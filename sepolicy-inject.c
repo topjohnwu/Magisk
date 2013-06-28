@@ -1,3 +1,11 @@
+/* 
+ * This was derived from public domain works with updates to 
+ * work with more modern SELinux libraries. 
+ * 
+ * It is released into the public domain.
+ * 
+ */
+
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
