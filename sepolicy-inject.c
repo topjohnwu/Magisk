@@ -19,6 +19,7 @@
 
 void usage(char *arg0) {
 	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm> -P <policy file> -o <output file>\n", arg0);
+	fprintf(stderr, "%s -Z permissive_type -P <policy file> -o <output file>\n", arg0);
 	exit(1);
 }
 
@@ -134,7 +135,7 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 
 int main(int argc, char **argv)
 {
-	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL, *outfile = NULL;
+	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL, *outfile = NULL, *permissive = NULL;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -149,10 +150,11 @@ int main(int argc, char **argv)
                 {"perm", required_argument, NULL, 'p'},
                 {"policy", required_argument, NULL, 'P'},
                 {"output", required_argument, NULL, 'o'},
+                {"permissive", required_argument, NULL, 'Z'},
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "s:t:c:p:P:o:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "s:t:c:p:P:o:Z:", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 's':
                         source = optarg;
@@ -172,12 +174,15 @@ int main(int argc, char **argv)
 		case 'o':
 			outfile = optarg;
 			break;
+		case 'Z':
+			permissive = optarg;
+			break;
 		default:
 			usage(argv[0]);
 		}
 	}
 
-	if (!source || !target || !class || !perm || !policy)
+	if (((!source || !target || !class || !perm) && !permissive) || !policy)
 		usage(argv[0]);
 
 	sepol_set_policydb(&policydb);
@@ -191,9 +196,22 @@ int main(int argc, char **argv)
         if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
-	if (add_rule(source, target, class, perm, &policydb)) {
-		fprintf(stderr, "Could not add rule\n");
-		return 1;
+	if (permissive) {
+		type_datum_t *type;
+        	type = hashtab_search(policydb.p_types.table, permissive);
+        	if (type == NULL) {
+                	fprintf(stderr, "type %s does not exist\n", permissive);
+                	return 1;
+        	}
+		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, 1)) {
+			fprintf(stderr, "Could not set bit in permissive map\n");
+			return 1;
+		}
+	} else {
+		if (add_rule(source, target, class, perm, &policydb)) {
+			fprintf(stderr, "Could not add rule\n");
+			return 1;
+		}
 	}
 
 	fp = fopen(outfile, "w");
