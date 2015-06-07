@@ -24,6 +24,9 @@ $ seinfo sepolicy | grep Permissive
 $ seinfo sepolicy2 | grep Permissive
    Permissives:         1    Polcap:              2
 
+Change a permissive domain to non-permissive:
+$ ./sepolicy-inject -z shell -P sepolicy -o sepolicy2
+
 
 TODO:
 
