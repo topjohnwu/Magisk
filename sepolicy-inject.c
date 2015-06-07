@@ -141,6 +141,7 @@ int main(int argc, char **argv)
 	sidtab_t sidtab;
 	char ch;
 	FILE *fp;
+	int permissive_value = 0;
 	
 	
         struct option long_options[] = {
@@ -151,10 +152,11 @@ int main(int argc, char **argv)
                 {"policy", required_argument, NULL, 'P'},
                 {"output", required_argument, NULL, 'o'},
                 {"permissive", required_argument, NULL, 'Z'},
+                {"not-permissive", required_argument, NULL, 'z'},
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "s:t:c:p:P:o:Z:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 's':
                         source = optarg;
@@ -176,6 +178,11 @@ int main(int argc, char **argv)
 			break;
 		case 'Z':
 			permissive = optarg;
+			permissive_value = 1;
+			break;
+		case 'z':
+			permissive = optarg;
+			permissive_value = 0;
 			break;
 		default:
 			usage(argv[0]);
@@ -203,7 +210,7 @@ int main(int argc, char **argv)
                 	fprintf(stderr, "type %s does not exist\n", permissive);
                 	return 1;
         	}
-		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, 1)) {
+		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, permissive_value)) {
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
 		}
