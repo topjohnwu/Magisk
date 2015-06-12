@@ -14,8 +14,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <sepol/debug.h>
 #include <sepol/policydb/policydb.h>
+#include <sepol/policydb/expand.h>
+#include <sepol/policydb/link.h>
 #include <sepol/policydb/services.h>
+#include <sepol/policydb/avrule_block.h>
+#include <sepol/policydb/conditional.h>
 
 void usage(char *arg0) {
 	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm> -P <policy file> -o <output file>\n", arg0);
@@ -30,6 +35,69 @@ void *cmalloc(size_t s) {
 		exit(1);
 	}
 	return t;
+}
+
+void set_attr(char *type, policydb_t *policy, int value) {
+	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
+	if (!attr)
+		exit(1);
+
+	if (attr->flavor != TYPE_ATTRIB)
+		exit(1);
+
+	if (ebitmap_set_bit(&attr->types, value - 1, 1))
+		exit(1);
+}
+
+void create_domain(char *d, policydb_t *policy) {
+	symtab_datum_t *src = hashtab_search(policy->p_types.table, d);
+	if(src)
+		return;
+
+	type_datum_t *typdatum = (type_datum_t *) malloc(sizeof(type_datum_t));
+	type_datum_init(typdatum);
+	typdatum->primary = 1;
+	typdatum->flavor = TYPE_TYPE;
+
+	uint32_t value = 0;
+	int r = symtab_insert(policy, SYM_TYPES, strdup(d), typdatum, SCOPE_DECL, 1, &value);
+	typdatum->s.value = value;
+
+	fprintf(stderr, "source type %s does not exist: %d,%d\n", d, r, value);
+	if (ebitmap_set_bit(&policy->global->branch_list->declared.scope[SYM_TYPES], value - 1, 1)) {
+		exit(1);
+	}
+
+	policy->type_attr_map = realloc(policy->type_attr_map, sizeof(ebitmap_t)*policy->p_types.nprim);
+	policy->attr_type_map = realloc(policy->attr_type_map, sizeof(ebitmap_t)*policy->p_types.nprim);
+	ebitmap_init(&policy->type_attr_map[value-1]);
+	ebitmap_init(&policy->attr_type_map[value-1]);
+	ebitmap_set_bit(&policy->type_attr_map[value-1], value-1, 1);
+
+	//Add the domain to all roles
+	for(unsigned i=0; i<policy->p_roles.nprim; ++i) {
+		//Not sure all those three calls are needed
+		ebitmap_set_bit(&policy->role_val_to_struct[i]->types.negset, value-1, 0);
+		ebitmap_set_bit(&policy->role_val_to_struct[i]->types.types, value-1, 1);
+		type_set_expand(&policy->role_val_to_struct[i]->types, &policy->role_val_to_struct[i]->cache, policy, 0);
+	}
+
+
+	src = hashtab_search(policy->p_types.table, d);
+	if(!src)
+		exit(1);
+
+	extern int policydb_index_decls(policydb_t * p);
+	if(policydb_index_decls(policy))
+		exit(1);
+
+	if(policydb_index_classes(policy))
+		exit(1);
+
+	if(policydb_index_others(NULL, policy, 1))
+		exit(1);
+
+	set_attr("domain", policy, value);
 }
 
 int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
@@ -208,6 +276,7 @@ int main(int argc, char **argv)
 
 	if (permissive) {
 		type_datum_t *type;
+		create_domain(permissive, &policydb);
         	type = hashtab_search(policydb.p_types.table, permissive);
         	if (type == NULL) {
                 	fprintf(stderr, "type %s does not exist\n", permissive);
@@ -218,6 +287,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	} else {
+		create_domain(source, policy);
 		if (add_rule(source, target, class, perm, &policydb)) {
 			fprintf(stderr, "Could not add rule\n");
 			return 1;
