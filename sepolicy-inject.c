@@ -192,6 +192,9 @@ int main(int argc, char **argv)
 	if (((!source || !target || !class || !perm) && !permissive) || !policy)
 		usage(argv[0]);
 
+	if(!outfile)
+		outfile = policy;
+
 	sepol_set_policydb(&policydb);
         sepol_set_sidtab(&sidtab);
 
