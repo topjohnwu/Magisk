@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	} else {
-		create_domain(source, policy);
+		create_domain(source, &policydb);
 		if (add_rule(source, target, class, perm, &policydb)) {
 			fprintf(stderr, "Could not add rule\n");
 			return 1;
