@@ -37,7 +37,7 @@ void *cmalloc(size_t s) {
 	return t;
 }
 
-void set_attr(char *type, policydb_t *policy, int value) {
+int set_attr(char *type, int value, policydb_t *policy) {
 	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
 	if (!attr)
 		exit(1);
@@ -47,6 +47,8 @@ void set_attr(char *type, policydb_t *policy, int value) {
 
 	if (ebitmap_set_bit(&attr->types, value - 1, 1))
 		exit(1);
+
+	return 0;
 }
 
 void create_domain(char *d, policydb_t *policy) {
@@ -97,7 +99,7 @@ void create_domain(char *d, policydb_t *policy) {
 	if(policydb_index_others(NULL, policy, 1))
 		exit(1);
 
-	set_attr("domain", policy, value);
+	set_attr("domain", value, policy);
 }
 
 int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
@@ -207,6 +209,18 @@ int add_transition(char *srcS, char *fconS, char *tgtS, char *c, policydb_t *pol
 	return 0;
 }
 
+int add_type(char *domainS, char *typeS, policydb_t *policy) {
+	type_datum_t *domain;
+
+	domain = hashtab_search(policy->p_types.table, domainS);
+	if (domain == NULL) {
+		fprintf(stderr, "source type %s does not exist\n", domainS);
+		return 1;
+	}
+
+	return set_attr(typeS, domain->s.value, policy);
+}
+
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 	int fd;
 	struct stat sb;
@@ -253,7 +267,7 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
-	char *fcon = NULL, *outfile = NULL, *permissive = NULL;
+	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *trust = NULL;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -263,6 +277,7 @@ int main(int argc, char **argv)
 	
 	
         struct option long_options[] = {
+                {"trust", required_argument, NULL, 'a'},
                 {"source", required_argument, NULL, 's'},
                 {"target", required_argument, NULL, 't'},
                 {"class", required_argument, NULL, 'c'},
@@ -275,8 +290,11 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "ef:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "a:f:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
                 switch (ch) {
+                case 'a':
+                        trust = optarg;
+                        break;
                 case 'f':
                         fcon = optarg;
                         break;
@@ -311,7 +329,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon && !trust) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
@@ -328,6 +346,7 @@ int main(int argc, char **argv)
         if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
+
 	if (permissive) {
 		type_datum_t *type;
 		create_domain(permissive, &policydb);
@@ -342,6 +361,8 @@ int main(int argc, char **argv)
 		}
 	} else if(fcon) {
 		add_transition(source, fcon, target, class, &policydb);
+	} else if(trust) {
+		add_type("su", "mlstrustedobject", &policydb);
 	} else {
 		create_domain(source, &policydb);
 		if (add_rule(source, target, class, perm, &policydb)) {
