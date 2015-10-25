@@ -157,6 +157,55 @@ int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
 	return 0;
 }
 	
+int add_transition(char *srcS, char *fconS, char *tgtS, char *c, policydb_t *policy) {
+	type_datum_t *src, *tgt, *fcon;
+	class_datum_t *cls;
+
+	avtab_datum_t *av;
+	avtab_key_t key;
+
+	src = hashtab_search(policy->p_types.table, srcS);
+	if (src == NULL) {
+		fprintf(stderr, "source type %s does not exist\n", srcS);
+		return 1;
+	}
+	tgt = hashtab_search(policy->p_types.table, tgtS);
+	if (tgt == NULL) {
+		fprintf(stderr, "target type %s does not exist\n", tgtS);
+		return 1;
+	}
+	cls = hashtab_search(policy->p_classes.table, c);
+	if (cls == NULL) {
+		fprintf(stderr, "class %s does not exist\n", c);
+		return 1;
+	}
+	fcon = hashtab_search(policy->p_types.table, fconS);
+	if (cls == NULL) {
+		fprintf(stderr, "class %s does not exist\n", fconS);
+		return 1;
+	}
+
+	key.source_type = src->s.value;
+	key.target_type = fcon->s.value;
+	key.target_class = cls->s.value;
+	key.specified = AVTAB_TRANSITION;
+	av = avtab_search(&policy->te_avtab, &key);
+
+	if (av == NULL) {
+		av = cmalloc(sizeof av);
+		av->data = tgt->s.value;
+		int ret = avtab_insert(&policy->te_avtab, &key, av);
+		if (ret) {
+			fprintf(stderr, "Error inserting into avtab\n");
+			return 1;
+		}
+	} else {
+		fprintf(stderr, "Warning, rule already defined! Won't override.\n");
+		fprintf(stderr, "Previous value = %d, wanted value = %d\n", av->data, tgt->s.value);
+	}
+
+	return 0;
+}
 
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 	int fd;
@@ -203,7 +252,8 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 
 int main(int argc, char **argv)
 {
-	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL, *outfile = NULL, *permissive = NULL;
+	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
+	char *fcon = NULL, *outfile = NULL, *permissive = NULL;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -217,6 +267,7 @@ int main(int argc, char **argv)
                 {"target", required_argument, NULL, 't'},
                 {"class", required_argument, NULL, 'c'},
                 {"perm", required_argument, NULL, 'p'},
+                {"fcon", required_argument, NULL, 'f'},
                 {"policy", required_argument, NULL, 'P'},
                 {"output", required_argument, NULL, 'o'},
                 {"permissive", required_argument, NULL, 'Z'},
@@ -224,8 +275,11 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "ef:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
                 switch (ch) {
+                case 'f':
+                        fcon = optarg;
+                        break;
                 case 's':
                         source = optarg;
                         break;
@@ -257,7 +311,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
@@ -286,6 +340,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
 		}
+	} else if(fcon) {
+		add_transition(source, fcon, target, class, &policydb);
 	} else {
 		create_domain(source, &policydb);
 		if (add_rule(source, target, class, perm, &policydb)) {
