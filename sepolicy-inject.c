@@ -37,6 +37,18 @@ void *cmalloc(size_t s) {
 	return t;
 }
 
+int get_attr(char *type, int value, policydb_t *policy) {
+	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
+	if (!attr)
+		exit(1);
+
+	if (attr->flavor != TYPE_ATTRIB)
+		exit(1);
+
+	return !! ebitmap_get_bit(&policy->attr_type_map[attr->s.value-1], value-1);
+	//return !! ebitmap_get_bit(&policy->type_attr_map[value-1], attr->s.value-1);
+}
+
 int set_attr(char *type, int value, policydb_t *policy) {
 	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
 	if (!attr)
@@ -45,7 +57,9 @@ int set_attr(char *type, int value, policydb_t *policy) {
 	if (attr->flavor != TYPE_ATTRIB)
 		exit(1);
 
-	if (ebitmap_set_bit(&attr->types, value - 1, 1))
+	if(ebitmap_set_bit(&policy->type_attr_map[value-1], attr->s.value-1, 1))
+		exit(1);
+	if(ebitmap_set_bit(&policy->attr_type_map[attr->s.value-1], value-1, 1))
 		exit(1);
 
 	return 0;
@@ -218,7 +232,8 @@ int add_type(char *domainS, char *typeS, policydb_t *policy) {
 		return 1;
 	}
 
-	return set_attr(typeS, domain->s.value, policy);
+	set_attr(typeS, domain->s.value, policy);
+	return 0;
 }
 
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
@@ -362,7 +377,8 @@ int main(int argc, char **argv)
 	} else if(fcon) {
 		add_transition(source, fcon, target, class, &policydb);
 	} else if(trust) {
-		add_type("su", "mlstrustedobject", &policydb);
+		add_type(trust, "mlstrustedobject", &policydb);
+		add_type(trust, "mlstrustedsubject", &policydb);
 	} else {
 		create_domain(source, &policydb);
 		if (add_rule(source, target, class, perm, &policydb)) {
