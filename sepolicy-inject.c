@@ -223,6 +223,44 @@ int add_transition(char *srcS, char *origS, char *tgtS, char *c, policydb_t *pol
 	return 0;
 }
 
+int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* filename, policydb_t *policy) {
+	type_datum_t *src, *tgt, *orig;
+	class_datum_t *cls;
+
+	src = hashtab_search(policy->p_types.table, srcS);
+	if (src == NULL) {
+		fprintf(stderr, "source type %s does not exist\n", srcS);
+		return 1;
+	}
+	tgt = hashtab_search(policy->p_types.table, tgtS);
+	if (tgt == NULL) {
+		fprintf(stderr, "target type %s does not exist\n", tgtS);
+		return 1;
+	}
+	cls = hashtab_search(policy->p_classes.table, c);
+	if (cls == NULL) {
+		fprintf(stderr, "class %s does not exist\n", c);
+		return 1;
+	}
+	orig = hashtab_search(policy->p_types.table, origS);
+	if (cls == NULL) {
+		fprintf(stderr, "class %s does not exist\n", origS);
+		return 1;
+	}
+
+	filename_trans_t *new_transition = cmalloc(sizeof(*new_transition));
+	new_transition->stype = src->s.value;
+	new_transition->ttype = orig->s.value;
+	new_transition->tclass = cls->s.value;
+	new_transition->otype = tgt->s.value;
+	new_transition->name = strdup(filename);
+	new_transition->next = policy->filename_trans;
+
+	policy->filename_trans = new_transition;
+
+	return 0;
+}
+
 int add_type(char *domainS, char *typeS, policydb_t *policy) {
 	type_datum_t *domain;
 
@@ -282,7 +320,7 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
-	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *trust = NULL;
+	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *trust = NULL, *filetrans = NULL;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -298,6 +336,7 @@ int main(int argc, char **argv)
                 {"class", required_argument, NULL, 'c'},
                 {"perm", required_argument, NULL, 'p'},
                 {"fcon", required_argument, NULL, 'f'},
+                {"filetransition", required_argument, NULL, 'g'},
                 {"policy", required_argument, NULL, 'P'},
                 {"output", required_argument, NULL, 'o'},
                 {"permissive", required_argument, NULL, 'Z'},
@@ -305,13 +344,16 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "a:f:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "a:f:g:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 'a':
                         trust = optarg;
                         break;
                 case 'f':
                         fcon = optarg;
+                        break;
+                case 'g':
+                        filetrans = optarg;
                         break;
                 case 's':
                         source = optarg;
@@ -344,7 +386,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon && !trust) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon && !trust &&!filetrans) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
@@ -374,6 +416,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
 		}
+	} else if(filetrans) {
+		add_file_transition(source, fcon, target, class, filetrans, &policydb);
 	} else if(fcon) {
 		add_transition(source, fcon, target, class, &policydb);
 	} else if(trust) {
