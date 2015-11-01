@@ -159,7 +159,7 @@ int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
 	av = avtab_search(&policy->te_avtab, &key);
 
 	if (av == NULL) {
-		av = cmalloc(sizeof av);
+		av = cmalloc(sizeof(*av));
 		av->data |= 1U << (perm->s.value - 1);
 		int ret = avtab_insert(&policy->te_avtab, &key, av);
 		if (ret) {
@@ -208,7 +208,7 @@ int add_transition(char *srcS, char *fconS, char *tgtS, char *c, policydb_t *pol
 	av = avtab_search(&policy->te_avtab, &key);
 
 	if (av == NULL) {
-		av = cmalloc(sizeof av);
+		av = cmalloc(sizeof(*av));
 		av->data = tgt->s.value;
 		int ret = avtab_insert(&policy->te_avtab, &key, av);
 		if (ret) {
