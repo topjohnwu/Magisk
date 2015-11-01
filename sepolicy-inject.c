@@ -21,6 +21,7 @@
 #include <sepol/policydb/services.h>
 #include <sepol/policydb/avrule_block.h>
 #include <sepol/policydb/conditional.h>
+#include <sepol/policydb/constraint.h>
 
 void usage(char *arg0) {
 	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm> -P <policy file> -o <output file>\n", arg0);
@@ -47,6 +48,17 @@ int get_attr(char *type, int value, policydb_t *policy) {
 
 	return !! ebitmap_get_bit(&policy->attr_type_map[attr->s.value-1], value-1);
 	//return !! ebitmap_get_bit(&policy->type_attr_map[value-1], attr->s.value-1);
+}
+
+int get_attr_id(char *type, policydb_t *policy) {
+	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
+	if (!attr)
+		exit(1);
+
+	if (attr->flavor != TYPE_ATTRIB)
+		exit(1);
+
+	return attr->s.value;
 }
 
 int set_attr(char *type, int value, policydb_t *policy) {
@@ -271,6 +283,22 @@ int add_type(char *domainS, char *typeS, policydb_t *policy) {
 	}
 
 	set_attr(typeS, domain->s.value, policy);
+
+	int typeId = get_attr_id(typeS, policy);
+	//Now let's update all constraints!
+	//(kernel doesn't support (yet?) type_names rules)
+	for(int i=0; i<policy->p_classes.nprim; ++i) {
+		class_datum_t *cl = policy->class_val_to_struct[i];
+		for(constraint_node_t *n = cl->constraints; n ; n=n->next) {
+			for(constraint_expr_t *e = n->expr; e; e=e->next) {
+				if(e->expr_type == CEXPR_NAMES) {
+					if(ebitmap_get_bit(&e->type_names->types, typeId-1)) {
+						ebitmap_set_bit(&e->names, domain->s.value-1, 1);
+					}
+				}
+			}
+		}
+	}
 	return 0;
 }
 
