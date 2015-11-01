@@ -128,7 +128,7 @@ void create_domain(char *d, policydb_t *policy) {
 	set_attr("domain", value, policy);
 }
 
-int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
+int add_rule(char *s, char *t, char *c, char *p, int effect, policydb_t *policy) {
 	type_datum_t *src, *tgt;
 	class_datum_t *cls;
 	perm_datum_t *perm;
@@ -167,7 +167,7 @@ int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
 	key.source_type = src->s.value;
 	key.target_type = tgt->s.value;
 	key.target_class = cls->s.value;
-	key.specified = AVTAB_ALLOWED;
+	key.specified = effect;
 	av = avtab_search(&policy->te_avtab, &key);
 
 	if (av == NULL) {
@@ -354,7 +354,7 @@ int main(int argc, char **argv)
 	sidtab_t sidtab;
 	char ch;
 	FILE *fp;
-	int permissive_value = 0;
+	int permissive_value = 0, noaudit = 0;
 	
 	
         struct option long_options[] = {
@@ -365,6 +365,7 @@ int main(int argc, char **argv)
                 {"perm", required_argument, NULL, 'p'},
                 {"fcon", required_argument, NULL, 'f'},
                 {"filetransition", required_argument, NULL, 'g'},
+                {"noaudit", no_argument, NULL, 'n'},
                 {"policy", required_argument, NULL, 'P'},
                 {"output", required_argument, NULL, 'o'},
                 {"permissive", required_argument, NULL, 'Z'},
@@ -372,7 +373,7 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "a:f:g:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "a:f:g:s:t:c:p:P:o:Z:z:n", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 'a':
                         attr = optarg;
@@ -408,6 +409,9 @@ int main(int argc, char **argv)
 		case 'z':
 			permissive = optarg;
 			permissive_value = 0;
+			break;
+		case 'n':
+			noaudit = 1;
 			break;
 		default:
 			usage(argv[0]);
@@ -450,9 +454,11 @@ int main(int argc, char **argv)
 		add_transition(source, fcon, target, class, &policydb);
 	} else if(attr) {
 		add_type(source, attr, &policydb);
+	} else if(noaudit) {
+		add_rule(source, target, class, perm, AVTAB_AUDITDENY, &policydb);
 	} else {
 		create_domain(source, &policydb);
-		if (add_rule(source, target, class, perm, &policydb)) {
+		if (add_rule(source, target, class, perm, AVTAB_ALLOWED, &policydb)) {
 			fprintf(stderr, "Could not add rule\n");
 			return 1;
 		}
