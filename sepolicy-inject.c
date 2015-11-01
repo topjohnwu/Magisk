@@ -348,7 +348,7 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
-	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *trust = NULL, *filetrans = NULL;
+	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -358,7 +358,7 @@ int main(int argc, char **argv)
 	
 	
         struct option long_options[] = {
-                {"trust", required_argument, NULL, 'a'},
+                {"attr", required_argument, NULL, 'a'},
                 {"source", required_argument, NULL, 's'},
                 {"target", required_argument, NULL, 't'},
                 {"class", required_argument, NULL, 'c'},
@@ -375,7 +375,7 @@ int main(int argc, char **argv)
         while ((ch = getopt_long(argc, argv, "a:f:g:s:t:c:p:P:o:Z:z:", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 'a':
-                        trust = optarg;
+                        attr = optarg;
                         break;
                 case 'f':
                         fcon = optarg;
@@ -414,7 +414,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon && !trust &&!filetrans) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
@@ -448,9 +448,8 @@ int main(int argc, char **argv)
 		add_file_transition(source, fcon, target, class, filetrans, &policydb);
 	} else if(fcon) {
 		add_transition(source, fcon, target, class, &policydb);
-	} else if(trust) {
-		add_type(trust, "mlstrustedobject", &policydb);
-		add_type(trust, "mlstrustedsubject", &policydb);
+	} else if(attr) {
+		add_type(source, attr, &policydb);
 	} else {
 		create_domain(source, &policydb);
 		if (add_rule(source, target, class, perm, &policydb)) {
