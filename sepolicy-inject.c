@@ -173,8 +173,8 @@ int add_rule(char *s, char *t, char *c, char *p, policydb_t *policy) {
 	return 0;
 }
 	
-int add_transition(char *srcS, char *fconS, char *tgtS, char *c, policydb_t *policy) {
-	type_datum_t *src, *tgt, *fcon;
+int add_transition(char *srcS, char *origS, char *tgtS, char *c, policydb_t *policy) {
+	type_datum_t *src, *tgt, *orig;
 	class_datum_t *cls;
 
 	avtab_datum_t *av;
@@ -195,14 +195,14 @@ int add_transition(char *srcS, char *fconS, char *tgtS, char *c, policydb_t *pol
 		fprintf(stderr, "class %s does not exist\n", c);
 		return 1;
 	}
-	fcon = hashtab_search(policy->p_types.table, fconS);
+	orig = hashtab_search(policy->p_types.table, origS);
 	if (cls == NULL) {
-		fprintf(stderr, "class %s does not exist\n", fconS);
+		fprintf(stderr, "class %s does not exist\n", origS);
 		return 1;
 	}
 
 	key.source_type = src->s.value;
-	key.target_type = fcon->s.value;
+	key.target_type = orig->s.value;
 	key.target_class = cls->s.value;
 	key.specified = AVTAB_TRANSITION;
 	av = avtab_search(&policy->te_avtab, &key);
