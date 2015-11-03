@@ -352,7 +352,7 @@ int main(int argc, char **argv)
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
-	char ch;
+	int ch;
 	FILE *fp;
 	int permissive_value = 0, noaudit = 0;
 	
