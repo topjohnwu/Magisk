@@ -455,11 +455,15 @@ int main(int argc, char **argv)
 	} else if(noaudit) {
 		add_rule(source, target, class, perm, AVTAB_AUDITDENY, &policydb);
 	} else {
-		create_domain(source, &policydb);
-		if (add_rule(source, target, class, perm, AVTAB_ALLOWED, &policydb)) {
-			fprintf(stderr, "Could not add rule\n");
-			return 1;
-		}
+		char *saveptr = NULL;
+
+		char *p = strtok_r(perm, ",", &saveptr);
+		do {
+			if (add_rule(source, target, class, p, AVTAB_ALLOWED, &policydb)) {
+				fprintf(stderr, "Could not add rule\n");
+				return 1;
+			}
+		} while( (p = strtok_r(NULL, ",", &saveptr)) != NULL);
 	}
 
 	fp = fopen(outfile, "w");
