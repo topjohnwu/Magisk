@@ -128,12 +128,34 @@ void create_domain(char *d, policydb_t *policy) {
 	set_attr("domain", value, policy);
 }
 
+int add_irule(int s, int t, int c, int p, int effect, policydb_t* policy) {
+	avtab_datum_t *av;
+	avtab_key_t key;
+
+	key.source_type = s;
+	key.target_type = t;
+	key.target_class = c;
+	key.specified = effect;
+	av = avtab_search(&policy->te_avtab, &key);
+
+	if (av == NULL) {
+		av = cmalloc(sizeof(*av));
+		av->data |= 1U << (p - 1);
+		int ret = avtab_insert(&policy->te_avtab, &key, av);
+		if (ret) {
+			fprintf(stderr, "Error inserting into avtab\n");
+			return 1;
+		}
+	}
+
+	av->data |= 1U << (p - 1);
+	return 0;
+}
+
 int add_rule(char *s, char *t, char *c, char *p, int effect, policydb_t *policy) {
 	type_datum_t *src, *tgt;
 	class_datum_t *cls;
 	perm_datum_t *perm;
-	avtab_datum_t *av;
-	avtab_key_t key;
 
 	src = hashtab_search(policy->p_types.table, s);
 	if (src == NULL) {
@@ -163,26 +185,79 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, policydb_t *policy)
 		}
 	}
 
-	// See if there is already a rule
-	key.source_type = src->s.value;
-	key.target_type = tgt->s.value;
-	key.target_class = cls->s.value;
-	key.specified = effect;
-	av = avtab_search(&policy->te_avtab, &key);
+	return add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, policy);
+}
 
-	if (av == NULL) {
-		av = cmalloc(sizeof(*av));
-		av->data |= 1U << (perm->s.value - 1);
-		int ret = avtab_insert(&policy->te_avtab, &key, av);
-		if (ret) {
-			fprintf(stderr, "Error inserting into avtab\n");
+int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, policydb_t *policy) {
+	type_datum_t *src, *tgt;
+	class_datum_t *cls;
+	perm_datum_t *perm;
+
+	//64(0kB) should be enough for everyone, right?
+	int m[64] = { -1 };
+
+	src = hashtab_search(policy->p_types.table, s);
+	if (src == NULL) {
+		fprintf(stderr, "source type %s does not exist\n", s);
+		return 1;
+	}
+
+	tgt = hashtab_search(policy->p_types.table, targetAttribute);
+	if (tgt == NULL) {
+		fprintf(stderr, "target type %s does not exist\n", targetAttribute);
+		return 1;
+	}
+	if(tgt->flavor != TYPE_ATTRIB)
+		exit(1);
+
+	for(int i=0; minusses && minusses[i]; ++i) {
+		type_datum_t *obj;
+		obj = hashtab_search(policy->p_types.table, minusses[i]);
+		if (m == NULL) {
+			fprintf(stderr, "minus type %s does not exist\n", minusses[i]);
+			return 1;
+		}
+		m[i] = obj->s.value-1;
+		m[i+1] = -1;
+	}
+
+	cls = hashtab_search(policy->p_classes.table, c);
+	if (cls == NULL) {
+		fprintf(stderr, "class %s does not exist\n", c);
+		return 1;
+	}
+
+	perm = hashtab_search(cls->permissions.table, p);
+	if (perm == NULL) {
+		if (cls->comdatum == NULL) {
+			fprintf(stderr, "perm %s does not exist in class %s\n", p, c);
+			return 1;
+		}
+		perm = hashtab_search(cls->comdatum->permissions.table, p);
+		if (perm == NULL) {
+			fprintf(stderr, "perm %s does not exist in class %s\n", p, c);
 			return 1;
 		}
 	}
 
-	av->data |= 1U << (perm->s.value - 1);
+	ebitmap_node_t *node;
+	int i;
 
-	return 0;
+	int ret = 0;
+
+	ebitmap_for_each_bit(&policy->attr_type_map[tgt->s.value-1], node, i) {
+		if(ebitmap_node_get_bit(node, i)) {
+			int found = 0;
+			for(int j=0; m[j] != -1; ++j) {
+				if(i == m[j])
+					found = 1;
+			}
+
+			if(!found)
+				ret |= add_irule(src->s.value, i+1, cls->s.value, perm->s.value, effect, policy);
+		}
+	}
+	return ret;
 }
 
 int add_transition(char *srcS, char *origS, char *tgtS, char *c, policydb_t *policy) {
@@ -447,23 +522,46 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	} else if(filetrans) {
-		add_file_transition(source, fcon, target, class, filetrans, &policydb);
+		if(add_file_transition(source, fcon, target, class, filetrans, &policydb))
+			return 1;
 	} else if(fcon) {
-		add_transition(source, fcon, target, class, &policydb);
+		if(add_transition(source, fcon, target, class, &policydb))
+			return 1;
 	} else if(attr) {
-		add_type(source, attr, &policydb);
+		if(add_type(source, attr, &policydb))
+			return 1;
 	} else if(noaudit) {
-		add_rule(source, target, class, perm, AVTAB_AUDITDENY, &policydb);
+		if(add_rule(source, target, class, perm, AVTAB_AUDITDENY, &policydb))
+			return 1;
 	} else {
-		char *saveptr = NULL;
+		//Add a rule to a whole set of typeattribute, not just a type
+		if(*target == '=') {
+			char *saveptr = NULL;
 
-		char *p = strtok_r(perm, ",", &saveptr);
-		do {
-			if (add_rule(source, target, class, p, AVTAB_ALLOWED, &policydb)) {
-				fprintf(stderr, "Could not add rule\n");
-				return 1;
+			char *targetAttribute = strtok_r(target, "-", &saveptr);
+
+			char *vals[64];
+			int i = 0;
+
+			char *m = NULL;
+			while( (m = strtok_r(NULL, "-", &saveptr)) != NULL) {
+				vals[i++] = m;
 			}
-		} while( (p = strtok_r(NULL, ",", &saveptr)) != NULL);
+			vals[i] = NULL;
+
+			if(add_typerule(source, targetAttribute+1, vals, class, perm, AVTAB_ALLOWED, &policydb))
+				return 1;
+		} else {
+			char *saveptr = NULL;
+
+			char *p = strtok_r(perm, ",", &saveptr);
+			do {
+				if (add_rule(source, target, class, p, AVTAB_ALLOWED, &policydb)) {
+					fprintf(stderr, "Could not add rule\n");
+					return 1;
+				}
+			} while( (p = strtok_r(NULL, ",", &saveptr)) != NULL);
+		}
 	}
 
 	fp = fopen(outfile, "w");
