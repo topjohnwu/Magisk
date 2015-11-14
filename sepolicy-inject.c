@@ -423,6 +423,7 @@ int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
+	int exists = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -432,6 +433,7 @@ int main(int argc, char **argv)
 
         struct option long_options[] = {
                 {"attr", required_argument, NULL, 'a'},
+                {"exists", no_argument, NULL, 'e'},
                 {"source", required_argument, NULL, 's'},
                 {"target", required_argument, NULL, 't'},
                 {"class", required_argument, NULL, 'c'},
@@ -446,10 +448,13 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "a:f:g:s:t:c:p:P:o:Z:z:n", long_options, NULL)) != -1) {
+        while ((ch = getopt_long(argc, argv, "a:ef:g:s:t:c:p:P:o:Z:z:n", long_options, NULL)) != -1) {
                 switch (ch) {
                 case 'a':
                         attr = optarg;
+                        break;
+                case 'e':
+                        exists = 1;
                         break;
                 case 'f':
                         fcon = optarg;
@@ -491,7 +496,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
@@ -520,6 +525,22 @@ int main(int argc, char **argv)
 		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, permissive_value)) {
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
+		}
+	} else if(exists) {
+		if(source) {
+			type_datum_t *tmp = hashtab_search(policydb.p_types.table, source);
+			if (!tmp)
+				exit(1);
+			else
+				exit(0);
+		} else if(class) {
+			class_datum_t *tmp = hashtab_search(policydb.p_classes.table, class);
+			if(!tmp)
+				exit(1);
+			else
+				exit(0);
+		} else {
+			usage(argv[0]);
 		}
 	} else if(filetrans) {
 		if(add_file_transition(source, fcon, target, class, filetrans, &policydb))
