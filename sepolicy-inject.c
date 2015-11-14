@@ -213,7 +213,7 @@ int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char 
 	for(int i=0; minusses && minusses[i]; ++i) {
 		type_datum_t *obj;
 		obj = hashtab_search(policy->p_types.table, minusses[i]);
-		if (m == NULL) {
+		if (obj == NULL) {
 			fprintf(stderr, "minus type %s does not exist\n", minusses[i]);
 			return 1;
 		}
