@@ -128,7 +128,7 @@ void create_domain(char *d, policydb_t *policy) {
 	set_attr("domain", value, policy);
 }
 
-int add_irule(int s, int t, int c, int p, int effect, policydb_t* policy) {
+int add_irule(int s, int t, int c, int p, int effect, int not, policydb_t* policy) {
 	avtab_datum_t *av;
 	avtab_key_t key;
 
@@ -148,11 +148,14 @@ int add_irule(int s, int t, int c, int p, int effect, policydb_t* policy) {
 		}
 	}
 
-	av->data |= 1U << (p - 1);
+	if(not)
+		av->data &= ~(1U << (p - 1));
+	else
+		av->data |= 1U << (p - 1);
 	return 0;
 }
 
-int add_rule(char *s, char *t, char *c, char *p, int effect, policydb_t *policy) {
+int add_rule(char *s, char *t, char *c, char *p, int effect, int not, policydb_t *policy) {
 	type_datum_t *src, *tgt;
 	class_datum_t *cls;
 	perm_datum_t *perm;
@@ -185,10 +188,10 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, policydb_t *policy)
 		}
 	}
 
-	return add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, policy);
+	return add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not, policy);
 }
 
-int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, policydb_t *policy) {
+int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, int not, policydb_t *policy) {
 	type_datum_t *src, *tgt;
 	class_datum_t *cls;
 	perm_datum_t *perm;
@@ -254,7 +257,7 @@ int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char 
 			}
 
 			if(!found)
-				ret |= add_irule(src->s.value, i+1, cls->s.value, perm->s.value, effect, policy);
+				ret |= add_irule(src->s.value, i+1, cls->s.value, perm->s.value, effect, not, policy);
 		}
 	}
 	return ret;
@@ -423,7 +426,7 @@ int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0;
+	int exists = 0, not = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -445,11 +448,19 @@ int main(int argc, char **argv)
                 {"output", required_argument, NULL, 'o'},
                 {"permissive", required_argument, NULL, 'Z'},
                 {"not-permissive", required_argument, NULL, 'z'},
+                {"not", no_argument, NULL, 0},
                 {NULL, 0, NULL, 0}
         };
 
-        while ((ch = getopt_long(argc, argv, "a:ef:g:s:t:c:p:P:o:Z:z:n", long_options, NULL)) != -1) {
+		int option_index = -1;
+        while ((ch = getopt_long(argc, argv, "a:c:ef:g:s:t:p:P:o:Z:z:n", long_options, &option_index)) != -1) {
                 switch (ch) {
+				case 0:
+					if(strcmp(long_options[option_index].name, "not") == 0)
+						not = 1;
+					else
+						usage(argv[0]);
+					break;
                 case 'a':
                         attr = optarg;
                         break;
@@ -552,7 +563,7 @@ int main(int argc, char **argv)
 		if(add_type(source, attr, &policydb))
 			return 1;
 	} else if(noaudit) {
-		if(add_rule(source, target, class, perm, AVTAB_AUDITDENY, &policydb))
+		if(add_rule(source, target, class, perm, AVTAB_AUDITDENY, not, &policydb))
 			return 1;
 	} else {
 		//Add a rule to a whole set of typeattribute, not just a type
@@ -570,14 +581,14 @@ int main(int argc, char **argv)
 			}
 			vals[i] = NULL;
 
-			if(add_typerule(source, targetAttribute+1, vals, class, perm, AVTAB_ALLOWED, &policydb))
+			if(add_typerule(source, targetAttribute+1, vals, class, perm, AVTAB_ALLOWED, not, &policydb))
 				return 1;
 		} else {
 			char *saveptr = NULL;
 
 			char *p = strtok_r(perm, ",", &saveptr);
 			do {
-				if (add_rule(source, target, class, p, AVTAB_ALLOWED, &policydb)) {
+				if (add_rule(source, target, class, p, AVTAB_ALLOWED, not, &policydb)) {
 					fprintf(stderr, "Could not add rule\n");
 					return 1;
 				}
