@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.topjohnwu.magisk.MainActivity">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Root Status:"
+        android:id="@+id/root_label"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(root access)"
+        android:id="@+id/root_status"
+        android:textStyle="bold"
+        android:layout_toEndOf="@+id/root_label"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selinux Status:"
+        android:id="@+id/selinux_label"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/root_status"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(root access)"
+        android:id="@+id/selinux_status"
+        android:textStyle="bold"
+        android:layout_below="@+id/root_status"
+        android:layout_toEndOf="@+id/selinux_label"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(root access)"
+        android:id="@+id/safety_net"
+        android:layout_below="@+id/selinux_label"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(root access)"
+        android:id="@+id/permissive"
+        android:layout_below="@+id/safety_net"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp" />
+
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Root Mount Toggle"
+        android:id="@+id/root_switch"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:switchPadding="20dp"
+        android:layout_below="@+id/permissive"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="10dp" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selinux Toggle"
+        android:id="@+id/permissive_switch"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:switchPadding="20dp"
+        android:layout_below="@+id/root_switch"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="10dp" />
+
+</RelativeLayout>
