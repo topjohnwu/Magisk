@@ -4,76 +4,107 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
-
-import java.io.DataInputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class MainActivity extends Activity {
 
-    private String suPATH;
-    private String xbinPATH;
-
-    private Switch rootSwitch, selinuxSwitch;
+    private Switch selinuxSwitch;
     private TextView rootStatus, selinuxStatus, safetyNet, permissive;
+    private Button rootButton;
+    private EditText countdown;
 
-    protected class callSU extends AsyncTask<String, Void, String[]> {
+    private String execute(String command) {
+
+        StringBuffer output = new StringBuffer();
+
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(command);
+            p.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+            while ((line = reader.readLine())!= null) {
+                output.append(line + "\n");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String response = output.toString();
+        return response;
+
+    }
+
+    private void updateStatus() {
+        String selinux = execute("getenforce");
+
+        if((new File("/system/xbin/su").exists())) {
+            rootStatus.setText("Mounted");
+            rootStatus.setTextColor(Color.RED);
+            safetyNet.setText("Root mounted and enabled. Safety Net (Android Pay) will NOT work");
+            safetyNet.setTextColor(Color.RED);
+            rootButton.setEnabled(true);
+        } else {
+            rootStatus.setText("Not Mounted");
+            rootStatus.setTextColor(Color.GREEN);
+            safetyNet.setText("Safety Net (Android Pay) should work, but no root temporarily");
+            safetyNet.setTextColor(Color.GREEN);
+            rootButton.setEnabled(false);
+        }
+
+        selinuxStatus.setText(selinux);
+
+        if(selinux.equals("Enforcing\n")) {
+            selinuxStatus.setTextColor(Color.GREEN);
+            selinuxSwitch.setChecked(true);
+            permissive.setText("SELinux is enforced");
+            permissive.setTextColor(Color.GREEN);
+        } else {
+            selinuxStatus.setTextColor(Color.RED);
+            selinuxSwitch.setChecked(false);
+            permissive.setText("Only turn off SELinux if necessary!");
+            permissive.setTextColor(Color.RED);
+        }
+    }
+
+    protected class SU extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected String[] doInBackground(String... params) {
-            String[] results = new String[2];
+        protected Void doInBackground(String... params) {
             try {
-                Process su = Runtime.getRuntime().exec(suPATH);
+                Process su = Runtime.getRuntime().exec("su");
                 DataOutputStream out = new DataOutputStream(su.getOutputStream());
-                DataInputStream in = new DataInputStream(su.getInputStream());
-                for(int i = 0; i < params.length; ++i) {
-                    out.writeBytes(params[i] + "\n");
+                for(String command : params) {
+                    out.writeBytes(command + "\n");
                     out.flush();
                 }
-                out.writeBytes("if [ -z $(which su) ]; then echo 0; else echo 1; fi;\n");
-                out.flush();
-                results[0] = in.readLine();
-                out.writeBytes("getenforce\n");
-                out.flush();
-                results[1] = in.readLine();
                 out.writeBytes("exit\n");
                 out.flush();
             } catch (IOException e) { e.printStackTrace(); }
-            return results;
+            return null;
         }
+
         @Override
-        protected void onPostExecute(String[] results) {
-            if(results[0].equals("1")) {
-                rootStatus.setText("Mounted");
-                rootStatus.setTextColor(Color.RED);
-                rootSwitch.setChecked(true);
-                safetyNet.setText("Root mounted and enabled. Safety Net (Android Pay) will NOT work");
-                safetyNet.setTextColor(Color.RED);
-            } else {
-                rootStatus.setText("Not Mounted");
-                rootStatus.setTextColor(Color.GREEN);
-                rootSwitch.setChecked(false);
-                safetyNet.setText("Safety Net (Android Pay) should work, but no root temporarily");
-                safetyNet.setTextColor(Color.GREEN);
-            }
-
-            selinuxStatus.setText(results[1]);
-
-            if(results[1].equals("Enforcing")) {
-                selinuxStatus.setTextColor(Color.GREEN);
-                selinuxSwitch.setChecked(true);
-                permissive.setText("SELinux is enforced");
-                permissive.setTextColor(Color.GREEN);
-            } else {
-                selinuxStatus.setTextColor(Color.RED);
-                selinuxSwitch.setChecked(false);
-                permissive.setText("Only turn off SELinux if necessary!");
-                permissive.setTextColor(Color.RED);
-            }
+        protected void onPostExecute(Void aVoid) {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateStatus();
+                }
+            }, 1500);
         }
     }
 
@@ -81,46 +112,28 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        boolean rooted = true;
-
-        File phh = new File("/magisk/phh/su");
-        File supersu = new File("/su/bin/su");
-
-        if(!supersu.exists()) {
-            if(!phh.exists()) {
-                setContentView(R.layout.no_root);
-                rooted = false;
-            } else {
-                suPATH = "/magisk/phh/su";
-                xbinPATH = "/magisk/phh/xbin";
-            }
+        if(!(new File("/magisk/phh/su")).exists()) {
+            setContentView(R.layout.no_root);
         } else {
-            suPATH = "/su/bin/su";
-            xbinPATH = "/su/xbin";
-        }
-
-        if(rooted) {
 
             setContentView(R.layout.activity_main);
 
-            rootSwitch = (Switch) findViewById(R.id.root_switch);
             selinuxSwitch = (Switch) findViewById(R.id.permissive_switch);
             rootStatus = (TextView) findViewById(R.id.root_status);
             selinuxStatus = (TextView) findViewById(R.id.selinux_status);
             safetyNet = (TextView) findViewById(R.id.safety_net);
             permissive = (TextView) findViewById(R.id.permissive);
+            countdown = (EditText) findViewById(R.id.countdown);
+            rootButton = (Button) findViewById(R.id.rootButton);
 
-            (new callSU()).execute();
+            updateStatus();
 
-            rootSwitch.setOnClickListener(new View.OnClickListener() {
+            rootButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Switch s = (Switch) view;
-                    if(s.isChecked()) {
-                        (new callSU()).execute("mount -o bind " + xbinPATH + " /system/xbin");
-                    } else {
-                        (new callSU()).execute("umount /system/xbin");
-                    }
+                    int timeout;
+                    timeout = Integer.parseInt(countdown.getText().toString()) * 60;
+                    (new SU()).execute("setprop magisk.timeout " + String.valueOf(timeout), "setprop magisk.phhsu 0");
                 }
             });
 
@@ -129,9 +142,9 @@ public class MainActivity extends Activity {
                 public void onClick(View view) {
                     Switch s = (Switch) view;
                     if(s.isChecked()) {
-                        (new callSU()).execute("setenforce 1");
+                        (new SU()).execute("setenforce 1");
                     } else {
-                        (new callSU()).execute("setenforce 0");
+                        (new SU()).execute("setenforce 0");
                     }
                 }
             });
