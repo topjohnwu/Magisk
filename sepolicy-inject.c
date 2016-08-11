@@ -433,11 +433,77 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 	return 0;
 }
 
+int auto_allow(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, policydb_t *policy) {
+	perm_datum_t *perm;
+	hashtab_t type_table, class_table, perm_table;
+	hashtab_ptr_t cur;
+	
+	type_table = policy->p_types.table;
+	class_table = policy->p_classes.table;
+
+	if (src == NULL) {
+		for (int i = 0; i < type_table->size; ++i) {
+			cur = type_table->htable[i];
+			while (cur != NULL) {
+				src = cur->datum;
+				if(auto_allow(src, tgt, cls, policy))
+					return 1;
+				cur = cur->next;
+			}
+		}
+	} else if (tgt == NULL) {
+		for (int i = 0; i < type_table->size; ++i) {
+			cur = type_table->htable[i];
+			while (cur != NULL) {
+				tgt = cur->datum;
+				if(auto_allow(src, tgt, cls, policy))
+					return 1;
+				cur = cur->next;
+			}
+		}
+	} else if (cls == NULL) {
+		for (int i = 0; i < class_table->size; ++i) {
+			cur = class_table->htable[i];
+			while (cur != NULL) {
+				cls = cur->datum;
+				if(auto_allow(src, tgt, cls, policy))
+					return 1;
+				cur = cur->next;
+			}
+		}
+	} else {
+		perm_table = cls->permissions.table;
+		for (int i = 0; i < perm_table->size; ++i) {
+			cur = perm_table->htable[i];
+			while (cur != NULL) {
+				perm = cur->datum;
+				if(add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, AVTAB_ALLOWED, 0, policy))
+					return 1;
+				cur = cur->next;
+			}
+		}
+
+		if (cls->comdatum != NULL) {
+			perm_table = cls->comdatum->permissions.table;
+			for (int i = 0; i < perm_table->size; ++i) {
+				cur = perm_table->htable[i];
+				while (cur != NULL) {
+					perm = cur->datum;
+					if(add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, AVTAB_ALLOWED, 0, policy))
+						return 1;
+					cur = cur->next;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0, not = 0;
+	int exists = 0, not = 0, autoAllow = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -460,6 +526,7 @@ int main(int argc, char **argv)
 		{"permissive", required_argument, NULL, 'Z'},
 		{"not-permissive", required_argument, NULL, 'z'},
 		{"not", no_argument, NULL, 0},
+		{"auto", no_argument, NULL, 0},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -469,6 +536,8 @@ int main(int argc, char **argv)
 			case 0:
 				if(strcmp(long_options[option_index].name, "not") == 0)
 					not = 1;
+				else if(strcmp(long_options[option_index].name, "auto") == 0)
+					autoAllow = 1;
 				else
 					usage(argv[0]);
 				break;
@@ -518,32 +587,42 @@ int main(int argc, char **argv)
 			}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists) || !policy)
+	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists && !auto_allow) || !policy)
 		usage(argv[0]);
 
 	if(!outfile)
 		outfile = policy;
 
 	sepol_set_policydb(&policydb);
-		sepol_set_sidtab(&sidtab);
+	sepol_set_sidtab(&sidtab);
 
 	if (load_policy(policy, &policydb, &pf)) {
 		fprintf(stderr, "Could not load policy\n");
 		return 1;
 	}
 
-		if (policydb_load_isids(&policydb, &sidtab))
+	if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
-
-	if (permissive) {
+	if (autoAllow) {
+		type_datum_t *src = NULL, *tgt = NULL;
+		class_datum_t *cls = NULL;
+		if (source)
+			src = hashtab_search(policydb.p_types.table, source);
+		if (target)
+			tgt = hashtab_search(policydb.p_types.table, target);
+		if (class)
+			cls = hashtab_search(policydb.p_classes.table, class);
+		if (auto_allow(src, tgt, cls, &policydb))
+			return 1;
+	} else if (permissive) {
 		type_datum_t *type;
 		create_domain(permissive, &policydb);
-			type = hashtab_search(policydb.p_types.table, permissive);
-			if (type == NULL) {
-					fprintf(stderr, "type %s does not exist\n", permissive);
-					return 1;
-			}
+		type = hashtab_search(policydb.p_types.table, permissive);
+		if (type == NULL) {
+				fprintf(stderr, "type %s does not exist\n", permissive);
+				return 1;
+		}
 		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, permissive_value)) {
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
