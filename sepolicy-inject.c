@@ -24,8 +24,19 @@
 #include <sepol/policydb/constraint.h>
 
 void usage(char *arg0) {
-	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm> -P <policy file> -o <output file>\n", arg0);
-	fprintf(stderr, "%s -Z permissive_type -P <policy file> -o <output file>\n", arg0);
+	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm_list> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tInject a rule\n\n");
+	fprintf(stderr, "%s -s <source type> -a <type_attribute> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tAdd a type_attribute to a domain\n\n");
+	fprintf(stderr, "%s -Z <source type> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tInject a permissive domain\n\n");
+	fprintf(stderr, "%s -z <source type> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tInject a non-permissive domain\n\n");
+	fprintf(stderr, "%s -e -s <source type> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tCheck if a SELinux type exists\n\n");
+	fprintf(stderr, "%s -e -c <class> -P <policy file>\n", arg0);
+	fprintf(stderr, "\tCheck if a SELinux class exists\n\n");
+	fprintf(stderr, "All options can add -o <output file> to output to another file\n");
 	exit(1);
 }
 
@@ -434,77 +445,77 @@ int main(int argc, char **argv)
 	FILE *fp;
 	int permissive_value = 0, noaudit = 0;
 
-        struct option long_options[] = {
-                {"attr", required_argument, NULL, 'a'},
-                {"exists", no_argument, NULL, 'e'},
-                {"source", required_argument, NULL, 's'},
-                {"target", required_argument, NULL, 't'},
-                {"class", required_argument, NULL, 'c'},
-                {"perm", required_argument, NULL, 'p'},
-                {"fcon", required_argument, NULL, 'f'},
-                {"filetransition", required_argument, NULL, 'g'},
-                {"noaudit", no_argument, NULL, 'n'},
-                {"policy", required_argument, NULL, 'P'},
-                {"output", required_argument, NULL, 'o'},
-                {"permissive", required_argument, NULL, 'Z'},
-                {"not-permissive", required_argument, NULL, 'z'},
-                {"not", no_argument, NULL, 0},
-                {NULL, 0, NULL, 0}
-        };
+	struct option long_options[] = {
+		{"attr", required_argument, NULL, 'a'},
+		{"exists", no_argument, NULL, 'e'},
+		{"source", required_argument, NULL, 's'},
+		{"target", required_argument, NULL, 't'},
+		{"class", required_argument, NULL, 'c'},
+		{"perm", required_argument, NULL, 'p'},
+		{"fcon", required_argument, NULL, 'f'},
+		{"filetransition", required_argument, NULL, 'g'},
+		{"noaudit", no_argument, NULL, 'n'},
+		{"policy", required_argument, NULL, 'P'},
+		{"output", required_argument, NULL, 'o'},
+		{"permissive", required_argument, NULL, 'Z'},
+		{"not-permissive", required_argument, NULL, 'z'},
+		{"not", no_argument, NULL, 0},
+		{NULL, 0, NULL, 0}
+	};
 
-		int option_index = -1;
-        while ((ch = getopt_long(argc, argv, "a:c:ef:g:s:t:p:P:o:Z:z:n", long_options, &option_index)) != -1) {
-                switch (ch) {
-				case 0:
-					if(strcmp(long_options[option_index].name, "not") == 0)
-						not = 1;
-					else
-						usage(argv[0]);
-					break;
-                case 'a':
-                        attr = optarg;
-                        break;
-                case 'e':
-                        exists = 1;
-                        break;
-                case 'f':
-                        fcon = optarg;
-                        break;
-                case 'g':
-                        filetrans = optarg;
-                        break;
-                case 's':
-                        source = optarg;
-                        break;
-                case 't':
-                        target = optarg;
-                        break;
-                case 'c':
-                        class = optarg;
-                        break;
-                case 'p':
-                        perm = optarg;
-                        break;
-                case 'P':
-                        policy = optarg;
-                        break;
-		case 'o':
-			outfile = optarg;
-			break;
-		case 'Z':
-			permissive = optarg;
-			permissive_value = 1;
-			break;
-		case 'z':
-			permissive = optarg;
-			permissive_value = 0;
-			break;
-		case 'n':
-			noaudit = 1;
-			break;
-		default:
-			usage(argv[0]);
-		}
+	int option_index = -1;
+	while ((ch = getopt_long(argc, argv, "a:c:ef:g:s:t:p:P:o:Z:z:n", long_options, &option_index)) != -1) {
+		switch (ch) {
+			case 0:
+				if(strcmp(long_options[option_index].name, "not") == 0)
+					not = 1;
+				else
+					usage(argv[0]);
+				break;
+			case 'a':
+				attr = optarg;
+				break;
+			case 'e':
+				exists = 1;
+				break;
+			case 'f':
+				fcon = optarg;
+				break;
+			case 'g':
+				filetrans = optarg;
+				break;
+			case 's':
+				source = optarg;
+				break;
+			case 't':
+				target = optarg;
+				break;
+			case 'c':
+				class = optarg;
+				break;
+			case 'p':
+				perm = optarg;
+				break;
+			case 'P':
+				policy = optarg;
+				break;
+			case 'o':
+				outfile = optarg;
+				break;
+			case 'Z':
+				permissive = optarg;
+				permissive_value = 1;
+				break;
+			case 'z':
+				permissive = optarg;
+				permissive_value = 0;
+				break;
+			case 'n':
+				noaudit = 1;
+				break;
+			default:
+				usage(argv[0]);
+			}
 	}
 
 	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists) || !policy)
@@ -514,25 +525,25 @@ int main(int argc, char **argv)
 		outfile = policy;
 
 	sepol_set_policydb(&policydb);
-        sepol_set_sidtab(&sidtab);
+		sepol_set_sidtab(&sidtab);
 
 	if (load_policy(policy, &policydb, &pf)) {
 		fprintf(stderr, "Could not load policy\n");
 		return 1;
 	}
 
-        if (policydb_load_isids(&policydb, &sidtab))
+		if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
 
 	if (permissive) {
 		type_datum_t *type;
 		create_domain(permissive, &policydb);
-        	type = hashtab_search(policydb.p_types.table, permissive);
-        	if (type == NULL) {
-                	fprintf(stderr, "type %s does not exist\n", permissive);
-                	return 1;
-        	}
+			type = hashtab_search(policydb.p_types.table, permissive);
+			if (type == NULL) {
+					fprintf(stderr, "type %s does not exist\n", permissive);
+					return 1;
+			}
 		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, permissive_value)) {
 			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
