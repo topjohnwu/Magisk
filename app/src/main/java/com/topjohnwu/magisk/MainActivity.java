@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import java.io.BufferedReader;
@@ -19,14 +17,13 @@ import java.io.InputStreamReader;
 
 public class MainActivity extends Activity {
 
-    private Switch selinuxSwitch;
-    private TextView rootStatus, selinuxStatus, safetyNet, permissive;
-    private Button rootButton;
-    private EditText countdown;
+    private Switch rootToggle, selinuxToggle;
+    private TextView magiskVersion, rootStatus, selinuxStatus, safetyNet, permissive;
+    private String suPath;
 
     private String execute(String command) {
 
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
 
         Process p;
         try {
@@ -34,48 +31,70 @@ public class MainActivity extends Activity {
             p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            String line = "";
+            String line;
             while ((line = reader.readLine())!= null) {
-                output.append(line + "\n");
+                if(output.length() != 0) output.append("\n");
+                output.append(line);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String response = output.toString();
-        return response;
+        return output.toString();
 
     }
 
     private void updateStatus() {
+
         String selinux = execute("getenforce");
-
-        if((new File("/system/xbin/su").exists())) {
-            rootStatus.setText("Mounted");
-            rootStatus.setTextColor(Color.RED);
-            safetyNet.setText("Root mounted and enabled. Safety Net (Android Pay) will NOT work");
-            safetyNet.setTextColor(Color.RED);
-            rootButton.setEnabled(true);
-        } else {
-            rootStatus.setText("Not Mounted");
-            rootStatus.setTextColor(Color.GREEN);
-            safetyNet.setText("Safety Net (Android Pay) should work, but no root temporarily");
-            safetyNet.setTextColor(Color.GREEN);
-            rootButton.setEnabled(false);
-        }
-
+        magiskVersion.setText(getString(R.string.magisk_version, execute("getprop magisk.version")));
         selinuxStatus.setText(selinux);
 
-        if(selinux.equals("Enforcing\n")) {
+        if(selinux.equals("Enforcing")) {
             selinuxStatus.setTextColor(Color.GREEN);
-            selinuxSwitch.setChecked(true);
-            permissive.setText("SELinux is enforced");
+            selinuxToggle.setChecked(true);
+            permissive.setText(R.string.selinux_enforcing_info);
             permissive.setTextColor(Color.GREEN);
         } else {
             selinuxStatus.setTextColor(Color.RED);
-            selinuxSwitch.setChecked(false);
-            permissive.setText("Only turn off SELinux if necessary!");
+            selinuxToggle.setChecked(false);
+            permissive.setText(R.string.selinux_permissive_info);
             permissive.setTextColor(Color.RED);
+        }
+
+        if((new File("/system/framework/twframework.jar")).exists()) {
+            selinuxToggle.setEnabled(false);
+            permissive.setText(R.string.selinux_samsung);
+        }
+
+        if((new File("/system/xbin/su").exists())) {
+            rootStatus.setTextColor(Color.RED);
+            safetyNet.setTextColor(Color.RED);
+            rootToggle.setChecked(true);
+
+            if(!(new File(suPath + "/su")).exists()) {
+                rootStatus.setText(R.string.root_system);
+                safetyNet.setText(R.string.root_system_info);
+                rootToggle.setEnabled(false);
+                selinuxToggle.setEnabled(false);
+            } else {
+                rootStatus.setText(R.string.root_mounted);
+                safetyNet.setText(R.string.root_mounted_info);
+            }
+        } else {
+            rootStatus.setTextColor(Color.GREEN);
+            safetyNet.setTextColor(Color.GREEN);
+            rootToggle.setChecked(false);
+
+            if(!(new File(suPath + "/su")).exists()) {
+                rootStatus.setText(R.string.root_none);
+                safetyNet.setText(R.string.root_none_info);
+                rootToggle.setEnabled(false);
+                selinuxToggle.setEnabled(false);
+            } else {
+                rootStatus.setText(R.string.root_unmounted);
+                safetyNet.setText(R.string.root_unmounted_info);
+            }
         }
     }
 
@@ -84,7 +103,7 @@ public class MainActivity extends Activity {
         @Override
         protected Void doInBackground(String... params) {
             try {
-                Process su = Runtime.getRuntime().exec("su");
+                Process su = Runtime.getRuntime().exec(suPath + "/su");
                 DataOutputStream out = new DataOutputStream(su.getOutputStream());
                 for(String command : params) {
                     out.writeBytes(command + "\n");
@@ -111,43 +130,52 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        if(!(new File("/magisk/phh/su")).exists()) {
-            setContentView(R.layout.no_root);
-        } else {
+        magiskVersion = (TextView) findViewById(R.id.magisk_version);
+        rootToggle = (Switch) findViewById(R.id.root_toggle);
+        selinuxToggle = (Switch) findViewById(R.id.selinux_toggle);
+        rootStatus = (TextView) findViewById(R.id.root_status);
+        selinuxStatus = (TextView) findViewById(R.id.selinux_status);
+        safetyNet = (TextView) findViewById(R.id.safety_net);
+        permissive = (TextView) findViewById(R.id.permissive);
 
-            setContentView(R.layout.activity_main);
+        suPath = execute("getprop magisk.supath");
 
-            selinuxSwitch = (Switch) findViewById(R.id.permissive_switch);
-            rootStatus = (TextView) findViewById(R.id.root_status);
-            selinuxStatus = (TextView) findViewById(R.id.selinux_status);
-            safetyNet = (TextView) findViewById(R.id.safety_net);
-            permissive = (TextView) findViewById(R.id.permissive);
-            countdown = (EditText) findViewById(R.id.countdown);
-            rootButton = (Button) findViewById(R.id.rootButton);
+        setContentView(R.layout.activity_main);
 
-            updateStatus();
+        magiskVersion = (TextView) findViewById(R.id.magisk_version);
+        rootToggle = (Switch) findViewById(R.id.root_toggle);
+        selinuxToggle = (Switch) findViewById(R.id.selinux_toggle);
+        rootStatus = (TextView) findViewById(R.id.root_status);
+        selinuxStatus = (TextView) findViewById(R.id.selinux_status);
+        safetyNet = (TextView) findViewById(R.id.safety_net);
+        permissive = (TextView) findViewById(R.id.permissive);
 
-            rootButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int timeout;
-                    timeout = Integer.parseInt(countdown.getText().toString()) * 60;
-                    (new SU()).execute("setprop magisk.timeout " + String.valueOf(timeout), "setprop magisk.phhsu 0");
+        updateStatus();
+
+        rootToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Switch s = (Switch) view;
+                if(s.isChecked()) {
+                    (new SU()).execute("setprop magisk.root 1");
+                } else {
+                    (new SU()).execute("setprop magisk.root 0");
                 }
-            });
+            }
+        });
 
-            selinuxSwitch.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Switch s = (Switch) view;
-                    if(s.isChecked()) {
-                        (new SU()).execute("setenforce 1");
-                    } else {
-                        (new SU()).execute("setenforce 0");
-                    }
+        selinuxToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Switch s = (Switch) view;
+                if(s.isChecked()) {
+                    (new SU()).execute("setenforce 1");
+                } else {
+                    (new SU()).execute("setenforce 0");
                 }
-            });
-        }
+            }
+        });
     }
 }

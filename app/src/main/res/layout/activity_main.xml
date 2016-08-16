@@ -10,12 +10,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.topjohnwu.magisk.MainActivity">
 
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Root Status:"
-        android:id="@+id/root_label"
+        android:text="@string/magisk_label"
+        android:id="@+id/magisk_label"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:textSize="20sp"
@@ -25,21 +24,43 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="(unavailable)"
+        android:text="@string/unavailable"
+        android:id="@+id/magisk_version"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:layout_alignTop="@+id/magisk_label"
+        android:layout_toEndOf="@+id/magisk_label" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/root_label"
+        android:id="@+id/root_label"
+        android:layout_below="@+id/magisk_label"
+        android:layout_alignParentStart="true"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/unavailable"
         android:id="@+id/root_status"
         android:textStyle="bold"
-        android:layout_toEndOf="@+id/root_label"
         android:textSize="20sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:layout_alignTop="@+id/root_label"
+        android:layout_toEndOf="@+id/root_label" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selinux Status:"
+        android:text="@string/selinux_label"
         android:id="@+id/selinux_label"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/root_status"
+        android:layout_below="@+id/root_label"
         android:textSize="20sp"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp" />
@@ -47,19 +68,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="(unavailable)"
+        android:text="@string/unavailable"
         android:id="@+id/selinux_status"
         android:textStyle="bold"
-        android:layout_below="@+id/root_status"
-        android:layout_toEndOf="@+id/selinux_label"
         android:textSize="20sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginLeft="10dp"
+        android:layout_alignTop="@+id/selinux_label"
+        android:layout_toEndOf="@+id/selinux_label" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="(unavailable)"
+        android:text="@string/unavailable"
         android:id="@+id/safety_net"
         android:layout_below="@+id/selinux_label"
         android:layout_alignParentStart="true"
@@ -70,7 +90,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="(unavailable)"
+        android:text="@string/unavailable"
         android:id="@+id/permissive"
         android:layout_below="@+id/safety_net"
         android:layout_alignParentStart="true"
@@ -81,44 +101,27 @@
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selinux Toggle"
-        android:id="@+id/permissive_switch"
+        android:text="@string/root_toggle"
+        android:id="@+id/root_toggle"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:switchPadding="20dp"
+        android:layout_below="@+id/permissive"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="10dp"
+        android:checked="false" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/selinux_toggle"
+        android:id="@+id/selinux_toggle"
         android:layout_marginTop="20dp"
         android:textSize="20sp"
         android:switchPadding="20dp"
-        android:layout_below="@+id/countdown"
+        android:layout_below="@+id/root_toggle"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="10dp" />
-
-    <EditText
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:id="@+id/countdown"
-        android:layout_below="@+id/permissive"
-        android:layout_alignParentStart="true"
-        android:textAlignment="center"
-        android:text="5"
-        android:layout_marginTop="10dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="minutes"
-        android:id="@+id/textMin"
-        android:layout_alignBottom="@+id/countdown"
-        android:layout_toEndOf="@+id/countdown"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Disable root"
-        android:id="@+id/rootButton"
-        android:layout_alignTop="@+id/countdown"
-        android:layout_toEndOf="@+id/textMin" />
+        android:layout_marginLeft="10dp"
+        android:checked="false" />
 
 </RelativeLayout>
