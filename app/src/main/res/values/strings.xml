@@ -18,4 +18,5 @@
     <string name="root_none_info">Safety Net (Android Pay) should work</string>
     <string name="magisk_version">Magisk v%1$s</string>
     <string name="selinux_samsung">Samsung do not support switching SELinux status!</string>
+    <string name="loading">Loading...</string>
 </resources>

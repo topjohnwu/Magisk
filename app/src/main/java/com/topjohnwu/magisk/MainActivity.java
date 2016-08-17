@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -53,6 +54,8 @@ public class MainActivity extends Activity {
                 new SU().execute("setenforce 0");
             }
         });
+
+        findViewById(R.id.modules).setOnClickListener(view -> startActivity(new Intent(this, ModulesActivity.class)));
     }
 
     private String execute(String command) {
