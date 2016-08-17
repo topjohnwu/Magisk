@@ -10,6 +10,10 @@ android {
         targetSdkVersion 24
         versionCode 3
         versionName "v4"
+
+        jackOptions {
+            enabled true
+        }
     }
     buildTypes {
         release {
@@ -21,5 +25,4 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
 }
