@@ -499,11 +499,36 @@ int auto_allow(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, policyd
 	return 0;
 }
 
+int live_patch(policydb_t *policydb) {
+	char *filename = "/sys/fs/selinux/load";
+	int fd, ret;
+	void *data = NULL;
+	size_t len;
+
+	policydb_to_image(NULL, policydb, &data, &len);
+
+	// based on libselinux security_load_policy()
+	fd = open(filename, O_RDWR);
+	if (fd < 0) {
+		fprintf(stderr, "Can't open '%s':  %s\n",
+		        filename, strerror(errno));
+		return 1;
+	}
+	ret = write(fd, data, len);
+	close(fd);
+	if (ret < 0) {
+		fprintf(stderr, "Could not write policy to %s\n",
+		        filename);
+		return 1;
+	}
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0, not = 0, autoAllow = 0;
+	int exists = 0, not = 0, autoAllow = 0, live = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -527,6 +552,7 @@ int main(int argc, char **argv)
 		{"not-permissive", required_argument, NULL, 'z'},
 		{"not", no_argument, NULL, 0},
 		{"auto", no_argument, NULL, 0},
+		{"live", no_argument, NULL, 0},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -538,6 +564,8 @@ int main(int argc, char **argv)
 					not = 1;
 				else if(strcmp(long_options[option_index].name, "auto") == 0)
 					autoAllow = 1;
+				else if(strcmp(long_options[option_index].name, "live") == 0)
+					live = 1;
 				else
 					usage(argv[0]);
 				break;
@@ -587,11 +615,14 @@ int main(int argc, char **argv)
 			}
 	}
 
-	if (((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists && !auto_allow) || !policy)
+	if ((!source || !target || !class || !perm) && !permissive && !fcon && !attr &&!filetrans && !exists && !auto_allow )
 		usage(argv[0]);
 
 	if(!outfile)
 		outfile = policy;
+
+	if(!policy)
+		policy = "/sys/fs/selinux/policy";
 
 	sepol_set_policydb(&policydb);
 	sepol_set_sidtab(&sidtab);
@@ -686,23 +717,31 @@ int main(int argc, char **argv)
 		}
 	}
 
-	fp = fopen(outfile, "w");
-	if (!fp) {
-		fprintf(stderr, "Could not open outfile\n");
-		return 1;
+	if (live) {
+		if (live_patch(&policydb)) {
+			fprintf(stderr, "Could not load new policy into kernel\n");
+			return 1;
+		}
 	}
+	
+	if (outfile) {
+		fp = fopen(outfile, "w");
+		if (!fp) {
+			fprintf(stderr, "Could not open outfile\n");
+			return 1;
+		}
 
-	policy_file_init(&outpf);
-	outpf.type = PF_USE_STDIO;
-	outpf.fp = fp;
+		policy_file_init(&outpf);
+		outpf.type = PF_USE_STDIO;
+		outpf.fp = fp;
 
-	if (policydb_write(&policydb, &outpf)) {
-		fprintf(stderr, "Could not write policy\n");
-		return 1;
+		if (policydb_write(&policydb, &outpf)) {
+			fprintf(stderr, "Could not write policy\n");
+			return 1;
+		}
+		fclose(fp);
 	}
 
 	policydb_destroy(&policydb);
-	fclose(fp);
-
 	return 0;
 }
