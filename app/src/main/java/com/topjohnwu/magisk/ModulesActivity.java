@@ -53,19 +53,25 @@ public class ModulesActivity extends Activity {
 
             if (magisk != null) {
                 for (File mod : magisk) {
-                    listModules.add(new Module(mod));
+                    Module m = new Module(mod);
+                    if (m.isValid()) {
+                        listModules.add(m);
+                    }
                 }
             }
 
             if (magiskCache != null) {
                 for (File mod : magiskCache) {
-                    listModules.add(new Module(mod));
+                    Module m = new Module(mod);
+                    if (m.isValid()) {
+                        listModules.add(m);
+                    }
                 }
             }
 
             //noinspection Convert2streamapi
             for (Module module : listModules) {
-                if (module.isValid()) try {
+                try {
                     module.parse();
                 } catch (Exception ignored) {
                 }
@@ -75,19 +81,19 @@ public class ModulesActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
 
             progress.dismiss();
 
-            mListView.setAdapter(new ModulesAdapter(ModulesActivity.this, R.layout.row));
+            mListView.setAdapter(new ModulesAdapter(ModulesActivity.this, R.layout.row, listModules));
         }
     }
 
     private class ModulesAdapter extends ArrayAdapter<Module> {
 
-        public ModulesAdapter(Context context, int resource) {
-            super(context, resource);
+        public ModulesAdapter(Context context, int resource, List<Module> modules) {
+            super(context, resource, modules);
         }
 
         @SuppressLint("SetTextI18n")
