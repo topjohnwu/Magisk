@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.model;
 
 import java.io.BufferedReader;
 import java.io.File;

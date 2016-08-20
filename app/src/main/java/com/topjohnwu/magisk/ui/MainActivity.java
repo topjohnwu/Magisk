@@ -1,19 +1,17 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.ui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import com.topjohnwu.magisk.R;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+
+import static com.topjohnwu.magisk.ui.utils.Utils.executeCommand;
 
 public class MainActivity extends Activity {
 
@@ -34,59 +32,29 @@ public class MainActivity extends Activity {
         safetyNet = (TextView) findViewById(R.id.safety_net);
         permissive = (TextView) findViewById(R.id.permissive);
 
-        suPath = execute("getprop magisk.supath");
+        suPath = executeCommand("getprop magisk.supath");
         updateStatus();
 
-        rootToggle.setOnClickListener(view -> {
-            Switch s = (Switch) view;
-            if (s.isChecked()) {
-                (new SU()).execute("setprop magisk.root 1");
-            } else {
-                (new SU()).execute("setprop magisk.root 0");
-            }
+        rootToggle.setOnCheckedChangeListener((view, checked) -> {
+            executeCommand(checked ? "setprop magisk.root 1" : "setprop magisk.root 0");
+            updateStatus();
         });
 
-        selinuxToggle.setOnClickListener(view -> {
-            Switch s = (Switch) view;
-            if (s.isChecked()) {
-                new SU().execute("setenforce 1");
-            } else {
-                new SU().execute("setenforce 0");
-            }
+        selinuxToggle.setOnCheckedChangeListener((view, checked) -> {
+            executeCommand(checked ? "setenforce 1" : "setenforce 0");
+            updateStatus();
         });
 
         findViewById(R.id.modules).setOnClickListener(view -> startActivity(new Intent(this, ModulesActivity.class)));
     }
 
-    private String execute(String command) {
-
-        StringBuilder output = new StringBuilder();
-
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(command);
-            p.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (output.length() != 0) output.append("\n");
-                output.append(line);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return output.toString();
-
-    }
-
     private void updateStatus() {
+        String selinux = executeCommand("getenforce");
 
-        String selinux = execute("getenforce");
-        magiskVersion.setText(getString(R.string.magisk_version, execute("getprop magisk.version")));
+        magiskVersion.setText(getString(R.string.magisk_version, executeCommand("getprop magisk.version")));
         selinuxStatus.setText(selinux);
 
+        assert selinux != null;
         if (selinux.equals("Enforcing")) {
             selinuxStatus.setTextColor(Color.GREEN);
             selinuxToggle.setChecked(true);
@@ -109,7 +77,7 @@ public class MainActivity extends Activity {
             safetyNet.setTextColor(Color.RED);
             rootToggle.setChecked(true);
 
-            if (!(new File(suPath + "/su")).exists()) {
+            if (!new File(suPath + "/su").exists()) {
                 rootStatus.setText(R.string.root_system);
                 safetyNet.setText(R.string.root_system_info);
                 rootToggle.setEnabled(false);
@@ -135,29 +103,4 @@ public class MainActivity extends Activity {
         }
     }
 
-    protected class SU extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            try {
-                Process su = Runtime.getRuntime().exec(suPath + "/su");
-                DataOutputStream out = new DataOutputStream(su.getOutputStream());
-                for (String command : params) {
-                    out.writeBytes(command + "\n");
-                    out.flush();
-                }
-                out.writeBytes("exit\n");
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            final Handler handler = new Handler();
-            handler.postDelayed(MainActivity.this::updateStatus, 1500);
-        }
-    }
 }
