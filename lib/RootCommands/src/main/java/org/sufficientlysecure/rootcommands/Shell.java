@@ -17,8 +17,9 @@
 
 package org.sufficientlysecure.rootcommands;
 
+import android.util.Log;
+
 import org.sufficientlysecure.rootcommands.command.Command;
-import org.sufficientlysecure.rootcommands.util.Log;
 import org.sufficientlysecure.rootcommands.util.RootAccessDeniedException;
 import org.sufficientlysecure.rootcommands.util.Utils;
 

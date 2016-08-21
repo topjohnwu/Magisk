@@ -16,7 +16,7 @@
 
 package org.sufficientlysecure.rootcommands;
 
-import org.sufficientlysecure.rootcommands.util.Log;
+import android.util.Log;
 
 public class RootCommands {
     public static final String TAG = "RootCommands";

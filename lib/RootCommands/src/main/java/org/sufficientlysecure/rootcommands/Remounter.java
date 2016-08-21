@@ -17,8 +17,9 @@
 
 package org.sufficientlysecure.rootcommands;
 
+import android.util.Log;
+
 import org.sufficientlysecure.rootcommands.command.SimpleCommand;
-import org.sufficientlysecure.rootcommands.util.Log;
 
 import java.io.File;
 import java.io.FileReader;

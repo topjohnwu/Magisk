@@ -12,7 +12,6 @@ public class Module {
 
     private String mName;
     private String mVersion;
-    private int mVersionCode;
     private String mDescription;
 
     public Module(File file) {
@@ -34,10 +33,6 @@ public class Module {
 
     public String getName() {
         return mName;
-    }
-
-    public int getVersionCode() {
-        return mVersionCode;
     }
 
     public String getVersion() {
@@ -69,9 +64,6 @@ public class Module {
                     break;
                 case "version":
                     mVersion = value;
-                    break;
-                case "versionCode":
-                    mVersionCode = Integer.parseInt(value);
                     break;
                 case "description":
                     mDescription = value;

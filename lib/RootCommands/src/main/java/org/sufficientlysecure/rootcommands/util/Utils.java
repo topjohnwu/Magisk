@@ -18,6 +18,8 @@
 
 package org.sufficientlysecure.rootcommands.util;
 
+import android.util.Log;
+
 import org.sufficientlysecure.rootcommands.RootCommands;
 
 import java.io.File;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/root"
+            android:icon="@drawable/root"
+            android:title="@string/root"/>
+
+        <item
+            android:id="@+id/modules"
+            android:icon="@drawable/ic_extension"
+            android:title="@string/modules"/>
+
+        <item
+            android:id="@+id/log"
+            android:icon="@drawable/ic_bug_report"
+            android:title="@string/log"/>
+
+    </group>
+
+    <!--
+    <group android:checkableBehavior="none">
+    </group>
+    -->
+
+</menu>

@@ -19,4 +19,13 @@
     <string name="magisk_version">Magisk v%1$s</string>
     <string name="selinux_samsung">Samsung do not support switching SELinux status!</string>
     <string name="loading">Loading...</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="root">Root</string>
+    <string name="modules">Modules</string>
+    <string name="log">Log</string>
 </resources>

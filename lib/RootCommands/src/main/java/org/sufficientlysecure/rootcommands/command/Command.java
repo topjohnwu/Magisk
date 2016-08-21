@@ -17,10 +17,11 @@
 
 package org.sufficientlysecure.rootcommands.command;
 
+import android.util.Log;
+
 import org.sufficientlysecure.rootcommands.RootCommands;
 import org.sufficientlysecure.rootcommands.Shell;
 import org.sufficientlysecure.rootcommands.util.BrokenBusyboxException;
-import org.sufficientlysecure.rootcommands.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;

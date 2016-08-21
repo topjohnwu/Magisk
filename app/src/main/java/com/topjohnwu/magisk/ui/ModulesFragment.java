@@ -1,35 +1,45 @@
 package com.topjohnwu.magisk.ui;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.ListView;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.Module;
 import com.topjohnwu.magisk.rv.ModulesAdapter;
+import com.topjohnwu.magisk.ui.utils.Utils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModulesActivity extends Activity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class ModulesFragment extends android.support.v4.app.Fragment {
 
     private static final String MAGISK_PATH = "/magisk";
     private static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+
     private List<Module> listModules = new ArrayList<>();
-    private ListView mListView;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_modules);
-
-        mListView = (ListView) findViewById(android.R.id.list);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.modules_fragment, container, false);
+        ButterKnife.bind(this, v);
 
         new CheckFolders().execute();
+
+        return v;
     }
 
     private class CheckFolders extends AsyncTask<Void, Integer, Boolean> {
@@ -40,13 +50,26 @@ public class ModulesActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progress = ProgressDialog.show(ModulesActivity.this, null, getString(R.string.loading), true, false);
+            progress = ProgressDialog.show(getContext(), null, getString(R.string.loading), true, false);
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            File[] magisk = new File(MAGISK_PATH).listFiles(File::isDirectory);
-            File[] magiskCache = new File(MAGISK_CACHE_PATH).listFiles(File::isDirectory);
+            File[] magisk = new File(MAGISK_PATH).listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            });
+
+            Utils.executeCommand("chmod 777 /cache");
+
+            File[] magiskCache = new File(MAGISK_CACHE_PATH).listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            });
 
             if (magisk != null) {
                 for (File mod : magisk) {
@@ -83,7 +106,7 @@ public class ModulesActivity extends Activity {
 
             progress.dismiss();
 
-            mListView.setAdapter(new ModulesAdapter(ModulesActivity.this, R.layout.row, listModules));
+            recyclerView.setAdapter(new ModulesAdapter(listModules));
         }
     }
 

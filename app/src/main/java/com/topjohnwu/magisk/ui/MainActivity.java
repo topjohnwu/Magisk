@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -35,17 +35,23 @@ public class MainActivity extends Activity {
         suPath = executeCommand("getprop magisk.supath");
         updateStatus();
 
-        rootToggle.setOnCheckedChangeListener((view, checked) -> {
-            executeCommand(checked ? "setprop magisk.root 1" : "setprop magisk.root 0");
-            updateStatus();
+        rootToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                executeCommand(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
+                updateStatus();
+            }
         });
 
-        selinuxToggle.setOnCheckedChangeListener((view, checked) -> {
-            executeCommand(checked ? "setenforce 1" : "setenforce 0");
-            updateStatus();
+        selinuxToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                executeCommand(b ? "setenforce 1" : "setenforce 0");
+                updateStatus();
+            }
         });
 
-        findViewById(R.id.modules).setOnClickListener(view -> startActivity(new Intent(this, ModulesActivity.class)));
+        //findViewById(R.id.modules).setOnClickListener(view -> startActivity(new Intent(this, ModulesActivity.class)));
     }
 
     private void updateStatus() {

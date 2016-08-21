@@ -19,12 +19,12 @@ package org.sufficientlysecure.rootcommands;
 
 import android.os.StatFs;
 import android.os.SystemClock;
+import android.util.Log;
 
 import org.sufficientlysecure.rootcommands.command.Command;
 import org.sufficientlysecure.rootcommands.command.ExecutableCommand;
 import org.sufficientlysecure.rootcommands.command.SimpleCommand;
 import org.sufficientlysecure.rootcommands.util.BrokenBusyboxException;
-import org.sufficientlysecure.rootcommands.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
