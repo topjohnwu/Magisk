@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
 
+    @IdRes
+    private int mSelectedId = R.id.modules;// for now
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,21 +55,31 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             }
         };
 
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        //noinspection ResourceType
+        mSelectedId = savedInstanceState == null ? mSelectedId : savedInstanceState.getInt(SELECTED_ITEM_ID);
+        navigationView.setCheckedItem(mSelectedId);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
             mDrawerHandler.removeCallbacksAndMessages(null);
             mDrawerHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    navigate(savedInstanceState.getInt(SELECTED_ITEM_ID));
+                    navigate(mSelectedId);
                 }
             }, 250);
         }
 
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(SELECTED_ITEM_ID, mSelectedId);
     }
 
     @Override
@@ -79,7 +93,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     @Override
     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
-        menuItem.setChecked(true);
+        mSelectedId = menuItem.getItemId();
         mDrawerHandler.removeCallbacksAndMessages(null);
         mDrawerHandler.postDelayed(new Runnable() {
             @Override

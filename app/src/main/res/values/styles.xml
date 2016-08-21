@@ -17,7 +17,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="android:elevation">4dp</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
-        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:textColorSecondary">@color/primary_text</item> <!-- force  -->
         <item name="actionMenuTextColor">@color/icons</item>
     </style>
 

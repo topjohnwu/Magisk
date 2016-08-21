@@ -25,7 +25,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ModulesFragment extends android.support.v4.app.Fragment {
+public class ModulesFragment extends Fragment {
 
     private static final String MAGISK_PATH = "/magisk";
     private static final String MAGISK_CACHE_PATH = "/cache/magisk";

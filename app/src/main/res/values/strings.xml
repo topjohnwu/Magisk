@@ -18,13 +18,11 @@
     <string name="root_none_info">Safety Net (Android Pay) should work</string>
     <string name="magisk_version">Magisk v%1$s</string>
     <string name="selinux_samsung">Samsung do not support switching SELinux status!</string>
-    <string name="loading">Loading...</string>
-    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="loading">Loading…</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
     <string name="root">Root</string>
     <string name="modules">Modules</string>
     <string name="log">Log</string>
@@ -32,4 +30,15 @@
     <string name="disable">Disable</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>
+    <string name="menuSaveToSd">Save to SD</string>
+    <string name="menuSend">Send</string>
+    <string name="menuReload">Reload</string>
+    <string name="sdcard_not_writable">SD card not found or not writable</string>
+    <string name="menuClearLog">Clear log now</string>
+    <string name="logs_cleared">Log successfully cleared</string>
+    <string name="logs_clear_failed">Could not clear the log:</string>
+    <string name="log_is_empty">Log is empty</string>
+    <string name="logs_save_failed">Could not write log to SD card:</string>
+    <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
+
 </resources>
