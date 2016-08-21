@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.model;
 
+import com.topjohnwu.magisk.ui.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,6 +10,10 @@ public class Module {
 
     private final boolean isValid;
     private final boolean isCache;
+
+    private File mRemoveFile;
+    private File mDisableFile;
+
     private File mPropFile;
 
     private String mName;
@@ -18,9 +24,11 @@ public class Module {
         this.isCache = file.getPath().contains("cache");
         this.isValid = new File(file + "/module.prop").exists();
 
-        if (isValid) {
-            mPropFile = new File(file + "/module.prop");
-        }
+        if (!isValid) return;
+
+        mPropFile = new File(file + "/module.prop");
+        mRemoveFile = new File(file + "/remove");
+        mDisableFile = new File(file + "/disable");
     }
 
     public boolean isValid() {
@@ -41,6 +49,14 @@ public class Module {
 
     public String getDescription() {
         return mDescription;
+    }
+
+    public void createRemoveFile() {
+        Utils.executeCommand("echo \"\" > " + mRemoveFile.getPath());
+    }
+
+    public void createDisableFile() {
+        Utils.executeCommand("echo \"\" > " + mDisableFile.getPath());
     }
 
     public void parse() throws Exception {

@@ -73,7 +73,7 @@
             android:focusable="false"
             android:gravity="center"
             android:padding="3dp"
-            android:src="@drawable/root"/>
+            android:src="@drawable/ic_menu_overflow_material"/>
 
     </LinearLayout>
 
