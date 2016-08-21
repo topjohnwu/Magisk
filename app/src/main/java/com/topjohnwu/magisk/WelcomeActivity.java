@@ -113,6 +113,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
             try {
+                toolbar.setElevation(navFragment instanceof ModulesFragment ? 0 : 10);
+
                 transaction.replace(R.id.content_frame, navFragment).commit();
             } catch (IllegalStateException ignored) {
             }

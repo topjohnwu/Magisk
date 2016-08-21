@@ -9,7 +9,6 @@ import java.io.FileReader;
 public class Module {
 
     private final boolean isValid;
-    private final boolean isCache;
 
     private File mRemoveFile;
     private File mDisableFile;
@@ -21,7 +20,6 @@ public class Module {
     private String mDescription;
 
     public Module(File file) {
-        this.isCache = file.getPath().contains("cache");
         this.isValid = new File(file + "/module.prop").exists();
 
         if (!isValid) return;
@@ -33,10 +31,6 @@ public class Module {
 
     public boolean isValid() {
         return isValid && mPropFile != null;
-    }
-
-    public boolean isCache() {
-        return isCache;
     }
 
     public String getName() {

@@ -3,25 +3,22 @@ package com.topjohnwu.magisk.ui;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.model.Module;
-import com.topjohnwu.magisk.rv.ItemClickListener;
-import com.topjohnwu.magisk.rv.ModulesAdapter;
 import com.topjohnwu.magisk.ui.utils.Utils;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,51 +30,20 @@ public class ModulesFragment extends android.support.v4.app.Fragment {
     private static final String MAGISK_PATH = "/magisk";
     private static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    private static List<Module> listModulesNoCache = new ArrayList<>();
+    private static List<Module> listModulesCache = new ArrayList<>();
+
     @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.pager) ViewPager viewPager;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
 
-    private List<Module> listModules = new ArrayList<>();
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    private ItemClickListener moduleActions = new ItemClickListener() {
-        @Override
-        public void onItemClick(final View view, final int position) {
-            PopupMenu popup = new PopupMenu(getContext(), view);
-            try {
-                Field[] fields = popup.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    if ("mPopup".equals(field.getName())) {
-                        field.setAccessible(true);
-                        Object menuPopupHelper = field.get(popup);
-                        Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
-                        Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
-                        setForceIcons.invoke(menuPopupHelper, true);
-                        break;
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.remove:
-                            listModules.get(position).createRemoveFile();
-                            Snackbar.make(view, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
-                            break;
-                        case R.id.disable:
-                            listModules.get(position).createDisableFile();
-                            Snackbar.make(view, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
-                            break;
-                    }
-
-                    return false;
-                }
-            });
-            popup.inflate(R.menu.module_popup);
-            popup.show();
-        }
-    };
+        listModulesCache.clear();
+        listModulesNoCache.clear();
+    }
 
     @Nullable
     @Override
@@ -85,9 +51,30 @@ public class ModulesFragment extends android.support.v4.app.Fragment {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, view);
 
+        viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
+        tabLayout.setupWithViewPager(viewPager);
+
         new CheckFolders().execute();
 
         return view;
+    }
+
+    public static class NoCacheModuleFragment extends BaseModuleFragment {
+
+        @Override
+        protected List<Module> listModules() {
+            return listModulesNoCache;
+        }
+
+    }
+
+    public static class CacheModuleFragment extends BaseModuleFragment {
+
+        @Override
+        protected List<Module> listModules() {
+            return listModulesCache;
+        }
+
     }
 
     private class CheckFolders extends AsyncTask<Void, Integer, Boolean> {
@@ -114,7 +101,11 @@ public class ModulesFragment extends android.support.v4.app.Fragment {
                 for (File mod : magisk) {
                     Module m = new Module(mod);
                     if (m.isValid()) {
-                        listModules.add(m);
+                        try {
+                            m.parse();
+                            listModulesNoCache.add(m);
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }
@@ -123,16 +114,12 @@ public class ModulesFragment extends android.support.v4.app.Fragment {
                 for (File mod : magiskCache) {
                     Module m = new Module(mod);
                     if (m.isValid()) {
-                        listModules.add(m);
+                        try {
+                            m.parse();
+                            listModulesCache.add(m);
+                        } catch (Exception ignored) {
+                        }
                     }
-                }
-            }
-
-            //noinspection Convert2streamapi
-            for (Module module : listModules) {
-                try {
-                    module.parse();
-                } catch (Exception ignored) {
                 }
             }
 
@@ -144,9 +131,37 @@ public class ModulesFragment extends android.support.v4.app.Fragment {
             super.onPostExecute(result);
 
             progressBar.setVisibility(View.GONE);
-
-            recyclerView.setAdapter(new ModulesAdapter(listModules, moduleActions));
         }
     }
 
+    private class TabsAdapter extends FragmentPagerAdapter {
+
+        String[] tabTitles = new String[]{
+                "_no_cache", "_cache"
+                // TODO stringify
+        };
+
+        public TabsAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+
+        @Override
+        public String getPageTitle(int position) {
+            return tabTitles[position];
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return new NoCacheModuleFragment();
+            } else {
+                return new CacheModuleFragment();
+            }
+        }
+    }
 }
