@@ -60,7 +60,6 @@ public class MainActivity extends Activity {
         magiskVersion.setText(getString(R.string.magisk_version, executeCommand("getprop magisk.version")));
         selinuxStatus.setText(selinux);
 
-        assert selinux != null;
         if (selinux.equals("Enforcing")) {
             selinuxStatus.setTextColor(Color.GREEN);
             selinuxToggle.setChecked(true);
