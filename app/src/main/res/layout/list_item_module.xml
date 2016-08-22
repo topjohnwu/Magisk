@@ -64,16 +64,36 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textIsSelectable="false"/>
 
+            <TextView
+                android:id="@+id/warning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/remove_file_created"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/red500"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/overflow"
+        <CheckBox
+            android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:focusable="false"
             android:gravity="center"
             android:padding="3dp"
             android:src="@drawable/ic_menu_overflow_material"
+            tools:ignore="ContentDescription"/>
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="3dp"
+            android:src="@drawable/ic_delete"
             tools:ignore="ContentDescription"/>
 
     </LinearLayout>

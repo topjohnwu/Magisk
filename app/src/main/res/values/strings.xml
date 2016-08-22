@@ -40,5 +40,6 @@
     <string name="log_is_empty">Log is empty</string>
     <string name="logs_save_failed">Could not write log to SD card:</string>
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
+    <string name="disable_file_removed">Module will be enabled at next reboot</string>
 
 </resources>

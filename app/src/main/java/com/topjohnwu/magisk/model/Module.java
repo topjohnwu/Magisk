@@ -45,12 +45,28 @@ public class Module {
         return mDescription;
     }
 
-    public void createRemoveFile() {
-        Utils.executeCommand("echo \"\" > " + mRemoveFile.getPath());
+    public void createDisableFile() {
+        Utils.executeCommand("touch " + mDisableFile.getPath());
     }
 
-    public void createDisableFile() {
-        Utils.executeCommand("echo \"\" > " + mDisableFile.getPath());
+    public boolean removeDisableFile() {
+        return mDisableFile.delete();
+    }
+
+    public boolean isEnabled() {
+        return mDisableFile.exists();
+    }
+
+    public void createRemoveFile() {
+        Utils.executeCommand("touch " + mRemoveFile.getPath());
+    }
+
+    public boolean deleteRemoveFile() {
+        return mRemoveFile.delete();
+    }
+
+    public boolean willBeRemoved() {
+        return mRemoveFile.exists();
     }
 
     public void parse() throws Exception {
