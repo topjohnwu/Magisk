@@ -3,8 +3,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:focusableInTouchMode="true"
-                tools:context=".ui.MainActivity">
+                android:layout_marginTop="?attr/actionBarSize"
+                android:focusableInTouchMode="true">
 
     <TextView
         android:id="@+id/magisk_label"
@@ -119,13 +119,5 @@
         android:switchPadding="20dp"
         android:text="@string/selinux_toggle"
         android:textSize="20sp"/>
-
-    <Button
-        android:id="@+id/modules"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:text="modules activity"/>
 
 </RelativeLayout>

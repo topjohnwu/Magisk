@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui;
+package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ui.utils.Utils;
+import com.topjohnwu.magisk.WelcomeActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -234,7 +234,7 @@ public class LogFragment extends Fragment {
         protected String doInBackground(File... log) {
             // Ensure initialize is done
             try {
-                Utils.initialize.get();
+                WelcomeActivity.initialize.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }

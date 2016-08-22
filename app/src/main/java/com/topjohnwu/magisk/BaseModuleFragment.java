@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui;
+package com.topjohnwu.magisk;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.model.Module;
+import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.rv.ItemClickListener;
 import com.topjohnwu.magisk.rv.ModulesAdapter;
 

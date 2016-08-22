@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui;
+package com.topjohnwu.magisk;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,9 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.model.Module;
-import com.topjohnwu.magisk.ui.utils.Utils;
+import com.topjohnwu.magisk.module.Module;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -31,7 +29,7 @@ public class ModulesFragment extends Fragment {
     private static final String MAGISK_PATH = "/magisk";
     private static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
-    private static List<Module> listModulesNoCache = new ArrayList<>();
+    private static List<Module> listModules = new ArrayList<>();
     private static List<Module> listModulesCache = new ArrayList<>();
 
     @BindView(R.id.progressBar) ProgressBar progressBar;
@@ -42,8 +40,8 @@ public class ModulesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        listModules.clear();
         listModulesCache.clear();
-        listModulesNoCache.clear();
     }
 
     @Nullable
@@ -60,11 +58,11 @@ public class ModulesFragment extends Fragment {
         return view;
     }
 
-    public static class NoCacheModuleFragment extends BaseModuleFragment {
+    public static class NormalModuleFragment extends BaseModuleFragment {
 
         @Override
         protected List<Module> listModules() {
-            return listModulesNoCache;
+            return listModules;
         }
 
     }
@@ -78,13 +76,13 @@ public class ModulesFragment extends Fragment {
 
     }
 
-    private class CheckFolders extends AsyncTask<Void, Integer, Boolean> {
+    private class CheckFolders extends AsyncTask<Void, Integer, Void> {
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected Void doInBackground(Void... voids) {
             // Ensure initialize is done
             try {
-                Utils.initialize.get();
+                WelcomeActivity.initialize.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -109,7 +107,7 @@ public class ModulesFragment extends Fragment {
                     if (m.isValid()) {
                         try {
                             m.parse();
-                            listModulesNoCache.add(m);
+                            listModules.add(m);
                         } catch (Exception ignored) {
                         }
                     }
@@ -129,12 +127,12 @@ public class ModulesFragment extends Fragment {
                 }
             }
 
-            return true;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
 
             progressBar.setVisibility(View.GONE);
         }
@@ -143,7 +141,7 @@ public class ModulesFragment extends Fragment {
     private class TabsAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
-                "_no_cache", "_cache"
+                "Modules", "Cache Modules"
                 // TODO stringify
         };
 
@@ -164,7 +162,7 @@ public class ModulesFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return new NoCacheModuleFragment();
+                return new NormalModuleFragment();
             } else {
                 return new CacheModuleFragment();
             }

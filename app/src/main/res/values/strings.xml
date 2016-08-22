@@ -28,6 +28,7 @@
     <string name="log">Log</string>
     <string name="remove">Remove</string>
     <string name="disable">Disable</string>
+    <string name="no_root_access">No root access, functionality limited</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="menuSaveToSd">Save to SD</string>

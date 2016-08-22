@@ -1,6 +1,6 @@
-package com.topjohnwu.magisk.model;
+package com.topjohnwu.magisk.module;
 
-import com.topjohnwu.magisk.ui.utils.Utils;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.File;
