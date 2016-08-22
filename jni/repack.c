@@ -39,7 +39,13 @@ int append_ramdisk(int ofd, off_t pos) {
 		//TODO: RECOVERY OR ROOTFS?
 		char str[32];
 		memset(str, 0, sizeof(str));
-		strcpy(str, "ROOTFS");
+		if(access("ramdisk-mtk-boot", R_OK)==0) {
+			strcpy(str, "ROOTFS");
+		} else if(access("ramdisk-mtk-recovery", R_OK)==0) {
+			strcpy(str, "RECOVERY");
+		} else {
+			exit(1);
+		}
 		memcpy(buf+8, str, sizeof(str));
 
 		memset(buf+8+sizeof(str), 0xff, 512-8-sizeof(str));
