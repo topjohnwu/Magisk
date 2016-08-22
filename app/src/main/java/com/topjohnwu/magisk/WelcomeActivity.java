@@ -27,7 +27,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
     private final Handler mDrawerHandler = new Handler();
-    public static Init initialize = new Init();
+    public static Init initialize;
     public static View view;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -69,6 +69,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+        initialize = new Init();
 
         initialize.execute();
 

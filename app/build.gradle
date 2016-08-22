@@ -9,8 +9,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 3
-        versionName "v4"
+        versionCode 4
+        versionName "2.0"
     }
     buildTypes {
         release {
