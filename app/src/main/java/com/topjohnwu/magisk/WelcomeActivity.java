@@ -19,6 +19,7 @@ import android.view.View;
 import com.topjohnwu.magisk.ui.LogFragment;
 import com.topjohnwu.magisk.ui.ModulesFragment;
 import com.topjohnwu.magisk.ui.RootFragment;
+import com.topjohnwu.magisk.ui.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +44,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
+        Utils.initialize.execute();
+
 
         setSupportActionBar(toolbar);
 

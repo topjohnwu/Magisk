@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui.utils;
 
+import android.os.AsyncTask;
+
 import java.util.List;
 
 import eu.chainfire.libsuperuser.Shell;
@@ -7,7 +9,22 @@ import eu.chainfire.libsuperuser.Shell;
 public class Utils {
 
     public static final String suPath = sh("getprop magisk.supath");
-    public static final boolean rootAccess = isRoot();
+    public static boolean rootAccess = false;
+    public static Init initialize = new Init();
+
+    public static class Init extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check root access
+            rootAccess = isRoot();
+            // Permission for java code to read /cache files
+            if (rootAccess) {
+                su("chmod 755 /cache", "chmod 644 /cache/magisk.log");
+            }
+            return null;
+        }
+    }
 
     public static String sh(String... commands) {
         List<String> result = Shell.SH.run(commands);
@@ -27,8 +44,6 @@ public class Utils {
         for (String s : result) {
             builder.append(s);
         }
-
-        Shell.SU.available();
 
         return builder.toString();
     }

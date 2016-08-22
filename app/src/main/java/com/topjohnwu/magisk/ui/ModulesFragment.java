@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,14 +82,19 @@ public class ModulesFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
+            // Ensure initialize is done
+            try {
+                Utils.initialize.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
             File[] magisk = new File(MAGISK_PATH).listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File file) {
                     return file.isDirectory();
                 }
             });
-
-            Utils.su("chmod 755 /cache");
 
             File[] magiskCache = new File(MAGISK_CACHE_PATH).listFiles(new FileFilter() {
                 @Override

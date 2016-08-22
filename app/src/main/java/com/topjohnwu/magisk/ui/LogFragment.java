@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -226,13 +227,18 @@ public class LogFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            Utils.su("chmod 755 /cache");
-            Utils.su("chmod 644 /cache/magisk.log");
             txtLog.setText("");
         }
 
         @Override
         protected String doInBackground(File... log) {
+            // Ensure initialize is done
+            try {
+                Utils.initialize.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
             Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 2);
 
             StringBuilder llog = new StringBuilder(15 * 10 * 1024);
