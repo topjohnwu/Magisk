@@ -88,7 +88,7 @@ public class ModulesFragment extends Fragment {
                 }
             });
 
-            Utils.executeCommand("chmod 777 /cache");
+            Utils.su("chmod 755 /cache");
 
             File[] magiskCache = new File(MAGISK_CACHE_PATH).listFiles(new FileFilter() {
                 @Override

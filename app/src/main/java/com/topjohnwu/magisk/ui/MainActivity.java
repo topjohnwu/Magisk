@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.R;
 
 import java.io.File;
 
-import static com.topjohnwu.magisk.ui.utils.Utils.executeCommand;
+import static com.topjohnwu.magisk.ui.utils.Utils.su;
 
 public class MainActivity extends Activity {
 
@@ -32,13 +32,13 @@ public class MainActivity extends Activity {
         safetyNet = (TextView) findViewById(R.id.safety_net);
         permissive = (TextView) findViewById(R.id.permissive);
 
-        suPath = executeCommand("getprop magisk.supath");
+        suPath = su("getprop magisk.supath");
         updateStatus();
 
         rootToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                executeCommand(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
+                su(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
                 updateStatus();
             }
         });
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         selinuxToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                executeCommand(b ? "setenforce 1" : "setenforce 0");
+                su(b ? "setenforce 1" : "setenforce 0");
                 updateStatus();
             }
         });
@@ -55,9 +55,9 @@ public class MainActivity extends Activity {
     }
 
     private void updateStatus() {
-        String selinux = executeCommand("getenforce");
+        String selinux = su("getenforce");
 
-        magiskVersion.setText(getString(R.string.magisk_version, executeCommand("getprop magisk.version")));
+        magiskVersion.setText(getString(R.string.magisk_version, su("getprop magisk.version")));
         selinuxStatus.setText(selinux);
 
         if (selinux.equals("Enforcing")) {

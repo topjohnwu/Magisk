@@ -46,23 +46,23 @@ public class Module {
     }
 
     public void createDisableFile() {
-        Utils.executeCommand("touch " + mDisableFile.getPath());
+        Utils.su("touch " + mDisableFile.getPath());
     }
 
-    public boolean removeDisableFile() {
-        return mDisableFile.delete();
+    public void removeDisableFile() {
+        Utils.su("rm -f " + mDisableFile.getPath());
     }
 
     public boolean isEnabled() {
-        return mDisableFile.exists();
+        return ! mDisableFile.exists();
     }
 
     public void createRemoveFile() {
-        Utils.executeCommand("touch " + mRemoveFile.getPath());
+        Utils.su("touch " + mRemoveFile.getPath());
     }
 
-    public boolean deleteRemoveFile() {
-        return mRemoveFile.delete();
+    public void deleteRemoveFile() {
+        Utils.su("rm -f " + mRemoveFile.getPath());
     }
 
     public boolean willBeRemoved() {

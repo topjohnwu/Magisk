@@ -226,8 +226,8 @@ public class LogFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            Utils.executeCommand("chmod 777 /cache");
-            Utils.executeCommand("chmod 777 /cache/magisk.log");
+            Utils.su("chmod 755 /cache");
+            Utils.su("chmod 644 /cache/magisk.log");
             txtLog.setText("");
         }
 
