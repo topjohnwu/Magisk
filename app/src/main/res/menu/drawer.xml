@@ -4,6 +4,11 @@
     <group android:checkableBehavior="single">
 
         <item
+            android:id="@+id/magisk"
+            android:icon="@drawable/magisk"
+            android:title="@string/magisk"/>
+
+        <item
             android:id="@+id/root"
             android:icon="@drawable/root"
             android:title="@string/root"/>

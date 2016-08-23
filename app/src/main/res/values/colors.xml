@@ -9,6 +9,9 @@
     <color name="secondary_text">#757575</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
+
     <color name="red500">#F44336</color>
+    <color name="green500">#4CAF50</color>
+    <color name="grey500">#9E9E9E</color>
 
 </resources>

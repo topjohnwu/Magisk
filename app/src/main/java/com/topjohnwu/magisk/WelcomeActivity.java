@@ -26,39 +26,15 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    private final Handler mDrawerHandler = new Handler();
     public static Init initialize;
     public static View view;
-
+    private final Handler mDrawerHandler = new Handler();
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
 
     @IdRes
-    private int mSelectedId = R.id.modules;// for now
-
-    public static class Init extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Check root access
-            Utils.checkRoot();
-            // Permission for java code to read /cache files
-            if (Utils.rootAccess) {
-                Utils.su("chmod 755 /cache", "chmod 644 /cache/magisk.log");
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-
-            if (!Utils.rootAccess) {
-                Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
-            }
-        }
-    }
+    private int mSelectedId = R.id.magisk;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -72,7 +48,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         initialize = new Init();
 
         initialize.execute();
-
 
         setSupportActionBar(toolbar);
 
@@ -143,6 +118,10 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     private void navigate(final int itemId) {
         Fragment navFragment = null;
         switch (itemId) {
+            case R.id.magisk:
+                setTitle(R.string.magisk);
+                navFragment = new MagiskFragment();
+                break;
             case R.id.root:
                 setTitle(R.string.root);
                 navFragment = new RootFragment();
@@ -165,6 +144,29 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
                 transaction.replace(R.id.content_frame, navFragment).commit();
             } catch (IllegalStateException ignored) {
+            }
+        }
+    }
+
+    public static class Init extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Check root access
+            Utils.checkRoot();
+            // Permission for java code to read /cache files
+            if (Utils.rootAccess) {
+                Utils.su("chmod 755 /cache", "chmod 644 /cache/magisk.log");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
+
+            if (!Utils.rootAccess) {
+                Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
             }
         }
     }

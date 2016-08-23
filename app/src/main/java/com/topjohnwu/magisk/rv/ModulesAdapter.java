@@ -66,7 +66,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                 module.deleteRemoveFile();
                 holder.warning.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
 
-                return false;
+                return true;
             }
         });
 

@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">Magisk Manager</string>
-    <string name="root_mounted">Mounted</string>
+    <string name="root_mounted">Root mounted</string>
     <string name="root_mounted_info">Root mounted and enabled. Safety Net (Android Pay) will NOT work</string>
-    <string name="root_unmounted">Not Mounted</string>
+    <string name="root_unmounted">Root not mounted</string>
     <string name="root_unmounted_info">Safety Net (Android Pay) should work, but no root temporarily</string>
     <string name="selinux_enforcing_info">SELinux is enforced</string>
-    <string name="selinux_permissive_info">Only turn off SELinux if necessary!</string>
+    <string name="selinux_permissive_info">SELinux is permissive\nOnly turn off SELinux if necessary!</string>
     <string name="unavailable">(unavailable)</string>
     <string name="magisk_label">Boot Version:</string>
     <string name="root_label">Root Status:</string>
-    <string name="selinux_label">Selinux Status:</string>
+    <string name="selinux_label">SeLinux is %s</string>
     <string name="root_toggle">Root Toggle</string>
-    <string name="selinux_toggle">Selinux Toggle</string>
+    <string name="selinux_toggle">SeLinux Toggle</string>
     <string name="root_system">Improperly Installed</string>
     <string name="root_system_info">Root improperly installed. Safety Net (Android Pay) will NOT work, and impossible to toggle</string>
     <string name="root_none">Not Rooted</string>
@@ -42,5 +42,6 @@
     <string name="logs_save_failed">Could not write log to SD card:</string>
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
+    <string name="magisk">Magisk</string>
 
 </resources>
