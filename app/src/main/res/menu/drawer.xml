@@ -9,11 +9,6 @@
             android:title="@string/magisk"/>
 
         <item
-            android:id="@+id/root"
-            android:icon="@drawable/root"
-            android:title="@string/root"/>
-
-        <item
             android:id="@+id/modules"
             android:icon="@drawable/ic_extension"
             android:title="@string/modules"/>

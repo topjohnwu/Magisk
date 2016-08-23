@@ -23,11 +23,13 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     private final List<Module> mList;
     private final ItemClickListener chboxListener;
     private final ItemClickListener deleteBtnListener;
+    private final ItemClickListener unDeleteBtnListener;
 
-    public ModulesAdapter(List<Module> list, ItemClickListener chboxListener, ItemClickListener deleteBtnListener) {
+    public ModulesAdapter(List<Module> list, ItemClickListener chboxListener, ItemClickListener deleteBtnListener, ItemClickListener undeleteBtnListener) {
         this.mList = list;
         this.chboxListener = chboxListener;
         this.deleteBtnListener = deleteBtnListener;
+        this.unDeleteBtnListener = undeleteBtnListener;
     }
 
     @Override
@@ -56,21 +58,27 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
-                holder.warning.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
-            }
-        });
-        holder.delete.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                module.deleteRemoveFile();
-                holder.warning.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
+                if (module.willBeRemoved()) {
+                    unDeleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
+                } else {
+                    deleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
+                }
 
-                return true;
+                updateDeleteButton(holder, module);
             }
         });
 
+        updateDeleteButton(holder, module);
+    }
+
+    private void updateDeleteButton(ViewHolder holder, Module module) {
         holder.warning.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
+
+        if (module.willBeRemoved()) {
+            holder.delete.setImageResource(R.drawable.ic_undelete);
+        } else {
+            holder.delete.setImageResource(R.drawable.ic_delete);
+        }
     }
 
     @Override

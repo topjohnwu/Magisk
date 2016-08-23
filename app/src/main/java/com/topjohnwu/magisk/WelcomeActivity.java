@@ -122,10 +122,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 setTitle(R.string.magisk);
                 navFragment = new MagiskFragment();
                 break;
-            case R.id.root:
-                setTitle(R.string.root);
-                navFragment = new RootFragment();
-                break;
             case R.id.modules:
                 setTitle(R.string.modules);
                 navFragment = new ModulesFragment();

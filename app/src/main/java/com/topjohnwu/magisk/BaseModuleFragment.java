@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.rv.ItemClickListener;
 import com.topjohnwu.magisk.rv.ModulesAdapter;
@@ -33,6 +32,7 @@ public abstract class BaseModuleFragment extends Fragment {
         recyclerView.setAdapter(new ModulesAdapter(listModules(), new ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                // On Checkbox change listener
                 CheckBox chbox = (CheckBox) view;
 
                 if (!chbox.isChecked()) {
@@ -46,8 +46,18 @@ public abstract class BaseModuleFragment extends Fragment {
         }, new ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                // On delete button click listener
+
                 listModules().get(position).createRemoveFile();
                 Snackbar.make(view, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+            }
+        }, new ItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // On undelete button click listener
+
+                listModules().get(position).deleteRemoveFile();
+                Snackbar.make(view, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
             }
         }));
         return view;

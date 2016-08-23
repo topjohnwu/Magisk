@@ -141,8 +141,7 @@ public class ModulesFragment extends Fragment {
     private class TabsAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
-                "Modules", "Cache Modules"
-                // TODO stringify
+                getString(R.string.modules), getString(R.string.cache_modules)
         };
 
         public TabsAdapter(FragmentManager fm) {
