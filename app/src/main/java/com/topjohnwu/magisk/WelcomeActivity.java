@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -130,6 +131,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 setTitle(R.string.log);
                 navFragment = new LogFragment();
                 break;
+            case R.id.app_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                return;
         }
 
         if (navFragment != null) {

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/main_items"
+        android:checkableBehavior="single">
 
         <item
             android:id="@+id/magisk"
@@ -20,9 +22,15 @@
 
     </group>
 
-    <!--
-    <group android:checkableBehavior="none">
+    <group
+        android:id="@+id/option_items"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/app_about"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/about"/>
+
     </group>
-    -->
 
 </menu>

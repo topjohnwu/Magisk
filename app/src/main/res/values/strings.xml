@@ -37,5 +37,14 @@
     <string name="magisk">Magisk</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="cache_modules">Cache modules</string>
+    <string name="about">About</string>
+    <string name="app_developers">Main developers</string>
+    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/dvdandroid">dvdandroid</a>]]></string>
+    <string name="app_changelog">App\'s changelog</string>
+    <string name="translators"/>
+    <string name="app_version">App\'s version</string>
+    <string name="app_source_code">Source code</string>
+    <string name="app_translators">App\'s translators</string>
+    <string name="support_thread">Support thread</string>
 
 </resources>
