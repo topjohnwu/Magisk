@@ -178,4 +178,8 @@ public class MagiskFragment extends Fragment {
             }
         }
     }
+
+    public void onRootGranted() {
+        updateStatus();
+    }
 }

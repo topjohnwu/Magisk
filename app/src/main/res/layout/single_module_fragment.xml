@@ -11,4 +11,16 @@
         android:layout_height="match_parent"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 
+    <TextView
+        android:id="@+id/empty_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="@string/no_modules_found"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        android:visibility="gone"/>
+
 </LinearLayout>

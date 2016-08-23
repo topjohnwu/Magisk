@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,12 +42,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-        view = findViewById(R.id.toolbar);
         ButterKnife.bind(this);
+        view = toolbar;
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
-        initialize = new Init();
+
+        initialize = new Init(this);
 
         initialize.execute();
 
@@ -118,17 +121,21 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     private void navigate(final int itemId) {
         Fragment navFragment = null;
+        String tag = "";
         switch (itemId) {
             case R.id.magisk:
                 setTitle(R.string.magisk);
+                tag = "magisk";
                 navFragment = new MagiskFragment();
                 break;
             case R.id.modules:
                 setTitle(R.string.modules);
+                tag = "modules";
                 navFragment = new ModulesFragment();
                 break;
             case R.id.log:
                 setTitle(R.string.log);
+                tag = "log";
                 navFragment = new LogFragment();
                 break;
             case R.id.app_about:
@@ -142,13 +149,27 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             try {
                 toolbar.setElevation(navFragment instanceof ModulesFragment ? 0 : 10);
 
-                transaction.replace(R.id.content_frame, navFragment).commit();
+                transaction.replace(R.id.content_frame, navFragment, tag).commit();
             } catch (IllegalStateException ignored) {
             }
         }
     }
 
     public static class Init extends AsyncTask<Void, Integer, Void> {
+
+        private final AppCompatActivity activity;
+        private ProgressDialog progress;
+
+        public Init(AppCompatActivity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progress = ProgressDialog.show(activity, null, activity.getString(R.string.loading), true, false);
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -165,9 +186,15 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
 
+            progress.dismiss();
+
             if (!Utils.rootAccess) {
                 Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
+                return;
             }
+
+            MagiskFragment fragment = (MagiskFragment) activity.getSupportFragmentManager().findFragmentByTag("magisk");
+            fragment.onRootGranted();
         }
     }
 }
