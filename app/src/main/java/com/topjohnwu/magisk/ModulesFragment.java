@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -51,12 +54,30 @@ public class ModulesFragment extends Fragment {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
-        tabLayout.setupWithViewPager(viewPager);
-
         new CheckFolders().execute();
 
+        setHasOptionsMenu(true);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_modules, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.force_reload:
+                listModules.clear();
+                listModulesCache.clear();
+
+                new CheckFolders().execute();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public static class NormalModuleFragment extends BaseModuleFragment {
@@ -96,6 +117,9 @@ public class ModulesFragment extends Fragment {
             super.onPostExecute(v);
 
             progressBar.setVisibility(View.GONE);
+
+            viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
+            tabLayout.setupWithViewPager(viewPager);
         }
     }
 

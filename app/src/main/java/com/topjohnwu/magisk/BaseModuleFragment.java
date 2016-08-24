@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.rv.ItemClickListener;
@@ -22,12 +23,20 @@ import butterknife.ButterKnife;
 public abstract class BaseModuleFragment extends Fragment {
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_rv) TextView emptyTv;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.single_module_fragment, container, false);
         ButterKnife.bind(this, view);
+
+        if (listModules().size() == 0) {
+            emptyTv.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+
+            return view;
+        }
 
         recyclerView.setAdapter(new ModulesAdapter(listModules(), new ItemClickListener() {
             @Override

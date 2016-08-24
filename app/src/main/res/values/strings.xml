@@ -46,5 +46,8 @@
     <string name="app_source_code">Source code</string>
     <string name="app_translators">App\'s translators</string>
     <string name="support_thread">Support thread</string>
+    <string name="force_reload">Refresh</string>
+    <string name="no_modules_found">No modules found</string>
+    <string name="loading">Loading…</string>
 
 </resources>
