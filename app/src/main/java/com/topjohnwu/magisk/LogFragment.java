@@ -25,16 +25,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.WelcomeActivity;
+import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
@@ -42,7 +41,7 @@ import butterknife.ButterKnife;
 
 public class LogFragment extends Fragment {
 
-    private static final File MAGISK_LOG = new File("/cache/magisk.log");
+    private static final String MAGISK_LOG = "/cache/magisk.log";
 
     @BindView(R.id.txtLog) TextView txtLog;
     @BindView(R.id.svLog) ScrollView svLog;
@@ -100,7 +99,7 @@ public class LogFragment extends Fragment {
     }
 
     private void reloadErrorLog() {
-        new LogsReader().execute(MAGISK_LOG);
+        new LogsManager(true).execute();
         svLog.post(new Runnable() {
             @Override
             public void run() {
@@ -116,17 +115,8 @@ public class LogFragment extends Fragment {
     }
 
     private void clear() {
-        try {
-            new FileOutputStream(MAGISK_LOG).close();
-            MAGISK_LOG.delete();
-            txtLog.setText(R.string.log_is_empty);
-
-            Snackbar.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
-
-            reloadErrorLog();
-        } catch (IOException e) {
-            Toast.makeText(getActivity(), getResources().getString(R.string.logs_clear_failed) + "\n" + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        new LogsManager(false).execute();
+        reloadErrorLog();
     }
 
     private void send() {
@@ -179,16 +169,13 @@ public class LogFragment extends Fragment {
         dir.mkdir();
 
         File targetFile = new File(dir, filename);
+        List<String> in = Utils.readFile(MAGISK_LOG);
 
         try {
-            FileInputStream in = new FileInputStream(MAGISK_LOG);
-            FileOutputStream out = new FileOutputStream(targetFile);
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = in.read(buffer)) > 0) {
-                out.write(buffer, 0, len);
+            FileWriter out = new FileWriter(targetFile);
+            for (String line : in) {
+                out.write(line + "\n");
             }
-            in.close();
             out.close();
 
             Toast.makeText(getActivity(), targetFile.toString(), Toast.LENGTH_LONG).show();
@@ -199,30 +186,12 @@ public class LogFragment extends Fragment {
         }
     }
 
-    private class LogsReader extends AsyncTask<File, Integer, String> {
+    private class LogsManager extends AsyncTask<Void, Integer, String> {
 
-        private static final int MAX_LOG_SIZE = 1000 * 1024; // 1000 KB
+        private boolean readLog;
 
-        private long skipLargeFile(BufferedReader is, long length) throws IOException {
-            if (length < MAX_LOG_SIZE)
-                return 0;
-
-            long skipped = length - MAX_LOG_SIZE;
-            long yetToSkip = skipped;
-            do {
-                yetToSkip -= is.skip(yetToSkip);
-            } while (yetToSkip > 0);
-
-            int c;
-            do {
-                c = is.read();
-                if (c == -1)
-                    break;
-                skipped++;
-            } while (c != '\n');
-
-            return skipped;
-
+        public LogsManager(boolean read) {
+            readLog = read;
         }
 
         @Override
@@ -231,40 +200,33 @@ public class LogFragment extends Fragment {
         }
 
         @Override
-        protected String doInBackground(File... log) {
+        protected String doInBackground(Void... voids) {
             // Ensure initialize is done
             try {
-                WelcomeActivity.initialize.get();
+                Utils.initialize.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 
-            Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 2);
+            if (readLog) {
+                List<String> logList = Utils.readFile(MAGISK_LOG);
 
-            StringBuilder llog = new StringBuilder(15 * 10 * 1024);
-            try {
-                File logfile = log[0];
-                BufferedReader br;
-                br = new BufferedReader(new FileReader(logfile));
-                long skipped = skipLargeFile(br, logfile.length());
-                if (skipped > 0) {
-                    llog.append("-----------------\n");
-                    llog.append("Log too long");
-                    llog.append("\n-----------------\n\n");
+                StringBuilder llog = new StringBuilder(15 * 10 * 1024);
+                for (String s : logList) {
+                    llog.append(s).append("\n");
                 }
 
-                char[] temp = new char[1024];
-                int read;
-                while ((read = br.read(temp)) > 0) {
-                    llog.append(temp, 0, read);
+                return llog.toString();
+            } else {
+                if (Utils.removeFile(MAGISK_LOG)) {
+                    Snackbar.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(txtLog, R.string.logs_clear_failed, Snackbar.LENGTH_SHORT).show();
                 }
-                br.close();
-            } catch (IOException e) {
-                llog.append("Cannot read log:\n");
-                llog.append(e.getMessage());
+                return "";
             }
 
-            return llog.toString();
+
         }
 
         @Override

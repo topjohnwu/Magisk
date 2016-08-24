@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
@@ -101,7 +102,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            if (!Utils.rootAccess) {
+            if (!Shell.rootAccess()) {
                 checkBox.setEnabled(false);
                 delete.setEnabled(false);
             }

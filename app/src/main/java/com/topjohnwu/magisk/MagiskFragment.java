@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,12 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -57,12 +61,18 @@ public class MagiskFragment extends Fragment {
         View view = inflater.inflate(R.layout.magisk_fragment, container, false);
         ButterKnife.bind(this, view);
 
+        try {
+            Utils.initialize.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
         updateStatus();
 
         rootToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Utils.su(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
+                Shell.su(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
                 updateStatus();
             }
         });
@@ -70,7 +80,7 @@ public class MagiskFragment extends Fragment {
         selinuxToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Utils.su(b ? "setenforce 1" : "setenforce 0");
+                Shell.su(b ? "setenforce 1" : "setenforce 0");
                 updateStatus();
             }
         });
@@ -87,8 +97,8 @@ public class MagiskFragment extends Fragment {
     }
 
     private void updateStatus() {
-        String selinux = Utils.sh("getenforce");
-        String version = Utils.sh("getprop magisk.version");
+        String selinux = Shell.sh("getenforce").get(0);
+        String version = Shell.sh("getprop magisk.version").get(0);
 
         if (TextUtils.isEmpty(version)) {
             magiskStatusContainer.setBackgroundColor(grey500);
@@ -134,9 +144,9 @@ public class MagiskFragment extends Fragment {
 
             safetyNetStatusIcon.setImageResource(statusError);
 
-            if (!Utils.rootAccess) {
+            if (!Shell.rootAccess()) {
                 rootStatusContainer.setBackgroundColor(red500);
-                rootStatusIcon.setImageResource(statusError);
+                rootStatusIcon.setImageResource(statusUnknown);
                 rootStatus.setTextColor(red500);
                 rootStatus.setText(R.string.root_system);
 
@@ -146,7 +156,7 @@ public class MagiskFragment extends Fragment {
                 safetyNetStatus.setText(R.string.root_system_info);
             } else {
                 rootStatusContainer.setBackgroundColor(green500);
-                rootStatusIcon.setImageResource(statusOK);
+                rootStatusIcon.setImageResource(statusError);
                 rootStatus.setTextColor(green500);
                 rootStatus.setText(R.string.root_mounted);
 
@@ -154,14 +164,14 @@ public class MagiskFragment extends Fragment {
             }
         } else {
             rootStatusContainer.setBackgroundColor(green500);
-            rootStatusIcon.setImageResource(red500);
+            rootStatusIcon.setImageResource(statusOK);
 
             rootStatus.setTextColor(green500);
             rootToggle.setChecked(false);
 
             safetyNetStatusIcon.setImageResource(statusOK);
 
-            if (!Utils.rootAccess) {
+            if (!Shell.rootAccess()) {
                 rootStatusContainer.setBackgroundColor(red500);
                 rootStatusIcon.setImageResource(statusError);
                 rootStatus.setTextColor(red500);

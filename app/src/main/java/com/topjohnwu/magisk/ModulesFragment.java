@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -29,8 +30,8 @@ public class ModulesFragment extends Fragment {
     private static final String MAGISK_PATH = "/magisk";
     private static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
-    private static List<Module> listModules = new ArrayList<>();
-    private static List<Module> listModulesCache = new ArrayList<>();
+//    protected static List<Module> listModules = new ArrayList<>();
+//    protected static List<Module> listModulesCache = new ArrayList<>();
 
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.pager) ViewPager viewPager;
@@ -40,8 +41,8 @@ public class ModulesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        listModules.clear();
-        listModulesCache.clear();
+//        listModules.clear();
+//        listModulesCache.clear();
     }
 
     @Nullable
@@ -62,7 +63,7 @@ public class ModulesFragment extends Fragment {
 
         @Override
         protected List<Module> listModules() {
-            return listModules;
+            return Utils.listModules;
         }
 
     }
@@ -71,7 +72,7 @@ public class ModulesFragment extends Fragment {
 
         @Override
         protected List<Module> listModules() {
-            return listModulesCache;
+            return Utils.listModulesCache;
         }
 
     }
@@ -82,49 +83,9 @@ public class ModulesFragment extends Fragment {
         protected Void doInBackground(Void... voids) {
             // Ensure initialize is done
             try {
-                WelcomeActivity.initialize.get();
+                Utils.initialize.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-            }
-
-            File[] magisk = new File(MAGISK_PATH).listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            });
-
-            File[] magiskCache = new File(MAGISK_CACHE_PATH).listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return file.isDirectory();
-                }
-            });
-
-            if (magisk != null) {
-                for (File mod : magisk) {
-                    Module m = new Module(mod);
-                    if (m.isValid()) {
-                        try {
-                            m.parse();
-                            listModules.add(m);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-            }
-
-            if (magiskCache != null) {
-                for (File mod : magiskCache) {
-                    Module m = new Module(mod);
-                    if (m.isValid()) {
-                        try {
-                            m.parse();
-                            listModulesCache.add(m);
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
             }
 
             return null;

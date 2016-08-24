@@ -1,56 +1,82 @@
 package com.topjohnwu.magisk.utils;
 
+import android.os.AsyncTask;
+
+import com.topjohnwu.magisk.module.Module;
+
+import java.util.ArrayList;
 import java.util.List;
-import eu.chainfire.libsuperuser.Shell;
 
 public class Utils {
 
-    public static final String suPath = sh("getprop magisk.supath");
-    public static boolean rootAccess = false;
+    public static Init initialize;
 
-    public static String sh(String... commands) {
-        List<String> result = Shell.SH.run(commands);
+    public static List<Module> listModules = new ArrayList<>();
+    public static List<Module> listModulesCache = new ArrayList<>();
+    public static List<String> listLog;
 
-        StringBuilder builder = new StringBuilder();
-        for (String s : result) {
-            builder.append(s);
-        }
+    public static class Init extends AsyncTask<Void, Void, Void> {
 
-        return builder.toString();
-    }
-
-    public static String su(String... commands) {
-        List<String> result = Shell.run(Utils.suPath + "/su", commands, null, false);
-
-        StringBuilder builder = new StringBuilder();
-        for (String s : result) {
-            builder.append(s);
-        }
-
-        return builder.toString();
-    }
-
-    public static void checkRoot() {
-        String [] availableTestCommands = new String[] {"echo -BOC-", "id"};
-        List<String> ret = Shell.run(Utils.suPath + "/su", availableTestCommands, null, false);
-        if (ret == null)
-            return;
-
-        // Taken from libsuperuser
-
-        // this is only one of many ways this can be done
-
-        for (String line : ret) {
-            if (line.contains("uid=")) {
-                // id command is working, let's see if we are actually root
-                rootAccess = line.contains("uid=0");
-            } else if (line.contains("-BOC-")) {
-                // if we end up here, at least the su command starts some kind
-                // of shell, let's hope it has root privileges - no way to know without
-                // additional native binaries
-                rootAccess = true;
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Shell.startRoot();
+            listModules.clear();
+            listModulesCache.clear();
+            List<String> magisk = getModList("/magisk");
+            List<String> magiskCache = getModList("/cache/magisk");
+            if (!magisk.isEmpty()) {
+                for (String mod : magisk) {
+                    listModules.add(new Module(mod));
+                }
             }
+
+            if (!magiskCache.isEmpty()) {
+                for (String mod : magiskCache) {
+                    listModulesCache.add(new Module(mod));
+                }
+            }
+            listLog = readFile("/cache/magisk.log");
+            return null;
         }
     }
+
+    public static boolean fileExist(String path) {
+        List<String> ret;
+        ret = Shell.sh("if [ -f " + path + " ]; then echo true; else echo false; fi");
+        if (!Boolean.parseBoolean(ret.get(0)) && Shell.rootAccess()) ret = Shell.su("if [ -f " + path + " ]; then echo true; else echo false; fi");
+        return Boolean.parseBoolean(ret.get(0));
+    }
+
+    public static boolean createFile(String path) {
+        if (!Shell.rootAccess()) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(Shell.su("touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi").get(0));
+        }
+    }
+
+    public static boolean removeFile(String path) {
+        if (!Shell.rootAccess()) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(Shell.su("rm -f " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo false; else echo true; fi").get(0));
+        }
+    }
+
+    public static List<String> getModList(String path) {
+        List<String> ret;
+        ret = Shell.sh("find " + path + " -type d -maxdepth 1 | while read ITEM ; do if [ -f $ITEM/module.prop ]; then echo $ITEM; fi; done");
+        if (ret.isEmpty() && Shell.rootAccess()) ret = Shell.su("find " + path + " -type d -maxdepth 1 | while read ITEM ; do if [ -f $ITEM/module.prop ]; then echo $ITEM; fi; done");
+        return ret;
+    }
+
+    public static List<String> readFile(String path) {
+        List<String> ret;
+        ret = Shell.sh("cat " + path);
+        if (ret.isEmpty() && Shell.rootAccess()) ret = Shell.su("cat " + path, "echo \' \'");
+        return ret;
+    }
+
+
 
 }

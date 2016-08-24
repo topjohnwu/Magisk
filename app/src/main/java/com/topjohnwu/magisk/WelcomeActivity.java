@@ -16,10 +16,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,7 +32,6 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    public static Init initialize;
     public static View view;
     private final Handler mDrawerHandler = new Handler();
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -46,9 +50,10 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
-        initialize = new Init();
 
-        initialize.execute();
+        Utils.initialize = new Utils.Init();
+
+        Utils.initialize.execute();
 
         setSupportActionBar(toolbar);
 
@@ -152,12 +157,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         @Override
         protected Void doInBackground(Void... voids) {
-            // Check root access
-            Utils.checkRoot();
-            // Permission for java code to read /cache files
-            if (Utils.rootAccess) {
-                Utils.su("chmod 755 /cache", "chmod 644 /cache/magisk.log");
-            }
             return null;
         }
 
@@ -165,7 +164,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
 
-            if (!Utils.rootAccess) {
+            if (!Shell.rootAccess()) {
                 Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
             }
         }
