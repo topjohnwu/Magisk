@@ -57,5 +57,12 @@
     <string name="force_reload">Refresh</string>
     <string name="no_modules_found">No modules found</string>
     <string name="loading">Loading…</string>
+    <string name="update_available">Update available!</string>
+    <string name="update">Update</string>
+    <string name="update_available_message">A new update of %1$s is available.\nChangelog version %2$s: \n%3$s</string>
+    <string name="no_thanks">No, thanks</string>
+    <string name="never_show_again">Don\'t show again</string>
+    <string name="error_download_file">Error downloading file</string>
+    <string name="flash_recovery">File downloaded, you can flash it in recovery</string>
 
 </resources>

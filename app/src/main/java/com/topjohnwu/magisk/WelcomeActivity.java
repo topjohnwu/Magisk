@@ -1,6 +1,11 @@
 package com.topjohnwu.magisk;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,13 +17,29 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-import com.github.javiersantos.appupdater.AppUpdater;
-import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.topjohnwu.magisk.utils.Shell;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +47,7 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    private static final String XML_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/master/app/magisk_update.xml";
+    private static final String JSON_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/master/app/magisk_update.xml";
     private final Handler mDrawerHandler = new Handler();
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -84,7 +105,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        new AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setUpdateXML(XML_UPDATE_CHECK).start();
     }
 
     @Override
@@ -151,6 +171,165 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 transaction.replace(R.id.content_frame, navFragment, tag).commit();
             } catch (IllegalStateException ignored) {
             }
+        }
+    }
+
+    private class CheckUpdates extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                HttpURLConnection c = (HttpURLConnection) new URL(JSON_UPDATE_CHECK).openConnection();
+                c.setRequestMethod("GET");
+                c.setInstanceFollowRedirects(false);
+                c.setDoOutput(false);
+                c.connect();
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                br.close();
+                return sb.toString();
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            if (result == null) return;
+
+            try {
+                JSONObject json = new JSONObject(result);
+
+                JSONObject app = json.getJSONObject("app");
+                JSONObject magisk = json.getJSONObject("magisk");
+
+                String appVersionCode = app.getString("versionCode");
+                String appLink = app.getString("link");
+                String appChangelog = app.getString("changelog");
+
+                String magiskVersionCode = magisk.getString("versionCode");
+                String magiskLink = magisk.getString("link");
+                String magiskChangelog = magisk.getString("changelog");
+
+                if (Integer.parseInt(appVersionCode) > BuildConfig.VERSION_CODE) {
+                    showUpdateDialog(true, appVersionCode, appLink, appChangelog);
+                }
+
+                String version = Shell.sh("getprop magisk.version").get(0);
+                int versionInt = TextUtils.isEmpty(version) ? 0 : Integer.parseInt(version);
+
+                if (Integer.parseInt(magiskVersionCode) > versionInt) {
+                    showUpdateDialog(false, magiskVersionCode, magiskLink, magiskChangelog);
+                }
+
+            } catch (JSONException ignored) {
+            }
+        }
+
+        private boolean isUpdateIgnored(String version) {
+            SharedPreferences prefs = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+            return prefs.getBoolean("update_ignored_" + version, false);
+        }
+
+        private void setUpdateIgnored(String version) {
+            SharedPreferences prefs = getSharedPreferences(getPackageName() + "_preferences", MODE_PRIVATE);
+            prefs.edit().putBoolean("update_ignored_" + version, true).apply();
+        }
+
+        private void showUpdateDialog(final boolean app, final String versionCode, final String link, String changelog) {
+            if (isUpdateIgnored(versionCode)) return;
+
+            String text = app ? getString(R.string.app_name) : getString(R.string.magisk);
+            String msg = getString(R.string.update_available_message, text, versionCode, changelog);
+
+            new AlertDialog.Builder(getApplicationContext())
+                    .setTitle(R.string.update_available)
+                    .setMessage(msg)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            new DownloadFile(link, app);
+                        }
+                    })
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .setNeutralButton(R.string.never_show_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            setUpdateIgnored(versionCode);
+                        }
+                    })
+                    .show();
+
+        }
+    }
+
+    private class DownloadFile extends AsyncTask<Void, Integer, Boolean> {
+
+        private final String link;
+        private final File downloadFile;
+        private final ProgressDialog progress;
+
+        public DownloadFile(String link, boolean apk) {
+            this.link = link;
+
+            if (apk) {
+                downloadFile = new File(getFilesDir() + "/MagiskManager.apk");
+            } else {
+                downloadFile = new File(getFilesDir() + "/Magisk.zip");
+            }
+
+            progress = ProgressDialog.show(getApplicationContext(), null, getString(R.string.loading), true, false);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                URL u = new URL(link);
+                URLConnection conn = u.openConnection();
+                int contentLength = conn.getContentLength();
+
+                DataInputStream stream = new DataInputStream(u.openStream());
+
+                byte[] buffer = new byte[contentLength];
+                stream.readFully(buffer);
+                stream.close();
+
+                DataOutputStream fos = new DataOutputStream(new FileOutputStream(downloadFile));
+                fos.write(buffer);
+                fos.flush();
+                fos.close();
+                return true;
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            progress.dismiss();
+            if (!result) {
+                Toast.makeText(getApplicationContext(), R.string.error_download_file, Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (downloadFile.getPath().contains("apk")) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(downloadFile), "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.flash_recovery, Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 }

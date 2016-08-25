@@ -43,8 +43,12 @@
     <string name="sdcard_not_writable">SD card non trovata o non scrivibile</string>
     <string name="selinux_enforcing_info">SELinux è  forzato</string>
     <string name="selinux_permissive_info">SELinux è permissivo\nSpegni SELinux solamente se necessario!</string>
-    <string name="selinux_samsung">Samsung non supporta la modifica dello stato di SELinux</string>
+    <string name="selinux_samsung_info">Samsung non supporta la modifica dello stato di SELinux</string>
     <string name="selinux_toggle">SeLinux Toggle</string>
     <string name="support_thread">Thread di supporto</string>
     <string name="translators">dvdandroid</string>
+    <string name="magisk_version_error">Hai installato Magisk?</string>
+    <string name="root_error">Errore root</string>
+    <string name="root_error_info">Stato Safety Net sconosciuto</string>
+    <string name="selinux_error_info">Stato SELinux sconosciuto</string>
 </resources>

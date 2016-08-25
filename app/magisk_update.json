@@ -1,0 +1,12 @@
+{
+  "app": {
+    "versionCode": "4",
+    "link": "http://forum.xda-developers.com/devdb/project/dl/?id=19924&task=get",
+    "changelog": "<b>Version 2.0</b>!"
+  },
+  "magisk": {
+    "versionCode": "6",
+    "link": "http://forum.xda-developers.com/devdb/project/dl/?id=19960&task=get",
+    "changelog": "<b>Version 6</b>!"
+  }
+}
