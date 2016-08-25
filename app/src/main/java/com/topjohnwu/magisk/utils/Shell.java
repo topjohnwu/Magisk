@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
+import android.os.AsyncTask;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,21 +25,18 @@ public class Shell {
     private static List<String> rootOutList = new ArrayList<>();
 
     static {
+        init();
+    }
+
+    private static void init() {
         List<String> ret = sh("getprop magisk.supath");
         if(!ret.isEmpty()) {
             suPath = ret.get(0) + "/su";
+            rootStatus = 1;
         } else {
             suPath = "su";
             rootStatus = 2;
         }
-    }
-
-    public static boolean rootAccess() {
-        return rootStatus > 0;
-    }
-
-    public static void startRoot() {
-        rootStatus = rootStatus == 0 ? 1 : 2;
 
         try {
             rootShell = Runtime.getRuntime().exec(suPath);
@@ -45,15 +44,14 @@ public class Shell {
             rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
             rootSTDOUT.start();
         } catch (IOException e) {
-            // runtime error! No binary found!
+            // runtime error! No binary found! Means no root
             rootStatus = 0;
             return;
         }
 
-
-        List<String> ret = su("echo -BOC-", "id");
+        ret = su("echo -BOC-", "id");
         if (ret == null) {
-            // Something wrong with root install, not enabled?
+            // Something wrong with root, not allowed?
             rootStatus = -1;
             return;
         }
@@ -82,6 +80,10 @@ public class Shell {
             rootSTDOUT.join();
             rootShell.destroy();
         }
+    }
+
+    public static boolean rootAccess() {
+        return rootStatus > 0;
     }
 
     public static List<String> sh(String... commands) {

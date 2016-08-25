@@ -25,6 +25,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -201,13 +202,6 @@ public class LogFragment extends Fragment {
 
         @Override
         protected String doInBackground(Void... voids) {
-            // Ensure initialize is done
-            try {
-                Utils.initialize.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
             if (readLog) {
                 List<String> logList = Utils.readFile(MAGISK_LOG);
 
@@ -225,8 +219,6 @@ public class LogFragment extends Fragment {
                 }
                 return "";
             }
-
-
         }
 
         @Override

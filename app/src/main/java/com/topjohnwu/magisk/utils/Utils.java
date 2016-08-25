@@ -1,44 +1,8 @@
 package com.topjohnwu.magisk.utils;
 
-import android.os.AsyncTask;
-
-import com.topjohnwu.magisk.module.Module;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-
-    public static Init initialize;
-
-    public static List<Module> listModules = new ArrayList<>();
-    public static List<Module> listModulesCache = new ArrayList<>();
-    public static List<String> listLog;
-
-    public static class Init extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Shell.startRoot();
-            listModules.clear();
-            listModulesCache.clear();
-            List<String> magisk = getModList("/magisk");
-            List<String> magiskCache = getModList("/cache/magisk");
-            if (!magisk.isEmpty()) {
-                for (String mod : magisk) {
-                    listModules.add(new Module(mod));
-                }
-            }
-
-            if (!magiskCache.isEmpty()) {
-                for (String mod : magiskCache) {
-                    listModulesCache.add(new Module(mod));
-                }
-            }
-            listLog = readFile("/cache/magisk.log");
-            return null;
-        }
-    }
 
     public static boolean fileExist(String path) {
         List<String> ret;

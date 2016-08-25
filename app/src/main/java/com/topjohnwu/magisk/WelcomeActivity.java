@@ -1,15 +1,12 @@
 package com.topjohnwu.magisk;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -17,15 +14,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,9 +44,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
-        Utils.initialize = new Utils.Init();
-
-        Utils.initialize.execute();
+        // Load mods in the background
+        ModulesFragment.loadMod = new ModulesFragment.loadModules();
+        ModulesFragment.loadMod.execute();
 
         setSupportActionBar(toolbar);
 
@@ -156,43 +147,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 transaction.replace(R.id.content_frame, navFragment, tag).commit();
             } catch (IllegalStateException ignored) {
             }
-        }
-    }
-
-    public static class Init extends AsyncTask<Void, Integer, Void> {
-
-        private final AppCompatActivity activity;
-        private ProgressDialog progress;
-
-        public Init(AppCompatActivity activity) {
-            this.activity = activity;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progress = ProgressDialog.show(activity, null, activity.getString(R.string.loading), true, false);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-
-            progress.dismiss();
-
-            if (!Shell.rootAccess()) {
-                Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
-                return;
-            }
-
-            MagiskFragment fragment = (MagiskFragment) activity.getSupportFragmentManager().findFragmentByTag("magisk");
-            fragment.onRootGranted();
         }
     }
 }
