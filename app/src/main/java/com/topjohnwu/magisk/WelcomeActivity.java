@@ -1,15 +1,12 @@
 package com.topjohnwu.magisk;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -17,15 +14,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Shell;
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.topjohnwu.magisk.utils.Utils;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,8 +27,9 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    public static View view;
+    private static final String XML_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/master/app/magisk_update.xml";
     private final Handler mDrawerHandler = new Handler();
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
@@ -47,7 +42,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
-        view = toolbar;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -90,6 +84,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        new AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setUpdateXML(XML_UPDATE_CHECK).start();
     }
 
     @Override
@@ -159,40 +155,4 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
-    public static class Init extends AsyncTask<Void, Integer, Void> {
-
-        private final AppCompatActivity activity;
-        private ProgressDialog progress;
-
-        public Init(AppCompatActivity activity) {
-            this.activity = activity;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progress = ProgressDialog.show(activity, null, activity.getString(R.string.loading), true, false);
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-
-            progress.dismiss();
-
-            if (!Shell.rootAccess()) {
-                Snackbar.make(view, R.string.no_root_access, Snackbar.LENGTH_LONG).show();
-                return;
-            }
-
-            MagiskFragment fragment = (MagiskFragment) activity.getSupportFragmentManager().findFragmentByTag("magisk");
-            fragment.onRootGranted();
-        }
-    }
 }

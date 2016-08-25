@@ -9,9 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -19,9 +16,6 @@ import android.widget.ProgressBar;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -30,23 +24,9 @@ import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
 
-    private static final String MAGISK_PATH = "/magisk";
-    private static final String MAGISK_CACHE_PATH = "/cache/magisk";
-
-//    protected static List<Module> listModules = new ArrayList<>();
-//    protected static List<Module> listModulesCache = new ArrayList<>();
-
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.pager) ViewPager viewPager;
     @BindView(R.id.tab_layout) TabLayout tabLayout;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-//        listModules.clear();
-//        listModulesCache.clear();
-    }
 
     @Nullable
     @Override
@@ -58,26 +38,6 @@ public class ModulesFragment extends Fragment {
 
         setHasOptionsMenu(true);
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_modules, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.force_reload:
-                listModules.clear();
-                listModulesCache.clear();
-
-                new CheckFolders().execute();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public static class NormalModuleFragment extends BaseModuleFragment {
@@ -99,6 +59,13 @@ public class ModulesFragment extends Fragment {
     }
 
     private class CheckFolders extends AsyncTask<Void, Integer, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressBar.setVisibility(View.VISIBLE);
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
