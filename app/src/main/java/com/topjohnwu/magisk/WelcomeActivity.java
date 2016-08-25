@@ -1,18 +1,22 @@
 package com.topjohnwu.magisk;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -61,6 +65,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     @IdRes
     private int mSelectedId = R.id.magisk;
+
+    private String mLastLink;
+    private boolean mLastIsApp;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -180,6 +187,17 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            new DownloadFile(this, mLastLink, mLastIsApp).execute();
+        } else {
+            Toast.makeText(this, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
+        }
+    }
+
     private class CheckUpdates extends AsyncTask<Void, Void, String> {
 
         private final Context context;
@@ -271,7 +289,16 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                     .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            new DownloadFile(context, link, app);
+                            mLastLink = link;
+                            mLastIsApp = app;
+
+                            if (ActivityCompat.checkSelfPermission(WelcomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                                    && Build.VERSION.SDK_INT >= 23) {
+                                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                                return;
+                            }
+
+                            new DownloadFile(context, link, app).execute();
                         }
                     })
                     .setNegativeButton(R.string.no_thanks, null)
@@ -296,10 +323,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             this.link = link;
             this.context = context;
 
+            File dir = new File(Environment.getExternalStorageDirectory() + "/Magisk");
+
+            if (!dir.exists()) dir.mkdir();
+
             if (apk) {
-                downloadFile = new File(getFilesDir() + "/MagiskManager.apk");
+                downloadFile = new File(dir + "/MagiskManager.apk");
             } else {
-                downloadFile = new File(getFilesDir() + "/Magisk.zip");
+                downloadFile = new File(dir + "/Magisk.zip");
             }
 
             Toast.makeText(context, downloadFile.getPath(), Toast.LENGTH_SHORT).show();

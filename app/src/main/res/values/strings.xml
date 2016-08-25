@@ -63,6 +63,6 @@
     <string name="no_thanks">No, thanks</string>
     <string name="never_show_again">Don\'t show again</string>
     <string name="error_download_file">Error downloading file</string>
-    <string name="flash_recovery">File downloaded, you can flash it in recovery</string>
+    <string name="flash_recovery">File downloaded in Magisk directory, you can flash it in recovery</string>
 
 </resources>
