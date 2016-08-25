@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,16 +32,18 @@ import com.topjohnwu.magisk.utils.Shell;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,7 +51,8 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    private static final String JSON_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/master/app/magisk_update.xml";
+    private static final String JSON_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updater/app/magisk_update.json";
+
     private final Handler mDrawerHandler = new Handler();
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -105,6 +110,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        new CheckUpdates(this).execute();
     }
 
     @Override
@@ -176,6 +182,12 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     private class CheckUpdates extends AsyncTask<Void, Void, String> {
 
+        private final Context context;
+
+        public CheckUpdates(Context context) {
+            this.context = context;
+        }
+
         @Override
         protected String doInBackground(Void... voids) {
             try {
@@ -222,7 +234,10 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                     showUpdateDialog(true, appVersionCode, appLink, appChangelog);
                 }
 
-                String version = Shell.sh("getprop magisk.version").get(0);
+                List<String> versionSh = Shell.sh("getprop magisk.version");
+
+                String version = versionSh.isEmpty() ? "" : versionSh.get(0);
+
                 int versionInt = TextUtils.isEmpty(version) ? 0 : Integer.parseInt(version);
 
                 if (Integer.parseInt(magiskVersionCode) > versionInt) {
@@ -249,14 +264,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             String text = app ? getString(R.string.app_name) : getString(R.string.magisk);
             String msg = getString(R.string.update_available_message, text, versionCode, changelog);
 
-            new AlertDialog.Builder(getApplicationContext())
+            new AlertDialog.Builder(context)
                     .setTitle(R.string.update_available)
-                    .setMessage(msg)
+                    .setMessage(Html.fromHtml(msg))
                     .setCancelable(false)
                     .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            new DownloadFile(link, app);
+                            new DownloadFile(context, link, app);
                         }
                     })
                     .setNegativeButton(R.string.no_thanks, null)
@@ -267,18 +282,19 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                         }
                     })
                     .show();
-
         }
     }
 
     private class DownloadFile extends AsyncTask<Void, Integer, Boolean> {
 
+        private final Context context;
         private final String link;
         private final File downloadFile;
         private final ProgressDialog progress;
 
-        public DownloadFile(String link, boolean apk) {
+        public DownloadFile(Context context, String link, boolean apk) {
             this.link = link;
+            this.context = context;
 
             if (apk) {
                 downloadFile = new File(getFilesDir() + "/MagiskManager.apk");
@@ -286,7 +302,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 downloadFile = new File(getFilesDir() + "/Magisk.zip");
             }
 
-            progress = ProgressDialog.show(getApplicationContext(), null, getString(R.string.loading), true, false);
+            Toast.makeText(context, downloadFile.getPath(), Toast.LENGTH_SHORT).show();
+
+            progress = ProgressDialog.show(context, null, getString(R.string.loading), true, false);
         }
 
         @Override
@@ -294,18 +312,29 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             try {
                 URL u = new URL(link);
                 URLConnection conn = u.openConnection();
-                int contentLength = conn.getContentLength();
+                conn.connect();
 
-                DataInputStream stream = new DataInputStream(u.openStream());
+                int length = conn.getContentLength();
 
-                byte[] buffer = new byte[contentLength];
-                stream.readFully(buffer);
-                stream.close();
+                InputStream input = new BufferedInputStream(u.openStream(), 8192);
+                OutputStream output = new FileOutputStream(downloadFile);
 
-                DataOutputStream fos = new DataOutputStream(new FileOutputStream(downloadFile));
-                fos.write(buffer);
-                fos.flush();
-                fos.close();
+                byte data[] = new byte[1024];
+                long total = 0;
+
+                int count;
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    output.write(data, 0, count);
+
+                    publishProgress((int) ((total * 100) / length));
+                }
+
+                output.flush();
+
+                output.close();
+                input.close();
+
                 return true;
             } catch (IOException e) {
                 return false;
@@ -313,11 +342,18 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            progress.setMessage(getString(R.string.loading) + values[0] + "%");
+        }
+
+        @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             progress.dismiss();
             if (!result) {
-                Toast.makeText(getApplicationContext(), R.string.error_download_file, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.error_download_file, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -327,7 +363,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             } else {
-                Toast.makeText(getApplicationContext(), R.string.flash_recovery, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, R.string.flash_recovery, Toast.LENGTH_LONG).show();
             }
 
         }

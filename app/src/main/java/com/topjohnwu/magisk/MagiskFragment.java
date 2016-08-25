@@ -14,11 +14,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -56,7 +54,7 @@ public class MagiskFragment extends Fragment {
     @BindColor(R.color.red500) int red500;
     @BindColor(R.color.green500) int green500;
     @BindColor(R.color.grey500) int grey500;
-    @BindColor(R.color.lime500) int lime500;
+    @BindColor(R.color.accent) int accent;
 
     int statusOK = R.drawable.ic_check_circle;
     int statusError = R.drawable.ic_error;
@@ -184,9 +182,9 @@ public class MagiskFragment extends Fragment {
                     // Proper root
                     if (new File("/system/xbin/su").exists()) {
                         // Mounted
-                        rootStatusContainer.setBackgroundColor(lime500);
+                        rootStatusContainer.setBackgroundColor(accent);
                         rootStatusIcon.setImageResource(statusError);
-                        rootStatus.setTextColor(lime500);
+                        rootStatus.setTextColor(accent);
                         rootStatus.setText(R.string.root_mounted);
                         rootToggle.setChecked(true);
                         safetyNetStatusIcon.setImageResource(statusError);
