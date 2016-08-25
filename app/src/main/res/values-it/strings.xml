@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Magisk Manager</string>
+    <string name="about">Info su…</string>
+    <string name="app_changelog">Changelog dell\'app</string>
+    <string name="app_developers">Sviluppatori principali</string>
+    <string name="app_developers_"><![CDATA[App creata da <a href="https://github.com/topjohnwu">topjohnwu</a> in collaborazione con <a href="https://github.com/dvdandroid">dvdandroid</a>]]></string>
+    <string name="app_source_code">Codice sorgente</string>
+    <string name="app_translators">Traduttori dell\'app</string>
+    <string name="app_version">Versione dell\'app</string>
+    <string name="cache_modules">Moduli in cache</string>
+    <string name="disable_file_created">Il modulo verrà disabilitato al prossimo riavvio</string>
+    <string name="disable_file_removed">Il modulo verrà abilitato al prossimo riavvio</string>
+    <string name="force_reload">Aggiorna</string>
+    <string name="loading">Caricamento…</string>
+    <string name="log">Log</string>
+    <string name="log_is_empty">Il log è vuoto</string>
+    <string name="logs_clear_failed">Non è possibile leggere il log:</string>
+    <string name="logs_cleared">Log pulito correttamente</string>
+    <string name="logs_save_failed">Non è stato possibile il log nella SD card:</string>
+    <string name="magisk_version">Versione installata di Magisk v%1$s</string>
+    <string name="menuClearLog">Pulisci log adesso</string>
+    <string name="menuReload">Ricarica</string>
+    <string name="menuSaveToSd">Salva nella SD</string>
+    <string name="menuSend">Invia</string>
+    <string name="modules">Moduli</string>
+    <string name="navigation_drawer_close">Chiudi navigation drawer</string>
+    <string name="navigation_drawer_open">Apri navigation drawer</string>
+    <string name="no_modules_found">Nessun modulo trovato</string>
+    <string name="no_root_access">Accesso root  rifiutato; funzionalità limitate</string>
+    <string name="permissionNotGranted">Questa funzionalità non funzionerà senza il permesso di scrittura della memoria esterna.</string>
+    <string name="remove_file_created">Il modulo verrà rimosso al prossimo riavvio</string>
+    <string name="remove_file_deleted">Il modulo non verrà rimosso al prossimo riavvio</string>
+    <string name="root_mounted">Root montato</string>
+    <string name="root_mounted_info">Root montato e abilitato. Safety Net (Android Pay) NON funzionerà</string>
+    <string name="root_none">Non rootato</string>
+    <string name="root_none_info">Safety Net (Android Pay) dovrebbe funzionare</string>
+    <string name="root_system">Non correttamente installato</string>
+    <string name="root_system_info">Root non correttamente installato. Safety Net (Android Pay) NON funzionerà, è ed impossibile attivare i toggle</string>
+    <string name="root_toggle">Root Toggle</string>
+    <string name="root_unmounted">Root non montato</string>
+    <string name="root_unmounted_info">Safety Net (Android Pay) dovrebbe funzionare, ma non il root temporaneo</string>
+    <string name="sdcard_not_writable">SD card non trovata o non scrivibile</string>
+    <string name="selinux_enforcing_info">SELinux è  forzato</string>
+    <string name="selinux_permissive_info">SELinux è permissivo\nSpegni SELinux solamente se necessario!</string>
+    <string name="selinux_samsung">Samsung non supporta la modifica dello stato di SELinux</string>
+    <string name="selinux_toggle">SeLinux Toggle</string>
+    <string name="support_thread">Thread di supporto</string>
+    <string name="translators">dvdandroid</string>
+</resources>

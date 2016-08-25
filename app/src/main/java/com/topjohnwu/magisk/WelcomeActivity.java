@@ -17,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,8 +26,9 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    public static View view;
+    private static final String XML_UPDATE_CHECK = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/master/app/magisk_update.xml";
     private final Handler mDrawerHandler = new Handler();
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
@@ -38,7 +41,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
-        view = toolbar;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -81,6 +83,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        new AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setUpdateXML(XML_UPDATE_CHECK).start();
     }
 
     @Override

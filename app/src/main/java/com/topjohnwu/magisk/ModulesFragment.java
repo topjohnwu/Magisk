@@ -9,9 +9,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -20,7 +17,6 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,9 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
-
-    private static final String MAGISK_PATH = "/magisk";
-    private static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
     private static List<Module> listModules = new ArrayList<>();
     private static List<Module> listModulesCache = new ArrayList<>();
@@ -51,12 +44,6 @@ public class ModulesFragment extends Fragment {
 
         setHasOptionsMenu(true);
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_modules, menu);
     }
 
     @Override

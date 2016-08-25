@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Magisk Manager</string>
 
+    <string name="magisk" translatable="false">Magisk</string>
     <string name="magisk_version">Installed Magisk v%1$s</string>
     <string name="magisk_version_error">Have you installed Magisk?</string>
 
@@ -42,7 +43,6 @@
     <string name="logs_save_failed">Could not write log to SD card:</string>
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
-    <string name="magisk">Magisk</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="cache_modules">Cache modules</string>
     <string name="about">About</string>
