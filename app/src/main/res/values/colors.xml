@@ -9,6 +9,7 @@
 
     <color name="red500">#F44336</color>
     <color name="green500">#4CAF50</color>
+    <color name="blue500">#2196F3</color>
     <color name="grey500">#9E9E9E</color>
 
 </resources>

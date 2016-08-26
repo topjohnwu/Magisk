@@ -64,5 +64,10 @@
     <string name="never_show_again">Don\'t show again</string>
     <string name="error_download_file">Error downloading file</string>
     <string name="flash_recovery">File downloaded in Magisk directory, you can flash it in recovery</string>
+    <string name="root">Root</string>
+    <string name="app_update_available">An update for Magisk Manager is available!</string>
+    <string name="magisk_update_available">An update for Magisk is available!</string>
+    <string name="cannot_check_updates">Cannot check for updates</string>
+    <string name="up_to_date">You\'ve got the latest version available of %1$s</string>
 
 </resources>
