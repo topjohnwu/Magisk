@@ -21,4 +21,7 @@
         <item name="actionMenuTextColor">@color/icons</item>
     </style>
 
+    <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
+
 </resources>
