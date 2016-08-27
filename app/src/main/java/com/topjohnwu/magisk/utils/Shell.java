@@ -14,10 +14,8 @@ import java.util.List;
 
 public class Shell {
 
-
-    public static String suPath;
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted; 2 = improperly rooted;
-    public static int rootStatus = 0;
+    public static int rootStatus;
 
     private static Process rootShell;
     private static DataOutputStream rootSTDIN;
@@ -29,27 +27,27 @@ public class Shell {
     }
 
     private static void init() {
-        List<String> ret = sh("getprop magisk.supath");
-        if(!ret.isEmpty()) {
-            suPath = ret.get(0) + "/su";
-            rootStatus = 1;
-        } else {
-            suPath = "su";
-            rootStatus = 2;
-        }
 
         try {
-            rootShell = Runtime.getRuntime().exec(suPath);
-            rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
-            rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
-            rootSTDOUT.start();
+            rootShell = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
+            rootStatus = 1;
         } catch (IOException e) {
-            // runtime error! No binary found! Means no root
-            rootStatus = 0;
-            return;
+            try {
+                // Improper root
+                rootShell = Runtime.getRuntime().exec("su");
+                rootStatus = 2;
+            } catch (IOException err) {
+                // No root
+                rootStatus = 0;
+                return;
+            }
         }
 
-        ret = su("echo -BOC-", "id");
+        rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
+        rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
+        rootSTDOUT.start();
+
+        List<String> ret = su("echo -BOC-", "id");
         if (ret == null) {
             // Something wrong with root, not allowed?
             rootStatus = -1;
@@ -73,7 +71,6 @@ public class Shell {
         super.finalize();
         if (rootAccess()) {
             rootSTDIN.write("exit\n".getBytes("UTF-8"));
-            rootSTDIN.flush();
             rootSTDIN.flush();
             rootShell.waitFor();
             rootSTDIN.close();
@@ -134,39 +131,37 @@ public class Shell {
         rootOutList.clear();
 
         try {
-            try {
-                for (String write : commands) {
-                    rootSTDIN.write((write + "\n").getBytes("UTF-8"));
-                    rootSTDIN.flush();
-                }
-                rootSTDIN.write(("echo \'-done-\'\n").getBytes("UTF-8"));
+            for (String write : commands) {
+                rootSTDIN.write((write + "\n").getBytes("UTF-8"));
                 rootSTDIN.flush();
-            } catch (IOException e) {
-                if (!e.getMessage().contains("EPIPE")) {
-                    throw e;
-                }
             }
+            rootSTDIN.write(("echo \' \'\n").getBytes("UTF-8"));
+            rootSTDIN.flush();
+            rootSTDIN.write(("echo \'-done-\'\n").getBytes("UTF-8"));
+            rootSTDIN.flush();
+        } catch (IOException e) {
+            if (!e.getMessage().contains("EPIPE")) {
+                return null;
+            }
+        }
 
-            while (true) {
-                try {
-                    // Process terminated, it means the interactive shell cannot be initialized
-                    rootShell.exitValue();
-                    return null;
-                } catch (IllegalThreadStateException e) {
-                    // Process still running, gobble output until done
-                    if (rootOutList != null && !rootOutList.isEmpty()) {
-                        if (rootOutList.get(rootOutList.size() - 1).equals("-done-")) {
-                            rootOutList.remove(rootOutList.size() - 1);
-                            break;
-                        }
+        while (true) {
+            try {
+                // Process terminated, it means the interactive shell cannot be initialized
+                rootShell.exitValue();
+                return null;
+            } catch (IllegalThreadStateException e) {
+                // Process still running, gobble output until done
+                int end = rootOutList.size() - 1;
+                if (rootOutList != null && end > 0) {
+                    if (rootOutList.get(end).equals("-done-")) {
+                        rootOutList.remove(end);
+                        rootOutList.remove(end - 1);
+                        break;
                     }
-                    rootSTDOUT.join(100);
                 }
+                try { rootSTDOUT.join(100); } catch (InterruptedException err) { return null; }
             }
-
-        } catch (IOException | InterruptedException e) {
-            // shell probably not found
-            return null;
         }
 
         return new ArrayList<>(rootOutList);

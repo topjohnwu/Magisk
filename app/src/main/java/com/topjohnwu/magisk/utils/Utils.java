@@ -37,7 +37,7 @@ public class Utils {
     public static List<String> readFile(String path) {
         List<String> ret;
         ret = Shell.sh("cat " + path);
-        if (ret.isEmpty() && Shell.rootAccess()) ret = Shell.su("cat " + path, "echo \' \'");
+        if (ret.isEmpty() && Shell.rootAccess()) ret = Shell.su("cat " + path);
         return ret;
     }
 

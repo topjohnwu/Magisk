@@ -36,8 +36,7 @@ public class StreamGobbler extends Thread {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.replaceAll("\\s", "").isEmpty())
-                    writer.add(line);
+                writer.add(line);
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

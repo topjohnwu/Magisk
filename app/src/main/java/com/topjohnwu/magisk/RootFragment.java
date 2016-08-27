@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -63,20 +64,14 @@ public class RootFragment extends Fragment {
 
         new updateUI().execute();
 
-        rootToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Shell.su(b ? "setprop magisk.root 1" : "setprop magisk.root 0");
-                new updateUI().execute();
-            }
+        rootToggle.setOnClickListener(toggle -> {
+            Shell.su(((CompoundButton) toggle).isChecked() ? "setprop magisk.root 1" : "setprop magisk.root 0");
+            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
         });
 
-        selinuxToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Shell.su(b ? "setenforce 1" : "setenforce 0");
-                new updateUI().execute();
-            }
+        selinuxToggle.setOnClickListener(toggle -> {
+            Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
+            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
         });
 
         return view;
@@ -132,7 +127,6 @@ public class RootFragment extends Fragment {
             }
 
             if (new File("/system/framework/twframework.jar").exists()) {
-                selinuxToggleView.setVisibility(View.GONE);
                 selinuxStatus.append("\n" + getString(R.string.selinux_samsung_info));
             }
 

@@ -71,12 +71,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         if (savedInstanceState == null) {
             mDrawerHandler.removeCallbacksAndMessages(null);
-            mDrawerHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    navigate(mSelectedId);
-                }
-            }, 250);
+            mDrawerHandler.postDelayed(() -> navigate(mSelectedId), 250);
         }
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -103,12 +98,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
         mSelectedId = menuItem.getItemId();
         mDrawerHandler.removeCallbacksAndMessages(null);
-        mDrawerHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                navigate(menuItem.getItemId());
-            }
-        }, 250);
+        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
 
         drawer.closeDrawer(GravityCompat.START);
         return true;

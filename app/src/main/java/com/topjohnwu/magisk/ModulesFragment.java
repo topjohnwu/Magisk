@@ -85,10 +85,6 @@ public class ModulesFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-            listModules.clear();
-            listModulesCache.clear();
-
             listModules.clear();
             listModulesCache.clear();
             List<String> magisk = Utils.getModList(MAGISK_PATH);
@@ -98,7 +94,6 @@ public class ModulesFragment extends Fragment {
                     listModules.add(new Module(mod));
                 }
             }
-
             if (!magiskCache.isEmpty()) {
                 for (String mod : magiskCache) {
                     listModulesCache.add(new Module(mod));
