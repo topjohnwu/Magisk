@@ -58,16 +58,16 @@
     <string name="no_modules_found">No modules found</string>
     <string name="loading">Loading…</string>
     <string name="update_available">Update available!</string>
-    <string name="update">Update</string>
-    <string name="update_available_message">A new update of %1$s is available.\nChangelog version %2$s: \n%3$s</string>
+    <string name="download">Download</string>
+    <string name="update_available_message"><![CDATA[A new version of %1$s is available!<br>Version: v%2$s<br>Changelog:<br>%3$s]]></string>
     <string name="no_thanks">No, thanks</string>
     <string name="never_show_again">Don\'t show again</string>
     <string name="error_download_file">Error downloading file</string>
     <string name="flash_recovery">File downloaded in Magisk directory, you can flash it in recovery</string>
     <string name="root">Root</string>
-    <string name="app_update_available">An update for Magisk Manager is available!</string>
-    <string name="magisk_update_available">An update for Magisk is available!</string>
+    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$s update!</string>
     <string name="cannot_check_updates">Cannot check for updates</string>
-    <string name="up_to_date">You\'ve got the latest version available of %1$s</string>
+    <string name="up_to_date">Latest version of %1$s installed</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ public class Shell {
 
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted; 2 = improperly rooted;
     public static int rootStatus;
+    public static int magiskVersion;
 
     private static Process rootShell;
     private static DataOutputStream rootSTDIN;
@@ -27,6 +29,13 @@ public class Shell {
     }
 
     private static void init() {
+
+        List<String> ret = sh("getprop magisk.version");
+        if (ret.get(0).replaceAll("\\s", "").isEmpty()) {
+            magiskVersion = -1;
+        } else {
+            magiskVersion = Integer.parseInt(ret.get(0));
+        }
 
         try {
             rootShell = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
@@ -47,7 +56,7 @@ public class Shell {
         rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
         rootSTDOUT.start();
 
-        List<String> ret = su("echo -BOC-", "id");
+        ret = su("echo -BOC-", "id");
         if (ret == null) {
             // Something wrong with root, not allowed?
             rootStatus = -1;
@@ -63,19 +72,6 @@ public class Shell {
                 rootStatus = -1;
                 return;
             }
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        if (rootAccess()) {
-            rootSTDIN.write("exit\n".getBytes("UTF-8"));
-            rootSTDIN.flush();
-            rootShell.waitFor();
-            rootSTDIN.close();
-            rootSTDOUT.join();
-            rootShell.destroy();
         }
     }
 

@@ -2,25 +2,20 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +24,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.utils.DownloadReceiver;
+import com.topjohnwu.magisk.receivers.ApkReceiver;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.magisk.receivers.ZipReceiver;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +37,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -79,10 +76,9 @@ public class MagiskFragment extends Fragment {
     int statusOK = R.drawable.ic_check_circle;
     int statusUnknown = R.drawable.ic_help;
 
-    private String mLastLink;
+    private String mLastLink, mLastFile;
     private boolean mLastIsApp;
     private List<String> version;
-    private long apkID, zipID;
 
     @Nullable
     @Override
@@ -96,101 +92,36 @@ public class MagiskFragment extends Fragment {
         return v;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            downloadFile();
-        } else {
-            Toast.makeText(getContext(), R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void setupCardView(final boolean app, final String versionCode, final String link, String changelog) {
-        View clickView;
-        if (app) {
-            clickView = appUpdateView;
-            appCheckUpdatesContainer.setBackgroundColor(blue500);
-            appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-            appCheckUpdatesStatus.setText(R.string.app_update_available);
-        } else {
-            clickView = magiskUpdateView;
-            magiskCheckUpdatesContainer.setBackgroundColor(blue500);
-            magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-            magiskCheckUpdatesStatus.setText(R.string.magisk_update_available);
-        }
-
-        String text = app ? getString(R.string.app_name) : getString(R.string.magisk);
-        final String msg = getString(R.string.update_available_message, text, versionCode, changelog);
-
+    private void setListener(View clickView, DownloadReceiver receiver, String link, String msg, String file) {
         clickView.setOnClickListener(view -> new AlertDialog.Builder(getContext())
                 .setTitle(R.string.update_available)
                 .setMessage(Html.fromHtml(msg))
                 .setCancelable(false)
-                .setPositiveButton(R.string.update, (dialogInterface, i) -> {
-                    mLastLink = link;
-                    mLastIsApp = app;
+                .setPositiveButton(R.string.download, (dialogInterface, i) -> {
 
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        downloadFile();
-                    } else {
-                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(getContext(), R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
+                        return;
                     }
 
+                    File downloadFile, dir = new File(Environment.getExternalStorageDirectory() + "/MagiskManager");
+
+                    downloadFile = new File(dir + "/" + file);
+
+                    if (!dir.exists()) dir.mkdir();
+
+                    DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
+                    request.setDestinationUri(Uri.fromFile(downloadFile));
+
+                    if (downloadFile.exists()) downloadFile.delete();
+
+                    receiver.setDownloadID(downloadManager.enqueue(request));
+
+                    getActivity().registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
                 })
                 .setNegativeButton(R.string.no_thanks, null)
                 .show());
-    }
-
-    private void downloadFile() {
-
-        File downloadFile, dir = new File(Environment.getExternalStorageDirectory() + "/MagiskManager");
-        DownloadReceiver receiver;
-
-        if (mLastIsApp) {
-            downloadFile = new File(dir + "/MagiskManager.apk");
-
-        } else {
-            downloadFile = new File(dir + "/Magisk.zip");
-        }
-
-        if (!dir.exists()) dir.mkdir();
-
-        DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(mLastLink));
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationUri(Uri.fromFile(downloadFile));
-
-        if (downloadFile.exists()) downloadFile.delete();
-
-        long downloadID = downloadManager.enqueue(request);
-
-        if (mLastIsApp) {
-            receiver = new DownloadReceiver(downloadID) {
-                @Override
-                public void task(File file) {
-                    Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                    install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    install.setData(FileProvider.getUriForFile(context, "com.topjohnwu.magisk.provider", file));
-                    context.startActivity(install);
-                }
-            };
-        } else {
-            receiver = new DownloadReceiver(downloadID) {
-                @Override
-                public void task(final File file) {
-                    new AlertDialog.Builder(context)
-                            .setTitle("Reboot Recovery")
-                            .setMessage("Do you want to flash in recovery now?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes, flash now", (dialogInterface, i) -> Toast.makeText(context, file.getPath(), Toast.LENGTH_LONG).show())
-                            .setNegativeButton(R.string.no_thanks, null)
-                            .show();
-                }
-            };
-        }
-        getActivity().registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     private class updateUI extends AsyncTask<Void, Void, Void> {
@@ -206,9 +137,7 @@ public class MagiskFragment extends Fragment {
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
 
-            version = Shell.sh("getprop magisk.version");
-
-            if (version.get(0).replaceAll("\\s", "").isEmpty()) {
+            if (Shell.magiskVersion == -1) {
                 magiskStatusContainer.setBackgroundColor(grey500);
                 magiskStatusIcon.setImageResource(statusUnknown);
 
@@ -219,7 +148,7 @@ public class MagiskFragment extends Fragment {
                 magiskStatusIcon.setImageResource(statusOK);
 
                 magiskVersion.setTextColor(green500);
-                magiskVersion.setText(getString(R.string.magisk_version, version.get(0)));
+                magiskVersion.setText(getString(R.string.magisk_version, String.valueOf(Shell.magiskVersion)));
             }
 
             progressBar.setVisibility(View.GONE);
@@ -270,6 +199,9 @@ public class MagiskFragment extends Fragment {
                 return;
             }
 
+            magiskUpdateView.setVisibility(View.VISIBLE);
+            appUpdateView.setVisibility(View.VISIBLE);
+
             try {
                 JSONObject json = new JSONObject(result);
 
@@ -284,25 +216,36 @@ public class MagiskFragment extends Fragment {
                 String magiskLink = magisk.getString("link");
                 String magiskChangelog = magisk.getString("changelog");
 
+                //if (Integer.parseInt(magiskVersionCode) > versionInt) {
+                if (99 > Shell.magiskVersion) {
+                    magiskCheckUpdatesContainer.setBackgroundColor(blue500);
+                    magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
+                    magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, magiskVersionCode));
+                    setListener(magiskUpdateView, new ZipReceiver(), "https://www.dropbox.com/s/dc16jf1ifhv6ef4/Magisk-v7.zip?dl=1",
+                            getString(R.string.update_available_message, "Magisk", appVersionCode, magiskChangelog),
+                            "latest_magisk.zip"
+                    );
+                } else {
+                    magiskCheckUpdatesContainer.setBackgroundColor(green500);
+                    magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
+                    magiskCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
+                }
+
                 if (Integer.parseInt(appVersionCode) > BuildConfig.VERSION_CODE) {
-                    setupCardView(true, appVersionCode, appLink, appChangelog);
+                    appCheckUpdatesContainer.setBackgroundColor(blue500);
+                    appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
+                    appCheckUpdatesStatus.setText(getString(R.string.app_update_available, appVersionCode));
+                    setListener(appUpdateView, new ApkReceiver(), appLink,
+                            getString(R.string.update_available_message, "Magisk Manager", appVersionCode, appChangelog),
+                            "latest_manager.apk"
+                    );
+
                 } else {
                     appCheckUpdatesContainer.setBackgroundColor(green500);
                     appCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
                     appCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.app_name)));
                 }
 
-                String v = version.get(0).replaceAll("\\s", "");
-
-                int versionInt = TextUtils.isEmpty(v) ? 0 : Integer.parseInt(v);
-
-                if (Integer.parseInt(magiskVersionCode) > versionInt) {
-                    setupCardView(false, magiskVersionCode, magiskLink, magiskChangelog);
-                } else {
-                    magiskCheckUpdatesContainer.setBackgroundColor(green500);
-                    magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
-                    magiskCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
-                }
 
             } catch (JSONException ignored) {
             }

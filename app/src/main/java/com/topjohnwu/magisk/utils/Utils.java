@@ -1,5 +1,13 @@
 package com.topjohnwu.magisk.utils;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
+
+import com.topjohnwu.magisk.R;
+
 import java.util.List;
 
 public class Utils {
@@ -41,6 +49,54 @@ public class Utils {
         return ret;
     }
 
+    public static class flashZIP extends AsyncTask<Void, Void, Boolean> {
 
+        private String mPath;
+        private ProgressDialog progress;
+        Context mContext;
+
+        public flashZIP(String path, Context context) {
+            mPath = path;
+            mContext = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progress = ProgressDialog.show(mContext, "Installing", "Patching boot image for Magisk....");
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            if (!Shell.rootAccess()) {
+                return false;
+            } else {
+                Shell.su(
+                        "rm -rf /data/tmp",
+                        "mkdir -p /data/tmp",
+                        "cp -af " + mPath + " /data/tmp/install.zip",
+                        "unzip -o /data/tmp/install.zip META-INF/com/google/android/* -d /data/tmp",
+                        "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip"
+                );
+                return Boolean.parseBoolean(Shell.su("if [ $? -eq 0 ]; then echo true; else echo false; fi").get(0));
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            Shell.su("rm -rf /data/tmp");
+            progress.dismiss();
+            if (!result) {
+                Toast.makeText(mContext, "Installation failed...", Toast.LENGTH_LONG).show();
+                return;
+            }
+            new AlertDialog.Builder(mContext)
+                    .setTitle("Reboot now?")
+                    .setPositiveButton("Yes", (dialogInterface1, i1) -> Toast.makeText(mContext, "Reboot...", Toast.LENGTH_LONG).show())
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .show();
+        }
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk.receivers;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
+import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
@@ -14,20 +14,16 @@ import com.topjohnwu.magisk.R;
 import java.io.File;
 
 /**
- * Created by topjohnwu on 2016/8/27.
+ * Created by topjohnwu
  */
-public abstract class DownloadReceiver extends BroadcastReceiver{
-    public Context context;
-    DownloadManager downloadManager;
+public abstract class DownloadReceiver extends BroadcastReceiver {
+    public Context mContext;
     long downloadID;
 
-    public DownloadReceiver(long downloadID) {
-        this.downloadID = downloadID;
-    }
     @Override
     public void onReceive(Context context, Intent intent) {
-        this.context = context;
-        downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        mContext = context;
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         String action = intent.getAction();
         if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)){
             DownloadManager.Query query = new DownloadManager.Query();
@@ -49,6 +45,8 @@ public abstract class DownloadReceiver extends BroadcastReceiver{
             }
         }
     }
+
+    public void setDownloadID(long id) { downloadID = id;}
 
     public abstract void task(File file);
 }
