@@ -48,12 +48,7 @@ public class AboutActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(view -> finish());
 
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -81,37 +76,31 @@ public class AboutActivity extends AppCompatActivity {
             appChangelog.setVisibility(View.GONE);
         } else {
             final String finalChanges = changes;
-            appChangelog.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog d = new AlertDialog.Builder(AboutActivity.this)
-                            .setTitle(R.string.app_changelog)
-                            .setMessage(Html.fromHtml(finalChanges))
-                            .setPositiveButton(android.R.string.ok, null)
-                            .create();
-
-                    d.show();
-
-                    //noinspection ConstantConditions
-                    ((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
-                }
-            });
-        }
-
-        appDevelopers.removeSummary();
-        appDevelopers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            appChangelog.setOnClickListener(v -> {
                 AlertDialog d = new AlertDialog.Builder(AboutActivity.this)
-                        .setTitle(R.string.app_developers)
-                        .setMessage(Html.fromHtml(getString(R.string.app_developers_)))
+                        .setTitle(R.string.app_changelog)
+                        .setMessage(Html.fromHtml(finalChanges))
                         .setPositiveButton(android.R.string.ok, null)
                         .create();
 
                 d.show();
+
                 //noinspection ConstantConditions
                 ((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
-            }
+            });
+        }
+
+        appDevelopers.removeSummary();
+        appDevelopers.setOnClickListener(view -> {
+            AlertDialog d = new AlertDialog.Builder(AboutActivity.this)
+                    .setTitle(R.string.app_developers)
+                    .setMessage(Html.fromHtml(getString(R.string.app_developers_)))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create();
+
+            d.show();
+            //noinspection ConstantConditions
+            ((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
         });
 
         String translators = getString(R.string.translators);
@@ -122,20 +111,10 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         appSourceCode.removeSummary();
-        appSourceCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_CODE_URL)));
-            }
-        });
+        appSourceCode.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_CODE_URL))));
 
         supportThread.removeSummary();
-        supportThread.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(XDA_THREAD)));
-            }
-        });
+        supportThread.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(XDA_THREAD))));
 
         setFloating();
     }

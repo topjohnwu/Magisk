@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.module;
 
 import android.util.Log;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.BufferedReader;
@@ -13,12 +14,15 @@ public class Module {
     private String mRemoveFile;
     private String mDisableFile;
 
-    private String mName;
-    private String mVersion;
-    private String mDescription;
+    private String mName = null;
+    private String mVersion = "(No version provided)";
+    private String mDescription = "(No description provided)";
 
     private boolean mEnable;
     private boolean mRemove;
+
+    private String mId;
+    private int mVersionCode;
 
 
     public Module(String path) {
@@ -46,7 +50,23 @@ public class Module {
                 case "description":
                     mDescription = value;
                     break;
+                case "id":
+                    mId = value;
+                    break;
+                case "versionCode":
+                    try {
+                        mVersionCode = Integer.parseInt(value);
+                    } catch (NumberFormatException e) {
+                        mVersionCode = 0;
+                    }
+                    break;
             }
+        }
+
+        if (mName == null) {
+            int sep = path.lastIndexOf('/');
+            mName = path.substring(sep + 1);
+            mId = mName;
         }
 
         mEnable = !Utils.fileExist(mDisableFile);

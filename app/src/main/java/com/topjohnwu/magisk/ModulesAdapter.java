@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.rv;
+package com.topjohnwu.magisk;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -22,11 +21,11 @@ import butterknife.ButterKnife;
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
     private final List<Module> mList;
-    private final ItemClickListener chboxListener;
-    private final ItemClickListener deleteBtnListener;
-    private final ItemClickListener unDeleteBtnListener;
+    private final Utils.ItemClickListener chboxListener;
+    private final Utils.ItemClickListener deleteBtnListener;
+    private final Utils.ItemClickListener unDeleteBtnListener;
 
-    public ModulesAdapter(List<Module> list, ItemClickListener chboxListener, ItemClickListener deleteBtnListener, ItemClickListener undeleteBtnListener) {
+    public ModulesAdapter(List<Module> list, Utils.ItemClickListener chboxListener, Utils.ItemClickListener deleteBtnListener, Utils.ItemClickListener undeleteBtnListener) {
         this.mList = list;
         this.chboxListener = chboxListener;
         this.deleteBtnListener = deleteBtnListener;
@@ -49,24 +48,16 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.description.setText(module.getDescription());
 
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                chboxListener.onItemClick(compoundButton, holder.getAdapterPosition());
-            }
-        });
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> chboxListener.onItemClick(compoundButton, holder.getAdapterPosition()));
 
-        holder.delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (module.willBeRemoved()) {
-                    unDeleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
-                } else {
-                    deleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
-                }
-
-                updateDeleteButton(holder, module);
+        holder.delete.setOnClickListener(view -> {
+            if (module.willBeRemoved()) {
+                unDeleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
+            } else {
+                deleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
             }
+
+            updateDeleteButton(holder, module);
         });
 
         updateDeleteButton(holder, module);

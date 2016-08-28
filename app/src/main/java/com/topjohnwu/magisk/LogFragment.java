@@ -101,18 +101,8 @@ public class LogFragment extends Fragment {
 
     private void reloadErrorLog() {
         new LogsManager(true).execute();
-        svLog.post(new Runnable() {
-            @Override
-            public void run() {
-                svLog.scrollTo(0, txtLog.getHeight());
-            }
-        });
-        hsvLog.post(new Runnable() {
-            @Override
-            public void run() {
-                hsvLog.scrollTo(0, 0);
-            }
-        });
+        svLog.post(() -> svLog.scrollTo(0, txtLog.getHeight()));
+        hsvLog.post(() -> hsvLog.scrollTo(0, 0));
     }
 
     private void clear() {
@@ -134,12 +124,7 @@ public class LogFragment extends Fragment {
         if (requestCode == 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (mClickedMenuItem != null) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            onOptionsItemSelected(mClickedMenuItem);
-                        }
-                    }, 500);
+                    new Handler().postDelayed(() -> onOptionsItemSelected(mClickedMenuItem), 500);
                 }
             } else {
                 Snackbar.make(txtLog, R.string.permissionNotGranted, Snackbar.LENGTH_LONG).show();

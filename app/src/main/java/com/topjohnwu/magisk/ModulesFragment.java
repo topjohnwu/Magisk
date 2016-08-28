@@ -28,13 +28,8 @@ import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
 
-    private static final String MAGISK_PATH = "/magisk";
-    private static final String MAGISK_CACHE_PATH = "/cache/magisk";
-
-    private static List<Module> listModules = new ArrayList<>();
-    private static List<Module> listModulesCache = new ArrayList<>();
-
-    public static loadModules loadMod;
+    public static List<Module> listModules = new ArrayList<>();
+    public static List<Module> listModulesCache = new ArrayList<>();
 
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.pager) ViewPager viewPager;
@@ -67,8 +62,7 @@ public class ModulesFragment extends Fragment {
                 progressBar.setVisibility(View.VISIBLE);
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
-                loadMod = new loadModules();
-                loadMod.execute();
+                new Utils.LoadModules(getContext()).execute();
                 new updateUI().execute();
                 break;
         }
@@ -94,40 +88,10 @@ public class ModulesFragment extends Fragment {
 
     }
 
-    public static class loadModules extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            listModules.clear();
-            listModulesCache.clear();
-            List<String> magisk = Utils.getModList(MAGISK_PATH);
-            List<String> magiskCache = Utils.getModList(MAGISK_CACHE_PATH);
-            if (!magisk.isEmpty()) {
-                for (String mod : magisk) {
-                    listModules.add(new Module(mod));
-                }
-            }
-            if (!magiskCache.isEmpty()) {
-                for (String mod : magiskCache) {
-                    listModulesCache.add(new Module(mod));
-                }
-            }
-
-            return null;
-        }
-    }
-
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            // Ensure loadMod is done
-            try {
-                loadMod.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-
             return null;
         }
 

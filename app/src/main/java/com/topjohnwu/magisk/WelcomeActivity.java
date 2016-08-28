@@ -3,14 +3,12 @@ package com.topjohnwu.magisk;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -22,7 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,10 +48,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
-        // Load mods in the background, as it is time consuming
-        ModulesFragment.loadMod = new ModulesFragment.loadModules();
-        ModulesFragment.loadMod.execute();
-        new Popups().execute();
+        // Startups
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+        new Utils.Initialize(this).execute();
+        new Utils.CheckUpdates(this).execute();
+        new Utils.LoadModules(this).execute();
 
         setSupportActionBar(toolbar);
 
@@ -84,10 +86,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-            }
         }
 
     @Override
@@ -153,22 +151,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
                 transaction.replace(R.id.content_frame, navFragment, tag).commit();
             } catch (IllegalStateException ignored) {
-            }
-        }
-    }
-
-    private class Popups extends AsyncTask <Void, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            return Shell.rootAccess();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean rootAccess) {
-            super.onPostExecute(rootAccess);
-            if (!rootAccess) {
-                Snackbar.make(findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
             }
         }
     }

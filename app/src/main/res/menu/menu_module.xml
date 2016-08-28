@@ -5,7 +5,7 @@
     <item
         android:id="@+id/force_reload"
         android:icon="@drawable/ic_refresh"
-        android:title="@string/force_reload"
+        android:title="@string/menuReload"
         app:showAsAction="always"/>
 
 </menu>

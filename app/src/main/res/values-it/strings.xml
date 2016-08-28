@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Magisk Manager</string>
     <string name="about">Info su…</string>
     <string name="app_changelog">Changelog dell\'app</string>
     <string name="app_developers">Sviluppatori principali</string>
@@ -11,8 +10,6 @@
     <string name="cache_modules">Moduli in cache</string>
     <string name="disable_file_created">Il modulo verrà disabilitato al prossimo riavvio</string>
     <string name="disable_file_removed">Il modulo verrà abilitato al prossimo riavvio</string>
-    <string name="force_reload">Aggiorna</string>
-    <string name="loading">Caricamento…</string>
     <string name="log">Log</string>
     <string name="log_is_empty">Il log è vuoto</string>
     <string name="logs_clear_failed">Non è possibile leggere il log:</string>

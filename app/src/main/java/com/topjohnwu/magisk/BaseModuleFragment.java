@@ -12,8 +12,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.rv.ItemClickListener;
-import com.topjohnwu.magisk.rv.ModulesAdapter;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
 
@@ -38,36 +37,27 @@ public abstract class BaseModuleFragment extends Fragment {
             return view;
         }
 
-        recyclerView.setAdapter(new ModulesAdapter(listModules(), new ItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                // On Checkbox change listener
-                CheckBox chbox = (CheckBox) view;
+        recyclerView.setAdapter(new ModulesAdapter(listModules(), (chk, position) -> {
+            // On Checkbox change listener
+            CheckBox chbox = (CheckBox) chk;
 
-                if (!chbox.isChecked()) {
-                    listModules().get(position).createDisableFile();
-                    Snackbar.make(view, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
-                } else {
-                    listModules().get(position).removeDisableFile();
-                    Snackbar.make(view, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
-                }
+            if (!chbox.isChecked()) {
+                listModules().get(position).createDisableFile();
+                Snackbar.make(chk, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
+            } else {
+                listModules().get(position).removeDisableFile();
+                Snackbar.make(chk, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
             }
-        }, new ItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                // On delete button click listener
+        }, (deleteBtn, position) -> {
+            // On delete button click listener
 
-                listModules().get(position).createRemoveFile();
-                Snackbar.make(view, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
-            }
-        }, new ItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                // On undelete button click listener
+            listModules().get(position).createRemoveFile();
+            Snackbar.make(deleteBtn, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+        }, (undeleteBtn, position) -> {
+            // On undelete button click listener
 
-                listModules().get(position).deleteRemoveFile();
-                Snackbar.make(view, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
-            }
+            listModules().get(position).deleteRemoveFile();
+            Snackbar.make(undeleteBtn, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
         }));
         return view;
     }

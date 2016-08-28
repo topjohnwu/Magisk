@@ -17,7 +17,6 @@ public class Shell {
 
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted; 2 = improperly rooted;
     public static int rootStatus;
-    public static int magiskVersion;
 
     private static Process rootShell;
     private static DataOutputStream rootSTDIN;
@@ -29,13 +28,6 @@ public class Shell {
     }
 
     private static void init() {
-
-        List<String> ret = sh("getprop magisk.version");
-        if (ret.get(0).replaceAll("\\s", "").isEmpty()) {
-            magiskVersion = -1;
-        } else {
-            magiskVersion = Integer.parseInt(ret.get(0));
-        }
 
         try {
             rootShell = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
@@ -56,7 +48,7 @@ public class Shell {
         rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
         rootSTDOUT.start();
 
-        ret = su("echo -BOC-", "id");
+        List<String> ret = su("echo -BOC-", "id");
         if (ret == null) {
             // Something wrong with root, not allowed?
             rootStatus = -1;

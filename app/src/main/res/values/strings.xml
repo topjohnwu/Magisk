@@ -1,9 +1,27 @@
 <resources>
-    <string name="app_name">Magisk Manager</string>
-
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
     <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="root">Root</string>
+    <string name="modules">Modules</string>
+    <string name="log">Log</string>
+
+    <!--Magisk Fragment-->
     <string name="magisk_version">Installed Magisk v%1$s</string>
     <string name="magisk_version_error">Have you installed Magisk?</string>
+
+    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$s update!</string>
+    <string name="cannot_check_updates">Cannot check for updates</string>
+    <string name="up_to_date">Latest version of %1$s installed</string>
+
+    <!--Root Fragment-->
+    <string name="root_toggle">Root Toggle</string>
+    <string name="selinux_toggle">SELinux Toggle</string>
 
     <string name="root_error">Root Error</string>
     <string name="root_error_info">Safety Net Status Unknown</string>
@@ -13,7 +31,7 @@
     <string name="root_mounted_info">Root mounted and enabled. Safety Net (Android Pay) will NOT work</string>
     <string name="root_unmounted">Root not mounted</string>
     <string name="root_unmounted_info">Safety Net (Android Pay) should work, but no root temporarily\nYou might need to manually add a card in Android Pay app to refresh the root status of AP</string>
-    <string name="root_system">Improperly Installed</string>
+    <string name="root_system">Magisk Incompatible Root Detected</string>
     <string name="root_system_info">Root improperly installed. Safety Net (Android Pay) will NOT work, and impossible to toggle</string>
 
     <string name="selinux_error_info">SELinux Status Unknown</string>
@@ -21,17 +39,15 @@
     <string name="selinux_permissive_info">SELinux is permissive\nOnly turn off SELinux if necessary!</string>
     <string name="selinux_samsung_info">Samsung need custom kernel for switching SELinux status!</string>
 
-    <string name="root_toggle">Root Toggle</string>
-    <string name="selinux_toggle">SELinux Toggle</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="modules">Modules</string>
-    <string name="log">Log</string>
-    <string name="no_root_access">No root access, functionality limited</string>
+    <!--Module Fragment-->
+    <string name="cache_modules">Cache modules</string>
+    <string name="no_modules_found">No modules found</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
+    <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>
+    <string name="disable_file_removed">Module will be enabled at next reboot</string>
+
+    <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
     <string name="menuSend">Send</string>
     <string name="menuReload">Reload</string>
@@ -41,10 +57,8 @@
     <string name="logs_clear_failed">Could not clear the log:</string>
     <string name="log_is_empty">Log is empty</string>
     <string name="logs_save_failed">Could not write log to SD card:</string>
-    <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
-    <string name="disable_file_removed">Module will be enabled at next reboot</string>
-    <string name="remove_file_deleted">Module will not be removed at next reboot</string>
-    <string name="cache_modules">Cache modules</string>
+
+    <!--About Activity-->
     <string name="about">About</string>
     <string name="app_developers">Main developers</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/dvdandroid">dvdandroid</a>]]></string>
@@ -54,20 +68,25 @@
     <string name="app_source_code">Source code</string>
     <string name="app_translators">App\'s translators</string>
     <string name="support_thread">Support thread</string>
-    <string name="force_reload">Refresh</string>
-    <string name="no_modules_found">No modules found</string>
-    <string name="loading">Loading…</string>
-    <string name="update_available">Update available!</string>
-    <string name="download">Download</string>
-    <string name="update_available_message"><![CDATA[A new version of %1$s is available!<br>Version: v%2$s<br>Changelog:<br>%3$s]]></string>
-    <string name="no_thanks">No, thanks</string>
-    <string name="never_show_again">Don\'t show again</string>
-    <string name="error_download_file">Error downloading file</string>
-    <string name="flash_recovery">File downloaded in Magisk directory, you can flash it in recovery</string>
-    <string name="root">Root</string>
-    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
-    <string name="magisk_update_available">Magisk v%1$s update!</string>
-    <string name="cannot_check_updates">Cannot check for updates</string>
-    <string name="up_to_date">Latest version of %1$s installed</string>
 
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
+    <string name="no_root_access">No root access, functionality limited</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="update_title">%1$s Update!</string>
+    <string name="update_msg"><![CDATA[New version v%2$s of %1$s is available!<br>Changelog:<br>%3$s]]></string>
+    <string name="download_install">Download and install</string>
+    <string name="download_file_error">Error downloading file</string>
+    <string name="manual_install">File downloaded in %1$s\nFlash it in recovery manually</string>
+    <string name="reboot_title">Installation succeeded!</string>
+    <string name="reboot_msg">Do you want to reboot now?</string>
+    <string name="reboot">Reboot</string>
+    <string name="zip_install_progress_title">Installing</string>
+    <string name="zip_install_progress_msg">"Installing %1$s …"</string>
+    <string name="no_magisk_title">No Magisk Installed!</string>
+    <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
+    <string name="root_method_title">Choose a root method</string>
+    <string name="phh">phh\'s superuser</string>
+    <string name="supersu">SuperSU</string>
+    <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
 </resources>
