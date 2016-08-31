@@ -1,8 +1,11 @@
 package com.topjohnwu.magisk;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,33 +28,51 @@ import butterknife.ButterKnife;
 
 public class RootFragment extends Fragment {
 
-    @BindView(R.id.progressBar) ProgressBar progressBar;
-
-    @BindView(R.id.rootSwitchView) View rootToggleView;
-    @BindView(R.id.selinuxSwitchView) View selinuxToggleView;
-    @BindView(R.id.rootStatusView) View rootStatusView;
-    @BindView(R.id.safetynetStatusView) View safetynetStatusView;
-    @BindView(R.id.selinuxStatusView) View selinuxStatusView;
-
-    @BindView(R.id.root_toggle) Switch rootToggle;
-    @BindView(R.id.selinux_toggle) Switch selinuxToggle;
-
-    @BindView(R.id.root_status_container) View rootStatusContainer;
-    @BindView(R.id.root_status_icon) ImageView rootStatusIcon;
-    @BindView(R.id.root_status) TextView rootStatus;
-
-    @BindView(R.id.selinux_status_container) View selinuxStatusContainer;
-    @BindView(R.id.selinux_status_icon) ImageView selinuxStatusIcon;
-    @BindView(R.id.selinux_status) TextView selinuxStatus;
-
-    @BindView(R.id.safety_net_status) TextView safetyNetStatus;
-    @BindView(R.id.safety_net_icon) ImageView safetyNetStatusIcon;
-
-    @BindColor(R.color.red500) int red500;
-    @BindColor(R.color.green500) int green500;
-    @BindColor(R.color.grey500) int grey500;
-    @BindColor(R.color.accent) int accent;
-
+    public SharedPreferences prefs;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.rootSwitchView)
+    View rootToggleView;
+    @BindView(R.id.autoRootSwitchView)
+    View autoRootToggleView;
+    @BindView(R.id.selinuxSwitchView)
+    View selinuxToggleView;
+    @BindView(R.id.rootStatusView)
+    View rootStatusView;
+    @BindView(R.id.safetynetStatusView)
+    View safetynetStatusView;
+    @BindView(R.id.selinuxStatusView)
+    View selinuxStatusView;
+    @BindView(R.id.root_toggle)
+    Switch rootToggle;
+    @BindView(R.id.auto_root_toggle)
+    Switch autoRootToggle;
+    @BindView(R.id.selinux_toggle)
+    Switch selinuxToggle;
+    @BindView(R.id.root_status_container)
+    View rootStatusContainer;
+    @BindView(R.id.root_status_icon)
+    ImageView rootStatusIcon;
+    @BindView(R.id.root_status)
+    TextView rootStatus;
+    @BindView(R.id.selinux_status_container)
+    View selinuxStatusContainer;
+    @BindView(R.id.selinux_status_icon)
+    ImageView selinuxStatusIcon;
+    @BindView(R.id.selinux_status)
+    TextView selinuxStatus;
+    @BindView(R.id.safety_net_status)
+    TextView safetyNetStatus;
+    @BindView(R.id.safety_net_icon)
+    ImageView safetyNetStatusIcon;
+    @BindColor(R.color.red500)
+    int red500;
+    @BindColor(R.color.green500)
+    int green500;
+    @BindColor(R.color.grey500)
+    int grey500;
+    @BindColor(R.color.accent)
+    int accent;
     int statusOK = R.drawable.ic_check_circle;
     int statusError = R.drawable.ic_error;
     int statusUnknown = R.drawable.ic_help;
@@ -63,10 +84,25 @@ public class RootFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         new updateUI().execute();
+        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         rootToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setprop magisk.root 1" : "setprop magisk.root 0");
             new Handler().postDelayed(() -> new updateUI().execute(), 1000);
+            if (!((CompoundButton) toggle).isChecked()) {
+                autoRootToggle.setChecked(false);
+            }
+        });
+
+        autoRootToggle.setOnClickListener(toggle -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("autoRootEnable", ((CompoundButton) toggle).isChecked());
+            editor.commit();
+            if (((CompoundButton) toggle).isChecked()) {
+                Intent myIntent = new Intent(getActivity(), MonitorService.class);
+                getActivity().startService(myIntent);
+            }
+
         });
 
         selinuxToggle.setOnClickListener(toggle -> {
@@ -77,7 +113,13 @@ public class RootFragment extends Fragment {
         return view;
     }
 
-    private class updateUI extends AsyncTask<Void, Void, Void> {
+    @Override
+    public void onResume() {
+        super.onResume();
+        new updateUI().execute();
+    }
+
+    public class updateUI extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -98,6 +140,7 @@ public class RootFragment extends Fragment {
 
             if (Shell.rootAccess()) {
                 rootToggleView.setVisibility(View.VISIBLE);
+                autoRootToggleView.setVisibility(View.VISIBLE);
                 selinuxToggleView.setVisibility(View.VISIBLE);
             }
 
@@ -183,7 +226,7 @@ public class RootFragment extends Fragment {
                     rootToggle.setChecked(true);
                     safetyNetStatusIcon.setImageResource(statusError);
                     safetyNetStatus.setText(R.string.root_system_info);
-
+                    autoRootToggleView.setVisibility(View.GONE);
                     rootToggleView.setVisibility(View.GONE);
                     selinuxToggleView.setVisibility(View.GONE);
                     break;

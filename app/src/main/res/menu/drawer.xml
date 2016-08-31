@@ -16,6 +16,11 @@
             android:title="@string/root"/>
 
         <item
+            android:id="@+id/autoroot"
+            android:icon="@drawable/ic_autoroot"
+            android:title="@string/auto_root"/>
+
+        <item
             android:id="@+id/modules"
             android:icon="@drawable/ic_extension"
             android:title="@string/modules"/>

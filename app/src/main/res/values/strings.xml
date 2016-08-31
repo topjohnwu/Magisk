@@ -21,6 +21,7 @@
 
     <!--Root Fragment-->
     <string name="root_toggle">Root Toggle</string>
+    <string name="auto_root">Auto Root</string>
     <string name="selinux_toggle">SELinux Toggle</string>
 
     <string name="root_error">Root Error</string>

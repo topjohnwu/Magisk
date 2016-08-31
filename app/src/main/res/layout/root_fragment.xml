@@ -35,6 +35,24 @@
                 android:textSize="16sp"/>
 
         </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:id="@+id/autoRootSwitchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp">
+
+            <Switch
+                android:id="@+id/auto_root_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                android:checked="true"
+                android:text="@string/auto_root"
+                android:textSize="16sp"/>
+
+        </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:id="@+id/selinuxSwitchView"
