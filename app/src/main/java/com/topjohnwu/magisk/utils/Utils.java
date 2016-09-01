@@ -156,19 +156,19 @@ public class Utils {
             }
 
             // Install Busybox and set as top priority
-            if (Shell.rootAccess()) {
-                String busybox = mContext.getApplicationInfo().nativeLibraryDir + "/libbusybox.so";
-                Shell.su(
-                        "rm -rf /data/busybox",
-                        "mkdir -p /data/busybox",
-                        "cp -af " + busybox + " /data/busybox/busybox",
-                        "chmod 755 /data/busybox /data/busybox/busybox",
-                        "chcon u:object_r:system_file:s0 /data/busybox /data/busybox/busybox",
-                        "/data/busybox/busybox --install -s /data/busybox",
-                        "rm -f /data/busybox/su",
-                        "export PATH=/data/busybox:$PATH"
-                );
-            }
+//            if (Shell.rootAccess()) {
+//                String busybox = mContext.getApplicationInfo().nativeLibraryDir + "/libbusybox.so";
+//                Shell.su(
+//                        "rm -rf /data/busybox",
+//                        "mkdir -p /data/busybox",
+//                        "cp -af " + busybox + " /data/busybox/busybox",
+//                        "chmod 755 /data/busybox /data/busybox/busybox",
+//                        "chcon u:object_r:system_file:s0 /data/busybox /data/busybox/busybox",
+//                        "/data/busybox/busybox --install -s /data/busybox",
+//                        "rm -f /data/busybox/su",
+//                        "export PATH=/data/busybox:$PATH"
+//                );
+//            }
             return null;
         }
 
