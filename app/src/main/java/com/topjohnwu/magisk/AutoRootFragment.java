@@ -29,13 +29,11 @@ public class AutoRootFragment extends ListFragment {
     private ApplicationAdapter listadaptor = null;
     public ListView listView;
     public SharedPreferences prefs;
-    private View view;
     List<String> arrayList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.auto_root_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.auto_root_fragment, container, false);
     }
 
     @Override
@@ -49,7 +47,7 @@ public class AutoRootFragment extends ListFragment {
             Set<String> set = new HashSet<String>();
             set.add("com.google.android.apps.walletnfcrel");
             editor.putStringSet("autoapps", set);
-            editor.commit();
+            editor.apply();
         }
         new LoadApplications().execute();
     }
