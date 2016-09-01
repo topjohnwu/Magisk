@@ -74,6 +74,25 @@ public class Module {
 
     }
 
+    public Module(ModuleRepo.Repo repo) {
+
+
+
+                    mName = repo.getName();
+                    mVersion = repo.getVersion();
+                    mDescription = repo.getDescription();
+                    mId = "foo";
+                    mVersionCode = 111;
+
+
+
+
+
+        mEnable = true;
+        mRemove = false;
+
+    }
+
     public String getName() {
         return mName;
     }

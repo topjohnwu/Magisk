@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,14 +22,12 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.module.ModuleRepo;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,6 +36,7 @@ public class ModulesFragment extends Fragment {
 
     public static List<Module> listModules = new ArrayList<>();
     public static List<Module> listModulesCache = new ArrayList<>();
+    public static List<Module> listModulesDownload = new ArrayList<>();
     private static final int FILE_SELECT_CODE = 0;
     private File input;
 
@@ -73,6 +73,7 @@ public class ModulesFragment extends Fragment {
 
 
         });
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -95,6 +96,7 @@ public class ModulesFragment extends Fragment {
             case R.id.force_reload:
                 listModules.clear();
                 listModulesCache.clear();
+                listModulesDownload.clear();
                 progressBar.setVisibility(View.VISIBLE);
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
@@ -123,6 +125,15 @@ public class ModulesFragment extends Fragment {
         }
 
     }
+    public static class DownloadModuleFragment extends BaseModuleFragment {
+
+        @Override
+        protected List<Module> listModules() {
+            return listModulesDownload;
+        }
+
+    }
+
 
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
@@ -145,7 +156,7 @@ public class ModulesFragment extends Fragment {
     private class TabsAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
-                getString(R.string.modules), getString(R.string.cache_modules)
+                getString(R.string.modules), getString(R.string.cache_modules) ,"Download"
         };
 
         public TabsAdapter(FragmentManager fm) {
@@ -166,9 +177,13 @@ public class ModulesFragment extends Fragment {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return new NormalModuleFragment();
-            } else {
+            } else if (position == 1) {
                 return new CacheModuleFragment();
+            } else {
+                Log.d("Magisk","DL Fragment picked here");
+                return new DownloadModuleFragment();
             }
         }
     }
+
 }

@@ -16,12 +16,14 @@ import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.module.ModuleRepo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -370,14 +372,23 @@ public class Utils {
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
             ModulesFragment.listModulesCache.clear();
+            ModulesFragment.listModulesDownload.clear();
             List<String> magisk = getModList(MAGISK_PATH);
+            Log.d("Magisk", String.valueOf(magisk));
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
+            ModuleRepo mr = new ModuleRepo();
+            List<ModuleRepo.Repo> magiskRepos = mr.listRepos();
             for (String mod : magisk) {
+                Log.d("Magisk","Utils, listing modules " + mod);
                 ModulesFragment.listModules.add(new Module(mod));
             }
             for (String mod : magiskCache) {
                 ModulesFragment.listModulesCache.add(new Module(mod));
             }
+            for (ModuleRepo.Repo repo : magiskRepos) {
+                ModulesFragment.listModulesDownload.add(new Module(repo));
+            }
+
             return null;
         }
     }
