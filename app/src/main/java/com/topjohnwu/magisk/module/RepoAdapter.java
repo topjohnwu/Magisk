@@ -1,12 +1,11 @@
 package com.topjohnwu.magisk.module;
 
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.WebRequest;
 
@@ -14,9 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,42 +27,48 @@ public class RepoAdapter {
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
     private Context activityContext;
+    private Date updatedDate, currentDate;
 
-
-    public List<Repo> listRepos(Context context) {
+    public List<Repo> listRepos(Context context, boolean refresh) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!prefs.contains("hasCachedRepos")) {
+        if (!prefs.contains("hasCachedRepos") | refresh) {
             activityContext = context;
-            MyAsyncTask asynchTask = new MyAsyncTask();
-            asynchTask.execute();
+            new MyAsyncTask().execute();
             List<String> out = null;
         } else {
             Log.d("Magisk", "Building from cache");
-            Map<String,?> map = prefs.getAll();
-            for (Map.Entry<String,?> entry : map.entrySet())
-            {
+            Map<String, ?> map = prefs.getAll();
+            repos.clear();
+            for (Map.Entry<String, ?> entry : map.entrySet()) {
                 if (entry.getKey().contains("module_")) {
-                    String repoString = entry.getValue().toString();
+                    String repoString = entry.getValue().toString().replace("&quot;", "\"");
                     JSONArray repoArray = null;
                     try {
                         repoArray = new JSONArray(repoString);
 
-                    repos.clear();
-                    for (int f = 0; f < repoArray.length(); f++) {
-                        JSONObject jsonobject = repoArray.getJSONObject(f);
-                        String name = jsonobject.getString("name");
-                        String moduleName, moduleDescription, zipUrl;
-                        moduleName = jsonobject.getString("moduleName");
-                        moduleDescription = jsonobject.getString("moduleDescription");
-                        zipUrl = jsonobject.getString("zipUrl");
-                        repos.add(new Repo(moduleName,moduleDescription,zipUrl));
 
-                    }
+                        for (int f = 0; f < repoArray.length(); f++) {
+                            JSONObject jsonobject = repoArray.getJSONObject(f);
+                            String name = entry.getKey().replace("module_", "");
+                            name = name.replace(" ", "");
+                            String moduleName, moduleDescription, zipUrl;
+                            moduleName = jsonobject.getString("moduleName");
+                            moduleDescription = jsonobject.getString("moduleDescription");
+                            zipUrl = jsonobject.getString("zipUrl");
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                            try {
+                                updatedDate = format.parse(jsonobject.getString("lastUpdate"));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            repos.add(new Repo(name, moduleDescription, zipUrl, updatedDate, activityContext));
+
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-                System.out.println(entry.getKey() + "/" + entry.getValue());
+
             }
 
         }
@@ -72,26 +78,31 @@ public class RepoAdapter {
     }
 
 
-
     class MyAsyncTask extends AsyncTask<String, String, Void> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            Toast.makeText(activityContext, "Refreshing online modules", Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         protected Void doInBackground(String... params) {
-            Log.d("Magisk", "doInBackground running");
+            publishProgress();
             // Creating service handler class instance
             WebRequest webreq = new WebRequest();
 
             // Making a request to url and getting response
             String jsonStr = webreq.makeWebServiceCall(url, WebRequest.GET);
+            Log.d("Magisk", "doInBackground Running, String: " + jsonStr + " Url: " + url);
 
-            Log.d("Response: ", "> " + jsonStr);
 
             try {
                 repos.clear();
@@ -100,11 +111,18 @@ public class RepoAdapter {
                     JSONObject jsonobject = jsonArray.getJSONObject(i);
                     String name = jsonobject.getString("name");
                     String url = jsonobject.getString("url");
-                        if (!name.contains("Repo.github.io")) {
-                            repos.add(new Repo(name, url, activityContext));
-                        }
-                    for (int f = 0; f < repos.size(); f++) {
-                        repos.get(f).fetch();
+                    String lastUpdate = jsonobject.getString("updated_at");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    try {
+                        updatedDate = format.parse(lastUpdate);
+
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    if (!name.contains("Repo.github.io")) {
+                        repos.add(new Repo(name, url, updatedDate, activityContext));
                     }
                 }
             } catch (JSONException e) {
@@ -124,7 +142,6 @@ public class RepoAdapter {
     protected void onPreExecute() {
 
     }
-
 
 
 }
