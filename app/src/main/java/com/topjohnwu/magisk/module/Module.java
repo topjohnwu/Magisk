@@ -1,13 +1,6 @@
 package com.topjohnwu.magisk.module;
 
-import android.util.Log;
-
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 
 public class Module {
 
@@ -17,13 +10,13 @@ public class Module {
     private String mName = null;
     private String mVersion = "(No version provided)";
     private String mDescription = "(No description provided)";
+    private String mUrl = null;
 
     private boolean mEnable;
     private boolean mRemove;
 
     private String mId;
     private int mVersionCode;
-
 
     public Module(String path) {
         mRemoveFile = path + "/remove";
@@ -74,24 +67,20 @@ public class Module {
 
     }
 
-    public Module(ModuleRepo.Repo repo) {
+    public Module(Repo repo) {
 
-
-
-                    mName = repo.getName();
-                    mVersion = repo.getVersion();
-                    mDescription = repo.getDescription();
-                    mId = "foo";
-                    mVersionCode = 111;
-
-
-
-
-
+        mName = repo.getName();
+        mVersion = repo.getVersion();
+        mDescription = repo.getDescription();
+        mId = "foo";
+        mVersionCode = 111;
+        mUrl = repo.getZipUrl();
         mEnable = true;
         mRemove = false;
 
     }
+
+
 
     public String getName() {
         return mName;

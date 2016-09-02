@@ -8,11 +8,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -23,7 +25,8 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.ModuleRepo;
+import com.topjohnwu.magisk.module.RepoAdapter;
+import com.topjohnwu.magisk.module.Repo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -376,8 +379,9 @@ public class Utils {
             List<String> magisk = getModList(MAGISK_PATH);
             Log.d("Magisk", String.valueOf(magisk));
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
-            ModuleRepo mr = new ModuleRepo();
-            List<ModuleRepo.Repo> magiskRepos = mr.listRepos();
+            RepoAdapter mr = new RepoAdapter();
+
+            List<Repo> magiskRepos = mr.listRepos(mContext);
             for (String mod : magisk) {
                 Log.d("Magisk","Utils, listing modules " + mod);
                 ModulesFragment.listModules.add(new Module(mod));
@@ -385,8 +389,8 @@ public class Utils {
             for (String mod : magiskCache) {
                 ModulesFragment.listModulesCache.add(new Module(mod));
             }
-            for (ModuleRepo.Repo repo : magiskRepos) {
-                ModulesFragment.listModulesDownload.add(new Module(repo));
+            for (Repo repo : magiskRepos) {
+                ModulesFragment.listModulesDownload.add(repo);
             }
 
             return null;
@@ -424,6 +428,7 @@ public class Utils {
                         "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
+                Log.d("Magisk","ZipResult: " + ret.toString());
                 return Boolean.parseBoolean(ret.get(ret.size() -1));
             }
         }

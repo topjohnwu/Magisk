@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.ModuleRepo;
+import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class ModulesFragment extends Fragment {
 
     public static List<Module> listModules = new ArrayList<>();
     public static List<Module> listModulesCache = new ArrayList<>();
-    public static List<Module> listModulesDownload = new ArrayList<>();
+    public static List<Repo> listModulesDownload = new ArrayList<>();
     private static final int FILE_SELECT_CODE = 0;
     private File input;
 
@@ -50,9 +50,8 @@ public class ModulesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, view);
-
+        new Utils.LoadModules(getContext()).execute();
         new updateUI().execute();
-
         setHasOptionsMenu(true);
         return view;
     }
@@ -125,10 +124,10 @@ public class ModulesFragment extends Fragment {
         }
 
     }
-    public static class DownloadModuleFragment extends BaseModuleFragment {
+    public static class DownloadModuleFragment extends BaseRepoFragment {
 
         @Override
-        protected List<Module> listModules() {
+        protected List<Repo> listRepos() {
             return listModulesDownload;
         }
 
@@ -180,7 +179,6 @@ public class ModulesFragment extends Fragment {
             } else if (position == 1) {
                 return new CacheModuleFragment();
             } else {
-                Log.d("Magisk","DL Fragment picked here");
                 return new DownloadModuleFragment();
             }
         }
