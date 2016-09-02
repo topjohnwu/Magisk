@@ -101,7 +101,16 @@ public class Repo {
 
     public String getVersion() {
         return version;
-    } 
+    }
+
+    public String getDescription() {
+        return moduleDescription;
+    }
+
+    public String getZipUrl() {
+        return zipUrl;
+    }
+
     public String getLogUrl() {
         return logUrl;
     }
