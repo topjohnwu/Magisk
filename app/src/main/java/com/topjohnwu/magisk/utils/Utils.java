@@ -28,6 +28,7 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.RepoAdapter;
 import com.topjohnwu.magisk.module.Repo;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,16 +38,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class Utils {
 
     public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
     public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
+    private Context appContext;
 
     public static final String MAGISK_PATH = "/magisk";
     public static final String MAGISK_CACHE_PATH = "/cache/magisk";
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+
 
     public static boolean fileExist(String path) {
         List<String> ret;
@@ -85,6 +90,10 @@ public class Utils {
         if (ret.isEmpty() && Shell.rootAccess())
             ret = Shell.su("cat " + path);
         return ret;
+    }
+
+    public Utils(Context context) {
+        appContext = context;
     }
 
     public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String file) {
@@ -366,9 +375,14 @@ public class Utils {
     public static class LoadModules extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
+        private boolean doReload;
 
-        public LoadModules(Context context) {
+        public LoadModules(Context context, boolean reload) {
+            Log.d("Magisk", "LoadModules created, online is " + reload);
             mContext = context;
+            doReload = reload;
+
+
         }
 
         @Override
@@ -377,23 +391,28 @@ public class Utils {
             ModulesFragment.listModulesCache.clear();
             ModulesFragment.listModulesDownload.clear();
             List<String> magisk = getModList(MAGISK_PATH);
-            Log.d("Magisk", String.valueOf(magisk));
+            Log.d("Magisk", "Reload called, online mode set to " + doReload);
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
             RepoAdapter mr = new RepoAdapter();
 
-            List<Repo> magiskRepos = mr.listRepos(mContext);
+
+            List<Repo> magiskRepos = mr.listRepos(mContext, doReload);
             for (String mod : magisk) {
-                Log.d("Magisk","Utils, listing modules " + mod);
-                ModulesFragment.listModules.add(new Module(mod));
+                ModulesFragment.listModules.add(new Module(mod,mContext));
             }
             for (String mod : magiskCache) {
-                ModulesFragment.listModulesCache.add(new Module(mod));
+                ModulesFragment.listModulesCache.add(new Module(mod,mContext));
             }
             for (Repo repo : magiskRepos) {
                 ModulesFragment.listModulesDownload.add(repo);
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
@@ -402,6 +421,7 @@ public class Utils {
         private String mPath, mName;
         private ProgressDialog progress;
         private Context mContext;
+        private List<String> ret;
 
         public FlashZIP(Context context, String name, String path) {
             mContext = context;
@@ -420,7 +440,7 @@ public class Utils {
             if (!Shell.rootAccess()) {
                 return false;
             } else {
-                List<String> ret = Shell.su(
+                ret = Shell.su(
                         "rm -rf /data/tmp",
                         "mkdir -p /data/tmp",
                         "cp -af " + mPath + " /data/tmp/install.zip",
@@ -428,7 +448,6 @@ public class Utils {
                         "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                Log.d("Magisk","ZipResult: " + ret.toString());
                 return Boolean.parseBoolean(ret.get(ret.size() -1));
             }
         }
@@ -441,6 +460,35 @@ public class Utils {
             if (!result) {
                 Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
                 return;
+            } else {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                String jsonString = prefs.getString("module_" + mName,"");
+                String retSplit[] = ret.toString().split("Using path:");
+                String ret2Split[] = retSplit[1].split(",");
+                String ret3Split[] = ret2Split[0].split("/");
+                String finalSplit = "/" + ret3Split[1] + "/" + ret3Split[2];
+                Log.d("Magisk","Damn, all that work for one path " + finalSplit);
+                if (!jsonString.equals("")) {
+
+                    JSONArray repoArray = null;
+                    try {
+                        repoArray = new JSONArray(jsonString);
+
+
+                        for (int f = 0; f < repoArray.length(); f++) {
+                            JSONObject jsonobject = repoArray.getJSONObject(f);
+                            String name = mName;
+                            Boolean installed = true;
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putBoolean("isInstalled_" + mName,true);
+                            editor.putString("path_" + mName,finalSplit);
+                            editor.apply();
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             done();
         }

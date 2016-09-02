@@ -11,38 +11,43 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Repo {
     public String name;
-    public String baseUrl, zipUrl,manifestUrl, logUrl;
-    public String manifest, version, moduleName, moduleDescription, moduleAuthor, moduleAuthorUrl;
-    public Boolean usesRoot,usesXposed;
+    public String baseUrl, zipUrl, manifestUrl, logUrl, manifest, version, moduleName, moduleDescription, moduleAuthor, moduleAuthorUrl;
+    public Date lastUpdate;
+    public Boolean usesRoot, usesXposed;
     private Context appContext;
     private SharedPreferences prefs;
 
 
-    public Repo(String name, String url, Context context) {
+    public Repo(String name, String url, Date updated, Context context) {
         appContext = context;
         this.name = name;
         this.baseUrl = url;
-        prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
+        this.lastUpdate = updated;
+        this.fetch();
 
     }
 
-    public Repo(String moduleName, String moduleDescription, String zipUrl) {
+    public Repo(String moduleName, String moduleDescription, String zipUrl, Date lastUpdated, Context context) {
+        Log.d("Magisk", "Hey, I'm a repo!  My name is " + moduleName);
+        appContext = context;
         this.zipUrl = zipUrl;
         this.moduleDescription = moduleDescription;
         this.moduleName = moduleName;
-        prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
+        this.lastUpdate = lastUpdated;
+
+
     }
 
     public void fetch() {
-
+        prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
         WebRequest webreq = new WebRequest();
         // Construct initial url for contents
-        Log.d("Magisk","Manifest string is: " + baseUrl + "/contents/");
+        Log.d("Magisk", "Manifest string is: " + baseUrl + "/contents/");
         String repoString = webreq.makeWebServiceCall(baseUrl + "/contents/", WebRequest.GET);
 
         try {
@@ -63,13 +68,13 @@ public class Repo {
             e.printStackTrace();
         }
 
-        Log.d("Magisk","Inner fetch: " + repoString);
+        Log.d("Magisk", "Inner fetch: " + repoString);
         try {
             WebRequest jsonReq = new WebRequest();
             // Construct initial url for contents
             String manifestString = webreq.makeWebServiceCall(this.manifestUrl, WebRequest.GET);
             JSONObject manifestObject = new JSONObject(manifestString);
-            Log.d("Magisk","Object: " +manifestObject.toString());
+            Log.d("Magisk", "Object: " + manifestObject.toString());
             version = manifestObject.getString("versionCode");
             moduleName = manifestObject.getString("moduleName");
             moduleDescription = manifestObject.getString("moduleDescription");
@@ -84,9 +89,13 @@ public class Repo {
                     + "\"usesRoot\":\"" + usesRoot + "\","
                     + "\"usesXposed\":\"" + usesXposed + "\","
                     + "\"zipUrl\":\"" + zipUrl + "\","
+                    + "\"lastUpdate\":\"" + lastUpdate + "\","
                     + "\"logUrl\":\"" + logUrl + "\"}]";
-            editor.putString("module_" + moduleName,prefsString);
-            editor.putBoolean("hasCachedRepos",true);
+            editor.putString("module_" + moduleName, prefsString);
+            editor.putBoolean("hasCachedRepos", true);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            editor.putString("updated", sdf.toString());
+            Log.d("Magisk", "Storing Preferences: " + prefsString);
             editor.apply();
 
         } catch (JSONException e) {
@@ -114,8 +123,6 @@ public class Repo {
     public String getLogUrl() {
         return logUrl;
     }
-
-
 
 
 }

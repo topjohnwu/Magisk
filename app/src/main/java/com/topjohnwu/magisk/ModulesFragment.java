@@ -2,9 +2,11 @@ package com.topjohnwu.magisk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -50,7 +52,12 @@ public class ModulesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, view);
-        new Utils.LoadModules(getContext()).execute();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (prefs.contains("hasCachedRepos")) {
+            new Utils.LoadModules(getActivity(), false).execute();
+        } else {
+            new Utils.LoadModules(getActivity(), true).execute();
+        }
         new updateUI().execute();
         setHasOptionsMenu(true);
         return view;
@@ -99,7 +106,7 @@ public class ModulesFragment extends Fragment {
                 progressBar.setVisibility(View.VISIBLE);
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
-                new Utils.LoadModules(getContext()).execute();
+                new Utils.LoadModules(getActivity(),false).execute();
                 new updateUI().execute();
                 break;
         }

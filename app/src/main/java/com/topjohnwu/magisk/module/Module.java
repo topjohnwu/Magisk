@@ -1,6 +1,13 @@
 package com.topjohnwu.magisk.module;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.Map;
 
 public class Module {
 
@@ -18,7 +25,16 @@ public class Module {
     private String mId;
     private int mVersionCode;
 
-    public Module(String path) {
+    public Module(String path, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Map<String,?> keys = prefs.getAll();
+
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+
+            if(entry.getValue().toString().contains(path)) {
+                Log.d("Magisk", "Hey, look a matching path, this guy's name is " + entry.getKey().replace("path_",""));
+            }
+        }
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";
         for (String line : Utils.readFile(path + "/module.prop")) {

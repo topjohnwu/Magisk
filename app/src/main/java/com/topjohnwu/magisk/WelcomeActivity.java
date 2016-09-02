@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -28,6 +30,7 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
+    private Context mContext;
 
     private final Handler mDrawerHandler = new Handler();
 
@@ -55,7 +58,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
-        new Utils.LoadModules(this).execute();
+        new Utils.LoadModules(getApplication(),false).execute();
 
         setSupportActionBar(toolbar);
 
@@ -87,6 +90,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         navigationView.setNavigationItemSelectedListener(this);
 
         }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
