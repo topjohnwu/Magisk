@@ -3,22 +3,21 @@ package com.topjohnwu.magisk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.AnimationHelper;
 
-import java.io.File;
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,22 +26,39 @@ import butterknife.ButterKnife;
 public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
 
     private final List<Repo> mList;
-    private View view;
+    private View viewMain;
     private Context context;
+    @BindView(R.id.update)
+    ImageView updateImage;
+    @BindView(R.id.installed)
+    ImageView installedImage;
+    @BindView(R.id.popup_layout)
+    LinearLayout popupLayout;
+    @BindView(R.id.author)
+    TextView authorText;
+    @BindView(R.id.log)
+    TextView logText;
+    @BindView(R.id.updateStatus) TextView updateStatus;
+    @BindView(R.id.installedStatus) TextView installedStatus;
+    private boolean isCardExpanded;
+
 
     public ReposAdapter(List<Repo> list) {
         this.mList = list;
 
     }
 
+    private boolean mIsInstalled;
+
+
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
+        viewMain = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
+        ButterKnife.bind(this, viewMain);
         context = parent.getContext();
-
-        return new ViewHolder(view);
+        return new ViewHolder(viewMain);
     }
 
     @Override
@@ -50,26 +66,49 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         final Repo repo = mList.get(position);
 
         holder.title.setText(repo.getName());
-        holder.versionName.setText(repo.getVersion());
+        holder.versionName.setText(repo.getmVersion());
         holder.description.setText(repo.getDescription());
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                if (!prefs.contains("isInstalled_" + repo.getName())) {
+        Log.d("Magisk","ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.contains("repo_isInstalled_" + repo.getId())) {
+            mIsInstalled = prefs.getBoolean("repo_isInstalled_" + repo.getId(),false);
+            if (mIsInstalled) {
+                installedImage.setImageResource(R.drawable.ic_done_black);
+                installedStatus.setText(R.string.module_installed);
+            }
+        }
 
-                    Utils.DownloadReceiver reciever = new Utils.DownloadReceiver() {
-                        @Override
-                        public void task(File file) {
-                            Log.d("Magisk", "Task firing");
-                            new Utils.FlashZIP(context, repo.getName(), file.toString()).execute();
-                        }
-                    };
-                    String filename = repo.getName().replace(" ", "") + ".zip";
-                    Utils.downloadAndReceive(context, reciever, repo.getZipUrl(), filename);
+        isCardExpanded = false;
+        AnimationHelper.collapse(popupLayout);
+
+        viewMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+
+            public void onClick(View view) {
+                if (isCardExpanded) {
+
+                    AnimationHelper.collapse(popupLayout);
+                    isCardExpanded = false;
                 } else {
-                    Toast.makeText(context,repo.getName() + " is already installed.",Toast.LENGTH_SHORT).show();
+                    AnimationHelper.expand(popupLayout);
+                    isCardExpanded = true;
+
                 }
+
+//                if (!mIsInstalled) {
+//
+//                    Utils.DownloadReceiver reciever = new Utils.DownloadReceiver() {
+//                        @Override
+//                        public void task(File file) {
+//                            Log.d("Magisk", "Task firing");
+//                            new Utils.FlashZIP(context, repo.getId(), file.toString()).execute();
+//                        }
+//                    };
+//                    String filename = repo.getId().replace(" ", "") + ".zip";
+//                    Utils.downloadAndReceive(context, reciever, repo.getmZipUrl(), filename);
+//                } else {
+//                    Toast.makeText(context,repo.getId() + " is already installed.",Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 

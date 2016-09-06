@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout android:id="@+id/swipeRefreshLayout"
+<LinearLayout android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    layout_height=""
+    android:orientation="vertical"
+
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -24,4 +25,4 @@
         android:textStyle="italic"
         android:visibility="gone"/>
 
-</android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

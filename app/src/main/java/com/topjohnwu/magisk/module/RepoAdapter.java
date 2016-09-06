@@ -3,29 +3,39 @@ package com.topjohnwu.magisk.module;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RepoAdapter {
     private String[] result;
     private static String url = "https://api.github.com/orgs/Magisk-Modules-Repo/repos";
-    private static List<Repo> repos = new ArrayList<Repo>();
+    private static List<Repo> repos = new ArrayList<Repo>() {
+
+    };
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
+	private static String TAG = "Magisk";
     private Context activityContext;
     private Date updatedDate, currentDate;
 
@@ -36,39 +46,17 @@ public class RepoAdapter {
             new MyAsyncTask().execute();
             List<String> out = null;
         } else {
-            Log.d("Magisk", "Building from cache");
+            Log.d(TAG, "Building from cache");
             Map<String, ?> map = prefs.getAll();
             repos.clear();
-            for (Map.Entry<String, ?> entry : map.entrySet()) {
-                if (entry.getKey().contains("module_")) {
-                    String repoString = entry.getValue().toString().replace("&quot;", "\"");
-                    JSONArray repoArray = null;
-                    try {
-                        repoArray = new JSONArray(repoString);
-
-
-                        for (int f = 0; f < repoArray.length(); f++) {
-                            JSONObject jsonobject = repoArray.getJSONObject(f);
-                            String name = entry.getKey().replace("module_", "");
-                            name = name.replace(" ", "");
-                            String moduleName, moduleDescription, zipUrl;
-                            moduleName = jsonobject.getString("moduleName");
-                            moduleDescription = jsonobject.getString("moduleDescription");
-                            zipUrl = jsonobject.getString("zipUrl");
-                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                            try {
-                                updatedDate = format.parse(jsonobject.getString("lastUpdate"));
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            repos.add(new Repo(name, moduleDescription, zipUrl, updatedDate, activityContext));
-
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                map.entrySet().stream().filter(entry -> entry.getKey().contains("repo_")).forEach(entry -> {
+                    String repoString = entry.getValue().toString();
+                    if (repoString.length() >= 0) {
+                        repos.add(new Repo(repoString,context));
                     }
-                }
 
+                });
             }
 
         }
@@ -120,8 +108,8 @@ public class RepoAdapter {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
-                    if (!name.contains("Repo.github.io")) {
+                    if ((!name.contains("Repo.github.io"))) {
+                    //if (!name.contains("Repo.github.io") && name.contains("template")) {
                         repos.add(new Repo(name, url, updatedDate, activityContext));
                     }
                 }

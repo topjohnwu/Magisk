@@ -42,6 +42,9 @@
     <!--Module Fragment-->
     <string name="cache_modules">Cache modules</string>
     <string name="no_modules_found">No modules found</string>
+    <string name="module_update_available">Update available</string>
+    <string name="mudule_up_to_date">Module is up-to-date</string>
+    <string name="module_installed">Module is installed</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>

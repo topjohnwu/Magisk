@@ -18,6 +18,7 @@ public class WebRequest {
     static String response = null;
     public final static int GET = 1;
     public final static int POST = 2;
+    private boolean addNewLine;
 
     //Constructor with no parameter
     public WebRequest() {
@@ -31,7 +32,15 @@ public class WebRequest {
      * @requestmethod - http request method
      */
     public String makeWebServiceCall(String url, int requestmethod) {
+        addNewLine=false;
         return this.makeWebServiceCall(url, requestmethod, null);
+
+    }
+
+    public String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
+        addNewLine = addNewLines;
+        return this.makeWebServiceCall(url, requestmethod, null);
+
     }
 
     /**
@@ -90,7 +99,7 @@ public class WebRequest {
                 String line;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = br.readLine()) != null) {
-                    response += line;
+                    response += line + "\n";
                 }
             } else {
                 response = "";

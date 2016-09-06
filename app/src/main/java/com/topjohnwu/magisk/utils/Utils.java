@@ -41,6 +41,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 
 public class Utils {
 
@@ -394,9 +395,8 @@ public class Utils {
             Log.d("Magisk", "Reload called, online mode set to " + doReload);
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
             RepoAdapter mr = new RepoAdapter();
-
-
             List<Repo> magiskRepos = mr.listRepos(mContext, doReload);
+
             for (String mod : magisk) {
                 ModulesFragment.listModules.add(new Module(mod,mContext));
             }
@@ -404,7 +404,9 @@ public class Utils {
                 ModulesFragment.listModulesCache.add(new Module(mod,mContext));
             }
             for (Repo repo : magiskRepos) {
-                ModulesFragment.listModulesDownload.add(repo);
+                if (repo.getId() != null){
+                    ModulesFragment.listModulesDownload.add(repo);
+            }
             }
 
             return null;
