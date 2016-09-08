@@ -45,90 +45,98 @@ public class Module {
                     this.mVersionCode = Integer.valueOf(props[1]);
                     break;
                 case "name":
-                    this.mName = props[1];
+                    this.mName = value;
                     break;
                 case "author":
-                    this.mAuthor = props[1];
+                    this.mAuthor = value;
                     break;
                 case "id":
-                    this.mId = props[1];
+                    this.mId = value;
                     break;
                 case "version":
-                    this.mVersion = props[1];
+                    this.mVersion = value;
                     break;
                 case "description":
-                    this.mDescription = props[1];
+                    this.mDescription = value;
                     break;
                 case "donate":
-                    this.mDonateUrl = props[1];
+                    this.mDonateUrl = value;
                     break;
                 case "support":
-                    this.mSupportUrl = props[1];
+                    this.mSupportUrl = value;
                     break;
                 case "donateUrl":
-                    this.mDonateUrl = props[1];
+                    this.mDonateUrl = value;
                     break;
                 case "zipUrl":
-                    this.mZipUrl = props[1];
+                    this.mZipUrl = value;
                     break;
                 case "baseUrl":
-                    this.mBaseUrl = props[1];
+                    this.mBaseUrl = value;
                     break;
                 case "manifestUrl":
-                    this.mManifestUrl = props[1];
+                    this.mManifestUrl = value;
                     break;
                 default:
-                    Log.d("Magisk", "Manifest string not recognized: " + props[0]);
+                    Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
                     break;
             }
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            if (mId != null) {
-                Log.d("Magisk", "Module: Checking for preference named repo_" + mId);
-                if (prefs.contains("repo_" + mId)) {
-                    String entryString = prefs.getString("repo_" + mId, "");
 
+        }
 
-                    String entryName = "repo" + mId;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-                    String[] subStrings = entryString.split("\n");
-                    for (String subKeys : subStrings) {
-                        String[] idEntry = subKeys.split("=", 2);
-                        Log.d("Magisk", "Module: Checking entry strings. Key is " + idEntry[0] + " and value is " + idEntry[1]);
-                        if (idEntry[0].equals("id")) {
-                            if (idEntry.length != 2) {
-                                continue;
-                            }
+        if (this.mId != null && !this.mId.isEmpty()) {
+            String preferenceString = "repo_" + this.mId;
+            String preferenceKey = prefs.getString(preferenceString,"nope");
+            Log.d("Magisk", "Module: Checking for preference named " + preferenceString);
+            if (!preferenceKey.equals("nope")) {
+                Log.d("Magisk", "Module: repo_" + mId + " found.");
+                String entryString = prefs.getString("repo_" + mId, "");
 
-                            if (idEntry[1].equals(mId)) {
-                                Log.d("Magisk", "Module: Hey, I know I'm online...");
-                                mIsOnline = true;
-                            } else mIsOnline = false;
+                String[] subStrings = entryString.split("\n");
+                for (String subKeys : subStrings) {
+                    String[] idEntry = subKeys.split("=", 2);
+                    if (idEntry[0].equals("id")) {
+                        if (idEntry.length != 2) {
+                            continue;
                         }
-                        if (idEntry[0].equals("versionCode")) {
-                            if (idEntry.length != 2) {
-                                continue;
-                            }
 
-                            if (Integer.valueOf(idEntry[1]) > mVersionCode) {
-                                mUpdateAvailable = true;
-                                Log.d("Magisk", "Module: Hey, I have an update...");
-                            } else mUpdateAvailable = false;
-                        }
+                        if (idEntry[1].equals(mId)) {
+                            Log.d("Magisk", "Module: Hey, I know I'm online...");
+                            mIsOnline = true;
+                        } else mIsOnline = false;
                     }
+                    if (idEntry[0].equals("versionCode")) {
+                        if (idEntry.length != 2) {
+                            continue;
+                        }
 
-
+                        if (Integer.valueOf(idEntry[1]) > mVersionCode) {
+                            mUpdateAvailable = true;
+                            Log.d("Magisk", "Module: Hey, I have an update...");
+                        } else mUpdateAvailable = false;
+                    }
                 }
 
-                SharedPreferences.Editor editor = prefs.edit();
-                if (mIsOnline) {
-                    editor.putBoolean("repo_isInstalled_" + mId, true);
 
-                } else {
-                    editor.putBoolean("repo_isInstalled_" + mId, false);
-                }
-                editor.apply();
             }
+
+            SharedPreferences.Editor editor = prefs.edit();
+            if (mIsOnline) {
+                editor.putBoolean("repo-isInstalled_" + mId, true);
+
+            } else {
+                editor.putBoolean("repo-isInstalled_" + mId, false);
+            }
+
+            if (mUpdateAvailable) {
+                editor.putBoolean("repo-canUpdate_" + mId, true);
+            } else {
+                editor.putBoolean("repo-canUpdate_" + mId, false);
+            }
+            editor.apply();
         }
 
         if (mName == null) {
@@ -147,8 +155,8 @@ public class Module {
         mName = repo.getName();
         mVersion = repo.getmVersion();
         mDescription = repo.getDescription();
-        mId = "foo";
-        mVersionCode = 111;
+        mId = repo.getId();
+        mVersionCode = repo.getmVersionCode();
         mUrl = repo.getmZipUrl();
         mEnable = true;
         mRemove = false;

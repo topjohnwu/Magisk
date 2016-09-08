@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.RepoAdapter;
+import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.module.Repo;
 
 import org.json.JSONArray;
@@ -38,16 +38,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Set;
 
 public class Utils {
 
     public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
     public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
     private Context appContext;
+    private static final String TAG = "Magisk";
 
     public static final String MAGISK_PATH = "/magisk";
     public static final String MAGISK_CACHE_PATH = "/cache/magisk";
@@ -373,17 +371,25 @@ public class Utils {
         }
     }
 
+    public static class AuthGithub extends AsyncTask<Void, Void, Void> {
+        private static String mClientToken = "5c9f47a299d48a6a649af3587bc97200bafcac65";
+
+        public AuthGithub(Context context) {}
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+    }
+
     public static class LoadModules extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
         private boolean doReload;
 
         public LoadModules(Context context, boolean reload) {
-            Log.d("Magisk", "LoadModules created, online is " + reload);
             mContext = context;
             doReload = reload;
-
-
         }
 
         @Override
@@ -392,29 +398,25 @@ public class Utils {
             ModulesFragment.listModulesCache.clear();
             ModulesFragment.listModulesDownload.clear();
             List<String> magisk = getModList(MAGISK_PATH);
-            Log.d("Magisk", "Reload called, online mode set to " + doReload);
+            Log.d("Magisk", "Utils: Reload called, loading modules from" +  (doReload ? " the internet " : " cache"));
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
-            RepoAdapter mr = new RepoAdapter();
+            RepoHelper mr = new RepoHelper();
             List<Repo> magiskRepos = mr.listRepos(mContext, doReload);
 
             for (String mod : magisk) {
+                Log.d("Magisk","Utils: Adding module from string " + mod);
                 ModulesFragment.listModules.add(new Module(mod,mContext));
             }
             for (String mod : magiskCache) {
+                Log.d("Magisk","Utils: Adding cache module from string " + mod);
                 ModulesFragment.listModulesCache.add(new Module(mod,mContext));
             }
             for (Repo repo : magiskRepos) {
-                if (repo.getId() != null){
-                    ModulesFragment.listModulesDownload.add(repo);
-            }
+                Log.d("Magisk","Utils: Adding repo from string " + repo.getId());
+                ModulesFragment.listModulesDownload.add(repo);
             }
 
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
         }
     }
 
@@ -462,35 +464,6 @@ public class Utils {
             if (!result) {
                 Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
                 return;
-            } else {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                String jsonString = prefs.getString("module_" + mName,"");
-                String retSplit[] = ret.toString().split("Using path:");
-                String ret2Split[] = retSplit[1].split(",");
-                String ret3Split[] = ret2Split[0].split("/");
-                String finalSplit = "/" + ret3Split[1] + "/" + ret3Split[2];
-                Log.d("Magisk","Damn, all that work for one path " + finalSplit);
-                if (!jsonString.equals("")) {
-
-                    JSONArray repoArray = null;
-                    try {
-                        repoArray = new JSONArray(jsonString);
-
-
-                        for (int f = 0; f < repoArray.length(); f++) {
-                            JSONObject jsonobject = repoArray.getJSONObject(f);
-                            String name = mName;
-                            Boolean installed = true;
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putBoolean("isInstalled_" + mName,true);
-                            editor.putString("path_" + mName,finalSplit);
-                            editor.apply();
-
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
             done();
         }

@@ -28,21 +28,23 @@ public class Repo {
     private String mVersionCode;
     private String mSupportUrl;
     private String mDonateUrl;
-    private Date lastUpdate;
+    private String lastUpdate;
     private Context appContext;
-    private boolean mIsInstalled;
+    private boolean mIsInstalled,mCanUpdate;
 
     public Repo(String manifestString, Context context) {
-        ParseProps(manifestString);
         appContext = context;
+        ParseProps(manifestString);
 
     }
+
+
 
     public Repo(String name, String url, Date updated, Context context) {
         appContext = context;
         this.mName = name;
         this.mBaseUrl = url;
-        this.lastUpdate = updated;
+        this.lastUpdate = updated.toString();
         this.fetch();
 
     }
@@ -52,28 +54,16 @@ public class Repo {
         this.mZipUrl = zipUrl;
         this.mDescription = moduleDescription;
         this.mName = moduleName;
-        this.lastUpdate = lastUpdated;
+        this.lastUpdate = lastUpdated.toString();
         this.fetch();
 
     }
 
-    private void fetch() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
-        if (prefs.contains("repo_" + this.mId)) {
-            String repoString = prefs.getString("repo_" + this.mId,"");
-            if (!repoString.equals("")) {
-                ParseProps(repoString);
-            }
-        }
-        if (prefs.contains("repo_isInstalled_" + this.mId)) {
-            mIsInstalled = prefs.getBoolean("repo_isInstalled_" + this.mId,false);
-
-        }
-
+    public void fetch() {
         WebRequest webreq = new WebRequest();
         // Construct initial url for contents
-        Log.d("Magisk", "Manifest string is: " + mBaseUrl + "/contents/");
-        String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents/", WebRequest.GET);
+        Log.d("Magisk", "Repo: Fetch called, Manifest string is: " + mBaseUrl + "/contents?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65");
+        String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65", WebRequest.GET);
         try {
             JSONArray repoArray = new JSONArray(repoString);
             for (int f = 0; f < repoArray.length(); f++) {
@@ -91,9 +81,11 @@ public class Repo {
             e.printStackTrace();
         }
 
-        Log.d("Magisk", "Inner fetch: " + repoString);
+        Log.d("Magisk", "Repo: Inner fetch: " + mManifestUrl + "?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65");
         WebRequest propReq = new WebRequest();
-        String manifestString = propReq.makeWebServiceCall(this.mManifestUrl,WebRequest.GET,true);
+        String manifestString = propReq.makeWebServiceCall(mManifestUrl,WebRequest.GET,true);
+        Log.d("Magisk","Repo: parseprops called from fetch for string " + manifestString);
+
         if (ParseProps(manifestString)) {
             PutProps(manifestString);
         }
@@ -111,7 +103,7 @@ public class Repo {
         editor.apply();
     }
     private boolean ParseProps(String string) {
-        Log.d("Magisk","Repo: parseprops called for string " + string);
+
         if ((string.length() <= 1) | (!string.contains("id"))) {
             return false;
         } else {
@@ -119,7 +111,6 @@ public class Repo {
             for (String line : lines) {
                 if (line != "") {
                     String props[] = line.split("=");
-                    Log.d("Magisk", "Repo: Split values are " + props[0] + " and " + props[1]);
                     switch (props[0]) {
                         case "versionCode":
                             this.mVersionCode = props[1];
@@ -157,6 +148,9 @@ public class Repo {
                         case "manifestUrl":
                             this.mManifestUrl = props[1];
                             break;
+                        case "logUrl":
+                            this.mLogUrl = props[1];
+                            break;
                         default:
                             Log.d("Magisk", "Manifest string not recognized: " + props[0]);
                             break;
@@ -164,7 +158,20 @@ public class Repo {
                 }
 
             }
-            return this.mName != null;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
+                if (prefs.contains("repo-isInstalled_" + this.mId)) {
+                    mIsInstalled = prefs.getBoolean("repo-isInstalled_" + this.mId,false);
+                }
+                if (prefs.contains("repo-canUpdate_" + this.mId)) {
+                    mCanUpdate = prefs.getBoolean("repo-canUpdate_" + this.mId,false);
+                }
+                if (prefs.contains("updated_" + this.mId)) {
+                    lastUpdate = prefs.getString("updated_" + this.mId,"");
+                }
+
+
+
+            return this.mId != null;
 
         }
     }
@@ -241,10 +248,11 @@ public class Repo {
         return mSupportUrl;
     }
 
-    public Date getLastUpdate() {
+    public String getLastUpdate() {
         return lastUpdate;
     }
 
     public boolean isInstalled() { return mIsInstalled; }
+    public boolean canUpdate() { return mCanUpdate; }
 }
 

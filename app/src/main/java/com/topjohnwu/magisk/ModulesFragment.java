@@ -56,23 +56,13 @@ public class ModulesFragment extends Fragment {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
 
         ButterKnife.bind(this, view);
+        //new Utils.LoadModules(getActivity(),false).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (prefs.contains("hasCachedRepos")) {
-            new Utils.LoadModules(getActivity(), false).execute();
-        } else {
-            new Utils.LoadModules(getActivity(), true).execute();
-        }
-
         new updateUI().execute();
         setHasOptionsMenu(true);
         return view;
     }
 
-    public void updateThisShit() {
-        new Utils.LoadModules(getActivity(), true).execute();
-        new updateUI().execute();
-        setHasOptionsMenu(true);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -92,8 +82,6 @@ public class ModulesFragment extends Fragment {
         });
 
     }
-
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -117,8 +105,7 @@ public class ModulesFragment extends Fragment {
                 listModulesCache.clear();
                 listModulesDownload.clear();
                 progressBar.setVisibility(View.VISIBLE);
-                ta = new TabsAdapter(getChildFragmentManager());
-                viewPager.setAdapter(ta);
+                viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
                 new Utils.LoadModules(getActivity(),true).execute();
                 new updateUI().execute();
@@ -126,19 +113,6 @@ public class ModulesFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void redrawLayout() {
-        listModules.clear();
-        listModulesCache.clear();
-        listModulesDownload.clear();
-        progressBar.setVisibility(View.VISIBLE);
-        ta = new TabsAdapter(getChildFragmentManager());
-        viewPager.setAdapter(ta);
-        tabLayout.setupWithViewPager(viewPager);
-        new Utils.LoadModules(getActivity(),false).execute();
-        new updateUI().execute();
-
     }
 
     public static class NormalModuleFragment extends BaseModuleFragment {
@@ -168,7 +142,7 @@ public class ModulesFragment extends Fragment {
     }
 
 
-    public class updateUI extends AsyncTask<Void, Void, Void> {
+    private class updateUI extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -180,8 +154,8 @@ public class ModulesFragment extends Fragment {
             super.onPostExecute(v);
 
             progressBar.setVisibility(View.GONE);
-            ta = new TabsAdapter(getChildFragmentManager());
-            viewPager.setAdapter(ta);
+
+            viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
             tabLayout.setupWithViewPager(viewPager);
         }
     }

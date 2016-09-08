@@ -4,10 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -58,7 +60,15 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
-        new Utils.LoadModules(getApplication(),false).execute();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!prefs.contains("oauth_key")) {
+
+        }
+        if (!prefs.contains("hasCachedRepos")) {
+            new Utils.LoadModules(this, true).execute();
+        } else {
+			new Utils.LoadModules(getApplication(),false).execute();
+		}
 
         setSupportActionBar(toolbar);
 
