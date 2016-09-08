@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -36,9 +38,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 
 public class Utils {
 
@@ -371,15 +385,39 @@ public class Utils {
         }
     }
 
-    public static class AuthGithub extends AsyncTask<Void, Void, Void> {
-        private static String mClientToken = "5c9f47a299d48a6a649af3587bc97200bafcac65";
+    public static String procFile(String value, Context context) {
 
-        public AuthGithub(Context context) {}
+        String cryptoPass = context.getResources().getString(R.string.pass);
+        try {
+            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey key = keyFactory.generateSecret(keySpec);
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
+            byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
+            // cipher is not thread safe
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
+
+            String decrypedValue = new String(decrypedValueBytes);
+            return decrypedValue;
+
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
         }
+        return value;
     }
 
     public static class LoadModules extends AsyncTask<Void, Void, Void> {

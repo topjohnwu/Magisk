@@ -3,11 +3,12 @@ package com.topjohnwu.magisk.module;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
 
 import org.json.JSONArray;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 public class RepoHelper {
     private String[] result;
-    private static String url = "https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65";
+    private static String url = "https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=";
     private static List<Repo> repos = new ArrayList<Repo>();
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
@@ -103,7 +104,8 @@ public class RepoHelper {
             WebRequest webreq = new WebRequest();
 
             // Making a request to url and getting response
-            String jsonStr = webreq.makeWebServiceCall(url, WebRequest.GET);
+            String token = activityContext.getString(R.string.some_string);
+            String jsonStr = webreq.makeWebServiceCall(url + Utils.procFile(token,activityContext), WebRequest.GET);
             Log.d("Magisk", "doInBackground Running, String: " + jsonStr + " Url: " + url);
             if(jsonStr != null && !jsonStr.isEmpty()) {
 

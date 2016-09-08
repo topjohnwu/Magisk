@@ -5,13 +5,14 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Repo {
@@ -32,6 +33,7 @@ public class Repo {
     private Context appContext;
     private boolean mIsInstalled,mCanUpdate;
 
+
     public Repo(String manifestString, Context context) {
         appContext = context;
         ParseProps(manifestString);
@@ -45,6 +47,7 @@ public class Repo {
         this.mName = name;
         this.mBaseUrl = url;
         this.lastUpdate = updated.toString();
+
         this.fetch();
 
     }
@@ -60,10 +63,11 @@ public class Repo {
     }
 
     public void fetch() {
+
         WebRequest webreq = new WebRequest();
         // Construct initial url for contents
-        Log.d("Magisk", "Repo: Fetch called, Manifest string is: " + mBaseUrl + "/contents?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65");
-        String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65", WebRequest.GET);
+        Log.d("Magisk", "Repo: Fetch called, Manifest string is: " + mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext));
+        String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext), WebRequest.GET);
         try {
             JSONArray repoArray = new JSONArray(repoString);
             for (int f = 0; f < repoArray.length(); f++) {
@@ -81,7 +85,7 @@ public class Repo {
             e.printStackTrace();
         }
 
-        Log.d("Magisk", "Repo: Inner fetch: " + mManifestUrl + "?access_token=5c9f47a299d48a6a649af3587bc97200bafcac65");
+        Log.d("Magisk", "Repo: Inner fetch: " + mManifestUrl + "?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext));
         WebRequest propReq = new WebRequest();
         String manifestString = propReq.makeWebServiceCall(mManifestUrl,WebRequest.GET,true);
         Log.d("Magisk","Repo: parseprops called from fetch for string " + manifestString);
@@ -175,6 +179,13 @@ public class Repo {
 
         }
     }
+
+
+
+
+
+
+
 
     public String getStringProperty(String mValue) {
         switch (mValue) {
