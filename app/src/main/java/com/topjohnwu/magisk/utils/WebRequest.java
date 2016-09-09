@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -18,6 +20,7 @@ public class WebRequest {
     static String response = null;
     public final static int GET = 1;
     public final static int POST = 2;
+    private boolean addNewLine;
 
     //Constructor with no parameter
     public WebRequest() {
@@ -31,7 +34,18 @@ public class WebRequest {
      * @requestmethod - http request method
      */
     public String makeWebServiceCall(String url, int requestmethod) {
+        addNewLine=false;
+        Log.d("Magisk","WebRequest: Service call received for URL " + url);
         return this.makeWebServiceCall(url, requestmethod, null);
+
+
+    }
+
+    public String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
+        addNewLine = addNewLines;
+        Log.d("Magisk","WebRequest: Service call(bool) received for URL " + url);
+        return this.makeWebServiceCall(url, requestmethod, null);
+
     }
 
     /**
@@ -90,7 +104,11 @@ public class WebRequest {
                 String line;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = br.readLine()) != null) {
-                    response += line;
+                    if (addNewLine) {
+                        response += line + "\n";
+                    } else {
+                        response += line;
+                    }
                 }
             } else {
                 response = "";

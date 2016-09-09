@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,7 +41,7 @@ public class ModulesFragment extends Fragment {
     public static List<Module> listModulesCache = new ArrayList<>();
     public static List<Repo> listModulesDownload = new ArrayList<>();
     private static final int FILE_SELECT_CODE = 0;
-    private File input;
+    private int viewPagePosition;
 
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.fab) FloatingActionButton fabio;
@@ -51,17 +52,15 @@ public class ModulesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
+
         ButterKnife.bind(this, view);
+        new Utils.LoadModules(getActivity(),false).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (prefs.contains("hasCachedRepos")) {
-            new Utils.LoadModules(getActivity(), false).execute();
-        } else {
-            new Utils.LoadModules(getActivity(), true).execute();
-        }
         new updateUI().execute();
         setHasOptionsMenu(true);
         return view;
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -100,18 +99,25 @@ public class ModulesFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.force_reload:
+                viewPagePosition = tabLayout.getSelectedTabPosition();
                 listModules.clear();
                 listModulesCache.clear();
                 listModulesDownload.clear();
                 progressBar.setVisibility(View.VISIBLE);
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
-                new Utils.LoadModules(getActivity(),false).execute();
+                viewPager.setCurrentItem(viewPagePosition);
+                new Utils.LoadModules(getActivity(),true).execute();
                 new updateUI().execute();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    void selectPage(int pageIndex){
+        tabLayout.setScrollPosition(pageIndex,0f,true);
+        viewPager.setCurrentItem(pageIndex);
     }
 
     public static class NormalModuleFragment extends BaseModuleFragment {
@@ -153,9 +159,10 @@ public class ModulesFragment extends Fragment {
             super.onPostExecute(v);
 
             progressBar.setVisibility(View.GONE);
-
             viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
             tabLayout.setupWithViewPager(viewPager);
+            selectPage(viewPagePosition);
+
         }
     }
 
@@ -185,7 +192,7 @@ public class ModulesFragment extends Fragment {
                 return new NormalModuleFragment();
             } else if (position == 1) {
                 return new CacheModuleFragment();
-            } else {
+            } else  {
                 return new DownloadModuleFragment();
             }
         }

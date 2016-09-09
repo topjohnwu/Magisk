@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                     xmlns:tools="http://schemas.android.com/tools"
@@ -13,6 +14,10 @@
                                     android:minHeight="?android:attr/listPreferredItemHeight"
                                     card_view:cardCornerRadius="2dp"
                                     card_view:cardElevation="2dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,10 +60,65 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textIsSelectable="false"/>
 
+            <LinearLayout
+                android:id="@+id/expand_layout"
+                android:minHeight="100dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
+            <TextView
+                android:id="@+id/installedStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
+            <TextView
+                android:id="@+id/updateStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
 
 
         </LinearLayout>
 
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/installed"
+            android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="5dp"
+            />
+
+        <ImageView
+            android:id="@+id/update"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="5dp" />
+
     </LinearLayout>
 
+    </LinearLayout>
 </android.support.v7.widget.CardView>
+
+

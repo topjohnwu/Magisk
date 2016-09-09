@@ -17,59 +17,126 @@ public class Module {
     private String mName = null;
     private String mVersion = "(No version provided)";
     private String mDescription = "(No description provided)";
-    private String mUrl = null;
+    private String mUrl,mSupportUrl,mDonateUrl,mZipUrl,mBaseUrl,mManifestUrl,mAuthor;
+    private boolean mEnable, mRemove,mUpdateAvailable,mIsOnline;
 
-    private boolean mEnable;
-    private boolean mRemove;
 
     private String mId;
     private int mVersionCode;
 
     public Module(String path, Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Map<String,?> keys = prefs.getAll();
 
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-
-            if(entry.getValue().toString().contains(path)) {
-                Log.d("Magisk", "Hey, look a matching path, this guy's name is " + entry.getKey().replace("path_",""));
-            }
-        }
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";
         for (String line : Utils.readFile(path + "/module.prop")) {
-            String[] parts = line.split("=", 2);
-            if (parts.length != 2) {
+            String[] props = line.split("=", 2);
+            if (props.length != 2) {
                 continue;
             }
 
-            String key = parts[0].trim();
+            String key = props[0].trim();
             if (key.charAt(0) == '#') {
                 continue;
             }
 
-            String value = parts[1].trim();
-            switch (key) {
+            String value = props[1].trim();
+            switch (props[0]) {
+                case "versionCode":
+                    this.mVersionCode = Integer.valueOf(props[1]);
+                    break;
                 case "name":
-                    mName = value;
+                    this.mName = value;
                     break;
-                case "version":
-                    mVersion = value;
-                    break;
-                case "description":
-                    mDescription = value;
+                case "author":
+                    this.mAuthor = value;
                     break;
                 case "id":
-                    mId = value;
+                    this.mId = value;
                     break;
-                case "versionCode":
-                    try {
-                        mVersionCode = Integer.parseInt(value);
-                    } catch (NumberFormatException e) {
-                        mVersionCode = 0;
-                    }
+                case "version":
+                    this.mVersion = value;
+                    break;
+                case "description":
+                    this.mDescription = value;
+                    break;
+                case "donate":
+                    this.mDonateUrl = value;
+                    break;
+                case "support":
+                    this.mSupportUrl = value;
+                    break;
+                case "donateUrl":
+                    this.mDonateUrl = value;
+                    break;
+                case "zipUrl":
+                    this.mZipUrl = value;
+                    break;
+                case "baseUrl":
+                    this.mBaseUrl = value;
+                    break;
+                case "manifestUrl":
+                    this.mManifestUrl = value;
+                    break;
+                default:
+                    Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
                     break;
             }
+
+
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        if (this.mId != null && !this.mId.isEmpty()) {
+            String preferenceString = "repo_" + this.mId;
+            String preferenceKey = prefs.getString(preferenceString,"nope");
+            Log.d("Magisk", "Module: Checking for preference named " + preferenceString);
+            if (!preferenceKey.equals("nope")) {
+                Log.d("Magisk", "Module: repo_" + mId + " found.");
+                String entryString = prefs.getString("repo_" + mId, "");
+
+                String[] subStrings = entryString.split("\n");
+                for (String subKeys : subStrings) {
+                    String[] idEntry = subKeys.split("=", 2);
+                    if (idEntry[0].equals("id")) {
+                        if (idEntry.length != 2) {
+                            continue;
+                        }
+
+                        if (idEntry[1].equals(mId)) {
+                            Log.d("Magisk", "Module: Hey, I know I'm online...");
+                            mIsOnline = true;
+                        } else mIsOnline = false;
+                    }
+                    if (idEntry[0].equals("versionCode")) {
+                        if (idEntry.length != 2) {
+                            continue;
+                        }
+
+                        if (Integer.valueOf(idEntry[1]) > mVersionCode) {
+                            mUpdateAvailable = true;
+                            Log.d("Magisk", "Module: Hey, I have an update...");
+                        } else mUpdateAvailable = false;
+                    }
+                }
+
+
+            }
+
+            SharedPreferences.Editor editor = prefs.edit();
+            if (mIsOnline) {
+                editor.putBoolean("repo-isInstalled_" + mId, true);
+
+            } else {
+                editor.putBoolean("repo-isInstalled_" + mId, false);
+            }
+
+            if (mUpdateAvailable) {
+                editor.putBoolean("repo-canUpdate_" + mId, true);
+            } else {
+                editor.putBoolean("repo-canUpdate_" + mId, false);
+            }
+            editor.apply();
         }
 
         if (mName == null) {
@@ -86,11 +153,11 @@ public class Module {
     public Module(Repo repo) {
 
         mName = repo.getName();
-        mVersion = repo.getVersion();
+        mVersion = repo.getmVersion();
         mDescription = repo.getDescription();
-        mId = "foo";
-        mVersionCode = 111;
-        mUrl = repo.getZipUrl();
+        mId = repo.getId();
+        mVersionCode = repo.getmVersionCode();
+        mUrl = repo.getmZipUrl();
         mEnable = true;
         mRemove = false;
 
@@ -133,5 +200,9 @@ public class Module {
     public boolean willBeRemoved() {
         return mRemove;
     }
+
+    public boolean isOnline() {return mIsOnline; }
+
+    public boolean isUpdateAvailable() { return mUpdateAvailable; };
 
 }
