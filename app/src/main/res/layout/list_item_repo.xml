@@ -60,22 +60,64 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textIsSelectable="false"/>
 
+            <LinearLayout
+                android:id="@+id/expand_layout"
+                android:minHeight="100dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
+            <TextView
+                android:id="@+id/installedStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
+            <TextView
+                android:id="@+id/updateStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
 
 
+        </LinearLayout>
 
         </LinearLayout>
         <ImageView
             android:id="@+id/installed"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+	        android:layout_height="match_parent"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="5dp"
+            />
 
         <ImageView
             android:id="@+id/update"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:gravity="center"
+            android:padding="5dp" />
 
     </LinearLayout>
-<!--    <include layout="@layout/list_item_repo_expanded" />-->
+
     </LinearLayout>
 </android.support.v7.widget.CardView>
 

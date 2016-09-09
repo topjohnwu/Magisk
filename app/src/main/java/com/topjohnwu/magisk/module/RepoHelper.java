@@ -29,7 +29,7 @@ public class RepoHelper {
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
     private static String TAG = "Magisk";
-    private String mName,mId,mUrl;
+    private String mName, mId, mUrl;
     private Context activityContext;
     private Date updatedDate, currentDate;
     private SharedPreferences prefs;
@@ -44,41 +44,44 @@ public class RepoHelper {
             List<String> out = null;
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
-            repos.clear();
-            Map<String, ?> map = prefs.getAll();
-			    for(Map.Entry<String,?> entry : map.entrySet()){
-                    if (entry.getKey().contains("repo_")) {
-                        Log.d("Magisk","RepoHelper: found entry for repo " + entry.getKey());
-                        String repoString = entry.getValue().toString().replace("&quot;", "\"");
-                        String[] repoStrings = repoString.split("\n");
-                        for(String string : repoStrings) {
-                            String[] splitStrings = string.split("=");
-                            switch(splitStrings[0]) {
-                                case ("id"):
-                                    mId = splitStrings[1];
-                                    break;
-                                case ("baseUrl"):
-                                    mUrl = splitStrings[1];
-                                    break;
-                                default:
-                                    break;
-                            }
-
-                        }
-                        Log.d("Magisk","RepoHelper: adding repo with id of " + mId);
-                        repos.add(new Repo(repoString,activityContext));
-
-
-                    }
-
-                }
-
+            BuildFromCache();
 
 
         }
 
 
         return repos;
+    }
+
+    private void BuildFromCache() {
+        repos.clear();
+        Map<String, ?> map = prefs.getAll();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            if (entry.getKey().contains("repo_")) {
+                Log.d("Magisk", "RepoHelper: found entry for repo " + entry.getKey());
+                String repoString = entry.getValue().toString().replace("&quot;", "\"");
+                String[] repoStrings = repoString.split("\n");
+                for (String string : repoStrings) {
+                    String[] splitStrings = string.split("=");
+                    switch (splitStrings[0]) {
+                        case ("id"):
+                            mId = splitStrings[1];
+                            break;
+                        case ("baseUrl"):
+                            mUrl = splitStrings[1];
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                Log.d("Magisk", "RepoHelper: adding repo with id of " + mId);
+                repos.add(new Repo(repoString, activityContext));
+
+
+            }
+
+        }
     }
 
 
@@ -105,9 +108,9 @@ public class RepoHelper {
 
             // Making a request to url and getting response
             String token = activityContext.getString(R.string.some_string);
-            String jsonStr = webreq.makeWebServiceCall(url + Utils.procFile(token,activityContext), WebRequest.GET);
+            String jsonStr = webreq.makeWebServiceCall(url + Utils.procFile(token, activityContext), WebRequest.GET);
             Log.d("Magisk", "doInBackground Running, String: " + jsonStr + " Url: " + url);
-            if(jsonStr != null && !jsonStr.isEmpty()) {
+            if (jsonStr != null && !jsonStr.isEmpty()) {
 
                 try {
                     repos.clear();
@@ -185,7 +188,9 @@ public class RepoHelper {
 
         protected void onPostExecute(Void v) {
             if (apiFail) {
-                Toast.makeText(activityContext,"GitHub API Limit reached, please try refreshing again in an hour.",Toast.LENGTH_LONG).show();
+                Toast.makeText(activityContext, "GitHub API Limit reached, please try refreshing again in an hour.", Toast.LENGTH_LONG).show();
+            } else {
+                BuildFromCache();
             }
 
         } // protected void onPostExecute(Void v)
