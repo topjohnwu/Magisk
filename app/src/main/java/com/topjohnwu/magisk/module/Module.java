@@ -7,8 +7,6 @@ import android.util.Log;
 
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.Map;
-
 public class Module {
 
     private String mRemoveFile;
@@ -203,6 +201,6 @@ public class Module {
 
     public boolean isOnline() {return mIsOnline; }
 
-    public boolean isUpdateAvailable() { return mUpdateAvailable; };
+    public boolean isUpdateAvailable() { return mUpdateAvailable; }
 
 }

@@ -102,7 +102,7 @@ public class Repo {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("repo_" + mId, manifestString);
         editor.putBoolean("hasCachedRepos", true);
-        editor.putString("updated_" + mId, this.lastUpdate.toString());
+        editor.putString("updated_" + mId, this.lastUpdate);
         Log.d("Magisk", "Storing Preferences: " + manifestString);
         editor.apply();
     }

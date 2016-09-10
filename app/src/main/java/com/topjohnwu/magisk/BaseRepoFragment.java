@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.WebWindow;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,6 +77,9 @@ public abstract class BaseRepoFragment extends Fragment {
         private View viewMain;
         private Context context;
         private boolean mIsInstalled, mCanUpdate;
+        private Repo repo;
+        private ViewHolder mHolder;
+        private int mPosition;
 
         public ReposAdapter(List<Repo> list) {
             this.mList = list;
@@ -96,42 +100,47 @@ public abstract class BaseRepoFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            final Repo repo = mList.get(position);
+            repo = mList.get(position);
+            mHolder = holder;
+            SetupViewElements();
 
-            Log.d("Magisk", "ReposAdapter: Trying set up bindview from list pos " + position + " out of a total of " + mList.size() + " and " + repo.getId());
+        }
+
+        private void SetupViewElements() {
+            mPosition = mHolder.getAdapterPosition();
             if (repo.getId() != null) {
-                TextView authorView = holder.author;
-                holder.title.setText(repo.getName());
-                holder.versionName.setText(repo.getmVersion());
-                holder.description.setText(repo.getDescription());
+                TextView authorView = mHolder.author;
+                mHolder.title.setText(repo.getName());
+                mHolder.versionName.setText(repo.getmVersion());
+                mHolder.description.setText(repo.getDescription());
                 String authorString = getResources().getString(R.string.author) + " " + repo.getmAuthor();
-                holder.author.setText(authorString);
+                mHolder.author.setText(authorString);
                 if ((repo.getmLogUrl() != null) && (repo.getmLogUrl().equals(""))) {
-                    holder.log.setText(repo.getmLogUrl());
-                    Linkify.addLinks(holder.log, Linkify.WEB_URLS);
+                    mHolder.log.setText(repo.getmLogUrl());
+                    Linkify.addLinks(mHolder.log, Linkify.WEB_URLS);
                 } else {
-                    holder.log.setVisibility(View.GONE);
+                    mHolder.log.setVisibility(View.GONE);
                 }
-                holder.installedStatus.setText(repo.isInstalled() ? getResources().getString(R.string.module_installed) : getResources().getString(R.string.module_not_installed));
-                if (mExpandedList.get(position)) {
-                    holder.expandLayout.setVisibility(View.VISIBLE);
+                mHolder.installedStatus.setText(repo.isInstalled() ? getResources().getString(R.string.module_installed) : getResources().getString(R.string.module_not_installed));
+                if (mExpandedList.get(mPosition)) {
+                    mHolder.expandLayout.setVisibility(View.VISIBLE);
                 } else {
-                    holder.expandLayout.setVisibility(View.GONE);
+                    mHolder.expandLayout.setVisibility(View.GONE);
                 }
                 if (repo.isInstalled()) {
-                    holder.installedStatus.setTextColor(Color.parseColor("#14AD00"));
-                    holder.updateStatus.setText(repo.canUpdate() ? getResources().getString(R.string.module_update_available) : getResources().getString(R.string.module_up_to_date));
+                    mHolder.installedStatus.setTextColor(Color.parseColor("#14AD00"));
+                    mHolder.updateStatus.setText(repo.canUpdate() ? getResources().getString(R.string.module_update_available) : getResources().getString(R.string.module_up_to_date));
                 }
                 Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 updateImage.setImageResource(R.drawable.ic_system_update_alt_black);
                 mCanUpdate = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
-                updateImage.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+
+                View.OnClickListener oCl = view -> {
+                    if (view == updateImage) {
                         if (!mIsInstalled | mCanUpdate) {
 
-                            Utils.DownloadReceiver reciever = new Utils.DownloadReceiver() {
+                            Utils.DownloadReceiver receiver = new Utils.DownloadReceiver() {
                                 @Override
                                 public void task(File file) {
                                     Log.d("Magisk", "Task firing");
@@ -139,12 +148,17 @@ public abstract class BaseRepoFragment extends Fragment {
                                 }
                             };
                             String filename = repo.getId().replace(" ", "") + ".zip";
-                            Utils.downloadAndReceive(context, reciever, repo.getmZipUrl(), filename);
+                            Utils.downloadAndReceive(context, receiver, repo.getmZipUrl(), filename);
                         } else {
                             Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                         }
+                    } else if (view == mHolder.log) {
+                        new WebWindow("Changelog",repo.getmLogUrl(),getActivity());
                     }
-                });
+                };
+
+                updateImage.setOnClickListener(oCl);
+                mHolder.log.setOnClickListener(oCl);
                 if (prefs.contains("repo-isInstalled_" + repo.getId())) {
                     mIsInstalled = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 //                    if (mIsInstalled) {
@@ -155,10 +169,7 @@ public abstract class BaseRepoFragment extends Fragment {
 
 
             }
-
-
         }
-
 
         @Override
         public int getItemCount() {

@@ -14,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,14 +22,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.nbsp.materialfilepicker.MaterialFilePicker;
+import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,11 +44,16 @@ public class ModulesFragment extends Fragment {
     public static List<Repo> listModulesDownload = new ArrayList<>();
     private static final int FILE_SELECT_CODE = 0;
     private int viewPagePosition;
+    private static final int RESULT_OK = 1;
 
-    @BindView(R.id.progressBar) ProgressBar progressBar;
-    @BindView(R.id.fab) FloatingActionButton fabio;
-    @BindView(R.id.pager) ViewPager viewPager;
-    @BindView(R.id.tab_layout) TabLayout tabLayout;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.fab)
+    FloatingActionButton fabio;
+    @BindView(R.id.pager)
+    ViewPager viewPager;
+    @BindView(R.id.tab_layout)
+    TabLayout tabLayout;
 
     @Nullable
     @Override
@@ -54,46 +61,56 @@ public class ModulesFragment extends Fragment {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
 
         ButterKnife.bind(this, view);
-        new Utils.LoadModules(getActivity(),false).execute();
+        new Utils.LoadModules(getActivity(), false).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         new updateUI().execute();
         setHasOptionsMenu(true);
         return view;
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_module, menu);
-        fabio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent();
-                intent.setType("*/zip");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,FILE_SELECT_CODE);
-            }
-
-
+        fabio.setOnClickListener(view -> {
+            openFilePicker();
         });
 
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case FILE_SELECT_CODE:
-                if (resultCode == Activity.RESULT_OK) {
-                    // Get the Uri of the selected file
-                    Uri uri = data.getData();
-                    String path = uri.getPath();
-                    String fileName = uri.getLastPathSegment();
-                    new Utils.FlashZIP(getActivity(), fileName, path).execute();
+    private void openFilePicker() {
+        new MaterialFilePicker()
+                .withSupportFragment(this)
+                .withFilter(Pattern.compile(".*\\.zip$"))
+                .withRequestCode(FILE_SELECT_CODE)
+                .withHiddenFiles(true)
+                .start();
+    }
 
-                }
-                break;
-        }}
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Magisk","WelcomeActivity: Got an OK result" + resultCode);
+        if (resultCode == Activity.RESULT_OK) {
+            String path = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+            Log.d("Magisk","ModuleFragment: Got an OK result " + path);
+            if (path != null) {
+                Log.d("Path: ", path);
+                Toast.makeText(getActivity(), "Picked file: " + path, Toast.LENGTH_LONG).show();
+                // Get the Uri of the selected file
+                String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+
+                Uri uri = Uri.parse(filePath);
+
+                path = uri.getPath();
+                Log.d("Magisk","ModuleFragment: Got an OK result " + filePath + " and " + uri.toString() + " and " + path);
+
+                String fileName = uri.getLastPathSegment();
+                new Utils.FlashZIP(getActivity(), fileName, path).execute();
+            }
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -107,7 +124,7 @@ public class ModulesFragment extends Fragment {
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
                 viewPager.setCurrentItem(viewPagePosition);
-                new Utils.LoadModules(getActivity(),true).execute();
+                new Utils.LoadModules(getActivity(), true).execute();
                 new updateUI().execute();
                 break;
         }
@@ -115,8 +132,8 @@ public class ModulesFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    void selectPage(int pageIndex){
-        tabLayout.setScrollPosition(pageIndex,0f,true);
+    void selectPage(int pageIndex) {
+        tabLayout.setScrollPosition(pageIndex, 0f, true);
         viewPager.setCurrentItem(pageIndex);
     }
 
@@ -137,6 +154,7 @@ public class ModulesFragment extends Fragment {
         }
 
     }
+
     public static class DownloadModuleFragment extends BaseRepoFragment {
 
         @Override
@@ -145,7 +163,6 @@ public class ModulesFragment extends Fragment {
         }
 
     }
-
 
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
@@ -169,7 +186,7 @@ public class ModulesFragment extends Fragment {
     private class TabsAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
-                getString(R.string.modules), getString(R.string.cache_modules) ,"Download"
+                getString(R.string.modules), getString(R.string.cache_modules), "Download"
         };
 
         public TabsAdapter(FragmentManager fm) {
@@ -192,7 +209,7 @@ public class ModulesFragment extends Fragment {
                 return new NormalModuleFragment();
             } else if (position == 1) {
                 return new CacheModuleFragment();
-            } else  {
+            } else {
                 return new DownloadModuleFragment();
             }
         }
