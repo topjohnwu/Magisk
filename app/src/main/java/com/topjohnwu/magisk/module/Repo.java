@@ -66,7 +66,6 @@ public class Repo {
 
         WebRequest webreq = new WebRequest();
         // Construct initial url for contents
-        Log.d("Magisk", "Repo: Fetch called, Manifest string is: " + mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext));
         String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext), WebRequest.GET);
         try {
             JSONArray repoArray = new JSONArray(repoString);
@@ -85,10 +84,8 @@ public class Repo {
             e.printStackTrace();
         }
 
-        Log.d("Magisk", "Repo: Inner fetch: " + mManifestUrl + "?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext));
         WebRequest propReq = new WebRequest();
         String manifestString = propReq.makeWebServiceCall(mManifestUrl,WebRequest.GET,true);
-        Log.d("Magisk","Repo: parseprops called from fetch for string " + manifestString);
 
         if (ParseProps(manifestString)) {
             PutProps(manifestString);
@@ -103,7 +100,6 @@ public class Repo {
         editor.putString("repo_" + mId, manifestString);
         editor.putBoolean("hasCachedRepos", true);
         editor.putString("updated_" + mId, this.lastUpdate);
-        Log.d("Magisk", "Storing Preferences: " + manifestString);
         editor.apply();
     }
     private boolean ParseProps(String string) {

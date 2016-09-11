@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -60,14 +61,21 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        RepoHelper.TaskDelegate delegate = result -> {
+            //Do a thing here when we get a result we want
+        };
         if (!prefs.contains("oauth_key")) {
 
         }
         if (!prefs.contains("hasCachedRepos")) {
             new Utils.LoadModules(this, true).execute();
+            new Utils.LoadRepos(this, true,delegate).execute();
+
         } else {
 			new Utils.LoadModules(getApplication(),false).execute();
-		}
+            new Utils.LoadRepos(this, false,delegate).execute();
+
+        }
 
         setSupportActionBar(toolbar);
 
@@ -145,6 +153,11 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 setTitle(R.string.modules);
                 tag = "modules";
                 navFragment = new ModulesFragment();
+                break;
+            case R.id.downloads:
+                setTitle(R.string.downloads);
+                tag = "downloads";
+                navFragment = new ReposFragment();
                 break;
             case R.id.log:
                 setTitle(R.string.log);

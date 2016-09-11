@@ -206,7 +206,7 @@ public abstract class BaseModuleFragment extends Fragment {
 
                 viewMain.setOnClickListener(view -> {
                     int position = getAdapterPosition();
-                    Log.d("Magisk", "BaseRepoFragment: CLICK. " + position + " and " + mExpandedList.get(position));
+                    Log.d("Magisk", "ReposFragment: CLICK. " + position + " and " + mExpandedList.get(position));
 
                     if (mExpandedList.get(position)) {
                         collapse(expandLayout);
@@ -226,7 +226,7 @@ public abstract class BaseModuleFragment extends Fragment {
                     // set Visible
 
 
-                    Log.d("Magisk", "BaseRepoFragment: Expand anim called " + mMeasuredHeight + " and " + view.getId());
+                    Log.d("Magisk", "ReposFragment: Expand anim called " + mMeasuredHeight + " and " + view.getId());
                     view.setVisibility(View.VISIBLE);
                     mAnimator.start();
                 }
@@ -234,7 +234,7 @@ public abstract class BaseModuleFragment extends Fragment {
                 private void collapse(View view) {
                     int finalHeight = view.getHeight();
                     ValueAnimator mAnimator = slideAnimator(finalHeight, 0);
-                    Log.d("Magisk", "BaseRepoFragment: Collapse anim called " + finalHeight + " and " + view.getId());
+                    Log.d("Magisk", "ReposFragment: Collapse anim called " + finalHeight + " and " + view.getId());
 
                     mAnimator.addListener(new Animator.AnimatorListener() {
                         @Override

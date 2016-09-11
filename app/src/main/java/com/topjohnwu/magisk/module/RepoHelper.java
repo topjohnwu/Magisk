@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,20 +36,20 @@ public class RepoHelper {
     private SharedPreferences prefs;
     private boolean apiFail;
 
-    public List<Repo> listRepos(Context context, boolean refresh) {
+    public List<Repo> listRepos(Context context, boolean refresh, TaskDelegate delegate) {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         activityContext = context;
+        TaskDelegate mDelegate = delegate;
+
+
         if (!prefs.contains("hasCachedRepos") | refresh) {
             Log.d(TAG, "RepoHelper: Building from web");
-            new MyAsyncTask().execute();
+            new MyAsyncTask(delegate).execute();
             List<String> out = null;
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
             BuildFromCache();
-
-
         }
-
 
         return repos;
     }
@@ -58,7 +59,6 @@ public class RepoHelper {
         Map<String, ?> map = prefs.getAll();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             if (entry.getKey().contains("repo_")) {
-                Log.d("Magisk", "RepoHelper: found entry for repo " + entry.getKey());
                 String repoString = entry.getValue().toString().replace("&quot;", "\"");
                 String[] repoStrings = repoString.split("\n");
                 for (String string : repoStrings) {
@@ -73,25 +73,26 @@ public class RepoHelper {
                         default:
                             break;
                     }
-
                 }
-                Log.d("Magisk", "RepoHelper: adding repo with id of " + mId);
                 repos.add(new Repo(repoString, activityContext));
-
-
             }
-
         }
     }
 
 
     class MyAsyncTask extends AsyncTask<String, String, Void> {
 
+        private TaskDelegate delegate;
+        public MyAsyncTask(TaskDelegate delegate) {
+            this.delegate = delegate;
+        }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
         }
+
+
 
         @Override
         protected void onProgressUpdate(String... values) {
@@ -109,7 +110,6 @@ public class RepoHelper {
             // Making a request to url and getting response
             String token = activityContext.getString(R.string.some_string);
             String jsonStr = webreq.makeWebServiceCall(url + Utils.procFile(token, activityContext), WebRequest.GET);
-            Log.d("Magisk", "doInBackground Running, String: " + jsonStr + " Url: " + url);
             if (jsonStr != null && !jsonStr.isEmpty()) {
 
                 try {
@@ -136,7 +136,6 @@ public class RepoHelper {
                                     String[] valueSub = valueString.split("=");
                                     if (valueSub[0].equals("id")) {
                                         mId = valueSub[1];
-                                        Log.d("Magisk", "RepoHelper: Got id for package of " + mId);
                                         if (prefs.contains("updated_" + mId)) {
                                             cacheUpdate = prefs.getString("updated_" + mId, "");
                                             hasCachedDate = true;
@@ -190,15 +189,22 @@ public class RepoHelper {
             if (apiFail) {
                 Toast.makeText(activityContext, "GitHub API Limit reached, please try refreshing again in an hour.", Toast.LENGTH_LONG).show();
             } else {
+                Log.d("Magisk","RepoHelper: postExecute fired");
+                delegate.taskCompletionResult("Complete");
                 BuildFromCache();
+
             }
 
-        } // protected void onPostExecute(Void v)
-    } //class MyAsyncTask extends AsyncTask<String, String, Void>
-
+        }
+    }
     protected void onPreExecute() {
 
     }
+
+    public interface TaskDelegate {
+        public void taskCompletionResult(String result);
+    }
+
 
 
 }

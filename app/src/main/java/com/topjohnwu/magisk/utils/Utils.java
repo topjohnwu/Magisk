@@ -23,9 +23,10 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.module.RepoHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,18 +55,17 @@ public class Utils {
 
     public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
     public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
-    private Context appContext;
     private static final String TAG = "Magisk";
 
     public static final String MAGISK_PATH = "/magisk";
     public static final String MAGISK_CACHE_PATH = "/cache/magisk";
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
-
     public static boolean fileExist(String path) {
         List<String> ret;
         ret = Shell.sh("if [ -f " + path + " ]; then echo true; else echo false; fi");
-        if (!Boolean.parseBoolean(ret.get(0)) && Shell.rootAccess()) ret = Shell.su("if [ -f " + path + " ]; then echo true; else echo false; fi");
+        if (!Boolean.parseBoolean(ret.get(0)) && Shell.rootAccess())
+            ret = Shell.su("if [ -f " + path + " ]; then echo true; else echo false; fi");
         return Boolean.parseBoolean(ret.get(0));
     }
 
@@ -102,7 +102,7 @@ public class Utils {
     }
 
     public Utils(Context context) {
-        appContext = context;
+        Context appContext = context;
     }
 
     public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String file) {
@@ -128,15 +128,19 @@ public class Utils {
         long downloadID;
         public String mName;
 
-        public DownloadReceiver() {}
-        public DownloadReceiver(String name) { mName = name; }
+        public DownloadReceiver() {
+        }
+
+        public DownloadReceiver(String name) {
+            mName = name;
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
             mContext = context;
             DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             String action = intent.getAction();
-            if(DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)){
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
                 DownloadManager.Query query = new DownloadManager.Query();
                 query.setFilterById(downloadID);
                 Cursor c = downloadManager.query(query);
@@ -157,11 +161,14 @@ public class Utils {
             }
         }
 
-        public void setDownloadID(long id) { downloadID = id;}
+        public void setDownloadID(long id) {
+            downloadID = id;
+        }
+
         public abstract void task(File file);
     }
 
-    public static class Initialize extends AsyncTask <Void, Void, Void> {
+    public static class Initialize extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
 
@@ -199,7 +206,7 @@ public class Utils {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (!Shell.rootAccess()) {
-                Snackbar.make(((Activity)mContext).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(((Activity) mContext).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
             }
 
         }
@@ -318,8 +325,7 @@ public class Utils {
                             new AlertDialog.Builder(mContext)
                                     .setTitle(R.string.root_method_title)
                                     .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                        switch(root)
-                                        {
+                                        switch (root) {
                                             case 0:
                                                 downloadAndReceive(
                                                         mContext,
@@ -430,24 +436,45 @@ public class Utils {
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
             ModulesFragment.listModulesCache.clear();
-            ModulesFragment.listModulesDownload.clear();
             List<String> magisk = getModList(MAGISK_PATH);
-            Log.d("Magisk", "Utils: Reload called, loading modules from" +  (doReload ? " the internet " : " cache"));
+            Log.d("Magisk", "Utils: Reload called, loading modules from" + (doReload ? " the internet " : " cache"));
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
             RepoHelper mr = new RepoHelper();
-            List<Repo> magiskRepos = mr.listRepos(mContext, doReload);
 
             for (String mod : magisk) {
-                Log.d("Magisk","Utils: Adding module from string " + mod);
-                ModulesFragment.listModules.add(new Module(mod,mContext));
+                Log.d("Magisk", "Utils: Adding module from string " + mod);
+                ModulesFragment.listModules.add(new Module(mod, mContext));
             }
             for (String mod : magiskCache) {
-                Log.d("Magisk","Utils: Adding cache module from string " + mod);
-                ModulesFragment.listModulesCache.add(new Module(mod,mContext));
+                Log.d("Magisk", "Utils: Adding cache module from string " + mod);
+                ModulesFragment.listModulesCache.add(new Module(mod, mContext));
             }
+
+            return null;
+        }
+    }
+
+    public static class LoadRepos extends AsyncTask<Void, Void, Void> {
+
+        private Context mContext;
+        private boolean doReload;
+        private RepoHelper.TaskDelegate mTaskDelegate;
+
+        public LoadRepos(Context context, boolean reload, RepoHelper.TaskDelegate delegate) {
+            mContext = context;
+            doReload = reload;
+            mTaskDelegate = delegate;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ReposFragment.mListRepos.clear();
+            RepoHelper mr = new RepoHelper();
+            List<Repo> magiskRepos = mr.listRepos(mContext, doReload, mTaskDelegate);
+
             for (Repo repo : magiskRepos) {
-                Log.d("Magisk","Utils: Adding repo from string " + repo.getId());
-                ModulesFragment.listModulesDownload.add(repo);
+                Log.d("Magisk", "Utils: Adding repo from string " + repo.getId());
+                ReposFragment.mListRepos.add(repo);
             }
 
             return null;
@@ -486,7 +513,7 @@ public class Utils {
                         "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                return Boolean.parseBoolean(ret.get(ret.size() -1));
+                return Boolean.parseBoolean(ret.get(ret.size() - 1));
             }
         }
 

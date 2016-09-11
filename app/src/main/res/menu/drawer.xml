@@ -21,6 +21,11 @@
             android:title="@string/modules"/>
 
         <item
+            android:id="@+id/downloads"
+            android:icon="@drawable/ic_extension"
+            android:title="@string/downloads"/>
+
+        <item
             android:id="@+id/log"
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>

@@ -41,7 +41,6 @@ public class ModulesFragment extends Fragment {
 
     public static List<Module> listModules = new ArrayList<>();
     public static List<Module> listModulesCache = new ArrayList<>();
-    public static List<Repo> listModulesDownload = new ArrayList<>();
     private static final int FILE_SELECT_CODE = 0;
     private int viewPagePosition;
     private static final int RESULT_OK = 1;
@@ -119,7 +118,6 @@ public class ModulesFragment extends Fragment {
                 viewPagePosition = tabLayout.getSelectedTabPosition();
                 listModules.clear();
                 listModulesCache.clear();
-                listModulesDownload.clear();
                 progressBar.setVisibility(View.VISIBLE);
                 viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
                 tabLayout.setupWithViewPager(viewPager);
@@ -155,14 +153,6 @@ public class ModulesFragment extends Fragment {
 
     }
 
-    public static class DownloadModuleFragment extends BaseRepoFragment {
-
-        @Override
-        protected List<Repo> listRepos() {
-            return listModulesDownload;
-        }
-
-    }
 
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
@@ -186,7 +176,7 @@ public class ModulesFragment extends Fragment {
     private class TabsAdapter extends FragmentPagerAdapter {
 
         String[] tabTitles = new String[]{
-                getString(R.string.modules), getString(R.string.cache_modules), "Download"
+                getString(R.string.modules), getString(R.string.cache_modules)
         };
 
         public TabsAdapter(FragmentManager fm) {
@@ -207,10 +197,8 @@ public class ModulesFragment extends Fragment {
         public Fragment getItem(int position) {
             if (position == 0) {
                 return new NormalModuleFragment();
-            } else if (position == 1) {
-                return new CacheModuleFragment();
             } else {
-                return new DownloadModuleFragment();
+                return new CacheModuleFragment();
             }
         }
     }
