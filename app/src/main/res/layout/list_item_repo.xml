@@ -19,29 +19,28 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal"
         android:padding="8dp">
 
-        <LinearLayout
-            android:layout_width="0dip"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="4dip"
-            android:layout_marginRight="4dip"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            >
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="wrap_content"
+                android:layout_width="300dip"
                 android:layout_height="wrap_content"
                 android:singleLine="false"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false"/>
+                android:textIsSelectable="false"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp" />
 
             <TextView
                 android:id="@+id/version_name"
@@ -50,7 +49,23 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
-                android:textStyle="bold|italic"/>
+                android:textStyle="bold|italic"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/title"
+                />
+
+            <ImageView
+                android:id="@+id/update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:gravity="right"
+                android:background="@drawable/ic_file_download_black"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="right"
+                android:layout_alignBaseline="@id/title"
+                android:layout_alignParentEnd="true"
+                />
 
             <TextView
                 android:id="@+id/description"
@@ -58,7 +73,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false"/>
+                android:textIsSelectable="false"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/update"
+                />
 
 
             <LinearLayout
@@ -66,7 +84,11 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="100dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_below="@id/description"
+                android:layout_alignParentStart="true"
+
+                >
 
                 <TextView
                     android:id="@+id/author"
@@ -90,13 +112,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="false"/>
+                    android:textIsSelectable="false"
+                    android:layout_marginBottom="20dip" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dip"
                     android:layout_gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="0dip">
                     <ImageView
                         android:id="@+id/changeLog"
                         android:layout_width="wrap_content"
@@ -105,12 +129,14 @@
                         android:layout_marginEnd="10dp"
                         android:background="@drawable/ic_changelog"/>
                     <ImageView
+                        android:id="@+id/authorLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
                         android:background="@drawable/ic_author"/>
                     <ImageView
+                        android:id="@+id/supportLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
@@ -118,36 +144,26 @@
                         android:background="@drawable/ic_support"/>
 
 
-                    <ImageView
-                        android:id="@+id/update"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        />
-
-                    <ImageView
-                        android:id="@+id/installed"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:visibility="gone"
-                        android:gravity="center_vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        />
-
                 </LinearLayout>
 
             </LinearLayout>
 
 
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/installed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:visibility="gone"
+            android:gravity="right"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            />
+
+    </RelativeLayout>
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

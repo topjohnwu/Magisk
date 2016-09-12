@@ -117,6 +117,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
             View.OnClickListener oCl = view -> {
                 Log.d("Magisk","Onlick captured, view is " + view.getId());
+
                 if (view.getId() == mHolder.updateImage.getId()) {
                     if (!mIsInstalled | mCanUpdate) {
 
@@ -132,12 +133,18 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     } else {
                         Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                     }
-                } else if (view.getId() == mHolder.changeLog.getId()) {
+                } if (view.getId() == mHolder.changeLog.getId()) {
                     new WebWindow("Changelog",repo.getmLogUrl(),this.context);
+                } if (view.getId() == mHolder.authorLink.getId()) {
+                    new WebWindow("Donate",repo.getmDonateUrl(),this.context);
+                } if (view.getId() == mHolder.supportLink.getId()) {
+                    new WebWindow("Support",repo.getmSupportUrl(),this.context);
                 }
             };
             mHolder.changeLog.setOnClickListener(oCl);
             mHolder.updateImage.setOnClickListener(oCl);
+            mHolder.authorLink.setOnClickListener(oCl);
+            mHolder.supportLink.setOnClickListener(oCl);
             if (prefs.contains("repo-isInstalled_" + repo.getId())) {
                 mIsInstalled = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 
@@ -174,8 +181,13 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         ImageView installedImage;
         @BindView(R.id.changeLog)
         ImageView changeLog;
+        @BindView(R.id.authorLink)
+        ImageView authorLink;
+        @BindView(R.id.supportLink)
+        ImageView supportLink;
         private ValueAnimator mAnimator;
-        private AnimatorSet animSetUpRight, animSetDownLeft;
+        private ObjectAnimator animY2;
+        private ViewHolder holder;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -183,26 +195,22 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             ButterKnife.bind(this, itemView);
             DisplayMetrics dimension = new DisplayMetrics();
             windowmanager.getDefaultDisplay().getMetrics(dimension);
-            expandLayout.getViewTreeObserver().addOnPreDrawListener(
+            holder = this;
+            this.expandLayout.getViewTreeObserver().addOnPreDrawListener(
                     new ViewTreeObserver.OnPreDrawListener() {
 
                         @Override
                         public boolean onPreDraw() {
                             final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
                             final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                            expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                            expandLayout.setVisibility(View.GONE);
-                            expandLayout.measure(widthSpec, heightSpec);
-                            mAnimator = slideAnimator(0, expandLayout.getMeasuredHeight());
-                            ObjectAnimator animX2 = ObjectAnimator.ofFloat(mHolder.updateImage, "x", -45);
-                            ObjectAnimator animY2 = ObjectAnimator.ofFloat(mHolder.updateImage, "y", -134);
-                            animSetDownLeft = new AnimatorSet();
-                            animSetDownLeft.playTogether(animX2, animY2);
-                            ObjectAnimator animX = ObjectAnimator.ofFloat(mHolder.updateImage, "x", 45);
-                            ObjectAnimator animY = ObjectAnimator.ofFloat(mHolder.updateImage, "y", 134);
-                            animSetUpRight = new AnimatorSet();
-                            animSetUpRight.playTogether(animX, animY);
-                            animSetUpRight.start();
+                            holder.expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
+                            holder.expandLayout.setVisibility(View.GONE);
+                            holder.expandLayout.measure(widthSpec, heightSpec);
+                            final int holderHeight = holder.expandLayout.getMeasuredHeight();
+                            mAnimator = slideAnimator(0, holderHeight);
+                            animY2 = ObjectAnimator.ofFloat(holder.updateImage, "translationY", holderHeight/2);
+
+
                             return true;
                         }
 
@@ -211,9 +219,9 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             viewMain.setOnClickListener(view -> {
                 int position = getAdapterPosition();
                 if (mExpandedList.get(position)) {
-                    collapse(expandLayout);
+                    collapse(holder.expandLayout);
                 } else {
-                    expand(expandLayout);
+                    expand(holder.expandLayout);
                 }
                 mExpandedList.set(position, !mExpandedList.get(position));
 
@@ -224,7 +232,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         private void expand(View view) {
             view.setVisibility(View.VISIBLE);
             mAnimator.start();
-            animSetDownLeft.start();
+            animY2.start();
 
         }
 
@@ -251,7 +259,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                 }
             });
             mAnimator.start();
-            animSetUpRight.start();
+            animY2.reverse();
 
         }
 
