@@ -23,6 +23,8 @@
 #include <sepol/policydb/conditional.h>
 #include <sepol/policydb/constraint.h>
 
+extern void builtin_rules(policydb_t *policydb);
+
 void usage(char *arg0) {
 	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm_list> -P <policy file>\n", arg0);
 	fprintf(stderr, "\tInject a rule\n\n");
@@ -651,8 +653,7 @@ int main(int argc, char **argv)
 		return 1;
 
 	if (builtin) {
-		// TODO: Create builtin rules
-		// builtin(&policydb);
+		builtin_rules(&policydb);
 	}
 	else if (permissive) {
 		type_datum_t *type;
