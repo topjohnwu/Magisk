@@ -37,7 +37,6 @@ public class Module {
                 continue;
             }
 
-            String value = props[1].trim();
             switch (props[0]) {
                 case "versionCode":
                     this.mVersionCode = Integer.valueOf(props[1]);
@@ -111,6 +110,18 @@ public class Module {
                             Log.d("Magisk", "Module: Hey, I know I'm online...");
                             mIsOnline = true;
                         } else mIsOnline = false;
+                    }
+                    if (idEntry[0].equals("logUrl")) {
+                        mLogUrl = idEntry[1];
+                    }
+                    if (idEntry[0].equals("support")) {
+                        mSupportUrl = idEntry[1];
+                    }
+                    if (idEntry[0].equals("zipUrl")) {
+                        mZipUrl = idEntry[1];
+                    }
+                    if (idEntry[0].equals("donate")) {
+                        mDonateUrl = idEntry[1];
                     }
 
                     if (idEntry[0].equals("versionCode")) {
