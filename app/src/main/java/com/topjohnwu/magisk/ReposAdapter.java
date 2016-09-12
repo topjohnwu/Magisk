@@ -93,8 +93,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     private void SetupViewElements() {
         int mPosition = mHolder.getAdapterPosition();
+        String titleString;
         if (repo.getId() != null) {
-            mHolder.title.setText(repo.getName());
+            if (repo.isCacheModule()) {
+                titleString = "[Cache] " + repo.getName();
+            } else {
+                titleString = repo.getName();
+            }
+
+            mHolder.title.setText(titleString);
             mHolder.versionName.setText(repo.getmVersion());
             mHolder.description.setText(repo.getDescription());
             String authorString = this.context.getResources().getString(R.string.author) + " " + repo.getmAuthor();

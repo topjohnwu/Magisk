@@ -31,7 +31,7 @@ public class Repo {
     private String mDonateUrl;
     private String lastUpdate;
     private Context appContext;
-    private boolean mIsInstalled,mCanUpdate;
+    private boolean mIsInstalled,mCanUpdate,mIsCacheModule;
 
 
     public Repo(String manifestString, Context context) {
@@ -132,6 +132,9 @@ public class Repo {
                             break;
                         case "donate":
                             this.mDonateUrl = props[1];
+                            break;
+                        case "cacheModule":
+                            this.mIsCacheModule = Boolean.valueOf(props[1]);
                             break;
                         case "support":
                             this.mSupportUrl = props[1];
@@ -261,5 +264,6 @@ public class Repo {
 
     public boolean isInstalled() { return mIsInstalled; }
     public boolean canUpdate() { return mCanUpdate; }
+    public boolean isCacheModule() { return mIsCacheModule; }
 }
 
