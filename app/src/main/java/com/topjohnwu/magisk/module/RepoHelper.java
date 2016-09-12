@@ -19,6 +19,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class RepoHelper {
             BuildFromCache();
         }
 
+        Collections.sort(repos, new CustomComparator());
         return repos;
     }
 
@@ -205,6 +208,12 @@ public class RepoHelper {
         public void taskCompletionResult(String result);
     }
 
+    public class CustomComparator implements Comparator<Repo> {
+        @Override
+        public int compare(Repo o1, Repo o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
 
 
 }
