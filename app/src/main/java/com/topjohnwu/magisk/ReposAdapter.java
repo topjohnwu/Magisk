@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,11 +12,15 @@ import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,12 +42,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     private ReposFragment reposFragment;
     private final List<Repo> mList;
     List<Boolean> mExpandedList;
-    @BindView(R.id.update)
-    ImageView updateImage;
-    @BindView(R.id.installed)
-    ImageView installedImage;
-    @BindView(R.id.expand_layout)
-    LinearLayout expandedLayout;
     private View viewMain;
     private Context context;
     private boolean mIsInstalled, mCanUpdate;
@@ -99,12 +99,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             mHolder.description.setText(repo.getDescription());
             String authorString = this.context.getResources().getString(R.string.author) + " " + repo.getmAuthor();
             mHolder.author.setText(authorString);
-            if ((repo.getmLogUrl() != null) && (repo.getmLogUrl().equals(""))) {
-                mHolder.log.setText(repo.getmLogUrl());
-                Linkify.addLinks(mHolder.log, Linkify.WEB_URLS);
-            } else {
-                mHolder.log.setVisibility(View.GONE);
-            }
             mHolder.installedStatus.setText(repo.isInstalled() ? this.context.getResources().getString(R.string.module_installed) : this.context.getResources().getString(R.string.module_not_installed));
             if (mExpandedList.get(mPosition)) {
                 mHolder.expandLayout.setVisibility(View.VISIBLE);
@@ -115,13 +109,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                 mHolder.installedStatus.setTextColor(Color.parseColor("#14AD00"));
                 mHolder.updateStatus.setText(repo.canUpdate() ? this.context.getResources().getString(R.string.module_update_available) : this.context.getResources().getString(R.string.module_up_to_date));
             }
+
             Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            updateImage.setImageResource(R.drawable.ic_system_update_alt_black);
+            mHolder.updateImage.setImageResource(R.drawable.ic_file_download_black);
             mCanUpdate = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 
             View.OnClickListener oCl = view -> {
-                if (view == updateImage) {
+                Log.d("Magisk","Onlick captured, view is " + view.getId());
+                if (view.getId() == mHolder.updateImage.getId()) {
                     if (!mIsInstalled | mCanUpdate) {
 
                         Utils.DownloadReceiver receiver = new Utils.DownloadReceiver() {
@@ -136,13 +132,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     } else {
                         Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                     }
-                } else if (view == mHolder.log) {
-                    new WebWindow("Changelog", repo.getmLogUrl(), this.context);
+                } else if (view.getId() == mHolder.changeLog.getId()) {
+                    new WebWindow("Changelog",repo.getmLogUrl(),this.context);
                 }
             };
-
-            updateImage.setOnClickListener(oCl);
-            mHolder.log.setOnClickListener(oCl);
+            mHolder.changeLog.setOnClickListener(oCl);
+            mHolder.updateImage.setOnClickListener(oCl);
             if (prefs.contains("repo-isInstalled_" + repo.getId())) {
                 mIsInstalled = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 
@@ -151,9 +146,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         }
     }
 
-//    protected List<Repo> mListRepos() {
-//        return ReposFragment.listModulesDownload;
-//    }
 
     @Override
     public int getItemCount() {
@@ -170,15 +162,20 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         TextView description;
         @BindView(R.id.author)
         TextView author;
-        @BindView(R.id.log)
-        TextView log;
         @BindView(R.id.installedStatus)
         TextView installedStatus;
         @BindView(R.id.updateStatus)
         TextView updateStatus;
         @BindView(R.id.expand_layout)
         LinearLayout expandLayout;
+        @BindView(R.id.update)
+        ImageView updateImage;
+        @BindView(R.id.installed)
+        ImageView installedImage;
+        @BindView(R.id.changeLog)
+        ImageView changeLog;
         private ValueAnimator mAnimator;
+        private AnimatorSet animSetUpRight, animSetDownLeft;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -197,6 +194,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             expandLayout.setVisibility(View.GONE);
                             expandLayout.measure(widthSpec, heightSpec);
                             mAnimator = slideAnimator(0, expandLayout.getMeasuredHeight());
+                            ObjectAnimator animX2 = ObjectAnimator.ofFloat(mHolder.updateImage, "x", -45);
+                            ObjectAnimator animY2 = ObjectAnimator.ofFloat(mHolder.updateImage, "y", -134);
+                            animSetDownLeft = new AnimatorSet();
+                            animSetDownLeft.playTogether(animX2, animY2);
+                            ObjectAnimator animX = ObjectAnimator.ofFloat(mHolder.updateImage, "x", 45);
+                            ObjectAnimator animY = ObjectAnimator.ofFloat(mHolder.updateImage, "y", 134);
+                            animSetUpRight = new AnimatorSet();
+                            animSetUpRight.playTogether(animX, animY);
+                            animSetUpRight.start();
                             return true;
                         }
 
@@ -218,6 +224,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         private void expand(View view) {
             view.setVisibility(View.VISIBLE);
             mAnimator.start();
+            animSetDownLeft.start();
+
         }
 
         private void collapse(View view) {
@@ -243,6 +251,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                 }
             });
             mAnimator.start();
+            animSetUpRight.start();
+
         }
 
         private ValueAnimator slideAnimator(int start, int end) {

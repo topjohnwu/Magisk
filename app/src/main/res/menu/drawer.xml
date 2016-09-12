@@ -22,7 +22,7 @@
 
         <item
             android:id="@+id/downloads"
-            android:icon="@drawable/ic_extension"
+            android:icon="@drawable/ic_file_download_black"
             android:title="@string/downloads"/>
 
         <item
