@@ -1,3 +1,6 @@
 [submodule "selinux"]
 	path = selinux
 	url = https://github.com/topjohnwu/selinux
+[submodule "jni/sepolicy-inject"]
+	path = jni/sepolicy-inject
+	url = https://github.com/topjohnwu/sepolicy-inject
