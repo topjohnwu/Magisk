@@ -41,6 +41,8 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -439,12 +441,12 @@ public class Utils {
             List<String> magisk = getModList(MAGISK_PATH);
             Log.d("Magisk", "Utils: Reload called, loading modules from" + (doReload ? " the internet " : " cache"));
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
-            RepoHelper mr = new RepoHelper();
 
             for (String mod : magisk) {
                 Log.d("Magisk", "Utils: Adding module from string " + mod);
                 ModulesFragment.listModules.add(new Module(mod, mContext));
             }
+
             for (String mod : magiskCache) {
                 Log.d("Magisk", "Utils: Adding cache module from string " + mod);
                 ModulesFragment.listModulesCache.add(new Module(mod, mContext));
@@ -452,6 +454,7 @@ public class Utils {
 
             return null;
         }
+
     }
 
     public static class LoadRepos extends AsyncTask<Void, Void, Void> {
@@ -479,6 +482,8 @@ public class Utils {
 
             return null;
         }
+
+
     }
 
     public static class FlashZIP extends AsyncTask<Void, Void, Boolean> {
@@ -544,4 +549,6 @@ public class Utils {
         void onItemClick(View view, int position);
 
     }
+
+
 }

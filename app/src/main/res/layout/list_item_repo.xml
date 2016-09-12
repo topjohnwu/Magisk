@@ -71,7 +71,7 @@
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+		        android:layout_gravity="center_vertical"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textIsSelectable="false"
                 android:layout_alignParentStart="true"
@@ -111,6 +111,7 @@
                     android:id="@+id/updateStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+		    android:layout_gravity="center_horizontal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="false"
                     android:layout_marginBottom="20dip" />

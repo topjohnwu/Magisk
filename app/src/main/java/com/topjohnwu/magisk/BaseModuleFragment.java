@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.WebWindow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,7 +133,36 @@ public abstract class BaseModuleFragment extends Fragment {
             holder.title.setText(module.getName());
             holder.versionName.setText(module.getVersion());
             holder.description.setText(module.getDescription());
+            holder.author.setText(module.getAuthor());
 
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            if (prefs.contains("repo-canUpdate_" + module.getId())) {
+                if (prefs.getBoolean("repo-canUpdate_" + module.getId(),false)) {
+                    holder.updateStatus.setText(R.string.module_update_available);
+                    holder.updateStatus.setVisibility(View.VISIBLE);
+                } else {
+                    holder.updateStatus.setVisibility(View.GONE);
+                }
+            }
+
+            View.OnClickListener oCl = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (view.getId() == holder.changeLog.getId()) {
+                        new WebWindow("Changelog",module.getChangeLog(),context);
+                    }
+                    if (view.getId() == holder.authorLink.getId()) {
+                        new WebWindow("Donate",module.getmDonateUrl(),context);
+                    }
+                    if (view.getId() == holder.supportLink.getId()) {
+                        new WebWindow("Support",module.getmSupportUrl(),context);
+                    }
+                }
+            };
+
+            holder.authorLink.setOnClickListener(oCl);
+            holder.changeLog.setOnClickListener(oCl);
+            holder.supportLink.setOnClickListener(oCl);
             holder.checkBox.setChecked(module.isEnabled());
             holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> chboxListener.onItemClick(compoundButton, holder.getAdapterPosition()));
 
@@ -170,14 +200,15 @@ public abstract class BaseModuleFragment extends Fragment {
 
             @BindView(R.id.version_name) TextView versionName;
             @BindView(R.id.description) TextView description;
-
             @BindView(R.id.warning) TextView warning;
-
             @BindView(R.id.checkbox) CheckBox checkBox;
-            @BindView(R.id.delete)
-            ImageView delete;
-			@BindView(R.id.expand_layout)
-            LinearLayout expandLayout;
+            @BindView(R.id.author) TextView author;
+            @BindView(R.id.updateStatus) TextView updateStatus;
+            @BindView(R.id.delete) ImageView delete;
+            @BindView(R.id.changeLog) ImageView changeLog;
+            @BindView(R.id.authorLink) ImageView authorLink;
+            @BindView(R.id.supportLink) ImageView supportLink;
+			@BindView(R.id.expand_layout) LinearLayout expandLayout;
             private ValueAnimator mAnimator;
             private int mMeasuredHeight;
 
@@ -188,6 +219,7 @@ public abstract class BaseModuleFragment extends Fragment {
 				DisplayMetrics dimension = new DisplayMetrics();
                 windowmanager.getDefaultDisplay().getMetrics(dimension);
                 final int mHeight = dimension.heightPixels;
+
                 expandLayout.getViewTreeObserver().addOnPreDrawListener(
                         new ViewTreeObserver.OnPreDrawListener() {
 
@@ -195,7 +227,6 @@ public abstract class BaseModuleFragment extends Fragment {
                             public boolean onPreDraw() {
                                 expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
                                 expandLayout.setVisibility(View.GONE);
-
                                 final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
                                 final int heightSpec = View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED);
                                 expandLayout.measure(widthSpec, heightSpec);

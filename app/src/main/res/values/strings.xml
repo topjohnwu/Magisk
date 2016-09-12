@@ -42,7 +42,7 @@
     <!--Module Fragment-->
     <string name="cache_modules">Cache modules</string>
     <string name="no_modules_found">No modules found</string>
-    <string name="module_update_available">An update is available</string>
+    <string name="module_update_available">An update is available!</string>
     <string name="module_up_to_date">Module is up-to-date</string>
     <string name="module_installed">Module is installed</string>
     <string name="module_not_installed">Module is not installed</string>

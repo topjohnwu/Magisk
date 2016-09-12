@@ -15,8 +15,8 @@ public class Module {
     private String mName = null;
     private String mVersion = "(No version provided)";
     private String mDescription = "(No description provided)";
-    private String mUrl,mSupportUrl,mDonateUrl,mZipUrl,mBaseUrl,mManifestUrl,mAuthor;
-    private boolean mEnable, mRemove,mUpdateAvailable,mIsOnline;
+    private String mUrl,mSupportUrl,mDonateUrl,mZipUrl,mBaseUrl,mManifestUrl,mAuthor,mLogUrl;
+    private boolean mEnable, mRemove,mUpdateAvailable,mIsOnline,mIsCacheModule;
 
 
     private String mId;
@@ -43,40 +43,46 @@ public class Module {
                     this.mVersionCode = Integer.valueOf(props[1]);
                     break;
                 case "name":
-                    this.mName = value;
+                    this.mName = props[1];
                     break;
                 case "author":
-                    this.mAuthor = value;
+                    this.mAuthor = props[1];
                     break;
                 case "id":
-                    this.mId = value;
+                    this.mId = props[1];
                     break;
                 case "version":
-                    this.mVersion = value;
+                    this.mVersion = props[1];
                     break;
                 case "description":
-                    this.mDescription = value;
+                    this.mDescription = props[1];
                     break;
                 case "donate":
-                    this.mDonateUrl = value;
+                    this.mDonateUrl = props[1];
+                    break;
+                case "cacheModule":
+                    this.mIsCacheModule = Boolean.valueOf(props[1]);
                     break;
                 case "support":
-                    this.mSupportUrl = value;
+                    this.mSupportUrl = props[1];
                     break;
                 case "donateUrl":
-                    this.mDonateUrl = value;
+                    this.mDonateUrl = props[1];
                     break;
                 case "zipUrl":
-                    this.mZipUrl = value;
+                    this.mZipUrl = props[1];
                     break;
                 case "baseUrl":
-                    this.mBaseUrl = value;
+                    this.mBaseUrl = props[1];
                     break;
                 case "manifestUrl":
-                    this.mManifestUrl = value;
+                    this.mManifestUrl = props[1];
+                    break;
+                case "logUrl":
+                    this.mLogUrl = props[1];
                     break;
                 default:
-                    Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
+                    Log.d("Magisk", "Manifest string not recognized: " + props[0]);
                     break;
             }
 
@@ -106,6 +112,7 @@ public class Module {
                             mIsOnline = true;
                         } else mIsOnline = false;
                     }
+
                     if (idEntry[0].equals("versionCode")) {
                         if (idEntry.length != 2) {
                             continue;
@@ -171,6 +178,14 @@ public class Module {
         return mVersion;
     }
 
+    public String getAuthor() {
+        return mAuthor;
+    }
+
+    public String getId() {return mId; }
+
+    public String getChangeLog() {return mLogUrl; }
+
     public String getDescription() {
         return mDescription;
     }
@@ -197,6 +212,18 @@ public class Module {
 
     public boolean willBeRemoved() {
         return mRemove;
+    }
+
+    public String getmDonateUrl() {
+        return mDonateUrl;
+    }
+
+    public String getmManifestUrl() {
+        return mManifestUrl;
+    }
+
+    public String getmSupportUrl() {
+        return mSupportUrl;
     }
 
     public boolean isOnline() {return mIsOnline; }

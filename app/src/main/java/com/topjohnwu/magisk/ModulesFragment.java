@@ -31,6 +31,8 @@ import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -123,6 +125,8 @@ public class ModulesFragment extends Fragment {
                 tabLayout.setupWithViewPager(viewPager);
                 viewPager.setCurrentItem(viewPagePosition);
                 new Utils.LoadModules(getActivity(), true).execute();
+                Collections.sort(listModules,new CustomComparator());
+                Collections.sort(listModulesCache,new CustomComparator());
                 new updateUI().execute();
                 break;
         }
@@ -200,6 +204,12 @@ public class ModulesFragment extends Fragment {
             } else {
                 return new CacheModuleFragment();
             }
+        }
+    }
+    public class CustomComparator implements Comparator<Module> {
+        @Override
+        public int compare(Module o1, Module o2) {
+            return o1.getName().compareTo(o2.getName());
         }
     }
 
