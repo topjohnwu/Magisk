@@ -28,6 +28,7 @@ import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class ModulesFragment extends Fragment {
     ViewPager viewPager;
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
+    private RepoHelper.TaskDelegate mTaskDelegate;
 
     @Nullable
     @Override
@@ -64,8 +66,14 @@ public class ModulesFragment extends Fragment {
         ButterKnife.bind(this, view);
         new Utils.LoadModules(getActivity(), false).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mTaskDelegate = result -> {
+            if (result.equals("OK")) {
+                Log.d("Magisk","ModulesFragment: We dun got the result, hur hur.");
+                RefreshUI();
+            }
+
+        };
         new updateUI().execute();
-        setHasOptionsMenu(true);
         return view;
     }
 
@@ -112,27 +120,20 @@ public class ModulesFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.force_reload:
-                viewPagePosition = tabLayout.getSelectedTabPosition();
-                listModules.clear();
-                listModulesCache.clear();
-                progressBar.setVisibility(View.VISIBLE);
-                viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
-                tabLayout.setupWithViewPager(viewPager);
-                viewPager.setCurrentItem(viewPagePosition);
-                new Utils.LoadModules(getActivity(), true).execute();
-                Collections.sort(listModules,new CustomComparator());
-                Collections.sort(listModulesCache,new CustomComparator());
-                new updateUI().execute();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
+    private void RefreshUI() {
+        viewPagePosition = tabLayout.getSelectedTabPosition();
+        listModules.clear();
+        listModulesCache.clear();
+        progressBar.setVisibility(View.VISIBLE);
+        viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
+        tabLayout.setupWithViewPager(viewPager);
+        viewPager.setCurrentItem(viewPagePosition);
+        new Utils.LoadModules(getActivity(), true).execute();
+        Collections.sort(listModules,new CustomComparator());
+        Collections.sort(listModulesCache,new CustomComparator());
+        new updateUI().execute();
     }
+
 
     void selectPage(int pageIndex) {
         tabLayout.setScrollPosition(pageIndex, 0f, true);
@@ -168,7 +169,6 @@ public class ModulesFragment extends Fragment {
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
-
             progressBar.setVisibility(View.GONE);
             viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
             tabLayout.setupWithViewPager(viewPager);
@@ -200,9 +200,13 @@ public class ModulesFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return new NormalModuleFragment();
+                NormalModuleFragment nmf = new NormalModuleFragment();
+                nmf.SetDelegate(mTaskDelegate);
+                return nmf;
             } else {
-                return new CacheModuleFragment();
+                CacheModuleFragment cmf = new CacheModuleFragment();
+                cmf.SetDelegate(mTaskDelegate);
+                return cmf;
             }
         }
     }
