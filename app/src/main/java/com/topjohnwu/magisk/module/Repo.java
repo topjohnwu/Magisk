@@ -18,7 +18,7 @@ import java.util.Date;
 public class Repo {
     private String mBaseUrl;
     private String mZipUrl;
-    private String mLogUrl;
+    private String mLogText;
     private String mManifestUrl;
     private String mVersion;
     private String mName;
@@ -77,7 +77,9 @@ public class Repo {
                 } else if (name.equals("module.prop")) {
                     this.mManifestUrl = jsonobject.getString("download_url");
                 } else if (name.equals("changelog.txt")) {
-                    this.mLogUrl = jsonobject.getString("download_url");
+                    String logUrl = jsonobject.getString("download_url");;
+                    String logText = webreq.makeWebServiceCall(logUrl,WebRequest.GET);
+                    this.mLogText = logText;
                 }
             }
         } catch (JSONException e) {
@@ -94,9 +96,10 @@ public class Repo {
     }
 
     private void PutProps(String manifestString) {
-        manifestString = manifestString + "zipUrl=" + mZipUrl + "\nbaseUrl=" + mBaseUrl + "\nlogUrl=" + mLogUrl + "\nmanifestUrl=" + mManifestUrl;
+        manifestString = manifestString + "zipUrl=" + mZipUrl + "\nbaseUrl=" + mBaseUrl + "\nmanifestUrl=" + mManifestUrl;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
         SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("log_" + mId, mLogText);
         editor.putString("repo_" + mId, manifestString);
         editor.putBoolean("hasCachedRepos", true);
         editor.putString("updated_" + mId, this.lastUpdate);
@@ -151,9 +154,6 @@ public class Repo {
                         case "manifestUrl":
                             this.mManifestUrl = props[1];
                             break;
-                        case "logUrl":
-                            this.mLogUrl = props[1];
-                            break;
                         default:
                             Log.d("Magisk", "Manifest string not recognized: " + props[0]);
                             break;
@@ -171,7 +171,9 @@ public class Repo {
                 if (prefs.contains("updated_" + this.mId)) {
                     lastUpdate = prefs.getString("updated_" + this.mId,"");
                 }
-
+                if (prefs.contains("log_" + this.mId)) {
+                    mLogText = prefs.getString("log_" + this.mId,"");
+                }
 
 
             return this.mId != null;
@@ -237,8 +239,8 @@ public class Repo {
         return mBaseUrl;
     }
 
-    public String getmLogUrl() {
-        return mLogUrl;
+    public String getmLogText() {
+        return mLogText;
     }
 
 

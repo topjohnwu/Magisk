@@ -31,7 +31,6 @@ public class ReposFragment extends Fragment {
     TextView emptyTv;
     @BindView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout swipeRefreshLayout;
-    private RepoHelper.TaskDelegate taskDelegate;
 
     @Nullable
 
@@ -57,18 +56,17 @@ public class ReposFragment extends Fragment {
     }
 
     private void LoadRepo (boolean doReload) {
-        taskDelegate = result -> {
+        RepoHelper.TaskDelegate taskDelegate = result -> {
             if (result.equals("Complete")) {
                 Log.d("Magisk", "ReposFragment, got delegate");
                 UpdateUI();
             }
 
-
         };
         Log.d("Magisk","ReposFragment, LoadRepo called");
         mListRepos.clear();
         RepoHelper mr = new RepoHelper();
-        List<Repo> magiskRepos = mr.listRepos(getActivity(), doReload,taskDelegate);
+        List<Repo> magiskRepos = mr.listRepos(getActivity(), doReload, taskDelegate);
 
         for (Repo repo : magiskRepos) {
             Log.d("Magisk", "ReposFragment: Adding repo from string " + repo.getId());

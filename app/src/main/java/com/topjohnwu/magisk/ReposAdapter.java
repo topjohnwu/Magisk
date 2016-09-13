@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -9,18 +8,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.util.Linkify;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -119,11 +113,10 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
             Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            mHolder.updateImage.setImageResource(R.drawable.ic_file_download_black);
             mCanUpdate = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 
             View.OnClickListener oCl = view -> {
-                Log.d("Magisk","Onlick captured, view is " + view.getId());
+                Log.d("Magisk", "Onlick captured, view is " + view.getId());
 
                 if (view.getId() == mHolder.updateImage.getId()) {
                     if (!mIsInstalled | mCanUpdate) {
@@ -140,12 +133,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     } else {
                         Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                     }
-                } if (view.getId() == mHolder.changeLog.getId()) {
-                    new WebWindow("Changelog",repo.getmLogUrl(),this.context);
-                } if (view.getId() == mHolder.authorLink.getId()) {
-                    new WebWindow("Donate",repo.getmDonateUrl(),this.context);
-                } if (view.getId() == mHolder.supportLink.getId()) {
-                    new WebWindow("Support",repo.getmSupportUrl(),this.context);
+                }
+                if (view.getId() == mHolder.changeLog.getId()) {
+                    new WebWindow("Changelog", repo.getmLogText(), this.context);
+                }
+                if (view.getId() == mHolder.authorLink.getId()) {
+                    new WebWindow("Donate", repo.getmDonateUrl(), this.context);
+                }
+                if (view.getId() == mHolder.supportLink.getId()) {
+                    new WebWindow("Support", repo.getmSupportUrl(), this.context);
                 }
             };
             mHolder.changeLog.setOnClickListener(oCl);
@@ -159,7 +155,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
         }
     }
-
 
     @Override
     public int getItemCount() {
@@ -215,8 +210,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             holder.expandLayout.measure(widthSpec, heightSpec);
                             final int holderHeight = holder.expandLayout.getMeasuredHeight();
                             mAnimator = slideAnimator(0, holderHeight);
-                            animY2 = ObjectAnimator.ofFloat(holder.updateImage, "translationY", holderHeight/2);
-
+                            animY2 = ObjectAnimator.ofFloat(holder.updateImage, "translationY", holderHeight / 2);
 
                             return true;
                         }

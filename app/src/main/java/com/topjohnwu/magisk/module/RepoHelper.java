@@ -18,36 +18,31 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class RepoHelper {
-    private String[] result;
-    private static String url = "https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=";
-    private static List<Repo> repos = new ArrayList<Repo>();
-    private static final String TAG_ID = "id";
-    private static final String TAG_NAME = "name";
+    private static List<Repo> repos = new ArrayList<>();
     private static String TAG = "Magisk";
-    private String mName, mId, mUrl;
     private Context activityContext;
-    private Date updatedDate, currentDate;
+    private Date updatedDate;
     private SharedPreferences prefs;
     private boolean apiFail;
+
+    public RepoHelper() {
+    }
 
     public List<Repo> listRepos(Context context, boolean refresh, TaskDelegate delegate) {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         activityContext = context;
-        TaskDelegate mDelegate = delegate;
-
 
         if (!prefs.contains("hasCachedRepos") | refresh) {
             Log.d(TAG, "RepoHelper: Building from web");
-            new MyAsyncTask(delegate).execute();
-            List<String> out = null;
+            new BuildFromWeb(delegate).execute();
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
             BuildFromCache();
@@ -63,39 +58,24 @@ public class RepoHelper {
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             if (entry.getKey().contains("repo_")) {
                 String repoString = entry.getValue().toString().replace("&quot;", "\"");
-                String[] repoStrings = repoString.split("\n");
-                for (String string : repoStrings) {
-                    String[] splitStrings = string.split("=");
-                    switch (splitStrings[0]) {
-                        case ("id"):
-                            mId = splitStrings[1];
-                            break;
-                        case ("baseUrl"):
-                            mUrl = splitStrings[1];
-                            break;
-                        default:
-                            break;
-                    }
-                }
                 repos.add(new Repo(repoString, activityContext));
             }
         }
     }
 
-
-    class MyAsyncTask extends AsyncTask<String, String, Void> {
+    class BuildFromWeb extends AsyncTask<String, String, Void> {
 
         private TaskDelegate delegate;
-        public MyAsyncTask(TaskDelegate delegate) {
+
+        public BuildFromWeb(TaskDelegate delegate) {
             this.delegate = delegate;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
         }
-
-
 
         @Override
         protected void onProgressUpdate(String... values) {
@@ -112,7 +92,8 @@ public class RepoHelper {
 
             // Making a request to url and getting response
             String token = activityContext.getString(R.string.some_string);
-            String jsonStr = webreq.makeWebServiceCall(url + Utils.procFile(token, activityContext), WebRequest.GET);
+            String url1 = activityContext.getString(R.string.url_main);
+            String jsonStr = webreq.makeWebServiceCall(url1 + Utils.procFile(token, activityContext), WebRequest.GET);
             if (jsonStr != null && !jsonStr.isEmpty()) {
 
                 try {
@@ -128,7 +109,7 @@ public class RepoHelper {
                         String manifestString = "";
                         boolean doUpdate = true;
                         boolean hasCachedDate = false;
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
                         Map<String, ?> map = prefs.getAll();
                         for (Map.Entry<String, ?> entry : map.entrySet()) {
                             if (entry.getValue().toString().contains(url)) {
@@ -158,7 +139,6 @@ public class RepoHelper {
                                 Log.d("Magisk", "RepoHelper: DoUpdate is " + doUpdate);
                             }
 
-
                         } catch (ParseException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -185,14 +165,13 @@ public class RepoHelper {
             }
             return null;
 
-
         }
 
         protected void onPostExecute(Void v) {
             if (apiFail) {
                 Toast.makeText(activityContext, "GitHub API Limit reached, please try refreshing again in an hour.", Toast.LENGTH_LONG).show();
             } else {
-                Log.d("Magisk","RepoHelper: postExecute fired");
+                Log.d("Magisk", "RepoHelper: postExecute fired");
                 delegate.taskCompletionResult("Complete");
                 BuildFromCache();
 
@@ -200,12 +179,9 @@ public class RepoHelper {
 
         }
     }
-    protected void onPreExecute() {
-
-    }
 
     public interface TaskDelegate {
-        public void taskCompletionResult(String result);
+        void taskCompletionResult(String result);
     }
 
     public class CustomComparator implements Comparator<Repo> {
@@ -214,6 +190,5 @@ public class RepoHelper {
             return o1.getName().compareTo(o2.getName());
         }
     }
-
 
 }

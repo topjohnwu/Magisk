@@ -14,16 +14,10 @@
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="2dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="8dp">
-
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:layout_gravity="center_vertical">
 
             <TextView
@@ -78,7 +72,7 @@
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>
-
+            <!--TODO - Work in an auto-update notifier, make this fly around like magic -->
             <!--<ImageView-->
             <!--android:id="@+id/update"-->
             <!--android:layout_width="wrap_content"-->
@@ -155,6 +149,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:layout_marginStart="10dp"
+                        android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_changelog" />
 
                     <ImageView
@@ -163,6 +158,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:layout_marginStart="10dp"
+                        android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_author" />
 
                     <ImageView
@@ -171,6 +167,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
                         android:layout_marginStart="10dp"
+                        android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_support" />
 
 
@@ -181,6 +178,6 @@
         </RelativeLayout>
 
 
-    </LinearLayout>
+
 
 </android.support.v7.widget.CardView>
