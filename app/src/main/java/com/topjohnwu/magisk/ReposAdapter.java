@@ -33,24 +33,37 @@ import butterknife.ButterKnife;
 
 public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
 
-    private ReposFragment reposFragment;
     private final List<Repo> mList;
     List<Boolean> mExpandedList;
     private View viewMain;
     private Context context;
-    private boolean mIsInstalled, mCanUpdate;
+    private boolean mCanUpdate;
+    private boolean alertUpdate;
+    private boolean ignoreAlertUpdate;
     private Repo repo;
     private ViewHolder mHolder;
+    private String mDonateUrl, mSupportUrl, mLogUrl,alertPackage;
+    private SharedPreferences prefs;
+
 
     public ReposAdapter(ReposFragment reposFragment, List<Repo> list) {
-        this.reposFragment = reposFragment;
+        ReposFragment reposFragment1 = reposFragment;
+        alertPackage = "";
+        alertUpdate = false;
         this.mList = list;
         Log.d("Magisk", "ReposAdapter: I am alive. I have a list " + list.size());
         mExpandedList = new ArrayList<>(mList.size());
         for (int i = 0; i < mList.size(); i++) {
             mExpandedList.add(false);
+            if (mList.get(i).canUpdate()) {
+                alertUpdate = true;
+                if (alertPackage.equals("")) {
+                    alertPackage = mList.get(i).getName();
+                } else {
+                    alertPackage += mList.get(i).getName() + ", ";
+                }
+            }
         }
-
     }
 
     @Override
@@ -75,17 +88,21 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         repo = mList.get(position);
         mHolder = holder;
+        mDonateUrl = repo.getmDonateUrl();
+        mSupportUrl = repo.getmSupportUrl();
+        mLogUrl = repo.getmLogUrl();
         mExpandedList = new ArrayList<>(mList.size());
         for (int i = 0; i < mList.size(); i++) {
             mExpandedList.add(false);
         }
-        SetupViewElements();
+        SetupViewElements(repo);
 
     }
 
-    private void SetupViewElements() {
+    private void SetupViewElements(Repo repo) {
         int mPosition = mHolder.getAdapterPosition();
         String titleString;
         if (repo.getId() != null) {
@@ -100,26 +117,37 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             mHolder.description.setText(repo.getDescription());
             String authorString = this.context.getResources().getString(R.string.author) + " " + repo.getmAuthor();
             mHolder.author.setText(authorString);
+            String logUrl = repo.getmLogUrl();
+            String supportUrl = repo.getmSupportUrl();
+            String donateUrl = repo.getmDonateUrl();
+            if (supportUrl.equals("")) mHolder.supportLink.setBackgroundColor(Color.GRAY);
+            if (logUrl.equals("")) mHolder.changeLog.setBackgroundColor(Color.GRAY);
+            if (donateUrl.equals("")) mHolder.authorLink.setBackgroundColor(Color.GRAY);
+			if (prefs.contains("ignoreUpdateAlerts")) {
+                ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts",false);
+            }
             mHolder.installedStatus.setText(repo.isInstalled() ? this.context.getResources().getString(R.string.module_installed) : this.context.getResources().getString(R.string.module_not_installed));
             if (mExpandedList.get(mPosition)) {
                 mHolder.expandLayout.setVisibility(View.VISIBLE);
             } else {
                 mHolder.expandLayout.setVisibility(View.GONE);
             }
+
             if (repo.isInstalled()) {
                 mHolder.installedStatus.setTextColor(Color.parseColor("#14AD00"));
                 mHolder.updateStatus.setText(repo.canUpdate() ? this.context.getResources().getString(R.string.module_update_available) : this.context.getResources().getString(R.string.module_up_to_date));
             }
 
             Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            mCanUpdate = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
+            prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            mCanUpdate = prefs.getBoolean("repo-canUpdate_" + repo.getId(), false);
+
 
             View.OnClickListener oCl = view -> {
                 Log.d("Magisk", "Onlick captured, view is " + view.getId());
 
                 if (view.getId() == mHolder.updateImage.getId()) {
-                    if (!mIsInstalled | mCanUpdate) {
+                    if (!repo.isInstalled() | repo.canUpdate()) {
 
                         Utils.DownloadReceiver receiver = new Utils.DownloadReceiver() {
                             @Override
@@ -134,14 +162,14 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                         Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                if (view.getId() == mHolder.changeLog.getId()) {
-                    new WebWindow("Changelog", repo.getmLogText(), this.context);
+                if ((view.getId() == mHolder.changeLog.getId()) && (!repo.getmLogUrl().equals(""))) {
+                    new WebWindow("Changelog", repo.getmLogUrl(),context);
                 }
-                if (view.getId() == mHolder.authorLink.getId()) {
-                    new WebWindow("Donate", repo.getmDonateUrl(), this.context);
+                if ((view.getId() == mHolder.authorLink.getId()) && (!repo.getmSupportUrl().equals(""))) {
+                    new WebWindow("Donate", repo.getmDonateUrl(),context);
                 }
-                if (view.getId() == mHolder.supportLink.getId()) {
-                    new WebWindow("Support", repo.getmSupportUrl(), this.context);
+                if ((view.getId() == mHolder.supportLink.getId()) && (!repo.getmSupportUrl().equals(""))) {
+                    new WebWindow("Support", repo.getmSupportUrl(),context);
                 }
             };
             mHolder.changeLog.setOnClickListener(oCl);
@@ -149,12 +177,14 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             mHolder.authorLink.setOnClickListener(oCl);
             mHolder.supportLink.setOnClickListener(oCl);
             if (prefs.contains("repo-isInstalled_" + repo.getId())) {
-                mIsInstalled = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
+                boolean mIsInstalled = prefs.getBoolean("repo-isInstalled_" + repo.getId(), false);
 
             }
 
         }
     }
+
+
 
     @Override
     public int getItemCount() {

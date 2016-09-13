@@ -18,7 +18,7 @@ import java.util.Date;
 public class Repo {
     private String mBaseUrl;
     private String mZipUrl;
-    private String mLogText;
+    private String mLogUrl;
     private String mManifestUrl;
     private String mVersion;
     private String mName;
@@ -72,14 +72,17 @@ public class Repo {
             for (int f = 0; f < repoArray.length(); f++) {
                 JSONObject jsonobject = repoArray.getJSONObject(f);
                 String name = jsonobject.getString("name");
+                String url = jsonobject.getString("download_url").trim();
+                Log.d("Magisk","Repo - checking object named " + name + " with value of " + url);
                 if (name.contains(".zip")) {
-                    this.mZipUrl = jsonobject.getString("download_url");
-                } else if (name.equals("module.prop")) {
-                    this.mManifestUrl = jsonobject.getString("download_url");
-                } else if (name.equals("changelog.txt")) {
-                    String logUrl = jsonobject.getString("download_url");;
-                    String logText = webreq.makeWebServiceCall(logUrl,WebRequest.GET);
-                    this.mLogText = logText;
+                    this.mZipUrl = url;
+                }
+                if (name.equals("module.prop")) {
+                    this.mManifestUrl = url;
+                }
+                if (name.contains("log.txt")) {
+                    Log.d("Magisk","Repo: Setting log URL for " + name + " of " +  url);
+                    this.mLogUrl = url;
                 }
             }
         } catch (JSONException e) {
@@ -96,10 +99,9 @@ public class Repo {
     }
 
     private void PutProps(String manifestString) {
-        manifestString = manifestString + "zipUrl=" + mZipUrl + "\nbaseUrl=" + mBaseUrl + "\nmanifestUrl=" + mManifestUrl;
+        manifestString = manifestString + "zipUrl=" + mZipUrl + "\nbaseUrl=" + mBaseUrl + "\nlogUrl=" + mLogUrl + "\nmanifestUrl=" + mManifestUrl;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(appContext);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("log_" + mId, mLogText);
         editor.putString("repo_" + mId, manifestString);
         editor.putBoolean("hasCachedRepos", true);
         editor.putString("updated_" + mId, this.lastUpdate);
@@ -142,6 +144,9 @@ public class Repo {
                         case "support":
                             this.mSupportUrl = props[1];
                             break;
+                        case "logUrl":
+                            this.mLogUrl = props[1];
+                            break;
                         case "donateUrl":
                             this.mDonateUrl = props[1];
                             break;
@@ -171,9 +176,7 @@ public class Repo {
                 if (prefs.contains("updated_" + this.mId)) {
                     lastUpdate = prefs.getString("updated_" + this.mId,"");
                 }
-                if (prefs.contains("log_" + this.mId)) {
-                    mLogText = prefs.getString("log_" + this.mId,"");
-                }
+
 
 
             return this.mId != null;
@@ -239,8 +242,8 @@ public class Repo {
         return mBaseUrl;
     }
 
-    public String getmLogText() {
-        return mLogText;
+    public String getmLogUrl() {
+        return mLogUrl;
     }
 
 

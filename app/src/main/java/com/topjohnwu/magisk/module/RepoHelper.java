@@ -80,6 +80,7 @@ public class RepoHelper {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
+            prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
             Toast.makeText(activityContext, "Refreshing online modules", Toast.LENGTH_SHORT).show();
 
         }

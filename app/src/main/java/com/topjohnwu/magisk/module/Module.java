@@ -16,7 +16,7 @@ public class Module {
     private String mVersion = "(No version provided)";
     private String mDescription = "(No description provided)";
     private String mUrl,mSupportUrl,mDonateUrl,mZipUrl,mBaseUrl,mManifestUrl,mAuthor,mLogUrl;
-    private boolean mEnable, mRemove,mUpdateAvailable,mIsOnline,mIsCacheModule;
+    private boolean mEnable, mRemove,mUpdateAvailable, mIsInstalled,mIsCacheModule;
 
 
     private String mId;
@@ -81,12 +81,13 @@ public class Module {
                     this.mLogUrl = props[1];
                     break;
                 default:
-                    Log.d("Magisk", "Manifest string not recognized: " + props[0]);
+                    Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
                     break;
             }
 
 
         }
+        Log.d("Magisk","Module: Loaded module with ID of " + this.mId + " or " + mId);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -97,7 +98,6 @@ public class Module {
             if (!preferenceKey.equals("nope")) {
                 Log.d("Magisk", "Module: repo_" + mId + " found.");
                 String entryString = prefs.getString("repo_" + mId, "");
-
                 String[] subStrings = entryString.split("\n");
                 for (String subKeys : subStrings) {
                     String[] idEntry = subKeys.split("=", 2);
@@ -107,9 +107,9 @@ public class Module {
                         }
 
                         if (idEntry[1].equals(mId)) {
-                            Log.d("Magisk", "Module: Hey, I know I'm online...");
-                            mIsOnline = true;
-                        } else mIsOnline = false;
+                            Log.d("Magisk", "Module: Hey, I know " + mId + " is online...");
+                            mIsInstalled = true;
+                        } else mIsInstalled = false;
                     }
                     if (idEntry[0].equals("logUrl")) {
                         mLogUrl = idEntry[1];
@@ -140,9 +140,8 @@ public class Module {
             }
 
             SharedPreferences.Editor editor = prefs.edit();
-            if (mIsOnline) {
+            if (mIsInstalled) {
                 editor.putBoolean("repo-isInstalled_" + mId, true);
-
             } else {
                 editor.putBoolean("repo-isInstalled_" + mId, false);
             }
@@ -195,7 +194,7 @@ public class Module {
 
     public String getId() {return mId; }
 
-    public String getChangeLog() {return mLogUrl; }
+    public String getmLogUrl() {return mLogUrl; }
 
     public String getDescription() {
         return mDescription;
@@ -229,6 +228,8 @@ public class Module {
         return mDonateUrl;
     }
 
+    public String getmZipUrl() { return mZipUrl; }
+
     public String getmManifestUrl() {
         return mManifestUrl;
     }
@@ -237,7 +238,7 @@ public class Module {
         return mSupportUrl;
     }
 
-    public boolean isOnline() {return mIsOnline; }
+    public boolean isInstalled() {return mIsInstalled; }
 
     public boolean isUpdateAvailable() { return mUpdateAvailable; }
 
