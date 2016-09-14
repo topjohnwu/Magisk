@@ -167,9 +167,6 @@ public abstract class BaseModuleFragment extends Fragment {
             String logUrl = module.getmLogUrl();
             String supportUrl = module.getmSupportUrl();
             String donateUrl = module.getmDonateUrl();
-            if (supportUrl != null && !supportUrl.isEmpty()) holder.supportLink.setBackgroundColor(Color.GRAY);
-            if (logUrl != null && !logUrl.isEmpty()) holder.changeLog.setBackgroundColor(Color.GRAY);
-            if (donateUrl != null && !donateUrl.isEmpty()) holder.authorLink.setBackgroundColor(Color.GRAY);
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (prefs.contains("ignoreUpdateAlerts")) {
                 ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);

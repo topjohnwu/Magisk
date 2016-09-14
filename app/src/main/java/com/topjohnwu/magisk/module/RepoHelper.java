@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -43,6 +44,9 @@ public class RepoHelper {
         if (!prefs.contains("hasCachedRepos") | refresh) {
             Log.d(TAG, "RepoHelper: Building from web");
             new BuildFromWeb(delegate).execute();
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+            String date = format.format(Calendar.getInstance().getTime());
+            prefs.edit().putString("last_update",date).apply();
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
             BuildFromCache();
