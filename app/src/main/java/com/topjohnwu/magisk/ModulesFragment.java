@@ -13,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.provider.DocumentFile;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,21 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-
-import com.github.angads25.filepicker.controller.DialogSelectionListener;
-import com.github.angads25.filepicker.model.DialogConfigs;
-import com.github.angads25.filepicker.model.DialogProperties;
-import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.lib;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -69,8 +57,6 @@ public class ModulesFragment extends Fragment {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
 
         ButterKnife.bind(this, view);
-        String[] extensions = new String[1];
-        extensions[0] = "zip";
         fabio.setOnClickListener(v -> {
             Intent fileintent = new Intent(Intent.ACTION_GET_CONTENT);
             fileintent.setType("application/zip");
@@ -101,21 +87,21 @@ public class ModulesFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         String file = "";
-        if(resultCode == Activity.RESULT_OK && requestCode == RQS_OPEN_DOCUMENT_TREE){
+        if (resultCode == Activity.RESULT_OK && requestCode == RQS_OPEN_DOCUMENT_TREE) {
             if (isExternalStorageDocument(data.getData())) {
                 final String docId = DocumentsContract.getDocumentId(data.getData());
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
                 if ("primary".equalsIgnoreCase(type)) {
-                     file = Environment.getExternalStorageDirectory() + "/" + split[1];
+                    file = Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
 
                 // TODO handle non-primary volumes
             }
             String shit = data.getDataString();
 
-            Log.d("Magisk","ModulesFragment: Got a result, " + shit + " and " + data.getData().getAuthority() + " and " + file);
+            Log.d("Magisk", "ModulesFragment: Got a result, " + shit + " and " + data.getData().getAuthority() + " and " + file);
 
         }
     }
@@ -127,8 +113,6 @@ public class ModulesFragment extends Fragment {
 
 
     }
-
-
 
 
     private void RefreshUI() {
