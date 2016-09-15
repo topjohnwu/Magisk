@@ -2,9 +2,12 @@ package com.topjohnwu.magisk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -12,13 +15,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.FileInfo;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Utils;
@@ -54,9 +61,10 @@ public class ModulesFragment extends Fragment {
 
         ButterKnife.bind(this, view);
         fabio.setOnClickListener(v -> {
-            Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            fileIntent.setType("application/zip");
-            fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            Intent getContentIntent = FileUtils.createGetContentIntent(null);
+            getContentIntent.setType("application/zip");
+            Intent fileIntent = Intent.createChooser(getContentIntent, "Select a file");
+
             startActivityForResult(fileIntent, FETCH_ZIP_CODE);
 
         });
@@ -75,13 +83,27 @@ public class ModulesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Uri mUri = data.getData();
-        final int takeFlags = data.getFlags()
-                & (Intent.FLAG_GRANT_READ_URI_PERMISSION
-                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        if (resultCode == Activity.RESULT_OK && requestCode == FETCH_ZIP_CODE) {
-            new Utils.FlashZIP(getActivity(), mUri, takeFlags).execute();
+        if (data != null) {
+            // Get the URI of the selected file
+            final Uri uri = data.getData();
+            Log.i("Magisk", "ModulesFragment: Uri = " + uri.toString() + " or ");
+            new Utils.FlashZIP(getActivity(),uri).execute();
+            try {
+                // Get the file path from the URI
+                FileInfo fileInfo = FileUtils.getFileInfo(getActivity(), uri);
+                Toast.makeText(getActivity(),
+                        "File Selected: " + fileInfo.getDisplayName() + " size: " + fileInfo.getSize(), Toast.LENGTH_LONG).show();
+
+                if (!fileInfo.isExternal()) {
+
+                } else {
+
+                }
+            } catch (Exception e) {
+                Log.e("FileSelectorTestAc...", "File select error", e);
+            }
         }
+
     }
 
     @Override

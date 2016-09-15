@@ -506,7 +506,7 @@ public class Utils {
             deleteFileAfter = false;
         }
 
-        public FlashZIP(Context context, Uri uRi, int flags) {
+        public FlashZIP(Context context, Uri uRi) {
             mContext = context;
             mUri = uRi;
             deleteFileAfter = true;
@@ -527,7 +527,7 @@ public class Utils {
                 this.cancel(true);
             }
             ContentResolver contentResolver = mContext.getContentResolver();
-            contentResolver.takePersistableUriPermission(mUri, flags);
+            //contentResolver.takePersistableUriPermission(mUri, flags);
             try {
                 InputStream in = contentResolver.openInputStream(mUri);
                 Log.d("Magisk", "Firing inputStream");
