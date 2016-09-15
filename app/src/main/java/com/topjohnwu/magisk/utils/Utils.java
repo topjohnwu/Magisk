@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -33,16 +35,18 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -483,30 +487,106 @@ public class Utils {
             return null;
         }
 
-
     }
 
     public static class FlashZIP extends AsyncTask<Void, Void, Boolean> {
 
         private String mPath, mName;
+        private Uri mUri;
         private ProgressDialog progress;
+        private File mFile;
         private Context mContext;
         private List<String> ret;
+        private boolean deleteFileAfter;
 
         public FlashZIP(Context context, String name, String path) {
             mContext = context;
             mName = name;
             mPath = path;
+            deleteFileAfter = false;
+        }
+
+        public FlashZIP(Context context, Uri uRi, int flags) {
+            mContext = context;
+            mUri = uRi;
+            deleteFileAfter = true;
+            String file = "";
+            final String docId = DocumentsContract.getDocumentId(mUri);
+
+            Log.d("Magisk","Utils: FlashZip Running, " + docId + " and " + mUri.toString());
+            String[] split = docId.split(":");
+            mName = split[1];
+            if (mName.contains("/")) {
+                split = mName.split("/");
+            }
+            if (split[1].contains(".zip")) {
+                file = mContext.getFilesDir() + "/" + split[1];
+                Log.d("Magisk", "Utils: FlashZip running for uRI " + mUri.toString());
+            } else {
+                Log.e("Magisk", "Utils: error parsing Zipfile " + mUri.getPath());
+                this.cancel(true);
+            }
+            ContentResolver contentResolver = mContext.getContentResolver();
+            contentResolver.takePersistableUriPermission(mUri, flags);
+            try {
+                InputStream in = contentResolver.openInputStream(mUri);
+                Log.d("Magisk", "Firing inputStream");
+                mFile = createFileFromInputStream(in, file, mContext);
+                if (mFile != null) {
+                    mPath = mFile.getPath();
+                    Log.d("Magisk", "Utils: Mpath is " + mPath);
+                } else {
+                    Log.e("Magisk", "Utils: error creating file " + mUri.getPath());
+                    this.cancel(true);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            // TODO handle non-primary volumes
+
+        }
+
+        private static File createFileFromInputStream(InputStream inputStream, String fileName, Context context) {
+
+            try {
+                File f = new File(fileName);
+                f.setWritable(true, false);
+                OutputStream outputStream = new FileOutputStream(f);
+                byte buffer[] = new byte[1024];
+                int length;
+
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+
+                outputStream.close();
+                inputStream.close();
+                Log.d("Magisk", "Holy balls, I think it worked.  File is " + f.getPath());
+                return f;
+
+            } catch (IOException e) {
+                System.out.println("error in creating a file");
+                e.printStackTrace();
+            }
+
+            return null;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
             progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mName));
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
+            if (mPath != null) {
+                Log.e("Magisk", "Utils: Error, flashZIP called without a valid zip file to flash.");
+                this.cancel(true);
+                return false;
+            }
             if (!Shell.rootAccess()) {
                 return false;
             } else {
@@ -518,7 +598,7 @@ public class Utils {
                         "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                return Boolean.parseBoolean(ret.get(ret.size() - 1));
+                return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
             }
         }
 
@@ -526,6 +606,10 @@ public class Utils {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             Shell.su("rm -rf /data/tmp");
+            if (deleteFileAfter) {
+                Shell.su("rm -rf " + mPath);
+                Log.d("Magisk", "Utils: Deleting file " + mPath);
+            }
             progress.dismiss();
             if (!result) {
                 Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
@@ -549,6 +633,5 @@ public class Utils {
         void onItemClick(View view, int position);
 
     }
-
 
 }

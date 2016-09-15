@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -14,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,10 +33,9 @@ import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
 
+    private static final int FETCH_ZIP_CODE = 2;
     public static List<Module> listModules = new ArrayList<>();
     public static List<Module> listModulesCache = new ArrayList<>();
-    private int viewPagePosition;
-
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
     @BindView(R.id.fab)
@@ -48,8 +44,8 @@ public class ModulesFragment extends Fragment {
     ViewPager viewPager;
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
+    private int viewPagePosition;
     private RepoHelper.TaskDelegate mTaskDelegate;
-    private static final int RQS_OPEN_DOCUMENT_TREE = 2;
 
     @Nullable
     @Override
@@ -58,17 +54,16 @@ public class ModulesFragment extends Fragment {
 
         ButterKnife.bind(this, view);
         fabio.setOnClickListener(v -> {
-            Intent fileintent = new Intent(Intent.ACTION_GET_CONTENT);
-            fileintent.setType("application/zip");
-            startActivityForResult(fileintent, RQS_OPEN_DOCUMENT_TREE);
-
+            Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            fileIntent.setType("application/zip");
+            fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(fileIntent, FETCH_ZIP_CODE);
 
         });
 
         new Utils.LoadModules(getActivity(), false).execute();
         mTaskDelegate = result -> {
             if (result.equals("OK")) {
-                Log.d("Magisk", "ModulesFragment: We dun got the result, hur hur.");
                 RefreshUI();
             }
 
@@ -78,31 +73,14 @@ public class ModulesFragment extends Fragment {
         return view;
     }
 
-
-    public static boolean isExternalStorageDocument(Uri uri) {
-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
-    }
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String file = "";
-        if (resultCode == Activity.RESULT_OK && requestCode == RQS_OPEN_DOCUMENT_TREE) {
-            if (isExternalStorageDocument(data.getData())) {
-                final String docId = DocumentsContract.getDocumentId(data.getData());
-                final String[] split = docId.split(":");
-                final String type = split[0];
-
-                if ("primary".equalsIgnoreCase(type)) {
-                    file = Environment.getExternalStorageDirectory() + "/" + split[1];
-                }
-
-                // TODO handle non-primary volumes
-            }
-            String shit = data.getDataString();
-
-            Log.d("Magisk", "ModulesFragment: Got a result, " + shit + " and " + data.getData().getAuthority() + " and " + file);
-
+        Uri mUri = data.getData();
+        final int takeFlags = data.getFlags()
+                & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        if (resultCode == Activity.RESULT_OK && requestCode == FETCH_ZIP_CODE) {
+            new Utils.FlashZIP(getActivity(), mUri, takeFlags).execute();
         }
     }
 
@@ -111,9 +89,7 @@ public class ModulesFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_module, menu);
 
-
     }
-
 
     private void RefreshUI() {
         viewPagePosition = tabLayout.getSelectedTabPosition();
@@ -128,7 +104,6 @@ public class ModulesFragment extends Fragment {
         Collections.sort(listModulesCache, new CustomComparator());
         new updateUI().execute();
     }
-
 
     void selectPage(int pageIndex) {
         tabLayout.setScrollPosition(pageIndex, 0f, true);
@@ -152,7 +127,6 @@ public class ModulesFragment extends Fragment {
         }
 
     }
-
 
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
