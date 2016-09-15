@@ -1,43 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_marginTop="?attr/actionBarSize"
-              android:orientation="vertical">
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:minHeight="?attr/actionBarSize"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="?attr/colorAccent"
-        app:tabMode="fixed"
-        app:tabTextAppearance="@style/TextAppearance.Design.Tab"/>
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/llayout"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:minHeight="?attr/actionBarSize"
+                app:tabGravity="fill"
+                app:tabIndicatorColor="?attr/colorAccent"
+                app:tabMode="fixed"
+                app:tabTextAppearance="@style/TextAppearance.Design.Tab" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:src="@drawable/ic_add"
-         />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
 
-</LinearLayout>
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true" />
+
+
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ly_bar_bottom"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:baselineAlignBottom="false"
+                android:clickable="true"
+                android:src="@drawable/ic_add"
+                app:layout_anchorGravity="bottom|right|end"
+                />
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
