@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -54,10 +57,19 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         // Startups
+        PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
+        if (!isMyServiceRunning(MonitorService.class)) {
+            Intent myIntent = new Intent(getApplication(), MonitorService.class);
+            getApplication().startService(myIntent);
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
+        if (!hasPermission()) {
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 100);
+        }
+
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -105,7 +117,9 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-
+        if (getIntent().hasExtra("relaunch")) {
+            navigate(R.id.root);
+        }
     }
 
 
@@ -135,6 +149,25 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         return true;
     }
 
+    private boolean hasPermission() {
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void navigate(final int itemId) {
         Fragment navFragment = null;
         String tag = "";
@@ -148,6 +181,11 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 setTitle(R.string.root);
                 tag = "root";
                 navFragment = new RootFragment();
+                break;
+            case R.id.autoroot:
+                setTitle(R.string.auto_root);
+                tag = "ic_autoroot";
+                navFragment = new AutoRootFragment();
                 break;
             case R.id.modules:
                 setTitle(R.string.modules);

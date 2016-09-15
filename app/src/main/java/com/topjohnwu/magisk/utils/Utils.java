@@ -393,6 +393,17 @@ public class Utils {
         }
     }
 
+    public static boolean rootStatus() {
+        try {
+            String rootStatus = Shell.su("getprop magisk.root").toString();
+            return Integer.valueOf(rootStatus).equals(1);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
     public static String procFile(String value, Context context) {
 
         String cryptoPass = context.getResources().getString(R.string.pass);
@@ -513,7 +524,7 @@ public class Utils {
             String file = "";
             final String docId = DocumentsContract.getDocumentId(mUri);
 
-            Log.d("Magisk","Utils: FlashZip Running, " + docId + " and " + mUri.toString());
+            Log.d("Magisk", "Utils: FlashZip Running, " + docId + " and " + mUri.toString());
             String[] split = docId.split(":");
             mName = split[1];
             if (mName.contains("/")) {

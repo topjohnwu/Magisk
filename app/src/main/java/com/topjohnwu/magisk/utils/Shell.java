@@ -68,6 +68,23 @@ public class Shell {
         return rootStatus > 0;
     }
 
+
+    public static boolean GetRootStatus() {
+        if (Shell.sh("which su").contains("su")) {
+            Shell.su(("setprop magisk.root 0"));
+        }
+        try {
+            String rootStatus = Shell.su("getprop magisk.root").toString();
+            return Integer.valueOf(rootStatus).equals(1);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    
+
     public static List<String> sh(String... commands) {
         List<String> res = Collections.synchronizedList(new ArrayList<String>());
 

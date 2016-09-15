@@ -24,6 +24,8 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
     private PackageManager packageManager;
     public ArrayList arrayList;
     public SharedPreferences prefs;
+    private int BLACKLIST_LIST = 1;
+    private int WHITELIST_LIST = 2;
 
     public ApplicationAdapter(Context context, int textViewResourceId,
                               List<ApplicationInfo> appsList) {
@@ -68,7 +70,7 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
             appName.setText(applicationInfo.loadLabel(packageManager));
             packageName.setText(applicationInfo.packageName);
             iconview.setImageDrawable(applicationInfo.loadIcon(packageManager));
-            if (CheckApp(applicationInfo.packageName)) {
+            if (CheckApp(applicationInfo.packageName,BLACKLIST_LIST)) {
                 statusview.setImageDrawable(this.context.getDrawable(R.drawable.root));
             } else {
                 statusview.setImageDrawable(null);
@@ -87,8 +89,10 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         ApplicationInfo applicationInfo = appsList.get(position);
         if (null != applicationInfo) {
             ImageView statusview = (ImageView) view.findViewById(R.id.app_status);
-            if (CheckApp(applicationInfo.packageName)) {
+            if (CheckApp(applicationInfo.packageName,BLACKLIST_LIST)) {
                 statusview.setImageDrawable(this.context.getDrawable(R.drawable.root));
+            } else if (CheckApp(applicationInfo.packageName,WHITELIST_LIST)) {
+                statusview.setImageDrawable(this.context.getDrawable(R.drawable.ic_stat_notification_autoroot_off));
             } else {
                 statusview.setImageDrawable(null);
             }
@@ -96,10 +100,18 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
     }
 
-    private boolean CheckApp(String appToCheck) {
-        Set<String> set = prefs.getStringSet("autoapps", null);
-        arrayList = new ArrayList<>(set);
-        return arrayList.toString().contains(appToCheck);
+    private boolean CheckApp(String appToCheck,int list) {
+        if (list == BLACKLIST_LIST) {
+            Set<String> set = prefs.getStringSet("auto_blacklist", null);
+            arrayList = new ArrayList<>(set);
+            return arrayList.toString().contains(appToCheck);
+        } else {
+            Set<String> set = prefs.getStringSet("auto_whitelist", null);
+            arrayList = new ArrayList<>(set);
+            return arrayList.toString().contains(appToCheck);
+        }
+
+
 
     }
 

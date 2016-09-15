@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -29,7 +28,7 @@ public class AutoRootFragment extends ListFragment {
     private ApplicationAdapter listadaptor = null;
     public ListView listView;
     public SharedPreferences prefs;
-    List<String> arrayList;
+    List<String> arrayBlackList,arrayWhiteList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,11 +41,14 @@ public class AutoRootFragment extends ListFragment {
         listView = getListView();
         packageManager = getActivity().getPackageManager();
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (!prefs.contains("autoapps")) {
+        if (!prefs.contains("auto_blacklist")) {
             SharedPreferences.Editor editor = prefs.edit();
-            Set<String> set = new HashSet<String>();
+            Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");
-            editor.putStringSet("autoapps", set);
+            editor.putStringSet("auto_blacklist", set);
+            set.clear();
+            set.add("com.kermidas.TitaniumBackupPro");
+            editor.putStringSet("auto_whitelist",set);
             editor.apply();
         }
         new LoadApplications().execute();
@@ -70,28 +72,43 @@ public class AutoRootFragment extends ListFragment {
 
     private void ToggleApp(String appToCheck, int position, View v) {
 
-        Set<String> set = prefs.getStringSet("autoapps", null);
+        Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
+        Set<String> whiteListSet = prefs.getStringSet("auto_whitelist", null);
 
-        arrayList = new ArrayList<>(set);
-        Log.d("Magisk", "Trying to toggle for " + appToCheck + " stringset is " + arrayList.toString());
-        SharedPreferences.Editor editor = prefs.edit();
+        assert blackListSet != null;
+        arrayBlackList = new ArrayList<>(blackListSet);
+        assert whiteListSet != null;
+        arrayWhiteList = new ArrayList<>(whiteListSet);
+        Log.d("Magisk", "Trying to toggle for " + appToCheck + " stringset is " + arrayBlackList.toString());
 
-        if (arrayList.contains(appToCheck)) {
-            Log.d("Magisk", "App is in array, removing");
+        if ((!arrayBlackList.contains(appToCheck)) && (!arrayWhiteList.contains(appToCheck))) {
+            Log.d("Magisk", "App is not in any array, adding to whitelist");
+            arrayWhiteList.add(appToCheck);
 
-            for (int i = 0; i < arrayList.size(); i++) {
-                if (appToCheck.equals(arrayList.get(i))) {
-                    arrayList.remove(i);
+
+        } else if (arrayWhiteList.contains(appToCheck)) {
+            Log.d("Magisk", "App is in whitelist, moving to blacklist");
+            for (int i = 0; i < arrayWhiteList.size(); i++) {
+                if (appToCheck.equals(arrayWhiteList.get(i))) {
+                    arrayWhiteList.remove(i);
+                }
+            }
+            arrayBlackList.add(appToCheck);
+
+        } else if (arrayBlackList.contains(appToCheck)) {
+            Log.d("Magisk", "App is in Blacklist, removing");
+            for (int i = 0; i < arrayBlackList.size(); i++) {
+                if (appToCheck.equals(arrayBlackList.get(i))) {
+                    arrayBlackList.remove(i);
                 }
             }
 
-        } else {
-            arrayList.add(appToCheck);
-
         }
-        Set<String> set2 = new HashSet<String>(arrayList);
+        Set<String> set2 = new HashSet<>(arrayBlackList);
         Log.d("Magisk", "Committing set, value is: " + set2);
-        editor.putStringSet("autoapps", set2);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("auto_blacklist", new HashSet<>(arrayBlackList));
+        editor.putStringSet("auto_whitelist", new HashSet<>(arrayWhiteList));
         editor.apply();
         listadaptor.UpdateRootStatusView(position,v);
 
@@ -99,7 +116,7 @@ public class AutoRootFragment extends ListFragment {
     }
 
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
-        ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+        ArrayList<ApplicationInfo> applist = new ArrayList<>();
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {

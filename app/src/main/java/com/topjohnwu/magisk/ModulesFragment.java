@@ -1,13 +1,9 @@
 package com.topjohnwu.magisk;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -87,7 +83,7 @@ public class ModulesFragment extends Fragment {
             // Get the URI of the selected file
             final Uri uri = data.getData();
             Log.i("Magisk", "ModulesFragment: Uri = " + uri.toString() + " or ");
-            new Utils.FlashZIP(getActivity(),uri).execute();
+            new Utils.FlashZIP(getActivity(), uri).execute();
             try {
                 // Get the file path from the URI
                 FileInfo fileInfo = FileUtils.getFileInfo(getActivity(), uri);

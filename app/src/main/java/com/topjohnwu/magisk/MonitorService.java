@@ -31,10 +31,9 @@ public class MonitorService extends Service
 {
 
     private static final String TAG = "Magisk";
-    Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private Boolean disableroot;
     private Boolean disablerootprev;
-    private Boolean stopauto;
 
     @Nullable
     @Override
@@ -44,20 +43,12 @@ public class MonitorService extends Service
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-            new Thread(() -> {
-                checkProcesses.run();
-            }).start();
+            checkProcesses.run();
 
             return START_STICKY;
 
     }
 
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "Destroyah!");
-        super.onDestroy();
-
-    }
 
     private Runnable checkProcesses = new Runnable() {
         @Override
@@ -66,7 +57,7 @@ public class MonitorService extends Service
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             if (prefs.getBoolean("autoRootEnable", false)) {
 
-                Set<String> set = prefs.getStringSet("autoapps", null);
+                Set<String> set = prefs.getStringSet("auto_blacklist", null);
 
                 if (set != null) {
                     disableroot = getStats(set);
@@ -76,16 +67,7 @@ public class MonitorService extends Service
                     int counter = 0;
                     String rootstatus = (disableroot ? "disabled" : "enabled");
                     if (disableroot) {
-                        Shell.su("setprop magisk.root 0");
-                        if (Shell.sh("which su").contains("su")) {
-                            Shell.su(("setprop magisk.root 0"));
-                        }
-                        if (Shell.sh("which su").contains("su")) {
-                            Shell.su(("setprop magisk.root 0"));
-                        }
-                        if (Shell.sh("which su").contains("su")) {
-                            Shell.su(("setprop magisk.root 0"));
-                        }
+                        ForceDisableRoot();
                     } else {
                             counter +=1;
                             if (counter >=3) {
@@ -93,39 +75,8 @@ public class MonitorService extends Service
                                 counter = 0;
                             }
                         }
-//                    Shell.su((disableroot ? "setprop magisk.root 0" : "setprop magisk.root 1"));
 
-                    NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder mBuilder;
-                    mNotifyMgr.cancelAll();
-                    if (disableroot) {
-
-                        Intent intent = new Intent(getApplication(), WelcomeActivity.class);
-                        intent.putExtra("relaunch", "relaunch");
-                        PendingIntent pendingIntent = PendingIntent.getActivity(
-                                getApplicationContext(),
-                                0,
-                                intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT);
-
-                        mBuilder =
-                                new NotificationCompat.Builder(getApplicationContext())
-                                        .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
-                                        .setContentIntent(pendingIntent)
-                                        .setContentTitle("Auto-root status changed")
-                                        .setContentText("Auto root has been " + rootstatus + "!  Tap to re-enable when done.");
-
-                    } else {
-                        mBuilder =
-                                new NotificationCompat.Builder(getApplicationContext())
-                                        .setAutoCancel(true)
-                                        .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
-                                        .setContentTitle("Auto-root status changed")
-                                        .setContentText("Auto root has been " + rootstatus + "!");
-                    }
-// Builds the notification and issues it.
-                    int mNotificationId = 1;
-                    mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                    ShowNotification(disableroot);
 
                 }
                 disablerootprev = disableroot;
@@ -137,6 +88,53 @@ public class MonitorService extends Service
         }
 
     };
+
+    private void ForceDisableRoot() {
+        Shell.su("setprop magisk.root 0");
+        if (Shell.sh("which su").contains("su")) {
+            Shell.su(("setprop magisk.root 0"));
+        }
+        if (Shell.sh("which su").contains("su")) {
+            Shell.su(("setprop magisk.root 0"));
+        }
+        if (Shell.sh("which su").contains("su")) {
+            Shell.su(("setprop magisk.root 0"));
+        }
+    }
+
+    private void ShowNotification(boolean rootAction) {
+        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder;
+        mNotifyMgr.cancelAll();
+        if (rootAction) {
+
+            Intent intent = new Intent(getApplication(), WelcomeActivity.class);
+            intent.putExtra("relaunch", "relaunch");
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    getApplicationContext(),
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+            mBuilder =
+                    new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
+                            .setContentIntent(pendingIntent)
+                            .setContentTitle("Auto-root status changed")
+                            .setContentText("Auto root has been " + rootAction + "!  Tap to re-enable when done.");
+
+        } else {
+            mBuilder =
+                    new NotificationCompat.Builder(getApplicationContext())
+                            .setAutoCancel(true)
+                            .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
+                            .setContentTitle("Auto-root status changed")
+                            .setContentText("Auto root has been " + rootAction + "!");
+        }
+        // Builds the notification and issues it.
+        int mNotificationId = 1;
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+    }
 
     private boolean getStats(Set<String> seti) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -171,14 +169,6 @@ public class MonitorService extends Service
         }
 
         return topPackageName.equals(packageName);
-    }
-
-    private boolean hasUsagePermission() {
-        AppOpsManager appOps = (AppOpsManager)
-                getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(), getPackageName());
-        return mode == AppOpsManager.MODE_ALLOWED;
     }
 
 }
