@@ -153,7 +153,7 @@ public class RootFragment extends Fragment {
                     break;
                 case 1:
                     // Proper root
-                    if (new File("/system/xbin/su").exists()) {
+                    if (new File("/magisk/.core/bin/su").exists()) {
                         // Mounted
                         rootStatusContainer.setBackgroundColor(accent);
                         rootStatusIcon.setImageResource(statusError);
