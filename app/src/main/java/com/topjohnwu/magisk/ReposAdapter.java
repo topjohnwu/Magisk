@@ -120,10 +120,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             String logUrl = repo.getmLogUrl();
             String supportUrl = repo.getmSupportUrl();
             String donateUrl = repo.getmDonateUrl();
-            if (supportUrl.equals("")) mHolder.supportLink.setBackgroundColor(Color.GRAY);
-            if (logUrl.equals("")) mHolder.changeLog.setBackgroundColor(Color.GRAY);
-            if (donateUrl.equals("")) mHolder.authorLink.setBackgroundColor(Color.GRAY);
-			if (prefs.contains("ignoreUpdateAlerts")) {
+            if (prefs.contains("ignoreUpdateAlerts")) {
                 ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts",false);
             }
             mHolder.installedStatus.setText(repo.isInstalled() ? this.context.getResources().getString(R.string.module_installed) : this.context.getResources().getString(R.string.module_not_installed));
