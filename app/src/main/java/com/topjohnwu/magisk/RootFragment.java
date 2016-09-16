@@ -2,6 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -74,8 +77,11 @@ public class RootFragment extends Fragment {
     @BindColor(R.color.accent)
     int accent;
     int statusOK = R.drawable.ic_check_circle;
+    int statusAuto = R.drawable.ic_autoroot;
     int statusError = R.drawable.ic_error;
     int statusUnknown = R.drawable.ic_help;
+
+    private boolean autoRootStatus;
 
     @Nullable
     @Override
@@ -83,8 +89,16 @@ public class RootFragment extends Fragment {
         View view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        new updateUI().execute();
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (prefs.contains("autoRootEnable")) {
+            autoRootStatus = prefs.getBoolean("autoRootEnable",false);
+            rootToggle.setEnabled(false);
+        } else {
+            autoRootStatus = false;
+            rootToggle.setEnabled(true);
+        }
+        autoRootToggle.setChecked(autoRootStatus);
+        new updateUI().execute();
 
         rootToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setprop magisk.root 1" : "setprop magisk.root 0");
@@ -95,13 +109,8 @@ public class RootFragment extends Fragment {
         });
 
         autoRootToggle.setOnClickListener(toggle -> {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("autoRootEnable", ((CompoundButton) toggle).isChecked());
-            editor.commit();
-            if (((CompoundButton) toggle).isChecked()) {
-                Intent myIntent = new Intent(getActivity(), MonitorService.class);
-                getActivity().startService(myIntent);
-            }
+            ToggleAutoRoot(autoRootToggle.isChecked());
+            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
 
         });
 
@@ -111,6 +120,25 @@ public class RootFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void ToggleAutoRoot(boolean toggleState) {
+        autoRootStatus = toggleState;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("autoRootEnable", (toggleState));
+        editor.apply();
+        if (toggleState) {
+            Intent myIntent = new Intent(getActivity(), MonitorService.class);
+            getActivity().startService(myIntent);
+            rootToggle.setEnabled(false);
+            boolean boo = Utils.isMyServiceRunning(MonitorService.class, getActivity());
+            if (boo) {
+                Intent myServiceIntent = new Intent(getActivity(), MonitorService.class);
+                getActivity().startService(myServiceIntent);
+            }
+        } else {
+            rootToggle.setEnabled(true);
+        }
     }
 
     @Override
@@ -196,26 +224,40 @@ public class RootFragment extends Fragment {
                     break;
                 case 1:
                     // Proper root
-                    if (new File("/system/xbin/su").exists()) {
-                        // Mounted
-                        rootStatusContainer.setBackgroundColor(accent);
-                        rootStatusIcon.setImageResource(statusError);
-                        rootStatus.setTextColor(accent);
-                        rootStatus.setText(R.string.root_mounted);
-                        rootToggle.setChecked(true);
-                        safetyNetStatusIcon.setImageResource(statusError);
-                        safetyNetStatus.setText(R.string.root_mounted_info);
-                        break;
-                    } else {
-                        // Not Mounted
-                        rootStatusContainer.setBackgroundColor(green500);
-                        rootStatusIcon.setImageResource(statusOK);
-                        rootStatus.setTextColor(green500);
-                        rootStatus.setText(R.string.root_unmounted);
-                        rootToggle.setChecked(false);
-                        safetyNetStatusIcon.setImageResource(statusOK);
-                        safetyNetStatus.setText(R.string.root_unmounted_info);
-                        break;
+                        if (autoRootStatus) {
+                            rootStatusContainer.setBackgroundColor(green500);
+                            rootStatusIcon.setImageResource(statusAuto);
+                            rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                            rootStatus.setTextColor(green500);
+                            rootStatus.setText(R.string.root_auto_unmounted);
+                            rootToggle.setEnabled(false);
+                            safetyNetStatusIcon.setImageResource(statusOK);
+                            safetyNetStatus.setText(R.string.root_auto_unmounted_info);
+                            break;
+                        } else {
+                            rootToggle.setEnabled(true);
+                            if (new File("/system/xbin/su").exists()) {
+                                // Mounted
+                                rootStatusContainer.setBackgroundColor(accent);
+                                rootStatusIcon.setImageResource(statusError);
+                                rootStatus.setTextColor(accent);
+                                rootStatus.setText(R.string.root_mounted);
+                                rootToggle.setChecked(true);
+                                safetyNetStatusIcon.setImageResource(statusError);
+                                safetyNetStatus.setText(R.string.root_mounted_info);
+                                break;
+                            } else {
+                                // Not Mounted
+                                rootStatusContainer.setBackgroundColor(green500);
+                                rootStatusIcon.setImageResource(statusOK);
+                                rootStatus.setTextColor(green500);
+                                rootStatus.setText(R.string.root_unmounted);
+                                rootToggle.setChecked(false);
+                                safetyNetStatusIcon.setImageResource(statusOK);
+                                safetyNetStatus.setText(R.string.root_unmounted_info);
+                                break;
+                            }
+
                     }
                 case 2:
                     // Improper root

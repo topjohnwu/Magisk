@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -35,13 +34,15 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    private Context mContext;
 
     private final Handler mDrawerHandler = new Handler();
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.drawer_layout) DrawerLayout drawer;
-    @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
 
     @IdRes
     private int mSelectedId = R.id.magisk;
@@ -58,7 +59,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         // Startups
         PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
-        if (!isMyServiceRunning(MonitorService.class)) {
+        if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
             Intent myIntent = new Intent(getApplication(), MonitorService.class);
             getApplication().startService(myIntent);
         }
@@ -76,16 +77,13 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         RepoHelper.TaskDelegate delegate = result -> {
             //Do a thing here when we get a result we want
         };
-        if (!prefs.contains("oauth_key")) {
-
-        }
         if (!prefs.contains("hasCachedRepos")) {
             new Utils.LoadModules(this, true).execute();
-            new Utils.LoadRepos(this, true,delegate).execute();
+            new Utils.LoadRepos(this, true, delegate).execute();
 
         } else {
-            new Utils.LoadModules(getApplication(),false).execute();
-            new Utils.LoadRepos(this, false,delegate).execute();
+            new Utils.LoadModules(getApplication(), false).execute();
+            new Utils.LoadRepos(this, false, delegate).execute();
 
         }
 
@@ -122,7 +120,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -156,16 +153,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 android.os.Process.myUid(), getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
 
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void navigate(final int itemId) {

@@ -18,6 +18,8 @@ import android.widget.ListView;
 import com.topjohnwu.magisk.utils.ApplicationAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +30,7 @@ public class AutoRootFragment extends ListFragment {
     private ApplicationAdapter listadaptor = null;
     public ListView listView;
     public SharedPreferences prefs;
-    List<String> arrayBlackList,arrayWhiteList;
+    List<String> arrayBlackList, arrayWhiteList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,10 +47,11 @@ public class AutoRootFragment extends ListFragment {
             SharedPreferences.Editor editor = prefs.edit();
             Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");
+            set.add("com.google.android.gms");
             editor.putStringSet("auto_blacklist", set);
             set.clear();
             set.add("com.kermidas.TitaniumBackupPro");
-            editor.putStringSet("auto_whitelist",set);
+            editor.putStringSet("auto_whitelist", set);
             editor.apply();
         }
         new LoadApplications().execute();
@@ -60,7 +63,6 @@ public class AutoRootFragment extends ListFragment {
         new LoadApplications().execute();
 
     }
-
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -84,7 +86,6 @@ public class AutoRootFragment extends ListFragment {
         if ((!arrayBlackList.contains(appToCheck)) && (!arrayWhiteList.contains(appToCheck))) {
             Log.d("Magisk", "App is not in any array, adding to whitelist");
             arrayWhiteList.add(appToCheck);
-
 
         } else if (arrayWhiteList.contains(appToCheck)) {
             Log.d("Magisk", "App is in whitelist, moving to blacklist");
@@ -110,8 +111,7 @@ public class AutoRootFragment extends ListFragment {
         editor.putStringSet("auto_blacklist", new HashSet<>(arrayBlackList));
         editor.putStringSet("auto_whitelist", new HashSet<>(arrayWhiteList));
         editor.apply();
-        listadaptor.UpdateRootStatusView(position,v);
-
+        listadaptor.UpdateRootStatusView(position, v);
 
     }
 
@@ -126,8 +126,17 @@ public class AutoRootFragment extends ListFragment {
                 e.printStackTrace();
             }
         }
+        Collections.sort(applist, new CustomComparator());
 
         return applist;
+    }
+
+    public class CustomComparator implements Comparator<ApplicationInfo> {
+        @Override
+        public int compare(ApplicationInfo o1, ApplicationInfo o2) {
+            packageManager = getActivity().getPackageManager();
+            return o1.loadLabel(packageManager).toString().compareTo(o2.loadLabel(packageManager).toString());
+        }
     }
 
     private class LoadApplications extends AsyncTask<Void, Void, Void> {

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -396,12 +397,28 @@ public class Utils {
     public static boolean rootStatus() {
         try {
             String rootStatus = Shell.su("getprop magisk.root").toString();
-            return Integer.valueOf(rootStatus).equals(1);
+            String fuckyeah = Shell.sh("which su").toString();
+            Log.d("Magisk","Utils: Rootstatus Checked, " + rootStatus + " and " + fuckyeah);
+            if (rootStatus.contains("0") && !fuckyeah.contains("su")) {
+                return false;
+            } else {
+                return true;
+            }
         } catch (NullPointerException e) {
             e.printStackTrace();
             return false;
         }
 
+    }
+
+    public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String procFile(String value, Context context) {
