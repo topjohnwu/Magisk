@@ -199,7 +199,29 @@ void suDaemonRights() {
 	allow("su_daemon", "shell_exec", "file", "open");
 	allow("su_daemon", "su_daemon", "capability", "chown");
 	allow("su_daemon", "su", "process", "transition");
-	noaudit("su_daemon", "su", "process", "siginh rlimitinh noatsecure");
+	allow("su_daemon", "su", "process", "siginh");
+	allow("su_daemon", "su", "process", "rlimitinh");
+	allow("su_daemon", "su", "process", "noatsecure");
+
+	// suL9
+	allow("su_daemon", "su_daemon", "dir", ALL);
+	allow("su_daemon", "su_daemon", "file", ALL);
+	allow("su_daemon", "su_daemon", "lnk_file", ALL);
+	allow("su_daemon", "system_data_file", "dir", ALL);
+	allow("su_daemon", "system_data_file", "file", ALL);
+	allow("su_daemon", "system_data_file", "lnk_file", ALL);
+	allow("su_daemon", "labeledfs", "filesystem", "associate");
+	allow("su_daemon", "su_daemon", "process", "setfscreate");
+	allow("su_daemon", "tmpfs", "filesystem", "associate");
+	allow("su_daemon", "su_daemon", "file", "relabelfrom");
+	allow("su_daemon", "system_file", "file", "mounton");
+
+	// Allow to start daemon by script in su domain
+	allow("su_daemon", "su", "file", "write");
+	allow("su_daemon", "proc", "file", "read");
+	allow("su_daemon", "proc", "file", "open");
+	allow("su_daemon", "su_daemon", "process", "setcurrent");
+	allow("su_daemon", "system_file", "file", "execute_no_trans");
 }
 
 void suBind() {
@@ -262,20 +284,6 @@ void otherToSU() {
 	add_type("surfaceflinger", "mlstrustedsubject", policy);
 }
 
-void suL9() {
-	allow("su_daemon", "su_daemon", "dir", ALL);
-	allow("su_daemon", "su_daemon", "file", ALL);
-	allow("su_daemon", "su_daemon", "lnk_file", ALL);
-	allow("su_daemon", "system_data_file", "dir", ALL);
-	allow("su_daemon", "system_data_file", "file", ALL);
-	allow("su_daemon", "system_data_file", "lnk_file", ALL);
-	allow("su_daemon", "labeledfs", "filesystem", "associate");
-	allow("su_daemon", "su_daemon", "process", "setfscreate");
-	allow("su_daemon", "tmpfs", "filesystem", "associate");
-	allow("su_daemon", "su_daemon", "file", "relabelfrom");
-	allow("su_daemon", "system_file", "file", "mounton");
-}
-
 void builtin_rules(policydb_t *policydb) {
 	policy = policydb;
 
@@ -307,9 +315,9 @@ void builtin_rules(policydb_t *policydb) {
 
 	// Allow init to execute su daemon/transition
 	allow("init", "su_daemon", "process", "transition");
-	noaudit("init", "su_daemon", "process", "rlimitinh");
-	noaudit("init", "su_daemon", "process", "siginh");
-	noaudit("init", "su_daemon", "process", "noatsecure");
+	allow("init", "su_daemon", "process", "rlimitinh");
+	allow("init", "su_daemon", "process", "siginh");
+	allow("init", "su_daemon", "process", "noatsecure");
 	suDaemonRights();
 	suBind();
 	suRights();
@@ -319,6 +327,4 @@ void builtin_rules(policydb_t *policydb) {
 	add_type("su_device", "mlstrustedobject", policy);
 	add_type("su_daemon", "mlstrustedsubject", policy);
 	add_type("su", "mlstrustedsubject", policy);
-
-	suL9();
 }
