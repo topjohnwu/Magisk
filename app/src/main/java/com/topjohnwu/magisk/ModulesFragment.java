@@ -43,14 +43,10 @@ public class ModulesFragment extends Fragment {
     private static final int FETCH_ZIP_CODE = 2;
     public static List<Module> listModules = new ArrayList<>();
     public static List<Module> listModulesCache = new ArrayList<>();
-    @BindView(R.id.progressBar)
-    ProgressBar progressBar;
-    @BindView(R.id.fab)
-    FloatingActionButton fabio;
-    @BindView(R.id.pager)
-    ViewPager viewPager;
-    @BindView(R.id.tab_layout)
-    TabLayout tabLayout;
+    @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.fab) FloatingActionButton fabio;
+    @BindView(R.id.pager) ViewPager viewPager;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
     private int viewPagePosition;
     private RepoHelper.TaskDelegate mTaskDelegate;
 
@@ -69,12 +65,10 @@ public class ModulesFragment extends Fragment {
 
         });
 
-        new Utils.LoadModules(getActivity()).execute();
         mTaskDelegate = result -> {
             if (result.equals("OK")) {
                 RefreshUI();
             }
-
         };
 
         new updateUI().execute();
