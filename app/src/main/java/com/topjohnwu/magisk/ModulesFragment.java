@@ -69,7 +69,7 @@ public class ModulesFragment extends Fragment {
 
         });
 
-        new Utils.LoadModules(getActivity(), false).execute();
+        new Utils.LoadModules(getActivity()).execute();
         mTaskDelegate = result -> {
             if (result.equals("OK")) {
                 RefreshUI();
@@ -121,7 +121,7 @@ public class ModulesFragment extends Fragment {
         viewPager.setAdapter(new TabsAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(viewPagePosition);
-        new Utils.LoadModules(getActivity(), true).execute();
+        new Utils.LoadModules(getActivity()).execute();
         Collections.sort(listModules, new CustomComparator());
         Collections.sort(listModulesCache, new CustomComparator());
         new updateUI().execute();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,7 +33,6 @@ import butterknife.ButterKnife;
 public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-    private Context mContext;
 
     private final Handler mDrawerHandler = new Handler();
 
@@ -49,10 +49,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-
         // Startups
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -67,15 +63,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         if (!prefs.contains("oauth_key")) {
 
         }
-        if (!prefs.contains("hasCachedRepos")) {
-            new Utils.LoadModules(this, true).execute();
-            new Utils.LoadRepos(this, true,delegate).execute();
-
-        } else {
-			new Utils.LoadModules(getApplication(),false).execute();
-            new Utils.LoadRepos(this, false,delegate).execute();
-
-        }
+        new Utils.LoadModules(this).execute();
+        new Utils.LoadRepos(this, !prefs.contains("hasCachedRepos"), delegate).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         setSupportActionBar(toolbar);
 

@@ -15,6 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -65,13 +66,13 @@ public class RootFragment extends Fragment {
         new updateUI().execute();
 
         rootToggle.setOnClickListener(toggle -> {
-            Shell.su(((CompoundButton) toggle).isChecked() ? "setprop magisk.root 1" : "setprop magisk.root 0");
-            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
+            Utils.toggleRoot(((CompoundButton) toggle).isChecked());
+            new updateUI().execute();
         });
 
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
-            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
+            new updateUI().execute();
         });
 
         return view;
@@ -153,25 +154,25 @@ public class RootFragment extends Fragment {
                     break;
                 case 1:
                     // Proper root
-                    if (new File("/magisk/.core/bin/su").exists()) {
-                        // Mounted
+                    if (Utils.rootEnabled()) {
+                        // Enabled
                         rootStatusContainer.setBackgroundColor(accent);
                         rootStatusIcon.setImageResource(statusError);
                         rootStatus.setTextColor(accent);
-                        rootStatus.setText(R.string.root_mounted);
+                        rootStatus.setText(R.string.root_enabled);
                         rootToggle.setChecked(true);
                         safetyNetStatusIcon.setImageResource(statusError);
-                        safetyNetStatus.setText(R.string.root_mounted_info);
+                        safetyNetStatus.setText(R.string.root_enabled_info);
                         break;
                     } else {
-                        // Not Mounted
+                        // Disabled
                         rootStatusContainer.setBackgroundColor(green500);
                         rootStatusIcon.setImageResource(statusOK);
                         rootStatus.setTextColor(green500);
-                        rootStatus.setText(R.string.root_unmounted);
+                        rootStatus.setText(R.string.root_disabled);
                         rootToggle.setChecked(false);
                         safetyNetStatusIcon.setImageResource(statusOK);
-                        safetyNetStatus.setText(R.string.root_unmounted_info);
+                        safetyNetStatus.setText(R.string.root_disabled_info);
                         break;
                     }
                 case 2:

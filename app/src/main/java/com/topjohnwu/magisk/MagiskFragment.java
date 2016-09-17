@@ -104,7 +104,7 @@ public class MagiskFragment extends Fragment {
                     magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(Utils.remoteMagiskVersion)));
                     magiskUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
                             .setTitle(getString(R.string.update_title, getString(R.string.magisk)))
-                            .setMessage(Html.fromHtml(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(Utils.remoteMagiskVersion), Utils.magiskChangelog)))
+                            .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(Utils.remoteMagiskVersion), Utils.magiskChangelog))
                             .setCancelable(true)
                             .setPositiveButton(R.string.download_install, (dialogInterface, i) -> {
                                 Utils.downloadAndReceive(
@@ -131,7 +131,7 @@ public class MagiskFragment extends Fragment {
                     appCheckUpdatesStatus.setText(getString(R.string.app_update_available, String.valueOf(Utils.remoteAppVersion)));
                     appUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
                             .setTitle(getString(R.string.update_title, getString(R.string.app_name)))
-                            .setMessage(Html.fromHtml(getString(R.string.update_msg, getString(R.string.app_name), String.valueOf(Utils.remoteAppVersion), Utils.appChangelog)))
+                            .setMessage(getString(R.string.update_msg, getString(R.string.app_name), String.valueOf(Utils.remoteAppVersion), Utils.appChangelog))
                             .setCancelable(true)
                             .setPositiveButton(R.string.download_install, (dialogInterface, i) -> {
                                 Utils.downloadAndReceive(getActivity(),

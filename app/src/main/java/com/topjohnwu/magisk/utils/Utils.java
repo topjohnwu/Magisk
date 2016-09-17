@@ -69,25 +69,45 @@ public class Utils {
 
     public static boolean fileExist(String path) {
         List<String> ret;
-        ret = Shell.sh("if [ -f " + path + " ]; then echo true; else echo false; fi");
-        if (!Boolean.parseBoolean(ret.get(0)) && Shell.rootAccess())
-            ret = Shell.su("if [ -f " + path + " ]; then echo true; else echo false; fi");
+        String command = "if [ -f " + path + " ]; then echo true; else echo false; fi";
+        if (Shell.rootAccess()) {
+            ret = Shell.su(command);
+        } else {
+            ret = Shell.sh(command);
+        }
+        return Boolean.parseBoolean(ret.get(0));
+    }
+
+    public static boolean rootEnabled() {
+        List<String> ret;
+        String command = "if [ -z $(which su) ]; then echo false; else echo true; fi";
+        ret = Shell.sh(command);
         return Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean createFile(String path) {
+        String command = "touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi";
         if (!Shell.rootAccess()) {
             return false;
         } else {
-            return Boolean.parseBoolean(Shell.su("touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi").get(0));
+            return Boolean.parseBoolean(Shell.su(command).get(0));
         }
     }
 
     public static boolean removeFile(String path) {
+        String command = "rm -f " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo false; else echo true; fi";
         if (!Shell.rootAccess()) {
             return false;
         } else {
-            return Boolean.parseBoolean(Shell.su("rm -f " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo false; else echo true; fi").get(0));
+            return Boolean.parseBoolean(Shell.su(command).get(0));
+        }
+    }
+
+    public static void toggleRoot(Boolean b) {
+        if (b) {
+            Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
+        } else {
+            Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
         }
     }
 
@@ -107,10 +127,6 @@ public class Utils {
         return ret;
     }
 
-    public Utils(Context context) {
-        Context appContext = context;
-    }
-
     public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String file) {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
@@ -127,6 +143,30 @@ public class Utils {
 
         receiver.setDownloadID(downloadManager.enqueue(request));
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    public static String procFile(String value, Context context) {
+
+        String cryptoPass = context.getResources().getString(R.string.pass);
+        try {
+            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey key = keyFactory.generateSecret(keySpec);
+
+            byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
+            // cipher is not thread safe
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
+
+            return new String(decrypedValueBytes);
+
+        } catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException
+                | BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException
+                | InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return value;
     }
 
     public abstract static class DownloadReceiver extends BroadcastReceiver {
@@ -393,49 +433,12 @@ public class Utils {
         }
     }
 
-    public static String procFile(String value, Context context) {
-
-        String cryptoPass = context.getResources().getString(R.string.pass);
-        try {
-            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
-
-            byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
-            // cipher is not thread safe
-            Cipher cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
-
-            String decrypedValue = new String(decrypedValueBytes);
-            return decrypedValue;
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
-
     public static class LoadModules extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
-        private boolean doReload;
 
-        public LoadModules(Context context, boolean reload) {
+        public LoadModules(Context context) {
             mContext = context;
-            doReload = reload;
         }
 
         @Override
@@ -443,7 +446,7 @@ public class Utils {
             ModulesFragment.listModules.clear();
             ModulesFragment.listModulesCache.clear();
             List<String> magisk = getModList(MAGISK_PATH);
-            Log.d("Magisk", "Utils: Reload called, loading modules from" + (doReload ? " the internet " : " cache"));
+            Log.d("Magisk", "Utils: Reload called, loading modules");
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
 
             for (String mod : magisk) {

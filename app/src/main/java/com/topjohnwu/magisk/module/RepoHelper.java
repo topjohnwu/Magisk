@@ -46,7 +46,7 @@ public class RepoHelper {
             new BuildFromWeb(delegate).execute();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             String date = format.format(Calendar.getInstance().getTime());
-            prefs.edit().putString("last_update",date).apply();
+            prefs.edit().putString("last_update", date).apply();
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
             BuildFromCache();
