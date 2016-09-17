@@ -101,11 +101,8 @@ public class RootFragment extends Fragment {
         new updateUI().execute();
 
         rootToggle.setOnClickListener(toggle -> {
-            Shell.su(((CompoundButton) toggle).isChecked() ? "setprop magisk.root 1" : "setprop magisk.root 0");
-            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
-            if (!((CompoundButton) toggle).isChecked()) {
-                autoRootToggle.setChecked(false);
-            }
+            Utils.toggleRoot(((CompoundButton) toggle).isChecked());
+            new updateUI().execute();
         });
 
         autoRootToggle.setOnClickListener(toggle -> {
@@ -116,7 +113,7 @@ public class RootFragment extends Fragment {
 
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
-            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
+            new updateUI().execute();
         });
 
         return view;

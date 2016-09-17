@@ -27,7 +27,7 @@
 
         <item
             android:id="@+id/downloads"
-            android:icon="@drawable/ic_file_download_black"
+            android:icon="@drawable/ic_cloud_download"
             android:title="@string/downloads"/>
 
         <item

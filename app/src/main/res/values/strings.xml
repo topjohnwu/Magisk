@@ -83,7 +83,7 @@
     <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
     <string name="update_title">%1$s Update!</string>
-    <string name="update_msg"><![CDATA[New version v%2$s of %1$s is available!<br>Changelog:<br>%3$s]]></string>
+    <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
     <string name="download_install">Download and install</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="manual_install">File downloaded in %1$s\nFlash it in recovery manually</string>
