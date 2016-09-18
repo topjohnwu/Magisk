@@ -15,8 +15,9 @@ public class Module {
     private String mName = null;
     private String mVersion = "(No version provided)";
     private String mDescription = "(No description provided)";
-    private String mUrl,mSupportUrl,mDonateUrl,mZipUrl,mBaseUrl,mManifestUrl,mAuthor,mLogUrl;
-    private boolean mEnable, mRemove,mUpdateAvailable, mIsInstalled,mIsCacheModule;
+    private String mSupportUrl, mDonateUrl, mZipUrl, mAuthor, mLogUrl;
+    private boolean mEnable = false, mRemove = false, mUpdateAvailable = false, mIsInstalled,
+            mIsCacheModule = false;
 
 
     private String mId;
@@ -38,47 +39,32 @@ public class Module {
             }
 
             switch (props[0]) {
-                case "versionCode":
-                    this.mVersionCode = Integer.valueOf(props[1]);
+                case "id":
+                    this.mId = props[1];
                     break;
                 case "name":
                     this.mName = props[1];
                     break;
-                case "author":
-                    this.mAuthor = props[1];
-                    break;
-                case "id":
-                    this.mId = props[1];
-                    break;
                 case "version":
                     this.mVersion = props[1];
                     break;
+                case "versionCode":
+                    this.mVersionCode = Integer.parseInt(props[1]);
+                    break;
+                case "author":
+                    this.mAuthor = props[1];
+                    break;
                 case "description":
                     this.mDescription = props[1];
+                    break;
+                case "support":
+                    this.mSupportUrl = props[1];
                     break;
                 case "donate":
                     this.mDonateUrl = props[1];
                     break;
                 case "cacheModule":
-                    this.mIsCacheModule = Boolean.valueOf(props[1]);
-                    break;
-                case "support":
-                    this.mSupportUrl = props[1];
-                    break;
-                case "donateUrl":
-                    this.mDonateUrl = props[1];
-                    break;
-                case "zipUrl":
-                    this.mZipUrl = props[1];
-                    break;
-                case "baseUrl":
-                    this.mBaseUrl = props[1];
-                    break;
-                case "manifestUrl":
-                    this.mManifestUrl = props[1];
-                    break;
-                case "logUrl":
-                    this.mLogUrl = props[1];
+                    this.mIsCacheModule = Boolean.parseBoolean(props[1]);
                     break;
                 default:
                     Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
@@ -165,18 +151,18 @@ public class Module {
 
     }
 
-    public Module(Repo repo) {
-
-        mName = repo.getName();
-        mVersion = repo.getmVersion();
-        mDescription = repo.getDescription();
-        mId = repo.getId();
-        mVersionCode = repo.getmVersionCode();
-        mUrl = repo.getmZipUrl();
-        mEnable = true;
-        mRemove = false;
-
-    }
+//    public Module(Repo repo) {
+//
+//        mName = repo.getName();
+//        mVersion = repo.getmVersion();
+//        mDescription = repo.getDescription();
+//        mId = repo.getId();
+//        mVersionCode = repo.getmVersionCode();
+//        mUrl = repo.getmZipUrl();
+//        mEnable = true;
+//        mRemove = false;
+//
+//    }
 
 
 
@@ -224,21 +210,23 @@ public class Module {
         return mRemove;
     }
 
+    public boolean isCache() {
+        return mIsCacheModule;
+    }
+
+    public void setCache() {
+        mIsCacheModule = true;
+    }
+
     public String getmDonateUrl() {
         return mDonateUrl;
     }
 
     public String getmZipUrl() { return mZipUrl; }
 
-    public String getmManifestUrl() {
-        return mManifestUrl;
-    }
-
     public String getmSupportUrl() {
         return mSupportUrl;
     }
-
-    public boolean isInstalled() {return mIsInstalled; }
 
     public boolean isUpdateAvailable() { return mUpdateAvailable; }
 

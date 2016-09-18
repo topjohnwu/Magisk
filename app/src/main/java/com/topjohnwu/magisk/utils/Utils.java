@@ -444,7 +444,6 @@ public class Utils {
         @Override
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
-            ModulesFragment.listModulesCache.clear();
             List<String> magisk = getModList(MAGISK_PATH);
             Log.d("Magisk", "Utils: Reload called, loading modules");
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
@@ -456,7 +455,10 @@ public class Utils {
 
             for (String mod : magiskCache) {
                 Log.d("Magisk", "Utils: Adding cache module from string " + mod);
-                ModulesFragment.listModulesCache.add(new Module(mod, mContext));
+                Module cacheMod = new Module(mod, mContext);
+                // Prevent people forgot to change module.prop
+                cacheMod.setCache();
+                ModulesFragment.listModules.add(cacheMod);
             }
 
             return null;

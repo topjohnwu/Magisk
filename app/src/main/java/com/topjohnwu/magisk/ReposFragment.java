@@ -1,9 +1,7 @@
 package com.topjohnwu.magisk;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -50,7 +48,7 @@ public class ReposFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.single_repo_fragment, container, false);
+        View view = inflater.inflate(R.layout.repos_fragment, container, false);
         mView = view;
         ButterKnife.bind(this, view);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
