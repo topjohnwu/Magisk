@@ -236,28 +236,27 @@ public class RootFragment extends Fragment {
                             break;
                         } else {
                             rootToggle.setEnabled(true);
-                            if (new File("/system/xbin/su").exists()) {
-                                // Mounted
-                                rootStatusContainer.setBackgroundColor(accent);
-                                rootStatusIcon.setImageResource(statusError);
-                                rootStatus.setTextColor(accent);
-                                rootStatus.setText(R.string.root_mounted);
-                                rootToggle.setChecked(true);
-                                safetyNetStatusIcon.setImageResource(statusError);
-                                safetyNetStatus.setText(R.string.root_mounted_info);
-                                break;
-                            } else {
-                                // Not Mounted
-                                rootStatusContainer.setBackgroundColor(green500);
-                                rootStatusIcon.setImageResource(statusOK);
-                                rootStatus.setTextColor(green500);
-                                rootStatus.setText(R.string.root_unmounted);
-                                rootToggle.setChecked(false);
-                                safetyNetStatusIcon.setImageResource(statusOK);
-                                safetyNetStatus.setText(R.string.root_unmounted_info);
-                                break;
+                            if (new File("/magisk/.core/bin/su").exists()) {
+                        // Mounted
+                        rootStatusContainer.setBackgroundColor(accent);
+                        rootStatusIcon.setImageResource(statusError);
+                        rootStatus.setTextColor(accent);
+                        rootStatus.setText(R.string.root_mounted);
+                        rootToggle.setChecked(true);
+                        safetyNetStatusIcon.setImageResource(statusError);
+                        safetyNetStatus.setText(R.string.root_mounted_info);
+                        break;
+                             } else {
+                        // Not Mounted
+                        rootStatusContainer.setBackgroundColor(green500);
+                        rootStatusIcon.setImageResource(statusOK);
+                        rootStatus.setTextColor(green500);
+                        rootStatus.setText(R.string.root_unmounted);
+                        rootToggle.setChecked(false);
+                        safetyNetStatusIcon.setImageResource(statusOK);
+                        safetyNetStatus.setText(R.string.root_unmounted_info);
+                        break;
                             }
-
                     }
                 case 2:
                     // Improper root
