@@ -5,75 +5,39 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
-public class Module {
+public class Module extends BaseModule {
 
     private String mRemoveFile;
     private String mDisableFile;
 
-    private String mName = null;
-    private String mVersion = "(No version provided)";
-    private String mDescription = "(No description provided)";
-    private String mSupportUrl, mDonateUrl, mZipUrl, mAuthor, mLogUrl;
-    private boolean mEnable = false, mRemove = false, mUpdateAvailable = false, mIsInstalled,
-            mIsCacheModule = false;
-
-
-    private String mId;
-    private int mVersionCode;
+    private String mZipUrl, mLogUrl;
+    private boolean mEnable, mRemove, mUpdateAvailable = false, mIsInstalled;
 
     public Module(String path, Context context) {
 
+        super(Utils.readFile(path + "/module.prop"));
+
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";
-        for (String line : Utils.readFile(path + "/module.prop")) {
-            String[] props = line.split("=", 2);
-            if (props.length != 2) {
-                continue;
-            }
 
-            String key = props[0].trim();
-            if (key.charAt(0) == '#') {
-                continue;
-            }
-
-            switch (props[0]) {
-                case "id":
-                    this.mId = props[1];
-                    break;
-                case "name":
-                    this.mName = props[1];
-                    break;
-                case "version":
-                    this.mVersion = props[1];
-                    break;
-                case "versionCode":
-                    this.mVersionCode = Integer.parseInt(props[1]);
-                    break;
-                case "author":
-                    this.mAuthor = props[1];
-                    break;
-                case "description":
-                    this.mDescription = props[1];
-                    break;
-                case "support":
-                    this.mSupportUrl = props[1];
-                    break;
-                case "donate":
-                    this.mDonateUrl = props[1];
-                    break;
-                case "cacheModule":
-                    this.mIsCacheModule = Boolean.parseBoolean(props[1]);
-                    break;
-                default:
-                    Log.d("Magisk", "Module: Manifest string not recognized: " + props[0]);
-                    break;
-            }
-
-
+        if (mId == null) {
+            int sep = path.lastIndexOf('/');
+            mId = path.substring(sep + 1);
         }
-        Log.d("Magisk","Module: Loaded module with ID of " + this.mId + " or " + mId);
+
+        if (mName == null)
+            mName = mId;
+
+        if (mDescription == null)
+            mDescription = context.getString(R.string.no_info_provided);
+
+        if (mVersion == null)
+            mVersion = context.getString(R.string.no_info_provided);
+
+        Log.d("Magisk","Module: Loaded module with ID of " + mId );
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -140,51 +104,12 @@ public class Module {
             editor.apply();
         }
 
-        if (mName == null) {
-            int sep = path.lastIndexOf('/');
-            mName = path.substring(sep + 1);
-            mId = mName;
-        }
-
         mEnable = !Utils.fileExist(mDisableFile);
         mRemove = Utils.fileExist(mRemoveFile);
 
     }
 
-//    public Module(Repo repo) {
-//
-//        mName = repo.getName();
-//        mVersion = repo.getmVersion();
-//        mDescription = repo.getDescription();
-//        mId = repo.getId();
-//        mVersionCode = repo.getmVersionCode();
-//        mUrl = repo.getmZipUrl();
-//        mEnable = true;
-//        mRemove = false;
-//
-//    }
-
-
-
-    public String getName() {
-        return mName;
-    }
-
-    public String getVersion() {
-        return mVersion;
-    }
-
-    public String getAuthor() {
-        return mAuthor;
-    }
-
-    public String getId() {return mId; }
-
     public String getmLogUrl() {return mLogUrl; }
-
-    public String getDescription() {
-        return mDescription;
-    }
 
     public void createDisableFile() {
         mEnable = !Utils.createFile(mDisableFile);
@@ -210,23 +135,7 @@ public class Module {
         return mRemove;
     }
 
-    public boolean isCache() {
-        return mIsCacheModule;
-    }
-
-    public void setCache() {
-        mIsCacheModule = true;
-    }
-
-    public String getmDonateUrl() {
-        return mDonateUrl;
-    }
-
     public String getmZipUrl() { return mZipUrl; }
-
-    public String getmSupportUrl() {
-        return mSupportUrl;
-    }
 
     public boolean isUpdateAvailable() { return mUpdateAvailable; }
 

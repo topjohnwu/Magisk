@@ -40,6 +40,7 @@
     <string name="selinux_samsung_info">Samsung need custom kernel for switching SELinux status!</string>
 
     <!--Module Fragment-->
+    <string name="no_info_provided">(No info provided)</string>
     <string name="cache_modules">Cache modules</string>
     <string name="no_modules_found">No modules found</string>
     <string name="module_update_available">An update is available!</string>
