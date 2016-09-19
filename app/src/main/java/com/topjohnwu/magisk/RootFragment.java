@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -126,13 +125,7 @@ public class RootFragment extends Fragment {
     }
 
 
-    private void CheckAccessPermissions() {
-        if (!Utils.hasStatsPermission(getActivity())) {
-            Toast.makeText(getActivity(),"Please allow Usage Access for auto root to work.",Toast.LENGTH_LONG).show();
-            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 100);
-        }
 
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -141,24 +134,27 @@ public class RootFragment extends Fragment {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
                 Log.d("Magisk","Got result code OK for permissions");
-                Toast.makeText(getActivity(),"Auto-root disabled, permissions required.",Toast.LENGTH_LONG).show();
 
 
             } else {
                 autoRootToggle.setEnabled(false);
+                Toast.makeText(getActivity(),"Auto-root disabled, permissions required.",Toast.LENGTH_LONG).show();
+
             }
 
         }
     }
 
     private void ToggleAutoRoot(boolean toggleState) {
-        CheckAccessPermissions();
-        if (Utils.hasStatsPermission(getActivity())) {
             autoRootStatus = toggleState;
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("autoRootEnable", (toggleState));
             editor.apply();
             if (toggleState) {
+                if (!Utils.hasStatsPermission(getActivity(),"com.topjohnwu.magisk/WindowChangeDetectingService")) {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                    startActivityForResult(intent, 100);
+                }
                 Intent myIntent = new Intent(getActivity(), MonitorService.class);
                 getActivity().startService(myIntent);
                 rootToggle.setEnabled(false);
@@ -172,7 +168,7 @@ public class RootFragment extends Fragment {
                 getActivity().stopService(myIntent);
                 rootToggle.setEnabled(true);
             }
-        }
+
     }
 
     @Override

@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -86,7 +85,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                super.onDrawerSlide(drawerView, 0); // this disables the arrow @ completed state
+                super.onDrawerSlide(drawerView, 0); // this disables the arrow @ completed tate
             }
 
             @Override

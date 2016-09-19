@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
@@ -23,6 +24,8 @@ import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.ModulesFragment;
@@ -171,13 +174,23 @@ public class Utils {
         return value;
     }
 
-        public static boolean hasStatsPermission(Context context) {
-            AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                    android.os.Process.myUid(), context.getPackageName());
-            return mode == AppOpsManager.MODE_ALLOWED;
 
+
+    public static boolean hasStatsPermission(Context context, String id) {
+
+        AccessibilityManager am = (AccessibilityManager) context
+                .getSystemService(Context.ACCESSIBILITY_SERVICE);
+
+        List<AccessibilityServiceInfo> runningServices = am
+                .getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
+        for (AccessibilityServiceInfo service : runningServices) {
+            if (id.equals(service.getId())) {
+                return true;
+            }
         }
+
+        return false;
+    }
 
 
     public abstract static class DownloadReceiver extends BroadcastReceiver {

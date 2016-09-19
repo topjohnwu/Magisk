@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,7 @@ public class AutoRootFragment extends ListFragment {
     private ApplicationAdapter listadaptor = null;
     public ListView listView;
     public SharedPreferences prefs;
-    List<String> arrayBlackList, arrayWhiteList;
+    List<String> arrayBlackList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,9 +48,6 @@ public class AutoRootFragment extends ListFragment {
             set.add("com.google.android.apps.walletnfcrel");
             set.add("com.google.android.gms");
             editor.putStringSet("auto_blacklist", set);
-            set.clear();
-            set.add("com.kermidas.TitaniumBackupPro");
-            editor.putStringSet("auto_whitelist", set);
             editor.apply();
         }
         new LoadApplications().execute();
@@ -75,29 +71,15 @@ public class AutoRootFragment extends ListFragment {
     private void ToggleApp(String appToCheck, int position, View v) {
 
         Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
-        Set<String> whiteListSet = prefs.getStringSet("auto_whitelist", null);
+
 
         assert blackListSet != null;
         arrayBlackList = new ArrayList<>(blackListSet);
-        assert whiteListSet != null;
-        arrayWhiteList = new ArrayList<>(whiteListSet);
-        Log.d("Magisk", "Trying to toggle for " + appToCheck + " stringset is " + arrayBlackList.toString());
 
-        if ((!arrayBlackList.contains(appToCheck)) && (!arrayWhiteList.contains(appToCheck))) {
-            Log.d("Magisk", "App is not in any array, adding to whitelist");
-            arrayWhiteList.add(appToCheck);
-
-        } else if (arrayWhiteList.contains(appToCheck)) {
-            Log.d("Magisk", "App is in whitelist, moving to blacklist");
-            for (int i = 0; i < arrayWhiteList.size(); i++) {
-                if (appToCheck.equals(arrayWhiteList.get(i))) {
-                    arrayWhiteList.remove(i);
-                }
-            }
+        if (!arrayBlackList.contains(appToCheck)) {
             arrayBlackList.add(appToCheck);
 
-        } else if (arrayBlackList.contains(appToCheck)) {
-            Log.d("Magisk", "App is in Blacklist, removing");
+        } else {
             for (int i = 0; i < arrayBlackList.size(); i++) {
                 if (appToCheck.equals(arrayBlackList.get(i))) {
                     arrayBlackList.remove(i);
@@ -105,12 +87,7 @@ public class AutoRootFragment extends ListFragment {
             }
 
         }
-        Set<String> set2 = new HashSet<>(arrayBlackList);
-        Log.d("Magisk", "Committing set, value is: " + set2);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet("auto_blacklist", new HashSet<>(arrayBlackList));
-        editor.putStringSet("auto_whitelist", new HashSet<>(arrayWhiteList));
-        editor.apply();
+        prefs.edit().putStringSet("auto_blacklist", new HashSet<>(arrayBlackList)).apply();
         listadaptor.UpdateRootStatusView(position, v);
 
     }

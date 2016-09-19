@@ -1,59 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:padding="5dp">
 
-    <ImageView
-        android:id="@+id/app_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:padding="3dp"
-        android:scaleType="centerCrop"/>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginBottom="3dip"
+    android:layout_marginLeft="8dip"
+    android:layout_marginRight="8dip"
+    android:layout_marginTop="3dip"
+    android:background="?android:attr/selectableItemBackground"
+
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="2dp"
+    style="@style/Base.CardView">
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:padding="10dp">
 
-        <LinearLayout
-            android:id="@+id/lynn"
+        <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/app_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+
+            android:scaleType="centerCrop" />
+
+
+        <TextView
+            android:id="@+id/app_name"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center_vertical"
-            android:orientation="vertical"
-            android:paddingLeft="5dp"
-            android:paddingRight="50dp">
-
-            <TextView
-                android:id="@+id/app_name"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/app_paackage"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"></RelativeLayout>
-
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/app_status"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_gravity="center_horizontal"
-            android:padding="3dp"
-            android:scaleType="centerCrop"/>
+            android:layout_toEndOf="@+id/app_icon"
+            android:gravity="center_vertical"
+            android:paddingEnd="3dp"
+            android:paddingStart="3dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/app_paackage"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/app_name"
+            android:layout_toEndOf="@+id/app_icon"
+            android:gravity="center_vertical"
+            android:paddingEnd="3dp"
+            android:paddingStart="3dp" />
+
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:focusable="false"
+            android:gravity="center"
+            android:src="@drawable/ic_menu_overflow_material"
+            />
+
 
     </RelativeLayout>
 
-</LinearLayout>
+
+</android.support.v7.widget.CardView>
+
+

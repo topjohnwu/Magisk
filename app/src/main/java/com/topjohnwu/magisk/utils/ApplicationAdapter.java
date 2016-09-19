@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,8 +25,6 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
     private PackageManager packageManager;
     public ArrayList arrayList;
     public SharedPreferences prefs;
-    private int BLACKLIST_LIST = 1;
-    private int WHITELIST_LIST = 2;
 
     public ApplicationAdapter(Context context, int textViewResourceId,
                               List<ApplicationInfo> appsList) {
@@ -66,14 +65,14 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
             TextView appName = (TextView) view.findViewById(R.id.app_name);
             TextView packageName = (TextView) view.findViewById(R.id.app_paackage);
             ImageView iconview = (ImageView) view.findViewById(R.id.app_icon);
-            ImageView statusview = (ImageView) view.findViewById(R.id.app_status);
+            CheckBox statusview = (CheckBox) view.findViewById(R.id.checkbox);
             appName.setText(applicationInfo.loadLabel(packageManager));
             packageName.setText(applicationInfo.packageName);
             iconview.setImageDrawable(applicationInfo.loadIcon(packageManager));
-            if (CheckApp(applicationInfo.packageName, BLACKLIST_LIST)) {
-                statusview.setImageDrawable(this.context.getDrawable(R.drawable.root));
+            if (CheckApp(applicationInfo.packageName)) {
+                statusview.setChecked(true);
             } else {
-                statusview.setImageDrawable(null);
+                statusview.setChecked(false);
             }
         }
         return view;
@@ -88,21 +87,18 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         }
         ApplicationInfo applicationInfo = appsList.get(position);
         if (null != applicationInfo) {
-            ImageView statusview = (ImageView) view.findViewById(R.id.app_status);
-            if (CheckApp(applicationInfo.packageName, BLACKLIST_LIST)) {
-                statusview.setImageDrawable(this.context.getDrawable(R.drawable.root));
-            } else if (CheckApp(applicationInfo.packageName, WHITELIST_LIST)) {
-                statusview.setImageDrawable(this.context.getDrawable(R.drawable.ic_stat_notification_autoroot_off));
+            CheckBox statusview = (CheckBox) view.findViewById(R.id.checkbox);
+            if (CheckApp(applicationInfo.packageName)) {
+                statusview.setChecked(true);
             } else {
-                statusview.setImageDrawable(null);
+                statusview.setChecked(false);
             }
         }
 
     }
 
-    private boolean CheckApp(String appToCheck, int list) {
+    private boolean CheckApp(String appToCheck) {
         boolean starter = false;
-        if (list == BLACKLIST_LIST) {
             Set<String> set = prefs.getStringSet("auto_blacklist", null);
             if (set != null) {
                 arrayList = new ArrayList<>(set);
@@ -113,18 +109,6 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
                 }
             }
 
-        } else {
-            Set<String> set = prefs.getStringSet("auto_whitelist", null);
-            if (set != null) {
-                arrayList = new ArrayList<>(set);
-                for (String string : set) {
-                    if (string.equals(appToCheck)) {
-                        starter = true;
-                    }
-                }
-            }
-
-        }
         return starter;
 
     }
