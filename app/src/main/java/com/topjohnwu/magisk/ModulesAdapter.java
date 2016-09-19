@@ -136,7 +136,6 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
         View.OnClickListener oCl = view -> {
             if (view.getId() == holder.changeLog.getId()) {
-
                 new WebWindow("Changelog", module.getmLogUrl(), context);
             }
             if (view.getId() == holder.authorLink.getId()) {

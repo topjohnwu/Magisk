@@ -20,7 +20,6 @@ public class WebRequest {
     static String response = null;
     public final static int GET = 1;
     public final static int POST = 2;
-    private boolean addNewLine;
 
     //Constructor with no parameter
     public WebRequest() {
@@ -33,18 +32,16 @@ public class WebRequest {
      * @url - url to make request
      * @requestmethod - http request method
      */
-    public String makeWebServiceCall(String url, int requestmethod) {
-        addNewLine=false;
+    public static String makeWebServiceCall(String url, int requestmethod) {
         Log.d("Magisk","WebRequest: Service call received for URL " + url);
-        return this.makeWebServiceCall(url, requestmethod, null);
+        return makeWebServiceCall(url, requestmethod, null, false);
 
 
     }
 
-    public String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
-        addNewLine = addNewLines;
+    public static String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
         Log.d("Magisk","WebRequest: Service call(bool) received for URL " + url);
-        return this.makeWebServiceCall(url, requestmethod, null);
+        return makeWebServiceCall(url, requestmethod, null, addNewLines);
 
     }
 
@@ -55,8 +52,8 @@ public class WebRequest {
      * @requestmethod - http request method
      * @params - http request params
      */
-    public String makeWebServiceCall(String urladdress, int requestmethod,
-                                     HashMap<String, String> params) {
+    public static String makeWebServiceCall(String urladdress, int requestmethod,
+                                     HashMap<String, String> params, boolean addNewLines) {
         URL url;
         String response = "";
         try {
@@ -104,7 +101,7 @@ public class WebRequest {
                 String line;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = br.readLine()) != null) {
-                    if (addNewLine) {
+                    if (addNewLines) {
                         response += line + "\n";
                     } else {
                         response += line;

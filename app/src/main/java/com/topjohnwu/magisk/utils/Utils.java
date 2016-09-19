@@ -481,8 +481,7 @@ public class Utils {
         @Override
         protected Void doInBackground(Void... voids) {
             ReposFragment.mListRepos.clear();
-            RepoHelper mr = new RepoHelper();
-            List<Repo> magiskRepos = mr.listRepos(mContext, doReload, mTaskDelegate);
+            List<Repo> magiskRepos = RepoHelper.listRepos(mContext, doReload, mTaskDelegate);
 
             for (Repo repo : magiskRepos) {
                 Log.d("Magisk", "Utils: Adding repo from string " + repo.getId());

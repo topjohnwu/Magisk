@@ -94,6 +94,7 @@
     <string name="phh">phh\'s superuser</string>
     <string name="supersu">SuperSU</string>
     <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
+
     <string name="pass">MagiskRox666</string>
     <string name="some_string">GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus</string>
     <string name="downloads">Downloads</string>

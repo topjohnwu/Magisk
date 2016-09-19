@@ -64,9 +64,8 @@ public class Repo {
 
     public void fetch() {
 
-        WebRequest webreq = new WebRequest();
         // Construct initial url for contents
-        String repoString = webreq.makeWebServiceCall(mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string),appContext), WebRequest.GET);
+        String repoString = WebRequest.makeWebServiceCall(mBaseUrl + "/contents?access_token=" + Utils.procFile(appContext.getString(R.string.some_string), appContext), WebRequest.GET);
         try {
             JSONArray repoArray = new JSONArray(repoString);
             for (int f = 0; f < repoArray.length(); f++) {
@@ -89,8 +88,7 @@ public class Repo {
             e.printStackTrace();
         }
 
-        WebRequest propReq = new WebRequest();
-        String manifestString = propReq.makeWebServiceCall(mManifestUrl,WebRequest.GET,true);
+        String manifestString = WebRequest.makeWebServiceCall(mManifestUrl, WebRequest.GET, true);
 
         if (ParseProps(manifestString)) {
             PutProps(manifestString);

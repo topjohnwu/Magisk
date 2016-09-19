@@ -112,8 +112,7 @@ public class ReposFragment extends Fragment {
         };
         Log.d("Magisk","ReposFragment, LoadRepo called");
         mListRepos.clear();
-        RepoHelper mr = new RepoHelper();
-        List<Repo> magiskRepos = mr.listRepos(getActivity(), doReload, taskDelegate);
+        List<Repo> magiskRepos = RepoHelper.listRepos(getActivity(), doReload, taskDelegate);
 
         for (Repo repo : magiskRepos) {
             Log.d("Magisk", "ReposFragment: Adding repo from string " + repo.getId());

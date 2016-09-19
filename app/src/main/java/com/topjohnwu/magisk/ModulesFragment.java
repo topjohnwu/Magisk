@@ -74,32 +74,30 @@ public class ModulesFragment extends Fragment {
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
 
-            if (listModules().size() == 0) {
+            if (listModules.size() == 0) {
                 emptyTv.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             } else {
                 recyclerView.setVisibility(View.VISIBLE);
             }
-            recyclerView.setAdapter(new ModulesAdapter(listModules(), (chk, position) -> {
+            recyclerView.setAdapter(new ModulesAdapter(listModules, (chk, position) -> {
                 // On Checkbox change listener
                 CheckBox chbox = (CheckBox) chk;
 
                 if (!chbox.isChecked()) {
-                    listModules().get(position).createDisableFile();
+                    listModules.get(position).createDisableFile();
                     Snackbar.make(chk, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
                 } else {
-                    listModules().get(position).removeDisableFile();
+                    listModules.get(position).removeDisableFile();
                     Snackbar.make(chk, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
                 }
             }, (deleteBtn, position) -> {
                 // On delete button click listener
-
-                listModules().get(position).createRemoveFile();
+                listModules.get(position).createRemoveFile();
                 Snackbar.make(deleteBtn, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
             }, (undeleteBtn, position) -> {
                 // On undelete button click listener
-
-                listModules().get(position).deleteRemoveFile();
+                listModules.get(position).deleteRemoveFile();
                 Snackbar.make(undeleteBtn, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
             }));
 
@@ -107,12 +105,6 @@ public class ModulesFragment extends Fragment {
                 mSwipeRefreshLayout.setRefreshing(false);
 
         }
-    }
-
-
-//    protected abstract List<Module> listModules();
-    protected List<Module> listModules() {
-        return listModules;
     }
 
 }
