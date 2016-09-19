@@ -28,13 +28,12 @@
     <string name="root_error_info">Safety Net Status Unknown</string>
     <string name="root_none">Not Rooted</string>
     <string name="root_none_info">Safety Net (Android Pay) should work</string>
-    <string name="root_mounted">Root mounted</string>
-    <string name="root_mounted_info">Root mounted and enabled. Safety Net (Android Pay) will NOT work.</string>
-    <string name="root_unmounted">Root not mounted</string>
-    <string name="root_unmounted_info">Safety Net (Android Pay) should work, but no root temporarily\nYou might need to manually add a card in Android Pay app to refresh the root status of AP</string>
+    <string name="root_enabled">Root enabled</string>
+    <string name="root_enabled_info">Root enabled. Safety Net (Android Pay) will NOT work</string>
+    <string name="root_disabled">Root disabled</string>
+    <string name="root_disabled_info">Safety Net (Android Pay) should work, but no root temporarily\nYou might need to manually add a card in Android Pay app to refresh the root status of AP</string>
     <string name="root_auto_unmounted">Root set to auto-mount</string>
     <string name="root_auto_unmounted_info">Root will auto unmount for selected applications.  Safety Net (Android Pay) should work.</string>
-
     <string name="root_system">Magisk Incompatible Root Detected</string>
     <string name="root_system_info">Root improperly installed. Safety Net (Android Pay) will NOT work, and impossible to toggle.</string>
 
@@ -44,6 +43,7 @@
     <string name="selinux_samsung_info">Samsung need custom kernel for switching SELinux status!</string>
 
     <!--Module Fragment-->
+    <string name="no_info_provided">(No info provided)</string>
     <string name="cache_modules">Cache modules</string>
     <string name="no_modules_found">No modules found</string>
     <string name="module_update_available">An update is available!</string>
@@ -98,6 +98,7 @@
     <string name="phh">phh\'s superuser</string>
     <string name="supersu">SuperSU</string>
     <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
+
     <string name="pass">MagiskRox666</string>
     <string name="some_string">GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus</string>
     <string name="downloads">Downloads</string>

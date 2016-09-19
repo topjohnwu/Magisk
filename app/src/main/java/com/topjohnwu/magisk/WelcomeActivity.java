@@ -1,11 +1,10 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
-import android.app.AppOpsManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,10 +52,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-
         // Startups
         PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
         if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
@@ -67,9 +62,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
-        if (!hasPermission()) {
-            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 100);
-        }
+
 
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
@@ -77,15 +70,11 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         RepoHelper.TaskDelegate delegate = result -> {
             //Do a thing here when we get a result we want
         };
-        if (!prefs.contains("hasCachedRepos")) {
-            new Utils.LoadModules(this, true).execute();
+        new Utils.LoadModules(this).execute();
             new Utils.LoadRepos(this, true, delegate).execute();
-
-        } else {
-            new Utils.LoadModules(getApplication(), false).execute();
+        new Utils.LoadRepos(this, !prefs.contains("hasCachedRepos"), delegate).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Utils.LoadModules(getApplication()).execute();
             new Utils.LoadRepos(this, false, delegate).execute();
-
-        }
 
         setSupportActionBar(toolbar);
 
@@ -146,14 +135,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         return true;
     }
 
-    private boolean hasPermission() {
-        AppOpsManager appOps = (AppOpsManager)
-                getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), getPackageName());
-        return mode == AppOpsManager.MODE_ALLOWED;
 
-    }
 
     private void navigate(final int itemId) {
         Fragment navFragment = null;

@@ -8,6 +8,8 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,6 +36,7 @@ public class MonitorService extends Service
     private Boolean disableroot;
     private Boolean disablerootprev;
     private int counter = 0;
+    private String mPackageName;
 
     @Nullable
     @Override
@@ -47,6 +50,18 @@ public class MonitorService extends Service
 
         return START_STICKY;
 
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d("Magisk","MonitorService: Service created");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("Magisk","MonitorService: Service destroyed");
     }
 
     private Runnable checkProcesses = new Runnable() {
@@ -86,51 +101,20 @@ public class MonitorService extends Service
 
     private void ForceDisableRoot() {
         Log.d("Magisk", "MonitorService: Forcedisable called.");
-        Shell.su("setprop magisk.root 0");
-
-        if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 0"));
+        Utils.toggleRoot(false);
+        if (Utils.rootEnabled()) {
+            Utils.toggleRoot(false);
             Log.d(TAG, "MonitorService: FORCING.");
         }
-        Log.d("Magisk", "MonitorService: Forcedisable called. " + Utils.rootStatus());
+        Log.d("Magisk", "MonitorService: Forcedisable called. " + Utils.rootEnabled());
     }
 
     private void ForceEnableRoot() {
         Log.d("Magisk", "MonitorService: ForceEnable called.");
-        if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        } else if (!Utils.rootStatus()) {
-            Shell.su(("setprop magisk.root 1"));
-            Log.d(TAG, "MonitorService: FORCING.");
-        }
+        Utils.toggleRoot(true);
+        if (!Utils.rootEnabled()) {
+            Utils.toggleRoot(true);
+            }
     }
 
     private void ShowNotification(boolean rootAction) {
@@ -141,18 +125,23 @@ public class MonitorService extends Service
 
             Intent intent = new Intent(getApplication(), WelcomeActivity.class);
             intent.putExtra("relaunch", "relaunch");
+            String rootMessage;
             PendingIntent pendingIntent = PendingIntent.getActivity(
                     getApplicationContext(),
                     0,
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-
+            if (mPackageName.equals("")) {
+                rootMessage = "Root has been disabled";
+            } else {
+                rootMessage = "Root has been disabled for " + mPackageName;
+            }
             mBuilder =
                     new NotificationCompat.Builder(getApplicationContext())
                             .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
                             .setContentIntent(pendingIntent)
                             .setContentTitle("Auto-root status changed")
-                            .setContentText("Root has been disabled.");
+                            .setContentText(rootMessage);
             int mNotificationId = 1;
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
         } else {
@@ -178,6 +167,20 @@ public class MonitorService extends Service
         return false;
     }
 
+    private String getAppName (String packageName) {
+        PackageManager pkManager = getPackageManager();
+        ApplicationInfo appInfo;
+        String appname = "";
+        try {
+            appInfo = pkManager.getApplicationInfo(packageName, 0);
+            appname = (String) ((appInfo != null) ? pkManager.getApplicationLabel(appInfo) : "???");
+            return appname;
+        } catch (final PackageManager.NameNotFoundException e) {
+            return null;
+        }
+    }
+
+
     protected boolean isAppForeground(String packageName) {
         UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         long time = System.currentTimeMillis();
@@ -195,8 +198,9 @@ public class MonitorService extends Service
                 if (topPackageName.equals("com.topjohnwu.magisk")) {
                     mySortedMap.remove(mySortedMap.lastKey());
                     topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                    mPackageName = getAppName(topPackageName);
                 }
-                //Log.d("Magisk", "MonitorService: Hi Captain, the package we need to kill for is " + topPackageName);
+
             }
         }
 

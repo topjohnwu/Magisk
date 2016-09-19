@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AppOpsManager;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -169,6 +170,15 @@ public class Utils {
         }
         return value;
     }
+
+        public static boolean hasStatsPermission(Context context) {
+            AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), context.getPackageName());
+            return mode == AppOpsManager.MODE_ALLOWED;
+
+        }
+
 
     public abstract static class DownloadReceiver extends BroadcastReceiver {
         public Context mContext;
@@ -438,7 +448,7 @@ public class Utils {
         try {
             String rootStatus = Shell.su("getprop magisk.root").toString();
             String fuckyeah = Shell.sh("which su").toString();
-            Log.d("Magisk","Utils: Rootstatus Checked, " + rootStatus + " and " + fuckyeah);
+            Log.d("Magisk", "Utils: Rootstatus Checked, " + rootStatus + " and " + fuckyeah);
             if (rootStatus.contains("0") && !fuckyeah.contains("su")) {
                 return false;
             } else {
@@ -448,7 +458,6 @@ public class Utils {
             e.printStackTrace();
             return false;
         }
-
     }
 
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
@@ -457,7 +466,7 @@ public class Utils {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;
             }
-        }
+       }
         return false;
     }
 
@@ -472,7 +481,6 @@ public class Utils {
         @Override
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
-            ModulesFragment.listModulesCache.clear();
             List<String> magisk = getModList(MAGISK_PATH);
             Log.d("Magisk", "Utils: Reload called, loading modules");
             List<String> magiskCache = getModList(MAGISK_CACHE_PATH);
@@ -484,7 +492,10 @@ public class Utils {
 
             for (String mod : magiskCache) {
                 Log.d("Magisk", "Utils: Adding cache module from string " + mod);
-                ModulesFragment.listModulesCache.add(new Module(mod, mContext));
+                Module cacheMod = new Module(mod, mContext);
+                // Prevent people forgot to change module.prop
+                cacheMod.setCache();
+                ModulesFragment.listModules.add(cacheMod);
             }
 
             return null;
@@ -507,8 +518,7 @@ public class Utils {
         @Override
         protected Void doInBackground(Void... voids) {
             ReposFragment.mListRepos.clear();
-            RepoHelper mr = new RepoHelper();
-            List<Repo> magiskRepos = mr.listRepos(mContext, doReload, mTaskDelegate);
+            List<Repo> magiskRepos = RepoHelper.listRepos(mContext, doReload, mTaskDelegate);
 
             for (Repo repo : magiskRepos) {
                 Log.d("Magisk", "Utils: Adding repo from string " + repo.getId());
@@ -545,13 +555,13 @@ public class Utils {
             final String docId = DocumentsContract.getDocumentId(mUri);
 
             Log.d("Magisk", "Utils: FlashZip Running, " + docId + " and " + mUri.toString());
-            String[] split = docId.split(":");
-            mName = split[1];
-            if (mName.contains("/")) {
-                split = mName.split("/");
-            }
-            if (split[1].contains(".zip")) {
-                file = mContext.getFilesDir() + "/" + split[1];
+            if (docId.contains(":"))
+                mName = docId.split(":")[1];
+            else mName = docId;
+            if (mName.contains("/"))
+                mName = mName.substring(mName.lastIndexOf('/') + 1);
+            if (mName.contains(".zip")) {
+                file = mContext.getFilesDir() + "/" + mName;
                 Log.d("Magisk", "Utils: FlashZip running for uRI " + mUri.toString());
             } else {
                 Log.e("Magisk", "Utils: error parsing Zipfile " + mUri.getPath());
@@ -615,6 +625,7 @@ public class Utils {
         protected Boolean doInBackground(Void... voids) {
             if (mPath != null) {
                 Log.e("Magisk", "Utils: Error, flashZIP called without a valid zip file to flash.");
+                progress.dismiss();
                 this.cancel(true);
                 return false;
             }
@@ -622,11 +633,11 @@ public class Utils {
                 return false;
             } else {
                 ret = Shell.su(
-                        "rm -rf /data/tmp",
-                        "mkdir -p /data/tmp",
-                        "cp -af " + mPath + " /data/tmp/install.zip",
-                        "unzip -o /data/tmp/install.zip META-INF/com/google/android/* -d /data/tmp",
-                        "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
+                        "rm -rf /dev/tmp",
+                        "mkdir -p /dev/tmp",
+                        "cp -af " + mPath + " /dev/tmp/install.zip",
+                        "unzip -o /dev/tmp/install.zip META-INF/com/google/android/* -d /dev/tmp",
+                        "BOOTMODE=true sh /dev/tmp/META-INF/com/google/android/update-binary dummy 1 /dev/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
                 return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
@@ -636,7 +647,6 @@ public class Utils {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            Shell.su("rm -rf /data/tmp");
             if (deleteFileAfter) {
                 Shell.su("rm -rf " + mPath);
                 Log.d("Magisk", "Utils: Deleting file " + mPath);

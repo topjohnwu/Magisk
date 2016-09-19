@@ -1,56 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:padding="5dp">
 
     <ImageView
         android:id="@+id/app_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:padding="3dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"/>
+
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/lynn"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingLeft="5dp"
-        android:paddingRight="50dp">
-
-        <TextView
-            android:id="@+id/app_name"
+        <LinearLayout
+            android:id="@+id/lynn"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:gravity="center_vertical"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="50dp">
 
-        <TextView
-            android:id="@+id/app_paackage"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical" />
+            <TextView
+                android:id="@+id/app_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:textStyle="bold"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></RelativeLayout>
+            <TextView
+                android:id="@+id/app_paackage"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></RelativeLayout>
 
 
-    </LinearLayout>
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/app_status"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center_horizontal"
             android:padding="3dp"
-            android:scaleType="centerCrop"
-            android:layout_gravity="right"
-            android:layout_alignParentEnd="true" />
+            android:scaleType="centerCrop"/>
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>

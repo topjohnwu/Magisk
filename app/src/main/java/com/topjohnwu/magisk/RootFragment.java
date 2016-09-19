@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -8,8 +9,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -90,6 +94,8 @@ public class RootFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+
         if (prefs.contains("autoRootEnable")) {
             autoRootStatus = prefs.getBoolean("autoRootEnable",false);
             rootToggle.setEnabled(false);
@@ -119,22 +125,51 @@ public class RootFragment extends Fragment {
         return view;
     }
 
-    private void ToggleAutoRoot(boolean toggleState) {
-        autoRootStatus = toggleState;
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("autoRootEnable", (toggleState));
-        editor.apply();
-        if (toggleState) {
-            Intent myIntent = new Intent(getActivity(), MonitorService.class);
-            getActivity().startService(myIntent);
-            rootToggle.setEnabled(false);
-            boolean boo = Utils.isMyServiceRunning(MonitorService.class, getActivity());
-            if (boo) {
-                Intent myServiceIntent = new Intent(getActivity(), MonitorService.class);
-                getActivity().startService(myServiceIntent);
+
+    private void CheckAccessPermissions() {
+        if (!Utils.hasStatsPermission(getActivity())) {
+            Toast.makeText(getActivity(),"Please allow Usage Access for auto root to work.",Toast.LENGTH_LONG).show();
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), 100);
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 100) {
+            // Make sure the request was successful
+            if (resultCode == Activity.RESULT_OK) {
+                Log.d("Magisk","Got result code OK for permissions");
+                Toast.makeText(getActivity(),"Auto-root disabled, permissions required.",Toast.LENGTH_LONG).show();
+
+
+            } else {
+                autoRootToggle.setEnabled(false);
             }
-        } else {
-            rootToggle.setEnabled(true);
+
+        }
+    }
+
+    private void ToggleAutoRoot(boolean toggleState) {
+        CheckAccessPermissions();
+        if (Utils.hasStatsPermission(getActivity())) {
+            autoRootStatus = toggleState;
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("autoRootEnable", (toggleState));
+            editor.apply();
+            if (toggleState) {
+                Intent myIntent = new Intent(getActivity(), MonitorService.class);
+                getActivity().startService(myIntent);
+                rootToggle.setEnabled(false);
+                boolean boo = Utils.isMyServiceRunning(MonitorService.class, getActivity());
+                if (boo) {
+                    Intent myServiceIntent = new Intent(getActivity(), MonitorService.class);
+                    getActivity().startService(myServiceIntent);
+                }
+            } else {
+                rootToggle.setEnabled(true);
+            }
         }
     }
 
@@ -233,25 +268,25 @@ public class RootFragment extends Fragment {
                             break;
                         } else {
                             rootToggle.setEnabled(true);
-                            if (new File("/magisk/.core/bin/su").exists()) {
+                    if (Utils.rootEnabled()) {
                         // Mounted
                         rootStatusContainer.setBackgroundColor(accent);
                         rootStatusIcon.setImageResource(statusError);
                         rootStatus.setTextColor(accent);
-                        rootStatus.setText(R.string.root_mounted);
+                        rootStatus.setText(R.string.root_enabled);
                         rootToggle.setChecked(true);
                         safetyNetStatusIcon.setImageResource(statusError);
-                        safetyNetStatus.setText(R.string.root_mounted_info);
+                        safetyNetStatus.setText(R.string.root_enabled_info);
                         break;
                              } else {
-                        // Not Mounted
+                        // Disabled
                         rootStatusContainer.setBackgroundColor(green500);
                         rootStatusIcon.setImageResource(statusOK);
                         rootStatus.setTextColor(green500);
-                        rootStatus.setText(R.string.root_unmounted);
+                        rootStatus.setText(R.string.root_disabled);
                         rootToggle.setChecked(false);
                         safetyNetStatusIcon.setImageResource(statusOK);
-                        safetyNetStatus.setText(R.string.root_unmounted_info);
+                        safetyNetStatus.setText(R.string.root_disabled_info);
                         break;
                             }
                     }

@@ -29,35 +29,32 @@ import java.util.Map;
 public class RepoHelper {
     private static List<Repo> repos = new ArrayList<>();
     private static String TAG = "Magisk";
-    private Context activityContext;
-    private Date updatedDate;
-    private SharedPreferences prefs;
-    private boolean apiFail;
 
     public RepoHelper() {
     }
 
-    public List<Repo> listRepos(Context context, boolean refresh, TaskDelegate delegate) {
-        prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        activityContext = context;
+    public static List<Repo> listRepos(Context context, boolean refresh, TaskDelegate delegate) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         if (!prefs.contains("hasCachedRepos") | refresh) {
             Log.d(TAG, "RepoHelper: Building from web");
-            new BuildFromWeb(delegate).execute();
+            new BuildFromWeb(delegate, context).execute();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             String date = format.format(Calendar.getInstance().getTime());
             prefs.edit().putString("last_update", date).apply();
         } else {
             Log.d(TAG, "RepoHelper: Building from cache");
-            BuildFromCache();
+            BuildFromCache(context);
         }
 
         Collections.sort(repos, new CustomComparator());
         return repos;
     }
 
-    private void BuildFromCache() {
+    private static void BuildFromCache(Context activityContext) {
         repos.clear();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activityContext);
         Map<String, ?> map = prefs.getAll();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             if (entry.getKey().contains("repo_")) {
@@ -67,12 +64,16 @@ public class RepoHelper {
         }
     }
 
-    class BuildFromWeb extends AsyncTask<String, String, Void> {
+    static class BuildFromWeb extends AsyncTask<String, String, Boolean> {
 
         private TaskDelegate delegate;
+        private SharedPreferences prefs;
+        private Context activityContext;
 
-        public BuildFromWeb(TaskDelegate delegate) {
+        public BuildFromWeb(TaskDelegate delegate, Context activityContext) {
             this.delegate = delegate;
+            this.activityContext = activityContext;
+            prefs = PreferenceManager.getDefaultSharedPreferences(activityContext);
         }
 
         @Override
@@ -90,15 +91,13 @@ public class RepoHelper {
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
             publishProgress();
-            // Creating service handler class instance
-            WebRequest webreq = new WebRequest();
 
             // Making a request to url and getting response
             String token = activityContext.getString(R.string.some_string);
             String url1 = activityContext.getString(R.string.url_main);
-            String jsonStr = webreq.makeWebServiceCall(url1 + Utils.procFile(token, activityContext), WebRequest.GET);
+            String jsonStr = WebRequest.makeWebServiceCall(url1 + Utils.procFile(token, activityContext), WebRequest.GET);
             if (jsonStr != null && !jsonStr.isEmpty()) {
 
                 try {
@@ -115,6 +114,7 @@ public class RepoHelper {
                         boolean doUpdate = true;
                         boolean hasCachedDate = false;
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+                        Date updatedDate;
                         Map<String, ?> map = prefs.getAll();
                         for (Map.Entry<String, ?> entry : map.entrySet()) {
                             if (entry.getValue().toString().contains(url)) {
@@ -147,6 +147,7 @@ public class RepoHelper {
                         } catch (ParseException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
+                            return true;
                         }
                         if (!name.contains("Repo.github.io")) {
                             if (doUpdate) {
@@ -164,21 +165,19 @@ public class RepoHelper {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                apiFail = false;
+                return false;
             } else {
-                apiFail = true;
+                return true;
             }
-            return null;
-
         }
 
-        protected void onPostExecute(Void v) {
+        protected void onPostExecute(Boolean apiFail) {
             if (apiFail) {
                 Toast.makeText(activityContext, "GitHub API Limit reached, please try refreshing again in an hour.", Toast.LENGTH_LONG).show();
             } else {
                 Log.d("Magisk", "RepoHelper: postExecute fired");
                 delegate.taskCompletionResult("Complete");
-                BuildFromCache();
+                BuildFromCache(activityContext);
 
             }
 
@@ -189,7 +188,7 @@ public class RepoHelper {
         void taskCompletionResult(String result);
     }
 
-    public class CustomComparator implements Comparator<Repo> {
+    public static class CustomComparator implements Comparator<Repo> {
         @Override
         public int compare(Repo o1, Repo o2) {
             return o1.getName().compareTo(o2.getName());
