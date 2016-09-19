@@ -168,6 +168,8 @@ public class RootFragment extends Fragment {
                     getActivity().startService(myServiceIntent);
                 }
             } else {
+                Intent myIntent = new Intent(getActivity(), MonitorService.class);
+                getActivity().stopService(myIntent);
                 rootToggle.setEnabled(true);
             }
         }

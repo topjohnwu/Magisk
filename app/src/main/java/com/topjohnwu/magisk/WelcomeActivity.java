@@ -54,9 +54,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         // Startups
         PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
-        if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
-            Intent myIntent = new Intent(getApplication(), MonitorService.class);
-            getApplication().startService(myIntent);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.contains("autoRootEnable")) {
+            if (prefs.getBoolean("autoRootEnable",false)) {
+                if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
+                    Intent myIntent = new Intent(getApplication(), MonitorService.class);
+                    getApplication().startService(myIntent);
+                }
+            }
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -66,7 +71,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         new Utils.Initialize(this).execute();
         new Utils.CheckUpdates(this).execute();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         RepoHelper.TaskDelegate delegate = result -> {
             //Do a thing here when we get a result we want
         };

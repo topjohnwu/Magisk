@@ -36,7 +36,7 @@ public class MonitorService extends Service
     private Boolean disableroot;
     private Boolean disablerootprev;
     private int counter = 0;
-    private String mPackageName;
+    private String mPackageName = "";
 
     @Nullable
     @Override
@@ -46,8 +46,6 @@ public class MonitorService extends Service
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        checkProcesses.run();
-
         return START_STICKY;
 
     }
@@ -55,6 +53,7 @@ public class MonitorService extends Service
     @Override
     public void onCreate() {
         super.onCreate();
+        checkProcesses.run();
         Log.d("Magisk","MonitorService: Service created");
     }
 
@@ -94,7 +93,7 @@ public class MonitorService extends Service
                 //Log.d(TAG,"Root check completed, set to " + (disableroot ? "disabled" : "enabled"));
 
             }
-            handler.postDelayed(checkProcesses, 1000);
+            handler.postDelayed(checkProcesses, 500);
         }
 
     };
@@ -182,29 +181,31 @@ public class MonitorService extends Service
 
 
     protected boolean isAppForeground(String packageName) {
-        UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
-        long time = System.currentTimeMillis();
-        List<UsageStats> stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time);
-        String topPackageName = "";
-        if (stats != null) {
+            UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+            long time = System.currentTimeMillis();
+            List<UsageStats> stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time);
+            String topPackageName = "";
+            if (stats != null) {
 
-            SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
-            for (UsageStats usageStats : stats) {
+                SortedMap<Long, UsageStats> mySortedMap = new TreeMap<>();
+                for (UsageStats usageStats : stats) {
                     mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
 
-            }
-            if (!mySortedMap.isEmpty()) {
-                topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
-                if (topPackageName.equals("com.topjohnwu.magisk")) {
-                    mySortedMap.remove(mySortedMap.lastKey());
-                    topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
-                    mPackageName = getAppName(topPackageName);
                 }
+                if (!mySortedMap.isEmpty()) {
+                    topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                    if (topPackageName.equals("com.topjohnwu.magisk")) {
+                        mySortedMap.remove(mySortedMap.lastKey());
+                        topPackageName = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
+                        Log.d("Magisk","MonitorService: Package is " + topPackageName);
+                        mPackageName = getAppName(topPackageName);
+                    }
 
+                }
             }
-        }
+            return topPackageName.equals(packageName);
 
-        return topPackageName.equals(packageName);
+
     }
 
 }
