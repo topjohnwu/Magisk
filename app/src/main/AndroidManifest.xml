@@ -42,8 +42,9 @@
         </service>
 
         <receiver
-            android:name=".receivers.PrivateBroadcastReceiver"
-            android:exported="false">
+            android:name=".tile.PrivateBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_AUTOROOT"/>
                 <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_DISABLEROOT"/>

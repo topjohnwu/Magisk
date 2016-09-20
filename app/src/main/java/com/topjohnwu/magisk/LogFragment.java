@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.annotation.SuppressLint;

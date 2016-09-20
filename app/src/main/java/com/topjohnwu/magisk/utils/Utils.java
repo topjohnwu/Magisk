@@ -35,9 +35,10 @@ import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
-import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.tile.PrivateBroadcastReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.services.QuickSettingTileService;
+import com.topjohnwu.magisk.tile.CustomTileHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,12 +70,12 @@ import javax.crypto.spec.DESKeySpec;
 public class Utils {
 
     public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
-    private static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
+    public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
     private static final String TAG = "Magisk";
 
-    private static final String MAGISK_PATH = "/magisk";
-    private static final String MAGISK_CACHE_PATH = "/cache/magisk";
-    private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+    public static final String MAGISK_PATH = "/magisk";
+    public static final String MAGISK_CACHE_PATH = "/cache/magisk";
+    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
     public static boolean fileExist(String path) {
         List<String> ret;
@@ -195,15 +196,18 @@ public class Utils {
     }
 
     public static void SetupQuickSettingsTile(Context mContext) {
+        Log.d("Magisk","Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
             mContext.startService(serviceIntent);
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            Log.d("Magisk","Utils: Marshmallow build detected");
             String mLabelString;
             int mRootIcon = R.drawable.root;
             int mAutoRootIcon = R.drawable.ic_autoroot;
             int mRootsState = CheckRootsState(mContext);
+            Log.d("Magisk","Utils: Root State returned as " + mRootsState);
             final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
             final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
             final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
@@ -232,12 +236,13 @@ public class Utils {
                     break;
             }
 
-            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "com.magisk.ROOT_TILE")
+            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "ROOT")
                     .setLabel(mLabelString)
                     .setIconResource(mIcon)
                     .setOnClickBroadcast(intent)
                     .build();
             mContext.sendBroadcast(tileConfigurationIntent);
+            
         }
     }
 
@@ -248,7 +253,7 @@ public class Utils {
         if (autoRootEnabled(mContext)) {
             return 2;
         } else {
-            if (rootStatus()) {
+            if (rootEnabled()) {
                 return 1;
 
             } else {
@@ -557,21 +562,7 @@ public class Utils {
         }
     }
 
-    public static boolean rootStatus() {
-        try {
-            String rootStatus = Shell.su("getprop magisk.root").toString();
-            String fuckyeah = Shell.sh("which su").toString();
-            Log.d("Magisk", "Utils: Rootstatus Checked, " + rootStatus + " and " + fuckyeah);
-            if (rootStatus.contains("0") && !fuckyeah.contains("su")) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
 
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

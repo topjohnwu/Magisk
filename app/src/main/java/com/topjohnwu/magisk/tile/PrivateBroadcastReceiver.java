@@ -1,8 +1,9 @@
-package com.topjohnwu.magisk.receivers;
+package com.topjohnwu.magisk.tile;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -18,7 +19,7 @@ public final class PrivateBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
-
+        Log.d("Magisk","Broadcast Receiver, Made it this far!");
         if (ACTION_AUTOROOT.equals(action)) {
             Utils.toggleAutoRoot(true, context);
         }
