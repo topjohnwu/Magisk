@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.services;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Icon;
@@ -6,6 +6,7 @@ import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.util.Log;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
 @SuppressLint("NewApi")

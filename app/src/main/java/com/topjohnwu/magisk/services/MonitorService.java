@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.services;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
@@ -16,6 +16,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.WelcomeActivity;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Set;

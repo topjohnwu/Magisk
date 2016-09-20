@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
@@ -27,13 +28,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
 import com.topjohnwu.magisk.ModulesFragment;
-import com.topjohnwu.magisk.MonitorService;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.services.QuickSettingTileService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,12 +69,12 @@ import javax.crypto.spec.DESKeySpec;
 public class Utils {
 
     public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
-    public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
+    private static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
     private static final String TAG = "Magisk";
 
-    public static final String MAGISK_PATH = "/magisk";
-    public static final String MAGISK_CACHE_PATH = "/cache/magisk";
-    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+    private static final String MAGISK_PATH = "/magisk";
+    private static final String MAGISK_CACHE_PATH = "/cache/magisk";
+    private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
     public static boolean fileExist(String path) {
         List<String> ret;
@@ -188,6 +192,70 @@ public class Utils {
             e.printStackTrace();
         }
         return value;
+    }
+
+    public static void SetupQuickSettingsTile(Context mContext) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
+            mContext.startService(serviceIntent);
+        }
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            String mLabelString;
+            int mRootIcon = R.drawable.root;
+            int mAutoRootIcon = R.drawable.ic_autoroot;
+            int mRootsState = CheckRootsState(mContext);
+            final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
+            final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
+            final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
+            Intent intent;
+            int mIcon;
+            switch (mRootsState) {
+                case 2:
+                    mLabelString = "Auto-root";
+                    mIcon = mAutoRootIcon;
+                    intent = autoBroadcast;
+                    break;
+                case 1:
+                    mLabelString = "Root enabled";
+                    mIcon = mRootIcon;
+                    intent = enableBroadcast;
+                    break;
+                case 0:
+                    mLabelString = "Root disabled";
+                    mIcon = mRootIcon;
+                    intent = disableBroadcast;
+                    break;
+                default:
+                    mLabelString = "Root enabled";
+                    mIcon = mRootIcon;
+                    intent = enableBroadcast;
+                    break;
+            }
+
+            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "com.magisk.ROOT_TILE")
+                    .setLabel(mLabelString)
+                    .setIconResource(mIcon)
+                    .setOnClickBroadcast(intent)
+                    .build();
+            mContext.sendBroadcast(tileConfigurationIntent);
+        }
+    }
+
+    // Gets an overall state for the quick settings tile
+    // 0 for root disabled, 1 for root enabled (no auto), 2 for auto-root
+
+    public static int CheckRootsState(Context mContext) {
+        if (autoRootEnabled(mContext)) {
+            return 2;
+        } else {
+            if (rootStatus()) {
+                return 1;
+
+            } else {
+                return 0;
+
+            }
+        }
     }
 
     // To check if service is enabled

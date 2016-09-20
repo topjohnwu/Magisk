@@ -24,6 +24,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.utils.LogFragment;
+import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -62,10 +64,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 }
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Intent serviceIntent = new Intent(this, QuickSettingTileService.class);
-            startService(serviceIntent);
-        }
+        Utils.SetupQuickSettingsTile(getApplicationContext());
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
