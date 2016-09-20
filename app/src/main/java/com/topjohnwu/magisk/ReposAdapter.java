@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
 
@@ -150,7 +151,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             @Override
                             public void task(File file) {
                                 Log.d("Magisk", "Task firing");
-                                new Utils.FlashZIP(context, repo.getId(), file.toString()).execute();
+                                new Async.FlashZIP(context, repo.getId(), file.toString()).execute();
                             }
                         };
                         String filename = repo.getId().replace(" ", "") + ".zip";

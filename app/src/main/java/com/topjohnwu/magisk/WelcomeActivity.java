@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -72,16 +73,16 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
 
-        new Utils.Initialize(this).execute();
-        new Utils.CheckUpdates(this).execute();
+        Utils.init(this);
+        new Async.CheckUpdates(this).execute();
         RepoHelper.TaskDelegate delegate = result -> {
             //Do a thing here when we get a result we want
         };
-        new Utils.LoadModules(this).execute();
-            new Utils.LoadRepos(this, true, delegate).execute();
-        new Utils.LoadRepos(this, !prefs.contains("hasCachedRepos"), delegate).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            new Utils.LoadModules(getApplication()).execute();
-            new Utils.LoadRepos(this, false, delegate).execute();
+        new Async.LoadModules(this).execute();
+            new Async.LoadRepos(this, true, delegate).execute();
+        new Async.LoadRepos(this, !prefs.contains("hasCachedRepos"), delegate).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Async.LoadModules(getApplication()).execute();
+            new Async.LoadRepos(this, false, delegate).execute();
 
         setSupportActionBar(toolbar);
 

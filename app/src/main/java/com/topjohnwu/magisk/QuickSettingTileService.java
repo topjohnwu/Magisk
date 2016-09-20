@@ -32,7 +32,7 @@ public class QuickSettingTileService extends TileService {
         Icon iconAuto = Icon.createWithResource(getApplicationContext(), R.drawable.ic_autoroot);
         Tile tile = this.getQsTile();
         boolean autoRootStatus = Utils.autoRootEnabled(getApplicationContext());
-        boolean rootStatus = Utils.rootStatus();
+        boolean rootStatus = Utils.rootEnabled();
         Log.d("Magisk", "QST: Auto and root are " + autoRootStatus + " and " + rootStatus);
         if (autoRootStatus) {
             tile.setLabel("Auto-root");

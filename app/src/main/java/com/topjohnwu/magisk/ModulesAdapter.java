@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
@@ -109,7 +110,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                                     @Override
                                     public void task(File file) {
                                         Log.d("Magisk", "Task firing");
-                                        new Utils.FlashZIP(context, mModule.getId(), file.toString()).execute();
+                                        new Async.FlashZIP(context, mModule.getId(), file.toString()).execute();
                                     }
                                 };
                                 String filename = mModule.getId().replace(" ", "") + ".zip";

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -133,7 +134,7 @@ public class ReposFragment extends Fragment {
                                 @Override
                                 public void task(File file) {
                                     Log.d("Magisk", "Task firing");
-                                    new Utils.FlashZIP(getActivity(), repo.getId(), file.toString()).execute();
+                                    new Async.FlashZIP(getActivity(), repo.getId(), file.toString()).execute();
                                 }
                             };
                             String filename = repo.getId().replace(" ", "") + ".zip";
