@@ -94,9 +94,8 @@ public class RootFragment extends Fragment {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-
         if (prefs.contains("autoRootEnable")) {
-            autoRootStatus = prefs.getBoolean("autoRootEnable",false);
+            autoRootStatus = prefs.getBoolean("autoRootEnable", false);
             rootToggle.setEnabled(false);
         } else {
             autoRootStatus = false;
@@ -124,21 +123,18 @@ public class RootFragment extends Fragment {
         return view;
     }
 
-
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
+        Log.d("Magisk", "Got result: " + requestCode + " and " + resultCode);
         if (requestCode == 100) {
             // Make sure the request was successful
             if (resultCode == Activity.RESULT_OK) {
-                Log.d("Magisk","Got result code OK for permissions");
-
+                Log.d("Magisk", "Got result code OK for permissions");
 
             } else {
                 autoRootToggle.setEnabled(false);
-                Toast.makeText(getActivity(),"Auto-root disabled, permissions required.",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Auto-root disabled, permissions required.", Toast.LENGTH_LONG).show();
 
             }
 
@@ -146,28 +142,28 @@ public class RootFragment extends Fragment {
     }
 
     private void ToggleAutoRoot(boolean toggleState) {
-            autoRootStatus = toggleState;
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("autoRootEnable", (toggleState));
-            editor.apply();
-            if (toggleState) {
-                if (!Utils.hasStatsPermission(getActivity(),"com.topjohnwu.magisk/WindowChangeDetectingService")) {
-                    Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                    startActivityForResult(intent, 100);
-                }
-                Intent myIntent = new Intent(getActivity(), MonitorService.class);
-                getActivity().startService(myIntent);
-                rootToggle.setEnabled(false);
-                boolean boo = Utils.isMyServiceRunning(MonitorService.class, getActivity());
-                if (boo) {
-                    Intent myServiceIntent = new Intent(getActivity(), MonitorService.class);
-                    getActivity().startService(myServiceIntent);
-                }
-            } else {
-                Intent myIntent = new Intent(getActivity(), MonitorService.class);
-                getActivity().stopService(myIntent);
-                rootToggle.setEnabled(true);
+        autoRootStatus = toggleState;
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("autoRootEnable", (toggleState));
+        editor.apply();
+        if (toggleState) {
+            if (!Utils.hasServicePermission(getActivity())) {
+                Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                startActivityForResult(intent, 100);
             }
+            Intent myIntent = new Intent(getActivity(), MonitorService.class);
+            getActivity().startService(myIntent);
+            rootToggle.setEnabled(false);
+            boolean boo = Utils.isMyServiceRunning(MonitorService.class, getActivity());
+            if (boo) {
+                Intent myServiceIntent = new Intent(getActivity(), MonitorService.class);
+                getActivity().startService(myServiceIntent);
+            }
+        } else {
+            Intent myIntent = new Intent(getActivity(), MonitorService.class);
+            getActivity().stopService(myIntent);
+            rootToggle.setEnabled(true);
+        }
 
     }
 
@@ -254,39 +250,39 @@ public class RootFragment extends Fragment {
                     break;
                 case 1:
                     // Proper root
-                        if (autoRootStatus) {
-                            rootStatusContainer.setBackgroundColor(green500);
-                            rootStatusIcon.setImageResource(statusAuto);
-                            rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                            rootStatus.setTextColor(green500);
-                            rootStatus.setText(R.string.root_auto_unmounted);
-                            rootToggle.setEnabled(false);
-                            safetyNetStatusIcon.setImageResource(statusOK);
-                            safetyNetStatus.setText(R.string.root_auto_unmounted_info);
+                    if (autoRootStatus) {
+                        rootStatusContainer.setBackgroundColor(green500);
+                        rootStatusIcon.setImageResource(statusAuto);
+                        rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                        rootStatus.setTextColor(green500);
+                        rootStatus.setText(R.string.root_auto_unmounted);
+                        rootToggle.setEnabled(false);
+                        safetyNetStatusIcon.setImageResource(statusOK);
+                        safetyNetStatus.setText(R.string.root_auto_unmounted_info);
+                        break;
+                    } else {
+                        rootToggle.setEnabled(true);
+                        if (Utils.rootEnabled()) {
+                            // Mounted
+                            rootStatusContainer.setBackgroundColor(accent);
+                            rootStatusIcon.setImageResource(statusError);
+                            rootStatus.setTextColor(accent);
+                            rootStatus.setText(R.string.root_enabled);
+                            rootToggle.setChecked(true);
+                            safetyNetStatusIcon.setImageResource(statusError);
+                            safetyNetStatus.setText(R.string.root_enabled_info);
                             break;
                         } else {
-                            rootToggle.setEnabled(true);
-                    if (Utils.rootEnabled()) {
-                        // Mounted
-                        rootStatusContainer.setBackgroundColor(accent);
-                        rootStatusIcon.setImageResource(statusError);
-                        rootStatus.setTextColor(accent);
-                        rootStatus.setText(R.string.root_enabled);
-                        rootToggle.setChecked(true);
-                        safetyNetStatusIcon.setImageResource(statusError);
-                        safetyNetStatus.setText(R.string.root_enabled_info);
-                        break;
-                             } else {
-                        // Disabled
-                        rootStatusContainer.setBackgroundColor(green500);
-                        rootStatusIcon.setImageResource(statusOK);
-                        rootStatus.setTextColor(green500);
-                        rootStatus.setText(R.string.root_disabled);
-                        rootToggle.setChecked(false);
-                        safetyNetStatusIcon.setImageResource(statusOK);
-                        safetyNetStatus.setText(R.string.root_disabled_info);
-                        break;
-                            }
+                            // Disabled
+                            rootStatusContainer.setBackgroundColor(green500);
+                            rootStatusIcon.setImageResource(statusOK);
+                            rootStatus.setTextColor(green500);
+                            rootStatus.setText(R.string.root_disabled);
+                            rootToggle.setChecked(false);
+                            safetyNetStatusIcon.setImageResource(statusOK);
+                            safetyNetStatus.setText(R.string.root_disabled_info);
+                            break;
+                        }
                     }
                 case 2:
                     // Improper root

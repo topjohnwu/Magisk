@@ -1,10 +1,8 @@
 package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AppOpsManager;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -17,18 +15,20 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
+import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.ModulesFragment;
+import com.topjohnwu.magisk.MonitorService;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
@@ -90,6 +90,11 @@ public class Utils {
         return Boolean.parseBoolean(ret.get(0));
     }
 
+    public static boolean autoRootEnabled(Context context) {
+            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
+
+    }
+
     public static boolean createFile(String path) {
         String command = "touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi";
         if (!Shell.rootAccess()) {
@@ -114,6 +119,17 @@ public class Utils {
         } else {
             Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
         }
+    }
+
+    public static void toggleAutoRoot(Boolean b, Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
+        Intent myServiceIntent = new Intent(context, MonitorService.class);
+        if (b) {
+            context.startService(myServiceIntent);
+        } else {
+            context.stopService(myServiceIntent);
+        }
+
     }
 
     public static List<String> getModList(String path) {
@@ -174,24 +190,40 @@ public class Utils {
         return value;
     }
 
+    // To check if service is enabled
+    public static boolean hasServicePermission(Context mContext) {
+        int accessibilityEnabled = 0;
+        final String service = mContext.getPackageName() + "/" + MonitorService.class.getCanonicalName();
+        try {
+            accessibilityEnabled = Settings.Secure.getInt(
+                    mContext.getApplicationContext().getContentResolver(),
+                    android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e(TAG, "Error finding setting, default accessibility to not found: "
+                    + e.getMessage());
+        }
+        TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
+        if (accessibilityEnabled == 1) {
+            String settingValue = Settings.Secure.getString(
+                    mContext.getApplicationContext().getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (settingValue != null) {
+                mStringColonSplitter.setString(settingValue);
+                while (mStringColonSplitter.hasNext()) {
+                    String accessibilityService = mStringColonSplitter.next();
 
-    public static boolean hasStatsPermission(Context context, String id) {
-
-        AccessibilityManager am = (AccessibilityManager) context
-                .getSystemService(Context.ACCESSIBILITY_SERVICE);
-
-        List<AccessibilityServiceInfo> runningServices = am
-                .getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
-        for (AccessibilityServiceInfo service : runningServices) {
-            if (id.equals(service.getId())) {
-                return true;
+                    if (accessibilityService.equalsIgnoreCase(service)) {
+                        return true;
+                    }
+                }
             }
+        } else {
+            Log.v(TAG, "***ACCESSIBILITY IS DISABLED***");
         }
 
         return false;
     }
-
 
     public abstract static class DownloadReceiver extends BroadcastReceiver {
         public Context mContext;
@@ -479,7 +511,7 @@ public class Utils {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;
             }
-       }
+        }
         return false;
     }
 

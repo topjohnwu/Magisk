@@ -62,6 +62,10 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 }
             }
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent serviceIntent = new Intent(this, QuickSettingTileService.class);
+            startService(serviceIntent);
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);

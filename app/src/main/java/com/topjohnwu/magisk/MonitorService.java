@@ -11,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -19,16 +18,11 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 public class MonitorService extends AccessibilityService {
     private static final String TAG = "Magisk";
-    private final Handler handler = new Handler();
     private Boolean disableroot;
-    private Boolean disablerootprev;
-    private int counter = 0;
-    private String mPackageName = "";
 
     @Override
     protected void onServiceConnected() {
@@ -39,7 +33,6 @@ public class MonitorService extends AccessibilityService {
         config.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
         config.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
         disableroot = false;
-        disablerootprev = disableroot;
         if (Build.VERSION.SDK_INT >= 16)
             //Just in case this helps
             config.flags = AccessibilityServiceInfo.FLAG_INCLUDE_NOT_IMPORTANT_VIEWS;
@@ -51,7 +44,7 @@ public class MonitorService extends AccessibilityService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("Magisk","MonitorService: Service created");
+        Log.d("Magisk", "MonitorService: Service created");
     }
 
     @Override
@@ -65,14 +58,13 @@ public class MonitorService extends AccessibilityService {
             ActivityInfo activityInfo = tryGetActivity(componentName);
             boolean isActivity = activityInfo != null;
             if (isActivity) {
-                Log.i("Magisk","CurrentActivity: " + componentName.getPackageName());
+                Log.i("Magisk", "CurrentActivity: " + componentName.getPackageName());
                 String mPackage = componentName.getPackageName();
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 if (prefs.getBoolean("autoRootEnable", false)) {
 
                     Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
-                    Set<String> setWhiteList = prefs.getStringSet("auto_whitelist", null);
 
                     if (setBlackList != null) {
                         disableroot = setBlackList.contains(mPackage);
@@ -82,21 +74,21 @@ public class MonitorService extends AccessibilityService {
                             ForceEnableRoot();
                         }
                         String appFriendly = getAppName(mPackage);
-                        ShowNotification(disableroot,appFriendly);
+                        ShowNotification(disableroot, appFriendly);
                     }
                 }
             }
         }
     }
 
-    private String getAppName (String packageName) {
+    private String getAppName(String packageName) {
         PackageManager pkManager = getPackageManager();
         ApplicationInfo appInfo;
-        String appname = "";
+        String appName;
         try {
             appInfo = pkManager.getApplicationInfo(packageName, 0);
-            appname = (String) ((appInfo != null) ? pkManager.getApplicationLabel(appInfo) : "???");
-            return appname;
+            appName = (String) ((appInfo != null) ? pkManager.getApplicationLabel(appInfo) : "???");
+            return appName;
         } catch (final PackageManager.NameNotFoundException e) {
             return "";
         }
