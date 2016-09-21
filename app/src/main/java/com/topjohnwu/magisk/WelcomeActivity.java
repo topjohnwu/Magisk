@@ -79,10 +79,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             //Do a thing here when we get a result we want
         };
         new Async.LoadModules(this).execute();
-            new Async.LoadRepos(this, true, delegate).execute();
-        new Async.LoadRepos(this, !prefs.contains("hasCachedRepos"), delegate).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            new Async.LoadModules(getApplication()).execute();
-            new Async.LoadRepos(this, false, delegate).execute();
+        new Async.LoadRepos(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         setSupportActionBar(toolbar);
 

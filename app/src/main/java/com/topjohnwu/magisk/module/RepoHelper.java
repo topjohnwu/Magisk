@@ -2,11 +2,9 @@ package com.topjohnwu.magisk.module;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
@@ -18,181 +16,76 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class RepoHelper {
     private static List<Repo> repos = new ArrayList<>();
     private static String TAG = "Magisk";
 
-    public RepoHelper() {
-    }
+    private static final String file_key = "RepoMap";
+    private static final String key = "repomap";
+    public static HashMap<String, Repo> repoMap;
 
-    public static List<Repo> listRepos(Context context, boolean refresh, TaskDelegate delegate) {
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        if (!prefs.contains("hasCachedRepos") | refresh) {
-            Log.d(TAG, "RepoHelper: Building from web");
-            new BuildFromWeb(delegate, context).execute();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-            String date = format.format(Calendar.getInstance().getTime());
-            prefs.edit().putString("last_update", date).apply();
-        } else {
-            Log.d(TAG, "RepoHelper: Building from cache");
-            BuildFromCache(context);
+    public static void createRepoMap(Context context) {
+        Gson gson = new Gson();
+        SharedPreferences prefs = context.getSharedPreferences(file_key, Context.MODE_PRIVATE);
+        String jsonString = prefs.getString(key, null);
+        if (jsonString != null) {
+            repoMap = gson.fromJson(jsonString, new TypeToken< HashMap<String, Repo> >(){}.getType());
         }
 
-        Collections.sort(repos, new CustomComparator());
-        return repos;
-    }
-
-    private static void BuildFromCache(Context activityContext) {
-        repos.clear();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activityContext);
-        Map<String, ?> map = prefs.getAll();
-        for (Map.Entry<String, ?> entry : map.entrySet()) {
-            if (entry.getKey().contains("repo_")) {
-                String repoString = entry.getValue().toString().replace("&quot;", "\"");
-                repos.add(new Repo(repoString, activityContext));
-            }
-        }
-    }
-
-    static class BuildFromWeb extends AsyncTask<String, String, Boolean> {
-
-        private TaskDelegate delegate;
-        private SharedPreferences prefs;
-        private Context activityContext;
-
-        public BuildFromWeb(TaskDelegate delegate, Context activityContext) {
-            this.delegate = delegate;
-            this.activityContext = activityContext;
-            prefs = PreferenceManager.getDefaultSharedPreferences(activityContext);
+        if (repoMap == null) {
+            repoMap = new HashMap<>();
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
-            Toast.makeText(activityContext, "Refreshing online modules", Toast.LENGTH_SHORT).show();
-
-        }
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            publishProgress();
-
-            // Making a request to url and getting response
-            String token = activityContext.getString(R.string.some_string);
-            String url1 = activityContext.getString(R.string.url_main);
-            String jsonStr = WebRequest.makeWebServiceCall(url1 + Utils.procFile(token, activityContext), WebRequest.GET);
-            if (jsonStr != null && !jsonStr.isEmpty()) {
-
-                try {
-                    repos.clear();
-                    JSONArray jsonArray = new JSONArray(jsonStr);
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonobject = jsonArray.getJSONObject(i);
-                        String name = jsonobject.getString("name");
-                        String url = jsonobject.getString("url");
-                        String lastUpdate = jsonobject.getString("updated_at");
-                        String mId = "";
-                        String cacheUpdate = "";
-                        String manifestString = "";
-                        boolean doUpdate = true;
-                        boolean hasCachedDate = false;
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-                        Date updatedDate;
-                        Map<String, ?> map = prefs.getAll();
-                        for (Map.Entry<String, ?> entry : map.entrySet()) {
-                            if (entry.getValue().toString().contains(url)) {
-                                Log.d("Magisk", "RepoHelper: found matching URL");
-                                manifestString = entry.getValue().toString();
-                                String[] entryStrings = entry.getValue().toString().split("\n");
-                                for (String valueString : entryStrings) {
-                                    String[] valueSub = valueString.split("=");
-                                    if (valueSub[0].equals("id")) {
-                                        mId = valueSub[1];
-                                        if (prefs.contains("updated_" + mId)) {
-                                            cacheUpdate = prefs.getString("updated_" + mId, "");
-                                            hasCachedDate = true;
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                        try {
-                            updatedDate = format.parse(lastUpdate);
-                            Log.d("Magisk", "RepoHelper: Dates found, online is " + updatedDate + " and cached is " + cacheUpdate);
-
-                            if (hasCachedDate) {
-
-                                doUpdate = !cacheUpdate.equals(updatedDate.toString());
-                                Log.d("Magisk", "RepoHelper: DoUpdate is " + doUpdate);
-                            }
-
-                        } catch (ParseException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                            return true;
-                        }
-                        if (!name.contains("Repo.github.io")) {
-                            if (doUpdate) {
-                                repos.add(new Repo(name, url, updatedDate, activityContext));
-                                Log.d(TAG, "RepoHelper: Trying to add new repo for online refresh - " + name);
-                            } else {
-                                repos.add(new Repo(manifestString, activityContext));
-                                Log.d(TAG, "RepoHelper: Trying to add new repo using manifestString of " + mId);
-                            }
-                        }
-                        for (int f = 0; f < repos.size(); f++) {
-                            repos.get(f).fetch();
-                        }
+        // Making a request to url and getting response
+        String token = context.getString(R.string.some_string);
+        String url1 = context.getString(R.string.url_main);
+        String jsonStr = WebRequest.makeWebServiceCall(url1 + Utils.procFile(token, context), WebRequest.GET);
+        if (jsonStr != null && !jsonStr.isEmpty()) {
+            try {
+                JSONArray jsonArray = new JSONArray(jsonStr);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonobject = jsonArray.getJSONObject(i);
+                    String id = jsonobject.getString("description");
+                    String name = jsonobject.getString("name");
+                    String lastUpdate = jsonobject.getString("updated_at");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+                    Date updatedDate;
+                    try {
+                        updatedDate = format.parse(lastUpdate);
+                    } catch (ParseException e) {
+                        continue;
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    Repo repo = repoMap.get(id);
+                    if (repo == null) {
+                        repoMap.put(id, new Repo(context, name, updatedDate));
+                    } else {
+                        repo.update(updatedDate);
+                    }
                 }
-                return false;
-            } else {
-                return true;
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+            jsonString = gson.toJson(repoMap);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(key, jsonString);
+            editor.apply();
         }
+    }
 
-        protected void onPostExecute(Boolean apiFail) {
-            if (apiFail) {
-                Toast.makeText(activityContext, "GitHub API Limit reached, please try refreshing again in an hour.", Toast.LENGTH_LONG).show();
-            } else {
-                Log.d("Magisk", "RepoHelper: postExecute fired");
-                delegate.taskCompletionResult("Complete");
-                BuildFromCache(activityContext);
-
-            }
-
-        }
+    public static List<Repo> getSortedList() {
+        ArrayList<Repo> list = new ArrayList<>(repoMap.values());
+        Collections.sort(list, new Utils.ModuleComparator());
+        return list;
     }
 
     public interface TaskDelegate {
         void taskCompletionResult(String result);
-    }
-
-    public static class CustomComparator implements Comparator<Repo> {
-        @Override
-        public int compare(Repo o1, Repo o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
     }
 
 }

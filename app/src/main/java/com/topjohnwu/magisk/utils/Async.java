@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
 
 import org.json.JSONException;
@@ -30,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 public class Async {
@@ -195,16 +195,18 @@ public class Async {
 
             for (String mod : magisk) {
                 Log.d("Magisk", "Utils: Adding module from string " + mod);
-                ModulesFragment.listModules.add(new Module(mod, mContext));
+                ModulesFragment.listModules.add(new Module(mContext, mod));
             }
 
             for (String mod : magiskCache) {
                 Log.d("Magisk", "Utils: Adding cache module from string " + mod);
-                Module cacheMod = new Module(mod, mContext);
+                Module cacheMod = new Module(mContext, mod);
                 // Prevent people forgot to change module.prop
                 cacheMod.setCache();
                 ModulesFragment.listModules.add(cacheMod);
             }
+
+            Collections.sort(ModulesFragment.listModules, new Utils.ModuleComparator());
 
             return null;
         }
@@ -217,22 +219,15 @@ public class Async {
         private boolean doReload;
         private RepoHelper.TaskDelegate mTaskDelegate;
 
-        public LoadRepos(Context context, boolean reload, RepoHelper.TaskDelegate delegate) {
+        public LoadRepos(Context context) {
             mContext = context;
-            doReload = reload;
-            mTaskDelegate = delegate;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
             ReposFragment.mListRepos.clear();
-            List<Repo> magiskRepos = RepoHelper.listRepos(mContext, doReload, mTaskDelegate);
-
-            for (Repo repo : magiskRepos) {
-                Log.d("Magisk", "Utils: Adding repo from string " + repo.getId());
-                ReposFragment.mListRepos.add(repo);
-            }
-
+            RepoHelper.createRepoMap(mContext);
+            ReposFragment.mListRepos = RepoHelper.getSortedList();
             return null;
         }
 

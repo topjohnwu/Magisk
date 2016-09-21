@@ -31,6 +31,7 @@ import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.MonitorService;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
+import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
@@ -52,6 +53,7 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -304,4 +306,10 @@ public class Utils {
 
     }
 
+    public static class ModuleComparator implements Comparator<BaseModule> {
+        @Override
+        public int compare(BaseModule o1, BaseModule o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
 }

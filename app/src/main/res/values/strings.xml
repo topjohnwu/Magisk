@@ -105,4 +105,6 @@
     <string name="some_string">GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus</string>
     <string name="downloads">Downloads</string>
     <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
+    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 </resources>

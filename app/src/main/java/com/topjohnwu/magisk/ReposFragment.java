@@ -112,14 +112,7 @@ public class ReposFragment extends Fragment {
 
         };
         Log.d("Magisk","ReposFragment, LoadRepo called");
-        mListRepos.clear();
-        List<Repo> magiskRepos = RepoHelper.listRepos(getActivity(), doReload, taskDelegate);
-
-        for (Repo repo : magiskRepos) {
-            Log.d("Magisk", "ReposFragment: Adding repo from string " + repo.getId());
-            mListRepos.add(repo);
-        }
-
+        new Async.LoadRepos(getActivity());
     }
 
     private void NotifyOfAlerts() {
@@ -138,7 +131,7 @@ public class ReposFragment extends Fragment {
                                 }
                             };
                             String filename = repo.getId().replace(" ", "") + ".zip";
-                            Utils.downloadAndReceive(getActivity(), receiver, repo.getmZipUrl(), filename);
+                            Utils.downloadAndReceive(getActivity(), receiver, repo.getZipUrl(), filename);
 
                             break;
 

@@ -85,8 +85,8 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.description.setText(module.getDescription());
         holder.author.setText(module.getAuthor());
         String logUrl = module.getmLogUrl();
-        String supportUrl = module.getmSupportUrl();
-        String donateUrl = module.getmDonateUrl();
+        String supportUrl = module.getSupportUrl();
+        String donateUrl = module.getDonateUrl();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs.contains("ignoreUpdateAlerts")) {
             ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);
@@ -140,10 +140,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                 new WebWindow("Changelog", module.getmLogUrl(), context);
             }
             if (view.getId() == holder.authorLink.getId()) {
-                new WebWindow("Donate", module.getmDonateUrl(), context);
+                new WebWindow("Donate", module.getDonateUrl(), context);
             }
             if (view.getId() == holder.supportLink.getId()) {
-                new WebWindow("Support", module.getmSupportUrl(), context);
+                new WebWindow("Support", module.getSupportUrl(), context);
             }
         };
 
