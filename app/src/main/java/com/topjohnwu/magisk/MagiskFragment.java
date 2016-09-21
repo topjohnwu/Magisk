@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -112,7 +112,7 @@ public class MagiskFragment extends Fragment {
                                         new Utils.DownloadReceiver(getString(R.string.magisk)) {
                                             @Override
                                             public void task(File file) {
-                                                new Utils.FlashZIP(mContext, mName, file.getPath()).execute();
+                                                new Async.FlashZIP(mContext, mName, file.getPath()).execute();
                                             }
                                         },
                                         Utils.magiskLink, "latest_magisk.zip");

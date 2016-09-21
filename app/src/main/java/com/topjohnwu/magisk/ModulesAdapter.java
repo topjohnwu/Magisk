@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
@@ -84,8 +85,8 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.description.setText(module.getDescription());
         holder.author.setText(module.getAuthor());
         String logUrl = module.getmLogUrl();
-        String supportUrl = module.getmSupportUrl();
-        String donateUrl = module.getmDonateUrl();
+        String supportUrl = module.getSupportUrl();
+        String donateUrl = module.getDonateUrl();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (prefs.contains("ignoreUpdateAlerts")) {
             ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);
@@ -109,7 +110,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                                     @Override
                                     public void task(File file) {
                                         Log.d("Magisk", "Task firing");
-                                        new Utils.FlashZIP(context, mModule.getId(), file.toString()).execute();
+                                        new Async.FlashZIP(context, mModule.getId(), file.toString()).execute();
                                     }
                                 };
                                 String filename = mModule.getId().replace(" ", "") + ".zip";
@@ -139,10 +140,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                 new WebWindow("Changelog", module.getmLogUrl(), context);
             }
             if (view.getId() == holder.authorLink.getId()) {
-                new WebWindow("Donate", module.getmDonateUrl(), context);
+                new WebWindow("Donate", module.getDonateUrl(), context);
             }
             if (view.getId() == holder.supportLink.getId()) {
-                new WebWindow("Support", module.getmSupportUrl(), context);
+                new WebWindow("Support", module.getSupportUrl(), context);
             }
         };
 

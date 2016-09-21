@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -111,14 +112,7 @@ public class ReposFragment extends Fragment {
 
         };
         Log.d("Magisk","ReposFragment, LoadRepo called");
-        mListRepos.clear();
-        List<Repo> magiskRepos = RepoHelper.listRepos(getActivity(), doReload, taskDelegate);
-
-        for (Repo repo : magiskRepos) {
-            Log.d("Magisk", "ReposFragment: Adding repo from string " + repo.getId());
-            mListRepos.add(repo);
-        }
-
+        new Async.LoadRepos(getActivity());
     }
 
     private void NotifyOfAlerts() {
@@ -133,11 +127,11 @@ public class ReposFragment extends Fragment {
                                 @Override
                                 public void task(File file) {
                                     Log.d("Magisk", "Task firing");
-                                    new Utils.FlashZIP(getActivity(), repo.getId(), file.toString()).execute();
+                                    new Async.FlashZIP(getActivity(), repo.getId(), file.toString()).execute();
                                 }
                             };
                             String filename = repo.getId().replace(" ", "") + ".zip";
-                            Utils.downloadAndReceive(getActivity(), receiver, repo.getmZipUrl(), filename);
+                            Utils.downloadAndReceive(getActivity(), receiver, repo.getZipUrl(), filename);
 
                             break;
 

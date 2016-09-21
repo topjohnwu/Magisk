@@ -16,7 +16,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.Async;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class ModulesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
 
             recyclerView.setVisibility(View.GONE);
-            new Utils.LoadModules(getActivity()).execute();
+            new Async.LoadModules(getActivity()).execute();
             new updateUI().execute();
             prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
 

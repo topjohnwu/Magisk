@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
 
@@ -91,9 +92,9 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         repo = mList.get(position);
         mHolder = holder;
-        mDonateUrl = repo.getmDonateUrl();
-        mSupportUrl = repo.getmSupportUrl();
-        mLogUrl = repo.getmLogUrl();
+        mDonateUrl = repo.getDonateUrl();
+        mSupportUrl = repo.getSupportUrl();
+        mLogUrl = repo.getLogUrl();
         mExpandedList = new ArrayList<>(mList.size());
         for (int i = 0; i < mList.size(); i++) {
             mExpandedList.add(false);
@@ -113,13 +114,10 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             }
 
             mHolder.title.setText(titleString);
-            mHolder.versionName.setText(repo.getmVersion());
+            mHolder.versionName.setText(repo.getVersion());
             mHolder.description.setText(repo.getDescription());
-            String authorString = this.context.getResources().getString(R.string.author) + " " + repo.getmAuthor();
+            String authorString = this.context.getResources().getString(R.string.author) + " " + repo.getAuthor();
             mHolder.author.setText(authorString);
-            String logUrl = repo.getmLogUrl();
-            String supportUrl = repo.getmSupportUrl();
-            String donateUrl = repo.getmDonateUrl();
             if (prefs.contains("ignoreUpdateAlerts")) {
                 ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts",false);
             }
@@ -135,7 +133,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                 mHolder.updateStatus.setText(repo.canUpdate() ? this.context.getResources().getString(R.string.module_update_available) : this.context.getResources().getString(R.string.module_up_to_date));
             }
 
-            Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getmVersion());
+            Log.d("Magisk", "ReposAdapter: Setting up info " + repo.getId() + " and " + repo.getDescription() + " and " + repo.getVersion());
             prefs = PreferenceManager.getDefaultSharedPreferences(context);
             mCanUpdate = prefs.getBoolean("repo-canUpdate_" + repo.getId(), false);
 
@@ -150,23 +148,23 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             @Override
                             public void task(File file) {
                                 Log.d("Magisk", "Task firing");
-                                new Utils.FlashZIP(context, repo.getId(), file.toString()).execute();
+                                new Async.FlashZIP(context, repo.getId(), file.toString()).execute();
                             }
                         };
                         String filename = repo.getId().replace(" ", "") + ".zip";
-                        Utils.downloadAndReceive(context, receiver, repo.getmZipUrl(), filename);
+                        Utils.downloadAndReceive(context, receiver, repo.getZipUrl(), filename);
                     } else {
                         Toast.makeText(context, repo.getId() + " is already installed.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                if ((view.getId() == mHolder.changeLog.getId()) && (!repo.getmLogUrl().equals(""))) {
-                    new WebWindow("Changelog", repo.getmLogUrl(),context);
+                if ((view.getId() == mHolder.changeLog.getId()) && (!repo.getLogUrl().equals(""))) {
+                    new WebWindow("Changelog", repo.getLogUrl(),context);
                 }
-                if ((view.getId() == mHolder.authorLink.getId()) && (!repo.getmSupportUrl().equals(""))) {
-                    new WebWindow("Donate", repo.getmDonateUrl(),context);
+                if ((view.getId() == mHolder.authorLink.getId()) && (!repo.getSupportUrl().equals(""))) {
+                    new WebWindow("Donate", repo.getDonateUrl(),context);
                 }
-                if ((view.getId() == mHolder.supportLink.getId()) && (!repo.getmSupportUrl().equals(""))) {
-                    new WebWindow("Support", repo.getmSupportUrl(),context);
+                if ((view.getId() == mHolder.supportLink.getId()) && (!repo.getSupportUrl().equals(""))) {
+                    new WebWindow("Support", repo.getSupportUrl(),context);
                 }
             };
             mHolder.changeLog.setOnClickListener(oCl);

@@ -16,9 +16,10 @@ public class Module extends BaseModule {
     private String mZipUrl, mLogUrl;
     private boolean mEnable, mRemove, mUpdateAvailable = false, mIsInstalled;
 
-    public Module(String path, Context context) {
+    public Module(Context context, String path) {
 
-        super(Utils.readFile(path + "/module.prop"));
+        super();
+        parseProps(Utils.readFile(path + "/module.prop"));
 
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";

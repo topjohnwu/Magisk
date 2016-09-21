@@ -38,10 +38,7 @@ dependencies {
     compile 'com.github.d8ahazard:BroadcastTileSupportUpdate:master'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.github.michalis-vitos:aFileChooser:master'
-
-
-
-
+    compile 'com.google.code.gson:gson:2.7'
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }

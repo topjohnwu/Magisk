@@ -7,16 +7,13 @@ import java.util.List;
 
 public abstract class BaseModule {
 
-    protected String mId, mName, mVersion, mDescription, mSupportUrl, mDonateUrl, mAuthor;
+    protected String mId, mName, mVersion, mAuthor, mDescription, mSupportUrl, mDonateUrl;
     protected boolean mIsCacheModule = false;
-
     protected int mVersionCode = 0;
 
-    public BaseModule(List<String> props) {
-        this(props.toArray(new String[props.size()]));
-    }
+    protected void parseProps(List<String> props) { parseProps(props.toArray(new String[props.size()])); }
 
-    public BaseModule(String[] props) {
+    protected void parseProps(String[] props) {
         for (String line : props) {
             String[] prop = line.split("=", 2);
             if (prop.length != 2) {
@@ -93,11 +90,11 @@ public abstract class BaseModule {
         return mVersionCode;
     }
 
-    public String getmDonateUrl() {
+    public String getDonateUrl() {
         return mDonateUrl;
     }
 
-    public String getmSupportUrl() {
+    public String getSupportUrl() {
         return mSupportUrl;
     }
 }
