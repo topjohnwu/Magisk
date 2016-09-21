@@ -18,6 +18,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.WelcomeActivity;
+import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Set;
@@ -125,32 +126,33 @@ public class MonitorService extends AccessibilityService {
     private void ShowNotification(boolean rootAction, String packageName) {
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder;
+        if (!PrefHelper.CheckBool("hide_root_notification")) {
+            if (rootAction) {
 
-        if (rootAction) {
-
-            Intent intent = new Intent(getApplication(), WelcomeActivity.class);
-            intent.putExtra("relaunch", "relaunch");
-            String rootMessage;
-            PendingIntent pendingIntent = PendingIntent.getActivity(
-                    getApplicationContext(),
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            if (packageName.equals("")) {
-                rootMessage = "Root has been disabled";
+                Intent intent = new Intent(getApplication(), WelcomeActivity.class);
+                intent.putExtra("relaunch", "relaunch");
+                String rootMessage;
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        getApplicationContext(),
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                if (packageName.equals("")) {
+                    rootMessage = "Root has been disabled";
+                } else {
+                    rootMessage = "Root has been disabled for " + packageName;
+                }
+                mBuilder =
+                        new NotificationCompat.Builder(getApplicationContext())
+                                .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
+                                .setContentIntent(pendingIntent)
+                                .setContentTitle("Auto-root status changed")
+                                .setContentText(rootMessage);
+                int mNotificationId = 1;
+                mNotifyMgr.notify(mNotificationId, mBuilder.build());
             } else {
-                rootMessage = "Root has been disabled for " + packageName;
+                mNotifyMgr.cancelAll();
             }
-            mBuilder =
-                    new NotificationCompat.Builder(getApplicationContext())
-                            .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
-                            .setContentIntent(pendingIntent)
-                            .setContentTitle("Auto-root status changed")
-                            .setContentText(rootMessage);
-            int mNotificationId = 1;
-            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-        } else {
-            mNotifyMgr.cancelAll();
         }
 
     }

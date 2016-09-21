@@ -31,13 +31,16 @@ import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.services.QuickSettingTileService;
+import com.topjohnwu.magisk.services.TileService;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -67,6 +70,12 @@ public class Utils {
         }
         if (!Shell.rootAccess()) {
             Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
+        }
+        if (PrefHelper.CheckBool("keep_root_off")) {
+            Utils.toggleRoot(false);
+        }
+        if (PrefHelper.CheckBool("enable_quicktile")) {
+            Utils.SetupQuickSettingsTile(context);
         }
     }
 
@@ -201,19 +210,19 @@ public class Utils {
     }
 
     public static void SetupQuickSettingsTile(Context mContext) {
-        Log.d("Magisk", "Utils: SetupQuickSettings called");
+        Logger.dh("Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
             mContext.startService(serviceIntent);
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-            Log.d("Magisk", "Utils: Marshmallow build detected");
+            Logger.dh("Utils: Marshmallow build detected");
             String mLabelString;
             int mRootIcon = R.drawable.root_white;
             int mAutoRootIcon = R.drawable.ic_autoroot_white;
             int mRootDisabled = R.drawable.root_grey;
             int mRootsState = CheckRootsState(mContext);
-            Log.d("Magisk", "Utils: Root State returned as " + mRootsState);
+            Logger.dh("Utils: Root State returned as " + mRootsState);
             final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
             final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
             final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
@@ -255,9 +264,67 @@ public class Utils {
         }
     }
 
+    public static void installTile(Context context) {
+
+        String qsTileId = "intent(" + TileService.TILE_ID + ")";
+        List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
+        if (lines != null && lines.size() == 1) {
+            List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
+            if (tiles.size() > 1) {
+                for (String tile : tiles) {
+                    if (tile.equals(qsTileId)) {
+                        Toast.makeText(context, "Tile already installed", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                String newTiles = TextUtils.join(",", tiles);
+                Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
+                Toast.makeText(context, "Tile installed", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        Toast.makeText(context, "Tile installation error", Toast.LENGTH_SHORT).show();
+    }
+
+
+    public static void uninstallTile(Context context) {
+
+        String qsTileId = "intent(" + TileService.TILE_ID + ")";
+        List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
+        if (lines != null && lines.size() == 1) {
+            List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
+            if (tiles.size() > 1) {
+                boolean isPresent = false;
+                for (int i = 0; i < tiles.size(); i++) {
+                    if (tiles.get(i).equals(qsTileId)) {
+                        isPresent = true;
+                        tiles.remove(i);
+                        break;
+                    }
+                }
+                if (isPresent) {
+                    String newTiles = TextUtils.join(",", tiles);
+                    Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
+                    Toast.makeText(context, "Tile uninstalled", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(context, "Tile already uninstalled", Toast.LENGTH_SHORT).show();
+
+
+            }
+        }
+        Toast.makeText(context, "Tile uninstallation error", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private void refreshService(Context context) {
+        context.startService(new Intent(context, TileService.class));
+    }
+
+
     public static void UpdateRootFragmentUI(Context context) {
 
-        Log.d("Magisk", "Utils: UpdateRF called");
+        Logger.dh("Magisk", "Utils: UpdateRF called");
         Intent intent = new Intent(context, RootFragment.class);
         intent.setAction("com.magisk.UPDATEUI");
         context.sendBroadcast(intent);

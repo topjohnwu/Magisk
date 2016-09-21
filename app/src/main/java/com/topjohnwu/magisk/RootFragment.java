@@ -12,7 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -97,7 +97,7 @@ public class RootFragment extends Fragment implements Receiver{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
-        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         if (prefs.contains("autoRootEnable")) {
             autoRootStatus = prefs.getBoolean("autoRootEnable", false);
@@ -125,22 +125,22 @@ public class RootFragment extends Fragment implements Receiver{
             new updateUI().execute();
         });
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
-                new IntentFilter("com.magisk.UPDATEUI"));
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
+//                new IntentFilter("com.magisk.UPDATEUI"));
 
         return view;
     }
 
-    private final BroadcastReceiver mYourBroadcastReceiver = new RootFragmentReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.d("Magisk", "RootFragment: UpdateRF called and fired");
-            new updateUI().execute();
-        }
-
-
-    };
+//    private final BroadcastReceiver mYourBroadcastReceiver = new RootFragmentReceiver(Re) {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//
+//            Log.d("Magisk", "RootFragment: UpdateRF called and fired");
+//            new updateUI().execute();
+//        }
+//
+//
+//    };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

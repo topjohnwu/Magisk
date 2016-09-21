@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,9 +13,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -175,14 +176,19 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 tag = "log";
                 navFragment = new LogFragment();
                 break;
+            case R.id.settings:
+                setTitle(R.string.settings);
+                tag = "settings";
+                navFragment = new SettingsFragment();
+                break;
             case R.id.app_about:
                 startActivity(new Intent(this, AboutActivity.class));
                 return;
         }
 
         if (navFragment != null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
             try {
                 toolbar.setElevation(navFragment instanceof ModulesFragment ? 0 : 10);
 

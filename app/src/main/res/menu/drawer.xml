@@ -35,6 +35,11 @@
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>
 
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings"/>
+
     </group>
 
     <group

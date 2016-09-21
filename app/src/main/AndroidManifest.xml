@@ -107,12 +107,9 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".RootFragment.mYourBroadcastReceiner">
-            <intent-filter>
-                <action android:name="com.magisk.UPDATEUI"/>
-            </intent-filter>
-        </receiver>
+
 
     </application>
+
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.ListFragment;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -8,7 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ListFragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,7 @@ public class AutoRootFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         listView = getListView();
         packageManager = getActivity().getPackageManager();
-        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (!prefs.contains("auto_blacklist")) {
             SharedPreferences.Editor editor = prefs.edit();
             Set<String> set = new HashSet<>();

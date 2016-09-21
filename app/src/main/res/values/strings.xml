@@ -70,7 +70,7 @@
     <!--About Activity-->
     <string name="about">About</string>
     <string name="app_developers">Main developers</string>
-    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/dvdandroid">dvdandroid</a>]]></string>
+    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">Topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
     <string name="translators"/>
     <string name="app_version">App\'s version</string>
@@ -107,4 +107,18 @@
     <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
     <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
     <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Fragment -->
+    <string name="settings">Settings</string>
+    <string name="settings_quicksettings_category">Quick Settings</string>
+    <string name="settings_enable_quicktile_title">Enable Quicksettings Tile</string>
+    <string name="settings_enable_quicktile_summary">Click here to enable or disable the quick settings tile.</string>
+    <string name="settings_keep_root_off_summary">Disable root unless otherwise enabled by Auto-root or toggle.</string>
+    <string name="settings_keep_root_off_title">Keep root turned off</string>
+    <string name="settings_developer_logging_title">Enable advanced debug logging</string>
+    <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
+    <string name="settings_root_category">Root</string>
+    <string name="settings_development_category">Development</string>
+    <string name="settings_hide_root_notification_summary">When checked, auto-root notifications will not be displayed.</string>
+    <string name="settings_hide_root_notification_title">Hide auto-root notifications</string>
 </resources>
