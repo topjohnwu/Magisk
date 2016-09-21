@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
@@ -27,14 +28,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
 import com.topjohnwu.magisk.ModulesFragment;
-import com.topjohnwu.magisk.MonitorService;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.tile.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.services.QuickSettingTileService;
+import com.topjohnwu.magisk.tile.CustomTileHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -208,6 +213,74 @@ public class Utils {
             e.printStackTrace();
         }
         return value;
+    }
+
+    public static void SetupQuickSettingsTile(Context mContext) {
+        Log.d("Magisk","Utils: SetupQuickSettings called");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
+            mContext.startService(serviceIntent);
+        }
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            Log.d("Magisk","Utils: Marshmallow build detected");
+            String mLabelString;
+            int mRootIcon = R.drawable.root;
+            int mAutoRootIcon = R.drawable.ic_autoroot;
+            int mRootsState = CheckRootsState(mContext);
+            Log.d("Magisk","Utils: Root State returned as " + mRootsState);
+            final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
+            final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
+            final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
+            Intent intent;
+            int mIcon;
+            switch (mRootsState) {
+                case 2:
+                    mLabelString = "Auto-root";
+                    mIcon = mAutoRootIcon;
+                    intent = autoBroadcast;
+                    break;
+                case 1:
+                    mLabelString = "Root enabled";
+                    mIcon = mRootIcon;
+                    intent = enableBroadcast;
+                    break;
+                case 0:
+                    mLabelString = "Root disabled";
+                    mIcon = mRootIcon;
+                    intent = disableBroadcast;
+                    break;
+                default:
+                    mLabelString = "Root enabled";
+                    mIcon = mRootIcon;
+                    intent = enableBroadcast;
+                    break;
+            }
+
+            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "ROOT")
+                    .setLabel(mLabelString)
+                    .setIconResource(mIcon)
+                    .setOnClickBroadcast(intent)
+                    .build();
+            mContext.sendBroadcast(tileConfigurationIntent);
+            
+        }
+    }
+
+    // Gets an overall state for the quick settings tile
+    // 0 for root disabled, 1 for root enabled (no auto), 2 for auto-root
+
+    public static int CheckRootsState(Context mContext) {
+        if (autoRootEnabled(mContext)) {
+            return 2;
+        } else {
+            if (rootEnabled()) {
+                return 1;
+
+            } else {
+                return 0;
+
+            }
+        }
     }
 
     // To check if service is enabled

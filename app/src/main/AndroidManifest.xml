@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.topjohnwu.magisk">
 
+          package="com.topjohnwu.magisk">
+    <uses-sdk tools:overrideLibrary="com.kcoppock.broadcatsttilesupport"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -20,7 +21,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <service
-            android:name=".MonitorService"
+            android:name=".services.MonitorService"
             android:label="@string/accessibility_service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
@@ -31,7 +32,7 @@
                 android:resource="@xml/accessibilityservice"/>
         </service>
         <service
-            android:name=".QuickSettingTileService"
+            android:name=".services.QuickSettingTileService"
             android:icon="@drawable/ic_autoroot"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
@@ -39,6 +40,17 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".tile.PrivateBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_AUTOROOT"/>
+                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_DISABLEROOT"/>
+                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_ENABLEROOT"/>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".WelcomeActivity"
@@ -52,7 +64,7 @@
         </activity>
         <activity
             android:name="com.ipaulpro.afilechooser.FileChooserActivity"
-            android:enabled="@bool/use_activity"
+            android:enabled="true"
             android:exported="true"
             android:icon="@drawable/ic_chooser"
             android:label="@string/choose_file">
@@ -90,7 +102,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
-        <receiver android:name=".AutoStart">
+        <receiver android:name=".receivers.AutoStartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
