@@ -10,6 +10,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,13 +33,15 @@ import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
+import com.topjohnwu.magisk.RootFragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
-import com.topjohnwu.magisk.tile.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.receivers.Receiver;
+import com.topjohnwu.magisk.receivers.RootFragmentReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.services.QuickSettingTileService;
-import com.topjohnwu.magisk.tile.CustomTileHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,7 +99,9 @@ public class Utils {
     }
 
     public static boolean autoRootEnabled(Context context) {
-            return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.d("Magisk", "AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
 
     }
 
@@ -119,22 +124,26 @@ public class Utils {
     }
 
     public static void toggleRoot(Boolean b) {
-        if (b) {
-            Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
-        } else {
-            Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
+        if (Utils.magiskVersion != -1) {
+            if (b) {
+                Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
+            } else {
+                Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
+            }
         }
     }
 
     public static void toggleAutoRoot(Boolean b, Context context) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
-        Intent myServiceIntent = new Intent(context, MonitorService.class);
-        if (b) {
-            context.startService(myServiceIntent);
-        } else {
-            context.stopService(myServiceIntent);
+        if (Utils.magiskVersion != -1) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
+            Intent myServiceIntent = new Intent(context, MonitorService.class);
+            if (b) {
+                context.startService(myServiceIntent);
+            } else {
+                context.stopService(myServiceIntent);
+            }
         }
-
+        UpdateRootFragmentUI(context);
     }
 
     public static List<String> getModList(String path) {
@@ -196,22 +205,24 @@ public class Utils {
     }
 
     public static void SetupQuickSettingsTile(Context mContext) {
-        Log.d("Magisk","Utils: SetupQuickSettings called");
+        Log.d("Magisk", "Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
             mContext.startService(serviceIntent);
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-            Log.d("Magisk","Utils: Marshmallow build detected");
+            Log.d("Magisk", "Utils: Marshmallow build detected");
             String mLabelString;
-            int mRootIcon = R.drawable.root;
-            int mAutoRootIcon = R.drawable.ic_autoroot;
+            int mRootIcon = R.drawable.root_white;
+            int mAutoRootIcon = R.drawable.ic_autoroot_white;
+            int mRootDisabled = R.drawable.root_grey;
             int mRootsState = CheckRootsState(mContext);
-            Log.d("Magisk","Utils: Root State returned as " + mRootsState);
+            Log.d("Magisk", "Utils: Root State returned as " + mRootsState);
             final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
             final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
             final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
             Intent intent;
+
             int mIcon;
             switch (mRootsState) {
                 case 2:
@@ -222,28 +233,39 @@ public class Utils {
                 case 1:
                     mLabelString = "Root enabled";
                     mIcon = mRootIcon;
-                    intent = enableBroadcast;
+                    intent = disableBroadcast;
                     break;
                 case 0:
                     mLabelString = "Root disabled";
-                    mIcon = mRootIcon;
-                    intent = disableBroadcast;
+                    mIcon = mRootDisabled;
+                    intent = enableBroadcast;
                     break;
                 default:
-                    mLabelString = "Root enabled";
-                    mIcon = mRootIcon;
-                    intent = enableBroadcast;
+                    mLabelString = "Root disabled";
+                    mIcon = mRootDisabled;
+                    intent = disableBroadcast;
                     break;
             }
 
-            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "ROOT")
+            Intent tileConfigurationIntent = new BroadcastTileIntentBuilder(mContext, "Magisk")
                     .setLabel(mLabelString)
                     .setIconResource(mIcon)
                     .setOnClickBroadcast(intent)
+                    .setOnLongClickBroadcast(autoBroadcast)
+                    .setVisible(true)
                     .build();
             mContext.sendBroadcast(tileConfigurationIntent);
-            
+
         }
+    }
+
+    public static void UpdateRootFragmentUI(Context context) {
+
+        Log.d("Magisk", "Utils: UpdateRF called");
+        Intent intent = new Intent(context, RootFragment.class);
+        intent.setAction("com.magisk.UPDATEUI");
+        context.sendBroadcast(intent);
+
     }
 
     // Gets an overall state for the quick settings tile
@@ -561,8 +583,6 @@ public class Utils {
             return null;
         }
     }
-
-
 
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

@@ -42,7 +42,7 @@
         </service>
 
         <receiver
-            android:name=".tile.PrivateBroadcastReceiver"
+            android:name=".receivers.PrivateBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -105,6 +105,11 @@
         <receiver android:name=".receivers.AutoStartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".RootFragment.mYourBroadcastReceiner">
+            <intent-filter>
+                <action android:name="com.magisk.UPDATEUI"/>
             </intent-filter>
         </receiver>
 

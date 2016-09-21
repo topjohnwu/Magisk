@@ -143,7 +143,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
 
 
-    private void navigate(final int itemId) {
+    public void navigate(final int itemId) {
         Fragment navFragment = null;
         String tag = "";
         switch (itemId) {

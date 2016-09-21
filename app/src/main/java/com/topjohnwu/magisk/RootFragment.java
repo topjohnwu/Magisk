@@ -1,16 +1,19 @@
 package com.topjohnwu.magisk;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.receivers.Receiver;
+import com.topjohnwu.magisk.receivers.RootFragmentReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -33,7 +38,7 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RootFragment extends Fragment {
+public class RootFragment extends Fragment implements Receiver{
 
     public SharedPreferences prefs;
     @BindView(R.id.progressBar)
@@ -92,7 +97,6 @@ public class RootFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
-
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
         if (prefs.contains("autoRootEnable")) {
@@ -112,7 +116,7 @@ public class RootFragment extends Fragment {
 
         autoRootToggle.setOnClickListener(toggle -> {
             ToggleAutoRoot(autoRootToggle.isChecked());
-            new Handler().postDelayed(() -> new updateUI().execute(), 1000);
+            new updateUI().execute();
 
         });
 
@@ -121,8 +125,22 @@ public class RootFragment extends Fragment {
             new updateUI().execute();
         });
 
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
+                new IntentFilter("com.magisk.UPDATEUI"));
+
         return view;
     }
+
+    private final BroadcastReceiver mYourBroadcastReceiver = new RootFragmentReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("Magisk", "RootFragment: UpdateRF called and fired");
+            new updateUI().execute();
+        }
+
+
+    };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -139,6 +157,9 @@ public class RootFragment extends Fragment {
 
             }
 
+        } else if (requestCode == 420) {
+            Log.d("Magisk", "Got result code OK for UI update.");
+            new updateUI().execute();
         }
     }
 
@@ -172,6 +193,11 @@ public class RootFragment extends Fragment {
     public void onResume() {
         super.onResume();
         new updateUI().execute();
+    }
+
+    @Override
+    public void onResult() {
+
     }
 
     public class updateUI extends AsyncTask<Void, Void, Void> {
@@ -301,4 +327,5 @@ public class RootFragment extends Fragment {
             }
         }
     }
+
 }
