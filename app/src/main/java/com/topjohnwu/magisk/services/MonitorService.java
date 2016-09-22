@@ -18,6 +18,7 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.WelcomeActivity;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -51,6 +52,12 @@ public class MonitorService extends AccessibilityService {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("Magisk", "MonitorService: Service destroyed");
+    }
+
+    @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             ComponentName componentName = new ComponentName(
@@ -71,11 +78,7 @@ public class MonitorService extends AccessibilityService {
 
                     if (setBlackList != null) {
                         disableroot = setBlackList.contains(mPackage);
-                        if (disableroot) {
-                            ForceDisableRoot();
-                        } else {
-                            ForceEnableRoot();
-                        }
+                        ForceRoot(!disableroot);
                         String appFriendly = getAppName(mPackage);
                         ShowNotification(disableroot, appFriendly);
                     }
@@ -105,14 +108,18 @@ public class MonitorService extends AccessibilityService {
         }
     }
 
-    private void ForceDisableRoot() {
-        Log.d("Magisk", "MonitorService: Forcedisable called.");
-        Utils.toggleRoot(false);
-        if (Utils.rootEnabled()) {
-            Utils.toggleRoot(false);
-            Log.d(TAG, "MonitorService: FORCING.");
+    private void ForceRoot(Boolean rootToggle) {
+
+        String rootString = rootToggle ? "on" : "off";
+        if (Utils.rootEnabled() != rootToggle) {
+            Logger.dh("MonitorService: toggling root " + rootString);
+            Utils.toggleRoot(rootToggle);
+            if (Utils.rootEnabled() != rootToggle) {
+                Utils.toggleRoot(rootToggle);
+                Logger.dh("MonitorService: FORCING to " + rootString);
+            }
+
         }
-        Log.d("Magisk", "MonitorService: Forcedisable called. " + Utils.rootEnabled());
     }
 
     private void ForceEnableRoot() {
@@ -126,7 +133,7 @@ public class MonitorService extends AccessibilityService {
     private void ShowNotification(boolean rootAction, String packageName) {
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder;
-        if (!PrefHelper.CheckBool("hide_root_notification")) {
+        if (!PrefHelper.CheckBool("hide_root_notification", getApplicationContext())) {
             if (rootAction) {
 
                 Intent intent = new Intent(getApplication(), WelcomeActivity.class);

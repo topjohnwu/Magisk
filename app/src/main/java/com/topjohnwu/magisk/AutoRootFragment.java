@@ -10,12 +10,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.topjohnwu.magisk.utils.ApplicationAdapter;
+import com.topjohnwu.magisk.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +37,17 @@ public class AutoRootFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.auto_root_fragment, container, false);
+        View view = inflater.inflate(R.layout.auto_root_fragment, container, false);
+        int horizontalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+        int verticalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
+        TypedValue tv = new TypedValue();
+        int actionBarHeight = 130;
+        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+
+        view.setPadding(horizontalMargin, actionBarHeight, horizontalMargin, verticalMargin);
+        return view;
     }
 
     @Override
@@ -44,6 +57,7 @@ public class AutoRootFragment extends ListFragment {
         packageManager = getActivity().getPackageManager();
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (!prefs.contains("auto_blacklist")) {
+            Logger.dh("AutoRootFragment: Setting default preferences for application");
             SharedPreferences.Editor editor = prefs.edit();
             Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");
@@ -63,6 +77,7 @@ public class AutoRootFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        Logger.dh("Click");
         super.onListItemClick(l, v, position, id);
         ApplicationInfo app = applist.get(position);
         ToggleApp(app.packageName, position, v);
@@ -70,10 +85,8 @@ public class AutoRootFragment extends ListFragment {
     }
 
     private void ToggleApp(String appToCheck, int position, View v) {
-
+        Logger.dh("Magisk","AutoRootFragment: ToggleApp called for " + appToCheck);
         Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
-
-
         assert blackListSet != null;
         arrayBlackList = new ArrayList<>(blackListSet);
 
@@ -88,7 +101,10 @@ public class AutoRootFragment extends ListFragment {
             }
 
         }
-        prefs.edit().putStringSet("auto_blacklist", new HashSet<>(arrayBlackList)).apply();
+        Logger.dh("Committing set, value is: " + arrayBlackList.toString());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("auto_blacklist", new HashSet<>(arrayBlackList));
+        editor.apply();
         listadaptor.UpdateRootStatusView(position, v);
 
     }
@@ -113,7 +129,7 @@ public class AutoRootFragment extends ListFragment {
         @Override
         public int compare(ApplicationInfo o1, ApplicationInfo o2) {
             packageManager = getActivity().getPackageManager();
-            return o1.loadLabel(packageManager).toString().compareTo(o2.loadLabel(packageManager).toString());
+            return o1.loadLabel(packageManager).toString().compareToIgnoreCase(o2.loadLabel(packageManager).toString());
         }
     }
 

@@ -15,10 +15,10 @@ public class AutoStartReceiver extends BroadcastReceiver {
         Log.d("Magisk", "Received Boot call, attempting to start service");
         Intent myIntent = new Intent(context, MonitorService.class);
         context.startService(myIntent);
-        if (PrefHelper.CheckBool("keep_root_off")) {
+        if (PrefHelper.CheckBool("keep_root_off",context)) {
             Utils.toggleRoot(false);
         }
-        if (PrefHelper.CheckBool("enable_quicktile")) {
+        if (PrefHelper.CheckBool("enable_quicktile",context)) {
             Utils.SetupQuickSettingsTile(context);
         }
 

@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +22,6 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
     private List<ApplicationInfo> appsList = null;
     private Context context;
     private PackageManager packageManager;
-    public ArrayList arrayList;
     public SharedPreferences prefs;
 
     public ApplicationAdapter(Context context, int textViewResourceId,
@@ -99,15 +97,14 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
     private boolean CheckApp(String appToCheck) {
         boolean starter = false;
-            Set<String> set = prefs.getStringSet("auto_blacklist", null);
-            if (set != null) {
-                arrayList = new ArrayList<>(set);
-                for (String string : set) {
-                    if (string.equals(appToCheck)) {
-                        starter = true;
-                    }
+        Set<String> set = prefs.getStringSet("auto_blacklist", null);
+        if (set != null) {
+            for (String string : set) {
+                if (string.equals(appToCheck)) {
+                    starter = true;
                 }
             }
+        }
 
         return starter;
 

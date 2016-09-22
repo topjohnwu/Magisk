@@ -115,6 +115,12 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 

@@ -1,10 +1,7 @@
 package com.topjohnwu.magisk;
 
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Fragment;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -12,8 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +19,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.topjohnwu.magisk.receivers.Receiver;
-import com.topjohnwu.magisk.receivers.RootFragmentReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -38,7 +33,7 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RootFragment extends Fragment implements Receiver{
+public class RootFragment extends Fragment implements Receiver {
 
     public SharedPreferences prefs;
     @BindView(R.id.progressBar)
@@ -91,21 +86,22 @@ public class RootFragment extends Fragment implements Receiver{
     int statusUnknown = R.drawable.ic_help;
 
     private boolean autoRootStatus;
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.root_fragment, container, false);
+        view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        autoRootStatus = prefs.getBoolean("autoRootEnable", false);
 
-        if (prefs.contains("autoRootEnable")) {
-            autoRootStatus = prefs.getBoolean("autoRootEnable", false);
-            rootToggle.setEnabled(false);
-        } else {
-            autoRootStatus = false;
-            rootToggle.setEnabled(true);
+        if (autoRootStatus) {
+            if (!Utils.hasServicePermission(getActivity())) {
+                autoRootStatus = false;
+            }
         }
+        rootToggle.setEnabled(!autoRootStatus);
         autoRootToggle.setChecked(autoRootStatus);
         new updateUI().execute();
 
@@ -115,10 +111,15 @@ public class RootFragment extends Fragment implements Receiver{
         });
 
         autoRootToggle.setOnClickListener(toggle -> {
-            ToggleAutoRoot(autoRootToggle.isChecked());
-            new updateUI().execute();
+                    if (!Utils.hasServicePermission(getActivity())) {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                        startActivityForResult(intent, 100);
+                    } else {
+                        ToggleAutoRoot(autoRootToggle.isChecked());
 
-        });
+                    }
+                }
+        );
 
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
@@ -147,14 +148,12 @@ public class RootFragment extends Fragment implements Receiver{
         // Check which request we're responding to
         Log.d("Magisk", "Got result: " + requestCode + " and " + resultCode);
         if (requestCode == 100) {
-            // Make sure the request was successful
-            if (resultCode == Activity.RESULT_OK) {
+            if (Utils.hasServicePermission(getActivity())) {
                 Log.d("Magisk", "Got result code OK for permissions");
-
+                ToggleAutoRoot(true);
             } else {
-                autoRootToggle.setEnabled(false);
-                Toast.makeText(getActivity(), "Auto-root disabled, permissions required.", Toast.LENGTH_LONG).show();
-
+                autoRootToggle.setChecked(false);
+                Snackbar.make(view, "Auto-root disabled, permissions required.", Snackbar.LENGTH_LONG).show();
             }
 
         } else if (requestCode == 420) {
@@ -169,10 +168,6 @@ public class RootFragment extends Fragment implements Receiver{
         editor.putBoolean("autoRootEnable", (toggleState));
         editor.apply();
         if (toggleState) {
-            if (!Utils.hasServicePermission(getActivity())) {
-                Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                startActivityForResult(intent, 100);
-            }
             Intent myIntent = new Intent(getActivity(), MonitorService.class);
             getActivity().startService(myIntent);
             rootToggle.setEnabled(false);
@@ -186,6 +181,8 @@ public class RootFragment extends Fragment implements Receiver{
             getActivity().stopService(myIntent);
             rootToggle.setEnabled(true);
         }
+
+        new updateUI().execute();
 
     }
 
@@ -206,6 +203,10 @@ public class RootFragment extends Fragment implements Receiver{
         protected Void doInBackground(Void... voids) {
             // Make sure static block invoked
             Shell.rootAccess();
+            // Set up Tile on UI Refresh
+            if (PrefHelper.CheckBool("enable_quicktile",getActivity())) {
+                Utils.SetupQuickSettingsTile(getActivity());
+            }
             return null;
         }
 

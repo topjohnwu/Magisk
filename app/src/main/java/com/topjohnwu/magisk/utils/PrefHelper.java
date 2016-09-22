@@ -10,19 +10,11 @@ public class PrefHelper {
 
     }
 
-    public static boolean CheckBool(String key) {
-        Context context = null;
-        try {
-            context = getApplicationUsingReflection();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static boolean CheckBool(String key, Context context) {
+
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(key, false);
     }
 
-    private static Application getApplicationUsingReflection() throws Exception {
-        return (Application) Class.forName("android.app.AppGlobals")
-                .getMethod("getInitialApplication").invoke(null, (Object[]) null);
-    }
+
 
 }

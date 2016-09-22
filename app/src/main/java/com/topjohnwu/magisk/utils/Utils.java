@@ -30,8 +30,8 @@ import com.topjohnwu.magisk.RootFragment;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
-import com.topjohnwu.magisk.services.QuickSettingTileService;
-import com.topjohnwu.magisk.services.TileService;
+import com.topjohnwu.magisk.services.TileServiceNewApi;
+import com.topjohnwu.magisk.services.TileServiceCompat;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -71,10 +71,10 @@ public class Utils {
         if (!Shell.rootAccess()) {
             Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
-        if (PrefHelper.CheckBool("keep_root_off")) {
+        if (PrefHelper.CheckBool("keep_root_off",context)) {
             Utils.toggleRoot(false);
         }
-        if (PrefHelper.CheckBool("enable_quicktile")) {
+        if (PrefHelper.CheckBool("enable_quicktile",context)) {
             Utils.SetupQuickSettingsTile(context);
         }
     }
@@ -129,6 +129,7 @@ public class Utils {
             } else {
                 Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
             }
+
         }
     }
 
@@ -212,7 +213,7 @@ public class Utils {
     public static void SetupQuickSettingsTile(Context mContext) {
         Logger.dh("Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Intent serviceIntent = new Intent(mContext, QuickSettingTileService.class);
+            Intent serviceIntent = new Intent(mContext, TileServiceNewApi.class);
             mContext.startService(serviceIntent);
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
@@ -266,7 +267,7 @@ public class Utils {
 
     public static void installTile(Context context) {
 
-        String qsTileId = "intent(" + TileService.TILE_ID + ")";
+        String qsTileId = "intent(" + TileServiceCompat.TILE_ID + ")";
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
             List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
@@ -289,7 +290,7 @@ public class Utils {
 
     public static void uninstallTile(Context context) {
 
-        String qsTileId = "intent(" + TileService.TILE_ID + ")";
+        String qsTileId = "intent(" + TileServiceCompat.TILE_ID + ")";
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
             List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
@@ -318,7 +319,7 @@ public class Utils {
 
 
     private void refreshService(Context context) {
-        context.startService(new Intent(context, TileService.class));
+        context.startService(new Intent(context, TileServiceCompat.class));
     }
 
 
@@ -448,7 +449,7 @@ public class Utils {
     public static class ModuleComparator implements Comparator<BaseModule> {
         @Override
         public int compare(BaseModule o1, BaseModule o2) {
-            return o1.getName().compareTo(o2.getName());
+            return o1.getName().compareToIgnoreCase(o2.getName());
         }
     }
 }

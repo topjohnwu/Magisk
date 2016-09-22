@@ -16,10 +16,9 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
 
-public class TileService extends Service {
+public class TileServiceCompat extends Service {
     private static BroadcastReceiver clickTileReceiver;
 
-    private static boolean running = false;
     private static boolean root, autoRoot;
 
     public static final String TILE_ID = "com.shovelgrill.magiskmmtile.TILE";
@@ -29,7 +28,7 @@ public class TileService extends Service {
     public static final int CLICK_TYPE_SIMPLE = 0;
     public static final int CLICK_TYPE_LONG = 1;
 
-    public TileService() {
+    public TileServiceCompat() {
     }
 
     @Override
@@ -40,7 +39,6 @@ public class TileService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        running = true;
         root = true;
         registerClickTileReceiver();
     }
@@ -82,7 +80,7 @@ public class TileService extends Service {
     private void onLongClick() {
         Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         sendBroadcast(it);
-        openApp(this,"com.topjohnwu.magisk");
+        Utils.toggleAutoRoot(!Utils.autoRootEnabled(getApplicationContext()),getApplicationContext());
     }
 
     public static boolean openApp(Context context, String packageName) {
@@ -133,7 +131,6 @@ public class TileService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(clickTileReceiver);
-        running = false;
     }
 
 }
