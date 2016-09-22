@@ -266,11 +266,19 @@ public class Utils {
     }
 
     public static void installTile(Context context) {
+        String qsTileId;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            qsTileId = "custom(com.topjohnwu.magisk/.services.TileServiceNewApi)";
+        } else {
+            qsTileId = "intent(Magisk)";
+        }
 
-        String qsTileId = "intent(" + TileServiceCompat.TILE_ID + ")";
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
             List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
+            List<String> tiles2;
+            int tileSpace = Math.round(tiles.size()/2);
+            Logger.dh("Utils: Current Tile String is "+ tiles);
             if (tiles.size() > 1) {
                 for (String tile : tiles) {
                     if (tile.equals(qsTileId)) {
@@ -278,9 +286,15 @@ public class Utils {
                         return;
                     }
                 }
+
+                tiles.add(tiles.size() + 1, qsTileId);
                 String newTiles = TextUtils.join(",", tiles);
+                Logger.dh("Utils: NewtilesString is "+ newTiles);
                 Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
                 Toast.makeText(context, "Tile installed", Toast.LENGTH_SHORT).show();
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+                    Utils.refreshService(context);
+                }
                 return;
             }
         }
@@ -290,7 +304,12 @@ public class Utils {
 
     public static void uninstallTile(Context context) {
 
-        String qsTileId = "intent(" + TileServiceCompat.TILE_ID + ")";
+        String qsTileId;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            qsTileId = "custom(com.topjohnwu.magisk/.services.TileServiceNewApi)";
+        } else {
+            qsTileId = "intent(Magisk)";
+        }
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
             List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
@@ -307,6 +326,9 @@ public class Utils {
                     String newTiles = TextUtils.join(",", tiles);
                     Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
                     Toast.makeText(context, "Tile uninstalled", Toast.LENGTH_SHORT).show();
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+                        Utils.refreshService(context);
+                    }
                     return;
                 }
                 Toast.makeText(context, "Tile already uninstalled", Toast.LENGTH_SHORT).show();
@@ -318,7 +340,9 @@ public class Utils {
     }
 
 
-    private void refreshService(Context context) {
+
+
+    private static void refreshService(Context context) {
         context.startService(new Intent(context, TileServiceCompat.class));
     }
 

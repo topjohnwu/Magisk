@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.receivers.Receiver;
 import com.topjohnwu.magisk.services.MonitorService;
@@ -113,6 +114,7 @@ public class RootFragment extends Fragment implements Receiver {
         autoRootToggle.setOnClickListener(toggle -> {
                     if (!Utils.hasServicePermission(getActivity())) {
                         Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                        Toast.makeText(getActivity(),"Please enable accessibility access for Magisk's auto-toggle feature to work.", Toast.LENGTH_LONG).show();
                         startActivityForResult(intent, 100);
                     } else {
                         ToggleAutoRoot(autoRootToggle.isChecked());

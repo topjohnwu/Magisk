@@ -21,9 +21,9 @@ public class TileServiceCompat extends Service {
 
     private static boolean root, autoRoot;
 
-    public static final String TILE_ID = "com.shovelgrill.magiskmmtile.TILE";
-    public static final String ACTION_TILE_CLICK = "com.shovelgrill.magiskmmtile.ACTION_TILE_CLICK";
-    public static final String EXTRA_CLICK_TYPE = "com.shovelgrill.magiskmmtile.EXTRA_CLICK_TYPE";
+    public static final String TILE_ID = "Magisk";
+    public static final String ACTION_TILE_CLICK = "magisk.ACTION_TILE_CLICK";
+    public static final String EXTRA_CLICK_TYPE = "magisk.EXTRA_CLICK_TYPE";
     public static final int CLICK_TYPE_UNKNOWN = -1;
     public static final int CLICK_TYPE_SIMPLE = 0;
     public static final int CLICK_TYPE_LONG = 1;

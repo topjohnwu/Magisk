@@ -68,7 +68,7 @@ public class MonitorService extends AccessibilityService {
             ActivityInfo activityInfo = tryGetActivity(componentName);
             boolean isActivity = activityInfo != null;
             if (isActivity) {
-                Log.i("Magisk", "CurrentActivity: " + componentName.getPackageName());
+                Logger.dh("MonitorService: CurrentActivity: " + componentName.getPackageName());
                 String mPackage = componentName.getPackageName();
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
