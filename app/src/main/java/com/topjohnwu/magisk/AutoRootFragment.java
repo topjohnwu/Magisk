@@ -122,7 +122,9 @@ public class AutoRootFragment extends ListFragment {
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
-                    applist.add(info);
+                    if (!info.packageName.contains("topjohnwu")) {
+                        applist.add(info);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
