@@ -41,12 +41,15 @@ public class TileServiceCompat extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        root = Utils.rootEnabled();
-        autoRoot = Utils.autoToggleEnabled(getApplicationContext());
+        updateRoots();
         updateTile();
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private void updateRoots() {
+        root = Utils.rootEnabled();
+        autoRoot = Utils.autoToggleEnabled(getApplicationContext());
+    }
 
 
     private void registerClickTileReceiver() {
@@ -70,26 +73,15 @@ public class TileServiceCompat extends Service {
 
 
     private void onSimpleClick() {
+		updateRoots();
+        updateTile();
         Utils.toggleRoot(!root);
     }
 
     private void onLongClick() {
-        Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        sendBroadcast(it);
-        Utils.toggleAutoRoot(!Utils.autoToggleEnabled(getApplicationContext()),getApplicationContext());
-    }
-
-    public static boolean openApp(Context context, String packageName) {
-        PackageManager manager = context.getPackageManager();
-        Intent i = manager.getLaunchIntentForPackage(packageName);
-        if (i == null) {
-            return false;
-            //throw new PackageManager.NameNotFoundException();
-        }
-        i.addCategory(Intent.CATEGORY_LAUNCHER);
-        i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        context.startActivity(i);
-        return true;
+        updateRoots();
+        updateTile();
+        Utils.toggleAutoRoot(!autoRoot,getApplicationContext());
     }
 
     private void updateTile() {

@@ -287,7 +287,7 @@ public class Utils {
                     }
                 }
 
-                tiles.add(tiles.size() + 1, qsTileId);
+                tiles.add(Math.round(tiles.size()/2), qsTileId);
                 String newTiles = TextUtils.join(",", tiles);
                 Logger.dh("Utils: NewtilesString is "+ newTiles);
                 Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
