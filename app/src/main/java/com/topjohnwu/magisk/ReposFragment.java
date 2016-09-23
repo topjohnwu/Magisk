@@ -43,7 +43,7 @@ public class ReposFragment extends Fragment {
     private boolean alertUpdate;
     private boolean ignoreAlertUpdate;
     private String alertPackage;
-    private SharedPreferences prefs;
+//    private SharedPreferences prefs;
 
     @Nullable
 
@@ -52,16 +52,16 @@ public class ReposFragment extends Fragment {
         View view = inflater.inflate(R.layout.repos_fragment, container, false);
         mView = view;
         ButterKnife.bind(this, view);
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (prefs.contains("ignoreUpdateAlerts")) {
-            ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);
-        }
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            this.LoadRepo(true);
-            ignoreAlertUpdate = false;
-            prefs.edit().putBoolean("ignoreUpdateAlerts",false).apply();
-
-        });
+//        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        if (prefs.contains("ignoreUpdateAlerts")) {
+//            ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);
+//        }
+//        swipeRefreshLayout.setOnRefreshListener(() -> {
+//            this.LoadRepo(true);
+//            ignoreAlertUpdate = false;
+//            prefs.edit().putBoolean("ignoreUpdateAlerts",false).apply();
+//
+//        });
         LoadRepo(false);
         setHasOptionsMenu(false);
         alertUpdate = false;
@@ -136,10 +136,10 @@ public class ReposFragment extends Fragment {
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
-                            ignoreAlertUpdate = true;
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putBoolean("ignoreUpdateAlerts", ignoreAlertUpdate);
-                            editor.apply();
+//                            ignoreAlertUpdate = true;
+//                            SharedPreferences.Editor editor = prefs.edit();
+//                            editor.putBoolean("ignoreUpdateAlerts", ignoreAlertUpdate);
+//                            editor.apply();
                             break;
                     }
                 };
