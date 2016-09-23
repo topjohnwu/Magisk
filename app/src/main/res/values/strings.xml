@@ -121,4 +121,7 @@
     <string name="settings_development_category">Development</string>
     <string name="settings_hide_root_notification_summary">When checked, auto-root notifications will not be displayed.</string>
     <string name="settings_hide_root_notification_title">Hide auto-root notifications</string>
+
+    <!--General Use -->
+    <string name="auto_toggle">Auto-toggle</string>
 </resources>

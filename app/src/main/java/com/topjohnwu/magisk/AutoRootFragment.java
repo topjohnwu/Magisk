@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,12 +46,28 @@ public class AutoRootFragment extends ListFragment {
         }
 
         view.setPadding(horizontalMargin, actionBarHeight, horizontalMargin, verticalMargin);
+
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializeElements();
+            super.onResume();
+            getActivity().setTitle("Auto-toggle");
+
+
+    }
+
+    private void initializeElements() {
         listView = getListView();
         packageManager = getActivity().getPackageManager();
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -66,13 +81,6 @@ public class AutoRootFragment extends ListFragment {
             editor.apply();
         }
         new LoadApplications().execute();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        new LoadApplications().execute();
-
     }
 
     @Override
@@ -128,7 +136,6 @@ public class AutoRootFragment extends ListFragment {
     public class CustomComparator implements Comparator<ApplicationInfo> {
         @Override
         public int compare(ApplicationInfo o1, ApplicationInfo o2) {
-            packageManager = getActivity().getPackageManager();
             return o1.loadLabel(packageManager).toString().compareToIgnoreCase(o2.loadLabel(packageManager).toString());
         }
     }
@@ -140,7 +147,7 @@ public class AutoRootFragment extends ListFragment {
         protected Void doInBackground(Void... params) {
             applist = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
             listadaptor = new ApplicationAdapter(getActivity(),
-                    R.layout.app_list_row, applist);
+                    R.layout.list_item_app, applist);
 
             return null;
         }

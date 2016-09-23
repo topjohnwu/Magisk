@@ -21,7 +21,7 @@ public final class PrivateBroadcastReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         Log.d("Magisk","Broadcast Receiver, Made it this far!  We're trying to " + action);
         if (ACTION_AUTOROOT.equals(action)) {
-            Utils.toggleAutoRoot(!Utils.autoRootEnabled(context),context);
+            Utils.toggleAutoRoot(!Utils.autoToggleEnabled(context),context);
         }
         if (ACTION_ENABLEROOT.equals(action)) {
             Utils.toggleAutoRoot(false, context);

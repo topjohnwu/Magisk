@@ -2,29 +2,29 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    style="@style/Base.CardView"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-                                    android:layout_marginBottom="3dip"
-                                    android:layout_marginLeft="8dip"
-                                    android:layout_marginRight="8dip"
-                                    android:layout_marginTop="3dip"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
+    android:layout_marginStart="@dimen/card_horizontal_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginTop="@dimen/card_vertical_margin"
 
                                     android:background="?android:attr/selectableItemBackground"
-                                    card_view:cardCornerRadius="2dp"
-                                    card_view:cardElevation="2dp">
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:layout_gravity="center_vertical"
-        android:padding="10dp">
+        android:padding="@dimen/card_layout_padding">
 
         <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
                    android:id="@+id/app_icon"
-                   android:layout_width="50dp"
-                   android:layout_height="50dp"
+                   android:layout_width="@dimen/card_appicon_size"
+                   android:layout_height="@dimen/card_appicon_size"
                    android:layout_centerVertical="true"
 
                    android:scaleType="centerCrop"/>
@@ -34,7 +34,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:paddingEnd="50dp"
+            android:paddingEnd="@dimen/card_appicon_size"
             android:paddingStart="65dp"
             android:gravity="center_horizontal"
             android:layout_alignBottom="@+id/app_icon"

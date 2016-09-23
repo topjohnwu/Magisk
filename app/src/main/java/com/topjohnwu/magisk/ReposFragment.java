@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk;
 
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -59,7 +59,7 @@ public class ReposFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             this.LoadRepo(true);
             ignoreAlertUpdate = false;
-            prefs.edit().putBoolean("ignoreUpdateAlerts",false).apply();
+            prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
 
         });
         LoadRepo(false);
@@ -75,6 +75,7 @@ public class ReposFragment extends Fragment {
         recyclerView.setAdapter(new ReposAdapter(this, mListRepos));
         return view;
     }
+
 
     @Override
     public void onStart() {
@@ -98,7 +99,7 @@ public class ReposFragment extends Fragment {
         super.onAttachFragment(childFragment);
     }
 
-    private void LoadRepo (boolean doReload) {
+    private void LoadRepo(boolean doReload) {
         RepoHelper.TaskDelegate taskDelegate = result -> {
             if (result.equals("Complete")) {
                 Log.d("Magisk", "ReposFragment, got delegate");
@@ -111,7 +112,7 @@ public class ReposFragment extends Fragment {
             }
 
         };
-        Log.d("Magisk","ReposFragment, LoadRepo called");
+        Log.d("Magisk", "ReposFragment, LoadRepo called");
         new Async.LoadRepos(getActivity());
     }
 
@@ -158,9 +159,10 @@ public class ReposFragment extends Fragment {
     public void onResume() {
         super.onResume();
         LoadRepo(false);
+        getActivity().setTitle("Magisk");
+
 
     }
-
 
 
     protected List<Repo> listRepos() {
@@ -168,7 +170,7 @@ public class ReposFragment extends Fragment {
     }
 
     private void UpdateUI() {
-        Log.d("Magisk","ReposFragment: UpdateUI Called, size is " + listRepos().size());
+        Log.d("Magisk", "ReposFragment: UpdateUI Called, size is " + listRepos().size());
 
         if (listRepos().size() == 0) {
             emptyTv.setVisibility(View.VISIBLE);
@@ -185,11 +187,6 @@ public class ReposFragment extends Fragment {
 
 
     }
-
-
-
-
-
 
 
 }

@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
 
@@ -29,9 +32,11 @@ public class ModulesFragment extends Fragment {
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyTv;
-
+private static final int FETCH_ZIP_CODE = 2;
     private SharedPreferences prefs;
     public static List<Module> listModules = new ArrayList<>();
+    @BindView(R.id.fab)
+    FloatingActionButton fabio;
 
     @Nullable
     @Override
@@ -40,7 +45,14 @@ public class ModulesFragment extends Fragment {
 
 
         ButterKnife.bind(this, viewMain);
+    fabio.setOnClickListener(v -> {
+            Intent getContentIntent = FileUtils.createGetContentIntent(null);
+            getContentIntent.setType("application/zip");
+            Intent fileIntent = Intent.createChooser(getContentIntent, "Select a file");
 
+            startActivityForResult(fileIntent, FETCH_ZIP_CODE);
+
+        });
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
 
@@ -62,6 +74,12 @@ public class ModulesFragment extends Fragment {
         new updateUI().execute();
 
         return viewMain;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle("Modules");
     }
 
     private class updateUI extends AsyncTask<Void, Void, Void> {

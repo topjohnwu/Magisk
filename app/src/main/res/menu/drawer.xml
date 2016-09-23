@@ -18,7 +18,7 @@
         <item
             android:id="@+id/autoroot"
             android:icon="@drawable/ic_autoroot"
-            android:title="@string/auto_root"/>
+            android:title="@string/auto_toggle"/>
 
         <item
             android:id="@+id/modules"

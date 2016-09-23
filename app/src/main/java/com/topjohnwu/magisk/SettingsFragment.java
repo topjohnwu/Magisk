@@ -1,16 +1,13 @@
 package com.topjohnwu.magisk;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -31,6 +28,12 @@ public class SettingsFragment extends PreferenceFragment {
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.uisettings);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle("Settings");
     }
 
     @Override
@@ -55,11 +58,11 @@ public class SettingsFragment extends PreferenceFragment {
         Preference.OnPreferenceClickListener preferenceClickListener = preference -> {
             if (preference == quickTilePreference) {
                 boolean isChecked = quickTilePreference.isChecked();
-                    if (isChecked) {
-                        Utils.installTile(getActivity());
-                    } else {
-                        Utils.uninstallTile(getActivity());
-                    }
+                if (isChecked) {
+                    Utils.installTile(getActivity());
+                } else {
+                    Utils.uninstallTile(getActivity());
+                }
 
             }
             if (preference == devLogPreference) {

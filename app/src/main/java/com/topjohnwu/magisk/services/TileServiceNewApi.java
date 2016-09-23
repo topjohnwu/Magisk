@@ -42,12 +42,12 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
         Icon iconRoot = Icon.createWithResource(getApplicationContext(), R.drawable.root);
         Icon iconAuto = Icon.createWithResource(getApplicationContext(), R.drawable.ic_autoroot);
         Tile tile = this.getQsTile();
-        boolean autoRootStatus = Utils.autoRootEnabled(getApplicationContext());
+        boolean autoRootStatus = Utils.autoToggleEnabled(getApplicationContext());
         boolean rootStatus = Utils.rootEnabled();
         int rootsStatus = Utils.CheckRootsState(getApplicationContext());
         Log.d("Magisk", "QST: Auto and root are " + autoRootStatus + " and " + rootStatus + Utils.CheckRootsState(getApplicationContext()));
         if (rootsStatus == 2) {
-            tile.setLabel("Auto-root");
+            tile.setLabel(getApplicationContext().getString(R.string.auto_toggle));
             tile.setIcon(iconAuto);
             tile.setState(Tile.STATE_ACTIVE);
 

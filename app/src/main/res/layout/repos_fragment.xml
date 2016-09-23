@@ -11,6 +11,7 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:dividerHeight="@dimen/card_divider_space"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 
     <TextView

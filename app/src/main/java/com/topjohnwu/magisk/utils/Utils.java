@@ -97,9 +97,9 @@ public class Utils {
         return Boolean.parseBoolean(ret.get(0));
     }
 
-    public static boolean autoRootEnabled(Context context) {
+    public static boolean autoToggleEnabled(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Log.d("Magisk", "AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
+        Logger.dh("Utils: AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
 
     }
@@ -232,7 +232,7 @@ public class Utils {
             int mIcon;
             switch (mRootsState) {
                 case 2:
-                    mLabelString = "Auto-root";
+                    mLabelString = mContext.getString(R.string.auto_toggle);
                     mIcon = mAutoRootIcon;
                     intent = autoBroadcast;
                     break;
@@ -360,7 +360,7 @@ public class Utils {
     // 0 for root disabled, 1 for root enabled (no auto), 2 for auto-root
 
     public static int CheckRootsState(Context mContext) {
-        if (autoRootEnabled(mContext)) {
+        if (autoToggleEnabled(mContext)) {
             return 2;
         } else {
             if (rootEnabled()) {

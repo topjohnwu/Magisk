@@ -2,6 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,9 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-
 import android.support.v4.app.ActivityCompat;
-import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,8 +25,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.module.RepoHelper;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -37,6 +38,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
     private final Handler mDrawerHandler = new Handler();
+    private String currentTitle;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -54,15 +56,14 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
 
+
         // Startups
         PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.contains("autoRootEnable")) {
-            if (prefs.getBoolean("autoRootEnable",false)) {
-                if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
-                    Intent myIntent = new Intent(getApplication(), MonitorService.class);
-                    getApplication().startService(myIntent);
-                }
+        if (Utils.autoToggleEnabled(getApplicationContext())) {
+            if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
+                Intent myIntent = new Intent(getApplication(), MonitorService.class);
+                getApplication().startService(myIntent);
             }
         }
         Utils.SetupQuickSettingsTile(getApplicationContext());
@@ -71,6 +72,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
+
+
 
 
         Utils.init(this);
@@ -114,6 +117,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -129,11 +133,23 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     @Override
     public void onBackPressed() {
+
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
+            Logger.dh("Welcomeactivity: Entrycount is " + backStackEntryCount);
+            if(backStackEntryCount>=2) {
+                super.onBackPressed();
+            } else {
+                finish();
+            }
         }
+
+
+
+
     }
 
     @Override
@@ -146,7 +162,11 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         return true;
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTitle(currentTitle);
+    }
 
     public void navigate(final int itemId) {
         Fragment navFragment = null;
@@ -163,7 +183,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 navFragment = new RootFragment();
                 break;
             case R.id.autoroot:
-                setTitle(R.string.auto_root);
+                setTitle(R.string.auto_toggle);
                 tag = "ic_autoroot";
                 navFragment = new AutoRootFragment();
                 break;
@@ -193,12 +213,15 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         if (navFragment != null) {
+
+
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
             try {
                 toolbar.setElevation(navFragment instanceof ModulesFragment ? 0 : 10);
+                currentTitle = getTitle().toString();
 
-                transaction.replace(R.id.content_frame, navFragment, tag).commit();
+                transaction.replace(R.id.content_frame, navFragment, tag).addToBackStack(currentTitle).commit();
             } catch (IllegalStateException ignored) {
             }
         }

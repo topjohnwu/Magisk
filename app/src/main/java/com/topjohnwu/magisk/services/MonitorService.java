@@ -25,7 +25,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import java.util.Set;
 
 public class MonitorService extends AccessibilityService {
-    private static final String TAG = "Magisk";
+    private static final String TAG = "MonitorService";
     private Boolean disableroot;
 
     @Override
@@ -70,10 +70,8 @@ public class MonitorService extends AccessibilityService {
             if (isActivity) {
                 Logger.dh("MonitorService: CurrentActivity: " + componentName.getPackageName());
                 String mPackage = componentName.getPackageName();
-
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                if (prefs.getBoolean("autoRootEnable", false)) {
-
+                if (Utils.autoToggleEnabled(getApplicationContext())) {
                     Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
 
                     if (setBlackList != null) {
@@ -153,7 +151,7 @@ public class MonitorService extends AccessibilityService {
                         new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(disableroot ? R.drawable.ic_stat_notification_autoroot_off : R.drawable.ic_stat_notification_autoroot_on)
                                 .setContentIntent(pendingIntent)
-                                .setContentTitle("Auto-root status changed")
+                                .setContentTitle(getApplicationContext().getString(R.string.auto_toggle) + " status changed")
                                 .setContentText(rootMessage);
                 int mNotificationId = 1;
                 mNotifyMgr.notify(mNotificationId, mBuilder.build());

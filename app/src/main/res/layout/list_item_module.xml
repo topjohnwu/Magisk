@@ -5,24 +5,25 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="3dip"
-    android:layout_marginLeft="8dip"
-    android:layout_marginRight="8dip"
-    android:layout_marginTop="3dip"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
+    android:layout_marginStart="@dimen/card_horizontal_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginTop="@dimen/card_vertical_margin"
     android:background="?android:attr/selectableItemBackground"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    card_view:cardCornerRadius="2dp"
-    card_view:cardElevation="2dp">
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:padding="@dimen/card_layout_padding"
             android:layout_gravity="center_vertical">
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="300dip"
+                android:layout_width="@dimen/card_textview_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
@@ -56,7 +57,7 @@
                     android:layout_height="wrap_content"
                     android:focusable="false"
                     android:gravity="center"
-                    android:padding="3dp"
+                    android:padding="@dimen/checkbox_padding"
                     android:src="@drawable/ic_menu_overflow_material"
                     tools:ignore="ContentDescription" />
 
@@ -67,7 +68,7 @@
                     android:layout_marginBottom="0dp"
                     android:focusable="false"
                     android:gravity="center"
-                    android:padding="3dp"
+                    android:padding="@dimen/checkbox_padding"
                     android:src="@drawable/ic_delete"
                     tools:ignore="ContentDescription" />
 
@@ -87,7 +88,7 @@
             <!--/>-->
             <TextView
                 android:id="@+id/description"
-                android:layout_width="300dip"
+                android:layout_width="@dimen/card_textview_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/version_name"
@@ -112,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/description"
-                android:minHeight="100dp"
+                android:minHeight="@dimen/min_rowheight"
                 android:orientation="vertical"
 
                 >
@@ -147,8 +148,8 @@
                         android:id="@+id/changeLog"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="@dimen/card_imageview_margin"
+                        android:layout_marginStart="@dimen/card_imageview_margin"
                         android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_changelog" />
 
@@ -156,8 +157,8 @@
                         android:id="@+id/authorLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="@dimen/card_imageview_margin"
+                        android:layout_marginStart="@dimen/card_imageview_margin"
                         android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_author" />
 
@@ -165,8 +166,8 @@
                         android:id="@+id/supportLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="@dimen/card_imageview_margin"
+                        android:layout_marginStart="@dimen/card_imageview_margin"
                         android:backgroundTint="@color/icon_grey"
                         android:background="@drawable/ic_support" />
 

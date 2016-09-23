@@ -95,7 +95,7 @@ public class RootFragment extends Fragment implements Receiver {
         view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        autoRootStatus = prefs.getBoolean("autoRootEnable", false);
+        autoRootStatus = Utils.autoToggleEnabled(getActivity());
 
         if (autoRootStatus) {
             if (!Utils.hasServicePermission(getActivity())) {
@@ -114,7 +114,7 @@ public class RootFragment extends Fragment implements Receiver {
         autoRootToggle.setOnClickListener(toggle -> {
                     if (!Utils.hasServicePermission(getActivity())) {
                         Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                        Toast.makeText(getActivity(),"Please enable accessibility access for Magisk's auto-toggle feature to work.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Please enable accessibility access for Magisk's auto-toggle feature to work.", Toast.LENGTH_LONG).show();
                         startActivityForResult(intent, 100);
                     } else {
                         ToggleAutoRoot(autoRootToggle.isChecked());
@@ -155,7 +155,7 @@ public class RootFragment extends Fragment implements Receiver {
                 ToggleAutoRoot(true);
             } else {
                 autoRootToggle.setChecked(false);
-                Snackbar.make(view, "Auto-root disabled, permissions required.", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, getActivity().getString(R.string.auto_toggle) + " disabled, permissions required.", Snackbar.LENGTH_LONG).show();
             }
 
         } else if (requestCode == 420) {
@@ -166,9 +166,7 @@ public class RootFragment extends Fragment implements Receiver {
 
     private void ToggleAutoRoot(boolean toggleState) {
         autoRootStatus = toggleState;
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean("autoRootEnable", (toggleState));
-        editor.apply();
+        Utils.toggleAutoRoot(toggleState, getActivity());
         if (toggleState) {
             Intent myIntent = new Intent(getActivity(), MonitorService.class);
             getActivity().startService(myIntent);
@@ -191,6 +189,8 @@ public class RootFragment extends Fragment implements Receiver {
     @Override
     public void onResume() {
         super.onResume();
+        getActivity().setTitle("Root");
+
         new updateUI().execute();
     }
 
@@ -206,7 +206,7 @@ public class RootFragment extends Fragment implements Receiver {
             // Make sure static block invoked
             Shell.rootAccess();
             // Set up Tile on UI Refresh
-            if (PrefHelper.CheckBool("enable_quicktile",getActivity())) {
+            if (PrefHelper.CheckBool("enable_quicktile", getActivity())) {
                 Utils.SetupQuickSettingsTile(getActivity());
             }
             return null;

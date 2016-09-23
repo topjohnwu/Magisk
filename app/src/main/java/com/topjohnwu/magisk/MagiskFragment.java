@@ -64,6 +64,12 @@ public class MagiskFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle("Magisk");
+    }
+
     private class updateUI extends AsyncTask<Void, Void, Void> {
 
         @Override

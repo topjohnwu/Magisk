@@ -7,14 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
-import android.service.quicksettings.Tile;
 
 import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
-
-import java.util.List;
 
 public class TileServiceCompat extends Service {
     private static BroadcastReceiver clickTileReceiver;
@@ -46,7 +42,7 @@ public class TileServiceCompat extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         root = Utils.rootEnabled();
-        autoRoot = Utils.autoRootEnabled(getApplicationContext());
+        autoRoot = Utils.autoToggleEnabled(getApplicationContext());
         updateTile();
         return super.onStartCommand(intent, flags, startId);
     }
@@ -80,7 +76,7 @@ public class TileServiceCompat extends Service {
     private void onLongClick() {
         Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         sendBroadcast(it);
-        Utils.toggleAutoRoot(!Utils.autoRootEnabled(getApplicationContext()),getApplicationContext());
+        Utils.toggleAutoRoot(!Utils.autoToggleEnabled(getApplicationContext()),getApplicationContext());
     }
 
     public static boolean openApp(Context context, String packageName) {
@@ -99,7 +95,7 @@ public class TileServiceCompat extends Service {
     private void updateTile() {
         BroadcastTileIntentBuilder broadcastTileIntentBuilder = new BroadcastTileIntentBuilder(this, TILE_ID);
         if (autoRoot) {
-            broadcastTileIntentBuilder.setLabel("Auto-root");
+            broadcastTileIntentBuilder.setLabel(getApplicationContext().getString(R.string.auto_toggle));
             broadcastTileIntentBuilder.setIconResource(R.drawable.ic_autoroot_white);
 
         } else {

@@ -119,6 +119,8 @@ public class   AboutActivity extends AppCompatActivity {
         setFloating();
     }
 
+
+
     public void setFloating() {
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {
@@ -136,6 +138,9 @@ public class   AboutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+           setTitle("About");
+
 
         getWindow().setStatusBarColor(getResources().getColor(R.color.primary_dark));
     }

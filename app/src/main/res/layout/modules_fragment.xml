@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout
+
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshLayout"
@@ -8,24 +9,50 @@
     android:layout_marginTop="?attr/actionBarSize"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="60dip"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
 
-    <TextView
-        android:id="@+id/empty_rv"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/llayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:fontFamily="sans-serif-light"
-        android:gravity="center"
-        android:text="@string/no_modules_found"
-        android:textSize="20sp"
-        android:textStyle="italic"
-        android:visibility="gone"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:dividerHeight="@dimen/card_divider_space"
+            android:paddingBottom="60dip"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/empty_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:text="@string/no_modules_found"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:baselineAlignBottom="false"
+            android:clickable="true"
+            android:src="@drawable/ic_add"
+            app:layout_anchorGravity="bottom|center_horizontal"
+            app:layout_anchor="@+id/empty_rv"
+            android:layout_gravity="top|center_horizontal" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
 
 </android.support.v4.widget.SwipeRefreshLayout>
