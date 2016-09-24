@@ -220,6 +220,7 @@ public class RootFragment extends Fragment implements Receiver {
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
 
+            autoRootToggle.setChecked(autoRootStatus);
             progressBar.setVisibility(View.GONE);
 
             rootStatusView.setVisibility(View.VISIBLE);
@@ -291,6 +292,7 @@ public class RootFragment extends Fragment implements Receiver {
                         rootStatus.setTextColor(green500);
                         rootStatus.setText(R.string.root_auto_unmounted);
                         rootToggle.setEnabled(false);
+                        autoRootToggle.setChecked(true);
                         safetyNetStatusIcon.setImageResource(statusOK);
                         safetyNetStatus.setText(R.string.root_auto_unmounted_info);
                         break;
