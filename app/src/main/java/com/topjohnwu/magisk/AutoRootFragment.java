@@ -122,7 +122,7 @@ public class AutoRootFragment extends ListFragment {
         for (ApplicationInfo info : list) {
             try {
                 if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
-                    if (!info.packageName.contains("topjohnwu")) {
+                    if (!info.packageName.contains("magisk")) {
                         applist.add(info);
                     }
                 }
