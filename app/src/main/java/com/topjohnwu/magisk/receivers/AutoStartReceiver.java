@@ -16,7 +16,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
         Intent myIntent = new Intent(context, MonitorService.class);
         context.startService(myIntent);
         if (PrefHelper.CheckBool("keep_root_off",context)) {
-            Utils.toggleRoot(false);
+            Utils.toggleRoot(false,context);
         }
         if (PrefHelper.CheckBool("enable_quicktile",context)) {
             Utils.SetupQuickSettingsTile(context);

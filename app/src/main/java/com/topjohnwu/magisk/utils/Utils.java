@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.service.quicksettings.TileService;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
@@ -30,8 +31,8 @@ import com.topjohnwu.magisk.RootFragment;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
-import com.topjohnwu.magisk.services.TileServiceNewApi;
 import com.topjohnwu.magisk.services.TileServiceCompat;
+import com.topjohnwu.magisk.services.TileServiceNewApi;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -71,10 +72,10 @@ public class Utils {
         if (!Shell.rootAccess()) {
             Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
-        if (PrefHelper.CheckBool("keep_root_off",context)) {
-            Utils.toggleRoot(false);
+        if (PrefHelper.CheckBool("keep_root_off", context)) {
+            Utils.toggleRoot(false, context);
         }
-        if (PrefHelper.CheckBool("enable_quicktile",context)) {
+        if (PrefHelper.CheckBool("enable_quicktile", context)) {
             Utils.SetupQuickSettingsTile(context);
         }
     }
@@ -114,39 +115,58 @@ public class Utils {
     }
 
     public static boolean removeFile(String path) {
+        boolean check;
         String command = "rm -f " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo false; else echo true; fi";
         if (!Shell.rootAccess()) {
             return false;
         } else {
-            return Boolean.parseBoolean(Shell.su(command).get(0));
+            try {
+                check = Boolean.parseBoolean(Shell.su(command).get(0));
+                return check;
+            } catch (NullPointerException e) {
+                Log.d("Magisk:", "SU error executing removeFile " + e);
+                return false;
+            }
         }
     }
 
-    public static void toggleRoot(Boolean b) {
+    public static void toggleRoot(Boolean b, Context context) {
         if (Utils.magiskVersion != -1) {
             if (b) {
                 Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
             } else {
                 Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
             }
-
+            if (PrefHelper.CheckBool("enable_quicktile", context)) {
+                SetupQuickSettingsTile(context);
+            }
+            PrefHelper.SetBool("root",b,context);
         }
     }
 
     public static void toggleAutoRoot(Boolean b, Context context) {
         if (Utils.magiskVersion != -1) {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
-            Intent myServiceIntent = new Intent(context, MonitorService.class);
-            if (b) {
-                context.startService(myServiceIntent);
+            if (!Utils.hasServicePermission(context)) {
+                Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                Toast.makeText(context, "Please enable Magisk in accessibility for auto-toggle work.", Toast.LENGTH_LONG).show();
+                context.startActivity(intent);
             } else {
-                context.stopService(myServiceIntent);
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
+                Intent myServiceIntent = new Intent(context, MonitorService.class);
+                if (b) {
+                    context.startService(myServiceIntent);
+                } else {
+                    context.stopService(myServiceIntent);
+                }
             }
+        }
+        if (PrefHelper.CheckBool("enable_quicktile", context)) {
+            SetupQuickSettingsTile(context);
         }
         UpdateRootFragmentUI(context);
     }
 
-    public static List<String> getModList(String path) {
+    static List<String> getModList(String path) {
         List<String> ret;
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
         if (Shell.rootAccess()) {
@@ -175,8 +195,18 @@ public class Utils {
         }
         File downloadFile, dir = new File(Environment.getExternalStorageDirectory() + "/MagiskManager");
         downloadFile = new File(dir + "/" + file);
-        if (!dir.exists()) dir.mkdir();
-        if (downloadFile.exists()) downloadFile.delete();
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                Toast.makeText(context, R.string.toast_error_makedir, Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        if (downloadFile.exists()) {
+            if (!downloadFile.delete()) {
+                Toast.makeText(context, R.string.toast_error_removing_files, Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
@@ -213,8 +243,10 @@ public class Utils {
     public static void SetupQuickSettingsTile(Context mContext) {
         Logger.dh("Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Logger.dh("Utils: Starting N quick settings service");
             Intent serviceIntent = new Intent(mContext, TileServiceNewApi.class);
             mContext.startService(serviceIntent);
+
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
             Logger.dh("Utils: Marshmallow build detected");
@@ -275,10 +307,8 @@ public class Utils {
 
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
-            List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
-            List<String> tiles2;
-            int tileSpace = Math.round(tiles.size()/2);
-            Logger.dh("Utils: Current Tile String is "+ tiles);
+            List<String> tiles = new LinkedList<>(Arrays.asList(lines.get(0).split(",")));
+            Logger.dh("Utils: Current Tile String is " + tiles);
             if (tiles.size() > 1) {
                 for (String tile : tiles) {
                     if (tile.equals(qsTileId)) {
@@ -287,9 +317,9 @@ public class Utils {
                     }
                 }
 
-                tiles.add(Math.round(tiles.size()/2), qsTileId);
+                tiles.add(Math.round(tiles.size() / 2), qsTileId);
                 String newTiles = TextUtils.join(",", tiles);
-                Logger.dh("Utils: NewtilesString is "+ newTiles);
+                Logger.dh("Utils: NewtilesString is " + newTiles);
                 Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
                 Toast.makeText(context, "Tile installed", Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
@@ -301,7 +331,6 @@ public class Utils {
         Toast.makeText(context, "Tile installation error", Toast.LENGTH_SHORT).show();
     }
 
-
     public static void uninstallTile(Context context) {
 
         String qsTileId;
@@ -312,7 +341,7 @@ public class Utils {
         }
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
-            List<String> tiles = new LinkedList<String>(Arrays.asList(lines.get(0).split(",")));
+            List<String> tiles = new LinkedList<>(Arrays.asList(lines.get(0).split(",")));
             if (tiles.size() > 1) {
                 boolean isPresent = false;
                 for (int i = 0; i < tiles.size(); i++) {
@@ -333,25 +362,20 @@ public class Utils {
                 }
                 Toast.makeText(context, "Tile already uninstalled", Toast.LENGTH_SHORT).show();
 
-
             }
         }
         Toast.makeText(context, "Tile uninstallation error", Toast.LENGTH_SHORT).show();
     }
 
-
-
-
     private static void refreshService(Context context) {
         context.startService(new Intent(context, TileServiceCompat.class));
     }
-
 
     public static void UpdateRootFragmentUI(Context context) {
 
         Logger.dh("Magisk", "Utils: UpdateRF called");
         Intent intent = new Intent(context, RootFragment.class);
-        intent.setAction("com.magisk.UPDATEUI");
+        intent.setAction("com.magisk.UPDATE");
         context.sendBroadcast(intent);
 
     }
@@ -452,7 +476,6 @@ public class Utils {
 
         public abstract void task(File file);
     }
-
 
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

@@ -39,6 +39,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     private final Handler mDrawerHandler = new Handler();
     private String currentTitle;
+    private String tag;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -73,6 +74,66 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
 
+        this.getFragmentManager().addOnBackStackChangedListener(
+                () -> {
+                    FragmentManager fragmentManager = getFragmentManager();
+                    Fragment hm=getFragmentManager().findFragmentByTag("root");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.root);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("autoroot");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.autoroot);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("magisk");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.magisk);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("modules");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.modules);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("downloads");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.downloads);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("log");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.log);
+                        }
+                    }
+                    hm=getFragmentManager().findFragmentByTag("settings");
+                    if(hm!=null)
+                    {
+                        if(hm.isVisible())
+                        {
+                            navigationView.setCheckedItem(R.id.settings);
+                        }
+                    }
+                });
 
 
 
@@ -170,7 +231,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     public void navigate(final int itemId) {
         Fragment navFragment = null;
-        String tag = "";
+        tag = "";
         switch (itemId) {
             case R.id.magisk:
                 setTitle(R.string.magisk);
@@ -183,8 +244,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                 navFragment = new RootFragment();
                 break;
             case R.id.autoroot:
-                setTitle(R.string.auto_toggle);
-                tag = "ic_autoroot";
+                setTitle(R.string.auto_toggle_apps);
+                tag = "autoroot";
                 navFragment = new AutoRootFragment();
                 break;
             case R.id.modules:

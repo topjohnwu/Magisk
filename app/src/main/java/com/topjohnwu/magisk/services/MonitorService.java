@@ -111,9 +111,9 @@ public class MonitorService extends AccessibilityService {
         String rootString = rootToggle ? "on" : "off";
         if (Utils.rootEnabled() != rootToggle) {
             Logger.dh("MonitorService: toggling root " + rootString);
-            Utils.toggleRoot(rootToggle);
+            Utils.toggleRoot(rootToggle,getApplicationContext());
             if (Utils.rootEnabled() != rootToggle) {
-                Utils.toggleRoot(rootToggle);
+                Utils.toggleRoot(rootToggle,getApplicationContext());
                 Logger.dh("MonitorService: FORCING to " + rootString);
             }
 
@@ -122,9 +122,9 @@ public class MonitorService extends AccessibilityService {
 
     private void ForceEnableRoot() {
         Log.d("Magisk", "MonitorService: ForceEnable called.");
-        Utils.toggleRoot(true);
+        Utils.toggleRoot(true,getApplicationContext());
         if (!Utils.rootEnabled()) {
-            Utils.toggleRoot(true);
+            Utils.toggleRoot(true,getApplicationContext());
         }
     }
 

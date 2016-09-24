@@ -75,7 +75,7 @@ public class TileServiceCompat extends Service {
     private void onSimpleClick() {
 		updateRoots();
         updateTile();
-        Utils.toggleRoot(!root);
+        Utils.toggleRoot(!root,getApplicationContext());
     }
 
     private void onLongClick() {

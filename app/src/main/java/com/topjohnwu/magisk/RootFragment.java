@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.receivers.Receiver;
 import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -88,6 +89,7 @@ public class RootFragment extends Fragment implements Receiver {
 
     private boolean autoRootStatus;
     private View view;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Nullable
     @Override
@@ -107,8 +109,8 @@ public class RootFragment extends Fragment implements Receiver {
         new updateUI().execute();
 
         rootToggle.setOnClickListener(toggle -> {
-            Utils.toggleRoot(((CompoundButton) toggle).isChecked());
-            new updateUI().execute();
+            Utils.toggleRoot(((CompoundButton) toggle).isChecked(), getActivity());
+
         });
 
         autoRootToggle.setOnClickListener(toggle -> {
@@ -121,29 +123,34 @@ public class RootFragment extends Fragment implements Receiver {
 
                     }
                 }
+
         );
+
+        listener = (prefs1, key) -> {
+
+
+            if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
+                Logger.dh("RootFragmnet, keychange detected for " + key);
+                new updateUI().execute();
+            }
+
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(listener);
 
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
             new updateUI().execute();
         });
 
-//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
-//                new IntentFilter("com.magisk.UPDATEUI"));
-
         return view;
     }
 
-//    private final BroadcastReceiver mYourBroadcastReceiver = new RootFragmentReceiver(Re) {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//
-//            Log.d("Magisk", "RootFragment: UpdateRF called and fired");
-//            new updateUI().execute();
-//        }
-//
-//
-//    };
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -158,9 +165,6 @@ public class RootFragment extends Fragment implements Receiver {
                 Snackbar.make(view, getActivity().getString(R.string.auto_toggle) + " disabled, permissions required.", Snackbar.LENGTH_LONG).show();
             }
 
-        } else if (requestCode == 420) {
-            Log.d("Magisk", "Got result code OK for UI update.");
-            new updateUI().execute();
         }
     }
 
@@ -182,7 +186,7 @@ public class RootFragment extends Fragment implements Receiver {
             rootToggle.setEnabled(true);
         }
 
-        new updateUI().execute();
+
 
     }
 
@@ -190,7 +194,6 @@ public class RootFragment extends Fragment implements Receiver {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Root");
-
         new updateUI().execute();
     }
 
@@ -209,6 +212,7 @@ public class RootFragment extends Fragment implements Receiver {
             if (PrefHelper.CheckBool("enable_quicktile", getActivity())) {
                 Utils.SetupQuickSettingsTile(getActivity());
             }
+            autoRootStatus = Utils.autoToggleEnabled(getActivity());
             return null;
         }
 

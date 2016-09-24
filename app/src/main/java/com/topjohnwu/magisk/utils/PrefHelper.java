@@ -15,6 +15,11 @@ public class PrefHelper {
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(key, false);
     }
 
+    public static void SetBool(String key, Boolean value, Context context) {
+
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(key, value).commit();
+    }
+
 
 
 }

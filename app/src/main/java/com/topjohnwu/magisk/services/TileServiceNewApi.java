@@ -1,94 +1,102 @@
 package com.topjohnwu.magisk.services;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.graphics.drawable.Icon;
-import android.preference.PreferenceManager;
 import android.service.quicksettings.Tile;
-import android.util.Log;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 @SuppressLint("NewApi")
-public class TileServiceNewApi extends android.service.quicksettings.TileService implements
-        SharedPreferences.OnSharedPreferenceChangeListener {
-    private int STATE_CURRENT;
+public class TileServiceNewApi extends android.service.quicksettings.TileService {
+    private int mRootsState;
 
     public TileServiceNewApi() {
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Logger.dh("QST (New): Service start");
+        return super.onStartCommand(intent, flags, startId);
 
+    }
 
     @Override
     public void onTileAdded() {
         super.onTileAdded();
+        Logger.dh("QST (New): Tile added");
         setupState();
         this.getQsTile().updateTile();
     }
 
     @Override
     public void onClick() {
-        switchState();
-        this.getQsTile().updateTile();
+        mRootsState = Utils.CheckRootsState(getApplicationContext());
+        switchState(mRootsState);
+        Logger.dh("QST (New): Tile clicked");
+    }
 
+
+    @Override
+    public void onStartListening() {
+        super.onStartListening();
+        setupState();
+        Logger.dh("QST (New): Tile is listening");
+    }
+
+    @Override
+    public void onStopListening() {
+        super.onStopListening();
+        Logger.dh("QST (New): Tile stopped listening");
     }
 
     private void setupState() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        preferences.registerOnSharedPreferenceChangeListener(this);
-        Logger.dh("TileService(New): SetupState");
+        mRootsState = Utils.CheckRootsState(getApplicationContext());
+        Logger.dh("QST (New): SetupState");
         Icon iconRoot = Icon.createWithResource(getApplicationContext(), R.drawable.root);
         Icon iconAuto = Icon.createWithResource(getApplicationContext(), R.drawable.ic_autoroot);
-        Tile tile = this.getQsTile();
-        boolean autoRootStatus = Utils.autoToggleEnabled(getApplicationContext());
-        boolean rootStatus = Utils.rootEnabled();
-        int rootsStatus = Utils.CheckRootsState(getApplicationContext());
-        Log.d("Magisk", "QST: Auto and root are " + autoRootStatus + " and " + rootStatus + Utils.CheckRootsState(getApplicationContext()));
-        if (rootsStatus == 2) {
-            tile.setLabel(getApplicationContext().getString(R.string.auto_toggle));
-            tile.setIcon(iconAuto);
-            tile.setState(Tile.STATE_ACTIVE);
+        Tile tile = getQsTile();
+        Logger.dh("QST: State is " + mRootsState);
+        switch (mRootsState) {
+            case 2:
+                tile.setLabel(getApplicationContext().getString(R.string.auto_toggle));
+                tile.setIcon(iconAuto);
+                tile.setState(Tile.STATE_ACTIVE);
+                break;
 
-        } else if (rootsStatus == 1) {
-            tile.setLabel("Root enabled");
-            tile.setIcon(iconRoot);
-            tile.setState(Tile.STATE_ACTIVE);
+            case 1:
+                tile.setLabel("Root enabled");
+                tile.setIcon(iconRoot);
+                tile.setState(Tile.STATE_ACTIVE);
+                break;
 
-
-        } else {
-            tile.setLabel("Root disabled");
-            tile.setIcon(iconRoot);
-            tile.setState(Tile.STATE_INACTIVE);
-
-
+            default:
+                tile.setLabel("Root disabled");
+                tile.setIcon(iconRoot);
+                tile.setState(Tile.STATE_INACTIVE);
+                break;
         }
 
         tile.updateTile();
     }
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,String key)
-    {
-        Logger.dh("TileService: Key Change registered for " + key);
-        if (key.equals("autoRootEnable")) {
+    private void switchState(int rootsState) {
 
-        }
-    }
-
-    private void switchState() {
-        switch (Utils.CheckRootsState(getApplicationContext())) {
+        switch (rootsState) {
             case 2:
-                Utils.toggleRoot(true);
+                Utils.toggleRoot(true, getApplicationContext());
                 Utils.toggleAutoRoot(false, getApplicationContext());
                 break;
             case 1:
-                Utils.toggleRoot(false);
+                Utils.toggleRoot(false, getApplicationContext());
                 break;
             case 0:
                 Utils.toggleAutoRoot(true, getApplicationContext());
                 break;
         }
+        this.onStartListening();
         setupState();
 
     }

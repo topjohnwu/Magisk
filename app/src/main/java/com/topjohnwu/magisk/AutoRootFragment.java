@@ -62,7 +62,7 @@ public class AutoRootFragment extends ListFragment {
         super.onResume();
         initializeElements();
             super.onResume();
-            getActivity().setTitle("Auto-toggle");
+            getActivity().setTitle(R.string.auto_toggle_apps);
 
 
     }
