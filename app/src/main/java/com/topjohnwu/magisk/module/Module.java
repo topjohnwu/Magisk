@@ -110,6 +110,16 @@ public class Module extends BaseModule {
 
     }
 
+    public void checkUpdate() {
+        Repo repo = RepoHelper.repoMap.get(mId);
+        if (repo != null) {
+            repo.setInstalled();
+            if (repo.getVersionCode() > mVersionCode) {
+                repo.setUpdate();
+            }
+        }
+    }
+
     public String getmLogUrl() {return mLogUrl; }
 
     public void createDisableFile() {

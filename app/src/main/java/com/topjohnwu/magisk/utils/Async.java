@@ -227,6 +227,7 @@ public class Async {
         protected Void doInBackground(Void... voids) {
             ReposFragment.mListRepos.clear();
             RepoHelper.createRepoMap(mContext);
+            RepoHelper.checkUpdate();
             ReposFragment.mListRepos = RepoHelper.getSortedList();
             return null;
         }

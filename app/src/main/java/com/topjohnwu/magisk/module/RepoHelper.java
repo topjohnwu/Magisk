@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
@@ -75,6 +76,12 @@ public class RepoHelper {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(key, jsonString);
             editor.apply();
+        }
+    }
+
+    public static void checkUpdate() {
+        for (Module module : ModulesFragment.listModules) {
+            module.checkUpdate();
         }
     }
 
