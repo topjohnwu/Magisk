@@ -32,7 +32,7 @@
     <string name="root_enabled_info">Root enabled. Safety Net (Android Pay) will NOT work</string>
     <string name="root_disabled">Root disabled</string>
     <string name="root_disabled_info">Safety Net (Android Pay) should work, but no root temporarily\nYou might need to manually add a card in Android Pay app to refresh the root status of AP</string>
-    <string name="root_auto_unmounted">Root set to auto-mount</string>
+    <string name="root_auto_unmounted">Root set to auto-toggle</string>
     <string name="root_auto_unmounted_info">Root will auto unmount for selected applications.  Safety Net (Android Pay) should work.</string>
     <string name="root_system">Magisk Incompatible Root Detected</string>
     <string name="root_system_info">Root improperly installed. Safety Net (Android Pay) will NOT work, and impossible to toggle.</string>

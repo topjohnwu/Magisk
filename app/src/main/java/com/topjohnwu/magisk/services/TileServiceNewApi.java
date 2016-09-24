@@ -87,12 +87,20 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
         switch (rootsState) {
             case 2:
                 Utils.toggleRoot(true, getApplicationContext());
+                if (!Utils.hasServicePermission(getApplicationContext())) {
+                    Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                    sendBroadcast(it);
+                }
                 Utils.toggleAutoRoot(false, getApplicationContext());
                 break;
             case 1:
                 Utils.toggleRoot(false, getApplicationContext());
                 break;
             case 0:
+                if (!Utils.hasServicePermission(getApplicationContext())) {
+                    Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                    sendBroadcast(it);
+                }
                 Utils.toggleAutoRoot(true, getApplicationContext());
                 break;
         }
