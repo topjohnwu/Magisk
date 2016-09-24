@@ -15,8 +15,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.WelcomeActivity;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Utils;
@@ -112,7 +112,7 @@ public class MonitorService extends AccessibilityService {
         if (!PrefHelper.CheckBool("hide_root_notification", getApplicationContext())) {
             if (rootAction) {
 
-                Intent intent = new Intent(getApplication(), WelcomeActivity.class);
+                Intent intent = new Intent(getApplication(), MainActivity.class);
                 intent.putExtra("relaunch", "relaunch");
                 String rootMessage;
                 PendingIntent pendingIntent = PendingIntent.getActivity(

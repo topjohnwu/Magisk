@@ -5,11 +5,9 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -22,15 +20,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.services.MonitorService;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class WelcomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
@@ -50,19 +46,11 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_welcome);
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         // Startups
-        PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
-        if (Utils.autoToggleEnabled(getApplicationContext())) {
-            if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
-                Intent myIntent = new Intent(getApplication(), MonitorService.class);
-                getApplication().startService(myIntent);
-            }
-        }
-        Utils.SetupQuickSettingsTile(getApplicationContext());
-
+        Utils.init(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
@@ -113,11 +101,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
                         }
                     }
                 });
-
-        Utils.init(this);
-        new Async.CheckUpdates(this).execute();
-        new Async.LoadModules(this).execute();
-        new Async.LoadRepos(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         setSupportActionBar(toolbar);
 

@@ -70,17 +70,6 @@ public class AutoRootFragment extends ListFragment {
     private void initializeElements() {
         listView = getListView();
         packageManager = getActivity().getPackageManager();
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (!prefs.contains("auto_blacklist")) {
-            Logger.dh("AutoRootFragment: Setting default preferences for application");
-            SharedPreferences.Editor editor = prefs.edit();
-            Set<String> set = new HashSet<>();
-            set.add("com.google.android.apps.walletnfcrel");
-            set.add("com.google.android.gms");
-            set.add("com.google.commerce.tapandpay");
-            editor.putStringSet("auto_blacklist", set);
-            editor.apply();
-        }
         new LoadApplications().execute();
     }
 

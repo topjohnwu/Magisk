@@ -24,4 +24,8 @@
     <style name="AppTheme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
     </style>
 
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
+    </style>
+
 </resources>
