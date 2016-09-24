@@ -16,10 +16,6 @@ import butterknife.ButterKnife;
 
 public class SettingsFragment extends PreferenceFragment {
     private CheckBoxPreference quickTilePreference;
-    private CheckBoxPreference devLogPreference;
-    private CheckBoxPreference keepRootOffPreference;
-    private CheckBoxPreference hideRootNotificationPreference;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,9 +37,8 @@ public class SettingsFragment extends PreferenceFragment {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         ButterKnife.bind(this, view);
         quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile");
-        devLogPreference = (CheckBoxPreference) findPreference("developer_logging");
-        keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
-        hideRootNotificationPreference = (CheckBoxPreference) findPreference("hide_root_notification");
+        CheckBoxPreference keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
+        CheckBoxPreference hideRootNotificationPreference = (CheckBoxPreference) findPreference("hide_root_notification");
 
         if (Utils.magiskVersion == -1) {
             quickTilePreference.setEnabled(false);
@@ -65,18 +60,7 @@ public class SettingsFragment extends PreferenceFragment {
                 }
 
             }
-            if (preference == devLogPreference) {
-                boolean isChecked = devLogPreference.isChecked();
 
-            }
-            if (preference == keepRootOffPreference) {
-                boolean isChecked = devLogPreference.isChecked();
-
-            }
-            if (preference == hideRootNotificationPreference) {
-                boolean isChecked = devLogPreference.isChecked();
-
-            }
             return false;
         };
 

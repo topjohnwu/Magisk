@@ -24,9 +24,7 @@ public WebWindow(String title, String url, Context context) {
     });
 
     alert.setView(wv);
-    alert.setNegativeButton("Close", (dialog, id) -> {
-        dialog.dismiss();
-    });
+    alert.setNegativeButton("Close", (dialog, id) -> dialog.dismiss());
     alert.show();
 }
 
