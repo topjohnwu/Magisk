@@ -21,7 +21,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.receivers.Receiver;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.PrefHelper;
@@ -35,7 +34,7 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RootFragment extends Fragment implements Receiver {
+public class RootFragment extends Fragment {
 
     public SharedPreferences prefs;
     @BindView(R.id.progressBar)
@@ -108,10 +107,7 @@ public class RootFragment extends Fragment implements Receiver {
         autoRootToggle.setChecked(autoRootStatus);
         new updateUI().execute();
 
-        rootToggle.setOnClickListener(toggle -> {
-            Utils.toggleRoot(((CompoundButton) toggle).isChecked(), getActivity());
-
-        });
+        rootToggle.setOnClickListener(toggle -> Utils.toggleRoot(((CompoundButton) toggle).isChecked(), getActivity()));
 
         autoRootToggle.setOnClickListener(toggle -> {
                     if (!Utils.hasServicePermission(getActivity())) {
@@ -127,7 +123,6 @@ public class RootFragment extends Fragment implements Receiver {
         );
 
         listener = (prefs1, key) -> {
-
 
             if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
                 Logger.dh("RootFragmnet, keychange detected for " + key);
@@ -186,8 +181,6 @@ public class RootFragment extends Fragment implements Receiver {
             rootToggle.setEnabled(true);
         }
 
-
-
     }
 
     @Override
@@ -195,11 +188,6 @@ public class RootFragment extends Fragment implements Receiver {
         super.onResume();
         getActivity().setTitle("Root");
         new updateUI().execute();
-    }
-
-    @Override
-    public void onResult() {
-
     }
 
     public class updateUI extends AsyncTask<Void, Void, Void> {
@@ -219,10 +207,8 @@ public class RootFragment extends Fragment implements Receiver {
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
-
             autoRootToggle.setChecked(autoRootStatus);
             progressBar.setVisibility(View.GONE);
-
             rootStatusView.setVisibility(View.VISIBLE);
             safetynetStatusView.setVisibility(View.VISIBLE);
             selinuxStatusView.setVisibility(View.VISIBLE);

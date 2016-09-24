@@ -293,6 +293,7 @@ public class Utils {
                     .setVisible(true)
                     .build();
             mContext.sendBroadcast(tileConfigurationIntent);
+            mContext.startService(new Intent(mContext, TileServiceCompat.class));
 
         }
     }

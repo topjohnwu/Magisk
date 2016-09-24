@@ -2,10 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -24,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
@@ -39,7 +36,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     private final Handler mDrawerHandler = new Handler();
     private String currentTitle;
-    private String tag;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -57,10 +53,8 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         setContentView(R.layout.activity_welcome);
         ButterKnife.bind(this);
 
-
         // Startups
         PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (Utils.autoToggleEnabled(getApplicationContext())) {
             if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
                 Intent myIntent = new Intent(getApplication(), MonitorService.class);
@@ -76,72 +70,52 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
         this.getFragmentManager().addOnBackStackChangedListener(
                 () -> {
-                    FragmentManager fragmentManager = getFragmentManager();
-                    Fragment hm=getFragmentManager().findFragmentByTag("root");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    Fragment hm = getFragmentManager().findFragmentByTag("root");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.root);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("autoroot");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("autoroot");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.autoroot);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("magisk");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("magisk");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.magisk);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("modules");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("modules");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.modules);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("downloads");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("downloads");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.downloads);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("log");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("log");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.log);
                         }
                     }
-                    hm=getFragmentManager().findFragmentByTag("settings");
-                    if(hm!=null)
-                    {
-                        if(hm.isVisible())
-                        {
+                    hm = getFragmentManager().findFragmentByTag("settings");
+                    if (hm != null) {
+                        if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.settings);
                         }
                     }
                 });
 
-
-
         Utils.init(this);
         new Async.CheckUpdates(this).execute();
-        RepoHelper.TaskDelegate delegate = result -> {
-            //Do a thing here when we get a result we want
-        };
         new Async.LoadModules(this).execute();
         new Async.LoadRepos(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -178,7 +152,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -195,21 +168,17 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
     @Override
     public void onBackPressed() {
 
-
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
             Logger.dh("Welcomeactivity: Entrycount is " + backStackEntryCount);
-            if(backStackEntryCount>=2) {
+            if (backStackEntryCount >= 2) {
                 super.onBackPressed();
             } else {
                 finish();
             }
         }
-
-
-
 
     }
 
@@ -231,7 +200,7 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
 
     public void navigate(final int itemId) {
         Fragment navFragment = null;
-        tag = "";
+        String tag = "";
         switch (itemId) {
             case R.id.magisk:
                 setTitle(R.string.magisk);
@@ -274,7 +243,6 @@ public class WelcomeActivity extends AppCompatActivity implements NavigationView
         }
 
         if (navFragment != null) {
-
 
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);

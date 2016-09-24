@@ -77,6 +77,7 @@ public class AutoRootFragment extends ListFragment {
             Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");
             set.add("com.google.android.gms");
+            set.add("com.google.commerce.tapandpay");
             editor.putStringSet("auto_blacklist", set);
             editor.apply();
         }

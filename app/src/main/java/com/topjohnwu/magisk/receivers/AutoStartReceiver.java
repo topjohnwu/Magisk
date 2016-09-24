@@ -20,6 +20,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
         }
         if (PrefHelper.CheckBool("enable_quicktile",context)) {
             Utils.SetupQuickSettingsTile(context);
+
         }
 
 

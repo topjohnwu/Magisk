@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -25,7 +24,6 @@ import com.topjohnwu.magisk.utils.Utils;
 import java.util.Set;
 
 public class MonitorService extends AccessibilityService {
-    private static final String TAG = "MonitorService";
     private Boolean disableroot;
 
     @Override
@@ -64,22 +62,18 @@ public class MonitorService extends AccessibilityService {
                     event.getPackageName().toString(),
                     event.getClassName().toString()
             );
+            Logger.dh("MonitorService: CurrentActivity: " + event.getPackageName());
 
-            ActivityInfo activityInfo = tryGetActivity(componentName);
-            boolean isActivity = activityInfo != null;
-            if (isActivity) {
-                Logger.dh("MonitorService: CurrentActivity: " + componentName.getPackageName());
-                String mPackage = componentName.getPackageName();
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                if (Utils.autoToggleEnabled(getApplicationContext())) {
-                    Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
+            String mPackage = componentName.getPackageName();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            if (Utils.autoToggleEnabled(getApplicationContext())) {
+                Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
 
-                    if (setBlackList != null) {
-                        disableroot = setBlackList.contains(mPackage);
-                        ForceRoot(!disableroot);
-                        String appFriendly = getAppName(mPackage);
-                        ShowNotification(disableroot, appFriendly);
-                    }
+                if (setBlackList != null) {
+                    disableroot = setBlackList.contains(mPackage);
+                    ForceRoot(!disableroot);
+                    String appFriendly = getAppName(mPackage);
+                    ShowNotification(disableroot, appFriendly);
                 }
             }
         }
@@ -98,33 +92,17 @@ public class MonitorService extends AccessibilityService {
         }
     }
 
-    private ActivityInfo tryGetActivity(ComponentName componentName) {
-        try {
-            return getPackageManager().getActivityInfo(componentName, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        }
-    }
-
     private void ForceRoot(Boolean rootToggle) {
 
         String rootString = rootToggle ? "on" : "off";
         if (Utils.rootEnabled() != rootToggle) {
             Logger.dh("MonitorService: toggling root " + rootString);
-            Utils.toggleRoot(rootToggle,getApplicationContext());
+            Utils.toggleRoot(rootToggle, getApplicationContext());
             if (Utils.rootEnabled() != rootToggle) {
-                Utils.toggleRoot(rootToggle,getApplicationContext());
+                Utils.toggleRoot(rootToggle, getApplicationContext());
                 Logger.dh("MonitorService: FORCING to " + rootString);
             }
 
-        }
-    }
-
-    private void ForceEnableRoot() {
-        Log.d("Magisk", "MonitorService: ForceEnable called.");
-        Utils.toggleRoot(true,getApplicationContext());
-        if (!Utils.rootEnabled()) {
-            Utils.toggleRoot(true,getApplicationContext());
         }
     }
 

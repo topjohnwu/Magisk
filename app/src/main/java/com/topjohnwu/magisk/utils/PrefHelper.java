@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-
-import android.app.Application;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
@@ -17,7 +15,7 @@ public class PrefHelper {
 
     public static void SetBool(String key, Boolean value, Context context) {
 
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(key, value).commit();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(key, value).apply();
     }
 
 
