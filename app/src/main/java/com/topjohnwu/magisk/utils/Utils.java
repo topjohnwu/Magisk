@@ -149,6 +149,7 @@ public class Utils {
             if (!Utils.hasServicePermission(context)) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 Toast.makeText(context, "Please enable Magisk in accessibility for auto-toggle work.", Toast.LENGTH_LONG).show();
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             } else {
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
