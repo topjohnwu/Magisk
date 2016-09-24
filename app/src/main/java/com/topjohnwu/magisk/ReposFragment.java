@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
+import com.wooplr.spotlight.SpotlightView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.topjohnwu.magisk.R.menu.drawer;
 
 public class ReposFragment extends Fragment {
 
@@ -74,6 +78,7 @@ public class ReposFragment extends Fragment {
         CheckForUpdates();
         Log.d("Magisk", "ReposFragment: ListRepos size is " + listRepos().size());
         recyclerView.setAdapter(new ReposAdapter(this, mListRepos));
+
         return view;
     }
 

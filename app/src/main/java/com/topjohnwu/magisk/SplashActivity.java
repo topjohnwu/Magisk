@@ -20,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         //setups go here
 
         // Set up default preferences,make sure we add "extra" blacklist entries.
@@ -63,7 +64,7 @@ public class SplashActivity extends AppCompatActivity {
         // Start main activity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        
+
         finish();
     }
 }

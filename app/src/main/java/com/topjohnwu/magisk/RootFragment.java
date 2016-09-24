@@ -1,15 +1,19 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +25,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.PrefHelper;
@@ -138,6 +144,7 @@ public class RootFragment extends Fragment {
             new updateUI().execute();
         });
 
+
         return view;
     }
 
@@ -146,6 +153,8 @@ public class RootFragment extends Fragment {
         super.onDestroy();
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -188,6 +197,7 @@ public class RootFragment extends Fragment {
         super.onResume();
         getActivity().setTitle("Root");
         new updateUI().execute();
+
     }
 
     public class updateUI extends AsyncTask<Void, Void, Void> {

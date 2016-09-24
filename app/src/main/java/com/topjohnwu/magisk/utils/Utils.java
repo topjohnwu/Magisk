@@ -145,6 +145,7 @@ public class Utils {
     }
 
     public static void toggleAutoRoot(Boolean b, Context context) {
+        Logger.dh("Utils: toggleAutocalled for " + b );
         if (Utils.magiskVersion != -1) {
             if (!Utils.hasServicePermission(context)) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -152,6 +153,7 @@ public class Utils {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             } else {
+                Logger.dh("Utils: toggleAuto checks passed, setting" + b );
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
                 Intent myServiceIntent = new Intent(context, MonitorService.class);
                 if (b) {

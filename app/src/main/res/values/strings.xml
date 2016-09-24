@@ -113,14 +113,14 @@
     <string name="settings_quicksettings_category">Quick Settings</string>
     <string name="settings_enable_quicktile_title">Enable Quicksettings Tile</string>
     <string name="settings_enable_quicktile_summary">Click here to enable or disable the quick settings tile.</string>
-    <string name="settings_keep_root_off_summary">Disable root unless otherwise enabled by Auto-root or toggle.</string>
+    <string name="settings_keep_root_off_summary">Disable root unless otherwise enabled by auto-toggle or toggle.</string>
     <string name="settings_keep_root_off_title">Keep root turned off</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
     <string name="settings_root_category">Root</string>
     <string name="settings_development_category">Development</string>
-    <string name="settings_hide_root_notification_summary">When checked, auto-root notifications will not be displayed.</string>
-    <string name="settings_hide_root_notification_title">Hide auto-root notifications</string>
+    <string name="settings_hide_root_notification_summary">When checked, auto-toggle notifications will not be displayed.</string>
+    <string name="settings_hide_root_notification_title">Hide auto-toggle notifications</string>
 
     <!--General Use -->
     <string name="auto_toggle">Auto-toggle</string>

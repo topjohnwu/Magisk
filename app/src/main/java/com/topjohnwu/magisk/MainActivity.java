@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,9 +20,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final Handler mDrawerHandler = new Handler();
     private String currentTitle;
+    private View mView;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -100,7 +104,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             navigationView.setCheckedItem(R.id.settings);
                         }
                     }
-                });
+                }
+
+        );
 
         setSupportActionBar(toolbar);
 
@@ -130,14 +136,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+        mView = getToolbarNavigationButton();
         if (getIntent().hasExtra("relaunch")) {
             navigate(R.id.root);
         }
+    startTour();
+    }
+
+    public ImageButton getToolbarNavigationButton() {
+        int size = toolbar.getChildCount();
+        for (int i = 0; i < size; i++) {
+            View child = toolbar.getChildAt(i);
+            if (child instanceof ImageButton) {
+                ImageButton btn = (ImageButton) child;
+                if (btn.getDrawable() == toolbar.getNavigationIcon()) {
+                    return btn;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+    }
+
+    private void startTour() {
+        navigate(R.id.root);
 
     }
 

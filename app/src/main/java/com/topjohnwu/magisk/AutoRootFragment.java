@@ -36,6 +36,7 @@ public class AutoRootFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         View view = inflater.inflate(R.layout.auto_root_fragment, container, false);
         int horizontalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
         int verticalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
