@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
@@ -63,6 +64,23 @@ public class SplashActivity extends AppCompatActivity {
         Utils.SetupQuickSettingsTile(getApplicationContext());
 
         // Initialize
+
+
+            if (Shell.rootAccess()) {
+                if (!Utils.busyboxInstalled()) {
+                    String busybox = getApplicationContext().getApplicationInfo().nativeLibraryDir + "/libbusybox.so";
+                    Shell.su(
+                            "rm -rf /data/busybox",
+                            "mkdir -p /data/busybox",
+                            "cp -af " + busybox + " /data/busybox/busybox",
+                            "chmod 755 /data/busybox /data/busybox/busybox",
+                            "chcon u:object_r:system_file:s0 /data/busybox /data/busybox/busybox",
+                            "/data/busybox/busybox --install -s /data/busybox",
+                            "rm -f /data/busybox/su",
+                            "export PATH=/data/busybox:$PATH"
+                    );
+                }
+            }
 
         new Async.CheckUpdates(this).execute();
         new Async.LoadModules(this).execute();

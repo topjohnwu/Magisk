@@ -91,6 +91,17 @@ public class Utils {
         return Boolean.parseBoolean(ret.get(0));
     }
 
+    public static boolean busyboxInstalled() {
+        List<String> ret;
+        String command = "if [ -d /data/busybox ]; then echo true; else echo false; fi";
+        if (Shell.rootAccess()) {
+            ret = Shell.su(command);
+        } else {
+            ret = Shell.sh(command);
+        }
+        return Boolean.parseBoolean(ret.get(0));
+    }
+
     public static boolean rootEnabled() {
         List<String> ret;
         String command = "if [ -z $(which su) ]; then echo false; else echo true; fi";
