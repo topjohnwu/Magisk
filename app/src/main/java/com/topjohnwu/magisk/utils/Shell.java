@@ -68,23 +68,6 @@ public class Shell {
         return rootStatus > 0;
     }
 
-
-    public static boolean GetRootStatus() {
-        if (Shell.sh("which su").contains("su")) {
-            Shell.su(("setprop magisk.root 0"));
-        }
-        try {
-            String rootStatus = Shell.su("getprop magisk.root").toString();
-            return Integer.valueOf(rootStatus).equals(1);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
-
-    
-
     public static List<String> sh(String... commands) {
         List<String> res = Collections.synchronizedList(new ArrayList<String>());
 
@@ -126,46 +109,92 @@ public class Shell {
         return res;
     }
 
+    // Run with the same shell by default
     public static List<String> su(String... commands) {
+        return su(false, commands);
+    }
 
-        if(!Shell.rootAccess()) return null;
+    public static List<String> su(boolean newShell, String... commands) {
+        List<String> res;
+        Process process;
+        DataOutputStream STDIN;
+        StreamGobbler STDOUT;
 
-        rootOutList.clear();
+        if (newShell) {
+            res = Collections.synchronizedList(new ArrayList<String>());
+            try {
+                process = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
+                STDIN = new DataOutputStream(process.getOutputStream());
+                STDOUT = new StreamGobbler(process.getInputStream(), res);
+            } catch (IOException e) {
+                try {
+                    // Improper root
+                    process = Runtime.getRuntime().exec("su");
+                    STDIN = new DataOutputStream(process.getOutputStream());
+                    STDOUT = new StreamGobbler(process.getInputStream(), res);
+                } catch (IOException err) {
+                    return null;
+                }
+            }
+            STDOUT.start();
+        } else {
+            process = rootShell;
+            STDIN = rootSTDIN;
+            STDOUT = rootSTDOUT;
+            res = rootOutList;
+            res.clear();
+        }
 
         try {
             for (String write : commands) {
-                rootSTDIN.write((write + "\n").getBytes("UTF-8"));
-                rootSTDIN.flush();
+                STDIN.write((write + "\n").getBytes("UTF-8"));
+                STDIN.flush();
             }
-            rootSTDIN.write(("echo \' \'\n").getBytes("UTF-8"));
-            rootSTDIN.flush();
-            rootSTDIN.write(("echo \'-done-\'\n").getBytes("UTF-8"));
-            rootSTDIN.flush();
+            if (newShell) {
+                STDIN.write("exit\n".getBytes("UTF-8"));
+                STDIN.flush();
+                process.waitFor();
+
+                try {
+                    STDIN.close();
+                } catch (IOException ignore) {
+                    // might be closed already
+                }
+
+                STDOUT.join();
+                process.destroy();
+            } else {
+                STDIN.write(("echo \' \'\n").getBytes("UTF-8"));
+                STDIN.flush();
+                STDIN.write(("echo \'-done-\'\n").getBytes("UTF-8"));
+                STDIN.flush();
+                while (true) {
+                    try {
+                        // Process terminated, it means the interactive shell has some issues
+                        process.exitValue();
+                        return null;
+                    } catch (IllegalThreadStateException e) {
+                        // Process still running, gobble output until done
+                        int end = res.size() - 1;
+                        if (end > 0) {
+                            if (res.get(end).equals("-done-")) {
+                                res.remove(end);
+                                res.remove(end - 1);
+                                break;
+                            }
+                        }
+                        try { STDOUT.join(100); } catch (InterruptedException err) { return null; }
+                    }
+                }
+            }
         } catch (IOException e) {
             if (!e.getMessage().contains("EPIPE")) {
                 return null;
             }
+        } catch(InterruptedException e) {
+            return null;
         }
 
-        while (true) {
-            try {
-                // Process terminated, it means the interactive shell cannot be initialized
-                rootShell.exitValue();
-                return null;
-            } catch (IllegalThreadStateException e) {
-                // Process still running, gobble output until done
-                int end = rootOutList.size() - 1;
-                if (rootOutList != null && end > 0) {
-                    if (rootOutList.get(end).equals("-done-")) {
-                        rootOutList.remove(end);
-                        rootOutList.remove(end - 1);
-                        break;
-                    }
-                }
-                try { rootSTDOUT.join(100); } catch (InterruptedException err) { return null; }
-            }
-        }
-
-        return new ArrayList<>(rootOutList);
+        return new ArrayList<>(res);
     }
 }

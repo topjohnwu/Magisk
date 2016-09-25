@@ -62,8 +62,8 @@ public class ModulesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
 
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadModules(getActivity()).execute();
-            new updateUI().execute();
+            new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
             prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
 
         });
@@ -76,7 +76,7 @@ public class ModulesFragment extends Fragment {
             }
         });
 
-        new updateUI().execute();
+        new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         return viewMain;
     }
@@ -88,7 +88,7 @@ public class ModulesFragment extends Fragment {
             final Uri uri = data.getData();
             try {
                 // Get the file path from the URI
-                new Async.FlashZIP(getActivity(), uri).execute();
+                new Async.FlashZIP(getActivity(), uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                 FileInfo fileInfo = FileUtils.getFileInfo(getActivity(), uri);
 
             } catch (Exception e) {

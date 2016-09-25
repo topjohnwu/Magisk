@@ -33,14 +33,12 @@ public class WebRequest {
      * @requestmethod - http request method
      */
     public static String makeWebServiceCall(String url, int requestmethod) {
-        Log.d("Magisk","WebRequest: Service call received for URL " + url);
         return makeWebServiceCall(url, requestmethod, null, false);
 
 
     }
 
     public static String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
-        Log.d("Magisk","WebRequest: Service call(bool) received for URL " + url);
         return makeWebServiceCall(url, requestmethod, null, addNewLines);
 
     }
@@ -54,6 +52,7 @@ public class WebRequest {
      */
     public static String makeWebServiceCall(String urladdress, int requestmethod,
                                      HashMap<String, String> params, boolean addNewLines) {
+        Logger.dh("WebRequest: Service call " + urladdress);
         URL url;
         String response = "";
         try {

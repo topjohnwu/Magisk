@@ -69,20 +69,13 @@ public class Utils {
         } else {
             magiskVersion = Integer.parseInt(ret.get(0));
         }
-        if (!Shell.rootAccess()) {
-            Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
-        }
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("keep_root_off", false)) {
-            Utils.toggleRoot(false, context);
-        }
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
-            Utils.SetupQuickSettingsTile(context);
-        }
+        String toolPath = context.getApplicationInfo().dataDir + "/busybox";
+        Shell.su("PATH=$PATH:" + toolPath);
     }
 
-    public static boolean fileExist(String path) {
+    public static boolean itemExist(String path) {
         List<String> ret;
-        String command = "if [ -f " + path + " ]; then echo true; else echo false; fi";
+        String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
         if (Shell.rootAccess()) {
             ret = Shell.su(command);
         } else {
@@ -91,22 +84,15 @@ public class Utils {
         return Boolean.parseBoolean(ret.get(0));
     }
 
-    public static boolean busyboxInstalled() {
+    public static boolean commandExists(String s) {
         List<String> ret;
-        String command = "if [ -d /data/busybox ]; then echo true; else echo false; fi";
-        if (Shell.rootAccess()) {
-            ret = Shell.su(command);
-        } else {
-            ret = Shell.sh(command);
-        }
+        String command = "if [ -z $(which " + s + ") ]; then echo false; else echo true; fi";
+        ret = Shell.sh(command);
         return Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean rootEnabled() {
-        List<String> ret;
-        String command = "if [ -z $(which su) ]; then echo false; else echo true; fi";
-        ret = Shell.sh(command);
-        return Boolean.parseBoolean(ret.get(0));
+        return commandExists("su");
     }
 
     public static boolean autoToggleEnabled(Context context) {

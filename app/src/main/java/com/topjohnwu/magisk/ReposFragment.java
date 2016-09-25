@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -126,7 +127,7 @@ public class ReposFragment extends Fragment {
                                 @Override
                                 public void task(File file) {
                                     Log.d("Magisk", "Task firing");
-                                    new Async.FlashZIP(getActivity(), repo.getId(), file.toString()).execute();
+                                    new Async.FlashZIP(getActivity(), repo.getId(), file.toString()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             };
                             String filename = repo.getId().replace(" ", "") + ".zip";

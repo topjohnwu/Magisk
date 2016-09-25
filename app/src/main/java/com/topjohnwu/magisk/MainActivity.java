@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -56,11 +58,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        // Startups
-        Utils.init(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+
+        if (!Shell.rootAccess()) {
+            Snackbar.make(findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
 
         this.getFragmentManager().addOnBackStackChangedListener(
@@ -108,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 }
-
         );
 
         setSupportActionBar(toolbar);
@@ -146,12 +149,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Logger.dh("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
 
         }
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
     }
 

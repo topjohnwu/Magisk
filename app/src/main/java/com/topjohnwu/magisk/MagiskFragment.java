@@ -70,7 +70,7 @@ public class MagiskFragment extends Fragment {
         ta0.recycle();
         ta1.recycle();
         ta2.recycle();
-        new updateUI().execute();
+        new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         return v;
     }
@@ -132,7 +132,7 @@ public class MagiskFragment extends Fragment {
                                     new Utils.DownloadReceiver(getString(R.string.magisk)) {
                                         @Override
                                         public void task(File file) {
-                                            new Async.FlashZIP(mContext, mName, file.getPath()).execute();
+                                            new Async.FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                         }
                                     },
                                     Utils.magiskLink, "latest_magisk.zip"))

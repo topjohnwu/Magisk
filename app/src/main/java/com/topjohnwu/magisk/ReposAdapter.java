@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -148,7 +149,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             @Override
                             public void task(File file) {
                                 Log.d("Magisk", "Task firing");
-                                new Async.FlashZIP(context, repo.getId(), file.toString()).execute();
+                                new Async.FlashZIP(context, repo.getId(), file.toString()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                             }
                         };
                         String filename = repo.getId().replace(" ", "") + ".zip";

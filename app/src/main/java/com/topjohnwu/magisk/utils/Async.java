@@ -35,6 +35,32 @@ import java.util.List;
 
 public class Async {
 
+    public static class BusyboxEnv extends AsyncTask<Void, Void, Void> {
+
+        Context mContext;
+
+        public BusyboxEnv(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            String toolPath = mContext.getApplicationInfo().dataDir + "/busybox";
+            String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
+            if (Shell.rootAccess() && !Utils.commandExists("unzip") && !Utils.itemExist(toolPath)) {
+                Shell.su(true,
+                        "mkdir " + toolPath,
+                        "chmod 755 " + toolPath,
+                        "ln -s " + busybox + " " + toolPath + "/busybox",
+                        "for tool in $(" + toolPath + "/busybox --list); do",
+                        "ln -s " + busybox + " " + toolPath + "/$tool",
+                        "done"
+                );
+            }
+            return null;
+        }
+    }
+
     public static class CheckUpdates extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
@@ -100,7 +126,7 @@ public class Async {
                                             rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
                                                 @Override
                                                 public void task(File file) {
-                                                    new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                    new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                                 }
                                             };
                                             break;
@@ -110,7 +136,7 @@ public class Async {
                                             rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
                                                 @Override
                                                 public void task(File file) {
-                                                    new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                    new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                                 }
                                             };
                                             break;
@@ -127,7 +153,7 @@ public class Async {
                                                 protected void done() {
                                                     Utils.downloadAndReceive(temp, rootReceiver, link, filename);
                                                 }
-                                            }.execute();
+                                            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                         }
                                     };
                                     Utils.downloadAndReceive(mContext, magiskReceiver, Utils.magiskLink, "latest_magisk.zip");
@@ -150,7 +176,7 @@ public class Async {
                                                     new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
                                                         @Override
                                                         public void task(File file) {
-                                                            new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                            new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                                         }
                                                     },
                                                     Utils.phhLink, "phhsu.zip");
@@ -161,7 +187,7 @@ public class Async {
                                                     new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
                                                         @Override
                                                         public void task(File file) {
-                                                            new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                            new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                                         }
                                                     },
                                                     Utils.supersuLink, "supersu.zip");
@@ -186,17 +212,17 @@ public class Async {
         @Override
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
+            Logger.dh("Loading modules");
             List<String> magisk = Utils.getModList(Utils.MAGISK_PATH);
-            Log.d("Magisk", "Utils: Reload called, loading modules");
             List<String> magiskCache = Utils.getModList(Utils.MAGISK_CACHE_PATH);
 
             for (String mod : magisk) {
-                Log.d("Magisk", "Utils: Adding module from string " + mod);
+                Logger.dh("Adding modules from " + mod);
                 ModulesFragment.listModules.add(new Module(mContext, mod));
             }
 
             for (String mod : magiskCache) {
-                Log.d("Magisk", "Utils: Adding cache module from string " + mod);
+                Logger.dh("Adding cache modules from " + mod);
                 Module cacheMod = new Module(mContext, mod);
                 // Prevent people forgot to change module.prop
                 cacheMod.setCache();
@@ -204,6 +230,8 @@ public class Async {
             }
 
             Collections.sort(ModulesFragment.listModules, new Utils.ModuleComparator());
+
+            Logger.dh("Module load done");
 
             return null;
         }

@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {
@@ -14,7 +15,7 @@ public class Module extends BaseModule {
     private String mDisableFile;
 
     private String mZipUrl, mLogUrl;
-    private boolean mEnable, mRemove, mUpdateAvailable = false, mIsInstalled;
+    private boolean mEnable, mRemove, mUpdateAvailable = false;
 
     public Module(Context context, String path) {
 
@@ -38,75 +39,10 @@ public class Module extends BaseModule {
         if (mVersion == null)
             mVersion = context.getString(R.string.no_info_provided);
 
-        Log.d("Magisk","Module: Loaded module with ID of " + mId );
+        Logger.dh("Module id: " + mId);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        if (this.mId != null && !this.mId.isEmpty()) {
-            String preferenceString = "repo_" + this.mId;
-            String preferenceKey = prefs.getString(preferenceString,"nope");
-            Log.d("Magisk", "Module: Checking for preference named " + preferenceString);
-            if (!preferenceKey.equals("nope")) {
-                Log.d("Magisk", "Module: repo_" + mId + " found.");
-                String entryString = prefs.getString("repo_" + mId, "");
-                String[] subStrings = entryString.split("\n");
-                for (String subKeys : subStrings) {
-                    String[] idEntry = subKeys.split("=", 2);
-                    if (idEntry[0].equals("id")) {
-                        if (idEntry.length != 2) {
-                            continue;
-                        }
-
-                        if (idEntry[1].equals(mId)) {
-                            Log.d("Magisk", "Module: Hey, I know " + mId + " is online...");
-                            mIsInstalled = true;
-                        } else mIsInstalled = false;
-                    }
-                    if (idEntry[0].equals("logUrl")) {
-                        mLogUrl = idEntry[1];
-                    }
-                    if (idEntry[0].equals("support")) {
-                        mSupportUrl = idEntry[1];
-                    }
-                    if (idEntry[0].equals("zipUrl")) {
-                        mZipUrl = idEntry[1];
-                    }
-                    if (idEntry[0].equals("donate")) {
-                        mDonateUrl = idEntry[1];
-                    }
-
-                    if (idEntry[0].equals("versionCode")) {
-                        if (idEntry.length != 2) {
-                            continue;
-                        }
-
-                        if (Integer.valueOf(idEntry[1]) > mVersionCode) {
-                            mUpdateAvailable = true;
-                            Log.d("Magisk", "Module: Hey, I have an update...");
-                        } else mUpdateAvailable = false;
-                    }
-                }
-
-
-            }
-
-            SharedPreferences.Editor editor = prefs.edit();
-            if (mIsInstalled) {
-                editor.putBoolean("repo-isInstalled_" + mId, true);
-            } else {
-                editor.putBoolean("repo-isInstalled_" + mId, false);
-            }
-
-            if (mUpdateAvailable) {
-                editor.putBoolean("repo-canUpdate_" + mId, true);
-            } else {
-                editor.putBoolean("repo-canUpdate_" + mId, false);
-            }
-            editor.apply();
-        }
-
-        mEnable = !Utils.fileExist(mDisableFile);
-        mRemove = Utils.fileExist(mRemoveFile);
+        mEnable = !Utils.itemExist(mDisableFile);
+        mRemove = Utils.itemExist(mRemoveFile);
 
     }
 

@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -110,7 +111,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                                     @Override
                                     public void task(File file) {
                                         Log.d("Magisk", "Task firing");
-                                        new Async.FlashZIP(context, mModule.getId(), file.toString()).execute();
+                                        new Async.FlashZIP(context, mModule.getId(), file.toString()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                     }
                                 };
                                 String filename = mModule.getId().replace(" ", "") + ".zip";

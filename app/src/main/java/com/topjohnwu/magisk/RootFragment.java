@@ -112,7 +112,7 @@ public class RootFragment extends Fragment {
         }
         rootToggle.setEnabled(!autoRootStatus);
         autoRootToggle.setChecked(autoRootStatus);
-        new updateUI().execute();
+        new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         rootToggle.setOnClickListener(toggle -> Utils.toggleRoot(((CompoundButton) toggle).isChecked(), getActivity()));
 
@@ -131,7 +131,7 @@ public class RootFragment extends Fragment {
 
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
-            new updateUI().execute();
+            new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         });
 
         return view;

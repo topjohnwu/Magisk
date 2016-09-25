@@ -104,13 +104,13 @@ public class LogFragment extends Fragment {
     }
 
     private void reloadErrorLog() {
-        new LogsManager(true).execute();
+        new LogsManager(true).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         svLog.post(() -> svLog.scrollTo(0, txtLog.getHeight()));
         hsvLog.post(() -> hsvLog.scrollTo(0, 0));
     }
 
     private void clear() {
-        new LogsManager(false).execute();
+        new LogsManager(false).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         reloadErrorLog();
     }
 
