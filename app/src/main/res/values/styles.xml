@@ -24,6 +24,7 @@
         <item name="android:textColorSecondary">@color/primary_text</item> <!-- force  -->
         <item name="actionMenuTextColor">@color/icons</item>
     </style>
+
     <style name="AppTheme.dh" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorPrimary">@color/dh_primary</item>
         <item name="colorPrimaryDark">@color/dh_primary_dark</item>
@@ -37,6 +38,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:textColorPrimary">@color/dh_primary_text</item>
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
+        <item name="android:alertDialogTheme">@style/YourAlertDialogTheme</item>
         <item name="ColorOK">@color/dh_alertOk</item>
         <item name="ColorWarn">@color/dh_alertWarn</item>
         <item name="ColorFail">@color/dh_alertFail</item>
@@ -58,6 +60,16 @@
 
     </style>
 
+    <style name="YourAlertDialogTheme">
+        <item name="android:textColor">@color/dh_primary_text</item>
+        <item name="android:textColorSecondary">@color/dh_primary_text</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+
+    </style>
 
 
     <style name="CardViewStyle.Light" parent="CardView">

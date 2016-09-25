@@ -8,7 +8,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +18,12 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.ButterKnife;
 
-
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private CheckBoxPreference quickTilePreference;
     private ListPreference themePreference;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+
+    public SettingsFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             hideRootNotificationPreference.setEnabled(true);
         }
 
-
         Preference.OnPreferenceClickListener preferenceClickListener = preference -> {
             if (preference == quickTilePreference) {
                 boolean isChecked = quickTilePreference.isChecked();
@@ -84,10 +83,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             return false;
         };
 
-
-
-
-
         quickTilePreference.setOnPreferenceClickListener(preferenceClickListener);
         // calculate margins
         int horizontalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
@@ -100,19 +95,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         view.setPadding(horizontalMargin, actionBarHeight, horizontalMargin, verticalMargin);
 
-
         return view;
 
     }
-
-
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Logger.dh("Settings: NewValue is " + key);
 
         if (key.equals("theme")) {
-            String pref = sharedPreferences.getString(key,"");
+            String pref = sharedPreferences.getString(key, "");
 
             themePreference.setSummary(pref);
             if (pref.equals("Dark")) {
@@ -123,15 +115,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("Relaunch","Settings");
+            intent.putExtra("Relaunch", "Settings");
             startActivity(intent);
-
 
             Logger.dh("SettingsFragment: theme is " + pref);
 
         }
-
-
 
     }
 }

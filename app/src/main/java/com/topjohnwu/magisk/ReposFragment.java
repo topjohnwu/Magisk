@@ -2,12 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +17,6 @@ import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
-import com.wooplr.spotlight.SpotlightView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,8 +25,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.topjohnwu.magisk.R.menu.drawer;
 
 public class ReposFragment extends Fragment {
 
@@ -104,7 +97,7 @@ public class ReposFragment extends Fragment {
         super.onAttachFragment(childFragment);
     }
 
-    private void LoadRepo (boolean doReload) {
+    private void LoadRepo(boolean doReload) {
         RepoHelper.TaskDelegate taskDelegate = result -> {
             if (result.equals("Complete")) {
                 Log.d("Magisk", "ReposFragment, got delegate");
@@ -159,23 +152,20 @@ public class ReposFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         LoadRepo(false);
         getActivity().setTitle("Magisk");
 
-
     }
-
 
     protected List<Repo> listRepos() {
         return mListRepos;
     }
 
     private void UpdateUI() {
-        Log.d("Magisk","ReposFragment: UpdateUI Called, size is " + listRepos().size());
+        Log.d("Magisk", "ReposFragment: UpdateUI Called, size is " + listRepos().size());
 
         if (listRepos().size() == 0) {
             emptyTv.setVisibility(View.VISIBLE);
@@ -190,13 +180,6 @@ public class ReposFragment extends Fragment {
             NotifyOfAlerts();
         }
 
-
     }
-
-
-
-
-
-
 
 }

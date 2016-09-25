@@ -30,11 +30,8 @@ import com.topjohnwu.magisk.utils.Utils;
 import java.io.File;
 import java.util.List;
 
-import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.topjohnwu.magisk.R.attr.cardStyle;
 
 public class RootFragment extends Fragment {
 

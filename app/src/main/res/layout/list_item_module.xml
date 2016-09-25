@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     xmlns:card_view="http://schemas.android.com/apk/res-auto"
                                     xmlns:tools="http://schemas.android.com/tools"
+                                    style="?attr/cardStyle"
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
@@ -10,7 +11,6 @@
                                     android:layout_marginStart="@dimen/card_horizontal_margin"
                                     android:layout_marginTop="@dimen/card_vertical_margin"
                                     android:minHeight="?android:attr/listPreferredItemHeight"
-                                    style="?attr/cardStyle"
                                     card_view:cardCornerRadius="@dimen/card_corner_radius"
                                     card_view:cardElevation="@dimen/card_elevation">
 
@@ -19,7 +19,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeight"
-        android:padding="@dimen/card_layout_padding">
+        android:padding="@dimen/card_layout_padding"
+        android:paddingEnd="@dimen/card_layout_padding"
+        android:paddingStart="@dimen/card_layout_padding">
 
         <TextView
             android:id="@+id/title"
@@ -115,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@id/description"
-            android:minHeight="@dimen/min_rowheight"
+            android:minHeight="70dp"
             android:orientation="vertical"
 
             >
@@ -141,7 +143,7 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="50dip"
+                android:layout_height="40dip"
                 android:layout_gravity="center"
                 android:layout_marginBottom="0dip"
                 android:orientation="horizontal">

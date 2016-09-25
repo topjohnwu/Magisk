@@ -42,8 +42,13 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         // Set up toggle states based on preferences, start services, disable root if set
-
         if (Utils.autoToggleEnabled(getApplicationContext())) {
+            if (!Utils.hasServicePermission(getApplicationContext())) {
+                Utils.toggleAutoRoot(false,getApplicationContext());
+            }
+        }
+        if (Utils.autoToggleEnabled(getApplicationContext())) {
+
             if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
                 Intent myIntent = new Intent(getApplication(), MonitorService.class);
                 getApplication().startService(myIntent);
