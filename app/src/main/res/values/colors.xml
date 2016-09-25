@@ -20,11 +20,12 @@
 
     <color name="dh_primary_text">#dedede</color>
     <color name="dh_secondary_text">#8A8A8A</color>
-    <color name="dh_icons">#000000</color>
-    <color name="dh_divider">#424242</color>
+    <color name="dh_icons">#dedede</color>
+    <color name="dh_divider">#313131</color>
     <color name="dh_alertWarn">#FF9800</color>
     <color name="dh_alertOk">#2196F3</color>
     <color name="dh_alertNeutral">#2196F3</color>
     <color name="dh_alertFail">#FF5722</color>
+
 
 </resources>

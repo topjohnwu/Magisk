@@ -60,6 +60,8 @@ public class LogFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Log");
+        setHasOptionsMenu(true);
+        reloadErrorLog();
     }
 
     @Override

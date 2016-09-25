@@ -40,6 +40,7 @@
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
         <item name="android:alertDialogTheme">@style/AlertDialog.dh</item>
         <item name="android:dialogTheme">@style/AlertDialog.dh</item>
+        <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
         <item name="ColorOK">@color/dh_alertOk</item>
         <item name="ColorWarn">@color/dh_alertWarn</item>
         <item name="ColorFail">@color/dh_alertFail</item>
@@ -47,6 +48,11 @@
 
 
     </style>
+
+    <style name="OverFlow" parent="@android:style/Widget.ActionBar">
+        <item name="android:backgroundTint">@color/dh_icons</item>
+    </style>
+
 
     <style name="AppTheme.Toolbar.dh" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorPrimary">@color/dh_primary</item>
@@ -66,7 +72,7 @@
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
         <item name="colorAccent">@color/dh_accent</item>
         <item name="android:textColorPrimary">@color/dh_primary_text</item>
-        <item name="android:background">@android:color/background_dark</item>
+        <item name="android:background">@color/dh_divider</item>
         <item name="android:textColorAlertDialogListItem">@color/dh_primary_text</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">true</item>
