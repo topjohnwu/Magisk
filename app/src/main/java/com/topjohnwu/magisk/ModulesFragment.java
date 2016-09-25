@@ -3,21 +3,24 @@ package com.topjohnwu.magisk;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.FileInfo;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
@@ -29,10 +32,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyTv;
-private static final int FETCH_ZIP_CODE = 2;
+    @BindView(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_rv)
+    TextView emptyTv;
+    private static final int FETCH_ZIP_CODE = 2;
     private SharedPreferences prefs;
     public static List<Module> listModules = new ArrayList<>();
     @BindView(R.id.fab)
@@ -43,9 +49,8 @@ private static final int FETCH_ZIP_CODE = 2;
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View viewMain = inflater.inflate(R.layout.modules_fragment, container, false);
 
-
         ButterKnife.bind(this, viewMain);
-    fabio.setOnClickListener(v -> {
+        fabio.setOnClickListener(v -> {
             Intent getContentIntent = FileUtils.createGetContentIntent(null);
             getContentIntent.setType("application/zip");
             Intent fileIntent = Intent.createChooser(getContentIntent, "Select a file");
@@ -74,6 +79,23 @@ private static final int FETCH_ZIP_CODE = 2;
         new updateUI().execute();
 
         return viewMain;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data != null) {
+            // Get the URI of the selected file
+            final Uri uri = data.getData();
+            try {
+                // Get the file path from the URI
+                new Async.FlashZIP(getActivity(), uri).execute();
+                FileInfo fileInfo = FileUtils.getFileInfo(getActivity(), uri);
+
+            } catch (Exception e) {
+                Log.e("FileSelectorTestAc...", "File select error", e);
+            }
+        }
+
     }
 
     @Override

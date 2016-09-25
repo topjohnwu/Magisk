@@ -127,4 +127,5 @@
     <string name="auto_toggle_apps">Auto-toggle List</string>
     <string name="toast_error_makedir">Error creating directory, could not download file.</string>
     <string name="toast_error_removing_files">Error removing old files, cancelled.</string>
+    <string name="settings_general_title">General</string>
 </resources>

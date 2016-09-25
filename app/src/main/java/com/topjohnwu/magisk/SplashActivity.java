@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
@@ -19,6 +18,9 @@ import java.util.Set;
 public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme","").equals("Dark")) {
+            setTheme(R.style.AppTheme_dh);
+        }
         super.onCreate(savedInstanceState);
 
         //setups go here
@@ -47,7 +49,7 @@ public class SplashActivity extends AppCompatActivity {
                 getApplication().startService(myIntent);
             }
         } else {
-            if (PrefHelper.CheckBool("keep_root_off", getApplication())) {
+            if (PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("keep_root_off", false)) {
                 Utils.toggleRoot(false, getApplication());
             }
         }
@@ -60,6 +62,7 @@ public class SplashActivity extends AppCompatActivity {
         new Async.CheckUpdates(this).execute();
         new Async.LoadModules(this).execute();
         new Async.LoadRepos(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 
         // Start main activity
         Intent intent = new Intent(this, MainActivity.class);

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -49,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+
+        String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme","");
+        Logger.dh("MainActivity: Theme is " + theme);
+        if (theme.equals("Dark")) {
+            setTheme(R.style.AppTheme_dh);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -106,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
 
+
+
         );
 
         setSupportActionBar(toolbar);
@@ -137,10 +146,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
         mView = getToolbarNavigationButton();
-        if (getIntent().hasExtra("relaunch")) {
-            navigate(R.id.root);
+
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            Logger.dh("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
+            String data = extras.getString("Relaunch"); // retrieve the data using keyName
+            if (data.contains("Settings")) {
+                navigate(R.id.settings);
+            }
         }
-    startTour();
+
     }
 
     public ImageButton getToolbarNavigationButton() {

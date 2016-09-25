@@ -2,6 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,11 +47,9 @@ public class MagiskFragment extends Fragment {
     @BindView(R.id.magisk_check_updates_status) TextView magiskCheckUpdatesStatus;
     @BindView(R.id.magisk_check_updates_progress) ProgressBar magiskCheckUpdatesProgress;
 
-    @BindColor(R.color.green500) int green500;
-    @BindColor(R.color.accent) int accent;
-    @BindColor(R.color.blue500) int blue500;
     @BindColor(R.color.grey500) int grey500;
 
+    private int colorOK, colorWarn, colorNeutral;
     int statusOK = R.drawable.ic_check_circle;
     int statusUnknown = R.drawable.ic_help;
 
@@ -58,7 +58,18 @@ public class MagiskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.magisk_fragment, container, false);
         ButterKnife.bind(this, v);
-
+        int[] attrs0 = {R.attr.ColorOK};
+        int[] attrs1 = {R.attr.ColorWarn};
+        int[] attrs2 = {R.attr.ColorNeutral};
+        TypedArray ta0 = getActivity().obtainStyledAttributes(attrs0);
+        TypedArray ta1 = getActivity().obtainStyledAttributes(attrs1);
+        TypedArray ta2 = getActivity().obtainStyledAttributes(attrs2);
+        colorOK = ta0.getColor(0, Color.GRAY);
+        colorWarn = ta1.getColor(0, Color.GRAY);
+        colorNeutral = ta2.getColor(0, Color.GRAY);
+        ta0.recycle();
+        ta1.recycle();
+        ta2.recycle();
         new updateUI().execute();
 
         return v;
@@ -88,16 +99,16 @@ public class MagiskFragment extends Fragment {
                 magiskVersion.setTextColor(grey500);
                 magiskVersion.setText(R.string.magisk_version_error);
             } else {
-                magiskStatusContainer.setBackgroundColor(green500);
+                magiskStatusContainer.setBackgroundColor(colorOK);
                 magiskStatusIcon.setImageResource(statusOK);
 
-                magiskVersion.setTextColor(green500);
+                magiskVersion.setTextColor(colorOK);
                 magiskVersion.setText(getString(R.string.magisk_version, String.valueOf(Utils.magiskVersion)));
             }
 
             if (Utils.remoteMagiskVersion == -1) {
-                appCheckUpdatesContainer.setBackgroundColor(accent);
-                magiskCheckUpdatesContainer.setBackgroundColor(accent);
+                appCheckUpdatesContainer.setBackgroundColor(colorWarn);
+                magiskCheckUpdatesContainer.setBackgroundColor(colorWarn);
 
                 appCheckUpdatesIcon.setImageResource(R.drawable.ic_warning);
                 magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_warning);
@@ -106,7 +117,7 @@ public class MagiskFragment extends Fragment {
                 magiskCheckUpdatesStatus.setText(R.string.cannot_check_updates);
             } else {
                 if (Utils.remoteMagiskVersion > Utils.magiskVersion) {
-                    magiskCheckUpdatesContainer.setBackgroundColor(blue500);
+                    magiskCheckUpdatesContainer.setBackgroundColor(colorNeutral);
                     magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
                     magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(Utils.remoteMagiskVersion)));
                     magiskUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
@@ -127,13 +138,13 @@ public class MagiskFragment extends Fragment {
                             .setNegativeButton(R.string.no_thanks, null)
                             .show());
                 } else {
-                    magiskCheckUpdatesContainer.setBackgroundColor(green500);
+                    magiskCheckUpdatesContainer.setBackgroundColor(colorOK);
                     magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
                     magiskCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
                 }
 
                 if (Utils.remoteAppVersion > BuildConfig.VERSION_CODE) {
-                    appCheckUpdatesContainer.setBackgroundColor(blue500);
+                    appCheckUpdatesContainer.setBackgroundColor(colorNeutral);
                     appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
                     appCheckUpdatesStatus.setText(getString(R.string.app_update_available, String.valueOf(Utils.remoteAppVersion)));
                     appUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
@@ -157,7 +168,7 @@ public class MagiskFragment extends Fragment {
                             .show()
                     );
                 } else {
-                    appCheckUpdatesContainer.setBackgroundColor(green500);
+                    appCheckUpdatesContainer.setBackgroundColor(colorOK);
                     appCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
                     appCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.app_name)));
                 }

@@ -74,15 +74,26 @@ public class TileServiceCompat extends Service {
     private void onSimpleClick() {
 		updateRoots();
         updateTile();
-        Utils.toggleAutoRoot(false,getApplicationContext());
-        Utils.toggleRoot(!root,getApplicationContext());
+        if (autoRoot) {
 
+            Utils.toggleAutoRoot(false, getApplicationContext());
+            if (!Utils.hasServicePermission(getApplicationContext())) {
+                Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                sendBroadcast(it);
+            }
+        } else {
+            Utils.toggleRoot(!root, getApplicationContext());
+        }
     }
 
     private void onLongClick() {
         updateRoots();
         updateTile();
         Utils.toggleAutoRoot(!autoRoot,getApplicationContext());
+        if (!Utils.hasServicePermission(getApplicationContext())) {
+            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(it);
+        }
     }
 
     private void updateTile() {

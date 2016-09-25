@@ -3,6 +3,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            xmlns:card_view="http://schemas.android.com/tools"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="?attr/actionBarSize">
 
@@ -23,6 +24,7 @@
             android:layout_height="wrap_content"
             android:elevation="2dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardCornerRadius="0dp">
 
             <Switch
@@ -41,6 +43,7 @@
             android:layout_height="wrap_content"
             android:elevation="2dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardCornerRadius="0dp">
 
             <Switch
@@ -60,6 +63,7 @@
             android:layout_height="wrap_content"
             android:elevation="2dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardCornerRadius="0dp">
 
             <Switch
@@ -82,6 +86,7 @@
             android:layout_marginRight="5dip"
             android:layout_marginTop="6dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -126,6 +131,7 @@
             android:layout_marginRight="5dip"
             android:layout_marginTop="6dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardUseCompatPadding="true">
 
             <LinearLayout
@@ -162,6 +168,7 @@
             android:layout_marginRight="5dip"
             android:layout_marginTop="6dp"
             android:visibility="gone"
+            style="?attr/cardStyle"
             app:cardUseCompatPadding="true">
 
             <LinearLayout

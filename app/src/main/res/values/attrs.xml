@@ -20,6 +20,12 @@
     <declare-styleable name="RowItem">
         <attr name="icon" format="reference"/>
         <attr name="text" format="string"/>
+        <attr name="cardStyle" format="reference"/>
+        <attr name="navStyle" format="reference"/>
+        <attr name="ColorOK" format="reference"/>
+        <attr name="ColorWarn" format="reference"/>
+        <attr name="ColorFail" format="reference"/>
+        <attr name="ColorNeutral" format="reference"/>
     </declare-styleable>
 
 </resources>

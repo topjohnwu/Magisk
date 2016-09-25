@@ -1,7 +1,16 @@
 <PreferenceScreen
     android:layout_marginTop="?attr/actionBarSize"
     xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/settings_general_title">
 
+        <ListPreference
+            android:key="theme"
+            android:title="Theme"
+            android:summary="Select a theme"
+            android:entries="@array/themes"
+            android:entryValues="@array/themes"/>
+    </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/settings_quicksettings_category">
 

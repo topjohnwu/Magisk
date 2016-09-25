@@ -5,21 +5,21 @@
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginStart="@dimen/card_horizontal_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
-    android:layout_marginTop="@dimen/card_vertical_margin"
-    android:background="?android:attr/selectableItemBackground"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    card_view:cardCornerRadius="@dimen/card_corner_radius"
-    card_view:cardElevation="@dimen/card_elevation">
+                                    android:layout_marginBottom="@dimen/card_vertical_margin"
+                                    android:layout_marginEnd="@dimen/card_horizontal_margin"
+                                    android:layout_marginStart="@dimen/card_horizontal_margin"
+                                    android:layout_marginTop="@dimen/card_vertical_margin"
+                                    android:minHeight="?android:attr/listPreferredItemHeight"
+                                    style="?attr/cardStyle"
+                                    card_view:cardCornerRadius="@dimen/card_corner_radius"
+                                    card_view:cardElevation="@dimen/card_elevation">
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?android:attr/listPreferredItemHeight"
-            android:padding="@dimen/card_layout_padding">
+        android:padding="@dimen/card_layout_padding">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -31,47 +31,47 @@
                 android:id="@+id/title"
                 android:layout_width="@dimen/card_textview_width"
                 android:layout_height="wrap_content"
-                android:singleLine="false"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="0dp" />
+                android:layout_marginTop="0dp"
+                android:maxLines="1"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
 
             <TextView
                 android:id="@+id/version_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/title"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
                 android:textStyle="bold|italic"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/title"
                 />
 
             <ImageView
                 android:id="@+id/update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:focusable="false"
-                android:gravity="end"
-                android:background="@drawable/ic_file_download_black"
-                android:backgroundTint="@color/icon_grey"
-                android:layout_gravity="end"
                 android:layout_alignBaseline="@id/title"
                 android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:background="@drawable/ic_file_download_black"
+                android:backgroundTint="@color/icon_grey"
+                android:focusable="false"
+                android:gravity="end"
                 />
 
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-		        android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/update"
+                android:layout_gravity="center_vertical"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"
                 />
 
 
@@ -79,10 +79,10 @@
                 android:id="@+id/expand_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/description"
                 android:minHeight="100dp"
                 android:orientation="vertical"
-                android:layout_below="@id/description"
-                android:layout_alignParentStart="true"
 
                 >
 
@@ -107,47 +107,49 @@
                     android:id="@+id/updateStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-		    android:layout_gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dip"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="false"
-                    android:layout_marginBottom="20dip" />
+                    android:textIsSelectable="false"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="50dip"
                     android:layout_gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="0dip">
+                    android:layout_marginBottom="0dip"
+                    android:orientation="horizontal">
+
                     <ImageView
                         android:id="@+id/changeLog"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_changelog"/>
+                        android:background="@drawable/ic_changelog"
+                        android:backgroundTint="@color/icon_grey"/>
+
                     <ImageView
                         android:id="@+id/authorLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_author"/>
+                        android:background="@drawable/ic_author"
+                        android:backgroundTint="@color/icon_grey"/>
+
                     <ImageView
                         android:id="@+id/supportLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_support"/>
+                        android:background="@drawable/ic_support"
+                        android:backgroundTint="@color/icon_grey"/>
 
 
                 </LinearLayout>
 
             </LinearLayout>
-
 
 
         </RelativeLayout>
@@ -156,11 +158,11 @@
             android:id="@+id/installed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="false"
-            android:visibility="gone"
-            android:gravity="end"
             android:layout_marginEnd="@dimen/card_imageview_margin"
             android:layout_marginStart="@dimen/card_imageview_margin"
+            android:focusable="false"
+            android:gravity="end"
+            android:visibility="gone"
             />
 
     </RelativeLayout>

@@ -5,11 +5,12 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.DocumentsContract;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.FileInfo;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
@@ -87,53 +88,51 @@ public class Async {
                         .setTitle(R.string.no_magisk_title)
                         .setMessage(R.string.no_magisk_msg)
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> {
-                            new AlertDialog.Builder(mContext)
-                                    .setTitle(R.string.root_method_title)
-                                    .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                        Utils.DownloadReceiver rootReceiver;
-                                        String link, filename;
-                                        switch (root) {
-                                            case 0:
-                                                link = Utils.phhLink;
-                                                filename = "phhsu.zip";
-                                                rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
-                                                    @Override
-                                                    public void task(File file) {
-                                                        new FlashZIP(mContext, mName, file.getPath()).execute();
-                                                    }
-                                                };
-                                                break;
-                                            case 1:
-                                                link = Utils.supersuLink;
-                                                filename = "supersu.zip";
-                                                rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
-                                                    @Override
-                                                    public void task(File file) {
-                                                        new FlashZIP(mContext, mName, file.getPath()).execute();
-                                                    }
-                                                };
-                                                break;
-                                            default:
-                                                rootReceiver = null;
-                                                link = filename = null;
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> new AlertDialog.Builder(mContext)
+                                .setTitle(R.string.root_method_title)
+                                .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
+                                    Utils.DownloadReceiver rootReceiver;
+                                    String link, filename;
+                                    switch (root) {
+                                        case 0:
+                                            link = Utils.phhLink;
+                                            filename = "phhsu.zip";
+                                            rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
+                                                @Override
+                                                public void task(File file) {
+                                                    new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                }
+                                            };
+                                            break;
+                                        case 1:
+                                            link = Utils.supersuLink;
+                                            filename = "supersu.zip";
+                                            rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
+                                                @Override
+                                                public void task(File file) {
+                                                    new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                }
+                                            };
+                                            break;
+                                        default:
+                                            rootReceiver = null;
+                                            link = filename = null;
+                                    }
+                                    Utils.DownloadReceiver magiskReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.magisk)) {
+                                        @Override
+                                        public void task(File file) {
+                                            Context temp = mContext;
+                                            new FlashZIP(mContext, mName, file.getPath()) {
+                                                @Override
+                                                protected void done() {
+                                                    Utils.downloadAndReceive(temp, rootReceiver, link, filename);
+                                                }
+                                            }.execute();
                                         }
-                                        Utils.DownloadReceiver magiskReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.magisk)) {
-                                            @Override
-                                            public void task(File file) {
-                                                Context temp = mContext;
-                                                new FlashZIP(mContext, mName, file.getPath()) {
-                                                    @Override
-                                                    protected void done() {
-                                                        Utils.downloadAndReceive(temp, rootReceiver, link, filename);
-                                                    }
-                                                }.execute();
-                                            }
-                                        };
-                                        Utils.downloadAndReceive(mContext, magiskReceiver, Utils.magiskLink, "latest_magisk.zip");
-                                    })
-                                    .show();
-                        })
+                                    };
+                                    Utils.downloadAndReceive(mContext, magiskReceiver, Utils.magiskLink, "latest_magisk.zip");
+                                })
+                                .show())
                         .setNegativeButton(R.string.no_thanks, null)
                         .show();
             } else if (Shell.rootStatus == 2) {
@@ -141,37 +140,35 @@ public class Async {
                         .setTitle(R.string.root_system)
                         .setMessage(R.string.root_system_msg)
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> {
-                            new AlertDialog.Builder(mContext)
-                                    .setTitle(R.string.root_method_title)
-                                    .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                        switch (root) {
-                                            case 0:
-                                                Utils.downloadAndReceive(
-                                                        mContext,
-                                                        new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
-                                                            @Override
-                                                            public void task(File file) {
-                                                                new FlashZIP(mContext, mName, file.getPath()).execute();
-                                                            }
-                                                        },
-                                                        Utils.phhLink, "phhsu.zip");
-                                                break;
-                                            case 1:
-                                                Utils.downloadAndReceive(
-                                                        mContext,
-                                                        new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
-                                                            @Override
-                                                            public void task(File file) {
-                                                                new FlashZIP(mContext, mName, file.getPath()).execute();
-                                                            }
-                                                        },
-                                                        Utils.supersuLink, "supersu.zip");
-                                                break;
-                                        }
-                                    })
-                                    .show();
-                        })
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> new AlertDialog.Builder(mContext)
+                                .setTitle(R.string.root_method_title)
+                                .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
+                                    switch (root) {
+                                        case 0:
+                                            Utils.downloadAndReceive(
+                                                    mContext,
+                                                    new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
+                                                        @Override
+                                                        public void task(File file) {
+                                                            new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                        }
+                                                    },
+                                                    Utils.phhLink, "phhsu.zip");
+                                            break;
+                                        case 1:
+                                            Utils.downloadAndReceive(
+                                                    mContext,
+                                                    new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
+                                                        @Override
+                                                        public void task(File file) {
+                                                            new FlashZIP(mContext, mName, file.getPath()).execute();
+                                                        }
+                                                    },
+                                                    Utils.supersuLink, "supersu.zip");
+                                            break;
+                                    }
+                                })
+                                .show())
                         .setNegativeButton(R.string.no_thanks, null)
                         .show();
             }
@@ -216,8 +213,6 @@ public class Async {
     public static class LoadRepos extends AsyncTask<Void, Void, Void> {
 
         private Context mContext;
-        private boolean doReload;
-        private RepoHelper.TaskDelegate mTaskDelegate;
 
         public LoadRepos(Context context) {
             mContext = context;
@@ -255,33 +250,31 @@ public class Async {
             mContext = context;
             mUri = uRi;
             deleteFileAfter = true;
-            String file = "";
-            final String docId = DocumentsContract.getDocumentId(mUri);
 
-            Log.d("Magisk", "Utils: FlashZip Running, " + docId + " and " + mUri.toString());
-            if (docId.contains(":"))
-                mName = docId.split(":")[1];
-            else mName = docId;
-            if (mName.contains("/"))
-                mName = mName.substring(mName.lastIndexOf('/') + 1);
-            if (mName.contains(".zip")) {
-                file = mContext.getFilesDir() + "/" + mName;
-                Log.d("Magisk", "Utils: FlashZip running for uRI " + mUri.toString());
-            } else {
-                Log.e("Magisk", "Utils: error parsing Zipfile " + mUri.getPath());
+            String file;
+            FileInfo fileInfo = FileUtils.getFileInfo(context, mUri);
+
+            Logger.dh("Utils: FlashZip Running, " + fileInfo.getPath());
+            String filename = fileInfo.getPath();
+            String idStr = filename.substring(filename.lastIndexOf('/') + 1);
+            if (!idStr.contains(".zip")) {
+                Logger.dh("Async: Improper name, cancelling " + idStr);
                 this.cancel(true);
+                progress.cancel();
             }
+            file = mContext.getFilesDir() + "/" + idStr;
+
             ContentResolver contentResolver = mContext.getContentResolver();
             //contentResolver.takePersistableUriPermission(mUri, flags);
             try {
                 InputStream in = contentResolver.openInputStream(mUri);
                 Log.d("Magisk", "Firing inputStream");
-                mFile = createFileFromInputStream(in, file, mContext);
+                mFile = createFileFromInputStream(in, file);
                 if (mFile != null) {
                     mPath = mFile.getPath();
-                    Log.d("Magisk", "Utils: Mpath is " + mPath);
+                    Logger.dh("Async: Mpath is " + mPath);
                 } else {
-                    Log.e("Magisk", "Utils: error creating file " + mUri.getPath());
+                    Log.e("Magisk", "Async: error creating file " + mUri.getPath());
                     this.cancel(true);
                 }
             } catch (FileNotFoundException e) {
@@ -292,7 +285,7 @@ public class Async {
 
         }
 
-        private static File createFileFromInputStream(InputStream inputStream, String fileName, Context context) {
+        private static File createFileFromInputStream(InputStream inputStream, String fileName) {
 
             try {
                 File f = new File(fileName);
@@ -307,12 +300,13 @@ public class Async {
 
                 outputStream.close();
                 inputStream.close();
-                Log.d("Magisk", "Holy balls, I think it worked.  File is " + f.getPath());
+                Logger.dh("Async: File created successfully - " + f.getPath());
                 return f;
 
             } catch (IOException e) {
                 System.out.println("error in creating a file");
                 e.printStackTrace();
+
             }
 
             return null;
@@ -327,23 +321,24 @@ public class Async {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            if (mPath != null) {
+            if (mPath == null) {
                 Log.e("Magisk", "Utils: Error, flashZIP called without a valid zip file to flash.");
-                progress.dismiss();
                 this.cancel(true);
+                progress.cancel();
                 return false;
             }
             if (!Shell.rootAccess()) {
                 return false;
             } else {
                 ret = Shell.su(
-                        "rm -rf /dev/tmp",
-                        "mkdir -p /dev/tmp",
-                        "cp -af " + mPath + " /dev/tmp/install.zip",
-                        "unzip -o /dev/tmp/install.zip META-INF/com/google/android/* -d /dev/tmp",
-                        "BOOTMODE=true sh /dev/tmp/META-INF/com/google/android/update-binary dummy 1 /dev/tmp/install.zip",
+                        "rm -rf /data/tmp",
+                        "mkdir -p /data/tmp",
+                        "cp -af " + mPath + " /data/tmp/install.zip",
+                        "unzip -o /data/tmp/install.zip META-INF/com/google/android/* -d /data/tmp",
+                        "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
+                Logger.dh("Async: ret is " + ret);
                 return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
             }
         }
@@ -351,6 +346,7 @@ public class Async {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
+            //Shell.su("rm -rf /data/tmp");
             if (deleteFileAfter) {
                 Shell.su("rm -rf " + mPath);
                 Log.d("Magisk", "Utils: Deleting file " + mPath);

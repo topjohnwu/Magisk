@@ -18,7 +18,6 @@ import android.view.accessibility.AccessibilityEvent;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Set;
@@ -109,7 +108,7 @@ public class MonitorService extends AccessibilityService {
     private void ShowNotification(boolean rootAction, String packageName) {
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder;
-        if (!PrefHelper.CheckBool("hide_root_notification", getApplicationContext())) {
+        if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("hide_root_notification", false)) {
             if (rootAction) {
 
                 Intent intent = new Intent(getApplication(), MainActivity.class);

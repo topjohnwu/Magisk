@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginStart="@dimen/card_horizontal_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
-    android:layout_marginTop="@dimen/card_vertical_margin"
-    android:background="?android:attr/selectableItemBackground"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    card_view:cardCornerRadius="@dimen/card_corner_radius"
-    card_view:cardElevation="@dimen/card_elevation">
+                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                                    xmlns:tools="http://schemas.android.com/tools"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginBottom="@dimen/card_vertical_margin"
+                                    android:layout_marginEnd="@dimen/card_horizontal_margin"
+                                    android:layout_marginStart="@dimen/card_horizontal_margin"
+                                    android:layout_marginTop="@dimen/card_vertical_margin"
+                                    android:minHeight="?android:attr/listPreferredItemHeight"
+                                    style="?attr/cardStyle"
+                                    card_view:cardCornerRadius="@dimen/card_corner_radius"
+                                    card_view:cardElevation="@dimen/card_elevation">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeight"
+        android:padding="@dimen/card_layout_padding">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="@dimen/card_textview_width"
             android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:padding="@dimen/card_layout_padding"
-            android:layout_gravity="center_vertical">
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textIsSelectable="false"/>
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="@dimen/card_textview_width"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="0dp"
-                android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false" />
+        <TextView
+            android:id="@+id/version_name"
+            android:layout_width="@dimen/card_textview_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/title"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textIsSelectable="false"
+            android:textStyle="bold|italic"/>
 
-            <TextView
-                android:id="@+id/version_name"
-                android:layout_width="@dimen/card_textview_width"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/title"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@android:color/tertiary_text_dark"
-                android:textIsSelectable="false"
-                android:textStyle="bold|italic"
-                android:layout_alignParentStart="true"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/expand_layout"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal"
+            android:paddingTop="15dp">
 
-            <LinearLayout
+
+            <CheckBox
+                android:id="@+id/checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:orientation="horizontal"
-                android:layout_alignParentTop="true"
-                android:layout_above="@+id/expand_layout"
-                android:paddingTop="15dp">
+                android:focusable="false"
+                android:gravity="center"
+                android:padding="@dimen/checkbox_padding"
+                android:src="@drawable/ic_menu_overflow_material"
+                tools:ignore="ContentDescription"/>
 
-
-                <CheckBox
-                    android:id="@+id/checkbox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:gravity="center"
-                    android:padding="@dimen/checkbox_padding"
-                    android:src="@drawable/ic_menu_overflow_material"
-                    tools:ignore="ContentDescription" />
-
-                <ImageView
+            <ImageView
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -72,115 +72,113 @@
                 android:gravity="center"
                 android:padding="@dimen/checkbox_padding"
                 android:src="@drawable/ic_delete"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"/>
 
-            </LinearLayout>
-            <!--TODO - Work in an auto-update notifier, make this fly around like magic -->
-            <!--<ImageView-->
-            <!--android:id="@+id/update"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:focusable="false"-->
-            <!--android:gravity="right"-->
-            <!--android:background="@drawable/ic_file_download_black"-->
-            <!--android:layout_marginEnd="10dp"-->
-            <!--android:layout_gravity="right"-->
-            <!--android:layout_alignBaseline="@id/title"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--/>-->
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="@dimen/card_textview_width"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/version_name"
-                android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false" />
+        </LinearLayout>
+        <!--TODO - Work in an auto-update notifier, make this fly around like magic -->
+        <!--<ImageView-->
+        <!--android:id="@+id/update"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:focusable="false"-->
+        <!--android:gravity="right"-->
+        <!--android:background="@drawable/ic_file_download_black"-->
+        <!--android:layout_marginEnd="10dp"-->
+        <!--android:layout_gravity="right"-->
+        <!--android:layout_alignBaseline="@id/title"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--/>-->
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="@dimen/card_textview_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/version_name"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textIsSelectable="false"/>
+
+        <TextView
+            android:id="@+id/warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/description"
+            android:layout_gravity="center_vertical"
+            android:text="@string/remove_file_created"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/red500"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/expand_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/description"
+            android:minHeight="@dimen/min_rowheight"
+            android:orientation="vertical"
+
+            >
 
             <TextView
-                android:id="@+id/warning"
+                android:id="@+id/author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/description"
-                android:layout_gravity="center_vertical"
-                android:text="@string/remove_file_created"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/red500"
-                android:visibility="gone" />
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic"/>
+
+            <TextView
+                android:id="@+id/updateStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dip"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
 
             <LinearLayout
-                android:id="@+id/expand_layout"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/description"
-                android:minHeight="@dimen/min_rowheight"
-                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="50dip"
+                android:layout_gravity="center"
+                android:layout_marginBottom="0dip"
+                android:orientation="horizontal">
 
-                >
-
-                <TextView
-                    android:id="@+id/author"
+                <ImageView
+                    android:id="@+id/changeLog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@android:color/tertiary_text_dark"
-                    android:textIsSelectable="false"
-                    android:textStyle="bold|italic" />
+                    android:layout_marginEnd="@dimen/card_imageview_margin"
+                    android:layout_marginStart="@dimen/card_imageview_margin"
+                    android:background="@drawable/ic_changelog"
+                    android:backgroundTint="@color/icon_grey"/>
 
-                <TextView
-                    android:id="@+id/updateStatus"
+                <ImageView
+                    android:id="@+id/authorLink"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dip"
-                    android:gravity="center_horizontal"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="false"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_marginEnd="@dimen/card_imageview_margin"
+                    android:layout_marginStart="@dimen/card_imageview_margin"
+                    android:background="@drawable/ic_author"
+                    android:backgroundTint="@color/icon_grey"/>
 
-                <LinearLayout
+                <ImageView
+                    android:id="@+id/supportLink"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dip"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="0dip"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/card_imageview_margin"
+                    android:layout_marginStart="@dimen/card_imageview_margin"
+                    android:background="@drawable/ic_support"
+                    android:backgroundTint="@color/icon_grey"/>
 
-                    <ImageView
-                        android:id="@+id/changeLog"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/card_imageview_margin"
-                        android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_changelog" />
-
-                    <ImageView
-                        android:id="@+id/authorLink"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/card_imageview_margin"
-                        android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_author" />
-
-                    <ImageView
-                        android:id="@+id/supportLink"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="@dimen/card_imageview_margin"
-                        android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:backgroundTint="@color/icon_grey"
-                        android:background="@drawable/ic_support" />
-
-
-                </LinearLayout>
 
             </LinearLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
-
+    </RelativeLayout>
 
 
 </android.support.v7.widget.CardView>

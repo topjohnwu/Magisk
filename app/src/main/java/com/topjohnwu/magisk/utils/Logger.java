@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.app.Application;
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Logger {
@@ -15,7 +16,7 @@ public class Logger {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (PrefHelper.CheckBool("developer_logging", context)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("developer_logging", false)) {
             if (args.length == 1 && args[0] instanceof Throwable) {
                 Log.d(LOG_TAG, msg, (Throwable) args[0]);
             } else {

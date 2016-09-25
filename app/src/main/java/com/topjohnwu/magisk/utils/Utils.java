@@ -72,10 +72,10 @@ public class Utils {
         if (!Shell.rootAccess()) {
             Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
-        if (PrefHelper.CheckBool("keep_root_off", context)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("keep_root_off", false)) {
             Utils.toggleRoot(false, context);
         }
-        if (PrefHelper.CheckBool("enable_quicktile", context)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
             Utils.SetupQuickSettingsTile(context);
         }
     }
@@ -137,10 +137,10 @@ public class Utils {
             } else {
                 Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
             }
-            if (PrefHelper.CheckBool("enable_quicktile", context)) {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
                 SetupQuickSettingsTile(context);
             }
-            PrefHelper.SetBool("root",b,context);
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root",b).apply();
         }
     }
 
@@ -156,6 +156,7 @@ public class Utils {
                 Logger.dh("Utils: toggleAuto checks passed, setting" + b );
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
                 Intent myServiceIntent = new Intent(context, MonitorService.class);
+                myServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 if (b) {
                     context.startService(myServiceIntent);
                 } else {
@@ -163,7 +164,7 @@ public class Utils {
                 }
             }
         }
-        if (PrefHelper.CheckBool("enable_quicktile", context)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
             SetupQuickSettingsTile(context);
         }
         UpdateRootFragmentUI(context);

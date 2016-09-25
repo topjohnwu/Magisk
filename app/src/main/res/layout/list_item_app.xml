@@ -5,15 +5,15 @@
                                     android:layout_width="fill_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginStart="@dimen/card_horizontal_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
-    android:layout_marginTop="@dimen/card_vertical_margin"
+                                    android:layout_marginBottom="@dimen/card_vertical_margin"
+                                    android:layout_marginEnd="@dimen/card_horizontal_margin"
+                                    android:layout_marginStart="@dimen/card_horizontal_margin"
+                                    android:layout_marginTop="@dimen/card_vertical_margin"
 
-                                    android:background="?android:attr/selectableItemBackground"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    card_view:cardCornerRadius="@dimen/card_corner_radius"
-    card_view:cardElevation="@dimen/card_elevation">
+                                    style="?attr/cardStyle"
+                                    android:minHeight="?android:attr/listPreferredItemHeight"
+                                    card_view:cardCornerRadius="@dimen/card_corner_radius"
+                                    card_view:cardElevation="@dimen/card_elevation">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,11 +33,11 @@
             android:id="@+id/textLayout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_alignBottom="@+id/app_icon"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
             android:paddingEnd="@dimen/card_appicon_size"
             android:paddingStart="65dp"
-            android:gravity="center_horizontal"
-            android:layout_alignBottom="@+id/app_icon"
             android:weightSum="1">
 
 
@@ -46,21 +46,21 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="false"
+                android:layout_weight="1"
                 android:paddingEnd="3dp"
                 android:paddingStart="3dp"
-                android:textStyle="bold"
-                android:layout_weight="1"/>
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/app_paackage"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
+                android:ellipsize="marquee"
                 android:gravity="center_vertical"
-                android:paddingEnd="3dp"
-                android:paddingStart="3dp"
+                android:marqueeRepeatLimit="marquee_forever"
                 android:maxLines="1"
-                android:marqueeRepeatLimit ="marquee_forever"
-                android:ellipsize="marquee"/>
+                android:paddingEnd="3dp"
+                android:paddingStart="3dp"/>
         </LinearLayout>
 
         <LinearLayout

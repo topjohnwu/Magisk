@@ -1,19 +1,16 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +22,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.getkeepsafe.taptargetview.TapTarget;
-import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.PrefHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -39,6 +33,8 @@ import java.util.List;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.topjohnwu.magisk.R.attr.cardStyle;
 
 public class RootFragment extends Fragment {
 
@@ -79,29 +75,37 @@ public class RootFragment extends Fragment {
     TextView safetyNetStatus;
     @BindView(R.id.safety_net_icon)
     ImageView safetyNetStatusIcon;
-    @BindColor(R.color.red500)
-    int red500;
-    @BindColor(R.color.green500)
-    int green500;
-    @BindColor(R.color.grey500)
-    int grey500;
-    @BindColor(R.color.accent)
-    int accent;
     int statusOK = R.drawable.ic_check_circle;
     int statusAuto = R.drawable.ic_autoroot;
     int statusError = R.drawable.ic_error;
     int statusUnknown = R.drawable.ic_help;
 
+    private int colorOK, colorFail, colorNeutral, colorWarn;
     private boolean autoRootStatus;
-    private View view;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private View view;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        int[] attrs0 = {R.attr.ColorOK};
+        int[] attrs1 = {R.attr.ColorFail};
+        int[] attrs2 = {R.attr.ColorNeutral};
+        int[] attrs3 = {R.attr.ColorWarn};
+        TypedArray ta0 = getActivity().obtainStyledAttributes(attrs0);
+        TypedArray ta1 = getActivity().obtainStyledAttributes(attrs1);
+        TypedArray ta2 = getActivity().obtainStyledAttributes(attrs2);
+        TypedArray ta3 = getActivity().obtainStyledAttributes(attrs3);
+        colorOK = ta0.getColor(0, Color.GRAY);
+        colorFail = ta1.getColor(0, Color.GRAY);
+        colorNeutral = ta2.getColor(0, Color.GRAY);
+        colorWarn = ta2.getColor(0, Color.GRAY);
+        ta0.recycle();
+        ta1.recycle();
+        ta2.recycle();
+        ta3.recycle();
         autoRootStatus = Utils.autoToggleEnabled(getActivity());
 
         if (autoRootStatus) {
@@ -128,22 +132,10 @@ public class RootFragment extends Fragment {
 
         );
 
-        listener = (prefs1, key) -> {
-
-            if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
-                Logger.dh("RootFragmnet, keychange detected for " + key);
-                new updateUI().execute();
-            }
-
-        };
-
-        prefs.registerOnSharedPreferenceChangeListener(listener);
-
         selinuxToggle.setOnClickListener(toggle -> {
             Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
             new updateUI().execute();
         });
-
 
         return view;
     }
@@ -151,10 +143,10 @@ public class RootFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        if (null != listener) {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        }
     }
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -162,8 +154,9 @@ public class RootFragment extends Fragment {
         Log.d("Magisk", "Got result: " + requestCode + " and " + resultCode);
         if (requestCode == 100) {
             if (Utils.hasServicePermission(getActivity())) {
-                Log.d("Magisk", "Got result code OK for permissions");
                 ToggleAutoRoot(true);
+                Snackbar.make(view, getActivity().getString(R.string.auto_toggle) + " has been enabled.", Snackbar.LENGTH_LONG).show();
+
             } else {
                 autoRootToggle.setChecked(false);
                 Snackbar.make(view, getActivity().getString(R.string.auto_toggle) + " disabled, permissions required.", Snackbar.LENGTH_LONG).show();
@@ -196,6 +189,17 @@ public class RootFragment extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Root");
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        listener = (prefs1, key) -> {
+
+            if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
+                Logger.dh("RootFragmnet, keychange detected for " + key);
+                new updateUI().execute();
+            }
+
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(listener);
         new updateUI().execute();
 
     }
@@ -207,7 +211,7 @@ public class RootFragment extends Fragment {
             // Make sure static block invoked
             Shell.rootAccess();
             // Set up Tile on UI Refresh
-            if (PrefHelper.CheckBool("enable_quicktile", getActivity())) {
+            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_quicktile", false)) {
                 Utils.SetupQuickSettingsTile(getActivity());
             }
             autoRootStatus = Utils.autoToggleEnabled(getActivity());
@@ -232,25 +236,25 @@ public class RootFragment extends Fragment {
             List<String> selinux = Shell.sh("getenforce");
 
             if (selinux.isEmpty()) {
-                selinuxStatusContainer.setBackgroundColor(grey500);
+                selinuxStatusContainer.setBackgroundColor(colorNeutral);
                 selinuxStatusIcon.setImageResource(statusUnknown);
 
                 selinuxStatus.setText(R.string.selinux_error_info);
-                selinuxStatus.setTextColor(grey500);
+                selinuxStatus.setTextColor(colorNeutral);
                 selinuxToggle.setChecked(false);
             } else if (selinux.get(0).equals("Enforcing")) {
-                selinuxStatusContainer.setBackgroundColor(green500);
+                selinuxStatusContainer.setBackgroundColor(colorOK);
                 selinuxStatusIcon.setImageResource(statusOK);
 
                 selinuxStatus.setText(R.string.selinux_enforcing_info);
-                selinuxStatus.setTextColor(green500);
+                selinuxStatus.setTextColor(colorOK);
                 selinuxToggle.setChecked(true);
             } else {
-                selinuxStatusContainer.setBackgroundColor(red500);
+                selinuxStatusContainer.setBackgroundColor(colorFail);
                 selinuxStatusIcon.setImageResource(statusError);
 
                 selinuxStatus.setText(R.string.selinux_permissive_info);
-                selinuxStatus.setTextColor(red500);
+                selinuxStatus.setTextColor(colorFail);
                 selinuxToggle.setChecked(false);
             }
 
@@ -261,9 +265,9 @@ public class RootFragment extends Fragment {
             switch (Shell.rootStatus) {
                 case -1:
                     // Root Error
-                    rootStatusContainer.setBackgroundColor(grey500);
+                    rootStatusContainer.setBackgroundColor(colorFail);
                     rootStatusIcon.setImageResource(statusUnknown);
-                    rootStatus.setTextColor(grey500);
+                    rootStatus.setTextColor(colorNeutral);
                     rootStatus.setText(R.string.root_error);
                     rootToggle.setChecked(false);
                     safetyNetStatusIcon.setImageResource(statusUnknown);
@@ -271,9 +275,9 @@ public class RootFragment extends Fragment {
                     break;
                 case 0:
                     // Not rooted
-                    rootStatusContainer.setBackgroundColor(green500);
+                    rootStatusContainer.setBackgroundColor(colorOK);
                     rootStatusIcon.setImageResource(statusOK);
-                    rootStatus.setTextColor(green500);
+                    rootStatus.setTextColor(colorOK);
                     rootStatus.setText(R.string.root_none);
                     rootToggle.setChecked(false);
                     safetyNetStatusIcon.setImageResource(statusOK);
@@ -282,10 +286,10 @@ public class RootFragment extends Fragment {
                 case 1:
                     // Proper root
                     if (autoRootStatus) {
-                        rootStatusContainer.setBackgroundColor(green500);
+                        rootStatusContainer.setBackgroundColor(colorOK);
                         rootStatusIcon.setImageResource(statusAuto);
                         rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                        rootStatus.setTextColor(green500);
+                        rootStatus.setTextColor(colorOK);
                         rootStatus.setText(R.string.root_auto_unmounted);
                         rootToggle.setEnabled(false);
                         autoRootToggle.setChecked(true);
@@ -296,9 +300,9 @@ public class RootFragment extends Fragment {
                         rootToggle.setEnabled(true);
                         if (Utils.rootEnabled()) {
                             // Mounted
-                            rootStatusContainer.setBackgroundColor(accent);
+                            rootStatusContainer.setBackgroundColor(colorWarn);
                             rootStatusIcon.setImageResource(statusError);
-                            rootStatus.setTextColor(accent);
+                            rootStatus.setTextColor(colorWarn);
                             rootStatus.setText(R.string.root_enabled);
                             rootToggle.setChecked(true);
                             safetyNetStatusIcon.setImageResource(statusError);
@@ -306,9 +310,9 @@ public class RootFragment extends Fragment {
                             break;
                         } else {
                             // Disabled
-                            rootStatusContainer.setBackgroundColor(green500);
+                            rootStatusContainer.setBackgroundColor(colorOK);
                             rootStatusIcon.setImageResource(statusOK);
-                            rootStatus.setTextColor(green500);
+                            rootStatus.setTextColor(colorOK);
                             rootStatus.setText(R.string.root_disabled);
                             rootToggle.setChecked(false);
                             safetyNetStatusIcon.setImageResource(statusOK);
@@ -318,9 +322,9 @@ public class RootFragment extends Fragment {
                     }
                 case 2:
                     // Improper root
-                    rootStatusContainer.setBackgroundColor(red500);
+                    rootStatusContainer.setBackgroundColor(colorFail);
                     rootStatusIcon.setImageResource(statusError);
-                    rootStatus.setTextColor(red500);
+                    rootStatus.setTextColor(colorFail);
                     rootStatus.setText(R.string.root_system);
                     rootToggle.setChecked(true);
                     safetyNetStatusIcon.setImageResource(statusError);
