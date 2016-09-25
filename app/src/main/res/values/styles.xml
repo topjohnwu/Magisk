@@ -41,10 +41,13 @@
         <item name="android:alertDialogTheme">@style/AlertDialog.dh</item>
         <item name="android:dialogTheme">@style/AlertDialog.dh</item>
         <item name="android:actionOverflowButtonStyle">@style/OverFlow</item>
+        <item name="colorControlNormal">@color/dh_primary_text</item>
+        <item name="colorControlActivated">@color/dh_accent</item>
+        <item name="colorControlHighlight">@color/dh_icons</item>
         <item name="ColorOK">@color/dh_alertOk</item>
         <item name="ColorWarn">@color/dh_alertWarn</item>
         <item name="ColorFail">@color/dh_alertFail</item>
-        <item name="ColorNeutral">@color/grey500</item>
+        <item name="ColorNeutral">@color/dh_alertWarn</item>
 
 
     </style>
@@ -104,6 +107,23 @@
         <item name="android:bottomBright">@android:color/transparent</item>
         <item name="android:bottomMedium">@android:color/transparent</item>
         <item name="android:centerMedium">@android:color/transparent</item>
+    </style>
+
+    <style name="ListViewStyle.dh" parent="android:Widget.Material.PopupMenu">
+        <item name="android:divider">@color/dh_divider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:listSelector">@android:color/background_dark</item>
+        <item name="android:drawSelectorOnTop">true</item>
+        <item name="android:cacheColorHint">@color/dh_divider</item>
+        <item name="android:foregroundTint">@color/dh_primary_text</item>
+    </style>
+
+    <style name="TransparentListView" parent="@android:style/Widget.ListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+        <item name="android:background">#FFFF00</item>
+        <item name="android:listSelector">@android:color/transparent</item>
+        <item name="android:divider">#F78181</item>
+        <item name="android:dividerHeight">3dp</item>
     </style>
 
     <style name="MyTitleTextStyle">
