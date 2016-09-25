@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -388,7 +389,14 @@ public class Async {
         }
 
         protected void done() {
-            new AlertDialog.Builder(mContext)
+            AlertDialog.Builder builder;
+            String theme = PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme", "");
+            if (theme.equals("Dark")) {
+                builder = new AlertDialog.Builder(mContext,R.style.AlertDialog_dh);
+            } else {
+                builder = new AlertDialog.Builder(mContext);
+            }
+            builder
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
                     .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.su("reboot"))

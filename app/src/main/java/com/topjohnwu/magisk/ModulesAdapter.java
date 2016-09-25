@@ -127,8 +127,13 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                                 break;
                         }
                     };
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    AlertDialog.Builder builder;
+                    String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
+                    if (theme.equals("Dark")) {
+                        builder = new AlertDialog.Builder(context,R.style.AlertDialog_dh);
+                    } else {
+                        builder = new AlertDialog.Builder(context);
+                    }
                     builder.setMessage("An update is available for " + mModule.getName() + ".  Would you like to install it?").setPositiveButton("Yes", dialogClickListener)
                             .setNegativeButton("No", dialogClickListener).show();
                     mListToUpdate.remove(mModule);

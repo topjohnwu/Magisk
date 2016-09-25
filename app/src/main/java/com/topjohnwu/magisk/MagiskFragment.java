@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.support.v4.content.FileProvider;
@@ -52,6 +53,7 @@ public class MagiskFragment extends Fragment {
     private int colorOK, colorWarn, colorNeutral;
     int statusOK = R.drawable.ic_check_circle;
     int statusUnknown = R.drawable.ic_help;
+    private AlertDialog.Builder builder;
 
     @Nullable
     @Override
@@ -91,6 +93,12 @@ public class MagiskFragment extends Fragment {
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
+            String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
+            if (theme.equals("Dark")) {
+                builder = new AlertDialog.Builder(getActivity(),R.style.AlertDialog_dh);
+            } else {
+                builder = new AlertDialog.Builder(getActivity());
+            }
 
             if (Utils.magiskVersion == -1) {
                 magiskStatusContainer.setBackgroundColor(grey500);
@@ -123,7 +131,7 @@ public class MagiskFragment extends Fragment {
                     magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
                     magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(Utils.remoteMagiskVersion)));
                     magiskCheckUpdatesStatus.setTextColor(colorNeutral);
-                    magiskUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
+                    magiskUpdateView.setOnClickListener(view -> builder
                             .setTitle(getString(R.string.update_title, getString(R.string.magisk)))
                             .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(Utils.remoteMagiskVersion), Utils.magiskChangelog))
                             .setCancelable(true)
@@ -150,7 +158,7 @@ public class MagiskFragment extends Fragment {
                     appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
                     appCheckUpdatesStatus.setText(getString(R.string.app_update_available, String.valueOf(Utils.remoteAppVersion)));
                     appCheckUpdatesStatus.setTextColor(colorNeutral);
-                    appUpdateView.setOnClickListener(view -> new AlertDialog.Builder(getActivity())
+                    appUpdateView.setOnClickListener(view -> builder
                             .setTitle(getString(R.string.update_title, getString(R.string.app_name)))
                             .setMessage(getString(R.string.update_msg, getString(R.string.app_name), String.valueOf(Utils.remoteAppVersion), Utils.appChangelog))
                             .setCancelable(true)

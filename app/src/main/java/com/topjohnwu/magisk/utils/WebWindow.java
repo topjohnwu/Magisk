@@ -1,16 +1,24 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.topjohnwu.magisk.R;
 
 public class WebWindow {
 
 public WebWindow(String title, String url, Context context) {
-    AlertDialog.Builder alert = new AlertDialog.Builder(context);
+    AlertDialog.Builder alert;
+    String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
+    if (theme.equals("Dark")) {
+        alert = new AlertDialog.Builder(context, R.style.AlertDialog_dh);
+    } else {
+        alert = new AlertDialog.Builder(context);
+    }
     alert.setTitle(title);
 
     WebView wv = new WebView(context);

@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -42,6 +44,7 @@ public class ReposFragment extends Fragment {
     private boolean alertUpdate;
     private boolean ignoreAlertUpdate;
     private String alertPackage;
+    private AlertDialog.Builder builder;
 //    private SharedPreferences prefs;
 
     @Nullable
@@ -132,10 +135,17 @@ public class ReposFragment extends Fragment {
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("An update is available for " + repo.getName() + ".  Would you like to install it?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
-                iterRepo.remove();
+                String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
+                Logger.dh("ReposFragment: Theme is " + theme);
+                if (theme.equals("Dark")) {
+                    builder = new AlertDialog.Builder(getActivity(),R.style.AlertDialog_dh);
+                } else {
+                    builder = new AlertDialog.Builder(getActivity());
+                }
+                    builder.setMessage("An update is available for " + repo.getName() + ".  Would you like to install it?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                    iterRepo.remove();
+
             }
 
         }

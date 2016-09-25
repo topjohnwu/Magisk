@@ -26,6 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
+                style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
@@ -100,6 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
+                style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <com.topjohnwu.magisk.utils.RowItem

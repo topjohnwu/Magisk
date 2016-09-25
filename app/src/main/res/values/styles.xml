@@ -38,7 +38,8 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:textColorPrimary">@color/dh_primary_text</item>
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
-        <item name="android:alertDialogTheme">@style/YourAlertDialogTheme</item>
+        <item name="android:alertDialogTheme">@style/AlertDialog.dh</item>
+        <item name="android:dialogTheme">@style/AlertDialog.dh</item>
         <item name="ColorOK">@color/dh_alertOk</item>
         <item name="ColorWarn">@color/dh_alertWarn</item>
         <item name="ColorFail">@color/dh_alertFail</item>
@@ -60,17 +61,49 @@
 
     </style>
 
-    <style name="YourAlertDialogTheme">
+    <style name="AlertDialog.dh" parent="ThemeOverlay.AppCompat.Dark">
         <item name="android:textColor">@color/dh_primary_text</item>
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
+        <item name="colorAccent">@color/dh_accent</item>
+        <item name="android:textColorPrimary">@color/dh_primary_text</item>
+        <item name="android:background">@android:color/background_dark</item>
+        <item name="android:textColorAlertDialogListItem">@color/dh_primary_text</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
         <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowTitleStyle">@style/MyTitleTextStyle</item>
         <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="android:alertDialogStyle">@style/ListPrefAlertDialogStyle</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:textAppearanceMedium">@style/MyAlertTextAppearance</item>
 
     </style>
 
+    <style name="MyAlertTextAppearance">
+        <!-- Set text size and color of title and message here -->
+        <item name="android:textColor">@color/dh_primary_text</item>
+    </style>
+
+
+
+    <style name="ListPrefAlertDialogStyle">
+        <item name="android:fullDark"    >@android:color/transparent</item>
+        <item name="android:topDark"     >@android:color/transparent</item>
+        <item name="android:centerDark"  >@android:color/transparent</item>
+        <item name="android:bottomDark"  >@android:color/transparent</item>
+        <item name="android:fullBright"  >@android:color/transparent</item>
+        <item name="android:topBright"   >@android:color/transparent</item>
+        <item name="android:centerBright">@android:color/transparent</item>
+        <item name="android:bottomBright">@android:color/transparent</item>
+        <item name="android:bottomMedium">@android:color/transparent</item>
+        <item name="android:centerMedium">@android:color/transparent</item>
+    </style>
+
+    <style name="MyTitleTextStyle">
+        <item name="android:textColor">@color/dh_primary_text</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
 
     <style name="CardViewStyle.Light" parent="CardView">
         <item name="cardBackgroundColor">@android:color/background_light</item>

@@ -4,18 +4,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.RowItem;
 
 import java.io.IOException;
@@ -28,7 +31,7 @@ public class   AboutActivity extends AppCompatActivity {
 
     private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
     private static final String XDA_THREAD = "http://forum.xda-developers.com/android/software/mod-magisk-v1-universal-systemless-t3432382";
-
+    private AlertDialog.Builder builder;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @BindView(R.id.app_version_info) RowItem appVersionInfo;
@@ -41,6 +44,11 @@ public class   AboutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
+        Logger.dh("AboutActivity: Theme is " + theme);
+        if (theme.equals("Dark")) {
+            setTheme(R.style.AppTheme_dh);
+        }
         setContentView(R.layout.activity_about);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -72,14 +80,24 @@ public class   AboutActivity extends AppCompatActivity {
         }
 
         appChangelog.removeSummary();
+        if (theme.equals("Dark")) {
+            builder = new AlertDialog.Builder(this,R.style.AlertDialog_dh);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
         if (changes == null) {
             appChangelog.setVisibility(View.GONE);
         } else {
-            final String finalChanges = changes;
+            Spanned result;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                result = Html.fromHtml(changes,Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            } else {
+                result = Html.fromHtml(changes);
+            }
             appChangelog.setOnClickListener(v -> {
-                AlertDialog d = new AlertDialog.Builder(AboutActivity.this)
+                AlertDialog d = builder
                         .setTitle(R.string.app_changelog)
-                        .setMessage(Html.fromHtml(finalChanges))
+                        .setMessage(result)
                         .setPositiveButton(android.R.string.ok, null)
                         .create();
 
@@ -92,9 +110,15 @@ public class   AboutActivity extends AppCompatActivity {
 
         appDevelopers.removeSummary();
         appDevelopers.setOnClickListener(view -> {
-            AlertDialog d = new AlertDialog.Builder(AboutActivity.this)
+            Spanned result;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                result = Html.fromHtml(getString(R.string.app_developers_),Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            } else {
+                result = Html.fromHtml(getString(R.string.app_developers_));
+            }
+            AlertDialog d = builder
                     .setTitle(R.string.app_developers)
-                    .setMessage(Html.fromHtml(getString(R.string.app_developers_)))
+                    .setMessage(result)
                     .setPositiveButton(android.R.string.ok, null)
                     .create();
 
@@ -142,6 +166,5 @@ public class   AboutActivity extends AppCompatActivity {
            setTitle("About");
 
 
-        getWindow().setStatusBarColor(getResources().getColor(R.color.primary_dark));
-    }
+            }
 }
