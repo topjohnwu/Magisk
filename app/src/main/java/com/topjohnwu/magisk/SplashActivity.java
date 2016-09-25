@@ -50,6 +50,8 @@ public class SplashActivity extends AppCompatActivity {
             if (!Utils.hasServicePermission(getApplicationContext())) {
                 Utils.toggleAutoRoot(false, getApplicationContext());
             }
+        }
+        if (Utils.autoToggleEnabled(getApplicationContext())) {
             if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
                 Intent myIntent = new Intent(getApplication(), MonitorService.class);
                 getApplication().startService(myIntent);
@@ -59,9 +61,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         // Set up quick settings tile
-        if (defaultPrefs.getBoolean("enable_quicktile", false)) {
-            Utils.SetupQuickSettingsTile(getApplicationContext());
-        }
+        Utils.SetupQuickSettingsTile(getApplicationContext());
 
         // Initialize
         Utils.init(this);

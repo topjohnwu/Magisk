@@ -164,7 +164,6 @@ public class Utils {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
             SetupQuickSettingsTile(context);
         }
-        UpdateRootFragmentUI(context);
     }
 
     static List<String> getModList(String path) {
@@ -373,18 +372,8 @@ public class Utils {
         context.startService(new Intent(context, TileServiceCompat.class));
     }
 
-    public static void UpdateRootFragmentUI(Context context) {
-
-        Logger.dh("Magisk", "Utils: UpdateRF called");
-        Intent intent = new Intent(context, RootFragment.class);
-        intent.setAction("com.magisk.UPDATE");
-        context.sendBroadcast(intent);
-
-    }
-
     // Gets an overall state for the quick settings tile
     // 0 for root disabled, 1 for root enabled (no auto), 2 for auto-root
-
     public static int CheckRootsState(Context mContext) {
         if (autoToggleEnabled(mContext)) {
             return 2;

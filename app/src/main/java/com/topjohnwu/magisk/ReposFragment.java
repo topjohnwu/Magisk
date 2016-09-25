@@ -51,16 +51,11 @@ public class ReposFragment extends Fragment {
         View view = inflater.inflate(R.layout.repos_fragment, container, false);
         mView = view;
         ButterKnife.bind(this, view);
-//        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        if (prefs.contains("ignoreUpdateAlerts")) {
-//            ignoreAlertUpdate = prefs.getBoolean("ignoreUpdateAlerts", false);
-//        }
-//        swipeRefreshLayout.setOnRefreshListener(() -> {
-//            this.LoadRepo(true);
-//            ignoreAlertUpdate = false;
-//            prefs.edit().putBoolean("ignoreUpdateAlerts",false).apply();
-//
-//        });
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            this.LoadRepo(true);
+            ignoreAlertUpdate = false;
+
+        });
         LoadRepo(false);
         setHasOptionsMenu(false);
         alertUpdate = false;
@@ -74,13 +69,6 @@ public class ReposFragment extends Fragment {
         recyclerView.setAdapter(new ReposAdapter(this, mListRepos));
 
         return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        NotifyOfAlerts();
-
     }
 
     private void CheckForUpdates() {
@@ -178,7 +166,7 @@ public class ReposFragment extends Fragment {
         if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
             CheckForUpdates();
-            NotifyOfAlerts();
+            //NotifyOfAlerts();
         }
 
     }
