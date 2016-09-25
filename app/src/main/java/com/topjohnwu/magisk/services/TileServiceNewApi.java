@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.services;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Icon;
+import android.preference.PreferenceManager;
 import android.service.quicksettings.Tile;
 
 import com.topjohnwu.magisk.R;
@@ -53,12 +54,16 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
     }
 
     private void setupState() {
+        if (!Utils.hasServicePermission(getApplicationContext())) {
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("autoRootEnable",false).apply();
+        }
         mRootsState = Utils.CheckRootsState(getApplicationContext());
         Logger.dh("QST (New): SetupState");
         Icon iconRoot = Icon.createWithResource(getApplicationContext(), R.drawable.root);
         Icon iconAuto = Icon.createWithResource(getApplicationContext(), R.drawable.ic_autoroot);
         Tile tile = getQsTile();
         Logger.dh("QST: State is " + mRootsState);
+
         switch (mRootsState) {
             case 2:
                 tile.setLabel(getApplicationContext().getString(R.string.auto_toggle));
