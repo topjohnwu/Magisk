@@ -40,11 +40,12 @@ public class ModulesFragment extends Fragment {
 
     private SharedPreferences prefs;
     public static List<Module> listModules = new ArrayList<>();
+    private View viewMain;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View viewMain = inflater.inflate(R.layout.modules_fragment, container, false);
+        viewMain = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, viewMain);
 
         mSwipeRefreshLayout.setRefreshing(true);
@@ -96,6 +97,7 @@ public class ModulesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        viewMain = this.getView();
         getActivity().setTitle("Modules");
     }
 
@@ -123,19 +125,19 @@ public class ModulesFragment extends Fragment {
 
                 if (!chbox.isChecked()) {
                     listModules.get(position).createDisableFile();
-                    Snackbar.make(chk, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(viewMain, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
                 } else {
                     listModules.get(position).removeDisableFile();
-                    Snackbar.make(chk, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(viewMain, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
                 }
             }, (deleteBtn, position) -> {
                 // On delete button click listener
                 listModules.get(position).createRemoveFile();
-                Snackbar.make(deleteBtn, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(viewMain, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
             }, (undeleteBtn, position) -> {
                 // On undelete button click listener
                 listModules.get(position).deleteRemoveFile();
-                Snackbar.make(undeleteBtn, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(viewMain, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
             }));
 
             mSwipeRefreshLayout.setRefreshing(false);
