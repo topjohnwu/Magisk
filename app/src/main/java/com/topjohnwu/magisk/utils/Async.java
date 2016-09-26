@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.RepoHelper;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,13 +119,13 @@ public class Async {
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> new AlertDialog.Builder(mContext)
                                 .setTitle(R.string.root_method_title)
                                 .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                    Utils.DownloadReceiver rootReceiver;
+                                    DownloadReceiver rootReceiver;
                                     String link, filename;
                                     switch (root) {
                                         case 0:
                                             link = Utils.phhLink;
                                             filename = "phhsu.zip";
-                                            rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
+                                            rootReceiver = new DownloadReceiver(mContext.getString(R.string.phh)) {
                                                 @Override
                                                 public void task(File file) {
                                                     new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -134,7 +135,7 @@ public class Async {
                                         case 1:
                                             link = Utils.supersuLink;
                                             filename = "supersu.zip";
-                                            rootReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
+                                            rootReceiver = new DownloadReceiver(mContext.getString(R.string.supersu)) {
                                                 @Override
                                                 public void task(File file) {
                                                     new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -145,7 +146,7 @@ public class Async {
                                             rootReceiver = null;
                                             link = filename = null;
                                     }
-                                    Utils.DownloadReceiver magiskReceiver = new Utils.DownloadReceiver(mContext.getString(R.string.magisk)) {
+                                    DownloadReceiver magiskReceiver = new DownloadReceiver(mContext.getString(R.string.magisk)) {
                                         @Override
                                         public void task(File file) {
                                             Context temp = mContext;
@@ -174,7 +175,7 @@ public class Async {
                                         case 0:
                                             Utils.downloadAndReceive(
                                                     mContext,
-                                                    new Utils.DownloadReceiver(mContext.getString(R.string.phh)) {
+                                                    new DownloadReceiver(mContext.getString(R.string.phh)) {
                                                         @Override
                                                         public void task(File file) {
                                                             new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -185,7 +186,7 @@ public class Async {
                                         case 1:
                                             Utils.downloadAndReceive(
                                                     mContext,
-                                                    new Utils.DownloadReceiver(mContext.getString(R.string.supersu)) {
+                                                    new DownloadReceiver(mContext.getString(R.string.supersu)) {
                                                         @Override
                                                         public void task(File file) {
                                                             new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);

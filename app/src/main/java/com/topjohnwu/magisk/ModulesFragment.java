@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.FileInfo;
 import com.ipaulpro.afilechooser.utils.FileUtils;
@@ -32,38 +31,36 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ModulesFragment extends Fragment {
-    @BindView(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @BindView(R.id.empty_rv)
-    TextView emptyTv;
     private static final int FETCH_ZIP_CODE = 2;
+
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_rv) TextView emptyTv;
+    @BindView(R.id.fab) FloatingActionButton fabio;
+
     private SharedPreferences prefs;
     public static List<Module> listModules = new ArrayList<>();
-    @BindView(R.id.fab)
-    FloatingActionButton fabio;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View viewMain = inflater.inflate(R.layout.modules_fragment, container, false);
-
         ButterKnife.bind(this, viewMain);
+
+        mSwipeRefreshLayout.setRefreshing(true);
         fabio.setOnClickListener(v -> {
             Intent getContentIntent = FileUtils.createGetContentIntent(null);
             getContentIntent.setType("application/zip");
             Intent fileIntent = Intent.createChooser(getContentIntent, "Select a file");
-
             startActivityForResult(fileIntent, FETCH_ZIP_CODE);
-
         });
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
             new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
             prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
 
         });
@@ -72,12 +69,10 @@ public class ModulesFragment extends Fragment {
             if (s.contains("updated")) {
                 viewMain.invalidate();
                 viewMain.requestLayout();
-
             }
         });
 
-        new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-
+        new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         return viewMain;
     }
 
@@ -104,8 +99,9 @@ public class ModulesFragment extends Fragment {
         getActivity().setTitle("Modules");
     }
 
-    private class updateUI extends AsyncTask<Void, Void, Void> {
+    private class UpdateUI extends AsyncTask<Void, Void, Void> {
 
+        // Just for blocking
         @Override
         protected Void doInBackground(Void... voids) {
             return null;
@@ -142,8 +138,7 @@ public class ModulesFragment extends Fragment {
                 Snackbar.make(undeleteBtn, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
             }));
 
-            if (mSwipeRefreshLayout.isRefreshing())
-                mSwipeRefreshLayout.setRefreshing(false);
+            mSwipeRefreshLayout.setRefreshing(false);
 
         }
     }

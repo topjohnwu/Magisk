@@ -19,7 +19,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.RowItem;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -25,11 +25,11 @@ public final class PrivateBroadcastReceiver extends BroadcastReceiver {
         }
         if (ACTION_ENABLEROOT.equals(action)) {
             Utils.toggleAutoRoot(false, context);
-            Utils.toggleRoot(true,context);
+            Utils.toggleRoot(true, context);
         }
         if (ACTION_DISABLEROOT.equals(action)) {
             Utils.toggleAutoRoot(false, context);
-            Utils.toggleRoot(false,context);
+            Utils.toggleRoot(false, context);
         }
 
         Utils.SetupQuickSettingsTile(context);

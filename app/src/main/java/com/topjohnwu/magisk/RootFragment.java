@@ -36,42 +36,26 @@ import butterknife.ButterKnife;
 public class RootFragment extends Fragment {
 
     public SharedPreferences prefs;
-    @BindView(R.id.progressBar)
-    ProgressBar progressBar;
-    @BindView(R.id.rootSwitchView)
-    View rootToggleView;
-    @BindView(R.id.autoRootSwitchView)
-    View autoRootToggleView;
-    @BindView(R.id.selinuxSwitchView)
-    View selinuxToggleView;
-    @BindView(R.id.rootStatusView)
-    View rootStatusView;
-    @BindView(R.id.safetynetStatusView)
-    View safetynetStatusView;
-    @BindView(R.id.selinuxStatusView)
-    View selinuxStatusView;
-    @BindView(R.id.root_toggle)
-    Switch rootToggle;
-    @BindView(R.id.auto_root_toggle)
-    Switch autoRootToggle;
-    @BindView(R.id.selinux_toggle)
-    Switch selinuxToggle;
-    @BindView(R.id.root_status_container)
-    View rootStatusContainer;
-    @BindView(R.id.root_status_icon)
-    ImageView rootStatusIcon;
-    @BindView(R.id.root_status)
-    TextView rootStatus;
-    @BindView(R.id.selinux_status_container)
-    View selinuxStatusContainer;
-    @BindView(R.id.selinux_status_icon)
-    ImageView selinuxStatusIcon;
-    @BindView(R.id.selinux_status)
-    TextView selinuxStatus;
-    @BindView(R.id.safety_net_status)
-    TextView safetyNetStatus;
-    @BindView(R.id.safety_net_icon)
-    ImageView safetyNetStatusIcon;
+
+    @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.rootSwitchView) View rootToggleView;
+    @BindView(R.id.autoRootSwitchView) View autoRootToggleView;
+    @BindView(R.id.selinuxSwitchView) View selinuxToggleView;
+    @BindView(R.id.rootStatusView) View rootStatusView;
+    @BindView(R.id.safetynetStatusView) View safetynetStatusView;
+    @BindView(R.id.selinuxStatusView) View selinuxStatusView;
+    @BindView(R.id.root_toggle) Switch rootToggle;
+    @BindView(R.id.auto_root_toggle) Switch autoRootToggle;
+    @BindView(R.id.selinux_toggle) Switch selinuxToggle;
+    @BindView(R.id.root_status_container) View rootStatusContainer;
+    @BindView(R.id.root_status_icon) ImageView rootStatusIcon;
+    @BindView(R.id.root_status) TextView rootStatus;
+    @BindView(R.id.selinux_status_container) View selinuxStatusContainer;
+    @BindView(R.id.selinux_status_icon) ImageView selinuxStatusIcon;
+    @BindView(R.id.selinux_status) TextView selinuxStatus;
+    @BindView(R.id.safety_net_status) TextView safetyNetStatus;
+    @BindView(R.id.safety_net_icon) ImageView safetyNetStatusIcon;
+
     int statusOK = R.drawable.ic_check_circle;
     int statusAuto = R.drawable.ic_autoroot;
     int statusError = R.drawable.ic_error;

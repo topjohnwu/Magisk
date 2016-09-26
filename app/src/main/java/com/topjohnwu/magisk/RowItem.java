@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk;
 
 import android.content.Context;
 import android.content.res.TypedArray;

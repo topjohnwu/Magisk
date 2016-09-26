@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -107,7 +108,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
                     DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
                         switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                Utils.DownloadReceiver receiver = new Utils.DownloadReceiver() {
+                                DownloadReceiver receiver = new DownloadReceiver() {
                                     @Override
                                     public void task(File file) {
                                         Log.d("Magisk", "Task firing");

@@ -1,0 +1,58 @@
+package com.topjohnwu.magisk.receivers;
+
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.widget.Toast;
+
+import com.topjohnwu.magisk.R;
+
+import java.io.File;
+
+public abstract class DownloadReceiver extends BroadcastReceiver {
+    public Context mContext;
+    long downloadID;
+    public String mName;
+
+    public DownloadReceiver() {
+    }
+
+    public DownloadReceiver(String name) {
+        mName = name;
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        mContext = context;
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        String action = intent.getAction();
+        if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
+            DownloadManager.Query query = new DownloadManager.Query();
+            query.setFilterById(downloadID);
+            Cursor c = downloadManager.query(query);
+            if (c.moveToFirst()) {
+                int columnIndex = c.getColumnIndex(DownloadManager.COLUMN_STATUS);
+                int status = c.getInt(columnIndex);
+                switch (status) {
+                    case DownloadManager.STATUS_SUCCESSFUL:
+                        File file = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
+                        task(file);
+                        break;
+                    default:
+                        Toast.makeText(context, R.string.download_file_error, Toast.LENGTH_LONG).show();
+                        break;
+                }
+                context.unregisterReceiver(this);
+            }
+        }
+    }
+
+    public void setDownloadID(long id) {
+        downloadID = id;
+    }
+
+    public abstract void task(File file);
+}

@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -137,7 +138,7 @@ public class MagiskFragment extends Fragment {
                             .setCancelable(true)
                             .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
                                     getActivity(),
-                                    new Utils.DownloadReceiver(getString(R.string.magisk)) {
+                                    new DownloadReceiver(getString(R.string.magisk)) {
                                         @Override
                                         public void task(File file) {
                                             new Async.FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -163,7 +164,7 @@ public class MagiskFragment extends Fragment {
                             .setMessage(getString(R.string.update_msg, getString(R.string.app_name), String.valueOf(Utils.remoteAppVersion), Utils.appChangelog))
                             .setCancelable(true)
                             .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(getActivity(),
-                                    new Utils.DownloadReceiver() {
+                                    new DownloadReceiver() {
                                         @Override
                                         public void task(File file) {
                                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);

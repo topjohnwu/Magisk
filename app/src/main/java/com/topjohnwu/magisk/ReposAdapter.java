@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
@@ -48,8 +49,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     private SharedPreferences prefs;
 
 
-    public ReposAdapter(ReposFragment reposFragment, List<Repo> list) {
-        ReposFragment reposFragment1 = reposFragment;
+    public ReposAdapter(List<Repo> list) {
         alertPackage = "";
         alertUpdate = false;
         this.mList = list;
@@ -145,7 +145,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                 if (view.getId() == mHolder.updateImage.getId()) {
                     if (!repo.isInstalled() | repo.canUpdate()) {
 
-                        Utils.DownloadReceiver receiver = new Utils.DownloadReceiver() {
+                        DownloadReceiver receiver = new DownloadReceiver() {
                             @Override
                             public void task(File file) {
                                 Log.d("Magisk", "Task firing");
