@@ -21,27 +21,28 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
 
+        super.onCreate(savedInstanceState);
+        SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
         if (defaultPrefs.getString("theme","").equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }
-        super.onCreate(savedInstanceState);
-
         //setups go here
 
         // Set up default preferences,make sure we add "extra" blacklist entries.
-        PreferenceManager.setDefaultValues(this, R.xml.defaultpref, false);
+
 
 
         if (!defaultPrefs.contains("auto_blacklist")) {
-            Logger.dh("AutoRootFragment: Setting default preferences for application");
+            Logger.dh("SplashActivity: Setting default preferences for application");
             SharedPreferences.Editor editor = defaultPrefs.edit();
             Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");
             set.add("com.google.android.gms");
             set.add("com.google.commerce.tapandpay");
             editor.putStringSet("auto_blacklist", set);
+            editor.putBoolean("autoRootEnable",false);
+            editor.putBoolean("root",Utils.rootEnabled());
             editor.apply();
         }
 

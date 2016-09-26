@@ -29,9 +29,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-
-        // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.uisettings);
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.uisettings, false);
     }
 
     @Override

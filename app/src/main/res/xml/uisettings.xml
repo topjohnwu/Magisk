@@ -8,6 +8,7 @@
             android:key="theme"
             android:title="Theme"
             android:summary="Select a theme"
+            android:defaultValue="Default"
             android:entries="@array/themes"
             android:entryValues="@array/themes"/>
     </PreferenceCategory>
@@ -16,6 +17,7 @@
 
         <CheckBoxPreference
             android:key="enable_quicktile"
+            android:defaultValue="false"
             android:title="@string/settings_enable_quicktile_title"
             android:summary="@string/settings_enable_quicktile_summary" />
 
@@ -24,6 +26,7 @@
         android:title="@string/settings_root_category">
         <CheckBoxPreference
             android:key="keep_root_off"
+            android:defaultValue="false"
             android:title="@string/settings_keep_root_off_title"
             android:summary="@string/settings_keep_root_off_summary" />
 
@@ -39,6 +42,7 @@
 
         <CheckBoxPreference
             android:key="developer_logging"
+            android:defaultValue="false"
             android:title="@string/settings_developer_logging_title"
             android:summary="@string/settings_developer_logging_summary" />
 
