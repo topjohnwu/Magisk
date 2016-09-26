@@ -43,12 +43,6 @@
                         android:layout_height="84dp"
                         android:layout_gravity="center"/>
 
-                    <ProgressBar
-                        android:id="@+id/progressBarVersion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"/>
-
                 </FrameLayout>
 
                 <TextView

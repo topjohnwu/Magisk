@@ -29,9 +29,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MagiskFragment extends Fragment {
-
-    @BindView(R.id.progressBarVersion) ProgressBar progressBar;
-
     @BindView(R.id.magiskStatusView) View magiskStatusView;
     @BindView(R.id.magisk_status_container) View magiskStatusContainer;
     @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
@@ -73,6 +70,21 @@ public class MagiskFragment extends Fragment {
         ta0.recycle();
         ta1.recycle();
         ta2.recycle();
+
+        if (Utils.magiskVersion == -1) {
+            magiskStatusContainer.setBackgroundColor(grey500);
+            magiskStatusIcon.setImageResource(statusUnknown);
+
+            magiskVersion.setTextColor(grey500);
+            magiskVersion.setText(R.string.magisk_version_error);
+        } else {
+            magiskStatusContainer.setBackgroundColor(colorOK);
+            magiskStatusIcon.setImageResource(statusOK);
+
+            magiskVersion.setText(getString(R.string.magisk_version, String.valueOf(Utils.magiskVersion)));
+            magiskVersion.setTextColor(colorOK);
+        }
+
         new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         return v;
@@ -101,21 +113,6 @@ public class MagiskFragment extends Fragment {
                 builder = new AlertDialog.Builder(getActivity());
             }
 
-            if (Utils.magiskVersion == -1) {
-                magiskStatusContainer.setBackgroundColor(grey500);
-                magiskStatusIcon.setImageResource(statusUnknown);
-
-                magiskVersion.setTextColor(grey500);
-                magiskVersion.setText(R.string.magisk_version_error);
-            } else {
-                magiskStatusContainer.setBackgroundColor(colorOK);
-                magiskStatusIcon.setImageResource(statusOK);
-
-
-                magiskVersion.setText(getString(R.string.magisk_version, String.valueOf(Utils.magiskVersion)));
-                magiskVersion.setTextColor(colorOK);
-            }
-
             if (Utils.remoteMagiskVersion == -1) {
                 appCheckUpdatesContainer.setBackgroundColor(colorWarn);
                 magiskCheckUpdatesContainer.setBackgroundColor(colorWarn);
@@ -124,6 +121,7 @@ public class MagiskFragment extends Fragment {
                 magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_warning);
 
                 appCheckUpdatesStatus.setText(R.string.cannot_check_updates);
+                appCheckUpdatesStatus.setTextColor(colorWarn);
                 magiskCheckUpdatesStatus.setText(R.string.cannot_check_updates);
                 magiskCheckUpdatesStatus.setTextColor(colorWarn);
             } else {
@@ -186,7 +184,6 @@ public class MagiskFragment extends Fragment {
                 }
             }
 
-            progressBar.setVisibility(View.GONE);
             appCheckUpdatesProgress.setVisibility(View.GONE);
             magiskCheckUpdatesProgress.setVisibility(View.GONE);
         }
