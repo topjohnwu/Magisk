@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -61,20 +62,32 @@ public class MonitorService extends AccessibilityService {
                     event.getPackageName().toString(),
                     event.getClassName().toString()
             );
-            Logger.dh("MonitorService: CurrentActivity: " + event.getPackageName());
+            ActivityInfo activityInfo = tryGetActivity(componentName);
+            boolean isActivity = activityInfo != null;
+            if (isActivity) {
+                Logger.dh("MonitorService: CurrentActivity: " + event.getPackageName());
 
-            String mPackage = componentName.getPackageName();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            if (Utils.autoToggleEnabled(getApplicationContext())) {
-                Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
+                String mPackage = componentName.getPackageName();
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                if (Utils.autoToggleEnabled(getApplicationContext())) {
+                    Set<String> setBlackList = prefs.getStringSet("auto_blacklist", null);
 
-                if (setBlackList != null) {
-                    disableroot = setBlackList.contains(mPackage);
-                    ForceRoot(!disableroot);
-                    String appFriendly = getAppName(mPackage);
-                    ShowNotification(disableroot, appFriendly);
+                    if (setBlackList != null) {
+                        disableroot = setBlackList.contains(mPackage);
+                        ForceRoot(!disableroot);
+                        String appFriendly = getAppName(mPackage);
+                        ShowNotification(disableroot, appFriendly);
+                    }
                 }
             }
+        }
+    }
+
+    private ActivityInfo tryGetActivity(ComponentName componentName) {
+        try {
+            return getPackageManager().getActivityInfo(componentName, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
         }
     }
 
