@@ -135,19 +135,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mSelectedId = savedInstanceState == null ? mSelectedId : savedInstanceState.getInt(SELECTED_ITEM_ID);
         navigationView.setCheckedItem(mSelectedId);
 
-        if (savedInstanceState == null) {
-            mDrawerHandler.removeCallbacksAndMessages(null);
-            mDrawerHandler.postDelayed(() -> navigate(mSelectedId), 250);
-        }
 
         navigationView.setNavigationItemSelectedListener(this);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            navigate(R.id.settings);
-            Logger.dh("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
+            String toLaunch = "";
+            toLaunch = getIntent().getExtras().getString("Relaunch");
+            if (toLaunch.equals("Settings")) {
+                Logger.dh("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
+                mSelectedId = R.id.settings;
+            }
 
         }
+
+
+        mDrawerHandler.removeCallbacksAndMessages(null);
+        navigate(mSelectedId);
+
 
     }
 

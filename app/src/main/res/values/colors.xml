@@ -16,7 +16,7 @@
     <color name="dh_primary">#3F51B5</color>
     <color name="dh_primary_dark">#303F9F</color>
     <color name="dh_primary_light">#C5CAE9</color>
-    <color name="dh_accent">#9C6DFF</color>
+    <color name="dh_accent">#448AFF</color>
 
     <color name="dh_primary_text">#dedede</color>
     <color name="dh_secondary_text">#8A8A8A</color>
@@ -24,8 +24,8 @@
     <color name="dh_divider">#313131</color>
     <color name="dh_alertWarn">#FF9800</color>
     <color name="dh_alertOk">@color/dh_accent</color>
-    <color name="dh_alertNeutral">#2196F3</color>
-    <color name="dh_alertFail">#FF5722</color>
+    <color name="dh_alertNeutral">@color/dh_primary_light</color>
+    <color name="dh_alertFail">@color/red500</color>
 
 
 </resources>
