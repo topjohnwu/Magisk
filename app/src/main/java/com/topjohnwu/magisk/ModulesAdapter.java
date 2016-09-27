@@ -1,37 +1,22 @@
 package com.topjohnwu.magisk;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.WebWindow;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,28 +24,44 @@ import butterknife.ButterKnife;
 
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
-    //@BindView(R.id.expand_layout) LinearLayout expandedLayout;
-
     private final List<Module> mList;
-    private View viewMain;
+    private View mView;
     private Context context;
-    private final Utils.ItemClickListener chboxListener;
-    private final Utils.ItemClickListener deleteBtnListener;
-    private final Utils.ItemClickListener unDeleteBtnListener;
 
-    public ModulesAdapter(List<Module> list, Utils.ItemClickListener chboxListener, Utils.ItemClickListener deleteBtnListener, Utils.ItemClickListener undeleteBtnListener) {
-        this.mList = list;
-        this.chboxListener = chboxListener;
-        this.deleteBtnListener = deleteBtnListener;
-        this.unDeleteBtnListener = undeleteBtnListener;
+    private Utils.ItemClickListener chboxListener, deleteBtnListener, unDeleteBtnListener;
+
+    public ModulesAdapter(List<Module> list) {
+        mList = list;
+        chboxListener = (chk, position) -> {
+            // On Checkbox change listener
+            CheckBox chbox = (CheckBox) chk;
+
+            if (!chbox.isChecked()) {
+                mList.get(position).createDisableFile();
+                Snackbar.make(mView, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
+            } else {
+                mList.get(position).removeDisableFile();
+                Snackbar.make(mView, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
+            }
+        };
+        deleteBtnListener = (deleteBtn, position) -> {
+            // On delete button click listener
+            mList.get(position).createRemoveFile();
+            Snackbar.make(mView, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+        };
+        unDeleteBtnListener = (undeleteBtn, position) -> {
+            // On undelete button click listener
+            mList.get(position).deleteRemoveFile();
+            Snackbar.make(mView, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
+        };
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        viewMain = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
+        mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
         context = parent.getContext();
-        ButterKnife.bind(this, viewMain);
-        return new ViewHolder(viewMain);
+        ButterKnife.bind(this, mView);
+        return new ViewHolder(mView);
     }
 
     @Override

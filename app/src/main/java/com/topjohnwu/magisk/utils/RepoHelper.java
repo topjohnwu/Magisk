@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.module;
+package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
 

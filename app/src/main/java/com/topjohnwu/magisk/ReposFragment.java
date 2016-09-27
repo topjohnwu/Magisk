@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,14 +16,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -32,37 +28,51 @@ import butterknife.ButterKnife;
 public class ReposFragment extends Fragment {
 
     public static List<Repo> mListRepos = new ArrayList<>();
-    public static List<Repo> mListReposToUpdate = new ArrayList<>();
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
-    @BindView(R.id.empty_rv)
-    TextView emptyTv;
-    @BindView(R.id.swipeRefreshLayout)
-    SwipeRefreshLayout swipeRefreshLayout;
+
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_rv) TextView emptyTv;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+
     private View mView;
     private boolean mCanUpdate;
     private boolean alertUpdate;
     private boolean ignoreAlertUpdate;
     private String alertPackage;
     private AlertDialog.Builder builder;
-//    private SharedPreferences prefs;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+    private SharedPreferences prefs;
 
     @Nullable
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.repos_fragment, container, false);
-        mView = view;
-        ButterKnife.bind(this, view);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            new Async.LoadRepos(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            ignoreAlertUpdate = false;
+        mView = inflater.inflate(R.layout.repos_fragment, container, false);
+        ButterKnife.bind(this, mView);
+
+        mSwipeRefreshLayout.setRefreshing(true);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            recyclerView.setVisibility(View.GONE);
+            prefs.edit().putBoolean("repo_done", false).apply();
+            new Async.LoadRepos(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
+
+        if (prefs.getBoolean("repo_done", false)) {
+            updateUI();
+        }
+
+        listener = (pref, s) -> {
+            if (s.equals("repo_done")) {
+                if (pref.getBoolean(s, false)) {
+                    Logger.dh("ReposFragment: UI refresh triggered");
+                    updateUI();
+                }
+            }
+        };
+
         //LoadRepo(false);
-        new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        setHasOptionsMenu(false);
-        alertUpdate = false;
 //        if (mListRepos.size() == 0) {
 //            emptyTv.setVisibility(View.VISIBLE);
 //            recyclerView.setVisibility(View.GONE);
@@ -71,18 +81,18 @@ public class ReposFragment extends Fragment {
         //CheckForUpdates();
         //recyclerView.setAdapter(new ReposAdapter(this, mListRepos));
 
-        return view;
+        return mView;
     }
 
-    private void CheckForUpdates() {
-        for (int i = 0; i < mListRepos.size(); i++) {
-            if (mListRepos.get(i).canUpdate()) {
-                alertUpdate = true;
-                mListReposToUpdate.add(mListRepos.get(i));
-
-            }
-        }
-    }
+//    private void CheckForUpdates() {
+//        for (int i = 0; i < mListRepos.size(); i++) {
+//            if (mListRepos.get(i).canUpdate()) {
+//                alertUpdate = true;
+//                mListReposToUpdate.add(mListRepos.get(i));
+//
+//            }
+//        }
+//    }
 
     @Override
     public void onAttachFragment(Fragment childFragment) {
@@ -154,52 +164,25 @@ public class ReposFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //LoadRepo(false);
-        getActivity().setTitle("Magisk");
-
+        getActivity().setTitle(R.string.downloads);
+        prefs.registerOnSharedPreferenceChangeListener(listener);
     }
-    
-    private class UpdateUI extends AsyncTask<Void, Void, Void> {
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
-        }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+    }
 
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            if (mListRepos.size() == 0) {
-                emptyTv.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-
-            }
-            Log.d("Magisk", "ReposFragment: ListRepos size is " + mListRepos.size());
+    private void updateUI() {
+        if (mListRepos.size() == 0) {
+            emptyTv.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
             recyclerView.setAdapter(new ReposAdapter(mListRepos));
-            if (swipeRefreshLayout.isRefreshing()) {
-                swipeRefreshLayout.setRefreshing(false);
-                //CheckForUpdates();
-                //NotifyOfAlerts();
-            }
         }
+        mSwipeRefreshLayout.setRefreshing(false);
     }
-
-//    private void UpdateUI() {
-//        Log.d("Magisk", "ReposFragment: UpdateUI Called, size is " + mListRepos.size());
-//
-//        if (mListRepos.size() == 0) {
-//            emptyTv.setVisibility(View.VISIBLE);
-//            recyclerView.setVisibility(View.GONE);
-//
-//        }
-//        Log.d("Magisk", "ReposFragment: ListRepos size is " + mListRepos.size());
-//        recyclerView.setAdapter(new ReposAdapter(this, mListRepos));
-//        if (swipeRefreshLayout.isRefreshing()) {
-//            swipeRefreshLayout.setRefreshing(false);
-//            CheckForUpdates();
-//            //NotifyOfAlerts();
-//        }
-//
-//    }
 
 }

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.module;
 
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.RepoHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {

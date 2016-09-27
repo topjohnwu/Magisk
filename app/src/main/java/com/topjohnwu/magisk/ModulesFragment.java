@@ -12,17 +12,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.ipaulpro.afilechooser.FileInfo;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,15 +40,17 @@ public class ModulesFragment extends Fragment {
 
     private SharedPreferences prefs;
     public static List<Module> listModules = new ArrayList<>();
-    private View viewMain;
+    private View mView;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        viewMain = inflater.inflate(R.layout.modules_fragment, container, false);
-        ButterKnife.bind(this, viewMain);
+        mView = inflater.inflate(R.layout.modules_fragment, container, false);
+        ButterKnife.bind(this, mView);
 
         mSwipeRefreshLayout.setRefreshing(true);
+
         fabio.setOnClickListener(v -> {
             Intent getContentIntent = FileUtils.createGetContentIntent(null);
             getContentIntent.setType("application/zip");
@@ -60,21 +62,24 @@ public class ModulesFragment extends Fragment {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            prefs.edit().putBoolean("ignoreUpdateAlerts", false).apply();
-
+            prefs.edit().putBoolean("module_done", false).apply();
+            new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
 
-        prefs.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> {
-            if (s.contains("updated")) {
-                viewMain.invalidate();
-                viewMain.requestLayout();
+        if (prefs.getBoolean("module_done", false)) {
+            updateUI();
+        }
+
+        listener = (pref, s) -> {
+            if (s.equals("module_done")) {
+                if (pref.getBoolean(s, false)) {
+                    Logger.dh("ModulesFragment: UI refresh triggered");
+                    updateUI();
+                }
             }
-        });
+        };
 
-        new UpdateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        return viewMain;
+        return mView;
     }
 
     @Override
@@ -82,14 +87,8 @@ public class ModulesFragment extends Fragment {
         if (data != null) {
             // Get the URI of the selected file
             final Uri uri = data.getData();
-            try {
-                // Get the file path from the URI
-                new Async.FlashZIP(getActivity(), uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                FileInfo fileInfo = FileUtils.getFileInfo(getActivity(), uri);
-
-            } catch (Exception e) {
-                Log.e("FileSelectorTestAc...", "File select error", e);
-            }
+            // Get the file path from the URI
+            new Async.FlashZIP(getActivity(), uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         }
 
     }
@@ -97,52 +96,26 @@ public class ModulesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        viewMain = this.getView();
-        getActivity().setTitle("Modules");
+        mView = this.getView();
+        getActivity().setTitle(R.string.modules);
+        prefs.registerOnSharedPreferenceChangeListener(listener);
     }
 
-    private class UpdateUI extends AsyncTask<Void, Void, Void> {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+    }
 
-        // Just for blocking
-        @Override
-        protected Void doInBackground(Void... voids) {
-            return null;
+    private void updateUI() {
+        if (listModules.size() == 0) {
+            emptyTv.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setAdapter(new ModulesAdapter(listModules));
         }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-
-            if (listModules.size() == 0) {
-                emptyTv.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
-            } else {
-                recyclerView.setVisibility(View.VISIBLE);
-            }
-            recyclerView.setAdapter(new ModulesAdapter(listModules, (chk, position) -> {
-                // On Checkbox change listener
-                CheckBox chbox = (CheckBox) chk;
-
-                if (!chbox.isChecked()) {
-                    listModules.get(position).createDisableFile();
-                    Snackbar.make(viewMain, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
-                } else {
-                    listModules.get(position).removeDisableFile();
-                    Snackbar.make(viewMain, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
-                }
-            }, (deleteBtn, position) -> {
-                // On delete button click listener
-                listModules.get(position).createRemoveFile();
-                Snackbar.make(viewMain, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
-            }, (undeleteBtn, position) -> {
-                // On undelete button click listener
-                listModules.get(position).deleteRemoveFile();
-                Snackbar.make(viewMain, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
-            }));
-
-            mSwipeRefreshLayout.setRefreshing(false);
-
-        }
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
 }

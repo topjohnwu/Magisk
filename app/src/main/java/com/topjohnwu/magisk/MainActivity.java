@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navFragment = new RootFragment();
                 break;
             case R.id.autoroot:
-                setTitle(R.string.auto_toggle_apps);
+                setTitle(R.string.auto_toggle);
                 tag = "autoroot";
                 navFragment = new AutoRootFragment();
                 break;

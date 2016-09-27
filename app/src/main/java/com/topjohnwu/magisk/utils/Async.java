@@ -1,40 +1,31 @@
 package com.topjohnwu.magisk.utils;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.renderscript.ScriptGroup;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ipaulpro.afilechooser.FileInfo;
-import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.RepoHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -157,6 +148,11 @@ public class Async {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void v) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            prefs.edit().putBoolean("module_done", true).apply();
+        }
     }
 
     public static class LoadRepos extends AsyncTask<Void, Void, Void> {
@@ -176,11 +172,16 @@ public class Async {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void v) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            prefs.edit().putBoolean("repo_done", true).apply();
+        }
     }
 
     public static class FlashZIP extends AsyncTask<Void, Void, Boolean> {
 
-        private String mPath, mName;
+        private String mName;
         private Uri mUri;
         private ProgressDialog progress;
         private File mFile, sdFile;
@@ -282,7 +283,7 @@ public class Async {
                 if (sdFile == null) {
                     Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
                 }
                 return;
             }
