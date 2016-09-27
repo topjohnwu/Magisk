@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             navigationView.setCheckedItem(R.id.downloads);
                         }
                     }
-                    hm = getFragmentManager().findFragmentByTag("dev");
+                    hm = getFragmentManager().findFragmentByTag("log");
                     if (hm != null) {
                         if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.log);
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.log:
                 setTitle(R.string.log);
-                tag = "dev";
+                tag = "log";
                 navFragment = new LogFragment();
                 break;
             case R.id.settings:

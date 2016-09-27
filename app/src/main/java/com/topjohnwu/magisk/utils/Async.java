@@ -254,8 +254,6 @@ public class Async {
                 e.printStackTrace();
                 return false;
             }
-            Logger.dev(mName + "; " + mFile.getPath());
-//            return false;
             if (Shell.rootAccess()) {
                 ret = Shell.su(
                         "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
