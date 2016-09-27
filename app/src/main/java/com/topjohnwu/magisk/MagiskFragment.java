@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -138,8 +139,8 @@ public class MagiskFragment extends Fragment {
                                     getActivity(),
                                     new DownloadReceiver(getString(R.string.magisk)) {
                                         @Override
-                                        public void task(File file) {
-                                            new Async.FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                        public void task(Uri uri) {
+                                            new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                         }
                                     },
                                     Utils.magiskLink, "latest_magisk.zip"))
@@ -164,10 +165,10 @@ public class MagiskFragment extends Fragment {
                             .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(getActivity(),
                                     new DownloadReceiver() {
                                         @Override
-                                        public void task(File file) {
+                                        public void task(Uri uri) {
                                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                                             install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                            install.setData(FileProvider.getUriForFile(mContext, "com.topjohnwu.magisk.provider", file));
+                                            install.setData(uri);
                                             mContext.startActivity(install);
                                         }
                                     },

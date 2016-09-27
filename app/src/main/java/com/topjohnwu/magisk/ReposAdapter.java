@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -147,9 +148,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
                         DownloadReceiver receiver = new DownloadReceiver() {
                             @Override
-                            public void task(File file) {
-                                Log.d("Magisk", "Task firing");
-                                new Async.FlashZIP(context, repo.getId(), file.toString()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                            public void task(Uri uri) {
+                                new Async.FlashZIP(context, uri, repo.getName() + "-v" + repo.getVersion());
                             }
                         };
                         String filename = repo.getId().replace(" ", "") + ".zip";

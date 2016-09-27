@@ -1,11 +1,5 @@
 package com.topjohnwu.magisk.module;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
-
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -13,13 +7,10 @@ public class Module extends BaseModule {
 
     private String mRemoveFile;
     private String mDisableFile;
-
-    private String mZipUrl, mLogUrl;
     private boolean mEnable, mRemove, mUpdateAvailable = false;
 
-    public Module(Context context, String path) {
+    public Module(String path) {
 
-        super();
         parseProps(Utils.readFile(path + "/module.prop"));
 
         mRemoveFile = path + "/remove";
@@ -33,13 +24,7 @@ public class Module extends BaseModule {
         if (mName == null)
             mName = mId;
 
-        if (mDescription == null)
-            mDescription = context.getString(R.string.no_info_provided);
-
-        if (mVersion == null)
-            mVersion = context.getString(R.string.no_info_provided);
-
-        Logger.dh("Module id: " + mId);
+        Logger.dh("Creating Module, id: " + mId);
 
         mEnable = !Utils.itemExist(mDisableFile);
         mRemove = Utils.itemExist(mRemoveFile);
@@ -52,11 +37,10 @@ public class Module extends BaseModule {
             repo.setInstalled();
             if (repo.getVersionCode() > mVersionCode) {
                 repo.setUpdate();
+                mUpdateAvailable = true;
             }
         }
     }
-
-    public String getmLogUrl() {return mLogUrl; }
 
     public void createDisableFile() {
         mEnable = !Utils.createFile(mDisableFile);
@@ -81,8 +65,6 @@ public class Module extends BaseModule {
     public boolean willBeRemoved() {
         return mRemove;
     }
-
-    public String getmZipUrl() { return mZipUrl; }
 
     public boolean isUpdateAvailable() { return mUpdateAvailable; }
 

@@ -3,9 +3,12 @@ package com.topjohnwu.magisk.utils;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.renderscript.ScriptGroup;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -73,21 +76,10 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            String jsonStr = WebRequest.makeWebServiceCall(Utils.UPDATE_JSON, WebRequest.GET);
             try {
-                HttpURLConnection c = (HttpURLConnection) new URL(Utils.UPDATE_JSON).openConnection();
-                c.setRequestMethod("GET");
-                c.setInstanceFollowRedirects(false);
-                c.setDoOutput(false);
-                c.connect();
+                JSONObject json = new JSONObject(jsonStr);
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                }
-                br.close();
-                JSONObject json = new JSONObject(sb.toString());
                 JSONObject magisk = json.getJSONObject("magisk");
                 JSONObject app = json.getJSONObject("app");
                 JSONObject root = json.getJSONObject("root");
@@ -102,9 +94,7 @@ public class Async {
 
                 Utils.phhLink = root.getString("phh");
                 Utils.supersuLink = root.getString("supersu");
-
-            } catch (IOException | JSONException ignored) {
-            }
+            } catch (JSONException ignored) {}
             return null;
         }
 
@@ -116,87 +106,16 @@ public class Async {
                         .setTitle(R.string.no_magisk_title)
                         .setMessage(R.string.no_magisk_msg)
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> new AlertDialog.Builder(mContext)
-                                .setTitle(R.string.root_method_title)
-                                .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                    DownloadReceiver rootReceiver;
-                                    String link, filename;
-                                    switch (root) {
-                                        case 0:
-                                            link = Utils.phhLink;
-                                            filename = "phhsu.zip";
-                                            rootReceiver = new DownloadReceiver(mContext.getString(R.string.phh)) {
-                                                @Override
-                                                public void task(File file) {
-                                                    new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                                }
-                                            };
-                                            break;
-                                        case 1:
-                                            link = Utils.supersuLink;
-                                            filename = "supersu.zip";
-                                            rootReceiver = new DownloadReceiver(mContext.getString(R.string.supersu)) {
-                                                @Override
-                                                public void task(File file) {
-                                                    new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                                }
-                                            };
-                                            break;
-                                        default:
-                                            rootReceiver = null;
-                                            link = filename = null;
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
+                                mContext,
+                                new DownloadReceiver(mContext.getString(R.string.magisk)) {
+                                    @Override
+                                    public void task(Uri uri) {
+                                        new FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                     }
-                                    DownloadReceiver magiskReceiver = new DownloadReceiver(mContext.getString(R.string.magisk)) {
-                                        @Override
-                                        public void task(File file) {
-                                            Context temp = mContext;
-                                            new FlashZIP(mContext, mName, file.getPath()) {
-                                                @Override
-                                                protected void done() {
-                                                    Utils.downloadAndReceive(temp, rootReceiver, link, filename);
-                                                }
-                                            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                        }
-                                    };
-                                    Utils.downloadAndReceive(mContext, magiskReceiver, Utils.magiskLink, "latest_magisk.zip");
-                                })
-                                .show())
-                        .setNegativeButton(R.string.no_thanks, null)
-                        .show();
-            } else if (Shell.rootStatus == 2) {
-                new AlertDialog.Builder(mContext)
-                        .setTitle(R.string.root_system)
-                        .setMessage(R.string.root_system_msg)
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> new AlertDialog.Builder(mContext)
-                                .setTitle(R.string.root_method_title)
-                                .setItems(new String[]{mContext.getString(R.string.phh), mContext.getString(R.string.supersu)}, (dialogInterface1, root) -> {
-                                    switch (root) {
-                                        case 0:
-                                            Utils.downloadAndReceive(
-                                                    mContext,
-                                                    new DownloadReceiver(mContext.getString(R.string.phh)) {
-                                                        @Override
-                                                        public void task(File file) {
-                                                            new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                                        }
-                                                    },
-                                                    Utils.phhLink, "phhsu.zip");
-                                            break;
-                                        case 1:
-                                            Utils.downloadAndReceive(
-                                                    mContext,
-                                                    new DownloadReceiver(mContext.getString(R.string.supersu)) {
-                                                        @Override
-                                                        public void task(File file) {
-                                                            new FlashZIP(mContext, mName, file.getPath()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                                        }
-                                                    },
-                                                    Utils.supersuLink, "supersu.zip");
-                                            break;
-                                    }
-                                })
-                                .show())
+                                },
+                                Utils.magiskLink,
+                                "latest_magisk.zip"))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show();
             }
@@ -220,12 +139,12 @@ public class Async {
 
             for (String mod : magisk) {
                 Logger.dh("Adding modules from " + mod);
-                ModulesFragment.listModules.add(new Module(mContext, mod));
+                ModulesFragment.listModules.add(new Module(mod));
             }
 
             for (String mod : magiskCache) {
                 Logger.dh("Adding cache modules from " + mod);
-                Module cacheMod = new Module(mContext, mod);
+                Module cacheMod = new Module(mod);
                 // Prevent people forgot to change module.prop
                 cacheMod.setCache();
                 ModulesFragment.listModules.add(cacheMod);
@@ -264,126 +183,107 @@ public class Async {
         private String mPath, mName;
         private Uri mUri;
         private ProgressDialog progress;
-        private File mFile;
+        private File mFile, sdFile;
         private Context mContext;
         private List<String> ret;
-        private boolean deleteFileAfter;
+        private boolean copyToSD;
 
-        public FlashZIP(Context context, String name, String path) {
+        public FlashZIP(Context context, Uri uri, String name) {
             mContext = context;
+            mUri = uri;
             mName = name;
-            mPath = path;
-            deleteFileAfter = false;
+            copyToSD = true;
         }
 
-        public FlashZIP(Context context, Uri uRi) {
+        public FlashZIP(Context context, Uri uri) {
             mContext = context;
-            mUri = uRi;
-            deleteFileAfter = true;
-
-            String file;
-            FileInfo fileInfo = FileUtils.getFileInfo(context, mUri);
-
-            Logger.dh("Utils: FlashZip Running, " + fileInfo.getPath());
-            String filename = fileInfo.getPath();
-            String idStr = filename.substring(filename.lastIndexOf('/') + 1);
-            if (!idStr.contains(".zip")) {
-                Logger.dh("Async: Improper name, cancelling " + idStr);
-                this.cancel(true);
-                progress.cancel();
-            }
-            file = mContext.getFilesDir() + "/" + idStr;
-
-            ContentResolver contentResolver = mContext.getContentResolver();
-            //contentResolver.takePersistableUriPermission(mUri, flags);
-            try {
-                InputStream in = contentResolver.openInputStream(mUri);
-                Log.d("Magisk", "Firing inputStream");
-                mFile = createFileFromInputStream(in, file);
-                if (mFile != null) {
-                    mPath = mFile.getPath();
-                    Logger.dh("Async: Mpath is " + mPath);
-                } else {
-                    Log.e("Magisk", "Async: error creating file " + mUri.getPath());
-                    this.cancel(true);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            // TODO handle non-primary volumes
-
+            mUri = uri;
+            mName = uri.getLastPathSegment();
+            copyToSD = false;
         }
 
-        private static File createFileFromInputStream(InputStream inputStream, String fileName) {
+        private static void createFileFromInputStream(InputStream inputStream, File f) throws IOException {
+            if (f.exists() && !f.delete()) {
+                throw new IOException();
+            }
+            f.setWritable(true, false);
+            OutputStream outputStream = new FileOutputStream(f);
+            byte buffer[] = new byte[1024];
+            int length;
 
-            try {
-                File f = new File(fileName);
-                f.setWritable(true, false);
-                OutputStream outputStream = new FileOutputStream(f);
-                byte buffer[] = new byte[1024];
-                int length;
-
-                while ((length = inputStream.read(buffer)) > 0) {
-                    outputStream.write(buffer, 0, length);
-                }
-
-                outputStream.close();
-                inputStream.close();
-                Logger.dh("Async: File created successfully - " + f.getPath());
-                return f;
-
-            } catch (IOException e) {
-                System.out.println("error in creating a file");
-                e.printStackTrace();
-
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
             }
 
-            return null;
+            outputStream.close();
+            Logger.dh("FlashZip: File created successfully - " + f.getPath());
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
             progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mName));
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            if (mPath == null) {
-                Log.e("Magisk", "Utils: Error, flashZIP called without a valid zip file to flash.");
+            Logger.dh("FlashZip Running... " + mName);
+            InputStream in;
+            try {
+                try {
+                    in = mContext.getContentResolver().openInputStream(mUri);
+                    mFile = new File(mContext.getFilesDir().getAbsolutePath() + "/install.zip");
+                    createFileFromInputStream(in, mFile);
+                } catch (FileNotFoundException e) {
+                    Log.e("Magisk", "FlashZip: Invalid Uri");
+                    throw e;
+                } catch (IOException e) {
+                    Log.e("Magisk", "FlashZip: Error in creating file");
+                    throw e;
+                }
+            } catch (Throwable e) {
                 this.cancel(true);
                 progress.cancel();
+                e.printStackTrace();
                 return false;
             }
-            if (!Shell.rootAccess()) {
-                return false;
-            } else {
+            if (Shell.rootAccess()) {
                 ret = Shell.su(
-                        "rm -rf /data/tmp",
-                        "mkdir -p /data/tmp",
-                        "cp -af " + mPath + " /data/tmp/install.zip",
-                        "unzip -o /data/tmp/install.zip META-INF/com/google/android/* -d /data/tmp",
-                        "BOOTMODE=true sh /data/tmp/META-INF/com/google/android/update-binary dummy 1 /data/tmp/install.zip",
+                        "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
+                        "BOOTMODE=true sh " + mFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mFile.getPath(),
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                Logger.dh("Async: ret is " + ret);
-                return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
+                Logger.dh("FlashZip: Console log:\n" + ret);
             }
+            // Copy the file to sdcard
+            if (copyToSD) {
+                try {
+                    sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + (mName.contains(".zip") ? mName : mName + ".zip"));
+                    if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
+                        throw new IOException();
+                    }
+                    createFileFromInputStream(in, sdFile);
+                    assert in != null;
+                    in.close();
+                } catch (IOException e) {
+                    Log.e("Magisk", "FlashZip: Unable to copy to sdcard");
+                    e.printStackTrace();
+                }
+            }
+            mFile.delete();
+            return ret == null || !Boolean.parseBoolean(ret.get(ret.size() - 1));
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            //Shell.su("rm -rf /data/tmp");
-            if (deleteFileAfter) {
-                Shell.su("rm -rf " + mPath);
-                Log.d("Magisk", "Utils: Deleting file " + mPath);
-            }
             progress.dismiss();
             if (!result) {
-                Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
+                if (sdFile == null) {
+                    Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mPath), Toast.LENGTH_LONG).show();
+                }
                 return;
             }
             done();
@@ -393,14 +293,14 @@ public class Async {
             AlertDialog.Builder builder;
             String theme = PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme", "");
             if (theme.equals("Dark")) {
-                builder = new AlertDialog.Builder(mContext,R.style.AlertDialog_dh);
+                builder = new AlertDialog.Builder(mContext, R.style.AlertDialog_dh);
             } else {
                 builder = new AlertDialog.Builder(mContext);
             }
             builder
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
-                    .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.su("reboot"))
+                    .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.su("sh -c reboot"))
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }

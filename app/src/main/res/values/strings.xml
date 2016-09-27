@@ -54,7 +54,7 @@
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
-    <string name="author">Created by </string>
+    <string name="author">Created by %1$s</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
@@ -83,12 +83,12 @@
     <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
     <string name="accessibility_service_description">Accessibility service required for Magisk auto-unroot feature</string>
-    <string name="accessibility_service_name">Magisk Manager</string>
     <string name="update_title">%1$s Update!</string>
     <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
     <string name="download_install">Download and install</string>
     <string name="download_file_error">Error downloading file</string>
-    <string name="manual_install">File downloaded in %1$s\nFlash it in recovery manually</string>
+    <string name="install_error">Installation error!</string>
+    <string name="manual_install">Error in flashing file, zip file placed in %1$s\nFlash it in recovery manually</string>
     <string name="reboot_title">Installation succeeded!</string>
     <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
@@ -101,6 +101,7 @@
     <string name="supersu">SuperSU</string>
     <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
 
+    <!--Web Related-->
     <string name="pass">MagiskRox666</string>
     <string name="some_string">GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus</string>
     <string name="downloads">Downloads</string>

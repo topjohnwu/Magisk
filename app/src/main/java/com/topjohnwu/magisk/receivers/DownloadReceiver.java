@@ -38,8 +38,8 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                 int status = c.getInt(columnIndex);
                 switch (status) {
                     case DownloadManager.STATUS_SUCCESSFUL:
-                        File file = new File(Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))).getPath());
-                        task(file);
+                        Uri uri = Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
+                        task(uri);
                         break;
                     default:
                         Toast.makeText(context, R.string.download_file_error, Toast.LENGTH_LONG).show();
@@ -54,5 +54,5 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
         downloadID = id;
     }
 
-    public abstract void task(File file);
+    public void task(Uri uri) {}
 }
