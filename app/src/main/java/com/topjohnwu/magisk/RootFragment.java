@@ -174,7 +174,7 @@ public class RootFragment extends Fragment {
         listener = (prefs1, key) -> {
 
             if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
-                Logger.dh("RootFragmnet, keychange detected for " + key);
+                Logger.dev("RootFragmnet, keychange detected for " + key);
                 new updateUI().execute();
             }
 

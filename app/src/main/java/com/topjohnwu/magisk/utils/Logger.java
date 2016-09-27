@@ -7,9 +7,9 @@ import android.util.Log;
 
 public class Logger {
 
-    private static final String LOG_TAG = "Magisk: DH";
+    private static final String LOG_TAG = "Magisk: DEV";
 
-    public static void dh(String msg, Object... args) {
+    public static void dev(String msg, Object... args) {
         Context context = null;
         try {
             context = getApplicationUsingReflection();
@@ -22,6 +22,18 @@ public class Logger {
             } else {
                 Log.d(LOG_TAG, String.format(msg, args));
             }
+        }
+    }
+
+    public static void dev(String msg) {
+        Context context = null;
+        try {
+            context = getApplicationUsingReflection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("developer_logging", false)) {
+            Log.d(LOG_TAG, msg);
         }
     }
 

@@ -9,20 +9,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +70,7 @@ public class ModulesFragment extends Fragment {
         listener = (pref, s) -> {
             if (s.equals("module_done")) {
                 if (pref.getBoolean(s, false)) {
-                    Logger.dh("ModulesFragment: UI refresh triggered");
+                    Logger.dev("ModulesFragment: UI refresh triggered");
                     updateUI();
                 }
             }

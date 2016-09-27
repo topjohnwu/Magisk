@@ -100,7 +100,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Logger.dh("Settings: NewValue is " + key);
+        Logger.dev("Settings: NewValue is " + key);
 
         if (key.equals("theme")) {
             String pref = sharedPreferences.getString(key, "");
@@ -117,7 +117,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             intent.putExtra("Relaunch", "Settings");
             startActivity(intent);
 
-            Logger.dh("SettingsFragment: theme is " + pref);
+            Logger.dev("SettingsFragment: theme is " + pref);
 
         }
 

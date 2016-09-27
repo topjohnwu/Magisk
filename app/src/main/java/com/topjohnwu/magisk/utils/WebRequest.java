@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -52,7 +50,7 @@ public class WebRequest {
      */
     public static String makeWebServiceCall(String urladdress, int requestmethod,
                                      HashMap<String, String> params, boolean addNewLines) {
-        Logger.dh("WebRequest: Service call " + urladdress);
+        Logger.dev("WebRequest: Service call " + urladdress);
         URL url;
         String response = "";
         try {

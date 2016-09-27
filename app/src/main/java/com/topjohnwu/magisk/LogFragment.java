@@ -40,7 +40,7 @@ import butterknife.ButterKnife;
 
 public class LogFragment extends Fragment {
 
-    private static final String MAGISK_LOG = "/cache/magisk.log";
+    private static final String MAGISK_LOG = "/cache/magisk.dev";
 
     @BindView(R.id.txtLog) TextView txtLog;
     @BindView(R.id.svLog) ScrollView svLog;
@@ -154,7 +154,7 @@ public class LogFragment extends Fragment {
 
         Calendar now = Calendar.getInstance();
         String filename = String.format(
-                "magisk_%s_%04d%02d%02d_%02d%02d%02d.log", "error",
+                "magisk_%s_%04d%02d%02d_%02d%02d%02d.dev", "error",
                 now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));

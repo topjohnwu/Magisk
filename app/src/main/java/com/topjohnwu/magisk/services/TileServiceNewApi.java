@@ -19,7 +19,7 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Logger.dh("QST (New): Service start");
+        Logger.dev("QST (New): Service start");
         return super.onStartCommand(intent, flags, startId);
 
     }
@@ -27,7 +27,7 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
     @Override
     public void onTileAdded() {
         super.onTileAdded();
-        Logger.dh("QST (New): Tile added");
+        Logger.dev("QST (New): Tile added");
         setupState();
         this.getQsTile().updateTile();
     }
@@ -36,7 +36,7 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
     public void onClick() {
         mRootsState = Utils.CheckRootsState(getApplicationContext());
         switchState(mRootsState);
-        Logger.dh("QST (New): Tile clicked");
+        Logger.dev("QST (New): Tile clicked");
     }
 
 
@@ -44,13 +44,13 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
     public void onStartListening() {
         super.onStartListening();
         setupState();
-        Logger.dh("QST (New): Tile is listening");
+        Logger.dev("QST (New): Tile is listening");
     }
 
     @Override
     public void onStopListening() {
         super.onStopListening();
-        Logger.dh("QST (New): Tile stopped listening");
+        Logger.dev("QST (New): Tile stopped listening");
     }
 
     private void setupState() {
@@ -58,11 +58,11 @@ public class TileServiceNewApi extends android.service.quicksettings.TileService
             PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("autoRootEnable",false).apply();
         }
         mRootsState = Utils.CheckRootsState(getApplicationContext());
-        Logger.dh("QST (New): SetupState");
+        Logger.dev("QST (New): SetupState");
         Icon iconRoot = Icon.createWithResource(getApplicationContext(), R.drawable.root);
         Icon iconAuto = Icon.createWithResource(getApplicationContext(), R.drawable.ic_autoroot);
         Tile tile = getQsTile();
-        Logger.dh("QST: State is " + mRootsState);
+        Logger.dev("QST: State is " + mRootsState);
 
         switch (mRootsState) {
             case 2:

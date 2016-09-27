@@ -25,7 +25,7 @@ public class Module extends BaseModule {
         if (mName == null)
             mName = mId;
 
-        Logger.dh("Creating Module, id: " + mId);
+        Logger.dev("Creating Module, id: " + mId);
 
         mEnable = !Utils.itemExist(mDisableFile);
         mRemove = Utils.itemExist(mRemoveFile);

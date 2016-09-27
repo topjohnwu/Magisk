@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class ReposFragment extends Fragment {
         listener = (pref, s) -> {
             if (s.equals("repo_done")) {
                 if (pref.getBoolean(s, false)) {
-                    Logger.dh("ReposFragment: UI refresh triggered");
+                    Logger.dev("ReposFragment: UI refresh triggered");
                     updateUI();
                 }
             }
@@ -146,7 +145,7 @@ public class ReposFragment extends Fragment {
 //                };
 //
 //                String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
-//                Logger.dh("ReposFragment: Theme is " + theme);
+//                Logger.dev("ReposFragment: Theme is " + theme);
 //                if (theme.equals("Dark")) {
 //                    builder = new AlertDialog.Builder(getActivity(),R.style.AlertDialog_dh);
 //                } else {

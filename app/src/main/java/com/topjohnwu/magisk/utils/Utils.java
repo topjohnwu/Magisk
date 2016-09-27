@@ -92,7 +92,7 @@ public class Utils {
 
     public static boolean autoToggleEnabled(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Logger.dh("Utils: AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
+        Logger.dev("Utils: AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
 
     }
@@ -137,7 +137,7 @@ public class Utils {
     }
 
     public static void toggleAutoRoot(Boolean b, Context context) {
-        Logger.dh("Utils: toggleAutocalled for " + b );
+        Logger.dev("Utils: toggleAutocalled for " + b );
         if (Utils.magiskVersion != -1) {
             if (!Utils.hasServicePermission(context)) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -145,7 +145,7 @@ public class Utils {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             } else {
-                Logger.dh("Utils: toggleAuto checks passed, setting" + b );
+                Logger.dev("Utils: toggleAuto checks passed, setting" + b );
                 PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("autoRootEnable", b).apply();
                 Intent myServiceIntent = new Intent(context, MonitorService.class);
                 myServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -236,21 +236,21 @@ public class Utils {
     }
 
     public static void SetupQuickSettingsTile(Context mContext) {
-        Logger.dh("Utils: SetupQuickSettings called");
+        Logger.dev("Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Logger.dh("Utils: Starting N quick settings service");
+            Logger.dev("Utils: Starting N quick settings service");
             Intent serviceIntent = new Intent(mContext, TileServiceNewApi.class);
             mContext.startService(serviceIntent);
 
         }
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-            Logger.dh("Utils: Marshmallow build detected");
+            Logger.dev("Utils: Marshmallow build detected");
             String mLabelString;
             int mRootIcon = R.drawable.root_white;
             int mAutoRootIcon = R.drawable.ic_autoroot_white;
             int mRootDisabled = R.drawable.root_grey;
             int mRootsState = CheckRootsState(mContext);
-            Logger.dh("Utils: Root State returned as " + mRootsState);
+            Logger.dev("Utils: Root State returned as " + mRootsState);
             final Intent enableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_ENABLEROOT);
             final Intent disableBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_DISABLEROOT);
             final Intent autoBroadcast = new Intent(PrivateBroadcastReceiver.ACTION_AUTOROOT);
@@ -304,7 +304,7 @@ public class Utils {
         List<String> lines = Shell.su("settings get secure sysui_qs_tiles");
         if (lines != null && lines.size() == 1) {
             List<String> tiles = new LinkedList<>(Arrays.asList(lines.get(0).split(",")));
-            Logger.dh("Utils: Current Tile String is " + tiles);
+            Logger.dev("Utils: Current Tile String is " + tiles);
             if (tiles.size() > 1) {
                 for (String tile : tiles) {
                     if (tile.equals(qsTileId)) {
@@ -315,7 +315,7 @@ public class Utils {
 
                 tiles.add(Math.round(tiles.size() / 2), qsTileId);
                 String newTiles = TextUtils.join(",", tiles);
-                Logger.dh("Utils: NewtilesString is " + newTiles);
+                Logger.dev("Utils: NewtilesString is " + newTiles);
                 Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
                 Toast.makeText(context, "Tile installed", Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {

@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(final Bundle savedInstanceState) {
 
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
-        Logger.dh("MainActivity: Theme is " + theme);
+        Logger.dev("MainActivity: Theme is " + theme);
         if (theme.equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             navigationView.setCheckedItem(R.id.downloads);
                         }
                     }
-                    hm = getFragmentManager().findFragmentByTag("log");
+                    hm = getFragmentManager().findFragmentByTag("dev");
                     if (hm != null) {
                         if (hm.isVisible()) {
                             navigationView.setCheckedItem(R.id.log);
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String toLaunch = "";
             toLaunch = getIntent().getExtras().getString("Relaunch");
             if (toLaunch.equals("Settings")) {
-                Logger.dh("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
+                Logger.dev("MainActivity: Intent has extras " + getIntent().getExtras().getString("Relaunch"));
                 mSelectedId = R.id.settings;
             }
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             drawer.closeDrawer(GravityCompat.START);
         } else {
             int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
-            Logger.dh("Welcomeactivity: Entrycount is " + backStackEntryCount);
+            Logger.dev("Welcomeactivity: Entrycount is " + backStackEntryCount);
             if (backStackEntryCount >= 2) {
                 super.onBackPressed();
             } else {
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.log:
                 setTitle(R.string.log);
-                tag = "log";
+                tag = "dev";
                 navFragment = new LogFragment();
                 break;
             case R.id.settings:

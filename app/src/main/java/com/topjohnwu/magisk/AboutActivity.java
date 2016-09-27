@@ -44,7 +44,7 @@ public class   AboutActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
-        Logger.dh("AboutActivity: Theme is " + theme);
+        Logger.dev("AboutActivity: Theme is " + theme);
         if (theme.equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }

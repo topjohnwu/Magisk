@@ -3,10 +3,12 @@ package com.topjohnwu.magisk.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
@@ -124,17 +126,17 @@ public class Async {
         @Override
         protected Void doInBackground(Void... voids) {
             ModulesFragment.listModules.clear();
-            Logger.dh("Loading modules");
+            Logger.dev("Loading modules");
             List<String> magisk = Utils.getModList(Utils.MAGISK_PATH);
             List<String> magiskCache = Utils.getModList(Utils.MAGISK_CACHE_PATH);
 
             for (String mod : magisk) {
-                Logger.dh("Adding modules from " + mod);
+                Logger.dev("Adding modules from " + mod);
                 ModulesFragment.listModules.add(new Module(mod));
             }
 
             for (String mod : magiskCache) {
-                Logger.dh("Adding cache modules from " + mod);
+                Logger.dev("Adding cache modules from " + mod);
                 Module cacheMod = new Module(mod);
                 // Prevent people forgot to change module.prop
                 cacheMod.setCache();
@@ -143,7 +145,7 @@ public class Async {
 
             Collections.sort(ModulesFragment.listModules, new Utils.ModuleComparator());
 
-            Logger.dh("Module load done");
+            Logger.dev("Module load done");
 
             return null;
         }
@@ -199,7 +201,11 @@ public class Async {
         public FlashZIP(Context context, Uri uri) {
             mContext = context;
             mUri = uri;
-            mName = uri.getLastPathSegment();
+            Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            c.moveToFirst();
+            mName = c.getString(nameIndex);
+            c.close();
             copyToSD = false;
         }
 
@@ -217,7 +223,7 @@ public class Async {
             }
 
             outputStream.close();
-            Logger.dh("FlashZip: File created successfully - " + f.getPath());
+            Logger.dev("FlashZip: File created successfully - " + f.getPath());
         }
 
         @Override
@@ -228,7 +234,7 @@ public class Async {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            Logger.dh("FlashZip Running... " + mName);
+            Logger.dev("FlashZip Running... " + mName);
             InputStream in;
             try {
                 try {
@@ -248,13 +254,18 @@ public class Async {
                 e.printStackTrace();
                 return false;
             }
+            Logger.dev(mName + "; " + mFile.getPath());
+//            return false;
             if (Shell.rootAccess()) {
                 ret = Shell.su(
                         "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
                         "BOOTMODE=true sh " + mFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mFile.getPath(),
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                Logger.dh("FlashZip: Console log:\n" + ret);
+                Logger.dev("FlashZip: Console log:");
+                for (String line : ret) {
+                    Logger.dev(line);
+                }
             }
             // Copy the file to sdcard
             if (copyToSD) {
@@ -272,7 +283,7 @@ public class Async {
                 }
             }
             mFile.delete();
-            return ret == null || !Boolean.parseBoolean(ret.get(ret.size() - 1));
+            return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
         }
 
         @Override
@@ -285,9 +296,9 @@ public class Async {
                 } else {
                     Toast.makeText(mContext, mContext.getString(R.string.manual_install, mFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
                 }
-                return;
+            } else {
+                done();
             }
-            done();
         }
 
         protected void done() {

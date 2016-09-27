@@ -65,7 +65,7 @@ public class MonitorService extends AccessibilityService {
             ActivityInfo activityInfo = tryGetActivity(componentName);
             boolean isActivity = activityInfo != null;
             if (isActivity) {
-                Logger.dh("MonitorService: CurrentActivity: " + event.getPackageName());
+                Logger.dev("MonitorService: CurrentActivity: " + event.getPackageName());
 
                 String mPackage = componentName.getPackageName();
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -108,11 +108,11 @@ public class MonitorService extends AccessibilityService {
 
         String rootString = rootToggle ? "on" : "off";
         if (Utils.rootEnabled() != rootToggle) {
-            Logger.dh("MonitorService: toggling root " + rootString);
+            Logger.dev("MonitorService: toggling root " + rootString);
             Utils.toggleRoot(rootToggle, getApplicationContext());
             if (Utils.rootEnabled() != rootToggle) {
                 Utils.toggleRoot(rootToggle, getApplicationContext());
-                Logger.dh("MonitorService: FORCING to " + rootString);
+                Logger.dev("MonitorService: FORCING to " + rootString);
             }
 
         }

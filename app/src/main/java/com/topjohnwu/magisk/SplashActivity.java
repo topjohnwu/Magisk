@@ -10,10 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +32,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
         if (!defaultPrefs.contains("auto_blacklist")) {
-            Logger.dh("SplashActivity: Setting default preferences for application");
+            Logger.dev("SplashActivity: Setting default preferences for application");
             SharedPreferences.Editor editor = defaultPrefs.edit();
             Set<String> set = new HashSet<>();
             set.add("com.google.android.apps.walletnfcrel");

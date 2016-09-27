@@ -76,7 +76,7 @@ public class AutoRootFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Logger.dh("Click");
+        Logger.dev("Click");
         super.onListItemClick(l, v, position, id);
         ApplicationInfo app = applist.get(position);
         ToggleApp(app.packageName, position, v);
@@ -84,7 +84,7 @@ public class AutoRootFragment extends ListFragment {
     }
 
     private void ToggleApp(String appToCheck, int position, View v) {
-        Logger.dh("Magisk","AutoRootFragment: ToggleApp called for " + appToCheck);
+        Logger.dev("Magisk","AutoRootFragment: ToggleApp called for " + appToCheck);
         Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
         assert blackListSet != null;
         arrayBlackList = new ArrayList<>(blackListSet);
@@ -100,7 +100,7 @@ public class AutoRootFragment extends ListFragment {
             }
 
         }
-        Logger.dh("Committing set, value is: " + arrayBlackList.toString());
+        Logger.dev("Committing set, value is: " + arrayBlackList.toString());
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("auto_blacklist", new HashSet<>(arrayBlackList));
         editor.apply();
