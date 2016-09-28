@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.module;
 
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.RepoHelper;
+import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {
@@ -30,17 +30,6 @@ public class Module extends BaseModule {
         mEnable = !Utils.itemExist(mDisableFile);
         mRemove = Utils.itemExist(mRemoveFile);
 
-    }
-
-    public void checkUpdate() {
-        Repo repo = RepoHelper.repoMap.get(mId);
-        if (repo != null) {
-            repo.setInstalled();
-            if (repo.getVersionCode() > mVersionCode) {
-                repo.setUpdate();
-                mCanUpdate = true;
-            }
-        }
     }
 
     public void createDisableFile() {

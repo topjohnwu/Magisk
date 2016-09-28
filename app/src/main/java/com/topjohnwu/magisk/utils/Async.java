@@ -10,15 +10,11 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.ModulesFragment;
+import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ReposFragment;
-import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,10 +26,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.List;
 
 public class Async {
+
+    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
     public static class constructEnv extends AsyncTask<Void, Void, Void> {
 
@@ -77,21 +74,21 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String jsonStr = WebRequest.makeWebServiceCall(Utils.UPDATE_JSON, WebRequest.GET);
+            String jsonStr = WebRequest.makeWebServiceCall(UPDATE_JSON, WebRequest.GET);
             try {
                 JSONObject json = new JSONObject(jsonStr);
 
                 JSONObject magisk = json.getJSONObject("magisk");
                 JSONObject app = json.getJSONObject("app");
 
-                Utils.remoteMagiskVersion = magisk.getInt("versionCode");
-                Utils.magiskLink = magisk.getString("link");
-                Utils.magiskChangelog = magisk.getString("changelog");
+                MagiskFragment.remoteMagiskVersion = magisk.getInt("versionCode");
+                MagiskFragment.magiskLink = magisk.getString("link");
+                MagiskFragment.magiskChangelog = magisk.getString("changelog");
 
-                Utils.remoteAppVersion = app.getString("version");
-                Utils.remoteAppVersionCode = app.getInt("versionCode");
-                Utils.appLink = app.getString("link");
-                Utils.appChangelog = app.getString("changelog");
+                MagiskFragment.remoteAppVersion = app.getString("version");
+                MagiskFragment.remoteAppVersionCode = app.getInt("versionCode");
+                MagiskFragment.appLink = app.getString("link");
+                MagiskFragment.appChangelog = app.getString("changelog");
 
             } catch (JSONException ignored) {
                 Logger.dev("JSON error!");
@@ -116,28 +113,7 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            ModulesFragment.listModules.clear();
-            Logger.dev("Loading modules");
-            List<String> magisk = Utils.getModList(Utils.MAGISK_PATH);
-            List<String> magiskCache = Utils.getModList(Utils.MAGISK_CACHE_PATH);
-
-            for (String mod : magisk) {
-                Logger.dev("Adding modules from " + mod);
-                ModulesFragment.listModules.add(new Module(mod));
-            }
-
-            for (String mod : magiskCache) {
-                Logger.dev("Adding cache modules from " + mod);
-                Module cacheMod = new Module(mod);
-                // Prevent people forgot to change module.prop
-                cacheMod.setCache();
-                ModulesFragment.listModules.add(cacheMod);
-            }
-
-            Collections.sort(ModulesFragment.listModules, new Utils.ModuleComparator());
-
-            Logger.dev("Module load done");
-
+            ModuleHelper.createModuleMap();
             return null;
         }
 
@@ -158,10 +134,7 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            ReposFragment.mListRepos.clear();
-            RepoHelper.createRepoMap(mContext);
-            RepoHelper.checkUpdate();
-            ReposFragment.mListRepos = RepoHelper.getSortedList();
+            ModuleHelper.createRepoMap(mContext);
             return null;
         }
 

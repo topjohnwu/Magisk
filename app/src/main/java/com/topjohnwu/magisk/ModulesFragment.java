@@ -20,6 +20,7 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.ModuleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ModulesFragment extends Fragment {
     @BindView(R.id.fab) FloatingActionButton fabio;
 
     private SharedPreferences prefs;
-    public static List<Module> listModules = new ArrayList<>();
+    private List<Module> listModules = new ArrayList<>();
     private View mView;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
@@ -105,6 +106,7 @@ public class ModulesFragment extends Fragment {
     }
 
     private void updateUI() {
+        ModuleHelper.getModuleList(listModules);
         if (listModules.size() == 0) {
             emptyTv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

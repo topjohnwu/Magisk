@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
 
@@ -18,7 +19,6 @@ import java.util.Date;
 public class Repo extends BaseModule {
     protected String repoName, mLogUrl, mManifestUrl, mZipUrl;
     protected Date mLastUpdate;
-    protected boolean mIsInstalled = false;
 
     public Repo(Context context, String name, Date lastUpdate) {
         repoName = name;
@@ -42,10 +42,6 @@ public class Repo extends BaseModule {
         }
     }
 
-    public void setInstalled() {
-        mIsInstalled = true;
-    }
-
     public String getZipUrl() {
         return mZipUrl;
     }
@@ -61,6 +57,4 @@ public class Repo extends BaseModule {
     public Date getLastUpdate() {
         return mLastUpdate;
     }
-
-    public boolean isInstalled() { return mIsInstalled; }
 }

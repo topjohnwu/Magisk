@@ -27,7 +27,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.uisettings);
         PreferenceManager.setDefaultValues(getActivity(), R.xml.uisettings, false);
@@ -36,7 +35,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("Settings");
+        getActivity().setTitle(R.string.settings);
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
 
     }
@@ -58,7 +57,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         CheckBoxPreference keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
         CheckBoxPreference hideRootNotificationPreference = (CheckBoxPreference) findPreference("hide_root_notification");
         themePreference.setSummary(themePreference.getValue());
-        if (Utils.magiskVersion == -1) {
+        if (MagiskFragment.magiskVersion == -1) {
             quickTilePreference.setEnabled(false);
             keepRootOffPreference.setEnabled(false);
             hideRootNotificationPreference.setEnabled(false);

@@ -11,6 +11,7 @@
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
+    <string name="settings">Settings</string>
 
     <!--Magisk Fragment-->
     <string name="magisk_version">Installed Magisk v%1$s</string>
@@ -46,17 +47,18 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
-    <string name="cache_modules">Cache modules</string>
     <string name="no_modules_found">No modules found</string>
-    <string name="module_update_available">An update is available!</string>
-    <string name="module_up_to_date">Module is up-to-date</string>
-    <string name="module_installed">Module is installed</string>
     <string name="module_not_installed">Module is not installed</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
     <string name="author">Created by %1$s</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Update Available</string>
+    <string name="installed">Installed</string>
+    <string name="not_installed">Not Installed</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
@@ -72,7 +74,7 @@
     <!--About Activity-->
     <string name="about">About</string>
     <string name="app_developers">Main developers</string>
-    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">Topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
     <string name="translators"/>
     <string name="app_version">App\'s version</string>
@@ -104,13 +106,12 @@
     <string name="supersu">SuperSU</string>
     <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
 
-    <!--Web Related-->
+    <!--URL Templates-->
     <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
     <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
     <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Fragment -->
-    <string name="settings">Settings</string>
     <string name="settings_quicksettings_category">Quick Settings</string>
     <string name="settings_enable_quicktile_title">Enable Quicksettings Tile</string>
     <string name="settings_enable_quicktile_summary">Click here to enable or disable the quick settings tile.</string>

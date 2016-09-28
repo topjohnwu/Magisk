@@ -91,32 +91,15 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/description"
-                android:minHeight="100dp"
                 android:orientation="vertical">
 
 
-                <TextView
-                    android:id="@+id/installedStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="false"/>
-
-                <TextView
-                    android:id="@+id/updateStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dip"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="false"/>
-
                 <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="50dip"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="0dip"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_margin="15dip">
 
                     <ImageView
                         android:id="@+id/changeLog"

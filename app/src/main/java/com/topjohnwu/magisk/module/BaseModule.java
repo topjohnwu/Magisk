@@ -8,7 +8,7 @@ import java.util.List;
 public abstract class BaseModule {
 
     protected String mId, mName, mVersion, mAuthor, mDescription, mSupportUrl, mDonateUrl;
-    protected boolean mIsCacheModule = false, mCanUpdate = false;
+    protected boolean mIsCacheModule = false;
     protected int mVersionCode = 0;
 
     protected void parseProps(List<String> props) { parseProps(props.toArray(new String[props.size()])); }
@@ -54,7 +54,6 @@ public abstract class BaseModule {
                     this.mIsCacheModule = Boolean.parseBoolean(prop[1]);
                     break;
                 default:
-                    Log.d("Magisk", "Module: Manifest string not recognized: " + prop[0]);
                     break;
             }
         }
@@ -96,13 +95,5 @@ public abstract class BaseModule {
 
     public String getSupportUrl() {
         return mSupportUrl;
-    }
-
-    public void setUpdate() {
-        mCanUpdate = true;
-    }
-
-    public boolean canUpdate() {
-        return mCanUpdate;
     }
 }

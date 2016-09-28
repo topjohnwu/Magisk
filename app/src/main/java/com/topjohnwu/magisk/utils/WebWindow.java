@@ -21,6 +21,8 @@ public WebWindow(String title, String url, Context context) {
     }
     alert.setTitle(title);
 
+    Logger.dev("WebView: URL = " + url);
+
     WebView wv = new WebView(context);
     wv.loadUrl(url);
     wv.setWebViewClient(new WebViewClient() {

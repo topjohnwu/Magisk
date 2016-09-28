@@ -33,12 +33,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MagiskFragment extends Fragment {
+
+    public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersionCode = -1;
+    public static String magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.magiskStatusView) View magiskStatusView;
     @BindView(R.id.magisk_status_container) View magiskStatusContainer;
     @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
-    @BindView(R.id.magisk_version) TextView magiskVersion;
+    @BindView(R.id.magisk_version) TextView magiskVersionText;
 
     @BindView(R.id.app_updateView) View appUpdateView;
     @BindView(R.id.app_check_updates_container) View appCheckUpdatesContainer;
@@ -53,6 +57,7 @@ public class MagiskFragment extends Fragment {
     @BindView(R.id.magisk_check_updates_progress) ProgressBar magiskCheckUpdatesProgress;
 
     @BindColor(R.color.grey500) int grey500;
+    @BindColor(android.R.color.transparent) int trans;
 
     private int colorOK, colorWarn, colorNeutral;
     int statusOK = R.drawable.ic_check_circle;
@@ -80,24 +85,37 @@ public class MagiskFragment extends Fragment {
         ta1.recycle();
         ta2.recycle();
 
-        if (Utils.magiskVersion == -1) {
+        if (magiskVersion == -1) {
             magiskStatusContainer.setBackgroundColor(grey500);
             magiskStatusIcon.setImageResource(statusUnknown);
 
-            magiskVersion.setTextColor(grey500);
-            magiskVersion.setText(R.string.magisk_version_error);
+            magiskVersionText.setTextColor(grey500);
+            magiskVersionText.setText(R.string.magisk_version_error);
         } else {
             magiskStatusContainer.setBackgroundColor(colorOK);
             magiskStatusIcon.setImageResource(statusOK);
 
-            magiskVersion.setText(getString(R.string.magisk_version, String.valueOf(Utils.magiskVersion)));
-            magiskVersion.setTextColor(colorOK);
+            magiskVersionText.setText(getString(R.string.magisk_version, String.valueOf(magiskVersion)));
+            magiskVersionText.setTextColor(colorOK);
         }
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             prefs.edit().putBoolean("update_check_done", false).apply();
+
+            appCheckUpdatesContainer.setBackgroundColor(trans);
+            magiskCheckUpdatesContainer.setBackgroundColor(trans);
+
+            appCheckUpdatesIcon.setImageResource(0);
+            magiskCheckUpdatesIcon.setImageResource(0);
+
+            appCheckUpdatesStatus.setText(null);
+            magiskCheckUpdatesStatus.setText(null);
+
+            appCheckUpdatesProgress.setVisibility(View.VISIBLE);
+            magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
+
             new Async.CheckUpdates(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
 
@@ -139,7 +157,7 @@ public class MagiskFragment extends Fragment {
             builder = new AlertDialog.Builder(getActivity());
         }
 
-        if (Utils.remoteMagiskVersion == -1) {
+        if (remoteMagiskVersion == -1) {
             appCheckUpdatesContainer.setBackgroundColor(colorWarn);
             magiskCheckUpdatesContainer.setBackgroundColor(colorWarn);
 
@@ -151,14 +169,14 @@ public class MagiskFragment extends Fragment {
             magiskCheckUpdatesStatus.setText(R.string.cannot_check_updates);
             magiskCheckUpdatesStatus.setTextColor(colorWarn);
         } else {
-            if (Utils.remoteMagiskVersion > Utils.magiskVersion) {
+            if (remoteMagiskVersion > magiskVersion) {
                 magiskCheckUpdatesContainer.setBackgroundColor(colorNeutral);
                 magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-                magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(Utils.remoteMagiskVersion)));
+                magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(remoteMagiskVersion)));
                 magiskCheckUpdatesStatus.setTextColor(colorNeutral);
                 magiskUpdateView.setOnClickListener(view -> builder
                         .setTitle(getString(R.string.update_title, getString(R.string.magisk)))
-                        .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(Utils.remoteMagiskVersion), Utils.magiskChangelog))
+                        .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(remoteMagiskVersion), magiskChangelog))
                         .setCancelable(true)
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
                                 getActivity(),
@@ -168,8 +186,8 @@ public class MagiskFragment extends Fragment {
                                         new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                     }
                                 },
-                                Utils.magiskLink,
-                                "Magisk-v" + String.valueOf(Utils.remoteMagiskVersion) + ".zip"))
+                                magiskLink,
+                                "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show());
             } else {
@@ -179,14 +197,14 @@ public class MagiskFragment extends Fragment {
                 magiskCheckUpdatesStatus.setTextColor(colorOK);
             }
 
-            if (Utils.remoteAppVersionCode > BuildConfig.VERSION_CODE) {
+            if (remoteAppVersionCode > BuildConfig.VERSION_CODE) {
                 appCheckUpdatesContainer.setBackgroundColor(colorNeutral);
                 appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-                appCheckUpdatesStatus.setText(getString(R.string.app_update_available, Utils.remoteAppVersion));
+                appCheckUpdatesStatus.setText(getString(R.string.app_update_available, remoteAppVersion));
                 appCheckUpdatesStatus.setTextColor(colorNeutral);
                 appUpdateView.setOnClickListener(view -> builder
                         .setTitle(getString(R.string.update_title, getString(R.string.app_name)))
-                        .setMessage(getString(R.string.update_msg, getString(R.string.app_name), Utils.remoteAppVersion, Utils.appChangelog))
+                        .setMessage(getString(R.string.update_msg, getString(R.string.app_name), remoteAppVersion, appChangelog))
                         .setCancelable(true)
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(getActivity(),
                                 new DownloadReceiver() {
@@ -199,8 +217,8 @@ public class MagiskFragment extends Fragment {
                                         mContext.startActivity(install);
                                     }
                                 },
-                                Utils.appLink,
-                                "MagiskManager-v" + Utils.remoteAppVersion + ".apk"))
+                                appLink,
+                                "MagiskManager-v" + remoteAppVersion + ".apk"))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show()
                 );
@@ -215,8 +233,9 @@ public class MagiskFragment extends Fragment {
 
         appCheckUpdatesProgress.setVisibility(View.GONE);
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
+        mSwipeRefreshLayout.setRefreshing(false);
 
-        if (Utils.magiskVersion == -1) {
+        if (magiskVersion == -1) {
             builder
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
@@ -229,106 +248,10 @@ public class MagiskFragment extends Fragment {
                                     new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             },
-                            Utils.magiskLink,
-                            "Magisk-v" + String.valueOf(Utils.remoteMagiskVersion) + ".zip"))
+                            magiskLink,
+                            "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }
     }
-
-//    private class updateUI extends AsyncTask<Void, Void, Void> {
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void v) {
-//            super.onPostExecute(v);
-//            String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
-//            if (theme.equals("Dark")) {
-//                builder = new AlertDialog.Builder(getActivity(),R.style.AlertDialog_dh);
-//            } else {
-//                builder = new AlertDialog.Builder(getActivity());
-//            }
-//
-//            if (Utils.remoteMagiskVersion == -1) {
-//                appCheckUpdatesContainer.setBackgroundColor(colorWarn);
-//                magiskCheckUpdatesContainer.setBackgroundColor(colorWarn);
-//
-//                appCheckUpdatesIcon.setImageResource(R.drawable.ic_warning);
-//                magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_warning);
-//
-//                appCheckUpdatesStatus.setText(R.string.cannot_check_updates);
-//                appCheckUpdatesStatus.setTextColor(colorWarn);
-//                magiskCheckUpdatesStatus.setText(R.string.cannot_check_updates);
-//                magiskCheckUpdatesStatus.setTextColor(colorWarn);
-//            } else {
-//                if (Utils.remoteMagiskVersion > Utils.magiskVersion) {
-//                    magiskCheckUpdatesContainer.setBackgroundColor(colorNeutral);
-//                    magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-//                    magiskCheckUpdatesStatus.setText(getString(R.string.magisk_update_available, String.valueOf(Utils.remoteMagiskVersion)));
-//                    magiskCheckUpdatesStatus.setTextColor(colorNeutral);
-//                    magiskUpdateView.setOnClickListener(view -> builder
-//                            .setTitle(getString(R.string.update_title, getString(R.string.magisk)))
-//                            .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(Utils.remoteMagiskVersion), Utils.magiskChangelog))
-//                            .setCancelable(true)
-//                            .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
-//                                    getActivity(),
-//                                    new DownloadReceiver() {
-//                                        @Override
-//                                        public void task(Uri uri) {
-//                                            new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-//                                        }
-//                                    },
-//                                    Utils.magiskLink,
-//                                    "Magisk-v" + String.valueOf(Utils.remoteMagiskVersion) + ".zip"))
-//                            .setNegativeButton(R.string.no_thanks, null)
-//                            .show());
-//                } else {
-//                    magiskCheckUpdatesContainer.setBackgroundColor(colorOK);
-//                    magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
-//                    magiskCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
-//                    magiskCheckUpdatesStatus.setTextColor(colorOK);
-//                }
-//
-//                if (Utils.remoteAppVersionCode > BuildConfig.VERSION_CODE) {
-//                    appCheckUpdatesContainer.setBackgroundColor(colorNeutral);
-//                    appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
-//                    appCheckUpdatesStatus.setText(getString(R.string.app_update_available, Utils.remoteAppVersion));
-//                    appCheckUpdatesStatus.setTextColor(colorNeutral);
-//                    appUpdateView.setOnClickListener(view -> builder
-//                            .setTitle(getString(R.string.update_title, getString(R.string.app_name)))
-//                            .setMessage(getString(R.string.update_msg, getString(R.string.app_name), Utils.remoteAppVersion, Utils.appChangelog))
-//                            .setCancelable(true)
-//                            .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(getActivity(),
-//                                    new DownloadReceiver() {
-//                                        @Override
-//                                        public void task(Uri uri) {
-//                                            Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-//                                            install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                                            Uri content = FileProvider.getUriForFile(getActivity(), "com.topjohnwu.magisk.provider", new File(uri.getPath()));
-//                                            install.setData(content);
-//                                            mContext.startActivity(install);
-//                                        }
-//                                    },
-//                                    Utils.appLink,
-//                                    "MagiskManager-v" + Utils.remoteAppVersion + ".apk"))
-//                            .setNegativeButton(R.string.no_thanks, null)
-//                            .show()
-//                    );
-//                } else {
-//                    appCheckUpdatesContainer.setBackgroundColor(colorOK);
-//                    appCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
-//                    appCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.app_name)));
-//                    appCheckUpdatesStatus.setTextColor(colorOK);
-//
-//                }
-//            }
-//
-//            appCheckUpdatesProgress.setVisibility(View.GONE);
-//            magiskCheckUpdatesProgress.setVisibility(View.GONE);
-//        }
-//    }
 }

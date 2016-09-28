@@ -80,13 +80,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         if (description != null) {
             holder.description.setText(description);
         }
-        if (repo.isInstalled()) {
-            holder.installedStatus.setText(context.getString(R.string.module_installed));
-            holder.installedStatus.setTextColor(Color.parseColor("#14AD00"));
-            holder.updateStatus.setText(repo.canUpdate() ? context.getString(R.string.module_update_available) : context.getString(R.string.module_up_to_date));
-        } else {
-            holder.installedStatus.setText(context.getString(R.string.module_not_installed));
-        }
 
         View.OnClickListener listener = view -> {
             if (view.getId() == holder.updateImage.getId()) {
@@ -148,8 +141,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         @BindView(R.id.version_name) TextView versionName;
         @BindView(R.id.description) TextView description;
         @BindView(R.id.author) TextView author;
-        @BindView(R.id.installedStatus) TextView installedStatus;
-        @BindView(R.id.updateStatus) TextView updateStatus;
         @BindView(R.id.expand_layout) LinearLayout expandLayout;
         @BindView(R.id.update) ImageView updateImage;
         @BindView(R.id.installed) ImageView installedImage;

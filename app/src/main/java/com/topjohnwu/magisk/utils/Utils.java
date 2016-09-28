@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
+import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
@@ -49,13 +50,7 @@ import javax.crypto.spec.DESKeySpec;
 
 public class Utils {
 
-    public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersionCode = -1;
-    public static String magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
     private static final String TAG = "Magisk";
-
-    public static final String MAGISK_PATH = "/magisk";
-    public static final String MAGISK_CACHE_PATH = "/cache/magisk";
-    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
     private static final String cryptoPass = "MagiskRox666";
     private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
@@ -63,9 +58,9 @@ public class Utils {
     public static void init(Context context) {
         List<String> ret = Shell.sh("getprop magisk.version");
         if (ret.get(0).isEmpty()) {
-            magiskVersion = -1;
+            MagiskFragment.magiskVersion = -1;
         } else {
-            magiskVersion = Integer.parseInt(ret.get(0));
+            MagiskFragment.magiskVersion = Integer.parseInt(ret.get(0));
         }
         String toolPath = context.getApplicationInfo().dataDir + "/busybox";
         Shell.su("PATH=$PATH:" + toolPath);
@@ -111,7 +106,7 @@ public class Utils {
     }
 
     public static void toggleRoot(Boolean b, Context context) {
-        if (Utils.magiskVersion != -1) {
+        if (MagiskFragment.magiskVersion != -1) {
             if (b) {
                 Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
             } else {
@@ -126,7 +121,7 @@ public class Utils {
 
     public static void toggleAutoRoot(Boolean b, Context context) {
         Logger.dev("Utils: toggleAutocalled for " + b );
-        if (Utils.magiskVersion != -1) {
+        if (MagiskFragment.magiskVersion != -1) {
             if (!Utils.hasServicePermission(context)) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 Toast.makeText(context, "Please enable Magisk in accessibility for auto-toggle work.", Toast.LENGTH_LONG).show();
@@ -412,10 +407,4 @@ public class Utils {
 
     }
 
-    public static class ModuleComparator implements Comparator<BaseModule> {
-        @Override
-        public int compare(BaseModule o1, BaseModule o2) {
-            return o1.getName().compareToIgnoreCase(o2.getName());
-        }
-    }
 }
