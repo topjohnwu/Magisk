@@ -6,9 +6,8 @@ import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {
 
-    private String mRemoveFile;
-    private String mDisableFile;
-    private boolean mEnable, mRemove;
+    private String mRemoveFile, mDisableFile, mUpdateFile;
+    private boolean mEnable, mRemove, mUpdated;
 
     public Module(String path) {
 
@@ -16,6 +15,7 @@ public class Module extends BaseModule {
 
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";
+        mUpdateFile = path + "/update";
 
         if (mId == null) {
             int sep = path.lastIndexOf('/');
@@ -29,6 +29,7 @@ public class Module extends BaseModule {
 
         mEnable = !Utils.itemExist(mDisableFile);
         mRemove = Utils.itemExist(mRemoveFile);
+        mUpdated = Utils.itemExist(mUpdateFile);
 
     }
 
@@ -54,6 +55,10 @@ public class Module extends BaseModule {
 
     public boolean willBeRemoved() {
         return mRemove;
+    }
+
+    public boolean isUpdated() {
+        return mUpdated;
     }
 
 }

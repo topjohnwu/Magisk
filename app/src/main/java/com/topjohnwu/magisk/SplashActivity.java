@@ -25,12 +25,8 @@ public class SplashActivity extends AppCompatActivity {
         if (defaultPrefs.getString("theme","").equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }
-        //setups go here
 
         // Set up default preferences,make sure we add "extra" blacklist entries.
-
-
-
         if (!defaultPrefs.contains("auto_blacklist")) {
             Logger.dev("SplashActivity: Setting default preferences for application");
             SharedPreferences.Editor editor = defaultPrefs.edit();

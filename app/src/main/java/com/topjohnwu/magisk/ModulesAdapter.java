@@ -99,11 +99,17 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
             updateDeleteButton(holder, module);
         });
 
-        updateDeleteButton(holder, module);
+        if (module.isUpdated()) {
+            holder.notice.setVisibility(View.VISIBLE);
+            holder.notice.setText(R.string.update_file_created);
+            holder.delete.setEnabled(false);
+        } else {
+            updateDeleteButton(holder, module);
+        }
     }
 
     private void updateDeleteButton(ViewHolder holder, Module module) {
-        holder.warning.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
+        holder.notice.setVisibility(module.willBeRemoved() ? View.VISIBLE : View.GONE);
 
         if (module.willBeRemoved()) {
             holder.delete.setImageResource(R.drawable.ic_undelete);
@@ -122,10 +128,9 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         @BindView(R.id.title) TextView title;
         @BindView(R.id.version_name) TextView versionName;
         @BindView(R.id.description) TextView description;
-        @BindView(R.id.warning) TextView warning;
+        @BindView(R.id.notice) TextView notice;
         @BindView(R.id.checkbox) CheckBox checkBox;
         @BindView(R.id.author) TextView author;
-//        @BindView(R.id.updateStatus) TextView updateStatus;
         @BindView(R.id.delete) ImageView delete;
 
         public ViewHolder(View itemView) {

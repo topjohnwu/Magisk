@@ -49,6 +49,7 @@
     <string name="no_info_provided">(No info provided)</string>
     <string name="no_modules_found">No modules found</string>
     <string name="module_not_installed">Module is not installed</string>
+    <string name="update_file_created">Module will be updated at next reboot</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
     <string name="disable_file_created">Module will be disabled at next reboot</string>

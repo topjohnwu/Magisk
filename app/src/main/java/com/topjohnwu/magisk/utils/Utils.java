@@ -62,7 +62,7 @@ public class Utils {
         } else {
             MagiskFragment.magiskVersion = Integer.parseInt(ret.get(0));
         }
-        String toolPath = context.getApplicationInfo().dataDir + "/busybox";
+        String toolPath = context.getApplicationInfo().dataDir + "/tools";
         Shell.su("PATH=$PATH:" + toolPath);
     }
 

@@ -42,7 +42,7 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String toolPath = mContext.getApplicationInfo().dataDir + "/busybox";
+            String toolPath = mContext.getApplicationInfo().dataDir + "/tools";
             String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
             String zip = mContext.getApplicationInfo().dataDir + "/lib/libzip.so";
             if (Shell.rootAccess()) {

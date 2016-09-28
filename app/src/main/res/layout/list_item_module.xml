@@ -70,7 +70,7 @@
             android:textIsSelectable="false"/>
 
         <TextView
-            android:id="@+id/warning"
+            android:id="@+id/notice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/description"
