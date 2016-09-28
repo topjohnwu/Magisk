@@ -18,7 +18,7 @@ import java.util.Date;
 public class Repo extends BaseModule {
     protected String repoName, mLogUrl, mManifestUrl, mZipUrl;
     protected Date mLastUpdate;
-    protected boolean mIsInstalled = false, mCanUpdate = false;
+    protected boolean mIsInstalled = false;
 
     public Repo(Context context, String name, Date lastUpdate) {
         repoName = name;
@@ -42,10 +42,6 @@ public class Repo extends BaseModule {
         }
     }
 
-    public void setUpdate() {
-        mCanUpdate = true;
-    }
-
     public void setInstalled() {
         mIsInstalled = true;
     }
@@ -67,6 +63,4 @@ public class Repo extends BaseModule {
     }
 
     public boolean isInstalled() { return mIsInstalled; }
-    public boolean canUpdate() { return mCanUpdate; }
-    public boolean isCacheModule() { return mIsCacheModule; }
 }

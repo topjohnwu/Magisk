@@ -68,11 +68,14 @@ public class SplashActivity extends AppCompatActivity {
         defaultPrefs.edit()
                 .putBoolean("module_done", false)
                 .putBoolean("repo_done", false)
+                .putBoolean("update_check_done", false)
                 .apply();
-        new Async.CheckUpdates(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        new Async.LoadModules(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        new Async.LoadRepos(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
+        new Async.CheckUpdates(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         new Async.constructEnv(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        new Async.LoadModules(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        new Async.LoadRepos(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
         // Start main activity
         Intent intent = new Intent(this, MainActivity.class);

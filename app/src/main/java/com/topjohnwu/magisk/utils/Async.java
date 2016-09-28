@@ -58,7 +58,7 @@ public class Async {
                             "for tool in $(" + toolPath + "/busybox --list); do",
                             "ln -s " + busybox + " " + toolPath + "/$tool",
                             "done",
-                            !Utils.commandExists("zip") ? "ln -s " + zip + " " + toolPath + "/zip" : ""
+                            "ln -s " + zip + " " + toolPath + "/zip"
                     );
                 }
             }
@@ -101,24 +101,8 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            if (Shell.rootAccess() && Utils.magiskVersion == -1) {
-                new AlertDialog.Builder(mContext)
-                        .setTitle(R.string.no_magisk_title)
-                        .setMessage(R.string.no_magisk_msg)
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
-                                mContext,
-                                new DownloadReceiver() {
-                                    @Override
-                                    public void task(Uri uri) {
-                                        new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                    }
-                                },
-                                Utils.magiskLink,
-                                "Magisk-v" + String.valueOf(Utils.remoteMagiskVersion) + ".zip"))
-                        .setNegativeButton(R.string.no_thanks, null)
-                        .show();
-            }
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            prefs.edit().putBoolean("update_check_done", true).apply();
         }
     }
 

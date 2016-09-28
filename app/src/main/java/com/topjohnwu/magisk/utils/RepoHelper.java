@@ -9,8 +9,6 @@ import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.WebRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,9 +44,7 @@ public class RepoHelper {
         }
 
         // Making a request to url and getting response
-        String token = context.getString(R.string.some_string);
-        String url1 = context.getString(R.string.url_main);
-        String jsonStr = WebRequest.makeWebServiceCall(url1 + Utils.procFile(token, context), WebRequest.GET);
+        String jsonStr = WebRequest.makeWebServiceCall(context.getString(R.string.url_main) + Utils.getToken(), WebRequest.GET);
         if (jsonStr != null && !jsonStr.isEmpty()) {
             try {
                 JSONArray jsonArray = new JSONArray(jsonStr);

@@ -164,9 +164,9 @@ public class Shell {
                 STDOUT.join();
                 process.destroy();
             } else {
-                STDIN.write(("echo \' \'\n").getBytes("UTF-8"));
+                STDIN.write(("echo\n").getBytes("UTF-8"));
                 STDIN.flush();
-                STDIN.write(("echo \'-done-\'\n").getBytes("UTF-8"));
+                STDIN.write(("echo \'-root-done-\'\n").getBytes("UTF-8"));
                 STDIN.flush();
                 while (true) {
                     try {
@@ -177,9 +177,11 @@ public class Shell {
                         // Process still running, gobble output until done
                         int end = res.size() - 1;
                         if (end > 0) {
-                            if (res.get(end).equals("-done-")) {
+                            if (res.get(end).equals("-root-done-")) {
                                 res.remove(end);
-                                res.remove(end - 1);
+                                if (res.get(end -1).isEmpty()) {
+                                    res.remove(end -1);
+                                }
                                 break;
                             }
                         }

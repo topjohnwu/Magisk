@@ -57,9 +57,12 @@ public class Utils {
     public static final String MAGISK_CACHE_PATH = "/cache/magisk";
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
 
+    private static final String cryptoPass = "MagiskRox666";
+    private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
+
     public static void init(Context context) {
         List<String> ret = Shell.sh("getprop magisk.version");
-        if (ret.get(0).replaceAll("\\s", "").isEmpty()) {
+        if (ret.get(0).isEmpty()) {
             magiskVersion = -1;
         } else {
             magiskVersion = Integer.parseInt(ret.get(0));
@@ -187,15 +190,14 @@ public class Utils {
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
-    public static String procFile(String value, Context context) {
+    public static String getToken() {
 
-        String cryptoPass = context.getResources().getString(R.string.pass);
         try {
             DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 
-            byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
+            byte[] encrypedPwdBytes = Base64.decode(secret, Base64.DEFAULT);
             // cipher is not thread safe
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.DECRYPT_MODE, key);
@@ -208,7 +210,7 @@ public class Utils {
                 | InvalidKeySpecException e) {
             e.printStackTrace();
         }
-        return value;
+        return secret;
     }
 
     public static void SetupQuickSettingsTile(Context mContext) {

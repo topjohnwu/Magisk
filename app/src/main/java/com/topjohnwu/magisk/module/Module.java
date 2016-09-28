@@ -8,7 +8,7 @@ public class Module extends BaseModule {
 
     private String mRemoveFile;
     private String mDisableFile;
-    private boolean mEnable, mRemove, mUpdateAvailable = false;
+    private boolean mEnable, mRemove;
 
     public Module(String path) {
 
@@ -38,7 +38,7 @@ public class Module extends BaseModule {
             repo.setInstalled();
             if (repo.getVersionCode() > mVersionCode) {
                 repo.setUpdate();
-                mUpdateAvailable = true;
+                mCanUpdate = true;
             }
         }
     }
@@ -66,7 +66,5 @@ public class Module extends BaseModule {
     public boolean willBeRemoved() {
         return mRemove;
     }
-
-    public boolean isUpdateAvailable() { return mUpdateAvailable; }
 
 }
