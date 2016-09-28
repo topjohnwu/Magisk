@@ -49,8 +49,8 @@ import javax.crypto.spec.DESKeySpec;
 
 public class Utils {
 
-    public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersion = -1;
-    public static String magiskLink, magiskChangelog, appChangelog, appLink, phhLink, supersuLink;
+    public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersionCode = -1;
+    public static String magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
     private static final String TAG = "Magisk";
 
     public static final String MAGISK_PATH = "/magisk";
@@ -99,27 +99,12 @@ public class Utils {
 
     public static boolean createFile(String path) {
         String command = "touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi";
-        if (!Shell.rootAccess()) {
-            return false;
-        } else {
-            return Boolean.parseBoolean(Shell.su(command).get(0));
-        }
+        return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
     }
 
     public static boolean removeFile(String path) {
-        boolean check;
         String command = "rm -f " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo false; else echo true; fi";
-        if (!Shell.rootAccess()) {
-            return false;
-        } else {
-            try {
-                check = Boolean.parseBoolean(Shell.su(command).get(0));
-                return check;
-            } catch (NullPointerException e) {
-                Log.d("Magisk:", "SU error executing removeFile " + e);
-                return false;
-            }
-        }
+        return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
     }
 
     public static void toggleRoot(Boolean b, Context context) {
@@ -132,7 +117,7 @@ public class Utils {
             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
                 SetupQuickSettingsTile(context);
             }
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root",b).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root", b).apply();
         }
     }
 
@@ -183,29 +168,20 @@ public class Utils {
         return ret;
     }
 
-    public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String file) {
+    public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
+        File file = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
             return;
         }
-        File downloadFile, dir = new File(Environment.getExternalStorageDirectory() + "/MagiskManager");
-        downloadFile = new File(dir + "/" + file);
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                Toast.makeText(context, R.string.toast_error_makedir, Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-        if (downloadFile.exists()) {
-            if (!downloadFile.delete()) {
-                Toast.makeText(context, R.string.toast_error_removing_files, Toast.LENGTH_LONG).show();
-                return;
-            }
+
+        if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs()) || (file.exists() && !file.delete())) {
+            Toast.makeText(context, R.string.toast_error_makedir, Toast.LENGTH_LONG).show();
         }
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-        request.setDestinationUri(Uri.fromFile(downloadFile));
+        request.setDestinationUri(Uri.fromFile(file));
 
         receiver.setDownloadID(downloadManager.enqueue(request));
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));

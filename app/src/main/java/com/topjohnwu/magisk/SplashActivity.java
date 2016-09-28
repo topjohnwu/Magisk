@@ -72,7 +72,7 @@ public class SplashActivity extends AppCompatActivity {
         new Async.CheckUpdates(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         new Async.LoadModules(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         new Async.LoadRepos(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        new Async.BusyboxEnv(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new Async.constructEnv(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         // Start main activity
         Intent intent = new Intent(this, MainActivity.class);

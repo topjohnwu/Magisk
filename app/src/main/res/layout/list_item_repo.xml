@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                                    android:layout_width="fill_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_gravity="center"
-                                    android:layout_marginBottom="@dimen/card_vertical_margin"
-                                    android:layout_marginEnd="@dimen/card_horizontal_margin"
-                                    android:layout_marginStart="@dimen/card_horizontal_margin"
-                                    android:layout_marginTop="@dimen/card_vertical_margin"
-                                    android:minHeight="?android:attr/listPreferredItemHeight"
-                                    style="?attr/cardStyle"
-                                    card_view:cardCornerRadius="@dimen/card_corner_radius"
-                                    card_view:cardElevation="@dimen/card_elevation">
-
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginStart="@dimen/card_horizontal_margin"
+    android:layout_marginTop="@dimen/card_vertical_margin"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    style="?attr/cardStyle"
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,8 +24,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            >
+            android:layout_gravity="center_vertical">
 
             <TextView
                 android:id="@+id/title"
@@ -40,15 +39,38 @@
 
             <TextView
                 android:id="@+id/version_name"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/card_textview_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/title"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/no_info_provided"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
-                android:textStyle="bold|italic"
-                />
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="@dimen/card_textview_width"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/version_name"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/no_info_provided"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic"/>
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/author"
+                android:layout_gravity="center_vertical"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/no_info_provided"
+                android:textIsSelectable="false" />
 
             <ImageView
                 android:id="@+id/update"
@@ -60,19 +82,7 @@
                 android:background="@drawable/ic_file_download_black"
                 android:backgroundTint="@color/icon_grey"
                 android:focusable="false"
-                android:gravity="end"
-                />
-
-            <TextView
-                android:id="@+id/description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/update"
-                android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false"
-                />
+                android:gravity="end" />
 
 
             <LinearLayout
@@ -82,18 +92,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/description"
                 android:minHeight="100dp"
-                android:orientation="vertical"
-
-                >
-
-                <TextView
-                    android:id="@+id/author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@android:color/tertiary_text_dark"
-                    android:textIsSelectable="false"
-                    android:textStyle="bold|italic"/>
+                android:orientation="vertical">
 
 
                 <TextView
@@ -146,7 +145,6 @@
                         android:background="@drawable/ic_support"
                         android:backgroundTint="@color/icon_grey"/>
 
-
                 </LinearLayout>
 
             </LinearLayout>
@@ -162,8 +160,7 @@
             android:layout_marginStart="@dimen/card_imageview_margin"
             android:focusable="false"
             android:gravity="end"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
     </RelativeLayout>
 

@@ -17,8 +17,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
     long downloadID;
     public String mName;
 
-    public DownloadReceiver() {
-    }
+    public DownloadReceiver() {}
 
     public DownloadReceiver(String name) {
         mName = name;

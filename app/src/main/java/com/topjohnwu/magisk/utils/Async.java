@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,11 +35,11 @@ import java.util.List;
 
 public class Async {
 
-    public static class BusyboxEnv extends AsyncTask<Void, Void, Void> {
+    public static class constructEnv extends AsyncTask<Void, Void, Void> {
 
         Context mContext;
 
-        public BusyboxEnv(Context context) {
+        public constructEnv(Context context) {
             mContext = context;
         }
 
@@ -45,16 +47,22 @@ public class Async {
         protected Void doInBackground(Void... voids) {
             String toolPath = mContext.getApplicationInfo().dataDir + "/busybox";
             String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
-            if (Shell.rootAccess() && !Utils.commandExists("unzip") && !Utils.itemExist(toolPath)) {
-                Shell.su(true,
-                        "mkdir " + toolPath,
-                        "chmod 755 " + toolPath,
-                        "ln -s " + busybox + " " + toolPath + "/busybox",
-                        "for tool in $(" + toolPath + "/busybox --list); do",
-                        "ln -s " + busybox + " " + toolPath + "/$tool",
-                        "done"
-                );
+            String zip = mContext.getApplicationInfo().dataDir + "/lib/libzip.so";
+            if (Shell.rootAccess()) {
+                if (!Utils.commandExists("unzip") || !Utils.commandExists("zip") || !Utils.itemExist(toolPath)) {
+                    Shell.sh(
+                            "rm -rf " + toolPath,
+                            "mkdir " + toolPath,
+                            "chmod 755 " + toolPath,
+                            "ln -s " + busybox + " " + toolPath + "/busybox",
+                            "for tool in $(" + toolPath + "/busybox --list); do",
+                            "ln -s " + busybox + " " + toolPath + "/$tool",
+                            "done",
+                            !Utils.commandExists("zip") ? "ln -s " + zip + " " + toolPath + "/zip" : ""
+                    );
+                }
             }
+
             return null;
         }
     }
@@ -75,25 +83,24 @@ public class Async {
 
                 JSONObject magisk = json.getJSONObject("magisk");
                 JSONObject app = json.getJSONObject("app");
-                JSONObject root = json.getJSONObject("root");
 
                 Utils.remoteMagiskVersion = magisk.getInt("versionCode");
                 Utils.magiskLink = magisk.getString("link");
                 Utils.magiskChangelog = magisk.getString("changelog");
 
-                Utils.remoteAppVersion = app.getInt("versionCode");
+                Utils.remoteAppVersion = app.getString("version");
+                Utils.remoteAppVersionCode = app.getInt("versionCode");
                 Utils.appLink = app.getString("link");
                 Utils.appChangelog = app.getString("changelog");
 
-                Utils.phhLink = root.getString("phh");
-                Utils.supersuLink = root.getString("supersu");
-            } catch (JSONException ignored) {}
+            } catch (JSONException ignored) {
+                Logger.dev("JSON error!");
+            }
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(Void v) {
             if (Shell.rootAccess() && Utils.magiskVersion == -1) {
                 new AlertDialog.Builder(mContext)
                         .setTitle(R.string.no_magisk_title)
@@ -101,14 +108,14 @@ public class Async {
                         .setCancelable(true)
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
                                 mContext,
-                                new DownloadReceiver(mContext.getString(R.string.magisk)) {
+                                new DownloadReceiver() {
                                     @Override
                                     public void task(Uri uri) {
-                                        new FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                        new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                     }
                                 },
                                 Utils.magiskLink,
-                                "latest_magisk.zip"))
+                                "Magisk-v" + String.valueOf(Utils.remoteMagiskVersion) + ".zip"))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show();
             }
@@ -181,14 +188,13 @@ public class Async {
         }
     }
 
-    public static class FlashZIP extends AsyncTask<Void, Void, Boolean> {
+    public static class FlashZIP extends AsyncTask<Void, Void, Integer> {
 
         private String mName;
-        private Uri mUri;
+        protected Uri mUri;
         private ProgressDialog progress;
-        private File mFile, sdFile;
+        protected File mFile, sdFile;
         private Context mContext;
-        private List<String> ret;
         private boolean copyToSD;
 
         public FlashZIP(Context context, Uri uri, String name) {
@@ -204,17 +210,22 @@ public class Async {
             Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
             int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
             c.moveToFirst();
-            mName = c.getString(nameIndex);
+            if (nameIndex != -1) {
+                mName = c.getString(nameIndex);
+            } else {
+                int idx = uri.getPath().lastIndexOf('/');
+                mName = uri.getPath().substring(idx + 1);
+            }
             c.close();
             copyToSD = false;
         }
 
-        private static void createFileFromInputStream(InputStream inputStream, File f) throws IOException {
-            if (f.exists() && !f.delete()) {
+        private void createFileFromInputStream(InputStream inputStream, File file) throws IOException {
+            if (file.exists() && !file.delete()) {
                 throw new IOException();
             }
-            f.setWritable(true, false);
-            OutputStream outputStream = new FileOutputStream(f);
+            file.setWritable(true, false);
+            OutputStream outputStream = new FileOutputStream(file);
             byte buffer[] = new byte[1024];
             int length;
 
@@ -223,42 +234,53 @@ public class Async {
             }
 
             outputStream.close();
-            Logger.dev("FlashZip: File created successfully - " + f.getPath());
+            Logger.dev("FlashZip: File created successfully - " + file.getPath());
+        }
+
+        protected void preProcessing() throws Throwable {
+            try {
+                InputStream in = mContext.getContentResolver().openInputStream(mUri);
+                mFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
+                createFileFromInputStream(in, mFile);
+                in.close();
+            } catch (FileNotFoundException e) {
+                Log.e("Magisk", "FlashZip: Invalid Uri");
+                throw e;
+            } catch (IOException e) {
+                Log.e("Magisk", "FlashZip: Error in creating file");
+                throw e;
+            }
         }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
             progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mName));
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected Integer doInBackground(Void... voids) {
             Logger.dev("FlashZip Running... " + mName);
-            InputStream in;
-            try {
-                try {
-                    in = mContext.getContentResolver().openInputStream(mUri);
-                    mFile = new File(mContext.getFilesDir().getAbsolutePath() + "/install.zip");
-                    createFileFromInputStream(in, mFile);
-                } catch (FileNotFoundException e) {
-                    Log.e("Magisk", "FlashZip: Invalid Uri");
-                    throw e;
-                } catch (IOException e) {
-                    Log.e("Magisk", "FlashZip: Error in creating file");
-                    throw e;
-                }
-            } catch (Throwable e) {
-                this.cancel(true);
-                progress.cancel();
-                e.printStackTrace();
-                return false;
-            }
+            List<String> ret = null;
             if (Shell.rootAccess()) {
+                try {
+                    preProcessing();
+                } catch (Throwable e) {
+                    this.cancel(true);
+                    progress.cancel();
+                    e.printStackTrace();
+                    return -1;
+                }
                 ret = Shell.su(
                         "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
+                        "if [ \"$(cat " + mFile.getParent() + "/META-INF/com/google/android/updater-script)\" = \"#MAGISK\" ]; then echo true; else echo false; fi"
+                );
+                if (! Boolean.parseBoolean(ret.get(ret.size() - 1))) {
+                    return 0;
+                }
+                ret = Shell.su(
                         "BOOTMODE=true sh " + mFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mFile.getPath(),
-                        "if [ $? -eq 0 ]; then echo true; else echo false; fi"
+                        "if [ $? -eq 0 ]; then echo true; else echo false; fi",
+                        "rm -rf " + mFile.getParent() + "/META-INF"
                 );
                 Logger.dev("FlashZip: Console log:");
                 for (String line : ret) {
@@ -266,36 +288,53 @@ public class Async {
                 }
             }
             // Copy the file to sdcard
-            if (copyToSD) {
-                try {
-                    sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + (mName.contains(".zip") ? mName : mName + ".zip"));
-                    if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
-                        throw new IOException();
+            if (copyToSD && mFile != null) {
+                sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + (mName.contains(".zip") ? mName : mName + ".zip").replace(" ", "_"));
+                if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
+                    sdFile = null;
+                } else {
+                    try {
+                        FileInputStream in = new FileInputStream(mFile);
+                        createFileFromInputStream(in, sdFile);
+                        in.close();
+                        mFile.delete();
+                    } catch (IOException e) {
+                        // Use the badass way :)
+                        Shell.su("cp -af " + mFile.getPath() + " " + sdFile.getPath());
+                        if (!sdFile.exists()) {
+                            sdFile = null;
+                        }
                     }
-                    createFileFromInputStream(in, sdFile);
-                    assert in != null;
-                    in.close();
-                } catch (IOException e) {
-                    Log.e("Magisk", "FlashZip: Unable to copy to sdcard");
-                    e.printStackTrace();
+                }
+                if (mFile.exists() && !mFile.delete()) {
+                    Shell.su("rm -f " + mFile.getPath());
                 }
             }
-            mFile.delete();
-            return ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1));
+            if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
+                return 1;
+            }
+            return -1;
         }
 
+        // -1 = error; 0 = invalid zip; 1 = success
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
             progress.dismiss();
-            if (!result) {
-                if (sdFile == null) {
-                    Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
-                }
-            } else {
-                done();
+            switch (result) {
+                case -1:
+                    if (sdFile == null) {
+                        Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(mContext, mContext.getString(R.string.manual_install, mFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
+                    }
+                    break;
+                case 0:
+                    Toast.makeText(mContext, mContext.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();
+                    break;
+                case 1:
+                    done();
+                    break;
             }
         }
 
