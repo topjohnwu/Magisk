@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,16 +37,11 @@ import butterknife.ButterKnife;
 public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
 
     private final List<Repo> mList;
-    private List<Boolean> mExpandedList;
     private View mView;
     private Context context;
 
     public ReposAdapter(List<Repo> list) {
         mList = list;
-        mExpandedList = new ArrayList<>(mList.size());
-        for (int i = 0; i < mList.size(); i++) {
-            mExpandedList.add(false);
-        }
     }
 
     @Override
@@ -59,10 +55,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Repo repo = mList.get(position);
-        mExpandedList = new ArrayList<>(mList.size());
-        for (int i = 0; i < mList.size(); i++) {
-            mExpandedList.add(false);
-        }
         if (repo.isCache()) {
             holder.title.setText("[Cache] " + repo.getName());
         } else {
@@ -152,6 +144,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         private ObjectAnimator animY2;
         private ViewHolder holder;
 
+        private boolean expanded = false;
+
         public ViewHolder(View itemView) {
             super(itemView);
             WindowManager windowmanager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -179,13 +173,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     });
 
             mView.setOnClickListener(view -> {
-                int position = getAdapterPosition();
-                if (mExpandedList.get(position)) {
+                if (expanded) {
                     collapse(holder.expandLayout);
                 } else {
                     expand(holder.expandLayout);
                 }
-                mExpandedList.set(position, !mExpandedList.get(position));
+                expanded = !expanded;
             });
 
         }
