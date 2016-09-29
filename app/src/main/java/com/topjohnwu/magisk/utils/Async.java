@@ -203,6 +203,7 @@ public class Async {
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
+                Utils.removeFile(mFile.getPath());
                 createFileFromInputStream(in, mFile);
                 in.close();
             } catch (FileNotFoundException e) {
@@ -251,7 +252,12 @@ public class Async {
             }
             // Copy the file to sdcard
             if (copyToSD && mFile != null) {
-                sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + (mName.contains(".zip") ? mName : mName + ".zip").replace(" ", "_"));
+                String filename = (mName.contains(".zip") ? mName : mName + ".zip");
+                filename = filename.replace(" ", "_").replace("'", "").replace("\"", "")
+                        .replace("$", "").replace("`", "").replace("(", "_").replace(")", "_")
+                        .replace("#", "").replace("@", "").replace("*", "");
+                sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
+                Logger.dev("FlashZip: Copy zip back to " + sdFile.getPath());
                 if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
                     sdFile = null;
                 } else {
@@ -269,7 +275,7 @@ public class Async {
                     }
                 }
                 if (mFile.exists() && !mFile.delete()) {
-                    Shell.su("rm -f " + mFile.getPath());
+                    Utils.removeFile(mFile.getPath());
                 }
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {

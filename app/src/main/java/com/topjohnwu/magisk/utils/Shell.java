@@ -191,9 +191,11 @@ public class Shell {
             }
         } catch (IOException e) {
             if (!e.getMessage().contains("EPIPE")) {
+                Logger.dev("Shell: Root shell error...");
                 return null;
             }
         } catch(InterruptedException e) {
+            Logger.dev("Shell: Root shell error...");
             return null;
         }
 

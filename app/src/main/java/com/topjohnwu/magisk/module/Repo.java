@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebRequest;
@@ -30,12 +31,15 @@ public class Repo extends BaseModule {
     }
 
     public void update() {
+        Logger.dev("Repo: Re-fetch prop " + mId);
         String props = WebRequest.makeWebServiceCall(mManifestUrl, WebRequest.GET, true);
         String lines[] = props.split("\\n");
         parseProps(lines);
     }
 
     public void update(Date lastUpdate) {
+        Logger.dev("Repo: Old: " + mLastUpdate);
+        Logger.dev("Repo: New: " + lastUpdate);
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();
