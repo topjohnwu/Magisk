@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.topjohnwu.magisk">
+<manifest package="com.topjohnwu.magisk"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+
+          xmlns:tools="http://schemas.android.com/tools">
 
     <uses-sdk tools:overrideLibrary="com.kcoppock.broadcatsttilesupport" />
 
@@ -24,6 +25,7 @@
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"/>
+
         <activity
             android:name=".SplashActivity"
             android:configChanges="orientation|screenSize"
@@ -31,7 +33,6 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -65,6 +66,9 @@
 
         <activity
             android:name=".AboutActivity"
+            android:theme="@style/AppTheme.Transparent"/>
+        <activity
+            android:name=".SettingsActivity"
             android:theme="@style/AppTheme.Transparent" />
 
         <provider

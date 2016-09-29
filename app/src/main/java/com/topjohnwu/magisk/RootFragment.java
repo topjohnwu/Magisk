@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import java.io.File;
 import java.util.List;
 
+import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -52,8 +52,11 @@ public class RootFragment extends Fragment {
     int statusError = R.drawable.ic_error;
     int statusUnknown = R.drawable.ic_help;
 
-    private int colorOK, colorFail, colorNeutral, colorWarn;
-    //private boolean autoRootStatus;
+    @BindColor(R.color.green500) int colorOK;
+    @BindColor(R.color.yellow500) int colorWarn;
+    @BindColor(R.color.grey500) int colorNeutral;
+    @BindColor(R.color.red500) int colorFail;
+
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Nullable
@@ -61,22 +64,6 @@ public class RootFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.root_fragment, container, false);
         ButterKnife.bind(this, view);
-        int[] attrs0 = {R.attr.ColorOK};
-        int[] attrs1 = {R.attr.ColorFail};
-        int[] attrs2 = {R.attr.ColorNeutral};
-        int[] attrs3 = {R.attr.ColorWarn};
-        TypedArray ta0 = getActivity().obtainStyledAttributes(attrs0);
-        TypedArray ta1 = getActivity().obtainStyledAttributes(attrs1);
-        TypedArray ta2 = getActivity().obtainStyledAttributes(attrs2);
-        TypedArray ta3 = getActivity().obtainStyledAttributes(attrs3);
-        colorOK = ta0.getColor(0, Color.GRAY);
-        colorFail = ta1.getColor(0, Color.GRAY);
-        colorNeutral = ta2.getColor(0, Color.GRAY);
-        colorWarn = ta2.getColor(0, Color.GRAY);
-        ta0.recycle();
-        ta1.recycle();
-        ta2.recycle();
-        ta3.recycle();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -115,7 +102,6 @@ public class RootFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle(R.string.root);
         listener = (pref, key) -> {
             if ((key.contains("autoRootEnable")) || (key.equals("root"))) {
                 Logger.dev("RootFragmnet, keychange detected for " + key);

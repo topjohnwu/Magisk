@@ -91,9 +91,6 @@ public class Utils {
             } else {
                 Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
             }
-//            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
-//                setupQuickSettingsTile(context);
-//            }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root", b).apply();
         }
     }

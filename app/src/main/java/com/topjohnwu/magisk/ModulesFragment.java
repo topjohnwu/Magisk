@@ -47,8 +47,6 @@ public class ModulesFragment extends Fragment {
         mView = inflater.inflate(R.layout.modules_fragment, container, false);
         ButterKnife.bind(this, mView);
 
-        mSwipeRefreshLayout.setRefreshing(true);
-
         fabio.setOnClickListener(v -> {
             Intent getContentIntent = FileUtils.createGetContentIntent(null);
             getContentIntent.setType("application/zip");
@@ -95,7 +93,6 @@ public class ModulesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mView = this.getView();
-        getActivity().setTitle(R.string.modules);
         prefs.registerOnSharedPreferenceChangeListener(listener);
     }
 

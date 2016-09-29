@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.R;
 
 public abstract class DownloadReceiver extends BroadcastReceiver {
     public Context mContext;
-    long downloadID;
     public String mName;
+    long downloadID;
 
     public DownloadReceiver() {}
 

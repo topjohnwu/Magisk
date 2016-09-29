@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -31,10 +30,7 @@ public class AboutActivity extends AppCompatActivity {
     private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
     private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
     private static final String DONATION_URL = "http://topjohnwu.github.io/donate";
-
-    private AlertDialog.Builder builder;
     @BindView(R.id.toolbar) Toolbar toolbar;
-
     @BindView(R.id.app_version_info) RowItem appVersionInfo;
     @BindView(R.id.app_changelog) RowItem appChangelog;
     @BindView(R.id.app_developers) RowItem appDevelopers;
@@ -42,6 +38,7 @@ public class AboutActivity extends AppCompatActivity {
     @BindView(R.id.app_source_code) RowItem appSourceCode;
     @BindView(R.id.support_thread) RowItem supportThread;
     @BindView(R.id.donation) RowItem donation;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,9 +49,6 @@ public class AboutActivity extends AppCompatActivity {
             setTheme(R.style.AppTheme_dh);
         }
         setContentView(R.layout.activity_about);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
@@ -83,7 +77,7 @@ public class AboutActivity extends AppCompatActivity {
 
         appChangelog.removeSummary();
         if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(this,R.style.AlertDialog_dh);
+            builder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
         } else {
             builder = new AlertDialog.Builder(this);
         }
@@ -92,7 +86,7 @@ public class AboutActivity extends AppCompatActivity {
         } else {
             Spanned result;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(changes,Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                result = Html.fromHtml(changes, Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
             } else {
                 result = Html.fromHtml(changes);
             }
@@ -114,7 +108,7 @@ public class AboutActivity extends AppCompatActivity {
         appDevelopers.setOnClickListener(view -> {
             Spanned result;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(getString(R.string.app_developers_),Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+                result = Html.fromHtml(getString(R.string.app_developers_), Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
             } else {
                 result = Html.fromHtml(getString(R.string.app_developers_));
             }
@@ -148,8 +142,6 @@ public class AboutActivity extends AppCompatActivity {
         setFloating();
     }
 
-
-
     public void setFloating() {
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {
@@ -164,12 +156,4 @@ public class AboutActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-           setTitle("About");
-
-
-            }
 }

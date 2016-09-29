@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <android.support.v7.widget.CardView
+    style="?attr/cardStyle"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
@@ -11,9 +11,9 @@
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    style="?attr/cardStyle"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
-    card_view:cardElevation="@dimen/card_elevation">
+    card_view:cardElevation="@dimen/card_elevation"
+    card_view:cardUseCompatPadding="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -43,11 +43,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/title"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/no_info_provided"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
-                android:textStyle="bold|italic" />
+                android:textStyle="bold|italic"/>
 
             <TextView
                 android:id="@+id/author"
@@ -55,8 +55,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/version_name"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/no_info_provided"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false"
                 android:textStyle="bold|italic"/>
@@ -68,9 +68,9 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/author"
                 android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/no_info_provided"
-                android:textIsSelectable="false" />
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false"/>
 
             <ImageView
                 android:id="@+id/update"
@@ -82,7 +82,7 @@
                 android:background="@drawable/ic_file_download_black"
                 android:backgroundTint="@color/icon_grey"
                 android:focusable="false"
-                android:gravity="end" />
+                android:gravity="end"/>
 
 
             <LinearLayout
@@ -93,13 +93,11 @@
                 android:layout_below="@id/description"
                 android:orientation="vertical">
 
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_margin="15dip">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/changeLog"
@@ -107,8 +105,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:background="@drawable/ic_changelog"
-                        android:backgroundTint="@color/icon_grey"/>
+                        android:background="?android:attr/selectableItemBackground"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_changelog"
+                        android:tint="@color/icon_grey"/>
 
                     <ImageView
                         android:id="@+id/authorLink"
@@ -116,8 +116,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:background="@drawable/ic_author"
-                        android:backgroundTint="@color/icon_grey"/>
+                        android:background="?android:attr/selectableItemBackground"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_person"
+                        android:tint="@color/icon_grey"/>
 
                     <ImageView
                         android:id="@+id/supportLink"
@@ -125,8 +127,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/card_imageview_margin"
                         android:layout_marginStart="@dimen/card_imageview_margin"
-                        android:background="@drawable/ic_support"
-                        android:backgroundTint="@color/icon_grey"/>
+                        android:background="?android:attr/selectableItemBackground"
+                        android:padding="15dp"
+                        android:src="@drawable/ic_help"
+                        android:tint="@color/icon_grey"/>
 
                 </LinearLayout>
 
@@ -143,7 +147,7 @@
             android:layout_marginStart="@dimen/card_imageview_margin"
             android:focusable="false"
             android:gravity="end"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
     </RelativeLayout>
 

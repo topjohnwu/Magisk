@@ -21,25 +21,29 @@
             android:title="@string/downloads"/>
 
         <item
-            android:id="@+id/root"
-            android:icon="@drawable/root"
-            android:title="@string/root"/>
-
-        <item
             android:id="@+id/log"
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>
+        <item
+            android:id="@+id/root"
+            android:icon="@drawable/root"
+            android:title="@string/root"/>
+    </group>
+
+    <group
+        android:id="@+id/option_items"
+        android:checkableBehavior="none">
 
         <item
             android:id="@+id/settings"
             android:icon="@drawable/ic_settings"
             android:title="@string/settings"/>
 
-    </group>
+        <item
+            android:id="@+id/app_about"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/about"/>
 
-    <item
-        android:id="@+id/app_about"
-        android:icon="@drawable/ic_info_outline"
-        android:title="@string/about"/>
+    </group>
 
 </menu>

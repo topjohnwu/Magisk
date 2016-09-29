@@ -11,10 +11,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="ColorOK">@color/green500</item>
-        <item name="ColorWarn">@color/yellow500</item>
-        <item name="ColorFail">@color/red500</item>
-        <item name="ColorNeutral">@color/grey500</item>
     </style>
 
     <style name="AppTheme.dh" parent="ThemeOverlay.AppCompat.Dark">
@@ -27,7 +23,6 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="cardStyle">@style/CardViewStyle.Dark</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:textColorPrimary">@color/dh_primary_text</item>
         <item name="android:textColorSecondary">@color/dh_primary_text</item>
         <item name="android:alertDialogTheme">@style/AlertDialog.dh</item>
@@ -36,18 +31,11 @@
         <item name="colorControlNormal">@color/dh_primary_text</item>
         <item name="colorControlActivated">@color/dh_accent</item>
         <item name="colorControlHighlight">@color/dh_icons</item>
-        <item name="ColorOK">@color/dh_alertOk</item>
-        <item name="ColorWarn">@color/dh_alertWarn</item>
-        <item name="ColorFail">@color/dh_alertFail</item>
-        <item name="ColorNeutral">@color/dh_alertWarn</item>
-
-
     </style>
 
     <style name="OverFlow" parent="@android:style/Widget.ActionBar">
         <item name="android:backgroundTint">@color/dh_icons</item>
     </style>
-
 
     <style name="AppTheme.Toolbar.dh" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorPrimary">@color/dh_primary</item>
@@ -59,7 +47,6 @@
 
     <style name="CardViewStyle.Dark" parent="CardView">
         <item name="cardBackgroundColor">@android:color/background_dark</item>
-
     </style>
 
     <style name="AlertDialog.dh" parent="ThemeOverlay.AppCompat.Dark">
@@ -85,8 +72,6 @@
         <!-- Set text size and color of title and message here -->
         <item name="android:textColor">@color/dh_primary_text</item>
     </style>
-
-
 
     <style name="ListPrefAlertDialogStyle">
         <item name="android:fullDark"    >@android:color/transparent</item>
@@ -132,6 +117,8 @@
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
 </resources>

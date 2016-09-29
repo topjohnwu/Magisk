@@ -28,9 +28,21 @@ public class Module extends BaseModule {
 
         Logger.dev("Creating Module, id: " + mId);
 
-        mEnable = !Utils.itemExist(mDisableFile);
-        mRemove = Utils.itemExist(mRemoveFile);
-        mUpdated = Utils.itemExist(mUpdateFile);
+        try {
+            mEnable = !Utils.itemExist(mDisableFile);
+        } catch (Exception e) {
+            mEnable = false;
+        }
+        try {
+            mRemove = Utils.itemExist(mRemoveFile);
+        } catch (Exception e) {
+            mRemove = false;
+        }
+        try {
+            mUpdated = Utils.itemExist(mUpdateFile);
+        } catch (Exception e) {
+            mUpdated = false;
+        }
 
     }
 

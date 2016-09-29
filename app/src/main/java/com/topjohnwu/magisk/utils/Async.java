@@ -149,10 +149,10 @@ public class Async {
 
     public static class FlashZIP extends AsyncTask<Void, Void, Integer> {
 
-        private String mName;
         protected Uri mUri;
-        private ProgressDialog progress;
         protected File mFile, sdFile;
+        private String mName;
+        private ProgressDialog progress;
         private Context mContext;
         private boolean copyToSD;
 
