@@ -46,16 +46,18 @@ public class Async {
             String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
             String zip = mContext.getApplicationInfo().dataDir + "/lib/libzip.so";
             if (Shell.rootAccess()) {
-                if (!Utils.commandExists("unzip") || !Utils.commandExists("zip") || !Utils.itemExist(toolPath)) {
+                if (!Utils.itemExist(toolPath)) {
                     Shell.sh(
                             "rm -rf " + toolPath,
                             "mkdir " + toolPath,
                             "chmod 755 " + toolPath,
-                            "ln -s " + busybox + " " + toolPath + "/busybox",
-                            "for tool in $(" + toolPath + "/busybox --list); do",
-                            "ln -s " + busybox + " " + toolPath + "/$tool",
+                            "cd " + toolPath,
+                            "ln -s " + busybox + " busybox",
+                            "for tool in $(./busybox --list); do",
+                            "ln -s " + busybox + " $tool",
                             "done",
-                            "ln -s " + zip + " " + toolPath + "/zip"
+                            "rm -f su sh",
+                            "ln -s " + zip + " zip"
                     );
                 }
             }
@@ -165,15 +167,18 @@ public class Async {
             mContext = context;
             mUri = uri;
             Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
-            int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            c.moveToFirst();
-            if (nameIndex != -1) {
-                mName = c.getString(nameIndex);
-            } else {
+            if (c != null) {
+                int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                c.moveToFirst();
+                if (nameIndex != -1) {
+                    mName = c.getString(nameIndex);
+                }
+                c.close();
+            }
+            if (mName == null) {
                 int idx = uri.getPath().lastIndexOf('/');
                 mName = uri.getPath().substring(idx + 1);
             }
-            c.close();
             copyToSD = false;
         }
 
@@ -296,6 +301,10 @@ public class Async {
         }
 
         protected void done() {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            prefs.edit().putBoolean("module_done", false).apply();
+            new LoadModules(mContext).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
             AlertDialog.Builder builder;
             String theme = PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme", "");
             if (theme.equals("Dark")) {
@@ -306,9 +315,31 @@ public class Async {
             builder
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
-                    .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.su("sh -c reboot"))
+                    .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.sh("su -c reboot"))
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
+        }
+    }
+
+    public static class LinkBusyBox extends AsyncTask<Void, Void, Void> {
+
+        private boolean link;
+
+        public LinkBusyBox(boolean b) {
+            link = b;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (link) {
+                Shell.su(
+                        "rm -rf /magisk/.core/busybox",
+                        "ln -s /data/busybox /magisk/.core/busybox"
+                );
+            } else {
+                Shell.su("rm -rf /magisk/.core/busybox");
+            }
+            return null;
         }
     }
 }

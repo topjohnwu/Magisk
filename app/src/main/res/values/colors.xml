@@ -4,27 +4,21 @@
     <color name="primary">#009688</color>
     <color name="primary_dark">#00796B</color>
     <color name="accent">#FFC107</color>
-    <color name="primary_text">#212121</color>
-    <color name="icons">#FFFFFF</color>
     <color name="icon_grey">#757575</color>
     <color name="red500">#F44336</color>
     <color name="green500">#4CAF50</color>
-    <color name="blue500">#2196F3</color>
     <color name="grey500">#9E9E9E</color>
     <color name="yellow500">#FFC107</color>
 
     <color name="dh_primary">#3F51B5</color>
     <color name="dh_primary_dark">#303F9F</color>
-    <color name="dh_primary_light">#C5CAE9</color>
     <color name="dh_accent">#448AFF</color>
 
     <color name="dh_primary_text">#dedede</color>
-    <color name="dh_secondary_text">#8A8A8A</color>
     <color name="dh_icons">#dedede</color>
     <color name="dh_divider">#313131</color>
     <color name="dh_alertWarn">#FF9800</color>
     <color name="dh_alertOk">@color/dh_accent</color>
-    <color name="dh_alertNeutral">@color/dh_primary_light</color>
     <color name="dh_alertFail">@color/red500</color>
 
 

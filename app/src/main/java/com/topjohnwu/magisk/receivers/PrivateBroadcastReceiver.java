@@ -32,6 +32,6 @@ public final class PrivateBroadcastReceiver extends BroadcastReceiver {
             Utils.toggleRoot(false, context);
         }
 
-        Utils.SetupQuickSettingsTile(context);
+        Utils.setupQuickSettingsTile(context);
     }
 }

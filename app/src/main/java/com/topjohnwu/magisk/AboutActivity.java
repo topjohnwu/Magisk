@@ -29,7 +29,9 @@ import butterknife.ButterKnife;
 public class   AboutActivity extends AppCompatActivity {
 
     private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
-    private static final String XDA_THREAD = "http://forum.xda-developers.com/android/software/mod-magisk-v1-universal-systemless-t3432382";
+    private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
+    private static final String DONATION_URL = "http://topjohnwu.github.io/donate";
+
     private AlertDialog.Builder builder;
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -39,6 +41,7 @@ public class   AboutActivity extends AppCompatActivity {
     @BindView(R.id.app_translators) RowItem appTranslators;
     @BindView(R.id.app_source_code) RowItem appSourceCode;
     @BindView(R.id.support_thread) RowItem supportThread;
+    @BindView(R.id.donation) RowItem donation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,6 +141,9 @@ public class   AboutActivity extends AppCompatActivity {
 
         supportThread.removeSummary();
         supportThread.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(XDA_THREAD))));
+
+        donation.removeSummary();
+        donation.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(DONATION_URL))));
 
         setFloating();
     }

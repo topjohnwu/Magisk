@@ -19,7 +19,7 @@ public class AutoStartReceiver extends BroadcastReceiver {
             Utils.toggleRoot(false, context);
         }
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
-            Utils.SetupQuickSettingsTile(context);
+            Utils.setupQuickSettingsTile(context);
 
         }
 

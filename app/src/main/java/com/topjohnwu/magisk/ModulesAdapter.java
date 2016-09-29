@@ -67,7 +67,6 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Module module = mList.get(position);
-        Log.d("Magisk", "ModulesAdapter: Trying set up bindview from list pos " + position + " and " + module.getName());
         if (module.isCache()) {
             holder.title.setText("[Cache] " + module.getName());
         } else {

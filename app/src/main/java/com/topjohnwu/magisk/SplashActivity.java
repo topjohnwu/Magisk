@@ -19,7 +19,6 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         super.onCreate(savedInstanceState);
         SharedPreferences defaultPrefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
         if (defaultPrefs.getString("theme","").equals("Dark")) {
@@ -35,8 +34,8 @@ public class SplashActivity extends AppCompatActivity {
             set.add("com.google.android.gms");
             set.add("com.google.commerce.tapandpay");
             editor.putStringSet("auto_blacklist", set);
-            editor.putBoolean("autoRootEnable",false);
-            editor.putBoolean("root",Utils.rootEnabled());
+            editor.putBoolean("autoRootEnable", false);
+            editor.putBoolean("root", Utils.rootEnabled());
             editor.apply();
         }
 
@@ -56,7 +55,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         // Set up quick settings tile
-        Utils.SetupQuickSettingsTile(getApplicationContext());
+        Utils.setupQuickSettingsTile(getApplicationContext());
 
         // Initialize
         Utils.init(this);

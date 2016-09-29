@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion "24.0.3"
 
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 24
-        versionCode 4
+        versionCode 5
         versionName "2.0"
         jackOptions {
             enabled true
@@ -32,9 +32,9 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.android.support:cardview-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:cardview-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
     compile 'com.github.d8ahazard:BroadcastTileSupportUpdate:master'
     compile 'com.getkeepsafe.taptargetview:taptargetview:1.2.0'
     compile 'com.jakewharton:butterknife:8.4.0'

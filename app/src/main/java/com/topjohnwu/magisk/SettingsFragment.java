@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -12,18 +13,17 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.ButterKnife;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private CheckBoxPreference quickTilePreference;
+    private CheckBoxPreference quickTilePreference, busyboxPreference;
     private ListPreference themePreference;
-
-    public SettingsFragment() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,9 +50,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        ButterKnife.bind(this, view);
-        quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile");
         themePreference = (ListPreference) findPreference("theme");
+        busyboxPreference = (CheckBoxPreference) findPreference("busybox");
+        quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile") ;
+        busyboxPreference.setChecked(Utils.commandExists("unzip"));
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
         CheckBoxPreference keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
         CheckBoxPreference hideRootNotificationPreference = (CheckBoxPreference) findPreference("hide_root_notification");
@@ -67,21 +68,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             hideRootNotificationPreference.setEnabled(true);
         }
 
-        Preference.OnPreferenceClickListener preferenceClickListener = preference -> {
-            if (preference == quickTilePreference) {
-                boolean isChecked = quickTilePreference.isChecked();
-                if (isChecked) {
-                    Utils.installTile(getActivity());
-                } else {
-                    Utils.uninstallTile(getActivity());
-                }
-
-            }
-
-            return false;
-        };
-
-        quickTilePreference.setOnPreferenceClickListener(preferenceClickListener);
         // calculate margins
         int horizontalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
         int verticalMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
@@ -118,6 +104,44 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             Logger.dev("SettingsFragment: theme is " + pref);
 
+        } else if (key.equals("enable_quicktile")) {
+            boolean checked = sharedPreferences.getBoolean("enable_quicktile", false);
+            if (checked) {
+                new AsyncTask<Void, Void, Boolean> () {
+                    @Override
+                    protected Boolean doInBackground(Void... voids) {
+                        return Utils.installTile(getActivity());
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        super.onPostExecute(result);
+                        if (result) {
+                            Toast.makeText(getActivity(), "Tile installed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "Tile installation error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                new AsyncTask<Void, Void, Boolean> () {
+                    @Override
+                    protected Boolean doInBackground(Void... voids) {
+                        return Utils.uninstallTile(getActivity());
+                    }
+                    @Override
+                    protected void onPostExecute(Boolean result) {
+                        super.onPostExecute(result);
+                        if (result) {
+                            Toast.makeText(getActivity(), "Tile uninstalled", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "Tile uninstallation error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            }
+        } else if (key.equals("busybox")) {
+            boolean checked = sharedPreferences.getBoolean("busybox", false);
+            new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         }
 
     }

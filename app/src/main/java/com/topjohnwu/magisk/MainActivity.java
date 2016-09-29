@@ -35,12 +35,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final Handler mDrawerHandler = new Handler();
     private String currentTitle;
 
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.drawer_layout)
-    DrawerLayout drawer;
-    @BindView(R.id.nav_view)
-    NavigationView navigationView;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.nav_view) NavigationView navigationView;
 
     @IdRes
     private int mSelectedId = R.id.magisk;

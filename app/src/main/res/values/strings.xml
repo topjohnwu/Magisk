@@ -24,7 +24,6 @@
 
     <!--Root Fragment-->
     <string name="root_toggle">Root Toggle</string>
-    <string name="auto_root">Auto Root</string>
     <string name="selinux_toggle">SELinux Toggle</string>
 
     <string name="root_error">Root Error</string>
@@ -48,7 +47,6 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
     <string name="no_modules_found">No modules found</string>
-    <string name="module_not_installed">Module is not installed</string>
     <string name="update_file_created">Module will be updated at next reboot</string>
     <string name="remove_file_created">Module will be removed at next reboot</string>
     <string name="remove_file_deleted">Module will not be removed at next reboot</string>
@@ -60,6 +58,7 @@
     <string name="update_available">Update Available</string>
     <string name="installed">Installed</string>
     <string name="not_installed">Not Installed</string>
+    <string name="changelog">Changelog</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
@@ -80,6 +79,7 @@
     <string name="translators"/>
     <string name="app_version">App\'s version</string>
     <string name="app_source_code">Source code</string>
+    <string name="donation">Donation</string>
     <string name="app_translators">App\'s translators</string>
     <string name="support_thread">Support thread</string>
 
@@ -90,6 +90,8 @@
     <string name="accessibility_service_description">Accessibility service required for Magisk auto-unroot feature</string>
     <string name="update_title">%1$s Update!</string>
     <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
+    <string name="repo_install_title">Install %1$s</string>
+    <string name="repo_install_msg">Do you want to install %1$s ?</string>
     <string name="download_install">Download and install</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
@@ -102,10 +104,6 @@
     <string name="zip_install_progress_msg">"Installing %1$s …"</string>
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
-    <string name="root_method_title">Choose a root method</string>
-    <string name="phh">phh\'s superuser</string>
-    <string name="supersu">SuperSU</string>
-    <string name="root_system_msg">It seems that you have incompatible root installed\nDo you want to install Magisk compatible root now?</string>
 
     <!--URL Templates-->
     <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
@@ -113,20 +111,24 @@
     <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Fragment -->
+    <string name="settings_general_category">General</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_summary">Select a theme</string>
+    <string name="settings_busybox_title">Enable BusyBox</string>
+    <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
+
     <string name="settings_quicksettings_category">Quick Settings</string>
     <string name="settings_enable_quicktile_title">Enable Quicksettings Tile</string>
     <string name="settings_enable_quicktile_summary">Click here to enable or disable the quick settings tile.</string>
+
+    <string name="settings_root_category">Root</string>
     <string name="settings_keep_root_off_summary">Disable root unless otherwise enabled by auto-toggle or toggle.</string>
     <string name="settings_keep_root_off_title">Keep root turned off</string>
-    <string name="settings_developer_logging_title">Enable advanced debug logging</string>
-    <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
-    <string name="settings_root_category">Root</string>
-    <string name="settings_development_category">Development</string>
     <string name="settings_hide_root_notification_summary">When checked, auto-toggle notifications will not be displayed.</string>
     <string name="settings_hide_root_notification_title">Hide auto-toggle notifications</string>
 
-    <!--General Use -->
-    <string name="toast_error_makedir">Error creating directory, could not download file.</string>
-    <string name="toast_error_removing_files">Error removing old files, cancelled.</string>
-    <string name="settings_general_title">General</string>
+    <string name="settings_development_category">Development</string>
+    <string name="settings_developer_logging_title">Enable advanced debug logging</string>
+    <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
+
 </resources>

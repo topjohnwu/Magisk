@@ -104,12 +104,27 @@
                 style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
-                <com.topjohnwu.magisk.RowItem
-                    android:id="@+id/support_thread"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    app:icon="@drawable/ic_xda"
-                    app:text="@string/support_thread"/>
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical">
+
+                    <com.topjohnwu.magisk.RowItem
+                        android:id="@+id/support_thread"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/ic_xda"
+                        app:text="@string/support_thread"/>
+
+                    <com.topjohnwu.magisk.RowItem
+                        android:id="@+id/donation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:icon="@drawable/ic_attach_money"
+                        app:text="@string/donation"/>
+
+                </LinearLayout>
 
             </android.support.v7.widget.CardView>
 

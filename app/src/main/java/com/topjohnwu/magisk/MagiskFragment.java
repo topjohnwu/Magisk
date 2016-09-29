@@ -152,7 +152,7 @@ public class MagiskFragment extends Fragment {
     private void updateUI() {
         String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
         if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(getActivity(),R.style.AlertDialog_dh);
+            builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog_dh);
         } else {
             builder = new AlertDialog.Builder(getActivity());
         }
@@ -190,11 +190,28 @@ public class MagiskFragment extends Fragment {
                                 "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show());
+
             } else {
                 magiskCheckUpdatesContainer.setBackgroundColor(colorOK);
                 magiskCheckUpdatesIcon.setImageResource(R.drawable.ic_check_circle);
                 magiskCheckUpdatesStatus.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
                 magiskCheckUpdatesStatus.setTextColor(colorOK);
+                magiskUpdateView.setOnClickListener(view -> builder
+                        .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
+                        .setMessage(getString(R.string.repo_install_msg, "Magisk-v" + String.valueOf(remoteMagiskVersion)))
+                        .setCancelable(true)
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
+                                getActivity(),
+                                new DownloadReceiver() {
+                                    @Override
+                                    public void task(Uri uri) {
+                                        new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                    }
+                                },
+                                magiskLink,
+                                "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
+                        .setNegativeButton(R.string.no_thanks, null)
+                        .show());
             }
 
             if (remoteAppVersionCode > BuildConfig.VERSION_CODE) {

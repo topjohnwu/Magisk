@@ -89,6 +89,8 @@ public class RootFragment extends Fragment {
         ta3.recycle();
         autoRootStatus = Utils.autoToggleEnabled(getActivity());
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         if (autoRootStatus) {
             if (!Utils.hasServicePermission(getActivity())) {
                 autoRootStatus = false;
@@ -96,9 +98,18 @@ public class RootFragment extends Fragment {
         }
         rootToggle.setEnabled(!autoRootStatus);
         autoRootToggle.setChecked(autoRootStatus);
-        new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        updateUI();
 
-        rootToggle.setOnClickListener(toggle -> Utils.toggleRoot(((CompoundButton) toggle).isChecked(), getActivity()));
+        rootToggle.setOnClickListener(toggle -> {
+            new AsyncTask<Boolean, Void, Void>() {
+                @Override
+                protected Void doInBackground(Boolean... bools) {
+                    Utils.toggleRoot(bools[0], getActivity());
+                    return null;
+                }
+            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ((CompoundButton) toggle).isChecked());
+
+        });
 
         autoRootToggle.setOnClickListener(toggle -> {
                     if (!Utils.hasServicePermission(getActivity())) {
@@ -106,7 +117,7 @@ public class RootFragment extends Fragment {
                         Toast.makeText(getActivity(), "Please enable accessibility access for Magisk's auto-toggle feature to work.", Toast.LENGTH_LONG).show();
                         startActivityForResult(intent, 100);
                     } else {
-                        ToggleAutoRoot(autoRootToggle.isChecked());
+                        toggleAutoRoot(autoRootToggle.isChecked());
 
                     }
                 }
@@ -114,19 +125,45 @@ public class RootFragment extends Fragment {
         );
 
         selinuxToggle.setOnClickListener(toggle -> {
-            Shell.su(((CompoundButton) toggle).isChecked() ? "setenforce 1" : "setenforce 0");
-            new updateUI().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
+            new AsyncTask<Boolean, Void, Void>() {
+                @Override
+                protected Void doInBackground(Boolean... bools) {
+                    Shell.su(bools[0] ? "setenforce 1" : "setenforce 0");
+                    return null;
+                }
+                @Override
+                protected void onPostExecute(Void v) {
+                    super.onPostExecute(v);
+                    updateUI();
+                }
+            }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, ((CompoundButton) toggle).isChecked());
         });
 
         return view;
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.root);
+        listener = (pref, key) -> {
+
+            if ((key.contains("autoRootEnable")) || (key.equals("root"))) {
+                Logger.dev("RootFragmnet, keychange detected for " + key);
+                //new updateUI().execute();
+                updateUI();
+            }
+
+        };
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+        updateUI();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        if (null != listener) {
-            prefs.unregisterOnSharedPreferenceChangeListener(listener);
-        }
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
@@ -135,7 +172,7 @@ public class RootFragment extends Fragment {
         Log.d("Magisk", "Got result: " + requestCode + " and " + resultCode);
         if (requestCode == 100) {
             if (Utils.hasServicePermission(getActivity())) {
-                ToggleAutoRoot(true);
+                toggleAutoRoot(true);
                 Snackbar.make(view, getActivity().getString(R.string.auto_toggle) + " has been enabled.", Snackbar.LENGTH_LONG).show();
 
             } else {
@@ -146,7 +183,7 @@ public class RootFragment extends Fragment {
         }
     }
 
-    private void ToggleAutoRoot(boolean toggleState) {
+    private void toggleAutoRoot(boolean toggleState) {
         autoRootStatus = toggleState;
         Utils.toggleAutoRoot(toggleState, getActivity());
         if (toggleState) {
@@ -166,155 +203,119 @@ public class RootFragment extends Fragment {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().setTitle("Root");
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        listener = (prefs1, key) -> {
+    private void updateUI() {
+        autoRootToggle.setChecked(autoRootStatus);
+        progressBar.setVisibility(View.GONE);
+        rootStatusView.setVisibility(View.VISIBLE);
+        safetynetStatusView.setVisibility(View.VISIBLE);
+        selinuxStatusView.setVisibility(View.VISIBLE);
 
-            if ((key.contains("autoRootEnable")) | (key.equals("root"))) {
-                Logger.dev("RootFragmnet, keychange detected for " + key);
-                new updateUI().execute();
-            }
-
-        };
-
-        prefs.registerOnSharedPreferenceChangeListener(listener);
-        new updateUI().execute();
-
-    }
-
-    public class updateUI extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            // Make sure static block invoked
-            Shell.rootAccess();
-            // Set up Tile on UI Refresh
-            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_quicktile", false)) {
-                Utils.SetupQuickSettingsTile(getActivity());
-            }
-            autoRootStatus = Utils.autoToggleEnabled(getActivity());
-            return null;
+        if (Shell.rootAccess()) {
+            rootToggleView.setVisibility(View.VISIBLE);
+            autoRootToggleView.setVisibility(View.VISIBLE);
+            selinuxToggleView.setVisibility(View.VISIBLE);
         }
 
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            autoRootToggle.setChecked(autoRootStatus);
-            progressBar.setVisibility(View.GONE);
-            rootStatusView.setVisibility(View.VISIBLE);
-            safetynetStatusView.setVisibility(View.VISIBLE);
-            selinuxStatusView.setVisibility(View.VISIBLE);
+        List<String> selinux = Shell.sh("getenforce");
 
-            if (Shell.rootAccess()) {
-                rootToggleView.setVisibility(View.VISIBLE);
-                autoRootToggleView.setVisibility(View.VISIBLE);
-                selinuxToggleView.setVisibility(View.VISIBLE);
-            }
+        if (selinux.isEmpty()) {
+            selinuxStatusContainer.setBackgroundColor(colorNeutral);
+            selinuxStatusIcon.setImageResource(statusUnknown);
 
-            List<String> selinux = Shell.sh("getenforce");
+            selinuxStatus.setText(R.string.selinux_error_info);
+            selinuxStatus.setTextColor(colorNeutral);
+            selinuxToggle.setChecked(false);
+        } else if (selinux.get(0).equals("Enforcing")) {
+            selinuxStatusContainer.setBackgroundColor(colorOK);
+            selinuxStatusIcon.setImageResource(statusOK);
 
-            if (selinux.isEmpty()) {
-                selinuxStatusContainer.setBackgroundColor(colorNeutral);
-                selinuxStatusIcon.setImageResource(statusUnknown);
+            selinuxStatus.setText(R.string.selinux_enforcing_info);
+            selinuxStatus.setTextColor(colorOK);
+            selinuxToggle.setChecked(true);
+        } else {
+            selinuxStatusContainer.setBackgroundColor(colorFail);
+            selinuxStatusIcon.setImageResource(statusError);
 
-                selinuxStatus.setText(R.string.selinux_error_info);
-                selinuxStatus.setTextColor(colorNeutral);
-                selinuxToggle.setChecked(false);
-            } else if (selinux.get(0).equals("Enforcing")) {
-                selinuxStatusContainer.setBackgroundColor(colorOK);
-                selinuxStatusIcon.setImageResource(statusOK);
+            selinuxStatus.setText(R.string.selinux_permissive_info);
+            selinuxStatus.setTextColor(colorFail);
+            selinuxToggle.setChecked(false);
+        }
 
-                selinuxStatus.setText(R.string.selinux_enforcing_info);
-                selinuxStatus.setTextColor(colorOK);
-                selinuxToggle.setChecked(true);
-            } else {
-                selinuxStatusContainer.setBackgroundColor(colorFail);
-                selinuxStatusIcon.setImageResource(statusError);
+        if (new File("/system/framework/twframework.jar").exists()) {
+            selinuxStatus.append("\n" + getString(R.string.selinux_samsung_info));
+        }
 
-                selinuxStatus.setText(R.string.selinux_permissive_info);
-                selinuxStatus.setTextColor(colorFail);
-                selinuxToggle.setChecked(false);
-            }
-
-            if (new File("/system/framework/twframework.jar").exists()) {
-                selinuxStatus.append("\n" + getString(R.string.selinux_samsung_info));
-            }
-
-            switch (Shell.rootStatus) {
-                case -1:
-                    // Root Error
-                    rootStatusContainer.setBackgroundColor(colorFail);
-                    rootStatusIcon.setImageResource(statusUnknown);
-                    rootStatus.setTextColor(colorNeutral);
-                    rootStatus.setText(R.string.root_error);
-                    rootToggle.setChecked(false);
-                    safetyNetStatusIcon.setImageResource(statusUnknown);
-                    safetyNetStatus.setText(R.string.root_error_info);
-                    break;
-                case 0:
-                    // Not rooted
+        switch (Shell.rootStatus) {
+            case -1:
+                // Root Error
+                rootStatusContainer.setBackgroundColor(colorFail);
+                rootStatusIcon.setImageResource(statusUnknown);
+                rootStatus.setTextColor(colorNeutral);
+                rootStatus.setText(R.string.root_error);
+                rootToggle.setChecked(false);
+                safetyNetStatusIcon.setImageResource(statusUnknown);
+                safetyNetStatus.setText(R.string.root_error_info);
+                break;
+            case 0:
+                // Not rooted
+                rootStatusContainer.setBackgroundColor(colorOK);
+                rootStatusIcon.setImageResource(statusOK);
+                rootStatus.setTextColor(colorOK);
+                rootStatus.setText(R.string.root_none);
+                rootToggle.setChecked(false);
+                safetyNetStatusIcon.setImageResource(statusOK);
+                safetyNetStatus.setText(R.string.root_none_info);
+                break;
+            case 1:
+                // Proper root
+                if (autoRootStatus) {
                     rootStatusContainer.setBackgroundColor(colorOK);
-                    rootStatusIcon.setImageResource(statusOK);
+                    rootStatusIcon.setImageResource(statusAuto);
+                    rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                     rootStatus.setTextColor(colorOK);
-                    rootStatus.setText(R.string.root_none);
-                    rootToggle.setChecked(false);
+                    rootStatus.setText(R.string.root_auto_unmounted);
+                    rootToggle.setEnabled(false);
+                    autoRootToggle.setChecked(true);
                     safetyNetStatusIcon.setImageResource(statusOK);
-                    safetyNetStatus.setText(R.string.root_none_info);
+                    safetyNetStatus.setText(R.string.root_auto_unmounted_info);
                     break;
-                case 1:
-                    // Proper root
-                    if (autoRootStatus) {
-                        rootStatusContainer.setBackgroundColor(colorOK);
-                        rootStatusIcon.setImageResource(statusAuto);
-                        rootStatusIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                        rootStatus.setTextColor(colorOK);
-                        rootStatus.setText(R.string.root_auto_unmounted);
-                        rootToggle.setEnabled(false);
-                        autoRootToggle.setChecked(true);
-                        safetyNetStatusIcon.setImageResource(statusOK);
-                        safetyNetStatus.setText(R.string.root_auto_unmounted_info);
+                } else {
+                    rootToggle.setEnabled(true);
+                    if (Utils.rootEnabled()) {
+                        // Mounted
+                        rootStatusContainer.setBackgroundColor(colorWarn);
+                        rootStatusIcon.setImageResource(statusError);
+                        rootStatus.setTextColor(colorWarn);
+                        rootStatus.setText(R.string.root_enabled);
+                        rootToggle.setChecked(true);
+                        safetyNetStatusIcon.setImageResource(statusError);
+                        safetyNetStatus.setText(R.string.root_enabled_info);
                         break;
                     } else {
-                        rootToggle.setEnabled(true);
-                        if (Utils.rootEnabled()) {
-                            // Mounted
-                            rootStatusContainer.setBackgroundColor(colorWarn);
-                            rootStatusIcon.setImageResource(statusError);
-                            rootStatus.setTextColor(colorWarn);
-                            rootStatus.setText(R.string.root_enabled);
-                            rootToggle.setChecked(true);
-                            safetyNetStatusIcon.setImageResource(statusError);
-                            safetyNetStatus.setText(R.string.root_enabled_info);
-                            break;
-                        } else {
-                            // Disabled
-                            rootStatusContainer.setBackgroundColor(colorOK);
-                            rootStatusIcon.setImageResource(statusOK);
-                            rootStatus.setTextColor(colorOK);
-                            rootStatus.setText(R.string.root_disabled);
-                            rootToggle.setChecked(false);
-                            safetyNetStatusIcon.setImageResource(statusOK);
-                            safetyNetStatus.setText(R.string.root_disabled_info);
-                            break;
-                        }
+                        // Disabled
+                        rootStatusContainer.setBackgroundColor(colorOK);
+                        rootStatusIcon.setImageResource(statusOK);
+                        rootStatus.setTextColor(colorOK);
+                        rootStatus.setText(R.string.root_disabled);
+                        rootToggle.setChecked(false);
+                        safetyNetStatusIcon.setImageResource(statusOK);
+                        safetyNetStatus.setText(R.string.root_disabled_info);
+                        break;
                     }
-                case 2:
-                    // Improper root
-                    rootStatusContainer.setBackgroundColor(colorFail);
-                    rootStatusIcon.setImageResource(statusError);
-                    rootStatus.setTextColor(colorFail);
-                    rootStatus.setText(R.string.root_system);
-                    rootToggle.setChecked(true);
-                    safetyNetStatusIcon.setImageResource(statusError);
-                    safetyNetStatus.setText(R.string.root_system_info);
-                    autoRootToggleView.setVisibility(View.GONE);
-                    rootToggleView.setVisibility(View.GONE);
-                    selinuxToggleView.setVisibility(View.GONE);
-                    break;
-            }
+                }
+            case 2:
+                // Improper root
+                rootStatusContainer.setBackgroundColor(colorFail);
+                rootStatusIcon.setImageResource(statusError);
+                rootStatus.setTextColor(colorFail);
+                rootStatus.setText(R.string.root_system);
+                rootToggle.setChecked(true);
+                safetyNetStatusIcon.setImageResource(statusError);
+                safetyNetStatus.setText(R.string.root_system_info);
+                autoRootToggleView.setVisibility(View.GONE);
+                rootToggleView.setVisibility(View.GONE);
+                selinuxToggleView.setVisibility(View.GONE);
+                break;
         }
     }
 

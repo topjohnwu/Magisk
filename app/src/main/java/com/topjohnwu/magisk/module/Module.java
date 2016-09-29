@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.module;
 
+import android.os.AsyncTask;
+
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Utils;
@@ -34,11 +36,23 @@ public class Module extends BaseModule {
     }
 
     public void createDisableFile() {
-        mEnable = !Utils.createFile(mDisableFile);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                mEnable = !Utils.createFile(mDisableFile);
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     public void removeDisableFile() {
-        mEnable = Utils.removeFile(mDisableFile);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                mEnable = Utils.removeFile(mDisableFile);
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     public boolean isEnabled() {
@@ -46,11 +60,23 @@ public class Module extends BaseModule {
     }
 
     public void createRemoveFile() {
-        mRemove = Utils.createFile(mRemoveFile);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                mRemove = Utils.createFile(mRemoveFile);
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     public void deleteRemoveFile() {
-        mRemove = !Utils.removeFile(mRemoveFile);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                mRemove = !Utils.removeFile(mRemoveFile);
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
     }
 
     public boolean willBeRemoved() {

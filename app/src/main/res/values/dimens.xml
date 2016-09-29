@@ -2,7 +2,6 @@
 <resources>
     <dimen name="floating_height">650dp</dimen>
     <dimen name="floating_width">500dp</dimen>
-    <dimen name="min_rowheight">100dp</dimen>
     <dimen name="card_divider_space">5sp</dimen>
     <dimen name="card_horizontal_margin">8dip</dimen>
     <dimen name="card_vertical_margin">3dip</dimen>

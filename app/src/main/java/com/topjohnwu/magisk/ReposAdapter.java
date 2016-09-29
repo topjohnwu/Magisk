@@ -4,9 +4,12 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,6 +42,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     private final List<Repo> mList;
     private View mView;
     private Context context;
+    private AlertDialog.Builder builder;
 
     public ReposAdapter(List<Repo> list) {
         mList = list;
@@ -49,6 +53,14 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
         ButterKnife.bind(this, mView);
         context = parent.getContext();
+
+        String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
+        if (theme.equals("Dark")) {
+            builder = new AlertDialog.Builder(context,R.style.AlertDialog_dh);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+
         return new ViewHolder(mView);
     }
 
@@ -75,44 +87,51 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
         View.OnClickListener listener = view -> {
             if (view.getId() == holder.updateImage.getId()) {
-                Utils.downloadAndReceive(
-                        context,
-                        new DownloadReceiver(repo.getName() + "-" + repo.getVersion()) {
-                            @Override
-                            public void task(Uri uri) {
-                                new Async.FlashZIP(context, uri, mName) {
+                String fullname = repo.getName() + "-" + repo.getVersion();
+                builder
+                        .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                        .setMessage(context.getString(R.string.repo_install_msg, fullname))
+                        .setCancelable(true)
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
+                                context,
+                                new DownloadReceiver(fullname) {
                                     @Override
-                                    protected void preProcessing() throws Throwable {
-                                        super.preProcessing();
-                                        new File(mUri.getPath()).delete();
-                                        Shell.su(
-                                                "cd " + mFile.getParent(),
-                                                "mkdir git",
-                                                "unzip -o install.zip -d git",
-                                                "mv git/* install",
-                                                "cd install",
-                                                "rm -rf system/placeholder",
-                                                "chmod 644 $(find . -type f)",
-                                                "chmod 755 $(find . -type d)",
-                                                "rm -rf ../install.zip ../git",
-                                                "zip -r ../install.zip *",
-                                                "rm -rf ../install"
-                                        );
+                                    public void task(Uri uri) {
+                                        new Async.FlashZIP(context, uri, mName) {
+                                            @Override
+                                            protected void preProcessing() throws Throwable {
+                                                super.preProcessing();
+                                                new File(mUri.getPath()).delete();
+                                                Shell.su(
+                                                        "cd " + mFile.getParent(),
+                                                        "mkdir git",
+                                                        "unzip -o install.zip -d git",
+                                                        "mv git/* install",
+                                                        "cd install",
+                                                        "rm -rf system/placeholder",
+                                                        "chmod 644 $(find . -type f)",
+                                                        "chmod 755 $(find . -type d)",
+                                                        "rm -rf ../install.zip ../git",
+                                                        "zip -r ../install.zip *",
+                                                        "rm -rf ../install"
+                                                );
+                                            }
+                                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                     }
-                                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                            }
-                        },
-                        repo.getZipUrl(),
-                        repo.getId().replace(" ", "") + ".zip");
+                                },
+                                repo.getZipUrl(),
+                                repo.getId().replace(" ", "") + ".zip"))
+                        .setNegativeButton(R.string.no_thanks, null)
+                        .show();
             }
             if ((view.getId() == holder.changeLog.getId()) && (!repo.getLogUrl().equals(""))) {
-                new WebWindow("Changelog", repo.getLogUrl(), context);
+                new WebWindow(context.getString(R.string.changelog), repo.getLogUrl(), context);
             }
             if ((view.getId() == holder.authorLink.getId()) && (!repo.getSupportUrl().equals(""))) {
-                new WebWindow("Donate", repo.getDonateUrl(), context);
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
             }
             if ((view.getId() == holder.supportLink.getId()) && (!repo.getSupportUrl().equals(""))) {
-                new WebWindow("Support", repo.getSupportUrl(), context);
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
             }
         };
 

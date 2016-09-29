@@ -17,14 +17,6 @@
         <item name="ColorNeutral">@color/grey500</item>
     </style>
 
-    <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Light">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="android:elevation">4dp</item>
-        <item name="android:textColorPrimary">@color/primary_text</item>
-        <item name="android:textColorSecondary">@color/primary_text</item> <!-- force  -->
-        <item name="actionMenuTextColor">@color/icons</item>
-    </style>
-
     <style name="AppTheme.dh" parent="ThemeOverlay.AppCompat.Dark">
         <item name="colorPrimary">@color/dh_primary</item>
         <item name="colorPrimaryDark">@color/dh_primary_dark</item>

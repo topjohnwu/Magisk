@@ -61,7 +61,7 @@ public class ModulesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
             prefs.edit().putBoolean("module_done", false).apply();
-            new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Async.LoadModules(getActivity()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
         });
 
         if (prefs.getBoolean("module_done", false)) {

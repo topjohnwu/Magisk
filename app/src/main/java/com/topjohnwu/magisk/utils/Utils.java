@@ -23,7 +23,6 @@ import android.widget.Toast;
 import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
 import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
 import com.topjohnwu.magisk.services.MonitorService;
@@ -36,7 +35,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class Utils {
             MagiskFragment.magiskVersion = Integer.parseInt(ret.get(0));
         }
         String toolPath = context.getApplicationInfo().dataDir + "/tools";
-        Shell.su("PATH=$PATH:" + toolPath);
+        Shell.su("PATH=" + toolPath + ":$PATH");
     }
 
     public static boolean itemExist(String path) {
@@ -113,7 +111,7 @@ public class Utils {
                 Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
             }
             if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
-                SetupQuickSettingsTile(context);
+                setupQuickSettingsTile(context);
             }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root", b).apply();
         }
@@ -140,7 +138,7 @@ public class Utils {
             }
         }
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enable_quicktile", false)) {
-            SetupQuickSettingsTile(context);
+            setupQuickSettingsTile(context);
         }
     }
 
@@ -174,7 +172,7 @@ public class Utils {
         }
 
         if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs()) || (file.exists() && !file.delete())) {
-            Toast.makeText(context, R.string.toast_error_makedir, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
         }
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -208,7 +206,7 @@ public class Utils {
         return secret;
     }
 
-    public static void SetupQuickSettingsTile(Context mContext) {
+    public static void setupQuickSettingsTile(Context mContext) {
         Logger.dev("Utils: SetupQuickSettings called");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Logger.dev("Utils: Starting N quick settings service");
@@ -266,7 +264,7 @@ public class Utils {
         }
     }
 
-    public static void installTile(Context context) {
+    public static boolean installTile(Context context) {
         String qsTileId;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             qsTileId = "custom(com.topjohnwu.magisk/.services.TileServiceNewApi)";
@@ -281,8 +279,7 @@ public class Utils {
             if (tiles.size() > 1) {
                 for (String tile : tiles) {
                     if (tile.equals(qsTileId)) {
-                        Toast.makeText(context, "Tile already installed", Toast.LENGTH_SHORT).show();
-                        return;
+                        return true;
                     }
                 }
 
@@ -290,17 +287,16 @@ public class Utils {
                 String newTiles = TextUtils.join(",", tiles);
                 Logger.dev("Utils: NewtilesString is " + newTiles);
                 Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
-                Toast.makeText(context, "Tile installed", Toast.LENGTH_SHORT).show();
                 if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
                     Utils.refreshService(context);
                 }
-                return;
+                return true;
             }
         }
-        Toast.makeText(context, "Tile installation error", Toast.LENGTH_SHORT).show();
+        return false;
     }
 
-    public static void uninstallTile(Context context) {
+    public static boolean uninstallTile(Context context) {
 
         String qsTileId;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -323,17 +319,15 @@ public class Utils {
                 if (isPresent) {
                     String newTiles = TextUtils.join(",", tiles);
                     Shell.su("settings put secure sysui_qs_tiles \"" + newTiles + "\"");
-                    Toast.makeText(context, "Tile uninstalled", Toast.LENGTH_SHORT).show();
                     if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
                         Utils.refreshService(context);
                     }
-                    return;
                 }
-                Toast.makeText(context, "Tile already uninstalled", Toast.LENGTH_SHORT).show();
+                return true;
 
             }
         }
-        Toast.makeText(context, "Tile uninstallation error", Toast.LENGTH_SHORT).show();
+        return false;
     }
 
     private static void refreshService(Context context) {

@@ -10,15 +10,7 @@
             android:icon="@drawable/magisk"
             android:title="@string/magisk"/>
 
-        <item
-            android:id="@+id/root"
-            android:icon="@drawable/root"
-            android:title="@string/root"/>
 
-        <item
-            android:id="@+id/autoroot"
-            android:icon="@drawable/ic_autoroot"
-            android:title="@string/auto_toggle"/>
 
         <item
             android:id="@+id/modules"
@@ -29,6 +21,27 @@
             android:id="@+id/downloads"
             android:icon="@drawable/ic_cloud_download"
             android:title="@string/downloads"/>
+
+    </group>
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/root"
+            android:icon="@drawable/root"
+            android:title="@string/root"/>
+
+        <item
+            android:id="@+id/autoroot"
+            android:icon="@drawable/ic_autoroot"
+            android:title="@string/auto_toggle"/>
+
+    </group>
+
+    <group
+        android:id="@+id/option_items"
+        android:checkableBehavior="single">
 
         <item
             android:id="@+id/log"
@@ -42,15 +55,9 @@
 
     </group>
 
-    <group
-        android:id="@+id/option_items"
-        android:checkableBehavior="none">
-
-        <item
-            android:id="@+id/app_about"
-            android:icon="@drawable/ic_info_outline"
-            android:title="@string/about"/>
-
-    </group>
+    <item
+        android:id="@+id/app_about"
+        android:icon="@drawable/ic_info_outline"
+        android:title="@string/about"/>
 
 </menu>

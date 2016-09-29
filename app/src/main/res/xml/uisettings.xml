@@ -2,16 +2,24 @@
     android:layout_marginTop="?attr/actionBarSize"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/settings_general_title">
+        android:title="@string/settings_general_category">
 
         <ListPreference
             android:key="theme"
-            android:title="Theme"
-            android:summary="Select a theme"
+            android:title="@string/settings_theme_title"
+            android:summary="@string/settings_theme_summary"
             android:defaultValue="Default"
             android:entries="@array/themes"
             android:entryValues="@array/themes"/>
+
+        <CheckBoxPreference
+            android:key="busybox"
+            android:defaultValue="false"
+            android:title="@string/settings_busybox_title"
+            android:summary="@string/settings_busybox_summary" />
+
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/settings_quicksettings_category">
 
@@ -22,8 +30,10 @@
             android:summary="@string/settings_enable_quicktile_summary" />
 
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/settings_root_category">
+
         <CheckBoxPreference
             android:key="keep_root_off"
             android:defaultValue="false"
@@ -37,6 +47,7 @@
             android:summary="@string/settings_hide_root_notification_summary" />
 
     </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/settings_development_category">
 
