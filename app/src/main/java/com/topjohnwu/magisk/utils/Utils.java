@@ -39,17 +39,6 @@ public class Utils {
     private static final String cryptoPass = "MagiskRox666";
     private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
 
-    public static void init(Context context) {
-        List<String> ret = Shell.sh("getprop magisk.version");
-        if (ret.get(0).isEmpty()) {
-            MagiskFragment.magiskVersion = -1;
-        } else {
-            MagiskFragment.magiskVersion = Integer.parseInt(ret.get(0));
-        }
-        String toolPath = context.getApplicationInfo().dataDir + "/tools";
-        Shell.su("PATH=" + toolPath + ":$PATH");
-    }
-
     public static boolean itemExist(String path) {
         return itemExist(true, path);
     }

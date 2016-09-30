@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,20 +35,20 @@ public class Async {
 
     public static class constructEnv extends AsyncTask<Void, Void, Void> {
 
-        Context mContext;
+        ApplicationInfo mInfo;
 
-        public constructEnv(Context context) {
-            mContext = context;
+        public constructEnv(ApplicationInfo info) {
+            mInfo = info;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String toolPath = mContext.getApplicationInfo().dataDir + "/tools";
-            String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
-            String zip = mContext.getApplicationInfo().dataDir + "/lib/libzip.so";
+            String toolPath = mInfo.dataDir + "/tools";
+            String busybox = mInfo.dataDir + "/lib/libbusybox.so";
+            String zip = mInfo.dataDir + "/lib/libzip.so";
             if (Shell.rootAccess()) {
                 if (!Utils.itemExist(false, toolPath)) {
-                    Shell.sh(
+                    Shell.su(
                             "rm -rf " + toolPath,
                             "mkdir " + toolPath,
                             "chmod 755 " + toolPath,
@@ -60,6 +61,7 @@ public class Async {
                             "ln -s " + zip + " zip"
                     );
                 }
+                Shell.su("PATH=" + toolPath + ":$PATH");
             }
 
             return null;
@@ -68,10 +70,10 @@ public class Async {
 
     public static class CheckUpdates extends AsyncTask<Void, Void, Void> {
 
-        private Context mContext;
+        private SharedPreferences mPrefs;
 
-        public CheckUpdates(Context context) {
-            mContext = context;
+        public CheckUpdates(SharedPreferences prefs) {
+            mPrefs = prefs;
         }
 
         @Override
@@ -100,17 +102,16 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            prefs.edit().putBoolean("update_check_done", true).apply();
+            mPrefs.edit().putBoolean("update_check_done", true).apply();
         }
     }
 
     public static class LoadModules extends AsyncTask<Void, Void, Void> {
 
-        private Context mContext;
+        private SharedPreferences mPrefs;
 
-        public LoadModules(Context context) {
-            mContext = context;
+        public LoadModules(SharedPreferences prefs) {
+            mPrefs = prefs;
         }
 
         @Override
@@ -121,8 +122,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            prefs.edit().putBoolean("module_done", true).apply();
+            mPrefs.edit().putBoolean("module_done", true).apply();
         }
     }
 
@@ -142,8 +142,8 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            prefs.edit().putBoolean("repo_done", true).apply();
+            PreferenceManager.getDefaultSharedPreferences(mContext).edit()
+                    .putBoolean("repo_done", true).apply();
         }
     }
 
@@ -308,8 +308,8 @@ public class Async {
 
         protected void done() {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            prefs.edit().putBoolean("module_done", false).apply();
-            new LoadModules(mContext).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            prefs.edit().putBoolean("module_done", false).putBoolean("update_check_done", true).apply();
+            new LoadModules(prefs).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
             AlertDialog.Builder builder;
             String theme = PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme", "");

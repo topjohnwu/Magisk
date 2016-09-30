@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;

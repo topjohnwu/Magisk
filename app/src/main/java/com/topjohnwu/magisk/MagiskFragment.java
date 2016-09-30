@@ -9,10 +9,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.graphics.drawable.animated.BuildConfig;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +23,11 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
+import java.util.List;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -107,7 +109,7 @@ public class MagiskFragment extends Fragment {
             appCheckUpdatesProgress.setVisibility(View.VISIBLE);
             magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
 
-            new Async.CheckUpdates(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Async.CheckUpdates(prefs).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
 
         if (prefs.getBoolean("update_check_done", false)) {
@@ -145,6 +147,13 @@ public class MagiskFragment extends Fragment {
             builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog_dh);
         } else {
             builder = new AlertDialog.Builder(getActivity());
+        }
+
+        List<String> ret = Shell.sh("getprop magisk.version");
+        if (ret.get(0).isEmpty()) {
+            magiskVersion = -1;
+        } else {
+            magiskVersion = Integer.parseInt(ret.get(0));
         }
 
         if (remoteMagiskVersion == -1) {
@@ -204,13 +213,7 @@ public class MagiskFragment extends Fragment {
                         .show());
             }
 
-            int appVersionCode = 0;
-            try {
-                appVersionCode = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0).versionCode;
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            if (remoteAppVersionCode > appVersionCode) {
+            if (remoteAppVersionCode > BuildConfig.VERSION_CODE) {
                 appCheckUpdatesContainer.setBackgroundColor(colorInfo);
                 appCheckUpdatesIcon.setImageResource(R.drawable.ic_file_download);
                 appCheckUpdatesStatus.setText(getString(R.string.app_update_available, remoteAppVersion));
@@ -258,7 +261,13 @@ public class MagiskFragment extends Fragment {
                             new DownloadReceiver() {
                                 @Override
                                 public void task(Uri uri) {
-                                    new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                    new Async.FlashZIP(mContext, uri) {
+                                        @Override
+                                        protected void done() {
+                                            Shell.su("setprop magisk.version " + String.valueOf(remoteMagiskVersion));
+                                            super.done();
+                                        }
+                                    }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                                 }
                             },
                             magiskLink,
