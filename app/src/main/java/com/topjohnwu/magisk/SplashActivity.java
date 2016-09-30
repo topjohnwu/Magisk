@@ -25,6 +25,9 @@ public class SplashActivity extends AppCompatActivity {
             setTheme(R.style.AppTheme_dh);
         }
 
+        Logger.devLog = defaultPrefs.getBoolean("developer_logging", false);
+        Logger.logShell = defaultPrefs.getBoolean("shell_logging", false);
+
         // Set up default preferences,make sure we add "extra" blacklist entries.
         if (!defaultPrefs.contains("auto_blacklist")) {
             Logger.dev("SplashActivity: Setting default preferences for application");

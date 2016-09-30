@@ -84,7 +84,7 @@ public class AutoRootFragment extends ListFragment {
     }
 
     private void ToggleApp(String appToCheck, int position, View v) {
-        Logger.dev("Magisk","AutoRootFragment: ToggleApp called for " + appToCheck);
+        Logger.dev("Magisk", "AutoRootFragment: ToggleApp called for " + appToCheck);
         Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
         assert blackListSet != null;
         arrayBlackList = new ArrayList<>(blackListSet);

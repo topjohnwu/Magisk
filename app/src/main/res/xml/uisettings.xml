@@ -57,6 +57,12 @@
             android:title="@string/settings_developer_logging_title"
             android:summary="@string/settings_developer_logging_summary" />
 
+        <CheckBoxPreference
+            android:key="shell_logging"
+            android:defaultValue="false"
+            android:title="@string/settings_shell_logging_title"
+            android:summary="@string/settings_shell_logging_summary" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

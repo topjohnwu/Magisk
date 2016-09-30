@@ -130,5 +130,7 @@
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
+    <string name="settings_shell_logging_title">Enable shell command debug logging</string>
+    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
 
 </resources>

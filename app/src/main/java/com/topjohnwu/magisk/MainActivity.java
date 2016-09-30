@@ -63,53 +63,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Snackbar.make(findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
 
-        this.getFragmentManager().addOnBackStackChangedListener(
-                () -> {
-                    Fragment hm = getFragmentManager().findFragmentByTag("root");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.root);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("autoroot");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.autoroot);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("magisk");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.magisk);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("modules");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.modules);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("downloads");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.downloads);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("log");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.log);
-                        }
-                    }
-                    hm = getFragmentManager().findFragmentByTag("settings");
-                    if (hm != null) {
-                        if (hm.isVisible()) {
-                            navigationView.setCheckedItem(R.id.settings);
-                        }
-                    }
-                }
-        );
-
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
@@ -146,11 +99,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-
         mDrawerHandler.removeCallbacksAndMessages(null);
         navigate(mSelectedId);
-
-
     }
 
     @Override
@@ -166,15 +116,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            int backStackEntryCount = getFragmentManager().getBackStackEntryCount();
-            Logger.dev("Welcomeactivity: Entrycount is " + backStackEntryCount);
-            if (backStackEntryCount >= 2) {
-                super.onBackPressed();
-            } else {
-                finish();
-            }
+            finish();
         }
-
     }
 
     @Override

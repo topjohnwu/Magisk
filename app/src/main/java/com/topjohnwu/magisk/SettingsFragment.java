@@ -22,7 +22,6 @@ import com.topjohnwu.magisk.utils.Utils;
 import butterknife.ButterKnife;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private CheckBoxPreference quickTilePreference, busyboxPreference;
     private ListPreference themePreference;
 
     @Override
@@ -51,8 +50,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         themePreference = (ListPreference) findPreference("theme");
-        busyboxPreference = (CheckBoxPreference) findPreference("busybox");
-        quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile") ;
+        CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
+        CheckBoxPreference quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile");
         busyboxPreference.setChecked(Utils.commandExists("unzip"));
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
         CheckBoxPreference keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
@@ -62,10 +61,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             quickTilePreference.setEnabled(false);
             keepRootOffPreference.setEnabled(false);
             hideRootNotificationPreference.setEnabled(false);
+            busyboxPreference.setEnabled(false);
         } else {
             quickTilePreference.setEnabled(true);
             keepRootOffPreference.setEnabled(true);
             hideRootNotificationPreference.setEnabled(true);
+            busyboxPreference.setEnabled(true);
         }
 
         // calculate margins
@@ -142,6 +143,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } else if (key.equals("busybox")) {
             boolean checked = sharedPreferences.getBoolean("busybox", false);
             new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        } else if (key.equals("developer_logging")) {
+            Logger.devLog = sharedPreferences.getBoolean("developer_logging", false);
+        } else if (key.equals("shell_logging")) {
+            Logger.logShell = sharedPreferences.getBoolean("shell_logging", false);
         }
 
     }
