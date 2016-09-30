@@ -51,21 +51,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         View view = super.onCreateView(inflater, container, savedInstanceState);
         themePreference = (ListPreference) findPreference("theme");
         CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
-        CheckBoxPreference quickTilePreference = (CheckBoxPreference) findPreference("enable_quicktile");
         busyboxPreference.setChecked(Utils.commandExists("unzip"));
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
-        CheckBoxPreference keepRootOffPreference = (CheckBoxPreference) findPreference("keep_root_off");
-        CheckBoxPreference hideRootNotificationPreference = (CheckBoxPreference) findPreference("hide_root_notification");
         themePreference.setSummary(themePreference.getValue());
         if (MagiskFragment.magiskVersion == -1) {
-            quickTilePreference.setEnabled(false);
-            keepRootOffPreference.setEnabled(false);
-            hideRootNotificationPreference.setEnabled(false);
             busyboxPreference.setEnabled(false);
         } else {
-            quickTilePreference.setEnabled(true);
-            keepRootOffPreference.setEnabled(true);
-            hideRootNotificationPreference.setEnabled(true);
             busyboxPreference.setEnabled(true);
         }
 
@@ -88,65 +79,35 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Logger.dev("Settings: NewValue is " + key);
 
-        if (key.equals("theme")) {
-            String pref = sharedPreferences.getString(key, "");
+        switch (key) {
+            case "theme":
+                String pref = sharedPreferences.getString(key, "");
 
-            themePreference.setSummary(pref);
-            if (pref.equals("Dark")) {
-                getActivity().getApplication().setTheme(R.style.AppTheme_dh);
-            } else {
-                getActivity().getApplication().setTheme(R.style.AppTheme);
-            }
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("Relaunch", "Settings");
-            startActivity(intent);
+                themePreference.setSummary(pref);
+                if (pref.equals("Dark")) {
+                    getActivity().getApplication().setTheme(R.style.AppTheme_dh);
+                } else {
+                    getActivity().getApplication().setTheme(R.style.AppTheme);
+                }
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("Relaunch", "Settings");
+                startActivity(intent);
 
-            Logger.dev("SettingsFragment: theme is " + pref);
+                Logger.dev("SettingsFragment: theme is " + pref);
 
-        } else if (key.equals("enable_quicktile")) {
-            boolean checked = sharedPreferences.getBoolean("enable_quicktile", false);
-            if (checked) {
-                new AsyncTask<Void, Void, Boolean> () {
-                    @Override
-                    protected Boolean doInBackground(Void... voids) {
-                        return Utils.installTile(getActivity());
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        super.onPostExecute(result);
-                        if (result) {
-                            Toast.makeText(getActivity(), "Tile installed", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getActivity(), "Tile installation error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            } else {
-                new AsyncTask<Void, Void, Boolean> () {
-                    @Override
-                    protected Boolean doInBackground(Void... voids) {
-                        return Utils.uninstallTile(getActivity());
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        super.onPostExecute(result);
-                        if (result) {
-                            Toast.makeText(getActivity(), "Tile uninstalled", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getActivity(), "Tile uninstallation error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            }
-        } else if (key.equals("busybox")) {
-            boolean checked = sharedPreferences.getBoolean("busybox", false);
-            new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-        } else if (key.equals("developer_logging")) {
-            Logger.devLog = sharedPreferences.getBoolean("developer_logging", false);
-        } else if (key.equals("shell_logging")) {
-            Logger.logShell = sharedPreferences.getBoolean("shell_logging", false);
+                break;
+            case "busybox":
+                boolean checked = sharedPreferences.getBoolean("busybox", false);
+                new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                break;
+            case "developer_logging":
+                Logger.devLog = sharedPreferences.getBoolean("developer_logging", false);
+                break;
+            case "shell_logging":
+                Logger.logShell = sharedPreferences.getBoolean("shell_logging", false);
+                break;
         }
 
     }

@@ -7,7 +7,6 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="root">Root</string>
-    <string name="auto_toggle">Auto-toggle</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -34,8 +33,6 @@
     <string name="root_enabled_info">Root enabled. Safety Net (Android Pay) will NOT work</string>
     <string name="root_disabled">Root disabled</string>
     <string name="root_disabled_info">Safety Net (Android Pay) should work, but no root temporarily\nYou might need to manually add a card in Android Pay app to refresh the root status of AP</string>
-    <string name="root_auto_unmounted">Root set to auto-toggle</string>
-    <string name="root_auto_unmounted_info">Root will auto unmount for selected applications.  Safety Net (Android Pay) should work.</string>
     <string name="root_system">Magisk Incompatible Root Detected</string>
     <string name="root_system_info">Root improperly installed. Safety Net (Android Pay) will NOT work, and impossible to toggle.</string>
 
@@ -64,7 +61,6 @@
     <string name="menuSaveToSd">Save to SD</string>
     <string name="menuSend">Send</string>
     <string name="menuReload">Reload</string>
-    <string name="sdcard_not_writable">SD card not found or not writable</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
     <string name="logs_clear_failed">Could not clear the log:</string>
@@ -76,7 +72,7 @@
     <string name="app_developers">Main developers</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators"/>
+    <string name="translators" />
     <string name="app_version">App\'s version</string>
     <string name="app_source_code">Source code</string>
     <string name="donation">Donation</string>
@@ -87,7 +83,6 @@
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
-    <string name="accessibility_service_description">Accessibility service required for Magisk auto-unroot feature</string>
     <string name="update_title">%1$s Update!</string>
     <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
     <string name="repo_install_title">Install %1$s</string>
@@ -117,20 +112,18 @@
     <string name="settings_busybox_title">Enable BusyBox</string>
     <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
 
-    <string name="settings_quicksettings_category">Quick Settings</string>
-    <string name="settings_enable_quicktile_title">Enable Quicksettings Tile</string>
-    <string name="settings_enable_quicktile_summary">Click here to enable or disable the quick settings tile.</string>
-
-    <string name="settings_root_category">Root</string>
-    <string name="settings_keep_root_off_summary">Disable root unless otherwise enabled by auto-toggle or toggle.</string>
-    <string name="settings_keep_root_off_title">Keep root turned off</string>
-    <string name="settings_hide_root_notification_summary">When checked, auto-toggle notifications will not be displayed.</string>
-    <string name="settings_hide_root_notification_title">Hide auto-toggle notifications</string>
-
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
     <string name="settings_shell_logging_title">Enable shell command debug logging</string>
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+
+    <!-- Example settings for Data & Sync -->
+
+    <!-- Example settings for Notifications -->
 
 </resources>

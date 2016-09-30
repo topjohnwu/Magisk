@@ -10,8 +10,6 @@
             android:icon="@drawable/magisk"
             android:title="@string/magisk"/>
 
-
-
         <item
             android:id="@+id/modules"
             android:icon="@drawable/ic_extension"
@@ -22,26 +20,10 @@
             android:icon="@drawable/ic_cloud_download"
             android:title="@string/downloads"/>
 
-    </group>
-
-    <group
-        android:checkableBehavior="single">
-
         <item
             android:id="@+id/root"
             android:icon="@drawable/root"
             android:title="@string/root"/>
-
-        <item
-            android:id="@+id/autoroot"
-            android:icon="@drawable/ic_autoroot"
-            android:title="@string/auto_toggle"/>
-
-    </group>
-
-    <group
-        android:id="@+id/option_items"
-        android:checkableBehavior="single">
 
         <item
             android:id="@+id/log"

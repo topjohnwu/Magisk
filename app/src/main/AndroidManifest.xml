@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-
     package="com.topjohnwu.magisk">
 
     <uses-sdk tools:overrideLibrary="com.kcoppock.broadcatsttilesupport" />
@@ -15,62 +14,24 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <service
-            android:name=".services.MonitorService"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibilityservice" />
-        </service>
-        <service
-            android:name=".services.TileServiceNewApi"
-            android:icon="@drawable/ic_autoroot"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".services.TileServiceCompat"
-            android:enabled="true"
-            android:exported="true" />
-
-        <receiver
-            android:name=".receivers.PrivateBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_AUTOROOT" />
-                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_DISABLEROOT" />
-                <action android:name="com.topjohnwu.magisk.CUSTOMTILE_ACTION_ENABLEROOT" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"/>
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/SplashTheme"
             android:configChanges="orientation|screenSize"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -101,6 +62,7 @@
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>
         </provider>
+
         <activity
             android:name=".AboutActivity"
             android:theme="@style/AppTheme.Transparent" />
@@ -114,14 +76,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-        <receiver android:name=".receivers.AutoStartReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
 
     </application>
-
 
 </manifest>
