@@ -65,14 +65,16 @@ public class Utils {
     }
 
     public static boolean itemExist(String path) {
-        List<String> ret;
+        return itemExist(true, path);
+    }
+
+    public static boolean itemExist(boolean root, String path) {
         String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
-        if (Shell.rootAccess()) {
-            ret = Shell.su(command);
+        if (Shell.rootAccess() && root) {
+            return Boolean.parseBoolean(Shell.su(command).get(0));
         } else {
-            ret = Shell.sh(command);
+            return new File(path).exists();
         }
-        return Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean commandExists(String s) {

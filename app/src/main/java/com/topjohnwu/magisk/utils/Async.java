@@ -46,7 +46,7 @@ public class Async {
             String busybox = mContext.getApplicationInfo().dataDir + "/lib/libbusybox.so";
             String zip = mContext.getApplicationInfo().dataDir + "/lib/libzip.so";
             if (Shell.rootAccess()) {
-                if (!Utils.itemExist(toolPath)) {
+                if (!Utils.itemExist(false, toolPath)) {
                     Shell.sh(
                             "rm -rf " + toolPath,
                             "mkdir " + toolPath,
