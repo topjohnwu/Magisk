@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.module;
 
 
-import android.util.Log;
-
 import java.util.List;
 
 public abstract class BaseModule {

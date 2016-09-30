@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.module;
 import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {

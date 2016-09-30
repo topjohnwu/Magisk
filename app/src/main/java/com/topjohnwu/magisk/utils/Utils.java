@@ -1,26 +1,18 @@
 package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.kcoppock.broadcasttilesupport.BroadcastTileIntentBuilder;
 import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
@@ -30,8 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;

@@ -11,9 +11,6 @@ import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

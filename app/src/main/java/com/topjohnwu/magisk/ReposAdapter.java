@@ -5,14 +5,12 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +23,11 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
