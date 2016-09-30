@@ -9,6 +9,8 @@ public class Logger {
 
     private static final String LOG_TAG = "Magisk: DEV";
 
+    private static final boolean logShell = true;
+
     public static void dev(String msg, Object... args) {
         Context context = null;
         try {
@@ -34,6 +36,12 @@ public class Logger {
         }
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("developer_logging", false)) {
             Log.d(LOG_TAG, msg);
+        }
+    }
+
+    public static void shell(boolean root, String msg) {
+        if (logShell) {
+            Log.d(root ? "SU" : "SH", msg);
         }
     }
 

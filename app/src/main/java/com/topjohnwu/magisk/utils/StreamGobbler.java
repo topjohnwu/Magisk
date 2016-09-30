@@ -14,6 +14,7 @@ public class StreamGobbler extends Thread {
 
     private BufferedReader reader = null;
     private List<String> writer = null;
+    private boolean isRoot = false;
 
     /**
      * <p>StreamGobbler constructor</p>
@@ -30,6 +31,12 @@ public class StreamGobbler extends Thread {
         writer = outputList;
     }
 
+    public StreamGobbler(InputStream inputStream, List<String> outputList, boolean root) {
+        reader = new BufferedReader(new InputStreamReader(inputStream));
+        writer = outputList;
+        isRoot = root;
+    }
+
     @Override
     public void run() {
         // keep reading the InputStream until it ends (or an error occurs)
@@ -37,6 +44,9 @@ public class StreamGobbler extends Thread {
             String line;
             while ((line = reader.readLine()) != null) {
                 writer.add(line);
+                if (!line.equals("-root-done-") && !line.isEmpty()) {
+                    Logger.shell(isRoot, "OUT: " + line);
+                }
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

@@ -42,7 +42,7 @@ public class Shell {
         }
 
         rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
-        rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList);
+        rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList, true);
         rootSTDOUT.start();
 
         List<String> ret = su("echo -BOC-", "id");
@@ -82,6 +82,7 @@ public class Shell {
                 for (String write : commands) {
                     STDIN.write((write + "\n").getBytes("UTF-8"));
                     STDIN.flush();
+                    Logger.shell(false, write);
                 }
                 STDIN.write("exit\n".getBytes("UTF-8"));
                 STDIN.flush();
@@ -149,6 +150,7 @@ public class Shell {
             for (String write : commands) {
                 STDIN.write((write + "\n").getBytes("UTF-8"));
                 STDIN.flush();
+                Logger.shell(true, write);
             }
             if (newShell) {
                 STDIN.write("exit\n".getBytes("UTF-8"));
