@@ -98,7 +98,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                                             protected void preProcessing() throws Throwable {
                                                 super.preProcessing();
                                                 new File(mUri.getPath()).delete();
-                                                Shell.su(
+                                                Shell.sh(
+                                                        "PATH=" + context.getApplicationInfo().dataDir + "/tools:$PATH",
                                                         "cd " + mFile.getParent(),
                                                         "mkdir git",
                                                         "unzip -o install.zip -d git",

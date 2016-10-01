@@ -46,24 +46,20 @@ public class Async {
             String toolPath = mInfo.dataDir + "/tools";
             String busybox = mInfo.dataDir + "/lib/libbusybox.so";
             String zip = mInfo.dataDir + "/lib/libzip.so";
-            if (Shell.rootAccess()) {
-                if (!Utils.itemExist(false, toolPath)) {
-                    Shell.su(
-                            "rm -rf " + toolPath,
-                            "mkdir " + toolPath,
-                            "chmod 755 " + toolPath,
-                            "cd " + toolPath,
-                            "ln -s " + busybox + " busybox",
-                            "for tool in $(./busybox --list); do",
-                            "ln -s " + busybox + " $tool",
-                            "done",
-                            "rm -f su sh",
-                            "ln -s " + zip + " zip"
-                    );
-                }
-                Shell.su("PATH=" + toolPath + ":$PATH");
+            if (!Utils.itemExist(false, toolPath)) {
+                Shell.sh(
+                        "mkdir " + toolPath,
+                        "chmod 755 " + toolPath,
+                        "cd " + toolPath,
+                        "ln -s " + busybox + " busybox",
+                        "for tool in $(./busybox --list); do",
+                        "ln -s " + busybox + " $tool",
+                        "done",
+                        "rm -f su sh",
+                        "ln -s " + zip + " zip"
+                );
             }
-
+            Shell.su("PATH=" + toolPath + ":$PATH");
             return null;
         }
     }
@@ -254,7 +250,7 @@ public class Async {
             if (copyToSD && mFile != null) {
                 String filename = (mName.contains(".zip") ? mName : mName + ".zip");
                 filename = filename.replace(" ", "_").replace("'", "").replace("\"", "")
-                        .replace("$", "").replace("`", "").replace("(", "_").replace(")", "_")
+                        .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
                         .replace("#", "").replace("@", "").replace("*", "");
                 sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
                 Logger.dev("FlashZip: Copy zip back to " + sdFile.getPath());
@@ -268,6 +264,7 @@ public class Async {
                         mFile.delete();
                     } catch (IOException e) {
                         // Use the badass way :)
+                        e.printStackTrace();
                         Shell.su("cp -af " + mFile.getPath() + " " + sdFile.getPath());
                         if (!sdFile.exists()) {
                             sdFile = null;

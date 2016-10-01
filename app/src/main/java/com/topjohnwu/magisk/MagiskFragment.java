@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,19 +76,7 @@ public class MagiskFragment extends Fragment {
         View v = inflater.inflate(R.layout.magisk_fragment, container, false);
         ButterKnife.bind(this, v);
 
-        if (magiskVersion == -1) {
-            magiskStatusContainer.setBackgroundColor(colorNeutral);
-            magiskStatusIcon.setImageResource(statusUnknown);
-
-            magiskVersionText.setTextColor(colorNeutral);
-            magiskVersionText.setText(R.string.magisk_version_error);
-        } else {
-            magiskStatusContainer.setBackgroundColor(colorOK);
-            magiskStatusIcon.setImageResource(statusOK);
-
-            magiskVersionText.setText(getString(R.string.magisk_version, String.valueOf(magiskVersion)));
-            magiskVersionText.setTextColor(colorOK);
-        }
+        updateMagiskVersion();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
@@ -120,6 +106,7 @@ public class MagiskFragment extends Fragment {
             if (s.equals("update_check_done")) {
                 if (pref.getBoolean(s, false)) {
                     Logger.dev("MagiskFragment: UI refresh triggered");
+                    updateMagiskVersion();
                     updateUI();
                 }
             }
@@ -140,20 +127,36 @@ public class MagiskFragment extends Fragment {
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-
-    private void updateUI() {
-        String theme = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("theme", "");
-        if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog_dh);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-        }
-
+    private void updateMagiskVersion() {
         List<String> ret = Shell.sh("getprop magisk.version");
         if (ret.get(0).isEmpty()) {
             magiskVersion = -1;
         } else {
             magiskVersion = Integer.parseInt(ret.get(0));
+        }
+
+        if (magiskVersion == -1) {
+            magiskStatusContainer.setBackgroundColor(colorNeutral);
+            magiskStatusIcon.setImageResource(statusUnknown);
+
+            magiskVersionText.setTextColor(colorNeutral);
+            magiskVersionText.setText(R.string.magisk_version_error);
+        } else {
+            magiskStatusContainer.setBackgroundColor(colorOK);
+            magiskStatusIcon.setImageResource(statusOK);
+
+            magiskVersionText.setText(getString(R.string.magisk_version, String.valueOf(magiskVersion)));
+            magiskVersionText.setTextColor(colorOK);
+        }
+    }
+
+
+    private void updateUI() {
+        String theme = prefs.getString("theme", "");
+        if (theme.equals("Dark")) {
+            builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog_dh);
+        } else {
+            builder = new AlertDialog.Builder(getActivity());
         }
 
         if (remoteMagiskVersion == -1) {
