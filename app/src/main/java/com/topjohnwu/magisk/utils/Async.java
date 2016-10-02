@@ -238,9 +238,9 @@ public class Async {
                 }
                 ret = Shell.su(
                         "BOOTMODE=true sh " + mFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mFile.getPath(),
-                        "if [ $? -eq 0 ]; then echo true; else echo false; fi",
-                        "rm -rf " + mFile.getParent() + "/META-INF"
+                        "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
+                Shell.su("rm -rf " + mFile.getParent() + "/META-INF");
                 Logger.dev("FlashZip: Console log:");
                 for (String line : ret) {
                     Logger.dev(line);
@@ -261,7 +261,6 @@ public class Async {
                         FileInputStream in = new FileInputStream(mFile);
                         createFileFromInputStream(in, sdFile);
                         in.close();
-                        mFile.delete();
                     } catch (IOException e) {
                         // Use the badass way :)
                         e.printStackTrace();
@@ -271,9 +270,9 @@ public class Async {
                         }
                     }
                 }
-                if (mFile.exists() && !mFile.delete()) {
-                    Utils.removeFile(mFile.getPath());
-                }
+            }
+            if (mFile != null && mFile.exists() && !mFile.delete()) {
+                Utils.removeFile(mFile.getPath());
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;
@@ -309,7 +308,7 @@ public class Async {
             new LoadModules(prefs).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
             AlertDialog.Builder builder;
-            String theme = PreferenceManager.getDefaultSharedPreferences(mContext).getString("theme", "");
+            String theme = prefs.getString("theme", "");
             if (theme.equals("Dark")) {
                 builder = new AlertDialog.Builder(mContext, R.style.AlertDialog_dh);
             } else {

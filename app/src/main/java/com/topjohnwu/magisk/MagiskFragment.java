@@ -70,6 +70,44 @@ public class MagiskFragment extends Fragment {
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
+    private AlertDialog.OnClickListener flashMagisk = (dialogInterface, i) -> Utils.downloadAndReceive(
+            getActivity(),
+            new DownloadReceiver("Magisk-v" + String.valueOf(remoteMagiskVersion)) {
+                @Override
+                public void task(Uri uri) {
+                    new Async.FlashZIP(mContext, uri, mName) {
+                        @Override
+                        protected void preProcessing() throws Throwable {
+                            super.preProcessing();
+                            new File(mUri.getPath()).delete();
+                        }
+
+                        @Override
+                        protected void done() {
+                            Shell.su("setprop magisk.version " + String.valueOf(remoteMagiskVersion));
+                            super.done();
+                        }
+                    }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                }
+            },
+            magiskLink,
+            "latest_magisk.zip");
+
+    private AlertDialog.OnClickListener installMagiskApk = (dialogInterface, i) -> Utils.downloadAndReceive(
+            getActivity(),
+            new DownloadReceiver() {
+                @Override
+                public void task(Uri uri) {
+                    Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                    install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Uri content = FileProvider.getUriForFile(getActivity(), "com.topjohnwu.magisk.provider", new File(uri.getPath()));
+                    install.setData(content);
+                    mContext.startActivity(install);
+                }
+            },
+            appLink,
+            "MagiskManager-v" + remoteAppVersion + ".apk");
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -180,16 +218,7 @@ public class MagiskFragment extends Fragment {
                         .setTitle(getString(R.string.update_title, getString(R.string.magisk)))
                         .setMessage(getString(R.string.update_msg, getString(R.string.magisk), String.valueOf(remoteMagiskVersion), magiskChangelog))
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
-                                getActivity(),
-                                new DownloadReceiver() {
-                                    @Override
-                                    public void task(Uri uri) {
-                                        new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                    }
-                                },
-                                magiskLink,
-                                "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
+                        .setPositiveButton(R.string.download_install, flashMagisk)
                         .setNegativeButton(R.string.no_thanks, null)
                         .show());
 
@@ -202,16 +231,7 @@ public class MagiskFragment extends Fragment {
                         .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                         .setMessage(getString(R.string.repo_install_msg, "Magisk-v" + String.valueOf(remoteMagiskVersion)))
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
-                                getActivity(),
-                                new DownloadReceiver() {
-                                    @Override
-                                    public void task(Uri uri) {
-                                        new Async.FlashZIP(mContext, uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                    }
-                                },
-                                magiskLink,
-                                "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
+                        .setPositiveButton(R.string.download_install, flashMagisk)
                         .setNegativeButton(R.string.no_thanks, null)
                         .show());
             }
@@ -225,19 +245,7 @@ public class MagiskFragment extends Fragment {
                         .setTitle(getString(R.string.update_title, getString(R.string.app_name)))
                         .setMessage(getString(R.string.update_msg, getString(R.string.app_name), remoteAppVersion, appChangelog))
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(getActivity(),
-                                new DownloadReceiver() {
-                                    @Override
-                                    public void task(Uri uri) {
-                                        Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                                        install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        Uri content = FileProvider.getUriForFile(getActivity(), "com.topjohnwu.magisk.provider", new File(uri.getPath()));
-                                        install.setData(content);
-                                        mContext.startActivity(install);
-                                    }
-                                },
-                                appLink,
-                                "MagiskManager-v" + remoteAppVersion + ".apk"))
+                        .setPositiveButton(R.string.download_install, installMagiskApk)
                         .setNegativeButton(R.string.no_thanks, null)
                         .show()
                 );
@@ -259,22 +267,7 @@ public class MagiskFragment extends Fragment {
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
-                            getActivity(),
-                            new DownloadReceiver() {
-                                @Override
-                                public void task(Uri uri) {
-                                    new Async.FlashZIP(mContext, uri) {
-                                        @Override
-                                        protected void done() {
-                                            Shell.su("setprop magisk.version " + String.valueOf(remoteMagiskVersion));
-                                            super.done();
-                                        }
-                                    }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                                }
-                            },
-                            magiskLink,
-                            "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip"))
+                    .setPositiveButton(R.string.download_install, flashMagisk)
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }
