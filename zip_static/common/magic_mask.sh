@@ -8,13 +8,14 @@ COREDIR=/magisk/.core
 DUMMDIR=$COREDIR/dummy
 MIRRDIR=$COREDIR/mirror
 
-TMPDIR=/cache/tmp
+TMPDIR=/dev/tmp
 
-# Use the included busybox to do everything in all scripts for maximum compatibility
+# Use the included busybox to do everything for maximum compatibility
 # We also do so because we rely on the option "-c" for cp (reserve contexts)
+
+# Reserve the original PATH
+export OLDPATH=$PATH
 export PATH="/data/busybox:$PATH"
-# Version info
-setprop magisk.version 7
 
 log_print() {
   echo $1
@@ -32,7 +33,7 @@ mktouch() {
 }
 
 unblock() {
-  mkdir -p /dev/unblock
+  touch /dev/.magisk.unblock
   exit
 }
 
@@ -185,9 +186,12 @@ merge_image() {
 
           if ($OK); then
             # Merge (will reserve selinux contexts)
-            if [ `cp -afc /cache/merge_img/. /cache/data_img >/dev/null 2>&1; echo $?` -eq 0 ]; then
-              log_print "Merge complete"
-            fi
+            cd /cache/merge_img
+            for MOD in *; do
+              rm -rf /cache/data_img/$MOD
+              cp -afc $MOD /cache/data_img/
+            done
+            log_print "Merge complete"
           fi
 
           umount /cache/data_img
@@ -214,6 +218,15 @@ case $1 in
     touch $LOGFILE
     chmod 644 $LOGFILE
     log_print "Magisk post-fs mode running..."
+
+    if [ -d "/cache/magisk_merge" ]; then
+      cd /cache/magisk_merge
+      for MOD in *; do
+        rm -rf /cache/magisk/$MOD
+        cp -afc $MOD /cache/magisk/
+      done 
+      rm -rf /cache/magisk_merge
+    fi
 
     for MOD in /cache/magisk/* ; do
       if [ -f "$MOD/remove" ]; then
@@ -244,6 +257,10 @@ case $1 in
 
     log_print "Magisk post-fs-data mode running..."
 
+    # Live patch sepolicy
+    /data/magisk/sepolicy-inject --live -s su
+
+    # Cache support
     if [ -d "/cache/data_bin" ]; then
       rm -rf /data/busybox /data/magisk
       mkdir -p /data/busybox
@@ -254,14 +271,15 @@ case $1 in
       # Prevent issues
       rm -f /data/busybox/su /data/busybox/sh
     fi
-
     mv /cache/stock_boot.img /data 2>/dev/null
+    
+    chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
 
     # Handle image merging
     merge_image /cache/magisk.img
     merge_image /data/magisk_merge.img
 
-    # Mount /data image
+    # Mount magisk.img
     if [ `cat /proc/mounts | grep /magisk >/dev/null 2>&1; echo $?` -ne 0 ]; then
       loopsetup $IMG
       if [ ! -z "$LOOPDEVICE" ]; then
@@ -274,13 +292,14 @@ case $1 in
       unblock
     fi
 
-    mkdir -p $DUMMDIR
-    mkdir -p $MIRRDIR/system
-
     log_print "Preparing modules"
     # First do cleanups
-    rm -rf $DUMMDIR/*
+    rm -rf $DUMMDIR
     rmdir $(find /magisk -type d -depth ! -path "*core*" ) 2>/dev/null
+    rm -rf $COREDIR/bin
+
+    mkdir -p $DUMMDIR
+    mkdir -p $MIRRDIR/system
 
     # Travel through all mods
     for MOD in /magisk/* ; do
@@ -292,9 +311,11 @@ case $1 in
       fi
     done
 
-    # Proper permissions
-    find $DUMMDIR -type d -exec chmod 755 {} \;
-    find $DUMMDIR -type f -exec chmod 644 {} \;
+    # Proper permissions for generated items
+    chmod 755 $(find $COREDIR -type d)
+    chmod 644 $(find $COREDIR -type f)
+    find $COREDIR -type d -exec chmod 755 {} \;
+    find $COREDIR -type f -exec chmod 644 {} \;
 
     # linker(64), t*box, and app_process* are required if we need to dummy mount bin folder
     if [ -f "$TMPDIR/dummy/system/bin" ]; then
@@ -303,7 +324,7 @@ case $1 in
       cp -afc linker* t*box app_process* $DUMMDIR/system/bin/
     fi
 
-    # Shrink the image if possible
+    # Unmount, shrink, remount
     if [ `umount /magisk >/dev/null 2>&1; echo $?` -eq 0 ]; then
       losetup -d $LOOPDEVICE
       target_size_check $IMG
@@ -323,8 +344,7 @@ case $1 in
       unblock
     fi
 
-    # Remove legacy phh root and crap folder
-    rm -rf /magisk/phh
+    # Remove crap folder
     rm -rf /magisk/lost+found
     
     # Start doing tasks
@@ -350,9 +370,7 @@ case $1 in
     run_scripts post-fs-data
 
     # Bind hosts for Adblock apps
-    if [ ! -f "$COREDIR/hosts" ]; then
-      cp -afc /system/etc/hosts $COREDIR/hosts
-    fi
+    [ ! -f "$COREDIR/hosts" ] && cp -afc /system/etc/hosts $COREDIR/hosts
     log_print "Enabling systemless hosts file support"
     bind_mount $COREDIR/hosts /system/etc/hosts
 
@@ -363,7 +381,7 @@ case $1 in
     # Stage 4
     log_print "Bind mount mirror items"
     # Find all empty directores and dummy files, they should be mounted by original files in /system
-    find $DUMMDIR -type d -exec sh -c 'if [ -z "$(ls -A $1)" ]; then echo $1; fi' -- {} \; -o \( -type f -size 0 -print \) | while read ITEM ; do
+    find $DUMMDIR -type d -exec sh -c '[ -z "$(ls -A $1)" ] && echo $1' -- {} \; -o \( -type f -size 0 -print \) | while read ITEM ; do
       ORIG=${ITEM/dummy/mirror}
       TARGET=${ITEM#$DUMMDIR}
       bind_mount $ORIG $TARGET
@@ -372,17 +390,13 @@ case $1 in
     # All done
     rm -rf $TMPDIR
 
-    if [ ! -f "/supersu" ]; then
-      # Expose root path
-      setprop magisk.supath /magisk/.core/bin
-      setprop magisk.root 1
-    fi
-
     unblock
     ;;
 
   service )
-    rm -rf /cache/unblock
+    # Version info
+    setprop magisk.version 7
+    rm -rf /dev/unblock*
     log_print "Magisk late_start service mode running..."
     run_scripts service
     ;;
@@ -392,11 +406,10 @@ case $1 in
     ROOT=$(getprop magisk.root)
     if [ "$ROOT" -eq "1" ]; then
       log_print "Enabling root"
-      rm -f SUPATH
-      ln -s /data/magisk $SUPATH
+      ln -s $SUPATH /magisk/.core/bin
     else
       log_print "Disabling root"
-      rm -f SUPATH
+      rm -f /magisk/.core/bin
     fi
     ;;
 esac

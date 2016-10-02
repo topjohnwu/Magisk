@@ -8,19 +8,12 @@
 #
 ##########################################################################################
 
-TMPDIR=/tmp
-
 if [ -z "$BOOTMODE" ]; then
   BOOTMODE=false
 fi
 
-mount -o rw,remount rootfs /
-mkdir /magisk 2>/dev/null
-
-if ($BOOTMODE); then
-  TMPDIR=/data/tmp
-  mount -o ro,remount rootfs /
-fi
+TMPDIR=/tmp
+($BOOTMODE) && TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/magisk
 
@@ -87,6 +80,11 @@ find_boot_image() {
       if [ ! -z "$BOOTIMAGE" ]; then break; fi
     done
   fi
+  if [ -z "$BOOTIMAGE" ]; then
+    FSTAB="/etc/recovery.fstab"
+    [ ! -f "$FSTAB" ] && FSTAB="/etc/recovery.fstab.bak"
+    BOOTIMAGE=$(grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*')
+  fi
 }
 
 is_mounted() {
@@ -98,6 +96,40 @@ is_mounted() {
   return $?
 }
 
+mount_image() {
+  if [ ! -d "$2" ]; then
+    mount -o rw,remount rootfs /
+    mkdir -p $2 2>/dev/null
+    ($BOOTMODE) && mount -o ro,remount rootfs /
+    [ ! -d "$2" ] && return 1
+  fi
+  if (! is_mounted $2); then
+    LOOPDEVICE=
+    for LOOP in 0 1 2 3 4 5 6 7; do
+      if (! is_mounted $2); then
+        LOOPDEVICE=/dev/block/loop$LOOP
+        if [ ! -f "$LOOPDEVICE" ]; then
+          mknod $LOOPDEVICE b 7 $LOOP
+        fi
+        losetup $LOOPDEVICE $1
+        if [ "$?" -eq "0" ]; then
+          mount -t ext4 -o loop $LOOPDEVICE $2
+          if (! is_mounted $2); then
+            /system/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE $2
+          fi
+          if (! is_mounted $2); then
+            /system/bin/toybox mount -t ext4 -o loop $LOOPDEVICE $2
+          fi
+        fi
+        if (is_mounted $2); then
+          ui_print "- Mounting $1 to $2"
+          break;
+        fi
+      fi
+    done
+  fi
+}
+
 grep_prop() {
   REGEX="s/^$1=//p"
   shift
@@ -106,6 +138,22 @@ grep_prop() {
     FILES='/system/build.prop'
   fi
   cat $FILES 2>/dev/null | sed -n $REGEX | head -n 1
+}
+
+unpack_boot() {
+  rm -rf $UNPACKDIR $RAMDISK 2>/dev/null
+  mkdir -p $UNPACKDIR
+  mkdir -p $RAMDISK
+  cd $UNPACKDIR
+  $BINDIR/bootimgtools --extract $1
+
+  find $TMPDIR/boottmp -type d -exec chmod 755 {} \;
+  find $TMPDIR/boottmp -type f -exec chmod 644 {} \;
+  chmod 755 $(find $TMPDIR/boottmp -type d)
+  chmod 644 $(find $TMPDIR/boottmp -type f)
+
+  cd $RAMDISK
+  gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
 }
 
 repack_boot() {
@@ -190,7 +238,7 @@ if [ -z "$NOOVERRIDE" ]; then
   # read override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
-  getvar KEEPSUPERSU
+  getvar NORESTORE
 fi
 
 if [ -z "$KEEPVERITY" ]; then
@@ -201,9 +249,9 @@ if [ -z "$KEEPFORCEENCRYPT" ]; then
   # we don't keep forceencrypt by default
   KEEPFORCEENCRYPT=false
 fi
-if [ -z "$KEEPSUPERSU" ]; then
-  # we don't keep SuperSU by default
-  KEEPSUPERSU=false
+if [ -z "$NORESTORE" ]; then
+  # we don't keep ramdisk by default
+  NORESTORE=false
 fi
 
 SAMSUNG=false
@@ -213,8 +261,32 @@ if [ $? -eq 0 ]; then
 fi
 
 ##########################################################################################
+# Environment
+##########################################################################################
+
+ui_print "- Constructing environment"
+
+if (is_mounted /data); then
+  rm -rf /data/busybox /data/magisk 2>/dev/null
+  mkdir -p /data/busybox
+  cp -af $BINDIR /data/magisk
+  chmod 755 /data/busybox /data/magisk /data/magisk/*
+  chcon 'u:object_r:system_file:s0' /data/busybox /data/magisk /data/magisk/*
+  /data/magisk/busybox --install -s /data/busybox
+  # Prevent issues
+  rm -f /data/busybox/su /data/busybox/sh
+else
+  rm -rf /cache/data_bin 2>/dev/null
+  mkdir -p /cache/data_bin
+  cp -af $BINDIR /cache/data_bin
+fi
+
+##########################################################################################
 # Image
 ##########################################################################################
+
+# Fix SuperSU.....
+($BOOTMODE) && /data/magisk/sepolicy-inject -s fsck --live
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -230,55 +302,12 @@ else
   make_ext4fs -l 64M -a /magisk -S $INSTALLER/common/file_contexts_image $IMG
 fi
 
+mount_image $IMG /magisk
 if (! is_mounted /magisk); then
-  ui_print "- Mounting $IMG to /magisk"
-  LOOPDEVICE=
-  for LOOP in 0 1 2 3 4 5 6 7; do
-    if (! is_mounted /magisk); then
-      LOOPDEVICE=/dev/block/loop$LOOP
-      if [ ! -f "$LOOPDEVICE" ]; then
-        mknod $LOOPDEVICE b 7 $LOOP
-      fi
-      losetup $LOOPDEVICE $IMG
-      if [ "$?" -eq "0" ]; then
-        mount -t ext4 -o loop $LOOPDEVICE /magisk
-        if (! is_mounted /magisk); then
-          /system/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE /magisk
-        fi
-        if (! is_mounted /magisk); then
-          /system/bin/toybox mount -t ext4 -o loop $LOOPDEVICE /magisk
-        fi
-      fi
-      if (is_mounted /magisk); then
-        break;
-      fi
-    fi
-  done
+  ui_print "! Image mount failed... abort"
+  exit 1
 fi
-
-rm -rf $COREDIR/bin 2>/dev/null
-
-##########################################################################################
-# Environment
-##########################################################################################
-
-ui_print "- Constructing environment"
-
-if (is_mounted /data); then
-  rm -rf /data/busybox /data/magisk
-  mkdir -p /data/busybox
-  mkdir -p /data/magisk
-  cp -af $BINDIR/busybox $BINDIR/su $BINDIR/sepolicy-inject /data/magisk
-  chmod 755 /data/busybox /data/magisk /data/magisk/*
-  chcon 'u:object_r:system_file:s0' /data/busybox /data/magisk /data/magisk/*
-  /data/magisk/busybox --install -s /data/busybox
-  # Prevent issues
-  rm -f /data/busybox/su /data/busybox/sh
-else
-  rm -rf /cache/data_bin
-  mkdir -p /cache/data_bin
-  cp -af $BINDIR/busybox $BINDIR/su $BINDIR/sepolicy-inject /cache/data_bin
-fi
+MAGISKLOOP=$LOOPDEVICE
 
 ##########################################################################################
 # Boot image patch
@@ -294,8 +323,6 @@ ORIGBOOT=$TMPDIR/boottmp/boot.img
 NEWBOOT=$TMPDIR/boottmp/new-boot.img
 UNPACKDIR=$TMPDIR/boottmp/bootunpack
 RAMDISK=$TMPDIR/boottmp/ramdisk
-mkdir -p $UNPACKDIR
-mkdir -p $RAMDISK
 
 chmod 777 $CHROMEDIR/futility $BINDIR/*
 
@@ -303,45 +330,87 @@ ui_print "- Dumping boot image"
 dd if=$BOOTIMAGE of=$ORIGBOOT
 
 ui_print "- Unpacking boot image"
-cd $UNPACKDIR
-$BINDIR/bootimgtools --extract $ORIGBOOT
+unpack_boot $ORIGBOOT
 
-chmod 755 $(find $TMPDIR/boottmp -type d)
-chmod 644 $(find $TMPDIR/boottmp -type f)
+SUPERSU=false
 
-cd $RAMDISK
-gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
-
-if [ -f "supersu" ]; then
-  KEEPSUPERSU=true
-fi
-
-if (! $KEEPSUPERSU); then
+if (! $NORESTORE); then
   #  Backups
   if [ -d ".backup" ]; then
-    ui_print "- Reverting ramdisk backup"
+    ui_print "- Restoring ramdisk with backup"
     cp -af .backup/* .
     rm -rf magisk init.magisk.rc sbin/magic_mask.sh sbin/magisk_wrapper.sh 2>/dev/null
   else
-    if [ -d "magisk" -o -d "su" ]; then
-      cp -af /data/stock_boot*.gz /data/stock_boot.img.gz 2>/dev/null
-      gzip -d /data/stock_boot.img.gz 2>/dev/null
-      if [ -f "/data/stock_boot.img" ]; then
-        ui_print "- Using boot image backup"
-        cp -af /data/stock_boot.img $ORIGBOOT
-        rm -rf $RAMDISK $TMPDIR
-        mkdir -p $UNPACKDIR
-        mkdir -p $RAMDISK
+    if [ -f "sbin/launch_daemonsu.sh" ]; then
+      SUPERSU=true
+      # Save it for helper module
+      cp -af sbin/launch_daemonsu.sh $INSTALLER/roothelper/launch_daemonsu.sh
+    fi
+    # Non-standard boot image restores
+    if ($SUPERSU); then
+      ui_print "- SuperSU patched boot detected"
+      # Restore with SuperSU's backup
+      MOUNTSU=false
+      (! is_mounted /su) && (is_mounted /data) && mount_image /data/su.img /su && MOUNTSU=true
+      if (is_mounted /su); then
+        # Use sukernel's built-in functions
+        ui_print "- Using sukernel to restore boot image"
         cd $UNPACKDIR
-        $BINDIR/bootimgtools --extract $ORIGBOOT
-        cd $RAMDISK
-        gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
+        gunzip -c < $UNPACKDIR/ramdisk.gz > suramdisk
+        /su/bin/sukernel --restore suramdisk /data/stock_boot.img
+        if [ "$?" -ne "0" ]; then
+          # No boot backup found, use ramdisk backup
+          ui_print "- Restoring ramdisk with backup"
+          /su/bin/sukernel --cpio-restore suramdisk suramdisk
+          rm -rf $RAMDISK
+          mkdir -p $RAMDISK
+          cd $RAMDISK
+          cpio -i < $UNPACKDIR/suramdisk
+          rm -f $UNPACKDIR/suramdisk
+        else
+          ui_print "- Restoring boot image with backup"
+          cp -af /data/stock_boot.img $ORIGBOOT
+          unpack_boot $ORIGBOOT
+        fi
+        if ($MOUNTSU); then
+          ui_print "- Unmounting su.img"
+          umount /su
+          losetup -d $LOOPDEVICE
+        fi
       else
-        ui_print "! No backups found"
-        ui_print "! Installer will still proceed, but might cause issues"
-        ui_print "! If possible, please restore to stock boot then flash Magisk again"
-        # Force removing SuperSU parts
-        rm -rf su init.supersu.rc sbin/launch_daemonsu.sh 2>/dev/null
+        # Find the boot backup ourselves
+        ui_print "! su.img mount failed... find the backup ourselves"
+        cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+        gzip -d /data/stock_boot.img.gz 2>/dev/null
+        rm -rf /data/stock_boot.img.gz 2>/dev/null
+        if [ -f "/data/stock_boot.img" ]; then
+          ui_print "- Restoring boot image with backup"
+          cp -af /data/stock_boot.img $ORIGBOOT
+          unpack_boot $ORIGBOOT
+        else
+          ui_print "! No backups found"
+          ui_print "! Installer will still proceed, but might cause issues"
+          ui_print "! If possible, please restore to stock boot then flash Magisk again"
+          # Force removing SuperSU parts
+          rm -rf su init.supersu.rc sbin/launch_daemonsu.sh 2>/dev/null
+        fi
+      fi
+    else
+      # Magisk's own situation
+      if [ -d "magisk" ]; then
+        cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+        gzip -d /data/stock_boot.img.gz 2>/dev/null
+        if [ -f "/data/stock_boot.img" ]; then
+          ui_print "- Restoring boot image with backup"
+          cp -af /data/stock_boot.img $ORIGBOOT
+          unpack_boot $ORIGBOOT
+        else
+          ui_print "! No backups found"
+          ui_print "! Installer will still proceed, but might cause issues"
+          ui_print "! If possible, please restore to stock boot then flash Magisk again"
+          # Removing other boot image modifications
+          rm -rf sbin/su init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
+        fi
       fi
     fi
     ui_print "- Creating backups"
@@ -355,6 +424,10 @@ if (! $KEEPSUPERSU); then
   fi
 fi
 
+ui_print "- Installing root helper module"
+cp -af $INSTALLER/roothelper /magisk/00roothelper
+chmod 755 /magisk/00roothelper/post-fs-data.sh
+
 # Patch ramdisk
 ui_print "- Patching ramdisk"
 
@@ -362,65 +435,29 @@ if [ $(grep -c "import /init.magisk.rc" init.rc) -eq "0" ]; then
   sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" init.rc
 fi
 
-if (! $KEEPSUPERSU); then
-  sed -i "/selinux.reload_policy/d" init.rc
-  find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
-    if (! $KEEPVERITY); then
-      sed -i "s/,support_scfs//g" $FSTAB
-      sed -i 's;,\{0,1\}verify\(=[^,]*\)\{0,1\};;g' $FSTAB
-    fi
-    if (! $KEEPFORCEENCRYPT); then
-      sed -i "s/forceencrypt/encryptable/g" $FSTAB
-      sed -i "s/forcefdeorfbe/encryptable/g" $FSTAB
-    fi
-  done
-  rm verity_key 2>/dev/null
-
-  # sepolicy patches
-  # LD_LIBRARY_PATH=$BINDIR $BINDIR/supolicy --file sepolicy sepolicy.patched
-  # mv -f sepolicy.patched sepolicy
-  . $INSTALLER/common/supatch.sh
-  allow su_daemon "rootfs proc init system_file" "file dir lnk_file" "*"
-  allow init su_daemon unix_stream_socket connectto
-  allow su_daemon shell_exec file getattr
-  allow su_daemon tmpfs dir "*"
-  allow su_daemon selinuxfs file "read open write"
-  allow su_daemon kernel security "read_policy load_policy"
-  allow su_daemon toolbox_exec file "*"
-  allow kernel su fd use
-  allow init "rootfs system_file" file "*"
-  if $BINDIR/sepolicy-inject -e -s toolbox -P sepolicy; then
-    allow toolbox property_socket sock_file write
-    allow toolbox init unix_stream_socket connectto
-    allow toolbox init fifo_file "*"
-    allow toolbox default_prop property_service "*"
-    allow toolbox device dir "*"
+sed -i "/selinux.reload_policy/d" init.rc
+find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
+  if (! $KEEPVERITY); then
+    sed -i "s/,support_scfs//g" $FSTAB
+    sed -i 's;,\{0,1\}verify\(=[^,]*\)\{0,1\};;g' $FSTAB
   fi
-  # Just in case
-  $BINDIR/sepolicy-inject -Z init -P sepolicy
-  $BINDIR/sepolicy-inject -Z toolbox -P sepolicy
-  $BINDIR/sepolicy-inject -Z su_daemon -P sepolicy
-  # Fix Xposed
-  allow zygote app_data_file "dir file" "*"
-  allow zygote input_device "dir chr_file" "*"
-  allow untrusted_app untrusted_app capability setgid
-  allow "system_server system_app" "app_data_file" "file dir" "*"
-fi
+  if (! $KEEPFORCEENCRYPT); then
+    sed -i "s/forceencrypt/encryptable/g" $FSTAB
+    sed -i "s/forcefdeorfbe/encryptable/g" $FSTAB
+  fi
+done
+rm verity_key 2>/dev/null
+
+# sepolicy patches
+$BINDIR/sepolicy-inject --magisk -P sepolicy
 
 # Add new items
 mkdir -p magisk 2>/dev/null
 cp -af $INSTALLER/common/init.magisk.rc init.magisk.rc
 cp -af $INSTALLER/common/magic_mask.sh sbin/magic_mask.sh
-cp -af $INSTALLER/common/magisk_wrapper.sh sbin/magisk_wrapper.sh
 
-if (! $KEEPSUPERSU); then
-  cp -af $BINDIR/su $BINDIR/sepolicy-inject magisk
-else
-  touch supersu
-fi
-
-chmod 0755 magisk magisk/*
-chmod 0750 init.magisk.rc sbin/magic_mask.sh sbin/magisk_wrapper.sh
+chmod 0755 magisk
+chmod 0750 init.magisk.rc sbin/magic_mask.sh
 
 ui_print "- Repacking boot image"
 repack_boot
@@ -429,14 +466,8 @@ ORIGSIZE=$(ls -l $ORIGBOOT | awk '{print $5}')
 NEWSIZE=$(ls -l $NEWBOOT | awk '{print $5}')
 if [ "$NEWSIZE" -gt "$ORIGSIZE" ]; then
   ui_print "! Boot partition space insufficient"
-  ui_print "! Remove ramdisk backups and binaries"
-  rm -rf $RAMDISK/.backup $NEWBOOT $RAMDISK/magisk/* 2>/dev/null
-  if (! $KEEPSUPERSU); then
-    mkdir -p /cache/magisk
-    cp $BINDIR/su $BINDIR/sepolicy-inject /cache/magisk
-    chmod 755 /cache/magisk /cache/magisk/*
-    chcon 'u:object_r:system_file:s0' /cache/magisk /cache/magisk/*
-  fi
+  ui_print "! Try to remove ramdisk backups"
+  rm -rf $RAMDISK/.backup $NEWBOOT 2>/dev/null
   repack_boot
   NEWSIZE=$(ls -l $NEWBOOT | awk '{print $5}')
   if [ "$NEWSIZE" -gt "$ORIGSIZE" ]; then
@@ -448,13 +479,18 @@ fi
 
 chmod 644 $NEWBOOT
 
+if [ -L "$BOOTIMAGE" ]; then
+  ui_print "- Block symlink detected!"
+else
+  dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
+fi
 ui_print "- Flashing new boot image"
-dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
 dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
 
 if (! $BOOTMODE); then
+  ui_print "- Unmounting partitions"
   umount /magisk
-  losetup -d $LOOPDEVICE
+  losetup -d $MAGISKLOOP
   umount /system
 fi
 

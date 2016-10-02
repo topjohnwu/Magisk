@@ -2,57 +2,38 @@
 
 on post-fs
     # Paths
-    export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/su/bin:/magisk/.core/bin:/magisk/busybox/bin:/data/magisk
-
-    # Start root
-    start phhsu
-    wait /dev/su 1
+    export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/magisk/.core/busybox:/system/xbin
 
     start magisk_pfs
-    wait /dev/unblock 20
-    rmdir /dev/unblock
+    wait /dev/.magisk.unblock 20
+    rm /dev/.magisk.unblock
 
 on post-fs-data
 
-    # Try to start root again in case post-fs failed
-    start phhsu
-    wait /dev/su 1
-
     start magisk_pfsd
-    wait /dev/unblock 20
-    rmdir /dev/unblock
+    wait /dev/.magisk.unblock 40
+    rm /dev/.magisk.unblock
 
 on property:magisk.root=*
     start magisk_root
 
 # Services
 
-service phhsu /sbin/magisk_wrapper.sh phhsu
-    user root
-    seclabel u:r:su_daemon:s0
-    oneshot
-
 # launch post-fs script
-service magisk_pfs /sbin/magisk_wrapper.sh post-fs
+service magisk_pfs /sbin/magic_mask.sh post-fs
     user root
-    seclabel u:r:init:s0
+    seclabel u:r:su:s0
     oneshot
 
 # launch post-fs-data script
-service magisk_pfsd /sbin/magisk_wrapper.sh post-fs-data
+service magisk_pfsd /sbin/magic_mask.sh post-fs-data
     user root
-    seclabel u:r:init:s0
+    seclabel u:r:su:s0
     oneshot
 
 # launch late_start script
-service magisk_service /sbin/magisk_wrapper.sh service
+service magisk_service /sbin/magic_mask.sh service
     class late_start
     user root
-    seclabel u:r:init:s0
-    oneshot
-
-# root handling
-service magisk_root /sbin/magisk_wrapper.sh root
-    user root
-    seclabel u:r:init:s0
+    seclabel u:r:su:s0
     oneshot
