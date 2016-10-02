@@ -199,6 +199,7 @@ public class Async {
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
+                mFile.delete();
                 Utils.removeFile(mFile.getPath());
                 createFileFromInputStream(in, mFile);
                 in.close();
@@ -220,15 +221,15 @@ public class Async {
         protected Integer doInBackground(Void... voids) {
             Logger.dev("FlashZip Running... " + mName);
             List<String> ret = null;
+            try {
+                preProcessing();
+            } catch (Throwable e) {
+                this.cancel(true);
+                progress.cancel();
+                e.printStackTrace();
+                return -1;
+            }
             if (Shell.rootAccess()) {
-                try {
-                    preProcessing();
-                } catch (Throwable e) {
-                    this.cancel(true);
-                    progress.cancel();
-                    e.printStackTrace();
-                    return -1;
-                }
                 ret = Shell.su(
                         "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
                         "if [ \"$(cat " + mFile.getParent() + "/META-INF/com/google/android/updater-script)\" = \"#MAGISK\" ]; then echo true; else echo false; fi"
@@ -290,7 +291,7 @@ public class Async {
                     if (sdFile == null) {
                         Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(mContext, mContext.getString(R.string.manual_install, mFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, mContext.getString(R.string.manual_install, sdFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
                     }
                     break;
                 case 0:
