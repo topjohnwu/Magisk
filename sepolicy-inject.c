@@ -23,7 +23,8 @@
 #include <sepol/policydb/conditional.h>
 #include <sepol/policydb/constraint.h>
 
-extern void builtin_rules(policydb_t *policydb);
+extern void phh_rules(policydb_t *policydb);
+extern void magisk_rules(policydb_t *policydb);
 
 void usage(char *arg0) {
 	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm_list> -P <policy file>\n", arg0);
@@ -545,7 +546,7 @@ int main(int argc, char **argv)
 {
 	char *policy = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0, not = 0, live = 0, builtin = 0;
+	int exists = 0, not = 0, live = 0, builtin = 0, magisk = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -569,6 +570,7 @@ int main(int argc, char **argv)
 		{"not-permissive", required_argument, NULL, 'z'},
 		{"not", no_argument, NULL, 0},
 		{"live", no_argument, NULL, 0},
+		{"magisk", no_argument, NULL, 0},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -580,6 +582,8 @@ int main(int argc, char **argv)
 					not = 1;
 				else if(strcmp(long_options[option_index].name, "live") == 0)
 					live = 1;
+				else if(strcmp(long_options[option_index].name, "magisk") == 0)
+					magisk = 1;
 				else
 					usage(argv[0]);
 				break;
@@ -630,7 +634,7 @@ int main(int argc, char **argv)
 	}
 
 	// Use builtin rules if nothing specified
-	if (!source && !target && !class && !perm && !permissive && !fcon && !attr &&!filetrans && !exists)
+	if (!magisk && !source && !target && !class && !perm && !permissive && !fcon && !attr &&!filetrans && !exists)
 		builtin = 1;
 
 	// Overwrite original if not specified
@@ -653,7 +657,10 @@ int main(int argc, char **argv)
 		return 1;
 
 	if (builtin) {
-		builtin_rules(&policydb);
+		phh_rules(&policydb);
+	}
+	else if (magisk) {
+		magisk_rules(&policydb);
 	}
 	else if (permissive) {
 		type_datum_t *type;

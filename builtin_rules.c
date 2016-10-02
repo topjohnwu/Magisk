@@ -284,7 +284,7 @@ void otherToSU() {
 	add_type("surfaceflinger", "mlstrustedsubject", policy);
 }
 
-void builtin_rules(policydb_t *policydb) {
+void phh_rules(policydb_t *policydb) {
 	policy = policydb;
 
 	// Samsung specific
@@ -306,6 +306,7 @@ void builtin_rules(policydb_t *policydb) {
 	// Transition from untrusted_app to su_client
 	allowSuClient("shell");
 	allowSuClient("untrusted_app");
+	allowSuClient("system_app");
 	allowSuClient("platform_app");
 	allowSuClient("su");
 
@@ -327,4 +328,64 @@ void builtin_rules(policydb_t *policydb) {
 	add_type("su_device", "mlstrustedobject", policy);
 	add_type("su_daemon", "mlstrustedsubject", policy);
 	add_type("su", "mlstrustedsubject", policy);
+}
+
+void magisk_rules(policydb_t *policydb) {
+	policy = policydb;
+
+	setPermissive("su", 1);
+	setPermissive("init", 1);
+
+	add_type("su", "mlstrustedsubject", policy);
+
+	// Minimal to run Magisk script before live patching
+	allow("kernel", "su", "fd", "use");
+	allow("init", "su", "process", ALL);
+	allow("init", "system_file", "dir", ALL);
+	allow("init", "system_file", "lnk_file", ALL);
+	allow("init", "system_file", "file", ALL);
+	allow("su", "property_socket", "sock_file", "write");
+	allow("su", "shell_exec", "file", ALL);
+	allow("su", "init", "unix_stream_socket", "connectto");
+	allow("su", "su", "unix_dgram_socket", ALL);
+	allow("su", "su", "unix_stream_socket", ALL);
+	allow("su", "su", "process", ALL);
+	allow("su", "su", "capability", ALL);
+	allow("su", "su", "file", ALL);
+	allow("su", "su", "fifo_file", ALL);
+	allow("su", "su", "lnk_file", ALL);
+	allow("su", "su", "dir", ALL);
+	allow("su", "device", "file", ALL);
+	allow("su", "device", "dir", ALL);
+	allow("su", "storage_file", "file", ALL);
+	allow("su", "storage_file", "dir", ALL);
+	allow("su", "sysfs", "file", ALL);
+	allow("su", "sysfs", "dir", ALL);
+	allow("su", "block_device", "file", ALL);
+	allow("su", "block_device", "dir", ALL);
+	allow("su", "rootfs", "file", ALL);
+	allow("su", "rootfs", "dir", ALL);
+	allow("su", "toolbox_exec", "file", ALL);
+	allow("su", "toolbox_exec", "dir", ALL);
+	allow("su", "cache_file", "file", ALL);
+	allow("su", "cache_file", "dir", ALL);
+	allow("su", "system_file", "file", ALL);
+	allow("su", "system_file", "dir", ALL);
+	allow("su", "system_data_file", "file", ALL);
+	allow("su", "system_data_file", "dir", ALL);
+	allow("su", "kernel", "security", "read_policy");
+	allow("su", "kernel", "security", "load_policy");
+	allow("su", "selinuxfs", "file", ALL);
+
+	// Xposed
+	allow("untrusted_app", "untrusted_app", "capability", "setgid");
+	allow("system_server", "dex2oat_exec", "file", ALL);
+
+	// SuperSU
+	allow("init", "system_file", "file", "execute_no_trans");
+	allow("init", "su", "fd", "use");
+	allow("init", "kernel", "security", "read_policy");
+	allow("init", "kernel", "security", "load_policy");
+
+
 }
