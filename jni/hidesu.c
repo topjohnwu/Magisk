@@ -23,21 +23,20 @@ int disableSu(int pid) {
 	char *path = NULL;
 	asprintf(&path, "/proc/%d/ns/mnt", pid);
 	int fd = open(path, O_RDONLY);
-	if(fd == -1) exit(2);
+	if(fd == -1) return 2;
 //TODO: Fix non arm platforms
 #define SYS_setns 375
 	int res = syscall(SYS_setns, fd, 0);
-	if(res == -1) exit(3);
+	if(res == -1) return 3;
 
 	//XXX: What to mount to /sbin...?
 	res = mount("/system", "/sbin", "bind", MS_BIND, "");
-	if(res == -1) exit(4);
+	if(res == -1) return 4;
 	return 0;
 }
 
 int main(int argc, char **argv, char **envp) {
-	system("logcat -b events -c");
-	FILE *p = popen("logcat -b events -v raw -s am_proc_start", "r");
+	FILE *p = popen("while true;do logcat -b events -v raw -s am_proc_start;sleep 1;done", "r");
 	while(!feof(p)) {
 		//Format of am_proc_start is (as of Android 5.1 and 6.0)
 		//UserID, pid, unix uid, processName, hostingType, hostingName
@@ -63,7 +62,7 @@ int main(int argc, char **argv, char **envp) {
 
 		if(ret != 6) {
 			printf("sscanf returned %d on '%s'\n", ret, buffer);
-			exit(1);
+			continue;
 		}
 #define GMS_PROC "com.google.android.gms.unstable"
 		if(strcmp(processName, GMS_PROC) == 0) {
