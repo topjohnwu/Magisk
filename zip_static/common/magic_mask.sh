@@ -401,15 +401,4 @@ case $1 in
     run_scripts service
     ;;
 
-  root )
-    SUPATH=$(getprop magisk.supath)
-    ROOT=$(getprop magisk.root)
-    if [ "$ROOT" -eq "1" ]; then
-      log_print "Enabling root"
-      ln -s $SUPATH /magisk/.core/bin
-    else
-      log_print "Disabling root"
-      rm -f /magisk/.core/bin
-    fi
-    ;;
 esac

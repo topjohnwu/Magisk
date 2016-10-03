@@ -426,7 +426,7 @@ fi
 
 ui_print "- Installing root helper module"
 cp -af $INSTALLER/roothelper /magisk/00roothelper
-chmod 755 /magisk/00roothelper/post-fs-data.sh
+chmod 755 /magisk/00roothelper /magisk/00roothelper/*
 
 # Patch ramdisk
 ui_print "- Patching ramdisk"
