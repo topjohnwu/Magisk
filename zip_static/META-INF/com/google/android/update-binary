@@ -344,6 +344,8 @@ if (! $NORESTORE); then
     if [ -f "sbin/launch_daemonsu.sh" ]; then
       SUPERSU=true
       # Save it for helper module
+      mkdir -p /magisk/zzsupersu
+      touch /magisk/zzsupersu/stub
       cp -af sbin/launch_daemonsu.sh $INSTALLER/roothelper/launch_daemonsu.sh
     fi
     # Non-standard boot image restores

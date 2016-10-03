@@ -4,12 +4,12 @@ cd /magisk/00roothelper
 
 if [ -f "launch_daemonsu.sh" ]; then
   # SuperSU mode
-  rm -rf /magisk/supersu /magisk/99supersu
-  mkdir -p /magisk/99supersu
-  cp supersu.sh /magisk/99supersu/post-fs-data.sh
-  cp supersu.prop /magisk/99supersu/module.prop
-  cp launch_daemonsu.sh /magisk/99supersu/launch_daemonsu.sh
-  chmod 755 /magisk/99supersu /magisk/99supersu/*
+  rm -rf /magisk/supersu /magisk/zzsupersu
+  mkdir -p /magisk/zzsupersu
+  cp supersu.sh /magisk/zzsupersu/post-fs-data.sh
+  cp supersu.prop /magisk/zzsupersu/module.prop
+  cp launch_daemonsu.sh /magisk/zzsupersu/launch_daemonsu.sh
+  chmod 755 /magisk/zzsupersu /magisk/zzsupersu/*
 else
   # phh mode
   if [ -f "/magisk/phh/su" ]; then

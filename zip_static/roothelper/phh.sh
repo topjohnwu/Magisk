@@ -16,6 +16,9 @@ launch_daemonsu() {
   exec /magisk/phh/bin/su --daemon
 }
 
+# Disable the other root
+[ -d "/magisk/zzsupersu" ] && touch /magisk/zzsupersu/disable
+
 log_print "Live patching sepolicy"
 /magisk/phh/bin/sepolicy-inject --live
 
