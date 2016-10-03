@@ -73,17 +73,6 @@ public class Utils {
         return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
     }
 
-    public static void toggleRoot(Boolean b, Context context) {
-        if (MagiskFragment.magiskVersion != -1) {
-            if (b) {
-                Shell.su("ln -s $(getprop magisk.supath) /magisk/.core/bin", "setprop magisk.root 1");
-            } else {
-                Shell.su("rm -rf /magisk/.core/bin", "setprop magisk.root 0");
-            }
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("root", b).apply();
-        }
-    }
-
     static List<String> getModList(String path) {
         List<String> ret;
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";

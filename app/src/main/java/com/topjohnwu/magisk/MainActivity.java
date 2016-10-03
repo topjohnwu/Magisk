@@ -129,11 +129,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 tag = "magisk";
                 navFragment = new MagiskFragment();
                 break;
-            case R.id.root:
-                setTitle(R.string.root);
-                tag = "root";
-                navFragment = new RootFragment();
-                break;
             case R.id.modules:
                 setTitle(R.string.modules);
                 tag = "modules";

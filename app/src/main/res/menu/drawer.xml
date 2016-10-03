@@ -24,10 +24,6 @@
             android:id="@+id/log"
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>
-        <item
-            android:id="@+id/root"
-            android:icon="@drawable/root"
-            android:title="@string/root"/>
     </group>
 
     <group

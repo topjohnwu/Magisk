@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Shell {
 
-    // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted; 2 = improperly rooted;
+    // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted
     public static int rootStatus;
 
     private static Process rootShell;
@@ -27,18 +27,12 @@ public class Shell {
     private static void init() {
 
         try {
-            rootShell = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
+            rootShell = Runtime.getRuntime().exec("su");
             rootStatus = 1;
-        } catch (IOException e) {
-            try {
-                // Improper root
-                rootShell = Runtime.getRuntime().exec("su");
-                rootStatus = 2;
-            } catch (IOException err) {
-                // No root
-                rootStatus = 0;
-                return;
-            }
+        } catch (IOException err) {
+            // No root
+            rootStatus = 0;
+            return;
         }
 
         rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
