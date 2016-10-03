@@ -92,10 +92,12 @@ public class ModuleHelper {
                     Repo repo = cached.get(id);
                     if (repo == null) {
                         Logger.dev("ModuleHelper: Create new repo " + id);
-                        repoMap.put(id, new Repo(context, name, updatedDate));
+                        repo = new Repo(context, name, updatedDate);
                     } else {
                         Logger.dev("ModuleHelper: Cached repo " + id);
                         repo.update(updatedDate);
+                    }
+                    if (repo.getId() != null) {
                         repoMap.put(id, repo);
                     }
                 }
