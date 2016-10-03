@@ -1,0 +1,265 @@
+#!/sbin/sh
+##########################################################################################
+#
+# Magisk Uninstaller
+# by topjohnwu
+# 
+# This zip will remove all Magisk related files and revert boot image
+#
+##########################################################################################
+
+INSTALLER=/tmp/uninstall
+
+##########################################################################################
+# Flashable update-binary preparation
+##########################################################################################
+
+OUTFD=$2
+ZIP=$3
+
+readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
+if [ "$?" -eq "0" ]; then
+  OUTFD=0
+
+  for FD in `ls /proc/$$/fd`; do
+    readlink /proc/$$/fd/$FD 2>/dev/null | grep pipe >/dev/null
+    if [ "$?" -eq "0" ]; then
+      ps | grep " 3 $FD " | grep -v grep >/dev/null
+      if [ "$?" -eq "0" ]; then
+        OUTFD=$FD
+        break
+      fi
+    fi
+  done
+fi
+
+mkdir -p $INSTALLER
+cd $INSTALLER
+unzip -o "$ZIP"
+
+##########################################################################################
+# Functions
+##########################################################################################
+
+ui_print() {
+  echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
+  echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
+}
+
+getvar() {
+  local VARNAME=$1
+  local VALUE=$(eval echo \$"$VARNAME");
+  for FILE in /data/.magisk /cache/.magisk /system/.magisk; do
+    if [ -z "$VALUE" ]; then
+      LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
+      if [ ! -z "$LINE" ]; then
+        VALUE=${LINE#*=}
+      fi
+    fi
+  done
+  eval $VARNAME=\$VALUE
+}
+
+find_boot_image() {
+  if [ -z "$BOOTIMAGE" ]; then
+    for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
+      BOOTIMAGE=$(readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION)
+      if [ ! -z "$BOOTIMAGE" ]; then break; fi
+    done
+  fi
+  if [ -z "$BOOTIMAGE" ]; then
+    FSTAB="/etc/recovery.fstab"
+    [ ! -f "$FSTAB" ] && FSTAB="/etc/recovery.fstab.bak"
+    BOOTIMAGE=$(grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*')
+  fi
+}
+
+is_mounted() {
+  if [ ! -z "$2" ]; then
+    cat /proc/mounts | grep $1 | grep $2, >/dev/null
+  else
+    cat /proc/mounts | grep $1 >/dev/null
+  fi
+  return $?
+}
+
+grep_prop() {
+  REGEX="s/^$1=//p"
+  shift
+  FILES=$@
+  if [ -z "$FILES" ]; then
+    FILES='/system/build.prop'
+  fi
+  cat $FILES 2>/dev/null | sed -n $REGEX | head -n 1
+}
+
+unpack_boot() {
+  rm -rf $UNPACKDIR $RAMDISK 2>/dev/null
+  mkdir -p $UNPACKDIR
+  mkdir -p $RAMDISK
+  cd $UNPACKDIR
+  $BINDIR/bootimgtools --extract $1
+
+  find $TMPDIR/boottmp -type d -exec chmod 755 {} \;
+  find $TMPDIR/boottmp -type f -exec chmod 644 {} \;
+  chmod 755 $(find $TMPDIR/boottmp -type d)
+  chmod 644 $(find $TMPDIR/boottmp -type f)
+
+  cd $RAMDISK
+  gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
+}
+
+repack_boot() {
+  cd $RAMDISK
+  find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
+  cd $UNPACKDIR
+  $BINDIR/bootimgtools --repack $ORIGBOOT
+  if [ -f chromeos ]; then
+    echo " " > config
+    echo " " > bootloader
+    $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
+    rm -f new-boot.img
+    mv new-boot.img.signed new-boot.img
+  fi
+  if ($SAMSUNG); then
+    SAMSUNG_CHECK=$(cat new-boot.img | grep SEANDROIDENFORCE)
+    if [ $? -ne 0 ]; then
+      echo -n "SEANDROIDENFORCE" >> new-boot.img
+    fi
+  fi
+  mv new-boot.img $NEWBOOT
+}
+
+revert_boot() {
+  rm -rf $TMPDIR/boottmp 2>/dev/null
+  mkdir -p $TMPDIR/boottmp
+
+  CHROMEDIR=$INSTALLER/chromeos
+  ORIGBOOT=$TMPDIR/boottmp/boot.img
+  NEWBOOT=$TMPDIR/boottmp/new-boot.img
+  UNPACKDIR=$TMPDIR/boottmp/bootunpack
+  RAMDISK=$TMPDIR/boottmp/ramdisk
+
+  chmod 777 $CHROMEDIR/futility $BINDIR/*
+
+  ui_print "- Dumping boot image"
+  dd if=$BOOTIMAGE of=$ORIGBOOT
+
+  ui_print "- Unpacking boot image"
+  unpack_boot $ORIGBOOT
+
+  if [ -d ".backup" ]; then
+    ui_print "- Restoring ramdisk with backup"
+    cp -af .backup/* .
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
+    rm -rf .backup
+  else
+    ui_print "! No ramdisk backup found"
+    ui_print "! Unable to revert completely"
+    ui_print "! Will still remove Magisk additions"
+    # Removing boot image modifications
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
+  fi
+
+  ui_print "- Repacking boot image"
+  repack_boot
+}
+
+##########################################################################################
+# Main
+##########################################################################################
+
+ui_print "*****************************"
+ui_print "      Magisk Uninstaller     "
+ui_print "*****************************"
+
+if [ ! -d "$INSTALLER/arm" ]; then
+  ui_print "! Failed: Unable to extract zip file!"
+  exit 1
+fi
+
+ui_print "- Mounting /system(ro), /cache, /data"
+mount -o ro /system 2>/dev/null
+mount /cache 2>/dev/null
+mount /data 2>/dev/null
+
+if [ ! -f '/system/build.prop' ]; then
+  ui_print "! Failed: /system could not be mounted!"
+  exit 1
+fi
+
+API=$(grep_prop ro.build.version.sdk)
+ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
+ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
+ABILONG=$(grep_prop ro.product.cpu.abi)
+
+ARCH=arm
+IS64BIT=
+if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
+if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
+if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=1; fi;
+if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=1; fi;
+
+ui_print "- Device platform: $ARCH"
+
+BINDIR=$INSTALLER/arm
+if [ "$ARCH" = "x86" -o "$ARCH" = "x64" ]; then
+  BINDIR=$INSTALLER/x86
+fi
+
+find_boot_image
+if [ -z "$BOOTIMAGE" ]; then
+  ui_print "! Unable to detect boot image"
+  exit 1
+fi
+
+SAMSUNG=false
+SAMSUNG_CHECK=$(cat /system/build.prop | grep "ro.build.fingerprint=" | grep -i "samsung")
+if [ $? -eq 0 ]; then
+  SAMSUNG=true
+fi
+
+##########################################################################################
+# Detection all done, start installing
+##########################################################################################
+
+umount /magisk 2>/dev/null
+
+if (is_mounted /data); then
+  cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+  gzip -d /data/stock_boot.img.gz 2>/dev/null
+  rm -rf /data/stock_boot.img.gz 2>/dev/null
+  if [ -f "/data/stock_boot.img" ]; then
+    ui_print "- Boot image backup found!"
+    NEWBOOT=/data/stock_boot.img
+  else
+    ui_print "! Boot image backup unavalible, try using ramdisk backup"
+    revert_boot
+  fi
+  ui_print "- Removing Magisk files"
+  rm -rf /cache/magisk /cache/magisk_merge /cache/magisk.log /cache/last_magisk.log /cache/unblock /data/Magisk.apk /data/magisk.img /data/magisk_merge.img /data/busybox /data/magisk 2>/dev/null
+else
+  ui_print "! Data unavalible"
+  ui_print "! Impossible to restore original boot image"
+  ui_print "! Try using ramdisk backup"
+  revert_boot
+  ui_print "- Removing Magisk files"
+  rm -rf /cache/magisk* /cache/last_magisk.log /cache/unblock 2>/dev/null
+  ui_print "*****************************************"
+  ui_print "     Magisk is not fully removed yet     "
+  ui_print " Please manually remove /data/magisk.img "
+  ui_print "*****************************************"
+fi
+
+if [ -L "$BOOTIMAGE" ]; then
+  ui_print "- Block symlink detected!"
+else
+  dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
+fi
+ui_print "- Flashing reverted image"
+dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
+
+umount /system
+
+ui_print "- Done"
+exit 0

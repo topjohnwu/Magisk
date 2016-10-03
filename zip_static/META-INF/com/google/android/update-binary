@@ -209,11 +209,11 @@ ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
 ABILONG=$(grep_prop ro.product.cpu.abi)
 
 ARCH=arm
-IS64BIT=
+IS64BIT=false
 if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
 if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=1; fi;
-if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=1; fi;
+if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
+if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
 
 
 if [ "$API" -lt "21" ]; then
@@ -339,7 +339,7 @@ if (! $NORESTORE); then
   if [ -d ".backup" ]; then
     ui_print "- Restoring ramdisk with backup"
     cp -af .backup/* .
-    rm -rf magisk init.magisk.rc sbin/magic_mask.sh sbin/magisk_wrapper.sh 2>/dev/null
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
   else
     if [ -f "sbin/launch_daemonsu.sh" ]; then
       SUPERSU=true

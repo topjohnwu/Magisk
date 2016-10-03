@@ -396,7 +396,6 @@ case $1 in
   service )
     # Version info
     setprop magisk.version 7
-    rm -rf /dev/unblock*
     log_print "Magisk late_start service mode running..."
     run_scripts service
     ;;
