@@ -1,0 +1,110 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Apri drawer di navigazione</string>
+    <string name="navigation_drawer_close">Chiudi drawer di navigazione</string>
+    <string name="modules">Moduli</string>
+    <string name="downloads">Downloads</string>
+    <string name="log">Log</string>
+    <string name="settings">Impostazioni</string>
+
+    <!--Magisk Fragment-->
+    <string name="magisk_version">Versione Magisk: v%1$s</string>
+    <string name="magisk_version_error">Hai installato Magisk?</string>
+
+    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$s update!</string>
+    <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
+    <string name="up_to_date">L\'ultima versione di %1$s è installata</string>
+
+    <!--Root Fragment-->
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nessuna informazione)</string>
+    <string name="no_modules_found">Nessun modulo trovato</string>
+    <string name="update_file_created">Il modulo sarà aggiornato al prossimo riavvio</string>
+    <string name="remove_file_created">Il modulo sarà rimosso al prossimo riavvio</string>
+    <string name="remove_file_deleted">Il modulo non sarà rimosso al prossimo riavvio</string>
+    <string name="disable_file_created">Il modulo sarà disattivato al prossimo riavvio</string>
+    <string name="disable_file_removed">Il modulo sarà abilitato al prossimo riavvio</string>
+    <string name="author">Creato da:  %1$s</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Aggiornamento disponibile</string>
+    <string name="installed">Installato</string>
+    <string name="not_installed">Non installato</string>
+    <string name="changelog">Changelog</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Salva nella SD</string>
+    <string name="menuSend">Invia</string>
+    <string name="menuReload">Ricarica</string>
+    <string name="menuClearLog">Cancella log</string>
+    <string name="logs_cleared">Log creato con successo</string>
+    <string name="logs_clear_failed">Impossibile cancellare il registro:</string>
+    <string name="log_is_empty">Il log è vuoto</string>
+    <string name="logs_save_failed">Impossibile scrivere il log sulla SD</string>
+
+    <!--About Activity-->
+    <string name="about">Informazioni</string>
+    <string name="app_developers">Sviluppatori</string>
+    <string name="app_developers_"><![CDATA[App creata da <a href="https://github.com/topjohnwu">topjohnwu</a> in collaborazione con <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Changelog</string>
+    <string name="translators" />
+    <string name="app_version">Versione App</string>
+    <string name="app_source_code">Codice sorgente</string>
+    <string name="donation">Donazione</string>
+    <string name="app_translators">Traduttori App</string>
+    <string name="support_thread">Thread di supporto</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Questa funzione non funziona senza il permesso di scrivere sulla memoria di archiviazione esterna</string>
+    <string name="no_root_access">Accesso Root non trovato, funzionalità limitate</string>
+    <string name="no_thanks">No grazie</string>
+    <string name="update_title">%1$s Update!</string>
+    <string name="update_msg">Nuova versione di v%2$s di %1$s è disponibile! \nChangelog:\n%3$s</string>
+    <string name="repo_install_title">Installazione %1$s</string>
+    <string name="repo_install_msg">Vuoi installare %1$s ?</string>
+    <string name="download_install">Scarica e installa</string>
+    <string name="download_file_error">Errore nel download del file</string>
+    <string name="install_error">Errore di installazione!</string>
+    <string name="manual_install">Errore nel flash del file, il file zip è in %1$s\nFlash esegui il flash manuale</string>
+    <string name="invalid_zip">Lo zip non è un Modulo Magisk!!</string>
+    <string name="reboot_title">Installazione completata</string>
+    <string name="reboot_msg">Vuoi riavviare ora?</string>
+    <string name="reboot">Riavvia</string>
+    <string name="zip_install_progress_title">Installazione</string>
+    <string name="zip_install_progress_msg">"Installazione %1$s …"</string>
+    <string name="no_magisk_title">Magisk non installato!</string>
+    <string name="no_magisk_msg">Vuoi scaricare ed installare Magisk?</string>
+
+    <!--URL Templates-->
+    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
+    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Fragment -->
+    <string name="settings_general_category">Generali</string>
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_summary">Scegli un tema</string>
+    <string name="settings_busybox_title">Abilita BusyBox</string>
+    <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
+
+    <string name="settings_development_category">Development</string>
+    <string name="settings_developer_logging_title">Abilita Debug log avanzato</string>
+    <string name="settings_developer_logging_summary">Abilita questa funzione per avere un log più dettagliato.</string>
+    <string name="settings_shell_logging_title">Abilita shell di registrazione dei comandi di debug</string>
+    <string name="settings_shell_logging_summary">Abilita questa funzione per abilitare la registrazione tutti i comandi e l'output della shell</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+
+    <!-- Example settings for Data & Sync -->
+
+    <!-- Example settings for Notifications -->
+
+</resources>
