@@ -97,7 +97,7 @@
     <string name="settings_developer_logging_title">Abilita Debug log avanzato</string>
     <string name="settings_developer_logging_summary">Abilita questa funzione per avere un log più dettagliato.</string>
     <string name="settings_shell_logging_title">Abilita shell di registrazione dei comandi di debug</string>
-    <string name="settings_shell_logging_summary">Abilita questa funzione per abilitare la registrazione tutti i comandi e l'output della shell</string>
+    <string name="settings_shell_logging_summary">Abilita questa funzione per abilitare la registrazione tutti i comandi e l\'output della shell</string>
 
     <!-- Strings related to Settings -->
 
