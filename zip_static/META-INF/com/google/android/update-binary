@@ -448,7 +448,9 @@ find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
     sed -i "s/forcefdeorfbe/encryptable/g" $FSTAB
   fi
 done
-rm verity_key 2>/dev/null
+if (! $KEEPVERITY); then
+  rm verity_key 2>/dev/null
+fi
 
 # sepolicy patches
 $BINDIR/sepolicy-inject --magisk -P sepolicy
