@@ -17,6 +17,7 @@ typedef unsigned short int sa_family_t;
 #include <sys/resource.h>
 #include <unistd.h>
 #include <sys/mount.h> 
+#include <sys/inotify.h>
 
 #define HIDE_LIST "/magisk/.core/hidelist"
 
@@ -32,53 +33,75 @@ int hideMagisk(int pid) {
 	int res = syscall(SYS_setns, fd, 0);
 	if(res == -1) return 3;
 
-	res = umount2("/magisk", MNT_DETACH);
-	if(res == -1) return 4;
 	res = mount("/magisk/.core/mirror/system", "/system", "bind", MS_BIND, "");
+	if(res == -1) return 4;
+	res = umount2("/magisk", MNT_DETACH);
 	if(res == -1) return 4;
 	return 0;
 }
 
-int main(int argc, char **argv, char **envp) {
-	// Read config file
-	int allocated = 16, line = 0, i;
-	char buffer[512];
-	
-	char **list = (char **) malloc(sizeof(char*) * allocated);
-	FILE *fp = fopen(HIDE_LIST, "r");
-	if (fp == NULL){
-		fprintf(stderr, "Error opening hide list\n");
-		exit(1);
+int loadList(int fd, char ***list, int *line, time_t *last_update) {
+	int allocated = 16, i;
+	char *buffer, *tok;
+	struct stat file_stat;
+
+	fstat(fd, &file_stat);
+	if (file_stat.st_mtime == *last_update) {
+		return 0;
 	}
-	while (1) {
-		if (fgets(buffer, sizeof(buffer), fp) == NULL) {
-			--line;
-			break;
-		}
-		if (line >= allocated) {
-			// Double our allocation and re-allocate
-			allocated = allocated * 2;
-			list = (char **) realloc(list, sizeof(char*) * allocated);
-		}
-		list[line] = malloc(strlen(buffer));
-		strcpy(list[line], buffer);
-		int j;
-		// Remove endline
-		for (j = strlen(list[line]) - 1; j >= 0 && (list[line][j] == '\n' || list[line][j] == '\r'); j--)
-			;
-		list[line][j + 1] = '\0';
-		++line;
-	}
-	fclose(fp);
+	off_t filesize = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	buffer = malloc(sizeof(char) * filesize);
+	read(fd, buffer, filesize);
+	fstat(fd, &file_stat);
+	*last_update = file_stat.st_mtime;
+
+	// Free memory
+	for (; *line >= 0; --(*line))
+		free((*list)[*line]);
+	*line = 0;
+
+	*list = (char **) malloc(sizeof(char*) * allocated);
+
+	tok = strtok(buffer, "\r\n");
+    while (tok != NULL) {
+    	if (*line >= allocated) {
+    		// Double our allocation and re-allocate
+    		allocated = allocated * 2;
+    		*list = (char **) realloc((*list), sizeof(char*) * allocated);
+    	}
+    	if (strlen(tok)) {
+    		(*list)[*line] = malloc(strlen(tok));
+    		strcpy((*list)[*line], tok);
+    		++(*line);
+    	}
+        tok = strtok(NULL, "\r\n");
+    }
 
 	printf("Get package name from config:\n");
-	for(i = 0; i <= line; i++)
-		printf("%s\n", list[i]);
+	for(i = 0; i < *line; i++)
+		printf("%s\n", (*list)[i]);
 	printf("\n");
+	free(buffer);
+}
 
+int main(int argc, char **argv, char **envp) {
+	int line = -1, i;
+	char **list;
+	time_t last_update = 0;
 
+	int fd = open(HIDE_LIST, O_RDONLY);
+	if (fd == -1){
+		printf("Error opening file\n");
+		exit(1);
+	}
+
+	char buffer[512];
 	FILE *p = popen("while true;do logcat -b events -v raw -s am_proc_start;sleep 1;done", "r");
 	while(!feof(p)) {
+
+		loadList(fd, &list, &line, &last_update);
+
 		//Format of am_proc_start is (as of Android 5.1 and 6.0)
 		//UserID, pid, unix uid, processName, hostingType, hostingName
 		fgets(buffer, sizeof(buffer), p);
@@ -103,8 +126,7 @@ int main(int argc, char **argv, char **envp) {
 		if(ret != 6) {
 			continue;
 		}
-
-		for (i = 0; i <= line; ++i) {
+		for (i = 0; i < line; ++i) {
 			if(strstr(processName, list[i]) != NULL) {
 				printf("Disabling for process = %s, PID = %d, UID = %d\n", processName, pid, uid);
 				hideMagisk(pid);
@@ -112,6 +134,7 @@ int main(int argc, char **argv, char **envp) {
 		}
 	}
 
+	close(fd);
 	pclose(p);
 	for (; line >= 0; line--)
 		free(list[line]);

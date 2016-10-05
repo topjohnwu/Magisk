@@ -398,6 +398,10 @@ case $1 in
     setprop magisk.version 7
     log_print "Magisk late_start service mode running..."
     run_scripts service
+
+    # Enable magiskhide
+    log_print "Starting Magisk Hide"
+    /data/magisk/magiskhide &
     ;;
 
 esac
