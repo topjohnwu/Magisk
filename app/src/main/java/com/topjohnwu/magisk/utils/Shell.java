@@ -40,6 +40,7 @@ public class Shell {
         rootSTDOUT.start();
 
         List<String> ret = su("echo -BOC-", "id");
+
         if (ret == null) {
             // Something wrong with root, not allowed?
             rootStatus = -1;
@@ -115,21 +116,18 @@ public class Shell {
         DataOutputStream STDIN;
         StreamGobbler STDOUT;
 
+        if (!rootAccess()) {
+            return null;
+        }
+
         if (newShell) {
             res = Collections.synchronizedList(new ArrayList<String>());
             try {
-                process = Runtime.getRuntime().exec(sh("getprop magisk.supath").get(0) + "/su");
+                process = Runtime.getRuntime().exec("su");
                 STDIN = new DataOutputStream(process.getOutputStream());
                 STDOUT = new StreamGobbler(process.getInputStream(), res);
-            } catch (IOException e) {
-                try {
-                    // Improper root
-                    process = Runtime.getRuntime().exec("su");
-                    STDIN = new DataOutputStream(process.getOutputStream());
-                    STDOUT = new StreamGobbler(process.getInputStream(), res);
-                } catch (IOException err) {
-                    return null;
-                }
+            } catch (IOException err) {
+                return null;
             }
             STDOUT.start();
         } else {
