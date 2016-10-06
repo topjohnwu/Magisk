@@ -333,6 +333,19 @@ case $1 in
       cp -afc linker* t*box app_process* $DUMMDIR/system/bin/
     fi
 
+    LIBDIRS=( lib lib64 )
+    LIBS=( libc++.so libc.so libcrypto.so libcutils.so liblog.so libm.so libpackagelistparser.so libpcre.so libselinux.so libstdc++.so )
+    for LIBDIR in ${LIBDIRS[@]}; do
+      if [ -f "$TMPDIR/dummy/system/$LIBDIR" ]; then
+        cd /system/$LIBDIR
+        for LIB in ${LIBS[@]}; do
+          if [ ! -f "$TMPDIR/dummy/system/$LIBDIR/$LIB" ]; then
+            cp -afc $LIB $DUMMDIR/system/$LIBDIR/
+          fi
+        done
+      fi
+    done
+
     # Unmount, shrink, remount
     if [ `umount $MOUNTPOINT >/dev/null 2>&1; echo $?` -eq 0 ]; then
       losetup -d $LOOPDEVICE
