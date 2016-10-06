@@ -108,26 +108,19 @@ travel() {
             mktouch $DUMMDIR/$2/$ITEM
           fi
 
-          # Clone the original /system structure (depth 1)
-          if [ -e "/$2" ]; then
-            for DUMMY in /$2/* ; do
-              if [ -d "$DUMMY" ]; then
-                # Create dummy directory
-                mkdir -p $DUMMDIR$DUMMY
-              elif [ -L "$DUMMY" ]; then
-                # Symlinks are small, copy them
-                cp -afc $DUMMY $DUMMDIR$DUMMY
-              else
-                # Create dummy file
-                mktouch $DUMMDIR$DUMMY
-              fi
+          # Clone the original /system/$ITEM directory structure
+          ITEMDIR=$(dirname /$2/$ITEM)
+          if [ ! -f $DUMMDIR$ITEMDIR/.magisk ]; then
+            find "$ITEMDIR" -type f -o -type l |while read FILE; do
+              mktouch $DUMMDIR$FILE
             done
+            mktouch $DUMMDIR$ITEMDIR/.magisk
           fi
         fi
       fi
 
       if [ -d "$ITEM" ]; then
-        # It's an directory, travel deeper
+        # It's a directory, travel deeper
         (travel $1 $2/$ITEM)
       elif [ ! -L "$ITEM" ]; then
         # Mount this file
