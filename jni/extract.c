@@ -27,9 +27,9 @@ void dump_ramdisk(uint8_t *ptr, size_t size) {
 		dump(ptr, size, "ramdisk.gz");
 	//MTK header
 	} else if(memcmp(ptr, "\x88\x16\x88\x58", 4) == 0) {
-		if(memcmp(ptr+4, "RECOVERY", 8)==0) {
+		if(memcmp(ptr+8, "RECOVERY", 8)==0) {
 			dump(ptr, 0, "ramdisk-mtk-recovery");
-		} else if(memcmp(ptr+4, "ROOTFS\0\0", 8)==0) {
+		} else if(memcmp(ptr+8, "ROOTFS\0\0", 8)==0) {
 			dump(ptr, 0, "ramdisk-mtk-boot");
 		} else {
 			exit(1);
