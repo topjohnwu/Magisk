@@ -2,8 +2,11 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
+MOUNTLIST=/dev/mountlist
 
-COREDIR=/magisk/.core
+MOUNTPOINT=/magisk
+
+COREDIR=$MOUNTPOINT/.core
 
 DUMMDIR=$COREDIR/dummy
 MIRRDIR=$COREDIR/mirror
@@ -38,7 +41,7 @@ unblock() {
 }
 
 run_scripts() {
-  BASE=/magisk
+  BASE=$MOUNTPOINT
   if [ "$1" = "post-fs" ]; then
     BASE=/cache/magisk
   fi
@@ -137,8 +140,12 @@ travel() {
 bind_mount() {
   if [ -e "$1" -a -e "$2" ]; then
     mount -o bind $1 $2
-    if [ "$?" -eq "0" ]; then log_print "Mount: $1";
-    else log_print "Mount Fail: $1"; fi 
+    if [ "$?" -eq "0" ]; then 
+      log_print "Mount: $1"
+      echo $2 >> $MOUNTLIST
+    else 
+      log_print "Mount Fail: $1"
+    fi 
   fi
 }
 
@@ -260,6 +267,8 @@ case $1 in
     # Live patch sepolicy
     /data/magisk/sepolicy-inject --live -s su
 
+    [ ! -d "$MOUNTPOINT" ] && mkdir -p $MOUNTPOINT
+
     # Cache support
     if [ -d "/cache/data_bin" ]; then
       rm -rf /data/busybox /data/magisk
@@ -280,14 +289,14 @@ case $1 in
     merge_image /data/magisk_merge.img
 
     # Mount magisk.img
-    if [ `cat /proc/mounts | grep /magisk >/dev/null 2>&1; echo $?` -ne 0 ]; then
+    if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
       loopsetup $IMG
       if [ ! -z "$LOOPDEVICE" ]; then
-        mount -t ext4 -o rw,noatime $LOOPDEVICE /magisk
+        mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
       fi
     fi
 
-    if [ `cat /proc/mounts | grep /magisk >/dev/null 2>&1; echo $?` -ne 0 ]; then
+    if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
       log_print "magisk.img mount failed, nothing to do :("
       unblock
     fi
@@ -295,14 +304,14 @@ case $1 in
     log_print "Preparing modules"
     # First do cleanups
     rm -rf $DUMMDIR
-    rmdir $(find /magisk -type d -depth ! -path "*core*" ) 2>/dev/null
+    rmdir $(find $MOUNTPOINT -type d -depth ! -path "*core*" ) 2>/dev/null
     rm -rf $COREDIR/bin
 
     mkdir -p $DUMMDIR
     mkdir -p $MIRRDIR/system
 
     # Travel through all mods
-    for MOD in /magisk/* ; do
+    for MOD in $MOUNTPOINT/* ; do
       if [ -f "$MOD/remove" ]; then
         log_print "Remove module: $MOD"
         rm -rf $MOD
@@ -325,7 +334,7 @@ case $1 in
     fi
 
     # Unmount, shrink, remount
-    if [ `umount /magisk >/dev/null 2>&1; echo $?` -eq 0 ]; then
+    if [ `umount $MOUNTPOINT >/dev/null 2>&1; echo $?` -eq 0 ]; then
       losetup -d $LOOPDEVICE
       target_size_check $IMG
       NEWDATASIZE=$(((curUsedM / 32 + 2) * 32))
@@ -335,17 +344,17 @@ case $1 in
       fi
       loopsetup $IMG
       if [ ! -z "$LOOPDEVICE" ]; then
-        mount -t ext4 -o rw,noatime $LOOPDEVICE /magisk
+        mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
       fi
     fi
 
-    if [ `cat /proc/mounts | grep /magisk >/dev/null 2>&1; echo $?` -ne 0 ]; then
+    if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
       log_print "magisk.img mount failed, nothing to do :("
       unblock
     fi
 
     # Remove crap folder
-    rm -rf /magisk/lost+found
+    rm -rf $MOUNTPOINT/lost+found
     
     # Start doing tasks
     
@@ -400,8 +409,16 @@ case $1 in
     run_scripts service
 
     # Enable magiskhide
+    [ ! -f "$COREDIR/magiskhide/hidelist" ] && mktouch $COREDIR/magiskhide/hidelist
+    # Add preset for Safety Net
+    if [ $(grep -c "com.google.android.gms.unstable" $COREDIR/magiskhide/hidelist) -eq "0" ]; then
+      mv $COREDIR/magiskhide/hidelist $COREDIR/magiskhide/hidelist.tmp
+      echo "com.google.android.gms.unstable" > $COREDIR/magiskhide/hidelist
+      cat $COREDIR/magiskhide/hidelist.tmp >> $COREDIR/magiskhide/hidelist
+    fi
     log_print "Starting Magisk Hide"
-    /data/magisk/magiskhide &
+    (/data/magisk/magiskhide &)
+
     ;;
 
 esac
