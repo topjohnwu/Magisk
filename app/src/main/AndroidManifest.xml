@@ -4,7 +4,7 @@
 
           xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-sdk tools:overrideLibrary="com.kcoppock.broadcatsttilesupport" />
+    <uses-sdk tools:overrideLibrary="com.kcoppock.broadcasttilesupport" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
