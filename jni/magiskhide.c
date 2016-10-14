@@ -16,14 +16,35 @@ typedef unsigned short int sa_family_t;
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <sys/syscall.h>
+#include <asm/unistd.h>
 #include <sys/mount.h> 
 
-#define HIDE_LIST "/magisk/.core/magiskhide/hidelist"
-#define MOUNT_LIST "/dev/mountlist"
+char **file_to_str_arr(FILE *fp, int *size) {
+	int allocated = 16;
+	char *line = NULL, **array;
+	size_t len = 0;
+	ssize_t read;
 
-int hide_size = 0, mount_size = 0;
-char **hide_list, **mount_list;
-time_t last_update = 0;
+	array = (char **) malloc(sizeof(char*) * allocated);
+
+	*size = 0;
+	while ((read = getline(&line, &len, fp)) != -1) {
+		if (*size >= allocated) {
+			// Double our allocation and re-allocate
+			allocated *= 2;
+			array = (char **) realloc(array, sizeof(char*) * allocated);
+		}
+		// Remove end newline
+		if (line[read - 1] == '\n') {
+			line[read - 1] = '\0';
+		}
+		array[*size] = line;
+		line = NULL;
+		++(*size);
+	}
+	return array;
+}
 
 //WARNING: Calling this will change our current namespace
 //We don't care because we don't want to run from here anyway
@@ -32,103 +53,72 @@ int hideMagisk(int pid) {
 	asprintf(&path, "/proc/%d/ns/mnt", pid);
 	int fd = open(path, O_RDONLY);
 	if(fd == -1) return 2;
-//TODO: Fix non arm platforms
-#define SYS_setns 375
 	int res = syscall(SYS_setns, fd, 0);
 	if(res == -1) return 3;
 
-	int i;
-	for(i = mount_size - 1; i >= 0; --i) {
-		res = umount2(mount_list[i], MNT_DETACH);
-		if (res != -1) printf("Unmounted: %s\n", mount_list[i]);
-		else printf("Failed: %s\n", mount_list[i]);
+	path = NULL;
+	asprintf(&path, "/proc/%d/mounts", pid);
+	FILE *mount_fp = fopen(path, "r");
+	if (mount_fp == NULL) {
+		fprintf(stderr, "Error opening mount list!\n");
+		return 1;
 	}
-	res = umount2("/magisk", MNT_DETACH);
-	if (res != -1) printf("Unmounted: %s\n", "/magisk");
-	else printf("Failed: %s\n", "/magisk");
 
-	return 0;
-}
+	int mount_size;
+	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], *sbstr;
+	fclose(mount_fp);
 
-char** file_to_str_arr(const int fd, int *size) {
-	int allocated = 16;
-	char *buffer, *tok, **array;
-	
-	off_t filesize = lseek(fd, 0, SEEK_END);
-	buffer = malloc(sizeof(char) * filesize);
-	lseek(fd, 0, SEEK_SET);
-	read(fd, buffer, filesize);
-
-	array = (char **) malloc(sizeof(char*) * allocated);
-
-	*size = 0;
-	tok = strtok(buffer, "\r\n");
-    while (tok != NULL) {
-    	if (*size >= allocated) {
-    		// Double our allocation and re-allocate
-    		allocated = allocated * 2;
-    		array = (char **) realloc(array, sizeof(char*) * allocated);
-    	}
-    	if (strlen(tok)) {
-    		array[*size] = malloc(strlen(tok));
-    		strcpy(array[*size], tok);
-    		++(*size);
-    	}
-        tok = strtok(NULL, "\r\n");
-    }
-	free(buffer);
-	return array;
-}
-
-int load_hide_list(const int fd) {
-	int i;
-	struct stat file_stat;
-
-	fstat(fd, &file_stat);
-	if (file_stat.st_mtime == last_update) {
-		return 0;
+	int i, unmount = 0;
+	for(i = mount_size - 1; i >= 0; --i) {
+		if((strstr(mount_list[i], "/dev/block/loop") != NULL)) {
+			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
+			if (strstr(mountpoint, "/.core/dummy") != NULL) 
+				unmount = 0;
+			else
+				unmount = 1;
+		} else if ((sbstr = strstr(mount_list[i], "/.core/dummy")) != NULL) {
+			sscanf(sbstr, "/.core/dummy%256s", mountpoint);
+			unmount = 1;
+		}
+		if(unmount) {
+			unmount = 0;
+			res = umount2(mountpoint, MNT_DETACH);
+			if (res != -1) printf("Unmounted: %s\n", mountpoint);
+			else printf("Failed: %s\n", mountpoint);
+		}
+		free(mount_list[i]);
 	}
 
 	// Free memory
-	for(i = 0; i < hide_size; ++i)
-		free(hide_list[i]);
-	free(hide_list);
-
-	hide_list = file_to_str_arr(fd, &hide_size);
-
-    fstat(fd, &file_stat);
-	last_update = file_stat.st_mtime;
-
-	printf("Get package name from config:\n");
-	for(i = 0; i < hide_size; i++)
-		printf("%s\n", hide_list[i]);
-	printf("\n");
+	free(mount_list);
+	return 0;
 }
 
 int main(int argc, char **argv, char **envp) {
-	int i;
+	if (argc != 2) {
+		fprintf(stderr, "%s <process/package name list>\n", argv[0]);
+		return 1;
+	}
+	int i, hide_size;
+	char **hide_list;
 
-	int hide_fd = open(HIDE_LIST, O_RDONLY);
-	if (hide_fd == -1){
-		printf("Error opening hide list\n");
-		exit(1);
+	FILE *hide_fp = fopen(argv[1], "r");
+	if (hide_fp == NULL) {
+		fprintf(stderr, "Error opening hide list\n");
+		return 1;
 	}
 
-	int mount_fd = open(MOUNT_LIST, O_RDONLY);
-	if (mount_fd == -1){
-		printf("Error opening mount list\n");
-		exit(1);
-	}
+	hide_list = file_to_str_arr(hide_fp, &hide_size);
+	fclose(hide_fp);
 
-	mount_list = file_to_str_arr(mount_fd, &mount_size);
-	close(mount_fd);
+	printf("Get process / package name from config:\n");
+	for(i = 0; i < hide_size; i++)
+		printf("%s\n", hide_list[i]);
+	printf("\n");
 
 	char buffer[512];
 	FILE *p = popen("while true;do logcat -b events -v raw -s am_proc_start;sleep 1;done", "r");
 	while(!feof(p)) {
-
-		load_hide_list(hide_fd);
-
 		//Format of am_proc_start is (as of Android 5.1 and 6.0)
 		//UserID, pid, unix uid, processName, hostingType, hostingName
 		fgets(buffer, sizeof(buffer), p);
@@ -163,16 +153,11 @@ int main(int argc, char **argv, char **envp) {
 	}
 
 	pclose(p);
-	close(hide_fd);
 
 	// Free memory
 	for(i = 0; i < hide_size; ++i)
 		free(hide_list[i]);
 	free(hide_list);
-
-	for(i = 0; i < mount_size; ++i)
-		free(mount_list[i]);
-	free(mount_list);
 
 	return 0;
 }
