@@ -309,6 +309,10 @@ if (! is_mounted /magisk); then
 fi
 MAGISKLOOP=$LOOPDEVICE
 
+mkdir -p /magisk/.core/magiskhide 2>/dev/null
+cp -af $INSTALLER/common/magiskhide/. /magisk/.core/magiskhide
+chmod 755 /magisk/.core/magiskhide /magisk/.core/magiskhide/*
+
 ##########################################################################################
 # Boot image patch
 ##########################################################################################
@@ -346,7 +350,7 @@ if (! $NORESTORE); then
       # Save it for helper module
       mkdir -p /magisk/zzsupersu
       touch /magisk/zzsupersu/stub
-      cp -af sbin/launch_daemonsu.sh $INSTALLER/roothelper/launch_daemonsu.sh
+      cp -af sbin/launch_daemonsu.sh $INSTALLER/common/roothelper/launch_daemonsu.sh
     fi
     # Non-standard boot image restores
     if ($SUPERSU); then
@@ -427,7 +431,7 @@ if (! $NORESTORE); then
 fi
 
 ui_print "- Installing root helper module"
-cp -af $INSTALLER/roothelper /magisk/00roothelper
+cp -af $INSTALLER/common/roothelper /magisk/00roothelper
 chmod 755 /magisk/00roothelper /magisk/00roothelper/*
 
 # Patch ramdisk
@@ -460,7 +464,7 @@ mkdir -p magisk 2>/dev/null
 cp -af $INSTALLER/common/init.magisk.rc init.magisk.rc
 cp -af $INSTALLER/common/magic_mask.sh sbin/magic_mask.sh
 
-chmod 0755 magisk
+# chmod 0755 magisk
 chmod 0750 init.magisk.rc sbin/magic_mask.sh
 
 ui_print "- Repacking boot image"

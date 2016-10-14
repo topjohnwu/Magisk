@@ -1,0 +1,4 @@
+#!/system/bin/sh
+
+HIDELIST=$MOUNTPOINT/.core/magiskhide/hidelist
+cat $HIDELIST

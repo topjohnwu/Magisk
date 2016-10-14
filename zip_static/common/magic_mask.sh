@@ -2,9 +2,8 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
-MOUNTLIST=/dev/mountlist
 
-MOUNTPOINT=/magisk
+export MOUNTPOINT=/magisk
 
 COREDIR=$MOUNTPOINT/.core
 
@@ -142,7 +141,6 @@ bind_mount() {
     mount -o bind $1 $2
     if [ "$?" -eq "0" ]; then 
       log_print "Mount: $1"
-      echo $2 >> $MOUNTLIST
     else 
       log_print "Mount Fail: $1"
     fi 
@@ -301,6 +299,8 @@ case $1 in
       unblock
     fi
 
+    echo $MOUNTPOINT >> $MOUNTLIST
+
     log_print "Preparing modules"
     # First do cleanups
     rm -rf $DUMMDIR
@@ -407,7 +407,10 @@ case $1 in
     setprop magisk.version 7
     log_print "Magisk late_start service mode running..."
     run_scripts service
+    [ -f "$COREDIR/magiskhide/enable" ] && setprop magisk.hide 1
+    ;;
 
+  hide )
     # Enable magiskhide
     [ ! -f "$COREDIR/magiskhide/hidelist" ] && mktouch $COREDIR/magiskhide/hidelist
     # Add preset for Safety Net
@@ -415,10 +418,10 @@ case $1 in
       mv $COREDIR/magiskhide/hidelist $COREDIR/magiskhide/hidelist.tmp
       echo "com.google.android.gms.unstable" > $COREDIR/magiskhide/hidelist
       cat $COREDIR/magiskhide/hidelist.tmp >> $COREDIR/magiskhide/hidelist
+      rm -f $COREDIR/magiskhide/hidelist.tmp
     fi
     log_print "Starting Magisk Hide"
-    (/data/magisk/magiskhide &)
-
+    exec /data/magisk/magiskhide $COREDIR/magiskhide/hidelist
     ;;
 
 esac
