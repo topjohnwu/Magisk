@@ -421,7 +421,7 @@ if (! $NORESTORE); then
     fi
     ui_print "- Creating backups"
     mkdir .backup
-    cp -af init.rc *fstab* verity_key sepolicy .backup 2>/dev/null
+    cp -af init.*.rc *fstab* verity_key sepolicy .backup 2>/dev/null
     if (is_mounted /data); then
       cp -af $ORIGBOOT /data/stock_boot.img
     else
@@ -437,11 +437,17 @@ chmod 755 /magisk/00roothelper /magisk/00roothelper/*
 # Patch ramdisk
 ui_print "- Patching ramdisk"
 
-if [ $(grep -c "import /init.magisk.rc" init.rc) -eq "0" ]; then
-  sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" init.rc
-fi
+for rc in $(ls init.*.rc); do
+    if [ $(grep -c "import /init.environ.rc" $rc) -ne "0" ]; then
+        if [ $(grep -c "import /init.magisk.rc" $rc) -eq "0" ]; then
+            sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $rc
+        fi
+    fi
+    if [ $(grep -c "selinux.reload_policy" $rc) -ne "0" ]; then
+        sed -i "/selinux.reload_policy/d" $rc
+    fi
+done
 
-sed -i "/selinux.reload_policy/d" init.rc
 find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
   if (! $KEEPVERITY); then
     sed -i "s/,support_scfs//g" $FSTAB
