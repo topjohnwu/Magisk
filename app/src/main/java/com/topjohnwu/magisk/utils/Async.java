@@ -200,7 +200,7 @@ public class Async {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
                 mFile.delete();
-                Utils.removeFile(mFile.getPath());
+                Utils.removeItem(mFile.getPath());
                 createFileFromInputStream(in, mFile);
                 in.close();
             } catch (FileNotFoundException e) {
@@ -273,7 +273,7 @@ public class Async {
                 }
             }
             if (mFile != null && mFile.exists() && !mFile.delete()) {
-                Utils.removeFile(mFile.getPath());
+                Utils.removeItem(mFile.getPath());
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;

@@ -98,6 +98,8 @@
     <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
     <string name="settings_shell_logging_title">Enable shell command debug logging</string>
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
+    <string name="settings_magiskhide_title">Enable Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Reboot to apply settings</string>
 
     <!-- Strings related to Settings -->
 

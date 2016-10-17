@@ -75,11 +75,13 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.uisettings);
-            PreferenceManager.setDefaultValues(getActivity(), R.xml.uisettings, false);
+            addPreferencesFromResource(R.xml.app_settings);
+            PreferenceManager.setDefaultValues(getActivity(), R.xml.app_settings, false);
 
             themePreference = (ListPreference) findPreference("theme");
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
+            CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
+            magiskhidePreference.setChecked(Utils.itemExist(false, "/magisk/.core/magiskhide/enable"));
             busyboxPreference.setChecked(Utils.commandExists("unzip"));
 
             PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
@@ -88,8 +90,10 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (MagiskFragment.magiskVersion == -1) {
                 busyboxPreference.setEnabled(false);
+                magiskhidePreference.setEnabled(false);
             } else {
                 busyboxPreference.setEnabled(true);
+                magiskhidePreference.setEnabled(true);
             }
         }
 
@@ -124,8 +128,28 @@ public class SettingsActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     break;
+                case "magiskhide":
+                    boolean checked = sharedPreferences.getBoolean("magiskhide", false);
+                    if (checked) {
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                Utils.createFile("/magisk/.core/magiskhide/enable");
+                                return null;
+                            }
+                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    } else {
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                Utils.removeItem("/magisk/.core/magiskhide/enable");
+                                return null;
+                            }
+                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    }
+                    break;
                 case "busybox":
-                    boolean checked = sharedPreferences.getBoolean("busybox", false);
+                    checked = sharedPreferences.getBoolean("busybox", false);
                     new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                     break;
                 case "developer_logging":

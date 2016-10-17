@@ -60,7 +60,7 @@ public class Module extends BaseModule {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                mEnable = Utils.removeFile(mDisableFile);
+                mEnable = Utils.removeItem(mDisableFile);
                 return null;
             }
         }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -84,7 +84,7 @@ public class Module extends BaseModule {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                mRemove = !Utils.removeFile(mRemoveFile);
+                mRemove = !Utils.removeItem(mRemoveFile);
                 return null;
             }
         }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);

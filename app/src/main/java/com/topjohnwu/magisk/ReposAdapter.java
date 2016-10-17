@@ -35,13 +35,15 @@ import butterknife.ButterKnife;
 
 public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
 
-    private final List<Repo> mList;
+    private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
     private View mView;
     private Context context;
     private AlertDialog.Builder builder;
 
-    public ReposAdapter(List<Repo> list) {
-        mList = list;
+    public ReposAdapter(List<Repo> update, List<Repo> installed, List<Repo> others) {
+        mUpdateRepos = update;
+        mInstalledRepos = installed;
+        mOthersRepos = others;
     }
 
     @Override
@@ -62,7 +64,18 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final Repo repo = mList.get(position);
+        final Repo repo;
+        if (position >= mUpdateRepos.size()) {
+            position -= mUpdateRepos.size();
+            if (position >= mInstalledRepos.size()) {
+                position -= mInstalledRepos.size();
+                repo = mOthersRepos.get(position);
+            } else {
+                repo = mInstalledRepos.get(position);
+            }
+        } else {
+            repo = mUpdateRepos.get(position);
+        }
         if (repo.isCache()) {
             holder.title.setText("[Cache] " + repo.getName());
         } else {
@@ -140,7 +153,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mUpdateRepos.size() + mInstalledRepos.size() + mOthersRepos.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

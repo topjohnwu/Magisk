@@ -226,7 +226,7 @@ public class LogFragment extends Fragment {
 
                 return llog.toString();
             } else {
-                if (Utils.removeFile(MAGISK_LOG)) {
+                if (Utils.removeItem(MAGISK_LOG)) {
                     Snackbar.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                 } else {
                     Snackbar.make(txtLog, R.string.logs_clear_failed, Snackbar.LENGTH_SHORT).show();
