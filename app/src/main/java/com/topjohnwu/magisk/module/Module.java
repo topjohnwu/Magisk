@@ -28,42 +28,17 @@ public class Module extends BaseModule {
 
         Logger.dev("Creating Module, id: " + mId);
 
-        try {
-            mEnable = !Utils.itemExist(mDisableFile);
-        } catch (Exception e) {
-            mEnable = false;
-        }
-        try {
-            mRemove = Utils.itemExist(mRemoveFile);
-        } catch (Exception e) {
-            mRemove = false;
-        }
-        try {
-            mUpdated = Utils.itemExist(mUpdateFile);
-        } catch (Exception e) {
-            mUpdated = false;
-        }
-
+        mEnable = !Utils.itemExist(mDisableFile);
+        mRemove = Utils.itemExist(mRemoveFile);
+        mUpdated = Utils.itemExist(mUpdateFile);
     }
 
     public void createDisableFile() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                mEnable = !Utils.createFile(mDisableFile);
-                return null;
-            }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        mEnable = !Utils.createFile(mDisableFile);
     }
 
     public void removeDisableFile() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                mEnable = Utils.removeItem(mDisableFile);
-                return null;
-            }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        mEnable = Utils.removeItem(mDisableFile);
     }
 
     public boolean isEnabled() {
@@ -71,23 +46,11 @@ public class Module extends BaseModule {
     }
 
     public void createRemoveFile() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                mRemove = Utils.createFile(mRemoveFile);
-                return null;
-            }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        mRemove = Utils.createFile(mRemoveFile);
     }
 
     public void deleteRemoveFile() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                mRemove = !Utils.removeItem(mRemoveFile);
-                return null;
-            }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        mRemove = !Utils.removeItem(mRemoveFile);
     }
 
     public boolean willBeRemoved() {

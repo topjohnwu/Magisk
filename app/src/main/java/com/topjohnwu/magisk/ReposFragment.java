@@ -41,7 +41,6 @@ public class ReposFragment extends Fragment {
     private List<Repo> fInstalledRepos = new ArrayList<>();
     private List<Repo> fOthersRepos = new ArrayList<>();
 
-    private ReposAdapter mReposAdapter = new ReposAdapter(fUpdateRepos, fInstalledRepos, fOthersRepos);
     private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
 
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
@@ -57,7 +56,7 @@ public class ReposFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mSectionedAdapter = new
-                SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section, R.id.section_text, mReposAdapter);
+                SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section, R.id.section_text, new ReposAdapter(fUpdateRepos, fInstalledRepos, fOthersRepos));
 
         recyclerView.setAdapter(mSectionedAdapter);
 
@@ -176,6 +175,7 @@ public class ReposFragment extends Fragment {
             }
             SimpleSectionedRecyclerViewAdapter.Section[] array = sections.toArray(new SimpleSectionedRecyclerViewAdapter.Section[sections.size()]);
             mSectionedAdapter.setSections(array);
+            emptyTv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
         mSwipeRefreshLayout.setRefreshing(false);

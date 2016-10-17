@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,32 +29,8 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     private View mView;
     private Context context;
 
-    private Utils.ItemClickListener chboxListener, deleteBtnListener, unDeleteBtnListener;
-
     public ModulesAdapter(List<Module> list) {
         mList = list;
-        chboxListener = (chk, position) -> {
-            // On Checkbox change listener
-            CheckBox chbox = (CheckBox) chk;
-
-            if (!chbox.isChecked()) {
-                mList.get(position).createDisableFile();
-                Snackbar.make(mView, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
-            } else {
-                mList.get(position).removeDisableFile();
-                Snackbar.make(mView, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
-            }
-        };
-        deleteBtnListener = (deleteBtn, position) -> {
-            // On delete button click listener
-            mList.get(position).createRemoveFile();
-            Snackbar.make(mView, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
-        };
-        unDeleteBtnListener = (undeleteBtn, position) -> {
-            // On undelete button click listener
-            mList.get(position).deleteRemoveFile();
-            Snackbar.make(mView, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
-        };
     }
 
     @Override
@@ -85,16 +63,66 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         }
 
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> chboxListener.onItemClick(compoundButton, holder.getAdapterPosition()));
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        module.removeDisableFile();
+                        return null;
+                    }
 
-        holder.delete.setOnClickListener(view -> {
-            if (module.willBeRemoved()) {
-                unDeleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        Snackbar.make(mView, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
             } else {
-                deleteBtnListener.onItemClick(holder.delete, holder.getAdapterPosition());
-            }
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        module.createDisableFile();
+                        return null;
+                    }
 
-            updateDeleteButton(holder, module);
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        Snackbar.make(mView, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            }
+        });
+
+        holder.delete.setOnClickListener(v -> {
+            if (module.willBeRemoved()) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        module.deleteRemoveFile();
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        Snackbar.make(mView, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
+                        updateDeleteButton(holder, module);
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        module.createRemoveFile();
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        Snackbar.make(mView, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+                        updateDeleteButton(holder, module);
+                    }
+                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            }
         });
 
         if (module.isUpdated()) {

@@ -135,10 +135,4 @@ public class Utils {
         return secret;
     }
 
-    public interface ItemClickListener {
-
-        void onItemClick(View view, int position);
-
-    }
-
 }
