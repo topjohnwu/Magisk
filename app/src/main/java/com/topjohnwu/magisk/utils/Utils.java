@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
-import android.view.View;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;

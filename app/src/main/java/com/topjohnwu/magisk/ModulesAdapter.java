@@ -10,13 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
 
