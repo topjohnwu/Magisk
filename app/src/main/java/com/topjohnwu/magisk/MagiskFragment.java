@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -98,11 +99,18 @@ public class MagiskFragment extends Fragment {
             new DownloadReceiver() {
                 @Override
                 public void task(Uri uri) {
-                    Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                    install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    Uri content = FileProvider.getUriForFile(getActivity(), "com.topjohnwu.magisk.provider", new File(uri.getPath()));
-                    install.setData(content);
-                    mContext.startActivity(install);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                        install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        Uri content = FileProvider.getUriForFile(getActivity(), "com.topjohnwu.magisk.provider", new File(uri.getPath()));
+                        install.setData(content);
+                        mContext.startActivity(install);
+                    } else {
+                        Intent install = new Intent(Intent.ACTION_VIEW);
+                        install.setDataAndType(uri, "application/vnd.android.package-archive");
+                        install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(install);
+                    }
                 }
             },
             appLink,
