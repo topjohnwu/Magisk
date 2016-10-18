@@ -167,10 +167,10 @@ public class MagiskFragment extends Fragment {
 
     private void updateMagiskVersion() {
         List<String> ret = Shell.sh("getprop magisk.version");
-        if (ret.get(0).isEmpty()) {
-            magiskVersion = -1;
-        } else {
+        try {
             magiskVersion = Integer.parseInt(ret.get(0));
+        } catch (NumberFormatException e) {
+            magiskVersion = -1;
         }
 
         if (magiskVersion == -1) {
