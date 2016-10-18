@@ -1,7 +1,0 @@
-id=supersu
-name=SuperSU Helper
-version=v1
-versionCode=1
-author=topjohnwu
-description=This is a helper module for Chainfire's SuperSU to work with Magisk
-cacheModule=false

@@ -56,6 +56,7 @@ int hideMagisk(int pid) {
 	int res = syscall(SYS_setns, fd, 0);
 	if(res == -1) return 3;
 
+	free(path);
 	path = NULL;
 	asprintf(&path, "/proc/%d/mounts", pid);
 	FILE *mount_fp = fopen(path, "r");
@@ -63,6 +64,7 @@ int hideMagisk(int pid) {
 		fprintf(stderr, "Error opening mount list!\n");
 		return 1;
 	}
+	free(path);
 
 	int mount_size;
 	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], *sbstr;
@@ -88,9 +90,9 @@ int hideMagisk(int pid) {
 		}
 		free(mount_list[i]);
 	}
-
 	// Free memory
 	free(mount_list);
+
 	return 0;
 }
 

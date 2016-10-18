@@ -1,6 +1,7 @@
 #!/system/bin/sh
 
 LOGFILE=/cache/magisk.log
+HIDELOG=/cache/magiskhide.log
 IMG=/data/magisk.img
 
 export MOUNTPOINT=/magisk
@@ -193,6 +194,7 @@ merge_image() {
             # Merge (will reserve selinux contexts)
             cd /cache/merge_img
             for MOD in *; do
+              log_print "Merging: $MOD"
               rm -rf /cache/data_img/$MOD
               cp -afc $MOD /cache/data_img/
             done
@@ -227,8 +229,9 @@ case $1 in
     if [ -d "/cache/magisk_merge" ]; then
       cd /cache/magisk_merge
       for MOD in *; do
+        log_print "Merging: $MOD"
         rm -rf /cache/magisk/$MOD
-        cp -afc $MOD /cache/magisk/
+        mv $MOD /cache/magisk/$MOD
       done 
       rm -rf /cache/magisk_merge
     fi
@@ -298,8 +301,6 @@ case $1 in
       log_print "magisk.img mount failed, nothing to do :("
       unblock
     fi
-
-    echo $MOUNTPOINT >> $MOUNTLIST
 
     log_print "Preparing modules"
     # First do cleanups
@@ -404,7 +405,7 @@ case $1 in
 
   service )
     # Version info
-    setprop magisk.version 7
+    setprop magisk.version 8
     log_print "Magisk late_start service mode running..."
     run_scripts service
     [ -f "$COREDIR/magiskhide/enable" ] && setprop magisk.hide 1
@@ -420,8 +421,9 @@ case $1 in
       cat $COREDIR/magiskhide/hidelist.tmp >> $COREDIR/magiskhide/hidelist
       rm -f $COREDIR/magiskhide/hidelist.tmp
     fi
+    chmod 755 $COREDIR/magiskhide $COREDIR/magiskhide/*
     log_print "Starting Magisk Hide"
-    exec /data/magisk/magiskhide $COREDIR/magiskhide/hidelist
+    exec /data/magisk/magiskhide $COREDIR/magiskhide/hidelist > $HIDELOG
     ;;
 
 esac

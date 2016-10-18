@@ -1,9 +1,6 @@
 # Triggers
 
 on post-fs
-    # Paths
-    export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/magisk/.core/busybox:/system/xbin
-
     start magisk_pfs
     wait /dev/.magisk.unblock 20
     rm /dev/.magisk.unblock
