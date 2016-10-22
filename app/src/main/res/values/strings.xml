@@ -6,7 +6,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="auto_toggle">MagiskHide</string>
+    <string name="magiskhide">MagiskHide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>

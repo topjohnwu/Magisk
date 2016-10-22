@@ -4,25 +4,24 @@ import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
-import com.topjohnwu.magisk.services.MonitorService;
-import com.topjohnwu.magisk.services.TileServiceCompat;
-import com.topjohnwu.magisk.services.TileServiceNewApi;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -51,6 +50,29 @@ public class Utils {
         } else {
             return new File(path).exists();
         }
+    }
+
+    public static String getAppUID(String packageName) {
+        List<String> retString = Shell.su("ls -nld /data/data/" + packageName);
+        String splitMe = retString.get(0);
+        String[] splitString = retString.get(0).split(" ");
+        return splitString[5];
+    }
+
+    public static int WhichHide(Context context) {
+        Boolean mh = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("magiskhide", false);
+        Boolean sh = Utils.itemExist("/su/suhide/add");
+        if (mh && !sh) {
+            return 1;
+        }
+        if (sh && !mh) {
+            return 2;
+        }
+        if (sh && mh) {
+            return 3;
+        }
+        return 0;
+
     }
 
     public static boolean commandExists(String s) {

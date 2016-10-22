@@ -19,11 +19,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -90,7 +92,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+        checkHideSection();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkHideSection();
     }
 
     @Override
@@ -120,6 +129,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    private void checkHideSection() {
+        Menu menu = navigationView.getMenu();
+        if (PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("magiskhide",false) | (Utils.itemExist("/data/su/suhide"))) {
+
+            menu.findItem(R.id.magiskhide).setVisible(true);
+        } else {
+            menu.findItem(R.id.magiskhide).setVisible(false);
+        }
+    }
+
     public void navigate(final int itemId) {
         Fragment navFragment = null;
         String tag = "";
@@ -138,6 +157,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 setTitle(R.string.downloads);
                 tag = "downloads";
                 navFragment = new ReposFragment();
+                break;
+            case R.id.magiskhide:
+                setTitle(R.string.magiskhide);
+                tag = "magiskhide";
+                navFragment = new MagiskHideFragment();
                 break;
             case R.id.log:
                 setTitle(R.string.log);

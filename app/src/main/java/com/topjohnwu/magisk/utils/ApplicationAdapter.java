@@ -96,6 +96,8 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
 
     }
 
+
+
     private boolean CheckApp(String appToCheck) {
         boolean starter = false;
         Set<String> set = prefs.getStringSet("auto_blacklist", null);

@@ -7,10 +7,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.topjohnwu.magisk.services.MonitorService;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -19,7 +24,7 @@ public class SplashActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
-        if (prefs.getString("theme","").equals("Dark")) {
+        if (prefs.getString("theme", "").equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }
 
@@ -27,10 +32,25 @@ public class SplashActivity extends AppCompatActivity {
         Logger.logShell = prefs.getBoolean("shell_logging", false);
 
         // Set up default preferences,make sure we add "extra" blacklist entries.
-        if (!defaultPrefs.contains("auto_blacklist")) {
+        int hideVersion = Utils.WhichHide(getApplication());
+        List<String> hideList;
+        Set<String> set = new HashSet<>();
+        switch (hideVersion) {
+            case 1:
+                hideList = Shell.su("/magisk/.core/magiskhide/list");
+                set.addAll(hideList);
+                break;
+            case 2:
+                hideList = Shell.su("/su/suhide/list");
+                break;
+            case 3:
+                hideList = Shell.su("/magisk/.core/magiskhide/list");
+                hideList.addAll(Shell.su("/su/suhide/list"));
+                set.addAll(hideList);
+        }
+        if (!prefs.contains("auto_blacklist")) {
             Logger.dev("SplashActivity: Setting default preferences for application");
-            SharedPreferences.Editor editor = defaultPrefs.edit();
-            Set<String> set = new HashSet<>();
+            SharedPreferences.Editor editor = prefs.edit();
             set.add("com.google.android.apps.walletnfcrel");
             set.add("com.google.android.gms");
             set.add("com.google.commerce.tapandpay");
@@ -40,23 +60,6 @@ public class SplashActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        // Set up toggle states based on preferences, start services, disable root if set
-        if (Utils.autoToggleEnabled(getApplicationContext())) {
-            if (!Utils.hasServicePermission(getApplicationContext())) {
-                Utils.toggleAutoRoot(false, getApplicationContext());
-            }
-        }
-        if (Utils.autoToggleEnabled(getApplicationContext())) {
-            if (!Utils.isMyServiceRunning(MonitorService.class, getApplicationContext())) {
-                Intent myIntent = new Intent(getApplication(), MonitorService.class);
-                getApplication().startService(myIntent);
-            }
-        } else if (defaultPrefs.getBoolean("keep_root_off", false)) {
-            Utils.toggleRoot(false, getApplication());
-        }
-
-        // Set up quick settings tile
-        Utils.setupQuickSettingsTile(getApplicationContext());
 
         // Initialize
         prefs.edit()

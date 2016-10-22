@@ -27,8 +27,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.uisettings);
-        PreferenceManager.setDefaultValues(getActivity(), R.xml.uisettings, false);
+        addPreferencesFromResource(R.xml.app_settings);
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.app_settings, false);
     }
 
     @Override
@@ -105,41 +105,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             Logger.dev("SettingsFragment: theme is " + pref);
 
-        } else if (key.equals("enable_quicktile")) {
-            boolean checked = sharedPreferences.getBoolean("enable_quicktile", false);
-            if (checked) {
-                new AsyncTask<Void, Void, Boolean> () {
-                    @Override
-                    protected Boolean doInBackground(Void... voids) {
-                        return Utils.installTile(getActivity());
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        super.onPostExecute(result);
-                        if (result) {
-                            Toast.makeText(getActivity(), "Tile installed", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getActivity(), "Tile installation error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            } else {
-                new AsyncTask<Void, Void, Boolean> () {
-                    @Override
-                    protected Boolean doInBackground(Void... voids) {
-                        return Utils.uninstallTile(getActivity());
-                    }
-                    @Override
-                    protected void onPostExecute(Boolean result) {
-                        super.onPostExecute(result);
-                        if (result) {
-                            Toast.makeText(getActivity(), "Tile uninstalled", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getActivity(), "Tile uninstallation error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-            }
         } else if (key.equals("busybox")) {
             boolean checked = sharedPreferences.getBoolean("busybox", false);
             new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);

@@ -23,10 +23,10 @@
             android:title="@string/downloads"/>
 
         <item
-        <item
-            android:id="@+id/autoroot"
+            android:id="@+id/magiskhide"
             android:icon="@drawable/ic_autoroot"
-            android:title="@string/auto_toggle"/>
+            android:title="@string/magiskhide"/>
+        <item
             android:id="@+id/log"
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>

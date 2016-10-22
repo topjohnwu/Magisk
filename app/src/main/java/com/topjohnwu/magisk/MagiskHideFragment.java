@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,8 @@ import android.widget.ListView;
 
 import com.topjohnwu.magisk.utils.ApplicationAdapter;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,12 +27,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AutoRootFragment extends ListFragment {
+import static com.topjohnwu.magisk.utils.Utils.WhichHide;
+
+public class MagiskHideFragment extends ListFragment {
     private PackageManager packageManager = null;
     private List<ApplicationInfo> applist = null;
     private ApplicationAdapter listadaptor = null;
     public ListView listView;
     public SharedPreferences prefs;
+    private int hideVersion;
     List<String> arrayBlackList;
 
     @Override
@@ -47,7 +51,7 @@ public class AutoRootFragment extends ListFragment {
         }
 
         view.setPadding(horizontalMargin, actionBarHeight, horizontalMargin, verticalMargin);
-
+        hideVersion = WhichHide(getActivity());
         return view;
     }
 
@@ -62,9 +66,9 @@ public class AutoRootFragment extends ListFragment {
     public void onResume() {
         super.onResume();
         initializeElements();
-            super.onResume();
-            getActivity().setTitle(R.string.auto_toggle);
-
+        super.onResume();
+        getActivity().setTitle(R.string.magiskhide);
+        hideVersion = WhichHide(getActivity());
 
     }
 
@@ -84,19 +88,49 @@ public class AutoRootFragment extends ListFragment {
     }
 
     private void ToggleApp(String appToCheck, int position, View v) {
-        Logger.dev("Magisk", "AutoRootFragment: ToggleApp called for " + appToCheck);
+        Logger.dev("Magisk", "MagiskHideFragment: ToggleApp called for " + appToCheck);
         Set<String> blackListSet = prefs.getStringSet("auto_blacklist", null);
         assert blackListSet != null;
         arrayBlackList = new ArrayList<>(blackListSet);
-
+        String UID = Utils.getAppUID(appToCheck);
         if (!arrayBlackList.contains(appToCheck)) {
             arrayBlackList.add(appToCheck);
+            switch (hideVersion) {
+                case 1 :
+                    Shell.su("/magisk/.core/magiskhide/add " + appToCheck);
+                    break;
+                case 2 :
+                    Shell.su("/su/suhide/add " + UID);
+                    break;
+                case 3 :
+                    Shell.su("/su/suhide/add " + UID + "&& /magisk/.core/magiskhide/add " + appToCheck);
+                    break;
+                default :
+                    break;
+
+            }
+
+
 
         } else {
             for (int i = 0; i < arrayBlackList.size(); i++) {
                 if (appToCheck.equals(arrayBlackList.get(i))) {
                     arrayBlackList.remove(i);
                 }
+            }
+            switch (hideVersion) {
+                case 1 :
+                    Shell.su("/magisk/.core/magiskhide/rm " + appToCheck);
+                    break;
+                case 2 :
+                    Shell.su("/su/suhide/rm " + UID);
+                    break;
+                case 3 :
+                    Shell.su("/su/suhide/rm " + UID + "&& /magisk/.core/magiskhide/rm " + appToCheck);
+                    break;
+                default :
+                    break;
+
             }
 
         }
@@ -107,6 +141,8 @@ public class AutoRootFragment extends ListFragment {
         listadaptor.UpdateRootStatusView(position, v);
 
     }
+
+
 
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> applist = new ArrayList<>();
