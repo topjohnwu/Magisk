@@ -10,6 +10,8 @@
             android:icon="@drawable/magisk"
             android:title="@string/magisk"/>
 
+
+
         <item
             android:id="@+id/modules"
             android:icon="@drawable/ic_extension"
@@ -21,6 +23,10 @@
             android:title="@string/downloads"/>
 
         <item
+        <item
+            android:id="@+id/autoroot"
+            android:icon="@drawable/ic_autoroot"
+            android:title="@string/auto_toggle"/>
             android:id="@+id/log"
             android:icon="@drawable/ic_bug_report"
             android:title="@string/log"/>

@@ -13,6 +13,10 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.magisk.receivers.PrivateBroadcastReceiver;
+import com.topjohnwu.magisk.services.MonitorService;
+import com.topjohnwu.magisk.services.TileServiceCompat;
+import com.topjohnwu.magisk.services.TileServiceNewApi;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
@@ -58,6 +62,13 @@ public class Utils {
 
     public static boolean rootEnabled() {
         return commandExists("su");
+    }
+
+    public static boolean autoToggleEnabled(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Logger.dev("Utils: AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
+
     }
 
     public static boolean createFile(String path) {

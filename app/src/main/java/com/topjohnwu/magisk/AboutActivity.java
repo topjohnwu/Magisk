@@ -25,7 +25,7 @@ import java.io.InputStream;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AboutActivity extends AppCompatActivity {
+public class   AboutActivity extends AppCompatActivity {
 
     private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
     private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";

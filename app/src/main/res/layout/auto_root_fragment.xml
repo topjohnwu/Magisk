@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:id="@+id/Top">
+
+    <ListView android:id="@android:id/list"
+              android:divider="@android:color/transparent"
+              android:dividerHeight="@dimen/card_divider_space"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="6dp"/>
+
+</LinearLayout>

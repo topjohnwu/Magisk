@@ -11,4 +11,5 @@
     <dimen name="card_textview_width">300dip</dimen>
     <dimen name="checkbox_padding">3dp</dimen>
     <dimen name="card_imageview_margin">10dp</dimen>
+    <dimen name="card_appicon_size">50dp</dimen>
 </resources>

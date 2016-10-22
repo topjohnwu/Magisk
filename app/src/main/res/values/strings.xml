@@ -6,6 +6,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="auto_toggle">MagiskHide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -42,6 +43,7 @@
     <string name="menuSaveToSd">Save to SD</string>
     <string name="menuSend">Send</string>
     <string name="menuReload">Reload</string>
+    <string name="sdcard_not_writable">SD card not found or not writable</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
     <string name="logs_clear_failed">Could not clear the log:</string>
@@ -53,7 +55,7 @@
     <string name="app_developers">Main developers</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators" />
+    <string name="translators"/>
     <string name="app_version">App\'s version</string>
     <string name="app_source_code">Source code</string>
     <string name="donation">Donation</string>
@@ -64,6 +66,7 @@
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
+    <string name="accessibility_service_description">Accessibility service required for Magisk auto-unroot feature</string>
     <string name="update_title">%1$s Update!</string>
     <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
     <string name="repo_install_title">Install %1$s</string>

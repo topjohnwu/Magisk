@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginStart="@dimen/card_horizontal_margin"
+    android:layout_marginTop="@dimen/card_vertical_margin"
+    style="?attr/cardStyle"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    card_view:cardCornerRadius="@dimen/card_corner_radius"
+    card_view:cardElevation="@dimen/card_elevation">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_vertical"
+        android:padding="@dimen/card_layout_padding">
+
+        <ImageView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/app_icon"
+            android:layout_width="@dimen/card_appicon_size"
+            android:layout_height="@dimen/card_appicon_size"
+            android:layout_centerVertical="true"
+            android:scaleType="centerCrop"/>
+
+        <LinearLayout
+            android:id="@+id/textLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignBottom="@+id/app_icon"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingEnd="@dimen/card_appicon_size"
+            android:paddingStart="65dp"
+            android:weightSum="1">
+
+
+            <TextView
+                android:id="@+id/app_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="false"
+                android:layout_weight="1"
+                android:paddingEnd="3dp"
+                android:paddingStart="3dp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/app_paackage"
+                android:layout_width="fill_parent"
+                android:layout_height="25dp"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
+                android:paddingEnd="3dp"
+                android:paddingStart="3dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/Linear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false"
+                android:gravity="center"
+                android:src="@drawable/ic_menu_overflow_material"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
+
+
