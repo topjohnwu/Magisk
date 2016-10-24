@@ -32,29 +32,29 @@
     <string name="update_available">Atualização disponível</string>
     <string name="installed">Instalado</string>
     <string name="not_installed">Não Instalado</string>
-    <string name="changelog">Changelog</string>
+    <string name="changelog">Registro de mudança</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Salvar no SD</string>
     <string name="menuSend">Enviar</string>
     <string name="menuReload">Recarregar</string>
-    <string name="menuClearLog">Limpar log agora</string>
-    <string name="logs_cleared">Log Limpado com sucesso</string>
-    <string name="logs_clear_failed">Não foi possível limpar o log:</string>
-    <string name="log_is_empty">Log está vazio</string>
-    <string name="logs_save_failed">Não foi possível gravar log para o cartão SD:</string>
+    <string name="menuClearLog">Limpar registro agora</string>
+    <string name="logs_cleared">Registro limpado com sucesso</string>
+    <string name="logs_clear_failed">Não foi possível limpar o registro:</string>
+    <string name="log_is_empty">Registro está vazio</string>
+    <string name="logs_save_failed">Não foi possível gravar o registro para o cartão SD:</string>
 
     <!--About Activity-->
     <string name="about">Sobre</string>
     <string name="app_developers">Principais desenvolvedores</string>
     <string name="app_developers_"><![CDATA[App criado por <a href="https://github.com/topjohnwu">topjohnwu</a> em colaboração com <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-    <string name="app_changelog">App\'s changelog</string>
+    <string name="app_changelog">Registro de Mudanças do App</string>
     <string name="translators" />
-    <string name="app_version">App\'s versão</string>
+    <string name="app_version">Versão do App</string>
     <string name="app_source_code">Código fonte</string>
     <string name="donation">Doação</string>
-    <string name="app_translators">App\'s tradutores</string>
-    <string name="support_thread">segmento de suporte</string>
+    <string name="app_translators">Tradutores do App</string>
+    <string name="support_thread">Suporte</string>
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita de armazenamento externo.</string>
