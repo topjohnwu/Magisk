@@ -103,7 +103,7 @@ public class ApplicationAdapter extends ArrayAdapter<ApplicationInfo> {
         Set<String> set = prefs.getStringSet("auto_blacklist", null);
         if (set != null) {
             for (String string : set) {
-                if (string.equals(appToCheck)) {
+                if (string.contains(appToCheck)) {
                     starter = true;
                 }
             }

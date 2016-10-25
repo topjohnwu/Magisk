@@ -12,18 +12,17 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SplashActivity extends AppCompatActivity {
-
+private SharedPreferences prefs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
         if (prefs.getString("theme", "").equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
         }
@@ -31,35 +30,8 @@ public class SplashActivity extends AppCompatActivity {
         Logger.devLog = prefs.getBoolean("developer_logging", false);
         Logger.logShell = prefs.getBoolean("shell_logging", false);
 
-        // Set up default preferences,make sure we add "extra" blacklist entries.
-        int hideVersion = Utils.WhichHide(getApplication());
-        List<String> hideList;
-        Set<String> set = new HashSet<>();
-        switch (hideVersion) {
-            case 1:
-                hideList = Shell.su("/magisk/.core/magiskhide/list");
-                set.addAll(hideList);
-                break;
-            case 2:
-                hideList = Shell.su("/su/suhide/list");
-                break;
-            case 3:
-                hideList = Shell.su("/magisk/.core/magiskhide/list");
-                hideList.addAll(Shell.su("/su/suhide/list"));
-                set.addAll(hideList);
-        }
-        if (!prefs.contains("auto_blacklist")) {
-            Logger.dev("SplashActivity: Setting default preferences for application");
-            SharedPreferences.Editor editor = prefs.edit();
-            set.add("com.google.android.apps.walletnfcrel");
-            set.add("com.google.android.gms");
-            set.add("com.google.commerce.tapandpay");
-            editor.putStringSet("auto_blacklist", set);
-            editor.putBoolean("autoRootEnable", false);
-            editor.putBoolean("root", Utils.rootEnabled());
-            editor.apply();
-        }
-
+        // Check and set preferences/hides
+        setupHideLists();
 
         // Initialize
         prefs.edit()
@@ -82,6 +54,66 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
+    }
+
+    private void setupHideLists() {
+
+        Set<String> set = null;
+        Set<String> setOriginal = null;
+        List<String> hideList = null;
+        List<String> addList = null;
+        String listCmd, addCmd, addCmd2, rmCmd, rmCmd2;
+
+        // Build list of apps currently listed, add to preferences
+
+        int hideVersion = Utils.WhichHide(getApplication());
+
+        switch (hideVersion) {
+            case 1:
+                listCmd = "/magisk/.core/magiskhide/list";
+                break;
+            case 2:
+                listCmd = "/su/suhide/list";
+                break;
+            case 3:
+                listCmd = "/magisk/.core/magiskhide/list && /su/suhide/list";
+                break;
+            default:
+                listCmd = "";
+
+        }
+        if (Shell.rootAccess()) {
+            hideList = Shell.su(listCmd);
+        }
+        // Set up default preferences,make sure we add "extra" blacklist entries.
+
+        if (!prefs.contains("auto_blacklist")) {
+            Logger.dev("SplashActivity: Setting default preferences for application");
+            set.add("com.google.android.apps.walletnfcrel");
+            set.add("com.google.android.gms");
+            set.add("com.google.commerce.tapandpay");
+
+            // Add current items to hide list
+            if (hideList != null) set.addAll(hideList);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putStringSet("auto_blacklist", set);
+            Logger.dev("SplashActivity: Adding entries " + set.toString());
+            editor.apply();
+        }
+
+        setOriginal = prefs.getStringSet("auto_blacklist", set);
+        if (hideList != null) {
+            for (String item : hideList) {
+                if (!(setOriginal.contains(item))) {
+                    addList.add(item);
+                }
+            }
+        }
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putStringSet("auto_blacklist", set);
+        editor.apply();
 
     }
 }
