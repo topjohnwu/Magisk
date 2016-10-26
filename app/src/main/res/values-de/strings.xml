@@ -1,0 +1,112 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
+    <string name="navigation_drawer_close">Navigationsleiste schliessen</string>
+    <string name="modules">Module</string>
+    <string name="downloads">Downloads</string>
+    <string name="log">Log</string>
+    <string name="settings">Einstellungen</string>
+
+    <!--Magisk Fragment-->
+    <string name="magisk_version">Magisk v%1$s installiert</string>
+    <string name="magisk_version_error">Haben Sie Magisk installiert?</string>
+
+    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$s update!</string>
+    <string name="cannot_check_updates">Kann nicht auf Aktualisierungen prüfen</string>
+    <string name="up_to_date">Aktuellste Version von %1$s installiert</string>
+
+    <!--Root Fragment-->
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nichts angegeben)</string>
+    <string name="no_modules_found">Keine Module gefunden</string>
+    <string name="update_file_created">Modul wird beim nächsten Neustart aktualisiert</string>
+    <string name="remove_file_created">Modul wird beim nächsten Neustart entfernt</string>
+    <string name="remove_file_deleted">Modul wird beim nächsten Neustart nicht entfernt</string>
+    <string name="disable_file_created">Modul wird beim nächsten Neustart deaktiviert</string>
+    <string name="disable_file_removed">Modul wird beim nächsten Neustart aktiviert</string>
+    <string name="author">Erstellt von %1$s</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Aktualisierung verfügbar</string>
+    <string name="installed">Installiert</string>
+    <string name="not_installed">Nicht Installiert</string>
+    <string name="changelog">Changelog</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Auf SD Karte speichern</string>
+    <string name="menuSend">Senden</string>
+    <string name="menuReload">erneut laden</string>
+    <string name="menuClearLog">Log jetzt löschen</string>
+    <string name="logs_cleared">Log erfolgreich gelöscht</string>
+    <string name="logs_clear_failed">Konnte Log nicht löschen:</string>
+    <string name="log_is_empty">Log ist leer</string>
+    <string name="logs_save_failed">Konnte Log nicht auf SD Karte speichern:</string>
+
+    <!--About Activity-->
+    <string name="about">Über</string>
+    <string name="app_developers">Entwickler</string>
+    <string name="app_developers_"><![CDATA[Anwendung entwickelt von <a href="https://github.com/topjohnwu">topjohnwu</a> in Zusammenarbeit mit <a href="https://github.com/d8ahazard">Digitalhigh</a> und <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Anwendungs changelog</string>
+    <string name="translators" />
+    <string name="app_version">Anwendungs Version</string>
+    <string name="app_source_code">Quelltext</string>
+    <string name="donation">Spende</string>
+    <string name="app_translators">Anwendungs Übersetzer</string>
+    <string name="support_thread">Support thread</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Diese Funktion wird ohne erlaubnis auf den externen Speicher zu schreiben nicht funktionieren.</string>
+    <string name="no_root_access">Kein root Zugriff, Funktion eingeschränkt</string>
+    <string name="no_thanks">Nein Danke</string>
+    <string name="update_title">%1$s Aktualisierung!</string>
+    <string name="update_msg">Neue Version v%2$s von %1$s ist verfügbar!\nChangelog:\n%3$s</string>
+    <string name="repo_install_title">Installiere %1$s</string>
+    <string name="repo_install_msg">Wollen Sie %1$s installieren?</string>
+    <string name="download_install">Herunterladen und Installieren</string>
+    <string name="download_file_error">Fehler beim Herunterladen</string>
+    <string name="install_error">Fehler beim Installieren!</string>
+    <string name="manual_install">Fehler beim Flashen. Datei in %1$s abgelegt\n Bitte in recovery manuell flashen</string>
+    <string name="invalid_zip">Diese Datei ist kein Magisk Modul!!</string>
+    <string name="reboot_title">Installation erfolgreich!</string>
+    <string name="reboot_msg">Wollen Sie jetzt neu starten?</string>
+    <string name="reboot">Neustart</string>
+    <string name="zip_install_progress_title">Installiere</string>
+    <string name="zip_install_progress_msg">"Installiere %1$s …"</string>
+    <string name="no_magisk_title">Kein Magisk Installiert!</string>
+    <string name="no_magisk_msg">Wollen Sie Magisk herunterladen und installieren?</string>
+
+    <!--URL Templates-->
+    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
+    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Fragment -->
+    <string name="settings_general_category">Allgemein</string>
+    <string name="settings_theme_title">Aussehen</string>
+    <string name="settings_theme_summary">Wähle ein Theme aus</string>
+    <string name="settings_busybox_title">BusyBox aktivieren</string>
+    <string name="settings_busybox_summary">Magisks eingebautes BusyBox zum PATH hinzufügen</string>
+
+    <string name="settings_development_category">Entwicklung</string>
+    <string name="settings_developer_logging_title">Aktiviere erweitertes logging zum debuggen</string>
+    <string name="settings_developer_logging_summary">Aktivieren um ausführlichere logs zu erhalten.</string>
+    <string name="settings_shell_logging_title">Aktiviere debug logging für Shell Befehle</string>
+    <string name="settings_shell_logging_summary">Aktivieren um alle Shell Befehle und Ausgaben zu loggen.</string>
+    <string name="settings_magiskhide_title">Aktiviere Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Neu starten um Einstellungen zu aktivieren</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+
+    <!-- Example settings for Data & Sync -->
+
+    <!-- Example settings for Notifications -->
+
+</resources>
