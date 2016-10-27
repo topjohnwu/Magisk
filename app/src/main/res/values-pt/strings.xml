@@ -1,6 +1,6 @@
 <resources>
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Obrir gaveta de notificação</string>
+    <string name="navigation_drawer_open">Abrir gaveta de notificação</string>
     <string name="navigation_drawer_close">Fechar gaveta de notificação</string>
     <string name="modules">Módulos</string>
     <string name="downloads">Baixar</string>
@@ -57,7 +57,7 @@
     <string name="support_thread">Suporte</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita de armazenamento externo.</string>
+    <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita do armazenamento externo.</string>
     <string name="no_root_access">Sem acesso ao root, funcionalidade limitada</string>
     <string name="no_thanks">Não, Obrigado</string>
     <string name="update_title">%1$s Atualização!</string>
@@ -87,7 +87,7 @@
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_summary">Escolha um tema</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
-    <string name="settings_busybox_summary">Faça Magisk's built-in BusyBox ser visível no PATH</string>
+    <string name="settings_busybox_summary">Marque essa opção para o BusyBox do Magisk ser visível no PATH</string>
 
     <string name="settings_development_category">Desenvolvimento</string>
     <string name="settings_developer_logging_title">Ativar registro mais detalhado</string>
