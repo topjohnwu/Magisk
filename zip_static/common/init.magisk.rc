@@ -13,6 +13,9 @@ on post-fs-data
 on property:magisk.hide=1
     restart magisk_hide
 
+on property:magisk.restart_pfsd=1
+    trigger post-fs-data
+
 # Services
 
 # launch post-fs script
