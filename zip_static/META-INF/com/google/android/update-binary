@@ -62,7 +62,7 @@ ui_print() {
 getvar() {
   local VARNAME=$1
   local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /data/.magisk /cache/.magisk /system/.magisk; do
+  for FILE in /dev/.magisk /data/.magisk /cache/.magisk /system/.magisk; do
     if [ -z "$VALUE" ]; then
       LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
       if [ ! -z "$LINE" ]; then
@@ -203,42 +203,12 @@ if [ ! -f '/system/build.prop' ]; then
   exit 1
 fi
 
-API=$(grep_prop ro.build.version.sdk)
-ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
-ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
-ABILONG=$(grep_prop ro.product.cpu.abi)
-
-ARCH=arm
-IS64BIT=false
-if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
-if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
-
-
-if [ "$API" -lt "21" ]; then
-  ui_print "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
-  exit 1
-fi
-
-ui_print "- Device platform: $ARCH"
-
-BINDIR=$INSTALLER/arm
-if [ "$ARCH" = "x86" -o "$ARCH" = "x64" ]; then
-  BINDIR=$INSTALLER/x86
-fi
-
-find_boot_image
-if [ -z "$BOOTIMAGE" ]; then
-  ui_print "! Unable to detect boot image"
-  exit 1
-fi
-
 if [ -z "$NOOVERRIDE" ]; then
   # read override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar NORESTORE
+  getvar BOOTIMAGE
 fi
 
 if [ -z "$KEEPVERITY" ]; then
@@ -260,27 +230,32 @@ if [ $? -eq 0 ]; then
   SAMSUNG=true
 fi
 
-##########################################################################################
-# Environment
-##########################################################################################
+API=$(grep_prop ro.build.version.sdk)
+ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
+ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
+ABILONG=$(grep_prop ro.product.cpu.abi)
 
-ui_print "- Constructing environment"
+ARCH=arm
+IS64BIT=false
+if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
+if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
+if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
+if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
 
-if (is_mounted /data); then
-  rm -rf /data/busybox /data/magisk 2>/dev/null
-  mkdir -p /data/busybox
-  cp -af $BINDIR /data/magisk
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
-  chmod 755 /data/busybox /data/magisk /data/magisk/*
-  chcon 'u:object_r:system_file:s0' /data/busybox /data/magisk /data/magisk/*
-  /data/magisk/busybox --install -s /data/busybox
-  # Prevent issues
-  rm -f /data/busybox/su /data/busybox/sh
-else
-  rm -rf /cache/data_bin 2>/dev/null
-  mkdir -p /cache/data_bin
-  cp -af $BINDIR /cache/data_bin
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+
+if [ "$API" -lt "21" ]; then
+  ui_print "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
+  exit 1
+fi
+
+ui_print "- Device platform: $ARCH"
+
+BINDIR=$INSTALLER/$ARCH
+
+find_boot_image
+if [ -z "$BOOTIMAGE" ]; then
+  ui_print "! Unable to detect boot image"
+  exit 1
 fi
 
 ##########################################################################################
@@ -288,7 +263,7 @@ fi
 ##########################################################################################
 
 # Fix SuperSU.....
-($BOOTMODE) && /data/magisk/sepolicy-inject -s fsck --live
+($BOOTMODE) && $BINDIR/sepolicy-inject -s fsck --live
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -317,6 +292,29 @@ cp -af $INSTALLER/common/magiskhide/. /magisk/.core/magiskhide
 # Remove legacy SuperSU module
 mkdir -p /magisk/zzsupersu
 touch /magisk/zzsupersu/remove
+
+##########################################################################################
+# Environment
+##########################################################################################
+
+ui_print "- Constructing environment"
+
+if (is_mounted /data); then
+  rm -rf /data/busybox /data/magisk 2>/dev/null
+  mkdir -p /data/busybox
+  cp -af $BINDIR /data/magisk
+  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
+  chmod 755 /data/busybox /data/magisk /data/magisk/*
+  /data/magisk/busybox --install -s /data/busybox
+  ln -s /data/magisk/busybox /data/busybox/busybox
+  # Prevent issues
+  rm -f /data/busybox/su /data/busybox/sh
+else
+  rm -rf /cache/data_bin 2>/dev/null
+  mkdir -p /cache/data_bin
+  cp -af $BINDIR /cache/data_bin
+  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+fi
 
 ##########################################################################################
 # Boot image patch
@@ -374,17 +372,15 @@ if (! $NORESTORE); then
   fi
 fi
 
+# SuperSU already backup stock boot, no need to do again
 if (! $SUPERSU); then
   ui_print "- Creating backups"
   mkdir .backup 2>/dev/null
-  cp -af init.environ.rc *fstab* verity_key sepolicy .backup 2>/dev/null
-  if (! $SUPERSU); then
-    # SuperSU already backup stock boot, no need to do again
-    if (is_mounted /data); then
-      cp -af $ORIGBOOT /data/stock_boot.img
-    else
-      cp -af $ORIGBOOT /cache/stock_boot.img
-    fi
+  cp -af init init.environ.rc *fstab* verity_key sepolicy .backup 2>/dev/null
+  if (is_mounted /data); then
+    cp -af $ORIGBOOT /data/stock_boot.img
+  else
+    cp -af $ORIGBOOT /cache/stock_boot.img
   fi
 fi
 
@@ -400,7 +396,7 @@ for INIT in init*.rc; do
   fi
 done
 
-# Add magisk PATH
+# Add magisk specific
 if [ $(grep -c "export PATH" init.environ.rc) -eq "0" ]; then
   sed -i "/on init/a\ \ \ \ export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/magisk/.core/busybox" init.environ.rc
 else 
