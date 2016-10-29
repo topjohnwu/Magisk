@@ -12,20 +12,20 @@
     <string name="settings">Instellingen</string>
 
     <!--Magisk Fragment-->
-    <string name="magisk_version">Geinstalleerde Magisk: v%1$s</string>
-    <string name="magisk_version_error">Heb jij Magisk wel geinstalleerd?</string>
+    <string name="magisk_version">Geïnstalleerde Magisk: v%1$s</string>
+    <string name="magisk_version_error">Heb jij Magisk wel geïnstalleerd?</string>
 
     <string name="app_update_available">Magisk Manager App v%1$s update!</string>
     <string name="magisk_update_available">Magisk v%1$s update!</string>
-    <string name="cannot_check_updates">Kan geen updates controleren.</string>
-    <string name="up_to_date">Nieuwste versie van %1$s geinstalleerd</string>
+    <string name="cannot_check_updates">Kan niet controleren op updates.</string>
+    <string name="up_to_date">Nieuwste versie van %1$s geïnstalleerd</string>
 
     <!--Root Fragment-->
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Geen informatie gegeven)</string>
     <string name="no_modules_found">Geen modules gevonden</string>
-    <string name="update_file_created">Module wordt geupdatet bij de volgende reboot.</string>
+    <string name="update_file_created">Module wordt geüpdatet bij de volgende reboot.</string>
     <string name="remove_file_created">Module wordt verwijderd bij de volgende reboot.</string>
     <string name="remove_file_deleted">Module wordt niet verwijderd bij de volgende reboot.</string>
     <string name="disable_file_created">Module wordt uitgeschakeld bij de volgende reboot.</string>
@@ -34,8 +34,8 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Update Beschikbaar</string>
-    <string name="installed">Geinstalleerd</string>
-    <string name="not_installed">Niet geinstalleerd</string>
+    <string name="installed">Geïnstalleerd</string>
+    <string name="not_installed">Niet geïnstalleerd</string>
     <string name="changelog">Changelog</string>
 
     <!--Log Fragment-->
@@ -50,7 +50,7 @@
 
     <!--About Activity-->
     <string name="about">Over</string>
-    <string name="app_developers">Hoofd developers</string>
+    <string name="app_developers">Hoofddevelopers</string>
     <string name="app_developers_"><![CDATA[App gemaakt door <a href="https://github.com/topjohnwu">topjohnwu</a> in samenwerking met <a href="https://github.com/d8ahazard">Digitalhigh</a> en <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
     <string name="translators" />
@@ -61,25 +61,25 @@
     <string name="support_thread">Support thread</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
-    <string name="no_root_access">No root access, functionality limited</string>
-    <string name="no_thanks">No thanks</string>
+    <string name="permissionNotGranted">Deze feature zal niet werken zonder permissie om op de externe opslag te schrijven.</string>
+    <string name="no_root_access">Geen root, functionaliteit beperkt</string>
+    <string name="no_thanks">Nee bedankt</string>
     <string name="update_title">%1$s Update!</string>
-    <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
-    <string name="repo_install_title">Install %1$s</string>
-    <string name="repo_install_msg">Do you want to install %1$s ?</string>
-    <string name="download_install">Download and install</string>
-    <string name="download_file_error">Error downloading file</string>
-    <string name="install_error">Installation error!</string>
-    <string name="manual_install">Error in flashing file, zip file placed in %1$s\nFlash it in recovery manually</string>
-    <string name="invalid_zip">The zip is not a Magisk Module!!</string>
-    <string name="reboot_title">Installation succeeded!</string>
-    <string name="reboot_msg">Do you want to reboot now?</string>
+    <string name="update_msg">Nieuwe versie v%2$s van %1$s is beschikbaar!\nChangelog:\n%3$s</string>
+    <string name="repo_install_title">Installeer %1$s</string>
+    <string name="repo_install_msg">Wilt u  %1$s installeren?</string>
+    <string name="download_install">Downloaden en installeren</string>
+    <string name="download_file_error">Er is een fout opgetreden bij het downloaden van het bestand</string>
+    <string name="install_error">Er is een fout opgetreden in de installatie</string>
+    <string name="manual_install">Er is een fout opgetreden in het flashen van het bestand. Het zip bestand is opgeslagen in %1$s\nFlash het handmatig in recovery modus.</string>
+    <string name="invalid_zip">Zip bestand is geen Magisk Module!</string>
+    <string name="reboot_title">Installatie succesvol!</string>
+    <string name="reboot_msg">Wilt u nu rebooten?</string>
     <string name="reboot">Reboot</string>
-    <string name="zip_install_progress_title">Installing</string>
-    <string name="zip_install_progress_msg">"Installing %1$s …"</string>
-    <string name="no_magisk_title">No Magisk Installed!</string>
-    <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
+    <string name="zip_install_progress_title">Installeren</string>
+    <string name="zip_install_progress_msg">"Instalatievoortgang: %1$s …"</string>
+    <string name="no_magisk_title">Geen Magisk geïnstalleerd!</string>
+    <string name="no_magisk_msg">Wilt u Magisk downloaden en installeren?</string>
 
     <!--URL Templates-->
     <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
@@ -87,19 +87,19 @@
     <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Fragment -->
-    <string name="settings_general_category">General</string>
-    <string name="settings_theme_title">Theme</string>
-    <string name="settings_theme_summary">Select a theme</string>
-    <string name="settings_busybox_title">Enable BusyBox</string>
-    <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
+    <string name="settings_general_category">Algemeen</string>
+    <string name="settings_theme_title">Thema</string>
+    <string name="settings_theme_summary">Selecteer een thema</string>
+    <string name="settings_busybox_title">Schakel BusyBox in</string>
+    <string name="settings_busybox_summary">Maakt Magisk\'s ingebouwde BusyBox zichtbaar in PATH</string>
 
     <string name="settings_development_category">Development</string>
-    <string name="settings_developer_logging_title">Enable advanced debug logging</string>
-    <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
-    <string name="settings_shell_logging_title">Enable shell command debug logging</string>
-    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
-    <string name="settings_magiskhide_title">Enable Magisk Hide</string>
-    <string name="settings_magiskhide_summary">Reboot to apply settings</string>
+    <string name="settings_developer_logging_title">Geavanceerde debug logging</string>
+    <string name="settings_developer_logging_summary">Schakel dit in voor uitgebreidere logging.</string>
+    <string name="settings_shell_logging_title">Shell command debug loggin</string>
+    <string name="settings_shell_logging_summary">Schakel dit in om alle shell commands en output te loggen</string>
+    <string name="settings_magiskhide_title">Magisk verbergen</string>
+    <string name="settings_magiskhide_summary">Reboot om de instellingen toe te passen</string>
 
     <!-- Strings related to Settings -->
 
