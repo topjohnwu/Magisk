@@ -237,7 +237,7 @@ if (is_mounted /data); then
     revert_boot
   fi
   ui_print "- Removing Magisk files"
-  rm -rf /cache/magisk /cache/magisk_merge /cache/magisk.log /cache/last_magisk.log /cache/unblock /data/Magisk.apk /data/magisk.img /data/magisk_merge.img /data/busybox /data/magisk 2>/dev/null
+  rm -rf /cache/magisk /cache/magisk_merge /cache/magisk.log /cache/last_magisk.log /cache/unblock /data/Magisk.apk /data/magisk.img /data/magisk_merge.img /data/busybox /data/magisk /data/custom_ramdisk_patch.sh 2>/dev/null
 else
   ui_print "! Data unavalible"
   ui_print "! Impossible to restore original boot image"
