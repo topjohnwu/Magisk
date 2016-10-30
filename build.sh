@@ -1,16 +1,16 @@
 #!/bin/bash
 
 usage() {
-  echo "$0 --all <version number>"
+  echo "$0 all <version number>"
   echo -e "\tBuild binaries, zip, and sign Magisk"
   echo -e "\tThis is equlivant to first --build, then --zip"
-  echo "$0 --clean"
+  echo "$0 clean"
   echo -e "\tCleanup compiled / generated files"
-  echo "$0 --build"
+  echo "$0 build"
   echo -e "\tBuild the binaries with ndk"
-  echo "$0 --zip <version number>"
+  echo "$0 zip <version number>"
   echo -e "\tZip and sign Magisk"
-  echo "$0 --uninstaller"
+  echo "$0 uninstaller"
   echo -e "\tZip and sign the uninstaller"
   exit 1
 }
@@ -56,14 +56,18 @@ build_bin() {
 }
 
 zip_package() {
+  if [ ! -f "zip_static/arm/bootimgtools" ]; then
+    echo "! Missing binaries!!"
+    echo "! Please run \"$0 build\" before zipping"
+    exit 1
+  fi
   echo "************************"
   echo "* Adding version info"
-  echo "* \"Magisk v$1\""
   echo "************************"
   sed "s/MAGISK_VERSION_STUB/Magisk v$1 Boot Image Patcher/g" scripts/flash_script.sh > zip_static/META-INF/com/google/android/update-binary
   sed "s/MAGISK_VERSION_STUB/setprop magisk.version $1/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
   echo "************************"
-  echo "* Zipping the package"
+  echo "* Zipping Magisk v$1"
   echo "************************"
   cd zip_static
   find . -type f -exec chmod 644 {} \;
@@ -72,6 +76,25 @@ zip_package() {
   zip "../Magisk-v$1.zip" -r .
   cd ../
   sign_zip "Magisk-v$1.zip"
+}
+
+zip_uninstaller() {
+  if [ ! -f "uninstaller/arm/bootimgtools" ]; then
+    echo "! Missing binaries!!"
+    echo "! Please run \"$0 build\" before zipping"
+    exit 1
+  fi
+  echo "************************"
+  echo "* Zipping uninstaller"
+  echo "************************"
+  cd uninstaller
+  find . -type f -exec chmod 644 {} \;
+  find . -type d -exec chmod 755 {} \;
+  TIMESTAMP=$(date "+%Y%m%d")
+  rm -rf "../Magisk-uninstaller-$TIMESTAMP.zip"
+  zip "../Magisk-uninstaller-$TIMESTAMP.zip" -r .
+  cd ../
+  sign_zip "Magisk-uninstaller-$TIMESTAMP.zip"
 }
 
 sign_zip() {
@@ -103,22 +126,22 @@ DIR="$(cd "$(dirname "$0")"; pwd)"
 cd "$DIR"
 
 case $1 in
-  "--all" )
+  "all" )
     [ -z "$2" ] && echo -e "! Missing version number\n" && usage
     build_bin
     zip_package $2
     ;;
-  "--clean" )
+  "clean" )
     cleanup
     ;;
-  "--build" )
+  "build" )
     build_bin
     ;;
-  "--zip" )
+  "zip" )
     [ -z "$2" ] && echo -e "! Missing version number\n" && usage
     zip_package $2
     ;;
-  "--uninstaller" )
+  "uninstaller" )
     zip_uninstaller
     ;;
   * )
