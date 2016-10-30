@@ -184,9 +184,9 @@ repack_boot() {
 # Detection
 ##########################################################################################
 
-ui_print "****************************"
-ui_print "Magisk v8 Boot Image Patcher"
-ui_print "****************************"
+ui_print "*****************************"
+ui_print "MAGISK_VERSION_STUB"
+ui_print "*****************************"
 
 if [ ! -d "$INSTALLER/common" ]; then
   ui_print "! Failed: Unable to extract zip file!"

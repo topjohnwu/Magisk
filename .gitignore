@@ -1,3 +1,21 @@
-obj
-libs
+obj/
+libs/
 *.zip
+
+# Generated binaries
+zip_static/arm/*
+zip_static/arm64/*
+zip_static/x86/*
+zip_static/x64/*
+uninstaller/arm/*
+uninstaller/arm64/*
+uninstaller/x86/*
+uninstaller/x64/*
+zipsigntools/zipadjust
+
+# Generated scripts
+zip_static/common/magic_mask.sh
+zip_static/META-INF/com/google/android/update-binary
+
+# Leave all busybox!
+!busybox

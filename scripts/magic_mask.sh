@@ -396,7 +396,7 @@ case $1 in
 
   service )
     # Version info
-    setprop magisk.version 8
+    MAGISK_VERSION_STUB
     log_print "Magisk late_start service mode running..."
     run_scripts service
     [ -f "$COREDIR/magiskhide/enable" ] && setprop magisk.hide 1
