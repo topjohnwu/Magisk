@@ -6,6 +6,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskhide
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := magiskhide.c
+LOCAL_CFLAGS += -std=gnu11
 include $(BUILD_EXECUTABLE)
 
 include $(CLEAR_VARS)

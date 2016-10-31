@@ -21,8 +21,8 @@ export OLDPATH=$PATH
 
 
 log_print() {
-  echo $1
-  echo $1 >> $LOGFILE
+  echo "$1"
+  echo "$1" >> $LOGFILE
   log -p i -t Magisk "$1"
 }
 
@@ -224,7 +224,7 @@ case $1 in
     touch $LOGFILE
     chmod 644 $LOGFILE
 
-    log_print "Magisk post-fs mode running..."
+    log_print "** Magisk post-fs mode running..."
 
     # No more cache mods!
     # Only for multirom!
@@ -246,7 +246,7 @@ case $1 in
     # Don't run twice
     if [ "$(getprop magisk.restart_pfsd)" != "1" ]; then
 
-      log_print "Magisk post-fs-data mode running..."
+      log_print "** Magisk post-fs-data mode running..."
 
       # Live patch sepolicy
       /data/magisk/sepolicy-inject --live -s su
@@ -397,24 +397,18 @@ case $1 in
   service )
     # Version info
     MAGISK_VERSION_STUB
-    log_print "Magisk late_start service mode running..."
+    log_print "** Magisk late_start service mode running..."
     run_scripts service
-    [ -f "$COREDIR/magiskhide/enable" ] && setprop magisk.hide 1
-    ;;
 
-  hide )
-    # Enable magiskhide
-    [ ! -f "$COREDIR/magiskhide/hidelist" ] && mktouch $COREDIR/magiskhide/hidelist
-    # Add preset for Safety Net
-    if [ $(grep -c "com.google.android.gms.unstable" $COREDIR/magiskhide/hidelist) -eq "0" ]; then
-      mv $COREDIR/magiskhide/hidelist $COREDIR/magiskhide/hidelist.tmp
-      echo "com.google.android.gms.unstable" > $COREDIR/magiskhide/hidelist
-      cat $COREDIR/magiskhide/hidelist.tmp >> $COREDIR/magiskhide/hidelist
-      rm -f $COREDIR/magiskhide/hidelist.tmp
+    # MagiskHide
+    if [ -f "$COREDIR/magiskhide/enable" ]; then
+      [ ! -f "$COREDIR/magiskhide/hidelist" ] && mktouch $COREDIR/magiskhide/hidelist
+      chmod -R 755 $COREDIR/magiskhide
+      # Add Safety Net preset
+      $COREDIR/magiskhide/add com.google.android.gms.unstable
+      log_print "** Starting Magisk Hide"
+      /data/magisk/magiskhide
     fi
-    chmod 755 $COREDIR/magiskhide $COREDIR/magiskhide/*
-    log_print "Starting Magisk Hide"
-    exec /data/magisk/magiskhide $COREDIR/magiskhide/hidelist
     ;;
 
 esac

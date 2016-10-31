@@ -1,12 +1,9 @@
 #!/system/bin/sh
 
-HIDELIST=$MOUNTPOINT/.core/magiskhide/hidelist
+HIDELIST=/magisk/.core/magiskhide/hidelist
 
 if [ ! -z "$1" ]; then
   if [ $(grep -c "^$1$" $HIDELIST) -eq "0" ]; then
     echo "$1" >> $HIDELIST
   fi
 fi
-
-# Reload the list
-setprop magisk.hide 1
