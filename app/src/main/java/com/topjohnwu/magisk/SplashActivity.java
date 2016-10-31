@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.topjohnwu.magisk.utils.Async;
@@ -12,12 +13,16 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 public class SplashActivity extends AppCompatActivity {
-private SharedPreferences prefs;
+
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -59,7 +64,7 @@ private SharedPreferences prefs;
 
     private void setupHideLists() {
 
-        Set<String> set = null;
+        Set<String> set = new HashSet<>();
         Set<String> setOriginal = null;
         List<String> hideList = null;
         List<String> addList = null;
