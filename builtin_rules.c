@@ -282,6 +282,10 @@ void otherToSU() {
 	allow("surfaceflinger", "app_data_file", "file", ALL);
 	allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
 	add_type("surfaceflinger", "mlstrustedsubject", policy);
+
+	// suMiscL6
+	if (exists("audioserver"))
+		allow("audioserver", "audioserver", "process", "execmem");
 }
 
 void phh_rules(policydb_t *policydb) {
@@ -289,9 +293,8 @@ void phh_rules(policydb_t *policydb) {
 
 	// Samsung specific
 	// Prevent system from loading policy
-	if(exists("knox_system_app")) {
+	if(exists("knox_system_app"))
 		samsung();
-	}
 
 	// Create domains if they don't exist
 	setPermissive("su", 1);
@@ -309,10 +312,11 @@ void phh_rules(policydb_t *policydb) {
 	allowSuClient("system_app");
 	allowSuClient("platform_app");
 	allowSuClient("su");
+	if (exists("priv_app"))
+		allowSuClient("priv_app");
 
-	if(exists("ssd_tool")) {
+	if (exists("ssd_tool"))
 		allowSuClient("ssd_tool");
-	}
 
 	// Allow init to execute su daemon/transition
 	allow("init", "su_daemon", "process", "transition");
@@ -330,6 +334,7 @@ void phh_rules(policydb_t *policydb) {
 	add_type("su", "mlstrustedsubject", policy);
 }
 
+// Minimal to run Magisk script before live patching
 void magisk_rules(policydb_t *policydb) {
 	policy = policydb;
 
@@ -338,12 +343,12 @@ void magisk_rules(policydb_t *policydb) {
 
 	add_type("su", "mlstrustedsubject", policy);
 
-	// Minimal to run Magisk script before live patching
 	allow("kernel", "su", "fd", "use");
 	allow("init", "su", "process", ALL);
 	allow("init", "system_file", "dir", ALL);
 	allow("init", "system_file", "lnk_file", ALL);
 	allow("init", "system_file", "file", ALL);
+
 	allow("su", "property_socket", "sock_file", "write");
 	allow("su", "shell_exec", "file", ALL);
 	allow("su", "init", "unix_stream_socket", "connectto");
@@ -355,10 +360,48 @@ void magisk_rules(policydb_t *policydb) {
 	allow("su", "su", "fifo_file", ALL);
 	allow("su", "su", "lnk_file", ALL);
 	allow("su", "su", "dir", ALL);
+
+	// vold, bootanim, surfaceflinger might require mounts in multirom
+	allow("su", "vold_exec", "file", ALL);
+	allow("su", "bootanim_exec", "file", ALL);
+	allow("su", "surfaceflinger_exec", "file", ALL);
+
+	// Access toolbox/toybox tools
+	allow("su", "toolbox_exec", "file", ALL);
+	allow("su", "toolbox_exec", "lnk_file", ALL);
+
+	// For /dev 
 	allow("su", "device", "file", ALL);
 	allow("su", "device", "fifo_file", ALL);
 	allow("su", "device", "lnk_file", ALL);
 	allow("su", "device", "dir", ALL);
+
+	// For rootfs
+	allow("su", "rootfs", "file", ALL);
+	allow("su", "rootfs", "fifo_file", ALL);
+	allow("su", "rootfs", "lnk_file", ALL);
+	allow("su", "rootfs", "dir", ALL);
+
+	// For system/cache/data files
+	allow("su", "system_file", "file", ALL);
+	allow("su", "system_file", "fifo_file", ALL);
+	allow("su", "system_file", "lnk_file", ALL);
+	allow("su", "system_file", "dir", ALL);
+	allow("su", "system_data_file", "file", ALL);
+	allow("su", "system_data_file", "fifo_file", ALL);
+	allow("su", "system_data_file", "lnk_file", ALL);
+	allow("su", "system_data_file", "dir", ALL);
+	allow("su", "cache_file", "file", ALL);
+	allow("su", "cache_file", "fifo_file", ALL);
+	allow("su", "cache_file", "lnk_file", ALL);
+	allow("su", "cache_file", "dir", ALL);
+
+	// For sepolicy live patching
+	allow("su", "kernel", "security", "read_policy");
+	allow("su", "kernel", "security", "load_policy");
+	allow("su", "selinuxfs", "file", ALL);
+
+	// For detecting current mount status
 	allow("su", "storage_file", "file", ALL);
 	allow("su", "storage_file", "fifo_file", ALL);
 	allow("su", "storage_file", "lnk_file", ALL);
@@ -371,46 +414,7 @@ void magisk_rules(policydb_t *policydb) {
 	allow("su", "block_device", "fifo_file", ALL);
 	allow("su", "block_device", "lnk_file", ALL);
 	allow("su", "block_device", "dir", ALL);
-	allow("su", "rootfs", "file", ALL);
-	allow("su", "rootfs", "fifo_file", ALL);
-	allow("su", "rootfs", "lnk_file", ALL);
-	allow("su", "rootfs", "dir", ALL);
-	allow("su", "toolbox_exec", "file", ALL);
-	allow("su", "toolbox_exec", "fifo_file", ALL);
-	allow("su", "toolbox_exec", "lnk_file", ALL);
-	allow("su", "toolbox_exec", "dir", ALL);
-	allow("su", "zygote_exec", "file", ALL);
-	allow("su", "zygote_exec", "fifo_file", ALL);
-	allow("su", "zygote_exec", "lnk_file", ALL);
-	allow("su", "zygote_exec", "dir", ALL);
-	allow("su", "bootanim_exec", "file", ALL);
-	allow("su", "bootanim_exec", "fifo_file", ALL);
-	allow("su", "bootanim_exec", "lnk_file", ALL);
-	allow("su", "bootanim_exec", "dir", ALL);
-	allow("su", "dex2oat_exec", "file", ALL);
-	allow("su", "dex2oat_exec", "fifo_file", ALL);
-	allow("su", "dex2oat_exec", "lnk_file", ALL);
-	allow("su", "dex2oat_exec", "dir", ALL);
-	allow("su", "fsck_exec", "file", ALL);
-	allow("su", "fsck_exec", "fifo_file", ALL);
-	allow("su", "fsck_exec", "lnk_file", ALL);
-	allow("su", "fsck_exec", "dir", ALL);
-	allow("su", "cache_file", "file", ALL);
-	allow("su", "cache_file", "fifo_file", ALL);
-	allow("su", "cache_file", "lnk_file", ALL);
-	allow("su", "cache_file", "dir", ALL);
-	allow("su", "system_file", "file", ALL);
-	allow("su", "system_file", "fifo_file", ALL);
-	allow("su", "system_file", "lnk_file", ALL);
-	allow("su", "system_file", "dir", ALL);
-	allow("su", "system_data_file", "file", ALL);
-	allow("su", "system_data_file", "fifo_file", ALL);
-	allow("su", "system_data_file", "lnk_file", ALL);
-	allow("su", "system_data_file", "dir", ALL);
-	allow("su", "kernel", "security", "read_policy");
-	allow("su", "kernel", "security", "load_policy");
-	allow("su", "selinuxfs", "file", ALL);
-
+	
 	// Xposed
 	allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	allow("system_server", "dex2oat_exec", "file", ALL);
