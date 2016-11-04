@@ -15,8 +15,10 @@ MOUNTINFO=$TMPDIR/mnt
 # Use the included busybox for maximum compatibility and reliable results
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
 TOOLPATH=/data/busybox
+BINPATH=/data/magisk
 
 # Legacy support for old phh, we don't change PATH now
+# Will remove in the next release
 export OLDPATH=$PATH
 
 
@@ -224,10 +226,10 @@ case $1 in
     touch $LOGFILE
     chmod 644 $LOGFILE
 
-    log_print "** Magisk post-fs mode running..."
-
     # No more cache mods!
     # Only for multirom!
+
+    # log_print "** Magisk post-fs mode running..."
 
     unblock
     ;;
@@ -244,28 +246,31 @@ case $1 in
     fi
 
     # Don't run twice
-    if [ "$(getprop magisk.restart_pfsd)" != "1" ]; then
+    if [ "`getprop magisk.restart_pfsd`" != "1" ]; then
 
       log_print "** Magisk post-fs-data mode running..."
 
       # Live patch sepolicy
-      /data/magisk/sepolicy-inject --live -s su
+      $BINPATH/sepolicy-inject --live -s su
+
+      # Multirom functions should go here, not available right now
+      MULTIROM=false
 
       # Cache support
       if [ -d "/cache/data_bin" ]; then
-        rm -rf /data/busybox /data/magisk
-        mkdir -p /data/busybox
-        mv /cache/data_bin /data/magisk
-        chmod -R 755 /data/busybox /data/magisk
-        /data/magisk/busybox --install -s /data/busybox
-        ln -s /data/magisk/busybox /data/busybox/busybox
+        rm -rf $BINPATH $TOOLPATH
+        mkdir -p $TOOLPATH
+        mv /cache/data_bin $BINPATH
+        chmod -R 755 $BINPATH $TOOLPATH
+        $BINPATH/busybox --install -s $TOOLPATH
+        ln -s $BINPATH/busybox $TOOLPATH/busybox
         # Prevent issues
-        rm -f /data/busybox/su /data/busybox/sh
+        rm -f $TOOLPATH/su $TOOLPATH/sh
       fi
 
       mv /cache/stock_boot.img /data 2>/dev/null
 
-      chcon -R 'u:object_r:system_file:s0' /data/busybox /data/magisk
+      chcon -R 'u:object_r:system_file:s0' $BINPATH $TOOLPATH
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
@@ -286,7 +291,7 @@ case $1 in
         unblock
       fi
 
-      # Remove empty directories and remove legacy paths and previous symlink
+      # Remove empty directories, legacy paths and symlinks
       rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror
       $TOOLPATH/find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
 
@@ -322,7 +327,7 @@ case $1 in
       mkdir -p $DUMMDIR
       mkdir -p $MIRRDIR/system
 
-      # Travel through all mods
+      # Travel through all mods, all magic happens here
       for MOD in $MOUNTPOINT/* ; do
         if [ -f "$MOD/auto_mount" -a -d "$MOD/system" -a ! -f "$MOD/disable" ]; then
           (travel $MOD system)
@@ -379,7 +384,7 @@ case $1 in
       log_print "Bind mount mirror items"
       # Find all empty directores and dummy files, they should be mounted by original files in /system
       TOOLPATH=/data/busybox $TOOLPATH/find $DUMMDIR -type d \
-      -exec sh -c '[ -z "$($TOOLPATH/ls -A $1)" ] && echo $1' -- {} \; \
+      -exec sh -c '[ -z "`$TOOLPATH/ls -A $1`" ] && echo $1' -- {} \; \
       -o \( -type f -size 0 -print \) | \
       while read ITEM ; do
         ORIG=${ITEM/dummy/mirror}
@@ -387,8 +392,8 @@ case $1 in
         bind_mount $ORIG $TARGET
       done
 
-      # Restart post-fs-data, since data might be changed (multirom)
-      setprop magisk.restart_pfsd 1
+      # Restart post-fs-data if necessary (multirom)
+      ($MULTIROM) && setprop magisk.restart_pfsd 1
 
     fi
     unblock
@@ -400,14 +405,25 @@ case $1 in
     log_print "** Magisk late_start service mode running..."
     run_scripts service
 
-    # MagiskHide
+    # Hide Safety Net
     if [ -f "$COREDIR/magiskhide/enable" ]; then
-      [ ! -f "$COREDIR/magiskhide/hidelist" ] && mktouch $COREDIR/magiskhide/hidelist
+      log_print "** Removing tampered read-only system props"
+
+      VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
+      FLASHLOCKED=`getprop ro.boot.flash.locked`
+      VERITYMODE=`getprop ro.boot.veritymode`
+
+      [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
+      [ ! -z "$FLASHLOCKED" -a "$FLASHLOCKED" != "1" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
+      [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
+
+      mktouch $COREDIR/magiskhide/hidelist
       chmod -R 755 $COREDIR/magiskhide
       # Add Safety Net preset
       $COREDIR/magiskhide/add com.google.android.gms.unstable
       log_print "** Starting Magisk Hide"
       /data/magisk/magiskhide
+
     fi
     ;;
 

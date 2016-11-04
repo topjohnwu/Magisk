@@ -160,7 +160,7 @@ int main(int argc, char **argv, char **envp) {
 		logfile = fopen("/cache/magisk.log", "a+");
 		setbuf(logfile, NULL);
 
-		pthread_t list_monitor, unmount_thread;
+		pthread_t list_monitor;
 
 		pthread_mutex_init(&mutex, NULL);
 		pthread_create(&list_monitor, NULL, monitor_list, "/magisk/.core/magiskhide/hidelist");

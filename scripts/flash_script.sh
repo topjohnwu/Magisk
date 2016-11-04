@@ -376,7 +376,7 @@ fi
 if (! $SUPERSU); then
   ui_print "- Creating backups"
   mkdir .backup 2>/dev/null
-  cp -af init.environ.rc *fstab* verity_key sepolicy .backup 2>/dev/null
+  cp -af *fstab* verity_key sepolicy .backup 2>/dev/null
   if (is_mounted /data); then
     cp -af $ORIGBOOT /data/stock_boot.img
   else
@@ -396,17 +396,17 @@ for INIT in init*.rc; do
   fi
 done
 
-# Add magisk specific
-if [ $(grep -c "export PATH" init.environ.rc) -eq "0" ]; then
-  sed -i "/on init/a\ \ \ \ export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/magisk/.core/busybox" init.environ.rc
-else 
-  if [ $(grep -c "/magisk/.core/busybox" init.environ.rc) -eq "0" ]; then
-    sed -i "/export PATH/ s/\/system\/xbin/\/system\/xbin:\/magisk\/.core\/busybox/g" init.environ.rc
-  fi
-  if [ $(grep -c "/magisk/.core/bin" init.environ.rc) -eq "0" ] && (! $SUPERSU); then
-    sed -i "/export PATH/ s/\/sbin/\/magisk\/.core\/bin:\/sbin/g" init.environ.rc
-  fi
-fi
+# # Add magisk specific
+# if [ $(grep -c "export PATH" init.environ.rc) -eq "0" ]; then
+#   sed -i "/on init/a\ \ \ \ export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/magisk/.core/busybox" init.environ.rc
+# else 
+#   if [ $(grep -c "/magisk/.core/busybox" init.environ.rc) -eq "0" ]; then
+#     sed -i "/export PATH/ s/\/system\/xbin/\/system\/xbin:\/magisk\/.core\/busybox/g" init.environ.rc
+#   fi
+#   if [ $(grep -c "/magisk/.core/bin" init.environ.rc) -eq "0" ] && (! $SUPERSU); then
+#     sed -i "/export PATH/ s/\/sbin/\/magisk\/.core\/bin:\/sbin/g" init.environ.rc
+#   fi
+# fi
 
 if (! $SUPERSU); then
   sed -i "/selinux.reload_policy/d" init.rc
