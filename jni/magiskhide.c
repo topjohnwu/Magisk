@@ -56,8 +56,11 @@ int hideMagisk(int pid) {
 	char *path = NULL;
 	asprintf(&path, "/proc/%d/ns/mnt", pid);
 	int fd = open(path, O_RDONLY);
-	if(fd == -1) return 2;
-	if(setns(fd, 0) == -1) return 3;
+	if(fd == -1) return 2; // Maybe process died..
+	if(setns(fd, 0) == -1) {
+		fprintf(logfile, "Unable to change namespace for pid=%d\n", pid);
+		return 3;
+	}
 
 	free(path);
 	path = NULL;
@@ -65,7 +68,7 @@ int hideMagisk(int pid) {
 	FILE *mount_fp = fopen(path, "r");
 	if (mount_fp == NULL) {
 		fprintf(logfile, "Error opening mount list!\n");
-		return 1;
+		return 4;
 	}
 	free(path);
 
@@ -73,15 +76,17 @@ int hideMagisk(int pid) {
 	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], *sbstr;
 	fclose(mount_fp);
 
+	// Unmount in inverse order
 	for(i = mount_size - 1; i >= 0; --i) {
-		if(strstr(mount_list[i], "/dev/block/loop")) {
+		if (strstr(mount_list[i], "/dev/block/loop")) {
+			if (strstr(mount_list[i], "/dev/magisk")) continue;
+			// Everything from loop mount
 			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-			if (!strstr(mountpoint, "/dev/magisk/dummy")) 
-				lazy_unmount(mountpoint);
-		} else if ((sbstr = strstr(mount_list[i], "/dev/magisk/dummy"))) {
-			sscanf(sbstr, "/dev/magisk/dummy%256s", mountpoint);
-			lazy_unmount(mountpoint);
-		}
+		} else if (strstr(mount_list[i], "tmpfs /system/")) {
+			// Directly unmount skeletons
+			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
+		} else continue;
+		lazy_unmount(mountpoint);
 		free(mount_list[i]);
 	}
 	// Free memory
@@ -192,7 +197,7 @@ int main(int argc, char **argv, char **envp) {
 
 			for (i = 0; i < list_size; ++i) {
 				if(strstr(processName, hide_list[i])) {
-					fprintf(logfile, "MagiskHide: Disabling for process = %s, PID = %d, UID = %d\n", processName, pid, uid);
+					fprintf(logfile, "MagiskHide: Disabling for process=%s, PID=%d, UID=%d\n", processName, pid, uid);
 					forkpid = fork();
 					if (forkpid < 0)
 						break;
@@ -200,7 +205,7 @@ int main(int argc, char **argv, char **envp) {
 						hideMagisk(pid);
 						return 0;
 					}
-					wait(&i);
+					waitpid(forkpid, NULL, 0);
 					kill(forkpid, SIGTERM);
 					break;
 				}
