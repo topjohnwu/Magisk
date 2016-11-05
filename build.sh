@@ -42,6 +42,12 @@ build_bin() {
   echo "* Building binaries"
   echo "************************"
   ndk-build -j4
+  if [ $? -ne 0 ]; then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "! Magisk binary tools build failed...."
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
+  fi
   echo "************************"
   echo "* Copying binaries"
   echo "************************"
@@ -57,8 +63,10 @@ build_bin() {
 
 zip_package() {
   if [ ! -f "zip_static/arm/bootimgtools" ]; then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
     echo "! Missing binaries!!"
     echo "! Please run \"$0 build\" before zipping"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
     exit 1
   fi
   echo "************************"
@@ -103,6 +111,12 @@ sign_zip() {
     echo "* Compiling ZipAdjust"
     echo "************************"
     gcc -o zipsigntools/zipadjust zipsigntools/src/*.c -lz
+    if [ $? -ne 0 ]; then
+      echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+      echo "! ZipAdjust Build failed...."
+      echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+      exit 1
+    fi
     chmod 755 zipsigntools/zipadjust
   fi
   echo "************************"
