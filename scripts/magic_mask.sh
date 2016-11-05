@@ -48,7 +48,7 @@ run_scripts() {
     if [ ! -f "$MOD/disable" ]; then
       if [ -f "$MOD/$1.sh" ]; then
         chmod 755 $MOD/$1.sh
-        chcon 'u:object_r:system_file:s0' $MOD/$1.sh
+        chcon "u:object_r:system_file:s0" "$MOD/$1.sh"
         log_print "$1: $MOD/$1.sh"
         sh $MOD/$1.sh
       fi
@@ -75,64 +75,67 @@ target_size_check() {
 }
 
 travel() {
-  cd $1/$2
+  cd "$1/$2"
   if [ -f ".replace" ]; then
-    rm -rf $MOUNTINFO/$2
-    mktouch $MOUNTINFO/$2 $1
+    rm -rf "$MOUNTINFO/$2"
+    mktouch "$MOUNTINFO/$2" "$1"
   else
     for ITEM in * ; do
       if [ ! -e "/$2/$ITEM" ]; then
         # New item found
-        if [ $2 = "system" ]; then
+        if [ "$2" = "system" ]; then
           # We cannot add new items to /system root, delete it
-          rm -rf $ITEM
+          rm -rf "$ITEM"
         else
-          if [ -d "$MOUNTINFO/dummy/$2" ]; then
-            # We are in a higher level, delete the lower levels
-            rm -rf $MOUNTINFO/dummy/$2
-          fi
+          # If we are in a higher level, delete the lower levels
+          rm -rf "$MOUNTINFO/dummy/$2"
           # Mount the dummy parent
-          mktouch $MOUNTINFO/dummy/$2
+          mktouch "$MOUNTINFO/dummy/$2"
 
-          mkdir -p $DUMMDIR/$2 2>/dev/null
           if [ -d "$ITEM" ]; then
-            # Create new dummy directory
-            mkdir -p $DUMMDIR/$2/$ITEM
+            # Create new dummy directory and mount it
+            mkdir -p "$DUMMDIR/$2/$ITEM"
+            mktouch "$MOUNTINFO/$2/$ITEM" "$1"
           elif [ -L "$ITEM" ]; then
             # Symlinks are small, copy them
-            $TOOLPATH/cp -afc $ITEM $DUMMDIR/$2/$ITEM
+            mkdir -p "$DUMMDIR/$2" 2>/dev/null
+            $TOOLPATH/cp -afc "$ITEM" "$DUMMDIR/$2/$ITEM"
           else
-            # Create new dummy file
-            mktouch $DUMMDIR/$2/$ITEM
-          fi
-
-          # Clone the original /system structure (depth 1)
-          if [ -e "/$2" ]; then
-            for DUMMY in /$2/* ; do
-              if [ -d "$DUMMY" ]; then
-                # Create dummy directory
-                mkdir -p $DUMMDIR$DUMMY
-              elif [ -L "$DUMMY" ]; then
-                # Symlinks are small, copy them
-                $TOOLPATH/cp -afc $DUMMY $DUMMDIR$DUMMY
-              else
-                # Create dummy file
-                mktouch $DUMMDIR$DUMMY
-              fi
-            done
+            # Create new dummy file and mount it
+            mktouch "$DUMMDIR/$2/$ITEM"
+            mktouch "$MOUNTINFO/$2/$ITEM" "$1"
           fi
         fi
-      fi
-
-      if [ -d "$ITEM" ]; then
-        # It's an directory, travel deeper
-        (travel $1 $2/$ITEM)
-      elif [ ! -L "$ITEM" ]; then
-        # Mount this file
-        mktouch $MOUNTINFO/$2/$ITEM $1
+      else
+        if [ -d "$ITEM" ]; then
+          # It's an directory, travel deeper
+          (travel "$1" "$2/$ITEM")
+        elif [ ! -L "$ITEM" ]; then
+          # Mount this file
+          mktouch "$MOUNTINFO/$2/$ITEM" "$1"
+        fi
       fi
     done
   fi
+}
+
+clone_dummy() {
+  for ITEM in "$1/"* ; do
+    if [ -d "$DUMMDIR$ITEM" ]; then
+      (clone_dummy "$ITEM")
+    else
+      if [ -d "$ITEM" ]; then
+        # Create dummy directory
+        mkdir -p "$DUMMDIR$ITEM"
+      elif [ -L "$ITEM" ]; then
+        # Symlinks are small, copy them
+        $TOOLPATH/cp -afc "$ITEM" "$DUMMDIR$ITEM"
+      else
+        # Create dummy file
+        mktouch "$DUMMDIR$ITEM"
+      fi
+    fi
+  done
 }
 
 bind_mount() {
@@ -270,7 +273,7 @@ case $1 in
 
       mv /cache/stock_boot.img /data 2>/dev/null
 
-      chcon -R 'u:object_r:system_file:s0' $BINPATH $TOOLPATH
+      chcon -R "u:object_r:system_file:s0" $BINPATH $TOOLPATH
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
@@ -334,11 +337,6 @@ case $1 in
         fi
       done
 
-      # Proper permissions for generated items
-      $TOOLPATH/find $DUMMDIR -type d -exec chmod 755 {} \;
-      $TOOLPATH/find $DUMMDIR -type f -exec chmod 644 {} \;
-      $TOOLPATH/find $DUMMDIR -exec chcon 'u:object_r:system_file:s0' {} \;
-
       # linker(64), t*box, and app_process* are required if we need to dummy mount bin folder
       if [ -f "$MOUNTINFO/dummy/system/bin" ]; then
         rm -f $DUMMDIR/system/bin/linker* $DUMMDIR/system/bin/t*box $DUMMDIR/system/bin/app_process*
@@ -355,9 +353,15 @@ case $1 in
       log_print "Bind mount dummy system"
       $TOOLPATH/find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO/dummy}
-        ORIG=$DUMMDIR$TARGET
-        bind_mount $ORIG $TARGET
+        ORIG="$DUMMDIR$TARGET"
+        clone_dummy "$TARGET"
+        bind_mount "$ORIG" "$TARGET"
       done
+
+      # Proper permissions for generated items
+      $TOOLPATH/find $TMPDIR -type d -exec chmod 755 "{}" \;
+      $TOOLPATH/find $TMPDIR -type f -exec chmod 644 "{}" \;
+      $TOOLPATH/find $TMPDIR -exec chcon "u:object_r:system_file:s0" "{}" \;
 
       # Stage 2
       log_print "Bind mount module items"
@@ -423,7 +427,6 @@ case $1 in
       $COREDIR/magiskhide/add com.google.android.gms.unstable
       log_print "** Starting Magisk Hide"
       /data/magisk/magiskhide
-
     fi
     ;;
 
