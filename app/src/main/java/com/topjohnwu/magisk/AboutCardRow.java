@@ -29,7 +29,7 @@ import android.widget.TextView;
 /**
  * @author dvdandroid
  */
-public class RowItem extends LinearLayout {
+public class AboutCardRow extends LinearLayout {
 
     private final String title;
     private final Drawable icon;
@@ -40,22 +40,22 @@ public class RowItem extends LinearLayout {
 
     private final View mView;
 
-    public RowItem(Context context) {
+    public AboutCardRow(Context context) {
         this(context, null);
     }
 
-    public RowItem(Context context, AttributeSet attrs) {
+    public AboutCardRow(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public RowItem(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AboutCardRow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.RowItem, 0, 0);
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
 
         try {
-            title = a.getString(R.styleable.RowItem_text);
-            icon = a.getDrawable(R.styleable.RowItem_icon);
+            title = a.getString(R.styleable.AboutCardRow_text);
+            icon = a.getDrawable(R.styleable.AboutCardRow_icon);
         } finally {
             a.recycle();
         }

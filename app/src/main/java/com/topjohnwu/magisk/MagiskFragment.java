@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -88,7 +87,7 @@ public class MagiskFragment extends Fragment {
                             Shell.su("setprop magisk.version " + String.valueOf(remoteMagiskVersion));
                             super.done();
                         }
-                    }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    }.exec();
                 }
             },
             magiskLink,
@@ -141,7 +140,7 @@ public class MagiskFragment extends Fragment {
             appCheckUpdatesProgress.setVisibility(View.VISIBLE);
             magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
 
-            new Async.CheckUpdates(prefs).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Async.CheckUpdates(prefs).exec();
         });
 
         if (prefs.getBoolean("update_check_done", false)) {

@@ -17,7 +17,7 @@
 
 <resources>
 
-    <declare-styleable name="RowItem">
+    <declare-styleable name="AboutCardRow">
         <attr name="icon" format="reference"/>
         <attr name="text" format="string"/>
         <attr name="cardStyle" format="reference"/>

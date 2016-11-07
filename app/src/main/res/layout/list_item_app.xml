@@ -45,14 +45,13 @@
                 android:id="@+id/app_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="false"
                 android:layout_weight="1"
                 android:paddingEnd="3dp"
                 android:paddingStart="3dp"
                 android:textStyle="bold"/>
 
             <TextView
-                android:id="@+id/app_paackage"
+                android:id="@+id/app_package"
                 android:layout_width="fill_parent"
                 android:layout_height="25dp"
                 android:ellipsize="marquee"
@@ -74,10 +73,10 @@
                 android:id="@+id/checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="false"
                 android:focusable="false"
                 android:gravity="center"
-                android:src="@drawable/ic_menu_overflow_material"/>
+                android:src="@drawable/ic_menu_overflow_material"
+                android:checked="false" />
 
         </LinearLayout>
 

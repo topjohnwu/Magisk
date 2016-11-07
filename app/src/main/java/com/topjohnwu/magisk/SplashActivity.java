@@ -2,10 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.topjohnwu.magisk.utils.Async;
@@ -13,9 +11,7 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -45,20 +41,20 @@ public class SplashActivity extends AppCompatActivity {
                 .putBoolean("update_check_done", false)
                 .apply();
 
-        new Async.CheckUpdates(prefs).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        new Async.constructEnv(getApplicationInfo()).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        new Async.CheckUpdates(prefs).exec();
+        new Async.constructEnv(getApplicationInfo()).exec();
 
         new Async.LoadModules(prefs) {
             @Override
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);
-                new Async.LoadRepos(getApplicationContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new Async.LoadRepos(getApplicationContext()).exec();
                 // Start main activity
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
             }
-        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        }.exec();
 
     }
 
@@ -67,7 +63,7 @@ public class SplashActivity extends AppCompatActivity {
         Set<String> set = new HashSet<>();
         Set<String> setOriginal = null;
         List<String> hideList = null;
-        List<String> addList = null;
+//        List<String> addList = null;
         String listCmd, addCmd, addCmd2, rmCmd, rmCmd2;
 
         // Build list of apps currently listed, add to preferences
@@ -108,13 +104,13 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         setOriginal = prefs.getStringSet("auto_blacklist", set);
-        if (hideList != null) {
-            for (String item : hideList) {
-                if (!(setOriginal.contains(item))) {
-                    addList.add(item);
-                }
-            }
-        }
+//        if (hideList != null) {
+//            for (String item : hideList) {
+//                if (!(setOriginal.contains(item))) {
+//                    addList.add(item);
+//                }
+//            }
+//        }
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putStringSet("auto_blacklist", set);

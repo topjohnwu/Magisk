@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -67,7 +66,7 @@ public class ReposFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
             prefs.edit().putBoolean("repo_done", false).apply();
-            new Async.LoadRepos(getActivity()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new Async.LoadRepos(getActivity()).exec();
         });
 
         if (prefs.getBoolean("repo_done", false)) {

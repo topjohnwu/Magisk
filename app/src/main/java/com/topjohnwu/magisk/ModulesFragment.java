@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -59,7 +58,7 @@ public class ModulesFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
             prefs.edit().putBoolean("module_done", false).apply();
-            new Async.LoadModules(prefs).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            new Async.LoadModules(prefs).exec();
         });
 
         if (prefs.getBoolean("module_done", false)) {
@@ -84,7 +83,7 @@ public class ModulesFragment extends Fragment {
             // Get the URI of the selected file
             final Uri uri = data.getData();
             // Get the file path from the URI
-            new Async.FlashZIP(getActivity(), uri).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            new Async.FlashZIP(getActivity(), uri).exec();
         }
 
     }

@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -126,7 +125,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                                                         "rm -rf ../install"
                                                 );
                                             }
-                                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                                        }.exec();
                                     }
                                 },
                                 repo.getZipUrl(),

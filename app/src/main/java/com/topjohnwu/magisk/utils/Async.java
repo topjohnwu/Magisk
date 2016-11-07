@@ -31,9 +31,24 @@ import java.util.List;
 
 public class Async {
 
-    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+    public abstract static class RootTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+        @SafeVarargs
+        public final void exec(Params... params) {
+            executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, params);
+        }
+    }
 
-    public static class constructEnv extends AsyncTask<Void, Void, Void> {
+    public abstract static class NormalTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+        @SafeVarargs
+        public final void exec(Params... params) {
+            executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
+        }
+    }
+
+    public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+    public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
+
+    public static class constructEnv extends NormalTask<Void, Void, Void> {
 
         ApplicationInfo mInfo;
 
@@ -59,12 +74,23 @@ public class Async {
                         "ln -s " + zip + " zip"
                 );
             }
-            Shell.su("PATH=" + toolPath + ":$PATH");
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            new RootTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    Shell.su("PATH=" + mInfo.dataDir + "/tools:$PATH");
+                    return null;
+                }
+            }.exec();
         }
     }
 
-    public static class CheckUpdates extends AsyncTask<Void, Void, Void> {
+    public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
         private SharedPreferences mPrefs;
 
@@ -102,7 +128,7 @@ public class Async {
         }
     }
 
-    public static class LoadModules extends AsyncTask<Void, Void, Void> {
+    public static class LoadModules extends RootTask<Void, Void, Void> {
 
         private SharedPreferences mPrefs;
 
@@ -122,7 +148,7 @@ public class Async {
         }
     }
 
-    public static class LoadRepos extends AsyncTask<Void, Void, Void> {
+    public static class LoadRepos extends NormalTask<Void, Void, Void> {
 
         private Context mContext;
 
@@ -143,7 +169,7 @@ public class Async {
         }
     }
 
-    public static class FlashZIP extends AsyncTask<Void, Void, Integer> {
+    public static class FlashZIP extends RootTask<Void, Void, Integer> {
 
         protected Uri mUri;
         protected File mFile, sdFile;
@@ -306,7 +332,7 @@ public class Async {
         protected void done() {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             prefs.edit().putBoolean("module_done", false).putBoolean("update_check_done", true).apply();
-            new LoadModules(prefs).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            new LoadModules(prefs).exec();
 
             AlertDialog.Builder builder;
             String theme = prefs.getString("theme", "");
@@ -344,5 +370,24 @@ public class Async {
             }
             return null;
         }
+    }
+
+    public static class MagiskHide extends RootTask<Object, Void, Void> {
+        @Override
+        protected Void doInBackground(Object... params) {
+            boolean add = (boolean) params[0];
+            String packageName = (String) params[1];
+            Shell.su(MAGISK_HIDE_PATH + (add ? "add " : "rm ") + packageName);
+            return null;
+        }
+
+        public void add(CharSequence packageName) {
+            exec(true, packageName);
+        }
+
+        public void rm(CharSequence packageName) {
+            exec(false, packageName);
+        }
+
     }
 }

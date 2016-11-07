@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 6
-        versionName "2.1"
+        versionCode 7
+        versionName "2.5"
         jackOptions {
             enabled true
         }
@@ -23,6 +23,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dexOptions {
+        preDexLibraries = false
     }
 }
 repositories {

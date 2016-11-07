@@ -57,35 +57,35 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
                     </LinearLayout>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/app_version_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_info_outline"
                         app:text="@string/app_version"/>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/app_changelog"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_history"
                         app:text="@string/app_changelog"/>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/app_developers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_person"
                         app:text="@string/app_developers"/>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/app_translators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_language"
                         app:text="@string/app_translators"/>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/app_source_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -110,14 +110,14 @@
                     android:layout_marginBottom="8dp"
                     android:orientation="vertical">
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/support_thread"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_xda"
                         app:text="@string/support_thread"/>
 
-                    <com.topjohnwu.magisk.RowItem
+                    <com.topjohnwu.magisk.AboutCardRow
                         android:id="@+id/donation"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
