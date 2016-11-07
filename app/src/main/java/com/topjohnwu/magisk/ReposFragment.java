@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.adapters.ReposAdapter;
+import com.topjohnwu.magisk.adapters.SimpleSectionedRecyclerViewAdapter;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;

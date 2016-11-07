@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
+import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;

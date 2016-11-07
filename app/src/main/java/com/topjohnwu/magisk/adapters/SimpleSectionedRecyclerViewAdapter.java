@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
