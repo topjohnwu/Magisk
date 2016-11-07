@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -81,8 +80,6 @@ public class SettingsActivity extends AppCompatActivity {
             themePreference = (ListPreference) findPreference("theme");
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
-            magiskhidePreference.setChecked(Utils.itemExist(false, "/magisk/.core/magiskhide/enable"));
-            busyboxPreference.setChecked(Utils.commandExists("unzip"));
 
             PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
 
@@ -132,26 +129,26 @@ public class SettingsActivity extends AppCompatActivity {
                 case "magiskhide":
                     boolean checked = sharedPreferences.getBoolean("magiskhide", false);
                     if (checked) {
-                        new AsyncTask<Void, Void, Void>() {
+                        new Async.RootTask<Void, Void, Void>() {
                             @Override
                             protected Void doInBackground(Void... params) {
                                 Utils.createFile("/magisk/.core/magiskhide/enable");
                                 return null;
                             }
-                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        }.exec();
                     } else {
-                        new AsyncTask<Void, Void, Void>() {
+                        new Async.RootTask<Void, Void, Void>() {
                             @Override
                             protected Void doInBackground(Void... params) {
                                 Utils.removeItem("/magisk/.core/magiskhide/enable");
                                 return null;
                             }
-                        }.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        }.exec();
                     }
                     break;
                 case "busybox":
                     checked = sharedPreferences.getBoolean("busybox", false);
-                    new Async.LinkBusyBox(checked).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    new Async.LinkBusyBox(checked).exec();
                     break;
                 case "developer_logging":
                     Logger.devLog = sharedPreferences.getBoolean("developer_logging", false);

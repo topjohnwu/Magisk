@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,22 +55,28 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         ApplicationInfo info = mList.get(position);
+
         holder.appIcon.setImageDrawable(info.loadIcon(packageManager));
         holder.appName.setText(info.loadLabel(packageManager));
         holder.appPackage.setText(info.packageName);
         holder.checkBox.setChecked(false);
+
         for (String hidePackage : mHideList) {
             if (info.packageName.contains(hidePackage)) {
                 holder.checkBox.setChecked(true);
                 break;
             }
         }
-        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
-            Async.MagiskHide mh = new Async.MagiskHide();
-            if (b) {
-                mh.add(info.packageName);
-            } else {
-                mh.rm(info.packageName);
+
+        holder.checkBox.setOnClickListener(v -> {
+            CheckBox chkbox = (CheckBox) v;
+            if (chkbox.isChecked()) {
+                new Async.MagiskHide().add(info.packageName);
+                mHideList.add(info.packageName);
+            }
+            else {
+                new Async.MagiskHide().rm(info.packageName);
+                mHideList.remove(info.packageName);
             }
         });
     }

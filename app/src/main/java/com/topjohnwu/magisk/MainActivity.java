@@ -25,7 +25,6 @@ import android.view.View;
 
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("magiskhide",false) | (Utils.itemExist("/data/su/suhide"))) {
+        if (PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("magiskhide", false)) {
 
             menu.findItem(R.id.magiskhide).setVisible(true);
         } else {

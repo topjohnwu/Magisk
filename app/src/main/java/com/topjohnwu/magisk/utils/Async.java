@@ -48,11 +48,11 @@ public class Async {
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
 
-    public static class constructEnv extends NormalTask<Void, Void, Void> {
+    public static class ConstructEnv extends NormalTask<Void, Void, Void> {
 
         ApplicationInfo mInfo;
 
-        public constructEnv(ApplicationInfo info) {
+        public ConstructEnv(ApplicationInfo info) {
             mInfo = info;
         }
 
@@ -350,7 +350,7 @@ public class Async {
         }
     }
 
-    public static class LinkBusyBox extends AsyncTask<Void, Void, Void> {
+    public static class LinkBusyBox extends RootTask<Void, Void, Void> {
 
         private boolean link;
 

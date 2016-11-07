@@ -4,11 +4,9 @@ import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
 import android.widget.Toast;
@@ -33,8 +31,6 @@ import javax.crypto.spec.DESKeySpec;
 
 public class Utils {
 
-    private static final String TAG = "Magisk";
-
     private static final String cryptoPass = "MagiskRox666";
     private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
 
@@ -51,45 +47,11 @@ public class Utils {
         }
     }
 
-    public static String getAppUID(String packageName) {
-        List<String> retString = Shell.su("ls -nld /data/data/" + packageName);
-        String splitMe = retString.get(0);
-        String[] splitString = retString.get(0).split(" ");
-        return splitString[5];
-    }
-
-    public static int WhichHide(Context context) {
-        Boolean mh = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("magiskhide", false);
-        Boolean sh = Utils.itemExist("/su/suhide/add");
-        if (mh && !sh) {
-            return 1;
-        }
-        if (sh && !mh) {
-            return 2;
-        }
-        if (sh && mh) {
-            return 3;
-        }
-        return 0;
-
-    }
-
     public static boolean commandExists(String s) {
         List<String> ret;
         String command = "if [ -z $(which " + s + ") ]; then echo false; else echo true; fi";
         ret = Shell.sh(command);
         return Boolean.parseBoolean(ret.get(0));
-    }
-
-    public static boolean rootEnabled() {
-        return commandExists("su");
-    }
-
-    public static boolean autoToggleEnabled(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Logger.dev("Utils: AutoRootEnableCheck is " + preferences.getBoolean("autoRootEnable", false));
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("autoRootEnable", false);
-
     }
 
     public static boolean createFile(String path) {
