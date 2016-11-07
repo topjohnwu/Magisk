@@ -233,6 +233,9 @@ case $1 in
     # Only for multirom!
 
     # log_print "** Magisk post-fs mode running..."
+    
+    # Cleanup previous stuffs...
+    rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
 
     unblock
     ;;

@@ -5,5 +5,7 @@ HIDELIST=/magisk/.core/magiskhide/hidelist
 if [ ! -z "$1" ]; then
   if [ $(grep -c "^$1$" $HIDELIST) -eq "0" ]; then
     echo "$1" >> $HIDELIST
+    set `/data/busybox/ps -o pid,args | grep "$1" | grep -v "grep"`
+    kill "$1"
   fi
 fi

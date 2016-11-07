@@ -3,7 +3,7 @@
 HIDELIST=/magisk/.core/magiskhide/hidelist
 
 if [ ! -z "$1" ]; then
-  mv $HIDELIST $HIDELIST.tmp
+  cp -af $HIDELIST $HIDELIST.tmp
   cat $HIDELIST.tmp | grep -v "^$1$" > $HIDELIST
   rm -f $HIDELIST.tmp
   set `/data/busybox/ps -o pid,args | grep "$1" | grep -v "grep"`

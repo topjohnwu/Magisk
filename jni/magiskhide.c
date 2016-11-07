@@ -12,6 +12,9 @@
 #include <sys/inotify.h>
 #include <sys/wait.h>
 
+#define LOGFILE 	"/cache/magisk.log"
+#define HIDELIST 	"/magisk/.core/magiskhide/hidelist"
+
 FILE *logfile;
 int i, list_size;
 char **hide_list = NULL;
@@ -111,7 +114,7 @@ void update_list(const char *listpath) {
 	hide_list = file_to_str_arr(hide_fp, &list_size);
 	pthread_mutex_unlock(&mutex);
 	fclose(hide_fp);
-	fprintf(logfile, "MagiskHide: Update process/package list:\n");
+	if (list_size) fprintf(logfile, "MagiskHide: Update process/package list:\n");
 	for(i = 0; i < list_size; i++)
 		fprintf(logfile, "MagiskHide: %s\n", hide_list[i]);
 }
@@ -129,18 +132,22 @@ void *monitor_list(void *listpath) {
 	// Initial load
 	update_list((char*) listpath);
 
-	int inotifyFd;
+	int inotifyFd = -1;
 	char buffer[512];
 
-	inotifyFd = inotify_init();
-	if (inotifyFd == -1)
-		exit(1);
-	if (inotify_add_watch(inotifyFd, (char*) listpath, IN_ATTRIB | IN_MODIFY) == -1)
-		exit(1);
-
 	while(1) {
-		if (read(inotifyFd, buffer, 512) == -1)
-			exit(1);
+		if (inotifyFd == -1 || read(inotifyFd, buffer, 512) == -1) {
+			close(inotifyFd);
+			inotifyFd = inotify_init();
+			if (inotifyFd == -1) {
+				fprintf(logfile, "MagiskHide: Unable to watch %s\n", listpath);
+				exit(1);
+			}
+			if (inotify_add_watch(inotifyFd, (char*) listpath, IN_MODIFY) == -1) {
+				fprintf(logfile, "MagiskHide: Unable to watch %s\n", listpath);
+				exit(1);
+			}
+		}
 		update_list((char*) listpath);
 	}
 
@@ -162,13 +169,13 @@ int main(int argc, char **argv, char **envp) {
 		close(STDOUT_FILENO);
 		close(STDERR_FILENO);
 
-		logfile = fopen("/cache/magisk.log", "a+");
+		logfile = fopen(LOGFILE, "a+");
 		setbuf(logfile, NULL);
 
 		pthread_t list_monitor;
 
 		pthread_mutex_init(&mutex, NULL);
-		pthread_create(&list_monitor, NULL, monitor_list, "/magisk/.core/magiskhide/hidelist");
+		pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
 
 		char buffer[512];
 		FILE *p = popen("while true; do logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
