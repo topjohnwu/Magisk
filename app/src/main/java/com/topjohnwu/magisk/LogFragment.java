@@ -57,7 +57,7 @@ public class LogFragment extends Fragment {
 
         txtLog.setTextIsSelectable(true);
 
-        reloadErrorLog();
+        new LogManager().read();
 
         return view;
     }
@@ -66,7 +66,7 @@ public class LogFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
-        reloadErrorLog();
+        new LogManager().read();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LogFragment extends Fragment {
         mClickedMenuItem = item;
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                reloadErrorLog();
+                new LogManager().read();
                 return true;
             case R.id.menu_send:
                 new LogManager().send();
@@ -93,12 +93,6 @@ public class LogFragment extends Fragment {
             default:
                 return true;
         }
-    }
-
-    private void reloadErrorLog() {
-        new LogManager().read();
-        svLog.post(() -> svLog.scrollTo(0, txtLog.getHeight()));
-        hsvLog.post(() -> hsvLog.scrollTo(0, 0));
     }
 
     @Override
@@ -197,6 +191,8 @@ public class LogFragment extends Fragment {
                         txtLog.setText(R.string.log_is_empty);
                     else
                         txtLog.setText(llog);
+                    svLog.post(() -> svLog.scrollTo(0, txtLog.getHeight()));
+                    hsvLog.post(() -> hsvLog.scrollTo(0, 0));
                     break;
                 case 2:
                     bool = (boolean) o;
