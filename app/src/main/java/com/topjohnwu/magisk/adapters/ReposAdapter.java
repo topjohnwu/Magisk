@@ -76,11 +76,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         } else {
             repo = mUpdateRepos.get(position);
         }
-        if (repo.isCache()) {
-            holder.title.setText("[Cache] " + repo.getName());
-        } else {
-            holder.title.setText(repo.getName());
-        }
+        holder.title.setText(repo.getName());
         String author = repo.getAuthor();
         String versionName = repo.getVersion();
         String description = repo.getDescription();

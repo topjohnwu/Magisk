@@ -12,7 +12,7 @@ public class Repo extends BaseModule {
     protected String repoName, mLogUrl, mManifestUrl, mZipUrl;
     protected Date mLastUpdate;
 
-    public Repo(Context context, String name, Date lastUpdate) {
+    public Repo(Context context, String name, Date lastUpdate) throws CacheModException {
         repoName = name;
         mLastUpdate = lastUpdate;
         mLogUrl = context.getString(R.string.file_url, repoName, "changelog.txt");
@@ -21,16 +21,18 @@ public class Repo extends BaseModule {
         update();
     }
 
-    public void update() {
+    public void update() throws CacheModException {
         Logger.dev("Repo: Re-fetch prop " + mId);
         String props = WebRequest.makeWebServiceCall(mManifestUrl, WebRequest.GET, true);
         String lines[] = props.split("\\n");
         parseProps(lines);
     }
 
-    public void update(Date lastUpdate) {
+    public void update(Date lastUpdate) throws CacheModException {
         Logger.dev("Repo: Old: " + mLastUpdate);
         Logger.dev("Repo: New: " + lastUpdate);
+        if (mIsCacheModule)
+            throw new CacheModException(mId);
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();

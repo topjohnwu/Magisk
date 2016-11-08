@@ -8,7 +8,7 @@ public class Module extends BaseModule {
     private String mRemoveFile, mDisableFile, mUpdateFile;
     private boolean mEnable, mRemove, mUpdated;
 
-    public Module(String path) {
+    public Module(String path) throws CacheModException {
 
         parseProps(Utils.readFile(path + "/module.prop"));
 

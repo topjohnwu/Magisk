@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 
@@ -23,7 +24,6 @@ import java.util.TreeMap;
 
 public class ModuleHelper {
     public static final String MAGISK_PATH = "/magisk";
-    public static final String MAGISK_CACHE_PATH = "/cache/magisk";
 
     private static final String file_key = "RepoMap";
     private static final String key = "repomap";
@@ -38,16 +38,11 @@ public class ModuleHelper {
 
         for (String path : Utils.getModList(MAGISK_PATH)) {
             Logger.dev("ModuleHelper: Adding modules from " + path);
-            Module module = new Module(path);
-            moduleMap.put(module.getId(), module);
-        }
-
-        for (String path : Utils.getModList(MAGISK_CACHE_PATH)) {
-            Logger.dev("ModuleHelper: Adding cache modules from " + path);
-            Module cacheMod = new Module(path);
-            // Force set to cache
-            cacheMod.setCache();
-            moduleMap.put(cacheMod.getId(), cacheMod);
+            Module module;
+            try {
+                module = new Module(path);
+                moduleMap.put(module.getId(), module);
+            } catch (BaseModule.CacheModException ignored) {}
         }
 
         Logger.dev("ModuleHelper: Module load done");
@@ -90,16 +85,18 @@ public class ModuleHelper {
                         continue;
                     }
                     Repo repo = cached.get(id);
-                    if (repo == null) {
-                        Logger.dev("ModuleHelper: Create new repo " + id);
-                        repo = new Repo(context, name, updatedDate);
-                    } else {
-                        Logger.dev("ModuleHelper: Cached repo " + id);
-                        repo.update(updatedDate);
-                    }
-                    if (repo.getId() != null) {
-                        repoMap.put(id, repo);
-                    }
+                    try {
+                        if (repo == null) {
+                            Logger.dev("ModuleHelper: Create new repo " + id);
+                            repo = new Repo(context, name, updatedDate);
+                        } else {
+                            Logger.dev("ModuleHelper: Cached repo " + id);
+                            repo.update(updatedDate);
+                        }
+                        if (repo.getId() != null) {
+                            repoMap.put(id, repo);
+                        }
+                    } catch (BaseModule.CacheModException ignored) {}
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
