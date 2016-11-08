@@ -33,8 +33,9 @@ import butterknife.ButterKnife;
 
 public class MagiskFragment extends Fragment {
 
-    public static int magiskVersion, remoteMagiskVersion = -1, remoteAppVersionCode = -1;
-    public static String magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
+    public static int remoteAppVersionCode = -1;
+    public static double magiskVersion, remoteMagiskVersion = -1;
+    public static String magiskVersionString, magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -174,10 +175,14 @@ public class MagiskFragment extends Fragment {
 
     private void updateMagiskVersion() {
         List<String> ret = Shell.sh("getprop magisk.version");
-        try {
-            magiskVersion = Integer.parseInt(ret.get(0));
-        } catch (NumberFormatException e) {
+        if (ret.get(0).length() == 0) {
             magiskVersion = -1;
+        } else try {
+            magiskVersionString = ret.get(0);
+            magiskVersion = Double.parseDouble(ret.get(0));
+        } catch (NumberFormatException e) {
+            // Custom version don't need to receive updates
+            magiskVersion = Double.POSITIVE_INFINITY;
         }
 
         if (magiskVersion == -1) {
@@ -190,7 +195,7 @@ public class MagiskFragment extends Fragment {
             magiskStatusContainer.setBackgroundColor(colorOK);
             magiskStatusIcon.setImageResource(statusOK);
 
-            magiskVersionText.setText(getString(R.string.magisk_version, String.valueOf(magiskVersion)));
+            magiskVersionText.setText(getString(R.string.magisk_version, magiskVersionString));
             magiskVersionText.setTextColor(colorOK);
         }
     }

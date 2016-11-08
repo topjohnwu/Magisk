@@ -107,7 +107,7 @@ public class Async {
                 JSONObject magisk = json.getJSONObject("magisk");
                 JSONObject app = json.getJSONObject("app");
 
-                MagiskFragment.remoteMagiskVersion = magisk.getInt("versionCode");
+                MagiskFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
                 MagiskFragment.magiskLink = magisk.getString("link");
                 MagiskFragment.magiskChangelog = magisk.getString("changelog");
 
