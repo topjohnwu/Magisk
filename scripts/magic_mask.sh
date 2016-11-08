@@ -203,6 +203,7 @@ merge_image() {
             done
             $TOOLPATH/cp -afc .core/. /cache/data_img/.core 2>/dev/null
             log_print "Merge complete"
+            cd /
           fi
 
           umount /cache/data_img
@@ -232,10 +233,21 @@ case $1 in
     # No more cache mods!
     # Only for multirom!
 
-    # log_print "** Magisk post-fs mode running..."
-    
+    log_print "** Magisk post-fs mode running..."
+
     # Cleanup previous stuffs...
     rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
+
+    if [ -d "/cache/magisk_bootanim" ]; then
+      log_print "Mounting custom Boot Animation"
+      find /cache/magisk_bootanim -type f 2>/dev/null | while read ITEM ; do
+        chmod 644 "$ITEM"
+        chcon "u:object_r:system_file:s0" "$ITEM"
+        TARGET="${ITEM#/cache/magisk_bootanim}"
+        bind_mount "$ITEM" "$TARGET"
+      done
+    fi
+
 
     unblock
     ;;
@@ -379,9 +391,20 @@ case $1 in
       run_scripts post-fs-data
 
       # Bind hosts for Adblock apps
-      [ ! -f "$COREDIR/hosts" ] && $TOOLPATH/cp -afc /system/etc/hosts $COREDIR/hosts
-      log_print "Enabling systemless hosts file support"
-      bind_mount $COREDIR/hosts /system/etc/hosts
+      if [ -f "$COREDIR/hosts" ]; then
+        log_print "Enabling systemless hosts file support"
+        bind_mount $COREDIR/hosts /system/etc/hosts
+      fi
+
+      # Expose busybox
+      if [ -f "$COREDIR/busybox/enable" ]; then
+        log_print "Enabling BusyBox"
+        $TOOLPATH/cp -afc /data/busybox/. $COREDIR/busybox
+        $TOOLPATH/cp -afc /system/xbin/. $COREDIR/busybox
+        chmod 755 $COREDIR/busybox
+        chcon "u:object_r:system_file:s0" $COREDIR/busybox
+        bind_mount $COREDIR/busybox /system/xbin
+      fi
 
       # Stage 3
       log_print "Bind mount system mirror"
@@ -412,7 +435,7 @@ case $1 in
     log_print "** Magisk late_start service mode running..."
     run_scripts service
 
-    # Hide Safety Net
+    # Magisk Hide
     if [ -f "$COREDIR/magiskhide/enable" ]; then
       log_print "** Removing tampered read-only system props"
 
