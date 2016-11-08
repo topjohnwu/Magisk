@@ -1,14 +1,14 @@
 #!/bin/bash
 
 usage() {
-  echo "$0 all <version number>"
+  echo "$0 all <version name>"
   echo -e "\tBuild binaries, zip, and sign Magisk"
   echo -e "\tThis is equlivant to first --build, then --zip"
   echo "$0 clean"
   echo -e "\tCleanup compiled / generated files"
   echo "$0 build"
   echo -e "\tBuild the binaries with ndk"
-  echo "$0 zip <version number>"
+  echo "$0 zip <version name>"
   echo -e "\tZip and sign Magisk"
   echo "$0 uninstaller"
   echo -e "\tZip and sign the uninstaller"
@@ -19,7 +19,7 @@ cleanup() {
   echo "************************"
   echo "* Cleaning up"
   echo "************************"
-  ndk-build clean
+  ndk-build clean 2>/dev/null
   ls zip_static/arm/* | grep -v "busybox" | xargs rm -rfv
   ls zip_static/arm64/* | grep -v "busybox" | xargs rm -rfv
   ls zip_static/x86/* | grep -v "busybox" | xargs rm -rfv
@@ -41,6 +41,12 @@ build_bin() {
   echo "************************"
   echo "* Building binaries"
   echo "************************"
+  if [ -z `which ndk-build` ]; then
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "! Please add ndk-build to PATH!"
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit 1
+  fi
   ndk-build -j4
   if [ $? -ne 0 ]; then
     echo "!!!!!!!!!!!!!!!!!!!!!!!!"
@@ -73,7 +79,7 @@ zip_package() {
   echo "* Adding version info"
   echo "************************"
   sed "s/MAGISK_VERSION_STUB/Magisk v$1 Boot Image Patcher/g" scripts/flash_script.sh > zip_static/META-INF/com/google/android/update-binary
-  sed "s/MAGISK_VERSION_STUB/setprop magisk.version $1/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
+  sed "s/MAGISK_VERSION_STUB/setprop magisk.version \"$1\"/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
   echo "************************"
   echo "* Zipping Magisk v$1"
   echo "************************"
