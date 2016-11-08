@@ -6,7 +6,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="magiskhide">MagiskHide</string>
+    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -45,7 +45,6 @@
     <string name="menuReload">Reload</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
-    <string name="logs_clear_failed">Could not clear the log:</string>
     <string name="log_is_empty">Log is empty</string>
     <string name="logs_save_failed">Could not write log to SD card:</string>
 
@@ -87,27 +86,24 @@
     <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
     <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
-    <!--Settings Fragment -->
+    <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_summary">Select a theme</string>
+
+    <string name="settings_magiskhide_title">Enable Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Enable BusyBox</string>
-    <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
+    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
+    <string name="settings_hosts_title">Enable systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless support for Adblock apps</string>
 
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
     <string name="settings_shell_logging_title">Enable shell command debug logging</string>
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
-    <string name="settings_magiskhide_title">Enable Magisk Hide</string>
-    <string name="settings_magiskhide_summary">Reboot to apply settings</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
+    <string name="settings_reboot_toast">Reboot to apply settings</string>
 
 </resources>

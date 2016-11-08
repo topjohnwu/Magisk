@@ -55,7 +55,8 @@ public class Utils {
     }
 
     public static boolean createFile(String path) {
-        String command = "touch " + path + " 2>/dev/null; if [ -f " + path + " ]; then echo true; else echo false; fi";
+        String folder = path.substring(0, path.lastIndexOf('/'));
+        String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
         return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
     }
 

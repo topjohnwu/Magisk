@@ -19,7 +19,6 @@ android:orientation="vertical">
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:dividerHeight="@dimen/card_divider_space"
-            android:paddingBottom="60dip"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
 

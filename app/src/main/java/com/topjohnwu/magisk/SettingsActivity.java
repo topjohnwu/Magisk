@@ -11,9 +11,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
@@ -80,18 +82,21 @@ public class SettingsActivity extends AppCompatActivity {
             themePreference = (ListPreference) findPreference("theme");
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
+            CheckBoxPreference hostsPreference = (CheckBoxPreference) findPreference("hosts");
 
             PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
 
             themePreference.setSummary(themePreference.getValue());
 
-            if (MagiskFragment.magiskVersion < 8) {
-                magiskhidePreference.setEnabled(false);
-            } else if (MagiskFragment.magiskVersion < 7) {
+            if (MagiskFragment.magiskVersion < 9) {
+                hostsPreference.setEnabled(false);
                 busyboxPreference.setEnabled(false);
+            } else if (MagiskFragment.magiskVersion < 8) {
+                magiskhidePreference.setEnabled(false);
             } else {
                 busyboxPreference.setEnabled(true);
                 magiskhidePreference.setEnabled(true);
+                hostsPreference.setEnabled(true);
             }
         }
 
@@ -110,6 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             Logger.dev("Settings: Prefs change " + key);
+            boolean checked;
 
             switch (key) {
                 case "theme":
@@ -127,7 +133,7 @@ public class SettingsActivity extends AppCompatActivity {
                     startActivity(intent);
                     break;
                 case "magiskhide":
-                    boolean checked = sharedPreferences.getBoolean("magiskhide", false);
+                     checked = sharedPreferences.getBoolean("magiskhide", false);
                     if (checked) {
                         new Async.RootTask<Void, Void, Void>() {
                             @Override
@@ -148,7 +154,45 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case "busybox":
                     checked = sharedPreferences.getBoolean("busybox", false);
-                    new Async.LinkBusyBox(checked).exec();
+                    if (checked) {
+                        new Async.RootTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                Utils.createFile("/magisk/.core/busybox/enable");
+                                return null;
+                            }
+                        }.exec();
+                    } else {
+                        new Async.RootTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                Utils.removeItem("/magisk/.core/busybox/enable");
+                                return null;
+                            }
+                        }.exec();
+                    }
+                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    break;
+                case "hosts":
+                    checked = sharedPreferences.getBoolean("hosts", false);
+                    if (checked) {
+                        new Async.RootTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                Shell.su("cp -af /system/etc/hosts /magisk/.core/hosts");
+                                return null;
+                            }
+                        }.exec();
+                    } else {
+                        new Async.RootTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                Shell.su("umount -l /system/etc/hosts", "rm -f /magisk/.core/hosts");
+                                return null;
+                            }
+                        }.exec();
+                    }
+                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "developer_logging":
                     Logger.devLog = sharedPreferences.getBoolean("developer_logging", false);

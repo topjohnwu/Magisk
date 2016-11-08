@@ -39,6 +39,9 @@ public class Shell {
         rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList, true);
         rootSTDOUT.start();
 
+        // Setup umask
+        su("umask 022");
+
         List<String> ret = su("echo -BOC-", "id");
 
         if (ret == null) {

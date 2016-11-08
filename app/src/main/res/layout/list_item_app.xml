@@ -30,7 +30,6 @@
             android:scaleType="centerCrop"/>
 
         <LinearLayout
-            android:id="@+id/textLayout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_alignBottom="@+id/app_icon"
@@ -63,7 +62,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/Linear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

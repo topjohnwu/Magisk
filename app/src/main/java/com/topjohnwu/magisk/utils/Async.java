@@ -350,28 +350,6 @@ public class Async {
         }
     }
 
-    public static class LinkBusyBox extends RootTask<Void, Void, Void> {
-
-        private boolean link;
-
-        public LinkBusyBox(boolean b) {
-            link = b;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (link) {
-                Shell.su(
-                        "rm -rf /magisk/.core/busybox",
-                        "ln -s /data/busybox /magisk/.core/busybox"
-                );
-            } else {
-                Shell.su("rm -rf /magisk/.core/busybox");
-            }
-            return null;
-        }
-    }
-
     public static class MagiskHide extends RootTask<Object, Void, Void> {
         @Override
         protected Void doInBackground(Object... params) {

@@ -12,7 +12,6 @@
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/llayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize"
@@ -24,7 +23,6 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:dividerHeight="@dimen/card_divider_space"
-            android:paddingBottom="60dip"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
         <TextView

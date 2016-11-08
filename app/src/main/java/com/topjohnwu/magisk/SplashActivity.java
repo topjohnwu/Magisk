@@ -32,7 +32,8 @@ public class SplashActivity extends AppCompatActivity {
                 .putBoolean("repo_done", false)
                 .putBoolean("update_check_done", false)
                 .putBoolean("magiskhide", Utils.itemExist(false, "/magisk/.core/magiskhide/enable"))
-                .putBoolean("busybox", Utils.commandExists("unzip"))
+                .putBoolean("busybox", Utils.commandExists("busybox"))
+                .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
                 .apply();
 
         new Async.CheckUpdates(prefs).exec();

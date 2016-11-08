@@ -29,6 +29,12 @@
             android:title="@string/settings_busybox_title"
             android:summary="@string/settings_busybox_summary" />
 
+        <CheckBoxPreference
+            android:key="hosts"
+            android:defaultValue="false"
+            android:title="@string/settings_hosts_title"
+            android:summary="@string/settings_hosts_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
