@@ -32,6 +32,7 @@
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
     <string name="author">Created by %1$s</string>
+    <string name="fab_flash_zip">Flash Module Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Update Available</string>
