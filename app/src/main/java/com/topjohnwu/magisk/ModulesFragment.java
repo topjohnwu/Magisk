@@ -108,6 +108,7 @@ public class ModulesFragment extends Fragment {
             emptyTv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
+            emptyTv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             recyclerView.setAdapter(new ModulesAdapter(listModules));
         }

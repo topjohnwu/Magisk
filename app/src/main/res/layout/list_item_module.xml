@@ -111,19 +111,6 @@
                 tools:ignore="ContentDescription"/>
 
         </LinearLayout>
-        <!--TODO - Work in an auto-update notifier, make this fly around like magic -->
-        <!--<ImageView-->
-        <!--android:id="@+id/update"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:focusable="false"-->
-        <!--android:gravity="right"-->
-        <!--android:background="@drawable/ic_file_download_black"-->
-        <!--android:layout_marginEnd="10dp"-->
-        <!--android:layout_gravity="right"-->
-        <!--android:layout_alignBaseline="@id/title"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--/>-->
 
     </RelativeLayout>
 
