@@ -332,6 +332,9 @@ void phh_rules(policydb_t *policydb) {
 	add_type("su_device", "mlstrustedobject", policy);
 	add_type("su_daemon", "mlstrustedsubject", policy);
 	add_type("su", "mlstrustedsubject", policy);
+
+	// Allow chcon to rootfs
+	allow("rootfs", "labeledfs", "filesystem", "associate");
 }
 
 // Minimal to run Magisk script before live patching
@@ -424,6 +427,4 @@ void magisk_rules(policydb_t *policydb) {
 	allow("init", "su", "fd", "use");
 	allow("init", "kernel", "security", "read_policy");
 	allow("init", "kernel", "security", "load_policy");
-
-
 }
