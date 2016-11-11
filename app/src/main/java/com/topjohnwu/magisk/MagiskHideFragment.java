@@ -65,8 +65,8 @@ public class MagiskHideFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 fListApps.clear();
                 for (ApplicationInfo info : listApps) {
-                    if (info.loadLabel(packageManager).toString().contains(newText)
-                            || info.packageName.contains(newText)) {
+                    if (info.loadLabel(packageManager).toString().toLowerCase().contains(newText.toLowerCase())
+                            || info.packageName.toLowerCase().contains(newText.toLowerCase())) {
                         fListApps.add(info);
                     }
                 }
