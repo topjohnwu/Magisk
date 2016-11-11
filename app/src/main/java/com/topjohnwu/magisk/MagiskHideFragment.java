@@ -5,16 +5,21 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +33,11 @@ public class MagiskHideFragment extends Fragment {
 
     private PackageManager packageManager;
     private View mView;
-    private ApplicationAdapter appAdapter;
+    private List<ApplicationInfo> listApps = new ArrayList<>(), fListApps = new ArrayList<>();
+    private List<String> hideList = new ArrayList<>();
+    private ApplicationAdapter appAdapter = new ApplicationAdapter(fListApps, hideList);
+
+    private SearchView.OnQueryTextListener searchListener;
 
     @Nullable
     @Override
@@ -44,36 +53,68 @@ public class MagiskHideFragment extends Fragment {
             new LoadApps().exec();
         });
 
+        recyclerView.setAdapter(appAdapter);
+
+        searchListener = new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                fListApps.clear();
+                for (ApplicationInfo info : listApps) {
+                    if (info.loadLabel(packageManager).toString().contains(newText)
+                            || info.packageName.contains(newText)) {
+                        fListApps.add(info);
+                    }
+                }
+                appAdapter.notifyDataSetChanged();
+                return false;
+            }
+        };
+
         new LoadApps().exec();
         return mView;
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_magiskhide, menu);
+        SearchView search = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.app_search));
+        search.setOnQueryTextListener(searchListener);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        setHasOptionsMenu(true);
         mView = this.getView();
     }
 
     private class LoadApps extends Async.RootTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            List<ApplicationInfo> listApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+            listApps.clear();
+            hideList.clear();
+            fListApps.clear();
+            listApps.addAll(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
             Collections.sort(listApps, (a, b) -> a.loadLabel(packageManager).toString().toLowerCase()
                     .compareTo(b.loadLabel(packageManager).toString().toLowerCase()));
-            List<String> hideList = Shell.su(Async.MAGISK_HIDE_PATH + "list");
-            appAdapter = new ApplicationAdapter(listApps, hideList);
+            hideList.addAll(Shell.su(Async.MAGISK_HIDE_PATH + "list"));
+            fListApps.addAll(listApps);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
             updateUI();
         }
     }
 
     private void updateUI() {
-        recyclerView.setAdapter(appAdapter);
+        appAdapter.notifyDataSetChanged();
         recyclerView.setVisibility(View.VISIBLE);
         mSwipeRefreshLayout.setRefreshing(false);
     }
