@@ -9,20 +9,19 @@ import com.topjohnwu.magisk.utils.WebRequest;
 import java.util.Date;
 
 public class Repo extends BaseModule {
-    protected String repoName, mLogUrl, mManifestUrl, mZipUrl;
-    protected Date mLastUpdate;
+    private String mLogUrl, mManifestUrl, mZipUrl;
+    private Date mLastUpdate;
 
     public Repo(Context context, String name, Date lastUpdate) throws CacheModException {
-        repoName = name;
         mLastUpdate = lastUpdate;
-        mLogUrl = context.getString(R.string.file_url, repoName, "changelog.txt");
-        mManifestUrl = context.getString(R.string.file_url, repoName, "module.prop");
-        mZipUrl = context.getString(R.string.zip_url, repoName);
+        mLogUrl = context.getString(R.string.file_url, name, "changelog.txt");
+        mManifestUrl = context.getString(R.string.file_url, name, "module.prop");
+        mZipUrl = context.getString(R.string.zip_url, name);
         update();
     }
 
     public void update() throws CacheModException {
-        Logger.dev("Repo: Re-fetch prop " + mId);
+        Logger.dev("Repo: Re-fetch prop");
         String props = WebRequest.makeWebServiceCall(mManifestUrl, WebRequest.GET, true);
         String lines[] = props.split("\\n");
         parseProps(lines);

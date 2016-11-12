@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.module;
 
 
+import android.support.annotation.NonNull;
+
 import com.topjohnwu.magisk.utils.Logger;
 
 import java.util.List;
 
-public abstract class BaseModule {
+public abstract class BaseModule implements Comparable<BaseModule> {
 
     protected String mId, mName, mVersion, mAuthor, mDescription, mSupportUrl, mDonateUrl;
     protected boolean mIsCacheModule = false;
@@ -97,5 +99,10 @@ public abstract class BaseModule {
         public CacheModException(String id) {
             Logger.dev("Cache mods are no longer supported! id: " + id);
         }
+    }
+
+    @Override
+    public int compareTo(@NonNull BaseModule o) {
+        return this.getName().toLowerCase().compareTo(o.getName().toLowerCase());
     }
 }

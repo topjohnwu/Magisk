@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,19 +17,24 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.TreeMap;
+import java.util.Map;
 
 public class ModuleHelper {
-    public static final String MAGISK_PATH = "/magisk";
+    private static final String MAGISK_PATH = "/magisk";
+    private static final String FILE_KEY = "RepoMap";
+    private static final String REPO_KEY = "repomap";
+    private static final String VERSION_KEY = "version";
+    private static final int DATABASE_VER = 1;
 
-    private static final String file_key = "RepoMap";
-    private static final String key = "repomap";
-    private static TreeMap<String, Repo> repoMap = new TreeMap<>(new ModuleComparator());
-    private static TreeMap<String, Module> moduleMap = new TreeMap<>(new ModuleComparator());
+    private static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
+    private static ValueSortedMap<String, Module> moduleMap = new ValueSortedMap<>();
 
 
     public static void createModuleMap() {
@@ -54,24 +60,34 @@ public class ModuleHelper {
         repoMap.clear();
 
         Gson gson = new Gson();
-        SharedPreferences prefs = context.getSharedPreferences(file_key, Context.MODE_PRIVATE);
-        String jsonString = prefs.getString(key, null);
+        SharedPreferences prefs = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+        String jsonString;
 
-        TreeMap<String, Repo> cached = null;
+        int cachedVersion = prefs.getInt(VERSION_KEY, 0);
+        if (cachedVersion != DATABASE_VER) {
+            // Ignore incompatible cached database
+            jsonString = null;
+        } else {
+            jsonString = prefs.getString(REPO_KEY, null);
+        }
+
+        ValueSortedMap<String, Repo> cached = null;
 
         if (jsonString != null) {
-            cached = gson.fromJson(jsonString, new TypeToken< TreeMap<String, Repo> >(){}.getType());
+            cached = gson.fromJson(jsonString, new TypeToken< ValueSortedMap<String, Repo> >(){}.getType());
         }
 
         if (cached == null) {
-            cached = new TreeMap<>(new ModuleComparator());
+            cached = new ValueSortedMap<>();
         }
 
         // Making a request to url and getting response
-        String jsonStr = WebRequest.makeWebServiceCall(context.getString(R.string.url_main) + Utils.getToken(), WebRequest.GET);
-        if (jsonStr != null && !jsonStr.isEmpty()) {
+        jsonString = WebRequest.makeWebServiceCall(context.getString(R.string.url_main) + Utils.getToken(), WebRequest.GET);
+
+        if (jsonString != null && !jsonString.isEmpty()) {
+            // Have internet access
             try {
-                JSONArray jsonArray = new JSONArray(jsonStr);
+                JSONArray jsonArray = new JSONArray(jsonString);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonobject = jsonArray.getJSONObject(i);
                     String id = jsonobject.getString("description");
@@ -101,9 +117,15 @@ public class ModuleHelper {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            prefs.edit().putString(key, gson.toJson(repoMap)).apply();
+        } else {
+            // Use cached if no internet
+            repoMap.putAll(cached);
         }
+
+        prefs.edit()
+                .putInt(VERSION_KEY, DATABASE_VER)
+                .putString(REPO_KEY, gson.toJson(repoMap))
+                .apply();
 
         Logger.dev("ModuleHelper: Repo load done");
     }
@@ -131,10 +153,36 @@ public class ModuleHelper {
         }
     }
 
-    public static class ModuleComparator implements Comparator<String> {
+    private static class ValueSortedMap<K, V extends Comparable > extends HashMap<K, V> {
+
+        private List<V> sorted = new ArrayList<>();
+
+        @NonNull
         @Override
-        public int compare(String o1, String o2) {
-            return o1.toLowerCase().compareTo(o2.toLowerCase());
+        public Collection<V> values() {
+            if (sorted.isEmpty()) {
+                sorted.addAll(super.values());
+                Collections.sort(sorted);
+            }
+            return sorted;
+        }
+
+        @Override
+        public V put(K key, V value) {
+            sorted.clear();
+            return super.put(key, value);
+        }
+
+        @Override
+        public void putAll(Map<? extends K, ? extends V> m) {
+            sorted.clear();
+            super.putAll(m);
+        }
+
+        @Override
+        public V remove(Object key) {
+            sorted.clear();
+            return super.remove(key);
         }
     }
 }
