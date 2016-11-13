@@ -19,6 +19,9 @@ INSTALLER=$TMPDIR/magisk
 
 COREDIR=/magisk/.core
 
+# Default permissions
+umask 022
+
 ##########################################################################################
 # Flashable update-binary preparation
 ##########################################################################################
@@ -76,14 +79,14 @@ getvar() {
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
     for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
-      BOOTIMAGE=$(readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION)
+      BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION`
       if [ ! -z "$BOOTIMAGE" ]; then break; fi
     done
   fi
   if [ -z "$BOOTIMAGE" ]; then
     FSTAB="/etc/recovery.fstab"
     [ ! -f "$FSTAB" ] && FSTAB="/etc/recovery.fstab.bak"
-    BOOTIMAGE=$(grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*')
+    [ -f "$FSTAB" ] BOOTIMAGE=`grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
   fi
 }
 
@@ -146,11 +149,6 @@ unpack_boot() {
   mkdir -p $RAMDISK
   cd $UNPACKDIR
   $BINDIR/bootimgtools --extract $1
-
-  find $TMPDIR/boottmp -type d -exec chmod 755 {} \;
-  find $TMPDIR/boottmp -type f -exec chmod 644 {} \;
-  chmod 755 $(find $TMPDIR/boottmp -type d)
-  chmod 644 $(find $TMPDIR/boottmp -type f)
 
   cd $RAMDISK
   gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
@@ -220,7 +218,7 @@ if [ -z "$KEEPFORCEENCRYPT" ]; then
   KEEPFORCEENCRYPT=false
 fi
 if [ -z "$NORESTORE" ]; then
-  # we don't keep ramdisk by default
+  # we restore ramdisk by default
   NORESTORE=false
 fi
 
@@ -259,6 +257,33 @@ if [ -z "$BOOTIMAGE" ]; then
 fi
 
 ##########################################################################################
+# Environment
+##########################################################################################
+
+ui_print "- Constructing environment"
+
+if (is_mounted /data); then
+  rm -rf /data/busybox /data/magisk 2>/dev/null
+  mkdir -p /data/busybox
+  cp -af $BINDIR /data/magisk
+  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
+  chmod -R 755 /data/magisk
+  chcon -R "u:object_r:system_file:s0" /data/magisk
+  /data/magisk/busybox --install -s /data/busybox
+  ln -s /data/magisk/busybox /data/busybox/busybox
+  # Prevent issues
+  rm -f /data/busybox/su /data/busybox/sh
+  chcon -R "u:object_r:system_file:s0" /data/magisk /data/busybox
+  chmod -R 755 /data/magisk /data/busybox
+  PATH=/data/busybox:$PATH
+else
+  rm -rf /cache/data_bin 2>/dev/null
+  mkdir -p /cache/data_bin
+  cp -af $BINDIR /cache/data_bin
+  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+fi
+
+##########################################################################################
 # Image
 ##########################################################################################
 
@@ -294,29 +319,6 @@ mkdir -p /magisk/zzsupersu
 touch /magisk/zzsupersu/remove
 
 ##########################################################################################
-# Environment
-##########################################################################################
-
-ui_print "- Constructing environment"
-
-if (is_mounted /data); then
-  rm -rf /data/busybox /data/magisk 2>/dev/null
-  mkdir -p /data/busybox
-  cp -af $BINDIR /data/magisk
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
-  chmod 755 /data/busybox /data/magisk /data/magisk/*
-  /data/magisk/busybox --install -s /data/busybox
-  ln -s /data/magisk/busybox /data/busybox/busybox
-  # Prevent issues
-  rm -f /data/busybox/su /data/busybox/sh
-else
-  rm -rf /cache/data_bin 2>/dev/null
-  mkdir -p /cache/data_bin
-  cp -af $BINDIR /cache/data_bin
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
-fi
-
-##########################################################################################
 # Boot image patch
 ##########################################################################################
 
@@ -326,15 +328,13 @@ rm -rf $TMPDIR/boottmp 2>/dev/null
 mkdir -p $TMPDIR/boottmp
 
 CHROMEDIR=$INSTALLER/chromeos
-ORIGBOOT=$TMPDIR/boottmp/boot.img
 NEWBOOT=$TMPDIR/boottmp/new-boot.img
 UNPACKDIR=$TMPDIR/boottmp/bootunpack
 RAMDISK=$TMPDIR/boottmp/ramdisk
 
 chmod 777 $CHROMEDIR/futility $BINDIR/*
 
-ui_print "- Dumping boot image"
-dd if=$BOOTIMAGE of=$ORIGBOOT
+ORIGBOOT=$BOOTIMAGE
 
 ui_print "- Unpacking boot image"
 unpack_boot $ORIGBOOT
@@ -354,14 +354,14 @@ if (! $NORESTORE); then
       cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
     fi
     if [ -d "magisk" ]; then
-      # If Magisk is installed and no SuperSU and no ramdisk backups
+      # If Magisk is installed and not SuperSU and no ramdisk backups
       # Restore previous stock boot image
       if (! $SUPERSU); then
         cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
         gzip -d /data/stock_boot.img.gz 2>/dev/null
         if [ -f "/data/stock_boot.img" ]; then
           ui_print "- Restoring boot image with backup"
-          cp -af /data/stock_boot.img $ORIGBOOT
+          $ORIGBOOT=/data/stock_boot.img
           unpack_boot $ORIGBOOT
         fi
       fi
@@ -378,9 +378,9 @@ if (! $SUPERSU); then
   mkdir .backup 2>/dev/null
   cp -af *fstab* verity_key sepolicy .backup 2>/dev/null
   if (is_mounted /data); then
-    cp -af $ORIGBOOT /data/stock_boot.img
+    [ "$ORIGBOOT" != "/data/stock_boot.img" ] && dd if=$ORIGBOOT of=/data/stock_boot.img
   else
-    cp -af $ORIGBOOT /cache/stock_boot.img
+    dd if=$ORIGBOOT of=/cache/stock_boot.img
   fi
 fi
 
@@ -389,24 +389,12 @@ ui_print "- Patching ramdisk"
 
 # Add magisk entrypoint
 for INIT in init*.rc; do
-  if [ $(grep -c "import /init.environ.rc" $INIT) -ne "0" ] && [ $(grep -c "import /init.magisk.rc" $INIT) -eq "0" ]; then
+  if [ $(grep -c "import /init.environ.rc" $INIT) -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
     cp $INIT .backup
     sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
     break
   fi
 done
-
-# # Add magisk specific
-# if [ $(grep -c "export PATH" init.environ.rc) -eq "0" ]; then
-#   sed -i "/on init/a\ \ \ \ export PATH /magisk/.core/bin:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin:/magisk/.core/busybox" init.environ.rc
-# else 
-#   if [ $(grep -c "/magisk/.core/busybox" init.environ.rc) -eq "0" ]; then
-#     sed -i "/export PATH/ s/\/system\/xbin/\/system\/xbin:\/magisk\/.core\/busybox/g" init.environ.rc
-#   fi
-#   if [ $(grep -c "/magisk/.core/bin" init.environ.rc) -eq "0" ] && (! $SUPERSU); then
-#     sed -i "/export PATH/ s/\/sbin/\/magisk\/.core\/bin:\/sbin/g" init.environ.rc
-#   fi
-# fi
 
 if (! $SUPERSU); then
   sed -i "/selinux.reload_policy/d" init.rc
@@ -439,15 +427,15 @@ chmod 0750 init.magisk.rc sbin/magic_mask.sh
 ui_print "- Repacking boot image"
 repack_boot
 
-ORIGSIZE=$(ls -l $ORIGBOOT | awk '{print $5}')
-NEWSIZE=$(ls -l $NEWBOOT | awk '{print $5}')
-if [ "$NEWSIZE" -gt "$ORIGSIZE" ]; then
+BOOTSIZE=`blockdev --getsize64 $BOOTIMAGE`
+NEWSIZE=`ls -l $NEWBOOT | awk '{print $5}'`
+if [ "$NEWSIZE" -gt "$BOOTSIZE" ]; then
   ui_print "! Boot partition space insufficient"
-  ui_print "! Try to remove ramdisk backups"
+  ui_print "! Remove ramdisk backups and try again"
   rm -rf $RAMDISK/.backup $NEWBOOT 2>/dev/null
   repack_boot
-  NEWSIZE=$(ls -l $NEWBOOT | awk '{print $5}')
-  if [ "$NEWSIZE" -gt "$ORIGSIZE" ]; then
+  NEWSIZE=`ls -l $NEWBOOT | awk '{print $5}'`
+  if [ "$NEWSIZE" -gt "$BOOTSIZE" ]; then
     ui_print "! Boot partition size still too small..."
     ui_print "! Unable to install Magisk"
     exit 1
@@ -456,12 +444,8 @@ fi
 
 chmod 644 $NEWBOOT
 
-if [ -L "$BOOTIMAGE" ]; then
-  ui_print "- Block symlink detected!"
-else
-  dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
-fi
 ui_print "- Flashing new boot image"
+[ ! -L "$BOOTIMAGE" ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
 dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
 
 if (! $BOOTMODE); then
@@ -469,6 +453,7 @@ if (! $BOOTMODE); then
   umount /magisk
   losetup -d $MAGISKLOOP
   umount /system
+  rmdir /magisk
 fi
 
 ui_print "- Done"

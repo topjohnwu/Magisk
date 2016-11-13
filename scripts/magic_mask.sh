@@ -21,6 +21,9 @@ BINPATH=/data/magisk
 # Will remove in the next release
 export OLDPATH=$PATH
 
+# Default permissions
+umask 022
+
 
 log_print() {
   echo "$1"
@@ -198,10 +201,9 @@ merge_image() {
               if [ "$MOD" != "lost+found" ]; then
                 log_print "Merging: $MOD"
                 rm -rf /cache/data_img/$MOD
-                $TOOLPATH/cp -afc $MOD /cache/data_img/
               fi
             done
-            $TOOLPATH/cp -afc .core/. /cache/data_img/.core 2>/dev/null
+            $TOOLPATH/cp -afc . /cache/data_img
             log_print "Merge complete"
             cd /
           fi
@@ -289,6 +291,7 @@ case $1 in
       mv /cache/stock_boot.img /data 2>/dev/null
 
       chcon -R "u:object_r:system_file:s0" $BINPATH $TOOLPATH
+      chmod -R 755 $BINPATH $TOOLPATH
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null

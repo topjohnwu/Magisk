@@ -10,9 +10,6 @@ on post-fs-data
     wait /dev/.magisk.unblock 40
     rm /dev/.magisk.unblock
 
-on property:magisk.hide=1
-    restart magisk_hide
-
 on property:magisk.restart_pfsd=1
     trigger post-fs-data
 
@@ -33,12 +30,6 @@ service magisk_pfsd /sbin/magic_mask.sh post-fs-data
 # launch late_start script
 service magisk_service /sbin/magic_mask.sh service
     class late_start
-    user root
-    seclabel u:r:su:s0
-    oneshot
-
-# launch magisk hide script
-service magisk_hide /sbin/magic_mask.sh hide
     user root
     seclabel u:r:su:s0
     oneshot
