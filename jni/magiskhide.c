@@ -60,15 +60,15 @@ void lazy_unmount(const char* mountpoint) {
 int hideMagisk(int pid, int uid) {
 	struct stat info;
 	char path[256];
-	snprintf(path, 256, "/proc/%d", pid);
-	if (stat(path, &info) == -1) {
-		fprintf(logfile, "MagiskHide: Unable to get info for pid=%d\n", pid);
-		return 1;
-	}
-	if (info.st_uid != uid) {
-		fprintf(logfile, "MagiskHide: Incorrect uid=%d, expect uid=%d\n", info.st_uid, uid);
-		return 1;
-	}
+	// snprintf(path, 256, "/proc/%d", pid);
+	// if (stat(path, &info) == -1) {
+	// 	fprintf(logfile, "MagiskHide: Unable to get info for pid=%d\n", pid);
+	// 	return 1;
+	// }
+	// if (info.st_uid != uid) {
+	// 	fprintf(logfile, "MagiskHide: Incorrect uid=%d, expect uid=%d\n", info.st_uid, uid);
+	// 	return 1;
+	// }
 
 	snprintf(path, 256, "/proc/%d/ns/mnt", pid);
 	int fd = open(path, O_RDONLY);
