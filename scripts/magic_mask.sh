@@ -237,19 +237,18 @@ case $1 in
 
     log_print "** Magisk post-fs mode running..."
 
-    # Cleanup previous stuffs...
+    # Cleanup previous version stuffs...
     rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
 
-    if [ -d "/cache/magisk_bootanim" ]; then
-      log_print "Mounting custom Boot Animation"
-      find /cache/magisk_bootanim -type f 2>/dev/null | while read ITEM ; do
+    if [ -d "/cache/magisk_mount" ]; then
+      log_print "Mounting cache files"
+      find /cache/magisk_mount -type f 2>/dev/null | while read ITEM ; do
         chmod 644 "$ITEM"
         chcon "u:object_r:system_file:s0" "$ITEM"
-        TARGET="${ITEM#/cache/magisk_bootanim}"
+        TARGET="${ITEM#/cache/magisk_mount}"
         bind_mount "$ITEM" "$TARGET"
       done
     fi
-
 
     unblock
     ;;
@@ -290,7 +289,7 @@ case $1 in
 
       mv /cache/stock_boot.img /data 2>/dev/null
 
-      chcon -R "u:object_r:system_file:s0" $BINPATH $TOOLPATH
+      chcon -hR "u:object_r:system_file:s0" $BINPATH $TOOLPATH
       chmod -R 755 $BINPATH $TOOLPATH
 
       # Image merging
@@ -318,7 +317,7 @@ case $1 in
 
       # Remove modules
       for MOD in $MOUNTPOINT/* ; do
-        if [ -f "$MOD/remove" ]; then
+        if [ -f "$MOD/remove" ] || [ "$MOD" = "zzsupersu" ]; then
           log_print "Remove module: $MOD"
           rm -rf $MOD
         fi
@@ -377,7 +376,7 @@ case $1 in
       done
 
       # Proper permissions for generated items
-      chcon -R "u:object_r:system_file:s0" $TMPDIR
+      chcon -hR "u:object_r:system_file:s0" $TMPDIR
 
       # Stage 2
       log_print "Bind mount module items"
@@ -402,8 +401,8 @@ case $1 in
         log_print "Enabling BusyBox"
         $TOOLPATH/cp -afc /data/busybox/. $COREDIR/busybox
         $TOOLPATH/cp -afc /system/xbin/. $COREDIR/busybox
-        chmod 755 $COREDIR/busybox
-        chcon "u:object_r:system_file:s0" $COREDIR/busybox
+        chmod -R 755 $COREDIR/busybox
+        chcon -hR "u:object_r:system_file:s0" $COREDIR/busybox
         bind_mount $COREDIR/busybox /system/xbin
       fi
 

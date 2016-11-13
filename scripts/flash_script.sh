@@ -249,6 +249,7 @@ fi
 ui_print "- Device platform: $ARCH"
 
 BINDIR=$INSTALLER/$ARCH
+chmod -R 755 $CHROMEDIR/futility $BINDIR
 
 find_boot_image
 if [ -z "$BOOTIMAGE" ]; then
@@ -267,13 +268,11 @@ if (is_mounted /data); then
   mkdir -p /data/busybox
   cp -af $BINDIR /data/magisk
   cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
-  chmod -R 755 /data/magisk
-  chcon -R "u:object_r:system_file:s0" /data/magisk
   /data/magisk/busybox --install -s /data/busybox
   ln -s /data/magisk/busybox /data/busybox/busybox
   # Prevent issues
   rm -f /data/busybox/su /data/busybox/sh
-  chcon -R "u:object_r:system_file:s0" /data/magisk /data/busybox
+  chcon -hR "u:object_r:system_file:s0" /data/magisk /data/busybox
   chmod -R 755 /data/magisk /data/busybox
   PATH=/data/busybox:$PATH
 else
@@ -314,10 +313,6 @@ MAGISKLOOP=$LOOPDEVICE
 mkdir -p /magisk/.core/magiskhide 2>/dev/null
 cp -af $INSTALLER/common/magiskhide/. /magisk/.core/magiskhide
 
-# Remove legacy SuperSU module
-mkdir -p /magisk/zzsupersu
-touch /magisk/zzsupersu/remove
-
 ##########################################################################################
 # Boot image patch
 ##########################################################################################
@@ -331,8 +326,6 @@ CHROMEDIR=$INSTALLER/chromeos
 NEWBOOT=$TMPDIR/boottmp/new-boot.img
 UNPACKDIR=$TMPDIR/boottmp/bootunpack
 RAMDISK=$TMPDIR/boottmp/ramdisk
-
-chmod 777 $CHROMEDIR/futility $BINDIR/*
 
 ORIGBOOT=$BOOTIMAGE
 
