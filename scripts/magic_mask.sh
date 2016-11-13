@@ -370,10 +370,14 @@ case $1 in
       if [ -f "$MOUNTINFO/dummy/system/lib" ]; then
         cd /system/lib
         cp -afc $LIBS $DUMMDIR/system/lib
+        # Crash prevention!!
+        rm -f $COREDIR/magiskhide/enable 2>/dev/null
       fi
       if [ -f "$MOUNTINFO/dummy/system/lib64" ]; then
         cd /system/lib64
         cp -afc $LIBS $DUMMDIR/system/lib64
+        # Crash prevention!!
+        rm -f $COREDIR/magiskhide/enable 2>/dev/null
       fi
 
       # vendor libraries are device dependent, had no choice but copy them all if needed....
