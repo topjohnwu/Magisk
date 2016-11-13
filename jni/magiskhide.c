@@ -152,8 +152,6 @@ void quit_pthread(int sig) {
 
 void *monitor_list(void *listpath) {
 	signal(SIGQUIT, quit_pthread);
-	// Initial load
-	update_list((char*) listpath);
 
 	int inotifyFd = -1;
 	char buffer[512];
