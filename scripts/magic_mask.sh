@@ -16,10 +16,8 @@ MOUNTINFO=$TMPDIR/mnt
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
 TOOLPATH=/data/busybox
 BINPATH=/data/magisk
-
-# Legacy support for old phh, we don't change PATH now
-# Will remove in the next release
-export OLDPATH=$PATH
+OLDPATH=$PATH
+PATH=$TOOLPATH:$OLDPATH
 
 # Default permissions
 umask 022
@@ -34,9 +32,9 @@ log_print() {
 mktouch() {
   mkdir -p ${1%/*} 2>/dev/null
   if [ -z "$2" ]; then
-    touch $1 2>/dev/null
+    touch "$1" 2>/dev/null
   else
-    echo $2 > $1 2>/dev/null
+    echo "$2" > "$1" 2>/dev/null
   fi
 }
 
@@ -46,6 +44,7 @@ unblock() {
 }
 
 run_scripts() {
+  PATH=$OLDPATH
   BASE=$MOUNTPOINT
   for MOD in $BASE/* ; do
     if [ ! -f "$MOD/disable" ]; then
@@ -57,12 +56,13 @@ run_scripts() {
       fi
     fi
   done
+  PATH=$TOOLPATH:$OLDPATH
 }
 
 loopsetup() {
   LOOPDEVICE=
   for DEV in $(ls /dev/block/loop*); do
-    if [ `$TOOLPATH/losetup $DEV $1 >/dev/null 2>&1; echo $?` -eq 0 ]; then
+    if [ `losetup $DEV $1 >/dev/null 2>&1; echo $?` -eq 0 ]; then
       LOOPDEVICE=$DEV
       break
     fi
@@ -102,7 +102,7 @@ travel() {
           elif [ -L "$ITEM" ]; then
             # Symlinks are small, copy them
             mkdir -p "$DUMMDIR/$2" 2>/dev/null
-            $TOOLPATH/cp -afc "$ITEM" "$DUMMDIR/$2/$ITEM"
+            cp -afc "$ITEM" "$DUMMDIR/$2/$ITEM"
           else
             # Create new dummy file and mount it
             mktouch "$DUMMDIR/$2/$ITEM"
@@ -126,17 +126,18 @@ clone_dummy() {
   for ITEM in "$1/"* ; do
     if [ -d "$DUMMDIR$ITEM" ]; then
       (clone_dummy "$ITEM")
-    else
+    elif [ ! -e "$DUMMDIR$ITEM" ]; then
       if [ -d "$ITEM" ]; then
         # Create dummy directory
         mkdir -p "$DUMMDIR$ITEM"
       elif [ -L "$ITEM" ]; then
         # Symlinks are small, copy them
-        $TOOLPATH/cp -afc "$ITEM" "$DUMMDIR$ITEM"
+        cp -afc "$ITEM" "$DUMMDIR$ITEM"
       else
         # Create dummy file
         mktouch "$DUMMDIR$ITEM"
       fi
+      chcon -f "u:object_r:system_file:s0" "$DUMMDIR$ITEM"
     fi
   done
 }
@@ -203,7 +204,7 @@ merge_image() {
                 rm -rf /cache/data_img/$MOD
               fi
             done
-            $TOOLPATH/cp -afc . /cache/data_img
+            cp -afc . /cache/data_img
             log_print "Merge complete"
             cd /
           fi
@@ -213,8 +214,8 @@ merge_image() {
         fi
       fi
 
-      $TOOLPATH/losetup -d $LOOPDATA
-      $TOOLPATH/losetup -d $LOOPMERGE
+      losetup -d $LOOPDATA
+      losetup -d $LOOPMERGE
 
       rmdir /cache/data_img
       rmdir /cache/merge_img
@@ -289,7 +290,8 @@ case $1 in
 
       mv /cache/stock_boot.img /data 2>/dev/null
 
-      chcon -hR "u:object_r:system_file:s0" $BINPATH $TOOLPATH
+      find $BINPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
+      find $TOOLPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
       chmod -R 755 $BINPATH $TOOLPATH
 
       # Image merging
@@ -313,7 +315,7 @@ case $1 in
 
       # Remove empty directories, legacy paths and symlinks
       rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror
-      $TOOLPATH/find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
+      find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
 
       # Remove modules
       for MOD in $MOUNTPOINT/* ; do
@@ -325,7 +327,7 @@ case $1 in
 
       # Unmount, shrink, remount
       if [ `umount $MOUNTPOINT >/dev/null 2>&1; echo $?` -eq 0 ]; then
-        $TOOLPATH/losetup -d $LOOPDEVICE
+        losetup -d $LOOPDEVICE
         target_size_check $IMG
         NEWDATASIZE=$(((curUsedM / 32 + 2) * 32))
         if [ "$curSizeM" -gt "$NEWDATASIZE" ]; then
@@ -354,11 +356,36 @@ case $1 in
         fi
       done
 
-      # linker(64), t*box, and app_process* are required if we need to dummy mount bin folder
+      # Proper permissions for generated items
+      find $TMPDIR -exec chcon -h "u:object_r:system_file:s0" {} \;
+
+      # linker(64), t*box required
       if [ -f "$MOUNTINFO/dummy/system/bin" ]; then
-        rm -f $DUMMDIR/system/bin/linker* $DUMMDIR/system/bin/t*box $DUMMDIR/system/bin/app_process*
         cd /system/bin
-        $TOOLPATH/cp -afc linker* t*box app_process* $DUMMDIR/system/bin/
+        cp -afc linker* t*box $DUMMDIR/system/bin/
+      fi
+
+      # Some libraries are required
+      LIBS="libc++.so libc.so libcutils.so libm.so libstdc++.so libcrypto.so liblog.so libpcre.so libselinux.so libpackagelistparser.so"
+      if [ -f "$MOUNTINFO/dummy/system/lib" ]; then
+        cd /system/lib
+        cp -afc $LIBS $DUMMDIR/system/lib
+      fi
+      if [ -f "$MOUNTINFO/dummy/system/lib64" ]; then
+        cd /system/lib64
+        cp -afc $LIBS $DUMMDIR/system/lib64
+      fi
+
+      # vendor libraries are device dependent, had no choice but copy them all if needed....
+      if [ -f "$MOUNTINFO/dummy/system/vendor" ]; then
+        cp -afc /system/vendor/lib/. $DUMMDIR/system/vendor/lib
+        [ -d "/system/vendor/lib64" ] && cp -afc /system/vendor/lib64/. $DUMMDIR/system/vendor/lib64
+      fi
+      if [ -f "$MOUNTINFO/dummy/system/vendor/lib" ]; then
+        cp -afc /system/vendor/lib/. $DUMMDIR/system/vendor/lib
+      fi
+      if [ -f "$MOUNTINFO/dummy/system/vendor/lib64" ]; then
+        cp -afc /system/vendor/lib64/. $DUMMDIR/system/vendor/lib64
       fi
 
       # Remove crap folder
@@ -368,19 +395,16 @@ case $1 in
       
       # Stage 1
       log_print "Bind mount dummy system"
-      $TOOLPATH/find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
+      find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO/dummy}
         ORIG="$DUMMDIR$TARGET"
         clone_dummy "$TARGET"
         bind_mount "$ORIG" "$TARGET"
       done
 
-      # Proper permissions for generated items
-      chcon -hR "u:object_r:system_file:s0" $TMPDIR
-
       # Stage 2
       log_print "Bind mount module items"
-      $TOOLPATH/find $MOUNTINFO/system -type f 2>/dev/null | while read ITEM ; do
+      find $MOUNTINFO/system -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO}
         ORIG=`cat $ITEM`$TARGET
         bind_mount $ORIG $TARGET
@@ -399,8 +423,8 @@ case $1 in
       # Expose busybox
       if [ -f "$COREDIR/busybox/enable" ]; then
         log_print "Enabling BusyBox"
-        $TOOLPATH/cp -afc /data/busybox/. $COREDIR/busybox
-        $TOOLPATH/cp -afc /system/xbin/. $COREDIR/busybox
+        cp -afc /data/busybox/. $COREDIR/busybox
+        cp -afc /system/xbin/. $COREDIR/busybox
         chmod -R 755 $COREDIR/busybox
         chcon -hR "u:object_r:system_file:s0" $COREDIR/busybox
         bind_mount $COREDIR/busybox /system/xbin
@@ -413,8 +437,8 @@ case $1 in
       # Stage 4
       log_print "Bind mount mirror items"
       # Find all empty directores and dummy files, they should be mounted by original files in /system
-      TOOLPATH=/data/busybox $TOOLPATH/find $DUMMDIR -type d \
-      -exec sh -c '[ -z "`$TOOLPATH/ls -A $1`" ] && echo $1' -- {} \; \
+      TOOLPATH=/data/busybox find $DUMMDIR -type d \
+      -exec sh -c '[ -z "`ls -A $1`" ] && echo $1' -- {} \; \
       -o \( -type f -size 0 -print \) | \
       while read ITEM ; do
         ORIG=${ITEM/dummy/mirror}
