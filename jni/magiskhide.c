@@ -11,6 +11,8 @@
 #include <sys/mount.h>
 #include <sys/inotify.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define LOGFILE 	"/cache/magisk.log"
 #define HIDELIST 	"/magisk/.core/magiskhide/hidelist"
@@ -55,40 +57,61 @@ void lazy_unmount(const char* mountpoint) {
 
 //WARNING: Calling this will change our current namespace
 //We don't care because we don't want to run from here anyway
-int hideMagisk(int pid) {
-	char *path = NULL;
-	asprintf(&path, "/proc/%d/ns/mnt", pid);
+int hideMagisk(int pid, int uid) {
+	struct stat info;
+	char path[256];
+	snprintf(path, 256, "/proc/%d", pid);
+	if (stat(path, &info) == -1) {
+		fprintf(logfile, "MagiskHide: Unable to get info for pid=%d\n", pid);
+		return 1;
+	}
+	if (info.st_uid != uid) {
+		fprintf(logfile, "MagiskHide: Incorrect uid=%d, expect uid=%d\n", info.st_uid, uid);
+		return 1;
+	}
+
+	snprintf(path, 256, "/proc/%d/ns/mnt", pid);
 	int fd = open(path, O_RDONLY);
 	if(fd == -1) return 2; // Maybe process died..
 	if(setns(fd, 0) == -1) {
-		fprintf(logfile, "Unable to change namespace for pid=%d\n", pid);
+		fprintf(logfile, "MagiskHide: Unable to change namespace for pid=%d\n", pid);
 		return 3;
 	}
 
-	free(path);
-	path = NULL;
-	asprintf(&path, "/proc/%d/mounts", pid);
+	snprintf(path, 256, "/proc/%d/mounts", pid);
 	FILE *mount_fp = fopen(path, "r");
 	if (mount_fp == NULL) {
-		fprintf(logfile, "Error opening mount list!\n");
+		fprintf(logfile, "MagiskHide: Error opening mount list!\n");
 		return 4;
 	}
-	free(path);
 
 	int mount_size;
-	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], *sbstr;
+	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], cache_block[256];
 	fclose(mount_fp);
+
+	// Find the cache block
+	for(i = 0; i < mount_size; ++i) {
+		if (strstr(mount_list[i], "/cache")) {
+			sscanf(mount_list[i], "%256s", cache_block);
+			break;
+		}
+	}
 
 	// Unmount in inverse order
 	for(i = mount_size - 1; i >= 0; --i) {
-		if (strstr(mount_list[i], "/dev/block/loop")) {
+		if (strstr(mount_list[i], cache_block) && strstr(mount_list[i], "/system")) {
+			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
+		} else if (strstr(mount_list[i], "/dev/block/loop")) {
 			if (strstr(mount_list[i], "/dev/magisk")) continue;
 			// Everything from loop mount
 			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
 		} else if (strstr(mount_list[i], "tmpfs /system/")) {
 			// Directly unmount skeletons
 			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-		} else continue;
+		} else {
+			free(mount_list[i]);
+			continue;
+		}
 		lazy_unmount(mountpoint);
 		free(mount_list[i]);
 	}
@@ -116,7 +139,7 @@ void update_list(const char *listpath) {
 	fclose(hide_fp);
 	if (list_size) fprintf(logfile, "MagiskHide: Update process/package list:\n");
 	for(i = 0; i < list_size; i++)
-		fprintf(logfile, "MagiskHide: %s\n", hide_list[i]);
+		fprintf(logfile, "MagiskHide: [%s]\n", hide_list[i]);
 }
 
 void quit_pthread(int sig) {
@@ -209,7 +232,7 @@ int main(int argc, char **argv, char **envp) {
 					if (forkpid < 0)
 						break;
 					if (forkpid == 0) {
-						hideMagisk(pid);
+						hideMagisk(pid, uid);
 						return 0;
 					}
 					waitpid(forkpid, NULL, 0);

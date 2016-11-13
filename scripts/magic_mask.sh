@@ -377,9 +377,7 @@ case $1 in
       done
 
       # Proper permissions for generated items
-      $TOOLPATH/find $TMPDIR -type d -exec chmod 755 "{}" \;
-      $TOOLPATH/find $TMPDIR -type f -exec chmod 644 "{}" \;
-      $TOOLPATH/find $TMPDIR -exec chcon "u:object_r:system_file:s0" "{}" \;
+      chcon -R "u:object_r:system_file:s0" $TMPDIR
 
       # Stage 2
       log_print "Bind mount module items"
