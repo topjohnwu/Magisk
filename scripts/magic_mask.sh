@@ -304,7 +304,7 @@ case $1 in
       if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
         loopsetup $IMG
         if [ ! -z "$LOOPDEVICE" ]; then
-          mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
+          mount -t ext4 -o rw,noatime,suid $LOOPDEVICE $MOUNTPOINT
         fi
       fi
 
@@ -336,7 +336,7 @@ case $1 in
         fi
         loopsetup $IMG
         if [ ! -z "$LOOPDEVICE" ]; then
-          mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
+          mount -t ext4 -o rw,noatime,suid $LOOPDEVICE $MOUNTPOINT
         fi
         if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
           log_print "magisk.img mount failed, nothing to do :("
