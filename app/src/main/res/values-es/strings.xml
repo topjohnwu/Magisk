@@ -1,0 +1,110 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Abrir menú lateral</string>
+    <string name="navigation_drawer_close">Cerrar menú lateral</string>
+    <string name="magiskhide">Magisk Hide</string>
+    <string name="modules">Modulos</string>
+    <string name="downloads">Descargas</string>
+    <string name="log">Log</string>
+    <string name="settings">Ajustes</string>
+
+    <!--Magisk Fragment-->
+    <string name="magisk_version">Instalado Magisk v%1$s</string>
+    <string name="magisk_version_error">¿Has instalado Magisk?</string>
+
+    <string name="app_update_available">¡Actualización aplicación Magisk Manager v%1$s!</string>
+    <string name="magisk_update_available">¡Actualización Magisk v%1$s!</string>
+    <string name="cannot_check_updates">No se pueden buscar actualizaciones</string>
+    <string name="up_to_date">Última versión de %1$s instalada</string>
+
+    <!--Root Fragment-->
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(No hay información)</string>
+    <string name="no_modules_found">No se han encontrado módulos</string>
+    <string name="update_file_created">El módulo se actualizar´´a en el siguiente reinicio</string>
+    <string name="remove_file_created">El m´´odulo se eliminar´´a en el siguiente reinicio</string>
+    <string name="remove_file_deleted">El m´´odulo no se eliminir´´a en el siguiente reinicio</string>
+    <string name="disable_file_created">El m´´odulo se desactivar´´a en el siguiente reinicio</string>
+    <string name="disable_file_removed">El m´´odulo se activar´´a en el siguiente reinicio</string>
+    <string name="author">Creado por %1$s</string>
+    <string name="fab_flash_zip">Flashear M´´odulo Zip</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Actualizaci´´on disponible</string>
+    <string name="installed">Instalado</string>
+    <string name="not_installed">No Instalado</string>
+    <string name="changelog">Cambios</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Salvar a SD</string>
+    <string name="menuSend">Enviar</string>
+    <string name="menuReload">Recargar</string>
+    <string name="menuClearLog">Vaciar Log ahora</string>
+    <string name="logs_cleared">Log vaciado correctamente</string>
+    <string name="log_is_empty">El Log est´´a vacio</string>
+    <string name="logs_save_failed">Could not write log to SD card:</string>
+
+    <!--About Activity-->
+    <string name="about">Acerca de</string>
+    <string name="app_developers">Desarroladores principales</string>
+    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Cambios en la aplicaci´´on</string>
+    <string name="translators"/>
+    <string name="app_version">App\'s version</string>
+    <string name="app_source_code">C´´odigo fuente</string>
+    <string name="donation">Donar</string>
+    <string name="app_translators">Traductores de la aplicaci´´on</string>
+    <string name="support_thread">Hilo de soporte</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Esta opci´´on no funcionar´´a sin permiso de escritura en la memoria externa</string>
+    <string name="no_root_access">No hay acceso a root, funcionalidad limitada</string>
+    <string name="no_thanks">No gracias</string>
+    <string name="update_title">¡Actualizaci´´on de %1$s!</string>
+    <string name="update_msg">Disponible nueva versi´´on v%2$s de %1$s!\nCambios:\n%3$s</string>
+    <string name="repo_install_title">Instalar %1$s</string>
+    <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>
+    <string name="download_install">Descargar e instalar</string>
+    <string name="download_file_error">Error descargando fichero</string>
+    <string name="install_error">¡Error en la instalaci´´on!</string>
+    <string name="manual_install">Error flasheando fichero, zip colocado en %1$s\nFlashear manualmente desde recovery</string>
+    <string name="invalid_zip">¡El zip no es un M´´odulo Magisk!</string>
+    <string name="reboot_title">¡Instalaci´´on correcta!</string>
+    <string name="reboot_msg">¿Deseas reiniciar ahora?</string>
+    <string name="reboot">Reinciar</string>
+    <string name="zip_install_progress_title">Instalando</string>
+    <string name="zip_install_progress_msg">"Instalando %1$s …"</string>
+    <string name="no_magisk_title">¡Magisk no instalado!</string>
+    <string name="no_magisk_msg">¿Deseas descargar e instalar Magisk?</string>
+
+    <!--URL Templates-->
+    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
+    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">General</string>
+    <string name="settings_theme_title">Tema</string>
+    <string name="settings_theme_summary">Selecciona un tema</string>
+
+    <string name="settings_magiskhide_title">Habilitar Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
+    <string name="settings_busybox_title">Habilitar BusyBox</string>
+    <string name="settings_busybox_summary">Montar el busybox interno de Magisk en xbin</string>
+    <string name="settings_hosts_title">Habilitar fichero hosts fuera de la partici´´on de sistema</string>
+    <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partici´´on de sistema</string>
+
+    <string name="settings_development_category">Desarrollo</string>
+    <string name="settings_developer_logging_title">Habilitar informaci´´on de depuraci´´on en el log</string>
+    <string name="settings_developer_logging_summary">Activar esto para grabar m´´as informaci´´on en el log</string>
+    <string name="settings_shell_logging_title">Grabar comandos de terminal en el log</string>
+    <string name="settings_shell_logging_summary">Activar esto para grabar en el log todos los comandos ejecutados y su resultado</string>
+
+    <string name="settings_reboot_toast">Reiniciar para aplicar ajustes</string>
+
+</resources>
