@@ -26,16 +26,16 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se han encontrado módulos</string>
-    <string name="update_file_created">El módulo se actualizar´´a en el siguiente reinicio</string>
-    <string name="remove_file_created">El m´´odulo se eliminar´´a en el siguiente reinicio</string>
-    <string name="remove_file_deleted">El m´´odulo no se eliminir´´a en el siguiente reinicio</string>
-    <string name="disable_file_created">El m´´odulo se desactivar´´a en el siguiente reinicio</string>
-    <string name="disable_file_removed">El m´´odulo se activar´´a en el siguiente reinicio</string>
+    <string name="update_file_created">El módulo se actualizará en el siguiente reinicio</string>
+    <string name="remove_file_created">El módulo se eliminará en el siguiente reinicio</string>
+    <string name="remove_file_deleted">El módulo no se eliminirá en el siguiente reinicio</string>
+    <string name="disable_file_created">El módulo se desactivará en el siguiente reinicio</string>
+    <string name="disable_file_removed">El móodulo se activará en el siguiente reinicio</string>
     <string name="author">Creado por %1$s</string>
-    <string name="fab_flash_zip">Flashear M´´odulo Zip</string>
+    <string name="fab_flash_zip">Flashear Módulo Zip</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Actualizaci´´on disponible</string>
+    <string name="update_available">Actualización disponible</string>
     <string name="installed">Instalado</string>
     <string name="not_installed">No Instalado</string>
     <string name="changelog">Cambios</string>
@@ -46,35 +46,35 @@
     <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Vaciar Log ahora</string>
     <string name="logs_cleared">Log vaciado correctamente</string>
-    <string name="log_is_empty">El Log est´´a vacio</string>
-    <string name="logs_save_failed">Could not write log to SD card:</string>
+    <string name="log_is_empty">El Log está vacio</string>
+    <string name="logs_save_failed">No se ha podido escribir el log en la tarjeta SD:</string>
 
     <!--About Activity-->
     <string name="about">Acerca de</string>
     <string name="app_developers">Desarroladores principales</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-    <string name="app_changelog">Cambios en la aplicaci´´on</string>
+    <string name="app_changelog">Cambios en la aplicación</string>
     <string name="translators"/>
-    <string name="app_version">App\'s version</string>
-    <string name="app_source_code">C´´odigo fuente</string>
+    <string name="app_version">Versión de la aplicación</string>
+    <string name="app_source_code">Código fuente</string>
     <string name="donation">Donar</string>
-    <string name="app_translators">Traductores de la aplicaci´´on</string>
+    <string name="app_translators">Traductores de la aplicación</string>
     <string name="support_thread">Hilo de soporte</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Esta opci´´on no funcionar´´a sin permiso de escritura en la memoria externa</string>
+    <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa</string>
     <string name="no_root_access">No hay acceso a root, funcionalidad limitada</string>
     <string name="no_thanks">No gracias</string>
-    <string name="update_title">¡Actualizaci´´on de %1$s!</string>
-    <string name="update_msg">Disponible nueva versi´´on v%2$s de %1$s!\nCambios:\n%3$s</string>
+    <string name="update_title">¡Actualización de %1$s!</string>
+    <string name="update_msg">Disponible nueva versión v%2$s de %1$s!\nCambios:\n%3$s</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>
     <string name="download_install">Descargar e instalar</string>
     <string name="download_file_error">Error descargando fichero</string>
-    <string name="install_error">¡Error en la instalaci´´on!</string>
+    <string name="install_error">¡Error en la instalación!</string>
     <string name="manual_install">Error flasheando fichero, zip colocado en %1$s\nFlashear manualmente desde recovery</string>
-    <string name="invalid_zip">¡El zip no es un M´´odulo Magisk!</string>
-    <string name="reboot_title">¡Instalaci´´on correcta!</string>
+    <string name="invalid_zip">¡El zip no es un Módulo Magisk!</string>
+    <string name="reboot_title">¡Instalación correcta!</string>
     <string name="reboot_msg">¿Deseas reiniciar ahora?</string>
     <string name="reboot">Reinciar</string>
     <string name="zip_install_progress_title">Instalando</string>
@@ -96,12 +96,12 @@
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_busybox_title">Habilitar BusyBox</string>
     <string name="settings_busybox_summary">Montar el busybox interno de Magisk en xbin</string>
-    <string name="settings_hosts_title">Habilitar fichero hosts fuera de la partici´´on de sistema</string>
-    <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partici´´on de sistema</string>
+    <string name="settings_hosts_title">Habilitar fichero hosts fuera de la partición de sistema</string>
+    <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partición de sistema</string>
 
     <string name="settings_development_category">Desarrollo</string>
-    <string name="settings_developer_logging_title">Habilitar informaci´´on de depuraci´´on en el log</string>
-    <string name="settings_developer_logging_summary">Activar esto para grabar m´´as informaci´´on en el log</string>
+    <string name="settings_developer_logging_title">Habilitar información de depuración en el log</string>
+    <string name="settings_developer_logging_summary">Activar esto para grabar más información en el log</string>
     <string name="settings_shell_logging_title">Grabar comandos de terminal en el log</string>
     <string name="settings_shell_logging_summary">Activar esto para grabar en el log todos los comandos ejecutados y su resultado</string>
 
