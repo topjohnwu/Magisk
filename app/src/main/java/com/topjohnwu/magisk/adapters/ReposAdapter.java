@@ -92,26 +92,28 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
         View.OnClickListener listener = view -> {
             if (view.getId() == holder.updateImage.getId()) {
-                String fullname = repo.getName() + "-" + repo.getVersion();
+                String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
                 builder
                         .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                        .setMessage(context.getString(R.string.repo_install_msg, fullname))
+                        .setMessage(context.getString(R.string.repo_install_msg, filename))
                         .setCancelable(true)
-                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.downloadAndReceive(
+                        .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                                 context,
-                                new DownloadReceiver(fullname) {
+                                new DownloadReceiver() {
                                     @Override
                                     public void task(Uri uri) {
-                                        new Async.FlashZIP(context, uri, mName) {
+                                        new Async.FlashZIP(context, uri, mFilename) {
+                                            /*
+                                             * !!! This method is now depreciated, will be replaced with new method !!!
+                                             */
                                             @Override
                                             protected void preProcessing() throws Throwable {
-                                                super.preProcessing();
-                                                new File(mUri.getPath()).delete();
+                                                File file = new File(mUri.getPath());
                                                 Shell.sh(
                                                         "PATH=" + context.getApplicationInfo().dataDir + "/tools:$PATH",
-                                                        "cd " + mFile.getParent(),
+                                                        "cd " + file.getParent(),
                                                         "mkdir git",
-                                                        "unzip -o install.zip -d git",
+                                                        "unzip -o " + file + " -d git",
                                                         "mv git/* install",
                                                         "cd install",
                                                         "rm -rf system/placeholder",
@@ -121,12 +123,13 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                                                         "zip -r ../install.zip *",
                                                         "rm -rf ../install"
                                                 );
+                                                mUri = Uri.fromFile(new File(file.getParent() + "/install.zip"));
                                             }
                                         }.exec();
                                     }
                                 },
                                 repo.getZipUrl(),
-                                repo.getId().replace(" ", "") + ".zip"))
+                                Utils.getLegalFilename(filename)))
                         .setNegativeButton(R.string.no_thanks, null)
                         .show();
             }

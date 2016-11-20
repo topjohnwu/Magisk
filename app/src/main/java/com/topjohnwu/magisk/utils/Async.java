@@ -172,16 +172,16 @@ public class Async {
     public static class FlashZIP extends RootTask<Void, Void, Integer> {
 
         protected Uri mUri;
-        protected File mFile, sdFile;
-        private String mName;
+        protected File mCachedFile, sdFile;
+        private String mFilename;
         private ProgressDialog progress;
         private Context mContext;
         private boolean copyToSD;
 
-        public FlashZIP(Context context, Uri uri, String name) {
+        public FlashZIP(Context context, Uri uri, String filename) {
             mContext = context;
             mUri = uri;
-            mName = name;
+            mFilename = filename;
             copyToSD = true;
         }
 
@@ -193,13 +193,13 @@ public class Async {
                 int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 c.moveToFirst();
                 if (nameIndex != -1) {
-                    mName = c.getString(nameIndex);
+                    mFilename = c.getString(nameIndex);
                 }
                 c.close();
             }
-            if (mName == null) {
+            if (mFilename == null) {
                 int idx = uri.getPath().lastIndexOf('/');
-                mName = uri.getPath().substring(idx + 1);
+                mFilename = uri.getPath().substring(idx + 1);
             }
             copyToSD = false;
         }
@@ -221,34 +221,37 @@ public class Async {
             Logger.dev("FlashZip: File created successfully - " + file.getPath());
         }
 
-        protected void preProcessing() throws Throwable {
+        protected void preProcessing() throws Throwable {}
+
+        protected void copyToCache() throws Throwable {
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
-                mFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
-                mFile.delete();
-                Utils.removeItem(mFile.getPath());
-                createFileFromInputStream(in, mFile);
+                mCachedFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
+                mCachedFile.delete();
+                Utils.removeItem(mCachedFile.getPath());
+                createFileFromInputStream(in, mCachedFile);
                 in.close();
             } catch (FileNotFoundException e) {
-                Log.e("Magisk", "FlashZip: Invalid Uri");
+                Log.e(Logger.LOG_TAG, "FlashZip: Invalid Uri");
                 throw e;
             } catch (IOException e) {
-                Log.e("Magisk", "FlashZip: Error in creating file");
+                Log.e(Logger.LOG_TAG, "FlashZip: Error in creating file");
                 throw e;
             }
         }
 
         @Override
         protected void onPreExecute() {
-            progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mName));
+            progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mFilename));
         }
 
         @Override
         protected Integer doInBackground(Void... voids) {
-            Logger.dev("FlashZip Running... " + mName);
+            Logger.dev("FlashZip Running... " + mFilename);
             List<String> ret = null;
             try {
                 preProcessing();
+                copyToCache();
             } catch (Throwable e) {
                 this.cancel(true);
                 progress.cancel();
@@ -257,49 +260,46 @@ public class Async {
             }
             if (Shell.rootAccess()) {
                 ret = Shell.su(
-                        "unzip -o " + mFile.getPath() + " META-INF/com/google/android/* -d " + mFile.getParent(),
-                        "if [ \"$(cat " + mFile.getParent() + "/META-INF/com/google/android/updater-script)\" = \"#MAGISK\" ]; then echo true; else echo false; fi"
+                        "unzip -o " + mCachedFile.getPath() + " META-INF/com/google/android/* -d " + mCachedFile.getParent(),
+                        "if [ \"$(cat " + mCachedFile.getParent() + "/META-INF/com/google/android/updater-script)\" = \"#MAGISK\" ]; then echo true; else echo false; fi"
                 );
                 if (! Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                     return 0;
                 }
                 ret = Shell.su(
-                        "BOOTMODE=true sh " + mFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mFile.getPath(),
+                        "BOOTMODE=true sh " + mCachedFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mCachedFile.getPath(),
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                Shell.su("rm -rf " + mFile.getParent() + "/META-INF");
+                Shell.su("rm -rf " + mCachedFile.getParent() + "/META-INF");
                 Logger.dev("FlashZip: Console log:");
                 for (String line : ret) {
                     Logger.dev(line);
                 }
             }
             // Copy the file to sdcard
-            if (copyToSD && mFile != null) {
-                String filename = (mName.contains(".zip") ? mName : mName + ".zip");
-                filename = filename.replace(" ", "_").replace("'", "").replace("\"", "")
-                        .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
-                        .replace("#", "").replace("@", "").replace("*", "");
+            if (copyToSD && mCachedFile != null) {
+                String filename = Utils.getLegalFilename(mFilename.contains(".zip") ? mFilename : mFilename + ".zip");
                 sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
                 Logger.dev("FlashZip: Copy zip back to " + sdFile.getPath());
                 if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
                     sdFile = null;
                 } else {
                     try {
-                        FileInputStream in = new FileInputStream(mFile);
+                        FileInputStream in = new FileInputStream(mCachedFile);
                         createFileFromInputStream(in, sdFile);
                         in.close();
                     } catch (IOException e) {
                         // Use the badass way :)
                         e.printStackTrace();
-                        Shell.su("cp -af " + mFile.getPath() + " " + sdFile.getPath());
+                        Shell.su("cp -af " + mCachedFile.getPath() + " " + sdFile.getPath());
                         if (!sdFile.exists()) {
                             sdFile = null;
                         }
                     }
                 }
             }
-            if (mFile != null && mFile.exists() && !mFile.delete()) {
-                Utils.removeItem(mFile.getPath());
+            if (mCachedFile != null && mCachedFile.exists() && !mCachedFile.delete()) {
+                Utils.removeItem(mCachedFile.getPath());
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;

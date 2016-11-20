@@ -71,18 +71,12 @@ public class MagiskFragment extends Fragment {
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
-    private AlertDialog.OnClickListener flashMagisk = (dialogInterface, i) -> Utils.downloadAndReceive(
+    private AlertDialog.OnClickListener flashMagisk = (dialogInterface, i) -> Utils.dlAndReceive(
             getActivity(),
-            new DownloadReceiver("Magisk-v" + String.valueOf(remoteMagiskVersion)) {
+            new DownloadReceiver() {
                 @Override
                 public void task(Uri uri) {
-                    new Async.FlashZIP(mContext, uri, mName) {
-                        @Override
-                        protected void preProcessing() throws Throwable {
-                            super.preProcessing();
-                            new File(mUri.getPath()).delete();
-                        }
-
+                    new Async.FlashZIP(mContext, uri, mFilename) {
                         @Override
                         protected void done() {
                             Shell.su("setprop magisk.version " + String.valueOf(remoteMagiskVersion));
@@ -92,9 +86,9 @@ public class MagiskFragment extends Fragment {
                 }
             },
             magiskLink,
-            "latest_magisk.zip");
+            "Magisk-v" + String.valueOf(remoteMagiskVersion) + ".zip");
 
-    private AlertDialog.OnClickListener installMagiskApk = (dialogInterface, i) -> Utils.downloadAndReceive(
+    private AlertDialog.OnClickListener installMagiskApk = (dialogInterface, i) -> Utils.dlAndReceive(
             getActivity(),
             new DownloadReceiver() {
                 @Override

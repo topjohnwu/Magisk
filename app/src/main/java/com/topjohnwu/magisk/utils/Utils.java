@@ -87,7 +87,7 @@ public class Utils {
         return ret;
     }
 
-    public static void downloadAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
+    public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
         File file = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
@@ -103,6 +103,7 @@ public class Utils {
         request.setDestinationUri(Uri.fromFile(file));
 
         receiver.setDownloadID(downloadManager.enqueue(request));
+        receiver.setFilename(filename);
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
@@ -127,6 +128,12 @@ public class Utils {
             e.printStackTrace();
         }
         return secret;
+    }
+
+    public static String getLegalFilename(CharSequence filename) {
+        return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
+                .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
+                .replace("#", "").replace("@", "").replace("*", "");
     }
 
 }

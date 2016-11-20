@@ -83,7 +83,6 @@ public class ModulesFragment extends Fragment {
         if (data != null) {
             // Get the URI of the selected file
             final Uri uri = data.getData();
-            // Get the file path from the URI
             new Async.FlashZIP(getActivity(), uri).exec();
         }
 

@@ -4,7 +4,7 @@ import android.util.Log;
 
 public class Logger {
 
-    private static final String LOG_TAG = "Magisk: DEV";
+    public static final String LOG_TAG = "Magisk: DEV";
 
     public static boolean logShell, devLog;
 
