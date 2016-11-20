@@ -94,34 +94,7 @@ public class ReposFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                fUpdateRepos.clear();
-                fInstalledRepos.clear();
-                fOthersRepos.clear();
-                for (Repo repo: mUpdateRepos) {
-                    if (repo.getName().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
-                            ) {
-                        fUpdateRepos.add(repo);
-                    }
-                }
-                for (Repo repo: mInstalledRepos) {
-                    if (repo.getName().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
-                            ) {
-                        fInstalledRepos.add(repo);
-                    }
-                }
-                for (Repo repo: mOthersRepos) {
-                    if (repo.getName().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
-                            || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
-                            ) {
-                        fOthersRepos.add(repo);
-                    }
-                }
-                updateUI();
+                new FilterApps().exec(newText);
                 return false;
             }
         };
@@ -180,6 +153,46 @@ public class ReposFragment extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private class FilterApps extends Async.NormalTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... strings) {
+            String newText = strings[0];
+            fUpdateRepos.clear();
+            fInstalledRepos.clear();
+            fOthersRepos.clear();
+            for (Repo repo: mUpdateRepos) {
+                if (repo.getName().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
+                        ) {
+                    fUpdateRepos.add(repo);
+                }
+            }
+            for (Repo repo: mInstalledRepos) {
+                if (repo.getName().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
+                        ) {
+                    fInstalledRepos.add(repo);
+                }
+            }
+            for (Repo repo: mOthersRepos) {
+                if (repo.getName().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getAuthor().toLowerCase().contains(newText.toLowerCase())
+                        || repo.getDescription().toLowerCase().contains(newText.toLowerCase())
+                        ) {
+                    fOthersRepos.add(repo);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            updateUI();
+        }
     }
 
 }

@@ -63,14 +63,7 @@ public class MagiskHideFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                fListApps.clear();
-                for (ApplicationInfo info : listApps) {
-                    if (info.loadLabel(packageManager).toString().toLowerCase().contains(newText.toLowerCase())
-                            || info.packageName.toLowerCase().contains(newText.toLowerCase())) {
-                        fListApps.add(info);
-                    }
-                }
-                appAdapter.notifyDataSetChanged();
+                new FilterApps().exec(newText);
                 return false;
             }
         };
@@ -110,6 +103,26 @@ public class MagiskHideFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             updateUI();
+        }
+    }
+
+    private class FilterApps extends Async.NormalTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... strings) {
+            String newText = strings[0];
+            fListApps.clear();
+            for (ApplicationInfo info : listApps) {
+                if (info.loadLabel(packageManager).toString().toLowerCase().contains(newText.toLowerCase())
+                        || info.packageName.toLowerCase().contains(newText.toLowerCase())) {
+                    fListApps.add(info);
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            appAdapter.notifyDataSetChanged();
         }
     }
 
