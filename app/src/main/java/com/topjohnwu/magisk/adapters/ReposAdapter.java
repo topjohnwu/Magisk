@@ -23,11 +23,13 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
+import com.topjohnwu.magisk.utils.ZipUtils;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import butterknife.BindView;
@@ -102,30 +104,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                                 new DownloadReceiver() {
                                     @Override
                                     public void task(Uri uri) {
-                                        new Async.FlashZIP(context, uri, mFilename) {
-                                            /*
-                                             * !!! This method is now depreciated, will be replaced with new method !!!
-                                             */
-                                            @Override
-                                            protected void preProcessing() throws Throwable {
-                                                File file = new File(mUri.getPath());
-                                                Shell.sh(
-                                                        "PATH=" + context.getApplicationInfo().dataDir + "/tools:$PATH",
-                                                        "cd " + file.getParent(),
-                                                        "mkdir git",
-                                                        "unzip -o " + file + " -d git",
-                                                        "mv git/* install",
-                                                        "cd install",
-                                                        "rm -rf system/placeholder",
-                                                        "chmod 644 $(find . -type f)",
-                                                        "chmod 755 $(find . -type d)",
-                                                        "rm -rf ../install.zip ../git",
-                                                        "zip -r ../install.zip *",
-                                                        "rm -rf ../install"
-                                                );
-                                                mUri = Uri.fromFile(new File(file.getParent() + "/install.zip"));
-                                            }
-                                        }.exec();
+                                        try {
+                                            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                                            InputStream in = mContext.getContentResolver().openInputStream(uri);
+                                            ZipUtils.removeTopFolder(in, buffer);
+                                            buffer.writeTo(mContext.getContentResolver().openOutputStream(uri));
+                                        } catch (IOException e) {
+                                            return;
+                                        }
+                                        new Async.FlashZIP(mContext, uri, mFilename).exec();
                                     }
                                 },
                                 repo.getZipUrl(),

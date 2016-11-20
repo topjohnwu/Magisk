@@ -40,6 +40,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                 }
                 context.unregisterReceiver(this);
             }
+            c.close();
         }
     }
 

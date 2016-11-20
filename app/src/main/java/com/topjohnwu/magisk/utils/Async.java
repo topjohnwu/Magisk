@@ -60,7 +60,6 @@ public class Async {
         protected Void doInBackground(Void... voids) {
             String toolPath = mInfo.dataDir + "/tools";
             String busybox = mInfo.dataDir + "/lib/libbusybox.so";
-            String zip = mInfo.dataDir + "/lib/libzip.so";
             if (!Utils.itemExist(false, toolPath)) {
                 Shell.sh(
                         "mkdir " + toolPath,
@@ -70,8 +69,7 @@ public class Async {
                         "for tool in $(./busybox --list); do",
                         "ln -s " + busybox + " $tool",
                         "done",
-                        "rm -f su sh",
-                        "ln -s " + zip + " zip"
+                        "rm -f su sh"
                 );
             }
             return null;
