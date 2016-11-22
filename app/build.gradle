@@ -42,5 +42,9 @@ dependencies {
     compile 'com.github.michalis-vitos:aFileChooser:master'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.github.clans:fab:1.6.4'
+    compile 'com.madgag.spongycastle:core:1.54.0.0'
+    compile 'com.madgag.spongycastle:prov:1.54.0.0'
+    compile 'com.madgag.spongycastle:pkix:1.54.0.0'
+    compile 'com.madgag.spongycastle:pg:1.54.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }

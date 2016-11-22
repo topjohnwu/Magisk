@@ -4,3 +4,4 @@
 .idea/
 /build
 app/app-release.apk
+*.hprof

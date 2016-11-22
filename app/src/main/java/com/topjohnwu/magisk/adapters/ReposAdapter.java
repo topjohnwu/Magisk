@@ -27,9 +27,11 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;
@@ -104,14 +106,36 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                                 new DownloadReceiver() {
                                     @Override
                                     public void task(Uri uri) {
+                                        // Process and sign the zip
                                         try {
-                                            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                                            InputStream in = mContext.getContentResolver().openInputStream(uri);
-                                            ZipUtils.removeTopFolder(in, buffer);
-                                            buffer.writeTo(mContext.getContentResolver().openOutputStream(uri));
+                                            ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
+                                            ByteArrayInputStream inBuffer;
+
+                                            // First remove top folder (the folder with the repo name) in Github source zip
+                                            ZipUtils.removeTopFolder(mContext.getContentResolver().openInputStream(uri), outBuffer);
+                                            inBuffer = new ByteArrayInputStream(outBuffer.toByteArray().clone());
+                                            outBuffer.reset();
+
+                                            // Then sign the zip for the first time
+                                            ZipUtils.signZip(mContext, inBuffer, outBuffer, false);
+                                            inBuffer = new ByteArrayInputStream(outBuffer.toByteArray().clone());
+                                            outBuffer.reset();
+
+                                            // ZipAdjust to be placed here
+                                            // Call JNI for zipadjust...
+
+                                            // Finally, sign the whole zip file again
+                                            ZipUtils.signZip(mContext, inBuffer, outBuffer, true);
+
+                                            // Write it back to the downloaded zip
+                                            OutputStream out = mContext.getContentResolver().openOutputStream(uri);
+                                            outBuffer.writeTo(out);
+                                            out.close();
                                         } catch (IOException e) {
                                             return;
                                         }
+
+                                        // Flash the zip
                                         new Async.FlashZIP(mContext, uri, mFilename).exec();
                                     }
                                 },
