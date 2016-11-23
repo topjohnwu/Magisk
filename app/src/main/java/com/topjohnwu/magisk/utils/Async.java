@@ -167,25 +167,25 @@ public class Async {
         }
     }
 
-    public static class FlashZIP extends RootTask<Void, Void, Integer> {
+    public static class FlashZIP extends RootTask<Void, String, Integer> {
 
         protected Uri mUri;
-        protected File mCachedFile, sdFile;
+        protected File mCachedFile;
         private String mFilename;
-        private ProgressDialog progress;
+        protected ProgressDialog progress;
         private Context mContext;
-        private boolean copyToSD;
 
         public FlashZIP(Context context, Uri uri, String filename) {
             mContext = context;
             mUri = uri;
             mFilename = filename;
-            copyToSD = true;
+            progress = new ProgressDialog(mContext);
         }
 
         public FlashZIP(Context context, Uri uri) {
             mContext = context;
             mUri = uri;
+            progress = new ProgressDialog(mContext);
             Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
             if (c != null) {
                 int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -199,7 +199,6 @@ public class Async {
                 int idx = uri.getPath().lastIndexOf('/');
                 mFilename = uri.getPath().substring(idx + 1);
             }
-            copyToSD = false;
         }
 
         private void createFileFromInputStream(InputStream inputStream, File file) throws IOException {
@@ -240,7 +239,13 @@ public class Async {
 
         @Override
         protected void onPreExecute() {
-            progress = ProgressDialog.show(mContext, mContext.getString(R.string.zip_install_progress_title), mContext.getString(R.string.zip_install_progress_msg, mFilename));
+            progress.setTitle(R.string.zip_install_progress_title);
+            progress.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            progress.setMessage(values[0]);
         }
 
         @Override
@@ -251,11 +256,10 @@ public class Async {
                 preProcessing();
                 copyToCache();
             } catch (Throwable e) {
-                this.cancel(true);
-                progress.cancel();
                 e.printStackTrace();
                 return -1;
             }
+            publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
             if (Shell.rootAccess()) {
                 ret = Shell.su(
                         "unzip -o " + mCachedFile.getPath() + " META-INF/com/google/android/* -d " + mCachedFile.getParent(),
@@ -274,28 +278,6 @@ public class Async {
                     Logger.dev(line);
                 }
             }
-            // Copy the file to sdcard
-            if (copyToSD && mCachedFile != null) {
-                String filename = Utils.getLegalFilename(mFilename.contains(".zip") ? mFilename : mFilename + ".zip");
-                sdFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
-                Logger.dev("FlashZip: Copy zip back to " + sdFile.getPath());
-                if ((!sdFile.getParentFile().exists() && !sdFile.getParentFile().mkdirs()) || (sdFile.exists() && !sdFile.delete())) {
-                    sdFile = null;
-                } else {
-                    try {
-                        FileInputStream in = new FileInputStream(mCachedFile);
-                        createFileFromInputStream(in, sdFile);
-                        in.close();
-                    } catch (IOException e) {
-                        // Use the badass way :)
-                        e.printStackTrace();
-                        Shell.su("cp -af " + mCachedFile.getPath() + " " + sdFile.getPath());
-                        if (!sdFile.exists()) {
-                            sdFile = null;
-                        }
-                    }
-                }
-            }
             if (mCachedFile != null && mCachedFile.exists() && !mCachedFile.delete()) {
                 Utils.removeItem(mCachedFile.getPath());
             }
@@ -312,11 +294,7 @@ public class Async {
             progress.dismiss();
             switch (result) {
                 case -1:
-                    if (sdFile == null) {
-                        Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(mContext, mContext.getString(R.string.manual_install, sdFile.getAbsolutePath()), Toast.LENGTH_LONG).show();
-                    }
+                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mUri.getPath()), Toast.LENGTH_LONG).show();
                     break;
                 case 0:
                     Toast.makeText(mContext, mContext.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();

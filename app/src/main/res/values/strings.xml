@@ -78,6 +78,7 @@
     <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
     <string name="zip_install_progress_title">Installing</string>
+    <string name="zip_install_process_zip_msg">Processing zip file ...</string>
     <string name="zip_install_progress_msg">"Installing %1$s …"</string>
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
