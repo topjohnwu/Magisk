@@ -52,5 +52,5 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
         mFilename = filename;
     }
 
-    public void task(Uri uri) {}
+    public abstract void task(Uri uri);
 }

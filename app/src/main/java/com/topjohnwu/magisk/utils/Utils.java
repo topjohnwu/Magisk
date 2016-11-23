@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -134,6 +136,19 @@ public class Utils {
         return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
                 .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
                 .replace("#", "").replace("@", "").replace("*", "");
+    }
+
+    public static class ByteArrayInOutStream extends ByteArrayOutputStream {
+        public ByteArrayInputStream getInputStream() {
+            ByteArrayInputStream in = new ByteArrayInputStream(buf, 0, count);
+            count = 0;
+            buf = new byte[32];
+            return in;
+        }
+        public void setBuffer(byte[] buffer) {
+            buf = buffer;
+            count = buffer.length;
+        }
     }
 
 }

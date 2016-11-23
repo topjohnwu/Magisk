@@ -7,7 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AlertDialog;
@@ -21,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -179,13 +177,13 @@ public class Async {
             mContext = context;
             mUri = uri;
             mFilename = filename;
-            progress = new ProgressDialog(mContext);
         }
 
         public FlashZIP(Context context, Uri uri) {
             mContext = context;
             mUri = uri;
-            progress = new ProgressDialog(mContext);
+
+            // Try to get the filename ourselves
             Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
             if (c != null) {
                 int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -201,32 +199,23 @@ public class Async {
             }
         }
 
-        private void createFileFromInputStream(InputStream inputStream, File file) throws IOException {
-            if (file.exists() && !file.delete()) {
-                throw new IOException();
-            }
-            file.setWritable(true, false);
-            OutputStream outputStream = new FileOutputStream(file);
-            byte buffer[] = new byte[1024];
-            int length;
-
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-
-            outputStream.close();
-            Logger.dev("FlashZip: File created successfully - " + file.getPath());
-        }
-
         protected void preProcessing() throws Throwable {}
 
         protected void copyToCache() throws Throwable {
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mCachedFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
-                mCachedFile.delete();
-                Utils.removeItem(mCachedFile.getPath());
-                createFileFromInputStream(in, mCachedFile);
+                if (mCachedFile.exists() && !mCachedFile.delete()) {
+                    throw new IOException();
+                }
+                OutputStream outputStream = new FileOutputStream(mCachedFile);
+                byte buffer[] = new byte[1024];
+                int length;
+                while ((length = in.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+                outputStream.close();
+                Logger.dev("FlashZip: File created successfully - " + mCachedFile.getPath());
                 in.close();
             } catch (FileNotFoundException e) {
                 Log.e(Logger.LOG_TAG, "FlashZip: Invalid Uri");
@@ -239,6 +228,7 @@ public class Async {
 
         @Override
         protected void onPreExecute() {
+            progress = new ProgressDialog(mContext);
             progress.setTitle(R.string.zip_install_progress_title);
             progress.show();
         }

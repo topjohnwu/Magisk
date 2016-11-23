@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.util.Pair;
 
+import com.topjohnwu.magisk.utils.Utils.ByteArrayInOutStream;
+
 import org.spongycastle.asn1.ASN1InputStream;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.DEROutputStream;
@@ -80,6 +82,11 @@ public class ZipUtils {
     }
 
     public native static byte[] zipAdjust(byte[] bytes, int size);
+
+    // Wrapper function for the JNI function
+    public static void adjustZip(ByteArrayInOutStream buffer) {
+        buffer.setBuffer(zipAdjust(buffer.toByteArray(), buffer.size()));
+    }
 
     public static void removeTopFolder(InputStream in, OutputStream out) {
         try {
@@ -482,7 +489,7 @@ public class ZipUtils {
     private static void copyFiles(Manifest manifest,
                                   JarMap in, JarOutputStream out, long timestamp) throws IOException {
         Map<String, Attributes> entries = manifest.getEntries();
-        ArrayList<String> names = new ArrayList<String>(entries.keySet());
+        ArrayList<String> names = new ArrayList<>(entries.keySet());
         Collections.sort(names);
         for (String name : names) {
             JarEntry inEntry = in.getJarEntry(name);
@@ -588,10 +595,7 @@ public class ZipUtils {
                 copyFiles(manifest, inputJar, outputJar, timestamp);
                 // Don't add Otacert, it's not an OTA
                 // addOtacert(outputJar, publicKeyFile, timestamp, manifest, hash);
-                signFile(manifest, inputJar,
-                        publicKey,
-                        privateKey,
-                        outputJar);
+                signFile(manifest, inputJar, publicKey, privateKey, outputJar);
                 signer.notifyClosing();
                 outputJar.close();
                 signer.finish();

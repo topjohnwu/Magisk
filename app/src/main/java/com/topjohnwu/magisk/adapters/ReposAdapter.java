@@ -22,14 +22,13 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.magisk.receivers.RepoDlReceiver;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.Utils.ByteArrayInOutStream;
 import com.topjohnwu.magisk.utils.WebWindow;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
         String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
         if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(context,R.style.AlertDialog_dh);
+            builder = new AlertDialog.Builder(context, R.style.AlertDialog_dh);
         } else {
             builder = new AlertDialog.Builder(context);
         }
@@ -102,43 +101,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                         .setCancelable(true)
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                                 context,
-                                new DownloadReceiver() {
-                                    @Override
-                                    public void task(Uri uri) {
-                                        // Flash the zip
-                                        new Async.FlashZIP(mContext, uri, mFilename){
-                                            @Override
-                                            protected void preProcessing() throws Throwable {
-                                                // Process and sign the zip
-                                                publishProgress(mContext.getString(R.string.zip_install_process_zip_msg));
-                                                try {
-                                                    ByteArrayOutputStream outBuffer = new ByteArrayOutputStream();
-                                                    ByteArrayInputStream inBuffer;
-
-                                                    // First remove top folder (the folder with the repo name) in Github source zip
-                                                    ZipUtils.removeTopFolder(mContext.getContentResolver().openInputStream(mUri), outBuffer);
-                                                    inBuffer = new ByteArrayInputStream(outBuffer.toByteArray());
-                                                    outBuffer.reset();
-
-                                                    // Then sign the zip for the first time
-                                                    ZipUtils.signZip(mContext, inBuffer, outBuffer, false);
-
-                                                    // Call zipadjust through JNI
-                                                    inBuffer = new ByteArrayInputStream(ZipUtils.zipAdjust(outBuffer.toByteArray(), outBuffer.size()));
-                                                    outBuffer.reset();
-
-                                                    // Finally, sign the whole zip file again
-                                                    ZipUtils.signZip(mContext, inBuffer, outBuffer, true);
-
-                                                    // Write it back to the downloaded zip
-                                                    OutputStream out = mContext.getContentResolver().openOutputStream(mUri);
-                                                    outBuffer.writeTo(out);
-                                                    out.close();
-                                                } catch (IOException ignored) {}
-                                            }
-                                        }.exec();
-                                    }
-                                },
+                                new RepoDlReceiver(),
                                 repo.getZipUrl(),
                                 Utils.getLegalFilename(filename)))
                         .setNegativeButton(R.string.no_thanks, null)
