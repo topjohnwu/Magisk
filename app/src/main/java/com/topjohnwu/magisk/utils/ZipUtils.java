@@ -23,7 +23,6 @@ import org.spongycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,6 +73,14 @@ public class ZipUtils {
     private static final int USE_SHA1 = 1;
     private static final int USE_SHA256 = 2;
 
+    static {
+        System.loadLibrary("zipadjust");
+        sBouncyCastleProvider = new BouncyCastleProvider();
+        Security.insertProviderAt(sBouncyCastleProvider, 1);
+    }
+
+    public native static byte[] zipAdjust(byte[] bytes, int size);
+
     public static void removeTopFolder(InputStream in, OutputStream out) {
         try {
             JarInputStream source = new JarInputStream(in);
@@ -106,8 +113,6 @@ public class ZipUtils {
 
     public static void signZip(Context context, InputStream inputStream,
                                OutputStream outputStream, boolean signWholeFile) {
-        sBouncyCastleProvider = new BouncyCastleProvider();
-        Security.insertProviderAt(sBouncyCastleProvider, 1);
         JarMap inputJar;
         int hashes = 0;
         try {

@@ -30,7 +30,6 @@ import com.topjohnwu.magisk.utils.ZipUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -113,16 +112,15 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
                                             // First remove top folder (the folder with the repo name) in Github source zip
                                             ZipUtils.removeTopFolder(mContext.getContentResolver().openInputStream(uri), outBuffer);
-                                            inBuffer = new ByteArrayInputStream(outBuffer.toByteArray().clone());
+                                            inBuffer = new ByteArrayInputStream(outBuffer.toByteArray());
                                             outBuffer.reset();
 
                                             // Then sign the zip for the first time
                                             ZipUtils.signZip(mContext, inBuffer, outBuffer, false);
-                                            inBuffer = new ByteArrayInputStream(outBuffer.toByteArray().clone());
-                                            outBuffer.reset();
 
-                                            // ZipAdjust to be placed here
-                                            // Call JNI for zipadjust...
+                                            // Call zipadjust through JNI
+                                            inBuffer = new ByteArrayInputStream(ZipUtils.zipAdjust(outBuffer.toByteArray(), outBuffer.size()));
+                                            outBuffer.reset();
 
                                             // Finally, sign the whole zip file again
                                             ZipUtils.signZip(mContext, inBuffer, outBuffer, true);
