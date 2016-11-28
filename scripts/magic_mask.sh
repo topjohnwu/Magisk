@@ -16,8 +16,9 @@ MOUNTINFO=$TMPDIR/mnt
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
 TOOLPATH=/data/busybox
 BINPATH=/data/magisk
-OLDPATH=$PATH
-PATH=$TOOLPATH:$OLDPATH
+
+export OLDPATH=$PATH
+export PATH=$TOOLPATH:$OLDPATH
 
 # Default permissions
 umask 022
@@ -44,7 +45,6 @@ unblock() {
 }
 
 run_scripts() {
-  PATH=$OLDPATH
   BASE=$MOUNTPOINT
   for MOD in $BASE/* ; do
     if [ ! -f "$MOD/disable" ]; then
@@ -56,7 +56,6 @@ run_scripts() {
       fi
     fi
   done
-  PATH=$TOOLPATH:$OLDPATH
 }
 
 loopsetup() {
@@ -124,20 +123,26 @@ travel() {
 
 clone_dummy() {
   for ITEM in "$1/"* ; do
-    if [ -d "$DUMMDIR$ITEM" ]; then
-      (clone_dummy "$ITEM")
-    elif [ ! -e "$DUMMDIR$ITEM" ]; then
-      if [ -d "$ITEM" ]; then
-        # Create dummy directory
-        mkdir -p "$DUMMDIR$ITEM"
-      elif [ -L "$ITEM" ]; then
-        # Symlinks are small, copy them
-        cp -afc "$ITEM" "$DUMMDIR$ITEM"
+    if [ ! -e "$DUMMDIR$ITEM" ]; then
+      if [ ! -d "$MOUNTINFO$ITEM" ]; then
+        if [ -d "$ITEM" ]; then
+          # Create dummy directory
+          mkdir -p "$DUMMDIR$ITEM"
+        elif [ -L "$ITEM" ]; then
+          # Symlinks are small, copy them
+          cp -afc "$ITEM" "$DUMMDIR$ITEM"
+        else
+          # Create dummy file
+          mktouch "$DUMMDIR$ITEM"
+        fi
+        chcon -f "u:object_r:system_file:s0" "$DUMMDIR$ITEM"
       else
-        # Create dummy file
-        mktouch "$DUMMDIR$ITEM"
+        # Need to clone a skeleton
+        (clone_dummy "$ITEM")
       fi
-      chcon -f "u:object_r:system_file:s0" "$DUMMDIR$ITEM"
+    elif [ -d "$DUMMDIR$ITEM" ]; then
+      # Need to clone a skeleton
+      (clone_dummy "$ITEM")
     fi
   done
 }
@@ -270,12 +275,6 @@ case $1 in
 
       log_print "** Magisk post-fs-data mode running..."
 
-      # Live patch sepolicy
-      $BINPATH/sepolicy-inject --live -s su
-
-      # Multirom functions should go here, not available right now
-      MULTIROM=false
-
       # Cache support
       if [ -d "/cache/data_bin" ]; then
         rm -rf $BINPATH $TOOLPATH
@@ -293,6 +292,12 @@ case $1 in
       find $BINPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
       find $TOOLPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
       chmod -R 755 $BINPATH $TOOLPATH
+
+      # Live patch sepolicy
+      $BINPATH/sepolicy-inject --live -s su
+
+      # Multirom functions should go here, not available right now
+      MULTIROM=false
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null

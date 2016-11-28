@@ -19,6 +19,12 @@ INSTALLER=$TMPDIR/magisk
 
 COREDIR=/magisk/.core
 
+# Boot Image Variables
+CHROMEDIR=$INSTALLER/chromeos
+NEWBOOT=$TMPDIR/boottmp/new-boot.img
+UNPACKDIR=$TMPDIR/boottmp/bootunpack
+RAMDISK=$TMPDIR/boottmp/ramdisk
+
 # Default permissions
 umask 022
 
@@ -86,7 +92,7 @@ find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
     FSTAB="/etc/recovery.fstab"
     [ ! -f "$FSTAB" ] && FSTAB="/etc/recovery.fstab.bak"
-    [ -f "$FSTAB" ] BOOTIMAGE=`grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+    [ -f "$FSTAB" ] && BOOTIMAGE=`grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
   fi
 }
 
@@ -112,7 +118,7 @@ mount_image() {
       if (! is_mounted $2); then
         LOOPDEVICE=/dev/block/loop$LOOP
         if [ ! -f "$LOOPDEVICE" ]; then
-          mknod $LOOPDEVICE b 7 $LOOP
+          mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
         fi
         losetup $LOOPDEVICE $1
         if [ "$?" -eq "0" ]; then
@@ -148,7 +154,7 @@ unpack_boot() {
   mkdir -p $UNPACKDIR
   mkdir -p $RAMDISK
   cd $UNPACKDIR
-  $BINDIR/bootimgtools --extract $1
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --extract $1
 
   cd $RAMDISK
   gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
@@ -158,11 +164,11 @@ repack_boot() {
   cd $RAMDISK
   find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
   cd $UNPACKDIR
-  $BINDIR/bootimgtools --repack $ORIGBOOT
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $ORIGBOOT
   if [ -f chromeos ]; then
     echo " " > config
     echo " " > bootloader
-    $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
+    LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
     rm -f new-boot.img
     mv new-boot.img.signed new-boot.img
   fi
@@ -173,7 +179,7 @@ repack_boot() {
     fi
   fi
   mv new-boot.img $NEWBOOT
-  $BINDIR/bootimgtools --hexpatch $NEWBOOT \
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --hexpatch $NEWBOOT \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
   A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 }
@@ -251,6 +257,9 @@ ui_print "- Device platform: $ARCH"
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR/futility $BINDIR
 
+SYSTEMLIB=/system/lib
+($IS64BIT) && SYSTEMLIB=/system/lib64
+
 find_boot_image
 if [ -z "$BOOTIMAGE" ]; then
   ui_print "! Unable to detect boot image"
@@ -277,7 +286,6 @@ if (is_mounted /data); then
   PATH=/data/busybox:$PATH
 else
   rm -rf /cache/data_bin 2>/dev/null
-  mkdir -p /cache/data_bin
   cp -af $BINDIR /cache/data_bin
   cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
 fi
@@ -321,11 +329,6 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 
 rm -rf $TMPDIR/boottmp 2>/dev/null
 mkdir -p $TMPDIR/boottmp
-
-CHROMEDIR=$INSTALLER/chromeos
-NEWBOOT=$TMPDIR/boottmp/new-boot.img
-UNPACKDIR=$TMPDIR/boottmp/bootunpack
-RAMDISK=$TMPDIR/boottmp/ramdisk
 
 ORIGBOOT=$BOOTIMAGE
 
@@ -407,7 +410,7 @@ if (! $SUPERSU); then
 fi
 
 # sepolicy patches
-$BINDIR/sepolicy-inject --magisk -P sepolicy
+LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --magisk -P sepolicy
 
 # Add new items
 mkdir -p magisk 2>/dev/null
@@ -420,7 +423,7 @@ chmod 0750 init.magisk.rc sbin/magic_mask.sh
 ui_print "- Repacking boot image"
 repack_boot
 
-BOOTSIZE=`blockdev --getsize64 $BOOTIMAGE`
+BOOTSIZE=`blockdev --getsize64 $BOOTIMAGE 2>/dev/null`
 NEWSIZE=`ls -l $NEWBOOT | awk '{print $5}'`
 if [ "$NEWSIZE" -gt "$BOOTSIZE" ]; then
   ui_print "! Boot partition space insufficient"
