@@ -81,14 +81,17 @@ public class MagiskFragment extends Fragment {
                         @Override
                         protected boolean unzipAndCheck() {
                             publishProgress(mContext.getString(R.string.zip_install_unzip_zip_msg));
-                            // We might not have busybox yet, unzip with Java
-                            // We will have complete busybox after Magisk installation
-                            ZipUtils.unzip(mCachedFile, new File(mCachedFile.getParent(), "magisk"));
-                            Shell.su(
-                                    "mkdir -p " + Async.TMP_FOLDER_PATH + "/magisk",
-                                    "cp -af " + mCachedFile.getParent() + "/magisk/. " + Async.TMP_FOLDER_PATH + "/magisk"
-                            );
-                            return super.unzipAndCheck();
+                            if (Shell.rootAccess()) {
+                                // We might not have busybox yet, unzip with Java
+                                // We will have complete busybox after Magisk installation
+                                ZipUtils.unzip(mCachedFile, new File(mCachedFile.getParent(), "magisk"));
+                                Shell.su(
+                                        "mkdir -p " + Async.TMP_FOLDER_PATH + "/magisk",
+                                        "cp -af " + mCachedFile.getParent() + "/magisk/. " + Async.TMP_FOLDER_PATH + "/magisk"
+                                );
+                            }
+                            super.unzipAndCheck();
+                            return true;
                         }
 
                         @Override

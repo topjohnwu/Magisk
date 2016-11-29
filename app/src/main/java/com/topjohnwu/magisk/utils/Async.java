@@ -207,7 +207,7 @@ public class Async {
         @Override
         protected Integer doInBackground(Void... voids) {
             Logger.dev("FlashZip Running... " + mFilename);
-            List<String> ret = null;
+            List<String> ret;
             try {
                 preProcessing();
                 copyToCache();
@@ -216,8 +216,8 @@ public class Async {
                 return -1;
             }
             if (!unzipAndCheck()) return 0;
-            publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
             if (Shell.rootAccess()) {
+                publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
                 ret = Shell.su(
                         "BOOTMODE=true sh " + mCachedFile.getParent() +
                                 "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
@@ -231,6 +231,11 @@ public class Async {
                         "rm -rf " + mCachedFile.getParent() + "/*",
                         "rm -rf " + TMP_FOLDER_PATH
                 );
+            } else {
+                if (mCachedFile != null && mCachedFile.exists() && !mCachedFile.delete()) {
+                    Utils.removeItem(mCachedFile.getPath());
+                }
+                return -1;
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;
@@ -238,7 +243,7 @@ public class Async {
             return -1;
         }
 
-        // -1 = error; 0 = invalid zip; 1 = success
+        // -1 = error, manual install; 0 = invalid zip; 1 = success
         @Override
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);

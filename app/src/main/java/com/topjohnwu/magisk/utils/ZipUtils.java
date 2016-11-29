@@ -139,7 +139,7 @@ public class ZipUtils {
                 if (!entry.getName().contains(path)) {
                     continue;
                 }
-                Logger.dev("Extracting: " + entry);
+                Logger.dev("ZipUtils: Extracting: " + entry);
                 is = zipfile.getInputStream(entry);
                 dest = new File(folder, entry.getName());
                 if (dest.getParentFile().mkdirs()) {

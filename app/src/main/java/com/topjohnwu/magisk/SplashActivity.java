@@ -37,7 +37,6 @@ public class SplashActivity extends AppCompatActivity {
                 .apply();
 
         new Async.CheckUpdates(prefs).exec();
-//        new Async.ConstructEnv(getApplicationInfo()).exec();
 
         new Async.LoadModules(prefs) {
             @Override
