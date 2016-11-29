@@ -25,6 +25,7 @@ import org.spongycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +49,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -98,7 +100,7 @@ public class ZipUtils {
             byte buffer[] = new byte[4096];
             while ((entry = source.getNextJarEntry()) != null) {
                 // Remove the top directory from the path
-                path = entry.toString().substring(entry.toString().indexOf("/") + 1);
+                path = entry.getName().substring(entry.getName().indexOf("/") + 1);
                 // If it's the top folder, ignore it
                 if (path.isEmpty())
                     continue;
@@ -115,6 +117,44 @@ public class ZipUtils {
         } catch (IOException e) {
             e.printStackTrace();
             Logger.dev("ZipUtils: removeTopFolder IO error!");
+        }
+    }
+
+    public static void unzip(File file, File folder) {
+        unzip(file, folder, "");
+    }
+
+    public static void unzip(File file, File folder, String path) {
+        try {
+            int count;
+            FileOutputStream out;
+            File dest;
+            InputStream is;
+            JarEntry entry;
+            byte data[] = new byte[4096];
+            JarFile zipfile = new JarFile(file);
+            Enumeration e = zipfile.entries();
+            while(e.hasMoreElements()) {
+                entry = (JarEntry) e.nextElement();
+                if (!entry.getName().contains(path)) {
+                    continue;
+                }
+                Logger.dev("Extracting: " + entry);
+                is = zipfile.getInputStream(entry);
+                dest = new File(folder, entry.getName());
+                if (dest.getParentFile().mkdirs()) {
+                    dest.createNewFile();
+                }
+                out = new FileOutputStream(dest);
+                while ((count = is.read(data, 0, 4096)) != -1) {
+                    out.write(data, 0, count);
+                }
+                out.flush();
+                out.close();
+                is.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 

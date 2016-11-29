@@ -66,7 +66,7 @@
     <string name="download_install">Baixar e instalar</string>
     <string name="download_file_error">Erro ao baixar o arquivo</string>
     <string name="install_error">Erro na instalação!</string>
-    <string name="manual_install">Erro ao flashear o arquivo, arquivo zip colocado em %1$s\nFlashear isto na recuperação manualmente</string>
+    <string name="manual_install_1">Erro ao flashear o arquivo, arquivo zip colocado em %1$s\nFlashear isto na recuperação manualmente</string>
     <string name="invalid_zip">O zip não é um Módulo Magisk!!</string>
     <string name="reboot_title">Instalação bem-sucedida!</string>
     <string name="reboot_msg">Você quer reiniciar agora?</string>

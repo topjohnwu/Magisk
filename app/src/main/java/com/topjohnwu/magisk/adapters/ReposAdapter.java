@@ -21,15 +21,10 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.RepoDlReceiver;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.Utils.ByteArrayInOutStream;
 import com.topjohnwu.magisk.utils.WebWindow;
-import com.topjohnwu.magisk.utils.ZipUtils;
 
-import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;

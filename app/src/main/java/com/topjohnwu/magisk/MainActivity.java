@@ -91,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-        checkHideSection();
-
     }
 
     @Override
@@ -104,13 +102,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putInt(SELECTED_ITEM_ID, mSelectedId);
     }
 
     @Override
     public void onBackPressed() {
-
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -123,18 +119,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mSelectedId = menuItem.getItemId();
         mDrawerHandler.removeCallbacksAndMessages(null);
         mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
-
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (PreferenceManager.getDefaultSharedPreferences(getApplication()).getBoolean("magiskhide", false)) {
-
-            menu.findItem(R.id.magiskhide).setVisible(true);
-        } else {
+        if (MagiskFragment.magiskVersion == -1) {
             menu.findItem(R.id.magiskhide).setVisible(false);
+            menu.findItem(R.id.modules).setVisible(false);
+            menu.findItem(R.id.downloads).setVisible(false);
+        } else {
+            menu.findItem(R.id.modules).setVisible(true);
+            menu.findItem(R.id.downloads).setVisible(true);
+            menu.findItem(R.id.magiskhide).setVisible(
+                    PreferenceManager.getDefaultSharedPreferences(this).getBoolean("magiskhide", false));
         }
     }
 

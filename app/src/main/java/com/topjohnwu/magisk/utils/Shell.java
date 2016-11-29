@@ -39,8 +39,9 @@ public class Shell {
         rootSTDOUT = new StreamGobbler(rootShell.getInputStream(), rootOutList, true);
         rootSTDOUT.start();
 
-        // Setup umask
+        // Setup umask and PATH
         su("umask 022");
+        su("PATH=/data/busybox:$PATH");
 
         List<String> ret = su("echo -BOC-", "id");
 

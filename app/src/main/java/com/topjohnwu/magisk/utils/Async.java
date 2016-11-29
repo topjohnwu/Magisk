@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.utils;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,46 +44,7 @@ public class Async {
 
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
-
-    public static class ConstructEnv extends NormalTask<Void, Void, Void> {
-
-        ApplicationInfo mInfo;
-
-        public ConstructEnv(ApplicationInfo info) {
-            mInfo = info;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            String toolPath = mInfo.dataDir + "/tools";
-            String busybox = mInfo.dataDir + "/lib/libbusybox.so";
-            if (!Utils.itemExist(false, toolPath)) {
-                Shell.sh(
-                        "mkdir " + toolPath,
-                        "chmod 755 " + toolPath,
-                        "cd " + toolPath,
-                        "ln -s " + busybox + " busybox",
-                        "for tool in $(./busybox --list); do",
-                        "ln -s " + busybox + " $tool",
-                        "done",
-                        "rm -f su sh"
-                );
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            new RootTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    Shell.su("PATH=" + mInfo.dataDir + "/tools:$PATH");
-                    return null;
-                }
-            }.exec();
-        }
-    }
+    public static final String TMP_FOLDER_PATH = "/dev/tmp";
 
     public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
@@ -226,6 +186,12 @@ public class Async {
             }
         }
 
+        protected boolean unzipAndCheck() {
+            ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
+            return Utils.readFile(mCachedFile.getParent() + "/META-INF/com/google/android/updater-script")
+                    .get(0).contains("#MAGISK");
+        }
+
         @Override
         protected void onPreExecute() {
             progress = new ProgressDialog(mContext);
@@ -249,27 +215,22 @@ public class Async {
                 e.printStackTrace();
                 return -1;
             }
+            if (!unzipAndCheck()) return 0;
             publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
             if (Shell.rootAccess()) {
                 ret = Shell.su(
-                        "unzip -o " + mCachedFile.getPath() + " META-INF/com/google/android/* -d " + mCachedFile.getParent(),
-                        "if [ \"$(cat " + mCachedFile.getParent() + "/META-INF/com/google/android/updater-script)\" = \"#MAGISK\" ]; then echo true; else echo false; fi"
-                );
-                if (! Boolean.parseBoolean(ret.get(ret.size() - 1))) {
-                    return 0;
-                }
-                ret = Shell.su(
-                        "BOOTMODE=true sh " + mCachedFile.getParent() + "/META-INF/com/google/android/update-binary dummy 1 "+ mCachedFile.getPath(),
+                        "BOOTMODE=true sh " + mCachedFile.getParent() +
+                                "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
                         "if [ $? -eq 0 ]; then echo true; else echo false; fi"
                 );
-                Shell.su("rm -rf " + mCachedFile.getParent() + "/META-INF");
                 Logger.dev("FlashZip: Console log:");
                 for (String line : ret) {
                     Logger.dev(line);
                 }
-            }
-            if (mCachedFile != null && mCachedFile.exists() && !mCachedFile.delete()) {
-                Utils.removeItem(mCachedFile.getPath());
+                Shell.su(
+                        "rm -rf " + mCachedFile.getParent() + "/*",
+                        "rm -rf " + TMP_FOLDER_PATH
+                );
             }
             if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;
@@ -284,7 +245,9 @@ public class Async {
             progress.dismiss();
             switch (result) {
                 case -1:
-                    Toast.makeText(mContext, mContext.getString(R.string.manual_install, mUri.getPath()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.manual_install_1, mUri.getPath()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.manual_install_2), Toast.LENGTH_LONG).show();
                     break;
                 case 0:
                     Toast.makeText(mContext, mContext.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();

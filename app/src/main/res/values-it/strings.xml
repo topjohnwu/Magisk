@@ -1,7 +1,5 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer di navigazione</string>
@@ -70,7 +68,7 @@
     <string name="download_install">Scarica e installa</string>
     <string name="download_file_error">Errore nel download del file</string>
     <string name="install_error">Errore di installazione!</string>
-    <string name="manual_install">Errore nel flash del file, il file zip è in %1$s\nFlash esegui il flash manuale</string>
+    <string name="manual_install_1">Errore nel flash del file, il file zip è in %1$s\nFlash esegui il flash manuale</string>
     <string name="invalid_zip">Lo zip non è un Modulo Magisk!!</string>
     <string name="reboot_title">Installazione completata</string>
     <string name="reboot_msg">Vuoi riavviare ora?</string>

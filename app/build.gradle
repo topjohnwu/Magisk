@@ -15,8 +15,7 @@ android {
         }
         ndk {
             moduleName 'zipadjust'
-//            abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
-            abiFilters 'x86', 'x86_64', 'armeabi'
+            abiFilters 'x86', 'x86_64', 'armeabi', 'arm64-v8a'
         }
     }
 

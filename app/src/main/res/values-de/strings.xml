@@ -1,7 +1,5 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
@@ -70,7 +68,7 @@
     <string name="download_install">Herunterladen und Installieren</string>
     <string name="download_file_error">Fehler beim Herunterladen</string>
     <string name="install_error">Fehler beim Installieren!</string>
-    <string name="manual_install">Fehler beim Flashen. Datei in %1$s abgelegt\n Bitte in recovery manuell flashen</string>
+    <string name="manual_install_1">Fehler beim Flashen. Datei in %1$s abgelegt\n Bitte in recovery manuell flashen</string>
     <string name="invalid_zip">Diese Datei ist kein Magisk Modul!!</string>
     <string name="reboot_title">Installation erfolgreich!</string>
     <string name="reboot_msg">Wollen Sie jetzt neu starten?</string>

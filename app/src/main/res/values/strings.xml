@@ -72,13 +72,15 @@
     <string name="download_install">Download and install</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
-    <string name="manual_install">Error in flashing file, zip file placed in %1$s\nFlash it in recovery manually</string>
+    <string name="manual_install_1">Zip file placed in %1$s</string>
+    <string name="manual_install_2">Flash it in recovery manually</string>
     <string name="invalid_zip">The zip is not a Magisk Module!!</string>
     <string name="reboot_title">Installation succeeded!</string>
     <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
     <string name="zip_install_progress_title">Installing</string>
-    <string name="zip_install_process_zip_msg">Processing zip file ...</string>
+    <string name="zip_install_unzip_zip_msg">Unzipping zip file …</string>
+    <string name="zip_install_process_zip_msg">Processing zip file …</string>
     <string name="zip_install_progress_msg">"Installing %1$s …"</string>
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
