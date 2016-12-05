@@ -21,7 +21,7 @@ LOCAL_MODULE := sepolicy-inject
 LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_LIBRARIES := libsepol
 LOCAL_SRC_FILES := sepolicy-inject/sepolicy-inject.c sepolicy-inject/builtin_rules.c
-LOCAL_C_INCLUDES := selinux/libsepol/include/
+LOCAL_C_INCLUDES := $(my_path)/selinux/libsepol/include/
 LOCAL_CFLAGS += -std=gnu11
 include $(BUILD_EXECUTABLE)
 
@@ -32,4 +32,4 @@ LOCAL_SRC_FILES := resetprop/resetprop.cpp resetprop/system_properties.cpp reset
 LOCAL_LDLIBS += -latomic
 include $(BUILD_EXECUTABLE)
 
-include selinux/libsepol/Android.mk
+include $(my_path)/selinux/libsepol/Android.mk

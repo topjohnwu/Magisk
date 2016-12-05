@@ -1,9 +1,9 @@
-[submodule "selinux"]
-	path = selinux
-	url = https://github.com/topjohnwu/selinux
 [submodule "jni/sepolicy-inject"]
 	path = jni/sepolicy-inject
 	url = https://github.com/topjohnwu/sepolicy-inject
 [submodule "jni/resetprop"]
 	path = jni/resetprop
 	url = https://github.com/topjohnwu/resetprop.git
+[submodule "jni/selinux"]
+	path = jni/selinux
+	url = https://github.com/topjohnwu/selinux.git
