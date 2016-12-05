@@ -3,7 +3,7 @@
 usage() {
   echo "$0 all <version name>"
   echo -e "\tBuild binaries, zip, and sign Magisk"
-  echo -e "\tThis is equlivant to first --build, then --zip"
+  echo -e "\tThis is equlivant to first <build>, then <zip>"
   echo "$0 clean"
   echo -e "\tCleanup compiled / generated files"
   echo "$0 build"
@@ -37,23 +37,17 @@ mkcp() {
   cp -afv $1 $2
 }
 
+error() {
+  echo -e "\n! $1\n"
+  exit 1
+}
+
 build_bin() {
   echo "************************"
   echo "* Building binaries"
   echo "************************"
-  if [ -z `which ndk-build` ]; then
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "! Please add ndk-build to PATH!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit 1
-  fi
-  ndk-build -j4
-  if [ $? -ne 0 ]; then
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "! Magisk binary tools build failed...."
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit 1
-  fi
+  [ -z `which ndk-build` ] && error "Please add ndk-build to PATH!"
+  ndk-build -j4 || error "Magisk binary tools build failed...."
   echo "************************"
   echo "* Copying binaries"
   echo "************************"
@@ -68,13 +62,7 @@ build_bin() {
 }
 
 zip_package() {
-  if [ ! -f "zip_static/arm/bootimgtools" ]; then
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "! Missing binaries!!"
-    echo "! Please run \"$0 build\" before zipping"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-    exit 1
-  fi
+  [ ! -f "zip_static/arm/bootimgtools" ] && error "Missing binaries!! Please run '$0 build' before zipping"
   echo "************************"
   echo "* Adding version info"
   echo "************************"
@@ -93,18 +81,14 @@ zip_package() {
 }
 
 zip_uninstaller() {
-  if [ ! -f "uninstaller/arm/bootimgtools" ]; then
-    echo "! Missing binaries!!"
-    echo "! Please run \"$0 build\" before zipping"
-    exit 1
-  fi
+  [ ! -f "uninstaller/arm/bootimgtools" ] && error "Missing binaries!! Please run '$0 build' before zipping"
   echo "************************"
   echo "* Zipping uninstaller"
   echo "************************"
   cd uninstaller
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;
-  TIMESTAMP=$(date "+%Y%m%d")
+  TIMESTAMP=`date "+%Y%m%d"`
   rm -rf "../Magisk-uninstaller-$TIMESTAMP.zip"
   zip "../Magisk-uninstaller-$TIMESTAMP.zip" -r .
   cd ../
@@ -112,31 +96,25 @@ zip_uninstaller() {
 }
 
 sign_zip() {
-  if [ ! -f "zipsigntools/zipadjust" ]; then
+  if [ ! -f "ziptools/zipadjust" ]; then
     echo "************************"
     echo "* Compiling ZipAdjust"
     echo "************************"
-    gcc -o zipsigntools/zipadjust zipsigntools/src/*.c -lz
-    if [ $? -ne 0 ]; then
-      echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-      echo "! ZipAdjust Build failed...."
-      echo "!!!!!!!!!!!!!!!!!!!!!!!!"
-      exit 1
-    fi
-    chmod 755 zipsigntools/zipadjust
+    gcc -o ziptools/zipadjust ziptools/src/*.c -lz || error "ZipAdjust Build failed...."
+    chmod 755 ziptools/zipadjust
   fi
   echo "************************"
   echo "* First sign $1"
   echo "************************"
-  java -jar "zipsigntools/signapk.jar" "zipsigntools/test.certificate.x509.pem" "zipsigntools/test.key.pk8" "$1" "${1%.*}-firstsign.zip"
+  java -jar "ziptools/signapk.jar" "ziptools/test.certificate.x509.pem" "ziptools/test.key.pk8" "$1" "${1%.*}-firstsign.zip"
   echo "************************"
   echo "* Adjusting $1"
   echo "************************"
-  zipsigntools/zipadjust "${1%.*}-firstsign.zip" "${1%.*}-adjusted.zip"
+  ziptools/zipadjust "${1%.*}-firstsign.zip" "${1%.*}-adjusted.zip"
   echo "************************"
   echo "* Final sign $1"
   echo "************************"
-  java -jar "zipsigntools/signapk.jar" "zipsigntools/test.certificate.x509.pem" "zipsigntools/test.key.pk8" "${1%.*}-adjusted.zip" "${1%.*}-signed.zip"
+  java -jar "ziptools/minsignapk.jar" "ziptools/test.certificate.x509.pem" "ziptools/test.key.pk8" "${1%.*}-adjusted.zip" "${1%.*}-signed.zip"
 
   mv "${1%.*}-signed.zip" "$1"
   rm "${1%.*}-adjusted.zip" "${1%.*}-firstsign.zip"

@@ -27,6 +27,11 @@
 #include <errno.h>
 #include <zlib.h>
 
+#ifndef O_BINARY
+#define O_BINARY  0
+#define O_TEXT    0
+#endif
+
 #pragma pack(1)
 struct local_header_struct {
 	uint32_t signature;
@@ -194,7 +199,7 @@ static int xdecompress(int fdIn, int fdOut, off_t offsetIn, off_t offsetOut, siz
 int zipadjust(char* filenameIn, char* filenameOut, int decompress) {
 	int ok = 0;
 	
-	int fin = open(filenameIn, O_RDONLY);
+	int fin = open(filenameIn, O_RDONLY | O_BINARY);
 	if (fin > 0) {
 		unsigned int size = lseek(fin, 0, SEEK_END);
 		lseek(fin, 0, SEEK_SET);
@@ -234,7 +239,7 @@ int zipadjust(char* filenameIn, char* filenameOut, int decompress) {
 		memset(central_directory_out, 0, central_directory_in_size);
 
 		unlink(filenameOut);
-		int fout = open(filenameOut, O_CREAT | O_WRONLY, 0644);
+		int fout = open(filenameOut, O_CREAT | O_WRONLY | O_BINARY, 0644);
 		if (fout > 0) {
 
 			uintptr_t central_directory_in_index = 0;
