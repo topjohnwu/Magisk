@@ -46,7 +46,7 @@
 #define CM_ROOT_ACCESS_APPS_AND_ADB  3
 
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
-#define JAVA_PACKAGE_NAME "com.koushikdutta.superuser"
+#define JAVA_PACKAGE_NAME "me.phh.superuser"
 
 // If --rename-manifest-package is used in AAPT, this
 // must be changed to correspond to the new APK package name
