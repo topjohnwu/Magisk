@@ -7,3 +7,6 @@
 [submodule "jni/selinux"]
 	path = jni/selinux
 	url = https://github.com/topjohnwu/selinux.git
+[submodule "jni/su"]
+	path = jni/su
+	url = https://github.com/topjohnwu/Superuser.git
