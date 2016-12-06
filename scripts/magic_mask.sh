@@ -77,44 +77,44 @@ target_size_check() {
 }
 
 travel() {
-  cd "$1/$2"
+  cd "$TRAVEL_ROOT/$1"
   if [ -f ".replace" ]; then
-    rm -rf "$MOUNTINFO/$2"
-    mktouch "$MOUNTINFO/$2" "$1"
+    rm -rf "$MOUNTINFO/$1"
+    mktouch "$MOUNTINFO/$1" "$TRAVEL_ROOT"
   else
     for ITEM in * ; do
-      if [ ! -e "/$2/$ITEM" ]; then
+      if [ ! -e "/$1/$ITEM" ]; then
         # New item found
-        if [ "$2" = "system" ]; then
+        if [ "$1" = "system" ]; then
           # We cannot add new items to /system root, delete it
           rm -rf "$ITEM"
         else
           # If we are in a higher level, delete the lower levels
-          rm -rf "$MOUNTINFO/dummy/$2"
+          rm -rf "$MOUNTINFO/dummy/$1"
           # Mount the dummy parent
-          mktouch "$MOUNTINFO/dummy/$2"
+          mktouch "$MOUNTINFO/dummy/$1"
 
           if [ -d "$ITEM" ]; then
             # Create new dummy directory and mount it
-            mkdir -p "$DUMMDIR/$2/$ITEM"
-            mktouch "$MOUNTINFO/$2/$ITEM" "$1"
+            mkdir -p "$DUMMDIR/$1/$ITEM"
+            mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
           elif [ -L "$ITEM" ]; then
             # Symlinks are small, copy them
-            mkdir -p "$DUMMDIR/$2" 2>/dev/null
-            cp -afc "$ITEM" "$DUMMDIR/$2/$ITEM"
+            mkdir -p "$DUMMDIR/$1" 2>/dev/null
+            cp -afc "$ITEM" "$DUMMDIR/$1/$ITEM"
           else
             # Create new dummy file and mount it
-            mktouch "$DUMMDIR/$2/$ITEM"
-            mktouch "$MOUNTINFO/$2/$ITEM" "$1"
+            mktouch "$DUMMDIR/$1/$ITEM"
+            mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
           fi
         fi
       else
         if [ -d "$ITEM" ]; then
           # It's an directory, travel deeper
-          (travel "$1" "$2/$ITEM")
+          (travel "$1/$ITEM")
         elif [ ! -L "$ITEM" ]; then
           # Mount this file
-          mktouch "$MOUNTINFO/$2/$ITEM" "$1"
+          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         fi
       fi
     done
@@ -122,29 +122,49 @@ travel() {
 }
 
 clone_dummy() {
-  for ITEM in "$1/"* ; do
-    if [ ! -e "$DUMMDIR$ITEM" ]; then
+  for ITEM in $1/* ; do
+    if [ ! -e "$TRAVEL_ROOT$ITEM" ]; then
       if [ ! -d "$MOUNTINFO$ITEM" ]; then
-        if [ -d "$ITEM" ]; then
-          # Create dummy directory
-          mkdir -p "$DUMMDIR$ITEM"
-        elif [ -L "$ITEM" ]; then
-          # Symlinks are small, copy them
-          cp -afc "$ITEM" "$DUMMDIR$ITEM"
+        if [ -L "$ITEM" ]; then
+          # Copy original symlink
+          cp -afc "$ITEM" "$TRAVEL_ROOT$ITEM"
         else
-          # Create dummy file
-          mktouch "$DUMMDIR$ITEM"
+          # Link to mirror item
+          ln -s "$MIRRDIR$ITEM" "$TRAVEL_ROOT$ITEM"
         fi
-        chcon -f "u:object_r:system_file:s0" "$DUMMDIR$ITEM"
       else
         # Need to clone a skeleton
         (clone_dummy "$ITEM")
       fi
-    elif [ -d "$DUMMDIR$ITEM" ]; then
+    elif [ -d "$TRAVEL_ROOT$ITEM" ]; then
       # Need to clone a skeleton
       (clone_dummy "$ITEM")
     fi
   done
+}
+
+make_copy_image() {
+  TARGETSIZE=$2
+  if [ -z $TARGETSIZE ]; then
+    TARGETSIZE=`du -s $1 | awk '{print $1}'`
+    TARGETSIZE=$((($TARGETSIZE / 10240 + 2) * 10240))
+  fi
+  TARGETIMG=/data/magisk/${1//\//_}.img
+  make_ext4fs -l ${TARGETSIZE}K -a $1 $TARGETIMG
+  loopsetup $TARGETIMG
+  mkdir -p $MIRRDIR/copy$1
+  mount -t ext4 -o rw,noatime $LOOPDEVICE $MIRRDIR/copy$1
+  return $?
+}
+
+mount_copy_image() {
+  TARGETIMG=/data/magisk/${1//\//_}.img
+  umount $MIRRDIR/copy$1
+  rm -rf $MIRRDIR/copy
+  losetup -d $LOOPDEVICE 2>/dev/null
+  loopsetup $TARGETIMG
+  mount -t ext4 -o rw,noatime $LOOPDEVICE $1
+  return $?
 }
 
 bind_mount() {
@@ -200,7 +220,7 @@ merge_image() {
             OK=false
           fi
 
-          if ($OK); then
+          if $OK; then
             # Merge (will reserve selinux contexts)
             cd /cache/merge_img
             for MOD in *; do
@@ -247,7 +267,7 @@ case $1 in
     rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
 
     if [ -d "/cache/magisk_mount" ]; then
-      log_print "Mounting cache files"
+      log_print "* Mounting cache files"
       find /cache/magisk_mount -type f 2>/dev/null | while read ITEM ; do
         chmod 644 "$ITEM"
         chcon "u:object_r:system_file:s0" "$ITEM"
@@ -305,11 +325,11 @@ case $1 in
       merge_image /data/magisk_merge.img
 
       # Mount magisk.img
-      [ ! -d "$MOUNTPOINT" ] && mkdir -p $MOUNTPOINT
+      [ ! -d $MOUNTPOINT ] && mkdir -p $MOUNTPOINT
       if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
         loopsetup $IMG
         if [ ! -z "$LOOPDEVICE" ]; then
-          mount -t ext4 -o rw,noatime,suid $LOOPDEVICE $MOUNTPOINT
+          mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
         fi
       fi
 
@@ -318,11 +338,11 @@ case $1 in
         unblock
       fi
 
-      # Remove empty directories, legacy paths and symlinks
-      rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror
+      # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
+      rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img
 
-      # Remove modules
+      # Remove modules that is labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
         if [ -f "$MOD/remove" ] || [ "$MOD" = "zzsupersu" ]; then
           log_print "Remove module: $MOD"
@@ -341,7 +361,7 @@ case $1 in
         fi
         loopsetup $IMG
         if [ ! -z "$LOOPDEVICE" ]; then
-          mount -t ext4 -o rw,noatime,suid $LOOPDEVICE $MOUNTPOINT
+          mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
         fi
         if [ `cat /proc/mounts | grep $MOUNTPOINT >/dev/null 2>&1; echo $?` -ne 0 ]; then
           log_print "magisk.img mount failed, nothing to do :("
@@ -349,53 +369,111 @@ case $1 in
         fi
       fi
 
-      log_print "Preparing modules"
+      log_print "* Preparing modules"
 
       mkdir -p $DUMMDIR
       mkdir -p $MIRRDIR/system
 
-      # Travel through all mods, all magic happens here
+      # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
         if [ -f "$MOD/auto_mount" -a -d "$MOD/system" -a ! -f "$MOD/disable" ]; then
-          (travel $MOD system)
+          TRAVEL_ROOT=$MOD
+          (travel system)
         fi
       done
 
       # Proper permissions for generated items
       find $TMPDIR -exec chcon -h "u:object_r:system_file:s0" {} \;
 
-      # linker(64), t*box required
+      # linker(64), t*box required for bin
       if [ -f "$MOUNTINFO/dummy/system/bin" ]; then
-        cd /system/bin
-        cp -afc linker* t*box $DUMMDIR/system/bin/
+        cp -afc /system/bin/linker* /system/bin/t*box $DUMMDIR/system/bin/
       fi
 
-      # Some libraries are required
-      LIBS="libc++.so libc.so libcutils.so libm.so libstdc++.so libcrypto.so liblog.so libpcre.so libselinux.so libpackagelistparser.so"
+      BACKUPLIBS=false
+
+      # Libraries are full of issues, copy a full clone to data
+
+      # lib
       if [ -f "$MOUNTINFO/dummy/system/lib" ]; then
-        cd /system/lib
-        cp -afc $LIBS $DUMMDIR/system/lib
-        # Crash prevention!!
-        rm -f $COREDIR/magiskhide/enable 2>/dev/null
-      fi
-      if [ -f "$MOUNTINFO/dummy/system/lib64" ]; then
-        cd /system/lib64
-        cp -afc $LIBS $DUMMDIR/system/lib64
-        # Crash prevention!!
-        rm -f $COREDIR/magiskhide/enable 2>/dev/null
+        BACKUPLIBS=true
+        make_copy_image /system/lib
+        cp -afc /system/lib/. $MIRRDIR/copy/system/lib
+        cp -afc $DUMMDIR/system/lib/. $MIRRDIR/copy/system/lib
+        mount_copy_image /system/lib
+        rm -f $MOUNTINFO/dummy/system/lib
       fi
 
-      # vendor libraries are device dependent, had no choice but copy them all if needed....
+      # lib64
+      if [ -f "$MOUNTINFO/dummy/system/lib64" ]; then
+        BACKUPLIBS=true
+        make_copy_image /system/lib64
+        cp -afc /system/lib64/. $MIRRDIR/copy/system/lib64
+        cp -afc $DUMMDIR/system/lib64/. $MIRRDIR/copy/system/lib64
+        mount_copy_image /system/lib64
+        rm -f $MOUNTINFO/dummy/system/lib64
+      fi
+
+      # Whole vendor
       if [ -f "$MOUNTINFO/dummy/system/vendor" ]; then
-        cp -afc /system/vendor/lib/. $DUMMDIR/system/vendor/lib
-        [ -d "/system/vendor/lib64" ] && cp -afc /system/vendor/lib64/. $DUMMDIR/system/vendor/lib64
+        BACKUPLIBS=true
+        LIBSIZE=`du -s /vendor/lib | awk '{print $1}'`
+        if [ -d /vendor/lib64 ]; then
+          LIB64SIZE=`du -s /vendor/lib64 | awk '{print $1}'`
+          VENDORLIBSIZE=$(((($LIBSIZE + $LIB64SIZE) / 10240 + 2) * 10240))
+        else
+          VENDORLIBSIZE=$((($LIBSIZE / 10240 + 2) * 10240))
+        fi
+        make_copy_image /vendor $VENDORLIBSIZE
+
+        # Copy lib/lib64
+        mkdir -p $MIRRDIR/copy/vendor/lib
+        cp -afc /vendor/lib/. $MIRRDIR/copy/vendor/lib
+        cp -afc $DUMMDIR/system/vendor/lib/. $MIRRDIR/copy/vendor/lib 2>/dev/null
+        if [ -d /vendor/lib64 ]; then
+          mkdir -p $MIRRDIR/copy/vendor/lib64
+          cp -afc /vendor/lib64/. $MIRRDIR/copy/vendor/lib64
+          cp -afc $DUMMDIR/system/vendor/lib64/. $MIRRDIR/copy/vendor/lib64 2>/dev/null
+        fi
+
+        cp -afc $DUMMDIR/system/vendor/. $MIRRDIR/copy/vendor
+
+        TRAVEL_ROOT=$MIRRDIR/copy
+        (clone_dummy /vendor)
+        # Create vendor mirror
+        if [ `mount | grep -c "on /vendor type"` -ne 0 ]; then
+          VENDORBLOCK=`mount | grep "on /vendor type" | awk '{print $1}'`
+          mkdir -p $MIRRDIR/vendor
+          mount -o ro $VENDORBLOCK $MIRRDIR/vendor
+        else
+          ln -s $MIRRDIR/system/vendor $MIRRDIR/vendor
+        fi
+        mount_copy_image /vendor
+        rm -f $MOUNTINFO/dummy/system/vendor
       fi
+
+      # vendor lib
       if [ -f "$MOUNTINFO/dummy/system/vendor/lib" ]; then
-        cp -afc /system/vendor/lib/. $DUMMDIR/system/vendor/lib
+        BACKUPLIBS=true
+        make_copy_image /system/vendor/lib
+        cp -afc /system/vendor/lib/. $MIRRDIR/copy/system/vendor/lib
+        cp -afc $DUMMDIR/system/vendor/lib/. $MIRRDIR/copy/system/vendor/lib
+        mount_copy_image /system/vendor/lib
+        rm -f $MOUNTINFO/dummy/system/vendor/lib
       fi
+
+      # vendor lib64
       if [ -f "$MOUNTINFO/dummy/system/vendor/lib64" ]; then
-        cp -afc /system/vendor/lib64/. $DUMMDIR/system/vendor/lib64
+        BACKUPLIBS=true
+        make_copy_image /system/vendor/lib64
+        cp -afc /system/vendor/lib64/. $MIRRDIR/copy/system/vendor/lib64
+        cp -afc $DUMMDIR/system/vendor/lib64/. $MIRRDIR/copy/system/vendor/lib64
+        mount_copy_image /system/vendor/lib64
+        rm -f $MOUNTINFO/dummy/system/vendor/lib64
       fi
+
+      # Crash prevention!!
+      $BACKUPLIBS && rm -f $COREDIR/magiskhide/enable 2>/dev/null
 
       # Remove crap folder
       rm -rf $MOUNTPOINT/lost+found
@@ -403,16 +481,17 @@ case $1 in
       # Start doing tasks
       
       # Stage 1
-      log_print "Bind mount dummy system"
+      TRAVEL_ROOT=$DUMMDIR
+      log_print "* Bind mount dummy system"
       find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO/dummy}
         ORIG="$DUMMDIR$TARGET"
-        clone_dummy "$TARGET"
+        (clone_dummy "$TARGET")
         bind_mount "$ORIG" "$TARGET"
       done
 
       # Stage 2
-      log_print "Bind mount module items"
+      log_print "* Bind mount module items"
       find $MOUNTINFO/system -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO}
         ORIG=`cat $ITEM`$TARGET
@@ -425,13 +504,13 @@ case $1 in
 
       # Bind hosts for Adblock apps
       if [ -f "$COREDIR/hosts" ]; then
-        log_print "Enabling systemless hosts file support"
+        log_print "* Enabling systemless hosts file support"
         bind_mount $COREDIR/hosts /system/etc/hosts
       fi
 
       # Expose busybox
       if [ -f "$COREDIR/busybox/enable" ]; then
-        log_print "Enabling BusyBox"
+        log_print "* Enabling BusyBox"
         cp -afc /data/busybox/. $COREDIR/busybox
         cp -afc /system/xbin/. $COREDIR/busybox
         chmod -R 755 $COREDIR/busybox
@@ -440,23 +519,11 @@ case $1 in
       fi
 
       # Stage 3
-      log_print "Bind mount system mirror"
+      log_print "* Bind mount system mirror"
       bind_mount /system $MIRRDIR/system
 
-      # Stage 4
-      log_print "Bind mount mirror items"
-      # Find all empty directores and dummy files, they should be mounted by original files in /system
-      TOOLPATH=/data/busybox find $DUMMDIR -type d \
-      -exec sh -c '[ -z "`ls -A $1`" ] && echo $1' -- {} \; \
-      -o \( -type f -size 0 -print \) | \
-      while read ITEM ; do
-        ORIG=${ITEM/dummy/mirror}
-        TARGET=${ITEM#$DUMMDIR}
-        bind_mount $ORIG $TARGET
-      done
-
       # Restart post-fs-data if necessary (multirom)
-      ($MULTIROM) && setprop magisk.restart_pfsd 1
+      $MULTIROM && setprop magisk.restart_pfsd 1
 
     fi
     unblock
@@ -470,21 +537,24 @@ case $1 in
 
     # Magisk Hide
     if [ -f "$COREDIR/magiskhide/enable" ]; then
-      log_print "** Removing tampered read-only system props"
+      log_print "* Removing tampered read-only system props"
 
       VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
       FLASHLOCKED=`getprop ro.boot.flash.locked`
       VERITYMODE=`getprop ro.boot.veritymode`
 
-      [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
-      [ ! -z "$FLASHLOCKED" -a "$FLASHLOCKED" != "1" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
-      [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
+      [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
+      log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
+      [ ! -z "$FLASHLOCKED" -a "$FLASHLOCKED" != "1" ] && \
+      log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
+      [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && \
+      log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
 
       mktouch $COREDIR/magiskhide/hidelist
       chmod -R 755 $COREDIR/magiskhide
       # Add Safety Net preset
       $COREDIR/magiskhide/add com.google.android.gms.unstable
-      log_print "** Starting Magisk Hide"
+      log_print "* Starting Magisk Hide"
       /data/magisk/magiskhide
     fi
     ;;
