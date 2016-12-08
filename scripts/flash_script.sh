@@ -339,6 +339,7 @@ unpack_boot $ORIGBOOT
 SUPERSU=false
 if (! $NORESTORE); then
   if [ -d ".backup" ]; then
+    # This implies Magisk is already installed, but no SuperSU
     ui_print "- Restoring ramdisk with ramdisk backup"
     cp -af .backup/. .
     rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
@@ -350,8 +351,8 @@ if (! $NORESTORE); then
       cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
     fi
     if [ -d "magisk" ]; then
-      # If Magisk is installed and not SuperSU and no ramdisk backups
-      # Restore previous stock boot image
+      # If Magisk is installed and not SuperSU and no ramdisk backups,
+      # we restore previous stock boot image backups
       if (! $SUPERSU); then
         cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
         gzip -d /data/stock_boot.img.gz 2>/dev/null
@@ -368,8 +369,8 @@ if (! $NORESTORE); then
   fi
 fi
 
-# SuperSU already backup stock boot, no need to do again
 if (! $SUPERSU); then
+  # SuperSU already backup stock boot, no need to do again
   ui_print "- Creating backups"
   mkdir .backup 2>/dev/null
   cp -af *fstab* verity_key sepolicy .backup 2>/dev/null
@@ -377,6 +378,16 @@ if (! $SUPERSU); then
     [ "$ORIGBOOT" != "/data/stock_boot.img" ] && dd if=$ORIGBOOT of=/data/stock_boot.img
   else
     dd if=$ORIGBOOT of=/cache/stock_boot.img
+  fi
+
+  # SuperSU already have root, no need to install root
+  if [ ! -d /magisk/phh ]; then
+    ui_print "- Installing phh's SuperUser"
+    mkdir -p /magisk/phh/bin
+    mkdir -p /magisk/phh/su.d
+    cp -af $INSTALLER/common/phh/. /magisk/phh
+    cp -af $BINDIR/su $BINDIR/sepolicy-inject /magisk/phh/bin
+    chmod -R 755 /magisk/phh
   fi
 fi
 
