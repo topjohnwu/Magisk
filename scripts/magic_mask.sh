@@ -119,7 +119,11 @@ travel() {
 clone_dummy() {
   for ITEM in $MIRRDIR$1/* ; do
     REAL=${ITEM#$MIRRDIR}
-    if [ ! -e $MOUNTINFO$REAL ]; then
+    if [ -d $MOUNTINFO$REAL ]; then
+      # Need to clone deeper
+      mkdir -p $DUMMDIR$REAL
+      (clone_dummy $REAL)
+    else
       if [ -L $ITEM ]; then
         # Copy original symlink
         cp -afc $ITEM $DUMMDIR$REAL
@@ -129,13 +133,9 @@ clone_dummy() {
         else
           mktouch $DUMMDIR$REAL
         fi
-        # Mount the mirror
-        mktouch $MOUNTINFO/mirror$REAL
+        # Mount the mirror if not module item
+        [ ! -e $MOUNTINFO$REAL ] && mktouch $MOUNTINFO/mirror$REAL
       fi
-    elif [ -d $MOUNTINFO$REAL ]; then
-      # Need to clone deeper
-      mkdir -p $DUMMDIR$REAL
-      (clone_dummy $REAL)
     fi
   done
 }
