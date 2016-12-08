@@ -11,7 +11,7 @@ uninstaller/arm/*
 uninstaller/arm64/*
 uninstaller/x86/*
 uninstaller/x64/*
-zipsigntools/zipadjust
+ziptools/zipadjust
 
 # Generated scripts
 zip_static/common/magic_mask.sh
