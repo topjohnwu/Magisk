@@ -136,7 +136,9 @@ public class ZipUtils {
             Enumeration e = zipfile.entries();
             while(e.hasMoreElements()) {
                 entry = (JarEntry) e.nextElement();
-                if (!entry.getName().contains(path)) {
+                if (!entry.getName().contains(path)
+                        || entry.getName().charAt(entry.getName().length() - 1) == '/') {
+                    // Ignore directories, only create files
                     continue;
                 }
                 Logger.dev("ZipUtils: Extracting: " + entry);
