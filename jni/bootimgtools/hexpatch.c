@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bootimgtools.h"
+#include "bootimg.h"
 
 int hex2int(char c) {
 	int first = c / 16 - 3;

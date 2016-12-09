@@ -12,7 +12,7 @@ include $(BUILD_EXECUTABLE)
 include $(CLEAR_VARS)
 LOCAL_MODULE := bootimgtools
 LOCAL_MODULE_TAGS := optional
-LOCAL_SRC_FILES := bootimgtools.c extract.c repack.c hexpatch.c
+LOCAL_SRC_FILES := bootimgtools/main.c bootimgtools/extract.c bootimgtools/repack.c bootimgtools/hexpatch.c
 LOCAL_CFLAGS += -std=gnu11
 include $(BUILD_EXECUTABLE)
 

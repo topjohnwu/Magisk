@@ -1,7 +1,7 @@
 #include <getopt.h>
 #include <stdio.h>
 
-#include "bootimgtools.h"
+#include "bootimg.h"
 
 /********************
   Patch Boot Image

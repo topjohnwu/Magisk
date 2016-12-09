@@ -150,7 +150,8 @@ void quit_pthread(int sig) {
 	pthread_exit(NULL);
 }
 
-void *monitor_list(void *listpath) {
+void *monitor_list(void *path) {
+	char* listpath = (char*) path;
 	signal(SIGQUIT, quit_pthread);
 
 	int inotifyFd = -1;

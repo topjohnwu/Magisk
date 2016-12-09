@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "bootimgtools.h"
+#include "bootimg.h"
 
 off_t file_size(char *filename) {
 	struct stat st;
