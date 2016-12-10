@@ -583,6 +583,19 @@ int run_daemon() {
 
 	prepare();
 
+    switch (fork()) {
+        case 0:
+            break;
+        case -1:
+            PLOGE("fork");
+            return 1;
+        default:
+            return 0;
+    }
+
+    if (setsid() < 0 || setcon("u:r:su_daemon:s0") < 0)
+        return 1;
+
     int fd;
     struct sockaddr_un sun;
 
