@@ -194,88 +194,92 @@ void *monitor_list(void *path) {
 	return NULL;
 }
 
+void run_as_daemon() {
+	switch(fork()) {
+		case -1:
+			exit(-1);
+		case 0:
+			if (setsid() < 0)
+				exit(-1);
+			close(STDIN_FILENO);
+			close(STDOUT_FILENO);
+			close(STDERR_FILENO);
+			break;
+		default:
+			exit(0); 
+	}
+}
+
 int main(int argc, char **argv, char **envp) {
 
-	pid_t forkpid = fork();
+	run_as_daemon();
 
-	if (forkpid < 0)
-		return 1;
+	logfile = fopen(LOGFILE, "a+");
+	setbuf(logfile, NULL);
 
-	if (forkpid == 0) {
-		if (setsid() < 0)
-			return 1;
-
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		close(STDERR_FILENO);
-
-		logfile = fopen(LOGFILE, "a+");
-		setbuf(logfile, NULL);
-
-		// Fork a child to handle namespace switches and unmounts
-		pipe(pipefd);
-		forkpid = fork();
-		if (forkpid < 0)
-			return 1;
-		if (forkpid == 0)
+	// Fork a child to handle namespace switches and unmounts
+	pipe(pipefd);
+	switch(fork()) {
+		case -1:
+			exit(-1);
+		case 0:
 			return hideMagisk();
+		default:
+			break; 
+	}
+	close(pipefd[0]);
 
-		close(pipefd[0]);
+	// Start a thread to constantly check the hide list
+	pthread_t list_monitor;
+	pthread_mutex_init(&mutex, NULL);
+	pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
 
-		// Start a thread to constantly check the hide list
-		pthread_t list_monitor;
-		pthread_mutex_init(&mutex, NULL);
-		pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
+	char buffer[512];
+	FILE *p = popen("while true; do logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
 
-		char buffer[512];
-		FILE *p = popen("while true; do logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
+	while(!feof(p)) {
+		//Format of am_proc_start is (as of Android 5.1 and 6.0)
+		//UserID, pid, unix uid, processName, hostingType, hostingName
+		fgets(buffer, sizeof(buffer), p);
 
-		while(!feof(p)) {
-			//Format of am_proc_start is (as of Android 5.1 and 6.0)
-			//UserID, pid, unix uid, processName, hostingType, hostingName
-			fgets(buffer, sizeof(buffer), p);
-
-			char *pos = buffer;
-			while(1) {
-				pos = strchr(pos, ',');
-				if(pos == NULL)
-					break;
-				pos[0] = ' ';
-			}
-
-			int user, pid, uid;
-			char processName[256], hostingType[16], hostingName[256];
-			int ret = sscanf(buffer, "[%d %d %d %256s %16s %256s]",
-					&user, &pid, &uid,
-					processName, hostingType, hostingName);
-
-			if(ret != 6)
-				continue;
-
-			for (i = 0; i < list_size; ++i) {
-				if(strstr(processName, hide_list[i])) {
-					fprintf(logfile, "MagiskHide: Disabling for process=%s, PID=%d, UID=%d\n", processName, pid, uid);
-					write(pipefd[1], &pid, sizeof(pid));
-				}
-			}
+		char *pos = buffer;
+		while(1) {
+			pos = strchr(pos, ',');
+			if(pos == NULL)
+				break;
+			pos[0] = ' ';
 		}
 
-		// Close the logcat monitor
-		pclose(p);
+		int user, pid, uid;
+		char processName[256], hostingType[16], hostingName[256];
+		int ret = sscanf(buffer, "[%d %d %d %256s %16s %256s]",
+				&user, &pid, &uid,
+				processName, hostingType, hostingName);
 
-		// Close the config list monitor
-		pthread_kill(list_monitor, SIGQUIT);
-		pthread_mutex_destroy(&mutex);
+		if(ret != 6)
+			continue;
 
-		// Terminate our children
-		i = -1;
-		write(pipefd[1], &i, sizeof(i));
-
-		fprintf(logfile, "MagiskHide: Cannot read from logcat, abort...\n");
-		fclose(logfile);
-
-		return 1;
+		for (i = 0; i < list_size; ++i) {
+			if(strstr(processName, hide_list[i])) {
+				fprintf(logfile, "MagiskHide: Disabling for process=%s, PID=%d, UID=%d\n", processName, pid, uid);
+				write(pipefd[1], &pid, sizeof(pid));
+			}
+		}
 	}
 
-	return 0;
+	// Close the logcat monitor
+	pclose(p);
+
+	// Close the config list monitor
+	pthread_kill(list_monitor, SIGQUIT);
+	pthread_mutex_destroy(&mutex);
+
+	// Terminate our children
+	i = -1;
+	write(pipefd[1], &i, sizeof(i));
+
+	fprintf(logfile, "MagiskHide: Cannot read from logcat, abort...\n");
+	fclose(logfile);
+
+	return 1;
 }
