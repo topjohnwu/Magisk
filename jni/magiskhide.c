@@ -19,7 +19,7 @@
 
 FILE *logfile;
 int i, list_size;
-char **hide_list = NULL;
+char **hide_list = NULL, cache_block[256];
 pthread_mutex_t mutex;
 
 char **file_to_str_arr(FILE *fp, int *size) {
@@ -58,7 +58,7 @@ void lazy_unmount(const char* mountpoint) {
 //WARNING: Calling this will change our current namespace
 //We don't care because we don't want to run from here anyway
 int hideMagisk(int pid, int uid) {
-	struct stat info;
+	// struct stat info;
 	char path[256];
 	// snprintf(path, 256, "/proc/%d", pid);
 	// if (stat(path, &info) == -1) {
@@ -87,32 +87,40 @@ int hideMagisk(int pid, int uid) {
 
 	int mount_size;
 	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], cache_block[256];
-	fclose(mount_fp);
 
-	// Find the cache block
-	for(i = 0; i < mount_size; ++i) {
-		if (strstr(mount_list[i], "/cache")) {
-			sscanf(mount_list[i], "%256s", cache_block);
-			break;
+	// Find the cache block name if not found yet
+	if (strlen(cache_block) == 0) {
+		for(i = 0; i < mount_size; ++i) {
+			if (strstr(mount_list[i], " /cache ")) {
+				sscanf(mount_list[i], "%256s", cache_block);
+				break;
+			}
 		}
 	}
-
-	// Unmount in inverse order
+	
+	// First unmount the dummy skeletons and the cache mounts
 	for(i = mount_size - 1; i >= 0; --i) {
-		if (strstr(mount_list[i], cache_block) && strstr(mount_list[i], "/system")) {
+		if (strstr(mount_list[i], "tmpfs /system/") || strstr(mount_list[i], "tmpfs /vendor/")
+			|| (strstr(mount_list[i], cache_block) && strstr(mount_list[i], "/system")) ) {
 			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-		} else if (strstr(mount_list[i], "/dev/block/loop")) {
-			if (strstr(mount_list[i], "/dev/magisk")) continue;
-			// Everything from loop mount
-			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-		} else if (strstr(mount_list[i], "tmpfs /system/")) {
-			// Directly unmount skeletons
-			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-		} else {
-			free(mount_list[i]);
-			continue;
+			lazy_unmount(mountpoint);
 		}
-		lazy_unmount(mountpoint);
+		free(mount_list[i]);
+	}
+	// Free memory
+	free(mount_list);
+
+	// Re-read mount infos
+	fseek(mount_fp, 0, SEEK_SET);
+	mount_list = file_to_str_arr(mount_fp, &mount_size);
+	fclose(mount_fp);
+
+	// Unmount loop mounts
+	for(i = mount_size - 1; i >= 0; --i) {
+		if (strstr(mount_list[i], "/dev/block/loop")) {
+			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
+			lazy_unmount(mountpoint);
+		}
 		free(mount_list[i]);
 	}
 	// Free memory
@@ -170,7 +178,7 @@ void *monitor_list(void *path) {
 				exit(1);
 			}
 		}
-		update_list((char*) listpath);
+		update_list(listpath);
 	}
 
 	return NULL;
@@ -193,6 +201,9 @@ int main(int argc, char **argv, char **envp) {
 
 		logfile = fopen(LOGFILE, "a+");
 		setbuf(logfile, NULL);
+
+		// Set cache block to null
+		cache_block[0] = 0;
 
 		pthread_t list_monitor;
 
@@ -246,8 +257,7 @@ int main(int argc, char **argv, char **envp) {
 		pthread_kill(list_monitor, SIGQUIT);
 		pthread_mutex_destroy(&mutex);
 
-		fprintf(logfile, "MagiskHide: Error occurred...\n");
-
+		fprintf(logfile, "MagiskHide: Cannot read from logcat, abort...\n");
 		fclose(logfile);
 
 		return 1;
