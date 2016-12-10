@@ -18,8 +18,8 @@
 #define HIDELIST 	"/magisk/.core/magiskhide/hidelist"
 
 FILE *logfile;
-int i, list_size;
-char **hide_list = NULL, cache_block[256];
+int i, list_size, pipefd[2];
+char **hide_list = NULL;
 pthread_mutex_t mutex;
 
 char **file_to_str_arr(FILE *fp, int *size) {
@@ -55,11 +55,79 @@ void lazy_unmount(const char* mountpoint) {
 		fprintf(logfile, "MagiskHide: Unmount Failed (%s)\n", mountpoint);
 }
 
-//WARNING: Calling this will change our current namespace
-//We don't care because we don't want to run from here anyway
-int hideMagisk(int pid, int uid) {
+int hideMagisk() {
+	int pid;
+	char path[256], cache_block[256];
+	cache_block[0] = 0;
+
+	close(pipefd[1]);
+	while(1) {
+		read(pipefd[0], &pid, sizeof(pid));
+		if(pid == -1) break;
+		snprintf(path, 256, "/proc/%d/ns/mnt", pid);
+		int fd = open(path, O_RDONLY);
+		if(fd == -1) continue; // Maybe process died..
+		if(setns(fd, 0) == -1) {
+			fprintf(logfile, "MagiskHide: Unable to change namespace for pid=%d\n", pid);
+			continue;
+		}
+
+		snprintf(path, 256, "/proc/%d/mounts", pid);
+		FILE *mount_fp = fopen(path, "r");
+		if (mount_fp == NULL) {
+			fprintf(logfile, "MagiskHide: Error opening mount list!\n");
+			continue;
+		}
+
+		int mount_size;
+		char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], cache_block[256];
+
+		// Find the cache block name if not found yet
+		if (strlen(cache_block) == 0) {
+			for(i = 0; i < mount_size; ++i) {
+				if (strstr(mount_list[i], " /cache ")) {
+					sscanf(mount_list[i], "%256s", cache_block);
+					break;
+				}
+			}
+		}
+		
+		// First unmount the dummy skeletons and the cache mounts
+		for(i = mount_size - 1; i >= 0; --i) {
+			if (strstr(mount_list[i], "tmpfs /system/") || strstr(mount_list[i], "tmpfs /vendor/")
+				|| (strstr(mount_list[i], cache_block) && strstr(mount_list[i], "/system")) ) {
+				sscanf(mount_list[i], "%*s %256s", mountpoint);
+				lazy_unmount(mountpoint);
+			}
+			free(mount_list[i]);
+		}
+		// Free memory
+		free(mount_list);
+
+		// Re-read mount infos
+		fseek(mount_fp, 0, SEEK_SET);
+		mount_list = file_to_str_arr(mount_fp, &mount_size);
+		fclose(mount_fp);
+
+		// Unmount loop mounts
+		for(i = mount_size - 1; i >= 0; --i) {
+			if (strstr(mount_list[i], "/dev/block/loop")) {
+				sscanf(mount_list[i], "%*s %256s", mountpoint);
+				lazy_unmount(mountpoint);
+			}
+			free(mount_list[i]);
+		}
+		// Free memory
+		free(mount_list);
+	}
+
+	// Should never go here
+	return 1;
+
+	// Below are UID checks, not used now but I'll leave it here
+
 	// struct stat info;
-	char path[256];
+	
 	// snprintf(path, 256, "/proc/%d", pid);
 	// if (stat(path, &info) == -1) {
 	// 	fprintf(logfile, "MagiskHide: Unable to get info for pid=%d\n", pid);
@@ -69,64 +137,6 @@ int hideMagisk(int pid, int uid) {
 	// 	fprintf(logfile, "MagiskHide: Incorrect uid=%d, expect uid=%d\n", info.st_uid, uid);
 	// 	return 1;
 	// }
-
-	snprintf(path, 256, "/proc/%d/ns/mnt", pid);
-	int fd = open(path, O_RDONLY);
-	if(fd == -1) return 2; // Maybe process died..
-	if(setns(fd, 0) == -1) {
-		fprintf(logfile, "MagiskHide: Unable to change namespace for pid=%d\n", pid);
-		return 3;
-	}
-
-	snprintf(path, 256, "/proc/%d/mounts", pid);
-	FILE *mount_fp = fopen(path, "r");
-	if (mount_fp == NULL) {
-		fprintf(logfile, "MagiskHide: Error opening mount list!\n");
-		return 4;
-	}
-
-	int mount_size;
-	char **mount_list = file_to_str_arr(mount_fp, &mount_size), mountpoint[256], cache_block[256];
-
-	// Find the cache block name if not found yet
-	if (strlen(cache_block) == 0) {
-		for(i = 0; i < mount_size; ++i) {
-			if (strstr(mount_list[i], " /cache ")) {
-				sscanf(mount_list[i], "%256s", cache_block);
-				break;
-			}
-		}
-	}
-	
-	// First unmount the dummy skeletons and the cache mounts
-	for(i = mount_size - 1; i >= 0; --i) {
-		if (strstr(mount_list[i], "tmpfs /system/") || strstr(mount_list[i], "tmpfs /vendor/")
-			|| (strstr(mount_list[i], cache_block) && strstr(mount_list[i], "/system")) ) {
-			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-			lazy_unmount(mountpoint);
-		}
-		free(mount_list[i]);
-	}
-	// Free memory
-	free(mount_list);
-
-	// Re-read mount infos
-	fseek(mount_fp, 0, SEEK_SET);
-	mount_list = file_to_str_arr(mount_fp, &mount_size);
-	fclose(mount_fp);
-
-	// Unmount loop mounts
-	for(i = mount_size - 1; i >= 0; --i) {
-		if (strstr(mount_list[i], "/dev/block/loop")) {
-			sscanf(mount_list[i], "%256s %256s", mountpoint, mountpoint);
-			lazy_unmount(mountpoint);
-		}
-		free(mount_list[i]);
-	}
-	// Free memory
-	free(mount_list);
-
-	return 0;
 }
 
 void update_list(const char *listpath) {
@@ -202,11 +212,18 @@ int main(int argc, char **argv, char **envp) {
 		logfile = fopen(LOGFILE, "a+");
 		setbuf(logfile, NULL);
 
-		// Set cache block to null
-		cache_block[0] = 0;
+		// Fork a child to handle namespace switches and unmounts
+		pipe(pipefd);
+		forkpid = fork();
+		if (forkpid < 0)
+			return 1;
+		if (forkpid == 0)
+			return hideMagisk();
 
+		close(pipefd[0]);
+
+		// Start a thread to constantly check the hide list
 		pthread_t list_monitor;
-
 		pthread_mutex_init(&mutex, NULL);
 		pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
 
@@ -238,24 +255,21 @@ int main(int argc, char **argv, char **envp) {
 			for (i = 0; i < list_size; ++i) {
 				if(strstr(processName, hide_list[i])) {
 					fprintf(logfile, "MagiskHide: Disabling for process=%s, PID=%d, UID=%d\n", processName, pid, uid);
-					forkpid = fork();
-					if (forkpid < 0)
-						break;
-					if (forkpid == 0) {
-						hideMagisk(pid, uid);
-						return 0;
-					}
-					waitpid(forkpid, NULL, 0);
-					kill(forkpid, SIGTERM);
-					break;
+					write(pipefd[1], &pid, sizeof(pid));
 				}
 			}
 		}
 
+		// Close the logcat monitor
 		pclose(p);
 
+		// Close the config list monitor
 		pthread_kill(list_monitor, SIGQUIT);
 		pthread_mutex_destroy(&mutex);
+
+		// Terminate our children
+		i = -1;
+		write(pipefd[1], &i, sizeof(i));
 
 		fprintf(logfile, "MagiskHide: Cannot read from logcat, abort...\n");
 		fclose(logfile);
