@@ -46,13 +46,13 @@
 #define CM_ROOT_ACCESS_APPS_AND_ADB  3
 
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
-#define JAVA_PACKAGE_NAME "me.phh.superuser"
+#define JAVA_PACKAGE_NAME "com.koushikdutta.superuser"
 
 // If --rename-manifest-package is used in AAPT, this
 // must be changed to correspond to the new APK package name
 // See the two Android.mk files for more details.
 #ifndef REQUESTOR
-#define REQUESTOR JAVA_PACKAGE_NAME
+#define REQUESTOR "me.phh.superuser"
 #endif
 // This is used if wrapping the fragment classes and activities
 // with classes in another package. CM requirement.
