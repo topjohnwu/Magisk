@@ -9,19 +9,6 @@ log_print() {
   log -p i -t phh "$1"
 }
 
-launch_daemonsu() {
-  # Revert to original path, legacy issue
-  case $PATH in
-    *busybox* )
-      export PATH=$OLDPATH
-      ;;
-  esac
-  # Switch contexts
-  echo "u:r:su_daemon:s0" > /proc/self/attr/current
-  # Start daemon
-  exec /sbin/su --daemon
-}
-
 # Disable the other root
 [ -d "/magisk/zzsupersu" ] && touch /magisk/zzsupersu/disable
 
@@ -47,4 +34,5 @@ for script in $MODDIR/su.d/* ; do
 done
 
 log_print "Starting su daemon"
-(launch_daemonsu &)
+[ ! -z $OLDPATH ] && export PATH=$OLDPATH
+/sbin/su --daemon

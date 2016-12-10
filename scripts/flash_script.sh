@@ -381,13 +381,14 @@ if (! $SUPERSU); then
   fi
 
   # SuperSU already have root, no need to install root
-  if [ ! -d /magisk/phh ]; then
-    ui_print "- Installing phh's SuperUser"
-    mkdir -p /magisk/phh/bin
-    mkdir -p /magisk/phh/su.d
+  if [ ! -d /magisk/phh -o `grep_prop versionCode /magisk/phh/module.prop` -lt \
+    `grep_prop versionCode $INSTALLER/common/phh/module.prop` ]; then
+    ui_print "- Installing/Upgrading phh's SuperUser"
+    mkdir -p /magisk/phh/bin 2>/dev/null
+    mkdir -p /magisk/phh/su.d 2>/dev/null
     cp -af $INSTALLER/common/phh/. /magisk/phh
     cp -af $BINDIR/su $BINDIR/sepolicy-inject /magisk/phh/bin
-    chmod -R 755 /magisk/phh
+    chmod -R 755 /magisk/phh/bin
   fi
 fi
 
