@@ -79,9 +79,6 @@
     <string name="no_magisk_msg">Wilt u Magisk downloaden en installeren?</string>
 
     <!--URL Templates-->
-    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
-    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
-    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Fragment -->
     <string name="settings_general_category">Algemeen</string>
@@ -97,6 +94,7 @@
     <string name="settings_shell_logging_summary">Schakel dit in om alle shell commands en output te loggen</string>
     <string name="settings_magiskhide_title">Magisk verbergen</string>
     <string name="settings_magiskhide_summary">Reboot om de instellingen toe te passen</string>
+    <string name="zip_install_unzip_zip_msg"></string>
 
     <!-- Strings related to Settings -->
 

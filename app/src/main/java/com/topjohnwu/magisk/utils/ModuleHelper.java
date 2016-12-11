@@ -82,7 +82,7 @@ public class ModuleHelper {
         }
 
         // Making a request to url and getting response
-        jsonString = WebRequest.makeWebServiceCall(context.getString(R.string.url_main) + Utils.getToken(), WebRequest.GET);
+        jsonString = WebRequest.makeWebServiceCall(context.getString(R.string.url_main, Utils.getToken()), WebRequest.GET);
 
         if (jsonString != null && !jsonString.isEmpty()) {
             // Have internet access

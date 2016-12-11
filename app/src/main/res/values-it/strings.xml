@@ -79,9 +79,6 @@
     <string name="no_magisk_msg">Vuoi scaricare ed installare Magisk?</string>
 
     <!--URL Templates-->
-    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
-    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
-    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Fragment -->
     <string name="settings_general_category">Generali</string>

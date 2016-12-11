@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
@@ -48,10 +48,9 @@ public class ModulesFragment extends Fragment {
         ButterKnife.bind(this, mView);
 
         fabio.setOnClickListener(v -> {
-            Intent getContentIntent = FileUtils.createGetContentIntent(null);
-            getContentIntent.setType("application/zip");
-            Intent fileIntent = Intent.createChooser(getContentIntent, "Select a file");
-            startActivityForResult(fileIntent, FETCH_ZIP_CODE);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/zip");
+            startActivityForResult(intent, FETCH_ZIP_CODE);
         });
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -80,7 +79,7 @@ public class ModulesFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data != null) {
+        if (requestCode == FETCH_ZIP_CODE && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
             final Uri uri = data.getData();
             new Async.FlashZIP(getActivity(), uri).exec();
