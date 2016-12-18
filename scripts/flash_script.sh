@@ -156,6 +156,8 @@ unpack_boot() {
   cd $UNPACKDIR
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --extract $1
 
+  [ ! -f $UNPACKDIR/ramdisk.gz ] && return 1
+
   cd $RAMDISK
   gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
 }
@@ -164,7 +166,7 @@ repack_boot() {
   cd $RAMDISK
   find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
   cd $UNPACKDIR
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $ORIGBOOT
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
   if [ -f chromeos ]; then
     echo " " > config
     echo " " > bootloader
@@ -280,7 +282,7 @@ if (is_mounted /data); then
   /data/magisk/busybox --install -s /data/busybox
   ln -s /data/magisk/busybox /data/busybox/busybox
   # Prevent issues
-  rm -f /data/busybox/su /data/busybox/sh
+  rm -f /data/busybox/su /data/busybox/sh /data/busybox/reboot
   chcon -hR "u:object_r:system_file:s0" /data/magisk /data/busybox
   chmod -R 755 /data/magisk /data/busybox
   PATH=/data/busybox:$PATH
@@ -301,10 +303,10 @@ if (is_mounted /data); then
   IMG=/data/magisk.img
 else
   IMG=/cache/magisk.img
-  ui_print "- Data unavalible, use cache workaround"
+  ui_print "- Data unavailable, use cache workaround"
 fi
 
-if [ -f "$IMG" ]; then
+if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
@@ -313,7 +315,7 @@ fi
 
 mount_image $IMG /magisk
 if (! is_mounted /magisk); then
-  ui_print "! Image mount failed... abort"
+  ui_print "! Image mount failed..."
   exit 1
 fi
 MAGISKLOOP=$LOOPDEVICE
@@ -330,58 +332,61 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 rm -rf $TMPDIR/boottmp 2>/dev/null
 mkdir -p $TMPDIR/boottmp
 
-ORIGBOOT=$BOOTIMAGE
-
 ui_print "- Unpacking boot image"
-unpack_boot $ORIGBOOT
+unpack_boot $BOOTIMAGE
+if [ $? -ne 0 ]; then
+  ui_print "! Unable to unpack boot image"
+  exit 1;
+fi
 
 # Restore ramdisk
+ORIGBOOT=
 SUPERSU=false
+[ -f sbin/launch_daemonsu.sh ] && SUPERSU=true
 if (! $NORESTORE); then
   if [ -d ".backup" ]; then
-    # This implies Magisk is already installed, but no SuperSU
+    # This implies Magisk is already installed, and ramdisk backup exists
     ui_print "- Restoring ramdisk with ramdisk backup"
     cp -af .backup/. .
     rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
-  else
-    [ -f "sbin/launch_daemonsu.sh" ] && SUPERSU=true
-    if ($SUPERSU); then
-      ui_print "- SuperSU patched boot detected!"
-      ui_print "- Adding auto patch script for SuperSU"
-      cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+    ORIGBOOT=false
+  elif [ -d "magisk" ]; then
+    cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+    gzip -d /data/stock_boot.img.gz 2>/dev/null
+    [ -f /data/stock_boot.img ] && ORIGBOOT=/data/stock_boot.img
+    # If Magisk is installed and no SuperSU and no ramdisk backups,
+    # we restore previous stock boot image backups
+    if (! $SUPERSU) && [ ! -z $ORIGBOOT ]; then
+      ui_print "- Restoring boot image with backup"
+      unpack_boot $ORIGBOOT
     fi
-    if [ -d "magisk" ]; then
-      # If Magisk is installed and not SuperSU and no ramdisk backups,
-      # we restore previous stock boot image backups
-      if (! $SUPERSU); then
-        cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
-        gzip -d /data/stock_boot.img.gz 2>/dev/null
-        if [ -f "/data/stock_boot.img" ]; then
-          ui_print "- Restoring boot image with backup"
-          $ORIGBOOT=/data/stock_boot.img
-          unpack_boot $ORIGBOOT
-        fi
-      fi
-      # Removing possible modifications
-      rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
-      rm -rf init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
-    fi
+    # Removing possible modifications
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
+    rm -rf init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
+    ORIGBOOT=false
   fi
 fi
 
-if (! $SUPERSU); then
+if ($SUPERSU); then
+  ui_print "- SuperSU patched boot detected!"
+  ui_print "- Adding auto patch script for SuperSU"
+  cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+else
   # SuperSU already backup stock boot, no need to do again
-  ui_print "- Creating backups"
+  ui_print "- Creating ramdisk backup"
   mkdir .backup 2>/dev/null
   cp -af *fstab* verity_key sepolicy .backup 2>/dev/null
-  if (is_mounted /data); then
-    [ "$ORIGBOOT" != "/data/stock_boot.img" ] && dd if=$ORIGBOOT of=/data/stock_boot.img
-  else
-    dd if=$ORIGBOOT of=/cache/stock_boot.img
+  if [ -z $ORIGBOOT ]; then
+    ui_print "- Creating boot image backup"
+    if (is_mounted /data); then
+      dd if=$BOOTIMAGE of=/data/stock_boot.img
+    else
+      dd if=$BOOTIMAGE of=/cache/stock_boot.img
+    fi
   fi
 
   # SuperSU already have root, no need to install root
-  ROOT=
+  ROOT=false
   if [ ! -d /magisk/phh ]; then
     ui_print "- Installing phh's SuperUser"
     ROOT=true
@@ -390,7 +395,7 @@ if (! $SUPERSU); then
     ROOT=true
   fi
 
-  if [ ! -z $ROOT ]; then
+  if ($ROOT); then
     mkdir -p /magisk/phh/bin 2>/dev/null
     mkdir -p /magisk/phh/su.d 2>/dev/null
     cp -af $INSTALLER/common/phh/. /magisk/phh
@@ -404,7 +409,7 @@ ui_print "- Patching ramdisk"
 
 # Add magisk entrypoint
 for INIT in init*.rc; do
-  if [ $(grep -c "import /init.environ.rc" $INIT) -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
+  if [ `grep -c "import /init.environ.rc" $INIT` -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
     cp $INIT .backup
     sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
     break
@@ -460,7 +465,7 @@ fi
 chmod 644 $NEWBOOT
 
 ui_print "- Flashing new boot image"
-[ ! -L "$BOOTIMAGE" ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
+[ ! -L $BOOTIMAGE ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
 dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
 
 if (! $BOOTMODE); then
