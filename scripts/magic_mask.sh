@@ -264,7 +264,7 @@ case $1 in
         $BINPATH/busybox --install -s $TOOLPATH
         ln -s $BINPATH/busybox $TOOLPATH/busybox
         # Prevent issues
-        rm -f $TOOLPATH/su $TOOLPATH/sh
+        rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
       fi
 
       mv /cache/stock_boot.img /data 2>/dev/null
@@ -436,7 +436,8 @@ case $1 in
     log_print "** Magisk late_start service mode running..."
     run_scripts service
 
-    # Magisk Hide
+    # Magisk Hide (disable with SuperSU)
+    [ -f /sbin/launch_daemonsu.sh ] && rm -f $COREDIR/magiskhide/enable
     if [ -f $COREDIR/magiskhide/enable ]; then
       log_print "* Removing tampered read-only system props"
 
