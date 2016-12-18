@@ -381,9 +381,16 @@ if (! $SUPERSU); then
   fi
 
   # SuperSU already have root, no need to install root
-  if [ ! -d /magisk/phh -o `grep_prop versionCode /magisk/phh/module.prop` -lt \
-    `grep_prop versionCode $INSTALLER/common/phh/module.prop` ]; then
-    ui_print "- Installing/Upgrading phh's SuperUser"
+  ROOT=
+  if [ ! -d /magisk/phh ]; then
+    ui_print "- Installing phh's SuperUser"
+    ROOT=true
+  elif [ `grep_prop versionCode /magisk/phh/module.prop` -lt `grep_prop versionCode $INSTALLER/common/phh/module.prop` ]; then
+    ui_print "- Upgrading phh's SuperUser"
+    ROOT=true
+  fi
+
+  if [ ! -z $ROOT ]; then
     mkdir -p /magisk/phh/bin 2>/dev/null
     mkdir -p /magisk/phh/su.d 2>/dev/null
     cp -af $INSTALLER/common/phh/. /magisk/phh
