@@ -131,6 +131,11 @@ repack_boot() {
       echo -n "SEANDROIDENFORCE" >> new-boot.img
     fi
   fi
+  if ($LGE_G); then
+    # Prevent secure boot error on LG G2/G3.
+    # Just for know, It's a pattern which bootloader verifies at boot. Thanks to LG hackers.
+    echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> new-boot.img
+  fi
   mv new-boot.img $NEWBOOT
 }
 
@@ -188,6 +193,19 @@ if [ $? -eq 0 ]; then
   SAMSUNG=true
 fi
 
+LGE_G=false
+RBRAND=$(grep_prop ro.product.brand)
+RMODEL=$(grep_prop ro.product.device)
+if [ "$RBRAND" = "lge" ] || [ "$RBRAND" = "LGE" ];  then 
+  if [ "$RMODEL" = "*D80*" ] || 
+     [ "$RMODEL" = "*S98*" ] || 
+     [ "$RMODEL" = "*D85*" ] ||
+     [ "$RMODEL" = "*F40*" ]; then
+    LGE_G=true
+    ui_print "! Bump device detected"
+  fi
+fi
+
 API=$(grep_prop ro.build.version.sdk)
 ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
 ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
@@ -228,6 +246,11 @@ if (is_mounted /data); then
   if [ -f "/data/stock_boot.img" ]; then
     ui_print "- Boot image backup found!"
     NEWBOOT=/data/stock_boot.img
+    if ($LGE_G); then
+      # Prevent secure boot error on LG G2/G3.
+      # Just for know, It's a pattern which bootloader verifies at boot. Thanks to LG hackers.
+      echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> $NEWBOOT
+    fi
   else
     ui_print "! Boot image backup unavalible, try using ramdisk backup"
     revert_boot
