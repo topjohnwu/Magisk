@@ -180,6 +180,11 @@ repack_boot() {
       echo -n "SEANDROIDENFORCE" >> new-boot.img
     fi
   fi
+  if ($LGE_G); then
+    # Prevent secure boot error on LG G2/G3.
+    # Just for know, It's a pattern which bootloader verifies at boot. Thanks to LG hackers.
+    echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> new-boot.img
+  fi
   mv new-boot.img $NEWBOOT
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --hexpatch $NEWBOOT \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
@@ -234,6 +239,19 @@ SAMSUNG=false
 SAMSUNG_CHECK=$(cat /system/build.prop | grep "ro.build.fingerprint=" | grep -i "samsung")
 if [ $? -eq 0 ]; then
   SAMSUNG=true
+fi
+
+LGE_G=false
+RBRAND=$(grep_prop ro.product.brand)
+RMODEL=$(grep_prop ro.product.device)
+if [ "$RBRAND" = "lge" ] || [ "$RBRAND" = "LGE" ];  then 
+  if [ "$RMODEL" = "*D80*" ] || 
+     [ "$RMODEL" = "*S98*" ] || 
+     [ "$RMODEL" = "*D85*" ] ||
+     [ "$RMODEL" = "*F40*" ]; then
+    LGE_G=true
+    ui_print "! Bump device detected"
+  fi
 fi
 
 API=$(grep_prop ro.build.version.sdk)
