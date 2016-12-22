@@ -15,6 +15,14 @@ log_print() {
 log_print "Live patching sepolicy"
 $MODDIR/bin/sepolicy-inject --live
 
+log_print "Moving and linking /sbin binaries"
+mount -o rw,remount rootfs /
+mv /sbin /sbin_orig
+mkdir /sbin
+chmod 755 /sbin
+ln -s /sbin_orig/* /sbin
+mount -o ro,remount rootfs /
+
 # Expose the root path
 log_print "Mounting supath"
 rm -rf /magisk/.core/bin $MODDIR/sbin_bind
