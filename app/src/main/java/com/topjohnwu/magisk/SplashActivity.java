@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class SplashActivity extends AppCompatActivity {
@@ -35,6 +37,24 @@ public class SplashActivity extends AppCompatActivity {
                 .putBoolean("busybox", Utils.commandExists("busybox"))
                 .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
                 .apply();
+
+        // Simple POC for checking SN status
+        new SafetyNetHelper(getApplicationContext()) {
+            @Override
+            public void handleResults(int i) {
+                switch (i) {
+                    case -1:
+                        Toast.makeText(mContext, "SN: Error", Toast.LENGTH_LONG).show();
+                        break;
+                    case 0:
+                        Toast.makeText(mContext, "SN: Fail", Toast.LENGTH_LONG).show();
+                        break;
+                    case 1:
+                        Toast.makeText(mContext, "SN: Success", Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        }.requestTest();
 
         new Async.CheckUpdates(prefs).exec();
 

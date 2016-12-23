@@ -178,10 +178,10 @@ public class Async {
                 Logger.dev("FlashZip: File created successfully - " + mCachedFile.getPath());
                 in.close();
             } catch (FileNotFoundException e) {
-                Log.e(Logger.LOG_TAG, "FlashZip: Invalid Uri");
+                Log.e(Logger.TAG, "FlashZip: Invalid Uri");
                 throw e;
             } catch (IOException e) {
-                Log.e(Logger.LOG_TAG, "FlashZip: Error in creating file");
+                Log.e(Logger.TAG, "FlashZip: Error in creating file");
                 throw e;
             }
         }
