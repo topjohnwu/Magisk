@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
-    @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.nav_view) public NavigationView navigationView;
 
     @IdRes
-    private int mSelectedId = R.id.magisk;
+    private int mSelectedId = R.id.status;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -57,10 +57,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-        }
-
-        if (!Shell.rootAccess()) {
-            Snackbar.make(findViewById(android.R.id.content), R.string.no_root_access, Snackbar.LENGTH_LONG).show();
         }
 
         setSupportActionBar(toolbar);
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (MagiskFragment.magiskVersion == -1) {
+        if (StatusFragment.magiskVersion == -1) {
             menu.findItem(R.id.magiskhide).setVisible(false);
             menu.findItem(R.id.modules).setVisible(false);
             menu.findItem(R.id.downloads).setVisible(false);
@@ -141,28 +137,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment navFragment = null;
         String tag = "";
         switch (itemId) {
-            case R.id.magisk:
-                setTitle(R.string.magisk);
-                tag = "magisk";
-                navFragment = new MagiskFragment();
+            case R.id.status:
+                tag = "status";
+                navFragment = new StatusFragment();
+                break;
+            case R.id.install:
+                tag = "install";
+                navFragment = new InstallFragment();
                 break;
             case R.id.modules:
-                setTitle(R.string.modules);
                 tag = "modules";
                 navFragment = new ModulesFragment();
                 break;
             case R.id.downloads:
-                setTitle(R.string.downloads);
                 tag = "downloads";
                 navFragment = new ReposFragment();
                 break;
             case R.id.magiskhide:
-                setTitle(R.string.magiskhide);
                 tag = "magiskhide";
                 navFragment = new MagiskHideFragment();
                 break;
             case R.id.log:
-                setTitle(R.string.log);
                 tag = "log";
                 navFragment = new LogFragment();
                 break;
@@ -179,8 +174,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
             try {
                 transaction.replace(R.id.content_frame, navFragment, tag).commit();
-            } catch (IllegalStateException ignored) {
-            }
+            } catch (IllegalStateException ignored) {}
         }
     }
 }

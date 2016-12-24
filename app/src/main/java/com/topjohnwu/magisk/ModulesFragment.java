@@ -92,6 +92,7 @@ public class ModulesFragment extends Fragment {
         super.onResume();
         mView = this.getView();
         prefs.registerOnSharedPreferenceChangeListener(listener);
+        getActivity().setTitle(R.string.modules);
     }
 
     @Override

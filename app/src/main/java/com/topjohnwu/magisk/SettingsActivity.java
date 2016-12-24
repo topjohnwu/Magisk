@@ -89,10 +89,10 @@ public class SettingsActivity extends AppCompatActivity {
 
             themePreference.setSummary(themePreference.getValue());
 
-            if (MagiskFragment.magiskVersion < 9) {
+            if (StatusFragment.magiskVersion < 9) {
                 hostsPreference.setEnabled(false);
                 busyboxPreference.setEnabled(false);
-            } else if (MagiskFragment.magiskVersion < 8) {
+            } else if (StatusFragment.magiskVersion < 8) {
                 magiskhidePreference.setEnabled(false);
             } else {
                 busyboxPreference.setEnabled(true);

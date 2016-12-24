@@ -67,6 +67,7 @@ public class LogFragment extends Fragment {
         super.onResume();
         setHasOptionsMenu(true);
         new LogManager().read();
+        getActivity().setTitle(R.string.log);
     }
 
     @Override

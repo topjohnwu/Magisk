@@ -114,6 +114,7 @@ public class ReposFragment extends Fragment {
         super.onResume();
         setHasOptionsMenu(true);
         prefs.registerOnSharedPreferenceChangeListener(listener);
+        getActivity().setTitle(R.string.downloads);
     }
 
     @Override

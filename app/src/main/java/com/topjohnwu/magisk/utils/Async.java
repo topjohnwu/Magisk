@@ -12,8 +12,8 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.StatusFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,14 +63,14 @@ public class Async {
                 JSONObject magisk = json.getJSONObject("magisk");
                 JSONObject app = json.getJSONObject("app");
 
-                MagiskFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
-                MagiskFragment.magiskLink = magisk.getString("link");
-                MagiskFragment.magiskChangelog = magisk.getString("changelog");
+                StatusFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
+                StatusFragment.magiskLink = magisk.getString("link");
+                StatusFragment.magiskChangelog = magisk.getString("changelog");
 
-                MagiskFragment.remoteAppVersion = app.getString("version");
-                MagiskFragment.remoteAppVersionCode = app.getInt("versionCode");
-                MagiskFragment.appLink = app.getString("link");
-                MagiskFragment.appChangelog = app.getString("changelog");
+                StatusFragment.remoteAppVersion = app.getString("version");
+                StatusFragment.remoteAppVersionCode = app.getInt("versionCode");
+                StatusFragment.appLink = app.getString("link");
+                StatusFragment.appChangelog = app.getString("changelog");
 
             } catch (JSONException ignored) {
                 Logger.dev("JSON error!");

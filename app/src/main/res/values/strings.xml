@@ -11,15 +11,25 @@
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
     <string name="settings">Settings</string>
+    <string name="status">Status</string>
+    <string name="install">Install</string>
 
-    <!--Magisk Fragment-->
+    <!--Status Fragment-->
     <string name="magisk_version">Installed Magisk v%1$s</string>
-    <string name="magisk_version_error">Have you installed Magisk?</string>
+    <string name="magisk_version_error">Magisk not installed</string>
 
-    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
-    <string name="magisk_update_available">Magisk v%1$s update!</string>
-    <string name="cannot_check_updates">Cannot check for updates</string>
+    <string name="checking_for_updates">Checking for updates…</string>
+    <string name="magisk_update_available">Magisk v%1$s available!</string>
+    <string name="cannot_check_updates">Cannot check for updates, no Internet?</string>
     <string name="up_to_date">Latest version of %1$s installed</string>
+    <string name="root_error">Rooted but no root permission, not allowed?</string>
+    <string name="not_rooted">Not rooted</string>
+    <string name="proper_root">Properly rooted</string>
+    <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
+    <string name="safetyNet_error">Cannot check SafetyNet, no Internet?</string>
+    <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
+    <string name="safetyNet_pass">SafetyNet Passed</string>
+    <string name="root_info_warning">Functionality greatly limited</string>
 
     <!--Root Fragment-->
 
@@ -54,7 +64,7 @@
     <string name="app_developers">Main developers</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators"/>
+    <string name="translators" />
     <string name="app_version">App\'s version</string>
     <string name="app_source_code">Source code</string>
     <string name="donation">Donation</string>
@@ -65,11 +75,9 @@
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
-    <string name="update_title">%1$s Update!</string>
-    <string name="update_msg">New version v%2$s of %1$s is available!\nChangelog:\n%3$s</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
-    <string name="download_install">Download and install</string>
+    <string name="download_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
     <string name="manual_install_1">Zip file placed in %1$s</string>
