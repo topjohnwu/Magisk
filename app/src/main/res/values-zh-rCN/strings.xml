@@ -1,0 +1,113 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="magiskhide">Magisk 隐藏</string>
+    <string name="modules">模块</string>
+    <string name="downloads">下载</string>
+    <string name="log">日志</string>
+    <string name="settings">设置</string>
+
+    <!--Magisk Fragment-->
+    <string name="magisk_version">已安装 Magisk v%1$s</string>
+    <string name="magisk_version_error">你是否已安装 Magisk？</string>
+
+    <string name="app_update_available">Magisk 管理器可更新到 v%1$s！</string>
+    <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
+    <string name="cannot_check_updates">无法检查更新</string>
+    <string name="up_to_date">已安装最新版本的 %1$s</string>
+
+    <!--Root Fragment-->
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">（未提供信息）</string>
+    <string name="no_modules_found">未找到模块</string>
+    <string name="update_file_created">模块将在下次重启后更新</string>
+    <string name="remove_file_created">模块将在下次重启后移除</string>
+    <string name="remove_file_deleted">模块将不会在下次重启后移除</string>
+    <string name="disable_file_created">模块将在下次重启后禁用</string>
+    <string name="disable_file_removed">模块将在下次重启后启用</string>
+    <string name="author">作者：%1$s</string>
+    <string name="fab_flash_zip">刷入模块 Zip</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">可更新</string>
+    <string name="installed">已安装</string>
+    <string name="not_installed">未安装</string>
+    <string name="changelog">更新日志</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">保存到 SD 卡</string>
+    <string name="menuSend">发送</string>
+    <string name="menuReload">重载</string>
+    <string name="menuClearLog">清除日志</string>
+    <string name="logs_cleared">日志已成功清除</string>
+    <string name="log_is_empty">日志为空</string>
+    <string name="logs_save_failed">无法将日志写入 SD 卡：</string>
+
+    <!--About Activity-->
+    <string name="about">关于</string>
+    <string name="app_developers">主要开发者</string>
+    <string name="app_developers_"><![CDATA[此应用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 与 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作开发。]]></string>
+    <string name="app_changelog">应用更新日志</string>
+    <string name="translators"/>
+    <string name="app_version">应用版本</string>
+    <string name="app_source_code">源代码</string>
+    <string name="donation">捐赠</string>
+    <string name="app_translators">翻译者</string>
+    <string name="support_thread">支持主题</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">未授予写入外置存储权限，此功能无法正常工作。</string>
+    <string name="no_root_access">没有 ROOT 权限，功能受限</string>
+    <string name="no_thanks">不，谢谢</string>
+    <string name="update_title">%1$s 更新！</string>
+    <string name="update_msg">%1$s 可更新到 v%2$s！\n更新日志：\n%3$s</string>
+    <string name="repo_install_title">安装 %1$s</string>
+    <string name="repo_install_msg">你想要安装 %1$s 吗？</string>
+    <string name="download_install">下载并安装</string>
+    <string name="download_file_error">下载文件时出错</string>
+    <string name="install_error">安装出错！</string>
+    <string name="manual_install_1">Zip 文件已保存至 %1$s</string>
+    <string name="manual_install_2">请在 Recovery 中手动刷入</string>
+    <string name="invalid_zip">此 zip 文件不是 Magisk 模块！！</string>
+    <string name="reboot_title">安装成功！</string>
+    <string name="reboot_msg">你想要立即重启吗？</string>
+    <string name="reboot">重启</string>
+    <string name="zip_install_progress_title">正在安装</string>
+    <string name="zip_install_unzip_zip_msg">正在解压 zip 文件 …</string>
+    <string name="zip_install_process_zip_msg">正在处理 zip 文件 …</string>
+    <string name="zip_install_progress_msg">"正在安装 %1$s …"</string>
+    <string name="no_magisk_title">未安装 Magisk！</string>
+    <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>
+
+    <!--URL Templates-->
+    <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=%1$s</string>
+    <string name="file_url" translatable="false">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url" translatable="false">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">常规</string>
+    <string name="settings_theme_title">主题</string>
+    <string name="settings_theme_summary">选择一个主题</string>
+
+    <string name="settings_magiskhide_title">启用 Magisk 隐藏</string>
+    <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
+    <string name="settings_busybox_title">启用 BusyBox</string>
+    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
+    <string name="settings_hosts_title">启用 Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless 支持广告屏蔽应用</string>
+
+    <string name="settings_development_category">开发</string>
+    <string name="settings_developer_logging_title">启用高级调试日志记录</string>
+    <string name="settings_developer_logging_summary">勾选此项以启用更加详细的日志记录。</string>
+    <string name="settings_shell_logging_title">启用 shell 命令调试日志记录</string>
+    <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出的日志记录</string>
+
+    <string name="settings_reboot_toast">重启以应用设置/string>
+
+</resources>
