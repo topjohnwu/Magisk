@@ -20,11 +20,9 @@ public abstract class SafetyNetHelper
         implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private GoogleApiClient mGoogleApiClient;
-    protected Context mContext;
 
     public SafetyNetHelper(Context context) {
-        mContext = context;
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(SafetyNet.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)

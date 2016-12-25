@@ -12,7 +12,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -24,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Shell;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

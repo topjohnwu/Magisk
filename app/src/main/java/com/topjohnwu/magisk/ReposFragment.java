@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.adapters.SimpleSectionedRecyclerViewAdapter;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.ModuleHelper;
 
@@ -29,7 +30,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ReposFragment extends Fragment {
+public class ReposFragment extends Fragment implements CallbackHandler.EventListener {
+
+    public static final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
 
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyTv;
@@ -44,8 +47,6 @@ public class ReposFragment extends Fragment {
 
     private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
 
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
-    private SharedPreferences prefs;
     private SearchView.OnQueryTextListener searchListener;
 
     @Nullable
@@ -57,34 +58,22 @@ public class ReposFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mSectionedAdapter = new
-                SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section, R.id.section_text, new ReposAdapter(fUpdateRepos, fInstalledRepos, fOthersRepos));
+                SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section,
+                R.id.section_text, new ReposAdapter(fUpdateRepos, fInstalledRepos, fOthersRepos));
 
         recyclerView.setAdapter(mSectionedAdapter);
 
         mSwipeRefreshLayout.setRefreshing(true);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            prefs.edit().putBoolean("repo_done", false).apply();
             new Async.LoadRepos(getActivity()).exec();
         });
 
-        if (prefs.getBoolean("repo_done", false)) {
+        if (repoLoadDone.isTriggered) {
             reloadRepos();
             updateUI();
         }
-
-        listener = (pref, s) -> {
-            if (s.equals("repo_done")) {
-                if (pref.getBoolean(s, false)) {
-                    Logger.dev("ReposFragment: UI refresh triggered");
-                    reloadRepos();
-                    updateUI();
-                }
-            }
-        };
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
@@ -103,6 +92,13 @@ public class ReposFragment extends Fragment {
     }
 
     @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        Logger.dev("ReposFragment: UI refresh triggered");
+        reloadRepos();
+        updateUI();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_repo, menu);
         SearchView search = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.repo_search));
@@ -113,14 +109,14 @@ public class ReposFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
-        prefs.registerOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.register(repoLoadDone, this);
         getActivity().setTitle(R.string.downloads);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.unRegister(repoLoadDone, this);
     }
 
     private void reloadRepos() {

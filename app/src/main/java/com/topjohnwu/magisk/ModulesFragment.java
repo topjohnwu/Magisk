@@ -19,6 +19,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.ModuleHelper;
 
@@ -28,7 +29,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ModulesFragment extends Fragment {
+public class ModulesFragment extends Fragment implements CallbackHandler.EventListener {
+
+    public static final CallbackHandler.Event moduleLoadDone = new CallbackHandler.Event();
+
     private static final int FETCH_ZIP_CODE = 2;
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -36,10 +40,8 @@ public class ModulesFragment extends Fragment {
     @BindView(R.id.empty_rv) TextView emptyTv;
     @BindView(R.id.fab) FloatingActionButton fabio;
 
-    private SharedPreferences prefs;
     private List<Module> listModules = new ArrayList<>();
     private View mView;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Nullable
     @Override
@@ -53,28 +55,22 @@ public class ModulesFragment extends Fragment {
             startActivityForResult(intent, FETCH_ZIP_CODE);
         });
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            prefs.edit().putBoolean("module_done", false).apply();
-            new Async.LoadModules(prefs).exec();
+            new Async.LoadModules().exec();
         });
 
-        if (prefs.getBoolean("module_done", false)) {
+        if (moduleLoadDone.isTriggered) {
             updateUI();
         }
 
-        listener = (pref, s) -> {
-            if (s.equals("module_done")) {
-                if (pref.getBoolean(s, false)) {
-                    Logger.dev("ModulesFragment: UI refresh triggered");
-                    updateUI();
-                }
-            }
-        };
-
         return mView;
+    }
+
+    @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        Logger.dev("ModulesFragment: UI refresh triggered");
+        updateUI();
     }
 
     @Override
@@ -91,14 +87,14 @@ public class ModulesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mView = this.getView();
-        prefs.registerOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.register(moduleLoadDone, this);
         getActivity().setTitle(R.string.modules);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.unRegister(moduleLoadDone, this);
     }
 
     private void updateUI() {
@@ -113,5 +109,4 @@ public class ModulesFragment extends Fragment {
         }
         mSwipeRefreshLayout.setRefreshing(false);
     }
-
 }

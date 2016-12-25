@@ -2,14 +2,10 @@ package com.topjohnwu.magisk;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -19,28 +15,25 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ZipUtils;
 
-import java.io.File;
 import java.util.List;
 
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StatusFragment extends Fragment {
+public class StatusFragment extends Fragment implements CallbackHandler.EventListener {
 
-    public static int remoteAppVersionCode = -1;
     public static double magiskVersion, remoteMagiskVersion = -1;
-    public static String magiskVersionString, magiskLink, magiskChangelog, appLink, appChangelog, remoteAppVersion;
+    public static String magiskVersionString, magiskLink, magiskChangelog;
+    public static int SNCheckResult = -1;
 
-    private static int lastSNCheckResult = -1;
+    public static final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
+    public static final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -69,16 +62,13 @@ public class StatusFragment extends Fragment {
 
     private AlertDialog.Builder builder;
 
-    private SharedPreferences prefs;
-    private SharedPreferences.OnSharedPreferenceChangeListener listener;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.status_fragment, container, false);
         ButterKnife.bind(this, v);
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         String theme = prefs.getString("theme", "");
         if (theme.equals("Dark")) {
@@ -88,34 +78,26 @@ public class StatusFragment extends Fragment {
         }
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            prefs.edit().putBoolean("update_check_done", false).apply();
-
             magiskStatusContainer.setBackgroundColor(trans);
             magiskStatusIcon.setImageResource(0);
             magiskUpdateText.setText(R.string.checking_for_updates);
             magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
 
-            new Async.CheckUpdates(prefs).exec();
-            checkSafetyNet();
+            safetyNetProgress.setVisibility(View.VISIBLE);
+            safetyNetContainer.setBackgroundColor(trans);
+            safetyNetIcon.setImageResource(0);
+            safetyNetStatusText.setText(R.string.checking_safetyNet_status);
+
+            updateUI();
+            new Async.CheckUpdates().exec();
+            Async.checkSafetyNet(getActivity());
         });
 
-        listener = (pref, s) -> {
-            if (s.equals("update_check_done")) {
-                if (pref.getBoolean(s, false)) {
-                    Logger.dev("StatusFragment: UI refresh triggered");
-                    updateUI();
-                    updateCheckUI();
-                }
-            }
-        };
-
         updateUI();
-        if (prefs.getBoolean("update_check_done", false)) {
+        if (updateCheckDone.isTriggered) {
             updateCheckUI();
         }
-        if (lastSNCheckResult == -1) {
-            checkSafetyNet();
-        } else {
+        if (safetyNetDone.isTriggered) {
             updateSafetyNetUI();
         }
 
@@ -140,16 +122,29 @@ public class StatusFragment extends Fragment {
     }
 
     @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        if (event == updateCheckDone) {
+            Logger.dev("StatusFragment: Update Check UI refresh triggered");
+            updateCheckUI();
+        } else if (event == safetyNetDone) {
+            Logger.dev("StatusFragment: SafetyNet UI refresh triggered");
+            updateSafetyNetUI();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        prefs.registerOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.register(updateCheckDone, this);
+        CallbackHandler.register(safetyNetDone, this);
         getActivity().setTitle(R.string.status);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        CallbackHandler.unRegister(updateCheckDone, this);
+        CallbackHandler.unRegister(safetyNetDone, this);
     }
 
     private void updateUI() {
@@ -227,7 +222,7 @@ public class StatusFragment extends Fragment {
     private void updateSafetyNetUI() {
         int image, color;
         safetyNetProgress.setVisibility(View.GONE);
-        switch (lastSNCheckResult) {
+        switch (SNCheckResult) {
             case -1:
                 color = colorNeutral;
                 image = R.drawable.ic_help;
@@ -248,20 +243,6 @@ public class StatusFragment extends Fragment {
         safetyNetContainer.setBackgroundColor(color);
         safetyNetStatusText.setTextColor(color);
         safetyNetIcon.setImageResource(image);
-    }
-
-    private void checkSafetyNet() {
-        safetyNetProgress.setVisibility(View.VISIBLE);
-        safetyNetContainer.setBackgroundColor(trans);
-        safetyNetIcon.setImageResource(0);
-        safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-        new SafetyNetHelper(getActivity()) {
-            @Override
-            public void handleResults(int i) {
-                lastSNCheckResult = i;
-                updateSafetyNetUI();
-            }
-        }.requestTest();
     }
 }
 

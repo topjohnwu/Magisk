@@ -12,7 +12,9 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.StatusFragment;
 
 import org.json.JSONException;
@@ -48,12 +50,6 @@ public class Async {
 
     public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
-        private SharedPreferences mPrefs;
-
-        public CheckUpdates(SharedPreferences prefs) {
-            mPrefs = prefs;
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             String jsonStr = WebRequest.makeWebServiceCall(UPDATE_JSON, WebRequest.GET);
@@ -61,36 +57,32 @@ public class Async {
                 JSONObject json = new JSONObject(jsonStr);
 
                 JSONObject magisk = json.getJSONObject("magisk");
-                JSONObject app = json.getJSONObject("app");
 
                 StatusFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
                 StatusFragment.magiskLink = magisk.getString("link");
                 StatusFragment.magiskChangelog = magisk.getString("changelog");
 
-                StatusFragment.remoteAppVersion = app.getString("version");
-                StatusFragment.remoteAppVersionCode = app.getInt("versionCode");
-                StatusFragment.appLink = app.getString("link");
-                StatusFragment.appChangelog = app.getString("changelog");
-
-            } catch (JSONException ignored) {
-                Logger.dev("JSON error!");
-            }
+            } catch (JSONException ignored) {}
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            mPrefs.edit().putBoolean("update_check_done", true).apply();
+            CallbackHandler.triggerCallback(StatusFragment.updateCheckDone);
         }
     }
 
+    public static void checkSafetyNet(Context context) {
+        new SafetyNetHelper(context) {
+            @Override
+            public void handleResults(int i) {
+                StatusFragment.SNCheckResult = i;
+                CallbackHandler.triggerCallback(StatusFragment.safetyNetDone);
+            }
+        }.requestTest();
+    }
+
     public static class LoadModules extends RootTask<Void, Void, Void> {
-
-        private SharedPreferences mPrefs;
-
-        public LoadModules(SharedPreferences prefs) {
-            mPrefs = prefs;
-        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -100,7 +92,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            mPrefs.edit().putBoolean("module_done", true).apply();
+            CallbackHandler.triggerCallback(ModulesFragment.moduleLoadDone);
         }
     }
 
@@ -120,8 +112,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                    .putBoolean("repo_done", true).apply();
+            CallbackHandler.triggerCallback(ReposFragment.repoLoadDone);
         }
     }
 
@@ -266,7 +257,7 @@ public class Async {
         protected void done() {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             prefs.edit().putBoolean("module_done", false).putBoolean("update_check_done", true).apply();
-            new LoadModules(prefs).exec();
+            new LoadModules().exec();
 
             AlertDialog.Builder builder;
             String theme = prefs.getString("theme", "");
