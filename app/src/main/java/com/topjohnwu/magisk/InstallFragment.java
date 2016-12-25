@@ -1,10 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,22 +11,21 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.magisk.utils.CallbackHandler;
 
-import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class InstallFragment extends Fragment {
+public class InstallFragment extends Fragment implements CallbackHandler.EventListener {
 
-    private List<String> blockList;
+    public static final CallbackHandler.Event blockDetectionDone = new CallbackHandler.Event();
 
+    public static List<String> blockList;
+    public static String bootBlock = null;
+
+    @BindView(R.id.install_title) TextView installTitle;
     @BindView(R.id.block_spinner) Spinner spinner;
     @BindView(R.id.detect_bootimage) Button detectButton;
 
@@ -37,56 +34,46 @@ public class InstallFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.install_fragment, container, false);
         ButterKnife.bind(this, v);
-        detectButton.setOnClickListener(v1 -> detectBootImage());
-
-        getBlockList();
-
+        detectButton.setOnClickListener(v1 -> toAutoDetect());
+        installTitle.setText(getString(R.string.install_magisk_title, StatusFragment.remoteMagiskVersion));
+        if (blockDetectionDone.isTriggered) {
+            updateUI();
+        }
         return v;
     }
 
-    private void getBlockList() {
-        new Async.RootTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                blockList = Utils.getBlockList();
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, blockList);
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-                detectBootImage();
-            }
-        }.exec();
+    @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        updateUI();
     }
 
-    private void detectBootImage() {
-        new Async.RootTask<Void, Void, Void>() {
-            String boot;
-            @Override
-            protected Void doInBackground(Void... params) {
-                boot = Utils.detectBootImage();
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                if (boot != null) {
-                    int idx = blockList.indexOf(boot);
-                    if (idx != -1) {
-                        spinner.setSelection(idx);
-                    }
-                }
-            }
-        }.exec();
+    private void updateUI() {
+        blockList.add(0, getString(R.string.auto_detect, bootBlock));
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_item, blockList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        toAutoDetect();
+    }
+
+    private void toAutoDetect() {
+        if (bootBlock != null) {
+            spinner.setSelection(0);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle(R.string.install);
+        CallbackHandler.register(blockDetectionDone, this);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        CallbackHandler.unRegister(blockDetectionDone, this);
+    }
 }
 
 //    private AlertDialog.OnClickListener flashMagisk = (dialogInterface, i) -> Utils.dlAndReceive(

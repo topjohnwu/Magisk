@@ -19,7 +19,7 @@
     <string name="magisk_version_error">Magisk not installed</string>
 
     <string name="checking_for_updates">Checking for updates…</string>
-    <string name="magisk_update_available">Magisk v%1$s available!</string>
+    <string name="magisk_update_available">Magisk v%1$.1f available!</string>
     <string name="cannot_check_updates">Cannot check for updates, no Internet?</string>
     <string name="up_to_date">Latest version of %1$s installed</string>
     <string name="root_error">Rooted but no root permission, not allowed?</string>
@@ -117,5 +117,13 @@
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
 
     <string name="settings_reboot_toast">Reboot to apply settings</string>
+
+    <string name="auto_detect">"(Auto Detect) %1$s"</string>
+    <string name="boot_image_title">Boot Image Location</string>
+    <string name="detect_button">Detect</string>
+    <string name="advanced_settings_title">Advanced Settings</string>
+    <string name="keep_force_encryption">Keep force encryption</string>
+    <string name="keep_dm_verity">Keep dm-verity</string>
+    <string name="install_magisk_title">Install Magisk Version: v%1$.1f</string>
 
 </resources>

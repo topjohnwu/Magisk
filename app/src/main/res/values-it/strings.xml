@@ -13,8 +13,7 @@
     <string name="magisk_version">Versione Magisk: v%1$s</string>
     <string name="magisk_version_error">Hai installato Magisk?</string>
 
-    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
-    <string name="magisk_update_available">Magisk v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
     <string name="up_to_date">L\'ultima versione di %1$s è installata</string>
 
@@ -61,8 +60,6 @@
     <string name="permissionNotGranted">Questa funzione non funziona senza il permesso di scrivere sulla memoria di archiviazione esterna</string>
     <string name="no_root_access">Accesso Root non trovato, funzionalità limitate</string>
     <string name="no_thanks">No grazie</string>
-    <string name="update_title">%1$s Update!</string>
-    <string name="update_msg">Nuova versione di v%2$s di %1$s è disponibile! \nChangelog:\n%3$s</string>
     <string name="repo_install_title">Installazione %1$s</string>
     <string name="repo_install_msg">Vuoi installare %1$s ?</string>
     <string name="download_install">Scarica e installa</string>

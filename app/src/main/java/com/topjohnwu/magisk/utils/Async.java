@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.InstallFragment;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
@@ -292,5 +293,21 @@ public class Async {
             exec(false, packageName);
         }
 
+    }
+
+    public static class GetBootBlocks extends RootTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            InstallFragment.blockList = Shell.su("ls /dev/block | grep mmc");
+            if (InstallFragment.bootBlock == null) {
+                InstallFragment.bootBlock = Utils.detectBootImage();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            InstallFragment.blockDetectionDone.trigger();
+        }
     }
 }

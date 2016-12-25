@@ -138,10 +138,6 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("*", "");
     }
 
-    public static List<String> getBlockList() {
-        return Shell.su("ls /dev/block | grep mmc");
-    }
-
     public static String detectBootImage() {
         String[] commands = {
                 "for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",

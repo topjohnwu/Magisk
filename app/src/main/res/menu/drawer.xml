@@ -13,7 +13,8 @@
         <item
             android:id="@+id/install"
             android:icon="@drawable/magisk"
-            android:title="@string/install"/>
+            android:title="@string/install"
+            android:visible="false"/>
 
         <item
             android:id="@+id/modules"

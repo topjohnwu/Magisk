@@ -62,6 +62,10 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
 
     private AlertDialog.Builder builder;
 
+    static {
+        checkMagiskInfo();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -147,13 +151,10 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         CallbackHandler.unRegister(safetyNetDone, this);
     }
 
-    private void updateUI() {
-        int image, color;
-
+    private static void checkMagiskInfo() {
         List<String> ret = Shell.sh("getprop magisk.version");
         if (ret.get(0).length() == 0) {
             magiskVersion = -1;
-            magiskVersionText.setText(R.string.magisk_version_error);
         } else {
             try {
                 magiskVersionString = ret.get(0);
@@ -162,6 +163,17 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 // Custom version don't need to receive updates
                 magiskVersion = Double.POSITIVE_INFINITY;
             }
+        }
+    }
+
+    private void updateUI() {
+        int image, color;
+
+        checkMagiskInfo();
+
+        if (magiskVersion < 0) {
+            magiskVersionText.setText(R.string.magisk_version_error);
+        } else {
             magiskVersionText.setText(getString(R.string.magisk_version, magiskVersionString));
         }
 
@@ -199,7 +211,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         } else if (remoteMagiskVersion > magiskVersion) {
             color = colorInfo;
             image = R.drawable.ic_update;
-            magiskUpdateText.setText(getString(R.string.magisk_update_available, String.valueOf(remoteMagiskVersion)));
+            magiskUpdateText.setText(getString(R.string.magisk_update_available, remoteMagiskVersion));
         } else {
             color = colorOK;
             image = R.drawable.ic_check_circle;

@@ -4,10 +4,12 @@ import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -22,16 +24,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, CallbackHandler.EventListener {
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
     private final Handler mDrawerHandler = new Handler();
+    private SharedPreferences prefs;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
@@ -43,7 +48,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
-        String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        String theme = prefs.getString("theme", "");
         Logger.dev("MainActivity: Theme is " + theme);
         if (theme.equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
@@ -85,12 +92,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        if (StatusFragment.updateCheckDone.isTriggered) {
+            onTrigger(StatusFragment.updateCheckDone);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        CallbackHandler.register(StatusFragment.updateCheckDone, this);
         checkHideSection();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
     }
 
     @Override
@@ -117,17 +135,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        Menu menu = navigationView.getMenu();
+        if (StatusFragment.remoteMagiskVersion < 0) {
+            menu.findItem(R.id.install).setVisible(false);
+        } else {
+            menu.findItem(R.id.install).setVisible(true);
+        }
+    }
+
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (StatusFragment.magiskVersion == -1) {
+        if (StatusFragment.magiskVersion < 0) {
             menu.findItem(R.id.magiskhide).setVisible(false);
             menu.findItem(R.id.modules).setVisible(false);
             menu.findItem(R.id.downloads).setVisible(false);
         } else {
             menu.findItem(R.id.modules).setVisible(true);
             menu.findItem(R.id.downloads).setVisible(true);
-            menu.findItem(R.id.magiskhide).setVisible(
-                    PreferenceManager.getDefaultSharedPreferences(this).getBoolean("magiskhide", false));
+            menu.findItem(R.id.magiskhide).setVisible(prefs.getBoolean("magiskhide", false));
         }
     }
 

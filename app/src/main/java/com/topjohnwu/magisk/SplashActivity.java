@@ -31,6 +31,8 @@ public class SplashActivity extends AppCompatActivity {
                 .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
                 .apply();
 
+        // Start all async tasks
+        new Async.GetBootBlocks().exec();
         new Async.CheckUpdates().exec();
         Async.checkSafetyNet(getApplicationContext());
         new Async.LoadModules() {
@@ -38,12 +40,12 @@ public class SplashActivity extends AppCompatActivity {
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);
                 new Async.LoadRepos(getApplicationContext()).exec();
-                // Start main activity
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
             }
         }.exec();
 
+        // Start main activity
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

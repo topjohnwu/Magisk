@@ -13,8 +13,7 @@
     <string name="magisk_version">Geïnstalleerde Magisk: v%1$s</string>
     <string name="magisk_version_error">Heb jij Magisk wel geïnstalleerd?</string>
 
-    <string name="app_update_available">Magisk Manager App v%1$s update!</string>
-    <string name="magisk_update_available">Magisk v%1$s update!</string>
+    <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Kan niet controleren op updates.</string>
     <string name="up_to_date">Nieuwste versie van %1$s geïnstalleerd</string>
 
@@ -61,8 +60,6 @@
     <string name="permissionNotGranted">Deze feature zal niet werken zonder permissie om op de externe opslag te schrijven.</string>
     <string name="no_root_access">Geen root, functionaliteit beperkt</string>
     <string name="no_thanks">Nee bedankt</string>
-    <string name="update_title">%1$s Update!</string>
-    <string name="update_msg">Nieuwe versie v%2$s van %1$s is beschikbaar!\nChangelog:\n%3$s</string>
     <string name="repo_install_title">Installeer %1$s</string>
     <string name="repo_install_msg">Wilt u  %1$s installeren?</string>
     <string name="download_install">Downloaden en installeren</string>
