@@ -23,8 +23,7 @@ public class CallbackHandler {
         }
     }
 
-    public static void triggerCallback(Event event) {
-        event.isTriggered = true;
+    private static void triggerCallback(Event event) {
         HashSet<EventListener> list = listeners.get(event);
         if (list != null) {
             for (EventListener listener : list) {
@@ -35,6 +34,10 @@ public class CallbackHandler {
 
     public static class Event {
         public boolean isTriggered = false;
+        public void trigger() {
+            isTriggered = true;
+            triggerCallback(this);
+        }
     }
 
     public interface EventListener {

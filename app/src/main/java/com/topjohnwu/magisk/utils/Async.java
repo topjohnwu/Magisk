@@ -68,7 +68,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            CallbackHandler.triggerCallback(StatusFragment.updateCheckDone);
+            StatusFragment.updateCheckDone.trigger();
         }
     }
 
@@ -77,7 +77,7 @@ public class Async {
             @Override
             public void handleResults(int i) {
                 StatusFragment.SNCheckResult = i;
-                CallbackHandler.triggerCallback(StatusFragment.safetyNetDone);
+                StatusFragment.safetyNetDone.trigger();
             }
         }.requestTest();
     }
@@ -92,7 +92,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            CallbackHandler.triggerCallback(ModulesFragment.moduleLoadDone);
+            ModulesFragment.moduleLoadDone.trigger();
         }
     }
 
@@ -112,7 +112,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            CallbackHandler.triggerCallback(ReposFragment.repoLoadDone);
+            ReposFragment.repoLoadDone.trigger();
         }
     }
 
