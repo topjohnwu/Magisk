@@ -67,7 +67,7 @@ public class Utils {
         return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
     }
 
-    static List<String> getModList(String path) {
+    public static List<String> getModList(String path) {
         List<String> ret;
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
         if (Shell.rootAccess()) {
@@ -136,6 +136,25 @@ public class Utils {
         return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
                 .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
                 .replace("#", "").replace("@", "").replace("*", "");
+    }
+
+    public static List<String> getBlockList() {
+        return Shell.su("ls /dev/block | grep mmc");
+    }
+
+    public static String detectBootImage() {
+        String[] commands = {
+                "for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",
+                "BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION`",
+                "if [ ! -z \"$BOOTIMAGE\" ]; then break; fi",
+                "done",
+                "echo \"${BOOTIMAGE##*/}\""
+        };
+        List<String> ret = Shell.su(commands);
+        if (!ret.isEmpty()) {
+            return ret.get(0);
+        }
+        return null;
     }
 
     public static class ByteArrayInOutStream extends ByteArrayOutputStream {
