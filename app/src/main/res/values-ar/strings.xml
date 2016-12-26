@@ -1,0 +1,111 @@
+<resources>
+    <!--Universal-->
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">فتح درج التنقل</string>
+    <string name="navigation_drawer_close">إغلاق درج التنقل</string>
+    <string name="magiskhide">Magisk إخفاء</string>
+    <string name="modules">الإضافات</string>
+    <string name="downloads">التنزيلات</string>
+    <string name="log">السجل</string>
+    <string name="settings">الإعدادات</string>
+
+    <!--Magisk Fragment-->
+    <string name="magisk_version">المثبت Magisk v%1$s</string>
+    <string name="magisk_version_error">هل قمت بتثبيت Magisk؟</string>
+
+    <string name="app_update_available">مدير تطبيق Magisk v%1$s تحديث!</string>
+    <string name="magisk_update_available">Magisk v%1$s تحديث!</string>
+    <string name="cannot_check_updates">لا يمكن التحقق من التحديثات</string>
+    <string name="up_to_date">أحدث إصدار من %1$s مثبت</string>
+
+    <!--Root Fragment-->
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(لم يتم توفير أي معلومات)</string>
+    <string name="no_modules_found">لم يعثر على الإضافات</string>
+    <string name="update_file_created">سيتم تحديث الإضافة في إعادة التشغيل التالي</string>
+    <string name="remove_file_created">سيتم حذف الإضافة في إعادة التشغيل التالي</string>
+    <string name="remove_file_deleted">لن يتم حذف الإضافة في إعادة التشغيل التالي</string>
+    <string name="disable_file_created">سيتم تعطيل الإضافة في إعادة التشغيل التالي</string>
+    <string name="disable_file_removed">سيتم تمكين الإضافة في إعادة التشغيل التالي</string>
+    <string name="author">إنشئ بواسطة %1$s</string>
+    <string name="fab_flash_zip">تثبيت الملف المضغوط للإضافة</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">يتوفر تحديث</string>
+    <string name="installed">مثبت</string>
+    <string name="not_installed">غير مثبت</string>
+    <string name="changelog">التغييرات</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">حفظ إلى بطاقة ذاكرة SD</string>
+    <string name="menuSend">إرسال</string>
+    <string name="menuReload">إعادة تحميل</string>
+    <string name="menuClearLog">حذف السجل الآن</string>
+    <string name="logs_cleared">تم حذف السجل بنجاح</string>
+    <string name="log_is_empty">السجل فارغ</string>
+    <string name="logs_save_failed">لا يمكن كتابة السجل على بطاقة ذاكرة SD:</string>
+
+    <!--About Activity-->
+    <string name="about">حول</string>
+    <string name="app_developers">المطورين الرئيسيين</string>
+    <string name="app_developers_"><![CDATA[التطبيق إنشئ بواسطة <a href="https://github.com/topjohnwu">topjohnwu</a> بالتعاون مع <a href="https://github.com/d8ahazard">Digitalhigh</a> و <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">تغييرات التطبيق</string>
+    <string name="translators"/>
+    <string name="app_version">إصدار التطبيق</string>
+    <string name="app_source_code">الشفرة المصدرية</string>
+    <string name="donation">التبرع</string>
+    <string name="app_translators">مترجم التطبيق</string>
+    <string name="support_thread">منتدى الدعم</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
+    <string name="no_root_access">لا يوجد أذونات الروت، الوظائف محدودة</string>
+    <string name="no_thanks">لا شكراً</string>
+    <string name="update_title">%1$s محدث!</string>
+    <string name="update_msg">النسخة الجديدة v%2$s من %1$s متوفرة\nسجل التغييرات:\n%3$s</string>
+    <string name="repo_install_title">تثبيت %1$s</string>
+    <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
+    <string name="download_install">تنزيل وتثبيت</string>
+    <string name="download_file_error">خطأ تنزيل الملف</string>
+    <string name="install_error">خطأ في التثبيت!</string>
+    <string name="manual_install_1">الملف المضغوط وضع في %1$s</string>
+    <string name="manual_install_2">التثبيت في الإسترداد يدوياً</string>
+    <string name="invalid_zip">الملف المضغوط ليس إضافة Magisk!!</string>
+    <string name="reboot_title">التثبيت نجح!</string>
+    <string name="reboot_msg">هل تريد إعادة التشغيل الآن؟</string>
+    <string name="reboot">إعادة التشغيل</string>
+    <string name="zip_install_progress_title">تثبيت</string>
+    <string name="zip_install_unzip_zip_msg">فك الضغط عن الملف المضغوط …</string>
+    <string name="zip_install_process_zip_msg">معالجة الملف المضغوط …</string>
+    <string name="zip_install_progress_msg">"تثبيت %1$s …"</string>
+    <string name="no_magisk_title">لا يوجد Magisk مثبت!</string>
+    <string name="no_magisk_msg">هل ترغب في تنزيل وتثبيت Magisk؟</string>
+
+    <!--URL Templates-->
+    <string name="url_main">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=</string>
+    <string name="file_url">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
+    <string name="zip_url">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">عام</string>
+    <string name="settings_theme_title">السمة</string>
+    <string name="settings_theme_summary">أختر سمة</string>
+
+    <string name="settings_magiskhide_title">تمكين إخفاء Magisk</string>
+    <string name="settings_magiskhide_summary">إخفاء Magisk من مختلف حالات الإكتشاف</string>
+    <string name="settings_busybox_title">تمكين BusyBox</string>
+    <string name="settings_busybox_summary">ربط تحميل Magisk\'s المدمج في busybox إلى xbin</string>
+    <string name="settings_hosts_title">تمكين المضيفين(الهوست) لـ systemless</string>
+    <string name="settings_hosts_summary">Systemless يدعم تطبيقات حجب الإعلانات</string>
+
+    <string name="settings_development_category">التطوير</string>
+    <string name="settings_developer_logging_title">تمكين تصحيح السجلات المتقدمة</string>
+    <string name="settings_developer_logging_summary">حدد هذا الخيار لتمكين سجل مطول أكثر.</string>
+    <string name="settings_shell_logging_title">تمكين سجل تصحيح الأوامر الدفعية</string>
+    <string name="settings_shell_logging_summary">حدد هذا الخيار لتمكين سجل جميع الأوامر الدفعية والمخرجات</string>
+
+    <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
+
+</resources>
