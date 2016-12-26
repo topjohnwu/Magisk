@@ -11,7 +11,7 @@ import java.io.OutputStream;
 
 public class RepoDlReceiver extends DownloadReceiver {
     @Override
-    public void task(Uri uri) {
+    public void onDownloadDone(Uri uri) {
         // Flash the zip
         new Async.FlashZIP(mContext, uri, mFilename){
             @Override

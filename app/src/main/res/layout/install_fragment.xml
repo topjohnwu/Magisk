@@ -133,7 +133,6 @@
                     android:layout_marginEnd="25dp"
                     android:layout_marginStart="25dp" />
 
-
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -151,7 +150,6 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:clickable="true">
 
-
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -160,7 +158,6 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="25dp"
                 android:layout_marginStart="25dp">
-
 
                 <ImageView
                     android:layout_width="50dp"
@@ -173,10 +170,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Magiskify"
+                    android:text="@string/magiskify"
                     android:ems="10"
                     android:gravity="center"
-                    android:id="@+id/editText"
                     android:layout_weight="1"
                     android:textStyle="bold"
                     android:textColor="@android:color/black"

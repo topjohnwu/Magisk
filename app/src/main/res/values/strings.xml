@@ -31,7 +31,15 @@
     <string name="safetyNet_pass">SafetyNet Passed</string>
     <string name="root_info_warning">Functionality greatly limited</string>
 
-    <!--Root Fragment-->
+    <!--Install Fragment-->
+    <string name="auto_detect">"(Auto) %1$s"</string>
+    <string name="boot_image_title">Boot Image Location</string>
+    <string name="detect_button">Detect</string>
+    <string name="advanced_settings_title">Advanced Settings</string>
+    <string name="keep_force_encryption">Keep force encryption</string>
+    <string name="keep_dm_verity">Keep dm-verity</string>
+    <string name="install_magisk_title">Install Magisk Version: v%1$.1f</string>
+    <string name="magiskify">Magiskify</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
@@ -86,6 +94,7 @@
     <string name="reboot_title">Installation succeeded!</string>
     <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
+    <string name="copying_msg">Copying zip to temp directory</string>
     <string name="zip_install_progress_title">Installing</string>
     <string name="zip_install_unzip_zip_msg">Unzipping zip file …</string>
     <string name="zip_install_process_zip_msg">Processing zip file …</string>
@@ -117,13 +126,5 @@
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
 
     <string name="settings_reboot_toast">Reboot to apply settings</string>
-
-    <string name="auto_detect">"(Auto) %1$s"</string>
-    <string name="boot_image_title">Boot Image Location</string>
-    <string name="detect_button">Detect</string>
-    <string name="advanced_settings_title">Advanced Settings</string>
-    <string name="keep_force_encryption">Keep force encryption</string>
-    <string name="keep_dm_verity">Keep dm-verity</string>
-    <string name="install_magisk_title">Install Magisk Version: v%1$.1f</string>
 
 </resources>

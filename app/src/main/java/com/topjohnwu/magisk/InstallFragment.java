@@ -3,16 +3,21 @@ package com.topjohnwu.magisk;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
 import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -28,6 +33,9 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     @BindView(R.id.install_title) TextView installTitle;
     @BindView(R.id.block_spinner) Spinner spinner;
     @BindView(R.id.detect_bootimage) Button detectButton;
+    @BindView(R.id.flash_button) CardView flashButton;
+    @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
+    @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
 
     @Nullable
     @Override
@@ -36,6 +44,17 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
         installTitle.setText(getString(R.string.install_magisk_title, StatusFragment.remoteMagiskVersion));
+        flashButton.setOnClickListener(v1 -> {
+            String bootImage = bootBlock;
+            if (bootImage == null) {
+                bootImage = blockList.get(spinner.getSelectedItemPosition() - 1);
+            }
+            Utils.dlAndReceive(
+                    getActivity(),
+                    new MagiskDlReceiver(bootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
+                    StatusFragment.magiskLink,
+                    "Magisk-v" + String.valueOf(StatusFragment.remoteMagiskVersion) + ".zip");
+        });
         if (blockDetectionDone.isTriggered) {
             updateUI();
         }
@@ -48,9 +67,10 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void updateUI() {
-        blockList.add(0, getString(R.string.auto_detect, bootBlock));
+        List<String> items = new ArrayList<>(blockList);
+        items.add(0, getString(R.string.auto_detect, bootBlock));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                android.R.layout.simple_spinner_item, blockList);
+                android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         toAutoDetect();
@@ -75,36 +95,3 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         CallbackHandler.unRegister(blockDetectionDone, this);
     }
 }
-
-//    private AlertDialog.OnClickListener flashMagisk = (dialogInterface, i) -> Utils.dlAndReceive(
-//            getActivity(),
-//            new DownloadReceiver() {
-//                @Override
-//                public void task(Uri uri) {
-//                    new Async.FlashZIP(mContext, uri, mFilename) {
-//                        @Override
-//                        protected boolean unzipAndCheck() {
-//                            publishProgress(mContext.getString(R.string.zip_install_unzip_zip_msg));
-//                            if (Shell.rootAccess()) {
-//                                // We might not have busybox yet, unzip with Java
-//                                // We will have complete busybox after Magisk installation
-//                                ZipUtils.unzip(mCachedFile, new File(mCachedFile.getParent(), "magisk"));
-//                                Shell.su(
-//                                        "mkdir -p " + Async.TMP_FOLDER_PATH + "/magisk",
-//                                        "cp -af " + mCachedFile.getParent() + "/magisk/. " + Async.TMP_FOLDER_PATH + "/magisk"
-//                                );
-//                            }
-//                            super.unzipAndCheck();
-//                            return true;
-//                        }
-//
-//                        @Override
-//                        protected void done() {
-//                            Shell.su("setprop magisk.version " + String.valueOf(StatusFragment.remoteMagiskVersion));
-//                            super.done();
-//                        }
-//                    }.exec();
-//                }
-//            },
-//            StatusFragment.magiskLink,
-//            "Magisk-v" + String.valueOf(StatusFragment.remoteMagiskVersion) + ".zip");

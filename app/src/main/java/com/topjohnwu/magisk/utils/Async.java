@@ -62,7 +62,6 @@ public class Async {
                 StatusFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
                 StatusFragment.magiskLink = magisk.getString("link");
                 StatusFragment.magiskChangelog = magisk.getString("changelog");
-
             } catch (JSONException ignored) {}
             return null;
         }
@@ -153,7 +152,8 @@ public class Async {
 
         protected void preProcessing() throws Throwable {}
 
-        private void copyToCache() throws Throwable {
+        protected void copyToCache() throws Throwable {
+            publishProgress(mContext.getString(R.string.copying_msg));
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mCachedFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
@@ -229,7 +229,7 @@ public class Async {
                 }
                 return -1;
             }
-            if (ret != null && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
+            if (Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;
             }
             return -1;
@@ -299,9 +299,11 @@ public class Async {
     public static class GetBootBlocks extends RootTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            InstallFragment.blockList = Shell.su("ls /dev/block | grep mmc");
-            if (InstallFragment.bootBlock == null) {
-                InstallFragment.bootBlock = Utils.detectBootImage();
+            if (Shell.rootAccess()) {
+                InstallFragment.blockList = Shell.su("ls /dev/block | grep mmc");
+                if (InstallFragment.bootBlock == null) {
+                    InstallFragment.bootBlock = Utils.detectBootImage();
+                }
             }
             return null;
         }
