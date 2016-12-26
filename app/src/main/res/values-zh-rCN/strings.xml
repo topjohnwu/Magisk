@@ -1,7 +1,5 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -16,7 +14,6 @@
     <string name="magisk_version">已安装 Magisk v%1$s</string>
     <string name="magisk_version_error">你是否已安装 Magisk？</string>
 
-    <string name="app_update_available">Magisk 管理器可更新到 v%1$s！</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="cannot_check_updates">无法检查更新</string>
     <string name="up_to_date">已安装最新版本的 %1$s</string>
@@ -65,8 +62,6 @@
     <string name="permissionNotGranted">未授予写入外置存储权限，此功能无法正常工作。</string>
     <string name="no_root_access">没有 ROOT 权限，功能受限</string>
     <string name="no_thanks">不，谢谢</string>
-    <string name="update_title">%1$s 更新！</string>
-    <string name="update_msg">%1$s 可更新到 v%2$s！\n更新日志：\n%3$s</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">你想要安装 %1$s 吗？</string>
     <string name="download_install">下载并安装</string>
@@ -86,9 +81,6 @@
     <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>
 
     <!--URL Templates-->
-    <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=%1$s</string>
-    <string name="file_url" translatable="false">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
-    <string name="zip_url" translatable="false">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -108,6 +100,6 @@
     <string name="settings_shell_logging_title">启用 shell 命令调试日志记录</string>
     <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出的日志记录</string>
 
-    <string name="settings_reboot_toast">重启以应用设置/string>
+    <string name="settings_reboot_toast">重启以应用设置</string>
 
 </resources>

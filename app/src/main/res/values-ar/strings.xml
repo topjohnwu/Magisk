@@ -14,7 +14,6 @@
     <string name="magisk_version">المثبت Magisk v%1$s</string>
     <string name="magisk_version_error">هل قمت بتثبيت Magisk؟</string>
 
-    <string name="app_update_available">مدير تطبيق Magisk v%1$s تحديث!</string>
     <string name="magisk_update_available">Magisk v%1$s تحديث!</string>
     <string name="cannot_check_updates">لا يمكن التحقق من التحديثات</string>
     <string name="up_to_date">أحدث إصدار من %1$s مثبت</string>
@@ -63,8 +62,6 @@
     <string name="permissionNotGranted">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
     <string name="no_root_access">لا يوجد أذونات الروت، الوظائف محدودة</string>
     <string name="no_thanks">لا شكراً</string>
-    <string name="update_title">%1$s محدث!</string>
-    <string name="update_msg">النسخة الجديدة v%2$s من %1$s متوفرة\nسجل التغييرات:\n%3$s</string>
     <string name="repo_install_title">تثبيت %1$s</string>
     <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
     <string name="download_install">تنزيل وتثبيت</string>

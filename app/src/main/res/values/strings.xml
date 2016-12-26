@@ -39,7 +39,7 @@
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="install_magisk_title">Install Magisk Version: v%1$.1f</string>
-    <string name="magiskify">Magiskify</string>
+    <string name="magiskify" translatable="false">Magiskify</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
