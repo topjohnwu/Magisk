@@ -12,7 +12,7 @@
 
         <item
             android:id="@+id/install"
-            android:icon="@drawable/magisk"
+            android:icon="@drawable/ic_magisk"
             android:title="@string/install"
             android:visible="false"/>
 
