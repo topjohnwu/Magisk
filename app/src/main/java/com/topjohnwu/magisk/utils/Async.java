@@ -153,7 +153,7 @@ public class Async {
 
         protected void preProcessing() throws Throwable {}
 
-        protected void copyToCache() throws Throwable {
+        private void copyToCache() throws Throwable {
             try {
                 InputStream in = mContext.getContentResolver().openInputStream(mUri);
                 mCachedFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
@@ -250,14 +250,15 @@ public class Async {
                     Toast.makeText(mContext, mContext.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();
                     break;
                 case 1:
-                    done();
+                    onSuccess();
                     break;
             }
         }
 
-        protected void done() {
+        protected void onSuccess() {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            prefs.edit().putBoolean("module_done", false).putBoolean("update_check_done", true).apply();
+
+            StatusFragment.updateCheckDone.trigger();
             new LoadModules().exec();
 
             AlertDialog.Builder builder;

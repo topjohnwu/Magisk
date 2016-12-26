@@ -118,7 +118,7 @@
 
     <string name="settings_reboot_toast">Reboot to apply settings</string>
 
-    <string name="auto_detect">"(Auto Detect) %1$s"</string>
+    <string name="auto_detect">"(Auto) %1$s"</string>
     <string name="boot_image_title">Boot Image Location</string>
     <string name="detect_button">Detect</string>
     <string name="advanced_settings_title">Advanced Settings</string>
