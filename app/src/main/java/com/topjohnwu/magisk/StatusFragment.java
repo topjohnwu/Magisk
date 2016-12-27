@@ -60,8 +60,6 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @BindColor(R.color.blue500) int colorInfo;
     @BindColor(android.R.color.transparent) int trans;
 
-    private AlertDialog.Builder builder;
-
     static {
         checkMagiskInfo();
     }
@@ -71,15 +69,6 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.status_fragment, container, false);
         ButterKnife.bind(this, v);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        String theme = prefs.getString("theme", "");
-        if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialog_dh);
-        } else {
-            builder = new AlertDialog.Builder(getActivity());
-        }
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             magiskStatusContainer.setBackgroundColor(trans);
@@ -106,7 +95,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         }
 
         if (magiskVersion < 0) {
-            builder
+            MainActivity.alertBuilder
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)

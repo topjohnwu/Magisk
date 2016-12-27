@@ -101,6 +101,7 @@
     <string name="zip_install_progress_msg">"Installing %1$s …"</string>
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
+    <string name="downloading_toast">Downloading %1$s</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=%1$s</string>

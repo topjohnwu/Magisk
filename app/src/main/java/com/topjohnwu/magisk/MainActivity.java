@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -26,12 +27,15 @@ import android.view.View;
 
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CallbackHandler.EventListener {
+
+    public static AlertDialog.Builder alertBuilder = null;
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
@@ -54,6 +58,9 @@ public class MainActivity extends AppCompatActivity
         Logger.dev("MainActivity: Theme is " + theme);
         if (theme.equals("Dark")) {
             setTheme(R.style.AppTheme_dh);
+            alertBuilder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
+        } else {
+            alertBuilder = new AlertDialog.Builder(this);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -109,6 +116,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
+        alertBuilder = null;
     }
 
     @Override
@@ -138,24 +146,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onTrigger(CallbackHandler.Event event) {
         Menu menu = navigationView.getMenu();
-        if (StatusFragment.remoteMagiskVersion < 0) {
-            menu.findItem(R.id.install).setVisible(false);
-        } else {
-            menu.findItem(R.id.install).setVisible(true);
-        }
+        menu.findItem(R.id.install).setVisible(StatusFragment.remoteMagiskVersion > 0 &&
+                Shell.rootAccess());
     }
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (StatusFragment.magiskVersion < 0) {
-            menu.findItem(R.id.magiskhide).setVisible(false);
-            menu.findItem(R.id.modules).setVisible(false);
-            menu.findItem(R.id.downloads).setVisible(false);
-        } else {
-            menu.findItem(R.id.modules).setVisible(true);
-            menu.findItem(R.id.downloads).setVisible(true);
-            menu.findItem(R.id.magiskhide).setVisible(prefs.getBoolean("magiskhide", false));
-        }
+        menu.findItem(R.id.magiskhide).setVisible(StatusFragment.magiskVersion > 0 &&
+                prefs.getBoolean("magiskhide", false) && Shell.rootAccess());
+        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion > 0);
+        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion > 0);
     }
 
     public void navigate(final int itemId) {

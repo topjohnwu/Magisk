@@ -33,6 +33,8 @@ import javax.crypto.spec.DESKeySpec;
 
 public class Utils {
 
+    public static boolean isDownloading = false;
+
     private static final String cryptoPass = "MagiskRox666";
     private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
 
@@ -90,15 +92,24 @@ public class Utils {
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
-        File file = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
+        if (isDownloading) {
+            return;
+        }
+
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
             return;
         }
 
+        File file = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
+
         if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs()) || (file.exists() && !file.delete())) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
+            return;
         }
+
+        Toast.makeText(context, context.getString(R.string.downloading_toast, filename), Toast.LENGTH_LONG).show();
+        isDownloading = true;
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));

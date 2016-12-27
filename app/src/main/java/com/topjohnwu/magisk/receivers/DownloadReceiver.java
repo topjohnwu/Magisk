@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 
 public abstract class DownloadReceiver extends BroadcastReceiver {
     public Context mContext;
@@ -42,6 +43,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
             }
             c.close();
         }
+        Utils.isDownloading = false;
     }
 
     public void setDownloadID(long id) {

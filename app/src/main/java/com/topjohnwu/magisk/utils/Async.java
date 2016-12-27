@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.InstallFragment;
+import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
@@ -256,19 +257,10 @@ public class Async {
         }
 
         protected void onSuccess() {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-
             StatusFragment.updateCheckDone.trigger();
             new LoadModules().exec();
 
-            AlertDialog.Builder builder;
-            String theme = prefs.getString("theme", "");
-            if (theme.equals("Dark")) {
-                builder = new AlertDialog.Builder(mContext, R.style.AlertDialog_dh);
-            } else {
-                builder = new AlertDialog.Builder(mContext);
-            }
-            builder
+            MainActivity.alertBuilder
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
                     .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.sh("su -c reboot"))
