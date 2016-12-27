@@ -14,6 +14,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
+import com.topjohnwu.magisk.receivers.RepoDlReceiver;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -49,11 +51,19 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
             if (bootImage == null) {
                 bootImage = blockList.get(spinner.getSelectedItemPosition() - 1);
             }
-            Utils.dlAndReceive(
-                    getActivity(),
-                    new MagiskDlReceiver(bootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
-                    StatusFragment.magiskLink,
-                    "Magisk-v" + String.valueOf(StatusFragment.remoteMagiskVersion) + ".zip");
+            String filename = "Magisk-v" + String.valueOf(StatusFragment.remoteMagiskVersion) + ".zip";
+            String finalBootImage = bootImage;
+            MainActivity.alertBuilder
+                    .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
+                    .setMessage(getString(R.string.repo_install_msg, filename))
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
+                            getActivity(),
+                            new MagiskDlReceiver(finalBootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
+                            StatusFragment.magiskLink,
+                            Utils.getLegalFilename(filename)))
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .show();
         });
         if (blockDetectionDone.isTriggered) {
             updateUI();

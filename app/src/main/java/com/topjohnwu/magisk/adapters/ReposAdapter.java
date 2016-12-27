@@ -6,8 +6,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -19,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.RepoDlReceiver;
@@ -34,8 +33,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
     private View mView;
-    private Context context;
-    private AlertDialog.Builder builder;
+    private Context mContext;
 
     public ReposAdapter(List<Repo> update, List<Repo> installed, List<Repo> others) {
         mUpdateRepos = update;
@@ -47,14 +45,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
         ButterKnife.bind(this, mView);
-        context = parent.getContext();
-
-        String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
-        if (theme.equals("Dark")) {
-            builder = new AlertDialog.Builder(context, R.style.AlertDialog_dh);
-        } else {
-            builder = new AlertDialog.Builder(context);
-        }
+        mContext = parent.getContext();
 
         return new ViewHolder(mView);
     }
@@ -81,7 +72,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             holder.versionName.setText(versionName);
         }
         if (author != null) {
-            holder.author.setText(context.getString(R.string.author, author));
+            holder.author.setText(mContext.getString(R.string.author, author));
         }
         if (description != null) {
             holder.description.setText(description);
@@ -90,12 +81,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         View.OnClickListener listener = view -> {
             if (view.getId() == holder.updateImage.getId()) {
                 String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-                builder
-                        .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                        .setMessage(context.getString(R.string.repo_install_msg, filename))
+                MainActivity.alertBuilder
+                        .setTitle(mContext.getString(R.string.repo_install_title, repo.getName()))
+                        .setMessage(mContext.getString(R.string.repo_install_msg, filename))
                         .setCancelable(true)
                         .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
-                                context,
+                                mContext,
                                 new RepoDlReceiver(),
                                 repo.getZipUrl(),
                                 Utils.getLegalFilename(filename)))
@@ -103,13 +94,13 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                         .show();
             }
             if ((view.getId() == holder.changeLog.getId()) && (!repo.getLogUrl().equals(""))) {
-                new WebWindow(context.getString(R.string.changelog), repo.getLogUrl(), context);
+                new WebWindow(mContext.getString(R.string.changelog), repo.getLogUrl(), mContext);
             }
             if ((view.getId() == holder.authorLink.getId()) && (!repo.getSupportUrl().equals(""))) {
-                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
+                mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
             }
             if ((view.getId() == holder.supportLink.getId()) && (!repo.getSupportUrl().equals(""))) {
-                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
+                mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
             }
         };
 
@@ -145,7 +136,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            WindowManager windowmanager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            WindowManager windowmanager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             ButterKnife.bind(this, itemView);
             DisplayMetrics dimension = new DisplayMetrics();
             windowmanager.getDefaultDisplay().getMetrics(dimension);

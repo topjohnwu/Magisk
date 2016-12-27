@@ -14,7 +14,7 @@
     <string name="magisk_version">المثبت Magisk v%1$s</string>
     <string name="magisk_version_error">هل قمت بتثبيت Magisk؟</string>
 
-    <string name="magisk_update_available">Magisk v%1$s تحديث!</string>
+    <string name="magisk_update_available">Magisk v%1$.1f تحديث!</string>
     <string name="cannot_check_updates">لا يمكن التحقق من التحديثات</string>
     <string name="up_to_date">أحدث إصدار من %1$s مثبت</string>
 

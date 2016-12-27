@@ -94,12 +94,12 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
             updateSafetyNetUI();
         }
 
-        if (magiskVersion < 0) {
+        if (magiskVersion < 0 && Shell.rootAccess()) {
             MainActivity.alertBuilder
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.download_install, (dialogInterface, i) -> {
+                    .setPositiveButton(R.string.goto_install, (dialogInterface, i) -> {
                         ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
                         FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);

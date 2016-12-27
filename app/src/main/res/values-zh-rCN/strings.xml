@@ -14,7 +14,7 @@
     <string name="magisk_version">已安装 Magisk v%1$s</string>
     <string name="magisk_version_error">你是否已安装 Magisk？</string>
 
-    <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
+    <string name="magisk_update_available">Magisk 可更新到 v%1$.1f！</string>
     <string name="cannot_check_updates">无法检查更新</string>
     <string name="up_to_date">已安装最新版本的 %1$s</string>
 
