@@ -13,6 +13,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 
 #define LOGFILE 	"/cache/magisk.log"
 #define HIDELIST 	"/magisk/.core/magiskhide/hidelist"
@@ -70,6 +71,9 @@ int hideMagisk() {
 	int pid, zygote_num = 0;
 	char cache_block[256], zygote_ns[2][32];
 	cache_block[0] = '\0';
+
+	// Set to the top priority
+	setpriority(PRIO_PROCESS, 0, -20);
 
 	// Get the mount namespace of zygote
 	FILE *p = popen("/data/busybox/ps | grep zygote | grep -v grep", "r");
@@ -303,7 +307,7 @@ int main(int argc, char **argv, char **envp) {
 			continue;
 
 		for (i = 0; i < list_size; ++i) {
-			if(strstr(processName, hide_list[i])) {
+			if(strcmp(processName, hide_list[i]) == 0) {
 				// Check PID exist
 				if (kill(pid, 0) == -1) continue;
 				fprintf(logfile, "MagiskHide: %s(PID=%d ", processName, pid);
