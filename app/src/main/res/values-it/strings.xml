@@ -58,7 +58,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Questa funzione non funziona senza il permesso di scrivere sulla memoria di archiviazione esterna</string>
-    <string name="no_root_access">Accesso Root non trovato, funzionalità limitate</string>
     <string name="no_thanks">No grazie</string>
     <string name="repo_install_title">Installazione %1$s</string>
     <string name="repo_install_msg">Vuoi installare %1$s ?</string>

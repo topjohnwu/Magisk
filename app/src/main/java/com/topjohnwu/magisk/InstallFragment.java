@@ -14,8 +14,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
-import com.topjohnwu.magisk.receivers.RepoDlReceiver;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Utils;
 

@@ -81,7 +81,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
-    <string name="no_root_access">No root access, functionality limited</string>
     <string name="no_thanks">No thanks</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>

@@ -60,7 +60,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">未授予写入外置存储权限，此功能无法正常工作。</string>
-    <string name="no_root_access">没有 ROOT 权限，功能受限</string>
     <string name="no_thanks">不，谢谢</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">你想要安装 %1$s 吗？</string>

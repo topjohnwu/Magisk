@@ -60,7 +60,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa</string>
-    <string name="no_root_access">No hay acceso a root, funcionalidad limitada</string>
     <string name="no_thanks">No gracias</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>

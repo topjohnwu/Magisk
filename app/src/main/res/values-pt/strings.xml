@@ -56,7 +56,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita do armazenamento externo.</string>
-    <string name="no_root_access">Sem acesso ao root, funcionalidade limitada</string>
     <string name="no_thanks">Não, Obrigado</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Você deseja instalar%1$s ?</string>

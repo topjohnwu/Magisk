@@ -8,8 +8,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 7
-        versionName "2.5"
+        versionCode 10
+        versionName "3.0"
         jackOptions {
             enabled true
         }

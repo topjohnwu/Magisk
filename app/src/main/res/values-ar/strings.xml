@@ -60,7 +60,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
-    <string name="no_root_access">لا يوجد أذونات الروت، الوظائف محدودة</string>
     <string name="no_thanks">لا شكراً</string>
     <string name="repo_install_title">تثبيت %1$s</string>
     <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
