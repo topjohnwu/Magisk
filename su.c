@@ -42,7 +42,6 @@
 
 #include "su.h"
 #include "utils.h"
-#include "binds.h"
 
 extern int is_daemon;
 extern int daemon_from_uid;
@@ -470,70 +469,6 @@ static void usage(int status) {
     exit(status);
 }
 
-static __attribute__ ((noreturn)) void allow_bind(struct su_context *ctx) {
-    if(ctx->from.uid == 0)
-        exit(1);
-
-    if(ctx->bind.from[0] == '!') {
-        int ret = bind_remove(ctx->bind.to, ctx->from.uid);
-        if(!ret) {
-            fprintf(stderr, "The mentioned bind destination path didn't exist\n");
-            exit(1);
-        }
-        exit(0);
-    }
-    if(strcmp("--ls", ctx->bind.from)==0) {
-        bind_ls(ctx->from.uid);
-        exit(0);
-    }
-
-    if(!bind_uniq_dst(ctx->bind.to)) {
-        fprintf(stderr, "BIND: Distant file NOT unique. I refuse.\n");
-        exit(1);
-    }
-	int fd = open("/data/su/binds", O_WRONLY|O_APPEND|O_CREAT, 0600);
-	if(fd<0) {
-		fprintf(stderr, "Failed to open binds file\n");
-        exit(1);
-	}
-    char *str = NULL;
-    int len = asprintf(&str, "%d:%s:%s", ctx->from.uid, ctx->bind.from, ctx->bind.to);
-    write(fd, str, len+1); //len doesn't include final \0 and we want to write it
-    free(str);
-	close(fd);
-    exit(0);
-}
-
-static __attribute__ ((noreturn)) void allow_init(struct su_context *ctx) {
-    if(ctx->init[0]=='!') {
-        int ret = init_remove(ctx->init+1, ctx->from.uid);
-        if(!ret) {
-            fprintf(stderr, "The mentioned init path didn't exist\n");
-            exit(1);
-        }
-        exit(0);
-    }
-    if(strcmp("--ls", ctx->init) == 0) {
-        init_ls(ctx->from.uid);
-        exit(0);
-    }
-    if(!init_uniq(ctx->init))
-        //This script is already in init list
-        exit(1);
-
-	int fd = open("/data/su/init", O_WRONLY|O_APPEND|O_CREAT, 0600);
-	if(fd<0) {
-		fprintf(stderr, "Failed to open init file\n");
-        exit(1);
-	}
-    char *str = NULL;
-    int len = asprintf(&str, "%d:%s", ctx->from.uid, ctx->init);
-    write(fd, str, len+1); //len doesn't include final \0 and we want to write it
-    free(str);
-	close(fd);
-    exit(0);
-}
-
 static __attribute__ ((noreturn)) void deny(struct su_context *ctx) {
     char *cmd = get_command(&ctx->to);
 
@@ -575,11 +510,11 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx) {
     if (send_to_app)
         send_result(ctx, ALLOW);
 
-    if(ctx->bind.from[0] && ctx->bind.to[0])
-        allow_bind(ctx);
+    // if(ctx->bind.from[0] && ctx->bind.to[0])
+    //     allow_bind(ctx);
 
-    if(ctx->init[0])
-        allow_init(ctx);
+    // if(ctx->init[0])
+    //     allow_init(ctx);
 
     char *binary;
     argc = ctx->to.optind;
@@ -777,21 +712,14 @@ int su_main_nodaemon(int argc, char **argv) {
             .database_path = REQUESTOR_DATA_PATH REQUESTOR_DATABASE_PATH,
             .base_path = REQUESTOR_DATA_PATH REQUESTOR
         },
-        .bind = {
-            .from = "",
-            .to = "",
-        },
-        .init = "",
     };
     struct stat st;
     int c, socket_serv_fd, fd;
     char buf[64], *result;
     policy_t dballow;
     struct option long_opts[] = {
-        { "bind",            required_argument,    NULL, 'b' },
         { "command",            required_argument,    NULL, 'c' },
         { "help",            no_argument,        NULL, 'h' },
-        { "init",            required_argument,        NULL, 'i' },
         { "login",            no_argument,        NULL, 'l' },
         { "preserve-environment",    no_argument,        NULL, 'p' },
         { "shell",            required_argument,    NULL, 's' },
@@ -800,71 +728,54 @@ int su_main_nodaemon(int argc, char **argv) {
         { NULL, 0, NULL, 0 },
     };
 
-    while ((c = getopt_long(argc, argv, "+b:c:hlmps:Vvuz:", long_opts, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:", long_opts, NULL)) != -1) {
         switch(c) {
-            case 'b': {
-                    char *s = strdup(optarg);
-
-                    char *pos = strchr(s, ':');
-                    if(pos) {
-                        pos[0] = 0;
-                        ctx.bind.to = pos + 1;
-                        ctx.bind.from = s;
-                    } else {
-                        ctx.bind.from = "--ls";
-                        ctx.bind.to = "--ls";
-                    }
+            case 'c':
+                ctx.to.shell = DEFAULT_SHELL;
+                ctx.to.command = optarg;
+                break;
+            case 'h':
+                usage(EXIT_SUCCESS);
+                break;
+            case 'l':
+                ctx.to.login = 1;
+                break;
+            case 'm':
+            case 'p':
+                ctx.to.keepenv = 1;
+                break;
+            case 's':
+                ctx.to.shell = optarg;
+                break;
+            case 'V':
+                printf("%d\n", VERSION_CODE);
+                exit(EXIT_SUCCESS);
+            case 'v':
+                printf("%s (topjohnwu v1)\n", VERSION);
+                exit(EXIT_SUCCESS);
+            case 'u':
+                switch (get_multiuser_mode()) {
+                case MULTIUSER_MODE_USER:
+                    printf("%s\n", MULTIUSER_VALUE_USER);
+                    break;
+                case MULTIUSER_MODE_OWNER_MANAGED:
+                    printf("%s\n", MULTIUSER_VALUE_OWNER_MANAGED);
+                    break;
+                case MULTIUSER_MODE_OWNER_ONLY:
+                    printf("%s\n", MULTIUSER_VALUE_OWNER_ONLY);
+                    break;
+                case MULTIUSER_MODE_NONE:
+                    printf("%s\n", MULTIUSER_VALUE_NONE);
+                    break;
                 }
+                exit(EXIT_SUCCESS);
+            case 'z':
+                ctx.to.context = optarg;
                 break;
-        case 'c':
-            ctx.to.shell = DEFAULT_SHELL;
-            ctx.to.command = optarg;
-            break;
-        case 'h':
-            usage(EXIT_SUCCESS);
-            break;
-        case 'i':
-            ctx.init = optarg;
-            break;
-        case 'l':
-            ctx.to.login = 1;
-            break;
-        case 'm':
-        case 'p':
-            ctx.to.keepenv = 1;
-            break;
-        case 's':
-            ctx.to.shell = optarg;
-            break;
-        case 'V':
-            printf("%d\n", VERSION_CODE);
-            exit(EXIT_SUCCESS);
-        case 'v':
-            printf("%s cm-su subind suinit\n", VERSION);
-            exit(EXIT_SUCCESS);
-        case 'u':
-            switch (get_multiuser_mode()) {
-            case MULTIUSER_MODE_USER:
-                printf("%s\n", MULTIUSER_VALUE_USER);
-                break;
-            case MULTIUSER_MODE_OWNER_MANAGED:
-                printf("%s\n", MULTIUSER_VALUE_OWNER_MANAGED);
-                break;
-            case MULTIUSER_MODE_OWNER_ONLY:
-                printf("%s\n", MULTIUSER_VALUE_OWNER_ONLY);
-                break;
-            case MULTIUSER_MODE_NONE:
-                printf("%s\n", MULTIUSER_VALUE_NONE);
-                break;
-            }
-            exit(EXIT_SUCCESS);
-        case 'z':
-            ctx.to.context = optarg;
-            break;
-        default:
-            /* Bionic getopt_long doesn't terminate its error output by newline */
-            fprintf(stderr, "\n");
-            usage(2);
+            default:
+                /* Bionic getopt_long doesn't terminate its error output by newline */
+                fprintf(stderr, "\n");
+                usage(2);
         }
     }
     hacks_init();
