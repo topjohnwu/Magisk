@@ -21,6 +21,7 @@
 FILE *logfile;
 int i, list_size, pipefd[2];
 char **hide_list = NULL, buffer[512];
+pthread_t list_monitor;
 pthread_mutex_t mutex;
 
 char **file_to_str_arr(FILE *fp, int *size) {
@@ -86,15 +87,17 @@ int hideMagisk() {
 
 	while(1) {
 		read(pipefd[0], &pid, sizeof(pid));
+		// Termination called
 		if(pid == -1) break;
 
-		int badns;
+		int badns, fd;
 		while(1) {
 			badns = 0;
 			read_namespace(pid, buffer, 32);
+			printf("%s\n", buffer);
 			for (i = 0; i < zygote_num; ++i) {
 				if (strcmp(buffer, zygote_ns[i]) == 0) {
-					usleep(1000);
+					usleep(500);
 					badns = 1;
 					break;
 				}
@@ -102,12 +105,13 @@ int hideMagisk() {
 			if (!badns) break;
 		}
 
-		fprintf(logfile, "ns=%s]\n", buffer);
+		// Send pause signal ASAP
+		if (kill(pid, SIGSTOP) == -1) continue;
+
+		fprintf(logfile, "ns=%s)\n", buffer);
 
 		snprintf(buffer, sizeof(buffer), "/proc/%d/ns/mnt", pid);
-
-		int fd = open(buffer, O_RDONLY);
-		if(fd == -1) continue; // Maybe process died..
+		if((fd = open(buffer, O_RDONLY)) == -1) continue; // Maybe process died..
 		if(setns(fd, 0) == -1) {
 			fprintf(logfile, "MagiskHide: Unable to change namespace for pid=%d\n", pid);
 			continue;
@@ -159,6 +163,9 @@ int hideMagisk() {
 			free(mount_list[i]);
 		}
 		free(mount_list);
+
+		// Send resume signal
+		kill(pid, SIGCONT);
 	}
 
 	// Should never go here
@@ -220,6 +227,16 @@ void *monitor_list(void *path) {
 	return NULL;
 }
 
+void terminate(int sig) {
+	// Close the config list monitor
+	pthread_kill(list_monitor, SIGQUIT);
+	pthread_mutex_destroy(&mutex);
+
+	// Terminate our children
+	i = -1;
+	write(pipefd[1], &i, sizeof(i));
+}
+
 void run_as_daemon() {
 	switch(fork()) {
 		case -1:
@@ -242,6 +259,11 @@ int main(int argc, char **argv, char **envp) {
 
 	run_as_daemon();
 
+	// Handle all killing signals
+	signal(SIGINT, terminate);
+	signal(SIGKILL, terminate);
+	signal(SIGTERM, terminate);
+
 	// Fork a child to handle namespace switches and unmounts
 	pipe(pipefd);
 	switch(fork()) {
@@ -255,7 +277,6 @@ int main(int argc, char **argv, char **envp) {
 	close(pipefd[0]);
 
 	// Start a thread to constantly check the hide list
-	pthread_t list_monitor;
 	pthread_mutex_init(&mutex, NULL);
 	pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
 
@@ -274,18 +295,18 @@ int main(int argc, char **argv, char **envp) {
 			pos[0] = ' ';
 		}
 
-		int user, pid, uid;
-		char processName[256], hostingType[16], hostingName[256];
-		int ret = sscanf(buffer, "[%d %d %d %256s %16s %256s]",
-				&user, &pid, &uid,
-				processName, hostingType, hostingName);
+		int pid;
+		char processName[256];
+		int ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
 
-		if(ret != 6)
+		if(ret != 2)
 			continue;
 
 		for (i = 0; i < list_size; ++i) {
 			if(strstr(processName, hide_list[i])) {
-				fprintf(logfile, "MagiskHide: %s[PID=%d ", processName, pid);
+				// Check PID exist
+				if (kill(pid, 0) == -1) continue;
+				fprintf(logfile, "MagiskHide: %s(PID=%d ", processName, pid);
 				write(pipefd[1], &pid, sizeof(pid));
 			}
 		}
@@ -293,14 +314,7 @@ int main(int argc, char **argv, char **envp) {
 
 	// Close the logcat monitor
 	pclose(p);
-
-	// Close the config list monitor
-	pthread_kill(list_monitor, SIGQUIT);
-	pthread_mutex_destroy(&mutex);
-
-	// Terminate our children
-	i = -1;
-	write(pipefd[1], &i, sizeof(i));
+	terminate(0);
 
 	fprintf(logfile, "MagiskHide: Cannot read from logcat, abort...\n");
 	fclose(logfile);
