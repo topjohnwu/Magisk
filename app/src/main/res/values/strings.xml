@@ -85,7 +85,7 @@
     <string name="no_thanks">No thanks</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
-    <string name="download_install">Download and install</string>
+    <string name="download_install">Download &amp; install</string>
     <string name="goto_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>

@@ -42,10 +42,10 @@
 
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/fabmenu"
-            android:layout_width="wrap_content"
+            android:layout_width="500dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginRight="120dp"
+            android:layout_marginEnd="115dp"
             android:layout_marginBottom="10dp"
             app:layout_behavior=".FABBehavior"
             fab:menu_fab_size="normal"
@@ -73,6 +73,5 @@
         </com.github.clans.fab.FloatingActionMenu>
 
     </android.support.design.widget.CoordinatorLayout>
-
 
 </android.support.v4.widget.SwipeRefreshLayout>

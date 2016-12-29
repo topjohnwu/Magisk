@@ -60,6 +60,18 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
             new Async.LoadModules().exec();
         });
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                mSwipeRefreshLayout.setEnabled(recyclerView.getChildAt(0).getTop() >= 0);
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
         if (moduleLoadDone.isTriggered) {
             updateUI();
         }

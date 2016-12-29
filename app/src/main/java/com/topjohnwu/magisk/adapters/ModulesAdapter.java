@@ -25,7 +25,6 @@ import butterknife.ButterKnife;
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
     private final List<Module> mList;
-    private View mView;
     private Context context;
 
     public ModulesAdapter(List<Module> list) {
@@ -34,10 +33,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
         context = parent.getContext();
-        ButterKnife.bind(this, mView);
-        return new ViewHolder(mView);
+        ButterKnife.bind(this, view);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
                     @Override
                     protected void onPostExecute(Void v) {
-                        Snackbar.make(mView, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.title, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
                     }
                 }.exec();
             } else {
@@ -83,7 +82,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
                     @Override
                     protected void onPostExecute(Void v) {
-                        Snackbar.make(mView, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.title, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
                     }
                 }.exec();
             }
@@ -100,7 +99,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
                     @Override
                     protected void onPostExecute(Void v) {
-                        Snackbar.make(mView, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.title, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
                         updateDeleteButton(holder, module);
                     }
                 }.exec();
@@ -114,7 +113,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
                     @Override
                     protected void onPostExecute(Void v) {
-                        Snackbar.make(mView, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.title, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
                         updateDeleteButton(holder, module);
                     }
                 }.exec();
