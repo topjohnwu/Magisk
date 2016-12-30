@@ -79,7 +79,7 @@
 #ifndef VERSION_CODE
 #define VERSION_CODE 1
 #endif
-#define VERSION xstr(VERSION_CODE) " " REQUESTOR
+#define VERSION REQUESTOR " topjohnwu r" xstr(VERSION_CODE)
 
 #define PROTO_VERSION 1
 
@@ -98,7 +98,7 @@ struct su_request {
     int login;
     int keepenv;
     char *shell;
-	char *context;
+    char *context;
     char *command;
     char **argv;
     int argc;
@@ -123,29 +123,29 @@ struct su_user_info {
 };
 
 struct su_bind {
-	const char *from;
-	const char *to;
+    const char *from;
+    const char *to;
 };
 
 struct su_context {
     struct su_initiator from;
     struct su_request to;
     struct su_user_info user;
-	struct su_bind bind;
-	const char *init;
+    struct su_bind bind;
+    const char *init;
     mode_t umask;
     char sock_path[PATH_MAX];
 };
 
 // multiuser su behavior
 typedef enum {
-  // only owner can su
-  MULTIUSER_MODE_OWNER_ONLY = 0,
-  // owner gets a su prompt
-  MULTIUSER_MODE_OWNER_MANAGED = 1,
-  // user gets a su prompt
-  MULTIUSER_MODE_USER = 2,
-  MULTIUSER_MODE_NONE = 3,
+    // only owner can su
+    MULTIUSER_MODE_OWNER_ONLY = 0,
+    // owner gets a su prompt
+    MULTIUSER_MODE_OWNER_MANAGED = 1,
+    // user gets a su prompt
+    MULTIUSER_MODE_USER = 2,
+    MULTIUSER_MODE_NONE = 3,
 } multiuser_mode_t;
 
 #define MULTIUSER_VALUE_OWNER_ONLY    "owner"
@@ -166,14 +166,14 @@ extern int send_result(struct su_context *ctx, policy_t policy);
 
 static inline char *get_command(const struct su_request *to)
 {
-  if (to->command)
-    return to->command;
-  if (to->shell)
-    return to->shell;
-  char* ret = to->argv[to->optind];
-  if (ret)
-    return ret;
-  return DEFAULT_SHELL;
+    if (to->command)
+        return to->command;
+    if (to->shell)
+        return to->shell;
+    char* ret = to->argv[to->optind];
+    if (ret)
+        return ret;
+    return DEFAULT_SHELL;
 }
 
 void exec_loge(const char* fmt, ...);

@@ -562,10 +562,10 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx) {
             arg0, PARG(0), PARG(1), PARG(2), PARG(3), PARG(4), PARG(5),
             (ctx->to.optind + 6 < ctx->to.argc) ? " ..." : "");
 
-	if(ctx->to.context && strcmp(ctx->to.context, "u:r:su_light:s0") == 0) {
-		setexeccon(ctx->to.context);
-	} else {
-		setexeccon("u:r:su:s0");
+    if(ctx->to.context && strcmp(ctx->to.context, "u:r:su_light:s0") == 0) {
+        setexeccon(ctx->to.context);
+    } else {
+        setexeccon("u:r:su:s0");
     }
 
     ctx->to.argv[--argc] = arg0;
@@ -610,7 +610,7 @@ static void fork_for_samsung(void)
 int main(int argc, char *argv[]) {
     if (argc == 2 && strcmp(argv[1], "--daemon") == 0) {
         //Everything we'll exec will be in su, not su_daemon
-		setexeccon("u:r:su:s0");
+        setexeccon("u:r:su:s0");
         return run_daemon();
     }
     return su_main(argc, argv);
@@ -618,15 +618,15 @@ int main(int argc, char *argv[]) {
 
 int su_main(int argc, char *argv[]) {
     int ppid = getppid();
-	if ((geteuid() != AID_ROOT && getuid() != AID_ROOT) ||
-			(get_api_version() >= 18 && getuid() == AID_SHELL) ||
-			get_api_version() >= 19) {
-		// attempt to connect to daemon...
-		LOGD("starting daemon client %d %d", getuid(), geteuid());
-		return connect_daemon(argc, argv, ppid);
-	} else {
-		return su_main_nodaemon(argc, argv);
-	}
+    if ((geteuid() != AID_ROOT && getuid() != AID_ROOT) ||
+            (get_api_version() >= 18 && getuid() == AID_SHELL) ||
+            get_api_version() >= 19) {
+        // attempt to connect to daemon...
+        LOGD("starting daemon client %d %d", getuid(), geteuid());
+        return connect_daemon(argc, argv, ppid);
+    } else {
+        return su_main_nodaemon(argc, argv);
+    }
 
 }
 
@@ -700,7 +700,7 @@ int su_main_nodaemon(int argc, char **argv) {
             .keepenv = 0,
             .shell = NULL,
             .command = NULL,
-			.context = NULL,
+            .context = NULL,
             .argv = argv,
             .argc = argc,
             .optind = 0,
@@ -712,6 +712,11 @@ int su_main_nodaemon(int argc, char **argv) {
             .database_path = REQUESTOR_DATA_PATH REQUESTOR_DATABASE_PATH,
             .base_path = REQUESTOR_DATA_PATH REQUESTOR
         },
+        .bind = {      
+            .from = "",       
+            .to = "",     
+        },
+        .init = "",
     };
     struct stat st;
     int c, socket_serv_fd, fd;
@@ -751,7 +756,7 @@ int su_main_nodaemon(int argc, char **argv) {
                 printf("%d\n", VERSION_CODE);
                 exit(EXIT_SUCCESS);
             case 'v':
-                printf("%s (topjohnwu v1)\n", VERSION);
+                printf("%s\n", VERSION);
                 exit(EXIT_SUCCESS);
             case 'u':
                 switch (get_multiuser_mode()) {
