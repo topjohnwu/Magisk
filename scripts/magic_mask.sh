@@ -280,7 +280,8 @@ case $1 in
         rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
       fi
 
-      mv /cache/stock_boot.img /data 2>/dev/null
+      mv /cache/stock_boot.img /data/stock_boot.img 2>/dev/null
+      mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
 
       find $BINPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
       find $TOOLPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
@@ -433,6 +434,20 @@ case $1 in
         chmod -R 755 $COREDIR/busybox
         chcon -hR "u:object_r:system_file:s0" $COREDIR/busybox
         bind_mount $COREDIR/busybox /system/xbin
+      fi
+
+      if [ -f /data/magisk.apk ]; then
+        if [ -z `ls /data/app | grep com.topjohnwu.magisk` ]; then
+          mkdir /data/app/com.topjohnwu.magisk-1
+          cp /data/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
+          chmod 755 /data/app/com.topjohnwu.magisk-1
+          chmod 644 /data/app/com.topjohnwu.magisk-1/base.apk
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
+        fi
+        rm -f /data/magisk.apk 2>/dev/null
       fi
 
       # Restart post-fs-data if necessary (multirom)

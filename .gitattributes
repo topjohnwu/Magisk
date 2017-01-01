@@ -14,3 +14,4 @@ busybox binary
 futility binary
 *.jar binary
 *.exe binary
+*.apk binary

@@ -291,6 +291,7 @@ if (is_mounted /data); then
   mkdir -p /data/busybox
   cp -af $BINDIR /data/magisk
   cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
+  cp -af $INSTALLER/common/magisk.apk /data/magisk.apk
   /data/magisk/busybox --install -s /data/busybox
   ln -s /data/magisk/busybox /data/busybox/busybox
   # Prevent issues
@@ -303,6 +304,7 @@ else
   rm -rf /cache/data_bin 2>/dev/null
   cp -af $BINDIR /cache/data_bin
   cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+  cp -af $INSTALLER/common/magisk.apk /cache/magisk.apk
   chmod -R 755 /cache/data_bin
   BINDIR=/cache/data_bin
 fi
