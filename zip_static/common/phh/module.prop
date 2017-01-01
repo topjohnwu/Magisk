@@ -1,7 +1,7 @@
 id=phh
 name=phh's SuperUser
-version=r266 (topjohnwu v1)
-versionCode=5
+version=topjohnwu r1
+versionCode=6
 author=phhusson & topjohnwu
 description=OpenSource SELinux-capable SuperUser
 support=http://forum.xda-developers.com/showthread.php?t=3216394
