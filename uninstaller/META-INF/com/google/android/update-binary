@@ -102,6 +102,40 @@ grep_prop() {
   cat $FILES 2>/dev/null | sed -n $REGEX | head -n 1
 }
 
+mount_image() {
+  if [ ! -d "$2" ]; then
+    mount -o rw,remount rootfs /
+    mkdir -p $2 2>/dev/null
+    ($BOOTMODE) && mount -o ro,remount rootfs /
+    [ ! -d "$2" ] && return 1
+  fi
+  if (! is_mounted $2); then
+    LOOPDEVICE=
+    for LOOP in 0 1 2 3 4 5 6 7; do
+      if (! is_mounted $2); then
+        LOOPDEVICE=/dev/block/loop$LOOP
+        if [ ! -f "$LOOPDEVICE" ]; then
+          mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
+        fi
+        losetup $LOOPDEVICE $1
+        if [ "$?" -eq "0" ]; then
+          mount -t ext4 -o loop $LOOPDEVICE $2
+          if (! is_mounted $2); then
+            /system/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE $2
+          fi
+          if (! is_mounted $2); then
+            /system/bin/toybox mount -t ext4 -o loop $LOOPDEVICE $2
+          fi
+        fi
+        if (is_mounted $2); then
+          ui_print "- Mounting $1 to $2"
+          break;
+        fi
+      fi
+    done
+  fi
+}
+
 unpack_boot() {
   rm -rf $UNPACKDIR $RAMDISK 2>/dev/null
   mkdir -p $UNPACKDIR
@@ -117,7 +151,7 @@ repack_boot() {
   cd $RAMDISK
   find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
   cd $UNPACKDIR
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $ORIGBOOT
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
   if [ -f chromeos ]; then
     echo " " > config
     echo " " > bootloader
@@ -143,22 +177,42 @@ revert_boot() {
   rm -rf $TMPDIR/boottmp 2>/dev/null
   mkdir -p $TMPDIR/boottmp
 
-  ORIGBOOT=$BOOTIMAGE
-
   ui_print "- Unpacking boot image"
-  unpack_boot $ORIGBOOT
+  unpack_boot $BOOTIMAGE
 
-  if [ -d ".backup" ]; then
+  SUPERSU=false
+  [ -f sbin/launch_daemonsu.sh ] && SUPERSU=true
+
+  if ($SUPERSU); then
+    ui_print "- SuperSU patched boot detected!"
+    SUIMG=/data/su.img
+    mount_image $SUIMG /su
+    if (is_mounted /su); then
+      SUPERSULOOP=$LOOPDEVICE
+      gunzip -c < $UNPACKDIR/ramdisk.gz > $UNPACKDIR/ramdisk
+      ui_print "- Using sukernel to restore ramdisk"
+      # Restore ramdisk
+      LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-restore $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk
+      if [ $? -ne 0 ]; then
+        ui_print "! Unable to restore ramdisk"
+        ui_print "! Will still remove Magisk additions"
+      fi
+      rm -rf $RAMDISK
+      mkdir -p $RAMDISK
+      cd $RAMDISK
+      cpio -i < $UNPACKDIR/ramdisk
+      rm -f $UNPACKDIR/ramdisk
+    fi
+  elif [ -d ".backup" ]; then
     ui_print "- Restoring ramdisk with backup"
     cp -af .backup/. .
-    rm -rf magisk init.magisk.rc sbin/magic_mask.sh .backup 2>/dev/null
   else
     ui_print "! No ramdisk backup found"
-    ui_print "! Unable to revert completely"
     ui_print "! Will still remove Magisk additions"
-    # Removing boot image modifications
-    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
   fi
+
+  # Remove possible boot modifications
+  rm -rf magisk init.magisk.rc sbin/magic_mask.sh .backup 2>/dev/null
 
   ui_print "- Repacking boot image"
   repack_boot
@@ -240,17 +294,12 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 
 if (is_mounted /data); then
   PATH=/data/busybox:$PATH
-  cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
-  gzip -d /data/stock_boot.img.gz 2>/dev/null
-  rm -rf /data/stock_boot.img.gz 2>/dev/null
-  if [ -f "/data/stock_boot.img" ]; then
+  cp -f /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+  gunzip -d < /data/stock_boot.img.gz > /data/stock_boot.img 2>/dev/null
+  rm -f /data/stock_boot.img.gz 2>/dev/null
+  if [ -f /data/stock_boot.img ]; then
     ui_print "- Boot image backup found!"
     NEWBOOT=/data/stock_boot.img
-    if ($LGE_G); then
-      # Prevent secure boot error on LG G2/G3.
-      # Just for know, It's a pattern which bootloader verifies at boot. Thanks to LG hackers.
-      echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> $NEWBOOT
-    fi
   else
     ui_print "! Boot image backup unavalible, try using ramdisk backup"
     revert_boot
@@ -258,7 +307,7 @@ if (is_mounted /data); then
   ui_print "- Removing Magisk files"
   rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log \
           /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock \
-          /data/Magisk.apk /data/magisk.img /data/magisk_merge.img \
+          /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img \
           /data/busybox /data/magisk /data/custom_ramdisk_patch.sh 2>/dev/null
 else
   ui_print "! Data unavailable"
@@ -281,6 +330,11 @@ ui_print "- Flashing reverted image"
 dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
 
 umount /system
+if [ ! -z $SUPERSU ]; then
+  umount /su
+  losetup -d $SUPERSULOOP
+  rmdir /su
+fi
 
 ui_print "- Done"
 exit 0
