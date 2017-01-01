@@ -7,6 +7,8 @@ void monitor_proc() {
 	// Get the mount namespace of init
 	read_namespace(1, init_ns, 32);
 
+	printf("%s\n", init_ns);
+
 	// Get the mount namespace of zygote
 	FILE *p = popen("/data/busybox/ps | grep zygote | grep -v grep", "r");
 	while(fgets(buffer, sizeof(buffer), p)) {

@@ -19,7 +19,7 @@ static void terminate(int sig) {
 
 int main(int argc, char *argv[]) {
 
-	if (argc > 0) {
+	if (argc > 1) {
 		if (strcmp(argv[1], "--daemon") == 0)
 			run_as_daemon();
 		else {
