@@ -163,8 +163,10 @@ unpack_boot() {
 }
 
 repack_boot() {
-  cd $RAMDISK
-  find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
+  if (! $SUPERSU); then
+    cd $RAMDISK
+    find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
+  fi
   cd $UNPACKDIR
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
   if [ -f chromeos ]; then
@@ -186,9 +188,6 @@ repack_boot() {
     echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> new-boot.img
   fi
   mv new-boot.img $NEWBOOT
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --hexpatch $NEWBOOT \
-  49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
-  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 }
 
 ##########################################################################################
@@ -218,7 +217,6 @@ if [ -z "$NOOVERRIDE" ]; then
   # read override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
-  getvar NORESTORE
   getvar BOOTIMAGE
 fi
 
@@ -229,10 +227,6 @@ fi
 if [ -z "$KEEPFORCEENCRYPT" ]; then
   # we don't keep forceencrypt by default
   KEEPFORCEENCRYPT=false
-fi
-if [ -z "$NORESTORE" ]; then
-  # we restore ramdisk by default
-  NORESTORE=false
 fi
 
 SAMSUNG=false
@@ -304,10 +298,13 @@ if (is_mounted /data); then
   chcon -hR "u:object_r:system_file:s0" /data/magisk /data/busybox
   chmod -R 755 /data/magisk /data/busybox
   PATH=/data/busybox:$PATH
+  BINDIR=/data/magisk
 else
   rm -rf /cache/data_bin 2>/dev/null
   cp -af $BINDIR /cache/data_bin
   cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+  chmod -R 755 /cache/data_bin
+  BINDIR=/cache/data_bin
 fi
 
 ##########################################################################################
@@ -333,7 +330,7 @@ fi
 
 mount_image $IMG /magisk
 if (! is_mounted /magisk); then
-  ui_print "! Image mount failed..."
+  ui_print "! Magisk image mount failed..."
   exit 1
 fi
 MAGISKLOOP=$LOOPDEVICE
@@ -357,11 +354,59 @@ if [ $? -ne 0 ]; then
   exit 1;
 fi
 
-# Restore ramdisk
 ORIGBOOT=
 SUPERSU=false
 [ -f sbin/launch_daemonsu.sh ] && SUPERSU=true
-if (! $NORESTORE); then
+
+if ($SUPERSU); then
+
+  ##############################
+  # SuperSU installation process
+  ##############################
+
+  ui_print "- SuperSU patched boot detected!"
+  ui_print "- Adding auto patch script for SuperSU"
+  cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+  SUIMG=/data/su.img
+  mount_image $SUIMG /su
+  if (! is_mounted /su); then
+    ui_print "! SU image mount failed..."
+    ui_print "! Please immediately flash SuperSU now"
+    ui_print "! Installation will complete after flashing SuperSU"
+    exit 1
+  fi
+  SUPERSULOOP=$LOOPDEVICE
+  gunzip -c < $UNPACKDIR/ramdisk.gz > $UNPACKDIR/ramdisk
+  ui_print "- Using sukernel to restore ramdisk"
+  # Restore ramdisk
+  LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-restore $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk.orig
+  if [ $? -ne 0 ]; then
+    LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --restore $UNPACKDIR/ramdisk $TMPDIR/boottmp/stock_boot.img
+    if [ $? -ne 0 ]; then
+      ui_print "! Unable to restore ramdisk"
+      exit 1
+    fi
+    LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --bootimg-extract-ramdisk $TMPDIR/boottmp/stock_boot.img $UNPACKDIR/ramdisk.orig.gz
+    LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --ungzip $UNPACKDIR/ramdisk.orig.gz $UNPACKDIR/ramdisk.orig
+  fi
+  if [ ! -f $UNPACKDIR/ramdisk.orig ]; then
+    ui_print "! Unable to restore ramdisk"
+    exit 1
+  fi
+  rm -f $TMPDIR/boottmp/stock_boot.img $UNPACKDIR/ramdisk.orig.gz $UNPACKDIR/ramdisk.gz 2>/dev/null
+  ui_print "- Patching ramdisk with sukernel"
+  sh /data/custom_ramdisk_patch.sh $UNPACKDIR/ramdisk $BINDIR
+  LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-backup $UNPACKDIR/ramdisk.orig $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk
+  gzip -9 < $UNPACKDIR/ramdisk > $UNPACKDIR/ramdisk.gz
+  rm -f $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk.orig
+
+else
+
+  ##############################
+  # Magisk installation process
+  ##############################
+
+  # Ramdisk restore
   if [ -d ".backup" ]; then
     # This implies Magisk is already installed, and ramdisk backup exists
     ui_print "- Restoring ramdisk with ramdisk backup"
@@ -369,12 +414,13 @@ if (! $NORESTORE); then
     rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
     ORIGBOOT=false
   elif [ -d "magisk" ]; then
-    cp -af /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
+    mv -f /data/stock_boot_*.gz /data/stock_boot.img.gz 2>/dev/null
     gzip -d /data/stock_boot.img.gz 2>/dev/null
+    rm -f /data/stock_boot.img.gz 2>/dev/null
     [ -f /data/stock_boot.img ] && ORIGBOOT=/data/stock_boot.img
     # If Magisk is installed and no SuperSU and no ramdisk backups,
     # we restore previous stock boot image backups
-    if (! $SUPERSU) && [ ! -z $ORIGBOOT ]; then
+    if [ ! -z $ORIGBOOT ]; then
       ui_print "- Restoring boot image with backup"
       unpack_boot $ORIGBOOT
     fi
@@ -383,14 +429,8 @@ if (! $NORESTORE); then
     rm -rf init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
     ORIGBOOT=false
   fi
-fi
 
-if ($SUPERSU); then
-  ui_print "- SuperSU patched boot detected!"
-  ui_print "- Adding auto patch script for SuperSU"
-  cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
-else
-  # SuperSU already backup stock boot, no need to do again
+  # Backups
   ui_print "- Creating ramdisk backup"
   mkdir .backup 2>/dev/null
   cp -af *fstab* verity_key sepolicy .backup 2>/dev/null
@@ -403,7 +443,7 @@ else
     fi
   fi
 
-  # SuperSU already have root, no need to install root
+  # Root
   ROOT=false
   if [ ! -d /magisk/phh ]; then
     ui_print "- Installing phh's SuperUser"
@@ -420,21 +460,19 @@ else
     cp -af $BINDIR/su $BINDIR/sepolicy-inject /magisk/phh/bin
     chmod -R 755 /magisk/phh/bin
   fi
-fi
 
-# Patch ramdisk
-ui_print "- Patching ramdisk"
+  # Patch ramdisk
+  ui_print "- Patching ramdisk"
 
-# Add magisk entrypoint
-for INIT in init*.rc; do
-  if [ `grep -c "import /init.environ.rc" $INIT` -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
-    cp $INIT .backup
-    sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
-    break
-  fi
-done
+  # Add magisk entrypoint
+  for INIT in init*.rc; do
+    if [ `grep -c "import /init.environ.rc" $INIT` -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
+      cp $INIT .backup
+      sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
+      break
+    fi
+  done
 
-if (! $SUPERSU); then
   sed -i "/selinux.reload_policy/d" init.rc
   find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
     if (! $KEEPVERITY); then
@@ -449,18 +487,18 @@ if (! $SUPERSU); then
   if (! $KEEPVERITY); then
     rm verity_key 2>/dev/null
   fi
+
+  # sepolicy patches
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --magisk -P sepolicy
+
+  # Add new items
+  mkdir -p magisk 2>/dev/null
+  cp -af $INSTALLER/common/init.magisk.rc init.magisk.rc
+  cp -af $INSTALLER/common/magic_mask.sh sbin/magic_mask.sh
+
+  chmod 0755 magisk
+  chmod 0750 init.magisk.rc sbin/magic_mask.sh
 fi
-
-# sepolicy patches
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --magisk -P sepolicy
-
-# Add new items
-mkdir -p magisk 2>/dev/null
-cp -af $INSTALLER/common/init.magisk.rc init.magisk.rc
-cp -af $INSTALLER/common/magic_mask.sh sbin/magic_mask.sh
-
-chmod 0755 magisk
-chmod 0750 init.magisk.rc sbin/magic_mask.sh
 
 ui_print "- Repacking boot image"
 repack_boot
@@ -486,12 +524,19 @@ ui_print "- Flashing new boot image"
 [ ! -L $BOOTIMAGE ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
 dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
 
+cd /
+
 if (! $BOOTMODE); then
   ui_print "- Unmounting partitions"
   umount /magisk
   losetup -d $MAGISKLOOP
-  umount /system
   rmdir /magisk
+  if ($SUPERSU); then
+    umount /su
+    losetup -d $SUPERSULOOP
+    rmdir /su
+  fi
+  umount /system
 fi
 
 ui_print "- Done"

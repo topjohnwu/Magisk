@@ -340,6 +340,12 @@ case $1 in
 
       log_print "* Preparing modules"
 
+      # Disable phh and Magisk Hide for SuperSU
+      if [ -f /sbin/launch_daemonsu.sh ]; then
+        touch /magisk/phh/disable 2>/dev/null
+        rm -f $COREDIR/magiskhide/enable 2>/dev/null
+      fi
+
       mkdir -p $DUMMDIR
       mkdir -p $MIRRDIR/system
 
@@ -442,8 +448,7 @@ case $1 in
     log_print "** Magisk late_start service mode running..."
     run_scripts service
 
-    # Magisk Hide (disable with SuperSU)
-    [ -f /sbin/launch_daemonsu.sh ] && rm -f $COREDIR/magiskhide/enable
+    # Magisk Hide
     if [ -f $COREDIR/magiskhide/enable ]; then
       log_print "* Removing tampered read-only system props"
 
