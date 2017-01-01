@@ -190,6 +190,31 @@ repack_boot() {
   mv new-boot.img $NEWBOOT
 }
 
+remove_system_su() {
+  if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
+    ui_print "! System installed root detected, mount rw :("
+    mount -o rw,remount /system
+    # SuperSU
+    if [ -e /system/bin/.ext/.su ]; then
+      mv -f /system/bin/app_process32_original /system/bin/app_process32 2>/dev/null
+      mv -f /system/bin/app_process64_original /system/bin/app_process64 2>/dev/null
+      mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh 2>/dev/null
+      cd /system/bin
+      if [ -e app_process64 ]; then
+        ln -sf app_process64 app_process
+      else
+        ln -sf app_process32 app_process
+      fi
+    fi
+    rm -rf /system/.pin /system/bin/.ext /system/etc/.installed_su_daemon /system/etc/.has_su_daemon \
+    /system/xbin/daemonsu /system/xbin/su /system/xbin/sugote /system/xbin/sugote-mksh /system/xbin/supolicy \
+    /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
+    /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
+    /system/.supersu /cache/.supersu /data/.supersu \
+    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
+  fi
+}
+
 ##########################################################################################
 # Detection
 ##########################################################################################
@@ -228,6 +253,9 @@ if [ -z "$KEEPFORCEENCRYPT" ]; then
   # we don't keep forceencrypt by default
   KEEPFORCEENCRYPT=false
 fi
+
+# Check if system root is installed and remove
+remove_system_su
 
 SAMSUNG=false
 SAMSUNG_CHECK=$(cat /system/build.prop | grep "ro.build.fingerprint=" | grep -i "samsung")
@@ -427,8 +455,7 @@ else
       unpack_boot $ORIGBOOT
     fi
     # Removing possible modifications
-    rm -rf magisk init.magisk.rc sbin/magic_mask.sh 2>/dev/null
-    rm -rf init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh sbin/su init.xposed.rc sbin/mount_xposed.sh 2>/dev/null
     ORIGBOOT=false
   fi
 
