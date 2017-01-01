@@ -14,15 +14,25 @@ static void terminate(int sig) {
 	// Terminate our children
 	i = -1;
 	write(pipefd[1], &i, sizeof(i));
+	exit(0);
 }
 
-int main(int argc, char **argv, char **envp) {
+int main(int argc, char *argv[]) {
 
-	run_as_daemon();
+	if (argc > 0) {
+		if (strcmp(argv[1], "--daemon") == 0)
+			run_as_daemon();
+		else {
+			fprintf(stderr, "%s (with no options)\n\tRun magiskhide and output to stdout\n", argv[0]);
+			fprintf(stderr, "%s --daemon\n\tRun magiskhide as daemon, output to magisk.log\n", argv[0]);
+			return 1;
+		}
+	} else 
+		logfile = stdout;
+
 
 	// Handle all killing signals
 	signal(SIGINT, terminate);
-	signal(SIGKILL, terminate);
 	signal(SIGTERM, terminate);
 
 	// Fork a child to handle namespace switches and unmounts
@@ -40,6 +50,9 @@ int main(int argc, char **argv, char **envp) {
 	// Start a thread to constantly check the hide list
 	pthread_mutex_init(&mutex, NULL);
 	pthread_create(&list_monitor, NULL, monitor_list, HIDELIST);
+
+	// Set main process to the top priority
+	setpriority(PRIO_PROCESS, 0, -20);
 
 	monitor_proc();
 
