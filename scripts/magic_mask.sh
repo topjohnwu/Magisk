@@ -2,6 +2,7 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
+BLACKLIST="/system/lib /system/lib64 /system/etc /vendor/lib /vendor/lib64"
 
 MOUNTPOINT=/magisk
 
@@ -17,12 +18,8 @@ MOUNTINFO=$TMPDIR/mnt
 TOOLPATH=/data/busybox
 BINPATH=/data/magisk
 
-export OLDPATH=$PATH
-export PATH=$TOOLPATH:$OLDPATH
-
 # Default permissions
 umask 022
-
 
 log_print() {
   echo "$1"
@@ -37,6 +34,13 @@ mktouch() {
   else
     echo "$2" > "$1" 2>/dev/null
   fi
+}
+
+in_list() {
+  for i in $2; do
+    [ "$1" = "$i" ] && return 0
+  done
+  return 1
 }
 
 unblock() {
@@ -117,6 +121,9 @@ travel() {
 }
 
 clone_dummy() {
+  LINK=true
+  in_list $1 "$BLACKLIST" && LINK=false
+
   for ITEM in $MIRRDIR$1/* ; do
     REAL=${ITEM#$MIRRDIR}
     if [ -d $MOUNTINFO$REAL ]; then
@@ -128,13 +135,16 @@ clone_dummy() {
         # Copy original symlink
         cp -afc $ITEM $DUMMDIR$REAL
       else
-        if [ -d $ITEM ]; then
-          mkdir -p $DUMMDIR$REAL
+        if $LINK && [ ! -e $MOUNTINFO$REAL ]; then
+          ln -s $MIRRDIR$REAL $DUMMDIR$REAL
         else
-          mktouch $DUMMDIR$REAL
+          if [ -d $ITEM ]; then
+            mkdir -p $DUMMDIR$REAL
+          else
+            mktouch $DUMMDIR$REAL
+          fi
+          [ ! -e $MOUNTINFO$REAL ] && mktouch $MOUNTINFO/mirror$REAL
         fi
-        # Mount the mirror if not module item
-        [ ! -e $MOUNTINFO$REAL ] && mktouch $MOUNTINFO/mirror$REAL
       fi
     fi
   done
@@ -247,11 +257,14 @@ case $1 in
 
   post-fs-data )
     # /data not mounted yet
-    ! mount | grep " /data " && unblock
-    mount | grep " /data " | grep "tmpfs" && unblock
+    ! mount | grep " /data " >/dev/null && unblock
+    mount | grep " /data " | grep "tmpfs" >/dev/null && unblock
 
     # Don't run twice
     if [ "`getprop magisk.restart_pfsd`" != "1" ]; then
+
+      export OLDPATH=$PATH
+      export PATH=$TOOLPATH:$OLDPATH
 
       log_print "** Magisk post-fs-data mode running..."
 
@@ -297,10 +310,11 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img
+      rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
 
       # Remove modules that is labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
+        rm -f $MOD/system/placeholder 2>/dev/null
         if [ -f $MOD/remove ] || [ $MOD = zzsupersu ]; then
           log_print "Remove module: $MOD"
           rm -rf $MOD
@@ -329,6 +343,9 @@ case $1 in
       mkdir -p $DUMMDIR
       mkdir -p $MIRRDIR/system
 
+      # Remove crap folder
+      rm -rf $MOUNTPOINT/lost+found
+
       # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
         if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
@@ -345,18 +362,6 @@ case $1 in
         cp -afc /system/bin/linker* /system/bin/t*box $DUMMDIR/system/bin/
       fi
 
-      DISABLEHIDE=false
-
-      for i in /system /system/lib /system/lib64 /system/vendor /system/vendor/lib /system/vendor/lib64; do
-        [ -f $MOUNTINFO/dummy$1 ] && DISABLEHIDE=true && break
-      done
-
-      # Crash prevention!!
-      $DISABLEHIDE && rm -f $COREDIR/magiskhide/enable 2>/dev/null
-
-      # Remove crap folder
-      rm -rf $MOUNTPOINT/lost+found
-      
       # Start doing tasks
 
       # Stage 1
@@ -371,9 +376,10 @@ case $1 in
       else
         ln -s $MIRRDIR/system/vendor $MIRRDIR/vendor
       fi
+
       # Since mirrors always exist, we load libraries from mirrors
-      LD_LIBRARY_PATH=$MIRRDIR/system/lib:$MIRRDIR/vendor/lib
-      [ -d /system/lib64 ] LD_LIBRARY_PATH=$MIRRDIR/system/lib64:$MIRRDIR/vendor/lib64
+      export LD_LIBRARY_PATH=$MIRRDIR/system/lib:$MIRRDIR/vendor/lib
+      [ -d /system/lib64 ] && export LD_LIBRARY_PATH=$MIRRDIR/system/lib64:$MIRRDIR/vendor/lib64
 
       # Stage 2
       log_print "* Stage 2: Mount dummy skeletons"
@@ -457,7 +463,7 @@ case $1 in
       # Add Safety Net preset
       $COREDIR/magiskhide/add com.google.android.gms.unstable
       log_print "* Starting Magisk Hide"
-      /data/magisk/magiskhide
+      /data/magisk/magiskhide --daemon
     fi
     ;;
 
