@@ -2,7 +2,8 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
-BLACKLIST="/system/lib /system/lib64 /system/etc /vendor/lib /vendor/lib64"
+# BLACKLIST="/system/lib /system/lib64 /system/etc /system/framework /vendor/lib /vendor/lib64"
+WHITELIST="/system/app /system/priv-app /system/bin"
 
 MOUNTPOINT=/magisk
 
@@ -81,6 +82,9 @@ target_size_check() {
 }
 
 travel() {
+  # Ignore /system/vendor, we will handle it differently
+  [ "$1" = "system/vendor" ] && return
+
   cd $TRAVEL_ROOT/$1
   if [ -f .replace ]; then
     rm -rf $MOUNTINFO/$1
@@ -121,8 +125,8 @@ travel() {
 }
 
 clone_dummy() {
-  LINK=true
-  in_list $1 "$BLACKLIST" && LINK=false
+  LINK=false
+  in_list $1 "$WHITELIST" && LINK=true
 
   for ITEM in $MIRRDIR$1/* ; do
     REAL=${ITEM#$MIRRDIR}
@@ -353,11 +357,23 @@ case $1 in
       # Remove crap folder
       rm -rf $MOUNTPOINT/lost+found
 
+      # Link vendor if not exist
+      if [ ! -e /vendor ]; then
+        mount -o rw,remount rootfs /
+        ln -s /system/vendor /vendor
+        mount -o ro,remount rootfs /
+      fi
+
       # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
         if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
           TRAVEL_ROOT=$MOD
           (travel system)
+          rm -f $MOD/vendor 2>/dev/null
+          if [ -d $MOD/system/vendor ]; then
+            ln -s $MOD/system/vendor $MOD/vendor
+            (travel vendor)
+          fi
         fi
       done
 
@@ -384,13 +400,13 @@ case $1 in
         ln -s $MIRRDIR/system/vendor $MIRRDIR/vendor
       fi
 
-      # Since mirrors always exist, we load libraries from mirrors
+      # Since mirrors always exist, we load libraries and binaries from mirrors
       export LD_LIBRARY_PATH=$MIRRDIR/system/lib:$MIRRDIR/vendor/lib
-      [ -d /system/lib64 ] && export LD_LIBRARY_PATH=$MIRRDIR/system/lib64:$MIRRDIR/vendor/lib64
+      [ -d $MIRRDIR/system/lib64 ] && export LD_LIBRARY_PATH=$MIRRDIR/system/lib64:$MIRRDIR/vendor/lib64
 
       # Stage 2
       log_print "* Stage 2: Mount dummy skeletons"
-      # Move dummy /system/vendor to /vendor for consistency
+      # Move /system/vendor to /vendor for consistency
       mv -f $MOUNTINFO/dummy/system/vendor $MOUNTINFO/dummy/vendor 2>/dev/null
       mv -f $DUMMDIR/system/vendor $DUMMDIR/vendor 2>/dev/null
       find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
@@ -400,9 +416,17 @@ case $1 in
         bind_mount $ORIG $TARGET
       done
 
+      # Check if the dummy /system/bin is empty, it shouldn't
+      [ ! -e $DUMMDIR/system/bin/sh ] && clone_dummy /system/bin
+
       # Stage 3
       log_print "* Stage 3: Mount module items"
       find $MOUNTINFO/system -type f 2>/dev/null | while read ITEM ; do
+        TARGET=${ITEM#$MOUNTINFO}
+        ORIG=`cat $ITEM`$TARGET
+        bind_mount $ORIG $TARGET
+      done
+      find $MOUNTINFO/vendor -type f 2>/dev/null | while read ITEM ; do
         TARGET=${ITEM#$MOUNTINFO}
         ORIG=`cat $ITEM`$TARGET
         bind_mount $ORIG $TARGET
