@@ -175,7 +175,6 @@
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black"
                     android:textAllCaps="false"
                     android:textSize="20sp"
                     android:fontFamily="sans-serif" />

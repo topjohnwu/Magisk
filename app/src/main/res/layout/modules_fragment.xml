@@ -45,7 +45,7 @@
             android:layout_width="500dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginEnd="115dp"
+            android:layout_marginEnd="113dp"
             android:layout_marginBottom="10dp"
             app:layout_behavior=".FABBehavior"
             fab:menu_fab_size="normal"
