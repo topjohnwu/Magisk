@@ -397,7 +397,11 @@ if ($SUPERSU); then
   ui_print "- SuperSU patched boot detected!"
   ui_print "- Adding auto patch script for SuperSU"
   cp -af $INSTALLER/common/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
-  SUIMG=/data/su.img
+  if (is_mounted /data); then
+    SUIMG=/data/su.img
+  else
+    SUIMG=/cache/su.img
+  fi
   mount_image $SUIMG /su
   if (! is_mounted /su); then
     ui_print "! SU image mount failed..."
