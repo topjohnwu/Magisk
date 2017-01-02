@@ -2,7 +2,6 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
-# BLACKLIST="/system/lib /system/lib64 /system/etc /system/framework /vendor/lib /vendor/lib64"
 WHITELIST="/system/app /system/priv-app /system/bin"
 
 MOUNTPOINT=/magisk
@@ -366,6 +365,8 @@ case $1 in
 
       # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
+        # Read in defined system props
+        [ -f $MOD/system.prop ] && /data/magisk/resetprop --file $MOD/system.prop
         if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
           TRAVEL_ROOT=$MOD
           (travel system)

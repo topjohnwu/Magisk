@@ -7,7 +7,7 @@ on post-fs
 
 on post-fs-data
     start magisk_pfsd
-    wait /dev/.magisk.unblock 40
+    wait /dev/.magisk.unblock 60
     rm /dev/.magisk.unblock
 
 on property:magisk.restart_pfsd=1
