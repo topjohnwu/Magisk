@@ -69,7 +69,8 @@
                 android:layout_gravity="center_vertical"
                 android:text="@string/no_info_provided"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textIsSelectable="false"/>
+                android:textIsSelectable="false"
+                android:layout_alignEnd="@+id/author" />
 
             <ImageView
                 android:id="@+id/update"
