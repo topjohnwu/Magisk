@@ -26,6 +26,8 @@
     <string name="not_rooted">Not rooted</string>
     <string name="proper_root">Properly rooted</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
+    <string name="safetyNet_connection_failed">Cannot connect to Google API</string>
+    <string name="safetyNet_connection_suspended">Connection to Google API was suspended</string>
     <string name="safetyNet_error">Cannot check SafetyNet, no Internet?</string>
     <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
     <string name="safetyNet_pass">SafetyNet Passed</string>

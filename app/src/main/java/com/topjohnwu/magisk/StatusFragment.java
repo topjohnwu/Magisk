@@ -221,6 +221,16 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         int image, color;
         safetyNetProgress.setVisibility(View.GONE);
         switch (SNCheckResult) {
+            case -3:
+                color = colorNeutral;
+                image = R.drawable.ic_help;
+                safetyNetStatusText.setText(R.string.safetyNet_connection_suspended);
+                break;
+            case -2:
+                color = colorNeutral;
+                image = R.drawable.ic_help;
+                safetyNetStatusText.setText(R.string.safetyNet_connection_failed);
+                break;
             case -1:
                 color = colorNeutral;
                 image = R.drawable.ic_help;

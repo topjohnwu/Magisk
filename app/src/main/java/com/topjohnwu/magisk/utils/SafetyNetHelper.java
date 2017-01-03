@@ -32,6 +32,7 @@ public abstract class SafetyNetHelper
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
         Logger.dev("SN: Google API fail");
+        handleResults(-2);
     }
 
     @Override
@@ -43,6 +44,7 @@ public abstract class SafetyNetHelper
     @Override
     public void onConnectionSuspended(int i) {
         Logger.dev("SN: Google API Suspended");
+        handleResults(-3);
     }
 
     public void requestTest() {
