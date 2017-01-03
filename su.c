@@ -756,7 +756,7 @@ int su_main_nodaemon(int argc, char **argv) {
                 printf("%d\n", VERSION_CODE);
                 exit(EXIT_SUCCESS);
             case 'v':
-                printf("%s\n", VERSION);
+                printf("%s cm-su topjohnwu\n", VERSION);
                 exit(EXIT_SUCCESS);
             case 'u':
                 switch (get_multiuser_mode()) {

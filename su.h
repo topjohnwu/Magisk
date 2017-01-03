@@ -79,8 +79,8 @@
 #ifndef VERSION_CODE
 #define VERSION_CODE 17
 #endif
-// #define VERSION REQUESTOR " topjohnwu r" xstr(VERSION_CODE)
-#define VERSION REQUESTOR " topjohnwu r1"
+#define VERSION xstr(VERSION_CODE) " " REQUESTOR
+// #define VERSION REQUESTOR " topjohnwu r1"
 
 #define PROTO_VERSION 1
 
