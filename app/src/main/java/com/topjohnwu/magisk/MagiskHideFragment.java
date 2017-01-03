@@ -53,7 +53,7 @@ public class MagiskHideFragment extends Fragment {
             new LoadApps().exec();
         });
 
-        recyclerView.setAdapter(appAdapter);
+        recyclerView.swapAdapter(appAdapter, true);
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
