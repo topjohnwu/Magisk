@@ -2,7 +2,7 @@
 
 LOGFILE=/cache/magisk.log
 IMG=/data/magisk.img
-WHITELIST="/system/app /system/priv-app /system/bin"
+WHITELIST="/system/bin"
 
 MOUNTPOINT=/magisk
 
@@ -418,7 +418,7 @@ case $1 in
       done
 
       # Check if the dummy /system/bin is empty, it shouldn't
-      [ ! -e $DUMMDIR/system/bin/sh ] && clone_dummy /system/bin
+      [ -e $DUMMDIR/system/bin -a ! -e $DUMMDIR/system/bin/sh ] && clone_dummy /system/bin
 
       # Stage 3
       log_print "* Stage 3: Mount module items"
