@@ -130,4 +130,8 @@
 
     <string name="settings_reboot_toast">Reboot to apply settings</string>
 
+    <!-- Themes -->
+    <string name="theme_default_value" translatable="false">default</string>
+    <string name="theme_dark_value" translatable="false">dark</string>
+
 </resources>

@@ -14,7 +14,7 @@ public class WebWindow {
 public WebWindow(String title, String url, Context context) {
     AlertDialog.Builder alert;
     String theme = PreferenceManager.getDefaultSharedPreferences(context).getString("theme", "");
-    if (theme.equals("Dark")) {
+    if (Utils.isDarkTheme(theme, context)) {
         alert = new AlertDialog.Builder(context, R.style.AlertDialog_dh);
     } else {
         alert = new AlertDialog.Builder(context);

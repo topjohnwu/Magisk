@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (theme.equals("Dark")) {
+        if (Utils.isDarkTheme(theme, this)) {
             setTheme(R.style.AppTheme_dh);
         }
         setContentView(R.layout.activity_about);
@@ -76,7 +77,7 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         appChangelog.removeSummary();
-        if (theme.equals("Dark")) {
+        if (Utils.isDarkTheme(theme, this)) {
             builder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
         } else {
             builder = new AlertDialog.Builder(this);

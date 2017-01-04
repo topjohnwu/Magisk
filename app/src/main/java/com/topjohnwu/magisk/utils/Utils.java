@@ -164,6 +164,10 @@ public class Utils {
         return null;
     }
 
+    public static boolean isDarkTheme(String theme, Context resources) {
+        return theme != null && theme.equalsIgnoreCase(resources.getString(R.string.theme_dark_value));
+    }
+
     public static class ByteArrayInOutStream extends ByteArrayOutputStream {
         public ByteArrayInputStream getInputStream() {
             ByteArrayInputStream in = new ByteArrayInputStream(buf, 0, count);

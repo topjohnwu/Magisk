@@ -27,6 +27,7 @@ import android.view.View;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity
 
         String theme = prefs.getString("theme", "");
         Logger.dev("MainActivity: Theme is " + theme);
-        if (theme.equals("Dark")) {
+        if (Utils.isDarkTheme(theme, this)) {
             setTheme(R.style.AppTheme_dh);
             alertBuilder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
         } else {

@@ -4,4 +4,8 @@
         <item>"Default"</item>
         <item>"Dark"</item>
     </string-array>
+    <string-array name="themes_values">
+        <item>@string/theme_default_value</item>
+        <item>@string/theme_dark_value</item>
+    </string-array>
 </resources>

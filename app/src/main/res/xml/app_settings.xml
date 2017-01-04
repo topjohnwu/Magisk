@@ -8,9 +8,9 @@
             android:key="theme"
             android:title="@string/settings_theme_title"
             android:summary="@string/settings_theme_summary"
-            android:defaultValue="Default"
+            android:defaultValue="@string/theme_default_value"
             android:entries="@array/themes"
-            android:entryValues="@array/themes"/>
+            android:entryValues="@array/themes_values"/>
 
     </PreferenceCategory>
 
