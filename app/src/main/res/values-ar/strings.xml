@@ -51,7 +51,7 @@
     <string name="app_developers">المطورين الرئيسيين</string>
     <string name="app_developers_"><![CDATA[التطبيق إنشئ بواسطة <a href="https://github.com/topjohnwu">topjohnwu</a> بالتعاون مع <a href="https://github.com/d8ahazard">Digitalhigh</a> و <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">تغييرات التطبيق</string>
-    <string name="translators"/>
+    <string name="translators">xx6600xx ,silent_6600</string>
     <string name="app_version">إصدار التطبيق</string>
     <string name="app_source_code">الشفرة المصدرية</string>
     <string name="donation">التبرع</string>
@@ -100,5 +100,25 @@
     <string name="settings_shell_logging_summary">حدد هذا الخيار لتمكين سجل جميع الأوامر الدفعية والمخرجات</string>
 
     <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
+    <string name="auto_detect">\"(تلقائي) %1$s\"</string>
+    <string name="checking_for_updates">البحث عن تحديثات…</string>
+    <string name="install">التثبيت</string>
+    <string name="not_rooted">غير مروت</string>
+    <string name="proper_root">مروت فعلاً</string>
+    <string name="advanced_settings_title">إعدادات متقدمة</string>
+    <string name="boot_image_title">موقع ملف الإقلاع</string>
+    <string name="checking_safetyNet_status">التحقق من حالة SafetyNet...</string>
+    <string name="copying_msg">نسخ الملف المضغوط إلى دليل مؤقت</string>
+    <string name="detect_button">تحقق</string>
+    <string name="downloading_toast">جاري التنزيل %1$s</string>
+    <string name="install_magisk_title">تثبيت Magisk الإصدار: v%1$.1f</string>
+    <string name="keep_force_encryption">إبقاء التشفير القوى</string>
+    <string name="keep_dm_verity">إبقاء dm-verity</string>
+    <string name="root_error">مروت لكن لا يوجد إذن الروت، غير مسموح به؟</string>
+    <string name="root_info_warning">وظائف محدودة إلى حد كبير</string>
+    <string name="safetyNet_error">تعذر التحقق من SafetyNet، لا يوجد إنترنت؟</string>
+    <string name="safetyNet_pass">SafetyNet تخطى</string>
+    <string name="safetyNet_fail">فشل SafetyNet: عدم تطابق التشكيل الجانبي CTS</string>
+    <string name="status">الحالة</string>
 
 </resources>
