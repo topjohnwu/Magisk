@@ -20,9 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeight"
-        android:padding="@dimen/card_layout_padding"
-        android:paddingEnd="@dimen/card_layout_padding"
-        android:paddingStart="@dimen/card_layout_padding">
+        android:padding="@dimen/card_layout_padding">
 
         <TextView
             android:id="@+id/title"

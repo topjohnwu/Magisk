@@ -136,7 +136,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         @BindView(R.id.author) TextView author;
         @BindView(R.id.expand_layout) LinearLayout expandLayout;
         @BindView(R.id.update) ImageView updateImage;
-        @BindView(R.id.installed) ImageView installedImage;
         @BindView(R.id.changeLog) ImageView changeLog;
         @BindView(R.id.authorLink) ImageView authorLink;
         @BindView(R.id.supportLink) ImageView supportLink;
@@ -179,6 +178,11 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             layoutParams.height = expanded ? expandHeight : 0;
             expandLayout.setLayoutParams(layoutParams);
             expandLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
+            if (expanded) {
+                updateImage.setTranslationY(expandHeight / 2);
+            } else {
+                updateImage.setTranslationY(0);
+            }
         }
 
         private void expand() {
