@@ -41,7 +41,8 @@
     <string name="advanced_settings_title">Advanced Settings</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
-    <string name="install_magisk_title">Install Magisk Version: v%1$.1f</string>
+    <string name="current_magisk_title">Installed Magisk Version: v%1$s</string>
+    <string name="install_magisk_title">Latest Magisk Version: v%1$.1f</string>
     <string name="magiskify" translatable="false">Magiskify</string>
 
     <!--Module Fragment-->
@@ -105,6 +106,9 @@
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
     <string name="downloading_toast">Downloading %1$s</string>
+    <string name="magisk_update_title">New Magisk Update Available!</string>
+    <string name="magisk_update_message">Magisk v%1$.1f update is live, do you want to install?</string>
+    <string name="check_release_notes">Check release notes</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=%1$s</string>

@@ -1,7 +1,12 @@
 package com.topjohnwu.magisk;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,8 +31,10 @@ import butterknife.ButterKnife;
 public class StatusFragment extends Fragment implements CallbackHandler.EventListener {
 
     public static double magiskVersion, remoteMagiskVersion = -1;
-    public static String magiskVersionString, magiskLink, magiskChangelog;
+    public static String magiskVersionString = "(none)", magiskLink, releaseNoteLink;
     public static int SNCheckResult = -1;
+
+    private static boolean noDialog = false;
 
     public static final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
     public static final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
@@ -62,6 +69,8 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         checkMagiskInfo();
     }
 
+    private AlertDialog updateMagisk;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -84,12 +93,11 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
             safetyNetStatusText.setTextColor(defaultColor);
 
             safetyNetDone.isTriggered = false;
+            noDialog = false;
 
             updateUI();
             new Async.CheckUpdates().exec();
         });
-
-        updateUI();
 
         safetyNetContainer.setOnClickListener(view -> {
             safetyNetProgress.setVisibility(View.VISIBLE);
@@ -99,7 +107,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
             Async.checkSafetyNet(getActivity());
         });
 
-        if (magiskVersion < 0 && Shell.rootAccess()) {
+        if (magiskVersion < 0 && Shell.rootAccess() && !noDialog) {
             MainActivity.alertBuilder
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
@@ -112,9 +120,11 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                             transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
                         } catch (IllegalStateException ignored) {}
                     })
-                    .setNegativeButton(R.string.no_thanks, null)
+                    .setNegativeButton(R.string.no_thanks, (dialogInterface, i) -> noDialog = true)
                     .show();
         }
+
+        updateUI();
 
         return v;
     }
@@ -229,6 +239,31 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
 
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
+
+        updateMagisk = MainActivity.alertBuilder
+                .setTitle(R.string.magisk_update_title)
+                .setMessage(getString(R.string.magisk_update_message, remoteMagiskVersion))
+                .setCancelable(true)
+                .setPositiveButton(R.string.goto_install, (dialogInterface, i) -> {
+                    ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+                    try {
+                        transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
+                    } catch (IllegalStateException ignored) {}
+                })
+                .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
+                    getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(releaseNoteLink)));
+                })
+                .setNegativeButton(R.string.no_thanks, (dialogInterface, i) -> noDialog = true)
+                .create();
+
+        if (magiskVersion < remoteMagiskVersion && Shell.rootAccess()) {
+            magiskStatusContainer.setOnClickListener(view -> updateMagisk.show());
+            if (!noDialog) {
+                updateMagisk.show();
+            }
+        }
     }
 
     private void updateSafetyNetUI() {

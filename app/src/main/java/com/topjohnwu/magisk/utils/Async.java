@@ -59,12 +59,10 @@ public class Async {
             String jsonStr = WebRequest.makeWebServiceCall(UPDATE_JSON, WebRequest.GET);
             try {
                 JSONObject json = new JSONObject(jsonStr);
-
                 JSONObject magisk = json.getJSONObject("magisk");
-
                 StatusFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
                 StatusFragment.magiskLink = magisk.getString("link");
-                StatusFragment.magiskChangelog = magisk.getString("changelog");
+                StatusFragment.releaseNoteLink = magisk.getString("note");
             } catch (JSONException ignored) {}
             return null;
         }

@@ -30,6 +30,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public static List<String> blockList;
     public static String bootBlock = null;
 
+    @BindView(R.id.current_version_title) TextView currentVersionTitle;
     @BindView(R.id.install_title) TextView installTitle;
     @BindView(R.id.block_spinner) Spinner spinner;
     @BindView(R.id.detect_bootimage) Button detectButton;
@@ -43,13 +44,14 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         View v = inflater.inflate(R.layout.install_fragment, container, false);
         ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
+        currentVersionTitle.setText(getString(R.string.current_magisk_title, StatusFragment.magiskVersionString));
         installTitle.setText(getString(R.string.install_magisk_title, StatusFragment.remoteMagiskVersion));
         flashButton.setOnClickListener(v1 -> {
             String bootImage = bootBlock;
             if (bootImage == null) {
                 bootImage = blockList.get(spinner.getSelectedItemPosition() - 1);
             }
-            String filename = "Magisk-v" + String.valueOf(StatusFragment.remoteMagiskVersion) + ".zip";
+            String filename = "Magisk-v" + StatusFragment.remoteMagiskVersion + ".zip";
             String finalBootImage = bootImage;
             MainActivity.alertBuilder
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
