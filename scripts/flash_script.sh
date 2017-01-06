@@ -149,6 +149,11 @@ grep_prop() {
   cat $FILES 2>/dev/null | sed -n $REGEX | head -n 1
 }
 
+file_contain() {
+  grep "$1" "$2" >/dev/null 2>&1
+  return $?
+}
+
 unpack_boot() {
   rm -rf $UNPACKDIR $RAMDISK 2>/dev/null
   mkdir -p $UNPACKDIR
@@ -491,23 +496,31 @@ else
     mkdir -p /magisk/phh/su.d 2>/dev/null
     cp -af $INSTALLER/common/phh/. /magisk/phh
     cp -af $BINDIR/su $BINDIR/sepolicy-inject /magisk/phh/bin
-    chmod -R 755 /magisk/phh/bin
+    chmod -R 755 /magisk/phh
+    chown -R 0.0 /magisk/phh
   fi
 
   # Patch ramdisk
   ui_print "- Patching ramdisk"
 
-  # Add magisk entrypoint
-  for INIT in init*.rc; do
-    if [ `grep -c "import /init.environ.rc" $INIT` -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
-      cp $INIT .backup
-      sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
-      break
+  # Add magisk entrypoints
+  for RC in init*.rc; do
+    if file_contain "import /init.environ.rc" $RC && ! file_contain "import /init.magisk.rc" $RC; then
+      [ ! -f .backup/$RC ] && cp -af $RC .backup
+      sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $RC
+    fi
+    if file_contain "trigger load_persist_props_action" $RC && ! file_contain "trigger load_magisk_props_action" $RC; then
+      [ ! -f .backup/$RC ] && cp -af $RC .backup
+      sed -i "/trigger load_persist_props_action/a\ \ \ \ trigger load_magisk_props_action" $RC
+    fi
+    if file_contain "selinux.reload_policy"; then
+      [ ! -f .backup/$RC ] && cp -af $RC .backup
+      sed -i "/selinux.reload_policy/d" $RC
     fi
   done
 
-  sed -i "/selinux.reload_policy/d" init.rc
-  find . -type f -name "*fstab*" 2>/dev/null | while read FSTAB ; do
+  for FSTAB in *fstab*; do
+    [ -L $FSTAB ] && continue
     if (! $KEEPVERITY); then
       sed -i "s/,support_scfs//g" $FSTAB
       sed -i 's;,\{0,1\}verify\(=[^,]*\)\{0,1\};;g' $FSTAB

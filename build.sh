@@ -24,7 +24,8 @@ cleanup() {
   ls zip_static/arm64/* | grep -v "busybox" | xargs rm -rfv
   ls zip_static/x86/* | grep -v "busybox" | xargs rm -rfv
   ls zip_static/x64/* | grep -v "busybox" | xargs rm -rfv
-  rm -rfv zip_static/META-INF/com/google/android/update-binary 
+  rm -rfv zip_static/META-INF/com/google/android/update-binary
+  rm -rfv zip_static/common/custom_ramdisk_patch.sh
   rm -rfv zip_static/common/magic_mask.sh
   rm -rfv uninstaller/arm
   rm -rfv uninstaller/arm64
@@ -71,6 +72,7 @@ zip_package() {
   echo "************************"
   echo "* Zipping Magisk v$1"
   echo "************************"
+  cp -afv scripts/custom_ramdisk_patch.sh zip_static/common/custom_ramdisk_patch.sh
   cd zip_static
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;

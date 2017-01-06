@@ -10,6 +10,11 @@ on post-fs-data
     wait /dev/.magisk.unblock 60
     rm /dev/.magisk.unblock
 
+on load_magisk_props_action
+    start magisk_props
+    wait /dev/.magisk.unblock 5
+    rm /dev/.magisk.unblock
+
 on property:magisk.restart_pfsd=1
     trigger post-fs-data
 
@@ -23,6 +28,12 @@ service magisk_pfs /sbin/magic_mask.sh post-fs
 
 # launch post-fs-data script
 service magisk_pfsd /sbin/magic_mask.sh post-fs-data
+    user root
+    seclabel u:r:su:s0
+    oneshot
+
+# Load module props
+service magisk_props /sbin/magic_mask.sh load_magisk_props
     user root
     seclabel u:r:su:s0
     oneshot

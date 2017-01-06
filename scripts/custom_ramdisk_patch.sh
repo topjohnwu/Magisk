@@ -30,24 +30,33 @@ cpio_rm() {
   fi
 }
 
+file_contain() {
+  grep "$1" "$2" >/dev/null 2>&1
+  return $?
+}
+
 rm -rf /tmp/magisk/ramdisk 2>/dev/null
 mkdir -p /tmp/magisk/ramdisk
 cd /tmp/magisk/ramdisk
 
 cat $RAMDISK | cpio -i
 
-# Patch ramdisk
-echo "- Patching ramdisk"
-
 # Cleanup SuperSU backups
 cpio_rm -r .subackup
 
 # Add magisk entrypoint
-for INIT in init*.rc; do
-  if [ `grep -c "import /init.environ.rc" $INIT` -ne "0" ] && [ `grep -c "import /init.magisk.rc" $INIT` -eq "0" ]; then
-    sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $INIT
-    cpio_add $INIT 750
-    break
+for RC in init*.rc; do
+  if file_contain "import /init.environ.rc" $RC && ! file_contain "import /init.magisk.rc" $RC; then
+    sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $RC
+    cpio_add $RC 750
+  fi
+  if file_contain "trigger load_persist_props_action" $RC && ! file_contain "trigger load_magisk_props_action" $RC; then
+    sed -i "/trigger load_persist_props_action/a\ \ \ \ trigger load_magisk_props_action" $RC
+    cpio_add $RC 750
+  fi
+  if file_contain "selinux.reload_policy"; then
+    sed -i "/selinux.reload_policy/d" $RC
+    cpio_add $RC 750
   fi
 done
 

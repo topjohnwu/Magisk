@@ -28,7 +28,7 @@ log_print() {
 }
 
 mktouch() {
-  mkdir -p ${1%/*} 2>/dev/null
+  mkdir -p "${1%/*}" 2>/dev/null
   if [ -z "$2" ]; then
     touch "$1" 2>/dev/null
   else
@@ -54,7 +54,7 @@ run_scripts() {
     if [ ! -f $MOD/disable ]; then
       if [ -f $MOD/$1.sh ]; then
         chmod 755 $MOD/$1.sh
-        chcon "u:object_r:system_file:s0" "$MOD/$1.sh"
+        chcon u:object_r:system_file:s0 $MOD/$1.sh
         log_print "$1: $MOD/$1.sh"
         sh $MOD/$1.sh
       fi
@@ -73,7 +73,7 @@ loopsetup() {
 }
 
 target_size_check() {
-  e2fsck -p -f $1
+  e2fsck -p -f "$1"
   curBlocks=`e2fsck -n $1 2>/dev/null | cut -d, -f3 | cut -d\  -f2`;
   curUsedM=$((`echo "$curBlocks" | cut -d/ -f1` * 4 / 1024));
   curSizeM=$((`echo "$curBlocks" | cut -d/ -f2` * 4 / 1024));
@@ -84,39 +84,39 @@ travel() {
   # Ignore /system/vendor, we will handle it differently
   [ "$1" = "system/vendor" ] && return
 
-  cd $TRAVEL_ROOT/$1
+  cd "$TRAVEL_ROOT/$1"
   if [ -f .replace ]; then
-    rm -rf $MOUNTINFO/$1
-    mktouch $MOUNTINFO/$1 $TRAVEL_ROOT
+    rm -rf "$MOUNTINFO/$1"
+    mktouch "$MOUNTINFO/$1" "$TRAVEL_ROOT"
   else
     for ITEM in * ; do
-      if [ ! -e /$1/$ITEM ]; then
+      if [ ! -e "/$1/$ITEM" ]; then
         # New item found
         # If we are in a higher level, delete the lower levels
-        rm -rf $MOUNTINFO/dummy/$1
+        rm -rf "$MOUNTINFO/dummy/$1"
         # Mount the dummy parent
-        mktouch $MOUNTINFO/dummy/$1
+        mktouch "$MOUNTINFO/dummy/$1"
 
-        if [ -d $ITEM ]; then
+        if [ -d "$ITEM" ]; then
           # Create new dummy directory and mount it
-          mkdir -p $DUMMDIR/$1/$ITEM
-          mktouch $MOUNTINFO/$1/$ITEM $TRAVEL_ROOT
-        elif [ -L $ITEM ]; then
+          mkdir -p "$DUMMDIR/$1/$ITEM"
+          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
+        elif [ -L "$ITEM" ]; then
           # Symlinks are small, copy them
-          mkdir -p $DUMMDIR/$1 2>/dev/null
-          cp -afc $ITEM $DUMMDIR/$1/$ITEM
+          mkdir -p "$DUMMDIR/$1" 2>/dev/null
+          cp -afc "$ITEM" $"DUMMDIR/$1/$ITEM"
         else
           # Create new dummy file and mount it
-          mktouch $DUMMDIR/$1/$ITEM
-          mktouch $MOUNTINFO/$1/$ITEM $TRAVEL_ROOT
+          mktouch "$DUMMDIR/$1/$ITEM"
+          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         fi
       else
-        if [ -d $ITEM ]; then
+        if [ -d "$ITEM" ]; then
           # It's an directory, travel deeper
-          (travel $1/$ITEM)
-        elif [ ! -L $ITEM ]; then
+          (travel "$1/$ITEM")
+        elif [ ! -L "$ITEM" ]; then
           # Mount this file
-          mktouch $MOUNTINFO/$1/$ITEM $TRAVEL_ROOT
+          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         fi
       fi
     done
@@ -125,28 +125,28 @@ travel() {
 
 clone_dummy() {
   LINK=false
-  in_list $1 "$WHITELIST" && LINK=true
+  in_list "$1" "$WHITELIST" && LINK=true
 
   for ITEM in $MIRRDIR$1/* ; do
-    REAL=${ITEM#$MIRRDIR}
-    if [ -d $MOUNTINFO$REAL ]; then
+    REAL="${ITEM#$MIRRDIR}"
+    if [ -d "$MOUNTINFO$REAL" ]; then
       # Need to clone deeper
-      mkdir -p $DUMMDIR$REAL
-      (clone_dummy $REAL)
+      mkdir -p "$DUMMDIR$REAL"
+      (clone_dummy "$REAL")
     else
-      if [ -L $ITEM ]; then
+      if [ -L "$ITEM" ]; then
         # Copy original symlink
-        cp -afc $ITEM $DUMMDIR$REAL
+        cp -afc "$ITEM" "$DUMMDIR$REAL"
       else
-        if $LINK && [ ! -e $MOUNTINFO$REAL ]; then
-          ln -s $MIRRDIR$REAL $DUMMDIR$REAL
+        if $LINK && [ ! -e "$MOUNTINFO$REAL" ]; then
+          ln -s "$MIRRDIR$REAL" "$DUMMDIR$REAL"
         else
-          if [ -d $ITEM ]; then
-            mkdir -p $DUMMDIR$REAL
+          if [ -d "$ITEM" ]; then
+            mkdir -p "$DUMMDIR$REAL"
           else
-            mktouch $DUMMDIR$REAL
+            mktouch "$DUMMDIR$REAL"
           fi
-          [ ! -e $MOUNTINFO$REAL ] && mktouch $MOUNTINFO/mirror$REAL
+          [ ! -e "$MOUNTINFO$REAL" ] && mktouch "$MOUNTINFO/mirror$REAL"
         fi
       fi
     fi
@@ -154,8 +154,8 @@ clone_dummy() {
 }
 
 bind_mount() {
-  if [ -e $1 -a -e $2 ]; then
-    mount -o bind $1 $2
+  if [ -e "$1" -a -e "$2" ]; then
+    mount -o bind "$1" "$2"
     if [ $? -eq 0 ]; then 
       log_print "Mount: $1"
     else 
@@ -248,10 +248,10 @@ case $1 in
     if [ -d /cache/magisk_mount ]; then
       log_print "* Mounting cache files"
       find /cache/magisk_mount -type f 2>/dev/null | while read ITEM ; do
-        chmod 644 $ITEM
-        chcon "u:object_r:system_file:s0" $ITEM
-        TARGET=${ITEM#/cache/magisk_mount}
-        bind_mount $ITEM $TARGET
+        chmod 644 "$ITEM"
+        chcon u:object_r:system_file:s0 "$ITEM"
+        TARGET="${ITEM#/cache/magisk_mount}"
+        bind_mount "$ITEM" "$TARGET"
       done
     fi
 
@@ -276,7 +276,6 @@ case $1 in
         rm -rf $BINPATH $TOOLPATH
         mkdir -p $TOOLPATH
         mv /cache/data_bin $BINPATH
-        chmod -R 755 $BINPATH $TOOLPATH
         $BINPATH/busybox --install -s $TOOLPATH
         ln -s $BINPATH/busybox $TOOLPATH/busybox
         # Prevent issues
@@ -286,9 +285,10 @@ case $1 in
       mv /cache/stock_boot.img /data/stock_boot.img 2>/dev/null
       mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
 
-      find $BINPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
-      find $TOOLPATH -exec chcon -h "u:object_r:system_file:s0" {} \;
+      # Set up environment
       chmod -R 755 $BINPATH $TOOLPATH
+      chown -R 0.0 $BINPATH $TOOLPATH
+      find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
       # Live patch sepolicy
       $BINPATH/sepolicy-inject --live -s su
@@ -314,12 +314,12 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
+      rm -rf $MOUNTPOINT/zzsupersu $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
 
       # Remove modules that is labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
         rm -f $MOD/system/placeholder 2>/dev/null
-        if [ -f $MOD/remove ] || [ $MOD = zzsupersu ]; then
+        if [ -f $MOD/remove ]; then
           log_print "Remove module: $MOD"
           rm -rf $MOD
         fi
@@ -327,7 +327,7 @@ case $1 in
 
       # Unmount, shrink, remount
       if umount $MOUNTPOINT; then
-        losetup -d $LOOPDEVICE
+        losetup -d $LOOPDEVICE 2>/dev/null
         target_size_check $IMG
         NEWDATASIZE=$(((curUsedM / 32 + 2) * 32))
         if [ "$curSizeM" -gt "$NEWDATASIZE" ]; then
@@ -365,8 +365,6 @@ case $1 in
 
       # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
-        # Read in defined system props
-        [ -f $MOD/system.prop ] && /data/magisk/resetprop --file $MOD/system.prop
         if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
           TRAVEL_ROOT=$MOD
           (travel system)
@@ -379,7 +377,7 @@ case $1 in
       done
 
       # Proper permissions for generated items
-      find $TMPDIR -exec chcon -h "u:object_r:system_file:s0" {} \;
+      find $TMPDIR -exec chcon -h u:object_r:system_file:s0 {} \;
 
       # linker(64), t*box required for bin
       if [ -f $MOUNTINFO/dummy/system/bin ]; then
@@ -411,10 +409,10 @@ case $1 in
       mv -f $MOUNTINFO/dummy/system/vendor $MOUNTINFO/dummy/vendor 2>/dev/null
       mv -f $DUMMDIR/system/vendor $DUMMDIR/vendor 2>/dev/null
       find $MOUNTINFO/dummy -type f 2>/dev/null | while read ITEM ; do
-        TARGET=${ITEM#$MOUNTINFO/dummy}
-        ORIG=$DUMMDIR$TARGET
-        (clone_dummy $TARGET)
-        bind_mount $ORIG $TARGET
+        TARGET="${ITEM#$MOUNTINFO/dummy}"
+        ORIG="$DUMMDIR$TARGET"
+        (clone_dummy "$TARGET")
+        bind_mount "$ORIG" "$TARGET"
       done
 
       # Check if the dummy /system/bin is empty, it shouldn't
@@ -422,15 +420,10 @@ case $1 in
 
       # Stage 3
       log_print "* Stage 3: Mount module items"
-      find $MOUNTINFO/system -type f 2>/dev/null | while read ITEM ; do
-        TARGET=${ITEM#$MOUNTINFO}
-        ORIG=`cat $ITEM`$TARGET
-        bind_mount $ORIG $TARGET
-      done
-      find $MOUNTINFO/vendor -type f 2>/dev/null | while read ITEM ; do
-        TARGET=${ITEM#$MOUNTINFO}
-        ORIG=`cat $ITEM`$TARGET
-        bind_mount $ORIG $TARGET
+      find $MOUNTINFO/system $MOUNTINFO/vendor -type f 2>/dev/null | while read ITEM ; do
+        TARGET="${ITEM#$MOUNTINFO}"
+        ORIG="`cat "$ITEM"`$TARGET"
+        bind_mount "$ORIG" "$TARGET"
       done
 
       # Stage 4
@@ -440,9 +433,9 @@ case $1 in
       # Stage 5
       log_print "* Stage 5: Mount mirrored items back to dummy"
       find $MOUNTINFO/mirror -type f 2>/dev/null | while read ITEM ; do
-        TARGET=${ITEM#$MOUNTINFO/mirror}
-        ORIG=$MIRRDIR$TARGET
-        bind_mount $ORIG $TARGET
+        TARGET="${ITEM#$MOUNTINFO/mirror}"
+        ORIG="$MIRRDIR$TARGET"
+        bind_mount "$ORIG" "$TARGET"
       done
 
       # Bind hosts for Adblock apps
@@ -457,7 +450,7 @@ case $1 in
         cp -afc /data/busybox/. $COREDIR/busybox
         cp -afc /system/xbin/. $COREDIR/busybox
         chmod -R 755 $COREDIR/busybox
-        chcon -hR "u:object_r:system_file:s0" $COREDIR/busybox
+        chcon -hR u:object_r:system_file:s0 $COREDIR/busybox
         bind_mount $COREDIR/busybox /system/xbin
       fi
 
@@ -479,6 +472,17 @@ case $1 in
       $MULTIROM && setprop magisk.restart_pfsd 1
 
     fi
+    unblock
+    ;;
+
+  load_magisk_props )
+    for MOD in $MOUNTPOINT/* ; do
+      # Read in defined system props
+      if [ -f $MOD/system.prop ]; then
+        log_print "* Reading props from $MOD/system.prop"
+        /data/magisk/resetprop --file $MOD/system.prop
+      fi
+    done
     unblock
     ;;
 

@@ -74,6 +74,7 @@ EXIT /B %ERRORLEVEL%
   forfiles /P zip_static\x86 /C "cmd /C IF NOT @file == \"busybox\" DEL @file"
   forfiles /P zip_static\x64 /C "cmd /C IF NOT @file == \"busybox\" DEL @file"
   2>NUL DEL zip_static\META-INF\com\google\android\update-binary
+  2>NUL DEL zip_static\common\custom_ramdisk_patch.sh
   2>NUL DEL zip_static\common\magic_mask.sh
   2>NUL RMDIR /S /Q uninstaller\arm
   2>NUL RMDIR /S /Q uninstaller\arm64
@@ -98,6 +99,7 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Zipping Magisk v%~1
   ECHO ************************
+  COPY /Y scripts\custom_ramdisk_patch.sh zip_static\common\custom_ramdisk_patch.sh
   CD zip_static
   2>NUL DEL "..\Magisk-v%~1.zip"
   ..\ziptools\win_bin\zip "..\Magisk-v%~1.zip" -r .
