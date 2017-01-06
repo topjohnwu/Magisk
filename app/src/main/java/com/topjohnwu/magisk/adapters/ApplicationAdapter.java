@@ -29,19 +29,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private Context context;
     private PackageManager packageManager;
 
-    // Don't show in list...
-    private static final String[] blackList = {
-            "com.topjohnwu.magisk",
-            "com.google.android.gms"
-    };
+
 
     public ApplicationAdapter(List<ApplicationInfo> list, List<String> hideList) {
         mList = list;
         mHideList = hideList;
-        List<String> bl = Arrays.asList(blackList);
-        for (int i = 0; i < mList.size(); ++i)
-            if (bl.contains(mList.get(i).packageName))
-                mList.remove(i);
     }
 
     @Override

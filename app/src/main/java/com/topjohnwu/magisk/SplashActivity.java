@@ -42,6 +42,7 @@ public class SplashActivity extends AppCompatActivity {
                 new Async.LoadRepos(getApplicationContext()).exec();
             }
         }.exec();
+        new Async.LoadApps(getPackageManager()).exec();
 
         // Start main activity
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);

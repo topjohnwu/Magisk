@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.InstallFragment;
+import com.topjohnwu.magisk.MagiskHideFragment;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
@@ -25,6 +28,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public class Async {
@@ -111,6 +116,38 @@ public class Async {
         @Override
         protected void onPostExecute(Void v) {
             ReposFragment.repoLoadDone.trigger();
+        }
+    }
+
+    public static class LoadApps extends RootTask<Void, Void, Void> {
+
+        private PackageManager pm;
+
+        public LoadApps(PackageManager packageManager) {
+           pm = packageManager;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (! Shell.rootAccess()) return null;
+            MagiskHideFragment.hideList.clear();
+            MagiskHideFragment.fListApps.clear();
+            MagiskHideFragment.listApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+            for (Iterator<ApplicationInfo> i = MagiskHideFragment.listApps.iterator(); i.hasNext(); ) {
+                ApplicationInfo info = i.next();
+                if (MagiskHideFragment.blacklist.contains(info.packageName) || !info.enabled)
+                    i.remove();
+            }
+            Collections.sort(MagiskHideFragment.listApps, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
+                    .compareTo(b.loadLabel(pm).toString().toLowerCase()));
+            MagiskHideFragment.hideList.addAll(Shell.su(Async.MAGISK_HIDE_PATH + "list"));
+            MagiskHideFragment.fListApps.addAll(MagiskHideFragment.listApps);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            MagiskHideFragment.packageLoadDone.trigger();
         }
     }
 

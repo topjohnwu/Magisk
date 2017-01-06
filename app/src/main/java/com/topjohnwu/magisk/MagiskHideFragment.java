@@ -17,24 +17,38 @@ import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MagiskHideFragment extends Fragment {
+public class MagiskHideFragment extends Fragment implements CallbackHandler.EventListener {
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
+    public static List<ApplicationInfo> listApps, fListApps = new ArrayList<>();
+    public static List<String> hideList = new ArrayList<>();
+    // Don't show in list...
+    public static final List<String> blacklist =  Arrays.asList(
+            "android",
+            "com.topjohnwu.magisk",
+            "com.google.android.gms",
+            "com.google.android.apps.walletnfcrel",
+            "com.nianticlabs.pokemongo"
+    );
+    public static CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
+
     private PackageManager packageManager;
     private View mView;
-    private List<ApplicationInfo> listApps = new ArrayList<>(), fListApps = new ArrayList<>();
-    private List<String> hideList = new ArrayList<>();
     private ApplicationAdapter appAdapter = new ApplicationAdapter(fListApps, hideList);
 
     private SearchView.OnQueryTextListener searchListener;
@@ -50,14 +64,15 @@ public class MagiskHideFragment extends Fragment {
         mSwipeRefreshLayout.setRefreshing(true);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new LoadApps().exec();
+            new Async.LoadApps(packageManager).exec();
         });
 
-        recyclerView.swapAdapter(appAdapter, true);
+        recyclerView.setAdapter(appAdapter);
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                new FilterApps().exec(query);
                 return false;
             }
 
@@ -68,7 +83,6 @@ public class MagiskHideFragment extends Fragment {
             }
         };
 
-        new LoadApps().exec();
         return mView;
     }
 
@@ -85,26 +99,22 @@ public class MagiskHideFragment extends Fragment {
         setHasOptionsMenu(true);
         mView = this.getView();
         getActivity().setTitle(R.string.magiskhide);
+        CallbackHandler.register(packageLoadDone, this);
+        if (packageLoadDone.isTriggered) {
+            onTrigger(packageLoadDone);
+        }
     }
 
-    private class LoadApps extends Async.RootTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            listApps.clear();
-            hideList.clear();
-            fListApps.clear();
-            listApps.addAll(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
-            Collections.sort(listApps, (a, b) -> a.loadLabel(packageManager).toString().toLowerCase()
-                    .compareTo(b.loadLabel(packageManager).toString().toLowerCase()));
-            hideList.addAll(Shell.su(Async.MAGISK_HIDE_PATH + "list"));
-            fListApps.addAll(listApps);
-            return null;
-        }
+    @Override
+    public void onPause() {
+        super.onPause();
+        CallbackHandler.unRegister(packageLoadDone, this);
+    }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            updateUI();
-        }
+    @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        Logger.dev("MagiskHideFragment: UI refresh");
+        updateUI();
     }
 
     private class FilterApps extends Async.NormalTask<String, Void, Void> {
