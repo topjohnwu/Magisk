@@ -19,12 +19,9 @@ import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;

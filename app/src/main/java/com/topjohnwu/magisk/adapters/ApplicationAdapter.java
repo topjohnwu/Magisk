@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
 
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;

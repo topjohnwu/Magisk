@@ -34,7 +34,6 @@ public class SplashActivity extends AppCompatActivity {
         // Start all async tasks
         new Async.GetBootBlocks().exec();
         new Async.CheckUpdates().exec();
-        Async.checkSafetyNet(getApplicationContext());
         new Async.LoadModules() {
             @Override
             protected void onPostExecute(Void v) {

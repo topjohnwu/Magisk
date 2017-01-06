@@ -56,6 +56,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @BindColor(R.color.grey500) int colorNeutral;
     @BindColor(R.color.blue500) int colorInfo;
     @BindColor(android.R.color.transparent) int trans;
+    int defaultColor;
 
     static {
         checkMagiskInfo();
@@ -67,29 +68,36 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         View v = inflater.inflate(R.layout.status_fragment, container, false);
         ButterKnife.bind(this, v);
 
+        defaultColor = magiskUpdateText.getCurrentTextColor();
+
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             magiskStatusContainer.setBackgroundColor(trans);
             magiskStatusIcon.setImageResource(0);
             magiskUpdateText.setText(R.string.checking_for_updates);
             magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
+            magiskUpdateText.setTextColor(defaultColor);
 
+            safetyNetProgress.setVisibility(View.GONE);
+            safetyNetContainer.setBackgroundColor(colorNeutral);
+            safetyNetIcon.setImageResource(R.drawable.ic_safetynet);
+            safetyNetStatusText.setText(R.string.safetyNet_check_text);
+            safetyNetStatusText.setTextColor(defaultColor);
+
+            safetyNetDone.isTriggered = false;
+
+            updateUI();
+            new Async.CheckUpdates().exec();
+        });
+
+        updateUI();
+
+        safetyNetContainer.setOnClickListener(view -> {
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetContainer.setBackgroundColor(trans);
             safetyNetIcon.setImageResource(0);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-
-            updateUI();
-            new Async.CheckUpdates().exec();
             Async.checkSafetyNet(getActivity());
         });
-
-        updateUI();
-        if (updateCheckDone.isTriggered) {
-            updateCheckUI();
-        }
-        if (safetyNetDone.isTriggered) {
-            updateSafetyNetUI();
-        }
 
         if (magiskVersion < 0 && Shell.rootAccess()) {
             MainActivity.alertBuilder
@@ -127,12 +135,18 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         super.onResume();
         CallbackHandler.register(updateCheckDone, this);
         CallbackHandler.register(safetyNetDone, this);
+        if (updateCheckDone.isTriggered) {
+            updateCheckUI();
+        }
+        if (safetyNetDone.isTriggered) {
+            updateSafetyNetUI();
+        }
         getActivity().setTitle(R.string.status);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         CallbackHandler.unRegister(updateCheckDone, this);
         CallbackHandler.unRegister(safetyNetDone, this);
     }
