@@ -93,7 +93,6 @@
     <string name="settings_shell_logging_summary">Schakel dit in om alle shell commands en output te loggen</string>
     <string name="settings_magiskhide_title">Magisk verbergen</string>
     <string name="settings_magiskhide_summary">Reboot om de instellingen toe te passen</string>
-    <string name="zip_install_unzip_zip_msg"></string>
 
     <!-- Strings related to Settings -->
 

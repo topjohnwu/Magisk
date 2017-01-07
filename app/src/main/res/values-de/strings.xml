@@ -3,7 +3,7 @@
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
-    <string name="navigation_drawer_close">Navigationsleiste schliessen</string>
+    <string name="navigation_drawer_close">Navigationsleiste schließen</string>
     <string name="modules">Module</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
