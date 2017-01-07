@@ -69,7 +69,7 @@
     <string name="app_developers">主要开发者</string>
     <string name="app_developers_"><![CDATA[此应用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 与 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作开发。]]></string>
     <string name="app_changelog">应用更新日志</string>
-    <string name="translators" />
+    <string name="translators">gh2923</string>
     <string name="app_version">应用版本</string>
     <string name="app_source_code">源代码</string>
     <string name="donation">捐赠</string>

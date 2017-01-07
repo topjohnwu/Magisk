@@ -49,7 +49,7 @@
     <string name="app_developers">Sviluppatori</string>
     <string name="app_developers_"><![CDATA[App creata da <a href="https://github.com/topjohnwu">topjohnwu</a> in collaborazione con <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Changelog</string>
-    <string name="translators" />
+    <string name="translators">Fabb2303</string>
     <string name="app_version">Versione App</string>
     <string name="app_source_code">Codice sorgente</string>
     <string name="donation">Donazione</string>

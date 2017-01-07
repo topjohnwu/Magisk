@@ -49,7 +49,7 @@
     <string name="app_developers">Hoofddevelopers</string>
     <string name="app_developers_"><![CDATA[App gemaakt door <a href="https://github.com/topjohnwu">topjohnwu</a> in samenwerking met <a href="https://github.com/d8ahazard">Digitalhigh</a> en <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators" />
+    <string name="translators">NaamloosDT, Klaessen</string>
     <string name="app_version">App\'s versie</string>
     <string name="app_source_code">Source code</string>
     <string name="donation">Donatie</string>

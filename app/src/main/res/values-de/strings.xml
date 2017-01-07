@@ -49,7 +49,7 @@
     <string name="app_developers">Entwickler</string>
     <string name="app_developers_"><![CDATA[Anwendung entwickelt von <a href="https://github.com/topjohnwu">topjohnwu</a> in Zusammenarbeit mit <a href="https://github.com/d8ahazard">Digitalhigh</a> und <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Anwendungs changelog</string>
-    <string name="translators" />
+    <string name="translators">skalnet</string>
     <string name="app_version">Anwendungs Version</string>
     <string name="app_source_code">Quelltext</string>
     <string name="donation">Spende</string>
