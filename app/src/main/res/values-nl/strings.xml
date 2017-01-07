@@ -80,6 +80,9 @@
     <string name="settings_general_category">Algemeen</string>
     <string name="settings_theme_title">Thema</string>
     <string name="settings_theme_summary">Selecteer een thema</string>
+    <string name="theme_default">Standaard</string>
+    <string name="theme_dark">Donker</string>
+
     <string name="settings_busybox_title">Schakel BusyBox in</string>
     <string name="settings_busybox_summary">Maakt Magisk\'s ingebouwde BusyBox zichtbaar in PATH</string>
 

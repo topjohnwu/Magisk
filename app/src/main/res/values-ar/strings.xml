@@ -85,6 +85,8 @@
     <string name="settings_general_category">عام</string>
     <string name="settings_theme_title">السمة</string>
     <string name="settings_theme_summary">أختر سمة</string>
+    <string name="theme_default">إفتراضي</string>
+    <string name="theme_dark">غامق</string>
 
     <string name="settings_magiskhide_title">تمكين إخفاء Magisk</string>
     <string name="settings_magiskhide_summary">إخفاء Magisk من مختلف حالات الإكتشاف</string>

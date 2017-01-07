@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="themes">
-        <item>"Default"</item>
-        <item>"Dark"</item>
+        <item>@string/theme_default</item>
+        <item>@string/theme_dark</item>
     </string-array>
     <string-array name="themes_values">
         <item>@string/theme_default_value</item>

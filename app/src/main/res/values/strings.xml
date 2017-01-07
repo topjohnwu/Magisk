@@ -119,6 +119,8 @@
     <string name="settings_general_category">General</string>
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_summary">Select a theme</string>
+    <string name="theme_default">Default</string>
+    <string name="theme_dark">Dark</string>
 
     <string name="settings_magiskhide_title">Enable Magisk Hide</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>

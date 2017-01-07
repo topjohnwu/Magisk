@@ -106,6 +106,8 @@
     <string name="settings_general_category">常规</string>
     <string name="settings_theme_title">主题</string>
     <string name="settings_theme_summary">选择一个主题</string>
+    <string name="theme_default">默认</string>
+    <string name="theme_dark">深色</string>
 
     <string name="settings_magiskhide_title">启用 Magisk 隐藏</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>

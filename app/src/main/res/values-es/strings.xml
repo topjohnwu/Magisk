@@ -82,6 +82,8 @@
     <string name="settings_general_category">General</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_summary">Selecciona un tema</string>
+    <string name="theme_default">Por defecto</string>
+    <string name="theme_dark">Oscuro</string>
 
     <string name="settings_magiskhide_title">Habilitar Magisk Hide</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>

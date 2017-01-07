@@ -80,6 +80,9 @@
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_theme_title">Aussehen</string>
     <string name="settings_theme_summary">Wähle ein Theme aus</string>
+    <string name="theme_default">Standard</string>
+    <string name="theme_dark">Dunkel</string>
+
     <string name="settings_busybox_title">BusyBox aktivieren</string>
     <string name="settings_busybox_summary">Magisks eingebautes BusyBox zum PATH hinzufügen</string>
 

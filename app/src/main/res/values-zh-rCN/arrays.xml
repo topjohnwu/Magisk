@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="themes">
-        <item>"默认"</item>
-        <item>"深色"</item>
-    </string-array>
-</resources>
