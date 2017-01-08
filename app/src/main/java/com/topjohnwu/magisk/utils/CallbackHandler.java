@@ -33,10 +33,22 @@ public class CallbackHandler {
     }
 
     public static class Event {
+
         public boolean isTriggered = false;
+        private Object result;
+
         public void trigger() {
+            trigger(null);
+        }
+
+        public void trigger(Object result) {
+            this.result = result;
             isTriggered = true;
             triggerCallback(this);
+        }
+
+        public Object getResult() {
+            return result;
         }
     }
 

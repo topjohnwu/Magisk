@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.widget.Toast;
 
@@ -142,6 +143,10 @@ public class Utils {
         } else {
             return new AlertDialog.Builder(context);
         }
+    }
+
+    public static boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
+        return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
     }
 
     public static class ByteArrayInOutStream extends ByteArrayOutputStream {

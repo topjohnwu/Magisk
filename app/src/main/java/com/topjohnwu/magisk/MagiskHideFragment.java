@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.app.Fragment;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,7 +19,6 @@ import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,10 +30,8 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
-    public static List<ApplicationInfo> listApps, fListApps = new ArrayList<>();
-    public static List<String> hideList = new ArrayList<>();
     // Don't show in list...
-    public static final List<String> blacklist =  Arrays.asList(
+    public static final List<String> BLACKLIST =  Arrays.asList(
             "android",
             "com.topjohnwu.magisk",
             "com.google.android.gms",
@@ -46,7 +42,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
 
     private PackageManager packageManager;
     private View mView;
-    private ApplicationAdapter appAdapter = new ApplicationAdapter(fListApps, hideList);
+    private ApplicationAdapter appAdapter = new ApplicationAdapter();
 
     private SearchView.OnQueryTextListener searchListener;
 
@@ -69,13 +65,13 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                new FilterApps().exec(query);
+                appAdapter.filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                new FilterApps().exec(newText);
+                appAdapter.filter(newText);
                 return false;
             }
         };
@@ -111,33 +107,9 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Override
     public void onTrigger(CallbackHandler.Event event) {
         Logger.dev("MagiskHideFragment: UI refresh");
-        updateUI();
-    }
-
-    private class FilterApps extends Async.NormalTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... strings) {
-            String newText = strings[0];
-            fListApps.clear();
-            for (ApplicationInfo info : listApps) {
-                if (info.loadLabel(packageManager).toString().toLowerCase().contains(newText.toLowerCase())
-                        || info.packageName.toLowerCase().contains(newText.toLowerCase())) {
-                    fListApps.add(info);
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            appAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private void updateUI() {
-        appAdapter.notifyDataSetChanged();
+        Async.LoadApps.Result result = (Async.LoadApps.Result) event.getResult();
+        appAdapter.setLists(result.listApps, result.hideList);
         recyclerView.setVisibility(View.VISIBLE);
         mSwipeRefreshLayout.setRefreshing(false);
     }
-
 }
