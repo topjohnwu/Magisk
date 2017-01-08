@@ -39,13 +39,12 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @BindView(R.id.fab) FloatingActionButton fabio;
 
     private List<Module> listModules = new ArrayList<>();
-    private View mView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.modules_fragment, container, false);
-        ButterKnife.bind(this, mView);
+        View view = inflater.inflate(R.layout.modules_fragment, container, false);
+        ButterKnife.bind(this, view);
 
         fabio.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -74,7 +73,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
             updateUI();
         }
 
-        return mView;
+        return view;
     }
 
     @Override
@@ -96,7 +95,6 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public void onResume() {
         super.onResume();
-        mView = this.getView();
         CallbackHandler.register(moduleLoadDone, this);
         getActivity().setTitle(R.string.modules);
     }

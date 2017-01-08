@@ -41,7 +41,6 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     public static CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
 
     private PackageManager packageManager;
-    private View mView;
     private ApplicationAdapter appAdapter = new ApplicationAdapter();
 
     private SearchView.OnQueryTextListener searchListener;
@@ -49,8 +48,8 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.magisk_hide_fragment, container, false);
-        ButterKnife.bind(this, mView);
+        View view = inflater.inflate(R.layout.magisk_hide_fragment, container, false);
+        ButterKnife.bind(this, view);
 
         packageManager = getActivity().getPackageManager();
 
@@ -76,7 +75,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
             }
         };
 
-        return mView;
+        return view;
     }
 
     @Override
@@ -90,7 +89,6 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     public void onResume() {
         super.onResume();
         setHasOptionsMenu(true);
-        mView = this.getView();
         getActivity().setTitle(R.string.magiskhide);
         CallbackHandler.register(packageLoadDone, this);
         if (packageLoadDone.isTriggered) {
