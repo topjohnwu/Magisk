@@ -1,14 +1,11 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.ImageView;
@@ -29,13 +26,13 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     private List<ApplicationInfo> mOriginalList, mList;
     private List<String> mHideList;
-    private Context context;
     private PackageManager packageManager;
     private ApplicationFilter filter;
 
-    public ApplicationAdapter() {
+    public ApplicationAdapter(PackageManager packageManager) {
         mOriginalList = mList = Collections.emptyList();
         mHideList = Collections.emptyList();
+        this.packageManager = packageManager;
     }
 
     public void setLists(List<ApplicationInfo> listApps, List<String> hideList) {
@@ -47,8 +44,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
-        context = parent.getContext();
-        packageManager = context.getPackageManager();
         ButterKnife.bind(this, mView);
         return new ViewHolder(mView);
     }
@@ -101,12 +96,9 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         @BindView(R.id.app_package) TextView appPackage;
         @BindView(R.id.checkbox) CheckBox checkBox;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
-            WindowManager windowmanager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             ButterKnife.bind(this, itemView);
-            DisplayMetrics dimension = new DisplayMetrics();
-            windowmanager.getDefaultDisplay().getMetrics(dimension);
         }
     }
 

@@ -40,8 +40,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     );
     public static CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
 
-    private PackageManager packageManager;
-    private ApplicationAdapter appAdapter = new ApplicationAdapter();
+    private ApplicationAdapter appAdapter;
 
     private SearchView.OnQueryTextListener searchListener;
 
@@ -51,7 +50,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         View view = inflater.inflate(R.layout.magisk_hide_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        packageManager = getActivity().getPackageManager();
+        PackageManager packageManager = getActivity().getPackageManager();
 
         mSwipeRefreshLayout.setRefreshing(true);
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
@@ -59,6 +58,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
             new Async.LoadApps(packageManager).exec();
         });
 
+        appAdapter = new ApplicationAdapter(packageManager);
         recyclerView.setAdapter(appAdapter);
 
         searchListener = new SearchView.OnQueryTextListener() {
