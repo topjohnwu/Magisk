@@ -55,14 +55,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.appIcon.setImageDrawable(info.loadIcon(packageManager));
         holder.appName.setText(info.loadLabel(packageManager));
         holder.appPackage.setText(info.packageName);
-        holder.checkBox.setChecked(false);
-
-        for (String hidePackage : mHideList) {
-            if (info.packageName.contains(hidePackage)) {
-                holder.checkBox.setChecked(true);
-                break;
-            }
-        }
+        holder.checkBox.setChecked(mHideList.contains(info.packageName));
 
         holder.checkBox.setOnClickListener(v -> {
             CheckBox chkbox = (CheckBox) v;
