@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,6 +44,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     private ApplicationAdapter appAdapter;
 
     private SearchView.OnQueryTextListener searchListener;
+    private String lastFilter;
 
     @Nullable
     @Override
@@ -64,12 +66,14 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                lastFilter = query;
                 appAdapter.filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                lastFilter = newText;
                 appAdapter.filter(newText);
                 return false;
             }
@@ -109,5 +113,8 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         appAdapter.setLists(result.listApps, result.hideList);
         recyclerView.setVisibility(View.VISIBLE);
         mSwipeRefreshLayout.setRefreshing(false);
+        if (!TextUtils.isEmpty(lastFilter)) {
+            appAdapter.filter(lastFilter);
+        }
     }
 }
