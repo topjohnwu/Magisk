@@ -55,10 +55,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         PackageManager packageManager = getActivity().getPackageManager();
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            recyclerView.setVisibility(View.GONE);
-            new Async.LoadApps(packageManager).exec();
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new Async.LoadApps(packageManager).exec());
 
         appAdapter = new ApplicationAdapter(packageManager);
         recyclerView.setAdapter(appAdapter);
@@ -111,7 +108,6 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
         Logger.dev("MagiskHideFragment: UI refresh");
         Async.LoadApps.Result result = (Async.LoadApps.Result) event.getResult();
         appAdapter.setLists(result.listApps, result.hideList);
-        recyclerView.setVisibility(View.VISIBLE);
         mSwipeRefreshLayout.setRefreshing(false);
         if (!TextUtils.isEmpty(lastFilter)) {
             appAdapter.filter(lastFilter);
