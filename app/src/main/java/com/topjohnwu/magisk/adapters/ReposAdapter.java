@@ -8,12 +8,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,9 +32,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
 
     private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
     private HashSet<Repo> expandList = new HashSet<>();
-    private Context mContext;
-
-    private int expandHeight = 0;
 
     public ReposAdapter(List<Repo> update, List<Repo> installed, List<Repo> others) {
         mUpdateRepos = update;
@@ -48,13 +43,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
         ButterKnife.bind(this, v);
-        mContext = parent.getContext();
-
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        Context context = holder.itemView.getContext();
         final Repo repo;
         if (position >= mUpdateRepos.size()) {
             position -= mUpdateRepos.size();
@@ -75,7 +69,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             holder.versionName.setText(versionName);
         }
         if (author != null) {
-            holder.author.setText(mContext.getString(R.string.author, author));
+            holder.author.setText(context.getString(R.string.author, author));
         }
         if (description != null) {
             holder.description.setText(description);
@@ -94,17 +88,17 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         });
         holder.changeLog.setOnClickListener(view -> {
             if (!TextUtils.isEmpty(repo.getLogUrl())) {
-                new WebWindow(mContext.getString(R.string.changelog), repo.getLogUrl(), mContext);
+                new WebWindow(context.getString(R.string.changelog), repo.getLogUrl(), context);
             }
         });
         holder.updateImage.setOnClickListener(view -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            Utils.getAlertDialogBuilder(mContext)
-                    .setTitle(mContext.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(mContext.getString(R.string.repo_install_msg, filename))
+            Utils.getAlertDialogBuilder(context)
+                    .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                    .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
                     .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
-                            mContext,
+                            context,
                             new RepoDlReceiver(),
                             repo.getZipUrl(),
                             Utils.getLegalFilename(filename)))
@@ -113,12 +107,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         });
         holder.authorLink.setOnClickListener(view -> {
             if (!TextUtils.isEmpty(repo.getDonateUrl())) {
-                mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
             }
         });
         holder.supportLink.setOnClickListener(view -> {
             if (!TextUtils.isEmpty(repo.getSupportUrl())) {
-                mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
             }
         });
     }
@@ -128,7 +122,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         return mUpdateRepos.size() + mInstalledRepos.size() + mOthersRepos.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.title) TextView title;
         @BindView(R.id.version_name) TextView versionName;
@@ -143,13 +137,11 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         private ValueAnimator mAnimator;
         private ObjectAnimator animY2;
         private boolean mExpanded = false;
+        private static int expandHeight = 0;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
-            WindowManager windowmanager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             ButterKnife.bind(this, itemView);
-            DisplayMetrics dimension = new DisplayMetrics();
-            windowmanager.getDefaultDisplay().getMetrics(dimension);
             expandLayout.getViewTreeObserver().addOnPreDrawListener(
                     new ViewTreeObserver.OnPreDrawListener() {
 

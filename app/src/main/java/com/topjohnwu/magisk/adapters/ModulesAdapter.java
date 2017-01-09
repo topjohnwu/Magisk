@@ -3,11 +3,9 @@ package com.topjohnwu.magisk.adapters;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,7 +23,6 @@ import butterknife.ButterKnife;
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
     private final List<Module> mList;
-    private Context context;
 
     public ModulesAdapter(List<Module> list) {
         mList = list;
@@ -34,14 +31,15 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
-        context = parent.getContext();
         ButterKnife.bind(this, view);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        Context context = holder.itemView.getContext();
         final Module module = mList.get(position);
+
         holder.title.setText(module.getName());
         String author = module.getAuthor();
         String versionName = module.getVersion();
@@ -144,7 +142,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         return mList.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.title) TextView title;
         @BindView(R.id.version_name) TextView versionName;
@@ -154,12 +152,9 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         @BindView(R.id.author) TextView author;
         @BindView(R.id.delete) ImageView delete;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
-            WindowManager windowmanager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             ButterKnife.bind(this, itemView);
-            DisplayMetrics dimension = new DisplayMetrics();
-            windowmanager.getDefaultDisplay().getMetrics(dimension);
 
             if (!Shell.rootAccess()) {
                 checkBox.setEnabled(false);
