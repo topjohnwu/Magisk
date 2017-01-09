@@ -49,67 +49,44 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-            if (isChecked) {
-                new Async.RootTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        module.removeDisableFile();
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void v) {
-                        Snackbar.make(holder.title, R.string.disable_file_removed, Snackbar.LENGTH_SHORT).show();
-                    }
-                }.exec();
-            } else {
-                new Async.RootTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        module.createDisableFile();
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void v) {
-                        Snackbar.make(holder.title, R.string.disable_file_created, Snackbar.LENGTH_SHORT).show();
-                    }
-                }.exec();
+        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> new Async.RootTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if (isChecked) {
+                    module.removeDisableFile();
+                } else {
+                    module.createDisableFile();
+                }
+                return null;
             }
-        });
 
-        holder.delete.setOnClickListener(v -> {
-            if (module.willBeRemoved()) {
-                new Async.RootTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        module.deleteRemoveFile();
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void v) {
-                        Snackbar.make(holder.title, R.string.remove_file_deleted, Snackbar.LENGTH_SHORT).show();
-                        updateDeleteButton(holder, module);
-                    }
-                }.exec();
-            } else {
-                new Async.RootTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        module.createRemoveFile();
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void v) {
-                        Snackbar.make(holder.title, R.string.remove_file_created, Snackbar.LENGTH_SHORT).show();
-                        updateDeleteButton(holder, module);
-                    }
-                }.exec();
+            @Override
+            protected void onPostExecute(Void v) {
+                int title = isChecked ? R.string.disable_file_removed : R.string.disable_file_created;
+                Snackbar.make(holder.title, title, Snackbar.LENGTH_SHORT).show();
             }
-        });
+        }.exec());
+
+        holder.delete.setOnClickListener(v -> new Async.RootTask<Void, Void, Void>() {
+            private final boolean removed = module.willBeRemoved();
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                if (removed) {
+                    module.deleteRemoveFile();
+                } else {
+                    module.createRemoveFile();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                int title = removed ? R.string.remove_file_deleted : R.string.remove_file_created;
+                Snackbar.make(holder.title, title, Snackbar.LENGTH_SHORT).show();
+                updateDeleteButton(holder, module);
+            }
+        }.exec());
 
         if (module.isUpdated()) {
             holder.notice.setVisibility(View.VISIBLE);
