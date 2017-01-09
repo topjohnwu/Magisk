@@ -52,18 +52,10 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         Repo repo = getItem(position);
 
         holder.title.setText(repo.getName());
+        holder.versionName.setText(repo.getVersion());
         String author = repo.getAuthor();
-        String versionName = repo.getVersion();
-        String description = repo.getDescription();
-        if (versionName != null) {
-            holder.versionName.setText(versionName);
-        }
-        if (author != null) {
-            holder.author.setText(context.getString(R.string.author, author));
-        }
-        if (description != null) {
-            holder.description.setText(description);
-        }
+        holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
+        holder.description.setText(repo.getDescription());
 
         holder.setExpanded(expandList.contains(repo));
 

@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.adapters;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,18 +42,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         final Module module = mList.get(position);
 
         holder.title.setText(module.getName());
+        holder.versionName.setText(module.getVersion());
         String author = module.getAuthor();
-        String versionName = module.getVersion();
-        String description = module.getDescription();
-        if (versionName != null) {
-            holder.versionName.setText(versionName);
-        }
-        if (author != null) {
-            holder.author.setText(context.getString(R.string.author, author));
-        }
-        if (description != null) {
-            holder.description.setText(description);
-        }
+        holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
+        holder.description.setText(module.getDescription());
 
         holder.checkBox.setChecked(module.isEnabled());
         holder.checkBox.setOnClickListener((v) -> {
