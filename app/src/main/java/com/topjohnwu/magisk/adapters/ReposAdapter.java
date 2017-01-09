@@ -49,18 +49,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
-        final Repo repo;
-        if (position >= mUpdateRepos.size()) {
-            position -= mUpdateRepos.size();
-            if (position >= mInstalledRepos.size()) {
-                position -= mInstalledRepos.size();
-                repo = mOthersRepos.get(position);
-            } else {
-                repo = mInstalledRepos.get(position);
-            }
-        } else {
-            repo = mUpdateRepos.get(position);
-        }
+        Repo repo = getItem(position);
+
         holder.title.setText(repo.getName());
         String author = repo.getAuthor();
         String versionName = repo.getVersion();
@@ -120,6 +110,20 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return mUpdateRepos.size() + mInstalledRepos.size() + mOthersRepos.size();
+    }
+
+    private Repo getItem(int position) {
+        if (position >= mUpdateRepos.size()) {
+            position -= mUpdateRepos.size();
+            if (position >= mInstalledRepos.size()) {
+                position -= mInstalledRepos.size();
+                return mOthersRepos.get(position);
+            } else {
+                return mInstalledRepos.get(position);
+            }
+        } else {
+            return mUpdateRepos.get(position);
+        }
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
