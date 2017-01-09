@@ -47,10 +47,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
         holder.description.setText(module.getDescription());
 
+        holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnClickListener((v) -> {
-            CheckBox checkBox = (CheckBox) v;
-            if (checkBox.isChecked()) {
+        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+            if (isChecked) {
                 new Async.RootTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... voids) {
