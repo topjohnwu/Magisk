@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,7 +93,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
             }
         });
         holder.changeLog.setOnClickListener(view -> {
-            if (!repo.getLogUrl().isEmpty()) {
+            if (!TextUtils.isEmpty(repo.getLogUrl())) {
                 new WebWindow(mContext.getString(R.string.changelog), repo.getLogUrl(), mContext);
             }
         });
@@ -111,12 +112,12 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     .show();
         });
         holder.authorLink.setOnClickListener(view -> {
-            if (!repo.getDonateUrl().isEmpty()) {
+            if (!TextUtils.isEmpty(repo.getDonateUrl())) {
                 mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getDonateUrl())));
             }
         });
         holder.supportLink.setOnClickListener(view -> {
-            if (!repo.getSupportUrl().isEmpty()) {
+            if (!TextUtils.isEmpty(repo.getSupportUrl())) {
                 mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(repo.getSupportUrl())));
             }
         });
