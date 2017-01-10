@@ -37,9 +37,6 @@ public class Utils {
     public static boolean isDownloading = false;
     public static boolean isDarkTheme;
 
-    private static final String cryptoPass = "MagiskRox666";
-    private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
-
     public static boolean itemExist(String path) {
         return itemExist(true, path);
     }
@@ -116,29 +113,6 @@ public class Utils {
         receiver.setDownloadID(downloadManager.enqueue(request));
         receiver.setFilename(filename);
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    }
-
-    public static String getToken() {
-
-        try {
-            DESKeySpec keySpec = new DESKeySpec(cryptoPass.getBytes("UTF8"));
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
-
-            byte[] encrypedPwdBytes = Base64.decode(secret, Base64.DEFAULT);
-            // cipher is not thread safe
-            Cipher cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
-
-            return new String(decrypedValueBytes);
-
-        } catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException
-                | BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException
-                | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return secret;
     }
 
     public static String getLegalFilename(CharSequence filename) {
