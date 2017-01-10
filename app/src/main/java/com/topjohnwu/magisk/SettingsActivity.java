@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (Utils.isDarkTheme(theme, this)) {
+        if (Utils.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
 
@@ -120,10 +120,11 @@ public class SettingsActivity extends AppCompatActivity {
 
             switch (key) {
                 case "theme":
-                    String theme = prefs.getString(key, "");
+                    String theme = prefs.getString("theme", getString(R.string.theme_default_value));
+                    Utils.isDarkTheme = theme.equalsIgnoreCase(getString(R.string.theme_dark_value));
 
                     themePreference.setSummary(theme);
-                    if (Utils.isDarkTheme(theme, getActivity())) {
+                    if (Utils.isDarkTheme) {
                         getActivity().getApplication().setTheme(R.style.AppTheme_dh);
                     } else {
                         getActivity().getApplication().setTheme(R.style.AppTheme);

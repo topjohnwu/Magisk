@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -39,14 +39,13 @@ public class AboutActivity extends AppCompatActivity {
     @BindView(R.id.app_source_code) AboutCardRow appSourceCode;
     @BindView(R.id.support_thread) AboutCardRow supportThread;
     @BindView(R.id.donation) AboutCardRow donation;
-    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (Utils.isDarkTheme(theme, this)) {
+        if (Utils.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
         setContentView(R.layout.activity_about);
@@ -77,11 +76,6 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         appChangelog.removeSummary();
-        if (Utils.isDarkTheme(theme, this)) {
-            builder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
-        } else {
-            builder = new AlertDialog.Builder(this);
-        }
         if (changes == null) {
             appChangelog.setVisibility(View.GONE);
         } else {
@@ -92,13 +86,11 @@ public class AboutActivity extends AppCompatActivity {
                 result = Html.fromHtml(changes);
             }
             appChangelog.setOnClickListener(v -> {
-                AlertDialog d = builder
+                AlertDialog d = Utils.getAlertDialogBuilder(this)
                         .setTitle(R.string.app_changelog)
                         .setMessage(result)
                         .setPositiveButton(android.R.string.ok, null)
-                        .create();
-
-                d.show();
+                        .show();
 
                 //noinspection ConstantConditions
                 ((TextView) d.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
@@ -113,7 +105,7 @@ public class AboutActivity extends AppCompatActivity {
             } else {
                 result = Html.fromHtml(getString(R.string.app_developers_));
             }
-            AlertDialog d = builder
+            AlertDialog d = Utils.getAlertDialogBuilder(this)
                     .setTitle(R.string.app_developers)
                     .setMessage(result)
                     .setPositiveButton(android.R.string.ok, null)

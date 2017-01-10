@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -34,6 +35,7 @@ import javax.crypto.spec.DESKeySpec;
 public class Utils {
 
     public static boolean isDownloading = false;
+    public static boolean isDarkTheme;
 
     private static final String cryptoPass = "MagiskRox666";
     private static final String secret = "GTYybRBTYf5his9kQ16ZNO7qgkBJ/5MyVe4CGceAOIoXgSnnk8FTd4F1dE9p5Eus";
@@ -164,8 +166,12 @@ public class Utils {
         return null;
     }
 
-    public static boolean isDarkTheme(String theme, Context resources) {
-        return theme != null && theme.equalsIgnoreCase(resources.getString(R.string.theme_dark_value));
+    public static AlertDialog.Builder getAlertDialogBuilder(Context context) {
+        if (isDarkTheme) {
+            return new AlertDialog.Builder(context, R.style.AlertDialog_dh);
+        } else {
+            return new AlertDialog.Builder(context);
+        }
     }
 
     public static class ByteArrayInOutStream extends ByteArrayOutputStream {

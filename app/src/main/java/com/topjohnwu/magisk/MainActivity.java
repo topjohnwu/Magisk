@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -25,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.utils.CallbackHandler;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -34,8 +32,6 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CallbackHandler.EventListener {
-
-    public static AlertDialog.Builder alertBuilder = null;
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
@@ -54,13 +50,8 @@ public class MainActivity extends AppCompatActivity
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        String theme = prefs.getString("theme", "");
-        Logger.dev("MainActivity: Theme is " + theme);
-        if (Utils.isDarkTheme(theme, this)) {
+        if (Utils.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
-            alertBuilder = new AlertDialog.Builder(this, R.style.AlertDialog_dh);
-        } else {
-            alertBuilder = new AlertDialog.Builder(this);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -116,7 +107,6 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
-        alertBuilder = null;
     }
 
     @Override

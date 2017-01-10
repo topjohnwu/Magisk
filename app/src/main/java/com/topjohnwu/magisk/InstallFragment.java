@@ -53,7 +53,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
             }
             String filename = "Magisk-v" + StatusFragment.remoteMagiskVersion + ".zip";
             String finalBootImage = bootImage;
-            MainActivity.alertBuilder
+            Utils.getAlertDialogBuilder(getActivity())
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                     .setMessage(getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)

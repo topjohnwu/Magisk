@@ -3,8 +3,6 @@ package com.topjohnwu.magisk;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +19,7 @@ import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
 
@@ -108,7 +107,8 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         });
 
         if (magiskVersion < 0 && Shell.rootAccess() && !noDialog) {
-            MainActivity.alertBuilder
+            noDialog = true;
+            Utils.getAlertDialogBuilder(getActivity())
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
@@ -120,7 +120,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                             transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
                         } catch (IllegalStateException ignored) {}
                     })
-                    .setNegativeButton(R.string.no_thanks, (dialogInterface, i) -> noDialog = true)
+                    .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }
 
@@ -240,7 +240,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
 
-        updateMagisk = MainActivity.alertBuilder
+        updateMagisk = Utils.getAlertDialogBuilder(getActivity())
                 .setTitle(R.string.magisk_update_title)
                 .setMessage(getString(R.string.magisk_update_message, remoteMagiskVersion))
                 .setCancelable(true)
@@ -255,12 +255,13 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
                     getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(releaseNoteLink)));
                 })
-                .setNegativeButton(R.string.no_thanks, (dialogInterface, i) -> noDialog = true)
+                .setNegativeButton(R.string.no_thanks, null)
                 .create();
 
         if (magiskVersion < remoteMagiskVersion && Shell.rootAccess()) {
             magiskStatusContainer.setOnClickListener(view -> updateMagisk.show());
             if (!noDialog) {
+                noDialog = true;
                 updateMagisk.show();
             }
         }

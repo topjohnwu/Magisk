@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.InstallFragment;
 import com.topjohnwu.magisk.MagiskHideFragment;
-import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ReposFragment;
@@ -292,7 +291,7 @@ public class Async {
             StatusFragment.updateCheckDone.trigger();
             new LoadModules().exec();
 
-            MainActivity.alertBuilder
+            Utils.getAlertDialogBuilder(mContext)
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
                     .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.sh("su -c reboot"))

@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.RepoDlReceiver;
@@ -99,7 +98,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         });
         holder.updateImage.setOnClickListener(view -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            MainActivity.alertBuilder
+            Utils.getAlertDialogBuilder(mContext)
                     .setTitle(mContext.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(mContext.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
