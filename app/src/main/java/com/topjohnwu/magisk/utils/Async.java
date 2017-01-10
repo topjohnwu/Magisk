@@ -36,6 +36,7 @@ public class Async {
     public abstract static class RootTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
         @SafeVarargs
         public final void exec(Params... params) {
+            if (!Shell.rootAccess()) return;
             executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, params);
         }
     }
@@ -126,7 +127,6 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if (! Shell.rootAccess()) return null;
             MagiskHideFragment.hideList.clear();
             MagiskHideFragment.fListApps.clear();
             MagiskHideFragment.listApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -240,27 +240,20 @@ public class Async {
                 return -1;
             }
             if (!unzipAndCheck()) return 0;
-            if (Shell.rootAccess()) {
-                publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
-                ret = Shell.su(
-                        "BOOTMODE=true sh " + mCachedFile.getParent() +
-                                "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
-                        "if [ $? -eq 0 ]; then echo true; else echo false; fi"
-                );
-                Logger.dev("FlashZip: Console log:");
-                for (String line : ret) {
-                    Logger.dev(line);
-                }
-                Shell.su(
-                        "rm -rf " + mCachedFile.getParent() + "/*",
-                        "rm -rf " + TMP_FOLDER_PATH
-                );
-            } else {
-                if (mCachedFile != null && mCachedFile.exists() && !mCachedFile.delete()) {
-                    Utils.removeItem(mCachedFile.getPath());
-                }
-                return -1;
+            publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
+            ret = Shell.su(
+                    "BOOTMODE=true sh " + mCachedFile.getParent() +
+                            "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
+                    "if [ $? -eq 0 ]; then echo true; else echo false; fi"
+            );
+            Logger.dev("FlashZip: Console log:");
+            for (String line : ret) {
+                Logger.dev(line);
             }
+            Shell.su(
+                    "rm -rf " + mCachedFile.getParent() + "/*",
+                    "rm -rf " + TMP_FOLDER_PATH
+            );
             if (Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 return 1;
             }

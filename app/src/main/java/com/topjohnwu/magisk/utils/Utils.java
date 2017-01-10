@@ -74,11 +74,7 @@ public class Utils {
     public static List<String> getModList(String path) {
         List<String> ret;
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
-        if (Shell.rootAccess()) {
-            ret = Shell.su(command);
-        } else {
-            ret = Shell.sh(command);
-        }
+        ret = Shell.su(command);
         return ret;
     }
 

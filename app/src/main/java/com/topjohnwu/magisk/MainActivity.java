@@ -144,8 +144,12 @@ public class MainActivity extends AppCompatActivity
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(StatusFragment.magiskVersion > 0 &&
                 prefs.getBoolean("magiskhide", false) && Shell.rootAccess());
-        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion > 0);
-        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion > 0);
+        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion > 0 &&
+                Shell.rootAccess());
+        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion > 0 &&
+                Shell.rootAccess());
+        menu.findItem(R.id.log).setVisible(Shell.rootAccess());
+        menu.findItem(R.id.install).setVisible(Shell.rootAccess());
     }
 
     public void navigate(final int itemId) {
