@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
+    public static CallbackHandler.Event recreate = new CallbackHandler.Event();
+
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
 
@@ -90,23 +92,29 @@ public class MainActivity extends AppCompatActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-
-        if (StatusFragment.updateCheckDone.isTriggered) {
-            onTrigger(StatusFragment.updateCheckDone);
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         CallbackHandler.register(StatusFragment.updateCheckDone, this);
+        CallbackHandler.register(recreate, this);
+        if (StatusFragment.updateCheckDone.isTriggered) {
+            onTrigger(StatusFragment.updateCheckDone);
+        }
         checkHideSection();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
+        CallbackHandler.unRegister(recreate, this);
     }
 
     @Override
@@ -135,18 +143,22 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTrigger(CallbackHandler.Event event) {
-        Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.install).setVisible(StatusFragment.remoteMagiskVersion > 0 &&
-                Shell.rootAccess());
+        if (event == StatusFragment.updateCheckDone) {
+            Menu menu = navigationView.getMenu();
+            menu.findItem(R.id.install).setVisible(StatusFragment.remoteMagiskVersion > 0 &&
+                    Shell.rootAccess());
+        } else if (event == recreate) {
+            recreate();
+        }
     }
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(StatusFragment.magiskVersion > 0 &&
+        menu.findItem(R.id.magiskhide).setVisible(StatusFragment.magiskVersion >= 8 &&
                 prefs.getBoolean("magiskhide", false) && Shell.rootAccess());
-        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion > 0 &&
+        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion >= 4 &&
                 Shell.rootAccess());
-        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion > 0 &&
+        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion >= 4 &&
                 Shell.rootAccess());
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.install).setVisible(Shell.rootAccess());

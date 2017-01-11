@@ -12,6 +12,11 @@
             android:entries="@array/themes"
             android:entryValues="@array/themes_values"/>
 
+        <Preference
+            android:key="clear"
+            android:title="@string/settings_clear_cache_title"
+            android:summary="@string/settings_clear_cache_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

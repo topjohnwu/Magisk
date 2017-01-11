@@ -108,7 +108,9 @@
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="magisk_update_title">New Magisk Update Available!</string>
     <string name="magisk_update_message">Magisk v%1$.1f update is live, do you want to install?</string>
+    <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="check_release_notes">Check release notes</string>
+    <string name="repo_cache_cleared">Repo cache cleared</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos</string>
@@ -121,6 +123,8 @@
     <string name="settings_theme_summary">Select a theme</string>
     <string name="theme_default">Default</string>
     <string name="theme_dark">Dark</string>
+    <string name="settings_clear_cache_title">Clear Repo Cache</string>
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
 
     <string name="settings_magiskhide_title">Enable Magisk Hide</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
@@ -131,14 +135,13 @@
 
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
-    <string name="settings_developer_logging_summary">Check this to enable more verbose logging.</string>
+    <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>
     <string name="settings_shell_logging_title">Enable shell command debug logging</string>
-    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and output</string>
-
-    <string name="settings_reboot_toast">Reboot to apply settings</string>
+    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and its output</string>
 
     <!-- Themes -->
     <string name="theme_default_value" translatable="false">default</string>
     <string name="theme_dark_value" translatable="false">dark</string>
+
 
 </resources>

@@ -28,10 +28,10 @@ import java.util.Map;
 
 public class ModuleHelper {
     private static final String MAGISK_PATH = "/magisk";
-    private static final String FILE_KEY = "RepoMap";
+    public static final String FILE_KEY = "RepoMap";
     private static final String REPO_KEY = "repomap";
-    private static final String VERSION_KEY = "version";
-    private static final String ETAG_KEY = "ETag";
+    public static final String VERSION_KEY = "version";
+    public static final String ETAG_KEY = "ETag";
     private static final int DATABASE_VER = 1;
 
     private static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();

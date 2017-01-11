@@ -1,10 +1,11 @@
 package com.topjohnwu.magisk;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -86,14 +88,34 @@ public class SettingsActivity extends AppCompatActivity {
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
             CheckBoxPreference hostsPreference = (CheckBoxPreference) findPreference("hosts");
+            Preference clear = findPreference("clear");
 
-            themePreference.setSummary(themePreference.getValue());
+            clear.setOnPreferenceClickListener((pref) -> {
+                SharedPreferences repoMap = getActivity().getSharedPreferences(ModuleHelper.FILE_KEY, Context.MODE_PRIVATE);
+                repoMap.edit()
+                        .putString(ModuleHelper.ETAG_KEY, "")
+                        .putInt(ModuleHelper.VERSION_KEY, 0)
+                        .apply();
+                new Async.LoadRepos(getActivity()).exec();
+                Toast.makeText(getActivity(), R.string.repo_cache_cleared, Toast.LENGTH_LONG).show();
+                return true;
+            });
+
+            if (Utils.isDarkTheme) {
+                themePreference.setSummary(R.string.theme_dark);
+            } else {
+                themePreference.setSummary(R.string.theme_default);
+            }
 
             if (StatusFragment.magiskVersion < 9) {
                 hostsPreference.setEnabled(false);
                 busyboxPreference.setEnabled(false);
             } else if (StatusFragment.magiskVersion < 8) {
                 magiskhidePreference.setEnabled(false);
+            } else if (! Shell.rootAccess()) {
+                busyboxPreference.setEnabled(false);
+                magiskhidePreference.setEnabled(false);
+                hostsPreference.setEnabled(false);
             } else {
                 busyboxPreference.setEnabled(true);
                 magiskhidePreference.setEnabled(true);
@@ -121,81 +143,61 @@ public class SettingsActivity extends AppCompatActivity {
             switch (key) {
                 case "theme":
                     String theme = prefs.getString("theme", getString(R.string.theme_default_value));
-                    Utils.isDarkTheme = theme.equalsIgnoreCase(getString(R.string.theme_dark_value));
-
-                    themePreference.setSummary(theme);
-                    if (Utils.isDarkTheme) {
-                        getActivity().getApplication().setTheme(R.style.AppTheme_dh);
-                    } else {
-                        getActivity().getApplication().setTheme(R.style.AppTheme);
+                    if (Utils.isDarkTheme != theme.equalsIgnoreCase(getString(R.string.theme_dark_value))) {
+                        Utils.isDarkTheme = !Utils.isDarkTheme;
+                        getActivity().recreate();
+                        MainActivity.recreate.trigger();
                     }
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
                     break;
                 case "magiskhide":
-                     checked = prefs.getBoolean("magiskhide", false);
-                    if (checked) {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
+                    checked = prefs.getBoolean("magiskhide", false);
+                    new Async.RootTask<Void, Void, Void>() {
+                        private boolean enable = checked;
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            if (enable) {
                                 Utils.createFile("/magisk/.core/magiskhide/enable");
-                                return null;
-                            }
-                        }.exec();
-                    } else {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
+                            } else {
                                 Utils.removeItem("/magisk/.core/magiskhide/enable");
-                                return null;
                             }
-                        }.exec();
-                    }
+
+                            return null;
+                        }
+                    }.exec();
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "busybox":
                     checked = prefs.getBoolean("busybox", false);
-                    if (checked) {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
+                    new Async.RootTask<Void, Void, Void>() {
+                        private boolean enable = checked;
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            if (enable) {
                                 Utils.createFile("/magisk/.core/busybox/enable");
-                                return null;
-                            }
-                        }.exec();
-                    } else {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... params) {
+                            } else {
                                 Utils.removeItem("/magisk/.core/busybox/enable");
-                                return null;
                             }
-                        }.exec();
-                    }
+                            return null;
+                        }
+                    }.exec();
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "hosts":
                     checked = prefs.getBoolean("hosts", false);
-                    if (checked) {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... voids) {
-                                Shell.su("cp -af /system/etc/hosts /magisk/.core/hosts");
-                                return null;
+                    new Async.RootTask<Void, Void, Void>() {
+                        private boolean enable = checked;
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            if (enable) {
+                                Shell.su("cp -af /system/etc/hosts /magisk/.core/hosts",
+                                        "mount -o bind /magisk/.core/hosts /system/etc/hosts");
+                            } else {
+                                Shell.su("umount -l /system/etc/hosts",
+                                        "rm -f /magisk/.core/hosts");
                             }
-                        }.exec();
-                    } else {
-                        new Async.RootTask<Void, Void, Void>() {
-                            @Override
-                            protected Void doInBackground(Void... voids) {
-                                Shell.su("umount -l /system/etc/hosts", "rm -f /magisk/.core/hosts");
-                                return null;
-                            }
-                        }.exec();
-                    }
-                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                            return null;
+                        }
+                    }.exec();
                     break;
                 case "developer_logging":
                     Logger.devLog = prefs.getBoolean("developer_logging", false);
