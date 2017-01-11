@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.WebRequest;
+import com.topjohnwu.magisk.utils.WebService;
 
 import java.util.Date;
 
@@ -22,7 +22,7 @@ public class Repo extends BaseModule {
 
     public void update() throws CacheModException {
         Logger.dev("Repo: Re-fetch prop");
-        String props = WebRequest.makeWebServiceCall(mManifestUrl, WebRequest.GET, true);
+        String props = WebService.request(mManifestUrl, WebService.GET, true);
         String lines[] = props.split("\\n");
         parseProps(lines);
     }

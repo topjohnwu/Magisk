@@ -31,6 +31,7 @@ public class ModuleHelper {
     private static final String FILE_KEY = "RepoMap";
     private static final String REPO_KEY = "repomap";
     private static final String VERSION_KEY = "version";
+    private static final String ETAG_KEY = "ETag";
     private static final int DATABASE_VER = 1;
 
     private static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
@@ -57,10 +58,11 @@ public class ModuleHelper {
     public static void createRepoMap(Context context) {
         Logger.dev("ModuleHelper: Loading repos");
 
+        SharedPreferences prefs = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+
         repoMap.clear();
 
         Gson gson = new Gson();
-        SharedPreferences prefs = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         String jsonString;
 
         int cachedVersion = prefs.getInt(VERSION_KEY, 0);
@@ -74,20 +76,31 @@ public class ModuleHelper {
         ValueSortedMap<String, Repo> cached = null;
 
         if (jsonString != null) {
-            cached = gson.fromJson(jsonString, new TypeToken< ValueSortedMap<String, Repo> >(){}.getType());
+            cached = gson.fromJson(jsonString, new TypeToken<ValueSortedMap<String, Repo>>(){}.getType());
         }
 
         if (cached == null) {
             cached = new ValueSortedMap<>();
         }
 
-        // Making a request to url and getting response
-        jsonString = WebRequest.makeWebServiceCall(context.getString(R.string.url_main), WebRequest.GET);
+        // Get cached ETag to add in the request header
+        String etag = prefs.getString(ETAG_KEY, "");
+        HashMap<String, String> header = new HashMap<>();
+        header.put("If-None-Match", etag);
 
-        if (jsonString != null && !jsonString.isEmpty()) {
-            // Have internet access
+        // Making a request to main URL for repo info
+        jsonString = WebService.request(
+                context.getString(R.string.url_main), WebService.GET, null, header, false);
+
+        if (!jsonString.isEmpty()) {
             try {
                 JSONArray jsonArray = new JSONArray(jsonString);
+                // If it gets to this point, the response is valid, update ETag
+                etag = WebService.getLastResponseHeader().get(ETAG_KEY).get(0);
+                // Maybe bug in Android build tools, sometimes the ETag has crap in it...
+                etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
+
+                // Update repo info
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonobject = jsonArray.getJSONObject(i);
                     String id = jsonobject.getString("description");
@@ -106,7 +119,7 @@ public class ModuleHelper {
                             Logger.dev("ModuleHelper: Create new repo " + id);
                             repo = new Repo(context, name, updatedDate);
                         } else {
-                            Logger.dev("ModuleHelper: Cached repo " + id);
+                            Logger.dev("ModuleHelper: Update cached repo " + id);
                             repo.update(updatedDate);
                         }
                         if (repo.getId() != null) {
@@ -118,13 +131,15 @@ public class ModuleHelper {
                 e.printStackTrace();
             }
         } else {
-            // Use cached if no internet
+            // Use cached if no internet or no updates
+            Logger.dev("ModuleHelper: No updates, use cached");
             repoMap.putAll(cached);
         }
 
         prefs.edit()
                 .putInt(VERSION_KEY, DATABASE_VER)
                 .putString(REPO_KEY, gson.toJson(repoMap))
+                .putString(ETAG_KEY, etag)
                 .apply();
 
         Logger.dev("ModuleHelper: Repo load done");

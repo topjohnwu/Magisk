@@ -56,7 +56,7 @@ public class Async {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String jsonStr = WebRequest.makeWebServiceCall(UPDATE_JSON, WebRequest.GET);
+            String jsonStr = WebService.request(UPDATE_JSON, WebService.GET);
             try {
                 JSONObject json = new JSONObject(jsonStr);
                 JSONObject magisk = json.getJSONObject("magisk");

@@ -8,21 +8,17 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class WebRequest {
+public class WebService {
 
-    static String response = null;
     public final static int GET = 1;
     public final static int POST = 2;
 
-    //Constructor with no parameter
-    public WebRequest() {
-
-    }
+    private static Map<String, List<String>> responseHeader;
 
     /**
      * Making web service call
@@ -30,15 +26,12 @@ public class WebRequest {
      * @url - url to make request
      * @requestmethod - http request method
      */
-    public static String makeWebServiceCall(String url, int requestmethod) {
-        return makeWebServiceCall(url, requestmethod, null, false);
-
-
+    public static String request(String url, int method) {
+        return request(url, method, null, null, false);
     }
 
-    public static String makeWebServiceCall(String url, int requestmethod, boolean addNewLines) {
-        return makeWebServiceCall(url, requestmethod, null, addNewLines);
-
+    public static String request(String url, int method, boolean newline) {
+        return request(url, method, null, null, newline);
     }
 
     /**
@@ -47,24 +40,33 @@ public class WebRequest {
      * @url - url to make request
      * @requestmethod - http request method
      * @params - http request params
+     * @header - http request header
+     * @newline - true to append a newline each line
      */
-    public static String makeWebServiceCall(String urladdress, int requestmethod,
-                                     HashMap<String, String> params, boolean addNewLines) {
-        Logger.dev("WebRequest: Service call " + urladdress);
+    public static String request(String urlAddress, int method,
+                                 Map<String, String> params, Map<String, String> header,
+                                 boolean newline) {
+        Logger.dev("WebService: Service call " + urlAddress);
         URL url;
-        String response = "";
+        StringBuilder response = new StringBuilder();
         try {
-            url = new URL(urladdress);
+            url = new URL(urlAddress);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
             conn.setConnectTimeout(15000);
             conn.setDoInput(true);
 
-            if (requestmethod == POST) {
+            if (method == POST) {
                 conn.setRequestMethod("POST");
-            } else if (requestmethod == GET) {
+            } else if (method == GET) {
                 conn.setRequestMethod("GET");
+            }
+
+            if (header != null) {
+                for (Map.Entry<String, String> entry : header.entrySet()) {
+                    conn.setRequestProperty(entry.getKey(), entry.getValue());
+                }
             }
 
             if (params != null) {
@@ -98,20 +100,25 @@ public class WebRequest {
                 String line;
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 while ((line = br.readLine()) != null) {
-                    if (addNewLines) {
-                        response += line + "\n";
+                    if (newline) {
+                        response.append(line).append("\n");
                     } else {
-                        response += line;
+                        response.append(line);
                     }
                 }
+                responseHeader = conn.getHeaderFields();
             } else {
-                response = "";
+                responseHeader = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return response;
+        return response.toString();
+    }
+
+    public static Map<String, List<String>> getLastResponseHeader() {
+        return responseHeader;
     }
 
 }

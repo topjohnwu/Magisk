@@ -111,7 +111,7 @@
     <string name="check_release_notes">Check release notes</string>
 
     <!--URL Templates-->
-    <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos?access_token=8f3c379fbeb80754b45b02486482584893af142a</string>
+    <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos</string>
     <string name="file_url" translatable="false">https://raw.githubusercontent.com/Magisk-Modules-Repo/%1$s/master/%2$s</string>
     <string name="zip_url" translatable="false">https://github.com/Magisk-Modules-Repo/%1$s/archive/master.zip</string>
 
