@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
@@ -51,6 +52,13 @@ public class LogFragment extends Fragment {
     private MenuItem mClickedMenuItem;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Nullable
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.log_fragment, container, false);
         ButterKnife.bind(this, view);
@@ -65,7 +73,6 @@ public class LogFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        setHasOptionsMenu(true);
         new LogManager().read();
         getActivity().setTitle(R.string.log);
     }

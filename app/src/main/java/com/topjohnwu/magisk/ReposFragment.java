@@ -47,8 +47,13 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
 
     private SearchView.OnQueryTextListener searchListener;
 
-    @Nullable
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.repos_fragment, container, false);
@@ -106,7 +111,6 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     @Override
     public void onResume() {
         super.onResume();
-        setHasOptionsMenu(true);
         CallbackHandler.register(repoLoadDone, this);
         getActivity().setTitle(R.string.downloads);
     }

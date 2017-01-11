@@ -46,6 +46,12 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     private SearchView.OnQueryTextListener searchListener;
     private String lastFilter;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,7 +95,6 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Override
     public void onResume() {
         super.onResume();
-        setHasOptionsMenu(true);
         getActivity().setTitle(R.string.magiskhide);
         CallbackHandler.register(packageLoadDone, this);
         if (packageLoadDone.isTriggered) {
