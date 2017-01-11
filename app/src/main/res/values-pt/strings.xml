@@ -2,21 +2,44 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Abrir gaveta de notificação</string>
     <string name="navigation_drawer_close">Fechar gaveta de notificação</string>
+	<string name="magiskhide">Magisk Hide</string>
     <string name="modules">Módulos</string>
     <string name="downloads">Baixar</string>
     <string name="log">Registro</string>
     <string name="settings">Configurações</string>
-
-    <!--Magisk Fragment-->
+	<string name="status">Status</string>
+    <string name="install">Instalar</string>
+	
+    <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s Instalado</string>
-    <string name="magisk_version_error">Você instalou o Magisk?</string>
+    <string name="magisk_version_error">Magisk não instalado</string>
 
-    <string name="magisk_update_available">Atualização para Magisk v%1$.1f!</string>
+	<string name="checking_for_updates">Checando por atualizações…</string>
+    <string name="magisk_update_available">Magisk v%1$.1f disponível!</string>
     <string name="cannot_check_updates">Não é possível verificar se há atualizações</string>
     <string name="up_to_date">Última versão do %1$s instalado</string>
-
-    <!--Root Fragment-->
-
+    <string name="root_error">Rooteado mas sem permissão de root, o acesso foi permitido?</string>
+    <string name="not_rooted">Sem root</string>
+    <string name="proper_root">Rooteado</string>
+    <string name="safetyNet_check_text">Pressione para checar o SafetyNet</string>
+    <string name="checking_safetyNet_status">Checando status do SafetyNet…</string>
+    <string name="safetyNet_connection_failed">Não é possível conectar-se à API do Google</string>
+    <string name="safetyNet_connection_suspended">A conexão com API do Google foi suspensa</string>
+    <string name="safetyNet_error">Não é possível verificar o SafetyNet, sem Internet?</string>
+    <string name="safetyNet_fail">SafetyNet Falhou: CTS profile mismatch</string>
+    <string name="safetyNet_pass">SafetyNet Passado</string>
+    <string name="root_info_warning">Funcionalidade muito limitada</string>
+	
+    <!--Install Fragment-->
+	<string name="auto_detect">"(Auto) %1$s"</string>
+    <string name="boot_image_title">Local da Boot Image</string>
+    <string name="detect_button">Detectar</string>
+    <string name="advanced_settings_title">Configurações avançadas</string>
+    <string name="keep_force_encryption">Keep force encryption</string>
+    <string name="keep_dm_verity">Keep dm-verity</string>
+    <string name="current_magisk_title">Versão instalada do Magisk: v%1$s</string>
+    <string name="install_magisk_title">Última versão do Magisk: v%1$.1f</string>
+   
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
@@ -26,6 +49,7 @@
     <string name="disable_file_created">Módulo será desativado na próxima reinicialização</string>
     <string name="disable_file_removed">Módulo será ativado na próxima reinicialização</string>
     <string name="author">Criado por %1$s</string>
+	<string name="fab_flash_zip">Flashear Módulo Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Atualização disponível</string>
@@ -59,20 +83,27 @@
     <string name="no_thanks">Não, Obrigado</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Você deseja instalar%1$s ?</string>
-    <string name="download_install">Baixar e instalar</string>
+    <string name="download_install">Baixar &amp; instalar</string>
+	<string name="goto_install">Ir na seção \"Instalar\"</string>
     <string name="download_file_error">Erro ao baixar o arquivo</string>
     <string name="install_error">Erro na instalação!</string>
-    <string name="manual_install_1">Erro ao flashear o arquivo, arquivo zip colocado em %1$s\nFlashear isto na recuperação manualmente</string>
+    <string name="manual_install_1">Erro ao flashear o arquivo, arquivo zip colocado em %1$s</string>
+	<string name="manual_install_2">Flashear isto na recuperação manualmente</string>
     <string name="invalid_zip">O zip não é um Módulo Magisk!!</string>
     <string name="reboot_title">Instalação bem-sucedida!</string>
     <string name="reboot_msg">Você quer reiniciar agora?</string>
     <string name="reboot">Reiniciar</string>
+	<string name="copying_msg">Copiando zip para diretório temporário</string>
     <string name="zip_install_progress_title">Instalando</string>
+	<string name="zip_install_unzip_zip_msg">Descompactando arquivo zip …</string>
+    <string name="zip_install_process_zip_msg">Processando arquivo zip …</string>
     <string name="zip_install_progress_msg">"Instalando %1$s …"</string>
     <string name="no_magisk_title">Magisk Não Instalado!</string>
     <string name="no_magisk_msg">Você quer baixar e instalar o Magisk?</string>
-
-    <!--URL Templates-->
+	<string name="downloading_toast">Baixando %1$s</string>
+    <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
+    <string name="magisk_update_message">Magisk v%1$.1f Atualização está pronta, você quer instalar?</string>
+    <string name="check_release_notes">Verificar as notas da atualização</string>
 
     <!--Settings Fragment -->
     <string name="settings_general_category">Geral</string>
@@ -80,24 +111,20 @@
     <string name="settings_theme_summary">Escolha um tema</string>
     <string name="theme_default">Padrão</string>
     <string name="theme_dark">Escuro</string>
-
+	
+	<string name="settings_magiskhide_title">Ativar Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
-    <string name="settings_busybox_summary">Marque essa opção para o BusyBox do Magisk ser visível no PATH</string>
-
+    <string name="settings_busybox_summary">Monta a busybox interna do Magisk\'s para xbin</string>
+    <string name="settings_hosts_title">Ativar systemless hosts</string>
+    <string name="settings_hosts_summary">Suporte do systemless para Adblock apps</string>
+	
     <string name="settings_development_category">Desenvolvimento</string>
     <string name="settings_developer_logging_title">Ativar registro mais detalhado</string>
     <string name="settings_developer_logging_summary">Marque essa opção para habilitar um registro mais detalhado</string>
     <string name="settings_shell_logging_title">Ativar registro da shell de comando</string>
     <string name="settings_shell_logging_summary">Marque esta opção para habilitar o registro de todos os comandos shell e de saída</string>
-    <string name="settings_magiskhide_title">Ativar Magisk Hide</string>
-    <string name="settings_magiskhide_summary">Reiniciar para aplicar as configurações</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
-
+	<string name="settings_reboot_toast">Reinicie para aplicar configurações</string>
+	
 </resources>
