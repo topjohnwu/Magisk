@@ -131,8 +131,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public void onDestroy() {
-            super.onDestroy();
             prefs.unregisterOnSharedPreferenceChangeListener(this);
+            super.onDestroy();
         }
 
         @Override

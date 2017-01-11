@@ -92,13 +92,13 @@ public class MainActivity extends AppCompatActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+        CallbackHandler.register(recreate, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         CallbackHandler.register(StatusFragment.updateCheckDone, this);
-        CallbackHandler.register(recreate, this);
         if (StatusFragment.updateCheckDone.isTriggered) {
             onTrigger(StatusFragment.updateCheckDone);
         }
@@ -107,14 +107,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
         CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         CallbackHandler.unRegister(recreate, this);
+        super.onDestroy();
     }
 
     @Override
