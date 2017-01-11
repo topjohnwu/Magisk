@@ -39,7 +39,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
             "com.google.android.apps.walletnfcrel",
             "com.nianticlabs.pokemongo"
     );
-    public static CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
+    public static final CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
 
     private ApplicationAdapter appAdapter;
 

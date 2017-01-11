@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
-    public static CallbackHandler.Event recreate = new CallbackHandler.Event();
+    public static final CallbackHandler.Event recreate = new CallbackHandler.Event();
 
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
