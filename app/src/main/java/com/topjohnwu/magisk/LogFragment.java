@@ -71,10 +71,15 @@ public class LogFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getActivity().setTitle(R.string.log);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         new LogManager().read();
-        getActivity().setTitle(R.string.log);
     }
 
     @Override

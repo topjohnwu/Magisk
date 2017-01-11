@@ -109,16 +109,16 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         CallbackHandler.register(repoLoadDone, this);
         getActivity().setTitle(R.string.downloads);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
         CallbackHandler.unRegister(repoLoadDone, this);
+        super.onStop();
     }
 
     private void reloadRepos() {

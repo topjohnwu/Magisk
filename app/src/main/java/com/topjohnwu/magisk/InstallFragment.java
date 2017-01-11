@@ -98,15 +98,15 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         getActivity().setTitle(R.string.install);
         CallbackHandler.register(blockDetectionDone, this);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
         CallbackHandler.unRegister(blockDetectionDone, this);
+        super.onStop();
     }
 }

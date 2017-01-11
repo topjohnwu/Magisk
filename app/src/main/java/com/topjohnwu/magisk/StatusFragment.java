@@ -141,8 +141,8 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         CallbackHandler.register(updateCheckDone, this);
         CallbackHandler.register(safetyNetDone, this);
         if (updateCheckDone.isTriggered) {
@@ -155,10 +155,10 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
         CallbackHandler.unRegister(updateCheckDone, this);
         CallbackHandler.unRegister(safetyNetDone, this);
+        super.onStop();
     }
 
     private static void checkMagiskInfo() {

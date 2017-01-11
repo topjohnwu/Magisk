@@ -93,16 +93,16 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         CallbackHandler.register(moduleLoadDone, this);
         getActivity().setTitle(R.string.modules);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
         CallbackHandler.unRegister(moduleLoadDone, this);
+        super.onStop();
     }
 
     private void updateUI() {

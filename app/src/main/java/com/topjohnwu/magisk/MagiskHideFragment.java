@@ -93,8 +93,8 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         getActivity().setTitle(R.string.magiskhide);
         CallbackHandler.register(packageLoadDone, this);
         if (packageLoadDone.isTriggered) {
@@ -103,9 +103,9 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
         CallbackHandler.unRegister(packageLoadDone, this);
+        super.onStop();
     }
 
     @Override
