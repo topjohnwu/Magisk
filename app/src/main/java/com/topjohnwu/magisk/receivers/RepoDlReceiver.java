@@ -33,9 +33,9 @@ public class RepoDlReceiver extends DownloadReceiver {
                 ZipUtils.signZip(mContext, buffer.getInputStream(), buffer, true);
 
                 // Write it back to the downloaded zip
-                OutputStream out = mContext.getContentResolver().openOutputStream(mUri);
-                buffer.writeTo(out);
-                out.close();
+                try (OutputStream out = mContext.getContentResolver().openOutputStream(mUri)) {
+                    buffer.writeTo(out);
+                }
             }
         }.exec();
     }

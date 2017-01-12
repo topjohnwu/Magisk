@@ -125,17 +125,16 @@ public class ZipUtils {
     }
 
     public static void unzip(File file, File folder, String path) {
-        try {
-            int count;
-            FileOutputStream out;
-            File dest;
-            InputStream is;
-            JarEntry entry;
-            byte data[] = new byte[4096];
-            JarFile zipfile = new JarFile(file);
-            Enumeration e = zipfile.entries();
+        int count;
+        FileOutputStream out;
+        File dest;
+        InputStream is;
+        JarEntry entry;
+        byte data[] = new byte[4096];
+        try (JarFile zipfile = new JarFile(file)) {
+            Enumeration<JarEntry> e = zipfile.entries();
             while(e.hasMoreElements()) {
-                entry = (JarEntry) e.nextElement();
+                entry = e.nextElement();
                 if (!entry.getName().contains(path)
                         || entry.getName().charAt(entry.getName().length() - 1) == '/') {
                     // Ignore directories, only create files
@@ -518,9 +517,10 @@ public class ZipUtils {
                         .build(signer, publicKey));
         gen.addCertificates(certs);
         CMSSignedData sigData = gen.generate(data, false);
-        ASN1InputStream asn1 = new ASN1InputStream(sigData.getEncoded());
-        DEROutputStream dos = new DEROutputStream(out);
-        dos.writeObject(asn1.readObject());
+        try (ASN1InputStream asn1 = new ASN1InputStream(sigData.getEncoded())) {
+            DEROutputStream dos = new DEROutputStream(out);
+            dos.writeObject(asn1.readObject());
+        }
     }
     /**
      * Copy all the files in a manifest from input to output.  We set

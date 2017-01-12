@@ -182,14 +182,10 @@ public class LogFragment extends Fragment {
 
                     List<String> in = Utils.readFile(MAGISK_LOG);
 
-                    try {
-                        FileWriter out = new FileWriter(targetFile);
+                    try (FileWriter out = new FileWriter(targetFile)) {
                         for (String line : in) {
                             out.write(line + "\n");
                         }
-                        out.close();
-
-
                         return true;
                     } catch (IOException e) {
                         e.printStackTrace();

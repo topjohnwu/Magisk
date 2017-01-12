@@ -63,13 +63,11 @@ public class AboutActivity extends AppCompatActivity {
         appVersionInfo.setSummary(BuildConfig.VERSION_NAME);
 
         String changes = null;
-        try {
-            InputStream is = getAssets().open("changelog.html");
+        try (InputStream is = getAssets().open("changelog.html")) {
             int size = is.available();
 
             byte[] buffer = new byte[size];
             is.read(buffer);
-            is.close();
 
             changes = new String(buffer);
         } catch (IOException ignored) {
