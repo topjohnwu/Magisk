@@ -44,7 +44,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
-        ButterKnife.bind(this, mView);
         return new ViewHolder(mView);
     }
 

@@ -42,7 +42,6 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_repo, parent, false);
-        ButterKnife.bind(this, v);
         return new ViewHolder(v);
     }
 

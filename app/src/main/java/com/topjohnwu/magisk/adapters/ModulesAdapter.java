@@ -32,7 +32,6 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
-        ButterKnife.bind(this, view);
         return new ViewHolder(view);
     }
 
