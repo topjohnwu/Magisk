@@ -168,7 +168,7 @@ public class ModuleHelper {
         }
     }
 
-    private static class ValueSortedMap<K, V extends Comparable > extends HashMap<K, V> {
+    private static class ValueSortedMap<K, V extends Comparable<? super V>> extends HashMap<K, V> {
 
         private List<V> sorted = new ArrayList<>();
 
