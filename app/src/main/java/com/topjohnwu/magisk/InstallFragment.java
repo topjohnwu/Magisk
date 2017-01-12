@@ -24,6 +24,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class InstallFragment extends Fragment implements CallbackHandler.EventListener {
 
@@ -32,6 +33,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public static List<String> blockList;
     public static String bootBlock = null;
 
+    private Unbinder unbinder;
     @BindView(R.id.current_version_title) TextView currentVersionTitle;
     @BindView(R.id.install_title) TextView installTitle;
     @BindView(R.id.block_spinner) Spinner spinner;
@@ -44,7 +46,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.install_fragment, container, false);
-        ButterKnife.bind(this, v);
+        unbinder = ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
         currentVersionTitle.setText(getString(R.string.current_magisk_title, StatusFragment.magiskVersionString));
         installTitle.setText(getString(R.string.install_magisk_title, StatusFragment.remoteMagiskVersion));
@@ -108,5 +110,11 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public void onStop() {
         CallbackHandler.unRegister(blockDetectionDone, this);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

@@ -38,11 +38,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class LogFragment extends Fragment {
 
     private static final String MAGISK_LOG = "/cache/magisk.log";
 
+    private Unbinder unbinder;
     @BindView(R.id.txtLog) TextView txtLog;
     @BindView(R.id.svLog) ScrollView svLog;
     @BindView(R.id.hsvLog) HorizontalScrollView hsvLog;
@@ -61,7 +63,7 @@ public class LogFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.log_fragment, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         txtLog.setTextIsSelectable(true);
 
@@ -80,6 +82,12 @@ public class LogFragment extends Fragment {
     public void onResume() {
         super.onResume();
         new LogManager().read();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override

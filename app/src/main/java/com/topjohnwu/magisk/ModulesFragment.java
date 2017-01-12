@@ -26,6 +26,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class ModulesFragment extends Fragment implements CallbackHandler.EventListener {
 
@@ -33,6 +34,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
 
     private static final int FETCH_ZIP_CODE = 2;
 
+    private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyTv;
@@ -44,7 +46,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.modules_fragment, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         fabio.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -103,6 +105,12 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     public void onStop() {
         CallbackHandler.unRegister(moduleLoadDone, this);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     private void updateUI() {

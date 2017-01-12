@@ -25,9 +25,11 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class MagiskHideFragment extends Fragment implements CallbackHandler.EventListener {
 
+    private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
@@ -56,7 +58,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.magisk_hide_fragment, container, false);
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         PackageManager packageManager = getActivity().getPackageManager();
 
@@ -106,6 +108,12 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     public void onStop() {
         CallbackHandler.unRegister(packageLoadDone, this);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override

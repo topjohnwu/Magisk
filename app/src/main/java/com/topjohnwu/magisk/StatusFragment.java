@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class StatusFragment extends Fragment implements CallbackHandler.EventListener {
 
@@ -38,6 +39,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     public static final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
     public static final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
 
+    private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.magisk_status_container) View magiskStatusContainer;
@@ -74,7 +76,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.status_fragment, container, false);
-        ButterKnife.bind(this, v);
+        unbinder = ButterKnife.bind(this, v);
 
         defaultColor = magiskUpdateText.getCurrentTextColor();
 
@@ -159,6 +161,12 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         CallbackHandler.unRegister(updateCheckDone, this);
         CallbackHandler.unRegister(safetyNetDone, this);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     private static void checkMagiskInfo() {

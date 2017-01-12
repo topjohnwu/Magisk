@@ -27,11 +27,13 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class ReposFragment extends Fragment implements CallbackHandler.EventListener {
 
     public static final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
 
+    private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyTv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -57,8 +59,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.repos_fragment, container, false);
-
-        ButterKnife.bind(this, view);
+        unbinder = ButterKnife.bind(this, view);
 
         mSectionedAdapter = new
                 SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section,
@@ -119,6 +120,12 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     public void onStop() {
         CallbackHandler.unRegister(repoLoadDone, this);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     private void reloadRepos() {
