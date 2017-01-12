@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -44,7 +43,6 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) public NavigationView navigationView;
 
-    @IdRes
     private int mSelectedId = R.id.status;
 
     @Override
@@ -82,13 +80,11 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        //noinspection ResourceType
-        mSelectedId = savedInstanceState == null ? mSelectedId : savedInstanceState.getInt(SELECTED_ITEM_ID);
-        navigationView.setCheckedItem(mSelectedId);
-
         if (savedInstanceState == null) {
-            mDrawerHandler.removeCallbacksAndMessages(null);
-            mDrawerHandler.postDelayed(() -> navigate(mSelectedId), 250);
+            navigate(mSelectedId, true);
+            navigationView.setCheckedItem(mSelectedId);
+        } else {
+            mSelectedId = savedInstanceState.getInt(SELECTED_ITEM_ID);
         }
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -136,7 +132,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
         mSelectedId = menuItem.getItemId();
         mDrawerHandler.removeCallbacksAndMessages(null);
-        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
+        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId(), false), 250);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -164,48 +160,40 @@ public class MainActivity extends AppCompatActivity
         menu.findItem(R.id.install).setVisible(Shell.rootAccess());
     }
 
-    public void navigate(final int itemId) {
-        Fragment navFragment = null;
-        String tag = "";
+    public void navigate(int itemId, boolean now) {
         switch (itemId) {
             case R.id.status:
-                tag = "status";
-                navFragment = new StatusFragment();
+                displayFragment(new StatusFragment(), "status", now);
                 break;
             case R.id.install:
-                tag = "install";
-                navFragment = new InstallFragment();
+                displayFragment(new InstallFragment(), "install", now);
                 break;
             case R.id.modules:
-                tag = "modules";
-                navFragment = new ModulesFragment();
+                displayFragment(new ModulesFragment(), "modules", now);
                 break;
             case R.id.downloads:
-                tag = "downloads";
-                navFragment = new ReposFragment();
+                displayFragment(new ReposFragment(), "downloads", now);
                 break;
             case R.id.magiskhide:
-                tag = "magiskhide";
-                navFragment = new MagiskHideFragment();
+                displayFragment(new MagiskHideFragment(), "magiskhide", now);
                 break;
             case R.id.log:
-                tag = "log";
-                navFragment = new LogFragment();
+                displayFragment(new LogFragment(), "log", now);
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.app_about:
                 startActivity(new Intent(this, AboutActivity.class));
-                return;
+                break;
         }
+    }
 
-        if (navFragment != null) {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+    private void displayFragment(@NonNull Fragment navFragment, String tag, boolean now) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        if (!now) {
             transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-            try {
-                transaction.replace(R.id.content_frame, navFragment, tag).commit();
-            } catch (IllegalStateException ignored) {}
         }
+        transaction.replace(R.id.content_frame, navFragment, tag).commit();
     }
 }
