@@ -75,6 +75,17 @@ public class Utils {
         return ret;
     }
 
+    public static String readFirstLine(String path) {
+        List<String> ret;
+        String command = "head -1 " + path;
+        if (Shell.rootAccess()) {
+            ret = Shell.su(command);
+        } else {
+            ret = Shell.sh(command);
+        }
+        return isValidShellResponse(ret) ? ret.get(0) : null;
+    }
+
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
         if (isDownloading) {
             return;

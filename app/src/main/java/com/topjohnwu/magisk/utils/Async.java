@@ -218,9 +218,8 @@ public class Async {
 
         protected boolean unzipAndCheck() {
             ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
-            List<String> ret;
-            ret = Utils.readFile(mCachedFile.getParent() + "/META-INF/com/google/android/updater-script");
-            return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
+            String line = Utils.readFirstLine(mCachedFile.getParent() + "/META-INF/com/google/android/updater-script");
+            return line != null && line.contains("#MAGISK");
         }
 
         @Override
