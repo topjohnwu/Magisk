@@ -172,8 +172,7 @@ public class ZipUtils {
             inputJar = new JarMap(new JarInputStream(inputStream));
             if (signWholeFile) {
                 if (!"RSA".equalsIgnoreCase(privateKey.getAlgorithm())) {
-                    System.err.println("Cannot sign OTA packages with non-RSA keys");
-                    System.exit(1);
+                    throw new IOException("Cannot sign OTA packages with non-RSA keys");
                 }
                 signWholeFile(inputJar, context.getAssets().open(PUBLIC_KEY_NAME),
                         publicKey, privateKey, outputStream);
