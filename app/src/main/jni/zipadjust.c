@@ -1,35 +1,16 @@
-#include <jni.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <zlib.h>
 #include <android/log.h>
+#include "zipadjust.h"
 
 #define  LOG_TAG    "zipadjust"
 
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-size_t insize, outsize = 0, alloc = 0;
-unsigned char *fin, *fout;
-
-int zipadjust(int decompress) ;
-
-JNIEXPORT jbyteArray JNICALL
-Java_com_topjohnwu_magisk_utils_ZipUtils_zipAdjust(JNIEnv *env, jclass type, jbyteArray jbytes,
-                                                   jint size) {
-    fin = (*env)->GetPrimitiveArrayCritical(env, jbytes, NULL);
-    insize = (size_t) size;
-
-    zipadjust(0);
-
-    (*env)->ReleasePrimitiveArrayCritical(env, jbytes, fin, 0);
-
-    jbyteArray ret = (*env)->NewByteArray(env, outsize);
-    (*env)->SetByteArrayRegion(env, ret, 0, outsize, (const jbyte*) fout);
-    free(fout);
-
-    return ret;
-}
+size_t insize = 0, outsize = 0, alloc = 0;
+unsigned char *fin = NULL, *fout = NULL;
 
 #pragma pack(1)
 struct local_header_struct {
