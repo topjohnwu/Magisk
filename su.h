@@ -46,29 +46,28 @@
 #define CM_ROOT_ACCESS_APPS_AND_ADB  3
 
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
-#define JAVA_PACKAGE_NAME "com.koushikdutta.superuser"
+#define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 
 // If --rename-manifest-package is used in AAPT, this
 // must be changed to correspond to the new APK package name
 // See the two Android.mk files for more details.
 #ifndef REQUESTOR
-#define REQUESTOR "me.phh.superuser"
+#define REQUESTOR JAVA_PACKAGE_NAME
 #endif
 // This is used if wrapping the fragment classes and activities
 // with classes in another package. CM requirement.
 #ifndef REQUESTOR_PREFIX
-#define REQUESTOR_PREFIX JAVA_PACKAGE_NAME
+#define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
 #endif
 #define REQUESTOR_DATA_PATH "/data/data/"
 #define REQUESTOR_FILES_PATH REQUESTOR_DATA_PATH REQUESTOR "/files"
 #define REQUESTOR_USER_PATH "/data/user/"
 #define REQUESTOR_CACHE_PATH "/dev/" REQUESTOR
-#define REQUESTOR_DAEMON_PATH REQUESTOR_CACHE_PATH ".daemon"
-
+#define REQUESTOR_DAEMON_PATH "\0MAGISKSU"
 // there's no guarantee that the db or files are actually created named as such by
 // SQLiteOpenHelper, etc. Though that is the behavior as of current.
 // it is up to the Android application to symlink as appropriate.
-#define REQUESTOR_DATABASE_PATH REQUESTOR "/databases/su.sqlite"
+#define REQUESTOR_DATABASE_PATH REQUESTOR "/databases/su.db"
 #define REQUESTOR_MULTIUSER_MODE REQUESTOR_FILES_PATH "/multiuser_mode"
 
 #define DEFAULT_SHELL "/system/bin/sh"
@@ -77,10 +76,9 @@
 #define str(a) #a
 
 #ifndef VERSION_CODE
-#define VERSION_CODE 17
+#define VERSION_CODE 1
 #endif
-#define VERSION xstr(VERSION_CODE) " " REQUESTOR
-// #define VERSION REQUESTOR " topjohnwu r1"
+#define VERSION "MAGISKSU:" xstr(VERSION_CODE)
 
 #define PROTO_VERSION 1
 
@@ -123,17 +121,10 @@ struct su_user_info {
     char database_path[PATH_MAX];
 };
 
-struct su_bind {
-    const char *from;
-    const char *to;
-};
-
 struct su_context {
     struct su_initiator from;
     struct su_request to;
     struct su_user_info user;
-    struct su_bind bind;
-    const char *init;
     mode_t umask;
     char sock_path[PATH_MAX];
 };

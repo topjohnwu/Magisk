@@ -425,9 +425,6 @@ static int socket_send_request(int fd, const struct su_context *ctx) {
     write_token(fd, "from.uid", ctx->from.uid);
     write_token(fd, "to.uid", ctx->to.uid);
     write_string_data(fd, "from.bin", ctx->from.bin);
-    write_string_data(fd, "bind.from", ctx->bind.from);
-    write_string_data(fd, "bind.to", ctx->bind.to);
-    write_string_data(fd, "init", ctx->init);
     // TODO: Fix issue where not using -c does not result a in a command
     write_string_data(fd, "command", get_command(&ctx->to));
     write_token(fd, "eof", PROTO_VERSION);
@@ -509,12 +506,6 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx) {
 
     if (send_to_app)
         send_result(ctx, ALLOW);
-
-    // if(ctx->bind.from[0] && ctx->bind.to[0])
-    //     allow_bind(ctx);
-
-    // if(ctx->init[0])
-    //     allow_init(ctx);
 
     char *binary;
     argc = ctx->to.optind;
@@ -712,11 +703,6 @@ int su_main_nodaemon(int argc, char **argv) {
             .database_path = REQUESTOR_DATA_PATH REQUESTOR_DATABASE_PATH,
             .base_path = REQUESTOR_DATA_PATH REQUESTOR
         },
-        .bind = {      
-            .from = "",       
-            .to = "",     
-        },
-        .init = "",
     };
     struct stat st;
     int c, socket_serv_fd, fd;
@@ -756,7 +742,7 @@ int su_main_nodaemon(int argc, char **argv) {
                 printf("%d\n", VERSION_CODE);
                 exit(EXIT_SUCCESS);
             case 'v':
-                printf("%s cm-su topjohnwu\n", VERSION);
+                printf("%s\n", VERSION);
                 exit(EXIT_SUCCESS);
             case 'u':
                 switch (get_multiuser_mode()) {
@@ -851,12 +837,6 @@ int su_main_nodaemon(int argc, char **argv) {
         allow(&ctx);
     }
 
-    // autogrant shell at this point
-    if (ctx.from.uid == AID_SHELL) {
-        LOGD("Allowing shell.");
-        allow(&ctx);
-    }
-
     // deny if this is a non owner request and owner mode only
     if (ctx.user.multiuser_mode == MULTIUSER_MODE_OWNER_ONLY && ctx.user.android_user_id != 0) {
         deny(&ctx);
@@ -883,7 +863,6 @@ int su_main_nodaemon(int argc, char **argv) {
         deny(&ctx);
     }
 
-    //TODO: Ignore database check for init and bind?
     dballow = database_check(&ctx);
     switch (dballow) {
         case INTERACTIVE:

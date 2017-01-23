@@ -445,7 +445,7 @@ static int daemon_accept(int fd) {
 }
 
 int run_daemon() {
-    if (getuid() != 0 || getgid() != 0) {
+    if (getuid() != AID_ROOT || getgid() != AID_ROOT) {
         PLOGE("daemon requires root. uid/gid not root");
         return -1;
     }
@@ -455,13 +455,19 @@ int run_daemon() {
             break;
         case -1:
             PLOGE("fork");
-            return 1;
+            return -1;
         default:
             return 0;
     }
 
-    if (setsid() < 0 || setcon("u:r:su_daemon:s0") < 0)
-        return 1;
+    if (setsid() < 0) {
+        PLOGE("setsid");
+        return -1;
+    }
+    if (setcon("u:r:su_daemon:s0") < 0) {
+        PLOGE("setcon");
+        return -1;
+    }
 
     int fd;
     struct sockaddr_un sun;
@@ -478,31 +484,16 @@ int run_daemon() {
 
     memset(&sun, 0, sizeof(sun));
     sun.sun_family = AF_LOCAL;
-    sprintf(sun.sun_path, "%s/server", REQUESTOR_DAEMON_PATH);
+    strcpy(sun.sun_path, REQUESTOR_DAEMON_PATH);
 
-    /*
-     * Delete the socket to protect from situations when
-     * something bad occured previously and the kernel reused pid from that process.
-     * Small probability, isn't it.
-     */
     unlink(sun.sun_path);
-    unlink(REQUESTOR_DAEMON_PATH);
-
-    int previous_umask = umask(027);
-    mkdir(REQUESTOR_DAEMON_PATH, 0777);
-
-    memset(sun.sun_path, 0, sizeof(sun.sun_path));
-    memcpy(sun.sun_path, "\0" "SUPERUSER", strlen("SUPERUSER") + 1);
 
     if (bind(fd, (struct sockaddr*)&sun, sizeof(sun)) < 0) {
         PLOGE("daemon bind");
         goto err;
     }
 
-    chmod(REQUESTOR_DAEMON_PATH, 0755);
     chmod(sun.sun_path, 0777);
-
-    umask(previous_umask);
 
     if (listen(fd, 10) < 0) {
         PLOGE("daemon listen");
@@ -600,10 +591,7 @@ int connect_daemon(int argc, char *argv[], int ppid) {
 
     memset(&sun, 0, sizeof(sun));
     sun.sun_family = AF_LOCAL;
-    sprintf(sun.sun_path, "%s/server", REQUESTOR_DAEMON_PATH);
-
-    memset(sun.sun_path, 0, sizeof(sun.sun_path));
-    memcpy(sun.sun_path, "\0" "SUPERUSER", strlen("SUPERUSER") + 1);
+    strcpy(sun.sun_path, REQUESTOR_DAEMON_PATH);
 
     if (0 != connect(socketfd, (struct sockaddr*)&sun, sizeof(sun))) {
         PLOGE("connect");
