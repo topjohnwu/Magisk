@@ -143,5 +143,19 @@
     <string name="theme_default_value" translatable="false">default</string>
     <string name="theme_dark_value" translatable="false">dark</string>
 
+    <!--Superuser-->
+    <string name="su_request_title">Superuser Request</string>
+    <string name="deny">Deny</string>
+    <string name="grant">Grant</string>
+    <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
+    <string name="forever">Forever</string>
+    <string name="once">Once</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s is granted Superuser permissions</string>
+    <string name="su_deny_toast">%1$s is denied Superuser permissions</string>
+
 
 </resources>

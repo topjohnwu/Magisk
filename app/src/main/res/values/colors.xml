@@ -20,4 +20,6 @@
     <color name="dh_icons">#dedede</color>
     <color name="dh_divider">#313131</color>
 
+    <color name="su_request_background">#e0e0e0</color>
+
 </resources>

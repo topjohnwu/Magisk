@@ -8,9 +8,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission
-        android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -41,6 +38,20 @@
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".superuser.RequestActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="internal.superuser"
+            android:theme="@android:style/Theme.NoDisplay" />
+        <activity
+            android:name=".superuser.SuRequestActivity"
+            android:excludeFromRecents="true"
+            android:taskAffinity="internal.superuser"
+            android:theme="@style/SuRequest" />
+
+        <receiver
+            android:name=".superuser.SuReceiver" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

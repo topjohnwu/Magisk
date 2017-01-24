@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.topjohnwu.playground.superuser.RequestActivity"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:layout_width="375dp"
+    android:layout_gravity="center">
+
+    <TextView
+        android:text="@string/su_request_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/request_title"
+        android:gravity="center"
+        android:layout_marginTop="20dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:paddingStart="30dp">
+
+        <ImageView
+            app:srcCompat="@mipmap/ic_launcher"
+            android:id="@+id/app_icon"
+            android:layout_weight="1"
+            android:layout_marginEnd="15dp"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="5dp" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_weight="5">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColorPrimary"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/app_name" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColorSecondary"
+                android:id="@+id/package_name" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/timeout"
+        android:layout_margin="15dp"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_su_warning"
+        android:textColor="?android:textColorSecondary"
+        android:text="@string/su_warning"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="5dp"
+        android:drawablePadding="10dp" />
+
+    <LinearLayout
+        style="?android:buttonBarStyle"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp">
+
+        <Button
+            style="?android:buttonBarButtonStyle"
+            android:text="@string/deny"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/deny_btn"
+            android:layout_weight="1" />
+
+        <Button
+            style="?android:buttonBarButtonStyle"
+            android:text="@string/grant"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/grant_btn"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -121,4 +121,9 @@
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
+    <style name="SuRequest" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="android:colorBackground">@color/su_request_background</item>
+    </style>
+
 </resources>

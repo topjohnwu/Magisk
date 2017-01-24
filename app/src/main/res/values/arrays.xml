@@ -8,4 +8,12 @@
         <item>@string/theme_default_value</item>
         <item>@string/theme_dark_value</item>
     </string-array>
+    <string-array name="timeout">
+        <item>@string/forever</item>
+        <item>@string/once</item>
+        <item>@string/tenmin</item>
+        <item>@string/twentymin</item>
+        <item>@string/thirtymin</item>
+        <item>@string/sixtymin</item>
+    </string-array>
 </resources>
