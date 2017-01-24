@@ -28,11 +28,6 @@ import butterknife.Unbinder;
 
 public class InstallFragment extends Fragment implements CallbackHandler.EventListener {
 
-    public static final CallbackHandler.Event blockDetectionDone = new CallbackHandler.Event();
-
-    public static List<String> blockList;
-    public static String bootBlock = null;
-
     private Unbinder unbinder;
     @BindView(R.id.current_version_title) TextView currentVersionTitle;
     @BindView(R.id.install_title) TextView installTitle;
@@ -48,14 +43,14 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         View v = inflater.inflate(R.layout.install_fragment, container, false);
         unbinder = ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
-        currentVersionTitle.setText(getString(R.string.current_magisk_title, StatusFragment.magiskVersionString));
-        installTitle.setText(getString(R.string.install_magisk_title, StatusFragment.remoteMagiskVersion));
+        currentVersionTitle.setText(getString(R.string.current_magisk_title, Global.Info.magiskVersionString));
+        installTitle.setText(getString(R.string.install_magisk_title, Global.Info.remoteMagiskVersion));
         flashButton.setOnClickListener(v1 -> {
-            String bootImage = bootBlock;
+            String bootImage = Global.Info.bootBlock;
             if (bootImage == null) {
-                bootImage = blockList.get(spinner.getSelectedItemPosition() - 1);
+                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
             }
-            String filename = "Magisk-v" + StatusFragment.remoteMagiskVersion + ".zip";
+            String filename = "Magisk-v" + Global.Info.remoteMagiskVersion + ".zip";
             String finalBootImage = bootImage;
             Utils.getAlertDialogBuilder(getActivity())
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
@@ -64,15 +59,15 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
                     .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                             getActivity(),
                             new MagiskDlReceiver(finalBootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
-                            StatusFragment.magiskLink,
+                            Global.Info.magiskLink,
                             Utils.getLegalFilename(filename)))
                     .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
-                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(StatusFragment.releaseNoteLink)));
+                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Global.Info.releaseNoteLink)));
                     })
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });
-        if (blockDetectionDone.isTriggered) {
+        if (Global.Events.blockDetectionDone.isTriggered) {
             updateUI();
         }
         return v;
@@ -84,8 +79,8 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void updateUI() {
-        List<String> items = new ArrayList<>(blockList);
-        items.add(0, getString(R.string.auto_detect, bootBlock));
+        List<String> items = new ArrayList<>(Global.Data.blockList);
+        items.add(0, getString(R.string.auto_detect, Global.Info.bootBlock));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -94,7 +89,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void toAutoDetect() {
-        if (bootBlock != null) {
+        if (Global.Info.bootBlock != null) {
             spinner.setSelection(0);
         }
     }
@@ -103,12 +98,12 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.install);
-        CallbackHandler.register(blockDetectionDone, this);
+        CallbackHandler.register(Global.Events.blockDetectionDone, this);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(blockDetectionDone, this);
+        CallbackHandler.unRegister(Global.Events.blockDetectionDone, this);
         super.onStop();
     }
 

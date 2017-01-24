@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ModuleHelper;
+import com.topjohnwu.magisk.module.ModuleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +29,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class ModulesFragment extends Fragment implements CallbackHandler.EventListener {
-
-    public static final CallbackHandler.Event moduleLoadDone = new CallbackHandler.Event();
 
     private static final int FETCH_ZIP_CODE = 2;
 
@@ -71,7 +69,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
             }
         });
 
-        if (moduleLoadDone.isTriggered) {
+        if (Global.Events.moduleLoadDone.isTriggered) {
             updateUI();
         }
 
@@ -97,13 +95,13 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(moduleLoadDone, this);
+        CallbackHandler.register(Global.Events.moduleLoadDone, this);
         getActivity().setTitle(R.string.modules);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(moduleLoadDone, this);
+        CallbackHandler.unRegister(Global.Events.moduleLoadDone, this);
         super.onStop();
     }
 

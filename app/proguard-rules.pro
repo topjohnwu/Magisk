@@ -29,7 +29,7 @@
 
 # Application classes that will be serialized/deserialized over Gson
 -keep class com.topjohnwu.magisk.module.** { *; }
--keep class com.topjohnwu.magisk.utils.ModuleHelper$ValueSortedMap { *; }
+-keep class com.topjohnwu.magisk.module.ModuleHelper$ValueSortedMap { *; }
 
 # Prevent proguard from stripping interface information from TypeAdapterFactory,
 # JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)

@@ -29,19 +29,16 @@ import butterknife.Unbinder;
 
 public class MagiskHideFragment extends Fragment implements CallbackHandler.EventListener {
 
-    private Unbinder unbinder;
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-
-    // Don't show in list...
-    public static final List<String> BLACKLIST =  Arrays.asList(
+    public static final List<String> HIDEBLACKLIST =  Arrays.asList(
             "android",
             "com.topjohnwu.magisk",
             "com.google.android.gms",
             "com.google.android.apps.walletnfcrel",
             "com.nianticlabs.pokemongo"
     );
-    public static final CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
+    private Unbinder unbinder;
+    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
     private ApplicationAdapter appAdapter;
 
@@ -98,15 +95,15 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.magiskhide);
-        CallbackHandler.register(packageLoadDone, this);
-        if (packageLoadDone.isTriggered) {
-            onTrigger(packageLoadDone);
+        CallbackHandler.register(Global.Events.packageLoadDone, this);
+        if (Global.Events.packageLoadDone.isTriggered) {
+            onTrigger(Global.Events.packageLoadDone);
         }
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(packageLoadDone, this);
+        CallbackHandler.unRegister(Global.Events.packageLoadDone, this);
         super.onStop();
     }
 

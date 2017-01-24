@@ -28,9 +28,10 @@ import butterknife.ButterKnife;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
-    private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
     private static final String DONATION_URL = "http://topjohnwu.github.io/donate";
+    private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
+    private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
+
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.app_version_info) AboutCardRow appVersionInfo;
     @BindView(R.id.app_changelog) AboutCardRow appChangelog;

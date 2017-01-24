@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 
 public class SuRequestActivity extends AppCompatActivity {
 
+    private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
     private final static int SU_PROTOCOL_PARAM_MAX = 20;
     private final static int SU_PROTOCOL_NAME_MAX = 20;
     private final static int SU_PROTOCOL_VALUE_MAX = 256;
@@ -48,8 +49,6 @@ public class SuRequestActivity extends AppCompatActivity {
     private int uid, countdown = 10;
     private String appName, packageName;
     private CountDownTimer timer;
-
-    private int[] timeoutList = {0, -1, 10, 20, 30, 60};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

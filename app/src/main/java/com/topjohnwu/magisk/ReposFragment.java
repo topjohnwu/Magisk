@@ -20,7 +20,7 @@ import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ModuleHelper;
+import com.topjohnwu.magisk.module.ModuleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class ReposFragment extends Fragment implements CallbackHandler.EventListener {
-
-    public static final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -74,7 +72,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
             new Async.LoadRepos(getActivity()).exec();
         });
 
-        if (repoLoadDone.isTriggered) {
+        if (Global.Events.repoLoadDone.isTriggered) {
             reloadRepos();
             updateUI();
         }
@@ -112,13 +110,13 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(repoLoadDone, this);
+        CallbackHandler.register(Global.Events.repoLoadDone, this);
         getActivity().setTitle(R.string.downloads);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(repoLoadDone, this);
+        CallbackHandler.unRegister(Global.Events.repoLoadDone, this);
         super.onStop();
     }
 

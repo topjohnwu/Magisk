@@ -14,9 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ModuleHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -107,10 +107,10 @@ public class SettingsActivity extends AppCompatActivity {
                 themePreference.setSummary(R.string.theme_default);
             }
 
-            if (StatusFragment.magiskVersion < 9) {
+            if (Global.Info.magiskVersion < 9) {
                 hostsPreference.setEnabled(false);
                 busyboxPreference.setEnabled(false);
-            } else if (StatusFragment.magiskVersion < 8) {
+            } else if (Global.Info.magiskVersion < 8) {
                 magiskhidePreference.setEnabled(false);
             } else if (! Shell.rootAccess()) {
                 busyboxPreference.setEnabled(false);
@@ -146,7 +146,7 @@ public class SettingsActivity extends AppCompatActivity {
                     if (Utils.isDarkTheme != theme.equalsIgnoreCase(getString(R.string.theme_dark_value))) {
                         Utils.isDarkTheme = !Utils.isDarkTheme;
                         getActivity().recreate();
-                        MainActivity.recreate.trigger();
+                        Global.Events.reloadMainActivity.trigger();
                     }
                     break;
                 case "magiskhide":

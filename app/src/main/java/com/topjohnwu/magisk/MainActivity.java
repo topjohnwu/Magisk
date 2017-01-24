@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
 
-    public static final CallbackHandler.Event recreate = new CallbackHandler.Event();
-
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
 
@@ -88,28 +86,28 @@ public class MainActivity extends AppCompatActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-        CallbackHandler.register(recreate, this);
+        CallbackHandler.register(Global.Events.reloadMainActivity, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CallbackHandler.register(StatusFragment.updateCheckDone, this);
-        if (StatusFragment.updateCheckDone.isTriggered) {
-            onTrigger(StatusFragment.updateCheckDone);
+        CallbackHandler.register(Global.Events.updateCheckDone, this);
+        if (Global.Events.updateCheckDone.isTriggered) {
+            onTrigger(Global.Events.updateCheckDone);
         }
         checkHideSection();
     }
 
     @Override
     protected void onPause() {
-        CallbackHandler.unRegister(StatusFragment.updateCheckDone, this);
+        CallbackHandler.unRegister(Global.Events.updateCheckDone, this);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        CallbackHandler.unRegister(recreate, this);
+        CallbackHandler.unRegister(Global.Events.reloadMainActivity, this);
         super.onDestroy();
     }
 
@@ -139,22 +137,22 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTrigger(CallbackHandler.Event event) {
-        if (event == StatusFragment.updateCheckDone) {
+        if (event == Global.Events.updateCheckDone) {
             Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.install).setVisible(StatusFragment.remoteMagiskVersion > 0 &&
+            menu.findItem(R.id.install).setVisible(Global.Info.remoteMagiskVersion > 0 &&
                     Shell.rootAccess());
-        } else if (event == recreate) {
+        } else if (event == Global.Events.reloadMainActivity) {
             recreate();
         }
     }
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(StatusFragment.magiskVersion >= 8 &&
+        menu.findItem(R.id.magiskhide).setVisible(Global.Info.magiskVersion >= 8 &&
                 prefs.getBoolean("magiskhide", false) && Shell.rootAccess());
-        menu.findItem(R.id.modules).setVisible(StatusFragment.magiskVersion >= 4 &&
+        menu.findItem(R.id.modules).setVisible(Global.Info.magiskVersion >= 4 &&
                 Shell.rootAccess());
-        menu.findItem(R.id.downloads).setVisible(StatusFragment.magiskVersion >= 4 &&
+        menu.findItem(R.id.downloads).setVisible(Global.Info.magiskVersion >= 4 &&
                 Shell.rootAccess());
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.install).setVisible(Shell.rootAccess());

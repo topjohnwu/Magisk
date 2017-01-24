@@ -11,12 +11,10 @@ import android.provider.OpenableColumns;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.InstallFragment;
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskHideFragment;
-import com.topjohnwu.magisk.ModulesFragment;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ReposFragment;
-import com.topjohnwu.magisk.StatusFragment;
+import com.topjohnwu.magisk.module.ModuleHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,16 +58,16 @@ public class Async {
             try {
                 JSONObject json = new JSONObject(jsonStr);
                 JSONObject magisk = json.getJSONObject("magisk");
-                StatusFragment.remoteMagiskVersion = magisk.getDouble("versionCode");
-                StatusFragment.magiskLink = magisk.getString("link");
-                StatusFragment.releaseNoteLink = magisk.getString("note");
+                Global.Info.remoteMagiskVersion = magisk.getDouble("versionCode");
+                Global.Info.magiskLink = magisk.getString("link");
+                Global.Info.releaseNoteLink = magisk.getString("note");
             } catch (JSONException ignored) {}
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            StatusFragment.updateCheckDone.trigger();
+            Global.Events.updateCheckDone.trigger();
         }
     }
 
@@ -77,8 +75,8 @@ public class Async {
         new SafetyNetHelper(context) {
             @Override
             public void handleResults(int i) {
-                StatusFragment.SNCheckResult = i;
-                StatusFragment.safetyNetDone.trigger();
+                Global.Info.SNCheckResult = i;
+                Global.Events.safetyNetDone.trigger();
             }
         }.requestTest();
     }
@@ -93,7 +91,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            ModulesFragment.moduleLoadDone.trigger();
+            Global.Events.moduleLoadDone.trigger();
         }
     }
 
@@ -113,7 +111,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void v) {
-            ReposFragment.repoLoadDone.trigger();
+            Global.Events.repoLoadDone.trigger();
         }
     }
 
@@ -130,7 +128,7 @@ public class Async {
             List<ApplicationInfo> listApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
             for (Iterator<ApplicationInfo> i = listApps.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
-                if (MagiskHideFragment.BLACKLIST.contains(info.packageName) || !info.enabled)
+                if (MagiskHideFragment.HIDEBLACKLIST.contains(info.packageName) || !info.enabled)
                     i.remove();
             }
             Collections.sort(listApps, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
@@ -141,7 +139,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Result result) {
-            MagiskHideFragment.packageLoadDone.trigger(result);
+            Global.Events.packageLoadDone.trigger(result);
         }
 
         public static class Result {
@@ -289,7 +287,7 @@ public class Async {
         }
 
         protected void onSuccess() {
-            StatusFragment.updateCheckDone.trigger();
+            Global.Events.updateCheckDone.trigger();
             new LoadModules().exec();
 
             Utils.getAlertDialogBuilder(mContext)
@@ -324,9 +322,9 @@ public class Async {
         @Override
         protected Void doInBackground(Void... params) {
             if (Shell.rootAccess()) {
-                InstallFragment.blockList = Shell.su("ls /dev/block | grep mmc");
-                if (InstallFragment.bootBlock == null) {
-                    InstallFragment.bootBlock = Utils.detectBootImage();
+                Global.Data.blockList = Shell.su("ls /dev/block | grep mmc");
+                if (Global.Info.bootBlock == null) {
+                    Global.Info.bootBlock = Utils.detectBootImage();
                 }
             }
             return null;
@@ -334,7 +332,7 @@ public class Async {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            InstallFragment.blockDetectionDone.trigger();
+            Global.Events.blockDetectionDone.trigger();
         }
     }
 }
