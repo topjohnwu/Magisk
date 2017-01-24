@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Process;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
@@ -13,15 +14,25 @@ public class SuReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         int fromUid, toUid, pid;
         String command, action;
+        Policy policy;
 
         if (intent == null) return;
+
         fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
+        if (fromUid == Process.myUid()) return; // Don't show anything if it's Magisk Manager
+
         action = intent.getStringExtra("action");
         if (action == null) return;
+
         SuDatabaseHelper dbHelper = new SuDatabaseHelper(context);
-        Policy policy = dbHelper.getPolicy(fromUid);
-        if (policy == null) return;
+        policy = dbHelper.getPolicy(fromUid);
+        if (policy == null) try {
+            policy = new Policy(fromUid, context.getPackageManager());
+        } catch (Throwable throwable) {
+            return;
+        }
+
         if (policy.notification) {
             String message;
             switch (action) {

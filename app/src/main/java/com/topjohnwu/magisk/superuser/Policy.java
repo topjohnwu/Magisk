@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.superuser;
 
 import android.content.ContentValues;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 
 
@@ -11,6 +13,17 @@ public class Policy {
     public String packageName, appName;
 
     public Policy() {}
+
+    public Policy(int uid, PackageManager pm) throws Throwable {
+        String[] pkgs = pm.getPackagesForUid(uid);
+        if (pkgs != null && pkgs.length > 0) {
+            PackageInfo info = pm.getPackageInfo(pkgs[0], 0);
+            packageName = pkgs[0];
+            appName = info.applicationInfo.loadLabel(pm).toString();
+            logging = true;
+            notification = true;
+        } else throw new Throwable();
+    }
 
     public Policy(Cursor c) {
         uid = c.getInt(c.getColumnIndex("uid"));

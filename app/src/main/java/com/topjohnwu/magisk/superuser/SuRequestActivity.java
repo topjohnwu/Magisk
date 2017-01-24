@@ -71,7 +71,7 @@ public class SuRequestActivity extends AppCompatActivity {
         packageNameView.setText(packageName);
 
         grant_btn.setOnClickListener(v -> handleAction(true, timeoutList[timeout.getSelectedItemPosition()]));
-        deny_btn.setOnClickListener(v -> handleAction(false, 0));
+        deny_btn.setOnClickListener(v -> handleAction(false, timeoutList[timeout.getSelectedItemPosition()]));
     }
 
     void handleAction(boolean action, int timeout) {
