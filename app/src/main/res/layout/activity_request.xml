@@ -3,55 +3,69 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.topjohnwu.playground.superuser.RequestActivity"
-    android:orientation="vertical"
+    tools:context=".superuser.RequestActivity"
     android:layout_height="wrap_content"
-    android:layout_width="375dp"
-    android:layout_gravity="center">
+    android:layout_width="wrap_content"
+    android:minWidth="350dp"
+    android:layout_gravity="center"
+    android:orientation="vertical">
 
     <TextView
         android:text="@string/su_request_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/request_title"
-        android:gravity="center"
-        android:layout_marginTop="20dp" />
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:paddingStart="30dp">
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:layout_gravity="center_horizontal">
 
         <ImageView
-            app:srcCompat="@mipmap/ic_launcher"
             android:id="@+id/app_icon"
-            android:layout_weight="1"
-            android:layout_marginEnd="15dp"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:layout_marginStart="5dp" />
+            android:layout_weight="0"
+            android:layout_marginEnd="10dp"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="center_vertical" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_weight="5">
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:maxWidth="300dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="?android:textColorPrimary"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/app_name" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minWidth="200dp"
+                android:maxWidth="300dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="?android:textColorSecondary"
                 android:id="@+id/package_name" />
         </LinearLayout>
@@ -61,7 +75,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timeout"
-        android:layout_margin="15dp"
         android:layout_gravity="center_horizontal" />
 
     <TextView
