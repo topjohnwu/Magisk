@@ -8,11 +8,13 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,6 +32,7 @@ public class SuRequestActivity extends AppCompatActivity {
     private final static int SU_PROTOCOL_NAME_MAX = 20;
     private final static int SU_PROTOCOL_VALUE_MAX = 256;
 
+    @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
     @BindView(R.id.app_icon) ImageView appIcon;
     @BindView(R.id.app_name) TextView appNameView;
@@ -42,8 +45,9 @@ public class SuRequestActivity extends AppCompatActivity {
     private PackageManager pm;
     private PackageInfo info;
 
-    private int uid;
+    private int uid, countdown = 10;
     private String appName, packageName;
+    private CountDownTimer timer;
 
     private int[] timeoutList = {0, -1, 10, 20, 30, 60};
 
@@ -70,8 +74,27 @@ public class SuRequestActivity extends AppCompatActivity {
         appNameView.setText(appName);
         packageNameView.setText(packageName);
 
+        timer = new CountDownTimer(countdown * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                deny_btn.setText(getString(R.string.deny, "(" + millisUntilFinished / 1000 + ")"));
+            }
+            @Override
+            public void onFinish() {
+                deny_btn.setText(getString(R.string.deny, "(0)"));
+                handleAction(false, -1);
+            }
+        };
+
         grant_btn.setOnClickListener(v -> handleAction(true, timeoutList[timeout.getSelectedItemPosition()]));
         deny_btn.setOnClickListener(v -> handleAction(false, timeoutList[timeout.getSelectedItemPosition()]));
+        suPopup.setOnClickListener(v -> {
+            timer.cancel();
+            deny_btn.setText(getString(R.string.deny, ""));
+        });
+
+        timer.start();
+
     }
 
     void handleAction(boolean action, int timeout) {
@@ -85,7 +108,7 @@ public class SuRequestActivity extends AppCompatActivity {
             policy.uid = uid;
             policy.packageName = packageName;
             policy.appName = appName;
-            policy.until = (timeout == 0) ? 0 : System.currentTimeMillis() + timeout * 60 * 1000;
+            policy.until = (timeout == 0) ? 0 : (System.currentTimeMillis() / 1000 + timeout * 60);
             policy.policy = action ? 2 : 1;
             policy.logging = true;
             policy.notification = true;

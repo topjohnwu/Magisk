@@ -145,7 +145,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
-    <string name="deny">Deny</string>
+    <string name="deny">Deny%1$s</string>
     <string name="grant">Grant</string>
     <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
     <string name="forever">Forever</string>
