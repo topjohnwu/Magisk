@@ -198,12 +198,6 @@ static int from_init(struct su_initiator *from) {
     strncpy(from->bin, argv0, sizeof(from->bin));
     from->bin[sizeof(from->bin)-1] = '\0';
 
-    struct passwd *pw;
-    pw = getpwuid(from->uid);
-    if (pw && pw->pw_name) {
-        strncpy(from->name, pw->pw_name, sizeof(from->name));
-    }
-
     return 0;
 }
 
@@ -417,16 +411,9 @@ do {                                        \
 } while (0)
 
 static int socket_send_request(int fd, const struct su_context *ctx) {
-    write_token(fd, "version", PROTO_VERSION);
-    write_token(fd, "binary.version", VERSION_CODE);
-    write_token(fd, "pid", ctx->from.pid);
-    write_string_data(fd, "from.name", ctx->from.name);
-    write_string_data(fd, "to.name", ctx->to.name);
-    write_token(fd, "from.uid", ctx->from.uid);
-    write_token(fd, "to.uid", ctx->to.uid);
-    write_string_data(fd, "from.bin", ctx->from.bin);
-    // TODO: Fix issue where not using -c does not result a in a command
-    write_string_data(fd, "command", get_command(&ctx->to));
+    write_string_data(fd, "version", VERSION);
+    write_token(fd, "versionCode", VERSION_CODE);
+    write_token(fd, "uid", ctx->from.uid);
     write_token(fd, "eof", PROTO_VERSION);
     return 0;
 }
@@ -683,7 +670,6 @@ int su_main_nodaemon(int argc, char **argv) {
             .uid = 0,
             .bin = "",
             .args = "",
-            .name = "",
         },
         .to = {
             .uid = AID_ROOT,
@@ -695,7 +681,6 @@ int su_main_nodaemon(int argc, char **argv) {
             .argv = argv,
             .argc = argc,
             .optind = 0,
-            .name = "",
         },
         .user = {
             .android_user_id = 0,
@@ -791,8 +776,6 @@ int su_main_nodaemon(int argc, char **argv) {
             }
         } else {
             ctx.to.uid = pw->pw_uid;
-            if (pw->pw_name)
-                strncpy(ctx.to.name, pw->pw_name, sizeof(ctx.to.name));
         }
         optind++;
     }

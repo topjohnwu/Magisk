@@ -87,8 +87,11 @@ int send_result(struct su_context *ctx, policy_t policy) {
     char uid[256];
     sprintf(uid, "%d", ctx->from.uid);
 
-    char desired_uid[256];
-    sprintf(desired_uid, "%d", ctx->to.uid);
+    char toUid[256];
+    sprintf(toUid, "%d", ctx->to.uid);
+
+    char pid[256];
+    sprintf(pid, "%d", ctx->from.pid);
 
     char user[64];
     get_owner_login_user_args(ctx, user, sizeof(user));
@@ -101,20 +104,14 @@ int send_result(struct su_context *ctx, policy_t policy) {
             AM_PATH,
             ACTION_RESULT,
             "--ei",
-            "binary_version",
-            binary_version,
-            "--es",
-            "from_name",
-            ctx->from.name,
-            "--es",
-            "desired_name",
-            ctx->to.name,
-            "--ei",
-            "uid",
+            "from.uid",
             uid,
             "--ei",
-            "desired_uid",
-            desired_uid,
+            "to.uid",
+            toUid,
+            "--ei",
+            "pid",
+            pid,
             "--es",
             "command",
             get_command(&ctx->to),
@@ -132,20 +129,14 @@ int send_result(struct su_context *ctx, policy_t policy) {
         AM_PATH,
         ACTION_RESULT,
         "--ei",
-        "binary_version",
-        binary_version,
-        "--es",
-        "from_name",
-        ctx->from.name,
-        "--es",
-        "desired_name",
-        ctx->to.name,
-        "--ei",
-        "uid",
+        "from.uid",
         uid,
         "--ei",
-        "desired_uid",
-        desired_uid,
+        "to.uid",
+        toUid,
+        "--ei",
+        "pid",
+        pid,
         "--es",
         "command",
         get_command(&ctx->to),
