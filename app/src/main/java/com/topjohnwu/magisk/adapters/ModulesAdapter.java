@@ -61,8 +61,8 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
             @Override
             protected void onPostExecute(Void v) {
-                int title = isChecked ? R.string.disable_file_removed : R.string.disable_file_created;
-                Snackbar.make(holder.title, title, Snackbar.LENGTH_SHORT).show();
+                int snack = isChecked ? R.string.disable_file_removed : R.string.disable_file_created;
+                Snackbar.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
             }
         }.exec());
 
@@ -81,8 +81,8 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
             @Override
             protected void onPostExecute(Void v) {
-                int title = removed ? R.string.remove_file_deleted : R.string.remove_file_created;
-                Snackbar.make(holder.title, title, Snackbar.LENGTH_SHORT).show();
+                int snack = removed ? R.string.remove_file_deleted : R.string.remove_file_created;
+                Snackbar.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
                 updateDeleteButton(holder, module);
             }
         }.exec());

@@ -106,6 +106,7 @@
                 android:gravity="center"
                 android:padding="@dimen/checkbox_padding"
                 android:src="@drawable/ic_delete"
+                android:tint="@color/icon_grey"
                 tools:ignore="ContentDescription"/>
 
         </LinearLayout>

@@ -87,6 +87,7 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="no_thanks">No thanks</string>
+    <string name="yes">Yes</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
     <string name="download_install">Download &amp; install</string>
@@ -155,9 +156,17 @@
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">%1$s is granted Superuser permissions</string>
-    <string name="su_deny_toast">%1$s is denied Superuser permissions</string>
+    <string name="su_allow_toast">%1$s is granted Superuser rights</string>
+    <string name="su_deny_toast">%1$s is denied Superuser rights</string>
     <string name="no_apps_found">No apps found</string>
-
+    <string name="su_snack_grant">Superuser rights of %1$s is granted</string>
+    <string name="su_snack_deny">Superuser rights of %1$s is denied</string>
+    <string name="su_snack_notif_on">Notifications of %1$s is enabled</string>
+    <string name="su_snack_notif_off">Notifications of %1$s is disabled</string>
+    <string name="su_snack_log_on">Logging of %1$s is enabled</string>
+    <string name="su_snack_log_off">Logging of %1$s is disabled</string>
+    <string name="su_snack_revoke">%1$s rights are revoked</string>
+    <string name="su_revoke_title">Revoke?</string>
+    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
 
 </resources>

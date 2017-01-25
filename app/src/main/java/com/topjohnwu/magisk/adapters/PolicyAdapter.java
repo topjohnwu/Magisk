@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.adapters;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.superuser.SuDatabaseHelper;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -44,9 +46,8 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Policy policy = policyList.get(position);
         try {
-            Policy policy = policyList.get(position);
-
             holder.setExpanded(expandList.contains(policy));
 
             holder.itemView.setOnClickListener(view -> {
@@ -63,38 +64,56 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
             holder.packageName.setText(policy.packageName);
             holder.appIcon.setImageDrawable(pm.getPackageInfo(policy.packageName, 0).applicationInfo.loadIcon(pm));
             holder.masterSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if (isChecked && policy.policy == Policy.DENY) {
-                    policy.policy = Policy.ALLOW;
-                    dbHelper.addPolicy(policy);
-                } else if (!isChecked && policy.policy == Policy.ALLOW) {
-                    policy.policy = Policy.DENY;
+                if ((isChecked && policy.policy == Policy.DENY) ||
+                        (!isChecked && policy.policy == Policy.ALLOW)) {
+                    policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
+                    String message = v.getContext().getString(
+                            isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
+                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
             holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if (isChecked && !policy.notification) {
-                    policy.notification = true;
-                    dbHelper.addPolicy(policy);
-                } else if (!isChecked && policy.notification) {
-                    policy.notification = false;
+                if ((isChecked && !policy.notification) ||
+                        (!isChecked && policy.notification)) {
+                    policy.notification = isChecked;
+                    String message = v.getContext().getString(
+                            isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
+                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
             holder.loggingSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if (isChecked && !policy.logging) {
-                    policy.logging = true;
-                    dbHelper.addPolicy(policy);
-                } else if (!isChecked && policy.logging) {
-                    policy.logging = false;
+                if ((isChecked && !policy.logging) ||
+                        (!isChecked && policy.logging)) {
+                    policy.logging = isChecked;
+                    String message = v.getContext().getString(
+                            isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
+                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
+            holder.delete.setOnClickListener(v -> Utils.getAlertDialogBuilder(v.getContext())
+                    .setTitle(R.string.su_revoke_title)
+                    .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        policyList.remove(position);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, policyList.size());
+                        Snackbar.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
+                                Snackbar.LENGTH_SHORT).show();
+                        dbHelper.deletePolicy(policy.uid);
+                    })
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .setCancelable(true)
+                    .show());
             holder.masterSwitch.setChecked(policy.policy == Policy.ALLOW);
             holder.notificationSwitch.setChecked(policy.notification);
             holder.loggingSwitch.setChecked(policy.logging);
 
         } catch (PackageManager.NameNotFoundException e) {
             policyList.remove(position);
+            dbHelper.deletePolicy(policy.uid);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, policyList.size());
             onBindViewHolder(holder, position);
@@ -116,6 +135,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.notification_switch) Switch notificationSwitch;
         @BindView(R.id.logging_switch) Switch loggingSwitch;
 
+        @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
         private ValueAnimator mAnimator;
