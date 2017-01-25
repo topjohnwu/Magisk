@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.superuser;
 
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,10 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -117,7 +113,7 @@ public class SuRequestActivity extends AppCompatActivity {
             policy.packageName = packageName;
             policy.appName = appName;
             policy.until = (timeout == 0) ? 0 : (System.currentTimeMillis() / 1000 + timeout * 60);
-            policy.policy = action ? 2 : 1;
+            policy.policy = action ? Policy.ALLOW : Policy.DENY;
             policy.logging = true;
             policy.notification = true;
             new SuDatabaseHelper(this).addPolicy(policy);

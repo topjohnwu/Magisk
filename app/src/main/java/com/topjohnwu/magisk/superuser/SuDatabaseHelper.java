@@ -57,19 +57,20 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Policy> getPolicyList(PackageManager pm) {
+        List<Policy> ret = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
-        ArrayList<Policy> ret = new ArrayList<>();
         Policy policy;
         // Clear outdated policies
         db.delete(TABLE_NAME, "until > 0 and until < ?", new String[] { String.valueOf(System.currentTimeMillis()) });
-        try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null)) {
+        try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, "app_name")) {
             while (c.moveToNext()) {
                 policy = new Policy(c);
                 // Package is uninstalled
-                if (pm.getPackagesForUid(policy.uid) == null)
+                if (pm.getPackagesForUid(policy.uid) == null) {
                     deletePolicy(policy.uid);
-                else
+                } else {
                     ret.add(policy);
+                }
             }
         }
         db.close();

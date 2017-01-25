@@ -1,0 +1,67 @@
+package com.topjohnwu.magisk;
+
+
+import android.app.Fragment;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.topjohnwu.magisk.adapters.PolicyAdapter;
+import com.topjohnwu.magisk.superuser.Policy;
+import com.topjohnwu.magisk.superuser.SuDatabaseHelper;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
+public class SuperuserFragment extends Fragment {
+
+    private Unbinder unbinder;
+    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_rv) TextView emptyTv;
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_superuser, container, false);
+        unbinder = ButterKnife.bind(this, view);
+
+        PackageManager pm = getActivity().getPackageManager();
+
+        SuDatabaseHelper dbHelper = new SuDatabaseHelper(getActivity());
+        List<Policy> policyList = dbHelper.getPolicyList(pm);
+
+        PolicyAdapter adapter = new PolicyAdapter(policyList, dbHelper, pm);
+
+        if (policyList.size() == 0) {
+            emptyTv.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setAdapter(adapter);
+            emptyTv.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getActivity().setTitle(getString(R.string.superuser));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+}

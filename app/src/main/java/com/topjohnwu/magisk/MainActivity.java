@@ -165,6 +165,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.install:
                 displayFragment(new InstallFragment(), "install", now);
                 break;
+            case R.id.superuser:
+                displayFragment(new SuperuserFragment(), "superuser", now);
+                break;
             case R.id.modules:
                 displayFragment(new ModulesFragment(), "modules", now);
                 break;

@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.Global;

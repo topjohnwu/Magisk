@@ -9,6 +9,7 @@
     <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
+    <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Settings</string>
     <string name="status">Status</string>
@@ -156,9 +157,7 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s is granted Superuser permissions</string>
     <string name="su_deny_toast">%1$s is denied Superuser permissions</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="no_apps_found">No apps found</string>
 
 
 </resources>
