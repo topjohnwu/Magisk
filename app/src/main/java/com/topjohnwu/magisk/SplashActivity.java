@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class SplashActivity extends AppCompatActivity {
@@ -16,17 +15,13 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplication());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        String theme = prefs.getString("theme", getString(R.string.theme_default_value));
-        Utils.isDarkTheme = theme.equalsIgnoreCase(getString(R.string.theme_dark_value));
+        Global.Configs.init(getApplicationContext());
 
-        if (Utils.isDarkTheme) {
+        if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
-
-        Logger.devLog = prefs.getBoolean("developer_logging", false);
-        Logger.logShell = prefs.getBoolean("shell_logging", false);
 
         // Initialize prefs
         prefs.edit()

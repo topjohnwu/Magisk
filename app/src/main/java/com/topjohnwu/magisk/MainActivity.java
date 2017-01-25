@@ -24,7 +24,6 @@ import android.view.View;
 
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        if (Utils.isDarkTheme) {
+        if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
         super.onCreate(savedInstanceState);

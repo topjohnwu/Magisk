@@ -1,5 +1,10 @@
 package com.topjohnwu.magisk;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
+import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -21,7 +26,7 @@ public class Global {
     }
     public static class Data {
         public static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
-        public static ValueSortedMap<String, com.topjohnwu.magisk.module.Module> moduleMap = new ValueSortedMap<>();
+        public static ValueSortedMap<String, Module> moduleMap = new ValueSortedMap<>();
         public static List<String> blockList;
     }
     public static class Events {
@@ -32,6 +37,18 @@ public class Global {
         public static final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
         public static final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
         public static final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
+    }
+    public static class Configs {
+        public static boolean isDarkTheme;
+        public static boolean shellLogging;
+        public static boolean devLogging;
+
+        public static void init(Context context) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            isDarkTheme = prefs.getString("theme", context.getString(R.string.theme_default_value)).equalsIgnoreCase(context.getString(R.string.theme_dark_value));
+            devLogging = prefs.getBoolean("developer_logging", false);
+            shellLogging = prefs.getBoolean("shell_logging", false);
+        }
     }
 
 }

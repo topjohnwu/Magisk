@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.receivers;
 
 import android.net.Uri;
 
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.ZipUtils;

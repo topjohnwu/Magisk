@@ -16,10 +16,10 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionButton;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.module.ModuleHelper;
 
 import java.util.ArrayList;
 import java.util.List;

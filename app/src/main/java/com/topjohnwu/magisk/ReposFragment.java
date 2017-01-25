@@ -16,11 +16,11 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.adapters.SimpleSectionedRecyclerViewAdapter;
+import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.module.ModuleHelper;
 
 import java.util.ArrayList;
 import java.util.List;

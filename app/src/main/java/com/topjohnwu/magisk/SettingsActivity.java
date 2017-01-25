@@ -32,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (Utils.isDarkTheme) {
+        if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
 
@@ -101,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             });
 
-            if (Utils.isDarkTheme) {
+            if (Global.Configs.isDarkTheme) {
                 themePreference.setSummary(R.string.theme_dark);
             } else {
                 themePreference.setSummary(R.string.theme_default);
@@ -143,8 +143,8 @@ public class SettingsActivity extends AppCompatActivity {
             switch (key) {
                 case "theme":
                     String theme = prefs.getString("theme", getString(R.string.theme_default_value));
-                    if (Utils.isDarkTheme != theme.equalsIgnoreCase(getString(R.string.theme_dark_value))) {
-                        Utils.isDarkTheme = !Utils.isDarkTheme;
+                    if (Global.Configs.isDarkTheme != theme.equalsIgnoreCase(getString(R.string.theme_dark_value))) {
+                        Global.Configs.isDarkTheme = !Global.Configs.isDarkTheme;
                         getActivity().recreate();
                         Global.Events.reloadMainActivity.trigger();
                     }
@@ -200,10 +200,10 @@ public class SettingsActivity extends AppCompatActivity {
                     }.exec();
                     break;
                 case "developer_logging":
-                    Logger.devLog = prefs.getBoolean("developer_logging", false);
+                    Global.Configs.devLogging = prefs.getBoolean("developer_logging", false);
                     break;
                 case "shell_logging":
-                    Logger.logShell = prefs.getBoolean("shell_logging", false);
+                    Global.Configs.shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
             }
 
