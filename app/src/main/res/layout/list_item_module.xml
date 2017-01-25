@@ -40,7 +40,6 @@
             android:layout_alignParentStart="true"
             android:layout_below="@id/title"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/no_info_provided"
             android:textColor="@android:color/tertiary_text_dark"
             android:textIsSelectable="false"
             android:textStyle="bold|italic"/>
@@ -51,7 +50,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@id/version_name"
-            android:text="@string/no_info_provided"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/tertiary_text_dark"
             android:textIsSelectable="false"
@@ -63,7 +61,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/author"
             android:layout_gravity="center_vertical"
-            android:text="@string/no_info_provided"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textIsSelectable="false"/>
 
