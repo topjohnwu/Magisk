@@ -2,11 +2,13 @@ package com.topjohnwu.magisk.module;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -161,6 +163,17 @@ public class ModuleHelper {
                 others.add(repo);
             }
         }
+    }
+
+    public static void clearRepoCache(Context context) {
+        SharedPreferences repoMap = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+        repoMap.edit()
+                .remove(ETAG_KEY)
+                .remove(VERSION_KEY)
+                .apply();
+        Global.Events.repoLoadDone.isTriggered = false;
+        new Async.LoadRepos(context).exec();
+        Toast.makeText(context, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -91,13 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
             Preference clear = findPreference("clear");
 
             clear.setOnPreferenceClickListener((pref) -> {
-                SharedPreferences repoMap = getActivity().getSharedPreferences(ModuleHelper.FILE_KEY, Context.MODE_PRIVATE);
-                repoMap.edit()
-                        .putString(ModuleHelper.ETAG_KEY, "")
-                        .putInt(ModuleHelper.VERSION_KEY, 0)
-                        .apply();
-                new Async.LoadRepos(getActivity()).exec();
-                Toast.makeText(getActivity(), R.string.repo_cache_cleared, Toast.LENGTH_LONG).show();
+               ModuleHelper.clearRepoCache(getActivity());
                 return true;
             });
 

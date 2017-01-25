@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.superuser;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,7 +11,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -87,9 +91,14 @@ public class SuRequestActivity extends AppCompatActivity {
 
         grant_btn.setOnClickListener(v -> handleAction(true, timeoutList[timeout.getSelectedItemPosition()]));
         deny_btn.setOnClickListener(v -> handleAction(false, timeoutList[timeout.getSelectedItemPosition()]));
-        suPopup.setOnClickListener(v -> {
+        suPopup.setOnClickListener((v) -> {
             timer.cancel();
             deny_btn.setText(getString(R.string.deny, ""));
+        });
+        timeout.setOnTouchListener((v, event) -> {
+            timer.cancel();
+            deny_btn.setText(getString(R.string.deny, ""));
+            return false;
         });
 
         timer.start();
