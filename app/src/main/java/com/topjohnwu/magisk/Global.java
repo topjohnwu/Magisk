@@ -45,7 +45,7 @@ public class Global {
 
         public static void init(Context context) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            isDarkTheme = prefs.getString("theme", context.getString(R.string.theme_default_value)).equalsIgnoreCase(context.getString(R.string.theme_dark_value));
+            isDarkTheme = prefs.getBoolean("dark_theme", false);
             devLogging = prefs.getBoolean("developer_logging", false);
             shellLogging = prefs.getBoolean("shell_logging", false);
         }

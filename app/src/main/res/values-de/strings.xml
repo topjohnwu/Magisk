@@ -113,8 +113,8 @@
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
-    <string name="settings_theme_title">Thema</string>
-    <string name="settings_theme_summary">Wähle ein Thema</string>
+    <string name="settings_dark_theme_title">Thema</string>
+    <string name="settings_dark_theme_summary">Wähle ein Thema</string>
     <string name="theme_default">Standard</string>
     <string name="theme_dark">Dunkel</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>

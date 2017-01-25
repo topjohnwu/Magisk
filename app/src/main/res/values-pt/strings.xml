@@ -107,8 +107,8 @@
 
     <!--Settings Fragment -->
     <string name="settings_general_category">Geral</string>
-    <string name="settings_theme_title">Tema</string>
-    <string name="settings_theme_summary">Escolha um tema</string>
+    <string name="settings_dark_theme_title">Tema</string>
+    <string name="settings_dark_theme_summary">Escolha um tema</string>
     <string name="theme_default">Padrão</string>
     <string name="theme_dark">Escuro</string>
 	

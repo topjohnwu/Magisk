@@ -7,6 +7,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,7 +74,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-        private ListPreference themePreference;
         private SharedPreferences prefs;
 
         @Override
@@ -83,36 +83,28 @@ public class SettingsActivity extends AppCompatActivity {
             PreferenceManager.setDefaultValues(getActivity(), R.xml.app_settings, false);
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-            themePreference = (ListPreference) findPreference("theme");
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
-            CheckBoxPreference hostsPreference = (CheckBoxPreference) findPreference("hosts");
+            SwitchPreference hostsPreference = (SwitchPreference) findPreference("hosts");
             Preference clear = findPreference("clear");
 
             clear.setOnPreferenceClickListener((pref) -> {
-               ModuleHelper.clearRepoCache(getActivity());
+                ModuleHelper.clearRepoCache(getActivity());
                 return true;
             });
 
-            if (Global.Configs.isDarkTheme) {
-                themePreference.setSummary(R.string.theme_dark);
-            } else {
-                themePreference.setSummary(R.string.theme_default);
-            }
-
-            if (Global.Info.magiskVersion < 9) {
-                hostsPreference.setEnabled(false);
-                busyboxPreference.setEnabled(false);
-            } else if (Global.Info.magiskVersion < 8) {
-                magiskhidePreference.setEnabled(false);
-            } else if (! Shell.rootAccess()) {
+            if (!Shell.rootAccess()) {
                 busyboxPreference.setEnabled(false);
                 magiskhidePreference.setEnabled(false);
                 hostsPreference.setEnabled(false);
             } else {
-                busyboxPreference.setEnabled(true);
-                magiskhidePreference.setEnabled(true);
-                hostsPreference.setEnabled(true);
+                if (Global.Info.magiskVersion < 9) {
+                    hostsPreference.setEnabled(false);
+                    busyboxPreference.setEnabled(false);
+                }
+                if (Global.Info.magiskVersion < 8) {
+                    magiskhidePreference.setEnabled(false);
+                }
             }
         }
 
@@ -123,9 +115,9 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onDestroy() {
+        public void onStop() {
+            super.onStop();
             prefs.unregisterOnSharedPreferenceChangeListener(this);
-            super.onDestroy();
         }
 
         @Override
@@ -134,10 +126,10 @@ public class SettingsActivity extends AppCompatActivity {
             boolean checked;
 
             switch (key) {
-                case "theme":
-                    String theme = prefs.getString("theme", getString(R.string.theme_default_value));
-                    if (Global.Configs.isDarkTheme != theme.equalsIgnoreCase(getString(R.string.theme_dark_value))) {
-                        Global.Configs.isDarkTheme = !Global.Configs.isDarkTheme;
+                case "dark_theme":
+                    checked = prefs.getBoolean("dark_theme", false);
+                    if (Global.Configs.isDarkTheme != checked) {
+                        Global.Configs.isDarkTheme = checked;
                         getActivity().recreate();
                         Global.Events.reloadMainActivity.trigger();
                     }

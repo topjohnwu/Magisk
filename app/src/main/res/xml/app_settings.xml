@@ -4,13 +4,11 @@
     <PreferenceCategory
         android:title="@string/settings_general_category">
 
-        <ListPreference
-            android:key="theme"
-            android:title="@string/settings_theme_title"
-            android:summary="@string/settings_theme_summary"
-            android:defaultValue="@string/theme_default_value"
-            android:entries="@array/themes"
-            android:entryValues="@array/themes_values"/>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:title="@string/settings_dark_theme_title"
+            android:summary="@string/settings_dark_theme_summary"
+            android:key="dark_theme" />
 
         <Preference
             android:key="clear"
@@ -34,7 +32,7 @@
             android:title="@string/settings_busybox_title"
             android:summary="@string/settings_busybox_summary" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="hosts"
             android:defaultValue="false"
             android:title="@string/settings_hosts_title"

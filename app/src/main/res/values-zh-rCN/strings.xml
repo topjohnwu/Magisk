@@ -104,8 +104,8 @@
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
-    <string name="settings_theme_title">主题</string>
-    <string name="settings_theme_summary">选择一个主题</string>
+    <string name="settings_dark_theme_title">主题</string>
+    <string name="settings_dark_theme_summary">选择一个主题</string>
     <string name="theme_default">默认</string>
     <string name="theme_dark">深色</string>
 

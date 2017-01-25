@@ -83,8 +83,8 @@
 
     <!--Settings Activity -->
     <string name="settings_general_category">عام</string>
-    <string name="settings_theme_title">السمة</string>
-    <string name="settings_theme_summary">أختر سمة</string>
+    <string name="settings_dark_theme_title">السمة</string>
+    <string name="settings_dark_theme_summary">أختر سمة</string>
     <string name="theme_default">إفتراضي</string>
     <string name="theme_dark">غامق</string>
 
