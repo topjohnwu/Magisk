@@ -157,5 +157,8 @@
     <string name="su_allow_toast">%1$s is granted Superuser permissions</string>
     <string name="su_deny_toast">%1$s is denied Superuser permissions</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>

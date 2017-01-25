@@ -43,7 +43,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.modules_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_modules, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         fabio.setOnClickListener(v -> {

@@ -40,7 +40,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.install_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_install, container, false);
         unbinder = ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
         currentVersionTitle.setText(getString(R.string.current_magisk_title, Global.Info.magiskVersionString));

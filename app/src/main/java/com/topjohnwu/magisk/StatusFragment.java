@@ -68,7 +68,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.status_fragment, container, false);
+        View v = inflater.inflate(R.layout.fragment_status, container, false);
         unbinder = ButterKnife.bind(this, v);
 
         defaultColor = magiskUpdateText.getCurrentTextColor();

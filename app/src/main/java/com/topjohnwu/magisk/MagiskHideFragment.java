@@ -54,7 +54,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.magisk_hide_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         PackageManager packageManager = getActivity().getPackageManager();
