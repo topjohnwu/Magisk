@@ -62,7 +62,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         Policy policy;
         // Clear outdated policies
         db.delete(TABLE_NAME, "until > 0 and until < ?", new String[] { String.valueOf(System.currentTimeMillis()) });
-        try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, "app_name")) {
+        try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, "app_name ASC")) {
             while (c.moveToNext()) {
                 policy = new Policy(c);
                 // Package is uninstalled

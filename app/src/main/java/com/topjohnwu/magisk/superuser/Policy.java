@@ -45,7 +45,7 @@ public class Policy {
         values.put("uid", uid);
         values.put("package_name", packageName);
         values.put("app_name", appName);
-        values.put("policy",policy);
+        values.put("policy", policy);
         values.put("until", until);
         values.put("logging", logging ? 1 : 0);
         values.put("notification", notification ? 1 : 0);

@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
 
 import java.io.DataInputStream;
@@ -46,7 +47,7 @@ public class SuRequestActivity extends AppCompatActivity {
     private PackageManager pm;
     private PackageInfo info;
 
-    private int uid, countdown = 10;
+    private int uid;
     private String appName, packageName;
     private CountDownTimer timer;
 
@@ -73,7 +74,7 @@ public class SuRequestActivity extends AppCompatActivity {
         appNameView.setText(appName);
         packageNameView.setText(packageName);
 
-        timer = new CountDownTimer(countdown * 1000, 1000) {
+        timer = new CountDownTimer(Global.Configs.suRequestTimeout * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny, "(" + millisUntilFinished / 1000 + ")"));

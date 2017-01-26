@@ -24,8 +24,8 @@ public class SuReceiver extends BroadcastReceiver {
         action = intent.getStringExtra("action");
         if (action == null) return;
 
-        SuDatabaseHelper dbHelper = new SuDatabaseHelper(context);
-        policy = dbHelper.getPolicy(fromUid);
+        SuDatabaseHelper suDbHelper = new SuDatabaseHelper(context);
+        policy = suDbHelper.getPolicy(fromUid);
         if (policy == null) try {
             policy = new Policy(fromUid, context.getPackageManager());
         } catch (Throwable throwable) {
@@ -53,7 +53,12 @@ public class SuReceiver extends BroadcastReceiver {
             if (pid < 0) return;
             command = intent.getStringExtra("command");
             if (command == null) return;
-            // TODO: Place info into logs
+            SuLogEntry log = new SuLogEntry(policy);
+            log.toUid = toUid;
+            log.fromPid = pid;
+            log.command = command;
+            SuLogDatabaseHelper logDbHelper = new SuLogDatabaseHelper(context);
+            logDbHelper.addLog(log);
         }
     }
 }

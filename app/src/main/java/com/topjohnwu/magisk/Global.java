@@ -46,6 +46,8 @@ public class Global {
         public static boolean isDarkTheme;
         public static boolean shellLogging;
         public static boolean devLogging;
+        public static int suRequestTimeout = 10;
+        public static int suLogTimeout = 14;
 
     }
 
@@ -59,7 +61,7 @@ public class Global {
 
     static void updateMagiskInfo() {
         List<String> ret = Shell.sh("getprop magisk.version");
-        if (Utils.isValidShellResponse(ret)) {
+        if (!Utils.isValidShellResponse(ret)) {
             Info.magiskVersion = -1;
         } else {
             try {
