@@ -7,6 +7,7 @@
     <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Module</string>
     <string name="downloads">Downloads</string>
+    <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Einstellungen</string>
     <string name="status">Status</string>
@@ -84,7 +85,7 @@
     <string name="permissionNotGranted">Diese Funktion benötigt die Berechtigung zum Schreiben auf den externen Speicher.</string>
     <string name="no_thanks">Nein danke</string>
     <string name="repo_install_title">Installiere %1$s</string>
-    <string name="repo_install_msg">Möchtest Du %1$s installieren?</string>
+    <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download_install">Herunterladen &amp; installieren</string>
     <string name="goto_install">Zu \"Installieren\" wechseln</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
@@ -93,7 +94,7 @@
     <string name="manual_install_2">Manuell im Recovery flashen</string>
     <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!!</string>
     <string name="reboot_title">Installation erforlgreich!</string>
-    <string name="reboot_msg">Möchtest Du jetzt neustarten?</string>
+    <string name="reboot_msg">Möchtest du jetzt neustarten?</string>
     <string name="reboot">Neustart</string>
     <string name="copying_msg">Kopiere Zip ins temp-Verzeichnis</string>
     <string name="zip_install_progress_title">Installiere</string>
@@ -101,10 +102,10 @@
     <string name="zip_install_process_zip_msg">Verarbeite Zip-Datei …</string>
     <string name="zip_install_progress_msg">"Installiere %1$s …"</string>
     <string name="no_magisk_title">Magisk nicht installiert!</string>
-    <string name="no_magisk_msg">Möchtest Du Magisk herunterladen und installieren?</string>
+    <string name="no_magisk_msg">Möchtest du Magisk herunterladen und installieren?</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
-    <string name="magisk_update_message">Magisk-Update v%1$.1f ist verfügbar, möchtest Du es installieren?</string>
+    <string name="magisk_update_message">Magisk-Update v%1$.1f ist verfügbar, möchtest du es installieren?</string>
     <string name="settings_reboot_toast">Neustarten, um Änderungen zu übernehmen</string>
     <string name="check_release_notes">Änderungen anzeigen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
@@ -135,5 +136,19 @@
 
     <!-- Themes -->
 
-
+    <!--Superuser-->
+    <string name="su_request_title">Superuser-Anfrage</string>
+    <string name="deny">Gewähren</string>
+    <string name="grant">Verweigern%1$s</string>
+    <string name="su_warning">Gewährt vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
+    <string name="forever">Dauerhaft</string>
+    <string name="once">Nur diesmal</string>
+    <string name="tenmin">10 Min.</string>
+    <string name="twentymin">20 Min.</string>
+    <string name="thirtymin">30 Min.</string>
+    <string name="sixtymin">60 Min.</string>
+    <string name="su_allow_toast">Superuser-Rechte für %1$s gewährt</string>
+    <string name="su_deny_toast">Superuser-Rechte für %1$s verweigert</string>
+    <string name="no_apps_found">Keine Apps gefunden</string>
+    
 </resources>
