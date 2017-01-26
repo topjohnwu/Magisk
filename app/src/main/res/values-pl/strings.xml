@@ -1,7 +1,5 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Otwórz szufladę nawigacji</string>
@@ -43,7 +41,6 @@
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="current_magisk_title">Zainstalowana Wersja Magisk: v%1$s</string>
     <string name="install_magisk_title">Ostatnia Wersja Magisk: v%1$.1f</string>
-    <string name="magiskify" translatable="false">Magiskify</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
@@ -114,8 +111,6 @@
     
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
-    <string name="settings_theme_title">Motyw</string>
-    <string name="settings_theme_summary">Wybierz motyw</string>
     <string name="theme_default">Domyślny</string>
     <string name="theme_dark">Ciemny</string>
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>

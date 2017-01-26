@@ -27,6 +27,8 @@ public class Global {
         public static String releaseNoteLink;
         public static int SNCheckResult = -1;
         public static String bootBlock = null;
+        public static boolean isSuClient = false;
+        public static String suVersion = null;
     }
     public static class Data {
         public static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
@@ -56,6 +58,11 @@ public class Global {
         Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
         Configs.devLogging = prefs.getBoolean("developer_logging", false);
         Configs.shellLogging = prefs.getBoolean("shell_logging", false);
+        List<String> ret = Shell.sh("su -v");
+        if (Utils.isValidShellResponse(ret)) {
+            Info.suVersion = ret.get(0);
+            Info.isSuClient = Info.suVersion.toUpperCase().contains("MAGISK");
+        }
         updateMagiskInfo();
     }
 

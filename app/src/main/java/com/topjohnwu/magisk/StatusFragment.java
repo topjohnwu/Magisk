@@ -176,12 +176,11 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 rootStatusText.setText(R.string.not_rooted);
                 break;
             case 1:
-                List<String> stats = Shell.sh("su -v");
-                if (Utils.isValidShellResponse(stats)) {
+                if (Global.Info.suVersion != null) {
                     color = colorOK;
                     image = R.drawable.ic_check_circle;
                     rootStatusText.setText(R.string.proper_root);
-                    rootInfoText.setText(stats.get(0));
+                    rootInfoText.setText(Global.Info.suVersion);
                     break;
                 }
             case -1:

@@ -147,14 +147,14 @@ public class MainActivity extends AppCompatActivity
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(Global.Info.magiskVersion >= 8 &&
-                prefs.getBoolean("magiskhide", false) && Shell.rootAccess());
-        menu.findItem(R.id.modules).setVisible(Global.Info.magiskVersion >= 4 &&
-                Shell.rootAccess());
-        menu.findItem(R.id.downloads).setVisible(Global.Info.magiskVersion >= 4 &&
-                Shell.rootAccess());
-        menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.install).setVisible(Shell.rootAccess());
+        if (Shell.rootAccess()) {
+            menu.findItem(R.id.magiskhide).setVisible(
+                    Global.Info.magiskVersion >= 8 && prefs.getBoolean("magiskhide", false));
+            menu.findItem(R.id.modules).setVisible(Global.Info.magiskVersion >= 4);
+            menu.findItem(R.id.downloads).setVisible(Global.Info.magiskVersion >= 4);
+            menu.findItem(R.id.log).setVisible(true);
+            menu.findItem(R.id.superuser).setVisible(Global.Info.isSuClient);
+        }
     }
 
     public void navigate(int itemId, boolean now) {
