@@ -25,7 +25,8 @@ import java.util.List;
  * Remember to use the correct namespace for the fab:
  * xmlns:app="http://schemas.android.com/apk/res-auto"
  */
-public class FABBehavior extends CoordinatorLayout.Behavior {
+public class FABBehavior extends CoordinatorLayout.Behavior<View> {
+
     private float mTranslationY;
 
     public FABBehavior(Context context, AttributeSet attrs) {
@@ -74,11 +75,11 @@ public class FABBehavior extends CoordinatorLayout.Behavior {
 
     private float getTranslationY(CoordinatorLayout parent, View child) {
         float minOffset = 0.0F;
-        List dependencies = parent.getDependencies(child);
+        List<View> dependencies = parent.getDependencies(child);
         int i = 0;
 
         for (int z = dependencies.size(); i < z; ++i) {
-            View view = (View) dependencies.get(i);
+            View view = dependencies.get(i);
             if (view instanceof Snackbar.SnackbarLayout && parent.doViewsOverlap(child, view)) {
                 minOffset = Math.min(minOffset, ViewCompat.getTranslationY(view) - (float) view.getHeight());
             }
