@@ -23,7 +23,7 @@ import java.util.List;
  * FabMenu in a Coordinator Layout.
  *
  * Remember to use the correct namespace for the fab:
- * xmlns:fab="http://schemas.android.com/apk/res-auto"
+ * xmlns:app="http://schemas.android.com/apk/res-auto"
  */
 public class FABBehavior extends CoordinatorLayout.Behavior {
     private float mTranslationY;

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
@@ -11,8 +10,6 @@
 
 
     <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +22,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:dividerHeight="@dimen/card_divider_space"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            fab:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
         <TextView
             android:id="@+id/empty_rv"
@@ -47,7 +44,7 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginEnd="113dp"
             android:layout_marginBottom="10dp"
-            app:layout_behavior=".utils.FABBehavior"
+            fab:layout_behavior=".utils.FABBehavior"
             fab:menu_fab_size="normal"
             fab:menu_showShadow="true"
             fab:menu_shadowColor="#66000000"

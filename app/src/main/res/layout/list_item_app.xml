@@ -22,7 +22,6 @@
         android:padding="@dimen/card_layout_padding">
 
         <ImageView
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/app_icon"
             android:layout_width="@dimen/card_appicon_size"
             android:layout_height="@dimen/card_appicon_size"
