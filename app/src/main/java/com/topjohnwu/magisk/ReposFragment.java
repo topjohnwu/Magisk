@@ -59,8 +59,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        mSectionedAdapter = new
-                SimpleSectionedRecyclerViewAdapter(getActivity(), R.layout.section,
+        mSectionedAdapter = new SimpleSectionedRecyclerViewAdapter(R.layout.section,
                 R.id.section_text, new ReposAdapter(fUpdateRepos, fInstalledRepos, fOthersRepos));
 
         recyclerView.setAdapter(mSectionedAdapter);

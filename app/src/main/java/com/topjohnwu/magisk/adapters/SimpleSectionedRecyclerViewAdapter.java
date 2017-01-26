@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -13,25 +12,21 @@ import java.util.Comparator;
 
 public class SimpleSectionedRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final Context mContext;
     private static final int SECTION_TYPE = 0;
 
     private boolean mValid = true;
     private int mSectionResourceId;
     private int mTextResourceId;
-    private LayoutInflater mLayoutInflater;
     private RecyclerView.Adapter mBaseAdapter;
     private SparseArray<Section> mSections = new SparseArray<Section>();
 
 
-    public SimpleSectionedRecyclerViewAdapter(Context context, int sectionResourceId, int textResourceId,
+    public SimpleSectionedRecyclerViewAdapter(int sectionResourceId, int textResourceId,
                                               RecyclerView.Adapter baseAdapter) {
 
-        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
         mTextResourceId = textResourceId;
         mBaseAdapter = baseAdapter;
-        mContext = context;
 
         mBaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -74,7 +69,7 @@ public class SimpleSectionedRecyclerViewAdapter extends RecyclerView.Adapter<Rec
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int typeView) {
         if (typeView == SECTION_TYPE) {
-            final View view = LayoutInflater.from(mContext).inflate(mSectionResourceId, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(mSectionResourceId, parent, false);
             return new SectionViewHolder(view,mTextResourceId);
         }else{
             return mBaseAdapter.onCreateViewHolder(parent, typeView -1);
