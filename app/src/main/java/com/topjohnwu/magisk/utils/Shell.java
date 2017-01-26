@@ -170,6 +170,7 @@ public class Shell {
                     try {
                         // Process terminated, it means the interactive shell has some issues
                         process.exitValue();
+                        rootStatus = -1;
                         return null;
                     } catch (IllegalThreadStateException e) {
                         // Process still running, gobble output until done
@@ -183,17 +184,22 @@ public class Shell {
                                 break;
                             }
                         }
-                        try { STDOUT.join(100); } catch (InterruptedException err) { return null; }
+                        try { STDOUT.join(100); } catch (InterruptedException err) {
+                            rootStatus = -1;
+                            return null;
+                        }
                     }
                 }
             }
         } catch (IOException e) {
             if (!e.getMessage().contains("EPIPE")) {
                 Logger.dev("Shell: Root shell error...");
+                rootStatus = -1;
                 return null;
             }
         } catch(InterruptedException e) {
             Logger.dev("Shell: Root shell error...");
+            rootStatus = -1;
             return null;
         }
 

@@ -4,7 +4,7 @@ import android.net.Uri;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Utils.ByteArrayInOutStream;
+import com.topjohnwu.magisk.utils.ByteArrayInOutStream;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
 import java.io.OutputStream;

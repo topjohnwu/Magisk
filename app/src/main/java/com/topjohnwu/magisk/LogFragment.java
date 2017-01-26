@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -143,12 +144,14 @@ public class LogFragment extends Fragment {
                 case 0:
                     List<String> logList = Utils.readFile(MAGISK_LOG);
 
-                    StringBuilder llog = new StringBuilder(15 * 10 * 1024);
-                    for (String s : logList) {
-                        llog.append(s).append("\n");
+                    if (Utils.isValidShellResponse(logList)) {
+                        StringBuilder llog = new StringBuilder(15 * 10 * 1024);
+                        for (String s : logList) {
+                            llog.append(s).append("\n");
+                        }
+                        return llog.toString();
                     }
-
-                    return llog.toString();
+                    return "";
 
                 case 1:
                     Shell.su("echo > " + MAGISK_LOG);
@@ -182,21 +185,24 @@ public class LogFragment extends Fragment {
 
                     List<String> in = Utils.readFile(MAGISK_LOG);
 
-                    try (FileWriter out = new FileWriter(targetFile)) {
-                        for (String line : in) {
-                            out.write(line + "\n");
+                    if (Utils.isValidShellResponse(in)) {
+                        try (FileWriter out = new FileWriter(targetFile)) {
+                            for (String line : in)
+                                out.write(line + "\n");
+                            return true;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return false;
                         }
-                        return true;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return false;
                     }
+                    return false;
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Object o) {
+            if (o == null) return;
             boolean bool;
             String llog;
             switch (mode) {
@@ -204,7 +210,7 @@ public class LogFragment extends Fragment {
                 case 1:
                     llog = (String) o;
                     progressBar.setVisibility(View.GONE);
-                    if (llog.length() == 0)
+                    if (TextUtils.isEmpty(llog))
                         txtLog.setText(R.string.log_is_empty);
                     else
                         txtLog.setText(llog);

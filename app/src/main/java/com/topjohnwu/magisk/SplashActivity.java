@@ -17,7 +17,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        Global.Configs.init(getApplicationContext());
+        Global.init(getApplicationContext());
 
         if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);

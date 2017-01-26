@@ -31,29 +31,32 @@ public class Utils {
 
     public static boolean itemExist(boolean root, String path) {
         String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
+        List<String> ret;
         if (Shell.rootAccess() && root) {
-            return Boolean.parseBoolean(Shell.su(command).get(0));
+            ret = Shell.su(command);
+            return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
         } else {
             return new File(path).exists();
         }
     }
 
     public static boolean commandExists(String s) {
-        List<String> ret;
         String command = "if [ -z $(which " + s + ") ]; then echo false; else echo true; fi";
-        ret = Shell.sh(command);
-        return Boolean.parseBoolean(ret.get(0));
+        List<String> ret = Shell.sh(command);
+        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean createFile(String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
         String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
-        return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
+        List<String> ret = Shell.su(command);
+        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean removeItem(String path) {
         String command = "rm -rf " + path + " 2>/dev/null; if [ -e " + path + " ]; then echo false; else echo true; fi";
-        return Shell.rootAccess() && Boolean.parseBoolean(Shell.su(command).get(0));
+        List<String> ret = Shell.su(command);
+        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static List<String> getModList(String path) {
@@ -118,9 +121,8 @@ public class Utils {
                 "echo \"${BOOTIMAGE##*/}\""
         };
         List<String> ret = Shell.su(commands);
-        if (!ret.isEmpty()) {
+        if (isValidShellResponse(ret))
             return ret.get(0);
-        }
         return null;
     }
 
@@ -136,17 +138,14 @@ public class Utils {
         return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
     }
 
-    public static class ByteArrayInOutStream extends ByteArrayOutputStream {
-        public ByteArrayInputStream getInputStream() {
-            ByteArrayInputStream in = new ByteArrayInputStream(buf, 0, count);
-            count = 0;
-            buf = new byte[32];
-            return in;
+    public static boolean isValidShellResponse(List<String> list) {
+        if (list != null && list.size() != 0) {
+            // Check if all empty
+            for (String res : list) {
+                if (!TextUtils.isEmpty(res)) return true;
+            }
         }
-        public void setBuffer(byte[] buffer) {
-            buf = buffer;
-            count = buffer.length;
-        }
+        return false;
     }
 
 }

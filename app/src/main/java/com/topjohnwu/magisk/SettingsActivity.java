@@ -115,8 +115,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onStop() {
-            super.onStop();
+        public void onPause() {
+            super.onPause();
             prefs.unregisterOnSharedPreferenceChangeListener(this);
         }
 

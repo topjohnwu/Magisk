@@ -59,10 +59,6 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @BindColor(android.R.color.transparent) int trans;
     int defaultColor;
 
-    static {
-        checkMagiskInfo();
-    }
-
     private AlertDialog updateMagisk;
 
     @Nullable
@@ -162,25 +158,10 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         unbinder.unbind();
     }
 
-    private static void checkMagiskInfo() {
-        List<String> ret = Shell.sh("getprop magisk.version");
-        if (ret.get(0).length() == 0) {
-            Global.Info.magiskVersion = -1;
-        } else {
-            try {
-                Global.Info.magiskVersionString = ret.get(0);
-                Global.Info.magiskVersion = Double.parseDouble(ret.get(0));
-            } catch (NumberFormatException e) {
-                // Custom version don't need to receive updates
-                Global.Info.magiskVersion = Double.POSITIVE_INFINITY;
-            }
-        }
-    }
-
     private void updateUI() {
         int image, color;
 
-        checkMagiskInfo();
+        Global.updateMagiskInfo();
 
         if (Global.Info.magiskVersion < 0) {
             magiskVersionText.setText(R.string.magisk_version_error);
@@ -188,23 +169,26 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
             magiskVersionText.setText(getString(R.string.magisk_version, Global.Info.magiskVersionString));
         }
 
-        if (Shell.rootStatus == 1) {
-            color = colorOK;
-            image = R.drawable.ic_check_circle;
-            rootStatusText.setText(R.string.proper_root);
-            rootInfoText.setText(Shell.sh("su -v").get(0));
-
-        } else {
-            rootInfoText.setText(R.string.root_info_warning);
-            if (Shell.rootStatus == 0) {
+        switch (Shell.rootStatus) {
+            case 0:
                 color = colorBad;
                 image = R.drawable.ic_cancel;
                 rootStatusText.setText(R.string.not_rooted);
-            } else {
+                break;
+            case 1:
+                List<String> stats = Shell.sh("su -v");
+                if (Utils.isValidShellResponse(stats)) {
+                    color = colorOK;
+                    image = R.drawable.ic_check_circle;
+                    rootStatusText.setText(R.string.proper_root);
+                    rootInfoText.setText(stats.get(0));
+                    break;
+                }
+            case -1:
+            default:
                 color = colorNeutral;
                 image = R.drawable.ic_help;
                 rootStatusText.setText(R.string.root_error);
-            }
         }
         rootStatusContainer.setBackgroundColor(color);
         rootStatusText.setTextColor(color);

@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.util.Pair;
 
-import com.topjohnwu.magisk.utils.Utils.ByteArrayInOutStream;
-
 import org.spongycastle.asn1.ASN1InputStream;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.DEROutputStream;

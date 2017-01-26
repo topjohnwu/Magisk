@@ -218,8 +218,9 @@ public class Async {
 
         protected boolean unzipAndCheck() {
             ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
-            return Utils.readFile(mCachedFile.getParent() + "/META-INF/com/google/android/updater-script")
-                    .get(0).contains("#MAGISK");
+            List<String> ret;
+            ret = Utils.readFile(mCachedFile.getParent() + "/META-INF/com/google/android/updater-script");
+            return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
         }
 
         @Override
@@ -252,6 +253,7 @@ public class Async {
                             "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
                     "if [ $? -eq 0 ]; then echo true; else echo false; fi"
             );
+            if (!Utils.isValidShellResponse(ret)) return -1;
             Logger.dev("FlashZip: Console log:");
             for (String line : ret) {
                 Logger.dev(line);
@@ -293,7 +295,7 @@ public class Async {
             Utils.getAlertDialogBuilder(mContext)
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
-                    .setPositiveButton(R.string.reboot, (dialogInterface1, i) -> Shell.sh("su -c reboot"))
+                    .setPositiveButton(R.string.reboot, (dialogInterface, i) -> Shell.sh("su -c reboot"))
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }
@@ -323,9 +325,8 @@ public class Async {
         protected Void doInBackground(Void... params) {
             if (Shell.rootAccess()) {
                 Global.Data.blockList = Shell.su("ls /dev/block | grep mmc");
-                if (Global.Info.bootBlock == null) {
+                if (Global.Info.bootBlock == null)
                     Global.Info.bootBlock = Utils.detectBootImage();
-                }
             }
             return null;
         }

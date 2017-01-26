@@ -46,7 +46,11 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         currentVersionTitle.setText(getString(R.string.current_magisk_title, Global.Info.magiskVersionString));
         installTitle.setText(getString(R.string.install_magisk_title, Global.Info.remoteMagiskVersion));
         flashButton.setOnClickListener(v1 -> {
-            String bootImage = Global.Info.bootBlock;
+            String bootImage;
+            if (spinner.getSelectedItemPosition() > 0)
+                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
+            else
+                bootImage = Global.Info.bootBlock;
             if (bootImage == null) {
                 bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
             }
