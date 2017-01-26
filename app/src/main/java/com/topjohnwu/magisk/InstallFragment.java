@@ -47,12 +47,13 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         installTitle.setText(getString(R.string.install_magisk_title, Global.Info.remoteMagiskVersion));
         flashButton.setOnClickListener(v1 -> {
             String bootImage;
-            if (spinner.getSelectedItemPosition() > 0)
-                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
-            else
-                bootImage = Global.Info.bootBlock;
-            if (bootImage == null) {
-                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
+            if (Global.Info.bootBlock != null) {
+                if (spinner.getSelectedItemPosition() > 0)
+                    bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
+                else
+                    bootImage = Global.Info.bootBlock;
+            } else {
+                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition());
             }
             String filename = "Magisk-v" + Global.Info.remoteMagiskVersion + ".zip";
             String finalBootImage = bootImage;
@@ -84,7 +85,8 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
 
     private void updateUI() {
         List<String> items = new ArrayList<>(Global.Data.blockList);
-        items.add(0, getString(R.string.auto_detect, Global.Info.bootBlock));
+        if (Global.Info.bootBlock != null)
+            items.add(0, getString(R.string.auto_detect, Global.Info.bootBlock));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
