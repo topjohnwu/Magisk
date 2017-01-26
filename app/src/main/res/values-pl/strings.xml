@@ -1,0 +1,157 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Otwórz szufladę nawigacji</string>
+    <string name="navigation_drawer_close">Zamknij szufladę nawigacji</string>
+    <string name="magiskhide">Magisk Hide</string>
+    <string name="modules">Moduły</string>
+    <string name="downloads">Pobieranie</string>
+    <string name="log">Log</string>
+    <string name="settings">Ustawienia</string>
+    <string name="status">Status</string>
+    <string name="install">Instalacja</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">Zainstalowany Magisk v%1$s</string>
+    <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
+
+    <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
+    <string name="magisk_update_available">Magisk v%1$.1f dostępny!</string>
+    <string name="cannot_check_updates">Nie można sprawdzić dostępność aktualizacji, brak internetu</string>
+    <string name="up_to_date">Zainstalowana najnowsza wersja %1$s</string>
+    <string name="root_error">Zrotowany ale bez dostępu do roota</string>
+    <string name="not_rooted">Nie zrootowany</string>
+    <string name="proper_root">Prawidłowo zrootowany</string>
+    <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
+    <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
+    <string name="safetyNet_connection_failed">Nie można połączyć się z Google API</string>
+    <string name="safetyNet_connection_suspended">Połączenie z Google API zostało zawieszone</string>
+    <string name="safetyNet_error">Nie można sprawdzić SafetyNet bez Internetu</string>
+    <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
+    <string name="safetyNet_pass">SafetyNet Passed</string>
+    <string name="root_info_warning">Funkcjonalność znacznie ograniczona</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">"(Auto) %1$s"</string>
+    <string name="boot_image_title">Lokalizacja Boot Image</string>
+    <string name="detect_button">Wykryj</string>
+    <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
+    <string name="keep_force_encryption">Keep force encryption</string>
+    <string name="keep_dm_verity">Keep dm-verity</string>
+    <string name="current_magisk_title">Zainstalowana Wersja Magisk: v%1$s</string>
+    <string name="install_magisk_title">Ostatnia Wersja Magisk: v%1$.1f</string>
+    <string name="magiskify" translatable="false">Magiskify</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nie umieszczono informacji)</string>
+    <string name="no_modules_found">Nie znaleziono modułów</string>
+    <string name="update_file_created">Moduł zostanie zaktualizowany przy następnym restarcie</string>
+    <string name="remove_file_created">Moduł zostanie usunięty przy następnym uruchomieniu</string>
+    <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu</string>
+    <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie</string>
+    <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie</string>
+    <string name="author">Stworzone przez %1$s</string>
+    <string name="fab_flash_zip">Zflashuj Moduł Zip</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Aktualizacja jest dostępna</string>
+    <string name="installed">Zainstalowany</string>
+    <string name="not_installed">Nie zainstalowany</string>
+    <string name="changelog">Zmiany</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Zapisz na SD</string>
+    <string name="menuSend">Wyślij</string>
+    <string name="menuReload">Załaduj ponownie</string>
+    <string name="menuClearLog">Wyczyść Log</string>
+    <string name="logs_cleared">Log wyczyszczony</string>
+    <string name="log_is_empty">Log jest pusty</string>
+    <string name="logs_save_failed">Nie można zapisać logu na karcie SD:</string>
+
+    <!--About Activity-->
+    <string name="about">O Aplikacji</string>
+    <string name="app_developers">Developerzy</string>
+    <string name="app_developers_"><![CDATA[Autorzy aplikacji <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Zmiany w Aplikacji</string>
+    <string name="translators" />
+    <string name="app_version">Wersja Aplikacji</string>
+    <string name="app_source_code">Source code</string>
+    <string name="donation">Dotacja</string>
+    <string name="app_translators">Tłumacze Aplikacji</string>
+    <string name="support_thread">Strona Wsparcia</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
+    <string name="no_thanks">Nie dziękuję</string>
+    <string name="repo_install_title">Zainstaluj %1$s</string>
+    <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
+    <string name="download_install">Pobierz i zainstaluj</string>
+    <string name="goto_install">Idź do sekcji \"Instalacja\"</string>
+    <string name="download_file_error">Bład pobierania pliku</string>
+    <string name="install_error">Błąd instalacji!</string>
+    <string name="manual_install_1">Plik zip umieszczony w %1$s</string>
+    <string name="manual_install_2">Zflashuj go ręcznie w recovery</string>
+    <string name="invalid_zip">Ten zip nie jest Modułem Magisk!!</string>
+    <string name="reboot_title">Instalacja zakończona powodzeniem!</string>
+    <string name="reboot_msg">Czy chcesz teraz ponownie uruchomić?</string>
+    <string name="reboot">Restart</string>
+    <string name="copying_msg">Kopiowanie zip do katalogu temp</string>
+    <string name="zip_install_progress_title">Instalacja</string>
+    <string name="zip_install_unzip_zip_msg">Rozpakowywanie pliku zip …</string>
+    <string name="zip_install_process_zip_msg">Przetwarzanie pliku zip …</string>
+    <string name="zip_install_progress_msg">"Instalowanie %1$s …"</string>
+    <string name="no_magisk_title">Brak zainstalowanego Magisk!</string>
+    <string name="no_magisk_msg">Chcesz pobrać i zainstalować Magisk?</string>
+    <string name="downloading_toast">Pobieranie %1$s</string>
+    <string name="magisk_update_title">Nowa Wersja Magisk Dostepna!</string>
+    <string name="magisk_update_message">Magisk v%1$.1f jest dostępny, chcesz zainstalować?</string>
+    <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
+    <string name="check_release_notes">Sprawdź informacje o wydaniu</string>
+    <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
+    
+    <!--Settings Activity -->
+    <string name="settings_general_category">Ogólne</string>
+    <string name="settings_theme_title">Motyw</string>
+    <string name="settings_theme_summary">Wybierz motyw</string>
+    <string name="theme_default">Domyślny</string>
+    <string name="theme_dark">Ciemny</string>
+    <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
+    <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
+
+    <string name="settings_magiskhide_title">Włącz Magisk Hide</string>
+    <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
+    <string name="settings_busybox_title">Włącz BusyBox</string>
+    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
+    <string name="settings_hosts_title">Włącz systemless hosts</string>
+    <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
+
+    <string name="settings_development_category">Dla Developerów</string>
+    <string name="settings_developer_logging_title">Włącz zaawansowane logowanie debugowania</string>
+    <string name="settings_developer_logging_summary">Zaznacz, aby umożliwić pełne rejestrowanie</string>
+    <string name="settings_shell_logging_title">Włącz rejestrowanie poleceń powłoki debugowania</string>
+    <string name="settings_shell_logging_summary">Włącz, aby rejestrować wszystkie polecenia powłoki i wyjścia</string>
+
+     <!--Superuser-->
+    <string name="su_request_title">Prośba dostępu Superusera</string>
+    <string name="deny">Odmów</string>
+    <string name="grant">Przyznaj</string>
+    <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów jeśli nie jesteś pewien!</string>
+    <string name="forever">Zawsze</string>
+    <string name="once">Raz</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s ma przyznane uprawnienia Superusera</string>
+    <string name="su_deny_toast">%1$s ma odmówione uprawnienia Superusera</string>
+
+    <!-- Themes -->
+
+    <!--URL Templates-->
+    
+
+
+</resources>
