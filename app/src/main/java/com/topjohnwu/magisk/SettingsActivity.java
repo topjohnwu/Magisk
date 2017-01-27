@@ -6,6 +6,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +30,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
-        Logger.dev("AboutActivity: Theme is " + theme);
         if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
@@ -74,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
             implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         private SharedPreferences prefs;
+        private PreferenceScreen prefScreen;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,7 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.app_settings);
             PreferenceManager.setDefaultValues(getActivity(), R.xml.app_settings, false);
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            prefScreen = getPreferenceScreen();
 
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
@@ -122,21 +123,21 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
             Logger.dev("Settings: Prefs change " + key);
-            boolean checked;
+            boolean enabled;
 
             switch (key) {
                 case "dark_theme":
-                    checked = prefs.getBoolean("dark_theme", false);
-                    if (Global.Configs.isDarkTheme != checked) {
-                        Global.Configs.isDarkTheme = checked;
+                    enabled = prefs.getBoolean("dark_theme", false);
+                    if (Global.Configs.isDarkTheme != enabled) {
+                        Global.Configs.isDarkTheme = enabled;
                         getActivity().recreate();
                         Global.Events.reloadMainActivity.trigger();
                     }
                     break;
                 case "magiskhide":
-                    checked = prefs.getBoolean("magiskhide", false);
+                    enabled = prefs.getBoolean("magiskhide", false);
                     new Async.RootTask<Void, Void, Void>() {
-                        private boolean enable = checked;
+                        private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... params) {
                             if (enable) {
@@ -151,9 +152,9 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "busybox":
-                    checked = prefs.getBoolean("busybox", false);
+                    enabled = prefs.getBoolean("busybox", false);
                     new Async.RootTask<Void, Void, Void>() {
-                        private boolean enable = checked;
+                        private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... params) {
                             if (enable) {
@@ -167,9 +168,9 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "hosts":
-                    checked = prefs.getBoolean("hosts", false);
+                    enabled = prefs.getBoolean("hosts", false);
                     new Async.RootTask<Void, Void, Void>() {
-                        private boolean enable = checked;
+                        private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... voids) {
                             if (enable) {
@@ -183,6 +184,19 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     }.exec();
                     break;
+                case "su_access":
+                    Global.Configs.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
+                    Shell.su("setprop persist.sys.root_access " + Global.Configs.suAccessState);
+                    break;
+                case "su_request_timeout":
+                    Global.Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+                    break;
+                case "su_auto_response":
+                    Global.Configs.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+                    break;
+                case "su_notification":
+                    Global.Configs.suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+                    break;
                 case "developer_logging":
                     Global.Configs.devLogging = prefs.getBoolean("developer_logging", false);
                     break;
@@ -190,7 +204,6 @@ public class SettingsActivity extends AppCompatActivity {
                     Global.Configs.shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
             }
-
         }
     }
 

@@ -111,8 +111,6 @@
     
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
-    <string name="theme_default">Domyślny</string>
-    <string name="theme_dark">Ciemny</string>
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
@@ -131,7 +129,7 @@
 
      <!--Superuser-->
     <string name="su_request_title">Prośba dostępu Superusera</string>
-    <string name="deny">Odmów%1$s</string>
+    <string name="deny_with_str">Odmów%1$s</string>
     <string name="grant">Przyznaj</string>
     <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów jeśli nie jesteś pewien!</string>
     <string name="forever">Zawsze</string>

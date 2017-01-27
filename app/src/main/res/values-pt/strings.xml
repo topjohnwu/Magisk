@@ -109,10 +109,8 @@
     <string name="settings_general_category">Geral</string>
     <string name="settings_dark_theme_title">Tema</string>
     <string name="settings_dark_theme_summary">Escolha um tema</string>
-    <string name="theme_default">Padrão</string>
-    <string name="theme_dark">Escuro</string>
-	
-	<string name="settings_magiskhide_title">Ativar Magisk Hide</string>
+
+    <string name="settings_magiskhide_title">Ativar Magisk Hide</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
     <string name="settings_busybox_summary">Monta a busybox interna do Magisk\'s para xbin</string>

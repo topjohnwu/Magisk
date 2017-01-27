@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -22,13 +21,6 @@ public class SplashActivity extends AppCompatActivity {
         if (Global.Configs.isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
-
-        // Initialize prefs
-        prefs.edit()
-                .putBoolean("magiskhide", Utils.itemExist(false, "/magisk/.core/magiskhide/enable"))
-                .putBoolean("busybox", Utils.commandExists("busybox"))
-                .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
-                .apply();
 
         // Start all async tasks
         new Async.GetBootBlocks().exec();

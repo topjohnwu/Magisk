@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
@@ -144,6 +145,10 @@ public class Utils {
             }
         }
         return false;
+    }
+
+    public static int getPrefsInt(SharedPreferences prefs, String key, int def) {
+        return Integer.parseInt(prefs.getString(key, String.valueOf(def)));
     }
 
 }

@@ -172,6 +172,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 color = colorBad;
                 image = R.drawable.ic_cancel;
                 rootStatusText.setText(R.string.not_rooted);
+                rootInfoText.setText(R.string.root_info_warning);
                 break;
             case 1:
                 if (Global.Info.suVersion != null) {
@@ -186,6 +187,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 color = colorNeutral;
                 image = R.drawable.ic_help;
                 rootStatusText.setText(R.string.root_error);
+                rootInfoText.setText(R.string.root_info_warning);
         }
         rootStatusContainer.setBackgroundColor(color);
         rootStatusText.setTextColor(color);

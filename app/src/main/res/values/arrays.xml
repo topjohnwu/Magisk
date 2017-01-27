@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="themes">
-        <item>@string/theme_default</item>
-        <item>@string/theme_dark</item>
-    </string-array>
-    <string-array name="themes_values">
-        <item>@string/theme_default_value</item>
-        <item>@string/theme_dark_value</item>
-    </string-array>
-    <string-array name="timeout">
+    <string-array name="allow_timeout">
         <item>@string/forever</item>
         <item>@string/once</item>
         <item>@string/tenmin</item>
@@ -16,4 +8,45 @@
         <item>@string/thirtymin</item>
         <item>@string/sixtymin</item>
     </string-array>
+
+    <string-array name="su_access">
+        <item>@string/settings_su_disable</item>
+        <item>@string/settings_su_app</item>
+        <item>@string/settings_su_adb</item>
+        <item>@string/settings_su_app_adb</item>
+
+    </string-array>
+
+    <string-array name="value_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="request_timeout">
+        <item>@string/settings_su_request_10</item>
+        <item>@string/settings_su_request_20</item>
+        <item>@string/settings_su_request_30</item>
+        <item>@string/settings_su_request_60</item>
+    </string-array>
+
+    <string-array name="request_timeout_value">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="auto_response">
+        <item>@string/prompt</item>
+        <item>@string/deny</item>
+        <item>@string/grant</item>
+    </string-array>
+
+    <string-array name="su_notification">
+        <item>@string/none</item>
+        <item>@string/toast</item>
+    </string-array>
+
 </resources>

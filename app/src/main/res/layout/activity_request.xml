@@ -99,7 +99,7 @@
 
         <Button
             style="?android:buttonBarButtonStyle"
-            android:text="@string/deny"
+            android:text="@string/deny_with_str"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/deny_btn"

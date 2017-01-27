@@ -98,7 +98,7 @@ public class SuLogAdapter {
                 }
             });
             holder.appName.setText(logEntry.appName);
-            holder.action.setText(logEntry.action ? context.getString(R.string.grant) : context.getString(R.string.deny, ""));
+            holder.action.setText(context.getString(logEntry.action ? R.string.grant : R.string.deny));
             holder.command.setText(logEntry.command);
             holder.fromPid.setText(String.valueOf(logEntry.fromPid));
             holder.toUid.setText(String.valueOf(logEntry.toUid));

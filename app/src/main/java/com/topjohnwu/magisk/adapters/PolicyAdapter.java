@@ -117,8 +117,6 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         } catch (PackageManager.NameNotFoundException e) {
             policyList.remove(position);
             dbHelper.deletePolicy(policy.uid);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, policyList.size());
             onBindViewHolder(holder, position);
         }
     }

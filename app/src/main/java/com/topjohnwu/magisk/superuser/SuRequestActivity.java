@@ -34,6 +34,10 @@ public class SuRequestActivity extends AppCompatActivity {
     private final static int SU_PROTOCOL_NAME_MAX = 20;
     private final static int SU_PROTOCOL_VALUE_MAX = 256;
 
+    private static final int PROMPT = 0;
+    private static final int AUTO_DENY = 1;
+    private static final int AUTO_ALLOW = 2;
+
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
     @BindView(R.id.app_icon) ImageView appIcon;
@@ -64,24 +68,41 @@ public class SuRequestActivity extends AppCompatActivity {
         new SocketManager().execute();
     }
 
-    void updateUI() throws Throwable {
+    void showRequest() {
+
+        packageName = info.packageName;
+        appName = info.applicationInfo.loadLabel(pm).toString();
+
+        switch (Global.Configs.suResponseType) {
+            case AUTO_DENY:
+                handleAction(false, 0);
+                return;
+            case AUTO_ALLOW:
+                handleAction(true, 0);
+                return;
+            case PROMPT:
+            default:
+        }
+
         setContentView(R.layout.activity_request);
         ButterKnife.bind(this);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.timeout, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        timeout.setAdapter(adapter);
+
         appIcon.setImageDrawable(info.applicationInfo.loadIcon(pm));
         appNameView.setText(appName);
         packageNameView.setText(packageName);
 
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.allow_timeout, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        timeout.setAdapter(adapter);
+
         timer = new CountDownTimer(Global.Configs.suRequestTimeout * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                deny_btn.setText(getString(R.string.deny, "(" + millisUntilFinished / 1000 + ")"));
+                deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
             }
             @Override
             public void onFinish() {
-                deny_btn.setText(getString(R.string.deny, "(0)"));
+                deny_btn.setText(getString(R.string.deny_with_str, "(0)"));
                 handleAction(false, -1);
             }
         };
@@ -90,16 +111,15 @@ public class SuRequestActivity extends AppCompatActivity {
         deny_btn.setOnClickListener(v -> handleAction(false, timeoutList[timeout.getSelectedItemPosition()]));
         suPopup.setOnClickListener((v) -> {
             timer.cancel();
-            deny_btn.setText(getString(R.string.deny, ""));
+            deny_btn.setText(getString(R.string.deny));
         });
         timeout.setOnTouchListener((v, event) -> {
             timer.cancel();
-            deny_btn.setText(getString(R.string.deny, ""));
+            deny_btn.setText(getString(R.string.deny));
             return false;
         });
 
         timer.start();
-
     }
 
     void handleAction(boolean action, int timeout) {
@@ -175,14 +195,9 @@ public class SuRequestActivity extends AppCompatActivity {
             try {
                 if (!result) throw new Throwable();
                 String[] pkgs = pm.getPackagesForUid(uid);
-                if (pkgs != null && pkgs.length > 0) {
-                    info = pm.getPackageInfo(pkgs[0], 0);
-                    packageName = pkgs[0];
-                    appName = info.applicationInfo.loadLabel(pm).toString();
-                    updateUI();
-                }
-                else
-                    throw new Throwable();
+                if (pkgs == null || pkgs.length == 0) throw new Throwable();
+                info = pm.getPackageInfo(pkgs[0], 0);
+                showRequest();
             } catch (Throwable e) {
                 handleAction(false, -1);
             }

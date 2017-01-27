@@ -116,8 +116,6 @@
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Thema</string>
     <string name="settings_dark_theme_summary">Wähle ein Thema</string>
-    <string name="theme_default">Standard</string>
-    <string name="theme_dark">Dunkel</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die gespeicherten Informtionen der Online-Repos, erzwingt eine Aktualisierung</string>
 
@@ -138,7 +136,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
-    <string name="deny">Gewähren%1$s</string>
+    <string name="deny_with_str">Gewähren%1$s</string>
     <string name="grant">Verweigern%1$s</string>
     <string name="su_warning">Gewährt vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>

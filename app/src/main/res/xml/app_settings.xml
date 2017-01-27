@@ -18,7 +18,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Magisk">
+        android:title="@string/magisk">
 
         <CheckBoxPreference
             android:key="magiskhide"
@@ -41,15 +41,44 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/superuser">
+
+        <ListPreference
+            android:key="su_access"
+            android:title="Superuser Access"
+            android:entries="@array/su_access"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="su_auto_response"
+            android:title="Automatic Response"
+            android:entries="@array/auto_response"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="su_request_timeout"
+            android:title="Request Timeout"
+            android:entries="@array/request_timeout"
+            android:entryValues="@array/request_timeout_value" />
+
+        <ListPreference
+            android:key="su_notification"
+            android:title="Superuser Notification"
+            android:entries="@array/su_notification"
+            android:entryValues="@array/value_array" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/settings_development_category">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="developer_logging"
             android:defaultValue="false"
             android:title="@string/settings_developer_logging_title"
             android:summary="@string/settings_developer_logging_summary" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="shell_logging"
             android:defaultValue="false"
             android:title="@string/settings_shell_logging_title"

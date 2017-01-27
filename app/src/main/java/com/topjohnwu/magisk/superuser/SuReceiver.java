@@ -6,11 +6,17 @@ import android.content.Intent;
 import android.os.Process;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
 
 import java.util.Date;
 
 public class SuReceiver extends BroadcastReceiver {
+
+    private static final int NO_NOTIFICATION = 0;
+    private static final int TOAST = 1;
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
         int fromUid, toUid, pid;
@@ -34,9 +40,11 @@ public class SuReceiver extends BroadcastReceiver {
             return;
         }
 
+        Global.initSuConfigs(context);
+
         SuLogEntry log = new SuLogEntry(policy);
 
-        if (policy.notification) {
+        if (policy.notification && Global.Configs.suNotificationType == TOAST) {
             String message;
             switch (action) {
                 case "allow":
