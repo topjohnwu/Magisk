@@ -21,8 +21,6 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.List;
-
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;

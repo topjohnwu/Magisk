@@ -111,6 +111,9 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
             holder.notificationSwitch.setChecked(policy.notification);
             holder.loggingSwitch.setChecked(policy.logging);
 
+            // Hide for now
+            holder.moreInfo.setVisibility(View.GONE);
+
         } catch (PackageManager.NameNotFoundException e) {
             policyList.remove(position);
             dbHelper.deletePolicy(policy.uid);

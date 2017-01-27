@@ -25,7 +25,7 @@ public class SuperuserFragment extends Fragment {
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyTv;
+    @BindView(R.id.empty_rv) TextView emptyRv;
 
     @Nullable
     @Override
@@ -38,14 +38,12 @@ public class SuperuserFragment extends Fragment {
         SuDatabaseHelper dbHelper = new SuDatabaseHelper(getActivity());
         List<Policy> policyList = dbHelper.getPolicyList(pm);
 
-        PolicyAdapter adapter = new PolicyAdapter(policyList, dbHelper, pm);
-
         if (policyList.size() == 0) {
-            emptyTv.setVisibility(View.VISIBLE);
+            emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(adapter);
-            emptyTv.setVisibility(View.GONE);
+            recyclerView.setAdapter(new PolicyAdapter(policyList, dbHelper, pm));
+            emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
 

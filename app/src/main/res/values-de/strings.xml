@@ -138,7 +138,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
-    <string name="deny">Gewähren</string>
+    <string name="deny">Gewähren%1$s</string>
     <string name="grant">Verweigern%1$s</string>
     <string name="su_warning">Gewährt vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>

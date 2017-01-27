@@ -35,7 +35,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyTv;
+    @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.fab) FloatingActionButton fabio;
 
     private List<Module> listModules = new ArrayList<>();
@@ -114,10 +114,10 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     private void updateUI() {
         ModuleHelper.getModuleList(listModules);
         if (listModules.size() == 0) {
-            emptyTv.setVisibility(View.VISIBLE);
+            emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            emptyTv.setVisibility(View.GONE);
+            emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             recyclerView.setAdapter(new ModulesAdapter(listModules));
         }

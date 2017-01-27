@@ -15,6 +15,7 @@
         android:id="@+id/tab"
         app:tabPaddingEnd="20dp"
         app:tabPaddingStart="20dp"
+        android:elevation="4dp"
         android:visibility="gone">
 
     </android.support.design.widget.TabLayout>

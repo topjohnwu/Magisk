@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.nav_view) public NavigationView navigationView;
 
     private int mSelectedId = R.id.status;
+    private float toolbarElevation;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity
                 super.onDrawerSlide(drawerView, 0); // this disables the animation
             }
         };
+
+        toolbarElevation = toolbar.getElevation();
 
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -158,6 +161,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void navigate(int itemId, boolean now) {
+        toolbar.setElevation(toolbarElevation);
         switch (itemId) {
             case R.id.status:
                 displayFragment(new StatusFragment(), "status", now);
@@ -179,6 +183,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.log:
                 displayFragment(new LogFragment(), "log", now);
+                toolbar.setElevation(0);
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));

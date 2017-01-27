@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;

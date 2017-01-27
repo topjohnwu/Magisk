@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_arrow"
+        android:id="@+id/arrow"
+        android:layout_marginEnd="10dp" />
+
+    <TextView
+        android:text="2017/1/1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/date"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:gravity="center_vertical" />
+</LinearLayout>

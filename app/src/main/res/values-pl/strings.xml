@@ -131,7 +131,7 @@
 
      <!--Superuser-->
     <string name="su_request_title">Prośba dostępu Superusera</string>
-    <string name="deny">Odmów</string>
+    <string name="deny">Odmów%1$s</string>
     <string name="grant">Przyznaj</string>
     <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów jeśli nie jesteś pewien!</string>
     <string name="forever">Zawsze</string>

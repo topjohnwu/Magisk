@@ -33,7 +33,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyTv;
+    @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
     private List<Repo> mUpdateRepos = new ArrayList<>();
@@ -138,7 +138,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
 
     private void updateUI() {
         if (fUpdateRepos.size() + fInstalledRepos.size() + fOthersRepos.size() == 0) {
-            emptyTv.setVisibility(View.VISIBLE);
+            emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
             List<SimpleSectionedRecyclerViewAdapter.Section> sections = new ArrayList<>();
@@ -153,7 +153,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
             }
             SimpleSectionedRecyclerViewAdapter.Section[] array = sections.toArray(new SimpleSectionedRecyclerViewAdapter.Section[sections.size()]);
             mSectionedAdapter.setSections(array);
-            emptyTv.setVisibility(View.GONE);
+            emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
         mSwipeRefreshLayout.setRefreshing(false);

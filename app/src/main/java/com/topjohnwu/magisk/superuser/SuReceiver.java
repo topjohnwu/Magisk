@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
 
+import java.util.Date;
+
 public class SuReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -32,14 +34,18 @@ public class SuReceiver extends BroadcastReceiver {
             return;
         }
 
+        SuLogEntry log = new SuLogEntry(policy);
+
         if (policy.notification) {
             String message;
             switch (action) {
                 case "allow":
                     message = context.getString(R.string.su_allow_toast, policy.appName);
+                    log.action = true;
                     break;
                 case "deny":
                     message = context.getString(R.string.su_deny_toast, policy.appName);
+                    log.action = false;
                     break;
                 default:
                     return;
@@ -53,10 +59,10 @@ public class SuReceiver extends BroadcastReceiver {
             if (pid < 0) return;
             command = intent.getStringExtra("command");
             if (command == null) return;
-            SuLogEntry log = new SuLogEntry(policy);
             log.toUid = toUid;
             log.fromPid = pid;
             log.command = command;
+            log.date = new Date();
             SuLogDatabaseHelper logDbHelper = new SuLogDatabaseHelper(context);
             logDbHelper.addLog(log);
         }
