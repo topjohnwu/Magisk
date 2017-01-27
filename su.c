@@ -39,6 +39,7 @@
 #include <selinux/selinux.h>
 #include <arpa/inet.h>
 #include <sys/auxv.h>
+#include <sys/system_properties.h>
 
 #include "su.h"
 #include "utils.h"
@@ -754,7 +755,6 @@ int su_main_nodaemon(int argc, char **argv) {
                 usage(2);
         }
     }
-    hacks_init();
     if (optind < argc && !strcmp(argv[optind], "-")) {
         ctx.to.login = 1;
         optind++;
@@ -789,6 +789,8 @@ int su_main_nodaemon(int argc, char **argv) {
         deny(&ctx);
     }
 
+    
+    hacks_init();
     read_options(&ctx);
     user_init(&ctx);
 
@@ -823,6 +825,30 @@ int su_main_nodaemon(int argc, char **argv) {
     // deny if this is a non owner request and owner mode only
     if (ctx.user.multiuser_mode == MULTIUSER_MODE_OWNER_ONLY && ctx.user.android_user_id != 0) {
         deny(&ctx);
+    }
+
+    // Add prop check
+    char value[PROP_VALUE_MAX];
+    __system_property_get(ROOT_ACCESS_PROP, value);
+    if(strlen(value)) {
+        int prop_status = atoi(value);
+        switch(prop_status) {
+            case ROOT_ACCESS_DISABLED:
+                exit(EXIT_FAILURE);
+            case ROOT_ACCESS_APPS_ONLY:
+                if (ctx.from.uid == AID_SHELL)
+                    exit(EXIT_FAILURE);
+                break;
+            case ROOT_ACCESS_ADB_ONLY:
+                if (ctx.from.uid != AID_SHELL)
+                    exit(EXIT_FAILURE);
+                break;
+            case ROOT_ACCESS_APPS_AND_ADB:
+            default:
+                break;
+        }
+    } else {
+        exit(EXIT_FAILURE);
     }
 
     ctx.umask = umask(027);

@@ -39,11 +39,11 @@
 #define AID_RADIO (get_radio_uid())
 #endif
 
-// CyanogenMod-specific behavior
-#define CM_ROOT_ACCESS_DISABLED      0
-#define CM_ROOT_ACCESS_APPS_ONLY     1
-#define CM_ROOT_ACCESS_ADB_ONLY      2
-#define CM_ROOT_ACCESS_APPS_AND_ADB  3
+#define ROOT_ACCESS_PROP "persist.sys.root_access"
+#define ROOT_ACCESS_DISABLED      0
+#define ROOT_ACCESS_APPS_ONLY     1
+#define ROOT_ACCESS_ADB_ONLY      2
+#define ROOT_ACCESS_APPS_AND_ADB  3
 
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
@@ -76,7 +76,7 @@
 #define str(a) #a
 
 #ifndef VERSION_CODE
-#define VERSION_CODE 1
+#define VERSION_CODE 6
 #endif
 #define VERSION "MAGISKSU:" xstr(VERSION_CODE)
 
