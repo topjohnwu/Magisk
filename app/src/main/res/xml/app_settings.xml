@@ -18,6 +18,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="magisk"
         android:title="@string/magisk">
 
         <CheckBoxPreference
@@ -41,29 +42,30 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="superuser"
         android:title="@string/superuser">
 
         <ListPreference
             android:key="su_access"
-            android:title="Superuser Access"
+            android:title="@string/superuser_access"
             android:entries="@array/su_access"
             android:entryValues="@array/value_array" />
 
         <ListPreference
             android:key="su_auto_response"
-            android:title="Automatic Response"
+            android:title="@string/auto_response"
             android:entries="@array/auto_response"
             android:entryValues="@array/value_array" />
 
         <ListPreference
             android:key="su_request_timeout"
-            android:title="Request Timeout"
+            android:title="@string/request_timeout"
             android:entries="@array/request_timeout"
             android:entryValues="@array/request_timeout_value" />
 
         <ListPreference
             android:key="su_notification"
-            android:title="Superuser Notification"
+            android:title="@string/superuser_notification"
             android:entries="@array/su_notification"
             android:entryValues="@array/value_array" />
 

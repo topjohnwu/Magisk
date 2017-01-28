@@ -20,7 +20,7 @@ android {
     }
 
     compileOptions {
-        incremental false
+        incremental true
     }
 
     buildTypes {
@@ -34,7 +34,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     dexOptions {
-        preDexLibraries = false
+        preDexLibraries = true
     }
     externalNativeBuild {
         cmake {

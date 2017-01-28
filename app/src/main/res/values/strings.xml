@@ -130,8 +130,8 @@
     <string name="settings_magiskhide_summary">Hide Magisk from various detections\nRequires reboot</string>
     <string name="settings_busybox_title">Enable BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin\nRequires reboot</string>
-    <string name="settings_hosts_title">Enable systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless support for Adblock apps</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
 
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
@@ -141,6 +141,11 @@
     <string name="settings_su_request_20">20 seconds</string>
     <string name="settings_su_request_30">30 seconds</string>
     <string name="settings_su_request_60">60 seconds</string>
+    <string name="superuser_access">Superuser Access</string>
+    <string name="auto_response">Automatic Response</string>
+    <string name="request_timeout">Request Timeout</string>
+    <string name="superuser_notification">Superuser Notification</string>
+    <string name="request_timeout_summary">%1$s seconds</string>
 
     <string name="settings_development_category">App Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>

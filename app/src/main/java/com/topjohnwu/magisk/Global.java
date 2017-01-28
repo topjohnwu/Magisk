@@ -69,6 +69,7 @@ public class Global {
         initSuConfigs(context);
         // Initialize prefs
         prefs.edit()
+                .putBoolean("dark_theme", Configs.isDarkTheme)
                 .putBoolean("magiskhide", Utils.itemExist(false, "/magisk/.core/magiskhide/enable"))
                 .putBoolean("busybox", Utils.commandExists("busybox"))
                 .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))

@@ -3,7 +3,9 @@ package com.topjohnwu.magisk;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
@@ -79,25 +81,42 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.app_settings);
-            PreferenceManager.setDefaultValues(getActivity(), R.xml.app_settings, false);
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             prefScreen = getPreferenceScreen();
+
+            PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
+            PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
+
+            ListPreference suAccess = (ListPreference) findPreference("su_access");
+            ListPreference autoRes = (ListPreference) findPreference("su_auto_response");
+            ListPreference requestTimeout = (ListPreference) findPreference("su_request_timeout");
+            ListPreference suNotification = (ListPreference) findPreference("su_notification");
+
+            suAccess.setSummary(getResources()
+                    .getStringArray(R.array.su_access)[Utils.getPrefsInt(prefs, "su_access", 3)]);
+            autoRes.setSummary(getResources()
+                    .getStringArray(R.array.auto_response)[Utils.getPrefsInt(prefs, "su_auto_response", 0)]);
+            suNotification.setSummary(getResources()
+                    .getStringArray(R.array.su_notification)[Utils.getPrefsInt(prefs, "su_notification", 1)]);
+            requestTimeout.setSummary(
+                    getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
 
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
             SwitchPreference hostsPreference = (SwitchPreference) findPreference("hosts");
-            Preference clear = findPreference("clear");
 
-            clear.setOnPreferenceClickListener((pref) -> {
+            findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 ModuleHelper.clearRepoCache(getActivity());
                 return true;
             });
 
             if (!Shell.rootAccess()) {
-                busyboxPreference.setEnabled(false);
-                magiskhidePreference.setEnabled(false);
-                hostsPreference.setEnabled(false);
+                prefScreen.removePreference(magiskCategory);
+                prefScreen.removePreference(suCategory);
             } else {
+                if (!Global.Info.isSuClient) {
+                    prefScreen.removePreference(suCategory);
+                }
                 if (Global.Info.magiskVersion < 9) {
                     hostsPreference.setEnabled(false);
                     busyboxPreference.setEnabled(false);
