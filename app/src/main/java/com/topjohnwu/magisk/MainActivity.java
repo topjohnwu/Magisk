@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,6 +11,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,8 +30,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CallbackHandler.EventListener {
 
-    private static final String SELECTED_ITEM_ID = "SELECTED_ITEM_ID";
-
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
 
@@ -39,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) public NavigationView navigationView;
 
-    private int mSelectedId = R.id.status;
     private float toolbarElevation;
 
     @Override
@@ -79,15 +76,11 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState == null) {
-            navigate(mSelectedId, true);
-            navigationView.setCheckedItem(mSelectedId);
-        } else {
-            mSelectedId = savedInstanceState.getInt(SELECTED_ITEM_ID);
-        }
+        navigate(R.id.status);
 
         navigationView.setNavigationItemSelectedListener(this);
         CallbackHandler.register(Global.Events.reloadMainActivity, this);
+
     }
 
     @Override
@@ -113,12 +106,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(SELECTED_ITEM_ID, mSelectedId);
-    }
-
-    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(navigationView)) {
             drawer.closeDrawer(navigationView);
@@ -129,9 +116,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
-        mSelectedId = menuItem.getItemId();
         mDrawerHandler.removeCallbacksAndMessages(null);
-        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId(), false), 250);
+        mDrawerHandler.postDelayed(() -> navigate(menuItem.getItemId()), 250);
         drawer.closeDrawer(navigationView);
         return true;
     }
@@ -159,29 +145,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void navigate(int itemId, boolean now) {
-        toolbar.setElevation(toolbarElevation);
+    public void navigate(int itemId) {
         switch (itemId) {
             case R.id.status:
-                displayFragment(new StatusFragment(), "status", now);
+                displayFragment(new StatusFragment(), "status", true);
                 break;
             case R.id.install:
-                displayFragment(new InstallFragment(), "install", now);
+                displayFragment(new InstallFragment(), "install", true);
                 break;
             case R.id.superuser:
-                displayFragment(new SuperuserFragment(), "superuser", now);
+                displayFragment(new SuperuserFragment(), "superuser", true);
                 break;
             case R.id.modules:
-                displayFragment(new ModulesFragment(), "modules", now);
+                displayFragment(new ModulesFragment(), "modules", true);
                 break;
             case R.id.downloads:
-                displayFragment(new ReposFragment(), "downloads", now);
+                displayFragment(new ReposFragment(), "downloads", true);
                 break;
             case R.id.magiskhide:
-                displayFragment(new MagiskHideFragment(), "magiskhide", now);
+                displayFragment(new MagiskHideFragment(), "magiskhide", true);
                 break;
             case R.id.log:
-                displayFragment(new LogFragment(), "log", now);
+                displayFragment(new LogFragment(), "log", false);
                 toolbar.setElevation(0);
                 break;
             case R.id.settings:
@@ -193,11 +178,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void displayFragment(@NonNull Fragment navFragment, String tag, boolean now) {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        if (!now) {
-            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        }
-        transaction.replace(R.id.content_frame, navFragment, tag).commit();
+    private void displayFragment(@NonNull Fragment navFragment, String tag, boolean setElevation) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.replace(R.id.content_frame, navFragment, tag).commitNow();
+        if (setElevation) toolbar.setElevation(toolbarElevation);
     }
 }
