@@ -17,10 +17,9 @@ public class CallbackHandler {
     }
 
     public static void unRegister(Event event) {
-        HashSet<EventListener> list = listeners.get(event);
+        HashSet<EventListener> list = listeners.remove(event);
         if (list != null) {
             list.clear();
-            listeners.remove(event);
         }
     }
 
