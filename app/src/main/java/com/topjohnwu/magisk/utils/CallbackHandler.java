@@ -16,6 +16,14 @@ public class CallbackHandler {
         list.add(listener);
     }
 
+    public static void unRegister(Event event) {
+        HashSet<EventListener> list = listeners.get(event);
+        if (list != null) {
+            list.clear();
+            listeners.remove(event);
+        }
+    }
+
     public static void unRegister(Event event, EventListener listener) {
         HashSet<EventListener> list = listeners.get(event);
         if (list != null) {

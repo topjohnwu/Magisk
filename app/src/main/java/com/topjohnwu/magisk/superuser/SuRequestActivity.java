@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseArray;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.CallbackHandler;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -27,16 +30,18 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SuRequestActivity extends AppCompatActivity {
+public class SuRequestActivity extends AppCompatActivity implements CallbackHandler.EventListener {
 
     private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
-    private final static int SU_PROTOCOL_PARAM_MAX = 20;
-    private final static int SU_PROTOCOL_NAME_MAX = 20;
-    private final static int SU_PROTOCOL_VALUE_MAX = 256;
+    private static final int SU_PROTOCOL_PARAM_MAX = 20;
+    private static final int SU_PROTOCOL_NAME_MAX = 20;
+    private static final int SU_PROTOCOL_VALUE_MAX = 256;
 
     private static final int PROMPT = 0;
     private static final int AUTO_DENY = 1;
     private static final int AUTO_ALLOW = 2;
+
+    private static SparseArray<CallbackHandler.Event> uidMap = new SparseArray<>();
 
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
@@ -54,6 +59,8 @@ public class SuRequestActivity extends AppCompatActivity {
     private int uid;
     private String appName, packageName;
     private CountDownTimer timer;
+    private CallbackHandler.EventListener self;
+    private CallbackHandler.Event event;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +71,9 @@ public class SuRequestActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
+        self = this;
 
-        new SocketManager().execute();
+        new SocketManager().exec();
     }
 
     void showRequest() {
@@ -91,7 +99,8 @@ public class SuRequestActivity extends AppCompatActivity {
         appNameView.setText(appName);
         packageNameView.setText(packageName);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.allow_timeout, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.allow_timeout, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
 
@@ -122,28 +131,46 @@ public class SuRequestActivity extends AppCompatActivity {
         timer.start();
     }
 
+    @Override
+    public void onBackPressed() {
+        Policy temp = new Policy();
+        temp.policy = Policy.DENY;
+        event.trigger(temp);
+        CallbackHandler.unRegister(event);
+        uidMap.remove(uid);
+        finish();
+    }
+
+    @Override
+    public void onTrigger(CallbackHandler.Event event) {
+        Policy policy = (Policy) event.getResult();
+        try {
+            socket.getOutputStream().write(
+                    (policy.policy == Policy.ALLOW ? "socket:ALLOW" : "socket:DENY").getBytes());
+        } catch (Exception ignored) {}
+    }
+
     void handleAction(boolean action, int timeout) {
 
-        try {
-            socket.getOutputStream().write((action ? "socket:ALLOW" : "socket:DENY").getBytes());
-        } catch (Exception ignored) {}
+        Policy policy = new Policy();
+        policy.uid = uid;
+        policy.packageName = packageName;
+        policy.appName = appName;
+        policy.until = (timeout == 0) ? 0 : (System.currentTimeMillis() / 1000 + timeout * 60);
+        policy.policy = action ? Policy.ALLOW : Policy.DENY;
+        policy.logging = true;
+        policy.notification = true;
 
-        if (timeout >= 0) {
-            Policy policy = new Policy();
-            policy.uid = uid;
-            policy.packageName = packageName;
-            policy.appName = appName;
-            policy.until = (timeout == 0) ? 0 : (System.currentTimeMillis() / 1000 + timeout * 60);
-            policy.policy = action ? Policy.ALLOW : Policy.DENY;
-            policy.logging = true;
-            policy.notification = true;
-            new SuDatabaseHelper(this).addPolicy(policy);
-        }
+        if (timeout >= 0) new SuDatabaseHelper(this).addPolicy(policy);
+
+        event.trigger(policy);
+        CallbackHandler.unRegister(event);
+        uidMap.remove(uid);
 
         finish();
     }
 
-    private class SocketManager extends AsyncTask<Void, Void, Boolean> {
+    private class SocketManager extends Async.NormalTask<Void, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -194,10 +221,22 @@ public class SuRequestActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean result) {
             try {
                 if (!result) throw new Throwable();
-                String[] pkgs = pm.getPackagesForUid(uid);
-                if (pkgs == null || pkgs.length == 0) throw new Throwable();
-                info = pm.getPackageInfo(pkgs[0], 0);
-                showRequest();
+                boolean showRequest = false;
+                event = uidMap.get(uid);
+                if (event == null) {
+                    showRequest = true;
+                    event = new CallbackHandler.Event();
+                    uidMap.put(uid, event);
+                }
+                CallbackHandler.register(event, self);
+                if (showRequest) {
+                    String[] pkgs = pm.getPackagesForUid(uid);
+                    if (pkgs == null || pkgs.length == 0) throw new Throwable();
+                    info = pm.getPackageInfo(pkgs[0], 0);
+                    showRequest();
+                } else {
+                    finish();
+                }
             } catch (Throwable e) {
                 handleAction(false, -1);
             }
