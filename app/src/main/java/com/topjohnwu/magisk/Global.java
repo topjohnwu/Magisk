@@ -28,7 +28,6 @@ public class Global {
         public static String bootBlock = null;
         public static boolean isSuClient = false;
         public static String suVersion = null;
-        public static int shellUid;
     }
     public static class Data {
         public static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
@@ -60,12 +59,8 @@ public class Global {
         Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
         Configs.devLogging = prefs.getBoolean("developer_logging", false);
         Configs.shellLogging = prefs.getBoolean("shell_logging", false);
-        List<String> ret = Shell.sh("su -v");
-        if (Utils.isValidShellResponse(ret)) {
-            Info.suVersion = ret.get(0);
-            Info.isSuClient = Info.suVersion.toUpperCase().contains("MAGISK");
-        }
         updateMagiskInfo();
+        initSuAccess();
         initSuConfigs(context);
         // Initialize prefs
         prefs.edit()
@@ -82,19 +77,26 @@ public class Global {
 
     public static void initSuConfigs(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        List<String> ret = Shell.sh("getprop persist.sys.root_access");
-        if (Utils.isValidShellResponse(ret))
-            Configs.suAccessState = Integer.parseInt(ret.get(0));
-        else {
-            Shell.su("setprop persist.sys.root_access 3");
-            Configs.suAccessState = 3;
-        }
         Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
         Configs.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
         Configs.suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
-        ret = Shell.sh("id -u shell");
-        if (Utils.isValidShellResponse(ret))
-            Info.shellUid = Integer.parseInt(ret.get(0));
+    }
+
+    public static void initSuAccess() {
+        List<String> ret = Shell.sh("su -v");
+        if (Utils.isValidShellResponse(ret)) {
+            Info.suVersion = ret.get(0);
+            Info.isSuClient = Info.suVersion.toUpperCase().contains("MAGISK");
+        }
+        if (Info.isSuClient) {
+            ret = Shell.sh("getprop persist.sys.root_access");
+            if (Utils.isValidShellResponse(ret))
+                Configs.suAccessState = Integer.parseInt(ret.get(0));
+            else {
+                Shell.su("setprop persist.sys.root_access 3");
+                Configs.suAccessState = 3;
+            }
+        }
     }
 
     static void updateMagiskInfo() {

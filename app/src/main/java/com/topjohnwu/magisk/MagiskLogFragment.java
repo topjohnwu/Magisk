@@ -156,7 +156,6 @@ public class MagiskLogFragment extends Fragment {
                     return "";
 
                 case 2:
-                case 3:
                     if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
@@ -221,17 +220,6 @@ public class MagiskLogFragment extends Fragment {
                     else
                         Toast.makeText(getActivity(), getString(R.string.logs_save_failed), Toast.LENGTH_LONG).show();
                     break;
-                case 3:
-                    bool = (boolean) o;
-                    if (bool) {
-                        Intent sendIntent = new Intent();
-                        sendIntent.setAction(Intent.ACTION_SEND);
-                        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(targetFile));
-                        sendIntent.setType("application/html");
-                        startActivity(Intent.createChooser(sendIntent, getResources().getString(R.string.menuSend)));
-                    } else {
-                        Toast.makeText(getActivity(), getString(R.string.logs_save_failed), Toast.LENGTH_LONG).show();
-                    }
             }
         }
 
@@ -245,10 +233,6 @@ public class MagiskLogFragment extends Fragment {
 
         public void save() {
             exec(2);
-        }
-
-        public void send() {
-            exec(3);
         }
     }
 
