@@ -29,13 +29,6 @@ import butterknife.Unbinder;
 
 public class MagiskHideFragment extends Fragment implements CallbackHandler.EventListener {
 
-    public static final List<String> HIDEBLACKLIST =  Arrays.asList(
-            "android",
-            "com.topjohnwu.magisk",
-            "com.google.android.gms",
-            "com.google.android.apps.walletnfcrel",
-            "com.nianticlabs.pokemongo"
-    );
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;

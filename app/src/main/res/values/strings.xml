@@ -113,6 +113,7 @@
     <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="check_release_notes">Check release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
+    <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos</string>
@@ -152,8 +153,6 @@
     <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>
     <string name="settings_shell_logging_title">Enable shell command debug logging</string>
     <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and its output</string>
-
-    <!-- Themes -->
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>

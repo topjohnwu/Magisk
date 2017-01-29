@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskHideFragment;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.module.ModuleHelper;
 
 import org.json.JSONException;
@@ -127,7 +128,7 @@ public class Async {
             List<ApplicationInfo> listApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
             for (Iterator<ApplicationInfo> i = listApps.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
-                if (MagiskHideFragment.HIDEBLACKLIST.contains(info.packageName) || !info.enabled)
+                if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled)
                     i.remove();
             }
             Collections.sort(listApps, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
