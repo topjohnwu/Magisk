@@ -77,6 +77,8 @@ public class SettingsActivity extends AppCompatActivity {
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
 
+        private ListPreference suAccess, autoRes, suNotification, requestTimeout;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -87,19 +89,12 @@ public class SettingsActivity extends AppCompatActivity {
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
 
-            ListPreference suAccess = (ListPreference) findPreference("su_access");
-            ListPreference autoRes = (ListPreference) findPreference("su_auto_response");
-            ListPreference requestTimeout = (ListPreference) findPreference("su_request_timeout");
-            ListPreference suNotification = (ListPreference) findPreference("su_notification");
+            suAccess = (ListPreference) findPreference("su_access");
+            autoRes = (ListPreference) findPreference("su_auto_response");
+            requestTimeout = (ListPreference) findPreference("su_request_timeout");
+            suNotification = (ListPreference) findPreference("su_notification");
 
-            suAccess.setSummary(getResources()
-                    .getStringArray(R.array.su_access)[Utils.getPrefsInt(prefs, "su_access", 3)]);
-            autoRes.setSummary(getResources()
-                    .getStringArray(R.array.auto_response)[Utils.getPrefsInt(prefs, "su_auto_response", 0)]);
-            suNotification.setSummary(getResources()
-                    .getStringArray(R.array.su_notification)[Utils.getPrefsInt(prefs, "su_notification", 1)]);
-            requestTimeout.setSummary(
-                    getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
+            setSummary();
 
             CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
             CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
@@ -206,6 +201,8 @@ public class SettingsActivity extends AppCompatActivity {
                 case "su_access":
                     Global.Configs.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
                     Shell.su("setprop persist.sys.root_access " + Global.Configs.suAccessState);
+                    suAccess.setSummary(getResources()
+                            .getStringArray(R.array.su_access)[Global.Configs.suAccessState]);
                     break;
                 case "su_request_timeout":
                     Global.Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
@@ -223,6 +220,18 @@ public class SettingsActivity extends AppCompatActivity {
                     Global.Configs.shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
             }
+            setSummary();
+        }
+
+        private void setSummary() {
+            suAccess.setSummary(getResources()
+                    .getStringArray(R.array.su_access)[Global.Configs.suAccessState]);
+            autoRes.setSummary(getResources()
+                    .getStringArray(R.array.auto_response)[Global.Configs.suResponseType]);
+            suNotification.setSummary(getResources()
+                    .getStringArray(R.array.su_notification)[Global.Configs.suNotificationType]);
+            requestTimeout.setSummary(
+                    getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
         }
     }
 

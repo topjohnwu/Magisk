@@ -1,9 +1,13 @@
 package com.topjohnwu.magisk;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -24,6 +28,19 @@ public class SuLogFragment extends Fragment {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
     private Unbinder unbinder;
+    private SuLogDatabaseHelper dbHelper;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_log, menu);
+        menu.findItem(R.id.menu_save).setVisible(false);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,7 +49,14 @@ public class SuLogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = ButterKnife.bind(this, v);
 
-        SuLogDatabaseHelper dbHelper = new SuLogDatabaseHelper(getActivity());
+        dbHelper = new SuLogDatabaseHelper(getActivity());
+
+        updateList();
+
+        return v;
+    }
+
+    private void updateList() {
         List<SuLogEntry> logs = dbHelper.getLogList();
 
         if (logs.size() == 0) {
@@ -43,8 +67,21 @@ public class SuLogFragment extends Fragment {
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+    }
 
-        return v;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                updateList();
+                return true;
+            case R.id.menu_clear:
+                dbHelper.clearLogs();
+                updateList();
+                return true;
+            default:
+                return true;
+        }
     }
 
     @Override

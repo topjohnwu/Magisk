@@ -103,9 +103,6 @@ public class MagiskLogFragment extends Fragment {
             case R.id.menu_refresh:
                 new LogManager().read();
                 return true;
-            case R.id.menu_send:
-                new LogManager().send();
-                return true;
             case R.id.menu_save:
                 new LogManager().save();
                 return true;

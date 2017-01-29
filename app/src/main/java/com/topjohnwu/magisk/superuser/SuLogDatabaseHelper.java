@@ -38,6 +38,12 @@ public class SuLogDatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void clearLogs() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        db.close();
+    }
+
     public List<SuLogEntry> getLogList() {
         return getLogList(null);
     }

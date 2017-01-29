@@ -108,6 +108,7 @@ public class SuLogAdapter {
         @Override
         public void onBindGroupViewHolder(LogGroupViewHolder holder, int flatPosition, ExpandableGroup group) {
             holder.date.setText(group.getTitle());
+            if (isGroupExpanded(flatPosition)) holder.expand();
         }
     }
 

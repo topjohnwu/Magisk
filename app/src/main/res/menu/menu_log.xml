@@ -9,12 +9,6 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/menu_send"
-        android:icon="@drawable/ic_send"
-        android:title="@string/menuSend"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:id="@+id/menu_clear"
         android:icon="@drawable/ic_delete"
         android:title="@string/menuClearLog"
