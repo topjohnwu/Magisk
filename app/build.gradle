@@ -12,15 +12,12 @@ android {
         versionName "3.1"
         jackOptions {
             enabled true
+            jackInProcess true
         }
         ndk {
             moduleName 'zipadjust'
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
-    }
-
-    compileOptions {
-        incremental true
     }
 
     buildTypes {
