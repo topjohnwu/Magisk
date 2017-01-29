@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +31,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     private List<Policy> policyList;
     private SuDatabaseHelper dbHelper;
     private PackageManager pm;
-    private HashSet<Policy> expandList = new HashSet<>();
+    private Set<Policy> expandList = new HashSet<>();
 
     public PolicyAdapter(List<Policy> list, SuDatabaseHelper db, PackageManager pm) {
         policyList = list;

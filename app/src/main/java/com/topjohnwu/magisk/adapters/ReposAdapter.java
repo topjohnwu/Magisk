@@ -24,6 +24,7 @@ import com.topjohnwu.magisk.utils.WebWindow;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,7 +32,7 @@ import butterknife.ButterKnife;
 public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
 
     private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
-    private HashSet<Repo> expandList = new HashSet<>();
+    private Set<Repo> expandList = new HashSet<>();
 
     public ReposAdapter(List<Repo> update, List<Repo> installed, List<Repo> others) {
         mUpdateRepos = update;

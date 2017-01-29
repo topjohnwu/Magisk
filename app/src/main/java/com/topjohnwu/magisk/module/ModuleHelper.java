@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ModuleHelper {
 
@@ -70,7 +71,7 @@ public class ModuleHelper {
             jsonString = prefs.getString(REPO_KEY, null);
         }
 
-        ValueSortedMap<String, Repo> cached = null;
+        Map<String, Repo> cached = null;
 
         if (jsonString != null) {
             cached = gson.fromJson(jsonString, new TypeToken<ValueSortedMap<String, Repo>>(){}.getType());
@@ -82,7 +83,7 @@ public class ModuleHelper {
 
         // Get cached ETag to add in the request header
         String etag = prefs.getString(ETAG_KEY, "");
-        HashMap<String, String> header = new HashMap<>();
+        Map<String, String> header = new HashMap<>();
         header.put("If-None-Match", etag);
 
         // Making a request to main URL for repo info

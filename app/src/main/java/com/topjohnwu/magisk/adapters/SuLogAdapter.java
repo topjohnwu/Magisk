@@ -22,10 +22,11 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.superuser.SuLogEntry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,13 +34,13 @@ import butterknife.ButterKnife;
 public class SuLogAdapter {
 
     private ExpandableAdapter adapter;
-    private HashSet<SuLogEntry> expandList = new HashSet<>();
+    private Set<SuLogEntry> expandList = new HashSet<>();
 
     public SuLogAdapter(List<SuLogEntry> list) {
 
         // Separate the logs with date
-        LinkedHashMap<String, ArrayList<SuLogEntry>> logEntryMap = new LinkedHashMap<>();
-        ArrayList<SuLogEntry> group;
+        Map<String, List<SuLogEntry>> logEntryMap = new LinkedHashMap<>();
+        List<SuLogEntry> group;
         for (SuLogEntry log : list) {
             String date = log.getDateString();
             group = logEntryMap.get(date);
@@ -51,8 +52,8 @@ public class SuLogAdapter {
         }
 
         // Then format them into expandable groups
-        ArrayList<LogGroup> logEntryGroups = new ArrayList<>();
-        for (HashMap.Entry<String, ArrayList<SuLogEntry>> entry : logEntryMap.entrySet()) {
+        List<LogGroup> logEntryGroups = new ArrayList<>();
+        for (Map.Entry<String, List<SuLogEntry>> entry : logEntryMap.entrySet()) {
             logEntryGroups.add(new LogGroup(entry.getKey(), entry.getValue()));
         }
         adapter = new ExpandableAdapter(logEntryGroups);
