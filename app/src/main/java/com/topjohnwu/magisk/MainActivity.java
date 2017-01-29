@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity
 
     private void displayFragment(@NonNull Fragment navFragment, String tag, boolean setElevation) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        invalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.replace(R.id.content_frame, navFragment, tag).commitNow();
         if (setElevation) toolbar.setElevation(toolbarElevation);
