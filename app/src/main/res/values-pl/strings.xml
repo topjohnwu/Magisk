@@ -1,12 +1,15 @@
 <resources>
     <!--Universal-->
 
+    
+    
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Otwórz szufladę nawigacji</string>
     <string name="navigation_drawer_close">Zamknij szufladę nawigacji</string>
     <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Moduły</string>
     <string name="downloads">Pobieranie</string>
+    <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Ustawienia</string>
     <string name="status">Status</string>
@@ -42,6 +45,7 @@
     <string name="current_magisk_title">Zainstalowana Wersja Magisk: v%1$s</string>
     <string name="install_magisk_title">Ostatnia Wersja Magisk: v%1$.1f</string>
 
+    
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
     <string name="no_modules_found">Nie znaleziono modułów</string>
@@ -83,6 +87,7 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
     <string name="no_thanks">Nie dziękuję</string>
+    <string name="yes">Tak</string>
     <string name="repo_install_title">Zainstaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download_install">Pobierz i zainstaluj</string>
@@ -109,8 +114,15 @@
     <string name="check_release_notes">Sprawdź informacje o wydaniu</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     
+    <!--URL Templates-->
+    
+    
+    
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
+    <string name="settings_dark_theme_title">Ciemny Motyw</string>
+    <string name="settings_dark_theme_summary">Włacz ciemny motyw</string>
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
@@ -121,15 +133,33 @@
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
 
+    <string name="settings_su_app_adb">Aplikacje i ADB</string>
+    <string name="settings_su_app">Tylko aplikacje</string>
+    <string name="settings_su_adb">Tylko ADB</string>
+    <string name="settings_su_disable">Wyłaczone</string>
+    <string name="settings_su_request_10">10 sekund</string>
+    <string name="settings_su_request_20">20 sekund</string>
+    <string name="settings_su_request_30">30 ssekund</string>
+    <string name="settings_su_request_60">60 sekund</string>
+    <string name="superuser_access">Dostęp Superuser</string>
+    <string name="auto_response">Automatyczna Odpowiedź</string>
+    <string name="request_timeout">Czas Prośby</string>
+    <string name="superuser_notification">Powiadomienia Superusern</string>
+    <string name="request_timeout_summary">%1$s sekund</string>
+
     <string name="settings_development_category">Dla Developerów</string>
     <string name="settings_developer_logging_title">Włącz zaawansowane logowanie debugowania</string>
     <string name="settings_developer_logging_summary">Zaznacz, aby umożliwić pełne rejestrowanie</string>
     <string name="settings_shell_logging_title">Włącz rejestrowanie poleceń powłoki debugowania</string>
     <string name="settings_shell_logging_summary">Włącz, aby rejestrować wszystkie polecenia powłoki i wyjścia</string>
-
-     <!--Superuser-->
+    
+    <!-- Themes -->
+   
+    <!--Superuser-->
     <string name="su_request_title">Prośba dostępu Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>
+    <string name="deny">Odmów</string>
+    <string name="prompt">Zapytaj</string>
     <string name="grant">Przyznaj</string>
     <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów jeśli nie jesteś pewien!</string>
     <string name="forever">Zawsze</string>
@@ -140,11 +170,22 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s ma przyznane uprawnienia Superusera</string>
     <string name="su_deny_toast">%1$s ma odmówione uprawnienia Superusera</string>
+    <string name="no_apps_found">Nie znaleziono aplikacji</string>
+    <string name="su_snack_grant">Uprawnienia Superuser dla %1$s są przyznane</string>
+    <string name="su_snack_deny">Uprawnienia Superuser dla %1$s są odmówione</string>
+    <string name="su_snack_notif_on">Powiadomienia dla %1$s są włączone</string>
+    <string name="su_snack_notif_off">Powiadomienia dla %1$s są wyłączone</string>
+    <string name="su_snack_log_on">Logowanie dla %1$s jest włączone</string>
+    <string name="su_snack_log_off">Logowanie dla %1$s jest wyłączone</string>
+    <string name="su_snack_revoke">%1$s uprawnienia są odwołane</string>
+    <string name="su_revoke_title">Odwołać?</string>
+    <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
+    <string name="toast">Toast</string>
+    <string name="none">Brak</string>
 
-    <!-- Themes -->
-
-    <!--URL Templates-->
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Indentyfikator UID:\u0020</string>
+    <string name="command">Komenda:\u0020</string>
     
-
-
 </resources>
