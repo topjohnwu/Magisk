@@ -114,7 +114,7 @@ public class Async {
         }
     }
 
-    public static class LoadApps extends RootTask<Void, Void, LoadApps.Result> {
+    public static class LoadApps extends RootTask<Void, Void, Void> {
 
         private PackageManager pm;
 
@@ -123,33 +123,22 @@ public class Async {
         }
 
         @Override
-        protected Result doInBackground(Void... voids) {
-            List<ApplicationInfo> listApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-            for (Iterator<ApplicationInfo> i = listApps.iterator(); i.hasNext(); ) {
+        protected Void doInBackground(Void... voids) {
+            Global.Data.appList = pm.getInstalledApplications(0);
+            for (Iterator<ApplicationInfo> i = Global.Data.appList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
                 if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled)
                     i.remove();
             }
-            Collections.sort(listApps, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
+            Collections.sort(Global.Data.appList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                     .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            List<String> hideList = Shell.su(Async.MAGISK_HIDE_PATH + "list");
-            return new Result(listApps, hideList);
+            Global.Data.magiskHideList = Shell.su(Async.MAGISK_HIDE_PATH + "list");
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Result result) {
-            Global.Events.packageLoadDone.trigger(result);
-        }
-
-        public static class Result {
-
-            public final List<ApplicationInfo> listApps;
-            public final List<String> hideList;
-
-            Result(List<ApplicationInfo> listApps, List<String> hideList) {
-                this.listApps = listApps;
-                this.hideList = hideList;
-            }
+        protected void onPostExecute(Void v) {
+            Global.Events.packageLoadDone.trigger();
         }
     }
 

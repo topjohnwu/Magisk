@@ -106,8 +106,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     @Override
     public void onTrigger(CallbackHandler.Event event) {
         Logger.dev("MagiskHideFragment: UI refresh");
-        Async.LoadApps.Result result = (Async.LoadApps.Result) event.getResult();
-        appAdapter.setLists(result.listApps, result.hideList);
+        appAdapter.setLists(Global.Data.appList, Global.Data.magiskHideList);
         mSwipeRefreshLayout.setRefreshing(false);
         if (!TextUtils.isEmpty(lastFilter)) {
             appAdapter.filter(lastFilter);

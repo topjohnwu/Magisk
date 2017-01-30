@@ -87,9 +87,8 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         CallbackHandler.register(Global.Events.updateCheckDone, this);
-        if (Global.Events.updateCheckDone.isTriggered) {
+        if (Global.Events.updateCheckDone.isTriggered)
             onTrigger(Global.Events.updateCheckDone);
-        }
         checkHideSection();
     }
 
@@ -102,16 +101,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         CallbackHandler.unRegister(Global.Events.reloadMainActivity, this);
+        // Let garbage collector remove them
+        Global.Data.clear();
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(navigationView)) {
+        if (drawer.isDrawerOpen(navigationView))
             drawer.closeDrawer(navigationView);
-        } else {
+        else
             finish();
-        }
     }
 
     @Override

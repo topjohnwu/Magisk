@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.preference.PreferenceManager;
 import android.util.SparseArray;
 
@@ -16,9 +17,6 @@ import java.util.List;
 
 public class Global {
 
-    public static class Constant {
-        // No global constants now
-    }
     public static class Info {
         public static double magiskVersion;
         public static String magiskVersionString = "(none)";
@@ -34,6 +32,15 @@ public class Global {
         public static ValueSortedMap<String, Repo> repoMap;
         public static ValueSortedMap<String, Module> moduleMap;
         public static List<String> blockList;
+        public static List<ApplicationInfo> appList;
+        public static List<String> magiskHideList;
+        public static void clear() {
+            repoMap = null;
+            moduleMap = null;
+            blockList = null;
+            appList = null;
+            magiskHideList = null;
+        }
     }
     public static class Events {
         public static final CallbackHandler.Event blockDetectionDone = new CallbackHandler.Event();
