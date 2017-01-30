@@ -479,8 +479,6 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx) {
     char *arg0;
     int argc, err;
 
-    hacks_update_context(ctx);
-
     umask(ctx->umask);
     int send_to_app = 1;
 
@@ -541,7 +539,7 @@ static __attribute__ ((noreturn)) void allow(struct su_context *ctx) {
             arg0, PARG(0), PARG(1), PARG(2), PARG(3), PARG(4), PARG(5),
             (ctx->to.optind + 6 < ctx->to.argc) ? " ..." : "");
 
-    if(ctx->to.context && strcmp(ctx->to.context, "u:r:su_light:s0") == 0) {
+    if(ctx->to.context) {
         setexeccon(ctx->to.context);
     } else {
         setexeccon("u:r:su:s0");
@@ -803,8 +801,6 @@ int su_main_nodaemon(int argc, char **argv) {
         deny(&ctx);
     }
 
-    
-    hacks_init();
     read_options(&ctx);
     user_init(&ctx);
 

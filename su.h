@@ -179,9 +179,6 @@ int su_main_nodaemon(int argc, char *argv[]);
 // deadbeat dad fork.
 int fork_zero_fucks();
 
-void hacks_init();
-void hacks_update_context(struct su_context* ctxt);
-
 // fallback to using /system/bin/log.
 // can't use liblog.so because this is a static binary.
 #ifndef LOGE
