@@ -586,6 +586,17 @@ static void fork_for_samsung(void)
     }
 }
 
+static void concat_commands(char* command, int argc, char *argv[]) {
+    int i;
+    command[0] = '\0';
+    for (i = optind - 1; i < argc; ++i) {
+        if (strlen(command))
+            sprintf(command, "%s %s", command, argv[i]);
+        else
+            sprintf(command, "%s", argv[i]);
+    }
+}
+
 int main(int argc, char *argv[]) {
     if (argc == 2 && strcmp(argv[1], "--daemon") == 0) {
         //Everything we'll exec will be in su, not su_daemon
@@ -709,7 +720,10 @@ int su_main_nodaemon(int argc, char **argv) {
         switch(c) {
             case 'c':
                 ctx.to.shell = DEFAULT_SHELL;
-                ctx.to.command = optarg;
+                char command[ARG_MAX];
+                concat_commands(command, argc, argv);
+                ctx.to.command = command;
+                optind = argc;
                 break;
             case 'h':
                 usage(EXIT_SUCCESS);
