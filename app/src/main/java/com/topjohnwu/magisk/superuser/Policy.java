@@ -14,20 +14,17 @@ public class Policy {
 
     public int uid, policy;
     public long until;
-    public boolean logging, notification;
+    public boolean logging = true, notification = true;
     public String packageName, appName;
+    public PackageInfo info;
 
-    public Policy() {}
-
-    public Policy(int uid, PackageManager pm) throws Throwable {
+    public Policy(int uid, PackageManager pm) throws PackageManager.NameNotFoundException {
         String[] pkgs = pm.getPackagesForUid(uid);
         if (pkgs != null && pkgs.length > 0) {
-            PackageInfo info = pm.getPackageInfo(pkgs[0], 0);
+            info = pm.getPackageInfo(pkgs[0], 0);
             packageName = pkgs[0];
             appName = info.applicationInfo.loadLabel(pm).toString();
-            logging = true;
-            notification = true;
-        } else throw new Throwable();
+        } else throw new PackageManager.NameNotFoundException();
     }
 
     public Policy(Cursor c) {

@@ -38,7 +38,7 @@ public class ModuleHelper {
     public static void createModuleMap() {
         Logger.dev("ModuleHelper: Loading modules");
 
-        Global.Data.moduleMap.clear();
+        Global.Data.moduleMap = new ValueSortedMap<>();
 
         for (String path : Utils.getModList(MAGISK_PATH)) {
             Logger.dev("ModuleHelper: Adding modules from " + path);
@@ -57,7 +57,7 @@ public class ModuleHelper {
 
         SharedPreferences prefs = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
 
-        Global.Data.repoMap.clear();
+        Global.Data.repoMap = new ValueSortedMap<>();
 
         Gson gson = new Gson();
         String jsonString;

@@ -11,7 +11,6 @@ import android.provider.OpenableColumns;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.Global;
-import com.topjohnwu.magisk.MagiskHideFragment;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.module.ModuleHelper;

@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.SparseArray;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
@@ -30,8 +31,8 @@ public class Global {
         public static String suVersion = null;
     }
     public static class Data {
-        public static ValueSortedMap<String, Repo> repoMap = new ValueSortedMap<>();
-        public static ValueSortedMap<String, Module> moduleMap = new ValueSortedMap<>();
+        public static ValueSortedMap<String, Repo> repoMap;
+        public static ValueSortedMap<String, Module> moduleMap;
         public static List<String> blockList;
     }
     public static class Events {
@@ -42,6 +43,7 @@ public class Global {
         public static final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
         public static final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
         public static final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
+        public static SparseArray<CallbackHandler.Event> uidMap = new SparseArray<>();
     }
     public static class Configs {
         public static boolean isDarkTheme;

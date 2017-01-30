@@ -2,15 +2,14 @@ package com.topjohnwu.magisk.superuser;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.FileObserver;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseArray;
+import android.text.TextUtils;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -41,8 +40,6 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
     private static final int AUTO_DENY = 1;
     private static final int AUTO_ALLOW = 2;
 
-    private static SparseArray<CallbackHandler.Event> uidMap = new SparseArray<>();
-
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
     @BindView(R.id.app_icon) ImageView appIcon;
@@ -54,13 +51,12 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
     private String socketPath;
     private LocalSocket socket;
     private PackageManager pm;
-    private PackageInfo info;
 
     private int uid;
-    private String appName, packageName;
+    private Policy policy;
     private CountDownTimer timer;
     private CallbackHandler.EventListener self;
-    private CallbackHandler.Event event;
+    private CallbackHandler.Event event = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,20 +69,29 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
         socketPath = intent.getStringExtra("socket");
         self = this;
 
+        new FileObserver(socketPath) {
+            @Override
+            public void onEvent(int fileEvent, String path) {
+                if (fileEvent == FileObserver.DELETE_SELF) {
+                    if (event != null)
+                        event.trigger();
+                    finish();
+                }
+            }
+        }.startWatching();
+
         new SocketManager().exec();
     }
 
     void showRequest() {
 
-        packageName = info.packageName;
-        appName = info.applicationInfo.loadLabel(pm).toString();
-
         switch (Global.Configs.suResponseType) {
             case AUTO_DENY:
-                handleAction(false, 0);
+                event.trigger();
                 return;
             case AUTO_ALLOW:
-                handleAction(true, 0);
+                policy.policy = Policy.ALLOW;
+                event.trigger(policy);
                 return;
             case PROMPT:
             default:
@@ -95,9 +100,9 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
         setContentView(R.layout.activity_request);
         ButterKnife.bind(this);
 
-        appIcon.setImageDrawable(info.applicationInfo.loadIcon(pm));
-        appNameView.setText(appName);
-        packageNameView.setText(packageName);
+        appIcon.setImageDrawable(policy.info.applicationInfo.loadIcon(pm));
+        appNameView.setText(policy.appName);
+        packageNameView.setText(policy.packageName);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.allow_timeout, android.R.layout.simple_spinner_item);
@@ -112,12 +117,12 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
             @Override
             public void onFinish() {
                 deny_btn.setText(getString(R.string.deny_with_str, "(0)"));
-                handleAction(false, -1);
+                event.trigger();
             }
         };
 
-        grant_btn.setOnClickListener(v -> handleAction(true, timeoutList[timeout.getSelectedItemPosition()]));
-        deny_btn.setOnClickListener(v -> handleAction(false, timeoutList[timeout.getSelectedItemPosition()]));
+        grant_btn.setOnClickListener(v -> handleAction(Policy.ALLOW));
+        deny_btn.setOnClickListener(v -> handleAction(Policy.DENY));
         suPopup.setOnClickListener((v) -> {
             timer.cancel();
             deny_btn.setText(getString(R.string.deny));
@@ -133,41 +138,32 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
 
     @Override
     public void onBackPressed() {
-        Policy temp = new Policy();
-        temp.policy = Policy.DENY;
-        event.trigger(temp);
-        CallbackHandler.unRegister(event);
-        uidMap.remove(uid);
-        finish();
+        event.trigger();
     }
 
     @Override
     public void onTrigger(CallbackHandler.Event event) {
         Policy policy = (Policy) event.getResult();
+        String response = "socket:DENY";
+        if (policy != null) {
+            Global.Events.uidMap.remove(policy.uid);
+            if (policy.policy == Policy.ALLOW)
+                response = "socket:ALLOW";
+        }
         try {
-            socket.getOutputStream().write(
-                    (policy.policy == Policy.ALLOW ? "socket:ALLOW" : "socket:DENY").getBytes());
+            socket.getOutputStream().write((response).getBytes());
         } catch (Exception ignored) {}
+        finish();
     }
 
-    void handleAction(boolean action, int timeout) {
-
-        Policy policy = new Policy();
-        policy.uid = uid;
-        policy.packageName = packageName;
-        policy.appName = appName;
-        policy.until = (timeout == 0) ? 0 : (System.currentTimeMillis() / 1000 + timeout * 60);
-        policy.policy = action ? Policy.ALLOW : Policy.DENY;
-        policy.logging = true;
-        policy.notification = true;
-
-        if (timeout >= 0) new SuDatabaseHelper(this).addPolicy(policy);
-
+    void handleAction(int action) {
+        policy.policy = action;
         event.trigger(policy);
-        CallbackHandler.unRegister(event);
-        uidMap.remove(uid);
-
-        finish();
+        int time = timeoutList[timeout.getSelectedItemPosition()];
+        if (time >= 0) {
+            policy.until = time == 0 ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
+            new SuDatabaseHelper(this).addPolicy(policy);
+        }
     }
 
     private class SocketManager extends Async.NormalTask<Void, Void, Boolean> {
@@ -193,6 +189,9 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
 
                     String name = new String(nameBytes);
 
+                    if (TextUtils.equals(name, "eof"))
+                        break;
+
                     int dataLen = is.readInt();
                     if (dataLen > SU_PROTOCOL_VALUE_MAX)
                         throw new IllegalArgumentException(name + " data length too long: " + dataLen);
@@ -203,14 +202,13 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
                     String data = new String(dataBytes);
 
                     payload.put(name, data);
-
-                    if ("eof".equals(name))
-                        break;
                 }
 
+                if (payload.getAsInteger("uid") == null)
+                    return false;
                 uid = payload.getAsInteger("uid");
 
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 return false;
             }
@@ -219,26 +217,34 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
 
         @Override
         protected void onPostExecute(Boolean result) {
+            if (!result) {
+                finish();
+                return;
+            }
+            boolean showRequest = false;
+            event = Global.Events.uidMap.get(uid);
+            if (event == null) {
+                showRequest = true;
+                event = new CallbackHandler.Event() {
+                    @Override
+                    public void trigger(Object result) {
+                        super.trigger(result);
+                        CallbackHandler.unRegister(this);
+                    }
+                };
+                Global.Events.uidMap.put(uid, event);
+            }
+            CallbackHandler.register(event, self);
             try {
-                if (!result) throw new Throwable();
-                boolean showRequest = false;
-                event = uidMap.get(uid);
-                if (event == null) {
-                    showRequest = true;
-                    event = new CallbackHandler.Event();
-                    uidMap.put(uid, event);
-                }
-                CallbackHandler.register(event, self);
                 if (showRequest) {
-                    String[] pkgs = pm.getPackagesForUid(uid);
-                    if (pkgs == null || pkgs.length == 0) throw new Throwable();
-                    info = pm.getPackageInfo(pkgs[0], 0);
+                    policy = new Policy(uid, pm);
                     showRequest();
                 } else {
                     finish();
                 }
-            } catch (Throwable e) {
-                handleAction(false, -1);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+                event.trigger();
             }
         }
     }
