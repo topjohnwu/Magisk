@@ -11,7 +11,6 @@ public class Policy {
     public static final int DENY = 1;
     public static final int ALLOW = 2;
 
-
     public int uid, policy;
     public long until;
     public boolean logging = true, notification = true;
@@ -22,6 +21,7 @@ public class Policy {
         String[] pkgs = pm.getPackagesForUid(uid);
         if (pkgs != null && pkgs.length > 0) {
             info = pm.getPackageInfo(pkgs[0], 0);
+            this.uid = uid;
             packageName = pkgs[0];
             appName = info.applicationInfo.loadLabel(pm).toString();
         } else throw new PackageManager.NameNotFoundException();

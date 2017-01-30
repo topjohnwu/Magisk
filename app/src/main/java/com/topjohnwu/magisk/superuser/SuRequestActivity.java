@@ -87,11 +87,10 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
 
         switch (Global.Configs.suResponseType) {
             case AUTO_DENY:
-                event.trigger();
+                handleAction(Policy.DENY, 0);
                 return;
             case AUTO_ALLOW:
-                policy.policy = Policy.ALLOW;
-                event.trigger(policy);
+                handleAction(Policy.ALLOW, 0);
                 return;
             case PROMPT:
             default:
@@ -157,9 +156,12 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
     }
 
     void handleAction(int action) {
+        handleAction(action, timeoutList[timeout.getSelectedItemPosition()]);
+    }
+
+    void handleAction(int action, int time) {
         policy.policy = action;
         event.trigger(policy);
-        int time = timeoutList[timeout.getSelectedItemPosition()];
         if (time >= 0) {
             policy.until = time == 0 ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
             new SuDatabaseHelper(this).addPolicy(policy);
