@@ -1,4 +1,5 @@
 /*
+** Copyright 2017, John Wu (@topjohnwu)
 ** Copyright 2010, Adam Shanks (@ChainsDD)
 ** Copyright 2008, Zinx Verituse (@zinxv)
 **
@@ -287,6 +288,9 @@ static int daemon_accept(int fd) {
     LOGD("remote uid: %d", daemon_from_uid);
     daemon_from_pid = read_int(fd);
     LOGD("remote req pid: %d", daemon_from_pid);
+    int mount_storage = read_int(fd);
+    char *cwd = read_string(fd);
+    LOGD("remote cwd: %s", cwd);
 
     struct ucred credentials;
     socklen_t ucred_length = sizeof(struct ucred);
@@ -303,7 +307,6 @@ static int daemon_accept(int fd) {
         daemon_from_pid = credentials.pid;
     }
 
-    int mount_storage = read_int(fd);
     // The the FDs for each of the streams
     int infd  = recv_fd(fd);
     int outfd = recv_fd(fd);
@@ -441,6 +444,10 @@ static int daemon_accept(int fd) {
     }
 #endif
 
+    // Change directory to cwd
+    chdir(cwd);
+    free(cwd);
+
     return run_daemon_child(infd, outfd, errfd, argc, argv);
 }
 
@@ -575,6 +582,8 @@ int connect_daemon(int argc, char *argv[], int ppid) {
     int uid = getuid();
     int ptmx = -1;
     char pts_slave[PATH_MAX];
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
 
     struct sockaddr_un sun;
 
@@ -634,6 +643,8 @@ int connect_daemon(int argc, char *argv[], int ppid) {
     // Parent PID
     write_int(socketfd, ppid);
     write_int(socketfd, mount_storage);
+    // CWD
+    write_string(socketfd, cwd);
 
     // Send stdin
     if (atty & ATTY_IN) {

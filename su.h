@@ -78,7 +78,7 @@
 #ifndef VERSION_CODE
 #define VERSION_CODE 6
 #endif
-#define VERSION "MAGISKSU:" xstr(VERSION_CODE) " (topjohnwu)"
+#define VERSION xstr(VERSION_CODE) ":MAGISKSU (topjohnwu)"
 
 #define PROTO_VERSION 1
 
