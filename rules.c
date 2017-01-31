@@ -265,6 +265,9 @@ void su_rules() {
 	enforce("su_device");
 	enforce("su_daemon");
 
+	// Patch su to everything
+	allow("su", ALL, ALL, ALL);
+
 	// Autotransition su's socket to su_device
 	add_transition("su_daemon", "device", "su_device", "file");
 	add_transition("su_daemon", "device", "su_device", "dir");
