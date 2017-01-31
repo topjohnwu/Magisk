@@ -1,44 +1,4 @@
-#include <stdio.h>
-#include <sepol/policydb/policydb.h>
-
-#define ALL NULL
-
-extern int add_rule(char *s, char *t, char *c, char *p, int effect, int not, policydb_t *policy);
-extern void create_domain(char *d, policydb_t *policy);
-extern int add_transition(char *srcS, char *origS, char *tgtS, char *c, policydb_t *policy);
-extern int add_type(char *domainS, char *typeS, policydb_t *policy);
-
-policydb_t *policy;
-
-void allow(char *s, char *t, char *c, char *p) {
-	add_rule(s, t, c, p, AVTAB_ALLOWED, 0, policy);
-}
-
-void noaudit(char *s, char *t, char *c, char *p) {
-	add_rule(s, t, c, p, AVTAB_AUDITDENY, 0, policy);
-}
-
-void deny(char *s, char *t, char *c, char *p) {
-	add_rule(s, t, c, p, AVTAB_ALLOWED, 1, policy);
-}
-
-void setPermissive(char* permissive, int permissive_value) {
-	type_datum_t *type;
-	create_domain(permissive, policy);
-	type = hashtab_search(policy->p_types.table, permissive);
-	if (type == NULL) {
-			fprintf(stderr, "type %s does not exist\n", permissive);
-			return;
-	}
-	if (ebitmap_set_bit(&policy->permissive_map, type->s.value, permissive_value)) {
-		fprintf(stderr, "Could not set bit in permissive map\n");
-		return;
-	}
-}
-
-int exists(char* source) {
-	return (int) hashtab_search(policy->p_types.table, source);
-}
+#include "sepolicy-inject.h"
 
 void samsung() {
 	deny("init", "kernel", "security", "load_policy");
@@ -222,6 +182,12 @@ void suDaemonRights() {
 	allow("su_daemon", "proc", "file", "open");
 	allow("su_daemon", "su_daemon", "process", "setcurrent");
 	allow("su_daemon", "system_file", "file", "execute_no_trans");
+
+	// Allow to adb shell su
+	allow("su_daemon", "adbd", "fd", "use");
+	allow("su_daemon", "adbd", "unix_stream_socket", "read");
+	allow("su_daemon", "adbd", "unix_stream_socket", "write");
+	allow("su_daemon", "adbd", "unix_stream_socket", "ioctl");
 }
 
 void suBind() {
@@ -274,36 +240,34 @@ void otherToSU() {
 	allow(ALL, "su", "process", "sigchld");
 
 	// uNetworkL0
-	add_type("su", "netdomain", policy);
-	add_type("su", "bluetoothdomain", policy);
+	add_type("su", "netdomain");
+	add_type("su", "bluetoothdomain");
 
 	// suBackL6
 	allow("surfaceflinger", "app_data_file", "dir", ALL);
 	allow("surfaceflinger", "app_data_file", "file", ALL);
 	allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
-	add_type("surfaceflinger", "mlstrustedsubject", policy);
+	add_type("surfaceflinger", "mlstrustedsubject");
 
 	// suMiscL6
 	if (exists("audioserver"))
 		allow("audioserver", "audioserver", "process", "execmem");
 }
 
-void phh_rules(policydb_t *policydb) {
-	policy = policydb;
-
+void su_rules() {
 	// Samsung specific
 	// Prevent system from loading policy
 	if(exists("knox_system_app"))
 		samsung();
 
 	// Create domains if they don't exist
-	setPermissive("su", 1);
-	setPermissive("su_device", 0);
-	setPermissive("su_daemon", 0);
+	permissive("su");
+	enforce("su_device");
+	enforce("su_daemon");
 
 	// Autotransition su's socket to su_device
-	add_transition("su_daemon", "device", "su_device", "file", policy);
-	add_transition("su_daemon", "device", "su_device", "dir", policy);
+	add_transition("su_daemon", "device", "su_device", "file");
+	add_transition("su_daemon", "device", "su_device", "dir");
 	allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// Transition from untrusted_app to su_client
@@ -329,22 +293,21 @@ void phh_rules(policydb_t *policydb) {
 	otherToSU();
 
 	// Need to set su_device/su as trusted to be accessible from other categories
-	add_type("su_device", "mlstrustedobject", policy);
-	add_type("su_daemon", "mlstrustedsubject", policy);
-	add_type("su", "mlstrustedsubject", policy);
+	attradd("su_device", "mlstrustedobject");
+	attradd("su_daemon", "mlstrustedsubject");
+	attradd("su", "mlstrustedsubject");
 
-	// Allow chcon to rootfs
-	allow("rootfs", "labeledfs", "filesystem", "associate");
+	// Allow chcon to anything
+	allow(ALL, "labeledfs", "filesystem", "associate");
 }
 
 // Minimal to run Magisk script before live patching
-void magisk_rules(policydb_t *policydb) {
-	policy = policydb;
+void magisk_rules() {
 
-	setPermissive("su", 1);
-	setPermissive("init", 1);
+	permissive("su");
+	permissive("init");
 
-	add_type("su", "mlstrustedsubject", policy);
+	attradd("su", "mlstrustedsubject");
 
 	allow("kernel", "su", "fd", "use");
 	allow("init", "su", "process", ALL);
