@@ -1,8 +1,9 @@
 #!/system/bin/sh
 
 RAMDISK=$1
-BINDIR=$2
-[ -z $BINDIR ] && BINDIR=/data/magisk
+BINDIR=/data/magisk
+[ ! -e $BINDIR ] && BINDIR=/cache/data_bin
+[ ! -e $BINDIR ] && exit
 SYSTEMLIB=/system/lib
 [ -d /system/lib64 ] && SYSTEMLIB=/system/lib64
 

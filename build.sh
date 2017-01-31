@@ -26,6 +26,8 @@ cleanup() {
   ls zip_static/x64/* | grep -v "busybox" | xargs rm -rfv
   rm -rfv zip_static/META-INF/com/google/android/update-binary
   rm -rfv zip_static/common/custom_ramdisk_patch.sh
+  rm -rfv zip_static/common/magisksu.sh
+  rm -rfv zip_static/common/init.magisk.rc
   rm -rfv zip_static/common/magic_mask.sh
   rm -rfv uninstaller/arm
   rm -rfv uninstaller/arm64
@@ -52,8 +54,8 @@ build_bin() {
   echo "************************"
   echo "* Copying binaries"
   echo "************************"
-  mkcp "libs/armeabi/*" zip_static/arm
-  mkcp libs/armeabi/bootimgtools uninstaller/arm
+  mkcp "libs/armeabi-v7a/*" zip_static/arm
+  mkcp libs/armeabi-v7a/bootimgtools uninstaller/arm
   mkcp "libs/arm64-v8a/*" zip_static/arm64
   mkcp libs/arm64-v8a/bootimgtools uninstaller/arm64
   mkcp "libs/x86/*" zip_static/x86
@@ -73,6 +75,8 @@ zip_package() {
   echo "* Zipping Magisk v$1"
   echo "************************"
   cp -afv scripts/custom_ramdisk_patch.sh zip_static/common/custom_ramdisk_patch.sh
+  cp -afv scripts/magisksu.sh zip_static/common/magisksu.sh
+  cp -afv scripts/init.magisk.rc zip_static/common/init.magisk.rc
   cd zip_static
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;

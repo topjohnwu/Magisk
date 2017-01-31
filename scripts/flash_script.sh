@@ -321,25 +321,25 @@ ui_print "- Constructing environment"
 
 if (is_mounted /data); then
   rm -rf /data/busybox /data/magisk 2>/dev/null
-  mkdir -p /data/busybox
-  cp -af $BINDIR /data/magisk
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
+  mkdir -p /data/busybox /data/magisk
+  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop \
+         $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
   cp -af $INSTALLER/common/magisk.apk /data/magisk.apk
   /data/magisk/busybox --install -s /data/busybox
   ln -s /data/magisk/busybox /data/busybox/busybox
   # Prevent issues
   rm -f /data/busybox/su /data/busybox/sh /data/busybox/reboot
-  chcon -hR "u:object_r:system_file:s0" /data/magisk /data/busybox
+  chcon -hR u:object_r:system_file:s0 /data/magisk /data/busybox
   chmod -R 755 /data/magisk /data/busybox
-  PATH=/data/busybox:$PATH
-  BINDIR=/data/magisk
+  # PATH=/data/busybox:$PATH
 else
   rm -rf /cache/data_bin 2>/dev/null
-  cp -af $BINDIR /cache/data_bin
-  cp -af $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /cache/data_bin
+  mkdir -p /cache/data_bin
+  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop \
+         $INSTALLER/common/custom_ramdisk_patch.sh $INSTALLER/common/init.magisk.rc \
+         $INSTALLER/common/magic_mask.sh /cache/data_bin
   cp -af $INSTALLER/common/magisk.apk /cache/magisk.apk
   chmod -R 755 /cache/data_bin
-  BINDIR=/cache/data_bin
 fi
 
 ##########################################################################################
@@ -370,8 +370,11 @@ if (! is_mounted /magisk); then
 fi
 MAGISKLOOP=$LOOPDEVICE
 
-mkdir -p /magisk/.core/magiskhide 2>/dev/null
-cp -af $INSTALLER/common/magiskhide/. /magisk/.core/magiskhide
+# Core folders and scripts
+mkdir -p $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d 2>/dev/null
+cp -af $INSTALLER/common/magiskhide/. $BINDIR/magiskhide $COREDIR/magiskhide
+chmod -R 755 $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d
 
 ##########################################################################################
 # Boot image patch
@@ -434,7 +437,7 @@ if ($SUPERSU); then
   fi
   rm -f $TMPDIR/boottmp/stock_boot.img $UNPACKDIR/ramdisk.orig.gz $UNPACKDIR/ramdisk.gz 2>/dev/null
   ui_print "- Patching ramdisk with sukernel"
-  sh /data/custom_ramdisk_patch.sh $UNPACKDIR/ramdisk $BINDIR
+  sh /data/custom_ramdisk_patch.sh $UNPACKDIR/ramdisk
   LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-backup $UNPACKDIR/ramdisk.orig $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk
   gzip -9 < $UNPACKDIR/ramdisk > $UNPACKDIR/ramdisk.gz
   rm -f $UNPACKDIR/ramdisk $UNPACKDIR/ramdisk.orig
@@ -481,24 +484,13 @@ else
     fi
   fi
 
-  # Root
-  ROOT=false
-  if [ ! -d /magisk/phh ]; then
-    ui_print "- Installing phh's SuperUser"
-    ROOT=true
-  elif [ `grep_prop versionCode /magisk/phh/module.prop` -lt `grep_prop versionCode $INSTALLER/common/phh/module.prop` ]; then
-    ui_print "- Upgrading phh's SuperUser"
-    ROOT=true
-  fi
-
-  if ($ROOT); then
-    mkdir -p /magisk/phh/bin 2>/dev/null
-    mkdir -p /magisk/phh/su.d 2>/dev/null
-    cp -af $INSTALLER/common/phh/. /magisk/phh
-    cp -af $BINDIR/su $BINDIR/sepolicy-inject /magisk/phh/bin
-    chmod -R 755 /magisk/phh
-    chown -R 0.0 /magisk/phh
-  fi
+  # MagiskSU
+  ui_print "- Installing MagiskSU"
+  rm -rf $COREDIR/su 2>/dev/null
+  mkdir -p $COREDIR/su
+  cp -af $BINDIR/su $INSTALLER/common/magisksu.sh $COREDIR/su
+  chmod -R 755 $COREDIR/su
+  chown -R 0.0 $COREDIR/su
 
   # Patch ramdisk
   ui_print "- Patching ramdisk"
@@ -544,6 +536,7 @@ else
 
   chmod 0755 magisk
   chmod 0750 init.magisk.rc sbin/magic_mask.sh
+  chown 0.0 magisk init.magisk.rc sbin/magic_mask.sh
 fi
 
 ui_print "- Repacking boot image"

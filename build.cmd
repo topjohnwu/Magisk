@@ -53,11 +53,11 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying binaries
   ECHO ************************
-  COPY /Y libs\armeabi\* zip_static\arm
+  COPY /Y libs\armeabi-v7a\* zip_static\arm
   COPY /Y libs\arm64-v8a\* zip_static\arm64
   COPY /Y libs\x86\* zip_static\x86
   COPY /Y libs\x86_64\* zip_static\x64
-  CALL :mkcp libs\armeabi\bootimgtools uninstaller\arm
+  CALL :mkcp libs\armeabi-v7a\bootimgtools uninstaller\arm
   CALL :mkcp libs\arm64-v8a\bootimgtools uninstaller\arm64
   CALL :mkcp libs\x86\bootimgtools uninstaller\x86
   CALL :mkcp libs\x86_64\bootimgtools uninstaller\x64
@@ -75,6 +75,8 @@ EXIT /B %ERRORLEVEL%
   forfiles /P zip_static\x64 /C "cmd /C IF NOT @file == \"busybox\" DEL @file"
   2>NUL DEL zip_static\META-INF\com\google\android\update-binary
   2>NUL DEL zip_static\common\custom_ramdisk_patch.sh
+  2>NUL DEL zip_static\common\magisksu.sh
+  2>NUL DEL zip_static\common\init.magisk.rc
   2>NUL DEL zip_static\common\magic_mask.sh
   2>NUL RMDIR /S /Q uninstaller\arm
   2>NUL RMDIR /S /Q uninstaller\arm64
@@ -100,6 +102,8 @@ EXIT /B %ERRORLEVEL%
   ECHO * Zipping Magisk v%~1
   ECHO ************************
   COPY /Y scripts\custom_ramdisk_patch.sh zip_static\common\custom_ramdisk_patch.sh
+  COPY /Y scripts\magisksu.sh zip_static\common\magisksu.sh
+  COPY /Y scripts\init.magisk.rc zip_static\common\init.magisk.rc
   CD zip_static
   2>NUL DEL "..\Magisk-v%~1.zip"
   ..\ziptools\win_bin\zip "..\Magisk-v%~1.zip" -r .

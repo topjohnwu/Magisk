@@ -266,12 +266,13 @@ case $1 in
     # Don't run twice
     if [ "`getprop magisk.restart_pfsd`" != "1" ]; then
 
-      export OLDPATH=$PATH
-      export PATH=$TOOLPATH:$OLDPATH
-
       log_print "** Magisk post-fs-data mode running..."
 
       # Cache support
+      mv /cache/stock_boot.img /data/stock_boot.img 2>/dev/null
+      mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
+      mv /cache/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh 2>/dev/null
+
       if [ -d "/cache/data_bin" ]; then
         rm -rf $BINPATH $TOOLPATH
         mkdir -p $TOOLPATH
@@ -282,16 +283,15 @@ case $1 in
         rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
       fi
 
-      mv /cache/stock_boot.img /data/stock_boot.img 2>/dev/null
-      mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
+      # Live patch sepolicy
+      $BINPATH/sepolicy-inject --live
 
       # Set up environment
+      export OLDPATH=$PATH
+      export PATH=$TOOLPATH:$OLDPATH
       chmod -R 755 $BINPATH $TOOLPATH
       chown -R 0.0 $BINPATH $TOOLPATH
       find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
-
-      # Live patch sepolicy
-      $BINPATH/sepolicy-inject --live -s su
 
       # Multirom functions should go here, not available right now
       MULTIROM=false
@@ -314,9 +314,9 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $MOUNTPOINT/zzsupersu $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
+      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
 
-      # Remove modules that is labeled to be removed
+      # Remove modules that are labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
         rm -f $MOD/system/placeholder 2>/dev/null
         if [ -f $MOD/remove ]; then
@@ -342,13 +342,10 @@ case $1 in
         fi
       fi
 
-      log_print "* Preparing modules"
+      # Start MagiskSU if no SuperSU
+      [ ! -f /sbin/launch_daemonsu.sh ] && sh $COREDIR/su/magisksu.sh
 
-      # Disable phh and Magisk Hide for SuperSU
-      if [ -f /sbin/launch_daemonsu.sh ]; then
-        touch /magisk/phh/disable 2>/dev/null
-        rm -f $COREDIR/magiskhide/enable 2>/dev/null
-      fi
+      log_print "* Preparing modules"
 
       mkdir -p $DUMMDIR
       mkdir -p $MIRRDIR/system

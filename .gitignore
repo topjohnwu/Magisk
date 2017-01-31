@@ -15,6 +15,9 @@ ziptools/zipadjust
 
 # Generated scripts
 zip_static/common/magic_mask.sh
+zip_static/common/magisksu.sh
+zip_static/common/init.magisk.rc
+zip_static/common/custom_ramdisk_patch.sh
 zip_static/META-INF/com/google/android/update-binary
 
 # Leave all busybox!
