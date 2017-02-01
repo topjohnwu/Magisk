@@ -488,29 +488,6 @@ case $1 in
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
     run_scripts service
-
-    # Magisk Hide
-    if [ -f $COREDIR/magiskhide/enable ]; then
-      log_print "* Removing tampered read-only system props"
-
-      VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
-      FLASHLOCKED=`getprop ro.boot.flash.locked`
-      VERITYMODE=`getprop ro.boot.veritymode`
-
-      [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
-      log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
-      [ ! -z "$FLASHLOCKED" -a "$FLASHLOCKED" != "1" ] && \
-      log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
-      [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && \
-      log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
-
-      mktouch $COREDIR/magiskhide/hidelist
-      chmod -R 755 $COREDIR/magiskhide
-      # Add Safety Net preset
-      $COREDIR/magiskhide/add com.google.android.gms.unstable
-      log_print "* Starting Magisk Hide"
-      /data/magisk/magiskhide --daemon
-    fi
     ;;
 
 esac

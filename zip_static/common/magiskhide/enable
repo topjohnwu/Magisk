@@ -1,0 +1,39 @@
+#!/system/bin/sh
+
+MODDIR=/magisk/.core/magiskhide
+BINPATH=/data/magisk
+LOGFILE=/cache/magisk.log
+
+log_print() {
+  echo "MagiskHide: $1"
+  echo "MagiskHide: $1" >> $LOGFILE
+  log -p i -t Magisk "MagiskHide: $1"
+}
+
+log_print "Removing tampered read-only system props"
+
+VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
+FLASHLOCKED=`getprop ro.boot.flash.locked`
+VERITYMODE=`getprop ro.boot.veritymode`
+
+[ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
+[ ! -z "$FLASHLOCKED" -a "$FLASHLOCKED" != "1" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
+[ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
+
+touch $MODDIR/hidelist
+chmod -R 755 $MODDIR
+# Add Safety Net preset
+$MODDIR/add com.google.android.gms.unstable
+
+while read PROCESS; do
+  log_print "Killing $PROCESS"
+  set --
+  set `/data/busybox/ps -o pid,args | grep "$PROCESS" | grep -v grep` >/dev/null
+  [ ! -z "$1" ] && kill "$1"
+done < $MODDIR/hidelist
+
+log_print "Starting MagiskHide daemon"
+$MODDIR/magiskhide --daemon

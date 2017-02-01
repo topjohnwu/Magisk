@@ -1,11 +1,13 @@
 #!/system/bin/sh
 
 HIDELIST=/magisk/.core/magiskhide/hidelist
+PROCESS=$1
 
-if [ ! -z "$1" ]; then
-  if [ $(grep -c "^$1$" $HIDELIST) -eq "0" ]; then
-    echo "$1" >> $HIDELIST
-    set `/data/busybox/ps -o pid,args | grep "$1" | grep -v "grep"`
-    kill "$1"
+if [ ! -z "$PROCESS" ]; then
+  if [ `grep -c "^$PROCESS$" $HIDELIST` -eq "0" ]; then
+    echo "$PROCESS" >> $HIDELIST
+    set --
+    set `/data/busybox/ps -o pid,args | grep "$PROCESS" | grep -v grep` >/dev/null
+    [ ! -z "$1" ] && kill "$1"
   fi
 fi

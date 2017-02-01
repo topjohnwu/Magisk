@@ -526,8 +526,8 @@ else
     rm verity_key 2>/dev/null
   fi
 
-  # sepolicy patches
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --magisk -P sepolicy
+  # minimal sepolicy patches
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --minimal -P sepolicy
 
   # Add new items
   mkdir -p magisk 2>/dev/null
