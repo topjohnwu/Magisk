@@ -67,140 +67,15 @@ void samsung() {
 void allowSuClient(char *target) {
 	allow(target, "rootfs", "file", "execute_no_trans");
 	allow(target, "rootfs", "file", "execute");
-	allow(target, "su_daemon", "unix_stream_socket", "connectto");
-	allow(target, "su_daemon", "unix_stream_socket", "getopt");
+	allow(target, "su", "unix_stream_socket", "connectto");
+	allow(target, "su", "unix_stream_socket", "getopt");
 	allow(target, "su_device", "dir", "search");
 	allow(target, "su_device", "dir", "read");
 	allow(target, "su_device", "sock_file", "read");
 	allow(target, "su_device", "sock_file", "write");
-	allow("su_daemon", target, "fd", "use");
-	allow("su_daemon", target, "fifo_file", "read");
-	allow("su_daemon", target, "fifo_file", "write");
-	allow("su_daemon", target, "fifo_file", "getattr");
-	allow("su_daemon", target, "fifo_file", "ioctl");
-	allow("su_daemon", target, "dir", "search");
-	allow("su_daemon", target, "file", "read");
-	allow("su_daemon", target, "file", "open");
-	allow("su_daemon", target, "lnk_file", "read");
-	allow("su_daemon", "su_daemon", "capability", "sys_ptrace");
-}
-
-void suDaemonRights() {
-	allow("su_daemon", "rootfs", "file", "entrypoint");
-	allow("su_daemon", "su_daemon", "dir", "search");
-	allow("su_daemon", "su_daemon", "dir", "read");
-	allow("su_daemon", "su_daemon", "file", "read");
-	allow("su_daemon", "su_daemon", "file", "write");
-	allow("su_daemon", "su_daemon", "file", "open");
-	allow("su_daemon", "su_daemon", "lnk_file", "read");
-	allow("su_daemon", "su_daemon", "unix_dgram_socket", "create");
-	allow("su_daemon", "su_daemon", "unix_dgram_socket", "connect");
-	allow("su_daemon", "su_daemon", "unix_dgram_socket", "write");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "create");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "ioctl");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "read");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "getattr");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "write");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "setattr");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "lock");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "append");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "bind");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "connect");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "getopt");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "setopt");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "shutdown");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "listen");
-	allow("su_daemon", "su_daemon", "unix_stream_socket", "accept");
-	allow("su_daemon", "devpts", "chr_file", "read");
-	allow("su_daemon", "devpts", "chr_file", "write");
-	allow("su_daemon", "devpts", "chr_file", "open");
-	allow("su_daemon", "devpts", "chr_file", "getattr");
-	allow("su_daemon", "untrusted_app_devpts", "chr_file", "read");
-	allow("su_daemon", "untrusted_app_devpts", "chr_file", "write");
-	allow("su_daemon", "untrusted_app_devpts", "chr_file", "open");
-	allow("su_daemon", "untrusted_app_devpts", "chr_file", "getattr");
-	allow("su_daemon", "su_daemon", "capability", "setuid");
-	allow("su_daemon", "su_daemon", "capability", "setgid");
-	allow("su_daemon", "app_data_file", "dir", "getattr");
-	allow("su_daemon", "app_data_file", "dir", "search");
-	allow("su_daemon", "app_data_file", "dir", "write");
-	allow("su_daemon", "app_data_file", "dir", "add_name");
-	allow("su_daemon", "app_data_file", "file", "getattr");
-	allow("su_daemon", "app_data_file", "file", "read");
-	allow("su_daemon", "app_data_file", "file", "open");
-	allow("su_daemon", "app_data_file", "file", "lock");
-	allow("su_daemon", "su_daemon", "capability", "dac_override");
-	allow("su_daemon", "su_daemon", "process", "fork");
-	allow("su_daemon", "su_daemon", "process", "sigchld");
-	allow("su_daemon", "toolbox_exec", "file", "execute");
-	allow("su_daemon", "toolbox_exec", "file", "read");
-	allow("su_daemon", "toolbox_exec", "file", "open");
-	allow("su_daemon", "toolbox_exec", "file", "execute_no_trans");
-	allow("su_daemon", "device", "dir", "write");
-	allow("su_daemon", "device", "dir", "add_name");
-	allow("su_daemon", "su_device", "dir", "create");
-	allow("su_daemon", "su_device", "dir", "setattr");
-	allow("su_daemon", "su_device", "dir", "remove_name");
-	allow("su_daemon", "su_device", "dir", "add_name");
-	allow("su_daemon", "su_device", "sock_file", "create");
-	allow("su_daemon", "su_device", "sock_file", "unlink");
-	allow("su_daemon", "zygote_exec", "file", "execute");
-	allow("su_daemon", "zygote_exec", "file", "read");
-	allow("su_daemon", "zygote_exec", "file", "open");
-	allow("su_daemon", "zygote_exec", "file", "execute_no_trans");
-	allow("su_daemon", "zygote_exec", "lnk_file", "read");
-	allow("su_daemon", "zygote_exec", "lnk_file", "getattr");
-	allow("su_daemon", "su_device", "dir", "search");
-	allow("su_daemon", "su_device", "dir", "write");
-	allow("su_daemon", "su_device", "dir", "add_name");
-	allow("su_daemon", "su_daemon", "process", "setexec");
-	allow("su_daemon", "shell_exec", "file", "execute");
-	allow("su_daemon", "shell_exec", "file", "read");
-	allow("su_daemon", "shell_exec", "file", "open");
-	allow("su_daemon", "su_daemon", "capability", "chown");
-	allow("su_daemon", "su", "process", "transition");
-	allow("su_daemon", "su", "process", "siginh");
-	allow("su_daemon", "su", "process", "rlimitinh");
-	allow("su_daemon", "su", "process", "noatsecure");
-
-	// suL9
-	allow("su_daemon", "su_daemon", "dir", ALL);
-	allow("su_daemon", "su_daemon", "file", ALL);
-	allow("su_daemon", "su_daemon", "lnk_file", ALL);
-	allow("su_daemon", "system_data_file", "dir", ALL);
-	allow("su_daemon", "system_data_file", "file", ALL);
-	allow("su_daemon", "system_data_file", "lnk_file", ALL);
-	allow("su_daemon", "labeledfs", "filesystem", "associate");
-	allow("su_daemon", "su_daemon", "process", "setfscreate");
-	allow("su_daemon", "tmpfs", "filesystem", "associate");
-	allow("su_daemon", "su_daemon", "file", "relabelfrom");
-	allow("su_daemon", "system_file", "file", "mounton");
-
-	// Allow to start daemon by script in su domain
-	allow("su_daemon", "su", "file", "write");
-	allow("su_daemon", "proc", "file", "read");
-	allow("su_daemon", "proc", "file", "open");
-	allow("su_daemon", "su_daemon", "process", "setcurrent");
-	allow("su_daemon", "system_file", "file", "execute_no_trans");
-
-	// Allow to adb shell su
-	allow("su_daemon", "adbd", "fd", "use");
-	allow("su_daemon", "adbd", "unix_stream_socket", "read");
-	allow("su_daemon", "adbd", "unix_stream_socket", "write");
-	allow("su_daemon", "adbd", "unix_stream_socket", "ioctl");
-}
-
-void suBind() {
-	allow("su_daemon", "su_exec", "file", "mounton");
-	allow("su_daemon", "su_exec", "file", "read");
-	allow("su_daemon", "su_device", "dir", ALL);
-	allow("su_daemon", "su_device", "file", ALL);
-	allow("su_daemon", "su_device", "lnk_file", ALL);
-	allow("su_daemon", "system_file", "file", "relabelto");
 }
 
 void suRights() {
-	allow("su_daemon", "su_daemon", "capability", "sys_admin");
 	allow("servicemanager", "su", "dir", "search");
 	allow("servicemanager", "su", "dir", "read");
 	allow("servicemanager", "su", "file", "open");
@@ -263,14 +138,13 @@ void su_rules() {
 	// Create domains if they don't exist
 	permissive("su");
 	enforce("su_device");
-	enforce("su_daemon");
 
 	// Patch su to everything
 	allow("su", ALL, ALL, ALL);
 
 	// Autotransition su's socket to su_device
-	add_transition("su_daemon", "device", "su_device", "file");
-	add_transition("su_daemon", "device", "su_device", "dir");
+	add_transition("su", "device", "su_device", "file");
+	add_transition("su", "device", "su_device", "dir");
 	allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// Transition from untrusted_app to su_client
@@ -278,26 +152,21 @@ void su_rules() {
 	allowSuClient("untrusted_app");
 	allowSuClient("system_app");
 	allowSuClient("platform_app");
-	allowSuClient("su");
 	if (exists("priv_app"))
 		allowSuClient("priv_app");
-
 	if (exists("ssd_tool"))
 		allowSuClient("ssd_tool");
 
 	// Allow init to execute su daemon/transition
-	allow("init", "su_daemon", "process", "transition");
-	allow("init", "su_daemon", "process", "rlimitinh");
-	allow("init", "su_daemon", "process", "siginh");
-	allow("init", "su_daemon", "process", "noatsecure");
-	suDaemonRights();
-	suBind();
+	allow("init", "su", "process", "transition");
+	allow("init", "su", "process", "rlimitinh");
+	allow("init", "su", "process", "siginh");
+	allow("init", "su", "process", "noatsecure");
 	suRights();
 	otherToSU();
 
 	// Need to set su_device/su as trusted to be accessible from other categories
 	attradd("su_device", "mlstrustedobject");
-	attradd("su_daemon", "mlstrustedsubject");
 	attradd("su", "mlstrustedsubject");
 
 	// Allow chcon to anything
