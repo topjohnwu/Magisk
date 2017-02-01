@@ -471,7 +471,7 @@ int run_daemon() {
         PLOGE("setsid");
         return -1;
     }
-    if (setcon("u:r:su_daemon:s0") < 0) {
+    if (setcon("u:r:su:s0") < 0) {
         PLOGE("setcon");
         return -1;
     }
