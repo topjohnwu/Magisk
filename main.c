@@ -20,7 +20,7 @@ static void usage(char *arg0) {
 int main(int argc, char **argv) {
 	char *infile = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
 	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0, not = 0, live = 0, builtin = 0, magisk = 0;
+	int exists = 0, not = 0, live = 0, builtin = 0, minimal = 0;
 	policydb_t policydb;
 	struct policy_file pf, outpf;
 	sidtab_t sidtab;
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 		{"not-permissive", required_argument, NULL, 'z'},
 		{"not", no_argument, NULL, 0},
 		{"live", no_argument, NULL, 0},
-		{"magisk", no_argument, NULL, 0},
+		{"minimal", no_argument, NULL, 0},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -56,8 +56,8 @@ int main(int argc, char **argv) {
 					not = 1;
 				else if(strcmp(long_options[option_index].name, "live") == 0)
 					live = 1;
-				else if(strcmp(long_options[option_index].name, "magisk") == 0)
-					magisk = 1;
+				else if(strcmp(long_options[option_index].name, "minimal") == 0)
+					minimal = 1;
 				else
 					usage(argv[0]);
 				break;
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Use builtin rules if nothing specified
-	if (!magisk && !source && !target && !class && !perm && !permissive && !fcon && !attr &&!filetrans && !exists)
+	if (!minimal && !source && !target && !class && !perm && !permissive && !fcon && !attr &&!filetrans && !exists)
 		builtin = 1;
 
 	// Overwrite original if not specified
@@ -135,8 +135,8 @@ int main(int argc, char **argv) {
 	if (builtin) {
 		su_rules();
 	}
-	else if (magisk) {
-		magisk_rules();
+	else if (minimal) {
+		min_rules();
 	}
 	else if (permissive) {
 		type_datum_t *type;

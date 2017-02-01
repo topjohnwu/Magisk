@@ -174,7 +174,7 @@ void su_rules() {
 }
 
 // Minimal to run Magisk script before live patching
-void magisk_rules() {
+void min_rules() {
 
 	permissive("su");
 	permissive("init");

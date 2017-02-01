@@ -45,6 +45,6 @@ int exists(char *source);
 
 // Built in rules
 void su_rules();
-void magisk_rules();
+void min_rules();
 
 #endif
