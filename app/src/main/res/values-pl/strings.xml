@@ -65,7 +65,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Zapisz na SD</string>
-    <string name="menuSend">Wyślij</string>
     <string name="menuReload">Załaduj ponownie</string>
     <string name="menuClearLog">Wyczyść Log</string>
     <string name="logs_cleared">Log wyczyszczony</string>
@@ -126,7 +125,6 @@
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
-    <string name="settings_magiskhide_title">Włącz Magisk Hide</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>

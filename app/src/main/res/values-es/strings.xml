@@ -39,7 +39,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Salvar a SD</string>
-    <string name="menuSend">Enviar</string>
     <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Vaciar Log ahora</string>
     <string name="logs_cleared">Log vaciado correctamente</string>
@@ -83,7 +82,6 @@
     <string name="settings_dark_theme_title">Tema</string>
     <string name="settings_dark_theme_summary">Selecciona un tema</string>
 
-    <string name="settings_magiskhide_title">Habilitar Magisk Hide</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_busybox_title">Habilitar BusyBox</string>
     <string name="settings_busybox_summary">Montar el busybox interno de Magisk en xbin</string>

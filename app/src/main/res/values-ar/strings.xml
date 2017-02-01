@@ -39,7 +39,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">حفظ إلى بطاقة ذاكرة SD</string>
-    <string name="menuSend">إرسال</string>
     <string name="menuReload">إعادة تحميل</string>
     <string name="menuClearLog">حذف السجل الآن</string>
     <string name="logs_cleared">تم حذف السجل بنجاح</string>
@@ -86,7 +85,6 @@
     <string name="settings_dark_theme_title">السمة</string>
     <string name="settings_dark_theme_summary">أختر سمة</string>
 
-    <string name="settings_magiskhide_title">تمكين إخفاء Magisk</string>
     <string name="settings_magiskhide_summary">إخفاء Magisk من مختلف حالات الإكتشاف</string>
     <string name="settings_busybox_title">تمكين BusyBox</string>
     <string name="settings_busybox_summary">ربط تحميل Magisk\'s المدمج في busybox إلى xbin</string>

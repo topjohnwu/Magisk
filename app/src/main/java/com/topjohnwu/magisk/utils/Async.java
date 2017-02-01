@@ -293,18 +293,25 @@ public class Async {
     public static class MagiskHide extends RootTask<Object, Void, Void> {
         @Override
         protected Void doInBackground(Object... params) {
-            boolean add = (boolean) params[0];
-            String packageName = (String) params[1];
-            Shell.su(MAGISK_HIDE_PATH + (add ? "add " : "rm ") + packageName);
+            String command = (String) params[0];
+            Shell.su(MAGISK_HIDE_PATH + command);
             return null;
         }
 
         public void add(CharSequence packageName) {
-            exec(true, packageName);
+            exec("add " + packageName);
         }
 
         public void rm(CharSequence packageName) {
-            exec(false, packageName);
+            exec("rm " + packageName);
+        }
+
+        public void enable() {
+            exec("enable");
+        }
+
+        public void disable() {
+            exec("disable");
         }
 
     }

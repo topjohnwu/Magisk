@@ -76,8 +76,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         if (SNLIST.contains(info.packageName)) {
             holder.checkBox.setChecked(true);
             holder.checkBox.setEnabled(false);
-            holder.itemView.setOnClickListener(v ->
-                    Snackbar.make(holder.itemView, R.string.safetyNet_hide_notice, Snackbar.LENGTH_LONG).show());
+            holder.itemView.setOnClickListener(v -> {
+                Snackbar snackbar = Snackbar.make(holder.itemView, R.string.safetyNet_hide_notice, Snackbar.LENGTH_LONG);
+                ((TextView) snackbar.getView().findViewById(android.support.design.R.id.snackbar_text)).setMaxLines(2);
+                snackbar.show();
+            });
         } else {
             holder.checkBox.setEnabled(true);
             holder.checkBox.setChecked(mHideList.contains(info.packageName));

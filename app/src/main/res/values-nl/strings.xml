@@ -37,7 +37,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Opslaan op SD-kaart</string>
-    <string name="menuSend">Verzenden</string>
     <string name="menuReload">Herladen</string>
     <string name="menuClearLog">Maak log leeg</string>
     <string name="logs_cleared">Log succesvol geleegd</string>
@@ -89,7 +88,6 @@
     <string name="settings_developer_logging_summary">Schakel dit in voor uitgebreidere logging.</string>
     <string name="settings_shell_logging_title">Shell command debug loggin</string>
     <string name="settings_shell_logging_summary">Schakel dit in om alle shell commands en output te loggen</string>
-    <string name="settings_magiskhide_title">Magisk verbergen</string>
     <string name="settings_magiskhide_summary">Reboot om de instellingen toe te passen</string>
 
     <!-- Strings related to Settings -->

@@ -65,7 +65,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Auf SD-Karte speichern</string>
-    <string name="menuSend">Senden</string>
     <string name="menuReload">Erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
     <string name="logs_cleared">Log erfolgreich gelöscht</string>
@@ -126,7 +125,6 @@
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informtionen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
-    <string name="settings_magiskhide_title">Magisk Hide aktivieren</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden\nErfordert einen Neustart</string>
     <string name="settings_busybox_title">BusyBox aktivieren</string>
     <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten\nErfordert einen Neustart</string>

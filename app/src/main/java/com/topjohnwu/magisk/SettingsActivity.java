@@ -95,10 +95,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             setSummary();
 
-            CheckBoxPreference busyboxPreference = (CheckBoxPreference) findPreference("busybox");
-            CheckBoxPreference magiskhidePreference = (CheckBoxPreference) findPreference("magiskhide");
-            SwitchPreference hostsPreference = (SwitchPreference) findPreference("hosts");
-
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 ModuleHelper.clearRepoCache(getActivity());
                 return true;
@@ -108,16 +104,10 @@ public class SettingsActivity extends AppCompatActivity {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
             } else {
-                if (!Global.Info.isSuClient) {
+                if (!Global.Info.isSuClient)
                     prefScreen.removePreference(suCategory);
-                }
-                if (Global.Info.magiskVersion < 9) {
-                    hostsPreference.setEnabled(false);
-                    busyboxPreference.setEnabled(false);
-                }
-                if (Global.Info.magiskVersion < 8) {
-                    magiskhidePreference.setEnabled(false);
-                }
+                if (Global.Info.magiskVersion < 11)
+                    prefScreen.removePreference(magiskCategory);
             }
         }
 
@@ -149,20 +139,10 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
-                    new Async.RootTask<Void, Void, Void>() {
-                        private boolean enable = enabled;
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            if (enable) {
-                                Utils.createFile("/magisk/.core/magiskhide/enable");
-                            } else {
-                                Utils.removeItem("/magisk/.core/magiskhide/enable");
-                            }
-
-                            return null;
-                        }
-                    }.exec();
-                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    if (enabled)
+                        new Async.MagiskHide().enable();
+                    else
+                        new Async.MagiskHide().disable();
                     break;
                 case "busybox":
                     enabled = prefs.getBoolean("busybox", false);
@@ -170,11 +150,10 @@ public class SettingsActivity extends AppCompatActivity {
                         private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... params) {
-                            if (enable) {
+                            if (enable)
                                 Utils.createFile("/magisk/.core/busybox/enable");
-                            } else {
+                            else
                                 Utils.removeItem("/magisk/.core/busybox/enable");
-                            }
                             return null;
                         }
                     }.exec();

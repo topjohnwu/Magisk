@@ -56,6 +56,7 @@ public class Global {
         public static boolean isDarkTheme;
         public static boolean shellLogging;
         public static boolean devLogging;
+        public static boolean magiskHide;
         public static int suRequestTimeout;
         public static int suLogTimeout = 14;
         public static int suAccessState;
@@ -68,13 +69,14 @@ public class Global {
         Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
         Configs.devLogging = prefs.getBoolean("developer_logging", false);
         Configs.shellLogging = prefs.getBoolean("shell_logging", false);
+        Configs.magiskHide = prefs.getBoolean("magiskhide", false);
         updateMagiskInfo();
         initSuAccess();
         initSuConfigs(context);
         // Initialize prefs
         prefs.edit()
                 .putBoolean("dark_theme", Configs.isDarkTheme)
-                .putBoolean("magiskhide", Utils.itemExist(false, "/magisk/.core/magiskhide/enable"))
+                .putBoolean("magiskhide", Configs.magiskHide)
                 .putBoolean("busybox", Utils.commandExists("busybox"))
                 .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
                 .putString("su_request_timeout", String.valueOf(Configs.suRequestTimeout))

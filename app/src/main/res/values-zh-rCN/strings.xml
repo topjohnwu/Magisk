@@ -57,7 +57,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">保存到 SD 卡</string>
-    <string name="menuSend">发送</string>
     <string name="menuReload">重载</string>
     <string name="menuClearLog">清除日志</string>
     <string name="logs_cleared">日志已成功清除</string>
@@ -107,7 +106,6 @@
     <string name="settings_dark_theme_title">主题</string>
     <string name="settings_dark_theme_summary">选择一个主题</string>
 
-    <string name="settings_magiskhide_title">启用 Magisk 隐藏</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
     <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>

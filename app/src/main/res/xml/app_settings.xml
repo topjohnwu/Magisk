@@ -22,16 +22,16 @@
         android:title="@string/magisk">
 
         <CheckBoxPreference
-            android:key="magiskhide"
-            android:defaultValue="false"
-            android:title="@string/settings_magiskhide_title"
-            android:summary="@string/settings_magiskhide_summary" />
-
-        <CheckBoxPreference
             android:key="busybox"
             android:defaultValue="false"
             android:title="@string/settings_busybox_title"
             android:summary="@string/settings_busybox_summary" />
+
+        <SwitchPreference
+            android:key="magiskhide"
+            android:defaultValue="false"
+            android:title="@string/magiskhide"
+            android:summary="@string/settings_magiskhide_summary" />
 
         <SwitchPreference
             android:key="hosts"

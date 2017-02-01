@@ -65,7 +65,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
-    <string name="menuSend">Send</string>
     <string name="menuReload">Reload</string>
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
@@ -114,6 +113,7 @@
     <string name="check_release_notes">Check release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
+    <string name="start_magiskhide">Starting MagiskHide …</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos</string>
@@ -127,8 +127,7 @@
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
 
-    <string name="settings_magiskhide_title">Enable Magisk Hide</string>
-    <string name="settings_magiskhide_summary">Hide Magisk from various detections\nRequires reboot</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Enable BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin\nRequires reboot</string>
     <string name="settings_hosts_title">Systemless hosts</string>

@@ -12,13 +12,13 @@ public class RequestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Global.initSuConfigs(this);
-
         Intent intent = getIntent();
         if (intent == null) {
             finish();
             return;
         }
+
+        Global.initSuConfigs(this);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(this, SuRequestActivity.class);
         startActivity(intent);

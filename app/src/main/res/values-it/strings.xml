@@ -37,7 +37,6 @@
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Salva nella SD</string>
-    <string name="menuSend">Invia</string>
     <string name="menuReload">Ricarica</string>
     <string name="menuClearLog">Cancella log</string>
     <string name="logs_cleared">Log creato con successo</string>
