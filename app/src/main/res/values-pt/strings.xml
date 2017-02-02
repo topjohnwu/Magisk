@@ -1,15 +1,20 @@
 <resources>
+	
+	
+	
+	
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Abrir gaveta de notificação</string>
     <string name="navigation_drawer_close">Fechar gaveta de notificação</string>
 	<string name="magiskhide">Magisk Hide</string>
     <string name="modules">Módulos</string>
     <string name="downloads">Baixar</string>
+	<string name="superuser">Superusuário</string>
     <string name="log">Registro</string>
     <string name="settings">Configurações</string>
 	<string name="status">Status</string>
     <string name="install">Instalar</string>
-	
+
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s Instalado</string>
     <string name="magisk_version_error">Magisk não instalado</string>
@@ -29,7 +34,7 @@
     <string name="safetyNet_fail">SafetyNet Falhou: CTS profile mismatch</string>
     <string name="safetyNet_pass">SafetyNet Passado</string>
     <string name="root_info_warning">Funcionalidade muito limitada</string>
-	
+
     <!--Install Fragment-->
 	<string name="auto_detect">"(Auto) %1$s"</string>
     <string name="boot_image_title">Local da Boot Image</string>
@@ -39,7 +44,8 @@
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="current_magisk_title">Versão instalada do Magisk: v%1$s</string>
     <string name="install_magisk_title">Última versão do Magisk: v%1$.1f</string>
-   
+
+	
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
@@ -80,6 +86,7 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita do armazenamento externo.</string>
     <string name="no_thanks">Não, Obrigado</string>
+	<string name="yes">Sim</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Você deseja instalar%1$s ?</string>
     <string name="download_install">Baixar &amp; instalar</string>
@@ -102,25 +109,84 @@
 	<string name="downloading_toast">Baixando %1$s</string>
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
     <string name="magisk_update_message">Magisk v%1$.1f Atualização está pronta, você quer instalar?</string>
+	<string name="settings_reboot_toast">Reinicie para aplicar configurações</string>
     <string name="check_release_notes">Verificar as notas da atualização</string>
-
+	<string name="repo_cache_cleared">Cache do Repo. limpado</string>
+    <string name="safetyNet_hide_notice">Este aplicativo usa SafetyNet\nJá manipulado pelo MagiskHide por padrão</string>
+    <string name="start_magiskhide">Iniciando MagiskHide …</string>
+	
+	
+	
+	
+	
+	
     <!--Settings Fragment -->
     <string name="settings_general_category">Geral</string>
-    <string name="settings_dark_theme_title">Tema</string>
-    <string name="settings_dark_theme_summary">Escolha um tema</string>
+    <string name="settings_dark_theme_title">Tema escuro</string>
+    <string name="settings_dark_theme_summary">Ativa o tema escuro</string>
+    <string name="settings_clear_cache_title">Limpar Repo Cache</string>
+    <string name="settings_clear_cache_summary">Limpe as informações armazenadas em cache para repos. online, forçando o aplicativo a atualizar online</string>
 
     <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
     <string name="settings_busybox_summary">Monta a busybox interna do Magisk\'s para xbin</string>
     <string name="settings_hosts_title">Ativar systemless hosts</string>
     <string name="settings_hosts_summary">Suporte do systemless para Adblock apps</string>
-	
+
+	<string name="settings_su_app_adb">Aplicativos e ADB</string>
+    <string name="settings_su_app">Somente Aplicativos</string>
+    <string name="settings_su_adb">Somente ADB</string>
+    <string name="settings_su_disable">Desativado</string>
+    <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_20">20 segundos</string>
+    <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_60">60 segundos</string>
+    <string name="superuser_access">Acesso de superusuário</string>
+    <string name="auto_response">Resposta Automática</string>
+    <string name="request_timeout">Tempo limite de solicitação</string>
+    <string name="superuser_notification">Notificação do superusuário</string>
+    <string name="request_timeout_summary">%1$s segundos</string>
+
     <string name="settings_development_category">Desenvolvimento</string>
     <string name="settings_developer_logging_title">Ativar registro mais detalhado</string>
     <string name="settings_developer_logging_summary">Marque essa opção para habilitar um registro mais detalhado</string>
     <string name="settings_shell_logging_title">Ativar registro da shell de comando</string>
     <string name="settings_shell_logging_summary">Marque esta opção para habilitar o registro de todos os comandos shell e de saída</string>
 
-	<string name="settings_reboot_toast">Reinicie para aplicar configurações</string>
+	<!--Superuser-->
+	<string name="su_request_title">Solicitação de superusuário</string>
+    <string name="deny_with_str">Negar%1$s</string>
+    <string name="deny">Negar</string>
+    <string name="prompt">Painel</string>
+    <string name="grant">Permitir</string>
+    <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se você não tiver certeza!</string>
+    <string name="forever">Sempre</string>
+    <string name="once">Uma vez</string>
+    <string name="tenmin">10 minutos</string>
+    <string name="twentymin">20 minutos</string>
+    <string name="thirtymin">30 minutos</string>
+    <string name="sixtymin">60 minutos</string>
+    <string name="su_allow_toast">%1$s foi permitido o acesso de superusuário</string>
+    <string name="su_deny_toast">%1$s foi negado o acesso de superusuário</string>
+    <string name="no_apps_found">Não foram encontrados apps</string>
+    <string name="su_snack_grant">Acesso de superusuário do %1$s está permitido</string>
+    <string name="su_snack_deny">Acesso de superusuário do %1$s está negado</string>
+    <string name="su_snack_notif_on">Notificações do %1$s está ativado</string>
+    <string name="su_snack_notif_off">Notificações do %1$s está desativado</string>
+    <string name="su_snack_log_on">Registro do %1$s está ativado</string>
+    <string name="su_snack_log_off">Registro do %1$s está desativado</string>
+    <string name="su_snack_revoke">%1$s Direitos foi revogados</string>
+    <string name="su_revoke_title">Revogar?</string>
+    <string name="su_revoke_msg">Revogar os diretos do %1$s, Confirmar?</string>
+    <string name="toast">Notificação simples</string>
+    <string name="none">Nenhum</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Alvo UID:\u0020</string>
+    <string name="command">Comando:\u0020</string>
+	<string name="settings_disable_title">Desativar Magic Mount</string>
+    <string name="settings_disable_summary">Desativa Magic Mount, Isso impedirá que todos os módulos funcionem</string>
+	
 	
 </resources>
