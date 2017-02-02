@@ -7,6 +7,7 @@
     <string name="magiskhide">Magisk 隐藏</string>
     <string name="modules">模块</string>
     <string name="downloads">下载</string>
+    <string name="superuser">超级用户</string>
     <string name="log">日志</string>
     <string name="settings">设置</string>
     <string name="status">状态</string>
@@ -14,7 +15,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">已安装 Magisk v%1$s</string>
-    <string name="magisk_version_error">你是否已安装 Magisk？</string>
+    <string name="magisk_version_error">未安装 Magisk</string>
 
     <string name="checking_for_updates">正在检查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$.1f！</string>
@@ -23,7 +24,10 @@
     <string name="root_error">已 ROOT 但没有 ROOT 权限，未授予权限？</string>
     <string name="not_rooted">未 ROOT</string>
     <string name="proper_root">已正确 ROOT</string>
+    <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
+    <string name="safetyNet_connection_failed">无法连接至 Google API</string>
+    <string name="safetyNet_connection_suspended">与 Google API 的连接已暂停</string>
     <string name="safetyNet_error">无法检查 SafetyNet，没有网络连接？</string>
     <string name="safetyNet_fail">SafetyNet 失败：CTS 配置文件不匹配</string>
     <string name="safetyNet_pass">SafetyNet 已通过</string>
@@ -36,7 +40,8 @@
     <string name="advanced_settings_title">高级设置</string>
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保持 dm-verity</string>
-    <string name="install_magisk_title">安装 Magisk 版本：v%1$.1f</string>
+    <string name="current_magisk_title">已安装 Magisk 版本：v%1$s</string>
+    <string name="install_magisk_title">最新的 Magisk 版本：v%1$.1f</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -78,6 +83,7 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">未授予写入外置存储权限，此功能无法正常工作。</string>
     <string name="no_thanks">不，谢谢</string>
+    <string name="yes">是</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">你想要安装 %1$s 吗？</string>
     <string name="download_install">下载并安装</string>
@@ -98,19 +104,42 @@
     <string name="no_magisk_title">未安装 Magisk！</string>
     <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>
     <string name="downloading_toast">正在下载 %1$s</string>
+    <string name="magisk_update_title">Magisk 可更新！</string>
+    <string name="magisk_update_message">Magisk 已有新版本 v%1$.1f，你想要安装吗？</string>
+    <string name="settings_reboot_toast">重启以应用设置</string>
+    <string name="check_release_notes">查看发布说明</string>
+    <string name="repo_cache_cleared">资源库缓存已清除</string>
+    <string name="safetyNet_hide_notice">此应用使用了 SafetyNet\n已默认由 MagiskHide 处理</string>
+    <string name="start_magiskhide">正在启动 MagiskHide …</string>
 
     <!--URL Templates-->
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
-    <string name="settings_dark_theme_title">主题</string>
-    <string name="settings_dark_theme_summary">选择一个主题</string>
+    <string name="settings_dark_theme_title">深色主题</string>
+    <string name="settings_dark_theme_summary">使用深色主题</string>
+    <string name="settings_clear_cache_title">清除资源库缓存</string>
+    <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制应用刷新在线数据</string>
 
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
-    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
-    <string name="settings_hosts_title">启用 Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless 支持广告屏蔽应用</string>
+    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin\n需要重启</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
+
+    <string name="settings_su_app_adb">应用和 ADB</string>
+    <string name="settings_su_app">仅应用</string>
+    <string name="settings_su_adb">仅 ADB</string>
+    <string name="settings_su_disable">已禁用</string>
+    <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_20">20 秒</string>
+    <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_60">60 秒</string>
+    <string name="superuser_access">超级用户访问权限</string>
+    <string name="auto_response">自动响应</string>
+    <string name="request_timeout">请求超时</string>
+    <string name="superuser_notification">超级用户通知</string>
+    <string name="request_timeout_summary">%1$s 秒</string>
 
     <string name="settings_development_category">开发</string>
     <string name="settings_developer_logging_title">启用高级调试日志记录</string>
@@ -118,6 +147,39 @@
     <string name="settings_shell_logging_title">启用 shell 命令调试日志记录</string>
     <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出的日志记录</string>
 
-    <string name="settings_reboot_toast">重启以应用设置</string>
+    <!--Superuser-->
+    <string name="su_request_title">超级用户请求</string>
+    <string name="deny_with_str">拒绝 %1$s</string>
+    <string name="deny">拒绝</string>
+    <string name="prompt">提示</string>
+    <string name="grant">允许</string>
+    <string name="su_warning">将授予对你设备的完全访问权限。\n如果你不确定，请拒绝！</string>
+    <string name="forever">永久</string>
+    <string name="once">一次</string>
+    <string name="tenmin">10 分钟</string>
+    <string name="twentymin">20 分钟</string>
+    <string name="thirtymin">30 分钟</string>
+    <string name="sixtymin">60 分钟</string>
+    <string name="su_allow_toast">%1$s 已被授予超级用户权限</string>
+    <string name="su_deny_toast">%1$s 已被拒绝超级用户权限</string>
+    <string name="no_apps_found">未找到应用</string>
+    <string name="su_snack_grant">已授予 %1$s 超级用户权限</string>
+    <string name="su_snack_deny">已拒绝 %1$s 超级用户权限</string>
+    <string name="su_snack_notif_on">%1$s 的通知已启用</string>
+    <string name="su_snack_notif_off">%1$s 的通知已禁用</string>
+    <string name="su_snack_log_on">对 %1$s 的日志记录已启用</string>
+    <string name="su_snack_log_off">对 %1$s 的日志记录已禁用</string>
+    <string name="su_snack_revoke">%1$s 的权限已撤销</string>
+    <string name="su_revoke_title">撤销</string>
+    <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
+    <string name="toast">消息提示</string>
+    <string name="none">无</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">目标 UID:\u0020</string>
+    <string name="command">命令:\u0020</string>
+    <string name="settings_disable_title">禁用魔法挂载(Magic Mount)</string>
+    <string name="settings_disable_summary">禁用魔法挂载，所有模块将不会生效</string>
 
 </resources>
