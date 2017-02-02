@@ -22,6 +22,11 @@
         android:title="@string/magisk">
 
         <CheckBoxPreference
+            android:key="disable"
+            android:title="@string/settings_disable_title"
+            android:summary="@string/settings_disable_summary" />
+
+        <CheckBoxPreference
             android:key="busybox"
             android:defaultValue="false"
             android:title="@string/settings_busybox_title"

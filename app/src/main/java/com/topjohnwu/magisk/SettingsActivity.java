@@ -21,6 +21,9 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -137,27 +140,40 @@ public class SettingsActivity extends AppCompatActivity {
                         Global.Events.reloadMainActivity.trigger();
                     }
                     break;
+                case "disable":
+                    enabled = prefs.getBoolean("disable", false);
+                    File disable = new File(getActivity().getFilesDir() + "/disable");
+                    if (enabled)
+                        try {
+                            disable.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            prefs.edit().putBoolean("disable", false).apply();
+                        }
+                    else
+                        disable.delete();
+                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    break;
+                case "busybox":
+                    enabled = prefs.getBoolean("busybox", false);
+                    File busybox = new File(getActivity().getFilesDir() + "/busybox");
+                    if (enabled)
+                        try {
+                            busybox.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            prefs.edit().putBoolean("busybox", false).apply();
+                        }
+                    else
+                        busybox.delete();
+                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled)
                         new Async.MagiskHide().enable();
                     else
                         new Async.MagiskHide().disable();
-                    break;
-                case "busybox":
-                    enabled = prefs.getBoolean("busybox", false);
-                    new Async.RootTask<Void, Void, Void>() {
-                        private boolean enable = enabled;
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            if (enable)
-                                Utils.createFile("/magisk/.core/busybox/enable");
-                            else
-                                Utils.removeItem("/magisk/.core/busybox/enable");
-                            return null;
-                        }
-                    }.exec();
-                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
@@ -179,8 +195,6 @@ public class SettingsActivity extends AppCompatActivity {
                 case "su_access":
                     Global.Configs.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
                     Shell.su("setprop persist.sys.root_access " + Global.Configs.suAccessState);
-                    suAccess.setSummary(getResources()
-                            .getStringArray(R.array.su_access)[Global.Configs.suAccessState]);
                     break;
                 case "su_request_timeout":
                     Global.Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);

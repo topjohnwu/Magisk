@@ -185,5 +185,7 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>
     <string name="command">Command:\u0020</string>
+    <string name="settings_disable_title">Disable Magic Mount</string>
+    <string name="settings_disable_summary">Disable Magic Mount, which will prevent all modules to work</string>
 
 </resources>
