@@ -54,7 +54,7 @@
     <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu</string>
     <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie</string>
     <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie</string>
-    <string name="author">Stworzone przez %1$s</string>
+    <string name="author">Autor modu: %1$s</string>
     <string name="fab_flash_zip">Zflashuj Moduł Zip</string>
 
     <!--Repo Fragment-->
@@ -91,7 +91,7 @@
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download_install">Pobierz i zainstaluj</string>
     <string name="goto_install">Idź do sekcji \"Instalacja\"</string>
-    <string name="download_file_error">Bład pobierania pliku</string>
+    <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="install_error">Błąd instalacji!</string>
     <string name="manual_install_1">Plik zip umieszczony w %1$s</string>
     <string name="manual_install_2">Zflashuj go ręcznie w recovery</string>
@@ -112,8 +112,10 @@
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
     <string name="check_release_notes">Sprawdź informacje o wydaniu</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
+    <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJuż jest domyślnie obsługiwana przez MagiskHide</string>
+	<string name="start_magiskhide">Uruchamianie MagiskHide …</string>
     
-    <!--URL Templates-->
+	<!--URL Templates-->
     
     
     
@@ -121,7 +123,7 @@
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
-    <string name="settings_dark_theme_summary">Włacz ciemny motyw</string>
+    <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
@@ -142,7 +144,7 @@
     <string name="superuser_access">Dostęp Superuser</string>
     <string name="auto_response">Automatyczna Odpowiedź</string>
     <string name="request_timeout">Czas Prośby</string>
-    <string name="superuser_notification">Powiadomienia Superusern</string>
+    <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="request_timeout_summary">%1$s sekund</string>
 
     <string name="settings_development_category">Dla Developerów</string>
@@ -150,8 +152,6 @@
     <string name="settings_developer_logging_summary">Zaznacz, aby umożliwić pełne rejestrowanie</string>
     <string name="settings_shell_logging_title">Włącz rejestrowanie poleceń powłoki debugowania</string>
     <string name="settings_shell_logging_summary">Włącz, aby rejestrować wszystkie polecenia powłoki i wyjścia</string>
-    
-    <!-- Themes -->
    
     <!--Superuser-->
     <string name="su_request_title">Prośba dostępu Superusera</string>
@@ -169,8 +169,8 @@
     <string name="su_allow_toast">%1$s ma przyznane uprawnienia Superusera</string>
     <string name="su_deny_toast">%1$s ma odmówione uprawnienia Superusera</string>
     <string name="no_apps_found">Nie znaleziono aplikacji</string>
-    <string name="su_snack_grant">Uprawnienia Superuser dla %1$s są przyznane</string>
-    <string name="su_snack_deny">Uprawnienia Superuser dla %1$s są odmówione</string>
+    <string name="su_snack_grant">Przyznano uprawnienia Superuser dla %1$s</string>
+    <string name="su_snack_deny">Odmówiono uprawnień Superuser dla %1$s</string>
     <string name="su_snack_notif_on">Powiadomienia dla %1$s są włączone</string>
     <string name="su_snack_notif_off">Powiadomienia dla %1$s są wyłączone</string>
     <string name="su_snack_log_on">Logowanie dla %1$s jest włączone</string>
@@ -185,5 +185,7 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Indentyfikator UID:\u0020</string>
     <string name="command">Komenda:\u0020</string>
-    
+    <string name="settings_disable_title">Wyłącz Montowanie Magic</string>
+    <string name="settings_disable_summary">Disable Magic Mount, co uniemożliwi wszystkim modułom działanie</string>
+
 </resources>
