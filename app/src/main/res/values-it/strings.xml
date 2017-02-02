@@ -4,20 +4,47 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer di navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer di navigazione</string>
+    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Moduli</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
     <string name="settings">Impostazioni</string>
+    <string name="superuser">Superuser</string>
+    <string name="status">Stato</string>
+    <string name="install">Installa</string>
 
-    <!--Magisk Fragment-->
+     <!--Status Fragment-->
+    
     <string name="magisk_version">Versione Magisk: v%1$s</string>
     <string name="magisk_version_error">Hai installato Magisk?</string>
-
+    <string name="checking_for_updates">Controlla aggiornamenti…</string>
     <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
     <string name="up_to_date">L\'ultima versione di %1$s è installata</string>
-
-    <!--Root Fragment-->
+    <string name="root_error">Rootato ma senza permessi, non autorizzato?</string>
+    <string name="not_rooted">Non rootato</string>
+    <string name="proper_root">Rootato correttamente</string>
+    <string name="safetyNet_check_text">Tap per avviare controllo SafetyNet</string>
+    <string name="checking_safetyNet_status">Controllo SafetyNet</string>
+    <string name="safetyNet_connection_failed">Impossibile collegarsi alle API Google</string>
+    <string name="safetyNet_connection_suspended">Connessione alle API Google sospesa</string>
+    <string name="safetyNet_error">Impossibile controllare SafetyNet, no Internet?</string>
+    <string name="safetyNet_fail">Errore SafetyNet: il profilo CTS non corrisponde</string>
+    <string name="safetyNet_pass">SafetyNet corretto</string>
+    <string name="root_info_warning">Funzionalità molto limitata</string>
+        
+    
+        <!--Install Fragment-->
+    <string name="auto_detect">"(Auto) %1$s"</string>
+    <string name="boot_image_title">Boot Image</string>
+    <string name="detect_button">Identifica</string>
+    <string name="advanced_settings_title">Impostazioni Avanzate</string>
+    <string name="keep_force_encryption">Mantieni crittografia forzata</string>
+    <string name="keep_dm_verity">Mantieni dm-verity</string>
+    <string name="current_magisk_title">Versione Magisk installata: v%1$s</string>
+    <string name="install_magisk_title">Ultima versione Magisk: v%1$.1f</string>
+    <string name="magiskify" translatable="false">Magiskify</string>
+    
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
@@ -28,7 +55,8 @@
     <string name="disable_file_created">Il modulo sarà disattivato al prossimo riavvio</string>
     <string name="disable_file_removed">Il modulo sarà abilitato al prossimo riavvio</string>
     <string name="author">Creato da:  %1$s</string>
-
+    <string name="fab_flash_zip">Flash Modulo Zip</string>
+    
     <!--Repo Fragment-->
     <string name="update_available">Aggiornamento disponibile</string>
     <string name="installed">Installato</string>
