@@ -136,15 +136,19 @@ void su_rules() {
 		samsung();
 
 	// Create domains if they don't exist
+	if (!exists("su"))
+		create("su");
 	permissive("su");
+	if (!exists("su_device"))
+		create("su_device");
 	enforce("su_device");
 
 	// Patch su to everything
 	allow("su", ALL, ALL, ALL);
 
 	// Autotransition su's socket to su_device
-	add_transition("su", "device", "su_device", "file");
-	add_transition("su", "device", "su_device", "dir");
+	add_transition("su", "device", "file", "su_device");
+	add_transition("su", "device", "dir", "su_device");
 	allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// Transition from untrusted_app to su_client
@@ -176,6 +180,8 @@ void su_rules() {
 // Minimal to run Magisk script before live patching
 void min_rules() {
 
+	if (!exists("su"))
+		create("su");
 	permissive("su");
 	permissive("init");
 

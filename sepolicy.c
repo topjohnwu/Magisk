@@ -12,10 +12,10 @@ static void *cmalloc(size_t s) {
 static int get_attr(char *type, int value) {
 	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
 	if (!attr)
-		exit(1);
+		return 1;
 
 	if (attr->flavor != TYPE_ATTRIB)
-		exit(1);
+		return 1;
 
 	return !! ebitmap_get_bit(&policy->attr_type_map[attr->s.value-1], value-1);
 	//return !! ebitmap_get_bit(&policy->type_attr_map[value-1], attr->s.value-1);
@@ -24,10 +24,10 @@ static int get_attr(char *type, int value) {
 static int get_attr_id(char *type) {
 	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
 	if (!attr)
-		exit(1);
+		return 1;
 
 	if (attr->flavor != TYPE_ATTRIB)
-		exit(1);
+		return 1;
 
 	return attr->s.value;
 }
@@ -35,15 +35,15 @@ static int get_attr_id(char *type) {
 static int set_attr(char *type, int value) {
 	type_datum_t *attr = hashtab_search(policy->p_types.table, type);
 	if (!attr)
-		exit(1);
+		return 1;
 
 	if (attr->flavor != TYPE_ATTRIB)
-		exit(1);
+		return 1;
 
 	if(ebitmap_set_bit(&policy->type_attr_map[value-1], attr->s.value-1, 1))
-		exit(1);
+		return 1;
 	if(ebitmap_set_bit(&policy->attr_type_map[attr->s.value-1], value-1, 1))
-		exit(1);
+		return 1;
 
 	return 0;
 }
@@ -179,10 +179,10 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 	return 0;
 }
 
-void create_domain(char *d) {
+int create_domain(char *d) {
 	symtab_datum_t *src = hashtab_search(policy->p_types.table, d);
 	if(src)
-		return;
+		return 1;
 
 	type_datum_t *typdatum = (type_datum_t *) malloc(sizeof(type_datum_t));
 	type_datum_init(typdatum);
@@ -193,9 +193,8 @@ void create_domain(char *d) {
 	int r = symtab_insert(policy, SYM_TYPES, strdup(d), typdatum, SCOPE_DECL, 1, &value);
 	typdatum->s.value = value;
 
-	fprintf(stderr, "source type %s does not exist: %d,%d\n", d, r, value);
 	if (ebitmap_set_bit(&policy->global->branch_list->declared.scope[SYM_TYPES], value - 1, 1)) {
-		exit(1);
+		return 1;
 	}
 
 	policy->type_attr_map = realloc(policy->type_attr_map, sizeof(ebitmap_t)*policy->p_types.nprim);
@@ -215,52 +214,62 @@ void create_domain(char *d) {
 
 	src = hashtab_search(policy->p_types.table, d);
 	if(!src)
-		exit(1);
+		return 1;
 
 	extern int policydb_index_decls(policydb_t * p);
 	if(policydb_index_decls(policy))
-		exit(1);
+		return 1;
 
 	if(policydb_index_classes(policy))
-		exit(1);
+		return 1;
 
 	if(policydb_index_others(NULL, policy, 0))
-		exit(1);
+		return 1;
 
-	set_attr("domain", value);
+	return set_attr("domain", value);
 }
 
 int set_domain_state(char* s, int state) {
 	type_datum_t *type;
-	if (!exists(s))
-		create_domain(s);
-	type = hashtab_search(policy->p_types.table, s);
-	if (type == NULL) {
-			fprintf(stderr, "type %s does not exist\n", s);
+	hashtab_ptr_t cur;
+	if (s == NULL) {
+		hashtab_for_each(policy->p_types.table, &cur) {
+			type = cur->datum;
+			if (ebitmap_set_bit(&policy->permissive_map, type->s.value, state)) {
+				fprintf(stderr, "Could not set bit in permissive map\n");
+				return 1;
+			}
+		}
+	} else {
+		type = hashtab_search(policy->p_types.table, s);
+		if (type == NULL) {
+				fprintf(stderr, "type %s does not exist\n", s);
+				return 1;
+		}
+		if (ebitmap_set_bit(&policy->permissive_map, type->s.value, state)) {
+			fprintf(stderr, "Could not set bit in permissive map\n");
 			return 1;
+		}
 	}
-	if (ebitmap_set_bit(&policy->permissive_map, type->s.value, state)) {
-		fprintf(stderr, "Could not set bit in permissive map\n");
-		return 1;
-	}
+	
 	return 0;
 }
 
-int add_transition(char *srcS, char *origS, char *tgtS, char *c) {
-	type_datum_t *src, *tgt, *orig;
+int add_transition(char *s, char *t, char *c, char *d) {
+	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
 	avtab_datum_t *av;
 	avtab_key_t key;
 
-	src = hashtab_search(policy->p_types.table, srcS);
+	src = hashtab_search(policy->p_types.table, s);
 	if (src == NULL) {
-		fprintf(stderr, "source type %s does not exist\n", srcS);
+		fprintf(stderr, "source type %s does not exist\n", s);
 		return 1;
 	}
-	tgt = hashtab_search(policy->p_types.table, tgtS);
+	tgt = hashtab_search(policy->p_types.table, t);
 	if (tgt == NULL) {
-		fprintf(stderr, "target type %s does not exist\n", tgtS);
+		fprintf(stderr, "target type %s does not exist\n", t);
 		return 1;
 	}
 	cls = hashtab_search(policy->p_classes.table, c);
@@ -268,21 +277,21 @@ int add_transition(char *srcS, char *origS, char *tgtS, char *c) {
 		fprintf(stderr, "class %s does not exist\n", c);
 		return 1;
 	}
-	orig = hashtab_search(policy->p_types.table, origS);
-	if (cls == NULL) {
-		fprintf(stderr, "class %s does not exist\n", origS);
+	def = hashtab_search(policy->p_types.table, d);
+	if (def == NULL) {
+		fprintf(stderr, "default type %s does not exist\n", d);
 		return 1;
 	}
 
 	key.source_type = src->s.value;
-	key.target_type = orig->s.value;
+	key.target_type = tgt->s.value;
 	key.target_class = cls->s.value;
 	key.specified = AVTAB_TRANSITION;
 	av = avtab_search(&policy->te_avtab, &key);
 
 	if (av == NULL) {
 		av = cmalloc(sizeof(*av));
-		av->data = tgt->s.value;
+		av->data = def->s.value;
 		int ret = avtab_insert(&policy->te_avtab, &key, av);
 		if (ret) {
 			fprintf(stderr, "Error inserting into avtab\n");
@@ -290,24 +299,24 @@ int add_transition(char *srcS, char *origS, char *tgtS, char *c) {
 		}
 	} else {
 		fprintf(stderr, "Warning, rule already defined! Won't override.\n");
-		fprintf(stderr, "Previous value = %d, wanted value = %d\n", av->data, tgt->s.value);
+		fprintf(stderr, "Previous value = %d, wanted value = %d\n", av->data, def->s.value);
 	}
 
 	return 0;
 }
 
-int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* filename) {
-	type_datum_t *src, *tgt, *orig;
+int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
+	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
-	src = hashtab_search(policy->p_types.table, srcS);
+	src = hashtab_search(policy->p_types.table, s);
 	if (src == NULL) {
-		fprintf(stderr, "source type %s does not exist\n", srcS);
+		fprintf(stderr, "source type %s does not exist\n", s);
 		return 1;
 	}
-	tgt = hashtab_search(policy->p_types.table, tgtS);
+	tgt = hashtab_search(policy->p_types.table, t);
 	if (tgt == NULL) {
-		fprintf(stderr, "target type %s does not exist\n", tgtS);
+		fprintf(stderr, "target type %s does not exist\n", t);
 		return 1;
 	}
 	cls = hashtab_search(policy->p_classes.table, c);
@@ -315,17 +324,17 @@ int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* file
 		fprintf(stderr, "class %s does not exist\n", c);
 		return 1;
 	}
-	orig = hashtab_search(policy->p_types.table, origS);
-	if (cls == NULL) {
-		fprintf(stderr, "class %s does not exist\n", origS);
+	def = hashtab_search(policy->p_types.table, d);
+	if (def == NULL) {
+		fprintf(stderr, "default type %s does not exist\n", d);
 		return 1;
 	}
 
 	filename_trans_t *new_transition = cmalloc(sizeof(*new_transition));
 	new_transition->stype = src->s.value;
-	new_transition->ttype = orig->s.value;
+	new_transition->ttype = tgt->s.value;
 	new_transition->tclass = cls->s.value;
-	new_transition->otype = tgt->s.value;
+	new_transition->otype = def->s.value;
 	new_transition->name = strdup(filename);
 	new_transition->next = policy->filename_trans;
 
@@ -334,7 +343,7 @@ int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* file
 	return 0;
 }
 
-int add_typeattribute(char *domainS, char *typeS) {
+int add_typeattribute(char *domainS, char *attr) {
 	type_datum_t *domain;
 
 	domain = hashtab_search(policy->p_types.table, domainS);
@@ -343,9 +352,9 @@ int add_typeattribute(char *domainS, char *typeS) {
 		return 1;
 	}
 
-	set_attr(typeS, domain->s.value);
+	set_attr(attr, domain->s.value);
 
-	int typeId = get_attr_id(typeS);
+	int typeId = get_attr_id(attr);
 	//Now let's update all constraints!
 	//(kernel doesn't support (yet?) type_names rules)
 	for(int i=0; i<policy->p_classes.nprim; ++i) {

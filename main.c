@@ -2,12 +2,30 @@
 
 static void usage(char *arg0) {
 	fprintf(stderr, "%s [--live] [--minimal] [--load <infile>] [--save <outfile>] [policystatement...]\n\n", arg0);
+	fprintf(stderr, "  --live: directly load patched policy to device\n");
+	fprintf(stderr, "  --minimal: minimal patches for boot image to let Magisk live patch on boot\n\n");
 	fprintf(stderr, "Supported policy statements:\n\n");
-	fprintf(stderr, "\"allow source-class target-class permission-class permission\"\n");
-	fprintf(stderr, "\"deny source-class target-class permission-class permission\"\n");
-	fprintf(stderr, "\"permissive class\"\n");
-	fprintf(stderr, "\"enforcing class\"\n");
-	fprintf(stderr, "\"attradd class attribute\"\n");
+	fprintf(stderr, "\"allow #source-class #target-class permission-class #permission\"\n");
+	fprintf(stderr, "\"deny #source-class #target-class permission-class #permission\"\n");
+	fprintf(stderr, "\"create #class\"\n");
+	fprintf(stderr, "\"permissive #class\"\n");
+	fprintf(stderr, "\"enforcing #class\"\n");
+	fprintf(stderr, "\"attradd #class #attribute\"\n");
+	fprintf(stderr, "\"typetrans source-class target-class permission-class default-class (optional: object_name)\"\n");
+	fprintf(stderr, "\nsource-class and target-class can be replaced with attributes (will patch the whole group)");
+	fprintf(stderr, "Sections (except typetrans) can be replaced with \'*\'; it'll try to patch every possible matches\n");
+	fprintf(stderr, "Sections marked with \'#\' can be replaced with collections in curly brackets\n");
+	fprintf(stderr, "e.g.: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n");
+	fprintf(stderr, "Will be expanded to:\n");
+	fprintf(stderr, 
+"allow source1 target1 permission-class permission1\n\
+allow source1 target1 permission-class permission2\n\
+allow source1 target2 permission-class permission1\n\
+allow source1 target2 permission-class permission2\n\
+allow source2 target1 permission-class permission1\n\
+allow source2 target1 permission-class permission2\n\
+allow source2 target2 permission-class permission1\n\
+allow source2 target2 permission-class permission2\n");
 	fprintf(stderr, "\n");
 	exit(1);
 }
@@ -15,12 +33,12 @@ static void usage(char *arg0) {
 // Pattern 1: action { source } { target } class { permission }
 static int parse_pattern_1(int action, char* statement) {
 	int state = 0, in_bracket = 0;
-	char *tok, *class;
-	struct vector source, target, permission, *temp;
+	char *tok, *class, *saveptr;
+	vector source, target, permission, *temp;
 	vec_init(&source);
 	vec_init(&target);
 	vec_init(&permission);
-	tok = strtok(statement, " ");
+	tok = strtok_r(statement, " ", &saveptr);
 	while (tok != NULL) {
 		if (tok[0] == '{') {
 			if (in_bracket || state == 2) return 1;
@@ -58,7 +76,7 @@ static int parse_pattern_1(int action, char* statement) {
 			vec_push_back(temp, tok);
 		}
 		if (!in_bracket) ++state;
-		tok = strtok(NULL, " ");
+		tok = strtok_r(NULL, " ", &saveptr);
 	}
 	if (state != 4) return 1;
 	for(int i = 0; i < source.size; ++i)
@@ -66,16 +84,20 @@ static int parse_pattern_1(int action, char* statement) {
 			for (int k = 0; k < permission.size; ++k)
 				switch (action) {
 					case 0:
-						allow(source.data[i], target.data[j], class, permission.data[k]);
+						if (allow(source.data[i], target.data[j], class, permission.data[k]))
+							fprintf(stderr, "Error in: allow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 1:
-						deny(source.data[i], target.data[j], class, permission.data[k]);
+						if (deny(source.data[i], target.data[j], class, permission.data[k]))
+							fprintf(stderr, "Error in: deny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 2:
-						auditallow(source.data[i], target.data[j], class, permission.data[k]);
+						if (auditallow(source.data[i], target.data[j], class, permission.data[k]))
+							fprintf(stderr, "Error in: auditallow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 3:
-						auditdeny(source.data[i], target.data[j], class, permission.data[k]);
+						if (auditdeny(source.data[i], target.data[j], class, permission.data[k]))
+							fprintf(stderr, "Error in: auditdeny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					default:
 						return 1;
@@ -86,8 +108,130 @@ static int parse_pattern_1(int action, char* statement) {
 	return 0;
 }
 
+// Pattern 2: action { class } { attribute }
+int parse_pattern_2(int action, char* statement) {
+	int state = 0, in_bracket = 0;
+	char *tok, *saveptr;
+	vector class, attribute, *temp;
+	vec_init(&class);
+	vec_init(&attribute);
+	tok = strtok_r(statement, " ", &saveptr);
+	while (tok != NULL) {
+		if (tok[0] == '{') {
+			if (in_bracket) return 1;
+			in_bracket = 1;
+			if (tok[1]) {
+				++tok;
+				continue;
+			}
+		} else if (tok[strlen(tok) - 1] == '}') {
+			if (!in_bracket) return 1;
+			in_bracket = 0;
+			if (strlen(tok) - 1) {
+				tok[strlen(tok) - 1] = '\0';
+				continue;
+			}
+		} else {
+			if (tok[0] == '*') tok = ALL;
+			switch (state) {
+				case 0:
+					temp = &class;
+					break;
+				case 1:
+					temp = &attribute;
+					break;
+				default:
+					return 1;
+			}
+			vec_push_back(temp, tok);
+		}
+		if (!in_bracket) ++state;
+		tok = strtok_r(NULL, " ", &saveptr);
+	}
+	if (state != 2) return 1;
+	for(int i = 0; i < class.size; ++i)
+		for (int j = 0; j < attribute.size; ++j)
+			switch (action) {
+				case 0:
+					if (attradd(class.data[i], attribute.data[j]))
+						fprintf(stderr, "Error in: attradd %s %s\n", class.data[i], attribute.data[j]);
+					break;
+				default:
+					return 1;
+			}
+	vec_destroy(&class);
+	vec_destroy(&attribute);
+	return 0;
+}
+
+// Pattern 3: action { type }
+int parse_pattern_3(int action, char* statement) {
+	char *tok, *saveptr;
+	vector classes;
+	vec_init(&classes);
+	tok = strtok_r(statement, " {}", &saveptr);
+	while (tok != NULL) {
+		if (tok[0] == '*') tok = ALL;
+		vec_push_back(&classes, tok);
+		tok = strtok_r(NULL, " {}", &saveptr);
+	}
+	for (int i = 0; i < classes.size; ++i) {
+		switch (action) {
+			case 0:
+				if (create(classes.data[i]))
+					fprintf(stderr, "Error in: create %s", classes.data[i]);
+				break;
+			case 1:
+				if (permissive(classes.data[i]))
+					fprintf(stderr, "Error in: permissive %s", classes.data[i]);
+				break;
+			case 2:
+				if (enforce(classes.data[i]))
+					fprintf(stderr, "Error in: enforce %s", classes.data[i]);
+				break;
+		}
+	}
+	vec_destroy(&classes);
+	return 0;
+}
+
+// Pattern 4: action source target class default (filename)
+int parse_pattern_4(int action, char* statement) {
+	int state = 0;
+	char *tok, *saveptr;
+	char *source, *target, *class, *def, *filename = NULL;
+	tok = strtok_r(statement, " ", &saveptr);
+	while (tok != NULL) {
+		switch(state) {
+			case 0:
+				source = tok;
+				break;
+			case 1:
+				target = tok;
+				break;
+			case 2:
+				class = tok;
+				break;
+			case 3:
+				def = tok;
+				break;
+			case 4:
+				filename = tok;
+				break;
+			default:
+				return 1;
+		}
+		tok = strtok_r(NULL, " ", &saveptr);
+		++state;
+	}
+	if (state < 4) return 1;
+	if (typetrans(source, target, class, def, filename))
+		fprintf(stderr, "Error in: typetrans %s %s %s %s %s\n", source, target, class, def, filename ? filename : "");
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
-	char *infile = NULL, *outfile, *tok, cpy[ARG_MAX];
+	char *infile = NULL, *outfile, *tok, *saveptr, cpy[ARG_MAX];
 	int live = 0, minimal = 0;
 	struct vector rules;
 
@@ -141,7 +285,7 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages
 		strcpy(cpy, rules.data[i]);
-		tok = strtok(rules.data[i], " ");
+		tok = strtok_r(rules.data[i], " ", &saveptr);
 		if (strcmp(tok, "allow") == 0) {
 			if (parse_pattern_1(0, rules.data[i] + strlen(tok) + 1))
 				printf("Syntax error in \"%s\"\n", cpy);
@@ -154,6 +298,23 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(tok, "auditdeny") == 0) {
 			if (parse_pattern_1(3, rules.data[i] + strlen(tok) + 1))
 				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "attradd") == 0) {
+			if (parse_pattern_2(0, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "create") == 0) {
+			if (parse_pattern_3(0, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "permissive") == 0) {
+			if (parse_pattern_3(1, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "enforce") == 0) {
+			if (parse_pattern_3(2, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "typetrans") == 0) {
+			if (parse_pattern_4(0, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else {
+			usage(argv[0]);
 		}
 	}
 

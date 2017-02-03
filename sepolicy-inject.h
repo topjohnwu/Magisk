@@ -32,22 +32,23 @@ policydb_t *policy;
 
 // sepolicy manipulation functions
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf);
-void create_domain(char *d);
+int create_domain(char *d);
 int set_domain_state(char* s, int state);
-int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* filename);
-int add_transition(char *srcS, char *origS, char *tgtS, char *c);
-int add_typeattribute(char *domainS, char *typeS);
+int add_transition(char *s, char *t, char *c, char *d);
+int add_file_transition(char *s, char *t, char *c, char *d, char* filename);
+int add_typeattribute(char *domainS, char *attr);
 int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
-int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, int not);
 
 // Handy functions
-void allow(char *s, char *t, char *c, char *p);
-void deny(char *s, char *t, char *c, char *p);
-void auditallow(char *s, char *t, char *c, char *p);
-void auditdeny(char *s, char *t, char *c, char *p);
-void permissive(char *s);
-void enforce(char *s);
-void attradd(char *s, char *a);
+int allow(char *s, char *t, char *c, char *p);
+int deny(char *s, char *t, char *c, char *p);
+int auditallow(char *s, char *t, char *c, char *p);
+int auditdeny(char *s, char *t, char *c, char *p);
+int typetrans(char *s, char *t, char *c, char *d, char *o);
+int create(char *s);
+int permissive(char *s);
+int enforce(char *s);
+int attradd(char *s, char *a);
 int exists(char *source);
 
 // Vector of char*
