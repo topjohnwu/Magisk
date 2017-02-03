@@ -60,6 +60,7 @@ static int add_irule(int s, int t, int c, int p, int effect, int not) {
 
 	if (av == NULL) {
 		av = cmalloc(sizeof(*av));
+		memset(av, 0, sizeof(*av));
 		av->data |= 1U << (p - 1);
 		int ret = avtab_insert(&policy->te_avtab, &key, av);
 		if (ret) {
