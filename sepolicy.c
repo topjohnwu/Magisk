@@ -395,7 +395,7 @@ int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* file
 	return 0;
 }
 
-int add_type(char *domainS, char *typeS) {
+int add_typeattribute(char *domainS, char *typeS) {
 	type_datum_t *domain;
 
 	domain = hashtab_search(policy->p_types.table, domainS);

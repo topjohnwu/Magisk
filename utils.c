@@ -15,6 +15,28 @@ static void set_domain(char* s, int value) {
 	}
 }
 
+void vec_init(struct vector *v) {
+	v->size = 0;
+	v->cap = 1;
+	v->data = (char**) malloc(sizeof(char*));
+}
+
+void vec_push_back(struct vector *v, char* s) {
+	if (v == NULL) return;
+	if (v->size == v->cap) {
+		v->cap *= 2;
+		v->data = (char**) realloc(v->data, sizeof(char*) * v->cap);
+	}
+	v->data[v->size] = s;
+	++v->size;
+}
+
+void vec_destroy(struct vector *v) {
+	v->size = 0;
+	v->cap = 0;
+	free(v->data);
+}
+
 void allow(char *s, char *t, char *c, char *p) {
 	add_rule(s, t, c, p, AVTAB_ALLOWED, 0);
 }
@@ -40,7 +62,7 @@ void enforce(char *s) {
 }
 
 void attradd(char *s, char *a) {
-	add_type(s, a);
+	add_typeattribute(s, a);
 }
 
 int exists(char* source) {

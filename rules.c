@@ -115,14 +115,14 @@ void otherToSU() {
 	allow(ALL, "su", "process", "sigchld");
 
 	// uNetworkL0
-	add_type("su", "netdomain");
-	add_type("su", "bluetoothdomain");
+	attradd("su", "netdomain");
+	attradd("su", "bluetoothdomain");
 
 	// suBackL6
 	allow("surfaceflinger", "app_data_file", "dir", ALL);
 	allow("surfaceflinger", "app_data_file", "file", ALL);
 	allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
-	add_type("surfaceflinger", "mlstrustedsubject");
+	attradd("surfaceflinger", "mlstrustedsubject");
 
 	// suMiscL6
 	if (exists("audioserver"))

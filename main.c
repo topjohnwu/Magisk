@@ -1,119 +1,122 @@
 #include "sepolicy-inject.h"
 
 static void usage(char *arg0) {
-	fprintf(stderr, "%s -s <source type> -t <target type> -c <class> -p <perm_list> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tInject a rule\n\n");
-	fprintf(stderr, "%s -s <source type> -a <type_attribute> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tAdd a type_attribute to a domain\n\n");
-	fprintf(stderr, "%s -Z <source type> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tInject a permissive domain\n\n");
-	fprintf(stderr, "%s -z <source type> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tInject a non-permissive domain\n\n");
-	fprintf(stderr, "%s -e -s <source type> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tCheck if a SELinux type exists\n\n");
-	fprintf(stderr, "%s -e -c <class> -P <policy file>\n", arg0);
-	fprintf(stderr, "\tCheck if a SELinux class exists\n\n");
-	fprintf(stderr, "All options can add -o <output file> to output to another file\n");
+	fprintf(stderr, "%s [--live] [--minimal] [--load <infile>] [--save <outfile>] [policystatement...]\n\n", arg0);
+	fprintf(stderr, "Supported policy statements:\n\n");
+	fprintf(stderr, "\"allow source-class target-class permission-class permission\"\n");
+	fprintf(stderr, "\"deny source-class target-class permission-class permission\"\n");
+	fprintf(stderr, "\"permissive class\"\n");
+	fprintf(stderr, "\"enforcing class\"\n");
+	fprintf(stderr, "\"attradd class attribute\"\n");
+	fprintf(stderr, "\n");
 	exit(1);
 }
 
-int main(int argc, char **argv) {
-	char *infile = NULL, *source = NULL, *target = NULL, *class = NULL, *perm = NULL;
-	char *fcon = NULL, *outfile = NULL, *permissive = NULL, *attr = NULL, *filetrans = NULL;
-	int exists = 0, not = 0, live = 0, builtin = 0, minimal = 0;
-	policydb_t policydb;
-	struct policy_file pf, outpf;
-	sidtab_t sidtab;
-	int ch;
-	FILE *fp;
-	int permissive_value = 0, noaudit = 0;
-
-	struct option long_options[] = {
-		{"attr", required_argument, NULL, 'a'},
-		{"exists", no_argument, NULL, 'e'},
-		{"source", required_argument, NULL, 's'},
-		{"target", required_argument, NULL, 't'},
-		{"class", required_argument, NULL, 'c'},
-		{"perm", required_argument, NULL, 'p'},
-		{"fcon", required_argument, NULL, 'f'},
-		{"filetransition", required_argument, NULL, 'g'},
-		{"noaudit", no_argument, NULL, 'n'},
-		{"file", required_argument, NULL, 'P'},
-		{"output", required_argument, NULL, 'o'},
-		{"permissive", required_argument, NULL, 'Z'},
-		{"not-permissive", required_argument, NULL, 'z'},
-		{"not", no_argument, NULL, 0},
-		{"live", no_argument, NULL, 0},
-		{"minimal", no_argument, NULL, 0},
-		{NULL, 0, NULL, 0}
-	};
-
-	int option_index = -1;
-	while ((ch = getopt_long(argc, argv, "a:c:ef:g:s:t:p:P:o:Z:z:n", long_options, &option_index)) != -1) {
-		switch (ch) {
-			case 0:
-				if(strcmp(long_options[option_index].name, "not") == 0)
-					not = 1;
-				else if(strcmp(long_options[option_index].name, "live") == 0)
-					live = 1;
-				else if(strcmp(long_options[option_index].name, "minimal") == 0)
-					minimal = 1;
-				else
-					usage(argv[0]);
-				break;
-			case 'a':
-				attr = optarg;
-				break;
-			case 'e':
-				exists = 1;
-				break;
-			case 'f':
-				fcon = optarg;
-				break;
-			case 'g':
-				filetrans = optarg;
-				break;
-			case 's':
-				source = optarg;
-				break;
-			case 't':
-				target = optarg;
-				break;
-			case 'c':
-				class = optarg;
-				break;
-			case 'p':
-				perm = optarg;
-				break;
-			case 'P':
-				infile = optarg;
-				break;
-			case 'o':
-				outfile = optarg;
-				break;
-			case 'Z':
-				permissive = optarg;
-				permissive_value = 1;
-				break;
-			case 'z':
-				permissive = optarg;
-				permissive_value = 0;
-				break;
-			case 'n':
-				noaudit = 1;
-				break;
-			default:
-				usage(argv[0]);
+// Pattern 1: action { source } { target } class { permission }
+static int parse_pattern_1(int action, char* statement) {
+	int state = 0, in_bracket = 0;
+	char *tok, *class;
+	struct vector source, target, permission, *temp;
+	vec_init(&source);
+	vec_init(&target);
+	vec_init(&permission);
+	tok = strtok(statement, " ");
+	while (tok != NULL) {
+		if (tok[0] == '{') {
+			if (in_bracket || state == 2) return 1;
+			in_bracket = 1;
+			if (tok[1]) {
+				++tok;
+				continue;
 			}
+		} else if (tok[strlen(tok) - 1] == '}') {
+			if (!in_bracket || state == 2) return 1;
+			in_bracket = 0;
+			if (strlen(tok) - 1) {
+				tok[strlen(tok) - 1] = '\0';
+				continue;
+			}
+		} else {
+			if (tok[0] == '*') tok = ALL;
+			switch (state) {
+				case 0:
+					temp = &source;
+					break;
+				case 1:
+					temp = &target;
+					break;
+				case 2:
+					temp = NULL;
+					class = tok;
+					break;
+				case 3:
+					temp = &permission;
+					break;
+				default:
+					return 1;
+			}
+			vec_push_back(temp, tok);
+		}
+		if (!in_bracket) ++state;
+		tok = strtok(NULL, " ");
+	}
+	if (state != 4) return 1;
+	for(int i = 0; i < source.size; ++i)
+		for (int j = 0; j < target.size; ++j)
+			for (int k = 0; k < permission.size; ++k)
+				switch (action) {
+					case 0:
+						allow(source.data[i], target.data[j], class, permission.data[k]);
+						break;
+					case 1:
+						deny(source.data[i], target.data[j], class, permission.data[k]);
+						break;
+					case 2:
+						auditallow(source.data[i], target.data[j], class, permission.data[k]);
+						break;
+					case 3:
+						auditdeny(source.data[i], target.data[j], class, permission.data[k]);
+						break;
+					default:
+						return 1;
+				}
+	vec_destroy(&source);
+	vec_destroy(&target);
+	vec_destroy(&permission);
+	return 0;
+}
+
+int main(int argc, char *argv[]) {
+	char *infile = NULL, *outfile, *tok, cpy[ARG_MAX];
+	int live = 0, minimal = 0;
+	struct vector rules;
+
+	vec_init(&rules);
+
+	if (argc < 2) usage(argv[0]);
+	for (int i = 1; i < argc; ++i) {
+		if (argv[i][0] == '-' && argv[i][1] == '-') {
+			if (strcmp(argv[i], "--live") == 0)
+				live = 1;
+			else if (strcmp(argv[i], "--minimal") == 0)
+				minimal = 1;
+			else if (strcmp(argv[i], "--load") == 0) {
+				if (i + 1 >= argc) usage(argv[0]);
+				infile = argv[i + 1];
+				i += 1;
+			} else if (strcmp(argv[i], "--save") == 0) {
+				if (i + 1 >= argc) usage(argv[0]);
+				outfile = argv[i + 1];
+				i += 1;
+			} else 
+				usage(argv[0]);
+		} else
+			vec_push_back(&rules, argv[i]);
 	}
 
-	// Use builtin rules if nothing specified
-	if (!minimal && !source && !target && !class && !perm && !permissive && !fcon && !attr &&!filetrans && !exists)
-		builtin = 1;
-
-	// Overwrite original if not specified
-	if(!outfile)
-		outfile = infile;
+	policydb_t policydb;
+	struct policy_file pf;
+	sidtab_t sidtab;
 
 	// Use current policy if not specified
 	if(!infile)
@@ -132,114 +135,53 @@ int main(int argc, char **argv) {
 
 	policy = &policydb;
 
-	if (builtin) {
-		su_rules();
-	}
-	else if (minimal) {
-		min_rules();
-	}
-	else if (permissive) {
-		type_datum_t *type;
-		create_domain(permissive);
-		type = hashtab_search(policydb.p_types.table, permissive);
-		if (type == NULL) {
-				fprintf(stderr, "type %s does not exist\n", permissive);
-				return 1;
-		}
-		if (ebitmap_set_bit(&policydb.permissive_map, type->s.value, permissive_value)) {
-			fprintf(stderr, "Could not set bit in permissive map\n");
-			return 1;
-		}
-	} else if(exists) {
-		if(source) {
-			type_datum_t *tmp = hashtab_search(policydb.p_types.table, source);
-			if (!tmp)
-				exit(1);
-			else
-				exit(0);
-		} else if(class) {
-			class_datum_t *tmp = hashtab_search(policydb.p_classes.table, class);
-			if(!tmp)
-				exit(1);
-			else
-				exit(0);
-		} else {
-			usage(argv[0]);
-		}
-	} else if(filetrans) {
-		if(add_file_transition(source, fcon, target, class, filetrans))
-			return 1;
-	} else if(fcon) {
-		if(add_transition(source, fcon, target, class))
-			return 1;
-	} else if(attr) {
-		if(add_type(source, attr))
-			return 1;
-	} else if(noaudit) {
-		if(add_rule(source, target, class, perm, AVTAB_AUDITDENY, not))
-			return 1;
-	} else {
-		//Add a rule to a whole set of typeattribute, not just a type
-		if (target != NULL) {
-			if(*target == '=') {
-				char *saveptr = NULL;
+	if (!minimal && rules.size == 0) su_rules();
+	if (minimal) min_rules();
 
-				char *targetAttribute = strtok_r(target, "-", &saveptr);
-
-				char *vals[64];
-				int i = 0;
-
-				char *m = NULL;
-				while( (m = strtok_r(NULL, "-", &saveptr)) != NULL) {
-					vals[i++] = m;
-				}
-				vals[i] = NULL;
-
-				if(add_typerule(source, targetAttribute+1, vals, class, perm, AVTAB_ALLOWED, not))
-					return 1;
-			}
-		}
-		if (perm != NULL) {
-			char *saveptr = NULL;
-
-			char *p = strtok_r(perm, ",", &saveptr);
-			do {
-				if (add_rule(source, target, class, p, AVTAB_ALLOWED, not)) {
-					fprintf(stderr, "Could not add rule\n");
-					return 1;
-				}
-			} while( (p = strtok_r(NULL, ",", &saveptr)) != NULL);
-		} else {
-			if (add_rule(source, target, class, perm, AVTAB_ALLOWED, not)) {
-				fprintf(stderr, "Could not add rule\n");
-				return 1;
-			}
+	for (int i = 0; i < rules.size; ++i) {
+		// Since strtok will modify the origin string, copy the policy for error messages
+		strcpy(cpy, rules.data[i]);
+		tok = strtok(rules.data[i], " ");
+		if (strcmp(tok, "allow") == 0) {
+			if (parse_pattern_1(0, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "deny") == 0) {
+			if (parse_pattern_1(1, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "auditallow") == 0) {
+			if (parse_pattern_1(2, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
+		} else if (strcmp(tok, "auditdeny") == 0) {
+			if (parse_pattern_1(3, rules.data[i] + strlen(tok) + 1))
+				printf("Syntax error in \"%s\"\n", cpy);
 		}
 	}
 
-	if (live) {
-		if (live_patch()) {
-			fprintf(stderr, "Could not load new policy into kernel\n");
-			return 1;
-		}
-	}
-	
+	vec_destroy(&rules);
+
+	if (live) 
+		outfile = "/sys/fs/selinux/load";
+
 	if (outfile) {
-		fp = fopen(outfile, "w");
-		if (!fp) {
-			fprintf(stderr, "Could not open outfile\n");
+		int fd, ret;
+		void *data = NULL;
+		size_t len;
+		policydb_to_image(NULL, policy, &data, &len);
+		if (data == NULL) fprintf(stderr, "Error!");
+
+		fd = open(outfile, O_RDWR | O_CREAT);
+		if (fd < 0) {
+			fprintf(stderr, "Can't open '%s':  %s\n",
+			        outfile, strerror(errno));
 			return 1;
 		}
-
-		policy_file_init(&outpf);
-		outpf.type = PF_USE_STDIO;
-		outpf.fp = fp;
-
-		if (policydb_write(&policydb, &outpf)) {
-			fprintf(stderr, "Could not write policy\n");
+		ret = write(fd, data, len);
+		close(fd);
+		if (ret < 0) {
+			fprintf(stderr, "Could not write policy to %s\n",
+			        outfile);
 			return 1;
 		}
-		fclose(fp);
 	}
 
 	policydb_destroy(&policydb);
