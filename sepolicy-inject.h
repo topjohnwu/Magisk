@@ -22,18 +22,23 @@
 #include <sepol/policydb/conditional.h>
 #include <sepol/policydb/constraint.h>
 
+// hashtab traversal macro
+#define hashtab_for_each(table, ptr) \
+	for (int _i = 0; _i < table->size; ++_i) \
+		for (*ptr = table->htable[_i]; *ptr != NULL; *ptr = (*ptr)->next)
+
 // Global policydb
 policydb_t *policy;
 
 // sepolicy manipulation functions
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf);
 void create_domain(char *d);
+int set_domain_state(char* s, int state);
 int add_file_transition(char *srcS, char *origS, char *tgtS, char *c, char* filename);
 int add_transition(char *srcS, char *origS, char *tgtS, char *c);
 int add_typeattribute(char *domainS, char *typeS);
 int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
 int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, int not);
-int live_patch();
 
 // Handy functions
 void allow(char *s, char *t, char *c, char *p);
@@ -46,14 +51,14 @@ void attradd(char *s, char *a);
 int exists(char *source);
 
 // Vector of char*
-struct vector {
+typedef struct vector {
 	size_t size;
 	size_t cap;
 	char **data;
-};
-void vec_init(struct vector *v);
-void vec_push_back(struct vector *v, char* s);
-void vec_destroy(struct vector *v);
+} vector;
+void vec_init(vector *v);
+void vec_push_back(vector *v, char* s);
+void vec_destroy(vector *v);
 
 // Built in rules
 void su_rules();

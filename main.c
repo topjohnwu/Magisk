@@ -167,9 +167,12 @@ int main(int argc, char *argv[]) {
 		void *data = NULL;
 		size_t len;
 		policydb_to_image(NULL, policy, &data, &len);
-		if (data == NULL) fprintf(stderr, "Error!");
+		if (data == NULL) {
+			fprintf(stderr, "Fail to dump policydb image!");
+			return 1;
+		}
 
-		fd = open(outfile, O_RDWR | O_CREAT);
+		fd = open(outfile, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 		if (fd < 0) {
 			fprintf(stderr, "Can't open '%s':  %s\n",
 			        outfile, strerror(errno));

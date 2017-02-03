@@ -76,70 +76,64 @@ static int add_irule(int s, int t, int c, int p, int effect, int not) {
 }
 
 static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, int not) {
-	hashtab_t type_table, class_table, perm_table;
 	hashtab_ptr_t cur;
-	
-	type_table = policy->p_types.table;
-	class_table = policy->p_classes.table;
+	int ret = 0;
 
 	if (src == NULL) {
-		for (int i = 0; i < type_table->size; ++i) {
-			cur = type_table->htable[i];
-			while (cur != NULL) {
-				src = cur->datum;
-				if(add_rule_auto(src, tgt, cls, perm, effect, not))
-					return 1;
-				cur = cur->next;
-			}
+		hashtab_for_each(policy->p_types.table, &cur) {
+			src = cur->datum;
+			if(add_rule_auto(src, tgt, cls, perm, effect, not))
+				return 1;
 		}
 	} else if (tgt == NULL) {
-		for (int i = 0; i < type_table->size; ++i) {
-			cur = type_table->htable[i];
-			while (cur != NULL) {
-				tgt = cur->datum;
-				if(add_rule_auto(src, tgt, cls, perm, effect, not))
-					return 1;
-				cur = cur->next;
-			}
+		hashtab_for_each(policy->p_types.table, &cur) {
+			tgt = cur->datum;
+			if(add_rule_auto(src, tgt, cls, perm, effect, not))
+				return 1;
 		}
 	} else if (cls == NULL) {
-		for (int i = 0; i < class_table->size; ++i) {
-			cur = class_table->htable[i];
-			while (cur != NULL) {
-				cls = cur->datum;
-				if(add_rule_auto(src, tgt, cls, perm, effect, not))
-					return 1;
-				cur = cur->next;
-			}
+		hashtab_for_each(policy->p_classes.table, &cur) {
+			cls = cur->datum;
+			if(add_rule_auto(src, tgt, cls, perm, effect, not))
+				return 1;
 		}
 	} else if (perm == NULL) {
-		perm_table = cls->permissions.table;
-		for (int i = 0; i < perm_table->size; ++i) {
-			cur = perm_table->htable[i];
-			while (cur != NULL) {
-				perm = cur->datum;
-				if(add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not))
-					return 1;
-				cur = cur->next;
-			}
+		hashtab_for_each(cls->permissions.table, &cur) {
+			perm = cur->datum;
+			if(add_rule_auto(src, tgt, cls, perm, effect, not))
+				return 1;
 		}
 
 		if (cls->comdatum != NULL) {
-			perm_table = cls->comdatum->permissions.table;
-			for (int i = 0; i < perm_table->size; ++i) {
-				cur = perm_table->htable[i];
-				while (cur != NULL) {
-					perm = cur->datum;
-					if(add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not))
-						return 1;
-					cur = cur->next;
-				}
+			hashtab_for_each(cls->comdatum->permissions.table, &cur) {
+				perm = cur->datum;
+				if(add_rule_auto(src, tgt, cls, perm, effect, not))
+					return 1;
 			}
 		}
 	} else {
-		return add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not);
+		ebitmap_node_t *s_node, *t_node;
+		int i, j;
+		if (src->flavor == TYPE_ATTRIB) {
+			if (tgt->flavor == TYPE_ATTRIB) {
+				ebitmap_for_each_bit(&policy->attr_type_map[src->s.value-1], s_node, i) 
+					ebitmap_for_each_bit(&policy->attr_type_map[tgt->s.value-1], t_node, j)
+						if(ebitmap_node_get_bit(s_node, i) && ebitmap_node_get_bit(t_node, j))
+							ret |= add_irule(i + 1, j + 1, cls->s.value, perm->s.value, effect, not);
+					
+			} else {
+				ebitmap_for_each_bit(&policy->attr_type_map[src->s.value-1], s_node, i)
+					if(ebitmap_node_get_bit(s_node, i))
+						ret |= add_irule(i + 1, tgt->s.value, cls->s.value, perm->s.value, effect, not);
+			}
+		} else if (tgt->flavor == TYPE_ATTRIB) {
+			ebitmap_for_each_bit(&policy->attr_type_map[tgt->s.value-1], t_node, j)
+				if(ebitmap_node_get_bit(t_node, j))
+					ret |= add_irule(src->s.value, j + 1, cls->s.value, perm->s.value, effect, not);
+		} else
+			ret = add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not);
 	}
-	return 0;
+	return ret;
 }
 
 int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
@@ -175,7 +169,7 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 		fprintf(stderr, "policydb_init: Out of memory!\n");
 		return 1;
 	}
-	ret = policydb_read(policydb, pf, 1);
+	ret = policydb_read(policydb, pf, 0);
 	if (ret) {
 		fprintf(stderr, "error(s) encountered while parsing configuration\n");
 		return 1;
@@ -229,82 +223,26 @@ void create_domain(char *d) {
 	if(policydb_index_classes(policy))
 		exit(1);
 
-	if(policydb_index_others(NULL, policy, 1))
+	if(policydb_index_others(NULL, policy, 0))
 		exit(1);
 
 	set_attr("domain", value);
 }
 
-int add_typerule(char *s, char *targetAttribute, char **minusses, char *c, char *p, int effect, int not) {
-	type_datum_t *src, *tgt;
-	class_datum_t *cls;
-	perm_datum_t *perm;
-
-	//64(0kB) should be enough for everyone, right?
-	int m[64] = { -1 };
-
-	src = hashtab_search(policy->p_types.table, s);
-	if (src == NULL) {
-		fprintf(stderr, "source type %s does not exist\n", s);
+int set_domain_state(char* s, int state) {
+	type_datum_t *type;
+	if (!exists(s))
+		create_domain(s);
+	type = hashtab_search(policy->p_types.table, s);
+	if (type == NULL) {
+			fprintf(stderr, "type %s does not exist\n", s);
+			return 1;
+	}
+	if (ebitmap_set_bit(&policy->permissive_map, type->s.value, state)) {
+		fprintf(stderr, "Could not set bit in permissive map\n");
 		return 1;
 	}
-
-	tgt = hashtab_search(policy->p_types.table, targetAttribute);
-	if (tgt == NULL) {
-		fprintf(stderr, "target type %s does not exist\n", targetAttribute);
-		return 1;
-	}
-	if(tgt->flavor != TYPE_ATTRIB)
-		exit(1);
-
-	for(int i=0; minusses && minusses[i]; ++i) {
-		type_datum_t *obj;
-		obj = hashtab_search(policy->p_types.table, minusses[i]);
-		if (obj == NULL) {
-			fprintf(stderr, "minus type %s does not exist\n", minusses[i]);
-			return 1;
-		}
-		m[i] = obj->s.value-1;
-		m[i+1] = -1;
-	}
-
-	cls = hashtab_search(policy->p_classes.table, c);
-	if (cls == NULL) {
-		fprintf(stderr, "class %s does not exist\n", c);
-		return 1;
-	}
-
-	perm = hashtab_search(cls->permissions.table, p);
-	if (perm == NULL) {
-		if (cls->comdatum == NULL) {
-			fprintf(stderr, "perm %s does not exist in class %s\n", p, c);
-			return 1;
-		}
-		perm = hashtab_search(cls->comdatum->permissions.table, p);
-		if (perm == NULL) {
-			fprintf(stderr, "perm %s does not exist in class %s\n", p, c);
-			return 1;
-		}
-	}
-
-	ebitmap_node_t *node;
-	int i;
-
-	int ret = 0;
-
-	ebitmap_for_each_bit(&policy->attr_type_map[tgt->s.value-1], node, i) {
-		if(ebitmap_node_get_bit(node, i)) {
-			int found = 0;
-			for(int j=0; m[j] != -1; ++j) {
-				if(i == m[j])
-					found = 1;
-			}
-
-			if(!found)
-				ret |= add_irule(src->s.value, i+1, cls->s.value, perm->s.value, effect, not);
-		}
-	}
-	return ret;
+	return 0;
 }
 
 int add_transition(char *srcS, char *origS, char *tgtS, char *c) {
@@ -471,30 +409,4 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, int not) {
 		}
 	}
 	return add_rule_auto(src, tgt, cls, perm, effect, not);
-}
-
-int live_patch() {
-	char *filename = "/sys/fs/selinux/load";
-	int fd, ret;
-	void *data = NULL;
-	size_t len;
-
-	policydb_to_image(NULL, policy, &data, &len);
-	if (data == NULL) fprintf(stderr, "Error!");
-
-	// based on libselinux security_load_policy()
-	fd = open(filename, O_RDWR);
-	if (fd < 0) {
-		fprintf(stderr, "Can't open '%s':  %s\n",
-		        filename, strerror(errno));
-		return 1;
-	}
-	ret = write(fd, data, len);
-	close(fd);
-	if (ret < 0) {
-		fprintf(stderr, "Could not write policy to %s\n",
-		        filename);
-		return 1;
-	}
-	return 0;
 }
