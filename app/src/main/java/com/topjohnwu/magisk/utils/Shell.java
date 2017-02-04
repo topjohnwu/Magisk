@@ -41,7 +41,7 @@ public class Shell {
 
         // Setup umask and PATH
         su("umask 022");
-        su("PATH=/data/busybox:$PATH");
+        su("PATH=`[ -e /dev/busybox ] && echo /dev/busybox || echo /data/busybox`:$PATH");
 
         List<String> ret = su("echo -BOC-", "id");
 

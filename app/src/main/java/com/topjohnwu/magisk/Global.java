@@ -17,6 +17,8 @@ import java.util.List;
 
 public class Global {
 
+    public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
+
     public static class Info {
         public static double magiskVersion;
         public static String magiskVersionString = "(none)";
@@ -27,6 +29,7 @@ public class Global {
         public static String bootBlock = null;
         public static boolean isSuClient = false;
         public static String suVersion = null;
+        public static boolean disabled = false;
     }
     public static class Data {
         public static ValueSortedMap<String, Repo> repoMap;
@@ -64,28 +67,6 @@ public class Global {
         public static int suNotificationType;
     }
 
-    public static void init(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
-        Configs.devLogging = prefs.getBoolean("developer_logging", false);
-        Configs.shellLogging = prefs.getBoolean("shell_logging", false);
-        Configs.magiskHide = prefs.getBoolean("magiskhide", false);
-        updateMagiskInfo();
-        initSuAccess();
-        initSuConfigs(context);
-        // Initialize prefs
-        prefs.edit()
-                .putBoolean("dark_theme", Configs.isDarkTheme)
-                .putBoolean("magiskhide", Configs.magiskHide)
-                .putBoolean("busybox", Utils.commandExists("busybox"))
-                .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
-                .putString("su_request_timeout", String.valueOf(Configs.suRequestTimeout))
-                .putString("su_auto_response", String.valueOf(Configs.suResponseType))
-                .putString("su_notification", String.valueOf(Configs.suNotificationType))
-                .putString("su_access", String.valueOf(Configs.suAccessState))
-                .apply();
-    }
-
     public static void initSuConfigs(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
@@ -110,7 +91,7 @@ public class Global {
         }
     }
 
-    static void updateMagiskInfo() {
+    public static void updateMagiskInfo() {
         List<String> ret = Shell.sh("getprop magisk.version");
         if (!Utils.isValidShellResponse(ret)) {
             Info.magiskVersion = -1;
@@ -123,6 +104,9 @@ public class Global {
                 Info.magiskVersion = Double.POSITIVE_INFINITY;
             }
         }
+        ret = Shell.sh("getprop ro.magisk.disable");
+        if (Utils.isValidShellResponse(ret))
+            Info.disabled = Integer.parseInt(ret.get(0)) != 0;
     }
 
 }

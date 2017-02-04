@@ -163,6 +163,8 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
 
         if (Global.Info.magiskVersion < 0) {
             magiskVersionText.setText(R.string.magisk_version_error);
+        } else if (Global.Info.disabled) {
+            magiskVersionText.setText(getString(R.string.magisk_version_disable, Global.Info.magiskVersionString));
         } else {
             magiskVersionText.setText(getString(R.string.magisk_version, Global.Info.magiskVersionString));
         }
@@ -215,7 +217,11 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
         if (Global.Info.magiskVersion < 0) {
             color = colorBad;
             image = R.drawable.ic_cancel;
+        } else if (Global.Info.disabled) {
+            color = colorNeutral;
+            image = R.drawable.ic_cancel;
         }
+
         magiskStatusContainer.setBackgroundColor(color);
         magiskVersionText.setTextColor(color);
         magiskUpdateText.setTextColor(color);
@@ -231,7 +237,7 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
                 .setPositiveButton(R.string.goto_install, (dialogInterface, i) -> {
                     ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
                     FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+                    transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                     try {
                         transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
                     } catch (IllegalStateException ignored) {}

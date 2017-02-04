@@ -101,8 +101,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         CallbackHandler.unRegister(Global.Events.reloadMainActivity, this);
-        // Let garbage collector remove them
-        Global.Data.clear();
         super.onDestroy();
     }
 

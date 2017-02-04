@@ -14,11 +14,22 @@ import com.topjohnwu.magisk.utils.Async;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        Global.initSuAccess();
-        if (prefs.getBoolean("magiskhide", false)) {
-            Toast.makeText(context, R.string.start_magiskhide, Toast.LENGTH_SHORT).show();
-            new Async.MagiskHide().enable();
-        }
+        new Async.RootTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Global.initSuAccess();
+                Global.updateMagiskInfo();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                if (prefs.getBoolean("magiskhide", false) && !Global.Info.disabled && Global.Info.magiskVersion >= 11) {
+                    Toast.makeText(context, R.string.start_magiskhide, Toast.LENGTH_SHORT).show();
+                    new Async.MagiskHide().enable();
+                }
+            }
+        }.exec();
     }
 }

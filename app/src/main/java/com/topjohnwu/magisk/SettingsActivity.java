@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -20,9 +19,6 @@ import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
-
-import java.io.File;
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -88,6 +84,10 @@ public class SettingsActivity extends AppCompatActivity {
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             prefScreen = getPreferenceScreen();
 
+            SwitchPreference busybox = (SwitchPreference) findPreference("busybox");
+            SwitchPreference magiskHide = (SwitchPreference) findPreference("magiskhide");
+            SwitchPreference hosts = (SwitchPreference) findPreference("hosts");
+
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
 
@@ -111,6 +111,11 @@ public class SettingsActivity extends AppCompatActivity {
                     prefScreen.removePreference(suCategory);
                 if (Global.Info.magiskVersion < 11)
                     prefScreen.removePreference(magiskCategory);
+                if (Global.Info.disabled) {
+                    busybox.setEnabled(false);
+                    magiskHide.setEnabled(false);
+                    hosts.setEnabled(false);
+                }
             }
         }
 
@@ -142,31 +147,38 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
-                    File disable = new File(getActivity().getFilesDir() + "/disable");
-                    if (enabled)
-                        try {
-                            disable.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            prefs.edit().putBoolean("disable", false).apply();
+                    new Async.RootTask<Void, Void, Void>() {
+                        private boolean enable = enabled;
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            if (enable) {
+                                Utils.createFile(Global.MAGISK_DISABLE_FILE);
+                            } else {
+                                Utils.removeItem(Global.MAGISK_DISABLE_FILE);
+                            }
+                            return null;
                         }
-                    else
-                        disable.delete();
+                    }.exec();
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "busybox":
                     enabled = prefs.getBoolean("busybox", false);
-                    File busybox = new File(getActivity().getFilesDir() + "/busybox");
-                    if (enabled)
-                        try {
-                            busybox.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            prefs.edit().putBoolean("busybox", false).apply();
+                    new Async.RootTask<Void, Void, Void>() {
+                        private boolean enable = enabled;
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            if (enable) {
+                                Shell.su(
+                                        "setprop persist.magisk.busybox 1",
+                                        "sh /sbin/magic_mask.sh mount_busybox");
+                            } else {
+                                Shell.su(
+                                        "setprop persist.magisk.busybox 0",
+                                        "umount /system/xbin");
+                            }
+                            return null;
                         }
-                    else
-                        busybox.delete();
-                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    }.exec();
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
