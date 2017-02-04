@@ -503,11 +503,7 @@ else
       [ ! -f .backup/$RC ] && cp -af $RC .backup
       sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $RC
     fi
-    if file_contain "trigger load_persist_props_action" $RC && ! file_contain "trigger load_magisk_props_action" $RC; then
-      [ ! -f .backup/$RC ] && cp -af $RC .backup
-      sed -i "/trigger load_persist_props_action/a\ \ \ \ trigger load_magisk_props_action" $RC
-    fi
-    if file_contain "selinux.reload_policy"; then
+    if file_contain "selinux.reload_policy" $RC; then
       [ ! -f .backup/$RC ] && cp -af $RC .backup
       sed -i "/selinux.reload_policy/d" $RC
     fi
@@ -517,7 +513,7 @@ else
     [ -L $FSTAB ] && continue
     if (! $KEEPVERITY); then
       sed -i "s/,support_scfs//g" $FSTAB
-      sed -i 's;,\{0,1\}verify\(=[^,]*\)\{0,1\};;g' $FSTAB
+      sed -i 's/,\{0,1\}verify\(=[^,]*\)\{0,1\}//g' $FSTAB
     fi
     if (! $KEEPFORCEENCRYPT); then
       sed -i "s/forceencrypt/encryptable/g" $FSTAB

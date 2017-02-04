@@ -49,6 +49,7 @@ in_list() {
 
 unblock() {
   touch /dev/.magisk.unblock
+  chcon u:object_r:device:s0 /dev/.magisk.unblock
   exit
 }
 
@@ -465,25 +466,21 @@ case $1 in
         rm -f /data/magisk.apk 2>/dev/null
       fi
 
+      for MOD in $MOUNTPOINT/* ; do
+        # Read in defined system props
+        if [ -f $MOD/system.prop ]; then
+          log_print "* Reading props from $MOD/system.prop"
+          /data/magisk/resetprop --file $MOD/system.prop
+        fi
+      done
+
+      # Expose busybox
+      [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
+
       # Restart post-fs-data if necessary (multirom)
       $MULTIROM && setprop magisk.restart_pfsd 1
 
     fi
-    unblock
-    ;;
-
-  load_magisk_props )
-    for MOD in $MOUNTPOINT/* ; do
-      # Read in defined system props
-      if [ -f $MOD/system.prop ]; then
-        log_print "* Reading props from $MOD/system.prop"
-        /data/magisk/resetprop --file $MOD/system.prop
-      fi
-    done
-
-    # Expose busybox
-    [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
-
     unblock
     ;;
 
