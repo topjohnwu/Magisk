@@ -132,7 +132,7 @@
     <string name="settings_disable_summary">Everything will be disabled except root (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Enable BusyBox</string>
-    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin\nRequires reboot</string>
+    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
 

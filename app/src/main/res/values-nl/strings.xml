@@ -81,7 +81,6 @@
     <string name="settings_dark_theme_summary">Selecteer een thema</string>
 
     <string name="settings_busybox_title">Schakel BusyBox in</string>
-    <string name="settings_busybox_summary">Maakt Magisk\'s ingebouwde BusyBox zichtbaar in PATH</string>
 
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Geavanceerde debug logging</string>

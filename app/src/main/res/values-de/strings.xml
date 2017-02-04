@@ -129,7 +129,7 @@
 
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_busybox_title">BusyBox aktivieren</string>
-    <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten\nErfordert einen Neustart</string>
+    <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten</string>
     <string name="settings_hosts_title">Systemlose hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
 

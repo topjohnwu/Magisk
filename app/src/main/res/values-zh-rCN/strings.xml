@@ -123,7 +123,7 @@
 
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
-    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin\n需要重启</string>
+    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
 

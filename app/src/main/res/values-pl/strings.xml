@@ -129,7 +129,6 @@
 
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
-    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
 

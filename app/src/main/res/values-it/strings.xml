@@ -43,8 +43,7 @@
     <string name="keep_dm_verity">Mantieni dm-verity</string>
     <string name="current_magisk_title">Versione Magisk installata: v%1$s</string>
     <string name="install_magisk_title">Ultima versione Magisk: v%1$.1f</string>
-    <string name="magiskify" translatable="false">Magiskify</string>
-    
+
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
@@ -109,7 +108,6 @@
     <string name="settings_dark_theme_summary">Scegli un tema</string>
 
     <string name="settings_busybox_title">Abilita BusyBox</string>
-    <string name="settings_busybox_summary">Make Magisk\'s built-in BusyBox be visible in PATH</string>
 
     <string name="settings_development_category">Development</string>
     <string name="settings_developer_logging_title">Abilita Debug log avanzato</string>
