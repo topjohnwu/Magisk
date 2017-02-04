@@ -320,18 +320,14 @@ fi
 ui_print "- Constructing environment"
 
 if (is_mounted /data); then
-  rm -rf /data/busybox /data/magisk 2>/dev/null
-  mkdir -p /data/busybox /data/magisk
+  rm -rf /data/magisk 2>/dev/null
+  mkdir -p /data/magisk
   cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop \
          $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
   cp -af $INSTALLER/common/magisk.apk /data/magisk.apk
-  /data/magisk/busybox --install -s /data/busybox
-  ln -s /data/magisk/busybox /data/busybox/busybox
-  # Prevent issues
-  rm -f /data/busybox/su /data/busybox/sh /data/busybox/reboot
-  chcon -hR u:object_r:system_file:s0 /data/magisk /data/busybox
-  chmod -R 755 /data/magisk /data/busybox
-  # PATH=/data/busybox:$PATH
+  chmod -R 755 /data/magisk
+  chcon -h u:object_r:system_file:s0 /data/magisk /data/magisk/*
+  PATH=/data/busybox:$PATH
 else
   rm -rf /cache/data_bin 2>/dev/null
   mkdir -p /cache/data_bin
@@ -341,6 +337,13 @@ else
   cp -af $INSTALLER/common/magisk.apk /cache/magisk.apk
   chmod -R 755 /cache/data_bin
 fi
+
+# Temporary busybox for installation
+mkdir -p $TMPDIR/busybox
+$BINDIR/busybox --install -s $TMPDIR/busybox
+rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
+PATH=$TMPDIR/busybox:$PATH
+
 
 ##########################################################################################
 # Image
@@ -486,11 +489,10 @@ else
 
   # MagiskSU
   ui_print "- Installing MagiskSU"
-  rm -rf $COREDIR/su 2>/dev/null
-  mkdir -p $COREDIR/su
+  mkdir -p $COREDIR/su 2>/dev/null
   cp -af $BINDIR/su $INSTALLER/common/magisksu.sh $COREDIR/su
-  chmod -R 755 $COREDIR/su
-  chown -R 0.0 $COREDIR/su
+  chmod 755 $COREDIR/su/su $COREDIR/su/magisksu.sh
+  chown -R 0.0 $COREDIR/su/su $COREDIR/su/magisksu.sh
 
   # Patch ramdisk
   ui_print "- Patching ramdisk"

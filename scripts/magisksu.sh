@@ -2,7 +2,6 @@
 
 MODDIR=${0%/*}
 LOGFILE=/cache/magisk.log
-PATH=$OLDPATH
 
 log_print() {
   echo "MagiskSU: $1"

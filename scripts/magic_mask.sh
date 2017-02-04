@@ -15,8 +15,12 @@ MOUNTINFO=$TMPDIR/mnt
 
 # Use the included busybox for maximum compatibility and reliable results
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
-TOOLPATH=/data/busybox
+TOOLPATH=/dev/busybox
 BINPATH=/data/magisk
+OLDPATH=$PATH
+export PATH=$TOOLPATH:$OLDPATH
+
+APPDIR=/data/data/com.topjohnwu.magisk/files
 
 # Default permissions
 umask 022
@@ -273,24 +277,25 @@ case $1 in
       mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
       mv /cache/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh 2>/dev/null
 
-      if [ -d "/cache/data_bin" ]; then
-        rm -rf $BINPATH $TOOLPATH
-        mkdir -p $TOOLPATH
+      if [ -d /cache/data_bin ]; then
+        rm -rf $BINPATH
         mv /cache/data_bin $BINPATH
-        $BINPATH/busybox --install -s $TOOLPATH
-        ln -s $BINPATH/busybox $TOOLPATH/busybox
-        # Prevent issues
-        rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
       fi
+
+      chmod -R 755 $BINPATH
+      chown -R 0.0 $BINPATH
 
       # Live patch sepolicy
       $BINPATH/sepolicy-inject --live
 
       # Set up environment
-      export OLDPATH=$PATH
-      export PATH=$TOOLPATH:$OLDPATH
-      chmod -R 755 $BINPATH $TOOLPATH
-      chown -R 0.0 $BINPATH $TOOLPATH
+      mkdir -p $TOOLPATH
+      $BINPATH/busybox --install -s $TOOLPATH
+      ln -s $BINPATH/busybox $TOOLPATH/busybox
+      # Prevent issues
+      rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
+      chmod -R 755 $TOOLPATH
+      chown -R 0.0 $TOOLPATH
       find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
       # Multirom functions should go here, not available right now
@@ -314,7 +319,7 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img 2>/dev/null
+      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img /data/busybox 2>/dev/null
 
       # Remove modules that are labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
@@ -343,7 +348,12 @@ case $1 in
       fi
 
       # Start MagiskSU if no SuperSU
+      export PATH=$OLDPATH
       [ ! -f /sbin/launch_daemonsu.sh ] && sh $COREDIR/su/magisksu.sh
+      export PATH=$TOOLPATH:$OLDPATH
+
+      # Disable Magic Mount if specified
+      [ -f $APPDIR/disable ] && unblock
 
       log_print "* Preparing modules"
 
@@ -441,16 +451,6 @@ case $1 in
         bind_mount $COREDIR/hosts /system/etc/hosts
       fi
 
-      # Expose busybox
-      if [ -f $COREDIR/busybox/enable ]; then
-        log_print "* Enabling BusyBox"
-        cp -afc /data/busybox/. $COREDIR/busybox
-        cp -afc /system/xbin/. $COREDIR/busybox
-        chmod -R 755 $COREDIR/busybox
-        chcon -hR u:object_r:system_file:s0 $COREDIR/busybox
-        bind_mount $COREDIR/busybox /system/xbin
-      fi
-
       if [ -f /data/magisk.apk ]; then
         if [ -z `ls /data/app | grep com.topjohnwu.magisk` ]; then
           mkdir /data/app/com.topjohnwu.magisk-1
@@ -480,7 +480,18 @@ case $1 in
         /data/magisk/resetprop --file $MOD/system.prop
       fi
     done
+
+    # Expose busybox
+    [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
+
     unblock
+    ;;
+
+  mount_busybox )
+    log_print "* Enabling BusyBox"
+    cp -afc /system/xbin/. $TOOLPATH
+    umount /system/xbin 2>/dev/null
+    bind_mount $TOOLPATH /system/xbin
     ;;
 
   service )
