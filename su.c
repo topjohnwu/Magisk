@@ -621,7 +621,10 @@ int su_main(int argc, char *argv[]) {
 
 int su_main_nodaemon(int argc, char **argv) {
     int ppid = getppid();
-    fork_for_samsung();
+
+    // Only fork when not running in daemon mode (already forked from daemon)
+    if (! is_daemon)
+        fork_for_samsung();
 
     // Sanitize all secure environment variables (from linker_environ.c in AOSP linker).
     /* The same list than GLibc at this point */
@@ -665,14 +668,12 @@ int su_main_nodaemon(int argc, char **argv) {
 
     LOGD("su invoked.");
 
-    //Chainfire compatibility
-    if(argc >= 3 && (
-                strcmp(argv[1], "-cn") == 0 ||
-                strcmp(argv[1], "--context") == 0
-
-                )) {
-        argc-=2;
-        argv+=2;
+    // Replace -cn with z, for CF compatibility
+    for (int i = 0; i < argc; ++i) {
+        if (strcmp(argv[i], "-cn") == 0) {
+            strcpy(argv[i], "-z");
+            break;
+        }
     }
 
     struct su_context ctx = {
@@ -705,13 +706,13 @@ int su_main_nodaemon(int argc, char **argv) {
     char buf[64], *result;
     policy_t dballow;
     struct option long_opts[] = {
-        { "command",            required_argument,    NULL, 'c' },
-        { "help",            no_argument,        NULL, 'h' },
-        { "login",            no_argument,        NULL, 'l' },
-        { "preserve-environment",    no_argument,        NULL, 'p' },
-        { "shell",            required_argument,    NULL, 's' },
-        { "version",            no_argument,        NULL, 'v' },
-        { "context",            required_argument,        NULL, 'z' },
+        { "command",                required_argument,  NULL, 'c' },
+        { "help",                   no_argument,        NULL, 'h' },
+        { "login",                  no_argument,        NULL, 'l' },
+        { "preserve-environment",   no_argument,        NULL, 'p' },
+        { "shell",                  required_argument,  NULL, 's' },
+        { "version",                no_argument,        NULL, 'v' },
+        { "context",                required_argument,  NULL, 'z' },
         { NULL, 0, NULL, 0 },
     };
 
