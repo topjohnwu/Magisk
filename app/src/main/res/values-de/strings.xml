@@ -17,6 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s ist installiert</string>
+    <string name="magisk_version_disable">Magisk v%1$s ist deaktiviert</string>
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
 
     <string name="checking_for_updates">Suche nach Updates…</string>
@@ -25,7 +26,7 @@
     <string name="up_to_date">Die neuste Version von %1$s ist bereits installiert</string>
     <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>
     <string name="not_rooted">Nicht gerootet</string>
-    <string name="proper_root">Sachgemäß gerootet</string>
+    <string name="proper_root">Ordnungsgemäß gerootet</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
@@ -127,6 +128,8 @@
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informtionen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
+    <string name="settings_disable_title">Magisk deaktivieren</string>
+    <string name="settings_disable_summary">Deaktiviert alles außer den root-Zugang (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_busybox_title">BusyBox aktivieren</string>
     <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten</string>
@@ -185,7 +188,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Ziel-UID:\u0020</string>
     <string name="command">Befehl:\u0020</string>
-    <string name="settings_disable_title">Magic Mount deaktivieren</string>
-    <string name="settings_disable_summary">Deaktiviert alle Module</string>
  
 </resources>
