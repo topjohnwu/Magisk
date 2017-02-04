@@ -1,21 +1,21 @@
 #include "sepolicy-inject.h"
 
-static void usage(char *arg0) {
-	fprintf(stderr, "%s [--live] [--minimal] [--load <infile>] [--save <outfile>] [policystatement...]\n\n", arg0);
-	fprintf(stderr, "  --live: directly load patched policy to device\n");
-	fprintf(stderr, "  --minimal: minimal patches for boot image to let Magisk live patch on boot\n\n");
-	fprintf(stderr, "Supported policy statements:\n\n");
+static int syntax_err = 0;
+static char err_msg[ARG_MAX];
+
+static void statements() {
+	fprintf(stderr, "\nSupported policy statements:\n\n");
 	fprintf(stderr, "\"allow #source-class #target-class permission-class #permission\"\n");
 	fprintf(stderr, "\"deny #source-class #target-class permission-class #permission\"\n");
 	fprintf(stderr, "\"create #class\"\n");
 	fprintf(stderr, "\"permissive #class\"\n");
 	fprintf(stderr, "\"enforcing #class\"\n");
 	fprintf(stderr, "\"attradd #class #attribute\"\n");
-	fprintf(stderr, "\"typetrans source-class target-class permission-class default-class (optional: object_name)\"\n");
-	fprintf(stderr, "\nsource-class and target-class can be replaced with attributes (will patch the whole group)");
-	fprintf(stderr, "Sections (except typetrans) can be replaced with \'*\'; it'll try to patch every possible matches\n");
+	fprintf(stderr, "\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n");
+	fprintf(stderr, "\nsource-class and target-class can be attributes (patches the whole group)\n");
+	fprintf(stderr, "All sections (except typetrans) can be replaced with \'*\' to patch every possible matches\n");
 	fprintf(stderr, "Sections marked with \'#\' can be replaced with collections in curly brackets\n");
-	fprintf(stderr, "e.g.: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n");
+	fprintf(stderr, "e.g: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n");
 	fprintf(stderr, "Will be expanded to:\n");
 	fprintf(stderr, 
 "allow source1 target1 permission-class permission1\n\
@@ -27,6 +27,13 @@ allow source2 target1 permission-class permission2\n\
 allow source2 target2 permission-class permission1\n\
 allow source2 target2 permission-class permission2\n");
 	fprintf(stderr, "\n");
+}
+
+static void usage(char *arg0) {
+	fprintf(stderr, "%s [--live] [--minimal] [--load <infile>] [--save <outfile>] [policystatement...]\n\n", arg0);
+	fprintf(stderr, "  --live: directly load patched policy to device\n");
+	fprintf(stderr, "  --minimal: minimal patches for boot image to let Magisk live patch on boot\n");
+	statements();
 	exit(1);
 }
 
@@ -109,7 +116,7 @@ static int parse_pattern_1(int action, char* statement) {
 }
 
 // Pattern 2: action { class } { attribute }
-int parse_pattern_2(int action, char* statement) {
+static int parse_pattern_2(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *saveptr;
 	vector class, attribute, *temp;
@@ -165,7 +172,7 @@ int parse_pattern_2(int action, char* statement) {
 }
 
 // Pattern 3: action { type }
-int parse_pattern_3(int action, char* statement) {
+static int parse_pattern_3(int action, char* statement) {
 	char *tok, *saveptr;
 	vector classes;
 	vec_init(&classes);
@@ -179,15 +186,15 @@ int parse_pattern_3(int action, char* statement) {
 		switch (action) {
 			case 0:
 				if (create(classes.data[i]))
-					fprintf(stderr, "Error in: create %s", classes.data[i]);
+					fprintf(stderr, "Domain %s already exists\n", classes.data[i]);
 				break;
 			case 1:
 				if (permissive(classes.data[i]))
-					fprintf(stderr, "Error in: permissive %s", classes.data[i]);
+					fprintf(stderr, "Error in: permissive %s\n", classes.data[i]);
 				break;
 			case 2:
 				if (enforce(classes.data[i]))
-					fprintf(stderr, "Error in: enforce %s", classes.data[i]);
+					fprintf(stderr, "Error in: enforce %s\n", classes.data[i]);
 				break;
 		}
 	}
@@ -196,7 +203,7 @@ int parse_pattern_3(int action, char* statement) {
 }
 
 // Pattern 4: action source target class default (filename)
-int parse_pattern_4(int action, char* statement) {
+static int parse_pattern_4(int action, char* statement) {
 	int state = 0;
 	char *tok, *saveptr;
 	char *source, *target, *class, *def, *filename = NULL;
@@ -230,8 +237,13 @@ int parse_pattern_4(int action, char* statement) {
 	return 0;
 }
 
+static void syntax_error_msg() {
+	fprintf(stderr, "Syntax error in \"%s\"\n", err_msg);
+	syntax_err = 1;
+}
+
 int main(int argc, char *argv[]) {
-	char *infile = NULL, *outfile, *tok, *saveptr, cpy[ARG_MAX];
+	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
 	int live = 0, minimal = 0;
 	struct vector rules;
 
@@ -259,8 +271,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	policydb_t policydb;
-	struct policy_file pf;
 	sidtab_t sidtab;
+
+	policy = &policydb;
 
 	// Use current policy if not specified
 	if(!infile)
@@ -269,7 +282,7 @@ int main(int argc, char *argv[]) {
 	sepol_set_policydb(&policydb);
 	sepol_set_sidtab(&sidtab);
 
-	if (load_policy(infile, &policydb, &pf)) {
+	if (load_policy(infile)) {
 		fprintf(stderr, "Could not load policy\n");
 		return 1;
 	}
@@ -277,75 +290,58 @@ int main(int argc, char *argv[]) {
 	if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
-	policy = &policydb;
-
 	if (!minimal && rules.size == 0) su_rules();
 	if (minimal) min_rules();
 
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages
-		strcpy(cpy, rules.data[i]);
+		strcpy(err_msg, rules.data[i]);
 		tok = strtok_r(rules.data[i], " ", &saveptr);
 		if (strcmp(tok, "allow") == 0) {
 			if (parse_pattern_1(0, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "deny") == 0) {
 			if (parse_pattern_1(1, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "auditallow") == 0) {
 			if (parse_pattern_1(2, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "auditdeny") == 0) {
 			if (parse_pattern_1(3, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "attradd") == 0) {
 			if (parse_pattern_2(0, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "create") == 0) {
 			if (parse_pattern_3(0, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "permissive") == 0) {
 			if (parse_pattern_3(1, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "enforce") == 0) {
 			if (parse_pattern_3(2, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else if (strcmp(tok, "typetrans") == 0) {
 			if (parse_pattern_4(0, rules.data[i] + strlen(tok) + 1))
-				printf("Syntax error in \"%s\"\n", cpy);
+				syntax_error_msg();
 		} else {
-			usage(argv[0]);
+			syntax_error_msg();
 		}
 	}
 
+	if (syntax_err)
+		statements();
+
 	vec_destroy(&rules);
 
-	if (live) 
-		outfile = "/sys/fs/selinux/load";
+	if (live)
+		if (dump_policy("/sys/fs/selinux/load"))
+			return 1;
 
 	if (outfile) {
-		int fd, ret;
-		void *data = NULL;
-		size_t len;
-		policydb_to_image(NULL, policy, &data, &len);
-		if (data == NULL) {
-			fprintf(stderr, "Fail to dump policydb image!");
+		unlink(outfile);
+		if (dump_policy(outfile))
 			return 1;
-		}
-
-		fd = open(outfile, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-		if (fd < 0) {
-			fprintf(stderr, "Can't open '%s':  %s\n",
-			        outfile, strerror(errno));
-			return 1;
-		}
-		ret = write(fd, data, len);
-		close(fd);
-		if (ret < 0) {
-			fprintf(stderr, "Could not write policy to %s\n",
-			        outfile);
-			return 1;
-		}
 	}
 
 	policydb_destroy(&policydb);

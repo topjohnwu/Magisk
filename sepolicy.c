@@ -137,9 +137,10 @@ static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 	return ret;
 }
 
-int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
+int load_policy(const char *filename) {
 	int fd;
 	struct stat sb;
+	struct policy_file pf;
 	void *map;
 	int ret;
 
@@ -162,20 +163,46 @@ int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf) {
 		return 1;
 	}
 
-	policy_file_init(pf);
-	pf->type = PF_USE_MEMORY;
-	pf->data = map;
-	pf->len = sb.st_size;
-	if (policydb_init(policydb)) {
+	policy_file_init(&pf);
+	pf.type = PF_USE_MEMORY;
+	pf.data = map;
+	pf.len = sb.st_size;
+	if (policydb_init(policy)) {
 		fprintf(stderr, "policydb_init: Out of memory!\n");
 		return 1;
 	}
-	ret = policydb_read(policydb, pf, 0);
+	ret = policydb_read(policy, &pf, 0);
 	if (ret) {
 		fprintf(stderr, "error(s) encountered while parsing configuration\n");
 		return 1;
 	}
 
+	return 0;
+}
+
+int dump_policy(const char *filename) {
+	int fd, ret;
+	void *data = NULL;
+	size_t len;
+	policydb_to_image(NULL, policy, &data, &len);
+	if (data == NULL) {
+		fprintf(stderr, "Fail to dump policydb image!");
+		return 1;
+	}
+
+	fd = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	if (fd < 0) {
+		fprintf(stderr, "Can't open '%s':  %s\n",
+		        filename, strerror(errno));
+		return 1;
+	}
+	ret = write(fd, data, len);
+	close(fd);
+	if (ret < 0) {
+		fprintf(stderr, "Could not write policy to %s\n",
+		        filename);
+		return 1;
+	}
 	return 0;
 }
 

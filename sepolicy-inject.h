@@ -31,7 +31,8 @@
 policydb_t *policy;
 
 // sepolicy manipulation functions
-int load_policy(char *filename, policydb_t *policydb, struct policy_file *pf);
+int load_policy(const char *filename);
+int dump_policy(const char *filename);
 int create_domain(char *d);
 int set_domain_state(char* s, int state);
 int add_transition(char *s, char *t, char *c, char *d);
