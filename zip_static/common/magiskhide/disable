@@ -2,6 +2,7 @@
 
 MODDIR=/magisk/.core/magiskhide
 LOGFILE=/cache/magisk.log
+TOOLPATH=/dev/busybox
 
 log_print() {
   echo "MagiskHide: $1"
@@ -11,12 +12,12 @@ log_print() {
 
 log_print "Stopping MagiskHide daemon"
 set --
-set `/data/busybox/ps -o pid,args | grep "magiskhide" | grep -v grep | head -1` >/dev/null
+set `$TOOLPATH/ps -o pid,args | grep "magiskhide" | grep -v grep | head -1` >/dev/null
 [ ! -z "$1" ] && kill "$1"
 
 while read PROCESS; do
   log_print "Killing $PROCESS"
   set --
-  set `/data/busybox/ps -o pid,args | grep "$PROCESS" | grep -v grep` >/dev/null
+  set `$TOOLPATH/ps -o pid,args | grep "$PROCESS" | grep -v grep` >/dev/null
   [ ! -z "$1" ] && kill "$1"
 done < $MODDIR/hidelist

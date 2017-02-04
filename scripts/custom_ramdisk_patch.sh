@@ -51,10 +51,6 @@ for RC in init*.rc; do
     sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $RC
     cpio_add $RC 750
   fi
-  if file_contain "trigger load_persist_props_action" $RC && ! file_contain "trigger load_magisk_props_action" $RC; then
-    sed -i "/trigger load_persist_props_action/a\ \ \ \ trigger load_magisk_props_action" $RC
-    cpio_add $RC 750
-  fi
   if file_contain "selinux.reload_policy"; then
     sed -i "/selinux.reload_policy/d" $RC
     cpio_add $RC 750
