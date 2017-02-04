@@ -62,7 +62,7 @@ for RC in init*.rc; do
 done
 
 # sepolicy patches
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --magisk -P sepolicy
+LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --load sepolicy --save sepolicy --minimal
 cpio_add sepolicy 644
 
 # Add new items

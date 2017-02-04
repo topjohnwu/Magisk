@@ -350,7 +350,7 @@ PATH=$TMPDIR/busybox:$PATH
 ##########################################################################################
 
 # Fix SuperSU.....
-($BOOTMODE) && $BINDIR/sepolicy-inject -s fsck --live
+($BOOTMODE) && $BINDIR/sepolicy-inject --live "allow fsck * * *"
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -374,10 +374,10 @@ fi
 MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
-mkdir -p $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d 2>/dev/null
+mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 cp -af $INSTALLER/common/magiskhide/. $BINDIR/magiskhide $COREDIR/magiskhide
-chmod -R 755 $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/magiskhide $COREDIR/postfsdata.d $COREDIR/service.d
+chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 
 ##########################################################################################
 # Boot image patch
@@ -529,7 +529,7 @@ else
   fi
 
   # minimal sepolicy patches
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --minimal -P sepolicy
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/sepolicy-inject --load sepolicy --save sepolicy --minimal
 
   # Add new items
   mkdir -p magisk 2>/dev/null
