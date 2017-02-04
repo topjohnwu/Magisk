@@ -95,10 +95,12 @@ travel() {
     mktouch "$MOUNTINFO/$1" "$TRAVEL_ROOT"
   else
     for ITEM in * ; do
-      if [ ! -e "/$1/$ITEM" ]; then
-        # New item found
+      # This means it an empty folder (shouldn't happen, but better to be safe)
+      [ "$ITEM" = "*" ] && return;
+      # Target not found or target/file is a symlink
+      if [ ! -e "/$1/$ITEM" -o -L "/$1/$ITEM" -o -L "$ITEM" ]; then
         # If we are in a higher level, delete the lower levels
-        rm -rf "$MOUNTINFO/dummy/$1"
+        rm -rf "$MOUNTINFO/dummy/$1" 2>/dev/null
         # Mount the dummy parent
         mktouch "$MOUNTINFO/dummy/$1"
 
@@ -107,7 +109,7 @@ travel() {
           mkdir -p "$DUMMDIR/$1/$ITEM"
           mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         elif [ -L "$ITEM" ]; then
-          # Symlinks are small, copy them
+          # Copy symlinks
           mkdir -p "$DUMMDIR/$1" 2>/dev/null
           cp -afc "$ITEM" $"DUMMDIR/$1/$ITEM"
         else
@@ -138,7 +140,8 @@ clone_dummy() {
       # Need to clone deeper
       mkdir -p "$DUMMDIR$REAL"
       (clone_dummy "$REAL")
-    else
+    elif [ ! -f "$DUMMDIR$REAL" ]; then
+      # It's not the file to be added/replaced, clone it
       if [ -L "$ITEM" ]; then
         # Copy original symlink
         cp -afc "$ITEM" "$DUMMDIR$REAL"
