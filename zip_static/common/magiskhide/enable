@@ -11,6 +11,9 @@ log_print() {
   log -p i -t Magisk "MagiskHide: $1"
 }
 
+# Only enable when isn't started
+ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 && exit
+
 log_print "Removing tampered read-only system props"
 
 VERIFYBOOT=`getprop ro.boot.verifiedbootstate`

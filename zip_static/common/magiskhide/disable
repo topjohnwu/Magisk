@@ -10,7 +10,11 @@ log_print() {
   log -p i -t Magisk "MagiskHide: $1"
 }
 
+# Only disable when MagiskHide is started
+ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 || exit
+
 log_print "Stopping MagiskHide daemon"
+
 set --
 set `$TOOLPATH/ps -o pid,args | grep "magiskhide" | grep -v grep | head -1` >/dev/null
 [ ! -z "$1" ] && kill "$1"
