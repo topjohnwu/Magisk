@@ -29,7 +29,6 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="0dp"
-            android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textIsSelectable="false"/>
 
