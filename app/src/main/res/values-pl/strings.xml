@@ -17,6 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Zainstalowany Magisk v%1$s</string>
+    <string name="magisk_version_disable">Magisk v%1$s wyłaczony</string>
     <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
@@ -113,7 +114,7 @@
     <string name="check_release_notes">Sprawdź informacje o wydaniu</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJuż jest domyślnie obsługiwana przez MagiskHide</string>
-	<string name="start_magiskhide">Uruchamianie MagiskHide …</string>
+    <string name="start_magiskhide">Uruchamianie MagiskHide …</string>
     
 	<!--URL Templates-->
     
@@ -127,11 +128,14 @@
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
+    <string name="settings_disable_title">Wyłącz Montowanie Magic</string>
+    <string name="settings_disable_summary">Disable Magic Mount, co uniemożliwi wszystkim modułom działanie</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
+    <string name="settings_busybox_summary">Zmień montowanie Magisk z wbudowanego busybox do xbin</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
-
+    
     <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
@@ -184,7 +188,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Indentyfikator UID:\u0020</string>
     <string name="command">Komenda:\u0020</string>
-    <string name="settings_disable_title">Wyłącz Montowanie Magic</string>
-    <string name="settings_disable_summary">Disable Magic Mount, co uniemożliwi wszystkim modułom działanie</string>
 
 </resources>
