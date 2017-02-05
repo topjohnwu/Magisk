@@ -33,7 +33,7 @@
     <string name="safetyNet_connection_suspended">Połączenie z Google API zostało zawieszone</string>
     <string name="safetyNet_error">Nie można sprawdzić SafetyNet bez Internetu</string>
     <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
-    <string name="safetyNet_pass">SafetyNet Passed</string>
+    <string name="safetyNet_pass">SafetyNet Prawidłowy</string>
     <string name="root_info_warning">Funkcjonalność znacznie ograniczona</string>
 
     <!--Install Fragment-->
@@ -128,7 +128,7 @@
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
-    <string name="settings_disable_title">Wyłącz Montowanie Magic</string>
+    <string name="settings_disable_title">Wyłącz Montowanie Magisk</string>
     <string name="settings_disable_summary">Disable Magic Mount, co uniemożliwi wszystkim modułom działanie</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
