@@ -29,6 +29,7 @@ cleanup() {
   rm -rfv zip_static/common/magisksu.sh
   rm -rfv zip_static/common/init.magisk.rc
   rm -rfv zip_static/common/magic_mask.sh
+  rm -rfv uninstaller/common
   rm -rfv uninstaller/arm
   rm -rfv uninstaller/arm64
   rm -rfv uninstaller/x86
@@ -91,6 +92,7 @@ zip_uninstaller() {
   echo "************************"
   echo "* Zipping uninstaller"
   echo "************************"
+  mkcp scripts/magisk_uninstaller.sh uninstaller/common
   cd uninstaller
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;

@@ -175,6 +175,7 @@ repack_boot() {
   cd $UNPACKDIR
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
   if [ -f chromeos ]; then
+    cp -af $CHROMEDIR /data/magisk
     echo " " > config
     echo " " > bootloader
     LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
@@ -322,7 +323,7 @@ ui_print "- Constructing environment"
 if (is_mounted /data); then
   rm -rf /data/magisk 2>/dev/null
   mkdir -p /data/magisk
-  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop \
+  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/bootimgtools \
          $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
   cp -af $INSTALLER/common/magisk.apk /data/magisk.apk
   chmod -R 755 /data/magisk
@@ -331,7 +332,7 @@ if (is_mounted /data); then
 else
   rm -rf /cache/data_bin 2>/dev/null
   mkdir -p /cache/data_bin
-  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop \
+  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/bootimgtools \
          $INSTALLER/common/custom_ramdisk_patch.sh $INSTALLER/common/init.magisk.rc \
          $INSTALLER/common/magic_mask.sh /cache/data_bin
   cp -af $INSTALLER/common/magisk.apk /cache/magisk.apk

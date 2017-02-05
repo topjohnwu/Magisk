@@ -78,6 +78,7 @@ EXIT /B %ERRORLEVEL%
   2>NUL DEL zip_static\common\magisksu.sh
   2>NUL DEL zip_static\common\init.magisk.rc
   2>NUL DEL zip_static\common\magic_mask.sh
+  2>NUL RMDIR /S /Q uninstaller\common
   2>NUL RMDIR /S /Q uninstaller\arm
   2>NUL RMDIR /S /Q uninstaller\arm64
   2>NUL RMDIR /S /Q uninstaller\x86
@@ -118,6 +119,7 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Zipping uninstaller
   ECHO ************************
+  CALL :mkcp scripts\magisk_uninstaller.sh uninstaller\common
   FOR /F "tokens=* USEBACKQ" %%F IN (`ziptools\win_bin\date "+%%Y%%m%%d"`) DO (set timestamp=%%F)
   CD uninstaller
   2>NUL DEL "../Magisk-uninstaller-%timestamp%.zip"

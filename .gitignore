@@ -14,6 +14,7 @@ uninstaller/x64/*
 ziptools/zipadjust
 
 # Generated scripts
+uninstaller/common/
 zip_static/common/magic_mask.sh
 zip_static/common/magisksu.sh
 zip_static/common/init.magisk.rc

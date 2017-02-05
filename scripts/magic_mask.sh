@@ -2,6 +2,7 @@
 
 LOGFILE=/cache/magisk.log
 DISABLEFILE=/cache/.disable_magisk
+UNINSTALLER=/cache/magisk_uninstaller.sh
 IMG=/data/magisk.img
 WHITELIST="/system/bin"
 
@@ -262,7 +263,7 @@ case $1 in
     # Cleanup legacy stuffs...
     rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
 
-    [ -f $DISABLEFILE ] && unblock
+    [ -f $DISABLEFILE -o -f $UNINSTALLER ] && unblock
 
     if [ -d /cache/magisk_mount ]; then
       log_print "* Mounting cache files"
@@ -302,6 +303,13 @@ case $1 in
 
       # Live patch sepolicy
       $BINPATH/sepolicy-inject --live
+
+      if [ -f $UNINSTALLER ]; then
+        touch /dev/.magisk.unblock
+        chcon u:object_r:device:s0 /dev/.magisk.unblock
+        BOOTMODE=true sh $UNINSTALLER
+        exit
+      fi
 
       # Set up environment
       mkdir -p $TOOLPATH
