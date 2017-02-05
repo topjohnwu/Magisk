@@ -25,18 +25,9 @@ public class Utils {
     public static boolean isDownloading = false;
 
     public static boolean itemExist(String path) {
-        return itemExist(true, path);
-    }
-
-    public static boolean itemExist(boolean root, String path) {
         String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
-        List<String> ret;
-        if (Shell.rootAccess() && root) {
-            ret = Shell.su(command);
-            return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
-        } else {
-            return new File(path).exists();
-        }
+        List<String> ret = Shell.su(command);
+        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static boolean commandExists(String s) {
@@ -59,10 +50,8 @@ public class Utils {
     }
 
     public static List<String> getModList(String path) {
-        List<String> ret;
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
-        ret = Shell.su(command);
-        return ret;
+        return Shell.su(command);
     }
 
     public static List<String> readFile(String path) {
@@ -149,6 +138,15 @@ public class Utils {
 
     public static int getPrefsInt(SharedPreferences prefs, String key, int def) {
         return Integer.parseInt(prefs.getString(key, String.valueOf(def)));
+    }
+
+    public static void checkAndStartMagiskHide() {
+        String command = "ps | grep magiskhide >/dev/null; echo $?";
+        List<String> ret = Shell.su(command);
+        if (!isValidShellResponse(ret))
+            return;
+        if (Integer.parseInt(ret.get(0)) != 0)
+            new Async.MagiskHide().enable();
     }
 
 }

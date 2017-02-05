@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
 
+import java.io.File;
 import java.util.List;
 
 public class Global {
@@ -37,13 +38,6 @@ public class Global {
         public static List<String> blockList;
         public static List<ApplicationInfo> appList;
         public static List<String> magiskHideList;
-        public static void clear() {
-            repoMap = null;
-            moduleMap = null;
-            blockList = null;
-            appList = null;
-            magiskHideList = null;
-        }
     }
     public static class Events {
         public static final CallbackHandler.Event blockDetectionDone = new CallbackHandler.Event();
@@ -66,6 +60,29 @@ public class Global {
         public static int suResponseType;
         public static int suNotificationType;
     }
+    
+    public static void init(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
+        Configs.devLogging = prefs.getBoolean("developer_logging", false);
+        Configs.shellLogging = prefs.getBoolean("shell_logging", false);
+        Configs.magiskHide = prefs.getBoolean("magiskhide", false);
+        updateMagiskInfo();
+        initSuAccess();
+        initSuConfigs(context);
+        // Initialize prefs
+        prefs.edit()
+                .putBoolean("dark_theme", Configs.isDarkTheme)
+                .putBoolean("magiskhide", Configs.magiskHide)
+                .putBoolean("busybox", Utils.commandExists("busybox"))
+                .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
+                .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
+                .putString("su_request_timeout", String.valueOf(Configs.suRequestTimeout))
+                .putString("su_auto_response", String.valueOf(Configs.suResponseType))
+                .putString("su_notification", String.valueOf(Configs.suNotificationType))
+                .putString("su_access", String.valueOf(Configs.suAccessState))
+                .apply();
+    }
 
     public static void initSuConfigs(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -85,7 +102,7 @@ public class Global {
             if (Utils.isValidShellResponse(ret))
                 Configs.suAccessState = Integer.parseInt(ret.get(0));
             else {
-                Shell.su("setprop persist.sys.root_access 3");
+                Shell.su(true, "setprop persist.sys.root_access 3");
                 Configs.suAccessState = 3;
             }
         }
@@ -105,8 +122,12 @@ public class Global {
             }
         }
         ret = Shell.sh("getprop ro.magisk.disable");
-        if (Utils.isValidShellResponse(ret))
-            Info.disabled = Integer.parseInt(ret.get(0)) != 0;
+        try {
+            Info.disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
+        } catch (NumberFormatException e) {
+            Info.disabled = false;
+        }
+        
     }
 
 }

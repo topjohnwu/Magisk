@@ -2,13 +2,11 @@ package com.topjohnwu.magisk.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
@@ -50,40 +48,6 @@ public class Async {
     public static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
-
-    public static class InitConfigs extends RootTask<Void, Void, Void> {
-
-        Context mContext;
-
-        public InitConfigs(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-            Global.Configs.isDarkTheme = prefs.getBoolean("dark_theme", false);
-            Global.Configs.devLogging = prefs.getBoolean("developer_logging", false);
-            Global.Configs.shellLogging = prefs.getBoolean("shell_logging", false);
-            Global.Configs.magiskHide = prefs.getBoolean("magiskhide", false);
-            Global.updateMagiskInfo();
-            Global.initSuAccess();
-            Global.initSuConfigs(mContext);
-            // Initialize prefs
-            prefs.edit()
-                    .putBoolean("dark_theme", Global.Configs.isDarkTheme)
-                    .putBoolean("magiskhide", Global.Configs.magiskHide)
-                    .putBoolean("busybox", Utils.commandExists("busybox"))
-                    .putBoolean("hosts", Utils.itemExist(false, "/magisk/.core/hosts"))
-                    .putBoolean("disable", Utils.itemExist(Global.MAGISK_DISABLE_FILE))
-                    .putString("su_request_timeout", String.valueOf(Global.Configs.suRequestTimeout))
-                    .putString("su_auto_response", String.valueOf(Global.Configs.suResponseType))
-                    .putString("su_notification", String.valueOf(Global.Configs.suNotificationType))
-                    .putString("su_access", String.valueOf(Global.Configs.suAccessState))
-                    .apply();
-            return null;
-        }
-    }
 
     public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
@@ -327,10 +291,19 @@ public class Async {
     }
 
     public static class MagiskHide extends RootTask<Object, Void, Void> {
+
+        private boolean newShell = false;
+
+        public MagiskHide() {}
+
+        public MagiskHide(boolean b) {
+            newShell = b;
+        }
+
         @Override
         protected Void doInBackground(Object... params) {
             String command = (String) params[0];
-            Shell.su(MAGISK_HIDE_PATH + command);
+            Shell.su(newShell, MAGISK_HIDE_PATH + command);
             return null;
         }
 
