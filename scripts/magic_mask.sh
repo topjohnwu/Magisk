@@ -1,6 +1,7 @@
 #!/system/bin/sh
 
 LOGFILE=/cache/magisk.log
+DISABLEFILE=/cache/.disable_magisk
 IMG=/data/magisk.img
 WHITELIST="/system/bin"
 
@@ -253,6 +254,8 @@ case $1 in
     # Cleanup legacy stuffs...
     rm -rf /cache/magisk /cache/magisk_merge /cache/magiskhide.log
 
+    [ -f $DISABLEFILE ] && unblock
+
     if [ -d /cache/magisk_mount ]; then
       log_print "* Mounting cache files"
       find /cache/magisk_mount -type f 2>/dev/null | while read ITEM ; do
@@ -323,7 +326,8 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror /data/magisk/*.img /data/busybox 2>/dev/null
+      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror \
+             $COREDIR/busybox /data/magisk/*.img /data/busybox 2>/dev/null
 
       # Remove modules that are labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
@@ -356,8 +360,7 @@ case $1 in
       [ ! -f /sbin/launch_daemonsu.sh ] && sh $COREDIR/su/magisksu.sh
       export PATH=$TOOLPATH:$OLDPATH
 
-      # Disable Magic Mount if specified
-      [ -f $APPDIR/disable ] && unblock
+      [ -f $DISABLEFILE ] && unblock
 
       log_print "* Preparing modules"
 
@@ -498,6 +501,10 @@ case $1 in
     # Version info
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
+    if [ -f $DISABLEFILE ]; then
+      setprop ro.magisk.disable 1
+      exit
+    fi
     run_scripts service
     ;;
 

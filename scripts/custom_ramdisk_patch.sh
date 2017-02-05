@@ -51,7 +51,7 @@ for RC in init*.rc; do
     sed -i "/import \/init\.environ\.rc/iimport /init.magisk.rc" $RC
     cpio_add $RC 750
   fi
-  if file_contain "selinux.reload_policy"; then
+  if file_contain "selinux.reload_policy" $RC; then
     sed -i "/selinux.reload_policy/d" $RC
     cpio_add $RC 750
   fi
