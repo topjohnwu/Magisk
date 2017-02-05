@@ -18,9 +18,11 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 
-#define LOGFILE 	"/cache/magisk.log"
-#define HIDELIST 	"/magisk/.core/magiskhide/hidelist"
-#define DUMMYPATH	"/dev/magisk/dummy"
+#define LOGFILE 		"/cache/magisk.log"
+#define HIDELIST 		"/magisk/.core/magiskhide/hidelist"
+#define DUMMYPATH		"/dev/magisk/dummy"
+#define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
+#define SEPOLICY_INJECT "/data/magisk/sepolicy-inject"
 
 // Main thread
 void monitor_proc();
@@ -38,6 +40,7 @@ char **file_to_str_arr(FILE *fp, int *size);
 void read_namespace(const int pid, char* target, const size_t size);
 void lazy_unmount(const char* mountpoint);
 void run_as_daemon();
+void manage_selinux();
 
 // Global variable sharing through process/threads
 extern FILE *logfile;

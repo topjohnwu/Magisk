@@ -57,3 +57,35 @@ void run_as_daemon() {
 			exit(0); 
 	}
 }
+
+void manage_selinux() {
+	char *argv[] = { SEPOLICY_INJECT, "--live", "permissive *", NULL };
+	char str[20];
+	int fd, ret;
+	fd = open(ENFORCE_FILE, O_RDONLY);
+	if (fd < 0)
+		return;
+	ret = read(fd, str, 20);
+	close(fd);
+	if (ret < 1)
+		return;
+	// Permissive
+	if (str[0] == '0') {
+		fprintf(logfile, "MagiskHide: Permissive detected, switching to pseudo enforced\n");
+		fd = open(ENFORCE_FILE, O_RDWR);
+		if (fd < 0)
+			return;
+		ret = write(fd, "1", 1);
+		close(fd);
+		if (ret < 1)
+			return;
+		switch(fork()) {
+			case -1:
+				return;
+			case 0:
+				execvp(argv[0], argv);
+			default:
+				return;
+		}
+	}
+}

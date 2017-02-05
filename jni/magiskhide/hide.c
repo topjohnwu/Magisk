@@ -12,6 +12,8 @@ int hideMagisk() {
 		// Termination called
 		if(pid == -1) break;
 
+		manage_selinux();
+
 		snprintf(buffer, sizeof(buffer), "/proc/%d/ns/mnt", pid);
 		if((fd = open(buffer, O_RDONLY)) == -1) continue; // Maybe process died..
 		if(setns(fd, 0) == -1) {
