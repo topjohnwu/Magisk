@@ -115,6 +115,9 @@
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
     <string name="start_magiskhide">Starting MagiskHide …</string>
+    <string name="no_magisksu_title">Not using MagiskSU!</string>
+    <string name="no_magisksu_msg">You are not rooted with MagiskSU, using MagiskHide itself might not be enough!\nIt\'s not officially supported, and you would need additional tools (e.g suhide) to pass Safety Net.</string>
+    <string name="understand">I understand</string>
 
     <!--URL Templates-->
     <string name="url_main" translatable="false">https://api.github.com/orgs/Magisk-Modules-Repo/repos</string>

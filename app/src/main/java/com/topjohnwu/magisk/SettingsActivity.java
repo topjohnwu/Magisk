@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -182,9 +183,16 @@ public class SettingsActivity extends AppCompatActivity {
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
-                    if (enabled)
-                        new Async.MagiskHide().enable();
-                    else
+                    if (enabled) {
+                        if (!Global.Info.isSuClient) {
+                            Utils.getAlertDialogBuilder(getActivity())
+                                    .setTitle(R.string.no_magisksu_title)
+                                    .setMessage(R.string.no_magisksu_msg)
+                                    .setPositiveButton(R.string.understand, (dialog, which) -> new Async.MagiskHide().enable())
+                                    .setCancelable(false)
+                                    .show();
+                        } else new Async.MagiskHide().enable();
+                    } else
                         new Async.MagiskHide().disable();
                     break;
                 case "hosts":
