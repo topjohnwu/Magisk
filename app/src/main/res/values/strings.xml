@@ -46,6 +46,8 @@
     <string name="current_magisk_title">Installed Magisk Version: v%1$s</string>
     <string name="install_magisk_title">Latest Magisk Version: v%1$.1f</string>
     <string name="magiskify" translatable="false">Magiskify</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="reboot_countdown">Rebooting in %1$d</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>

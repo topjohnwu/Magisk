@@ -284,7 +284,7 @@ public class Async {
             Utils.getAlertDialogBuilder(mContext)
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
-                    .setPositiveButton(R.string.reboot, (dialogInterface, i) -> Shell.sh("su -c reboot"))
+                    .setPositiveButton(R.string.reboot, (dialogInterface, i) -> Shell.su(true, "reboot"))
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }

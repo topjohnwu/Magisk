@@ -213,6 +213,35 @@
 
             </android.support.v7.widget.CardView>
 
+            <android.support.v7.widget.CardView
+                android:id="@+id/uninstall_button"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="6dp"
+                style="?attr/cardStyle"
+                app:cardUseCompatPadding="true"
+                android:layout_width="match_parent"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/uninstall"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif" />
+
+            </android.support.v7.widget.CardView>
+
 
         </LinearLayout>
 

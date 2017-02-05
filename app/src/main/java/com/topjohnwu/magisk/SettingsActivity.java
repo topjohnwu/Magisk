@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
