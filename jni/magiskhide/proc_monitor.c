@@ -10,7 +10,7 @@ void monitor_proc() {
 	printf("%s\n", init_ns);
 
 	// Get the mount namespace of zygote
-	FILE *p = popen("/data/busybox/ps | grep zygote | grep -v grep", "r");
+	FILE *p = popen("ps | grep zygote | grep -v grep", "r");
 	while(fgets(buffer, sizeof(buffer), p)) {
 		if (zygote_num == 2) break;
 		sscanf(buffer, "%d", &pid);
