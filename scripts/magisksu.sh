@@ -11,7 +11,7 @@ log_print() {
 
 log_print "Moving and linking /sbin binaries"
 mount -o rw,remount rootfs /
-/dev/busybox/cp -afc /sbin /sbin_orig
+cp -af /sbin /sbin_orig
 mount -o ro,remount rootfs /
 
 log_print "Exposing su binary"

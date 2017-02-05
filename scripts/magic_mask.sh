@@ -66,6 +66,14 @@ run_scripts() {
       fi
     fi
   done
+  for SCRIPT in $COREDIR/${1}.d/* ; do
+    if [ -f "$SCRIPT" ]; then
+      chmod 755 $SCRIPT
+      chcon u:object_r:system_file:s0 $SCRIPT
+      log_print "${1}.d: $SCRIPT"
+      sh $SCRIPT
+    fi
+  done
 }
 
 loopsetup() {
@@ -441,7 +449,7 @@ case $1 in
       done
 
       # Stage 4
-      log_print "* Stage 4: Execute module scripts"
+      log_print "* Stage 4: Execute scripts"
       run_scripts post-fs-data
 
       # Stage 5
