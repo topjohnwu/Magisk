@@ -522,6 +522,9 @@ case $1 in
       exit
     fi
     run_scripts service
+    
+    # Start MagiskHide
+    [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
     ;;
 
 esac
