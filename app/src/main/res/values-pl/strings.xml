@@ -26,14 +26,14 @@
     <string name="up_to_date">Zainstalowana najnowsza wersja %1$s</string>
     <string name="root_error">Zrotowany ale bez dostępu do roota</string>
     <string name="not_rooted">Nie zrootowany</string>
-    <string name="proper_root">Prawidłowo zrootowany</string>
+    <string name="proper_root">Zrootowany prawidłowo</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_connection_failed">Nie można połączyć się z Google API</string>
     <string name="safetyNet_connection_suspended">Połączenie z Google API zostało zawieszone</string>
     <string name="safetyNet_error">Nie można sprawdzić SafetyNet bez Internetu</string>
-    <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
-    <string name="safetyNet_pass">SafetyNet Prawidłowy</string>
+    <string name="safetyNet_fail">Błąd SafetyNet: Niezgodność profilu CTS</string>
+    <string name="safetyNet_pass">SafetyNet Poprawny</string>
     <string name="root_info_warning">Funkcjonalność znacznie ograniczona</string>
 
     <!--Install Fragment-->
@@ -45,7 +45,9 @@
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="current_magisk_title">Zainstalowana Wersja Magisk: v%1$s</string>
     <string name="install_magisk_title">Ostatnia Wersja Magisk: v%1$.1f</string>
-
+   
+    <string name="uninstall">Odinstaluj</string>
+    <string name="reboot_countdown">Restartuj do %1$d</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
@@ -79,7 +81,7 @@
     <string name="app_changelog">Zmiany w Aplikacji</string>
     <string name="translators" />
     <string name="app_version">Wersja Aplikacji</string>
-    <string name="app_source_code">Source code</string>
+    <string name="app_source_code">Kod źródłowy</string>
     <string name="donation">Dotacja</string>
     <string name="app_translators">Tłumacze Aplikacji</string>
     <string name="support_thread">Strona Wsparcia</string>
@@ -115,6 +117,9 @@
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJuż jest domyślnie obsługiwana przez MagiskHide</string>
     <string name="start_magiskhide">Uruchamianie MagiskHide …</string>
+    <string name="no_magisksu_title">Nie Używaj MagiskSU!</string>
+    <string name="no_magisksu_msg">Jeśli nie masz roota z MagiskSU, używanie samego MagiskHide może nie wystarczyć! Inne metody nie są oficjalnie obsługiwane. Do poprawnego działania SaftyNet potrzebne będą dodatkowe narzędzia (np suhide)</string>
+    <string name="understand">Rozumiem</string>
     
 	<!--URL Templates-->
     
@@ -128,8 +133,8 @@
     <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
     <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
 
-    <string name="settings_disable_title">Wyłącz Montowanie Magisk</string>
-    <string name="settings_disable_summary">Disable Magic Mount, co uniemożliwi wszystkim modułom działanie</string>
+    <string name="settings_disable_title">Wyłącz Magisk</string>
+    <string name="settings_disable_summary">Wszystko zostanie wyłączone za wyjątkiem roota (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
     <string name="settings_busybox_summary">Zmień montowanie Magisk z wbudowanego busybox do xbin</string>
