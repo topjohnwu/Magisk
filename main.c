@@ -7,6 +7,8 @@ static void statements() {
 	fprintf(stderr, "\nSupported policy statements:\n\n");
 	fprintf(stderr, "\"allow #source-class #target-class permission-class #permission\"\n");
 	fprintf(stderr, "\"deny #source-class #target-class permission-class #permission\"\n");
+	fprintf(stderr, "\"auditallow #source-class #target-class permission-class #permission\"\n");
+	fprintf(stderr, "\"auditdeny #source-class #target-class permission-class #permission\"\n");
 	fprintf(stderr, "\"create #class\"\n");
 	fprintf(stderr, "\"permissive #class\"\n");
 	fprintf(stderr, "\"enforcing #class\"\n");
