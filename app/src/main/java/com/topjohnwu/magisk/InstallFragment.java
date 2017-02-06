@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -33,7 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class InstallFragment extends Fragment implements CallbackHandler.EventListener {
+public class InstallFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
 
     private static final String UNINSTALLER = "magisk_uninstaller.sh";
@@ -132,7 +132,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         updateUI();
     }
 
@@ -157,12 +157,12 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.install);
-        CallbackHandler.register(getApplication().blockDetectionDone, this);
+        getApplication().blockDetectionDone.register(this);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(getApplication().blockDetectionDone, this);
+        getApplication().blockDetectionDone.unRegister(this);
         super.onStop();
     }
 

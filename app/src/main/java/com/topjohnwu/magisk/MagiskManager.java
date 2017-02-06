@@ -8,7 +8,8 @@ import android.util.SparseArray;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.superuser.Policy;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -21,13 +22,14 @@ public class MagiskManager extends Application {
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
 
     // Events
-    public final CallbackHandler.Event blockDetectionDone = new CallbackHandler.Event();
-    public final CallbackHandler.Event packageLoadDone = new CallbackHandler.Event();
-    public final CallbackHandler.Event reloadMainActivity = new CallbackHandler.Event();
-    public final CallbackHandler.Event moduleLoadDone = new CallbackHandler.Event();
-    public final CallbackHandler.Event repoLoadDone = new CallbackHandler.Event();
-    public final CallbackHandler.Event updateCheckDone = new CallbackHandler.Event();
-    public final CallbackHandler.Event safetyNetDone = new CallbackHandler.Event();
+    public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> packageLoadDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> reloadMainActivity = new CallbackEvent<>();
+    public final CallbackEvent<Void> moduleLoadDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> updateCheckDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> safetyNetDone = new CallbackEvent<>();
+    public SparseArray<CallbackEvent<Policy>> uidMap = new SparseArray<>();
 
     // Info
     public double magiskVersion;
@@ -47,7 +49,6 @@ public class MagiskManager extends Application {
     public List<String> blockList;
     public List<ApplicationInfo> appList;
     public List<String> magiskHideList;
-    public SparseArray<CallbackHandler.Event> uidMap = new SparseArray<>();
 
     // Configurations
     public static boolean shellLogging;

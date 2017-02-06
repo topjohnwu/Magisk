@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ModulesFragment extends Fragment implements CallbackHandler.EventListener {
+public class ModulesFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
     private static final int FETCH_ZIP_CODE = 2;
 
@@ -76,7 +76,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         Logger.dev("ModulesFragment: UI refresh triggered");
         updateUI();
     }
@@ -94,13 +94,13 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(getApplication().moduleLoadDone, this);
+        getApplication().moduleLoadDone.register(this);
         getActivity().setTitle(R.string.modules);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(getApplication().moduleLoadDone, this);
+        getApplication().moduleLoadDone.unRegister(this);
         super.onStop();
     }
 

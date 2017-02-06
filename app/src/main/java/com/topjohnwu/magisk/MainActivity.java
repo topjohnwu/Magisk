@@ -21,14 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends Activity
-        implements NavigationView.OnNavigationItemSelectedListener, CallbackHandler.EventListener {
+        implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener<Void> {
 
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
@@ -79,28 +79,28 @@ public class MainActivity extends Activity
         navigate(R.id.status);
 
         navigationView.setNavigationItemSelectedListener(this);
-        CallbackHandler.register(getTopApplication().reloadMainActivity, this);
+        getTopApplication().reloadMainActivity.register(this);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CallbackHandler.register(getTopApplication().updateCheckDone, this);
-        if (getTopApplication().updateCheckDone.isTriggered)
-            onTrigger(getTopApplication().updateCheckDone);
+        getTopApplication().updateCheckDone.register(this);
+//        if (getTopApplication().updateCheckDone.isTriggered)
+//            onTrigger(getTopApplication().updateCheckDone);
         checkHideSection();
     }
 
     @Override
     protected void onPause() {
-        CallbackHandler.unRegister(getTopApplication().updateCheckDone, this);
+        getTopApplication().updateCheckDone.unRegister(this);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        CallbackHandler.unRegister(getTopApplication().reloadMainActivity, this);
+        getTopApplication().reloadMainActivity.unRegister(this);
         super.onDestroy();
     }
 
@@ -121,11 +121,11 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         if (event == getTopApplication().updateCheckDone) {
             Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.install).setVisible(getTopApplication().remoteMagiskVersion > 0 &&
-                    Shell.rootAccess());
+            menu.findItem(R.id.install).setVisible(
+                    getTopApplication().remoteMagiskVersion > 0 && Shell.rootAccess());
         } else if (event == getTopApplication().reloadMainActivity) {
             recreate();
         }

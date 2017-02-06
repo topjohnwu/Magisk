@@ -17,14 +17,14 @@ import android.widget.SearchView;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MagiskHideFragment extends Fragment implements CallbackHandler.EventListener {
+public class MagiskHideFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -71,6 +71,9 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
             }
         };
 
+        if (getApplication().packageLoadDone.isTriggered)
+            onTrigger(getApplication().packageLoadDone);
+
         return view;
     }
 
@@ -85,15 +88,12 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.magiskhide);
-        CallbackHandler.register(getApplication().packageLoadDone, this);
-        if (getApplication().packageLoadDone.isTriggered) {
-            onTrigger(getApplication().packageLoadDone);
-        }
+        getApplication().packageLoadDone.register(this);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(getApplication().packageLoadDone, this);
+        getApplication().packageLoadDone.unRegister(this);
         super.onStop();
     }
 
@@ -104,7 +104,7 @@ public class MagiskHideFragment extends Fragment implements CallbackHandler.Even
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         Logger.dev("MagiskHideFragment: UI refresh");
         appAdapter.setLists(getApplication().appList, getApplication().magiskHideList);
         mSwipeRefreshLayout.setRefreshing(false);

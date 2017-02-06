@@ -21,7 +21,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SuRequestActivity extends Activity implements CallbackHandler.EventListener {
+public class SuRequestActivity extends Activity implements CallbackEvent.Listener<Policy> {
 
     private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
     private static final int SU_PROTOCOL_PARAM_MAX = 20;
@@ -56,8 +56,8 @@ public class SuRequestActivity extends Activity implements CallbackHandler.Event
     private int uid;
     private Policy policy;
     private CountDownTimer timer;
-    private CallbackHandler.EventListener self;
-    private CallbackHandler.Event event = null;
+    private CallbackEvent.Listener<Policy> self;
+    private CallbackEvent<Policy> event = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,14 +143,11 @@ public class SuRequestActivity extends Activity implements CallbackHandler.Event
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
-        Policy policy = (Policy) event.getResult();
+    public void onTrigger(CallbackEvent<Policy> event) {
+        Policy policy = event.getResult();
         String response = "socket:DENY";
-        if (policy != null) {
-            magiskManager.uidMap.remove(policy.uid);
-            if (policy.policy == Policy.ALLOW)
-                response = "socket:ALLOW";
-        }
+        if (policy != null &&policy.policy == Policy.ALLOW )
+            response = "socket:ALLOW";
         try {
             socket.getOutputStream().write((response).getBytes());
         } catch (Exception ignored) {}
@@ -229,16 +226,17 @@ public class SuRequestActivity extends Activity implements CallbackHandler.Event
             event = magiskManager.uidMap.get(uid);
             if (event == null) {
                 showRequest = true;
-                event = new CallbackHandler.Event() {
+                event = new CallbackEvent<Policy>() {
                     @Override
-                    public void trigger(Object result) {
+                    public void trigger(Policy result) {
                         super.trigger(result);
-                        CallbackHandler.unRegister(this);
+                        unRegister();
+                        magiskManager.uidMap.remove(uid);
                     }
                 };
                 magiskManager.uidMap.put(uid, event);
             }
-            CallbackHandler.register(event, self);
+            event.register(self);
             try {
                 if (showRequest) {
                     policy = new Policy(uid, pm);

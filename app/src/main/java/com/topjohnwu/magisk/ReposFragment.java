@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ReposFragment extends Fragment implements CallbackHandler.EventListener {
+public class ReposFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -93,7 +93,7 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         Logger.dev("ReposFragment: UI refresh triggered");
         reloadRepos();
         updateUI();
@@ -109,13 +109,13 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(getApplication().repoLoadDone, this);
+        getApplication().repoLoadDone.register(this);
         getActivity().setTitle(R.string.downloads);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(getApplication().repoLoadDone, this);
+        getApplication().repoLoadDone.unRegister(this);
         super.onStop();
     }
 

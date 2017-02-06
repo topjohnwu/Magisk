@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.Async;
-import com.topjohnwu.magisk.utils.CallbackHandler;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class StatusFragment extends Fragment implements CallbackHandler.EventListener {
+public class StatusFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
     private static boolean noDialog = false;
 
@@ -115,11 +115,16 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
 
         updateUI();
 
+        if (getApplication().updateCheckDone.isTriggered)
+            updateCheckUI();
+        if (getApplication().safetyNetDone.isTriggered)
+            updateSafetyNetUI();
+
         return v;
     }
 
     @Override
-    public void onTrigger(CallbackHandler.Event event) {
+    public void onTrigger(CallbackEvent<Void> event) {
         if (event == getApplication().updateCheckDone) {
             Logger.dev("StatusFragment: Update Check UI refresh triggered");
             updateCheckUI();
@@ -132,21 +137,15 @@ public class StatusFragment extends Fragment implements CallbackHandler.EventLis
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(getApplication().updateCheckDone, this);
-        CallbackHandler.register(getApplication().safetyNetDone, this);
-        if (getApplication().updateCheckDone.isTriggered) {
-            updateCheckUI();
-        }
-        if (getApplication().safetyNetDone.isTriggered) {
-            updateSafetyNetUI();
-        }
+        getApplication().updateCheckDone.register(this);
+        getApplication().safetyNetDone.register(this);
         getActivity().setTitle(R.string.status);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(getApplication().updateCheckDone, this);
-        CallbackHandler.unRegister(getApplication().safetyNetDone, this);
+        getApplication().updateCheckDone.unRegister(this);
+        getApplication().safetyNetDone.unRegister(this);
         super.onStop();
     }
 
