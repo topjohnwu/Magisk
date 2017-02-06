@@ -5,7 +5,10 @@ import android.os.Bundle;
 
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.List;
 
 public class SplashActivity extends Activity {
 
@@ -18,13 +21,16 @@ public class SplashActivity extends Activity {
 
         // Init the info and configs and root shell
         magiskManager.init();
-        boolean boot_done = Utils.itemExist(MagiskManager.MAGISK_MANAGER_BOOT);
+
+        // Check MagiskHide status
+        List<String> ret = Shell.sh("getprop persist.magisk.hide");
+        boolean started = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
 
         // Now fire all async tasks
         new Async.CheckUpdates(magiskManager).exec();
         new Async.GetBootBlocks(magiskManager).exec();
-        if (magiskManager.prefs.getBoolean("magiskhide", false) && !magiskManager.disabled &&
-                magiskManager.magiskVersion > 10.3 && boot_done) {
+        if (magiskManager.magiskHide && !magiskManager.disabled &&
+                magiskManager.magiskVersion > 11 && !started) {
             new Async.MagiskHide().enable();
         }
         new Async.LoadModules(magiskManager) {

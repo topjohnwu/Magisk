@@ -56,8 +56,8 @@ public class MagiskManager extends Application {
     // Configurations
     public static boolean shellLogging;
     public static boolean devLogging;
-    public static boolean magiskHide;
 
+    public boolean magiskHide;
     public boolean isDarkTheme;
     public int suRequestTimeout;
     public int suLogTimeout = 14;

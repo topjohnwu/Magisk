@@ -229,7 +229,7 @@ public class Async {
 
         @Override
         protected void onPreExecute() {
-            progress = new ProgressDialog(magiskManager);
+            progress = new ProgressDialog(mContext);
             progress.setTitle(R.string.zip_install_progress_title);
             progress.show();
         }
@@ -323,11 +323,11 @@ public class Async {
         }
 
         public void enable() {
-            exec("enable");
+            exec("enable; setprop persist.magisk.hide 1");
         }
 
         public void disable() {
-            exec("disable");
+            exec("disable; setprop persist.magisk.hide 0");
         }
 
     }

@@ -10,6 +10,9 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.List;
 
 public class BootReceiver extends BroadcastReceiver {
 
@@ -29,11 +32,13 @@ public class BootReceiver extends BroadcastReceiver {
             MagiskManager magiskManager = (MagiskManager) getApplicationContext();
             magiskManager.initSuAccess();
             magiskManager.updateMagiskInfo();
+            List<String> ret = Shell.sh("getprop persist.magisk.hide");
+            boolean started = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
             if (magiskManager.prefs.getBoolean("magiskhide", false) &&
-                    !magiskManager.disabled && magiskManager.magiskVersion > 10.3) {
+                    !magiskManager.disabled && !started && magiskManager.magiskVersion > 11) {
                 magiskManager.toast(R.string.start_magiskhide, Toast.LENGTH_LONG);
                 Shell.su(true, Async.MAGISK_HIDE_PATH + "enable",
-                        "touch " + MagiskManager.MAGISK_MANAGER_BOOT);
+                        "setprop persist.magisk.hide 1");
             }
         }
     }
