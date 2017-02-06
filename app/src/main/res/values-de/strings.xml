@@ -23,7 +23,7 @@
     <string name="checking_for_updates">Suche nach Updates…</string>
     <string name="magisk_update_available">Magisk v%1$.1f ist verfügbar!</string>
     <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
-    <string name="up_to_date">Die neuste Version von %1$s ist bereits installiert</string>
+    <string name="up_to_date">Die neueste Version von %1$s ist bereits installiert</string>
     <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>
     <string name="not_rooted">Nicht gerootet</string>
     <string name="proper_root">Ordnungsgemäß gerootet</string>
@@ -44,7 +44,10 @@
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
     <string name="current_magisk_title">Installierte Magisk-Version: v%1$s</string>
-    <string name="install_magisk_title">Neuste Magisk-Version: v%1$.1f</string>
+    <string name="install_magisk_title">Neueste Magisk-Version: v%1$.1f</string>
+
+    <string name="uninstall">Deinstallieren</string>
+    <string name="reboot_countdown">Neustart in %1$d</string>
 
 
     <!--Module Fragment-->
@@ -85,7 +88,7 @@
     <string name="support_thread">Hilfeforum</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Diese Funktion benötigt Rechte zum Schreiben auf den externen Speicher.</string>
+    <string name="permissionNotGranted">Diese Funktion benötigt Rechte zum Schreiben auf dem externen Speicher.</string>
     <string name="no_thanks">Nein danke</string>
     <string name="yes">Ja</string>
     <string name="repo_install_title">Installiere %1$s</string>
@@ -126,7 +129,7 @@
     <string name="settings_dark_theme_title">Dunkles Theme</string>
     <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
-    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informtionen der Online-Repos. Erzwingt eine Aktualisierung</string>
+    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
     <string name="settings_disable_title">Magisk deaktivieren</string>
     <string name="settings_disable_summary">Deaktiviert alles außer den root-Zugang (MagiskSU)</string>
@@ -188,5 +191,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Ziel-UID:\u0020</string>
     <string name="command">Befehl:\u0020</string>
- 
+
 </resources>
