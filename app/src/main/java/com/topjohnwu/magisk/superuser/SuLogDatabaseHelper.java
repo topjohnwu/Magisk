@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +15,11 @@ public class SuLogDatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VER = 1;
     private static final String TABLE_NAME = "logs";
 
+    private MagiskManager magiskManager;
+
     public SuLogDatabaseHelper(Context context) {
         super(context, "sulog.db", null, DATABASE_VER);
+        magiskManager = (MagiskManager) context.getApplicationContext();
     }
 
     @Override
@@ -57,7 +60,7 @@ public class SuLogDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         // Clear outdated logs
         db.delete(TABLE_NAME, "time < ?", new String[] { String.valueOf(
-                System.currentTimeMillis() / 1000 - Global.Configs.suLogTimeout * 86400) });
+                System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
         try (Cursor c = db.query(TABLE_NAME, null, selection, null, null, null, "time DESC")) {
             while (c.moveToNext())
                 ret.add(new SuLogEntry(c));

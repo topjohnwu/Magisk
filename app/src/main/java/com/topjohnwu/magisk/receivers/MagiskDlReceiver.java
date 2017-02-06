@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.receivers;
 
 import android.net.Uri;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
@@ -56,7 +56,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Shell.su("setprop magisk.version "
-                                + String.valueOf(Global.Info.remoteMagiskVersion));
+                                + String.valueOf(((MagiskManager) mContext.getApplicationContext()).remoteMagiskVersion));
                         return null;
                     }
                 }.exec();

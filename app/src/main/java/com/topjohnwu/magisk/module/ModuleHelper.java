@@ -6,7 +6,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
@@ -22,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,29 +35,29 @@ public class ModuleHelper {
     private static final String REPO_KEY = "repomap";
     private static final String FILE_KEY = "RepoMap";
 
-    public static void createModuleMap() {
+    public static void createModuleMap(MagiskManager magiskManager) {
         Logger.dev("ModuleHelper: Loading modules");
 
-        Global.Data.moduleMap = new ValueSortedMap<>();
+        magiskManager.moduleMap = new ValueSortedMap<>();
 
         for (String path : Utils.getModList(MAGISK_PATH)) {
             Logger.dev("ModuleHelper: Adding modules from " + path);
             Module module;
             try {
                 module = new Module(path);
-                Global.Data.moduleMap.put(module.getId(), module);
+                magiskManager.moduleMap.put(module.getId(), module);
             } catch (BaseModule.CacheModException ignored) {}
         }
 
         Logger.dev("ModuleHelper: Data load done");
     }
 
-    public static void createRepoMap(Context context) {
+    public static void createRepoMap(MagiskManager magiskManager) {
         Logger.dev("ModuleHelper: Loading repos");
 
-        SharedPreferences prefs = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences prefs = magiskManager.prefs;
 
-        Global.Data.repoMap = new ValueSortedMap<>();
+        magiskManager.repoMap = new ValueSortedMap<>();
 
         Gson gson = new Gson();
         String jsonString;
@@ -88,7 +87,7 @@ public class ModuleHelper {
 
         // Making a request to main URL for repo info
         jsonString = WebService.request(
-                context.getString(R.string.url_main), WebService.GET, null, header, false);
+                magiskManager.getString(R.string.url_main), WebService.GET, null, header, false);
 
         if (!jsonString.isEmpty()) {
             try {
@@ -115,13 +114,13 @@ public class ModuleHelper {
                     try {
                         if (repo == null) {
                             Logger.dev("ModuleHelper: Create new repo " + id);
-                            repo = new Repo(context, name, updatedDate);
+                            repo = new Repo(magiskManager, name, updatedDate);
                         } else {
                             Logger.dev("ModuleHelper: Update cached repo " + id);
                             repo.update(updatedDate);
                         }
                         if (repo.getId() != null) {
-                            Global.Data.repoMap.put(id, repo);
+                            magiskManager.repoMap.put(id, repo);
                         }
                     } catch (BaseModule.CacheModException ignored) {}
                 }
@@ -131,50 +130,27 @@ public class ModuleHelper {
         } else {
             // Use cached if no internet or no updates
             Logger.dev("ModuleHelper: No updates, use cached");
-            Global.Data.repoMap.putAll(cached);
+            magiskManager.repoMap.putAll(cached);
         }
 
         prefs.edit()
                 .putInt(VERSION_KEY, GSON_DB_VER)
-                .putString(REPO_KEY, gson.toJson(Global.Data.repoMap))
+                .putString(REPO_KEY, gson.toJson(magiskManager.repoMap))
                 .putString(ETAG_KEY, etag)
                 .apply();
 
         Logger.dev("ModuleHelper: Repo load done");
     }
 
-    public static void getModuleList(List<Module> moduleList) {
-        moduleList.clear();
-        moduleList.addAll(Global.Data.moduleMap.values());
-    }
-
-    public static void getRepoLists(List<Repo> update, List<Repo> installed, List<Repo> others) {
-        update.clear();
-        installed.clear();
-        others.clear();
-        for (Repo repo : Global.Data.repoMap.values()) {
-            Module module = Global.Data.moduleMap.get(repo.getId());
-            if (module != null) {
-                if (repo.getVersionCode() > module.getVersionCode()) {
-                    update.add(repo);
-                } else {
-                    installed.add(repo);
-                }
-            } else {
-                others.add(repo);
-            }
-        }
-    }
-
-    public static void clearRepoCache(Context context) {
-        SharedPreferences repoMap = context.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+    public static void clearRepoCache(MagiskManager magiskManager) {
+        SharedPreferences repoMap = magiskManager.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         repoMap.edit()
                 .remove(ETAG_KEY)
                 .remove(VERSION_KEY)
                 .apply();
-        Global.Events.repoLoadDone.isTriggered = false;
-        new Async.LoadRepos(context).exec();
-        Toast.makeText(context, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
+        magiskManager.repoLoadDone.isTriggered = false;
+        new Async.LoadRepos(magiskManager).exec();
+        Toast.makeText(magiskManager, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
     }
 
 }

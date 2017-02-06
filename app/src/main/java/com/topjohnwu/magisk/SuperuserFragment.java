@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
+import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.superuser.SuDatabaseHelper;
 

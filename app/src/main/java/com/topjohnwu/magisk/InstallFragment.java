@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Shell;
@@ -54,19 +54,19 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
         View v = inflater.inflate(R.layout.fragment_install, container, false);
         unbinder = ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
-        currentVersionTitle.setText(getString(R.string.current_magisk_title, Global.Info.magiskVersionString));
-        installTitle.setText(getString(R.string.install_magisk_title, Global.Info.remoteMagiskVersion));
+        currentVersionTitle.setText(getString(R.string.current_magisk_title, getApplication().magiskVersionString));
+        installTitle.setText(getString(R.string.install_magisk_title, getApplication().remoteMagiskVersion));
         flashButton.setOnClickListener(v1 -> {
             String bootImage;
-            if (Global.Info.bootBlock != null) {
+            if (getApplication().bootBlock != null) {
                 if (spinner.getSelectedItemPosition() > 0)
-                    bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition() - 1);
+                    bootImage = getApplication().blockList.get(spinner.getSelectedItemPosition() - 1);
                 else
-                    bootImage = Global.Info.bootBlock;
+                    bootImage = getApplication().bootBlock;
             } else {
-                bootImage = Global.Data.blockList.get(spinner.getSelectedItemPosition());
+                bootImage = getApplication().blockList.get(spinner.getSelectedItemPosition());
             }
-            String filename = "Magisk-v" + Global.Info.remoteMagiskVersion + ".zip";
+            String filename = "Magisk-v" + getApplication().remoteMagiskVersion + ".zip";
             Utils.getAlertDialogBuilder(getActivity())
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                     .setMessage(getString(R.string.repo_install_msg, filename))
@@ -74,15 +74,15 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
                     .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                             getActivity(),
                             new MagiskDlReceiver(bootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
-                            Global.Info.magiskLink,
+                            getApplication().magiskLink,
                             Utils.getLegalFilename(filename)))
                     .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
-                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Global.Info.releaseNoteLink)));
+                        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getApplication().releaseNoteLink)));
                     })
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });
-        if (Global.Info.magiskVersion < 10.3) {
+        if (getApplication().magiskVersion < 10.3) {
             uninstallButton.setVisibility(View.GONE);
         } else {
             uninstallButton.setOnClickListener(vi -> {
@@ -125,7 +125,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
             });
         }
 
-        if (Global.Events.blockDetectionDone.isTriggered) {
+        if (getApplication().blockDetectionDone.isTriggered) {
             updateUI();
         }
         return v;
@@ -137,9 +137,9 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void updateUI() {
-        List<String> items = new ArrayList<>(Global.Data.blockList);
-        if (Global.Info.bootBlock != null)
-            items.add(0, getString(R.string.auto_detect, Global.Info.bootBlock));
+        List<String> items = new ArrayList<>(getApplication().blockList);
+        if (getApplication().bootBlock != null)
+            items.add(0, getString(R.string.auto_detect, getApplication().bootBlock));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -148,7 +148,7 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void toAutoDetect() {
-        if (Global.Info.bootBlock != null) {
+        if (getApplication().bootBlock != null) {
             spinner.setSelection(0);
         }
     }
@@ -157,12 +157,12 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.install);
-        CallbackHandler.register(Global.Events.blockDetectionDone, this);
+        CallbackHandler.register(getApplication().blockDetectionDone, this);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(Global.Events.blockDetectionDone, this);
+        CallbackHandler.unRegister(getApplication().blockDetectionDone, this);
         super.onStop();
     }
 

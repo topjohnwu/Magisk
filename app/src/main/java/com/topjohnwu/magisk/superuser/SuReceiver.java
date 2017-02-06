@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Process;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 
 import java.util.Date;
@@ -22,6 +22,8 @@ public class SuReceiver extends BroadcastReceiver {
         int fromUid, toUid, pid;
         String command, action;
         Policy policy;
+
+        MagiskManager magiskManager = (MagiskManager) context.getApplicationContext();
 
         if (intent == null) return;
 
@@ -40,7 +42,7 @@ public class SuReceiver extends BroadcastReceiver {
             return;
         }
 
-        Global.initSuConfigs(context);
+        magiskManager.initSuConfigs();
 
         SuLogEntry log = new SuLogEntry(policy);
 
@@ -58,7 +60,7 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
         }
 
-        if (policy.notification && Global.Configs.suNotificationType == TOAST)
+        if (policy.notification && magiskManager.suNotificationType == TOAST)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 
         if (policy.logging) {

@@ -8,7 +8,6 @@ import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.FileObserver;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -18,8 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SuRequestActivity extends AppCompatActivity implements CallbackHandler.EventListener {
+public class SuRequestActivity extends Activity implements CallbackHandler.EventListener {
 
     private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
     private static final int SU_PROTOCOL_PARAM_MAX = 20;
@@ -51,6 +51,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
     private String socketPath;
     private LocalSocket socket;
     private PackageManager pm;
+    private MagiskManager magiskManager;
 
     private int uid;
     private Policy policy;
@@ -64,6 +65,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         pm = getPackageManager();
+        magiskManager = getTopApplication();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
@@ -85,7 +87,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
 
     void showRequest() {
 
-        switch (Global.Configs.suResponseType) {
+        switch (magiskManager.suResponseType) {
             case AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
@@ -108,7 +110,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
 
-        timer = new CountDownTimer(Global.Configs.suRequestTimeout * 1000, 1000) {
+        timer = new CountDownTimer(magiskManager.suRequestTimeout * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
@@ -145,7 +147,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
         Policy policy = (Policy) event.getResult();
         String response = "socket:DENY";
         if (policy != null) {
-            Global.Events.uidMap.remove(policy.uid);
+            magiskManager.uidMap.remove(policy.uid);
             if (policy.policy == Policy.ALLOW)
                 response = "socket:ALLOW";
         }
@@ -224,7 +226,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
                 return;
             }
             boolean showRequest = false;
-            event = Global.Events.uidMap.get(uid);
+            event = magiskManager.uidMap.get(uid);
             if (event == null) {
                 showRequest = true;
                 event = new CallbackHandler.Event() {
@@ -234,7 +236,7 @@ public class SuRequestActivity extends AppCompatActivity implements CallbackHand
                         CallbackHandler.unRegister(this);
                     }
                 };
-                Global.Events.uidMap.put(uid, event);
+                magiskManager.uidMap.put(uid, event);
             }
             CallbackHandler.register(event, self);
             try {

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -26,7 +26,7 @@ import java.io.InputStream;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends Activity {
 
     private static final String DONATION_URL = "http://topjohnwu.github.io/donate";
     private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
@@ -46,7 +46,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (Global.Configs.isDarkTheme) {
+        if (getTopApplication().isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
         setContentView(R.layout.activity_about);

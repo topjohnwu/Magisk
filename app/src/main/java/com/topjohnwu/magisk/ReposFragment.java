@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +15,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.adapters.SimpleSectionedRecyclerViewAdapter;
-import com.topjohnwu.magisk.module.ModuleHelper;
+import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
@@ -68,10 +68,10 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadRepos(getActivity()).exec();
+            new Async.LoadRepos(getApplication()).exec();
         });
 
-        if (Global.Events.repoLoadDone.isTriggered) {
+        if (getApplication().repoLoadDone.isTriggered) {
             reloadRepos();
             updateUI();
         }
@@ -109,13 +109,13 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(Global.Events.repoLoadDone, this);
+        CallbackHandler.register(getApplication().repoLoadDone, this);
         getActivity().setTitle(R.string.downloads);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(Global.Events.repoLoadDone, this);
+        CallbackHandler.unRegister(getApplication().repoLoadDone, this);
         super.onStop();
     }
 
@@ -126,7 +126,20 @@ public class ReposFragment extends Fragment implements CallbackHandler.EventList
     }
 
     private void reloadRepos() {
-        ModuleHelper.getRepoLists(mUpdateRepos, mInstalledRepos, mOthersRepos);
+        mUpdateRepos.clear();
+        mInstalledRepos.clear();
+        mOthersRepos.clear();
+        for (Repo repo : getApplication().repoMap.values()) {
+            Module module = getApplication().moduleMap.get(repo.getId());
+            if (module != null) {
+                if (repo.getVersionCode() > module.getVersionCode())
+                    mUpdateRepos.add(repo);
+                else
+                    mInstalledRepos.add(repo);
+            } else {
+                mOthersRepos.add(repo);
+            }
+        }
         fUpdateRepos.clear();
         fInstalledRepos.clear();
         fOthersRepos.clear();

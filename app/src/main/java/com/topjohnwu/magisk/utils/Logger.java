@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.util.Log;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 
 public class Logger {
 
@@ -17,7 +17,7 @@ public class Logger {
     }
 
     public static void dev(String msg, Object... args) {
-        if (Global.Configs.devLogging) {
+        if (MagiskManager.devLogging) {
             if (args.length == 1 && args[0] instanceof Throwable) {
                 Log.d(TAG, "DEV: " + msg, (Throwable) args[0]);
             } else {
@@ -27,13 +27,13 @@ public class Logger {
     }
 
     public static void dev(String msg) {
-        if (Global.Configs.devLogging) {
+        if (MagiskManager.devLogging) {
             Log.d(TAG, "DEBUG: " + msg);
         }
     }
 
     public static void shell(boolean root, String msg) {
-        if (Global.Configs.shellLogging) {
+        if (MagiskManager.shellLogging) {
             Log.d(root ? "SU" : "SH", msg);
         }
     }

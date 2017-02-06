@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.module.ModuleHelper;
@@ -51,94 +51,106 @@ public class Async {
 
     public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
+        MagiskManager magiskManager;
+
+        public CheckUpdates(MagiskManager context) {
+            magiskManager = context;
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
             String jsonStr = WebService.request(UPDATE_JSON, WebService.GET);
             try {
                 JSONObject json = new JSONObject(jsonStr);
                 JSONObject magisk = json.getJSONObject("magisk");
-                Global.Info.remoteMagiskVersion = magisk.getDouble("versionCode");
-                Global.Info.magiskLink = magisk.getString("link");
-                Global.Info.releaseNoteLink = magisk.getString("note");
+                magiskManager.remoteMagiskVersion = magisk.getDouble("versionCode");
+                magiskManager.magiskLink = magisk.getString("link");
+                magiskManager.releaseNoteLink = magisk.getString("note");
             } catch (JSONException ignored) {}
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.Events.updateCheckDone.trigger();
+            magiskManager.updateCheckDone.trigger();
         }
     }
 
-    public static void checkSafetyNet(Context context) {
-        new SafetyNetHelper(context) {
+    public static void checkSafetyNet(MagiskManager magiskManager) {
+        new SafetyNetHelper(magiskManager) {
             @Override
             public void handleResults(int i) {
-                Global.Info.SNCheckResult = i;
-                Global.Events.safetyNetDone.trigger();
+                magiskManager.SNCheckResult = i;
+                magiskManager.safetyNetDone.trigger();
             }
         }.requestTest();
     }
 
     public static class LoadModules extends RootTask<Void, Void, Void> {
 
+        protected MagiskManager magiskManager;
+
+        public LoadModules(MagiskManager context) {
+            magiskManager = context;
+        }
         @Override
         protected Void doInBackground(Void... voids) {
-            ModuleHelper.createModuleMap();
+            ModuleHelper.createModuleMap(magiskManager);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.Events.moduleLoadDone.trigger();
+            magiskManager.moduleLoadDone.trigger();
         }
     }
 
     public static class LoadRepos extends NormalTask<Void, Void, Void> {
 
-        private Context mContext;
+        private MagiskManager magiskManager;
 
-        public LoadRepos(Context context) {
-            mContext = context;
+        public LoadRepos(MagiskManager context) {
+            magiskManager = context;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            ModuleHelper.createRepoMap(mContext);
+            ModuleHelper.createRepoMap(magiskManager);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.Events.repoLoadDone.trigger();
+            magiskManager.repoLoadDone.trigger();
         }
     }
 
     public static class LoadApps extends RootTask<Void, Void, Void> {
 
-        private PackageManager pm;
+        private MagiskManager magiskManager;
 
-        public LoadApps(PackageManager packageManager) {
-           pm = packageManager;
+        public LoadApps(MagiskManager context) {
+           magiskManager = context;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Global.Data.appList = pm.getInstalledApplications(0);
-            for (Iterator<ApplicationInfo> i = Global.Data.appList.iterator(); i.hasNext(); ) {
+            PackageManager pm = magiskManager.getPackageManager();
+            magiskManager.appList = pm.getInstalledApplications(0);
+            for (Iterator<ApplicationInfo> i = magiskManager.appList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
                 if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled)
                     i.remove();
             }
-            Collections.sort(Global.Data.appList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
+            Collections.sort(magiskManager.appList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                     .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            Global.Data.magiskHideList = Shell.su(Async.MAGISK_HIDE_PATH + "list");
+            magiskManager.magiskHideList = Shell.su(Async.MAGISK_HIDE_PATH + "list");
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.Events.packageLoadDone.trigger();
+            magiskManager.packageLoadDone.trigger();
         }
     }
 
@@ -149,19 +161,22 @@ public class Async {
         private String mFilename;
         protected ProgressDialog progress;
         private Context mContext;
+        private MagiskManager magiskManager;
 
         public FlashZIP(Context context, Uri uri, String filename) {
             mContext = context;
+            magiskManager = (MagiskManager) context.getApplicationContext();
             mUri = uri;
             mFilename = filename;
         }
 
         public FlashZIP(Context context, Uri uri) {
             mContext = context;
+            magiskManager = (MagiskManager) context.getApplicationContext();
             mUri = uri;
 
             // Try to get the filename ourselves
-            Cursor c = mContext.getContentResolver().query(uri, null, null, null, null);
+            Cursor c = magiskManager.getContentResolver().query(uri, null, null, null, null);
             if (c != null) {
                 int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 c.moveToFirst();
@@ -179,14 +194,14 @@ public class Async {
         protected void preProcessing() throws Throwable {}
 
         protected void copyToCache() throws Throwable {
-            publishProgress(mContext.getString(R.string.copying_msg));
-            mCachedFile = new File(mContext.getCacheDir().getAbsolutePath() + "/install.zip");
+            publishProgress(magiskManager.getString(R.string.copying_msg));
+            mCachedFile = new File(magiskManager.getCacheDir().getAbsolutePath() + "/install.zip");
             if (mCachedFile.exists() && !mCachedFile.delete()) {
                 Logger.error("FlashZip: Error while deleting already existing file");
                 throw new IOException();
             }
             try (
-                    InputStream in = mContext.getContentResolver().openInputStream(mUri);
+                    InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
                     OutputStream outputStream = new FileOutputStream(mCachedFile)
             ) {
                 byte buffer[] = new byte[1024];
@@ -214,7 +229,7 @@ public class Async {
 
         @Override
         protected void onPreExecute() {
-            progress = new ProgressDialog(mContext);
+            progress = new ProgressDialog(magiskManager);
             progress.setTitle(R.string.zip_install_progress_title);
             progress.show();
         }
@@ -236,7 +251,7 @@ public class Async {
                 return -1;
             }
             if (!unzipAndCheck()) return 0;
-            publishProgress(mContext.getString(R.string.zip_install_progress_msg, mFilename));
+            publishProgress(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
             ret = Shell.su(
                     "BOOTMODE=true sh " + mCachedFile.getParent() +
                             "/META-INF/com/google/android/update-binary dummy 1 " + mCachedFile.getPath(),
@@ -264,12 +279,12 @@ public class Async {
             progress.dismiss();
             switch (result) {
                 case -1:
-                    Toast.makeText(mContext, mContext.getString(R.string.install_error), Toast.LENGTH_LONG).show();
-                    Toast.makeText(mContext, mContext.getString(R.string.manual_install_1, mUri.getPath()), Toast.LENGTH_LONG).show();
-                    Toast.makeText(mContext, mContext.getString(R.string.manual_install_2), Toast.LENGTH_LONG).show();
+                    Toast.makeText(magiskManager, magiskManager.getString(R.string.install_error), Toast.LENGTH_LONG).show();
+                    Toast.makeText(magiskManager, magiskManager.getString(R.string.manual_install_1, mUri.getPath()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(magiskManager, magiskManager.getString(R.string.manual_install_2), Toast.LENGTH_LONG).show();
                     break;
                 case 0:
-                    Toast.makeText(mContext, mContext.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();
+                    Toast.makeText(magiskManager, magiskManager.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();
                     break;
                 case 1:
                     onSuccess();
@@ -278,8 +293,8 @@ public class Async {
         }
 
         protected void onSuccess() {
-            Global.Events.updateCheckDone.trigger();
-            new LoadModules().exec();
+            magiskManager.updateCheckDone.trigger();
+            new LoadModules(magiskManager).exec();
 
             Utils.getAlertDialogBuilder(mContext)
                     .setTitle(R.string.reboot_title)
@@ -326,19 +341,26 @@ public class Async {
     }
 
     public static class GetBootBlocks extends RootTask<Void, Void, Void> {
+
+        MagiskManager magiskManager;
+
+        public GetBootBlocks(MagiskManager context) {
+            magiskManager = context;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
             if (Shell.rootAccess()) {
-                Global.Data.blockList = Shell.su("ls /dev/block | grep mmc");
-                if (Global.Info.bootBlock == null)
-                    Global.Info.bootBlock = Utils.detectBootImage();
+                magiskManager.blockList = Shell.su("ls /dev/block | grep mmc");
+                if (magiskManager.bootBlock == null)
+                    magiskManager.bootBlock = Utils.detectBootImage();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.Events.blockDetectionDone.trigger();
+            magiskManager.blockDetectionDone.trigger();
         }
     }
 }

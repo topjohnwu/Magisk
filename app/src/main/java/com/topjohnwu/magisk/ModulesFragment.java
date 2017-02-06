@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
+import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackHandler;
 import com.topjohnwu.magisk.utils.Logger;
@@ -54,7 +53,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadModules().exec();
+            new Async.LoadModules(getApplication()).exec();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -69,7 +68,7 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
             }
         });
 
-        if (Global.Events.moduleLoadDone.isTriggered) {
+        if (getApplication().moduleLoadDone.isTriggered) {
             updateUI();
         }
 
@@ -95,13 +94,13 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     @Override
     public void onStart() {
         super.onStart();
-        CallbackHandler.register(Global.Events.moduleLoadDone, this);
+        CallbackHandler.register(getApplication().moduleLoadDone, this);
         getActivity().setTitle(R.string.modules);
     }
 
     @Override
     public void onStop() {
-        CallbackHandler.unRegister(Global.Events.moduleLoadDone, this);
+        CallbackHandler.unRegister(getApplication().moduleLoadDone, this);
         super.onStop();
     }
 
@@ -112,7 +111,8 @@ public class ModulesFragment extends Fragment implements CallbackHandler.EventLi
     }
 
     private void updateUI() {
-        ModuleHelper.getModuleList(listModules);
+        listModules.clear();
+        listModules.addAll(getApplication().moduleMap.values());
         if (listModules.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

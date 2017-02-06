@@ -9,11 +9,11 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
@@ -23,14 +23,14 @@ import com.topjohnwu.magisk.utils.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends Activity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Global.Configs.isDarkTheme) {
+        if (getTopApplication().isDarkTheme) {
             setTheme(R.style.AppTheme_dh);
         }
 
@@ -77,6 +77,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         private ListPreference suAccess, autoRes, suNotification, requestTimeout;
 
+        private MagiskManager getApplication() {
+            return (MagiskManager) getActivity().getApplication();
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -99,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
             setSummary();
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                ModuleHelper.clearRepoCache(getActivity());
+                ModuleHelper.clearRepoCache(getApplication());
                 return true;
             });
 
@@ -107,11 +111,11 @@ public class SettingsActivity extends AppCompatActivity {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
             } else {
-                if (!Global.Info.isSuClient)
+                if (!getApplication().isSuClient)
                     prefScreen.removePreference(suCategory);
-                if (Global.Info.magiskVersion < 11)
+                if (getApplication().magiskVersion < 11)
                     prefScreen.removePreference(magiskCategory);
-                if (Global.Info.disabled) {
+                if (getApplication().disabled) {
                     busybox.setEnabled(false);
                     magiskHide.setEnabled(false);
                     hosts.setEnabled(false);
@@ -139,10 +143,10 @@ public class SettingsActivity extends AppCompatActivity {
             switch (key) {
                 case "dark_theme":
                     enabled = prefs.getBoolean("dark_theme", false);
-                    if (Global.Configs.isDarkTheme != enabled) {
-                        Global.Configs.isDarkTheme = enabled;
+                    if (getApplication().isDarkTheme != enabled) {
+                        getApplication().isDarkTheme = enabled;
                         getActivity().recreate();
-                        Global.Events.reloadMainActivity.trigger();
+                        getApplication().reloadMainActivity.trigger();
                     }
                     break;
                 case "disable":
@@ -152,9 +156,9 @@ public class SettingsActivity extends AppCompatActivity {
                         @Override
                         protected Void doInBackground(Void... voids) {
                             if (enable) {
-                                Utils.createFile(Global.MAGISK_DISABLE_FILE);
+                                Utils.createFile(MagiskManager.MAGISK_DISABLE_FILE);
                             } else {
-                                Utils.removeItem(Global.MAGISK_DISABLE_FILE);
+                                Utils.removeItem(MagiskManager.MAGISK_DISABLE_FILE);
                             }
                             return null;
                         }
@@ -183,7 +187,7 @@ public class SettingsActivity extends AppCompatActivity {
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        if (!Global.Info.isSuClient) {
+                        if (!getApplication().isSuClient) {
                             Utils.getAlertDialogBuilder(getActivity())
                                     .setTitle(R.string.no_magisksu_title)
                                     .setMessage(R.string.no_magisksu_msg)
@@ -212,23 +216,23 @@ public class SettingsActivity extends AppCompatActivity {
                     }.exec();
                     break;
                 case "su_access":
-                    Global.Configs.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
-                    Shell.su("setprop persist.sys.root_access " + Global.Configs.suAccessState);
+                    getApplication().suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
+                    Shell.su("setprop persist.sys.root_access " + getApplication().suAccessState);
                     break;
                 case "su_request_timeout":
-                    Global.Configs.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+                    getApplication().suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
                     break;
                 case "su_auto_response":
-                    Global.Configs.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+                    getApplication().suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
                     break;
                 case "su_notification":
-                    Global.Configs.suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+                    getApplication().suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
                     break;
                 case "developer_logging":
-                    Global.Configs.devLogging = prefs.getBoolean("developer_logging", false);
+                    getApplication().devLogging = prefs.getBoolean("developer_logging", false);
                     break;
                 case "shell_logging":
-                    Global.Configs.shellLogging = prefs.getBoolean("shell_logging", false);
+                    getApplication().shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
             }
             setSummary();
@@ -236,11 +240,11 @@ public class SettingsActivity extends AppCompatActivity {
 
         private void setSummary() {
             suAccess.setSummary(getResources()
-                    .getStringArray(R.array.su_access)[Global.Configs.suAccessState]);
+                    .getStringArray(R.array.su_access)[getApplication().suAccessState]);
             autoRes.setSummary(getResources()
-                    .getStringArray(R.array.auto_response)[Global.Configs.suResponseType]);
+                    .getStringArray(R.array.auto_response)[getApplication().suResponseType]);
             suNotification.setSummary(getResources()
-                    .getStringArray(R.array.su_notification)[Global.Configs.suNotificationType]);
+                    .getStringArray(R.array.su_notification)[getApplication().suNotificationType]);
             requestTimeout.setSummary(
                     getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
         }

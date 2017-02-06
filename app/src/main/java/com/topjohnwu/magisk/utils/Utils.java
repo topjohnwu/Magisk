@@ -13,7 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
@@ -115,7 +115,7 @@ public class Utils {
     }
 
     public static AlertDialog.Builder getAlertDialogBuilder(Context context) {
-        if (Global.Configs.isDarkTheme) {
+        if (((MagiskManager) context.getApplicationContext()).isDarkTheme) {
             return new AlertDialog.Builder(context, R.style.AlertDialog_dh);
         } else {
             return new AlertDialog.Builder(context);
