@@ -3,8 +3,10 @@ package com.topjohnwu.magisk;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
@@ -20,6 +22,7 @@ import java.util.List;
 public class MagiskManager extends Application {
 
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
+    public static final String MAGISK_MANAGER_BOOT = "/dev/.magisk_manager_boot";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
@@ -64,10 +67,20 @@ public class MagiskManager extends Application {
 
     public SharedPreferences prefs;
 
+    private static Handler mHandler = new Handler();
+
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    public void toast(String msg, int duration) {
+        mHandler.post(() -> Toast.makeText(this, msg, duration).show());
+    }
+
+    public void toast(int resId, int duration) {
+        mHandler.post(() -> Toast.makeText(this, resId, duration).show());
     }
 
     public void init() {

@@ -132,6 +132,13 @@ public class Shell {
                 process = Runtime.getRuntime().exec("su");
                 STDIN = new DataOutputStream(process.getOutputStream());
                 STDOUT = new StreamGobbler(process.getInputStream(), res);
+
+                // Run the new shell with busybox and proper umask
+                STDIN.write(("umask 022\n").getBytes("UTF-8"));
+                STDIN.flush();
+                STDIN.write(("PATH=`[ -e /dev/busybox ] && echo /dev/busybox || " +
+                        "echo /data/busybox`:$PATH\n").getBytes("UTF-8"));
+                STDIN.flush();
             } catch (IOException err) {
                 return null;
             }

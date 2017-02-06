@@ -307,18 +307,10 @@ public class Async {
 
     public static class MagiskHide extends RootTask<Object, Void, Void> {
 
-        private boolean newShell = false;
-
-        public MagiskHide() {}
-
-        public MagiskHide(boolean b) {
-            newShell = b;
-        }
-
         @Override
         protected Void doInBackground(Object... params) {
             String command = (String) params[0];
-            Shell.su(newShell, MAGISK_HIDE_PATH + command);
+            Shell.su(MAGISK_HIDE_PATH + command);
             return null;
         }
 
