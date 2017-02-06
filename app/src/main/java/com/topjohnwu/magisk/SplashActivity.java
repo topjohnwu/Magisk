@@ -16,14 +16,9 @@ public class SplashActivity extends AppCompatActivity {
         // Init the info and configs and root shell
         Global.init(getApplicationContext());
 
-        // Start MagiskHide if not started at boot
-        if (Global.Configs.magiskHide && !Global.Info.disabled && Global.Info.magiskVersion > 10.3)
-            new Async.MagiskHide().enable();
-
         // Now fire all async tasks
-        new Async.LoadApps(getPackageManager()).exec();
-        new Async.GetBootBlocks().exec();
         new Async.CheckUpdates().exec();
+        new Async.GetBootBlocks().exec();
         new Async.LoadModules() {
             @Override
             protected void onPostExecute(Void v) {
@@ -31,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
                 new Async.LoadRepos(getApplicationContext()).exec();
             }
         }.exec();
+        new Async.LoadApps(getPackageManager()).exec();
 
         // Preparation done, now start main activity
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);

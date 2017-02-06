@@ -1,5 +1,6 @@
 #!/system/bin/sh
 
+[ -z $BOOTMODE ] && BOOTMODE=false
 TMPDIR=/tmp
 ($BOOTMODE) && TMPDIR=/dev/tmp
 

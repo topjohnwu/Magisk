@@ -82,44 +82,49 @@ public class InstallFragment extends Fragment implements CallbackHandler.EventLi
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });
-        uninstallButton.setOnClickListener(vi -> {
-            Utils.getAlertDialogBuilder(getActivity())
-                    .setTitle("Uninstall Magisk")
-                    .setMessage("This will remove all modules, MagiskSU, and potentially re-encrypt your device\nAre you sure to process?")
-                    .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
-                        try {
-                            InputStream in = getActivity().getAssets().open(UNINSTALLER);
-                            File uninstaller = new File(getActivity().getCacheDir().getAbsolutePath() + "/" + UNINSTALLER);
-                            FileOutputStream out = new FileOutputStream(uninstaller);
-                            byte[] bytes = new byte[1024];
-                            int read;
-                            while ((read = in.read(bytes)) != -1)
-                                out.write(bytes, 0, read);
-                            in.close();
-                            out.close();
-                            ProgressDialog progress = new ProgressDialog(getActivity());
-                            progress.setTitle(R.string.reboot);
-                            progress.show();
-                            new CountDownTimer(5000, 1000) {
-                                @Override
-                                public void onTick(long millisUntilFinished) {
-                                    progress.setMessage(getString(R.string.reboot_countdown, millisUntilFinished / 1000));
-                                }
+        if (Global.Info.magiskVersion < 10.3) {
+            uninstallButton.setVisibility(View.GONE);
+        } else {
+            uninstallButton.setOnClickListener(vi -> {
+                Utils.getAlertDialogBuilder(getActivity())
+                        .setTitle("Uninstall Magisk")
+                        .setMessage("This will remove all modules, MagiskSU, and potentially re-encrypt your device\nAre you sure to process?")
+                        .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                            try {
+                                InputStream in = getActivity().getAssets().open(UNINSTALLER);
+                                File uninstaller = new File(getActivity().getCacheDir().getAbsolutePath() + "/" + UNINSTALLER);
+                                FileOutputStream out = new FileOutputStream(uninstaller);
+                                byte[] bytes = new byte[1024];
+                                int read;
+                                while ((read = in.read(bytes)) != -1)
+                                    out.write(bytes, 0, read);
+                                in.close();
+                                out.close();
+                                ProgressDialog progress = new ProgressDialog(getActivity());
+                                progress.setTitle(R.string.reboot);
+                                progress.show();
+                                new CountDownTimer(5000, 1000) {
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                        progress.setMessage(getString(R.string.reboot_countdown, millisUntilFinished / 1000));
+                                    }
 
-                                @Override
-                                public void onFinish() {
-                                    progress.setMessage(getString(R.string.reboot_countdown, 0));
-                                    Shell.su(true, "cp -af " + uninstaller + " /cache/" + UNINSTALLER,
-                                            "reboot");
-                                }
-                            }.start();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    })
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
-        });
+                                    @Override
+                                    public void onFinish() {
+                                        progress.setMessage(getString(R.string.reboot_countdown, 0));
+                                        Shell.su(true, "cp -af " + uninstaller + " /cache/" + UNINSTALLER,
+                                                "reboot");
+                                    }
+                                }.start();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .setNegativeButton(R.string.no_thanks, null)
+                        .show();
+            });
+        }
+
         if (Global.Events.blockDetectionDone.isTriggered) {
             updateUI();
         }

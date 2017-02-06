@@ -44,22 +44,23 @@ public class SuReceiver extends BroadcastReceiver {
 
         SuLogEntry log = new SuLogEntry(policy);
 
-        if (policy.notification && Global.Configs.suNotificationType == TOAST) {
-            String message;
-            switch (action) {
-                case "allow":
-                    message = context.getString(R.string.su_allow_toast, policy.appName);
-                    log.action = true;
-                    break;
-                case "deny":
-                    message = context.getString(R.string.su_deny_toast, policy.appName);
-                    log.action = false;
-                    break;
-                default:
-                    return;
-            }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        String message;
+        switch (action) {
+            case "allow":
+                message = context.getString(R.string.su_allow_toast, policy.appName);
+                log.action = true;
+                break;
+            case "deny":
+                message = context.getString(R.string.su_deny_toast, policy.appName);
+                log.action = false;
+                break;
+            default:
+                return;
         }
+
+        if (policy.notification && Global.Configs.suNotificationType == TOAST)
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+
         if (policy.logging) {
             toUid = intent.getIntExtra("to.uid", -1);
             if (toUid < 0) return;
