@@ -1,0 +1,187 @@
+<resources>
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Открыть меню навигации</string>
+    <string name="navigation_drawer_close">Закрыть меню навигации</string>
+    <string name="magiskhide">Magisk Hide</string>
+    <string name="modules">Модули</string>
+    <string name="downloads">Загрузки</string>
+    <string name="superuser">Суперпользователь</string>
+    <string name="log">Лог</string>
+    <string name="settings">Настройки</string>
+    <string name="status">Статус</string>
+    <string name="install">Установка</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">Установлен Magisk v%1$s</string>
+    <string name="magisk_version_disable">Magisk v%1$s выключен</string>
+    <string name="magisk_version_error">Magisk не установлен</string>
+
+    <string name="checking_for_updates">Проверка обновлений…</string>
+    <string name="magisk_update_available">Доступен Magisk v%1$.1f!</string>
+    <string name="cannot_check_updates">Невозможно проверить обновления, нет соединения?</string>
+    <string name="up_to_date">Установлена последняя версия %1$s</string>
+    <string name="root_error">Рут есть, но нет разрешения, не разрешено?</string>
+    <string name="not_rooted">Нет рута</string>
+    <string name="proper_root">Рут получен правильно</string>
+    <string name="safetyNet_check_text">Нажмите для запуска проверки SafetyNet</string>
+    <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
+    <string name="safetyNet_connection_failed">Невозможно соединиться с API Google</string>
+    <string name="safetyNet_connection_suspended">Соединение с API Google было приостановлено</string>
+    <string name="safetyNet_error">Невозможно выполнить проверку SafetyNet, нет соединения?</string>
+    <string name="safetyNet_fail">SafetyNet не пройден: несовпадение профиля CTS</string>
+    <string name="safetyNet_pass">SafetyNet пройден</string>
+    <string name="root_info_warning">Функциональность значительно ограничена</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">"(Авто) %1$s"</string>
+    <string name="boot_image_title">Местоположение образа Boot</string>
+    <string name="detect_button">Определить</string>
+    <string name="advanced_settings_title">Дополнительные настройки</string>
+    <string name="keep_force_encryption">Оставить шифрование</string>
+    <string name="keep_dm_verity">Оставить dm-verity</string>
+    <string name="current_magisk_title">Установленная версия Magisk: v%1$s</string>
+    <string name="install_magisk_title">Последняя версия Magisk: v%1$.1f</string>
+    <string name="uninstall">Удалить</string>
+    <string name="reboot_countdown">Перезагрузка через %1$d</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Нет информации)</string>
+    <string name="no_modules_found">Модули не найдены</string>
+    <string name="update_file_created">Модуль будет обновлён при перезагрузке</string>
+    <string name="remove_file_created">Модуль будет удалён при перезагрузке</string>
+    <string name="remove_file_deleted">Модуль не будет удалён при перезагрузке</string>
+    <string name="disable_file_created">Модуль будет выключён при перезагрузке</string>
+    <string name="disable_file_removed">Модуль будет включён при перезагрузке</string>
+    <string name="author">Автор: %1$s</string>
+    <string name="fab_flash_zip">Прошить модуль из zip-архива</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Доступно обновление</string>
+    <string name="installed">Установлен</string>
+    <string name="not_installed">Не установлен</string>
+    <string name="changelog">Изменения</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Сохранить на SD-карту</string>
+    <string name="menuReload">Обновить</string>
+    <string name="menuClearLog">Очистить</string>
+    <string name="logs_cleared">Лог успешно очищен</string>
+    <string name="log_is_empty">Лог пуст</string>
+    <string name="logs_save_failed">Не удалось сохранить лог на SD-карту:</string>
+
+    <!--About Activity-->
+    <string name="about">О приложении</string>
+    <string name="app_developers">Основные разработчики</string>
+    <string name="app_developers_"><![CDATA[Приложение создано <a href="https://github.com/topjohnwu">topjohnwu</a> совместно с <a href="https://github.com/d8ahazard">Digitalhigh</a> и <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Список изменений</string>
+    <string name="translators">Exalm</string>
+    <string name="app_version">Версия</string>
+    <string name="app_source_code">Исходный код</string>
+    <string name="donation">Пожертвовать</string>
+    <string name="app_translators">Переводчики</string>
+    <string name="support_thread">Страница поддержки</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Это не будет работать без доступа к внешнему хранилищу</string>
+    <string name="no_thanks">Нет, спасибо</string>
+    <string name="yes">Да</string>
+    <string name="repo_install_title">Установить %1$s</string>
+    <string name="repo_install_msg">Вы хотите установить %1$s ?</string>
+    <string name="download_install">Скачать и установить</string>
+    <string name="goto_install">Перейти в раздел «Установка»</string>
+    <string name="download_file_error">Ошибка при скачивании файла</string>
+    <string name="install_error">Ошибка при установке!</string>
+    <string name="manual_install_1">Zip-файл помещён в %1$s</string>
+    <string name="manual_install_2">Прошейте руками через рекавери</string>а
+    <string name="invalid_zip">Этот архив не содержит модуль Magisk!!</string>
+    <string name="reboot_title">Установка успешна!</string>
+    <string name="reboot_msg">Вы хотите перезагрузиться?</string>
+    <string name="reboot">Перезагрузка</string>
+    <string name="copying_msg">Копирование архива во временную директорию</string>
+    <string name="zip_install_progress_title">Установка</string>
+    <string name="zip_install_unzip_zip_msg">Распаковка zip-файла…</string>
+    <string name="zip_install_process_zip_msg">Обработка zip-файла…</string>
+    <string name="zip_install_progress_msg">"Установка %1$s…"</string>
+    <string name="no_magisk_title">Magisk не установлен!</string>
+    <string name="no_magisk_msg">Вы хотите скачать и установить Magisk?</string>
+    <string name="downloading_toast">Скачивание %1$s</string>
+    <string name="magisk_update_title">Доступно обновление Magisk!</string>
+    <string name="magisk_update_message">Вышел Magisk версии v%1$.1f, установить?</string>
+    <string name="settings_reboot_toast">Перезагрузитесь для применения изменений</string>
+    <string name="check_release_notes">Посмотреть примечания к выпуску</string>
+    <string name="repo_cache_cleared">Кэш репозиториев очищен</string>
+    <string name="safetyNet_hide_notice">Это приложение использует SafetyNet\nУже обработано MagiskHide по умолчанию</string>
+    <string name="start_magiskhide">Запуск MagiskHide…</string>
+    <string name="no_magisksu_title">MagiskSU не используется!</string>
+    <string name="no_magisksu_msg">Если рут получен не через MagiskSU, использования MagiskHide может не хватить!\nЭто официально не поддерживается, и вам могут понадобиться дополнительные инструменты (например, suhide), чтобы пройти SafetyNet.</string>
+    <string name="understand">Я понимаю</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Основные</string>
+    <string name="settings_dark_theme_title">Тёмная тема</string>
+    <string name="settings_dark_theme_summary">Включить тёмную тему</string>
+    <string name="settings_clear_cache_title">Очистить кэш репозиториев</string>
+    <string name="settings_clear_cache_summary">Удалить сохранённую информацию о сетевых репозиториях, чтобы приложение обновило информацию из сети</string>
+
+    <string name="settings_disable_title">Отключить Magisk</string>
+    <string name="settings_disable_summary">Будет выключено все, кроме рута (MagiskSU)</string>
+    <string name="settings_magiskhide_summary">Скрыть Magisk от различных проверок</string>
+    <string name="settings_busybox_title">Включить BusyBox</string>
+    <string name="settings_busybox_summary">Примонтировать встроенный busybox из Magisk в xbin</string>
+    <string name="settings_hosts_title">Включить Systemless hosts</string>
+    <string name="settings_hosts_summary">Поддержа Systemless hosts для блокировщиков рекламы</string>
+
+    <string name="settings_su_app_adb">Для приложений и ADB</string>
+    <string name="settings_su_app">Только для приложений</string>
+    <string name="settings_su_adb">Только для ADB</string>
+    <string name="settings_su_disable">Выключен</string>
+    <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_20">20 секунд</string>
+    <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_60">60 секунд</string>
+    <string name="superuser_access">Доступ суперпользователя</string>
+    <string name="auto_response">Автоматический ответ</string>
+    <string name="request_timeout">Таймаут запроса</string>
+    <string name="superuser_notification">Уведомление суперпользователя</string>
+    <string name="request_timeout_summary">%1$s секунд</string>
+
+    <string name="settings_development_category">Разработка</string>
+    <string name="settings_developer_logging_title">Включить подробное логгирование</string>
+    <string name="settings_developer_logging_summary">Нажмите, чтобы включить подробную запись</string>
+    <string name="settings_shell_logging_title">Включить подробное логгирование команд оболочки</string>
+    <string name="settings_shell_logging_summary">Нажмите, чтобы включить запись всех команд оболочки и их вывод</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Запрос прав суперпользователя</string>
+    <string name="deny_with_str">Отказать %1$s</string>
+    <string name="deny">Отказать</string>
+    <string name="prompt">Запрос</string>
+    <string name="grant">Предоставить</string>
+    <string name="su_warning">Предоставить полный доступ к устройству.\nОтклоните, если не уверены!</string>
+    <string name="forever">Навсегда</string>
+    <string name="once">Один раз</string>
+    <string name="tenmin">На 10 минут</string>
+    <string name="twentymin">На 20 минут</string>
+    <string name="thirtymin">На 30 минут</string>
+    <string name="sixtymin">На 60 минут</string>
+    <string name="su_allow_toast">Права суперпользователя предоставлены для %1$s</string>
+    <string name="su_deny_toast">Отказано в получении прав суперпользователя для %1$s</string>
+    <string name="no_apps_found">Приложения не найдены</string>
+    <string name="su_snack_grant">Права суперпользователя предоставлены для %1$s</string>
+    <string name="su_snack_deny">Права суперпользователя для %1$s не предоставлены</string>
+    <string name="su_snack_notif_on">Включены уведомления для %1$s</string>
+    <string name="su_snack_notif_off">Выключены уведомления для %1$s</string>
+    <string name="su_snack_log_on">Включено логгирование для %1$s</string>
+    <string name="su_snack_log_off">Выключено логгирование для %1$s</string>
+    <string name="su_snack_revoke">Права для %1$s убраны</string>
+    <string name="su_revoke_title">Убрать?</string>
+    <string name="su_revoke_msg">Вы действительно хотите убрать права суперпользователя для %1$s?</string>
+    <string name="toast">Сообщение</string>
+    <string name="none">Ничего</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Идентификатор UID:\u0020</string>
+    <string name="command">Команда:\u0020</string>
+
+</resources>
