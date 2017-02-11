@@ -101,10 +101,19 @@ LGE_G=false
 RBRAND=$(grep_prop ro.product.brand)
 RMODEL=$(grep_prop ro.product.device)
 if [ "$RBRAND" = "lge" ] || [ "$RBRAND" = "LGE" ];  then 
-  if [ "$RMODEL" = "*D80*" ] || 
-     [ "$RMODEL" = "*S98*" ] || 
-     [ "$RMODEL" = "*D85*" ] ||
-     [ "$RMODEL" = "*F40*" ]; then
+  if [ "$RMODEL" = "d800" ] ||
+     [ "$RMODEL" = "d801" ] ||
+     [ "$RMODEL" = "d802" ] ||
+     [ "$RMODEL" = "d803" ] || 
+     [ "$RMODEL" = "ls980" ] ||
+     [ "$RMODEL" = "vs980" ] ||
+     [ "$RMODEL" = "l01f" ] || 
+     [ "$RMODEL" = "d850" ] ||
+     [ "$RMODEL" = "d852" ] ||
+     [ "$RMODEL" = "d855" ] ||
+     [ "$RMODEL" = "ls990" ] ||
+     [ "$RMODEL" = "vs985" ] ||
+     [ "$RMODEL" = "f400" ]; then
     LGE_G=true
     ui_print "! Bump device detected"
   fi
