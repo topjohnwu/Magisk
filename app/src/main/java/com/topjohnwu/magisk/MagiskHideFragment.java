@@ -50,7 +50,7 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
         PackageManager packageManager = getActivity().getPackageManager();
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> new Async.LoadApps(getApplication()).exec());
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new Async.LoadApps(getActivity()).exec());
 
         appAdapter = new ApplicationAdapter(packageManager);
         recyclerView.setAdapter(appAdapter);

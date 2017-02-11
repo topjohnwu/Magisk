@@ -53,7 +53,7 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadModules(getApplication()).exec();
+            new Async.LoadModules(getActivity()).exec();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

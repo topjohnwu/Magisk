@@ -23,7 +23,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
 
     @Override
     public void onDownloadDone(Uri uri) {
-        new Async.FlashZIP(mContext, uri, mFilename) {
+        new Async.FlashZIP(activity, uri, mFilename) {
 
             @Override
             protected void preProcessing() throws Throwable {
@@ -36,7 +36,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
 
             @Override
             protected boolean unzipAndCheck() {
-                publishProgress(mContext.getString(R.string.zip_install_unzip_zip_msg));
+                publishProgress(activity.getString(R.string.zip_install_unzip_zip_msg));
                 if (Shell.rootAccess()) {
                     // We might not have busybox yet, unzip with Java
                     // We will have complete busybox after Magisk installation
@@ -56,7 +56,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Shell.su("setprop magisk.version "
-                                + String.valueOf(((MagiskManager) mContext.getApplicationContext()).remoteMagiskVersion));
+                                + String.valueOf(((MagiskManager) activity.getApplicationContext()).remoteMagiskVersion));
                         return null;
                     }
                 }.exec();

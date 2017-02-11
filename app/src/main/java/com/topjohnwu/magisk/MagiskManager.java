@@ -22,7 +22,6 @@ import java.util.List;
 public class MagiskManager extends Application {
 
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
-    public static final String MAGISK_MANAGER_BOOT = "/dev/.magisk_manager_boot";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();

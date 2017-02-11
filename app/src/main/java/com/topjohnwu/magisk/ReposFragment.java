@@ -68,7 +68,7 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadRepos(getApplication()).exec();
+            new Async.LoadRepos(getActivity()).exec();
         });
 
         if (getApplication().repoLoadDone.isTriggered) {

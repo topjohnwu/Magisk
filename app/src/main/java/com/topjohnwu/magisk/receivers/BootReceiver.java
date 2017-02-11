@@ -29,7 +29,7 @@ public class BootReceiver extends BroadcastReceiver {
 
         @Override
         protected void onHandleIntent(Intent intent) {
-            MagiskManager magiskManager = (MagiskManager) getApplicationContext();
+            MagiskManager magiskManager = Utils.getMagiskManager(this);
             magiskManager.initSuAccess();
             magiskManager.updateMagiskInfo();
             List<String> ret = Shell.sh("getprop persist.magisk.hide");

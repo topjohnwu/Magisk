@@ -78,7 +78,7 @@ public class SettingsActivity extends Activity {
         private ListPreference suAccess, autoRes, suNotification, requestTimeout;
 
         private MagiskManager getApplication() {
-            return (MagiskManager) getActivity().getApplication();
+            return Utils.getMagiskManager(getActivity());
         }
 
         @Override
@@ -103,7 +103,7 @@ public class SettingsActivity extends Activity {
             setSummary();
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                ModuleHelper.clearRepoCache(getApplication());
+                ModuleHelper.clearRepoCache(getActivity());
                 return true;
             });
 

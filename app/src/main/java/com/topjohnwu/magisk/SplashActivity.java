@@ -27,20 +27,20 @@ public class SplashActivity extends Activity {
         boolean started = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
 
         // Now fire all async tasks
-        new Async.CheckUpdates(magiskManager).exec();
-        new Async.GetBootBlocks(magiskManager).exec();
+        new Async.CheckUpdates(this).exec();
+        new Async.GetBootBlocks(this).exec();
         if (magiskManager.magiskHide && !magiskManager.disabled &&
                 magiskManager.magiskVersion > 11 && !started) {
             new Async.MagiskHide().enable();
         }
-        new Async.LoadModules(magiskManager) {
+        new Async.LoadModules(this) {
             @Override
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);
-                new Async.LoadRepos(magiskManager).exec();
+                new Async.LoadRepos(activity).exec();
             }
         }.exec();
-        new Async.LoadApps(magiskManager).exec();
+        new Async.LoadApps(this).exec();
 
         // Preparation done, now start main activity
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);

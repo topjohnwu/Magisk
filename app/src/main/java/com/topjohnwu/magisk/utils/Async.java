@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -31,6 +31,15 @@ import java.util.List;
 public class Async {
 
     public abstract static class RootTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+        protected Activity activity;
+        protected MagiskManager magiskManager;
+
+        public RootTask() {}
+
+        public RootTask(Activity context) {
+            activity = context;
+            magiskManager = Utils.getMagiskManager(context);
+        }
         @SafeVarargs
         public final void exec(Params... params) {
             if (!Shell.rootAccess()) return;
@@ -39,6 +48,15 @@ public class Async {
     }
 
     public abstract static class NormalTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+        protected Activity activity;
+        protected MagiskManager magiskManager;
+
+        public NormalTask() {}
+
+        public NormalTask(Activity context) {
+            activity = context;
+            magiskManager = Utils.getMagiskManager(context);
+        }
         @SafeVarargs
         public final void exec(Params... params) {
             executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
@@ -51,10 +69,8 @@ public class Async {
 
     public static class CheckUpdates extends NormalTask<Void, Void, Void> {
 
-        MagiskManager magiskManager;
-
-        public CheckUpdates(MagiskManager context) {
-            magiskManager = context;
+        public CheckUpdates(Activity context) {
+            super(context);
         }
 
         @Override
@@ -88,11 +104,10 @@ public class Async {
 
     public static class LoadModules extends RootTask<Void, Void, Void> {
 
-        protected MagiskManager magiskManager;
-
-        public LoadModules(MagiskManager context) {
-            magiskManager = context;
+        public LoadModules(Activity context) {
+            super(context);
         }
+
         @Override
         protected Void doInBackground(Void... voids) {
             ModuleHelper.createModuleMap(magiskManager);
@@ -107,10 +122,8 @@ public class Async {
 
     public static class LoadRepos extends NormalTask<Void, Void, Void> {
 
-        private MagiskManager magiskManager;
-
-        public LoadRepos(MagiskManager context) {
-            magiskManager = context;
+        public LoadRepos(Activity context) {
+            super(context);
         }
 
         @Override
@@ -127,10 +140,8 @@ public class Async {
 
     public static class LoadApps extends RootTask<Void, Void, Void> {
 
-        private MagiskManager magiskManager;
-
-        public LoadApps(MagiskManager context) {
-           magiskManager = context;
+        public LoadApps(Activity context) {
+            super(context);
         }
 
         @Override
@@ -160,19 +171,15 @@ public class Async {
         protected File mCachedFile;
         private String mFilename;
         protected ProgressDialog progress;
-        private Context mContext;
-        private MagiskManager magiskManager;
 
-        public FlashZIP(Context context, Uri uri, String filename) {
-            mContext = context;
-            magiskManager = (MagiskManager) context.getApplicationContext();
+        public FlashZIP(Activity context, Uri uri, String filename) {
+            super(context);
             mUri = uri;
             mFilename = filename;
         }
 
-        public FlashZIP(Context context, Uri uri) {
-            mContext = context;
-            magiskManager = (MagiskManager) context.getApplicationContext();
+        public FlashZIP(Activity context, Uri uri) {
+            super(context);
             mUri = uri;
 
             // Try to get the filename ourselves
@@ -229,7 +236,7 @@ public class Async {
 
         @Override
         protected void onPreExecute() {
-            progress = new ProgressDialog(mContext);
+            progress = new ProgressDialog(activity);
             progress.setTitle(R.string.zip_install_progress_title);
             progress.show();
         }
@@ -294,9 +301,9 @@ public class Async {
 
         protected void onSuccess() {
             magiskManager.updateCheckDone.trigger();
-            new LoadModules(magiskManager).exec();
+            new LoadModules(activity).exec();
 
-            Utils.getAlertDialogBuilder(mContext)
+            Utils.getAlertDialogBuilder(activity)
                     .setTitle(R.string.reboot_title)
                     .setMessage(R.string.reboot_msg)
                     .setPositiveButton(R.string.reboot, (dialogInterface, i) -> Shell.su(true, "reboot"))
@@ -334,10 +341,8 @@ public class Async {
 
     public static class GetBootBlocks extends RootTask<Void, Void, Void> {
 
-        MagiskManager magiskManager;
-
-        public GetBootBlocks(MagiskManager context) {
-            magiskManager = context;
+        public GetBootBlocks(Activity context) {
+            super(context);
         }
 
         @Override

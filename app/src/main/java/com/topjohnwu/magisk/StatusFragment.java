@@ -84,7 +84,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             noDialog = false;
 
             updateUI();
-            new Async.CheckUpdates(getApplication()).exec();
+            new Async.CheckUpdates(getActivity()).exec();
         });
 
         safetyNetContainer.setOnClickListener(view -> {

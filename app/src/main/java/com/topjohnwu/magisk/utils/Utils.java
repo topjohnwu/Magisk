@@ -140,13 +140,8 @@ public class Utils {
         return Integer.parseInt(prefs.getString(key, String.valueOf(def)));
     }
 
-    public static void checkAndStartMagiskHide() {
-        String command = "ps | grep magiskhide >/dev/null; echo $?";
-        List<String> ret = Shell.su(command);
-        if (!isValidShellResponse(ret))
-            return;
-        if (Integer.parseInt(ret.get(0)) != 0)
-            new Async.MagiskHide().enable();
+    public static MagiskManager getMagiskManager(Context context) {
+        return (MagiskManager) context.getApplicationContext();
     }
 
 }

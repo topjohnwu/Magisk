@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.receivers;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +13,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
 public abstract class DownloadReceiver extends BroadcastReceiver {
-    public Context mContext;
+    public Activity activity;
     public String mFilename;
     long downloadID;
 
@@ -20,7 +21,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mContext = context;
+        activity = (Activity) context;
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         String action = intent.getAction();
         if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {

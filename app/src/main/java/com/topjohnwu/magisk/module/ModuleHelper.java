@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.module;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
@@ -142,15 +143,16 @@ public class ModuleHelper {
         Logger.dev("ModuleHelper: Repo load done");
     }
 
-    public static void clearRepoCache(MagiskManager magiskManager) {
-        SharedPreferences repoMap = magiskManager.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+    public static void clearRepoCache(Activity activity) {
+        MagiskManager magiskManager = Utils.getMagiskManager(activity);
+        SharedPreferences repoMap = activity.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         repoMap.edit()
                 .remove(ETAG_KEY)
                 .remove(VERSION_KEY)
                 .apply();
         magiskManager.repoLoadDone.isTriggered = false;
-        new Async.LoadRepos(magiskManager).exec();
-        Toast.makeText(magiskManager, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
+        new Async.LoadRepos(activity).exec();
+        Toast.makeText(activity, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
     }
 
 }
