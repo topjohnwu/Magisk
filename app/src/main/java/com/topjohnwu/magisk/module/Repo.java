@@ -28,8 +28,7 @@ public class Repo extends BaseModule {
     }
 
     public void update(Date lastUpdate) throws CacheModException {
-        Logger.dev("Repo: Old: " + mLastUpdate);
-        Logger.dev("Repo: New: " + lastUpdate);
+        Logger.dev("Repo: Old: " + mLastUpdate + " New: " + lastUpdate);
         if (mIsCacheModule)
             throw new CacheModException(mId);
         if (lastUpdate.after(mLastUpdate)) {

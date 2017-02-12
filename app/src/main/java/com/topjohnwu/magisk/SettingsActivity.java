@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.module.ModuleHelper;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -104,7 +103,7 @@ public class SettingsActivity extends Activity {
             setSummary();
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                ModuleHelper.clearRepoCache(getActivity());
+                Utils.clearRepoCache(getActivity());
                 return true;
             });
 

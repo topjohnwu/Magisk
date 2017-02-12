@@ -223,7 +223,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
                 return;
             }
             boolean showRequest = false;
-            event = magiskManager.uidMap.get(uid);
+            event = magiskManager.uidSuRequest.get(uid);
             if (event == null) {
                 showRequest = true;
                 event = new CallbackEvent<Policy>() {
@@ -231,10 +231,10 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
                     public void trigger(Policy result) {
                         super.trigger(result);
                         unRegister();
-                        magiskManager.uidMap.remove(uid);
+                        magiskManager.uidSuRequest.remove(uid);
                     }
                 };
-                magiskManager.uidMap.put(uid, event);
+                magiskManager.uidSuRequest.put(uid, event);
             }
             event.register(self);
             try {

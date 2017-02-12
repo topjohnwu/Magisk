@@ -97,7 +97,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
 
     public static class CacheModException extends Exception {
         public CacheModException(String id) {
-            Logger.dev("Cache mods are no longer supported! id: " + id);
+            Logger.error("Cache mods are no longer supported! id: " + id);
         }
     }
 

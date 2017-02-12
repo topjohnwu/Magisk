@@ -24,6 +24,7 @@ public class MagiskManager extends Application {
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
+    public static final String MAGISK_PATH = "/magisk";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
@@ -33,7 +34,7 @@ public class MagiskManager extends Application {
     public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();
     public final CallbackEvent<Void> updateCheckDone = new CallbackEvent<>();
     public final CallbackEvent<Void> safetyNetDone = new CallbackEvent<>();
-    public SparseArray<CallbackEvent<Policy>> uidMap = new SparseArray<>();
+    public final SparseArray<CallbackEvent<Policy>> uidSuRequest = new SparseArray<>();
 
     // Info
     public double magiskVersion;
