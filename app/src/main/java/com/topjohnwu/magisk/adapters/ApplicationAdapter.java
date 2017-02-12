@@ -50,8 +50,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     }
 
     public void setLists(List<ApplicationInfo> listApps, List<String> hideList) {
-        mOriginalList = mList = Collections.unmodifiableList(listApps);
-        mHideList = new ArrayList<>(hideList);
+        mOriginalList = mList = listApps;
+        mHideList = hideList;
         notifyDataSetChanged();
     }
 

@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
-import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
-public class LoadApps extends SerialTask<Void, Void, Void> {
+public class LoadApps extends ParallelTask<Void, Void, Void> {
 
     public LoadApps(Activity context) {
         super(context);
@@ -20,20 +19,20 @@ public class LoadApps extends SerialTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         PackageManager pm = magiskManager.getPackageManager();
-        magiskManager.appList = pm.getInstalledApplications(0);
-        for (Iterator<ApplicationInfo> i = magiskManager.appList.iterator(); i.hasNext(); ) {
+        List<ApplicationInfo> list = pm.getInstalledApplications(0);
+        for (Iterator<ApplicationInfo> i = list.iterator(); i.hasNext(); ) {
             ApplicationInfo info = i.next();
             if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled)
                 i.remove();
         }
-        Collections.sort(magiskManager.appList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
+        Collections.sort(list, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                 .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-        magiskManager.magiskHideList = Shell.su(MagiskManager.MAGISK_HIDE_PATH + "list");
+        magiskManager.appList = Collections.unmodifiableList(list);
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        magiskManager.packageLoadDone.trigger();
+        new MagiskHide(activity).list();
     }
 }

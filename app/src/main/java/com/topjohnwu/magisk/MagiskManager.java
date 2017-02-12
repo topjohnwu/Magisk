@@ -28,7 +28,7 @@ public class MagiskManager extends Application {
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> packageLoadDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> magiskHideDone = new CallbackEvent<>();
     public final CallbackEvent<Void> reloadMainActivity = new CallbackEvent<>();
     public final CallbackEvent<Void> moduleLoadDone = new CallbackEvent<>();
     public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();

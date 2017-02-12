@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
-import com.topjohnwu.magisk.asyncs.LoadApps;
+import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
@@ -50,7 +50,7 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
         PackageManager packageManager = getActivity().getPackageManager();
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> new LoadApps(getActivity()).exec());
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new MagiskHide(getActivity()).list());
 
         appAdapter = new ApplicationAdapter(packageManager);
         recyclerView.setAdapter(appAdapter);
@@ -71,8 +71,8 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
             }
         };
 
-        if (getApplication().packageLoadDone.isTriggered)
-            onTrigger(getApplication().packageLoadDone);
+        if (getApplication().magiskHideDone.isTriggered)
+            onTrigger(getApplication().magiskHideDone);
 
         return view;
     }
@@ -88,12 +88,12 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
     public void onStart() {
         super.onStart();
         getActivity().setTitle(R.string.magiskhide);
-        getApplication().packageLoadDone.register(this);
+        getApplication().magiskHideDone.register(this);
     }
 
     @Override
     public void onStop() {
-        getApplication().packageLoadDone.unRegister(this);
+        getApplication().magiskHideDone.unRegister(this);
         super.onStop();
     }
 
