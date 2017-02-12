@@ -229,10 +229,10 @@ public class SettingsActivity extends Activity {
                     getApplication().suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
                     break;
                 case "developer_logging":
-                    getApplication().devLogging = prefs.getBoolean("developer_logging", false);
+                    MagiskManager.devLogging = prefs.getBoolean("developer_logging", false);
                     break;
                 case "shell_logging":
-                    getApplication().shellLogging = prefs.getBoolean("shell_logging", false);
+                    MagiskManager.shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
             }
             setSummary();

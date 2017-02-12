@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.topjohnwu.magisk.R;
 
 /**
  * @author dvdandroid
