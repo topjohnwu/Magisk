@@ -13,9 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.MagiskHide;
+import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.module.ModuleHelper;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -151,7 +152,7 @@ public class SettingsActivity extends Activity {
                     break;
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
-                    new Async.RootTask<Void, Void, Void>() {
+                    new SerialTask<Void, Void, Void>() {
                         private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... voids) {
@@ -167,7 +168,7 @@ public class SettingsActivity extends Activity {
                     break;
                 case "busybox":
                     enabled = prefs.getBoolean("busybox", false);
-                    new Async.RootTask<Void, Void, Void>() {
+                    new SerialTask<Void, Void, Void>() {
                         private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... voids) {
@@ -191,16 +192,16 @@ public class SettingsActivity extends Activity {
                             Utils.getAlertDialogBuilder(getActivity())
                                     .setTitle(R.string.no_magisksu_title)
                                     .setMessage(R.string.no_magisksu_msg)
-                                    .setPositiveButton(R.string.understand, (dialog, which) -> new Async.MagiskHide().enable())
+                                    .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide().enable())
                                     .setCancelable(false)
                                     .show();
-                        } else new Async.MagiskHide().enable();
+                        } else new MagiskHide().enable();
                     } else
-                        new Async.MagiskHide().disable();
+                        new MagiskHide().disable();
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
-                    new Async.RootTask<Void, Void, Void>() {
+                    new SerialTask<Void, Void, Void>() {
                         private boolean enable = enabled;
                         @Override
                         protected Void doInBackground(Void... voids) {

@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk;
 
-import android.support.v7.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +14,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
@@ -84,7 +84,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             noDialog = false;
 
             updateUI();
-            new Async.CheckUpdates(getActivity()).exec();
+            new CheckUpdates(getActivity()).exec();
         });
 
         safetyNetContainer.setOnClickListener(view -> {
@@ -92,7 +92,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             safetyNetContainer.setBackgroundColor(trans);
             safetyNetIcon.setImageResource(0);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            Async.checkSafetyNet(getApplication());
+            Utils.checkSafetyNet(getApplication());
         });
 
         if (getApplication().magiskVersion < 0 && Shell.rootAccess() && !noDialog) {

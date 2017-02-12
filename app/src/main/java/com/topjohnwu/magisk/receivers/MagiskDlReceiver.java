@@ -4,7 +4,8 @@ import android.net.Uri;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.asyncs.FlashZIP;
+import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -23,7 +24,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
 
     @Override
     public void onDownloadDone(Uri uri) {
-        new Async.FlashZIP(activity, uri, mFilename) {
+        new FlashZIP(activity, uri, mFilename) {
 
             @Override
             protected void preProcessing() throws Throwable {
@@ -42,8 +43,8 @@ public class MagiskDlReceiver extends DownloadReceiver {
                     // We will have complete busybox after Magisk installation
                     ZipUtils.unzip(mCachedFile, new File(mCachedFile.getParent(), "magisk"));
                     Shell.su(
-                            "mkdir -p " + Async.TMP_FOLDER_PATH + "/magisk",
-                            "cp -af " + mCachedFile.getParent() + "/magisk/. " + Async.TMP_FOLDER_PATH + "/magisk",
+                            "mkdir -p " + MagiskManager.TMP_FOLDER_PATH + "/magisk",
+                            "cp -af " + mCachedFile.getParent() + "/magisk/. " + MagiskManager.TMP_FOLDER_PATH + "/magisk",
                             "mv -f " + mCachedFile.getParent() + "/magisk/META-INF " + mCachedFile.getParent() + "/META-INF"
                     );
                 }
@@ -52,7 +53,7 @@ public class MagiskDlReceiver extends DownloadReceiver {
 
             @Override
             protected void onSuccess() {
-                new Async.RootTask<Void, Void, Void>() {
+                new SerialTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Shell.su("setprop magisk.version "

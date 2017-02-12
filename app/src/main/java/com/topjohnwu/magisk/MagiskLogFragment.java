@@ -24,8 +24,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -126,7 +126,7 @@ public class MagiskLogFragment extends Fragment {
         }
     }
 
-    public class LogManager extends Async.RootTask<Object, Void, Object> {
+    public class LogManager extends SerialTask<Object, Void, Object> {
 
         int mode;
         File targetFile;

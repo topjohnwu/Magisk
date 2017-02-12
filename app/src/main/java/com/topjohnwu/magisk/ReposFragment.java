@@ -15,10 +15,11 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.adapters.SimpleSectionedRecyclerViewAdapter;
+import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
@@ -68,7 +69,7 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadRepos(getActivity()).exec();
+            new LoadRepos(getActivity()).exec();
         });
 
         if (getApplication().repoLoadDone.isTriggered) {
@@ -171,7 +172,7 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    private class FilterApps extends Async.NormalTask<String, Void, Void> {
+    private class FilterApps extends ParallelTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... strings) {
             String newText = strings[0];

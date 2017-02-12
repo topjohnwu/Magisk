@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 
 import java.io.DataInputStream;
@@ -167,7 +167,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
         }
     }
 
-    private class SocketManager extends Async.NormalTask<Void, Void, Boolean> {
+    private class SocketManager extends ParallelTask<Void, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Void... params) {

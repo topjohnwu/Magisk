@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.asyncs.LoadRepos;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -151,7 +151,7 @@ public class ModuleHelper {
                 .remove(VERSION_KEY)
                 .apply();
         magiskManager.repoLoadDone.isTriggered = false;
-        new Async.LoadRepos(activity).exec();
+        new LoadRepos(activity).exec();
         Toast.makeText(activity, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
     }
 

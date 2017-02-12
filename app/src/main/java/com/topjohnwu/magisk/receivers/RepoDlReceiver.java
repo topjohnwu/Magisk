@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.receivers;
 import android.net.Uri;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.asyncs.FlashZIP;
 import com.topjohnwu.magisk.utils.ByteArrayInOutStream;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -13,7 +13,7 @@ public class RepoDlReceiver extends DownloadReceiver {
     @Override
     public void onDownloadDone(Uri uri) {
         // Flash the zip
-        new Async.FlashZIP(activity, uri, mFilename){
+        new FlashZIP(activity, uri, mFilename){
             @Override
             protected void preProcessing() throws Throwable {
                 // Process and sign the zip

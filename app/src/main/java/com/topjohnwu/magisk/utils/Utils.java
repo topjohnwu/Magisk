@@ -66,9 +66,8 @@ public class Utils {
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
-        if (isDownloading) {
+        if (isDownloading)
             return;
-        }
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, R.string.permissionNotGranted, Toast.LENGTH_LONG).show();
@@ -144,4 +143,13 @@ public class Utils {
         return (MagiskManager) context.getApplicationContext();
     }
 
+    public static void checkSafetyNet(MagiskManager magiskManager) {
+        new SafetyNetHelper(magiskManager) {
+            @Override
+            public void handleResults(int i) {
+                magiskManager.SNCheckResult = i;
+                magiskManager.safetyNetDone.trigger();
+            }
+        }.requestTest();
+    }
 }

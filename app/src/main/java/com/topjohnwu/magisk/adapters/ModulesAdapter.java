@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> new Async.RootTask<Void, Void, Void>() {
+        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> new SerialTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (isChecked) {
@@ -70,7 +70,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
             }
         }.exec());
 
-        holder.delete.setOnClickListener(v -> new Async.RootTask<Void, Void, Void>() {
+        holder.delete.setOnClickListener(v -> new SerialTask<Void, Void, Void>() {
             private final boolean removed = module.willBeRemoved();
 
             @Override

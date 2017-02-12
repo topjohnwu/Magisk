@@ -15,8 +15,8 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
+import com.topjohnwu.magisk.asyncs.LoadApps;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
@@ -50,7 +50,7 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
         PackageManager packageManager = getActivity().getPackageManager();
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> new Async.LoadApps(getActivity()).exec());
+        mSwipeRefreshLayout.setOnRefreshListener(() -> new LoadApps(getActivity()).exec());
 
         appAdapter = new ApplicationAdapter(packageManager);
         recyclerView.setAdapter(appAdapter);

@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -37,7 +36,7 @@ public class BootReceiver extends BroadcastReceiver {
             if (magiskManager.prefs.getBoolean("magiskhide", false) &&
                     !magiskManager.disabled && !started && magiskManager.magiskVersion > 11) {
                 magiskManager.toast(R.string.start_magiskhide, Toast.LENGTH_LONG);
-                Shell.su(true, Async.MAGISK_HIDE_PATH + "enable",
+                Shell.su(true, MagiskManager.MAGISK_HIDE_PATH + "enable",
                         "setprop persist.magisk.hide 1");
             }
         }

@@ -14,9 +14,10 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
+import com.topjohnwu.magisk.asyncs.FlashZIP;
+import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.Async;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 
@@ -53,7 +54,7 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new Async.LoadModules(getActivity()).exec();
+            new LoadModules(getActivity()).exec();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -86,7 +87,7 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
         if (requestCode == FETCH_ZIP_CODE && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
             final Uri uri = data.getData();
-            new Async.FlashZIP(getActivity(), uri).exec();
+            new FlashZIP(getActivity(), uri).exec();
         }
 
     }

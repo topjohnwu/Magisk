@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Async;
+import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
@@ -86,10 +86,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    new Async.MagiskHide().add(info.packageName);
+                    new MagiskHide().add(info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    new Async.MagiskHide().rm(info.packageName);
+                    new MagiskHide().rm(info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });

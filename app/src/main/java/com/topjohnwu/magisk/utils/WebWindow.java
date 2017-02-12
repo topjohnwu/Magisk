@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
-import android.support.v7.app.AlertDialog;
 import android.content.Context;
+import android.support.v7.app.AlertDialog;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
