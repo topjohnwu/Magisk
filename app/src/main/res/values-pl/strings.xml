@@ -22,16 +22,16 @@
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="magisk_update_available">Magisk v%1$.1f dostępny!</string>
-    <string name="cannot_check_updates">Nie można sprawdzić dostępność aktualizacji, brak internetu</string>
+    <string name="cannot_check_updates">Nie można sprawdzić dostępności aktualizacji, brak internetu</string>
     <string name="up_to_date">Zainstalowana najnowsza wersja %1$s</string>
-    <string name="root_error">Zrotowany ale bez dostępu do roota</string>
-    <string name="not_rooted">Nie zrootowany</string>
-    <string name="proper_root">Zrootowany prawidłowo</string>
+    <string name="root_error">Root dostępny, ale dostęp nie przyznany</string>
+    <string name="not_rooted">Nie wykryto Roota</string>
+    <string name="proper_root">Root Dostępny</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_connection_failed">Nie można połączyć się z Google API</string>
     <string name="safetyNet_connection_suspended">Połączenie z Google API zostało zawieszone</string>
-    <string name="safetyNet_error">Nie można sprawdzić SafetyNet bez Internetu</string>
+    <string name="safetyNet_error">Nie można sprawdzić SafetyNet bez internetu</string>
     <string name="safetyNet_fail">Błąd SafetyNet: Niezgodność profilu CTS</string>
     <string name="safetyNet_pass">SafetyNet Poprawny</string>
     <string name="root_info_warning">Funkcjonalność znacznie ograniczona</string>
@@ -58,7 +58,7 @@
     <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie</string>
     <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie</string>
     <string name="author">Autor modu: %1$s</string>
-    <string name="fab_flash_zip">Zflashuj Moduł Zip</string>
+    <string name="fab_flash_zip">Zainstaluj Moduł Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Aktualizacja jest dostępna</string>
@@ -81,7 +81,7 @@
     <string name="app_changelog">Zmiany w Aplikacji</string>
     <string name="translators" />
     <string name="app_version">Wersja Aplikacji</string>
-    <string name="app_source_code">Kod źródłowy</string>
+    <string name="app_source_code">Kod Źródłowy</string>
     <string name="donation">Dotacja</string>
     <string name="app_translators">Tłumacze Aplikacji</string>
     <string name="support_thread">Strona Wsparcia</string>
@@ -97,7 +97,7 @@
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="install_error">Błąd instalacji!</string>
     <string name="manual_install_1">Plik zip umieszczony w %1$s</string>
-    <string name="manual_install_2">Zflashuj go ręcznie w recovery</string>
+    <string name="manual_install_2">Zainstaluj go ręcznie w recovery</string>
     <string name="invalid_zip">Ten zip nie jest Modułem Magisk!!</string>
     <string name="reboot_title">Instalacja zakończona powodzeniem!</string>
     <string name="reboot_msg">Czy chcesz teraz ponownie uruchomić?</string>
@@ -110,12 +110,12 @@
     <string name="no_magisk_title">Brak zainstalowanego Magisk!</string>
     <string name="no_magisk_msg">Chcesz pobrać i zainstalować Magisk?</string>
     <string name="downloading_toast">Pobieranie %1$s</string>
-    <string name="magisk_update_title">Nowa Wersja Magisk Dostepna!</string>
+    <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="magisk_update_message">Magisk v%1$.1f jest dostępny, chcesz zainstalować?</string>
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
-    <string name="check_release_notes">Sprawdź informacje o wydaniu</string>
+    <string name="check_release_notes">Sprawdź zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
-    <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJuż jest domyślnie obsługiwana przez MagiskHide</string>
+    <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJest już domyślnie obsługiwana przez MagiskHide</string>
     <string name="start_magiskhide">Uruchamianie MagiskHide …</string>
     <string name="no_magisksu_title">Nie Używaj MagiskSU!</string>
     <string name="no_magisksu_msg">Jeśli nie masz roota z MagiskSU, używanie samego MagiskHide może nie wystarczyć! Inne metody nie są oficjalnie obsługiwane. Do poprawnego działania SaftyNet potrzebne będą dodatkowe narzędzia (np suhide)</string>
@@ -130,8 +130,8 @@
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
-    <string name="settings_clear_cache_title">Wyczyść Cache Repozytorium</string>
-    <string name="settings_clear_cache_summary">Wyczyść cache dla repozytorium, wymusza odświeżenie online przez aplikację</string>
+    <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
+    <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
 
     <string name="settings_disable_title">Wyłącz Magisk</string>
     <string name="settings_disable_summary">Wszystko zostanie wyłączone za wyjątkiem roota (MagiskSU)</string>
@@ -144,14 +144,14 @@
     <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
-    <string name="settings_su_disable">Wyłaczone</string>
+    <string name="settings_su_disable">Wyłączone</string>
     <string name="settings_su_request_10">10 sekund</string>
     <string name="settings_su_request_20">20 sekund</string>
-    <string name="settings_su_request_30">30 ssekund</string>
+    <string name="settings_su_request_30">30 sekund</string>
     <string name="settings_su_request_60">60 sekund</string>
     <string name="superuser_access">Dostęp Superuser</string>
     <string name="auto_response">Automatyczna Odpowiedź</string>
-    <string name="request_timeout">Czas Prośby</string>
+    <string name="request_timeout">Czas na decyzję</string>
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="request_timeout_summary">%1$s sekund</string>
 
@@ -162,7 +162,7 @@
     <string name="settings_shell_logging_summary">Włącz, aby rejestrować wszystkie polecenia powłoki i wyjścia</string>
    
     <!--Superuser-->
-    <string name="su_request_title">Prośba dostępu Superusera</string>
+    <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>
     <string name="deny">Odmów</string>
     <string name="prompt">Zapytaj</string>
@@ -186,12 +186,12 @@
     <string name="su_snack_revoke">%1$s uprawnienia są odwołane</string>
     <string name="su_revoke_title">Odwołać?</string>
     <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
-    <string name="toast">Toast</string>
+    <string name="toast">Powiadomienie</string>
     <string name="none">Brak</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Indentyfikator UID:\u0020</string>
+    <string name="target_uid">Identyfikator UID:\u0020</string>
     <string name="command">Komenda:\u0020</string>
 
 </resources>
