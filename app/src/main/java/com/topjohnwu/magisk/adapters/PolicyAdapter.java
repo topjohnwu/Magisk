@@ -15,8 +15,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.Policy;
-import com.topjohnwu.magisk.superuser.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;

@@ -1,10 +1,12 @@
-package com.topjohnwu.magisk.superuser;
+package com.topjohnwu.magisk.database;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.topjohnwu.magisk.superuser.Policy;
 
 import java.util.ArrayList;
 import java.util.List;

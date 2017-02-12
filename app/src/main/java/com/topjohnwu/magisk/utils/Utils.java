@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import java.io.File;
@@ -157,13 +158,8 @@ public class Utils {
 
     public static void clearRepoCache(Activity activity) {
         MagiskManager magiskManager = getMagiskManager(activity);
-        SharedPreferences repoMap = activity.getSharedPreferences(LoadRepos.FILE_KEY, Context.MODE_PRIVATE);
-        repoMap.edit()
-                .remove(LoadRepos.ETAG_KEY)
-                .remove(LoadRepos.VERSION_KEY)
-                .apply();
-        magiskManager.repoLoadDone.isTriggered = false;
-        new LoadRepos(activity).exec();
+        magiskManager.prefs.edit().remove(LoadRepos.ETAG_KEY).apply();
+        new RepoDatabaseHelper(activity).clearRepo();
         Toast.makeText(activity, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
     }
 }

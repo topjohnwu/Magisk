@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.superuser;
+package com.topjohnwu.magisk.database;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.superuser.SuLogEntry;
 
 import java.util.ArrayList;
 import java.util.List;

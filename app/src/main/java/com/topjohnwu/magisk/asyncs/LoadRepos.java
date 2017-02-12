@@ -2,10 +2,9 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Logger;
@@ -16,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,13 +26,14 @@ import java.util.Map;
 public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
     public static final String ETAG_KEY = "ETag";
-    public static final String VERSION_KEY = "version";
-    public static final String REPO_KEY = "repomap";
-    public static final String FILE_KEY = "RepoMap";
-    private static final int GSON_DB_VER = 1;
+
+    private static final String REPO_URL = "https://api.github.com/orgs/Magisk-Modules-Repo/repos";
+
+    private String prefsPath;
 
     public LoadRepos(Activity context) {
         super(context);
+        prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
     }
 
     @Override
@@ -41,39 +42,27 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
         SharedPreferences prefs = magiskManager.prefs;
 
-        magiskManager.repoMap = new ValueSortedMap<>();
+        // Legacy data cleanup
+        new File(prefsPath, "RepoMap.xml").delete();
+        prefs.edit().remove("version").remove("repomap").apply();
 
-        Gson gson = new Gson();
-        String jsonString;
-
-        int cachedVersion = prefs.getInt(VERSION_KEY, 0);
-        if (cachedVersion != GSON_DB_VER) {
-            // Ignore incompatible cached database
-            jsonString = null;
-        } else {
-            jsonString = prefs.getString(REPO_KEY, null);
-        }
-
-        Map<String, Repo> cached = null;
-
-        if (jsonString != null) {
-            cached = gson.fromJson(jsonString, new TypeToken<ValueSortedMap<String, Repo>>(){}.getType());
-        }
-
-        if (cached == null) {
-            cached = new ValueSortedMap<>();
-        }
-
+        Map<String, String> header = new HashMap<>();
         // Get cached ETag to add in the request header
         String etag = prefs.getString(ETAG_KEY, "");
-        Map<String, String> header = new HashMap<>();
-        header.put("If-None-Match", etag);
 
-        // Making a request to main URL for repo info
-        jsonString = WebService.request(
-                magiskManager.getString(R.string.url_main), WebService.GET, null, header, false);
+        // Add header only if db exists
+        if (magiskManager.getDatabasePath("repo.db").exists())
+            header.put("If-None-Match", etag);
 
-        if (!jsonString.isEmpty()) {
+        magiskManager.repoMap = new ValueSortedMap<>();
+
+        // Make a request to main URL for repo info
+        String jsonString = WebService.request(REPO_URL, WebService.GET, null, header, false);
+
+        RepoDatabaseHelper dbHelper = new RepoDatabaseHelper(magiskManager);
+        ValueSortedMap<String, Repo> cached = dbHelper.getRepoMap();
+
+        if (!TextUtils.isEmpty(jsonString)) {
             try {
                 JSONArray jsonArray = new JSONArray(jsonString);
                 // If it gets to this point, the response is valid, update ETag
@@ -98,16 +87,18 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
                     try {
                         if (repo == null) {
                             Logger.dev("LoadRepos: Create new repo " + id);
-                            repo = new Repo(magiskManager, name, updatedDate);
+                            repo = new Repo(name, updatedDate);
                         } else {
+                            // Popout from cached
+                            cached.remove(id);
                             Logger.dev("LoadRepos: Update cached repo " + id);
                             repo.update(updatedDate);
                         }
-                        if (repo.getId() != null) {
+                        if (repo.getId() != null)
                             magiskManager.repoMap.put(id, repo);
-                        }
                     } catch (BaseModule.CacheModException ignored) {}
                 }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -115,13 +106,15 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
             // Use cached if no internet or no updates
             Logger.dev("LoadRepos: No updates, use cached");
             magiskManager.repoMap.putAll(cached);
+            cached.clear();
         }
 
-        prefs.edit()
-                .putInt(VERSION_KEY, GSON_DB_VER)
-                .putString(REPO_KEY, gson.toJson(magiskManager.repoMap))
-                .putString(ETAG_KEY, etag)
-                .apply();
+        // Update the database
+        dbHelper.addRepoMap(magiskManager.repoMap);
+        // The leftover cached are those removed remote, cleanup db
+        dbHelper.removeRepo(cached);
+        // Update ETag
+        prefs.edit().putString(ETAG_KEY, etag).apply();
 
         Logger.dev("LoadRepos: Repo load done");
         return null;

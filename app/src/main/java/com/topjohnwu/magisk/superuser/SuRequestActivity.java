@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 
 import java.io.DataInputStream;

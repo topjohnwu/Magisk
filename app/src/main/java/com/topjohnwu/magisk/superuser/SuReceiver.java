@@ -8,6 +8,8 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.database.SuLogDatabaseHelper;
 
 import java.util.Date;
 

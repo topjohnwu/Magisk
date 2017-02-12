@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.Policy;
-import com.topjohnwu.magisk.superuser.SuDatabaseHelper;
 
 import java.util.List;
 
