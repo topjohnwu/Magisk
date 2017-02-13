@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
@@ -117,11 +118,12 @@ public class Utils {
     }
 
     public static AlertDialog.Builder getAlertDialogBuilder(Context context) {
-        if (((MagiskManager) context.getApplicationContext()).isDarkTheme) {
-            return new AlertDialog.Builder(context, R.style.AlertDialog_dh);
-        } else {
-            return new AlertDialog.Builder(context);
-        }
+//        if (((MagiskManager) context.getApplicationContext()).isDarkTheme) {
+//            return new AlertDialog.Builder(context, R.style.AlertDialog_dh);
+//        } else {
+//            return new AlertDialog.Builder(context);
+//        }
+        return new AlertDialogBuilder(context);
     }
 
     public static boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
