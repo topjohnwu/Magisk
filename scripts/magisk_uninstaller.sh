@@ -49,8 +49,10 @@ unpack_boot() {
   cd $UNPACKDIR
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --extract $1
 
+  [ ! -f $UNPACKDIR/ramdisk.gz ] && return 1
+
   cd $RAMDISK
-  $BINDIR/busybox gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
+  gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
 }
 
 repack_boot() {
@@ -79,8 +81,14 @@ repack_boot() {
   mv new-boot.img $NEWBOOT
 }
 
+# Environments
 # Set permissions
-chmod -R 755 $CHROMEDIR/futility $BINDIR
+chmod -R 755 $CHROMEDIR/futility $BINDIR 2>/dev/null
+# Temporary busybox for installation
+mkdir -p $TMPDIR/busybox
+$BINDIR/busybox --install -s $TMPDIR/busybox
+rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
+PATH=$TMPDIR/busybox:$PATH
 
 # Find the boot image
 find_boot_image
@@ -121,13 +129,22 @@ fi
 
 # First unpack the boot image
 unpack_boot $BOOTIMAGE
+if [ $? -ne 0 ]; then
+  ui_print "! Unable to unpack boot image"
+  exit 1
+fi
 
+# Detect boot image state
 SUPERSU=false
 [ -f sbin/launch_daemonsu.sh ] && SUPERSU=true
+if [ ! -f init.magisk.rc ]; then
+  ui_print "! Magisk is not installed!"
+  exit 1
+fi
 
 if ($SUPERSU); then
   ui_print "- SuperSU patched image detected"
-  rm -f magisk sbin/init.magisk.rc sbin/magic_mask.sh
+  rm -rf magisk init.magisk.rc sbin/magic_mask.sh
   repack_boot
 else
   if [ -f /data/stock_boot.img ]; then
@@ -139,7 +156,7 @@ else
       ui_print "- Restoring ramdisk with backup"
       cp -af .backup/. .
     fi
-    rm -f magisk sbin/init.magisk.rc sbin/magic_mask.sh
+    rm -rf magisk init.magisk.rc sbin/magic_mask.sh .backup
     repack_boot
   fi
 fi

@@ -123,7 +123,7 @@ BINDIR=$INSTALLER/$ARCH
 
 # Copy the binaries to /data/magisk
 mkdir -p /data/magisk 2>/dev/null
-cp -af $BINDIR/bootimgtools $CHROMEDIR /data/magisk
+cp -af $BINDIR/* $CHROMEDIR /data/magisk
 
 ##########################################################################################
 # Detection all done, start installing
@@ -134,17 +134,20 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 if (is_mounted /data); then
   ui_print "- Running uninstaller scripts"
   sh $INSTALLER/common/magisk_uninstaller.sh
+  if [ $? -ne 0 ]; then
+    ui_print "! Magisk is not installed or an error occurred"
+    exit 1
+  fi
 else
   ui_print "! Data unavailable"
   ui_print "! Placing uninstall script to /cache"
-  ui_print "! The device will reboot multiple times"
+  ui_print "! The device might reboot multiple times"
   cp -af $INSTALLER/common/magisk_uninstaller.sh /cache/magisk_uninstaller.sh
   umount /system
+  ui_print "- Rebooting....."
   sleep 5
   reboot
 fi
-
-chmod 644 $NEWBOOT
 
 umount /system
 ui_print "- Done"

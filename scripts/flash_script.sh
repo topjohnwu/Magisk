@@ -175,7 +175,8 @@ repack_boot() {
   cd $UNPACKDIR
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
   if [ -f chromeos ]; then
-    cp -af $CHROMEDIR /data/magisk
+    # Copy required tools
+    cp -af $CHROMEDIR/. $CPPATH/chromeos
     echo " " > config
     echo " " > bootloader
     LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
@@ -329,24 +330,22 @@ fi
 
 ui_print "- Constructing environment"
 
+CPPATH
+
 if (is_mounted /data); then
-  rm -rf /data/magisk 2>/dev/null
-  mkdir -p /data/magisk
-  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/bootimgtools \
-         $INSTALLER/common/init.magisk.rc $INSTALLER/common/magic_mask.sh /data/magisk
-  cp -af $INSTALLER/common/magisk.apk /data/magisk.apk
-  chmod -R 755 /data/magisk
-  chcon -h u:object_r:system_file:s0 /data/magisk /data/magisk/*
-  PATH=/data/busybox:$PATH
+  CPPATH=/data/magisk
 else
-  rm -rf /cache/data_bin 2>/dev/null
-  mkdir -p /cache/data_bin
-  cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/bootimgtools \
-         $INSTALLER/common/custom_ramdisk_patch.sh $INSTALLER/common/init.magisk.rc \
-         $INSTALLER/common/magic_mask.sh /cache/data_bin
-  cp -af $INSTALLER/common/magisk.apk /cache/magisk.apk
-  chmod -R 755 /cache/data_bin
+  CPPATH=/cache/data_bin
 fi
+
+# Copy required files
+rm -rf $CPPATH 2>/dev/null
+mkdir -p $CPPATH
+cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/bootimgtools \
+       $INSTALLER/common/custom_ramdisk_patch.sh $INSTALLER/common/init.magisk.rc \
+       $INSTALLER/common/magic_mask.sh $CPPATH
+chmod -R 755 $CPPATH
+chcon -h u:object_r:system_file:s0 $CPPATH $CPPATH/*
 
 # Temporary busybox for installation
 mkdir -p $TMPDIR/busybox
@@ -402,7 +401,7 @@ ui_print "- Unpacking boot image"
 unpack_boot $BOOTIMAGE
 if [ $? -ne 0 ]; then
   ui_print "! Unable to unpack boot image"
-  exit 1;
+  exit 1
 fi
 
 ORIGBOOT=
