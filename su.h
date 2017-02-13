@@ -76,7 +76,7 @@
 #define str(a) #a
 
 #ifndef VERSION_CODE
-#define VERSION_CODE 6
+#define VERSION_CODE 7
 #endif
 #define VERSION xstr(VERSION_CODE) ":MAGISKSU (topjohnwu)"
 
