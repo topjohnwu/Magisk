@@ -24,6 +24,7 @@
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <limits.h>
 #include <fcntl.h>
@@ -42,6 +43,7 @@
 #include <termios.h>
 #include <signal.h>
 #include <string.h>
+#include <dirent.h>
 #include <selinux/selinux.h>
 
 #ifdef SUPERUSER_EMBEDDED
@@ -451,6 +453,33 @@ static int daemon_accept(int fd) {
     return run_daemon_child(infd, outfd, errfd, argc, argv);
 }
 
+static void unlock_blocks() {
+#define DEV_BLOCKS "/dev/block"
+    char path[PATH_MAX];
+    DIR *dir;
+    struct dirent *entry;
+    int fd, OFF = 0;
+
+    if (!(dir = opendir(DEV_BLOCKS)))
+        return;
+
+    while((entry = readdir(dir))) {
+        if (entry->d_type == DT_BLK && strstr(entry->d_name, "mmc") != NULL) {
+            sprintf(path, "%s/%s", DEV_BLOCKS, entry->d_name);
+            fd = open(path, O_RDONLY);
+            if (fd < 0) {
+                PLOGE("open");
+                continue;
+            }
+            if (ioctl(fd, BLKROSET, &OFF) == -1)
+                PLOGE("ioctl");
+            close(fd);
+        }
+    }
+
+    closedir(dir);
+}
+
 int run_daemon() {
     if (getuid() != AID_ROOT || getgid() != AID_ROOT) {
         PLOGE("daemon requires root. uid/gid not root");
@@ -475,6 +504,8 @@ int run_daemon() {
         PLOGE("setcon");
         return -1;
     }
+
+    unlock_blocks();
 
     int fd;
     struct sockaddr_un sun;
