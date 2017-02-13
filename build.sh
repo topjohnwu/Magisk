@@ -20,10 +20,11 @@ cleanup() {
   echo "* Cleaning up"
   echo "************************"
   ndk-build clean 2>/dev/null
-  ls zip_static/arm/* | grep -v "busybox" | xargs rm -rfv
-  ls zip_static/arm64/* | grep -v "busybox" | xargs rm -rfv
-  ls zip_static/x86/* | grep -v "busybox" | xargs rm -rfv
-  ls zip_static/x64/* | grep -v "busybox" | xargs rm -rfv
+  rm -rfv zip_static/arm
+  rm -rfv zip_static/arm64
+  rm -rfv zip_static/x86
+  rm -rfv zip_static/x64
+  rm -rfv zip_static/chromeos
   rm -rfv zip_static/META-INF/com/google/android/update-binary
   rm -rfv zip_static/common/custom_ramdisk_patch.sh
   rm -rfv zip_static/common/magisksu.sh
@@ -34,6 +35,7 @@ cleanup() {
   rm -rfv uninstaller/arm64
   rm -rfv uninstaller/x86
   rm -rfv uninstaller/x64
+  rm -rfv uninstaller/chromeos
 }
 
 mkcp() {
@@ -73,11 +75,19 @@ zip_package() {
   sed "s/MAGISK_VERSION_STUB/Magisk v$1 Boot Image Patcher/g" scripts/flash_script.sh > zip_static/META-INF/com/google/android/update-binary
   sed "s/MAGISK_VERSION_STUB/setprop magisk.version \"$1\"/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
   echo "************************"
-  echo "* Zipping Magisk v$1"
+  echo "* Copying files"
   echo "************************"
   cp -afv scripts/custom_ramdisk_patch.sh zip_static/common/custom_ramdisk_patch.sh
   cp -afv scripts/magisksu.sh zip_static/common/magisksu.sh
   cp -afv scripts/init.magisk.rc zip_static/common/init.magisk.rc
+  cp -afv binaries/busybox-arm zip_static/arm/busybox
+  cp -afv binaries/busybox-arm64 zip_static/arm64/busybox
+  cp -afv binaries/busybox-x86 zip_static/x86/busybox
+  cp -afv binaries/busybox-x64 zip_static/x64/busybox
+  cp -afv binaries/chromeos/. zip_static/chromeos
+  echo "************************"
+  echo "* Zipping Magisk v$1"
+  echo "************************"
   cd zip_static
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;
@@ -89,6 +99,15 @@ zip_package() {
 
 zip_uninstaller() {
   [ ! -f "uninstaller/arm/bootimgtools" ] && error "Missing binaries!! Please run '$0 build' before zipping"
+  echo "************************"
+  echo "* Copying files"
+  echo "************************"
+  mkcp scripts/magisk_uninstaller.sh uninstaller/common
+  cp -afv binaries/busybox-arm uninstaller/arm/busybox
+  cp -afv binaries/busybox-arm64 uninstaller/arm64/busybox
+  cp -afv binaries/busybox-x86 uninstaller/x86/busybox
+  cp -afv binaries/busybox-x64 uninstaller/x64/busybox
+  cp -afv binaries/chromeos/. zip_static/chromeos
   echo "************************"
   echo "* Zipping uninstaller"
   echo "************************"

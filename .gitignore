@@ -2,15 +2,17 @@ obj/
 libs/
 *.zip
 
-# Generated binaries
+# Copied binaries
 zip_static/arm/*
 zip_static/arm64/*
 zip_static/x86/*
 zip_static/x64/*
+zip_static/chromeos/*
 uninstaller/arm/*
 uninstaller/arm64/*
 uninstaller/x86/*
 uninstaller/x64/*
+uninstaller/chromeos/*
 ziptools/zipadjust
 
 # Generated scripts
@@ -20,6 +22,3 @@ zip_static/common/magisksu.sh
 zip_static/common/init.magisk.rc
 zip_static/common/custom_ramdisk_patch.sh
 zip_static/META-INF/com/google/android/update-binary
-
-# Leave all busybox!
-!busybox

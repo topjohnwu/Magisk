@@ -10,8 +10,7 @@
 *.cmd text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
-busybox binary
-futility binary
+binaries/** binary
 *.jar binary
 *.exe binary
 *.apk binary
