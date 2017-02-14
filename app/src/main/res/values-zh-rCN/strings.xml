@@ -15,6 +15,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">已安装 Magisk v%1$s</string>
+    <string name="magisk_version_disable">Magisk v%1$s 已禁用</string>
     <string name="magisk_version_error">未安装 Magisk</string>
 
     <string name="checking_for_updates">正在检查更新…</string>
@@ -42,6 +43,8 @@
     <string name="keep_dm_verity">保持 dm-verity</string>
     <string name="current_magisk_title">已安装 Magisk 版本：v%1$s</string>
     <string name="install_magisk_title">最新的 Magisk 版本：v%1$.1f</string>
+    <string name="uninstall">卸载</string>
+    <string name="reboot_countdown">将在 %1$d 后重启</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -111,8 +114,9 @@
     <string name="repo_cache_cleared">资源库缓存已清除</string>
     <string name="safetyNet_hide_notice">此应用使用了 SafetyNet\n已默认由 MagiskHide 处理</string>
     <string name="start_magiskhide">正在启动 MagiskHide …</string>
-
-    <!--URL Templates-->
+    <string name="no_magisksu_title">未使用 MagiskSU！</string>
+    <string name="no_magisksu_msg">你未使用 MagiskSU 进行 ROOT，仅使用 MagiskHide 可能并不足够！\n官方并不支持，你需要额外的工具（如 suhide）才能通过 Safety Net。</string>
+    <string name="understand">我明白</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -121,6 +125,8 @@
     <string name="settings_clear_cache_title">清除资源库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制应用刷新在线数据</string>
 
+    <string name="settings_disable_title">禁用 Magisk</string>
+    <string name="settings_disable_summary">除 ROOT (MagiskSU) 以外，其他都将被禁用</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
     <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
@@ -179,7 +185,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">目标 UID:\u0020</string>
     <string name="command">命令:\u0020</string>
-    <string name="settings_disable_title">禁用魔法挂载(Magic Mount)</string>
-    <string name="settings_disable_summary">禁用魔法挂载，所有模块将不会生效</string>
 
 </resources>
