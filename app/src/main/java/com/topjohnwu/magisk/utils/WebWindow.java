@@ -6,10 +6,12 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
+
 public class WebWindow {
 
 public WebWindow(String title, String url, Context context) {
-    AlertDialog.Builder alert = Utils.getAlertDialogBuilder(context);
+    AlertDialog.Builder alert = new AlertDialogBuilder(context);
     alert.setTitle(title);
 
     Logger.dev("WebView: URL = " + url);

@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -188,7 +189,7 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
                         if (!getApplication().isSuClient) {
-                            Utils.getAlertDialogBuilder(getActivity())
+                            new AlertDialogBuilder(getActivity())
                                     .setTitle(R.string.no_magisksu_title)
                                     .setMessage(R.string.no_magisksu_msg)
                                     .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide().enable())

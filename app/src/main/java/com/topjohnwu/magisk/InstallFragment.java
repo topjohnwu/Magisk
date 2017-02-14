@@ -16,8 +16,10 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.asyncs.ProcessMagiskZip;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.receivers.MagiskDlReceiver;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -67,13 +69,22 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
                 bootImage = getApplication().blockList.get(spinner.getSelectedItemPosition());
             }
             String filename = "Magisk-v" + getApplication().remoteMagiskVersion + ".zip";
-            Utils.getAlertDialogBuilder(getActivity())
+            new AlertDialogBuilder(getActivity())
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                     .setMessage(getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
                     .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                             getActivity(),
-                            new MagiskDlReceiver(bootImage, keepEncChkbox.isChecked(), keepVerityChkbox.isChecked()),
+                            new DownloadReceiver() {
+                                private String boot = bootImage;
+                                private boolean enc = keepEncChkbox.isChecked();
+                                private boolean verity = keepVerityChkbox.isChecked();
+
+                                @Override
+                                public void onDownloadDone(Uri uri) {
+                                    new ProcessMagiskZip(getActivity(), uri, boot, enc, verity).exec();
+                                }
+                            },
                             getApplication().magiskLink,
                             Utils.getLegalFilename(filename)))
                     .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
@@ -86,7 +97,7 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
             uninstallButton.setVisibility(View.GONE);
         } else {
             uninstallButton.setOnClickListener(vi -> {
-                Utils.getAlertDialogBuilder(getActivity())
+                new AlertDialogBuilder(getActivity())
                         .setTitle("Uninstall Magisk")
                         .setMessage("This will remove all modules, MagiskSU, and potentially re-encrypt your device\nAre you sure to process?")
                         .setPositiveButton(R.string.yes, (dialogInterface, i) -> {

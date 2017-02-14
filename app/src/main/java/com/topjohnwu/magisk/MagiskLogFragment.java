@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -121,7 +122,7 @@ public class MagiskLogFragment extends Fragment {
                     new Handler().postDelayed(() -> onOptionsItemSelected(mClickedMenuItem), 500);
                 }
             } else {
-                Snackbar.make(txtLog, R.string.permissionNotGranted, Snackbar.LENGTH_LONG).show();
+                SnackbarMaker.make(txtLog, R.string.permissionNotGranted, Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -150,7 +151,7 @@ public class MagiskLogFragment extends Fragment {
 
                 case 1:
                     Shell.su("echo > " + MAGISK_LOG);
-                    Snackbar.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
+                    SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
                 case 2:

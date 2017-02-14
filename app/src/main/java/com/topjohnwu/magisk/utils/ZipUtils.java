@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -88,7 +89,7 @@ public class ZipUtils {
         buffer.setBuffer(zipAdjust(buffer.toByteArray(), buffer.size()));
     }
 
-    public static void removeTopFolder(InputStream in, OutputStream out) {
+    public static void removeTopFolder(InputStream in, OutputStream out) throws IOException {
         try {
             JarInputStream source = new JarInputStream(in);
             JarOutputStream dest = new JarOutputStream(out);
@@ -113,16 +114,20 @@ public class ZipUtils {
             dest.close();
             in.close();
         } catch (IOException e) {
-            e.printStackTrace();
             Logger.dev("ZipUtils: removeTopFolder IO error!");
+            throw e;
         }
     }
 
-    public static void unzip(File file, File folder) {
+    public static void unzip(File file, File folder) throws Exception {
         unzip(file, folder, "");
     }
 
-    public static void unzip(File file, File folder, String path) {
+    public static void unzip(InputStream file, File folder) throws Exception {
+        unzip(file, folder, "");
+    }
+
+    public static void unzip(File file, File folder, String path) throws Exception {
         int count;
         FileOutputStream out;
         File dest;
@@ -133,32 +138,56 @@ public class ZipUtils {
             Enumeration<JarEntry> e = zipfile.entries();
             while(e.hasMoreElements()) {
                 entry = e.nextElement();
-                if (!entry.getName().contains(path)
-                        || entry.getName().charAt(entry.getName().length() - 1) == '/') {
+                if (!entry.getName().contains(path) || entry.isDirectory())
                     // Ignore directories, only create files
                     continue;
-                }
                 Logger.dev("ZipUtils: Extracting: " + entry);
                 is = zipfile.getInputStream(entry);
                 dest = new File(folder, entry.getName());
-                if (dest.getParentFile().mkdirs()) {
+                if (dest.getParentFile().mkdirs())
                     dest.createNewFile();
-                }
                 out = new FileOutputStream(dest);
-                while ((count = is.read(data, 0, 4096)) != -1) {
+                while ((count = is.read(data, 0, 4096)) != -1)
                     out.write(data, 0, count);
-                }
                 out.flush();
                 out.close();
                 is.close();
             }
         } catch(Exception e) {
             e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public static void unzip(InputStream file, File folder, String path) throws Exception {
+        int count;
+        FileOutputStream out;
+        File dest;
+        JarEntry entry;
+        byte data[] = new byte[4096];
+        try (JarInputStream zipfile = new JarInputStream(file)) {
+            while((entry = zipfile.getNextJarEntry()) != null) {
+                if (!entry.getName().contains(path) || entry.isDirectory())
+                    // Ignore directories, only create files
+                    continue;
+                Logger.dev("ZipUtils: Extracting: " + entry);
+                dest = new File(folder, entry.getName());
+                if (dest.getParentFile().mkdirs())
+                    dest.createNewFile();
+                out = new FileOutputStream(dest);
+                while ((count = zipfile.read(data, 0, 4096)) != -1)
+                    out.write(data, 0, count);
+                out.flush();
+                out.close();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
     public static void signZip(Context context, InputStream inputStream,
-                               OutputStream outputStream, boolean signWholeFile) {
+                               OutputStream outputStream, boolean signWholeFile) throws Exception {
         JarMap inputJar;
         int hashes = 0;
         try {
@@ -192,6 +221,7 @@ public class ZipUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
@@ -226,6 +256,13 @@ public class ZipUtils {
         }
         public Manifest getManifest() {
             return manifest;
+        }
+        public Enumeration<JarEntry> entries() {
+            Iterator<Map.Entry<String, Pair<JarEntry, ByteArrayOutputStream> >> i = entrySet().iterator();
+            ArrayList<JarEntry> list = new ArrayList<>();
+            while (i.hasNext())
+                list.add(i.next().getValue().first);
+            return Collections.enumeration(list);
         }
     }
 

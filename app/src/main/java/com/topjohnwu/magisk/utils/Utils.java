@@ -7,17 +7,19 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.OpenableColumns;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.LoadRepos;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
@@ -117,15 +119,6 @@ public class Utils {
         return null;
     }
 
-    public static AlertDialog.Builder getAlertDialogBuilder(Context context) {
-//        if (((MagiskManager) context.getApplicationContext()).isDarkTheme) {
-//            return new AlertDialog.Builder(context, R.style.AlertDialog_dh);
-//        } else {
-//            return new AlertDialog.Builder(context);
-//        }
-        return new AlertDialogBuilder(context);
-    }
-
     public static boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
         return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
     }
@@ -163,5 +156,30 @@ public class Utils {
         magiskManager.prefs.edit().remove(LoadRepos.ETAG_KEY).apply();
         new RepoDatabaseHelper(activity).clearRepo();
         Toast.makeText(activity, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
+    }
+
+    public static String getNameFromUri(Context context, Uri uri) {
+        String name = null;
+        try (Cursor c = context.getContentResolver().query(uri, null, null, null, null)) {
+            if (c != null) {
+                int nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIndex != -1) {
+                    c.moveToFirst();
+                    name = c.getString(nameIndex);
+                }
+            }
+        }
+        if (name == null) {
+            int idx = uri.getPath().lastIndexOf('/');
+            name = uri.getPath().substring(idx + 1);
+        }
+        return name;
+    }
+
+    public static void showUriSnack(Activity activity, Uri uri) {
+        SnackbarMaker.make(activity, activity.getString(R.string.internal_storage,
+                "/MagiskManager/" + Utils.getNameFromUri(activity, uri)),
+                Snackbar.LENGTH_LONG)
+                .setAction(R.string.ok, (v)->{}).show();
     }
 }

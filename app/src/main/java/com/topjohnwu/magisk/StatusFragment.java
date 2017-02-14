@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
@@ -97,7 +98,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
         if (getApplication().magiskVersion < 0 && Shell.rootAccess() && !noDialog) {
             noDialog = true;
-            Utils.getAlertDialogBuilder(getActivity())
+            new AlertDialogBuilder(getActivity())
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
@@ -229,7 +230,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
 
-        updateMagisk = Utils.getAlertDialogBuilder(getActivity())
+        updateMagisk = new AlertDialogBuilder(getActivity())
                 .setTitle(R.string.magisk_update_title)
                 .setMessage(getString(R.string.magisk_update_message, getApplication().remoteMagiskVersion))
                 .setCancelable(true)

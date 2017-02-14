@@ -18,8 +18,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +86,7 @@ public class AboutActivity extends Activity {
                 result = Html.fromHtml(changes);
             }
             appChangelog.setOnClickListener(v -> {
-                AlertDialog d = Utils.getAlertDialogBuilder(this)
+                AlertDialog d = new AlertDialogBuilder(this)
                         .setTitle(R.string.app_changelog)
                         .setMessage(result)
                         .setPositiveButton(android.R.string.ok, null)
@@ -105,7 +105,7 @@ public class AboutActivity extends Activity {
             } else {
                 result = Html.fromHtml(getString(R.string.app_developers_));
             }
-            AlertDialog d = Utils.getAlertDialogBuilder(this)
+            AlertDialog d = new AlertDialogBuilder(this)
                     .setTitle(R.string.app_developers)
                     .setMessage(result)
                     .setPositiveButton(android.R.string.ok, null)

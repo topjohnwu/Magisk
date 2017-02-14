@@ -17,8 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.receivers.RepoDlReceiver;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebWindow;
 
@@ -75,13 +77,18 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         });
         holder.updateImage.setOnClickListener(view -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            Utils.getAlertDialogBuilder(context)
+            new AlertDialogBuilder(context)
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
                     .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
                             context,
-                            new RepoDlReceiver(),
+                            new DownloadReceiver() {
+                                @Override
+                                public void onDownloadDone(Uri uri) {
+                                    new ProcessRepoZip(activity, uri).exec();
+                                }
+                            },
                             repo.getZipUrl(),
                             Utils.getLegalFilename(filename)))
                     .setNegativeButton(R.string.no_thanks, null)

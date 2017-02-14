@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.SerialTask;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
 
@@ -66,7 +67,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
             @Override
             protected void onPostExecute(Void v) {
                 int snack = isChecked ? R.string.disable_file_removed : R.string.disable_file_created;
-                Snackbar.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
+                SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
             }
         }.exec());
 
@@ -86,7 +87,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
             @Override
             protected void onPostExecute(Void v) {
                 int snack = removed ? R.string.remove_file_deleted : R.string.remove_file_created;
-                Snackbar.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
+                SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
                 updateDeleteButton(holder, module);
             }
         }.exec());

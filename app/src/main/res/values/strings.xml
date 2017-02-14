@@ -90,6 +90,7 @@
     <string name="permissionNotGranted">This feature will not work without permission to write external storage.</string>
     <string name="no_thanks">No thanks</string>
     <string name="yes">Yes</string>
+    <string name="ok">OK</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
     <string name="download_install">Download &amp; install</string>
@@ -120,6 +121,8 @@
     <string name="no_magisksu_title">Not using MagiskSU!</string>
     <string name="no_magisksu_msg">You are not rooted with MagiskSU, using MagiskHide itself might not be enough!\nIt\'s not officially supported, and you would need additional tools (e.g suhide) to pass Safety Net.</string>
     <string name="understand">I understand</string>
+    <string name="process_error">Process error</string>
+    <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

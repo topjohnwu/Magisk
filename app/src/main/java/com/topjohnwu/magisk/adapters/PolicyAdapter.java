@@ -15,9 +15,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.Policy;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +71,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
-                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
@@ -80,7 +81,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     policy.notification = isChecked;
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
-                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
@@ -90,18 +91,18 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     policy.logging = isChecked;
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
-                    Snackbar.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
                     dbHelper.addPolicy(policy);
                 }
             });
-            holder.delete.setOnClickListener(v -> Utils.getAlertDialogBuilder(v.getContext())
+            holder.delete.setOnClickListener(v -> new AlertDialogBuilder(v.getContext())
                     .setTitle(R.string.su_revoke_title)
                     .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
                     .setPositiveButton(R.string.yes, (dialog, which) -> {
                         policyList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, policyList.size());
-                        Snackbar.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
+                        SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
                                 Snackbar.LENGTH_SHORT).show();
                         dbHelper.deletePolicy(policy.uid);
                     })
