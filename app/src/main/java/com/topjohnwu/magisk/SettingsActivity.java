@@ -31,7 +31,7 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getTopApplication().isDarkTheme) {
-            setTheme(R.style.AppTheme_dh);
+            setTheme(R.style.AppTheme_Dark);
         }
 
         setContentView(R.layout.activity_container);

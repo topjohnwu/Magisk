@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -42,10 +41,10 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        prefs = getTopApplication().prefs;
 
         if (getTopApplication().isDarkTheme) {
-            setTheme(R.style.AppTheme_dh);
+            setTheme(R.style.AppTheme_Dark);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -81,14 +80,15 @@ public class MainActivity extends Activity
         navigationView.setNavigationItemSelectedListener(this);
         getTopApplication().reloadMainActivity.register(this);
 
+        if (getTopApplication().updateCheckDone.isTriggered)
+            onTrigger(getTopApplication().updateCheckDone);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         getTopApplication().updateCheckDone.register(this);
-//        if (getTopApplication().updateCheckDone.isTriggered)
-//            onTrigger(getTopApplication().updateCheckDone);
         checkHideSection();
     }
 

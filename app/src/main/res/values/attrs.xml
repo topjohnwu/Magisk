@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2016 dvdandroid
+  ~ Copyright 2017 topjohnwu
+  ~ Copyright 2017 dvdandroid
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -27,5 +28,7 @@
         <attr name="ColorFail" format="reference"/>
         <attr name="ColorNeutral" format="reference"/>
     </declare-styleable>
+
+    <attr name="colorAccentFallback" format="reference" />
 
 </resources>

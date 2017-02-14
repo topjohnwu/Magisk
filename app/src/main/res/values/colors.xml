@@ -4,6 +4,7 @@
     <color name="primary">#009688</color>
     <color name="primary_dark">#00796B</color>
     <color name="accent">#FFC107</color>
+    <color name="accentFallback">#FBC02D</color>
     <color name="icon_grey">#757575</color>
 
     <color name="red500">#F44336</color>
@@ -12,13 +13,10 @@
     <color name="blue500">#2196F3</color>
     <color name="yellow500">#FFC107</color>
 
-    <color name="dh_primary">#3F51B5</color>
-    <color name="dh_primary_dark">#303F9F</color>
-    <color name="dh_accent">#448AFF</color>
+    <color name="dark_primary">#1a237e</color>
+    <color name="dark_primary_dark">#000000</color>
 
-    <color name="dh_primary_text">#dedede</color>
-    <color name="dh_icons">#dedede</color>
-    <color name="dh_divider">#313131</color>
+    <color name="dark_secondary_text">#dedede</color>
 
     <color name="su_request_background">#e0e0e0</color>
 

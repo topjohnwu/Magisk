@@ -51,9 +51,8 @@
             fab:menu_shadowRadius="4dp"
             fab:menu_shadowXOffset="1dp"
             fab:menu_shadowYOffset="3dp"
-            fab:menu_colorNormal="#cddc39"
-            fab:menu_colorPressed="#9e9d24"
-            fab:menu_colorRipple="#99FFFFFF"
+            fab:menu_colorNormal="?android:colorAccent"
+            fab:menu_colorPressed="?attr/colorAccentFallback"
             fab:menu_animationDelayPerItem="50"
             fab:menu_icon="@drawable/ic_add"
             fab:menu_buttonSpacing="0dp"
@@ -64,6 +63,8 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:src="@drawable/ic_archive"
+                fab:fab_colorNormal="?android:colorAccent"
+                fab:fab_colorPressed="?attr/colorAccentFallback"
                 fab:fab_size="mini"
                 fab:fab_label="@string/fab_flash_zip" />
 

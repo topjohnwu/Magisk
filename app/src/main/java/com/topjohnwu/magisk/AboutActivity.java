@@ -48,7 +48,7 @@ public class AboutActivity extends Activity {
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
         if (getTopApplication().isDarkTheme) {
-            setTheme(R.style.AppTheme_dh);
+            setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);
