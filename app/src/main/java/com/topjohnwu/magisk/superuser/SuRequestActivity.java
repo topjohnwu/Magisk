@@ -83,7 +83,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
             }
         }.startWatching();
 
-        new SocketManager().exec();
+        new SocketManager(this).exec();
     }
 
     void showRequest() {
@@ -169,6 +169,10 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
     }
 
     private class SocketManager extends ParallelTask<Void, Void, Boolean> {
+
+        public SocketManager(Activity context) {
+            super(context);
+        }
 
         @Override
         protected Boolean doInBackground(Void... params) {
