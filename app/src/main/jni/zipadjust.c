@@ -1,13 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <zlib.h>
-#include <android/log.h>
 #include "zipadjust.h"
-
-#define  LOG_TAG    "zipadjust"
-
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 size_t insize = 0, outsize = 0, alloc = 0;
 unsigned char *fin = NULL, *fout = NULL;
