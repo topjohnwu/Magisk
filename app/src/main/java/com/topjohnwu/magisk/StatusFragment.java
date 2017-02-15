@@ -242,7 +242,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
                         transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
                     } catch (IllegalStateException ignored) {}
                 })
-                .setNeutralButton(R.string.check_release_notes, (dialog, which) -> {
+                .setNeutralButton(R.string.release_notes, (dialog, which) -> {
                     getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getApplication().releaseNoteLink)));
                 })
                 .setNegativeButton(R.string.no_thanks, null)

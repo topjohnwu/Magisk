@@ -42,8 +42,6 @@ public class Repo extends BaseModule {
 
     public void update(Date lastUpdate) throws CacheModException {
         Logger.dev("Repo: Local: " + mLastUpdate + " Remote: " + lastUpdate);
-        if (mIsCacheModule)
-            throw new CacheModException(mId);
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();
@@ -73,6 +71,10 @@ public class Repo extends BaseModule {
 
     public String getManifestUrl() {
         return String.format(FILE_URL, repoName, "module.prop");
+    }
+
+    public String getDetailUrl() {
+        return String.format(FILE_URL, repoName, "README.md");
     }
 
     public Date getLastUpdate() {

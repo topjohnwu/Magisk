@@ -61,7 +61,6 @@
     <string name="update_available">可更新</string>
     <string name="installed">已安装</string>
     <string name="not_installed">未安装</string>
-    <string name="changelog">更新日志</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">保存到 SD 卡</string>
@@ -93,8 +92,6 @@
     <string name="goto_install">前往“安装”界面</string>
     <string name="download_file_error">下载文件时出错</string>
     <string name="install_error">安装出错！</string>
-    <string name="manual_install_1">Zip 文件已保存至 %1$s</string>
-    <string name="manual_install_2">请在 Recovery 中手动刷入</string>
     <string name="invalid_zip">此 zip 文件不是 Magisk 模块！！</string>
     <string name="reboot_title">安装成功！</string>
     <string name="reboot_msg">你想要立即重启吗？</string>
@@ -110,7 +107,7 @@
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="magisk_update_message">Magisk 已有新版本 v%1$.1f，你想要安装吗？</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
-    <string name="check_release_notes">查看发布说明</string>
+    <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">资源库缓存已清除</string>
     <string name="safetyNet_hide_notice">此应用使用了 SafetyNet\n已默认由 MagiskHide 处理</string>
     <string name="start_magiskhide">正在启动 MagiskHide …</string>

@@ -64,7 +64,6 @@
     <string name="update_available">Update Available</string>
     <string name="installed">Installed</string>
     <string name="not_installed">Not Installed</string>
-    <string name="changelog">Changelog</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Save to SD</string>
@@ -91,14 +90,13 @@
     <string name="no_thanks">No thanks</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>
+    <string name="close">Close</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
     <string name="download_install">Download &amp; install</string>
     <string name="goto_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
-    <string name="manual_install_1">Zip file placed in %1$s</string>
-    <string name="manual_install_2">Flash it in recovery manually</string>
     <string name="invalid_zip">The zip is not a Magisk Module!!</string>
     <string name="reboot_title">Installation succeeded!</string>
     <string name="reboot_msg">Do you want to reboot now?</string>
@@ -114,7 +112,7 @@
     <string name="magisk_update_title">New Magisk Update Available!</string>
     <string name="magisk_update_message">Magisk v%1$.1f update is live, do you want to install?</string>
     <string name="settings_reboot_toast">Reboot to apply settings</string>
-    <string name="check_release_notes">Check release notes</string>
+    <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
     <string name="start_magiskhide">Starting MagiskHide …</string>

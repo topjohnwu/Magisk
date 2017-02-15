@@ -64,7 +64,6 @@
     <string name="update_available">Aktualizacja jest dostępna</string>
     <string name="installed">Zainstalowany</string>
     <string name="not_installed">Nie zainstalowany</string>
-    <string name="changelog">Zmiany</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Zapisz na SD</string>
@@ -96,8 +95,6 @@
     <string name="goto_install">Idź do sekcji \"Instalacja\"</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="install_error">Błąd instalacji!</string>
-    <string name="manual_install_1">Plik zip umieszczony w %1$s</string>
-    <string name="manual_install_2">Zainstaluj go ręcznie w recovery</string>
     <string name="invalid_zip">Ten zip nie jest Modułem Magisk!!</string>
     <string name="reboot_title">Instalacja zakończona powodzeniem!</string>
     <string name="reboot_msg">Czy chcesz teraz ponownie uruchomić?</string>
@@ -113,7 +110,7 @@
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="magisk_update_message">Magisk v%1$.1f jest dostępny, chcesz zainstalować?</string>
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
-    <string name="check_release_notes">Sprawdź zmiany</string>
+    <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
     <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJest już domyślnie obsługiwana przez MagiskHide</string>
     <string name="start_magiskhide">Uruchamianie MagiskHide …</string>

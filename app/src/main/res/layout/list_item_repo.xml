@@ -14,135 +14,72 @@
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?android:attr/listPreferredItemHeight"
+        android:orientation="horizontal"
         android:padding="@dimen/card_layout_padding">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:id="@+id/info_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/info_layout">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:id="@+id/title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="0dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textIsSelectable="false"/>
-
-                    <TextView
-                        android:id="@+id/version_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no_info_provided"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@android:color/tertiary_text_dark"
-                        android:textIsSelectable="false"
-                        android:textStyle="bold|italic"/>
-
-                    <TextView
-                        android:id="@+id/author"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no_info_provided"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@android:color/tertiary_text_dark"
-                        android:textIsSelectable="false"
-                        android:textStyle="bold|italic"/>
-
-                    <TextView
-                        android:id="@+id/description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/no_info_provided"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textIsSelectable="false" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/update"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/ic_file_download_black"
-                    android:backgroundTint="@color/icon_grey"
-                    android:focusable="false"
-                    android:gravity="end" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/expand_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/info_layout"
+            android:layout_weight="1"
+            android:clickable="true"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginTop="0dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false" />
 
-                <ImageView
-                    android:id="@+id/changeLog"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/card_imageview_margin"
-                    android:layout_marginStart="@dimen/card_imageview_margin"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="15dp"
-                    android:src="@drawable/ic_changelog"
-                    android:tint="@color/icon_grey"/>
+            <TextView
+                android:id="@+id/version_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_info_provided"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic" />
 
-                <ImageView
-                    android:id="@+id/authorLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/card_imageview_margin"
-                    android:layout_marginStart="@dimen/card_imageview_margin"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="15dp"
-                    android:src="@drawable/ic_person"
-                    android:tint="@color/icon_grey"/>
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_info_provided"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic" />
 
-                <ImageView
-                    android:id="@+id/supportLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/card_imageview_margin"
-                    android:layout_marginStart="@dimen/card_imageview_margin"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:padding="15dp"
-                    android:src="@drawable/ic_help"
-                    android:tint="@color/icon_grey"/>
-
-            </LinearLayout>
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/no_info_provided"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textIsSelectable="false" />
 
         </LinearLayout>
 
-    </RelativeLayout>
+        <ImageView
+            android:id="@+id/download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/ic_file_download_black"
+            android:backgroundTint="@color/icon_grey"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="end" />
+
+    </LinearLayout>
 
 
 </android.support.v7.widget.CardView>

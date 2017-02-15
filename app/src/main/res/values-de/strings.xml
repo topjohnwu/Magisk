@@ -65,7 +65,6 @@
     <string name="update_available">Update verfügbar</string>
     <string name="installed">Installiert</string>
     <string name="not_installed">Nicht installiert</string>
-    <string name="changelog">Änderungen</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Log auf SD-Karte speichern</string>
@@ -97,8 +96,6 @@
     <string name="goto_install">Zu \"Installieren\" wechseln</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="install_error">Fehler bei der Installation!</string>
-    <string name="manual_install_1">Zip-Datei unter %1$s gespeichert</string>
-    <string name="manual_install_2">Manuell mittels Recovery flashen</string>
     <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!</string>
     <string name="reboot_title">Installation erfolgreich!</string>
     <string name="reboot_msg">Möchtest du jetzt neustarten?</string>
@@ -114,7 +111,7 @@
     <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
     <string name="magisk_update_message">Magisk-Update v%1$.1f ist verfügbar, möchtest du es installieren?</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
-    <string name="check_release_notes">Änderungen anzeigen</string>
+    <string name="release_notes">Änderungen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
     <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide gehandhabt</string>
     <string name="start_magiskhide">Starte Magisk Hide…</string>

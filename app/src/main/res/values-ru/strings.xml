@@ -59,7 +59,6 @@
     <string name="update_available">Доступно обновление</string>
     <string name="installed">Установлен</string>
     <string name="not_installed">Не установлен</string>
-    <string name="changelog">Изменения</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Сохранить на SD-карту</string>
@@ -91,8 +90,7 @@
     <string name="goto_install">Перейти в раздел «Установка»</string>
     <string name="download_file_error">Ошибка при скачивании файла</string>
     <string name="install_error">Ошибка при установке!</string>
-    <string name="manual_install_1">Zip-файл помещён в %1$s</string>
-    <string name="manual_install_2">Прошейте руками через рекавери</string>а
+    а
     <string name="invalid_zip">Этот архив не содержит модуль Magisk!!</string>
     <string name="reboot_title">Установка успешна!</string>
     <string name="reboot_msg">Вы хотите перезагрузиться?</string>
@@ -108,7 +106,7 @@
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
     <string name="magisk_update_message">Вышел Magisk версии v%1$.1f, установить?</string>
     <string name="settings_reboot_toast">Перезагрузитесь для применения изменений</string>
-    <string name="check_release_notes">Посмотреть примечания к выпуску</string>
+    <string name="release_notes">Примечания к выпуску</string>
     <string name="repo_cache_cleared">Кэш репозиториев очищен</string>
     <string name="safetyNet_hide_notice">Это приложение использует SafetyNet\nУже обработано MagiskHide по умолчанию</string>
     <string name="start_magiskhide">Запуск MagiskHide…</string>

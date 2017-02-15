@@ -35,7 +35,6 @@
     <string name="update_available">Actualización disponible</string>
     <string name="installed">Instalado</string>
     <string name="not_installed">No Instalado</string>
-    <string name="changelog">Cambios</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Salvar a SD</string>
@@ -65,7 +64,6 @@
     <string name="download_install">Descargar e instalar</string>
     <string name="download_file_error">Error descargando fichero</string>
     <string name="install_error">¡Error en la instalación!</string>
-    <string name="manual_install_1">Error flasheando fichero, zip colocado en %1$s\nFlashear manualmente desde recovery</string>
     <string name="invalid_zip">¡El zip no es un Módulo Magisk!</string>
     <string name="reboot_title">¡Instalación correcta!</string>
     <string name="reboot_msg">¿Deseas reiniciar ahora?</string>

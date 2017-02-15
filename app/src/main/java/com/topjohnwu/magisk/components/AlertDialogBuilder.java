@@ -9,7 +9,10 @@ import android.support.annotation.StyleRes;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
@@ -19,10 +22,14 @@ import butterknife.ButterKnife;
 
 public class AlertDialogBuilder extends AlertDialog.Builder {
 
+    @BindView(R.id.button_panel) LinearLayout buttons;
+    @BindView(R.id.message_panel) LinearLayout messagePanel;
+
     @BindView(R.id.negative) Button negative;
     @BindView(R.id.positive) Button positive;
     @BindView(R.id.neutral) Button neutral;
     @BindView(R.id.message) TextView messageView;
+    @BindView(R.id.custom_view) ViewStub custom;
 
     private DialogInterface.OnClickListener positiveListener;
     private DialogInterface.OnClickListener negativeListener;
@@ -47,11 +54,30 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
         negative.setVisibility(View.GONE);
         positive.setVisibility(View.GONE);
         neutral.setVisibility(View.GONE);
+        buttons.setVisibility(View.GONE);
+        messagePanel.setVisibility(View.GONE);
+    }
+
+    @Override
+    public AlertDialog.Builder setView(int layoutResId) {
+        custom.setLayoutResource(layoutResId);
+        custom.inflate();
+        return this;
+    }
+
+    @Override
+    public AlertDialog.Builder setView(View view) {
+        ViewGroup parent = (ViewGroup) custom.getParent();
+        int idx = parent.indexOfChild(custom);
+        parent.removeView(custom);
+        parent.addView(view, idx);
+        return this;
     }
 
     @Override
     public AlertDialog.Builder setMessage(@Nullable CharSequence message) {
         messageView.setText(message);
+        messagePanel.setVisibility(View.VISIBLE);
         return this;
     }
 
@@ -62,6 +88,7 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
 
     @Override
     public AlertDialog.Builder setPositiveButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        buttons.setVisibility(View.VISIBLE);
         positive.setVisibility(View.VISIBLE);
         positive.setText(text);
         positiveListener = listener;
@@ -80,6 +107,7 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
 
     @Override
     public AlertDialog.Builder setNegativeButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        buttons.setVisibility(View.VISIBLE);
         negative.setVisibility(View.VISIBLE);
         negative.setText(text);
         negativeListener = listener;
@@ -98,6 +126,7 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
 
     @Override
     public AlertDialog.Builder setNeutralButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        buttons.setVisibility(View.VISIBLE);
         neutral.setVisibility(View.VISIBLE);
         neutral.setText(text);
         neutralListener = listener;

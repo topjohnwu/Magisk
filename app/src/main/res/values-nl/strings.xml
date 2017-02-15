@@ -33,7 +33,6 @@
     <string name="update_available">Update Beschikbaar</string>
     <string name="installed">Geïnstalleerd</string>
     <string name="not_installed">Niet geïnstalleerd</string>
-    <string name="changelog">Changelog</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Opslaan op SD-kaart</string>
@@ -63,7 +62,6 @@
     <string name="download_install">Downloaden en installeren</string>
     <string name="download_file_error">Er is een fout opgetreden bij het downloaden van het bestand</string>
     <string name="install_error">Er is een fout opgetreden in de installatie</string>
-    <string name="manual_install_1">Er is een fout opgetreden in het flashen van het bestand. Het zip bestand is opgeslagen in %1$s\nFlash het handmatig in recovery modus.</string>
     <string name="invalid_zip">Zip bestand is geen Magisk Module!</string>
     <string name="reboot_title">Installatie succesvol!</string>
     <string name="reboot_msg">Wilt u nu rebooten?</string>

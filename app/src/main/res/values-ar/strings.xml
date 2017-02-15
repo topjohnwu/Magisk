@@ -35,7 +35,6 @@
     <string name="update_available">يتوفر تحديث</string>
     <string name="installed">مثبت</string>
     <string name="not_installed">غير مثبت</string>
-    <string name="changelog">التغييرات</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">حفظ إلى بطاقة ذاكرة SD</string>
@@ -65,8 +64,6 @@
     <string name="download_install">تنزيل وتثبيت</string>
     <string name="download_file_error">خطأ تنزيل الملف</string>
     <string name="install_error">خطأ في التثبيت!</string>
-    <string name="manual_install_1">الملف المضغوط وضع في %1$s</string>
-    <string name="manual_install_2">التثبيت في الإسترداد يدوياً</string>
     <string name="invalid_zip">الملف المضغوط ليس إضافة Magisk!!</string>
     <string name="reboot_title">التثبيت نجح!</string>
     <string name="reboot_msg">هل تريد إعادة التشغيل الآن؟</string>

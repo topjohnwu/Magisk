@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.ByteArrayInOutStream;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;

@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:id="@+id/message_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -31,8 +32,14 @@
 
     </LinearLayout>
 
+    <ViewStub
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/custom_view"/>
+
     <LinearLayout
         style="?android:attr/buttonBarStyle"
+        android:id="@+id/button_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="54dip"
