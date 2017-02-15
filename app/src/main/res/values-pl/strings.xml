@@ -57,7 +57,7 @@
     <string name="remove_file_deleted">Moduł nie zostanie usunięty podczas następnego restartu</string>
     <string name="disable_file_created">Moduł zostanie wyłączony przy następnym restarcie</string>
     <string name="disable_file_removed">Moduł zostanie włączony przy następnym restarcie</string>
-    <string name="author">Autor modu: %1$s</string>
+    <string name="author">Autor: %1$s</string>
     <string name="fab_flash_zip">Zainstaluj Moduł Zip</string>
 
     <!--Repo Fragment-->
@@ -89,6 +89,8 @@
     <string name="permissionNotGranted">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
     <string name="no_thanks">Nie dziękuję</string>
     <string name="yes">Tak</string>
+	<string name="ok">OK</string>
+	<string name="close">Zamknij</string>
     <string name="repo_install_title">Zainstaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download_install">Pobierz i zainstaluj</string>
@@ -117,11 +119,8 @@
     <string name="no_magisksu_title">Nie Używaj MagiskSU!</string>
     <string name="no_magisksu_msg">Jeśli nie masz roota z MagiskSU, używanie samego MagiskHide może nie wystarczyć! Inne metody nie są oficjalnie obsługiwane. Do poprawnego działania SaftyNet potrzebne będą dodatkowe narzędzia (np suhide)</string>
     <string name="understand">Rozumiem</string>
-    
-	<!--URL Templates-->
-    
-    
-    
+    <string name="process_error">Błąd procesu</string>
+    <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
