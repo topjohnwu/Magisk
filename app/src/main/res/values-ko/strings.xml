@@ -1,7 +1,5 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">내비게이션 서랍 열기</string>
@@ -45,7 +43,6 @@
     <string name="keep_dm_verity">dm-verity 유지</string>
     <string name="current_magisk_title">설치된 Magisk 버전: v%1$s</string>
     <string name="install_magisk_title">최신 Magisk 버전: v%1$.1f</string>
-    <string name="magiskify" translatable="false">Magiskify</string>
     <string name="uninstall">제거</string>
     <string name="reboot_countdown">%1$d초 안에 다시 시작됨</string>
 

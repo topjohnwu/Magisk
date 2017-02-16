@@ -1,0 +1,190 @@
+<resources>
+    <!--Universal-->
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="magiskhide">Magisk 隱藏</string>
+    <string name="modules">模組</string>
+    <string name="downloads">下載</string>
+    <string name="superuser">超級用戶</string>
+    <string name="log">日誌</string>
+    <string name="settings">設置</string>
+    <string name="status">狀態</string>
+    <string name="install">安裝</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">已安裝 Magisk v%1$s</string>
+    <string name="magisk_version_disable">已禁用 Magisk v%1$s</string>
+    <string name="magisk_version_error">未安裝 Magisk</string>
+
+    <string name="checking_for_updates">正在檢查更新…</string>
+    <string name="magisk_update_available">Magisk 可更新到 v%1$.1f！</string>
+    <string name="cannot_check_updates">無法檢查更新，沒有網絡連線？</string>
+    <string name="up_to_date">已安裝最新版本的 %1$s</string>
+    <string name="root_error">已 ROOT 但沒有 ROOT 權限，未授予權限？</string>
+    <string name="not_rooted">未 ROOT</string>
+    <string name="proper_root">已正確 ROOT</string>
+    <string name="safetyNet_check_text">點擊啟動 SafetyNet 檢查</string>
+    <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
+    <string name="safetyNet_connection_failed">無法連接至 Google API</string>
+    <string name="safetyNet_connection_suspended">與 Google API 的連接已暫停</string>
+    <string name="safetyNet_error">無法檢查 SafetyNet，沒有網絡連線？</string>
+    <string name="safetyNet_fail">SafetyNet 失敗：CTS 配置文件不匹配</string>
+    <string name="safetyNet_pass">SafetyNet 已通過</string>
+    <string name="root_info_warning">功能嚴重受限</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">\"(自動) %1$s\"</string>
+    <string name="boot_image_title">Boot 鏡像位置</string>
+    <string name="detect_button">偵測</string>
+    <string name="advanced_settings_title">高級設置</string>
+    <string name="keep_force_encryption">保持強制加密</string>
+    <string name="keep_dm_verity">保留 dm-verity</string>
+    <string name="current_magisk_title">已安裝 Magisk 版本：v%1$s</string>
+    <string name="install_magisk_title">最新的 Magisk 版本：v%1$.1f</string>
+    <string name="uninstall">卸載</string>
+    <string name="reboot_countdown">將在 %1$d 後重啟</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">（未提供資訊）</string>
+    <string name="no_modules_found">未找到模組</string>
+    <string name="update_file_created">模組將在下次重啟後更新</string>
+    <string name="remove_file_created">模組將在下次重啟後移除</string>
+    <string name="remove_file_deleted">模組將不會在下次重啟後移除</string>
+    <string name="disable_file_created">模組將在下次重啟後禁用</string>
+    <string name="disable_file_removed">模組將在下次重啟後啟用</string>
+    <string name="author">作者：%1$s</string>
+    <string name="fab_flash_zip">刷入模組 Zip</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">可更新</string>
+    <string name="installed">已安裝</string>
+    <string name="not_installed">未安裝</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">保存到 SD 卡</string>
+    <string name="menuReload">重載</string>
+    <string name="menuClearLog">清除日誌</string>
+    <string name="logs_cleared">日誌已成功清除</string>
+    <string name="log_is_empty">日誌為空</string>
+    <string name="logs_save_failed">無法將日誌寫入 SD 卡：</string>
+
+    <!--About Activity-->
+    <string name="about">關於</string>
+    <string name="app_developers">主要開發者</string>
+    <string name="app_developers_"><![CDATA[此應用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 與 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作開發。]]></string>
+    <string name="app_changelog">應用更新日誌</string>
+    <string name="translators">topjohnwu</string>
+    <string name="app_version">應用版本</string>
+    <string name="app_source_code">原始碼</string>
+    <string name="donation">捐贈</string>
+    <string name="app_translators">翻譯者</string>
+    <string name="support_thread">討論串</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">未授予寫入外部存儲權限，此功能無法正常工作。</string>
+    <string name="no_thanks">不，謝謝</string>
+    <string name="yes">是</string>
+    <string name="repo_install_title">安裝 %1$s</string>
+    <string name="repo_install_msg">你想要安裝 %1$s 嗎？</string>
+    <string name="download_install">下載並安裝</string>
+    <string name="goto_install">前往“安裝”界面</string>
+    <string name="download_file_error">下載文件時出錯</string>
+    <string name="install_error">安裝出錯！</string>
+    <string name="invalid_zip">此 zip 文件不是 Magisk 模組！！</string>
+    <string name="reboot_title">安裝成功！</string>
+    <string name="reboot_msg">你想要立即重啟嗎？</string>
+    <string name="reboot">重啟</string>
+    <string name="copying_msg">正在復制 zip 到暫存目錄</string>
+    <string name="zip_install_progress_title">正在安裝</string>
+    <string name="zip_install_unzip_zip_msg">正在解壓 zip 文件 …</string>
+    <string name="zip_install_process_zip_msg">正在處理 zip 文件 …</string>
+    <string name="zip_install_progress_msg">"正在安裝 %1$s …"</string>
+    <string name="no_magisk_title">未安裝 Magisk！</string>
+    <string name="no_magisk_msg">你想要下載並安裝 Magisk 嗎？</string>
+    <string name="downloading_toast">正在下載 %1$s</string>
+    <string name="magisk_update_title">Magisk 可更新！</string>
+    <string name="magisk_update_message">Magisk 已有新版本 v%1$.1f，你想要安裝嗎？</string>
+    <string name="settings_reboot_toast">勾選此項以啟用對所有 shell 命令及輸出的日誌記錄</string>
+    <string name="release_notes">發布說明</string>
+    <string name="repo_cache_cleared">資源庫暫存已清除</string>
+    <string name="safetyNet_hide_notice">此應用使用了 SafetyNet\n已默認由 MagiskHide 處理</string>
+    <string name="start_magiskhide">正在啟動 MagiskHide …</string>
+    <string name="no_magisksu_title">未使用 MagiskSU！</string>
+    <string name="no_magisksu_msg">你未使用 MagiskSU 進行 ROOT，僅使用 MagiskHide 可能並不足夠！\n官方並不支持，你需要額外的工具（如 suhide）才能通過 Safety Net。</string>
+    <string name="understand">我明白</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">常規</string>
+    <string name="settings_dark_theme_title">深色主題</string>
+    <string name="settings_dark_theme_summary">使用深色主題</string>
+    <string name="settings_clear_cache_title">清除資源庫快取</string>
+    <string name="settings_clear_cache_summary">清除已暫存的在線資源庫快取，強制刷新在線數據</string>
+
+    <string name="settings_disable_title">禁用 Magisk</string>
+    <string name="settings_disable_summary">除 ROOT (MagiskSU) 以外，其他都將被禁用</string>
+    <string name="settings_magiskhide_summary">隱藏 Magisk 使其不被多種方法檢測到</string>
+    <string name="settings_busybox_title">啟用 BusyBox</string>
+    <string name="settings_busybox_summary">將 Magisk 內置的 Busybox 掛載到 xbin</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">為廣告屏蔽應用提供 Systemless hosts 支持</string>
+
+    <string name="settings_su_app_adb">應用和 ADB</string>
+    <string name="settings_su_app">僅應用</string>
+    <string name="settings_su_adb">僅 ADB</string>
+    <string name="settings_su_disable">已禁用</string>
+    <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_20">20 秒</string>
+    <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_60">60 秒</string>
+    <string name="superuser_access">超級用戶訪問權限</string>
+    <string name="auto_response">自動回應</string>
+    <string name="request_timeout">請求逾時</string>
+    <string name="superuser_notification">超級用戶通知</string>
+    <string name="request_timeout_summary">%1$s 秒</string>
+
+    <string name="settings_development_category">開發</string>
+    <string name="settings_developer_logging_title">啟用進階日誌記錄</string>
+    <string name="settings_developer_logging_summary">勾選此項以啟用更加詳細的日誌記錄。</string>
+    <string name="settings_shell_logging_title">啟用 shell 命令日誌記錄</string>
+    <string name="settings_shell_logging_summary">勾選此項以啟用對所有 shell 命令及輸出進行日誌記錄</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">超級用戶請求</string>
+    <string name="deny_with_str">拒絕 %1$s</string>
+    <string name="deny">拒絕</string>
+    <string name="prompt">提示</string>
+    <string name="grant">允許</string>
+    <string name="su_warning">將授予對你設備的最高權限。\n如果你不確定，請拒絕！</string>
+    <string name="forever">永久</string>
+    <string name="once">一次</string>
+    <string name="tenmin">10 分鐘</string>
+    <string name="twentymin">20 分鐘</string>
+    <string name="thirtymin">30 分鐘</string>
+    <string name="sixtymin">60 分鐘</string>
+    <string name="su_allow_toast">%1$s 已被授予超級用戶權限</string>
+    <string name="su_deny_toast">%1$s 已被拒絕超級用戶權限</string>
+    <string name="no_apps_found">未找到應用</string>
+    <string name="su_snack_grant">已授予 %1$s 超級用戶權限</string>
+    <string name="su_snack_deny">已拒絕 %1$s 超級用戶權限</string>
+    <string name="su_snack_notif_on">已啟用 %1$s 的通知</string>
+    <string name="su_snack_notif_off">已禁用 %1$s 的通知</string>
+    <string name="su_snack_log_on">已啟用對 %1$s 的日誌記錄</string>
+    <string name="su_snack_log_off">已禁用對 %1$s 的日誌記錄</string>
+    <string name="su_snack_revoke">已撤銷 %1$s 的權限</string>
+    <string name="su_revoke_title">撤銷</string>
+    <string name="su_revoke_msg">確認撤銷 %1$s 的權限？</string>
+    <string name="toast">消息提示</string>
+    <string name="none">無</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">目標 UID:\u0020</string>
+    <string name="command">"指令: "</string>
+    <string name="close">關閉</string>
+    <string name="internal_storage">Zip 已被儲存到:[內部儲存空間]%1$1</string>
+    <string name="ok">好</string>
+    <string name="process_error">處裡失敗</string>
+
+</resources>
