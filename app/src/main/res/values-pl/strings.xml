@@ -24,7 +24,7 @@
     <string name="cannot_check_updates">Nie można sprawdzić dostępności aktualizacji, brak internetu</string>
     <string name="up_to_date">Zainstalowana najnowsza wersja %1$s</string>
     <string name="root_error">Root dostępny, ale dostęp nie przyznany</string>
-    <string name="not_rooted">Nie wykryto Roota</string>
+    <string name="not_rooted">Brak Roota</string>
     <string name="proper_root">Root Dostępny</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
@@ -88,11 +88,12 @@
     <string name="permissionNotGranted">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
     <string name="no_thanks">Nie dziękuję</string>
     <string name="yes">Tak</string>
-	<string name="ok">OK</string>
-	<string name="close">Zamknij</string>
+    <string name="ok">OK</string>
+    <string name="close">Zamknij</string>
     <string name="repo_install_title">Zainstaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download_install">Pobierz i zainstaluj</string>
+    <string name="download">Pobierz</string>
     <string name="goto_install">Idź do sekcji \"Instalacja\"</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="install_error">Błąd instalacji!</string>
@@ -119,7 +120,8 @@
     <string name="understand">Rozumiem</string>
     <string name="process_error">Błąd procesu</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
-    
+    <string name="zip_process_title">Przetwarzanie</string>
+	
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
