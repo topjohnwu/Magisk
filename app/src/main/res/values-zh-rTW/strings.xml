@@ -98,8 +98,8 @@
     <string name="reboot">重啟</string>
     <string name="copying_msg">正在復制 zip 到暫存目錄</string>
     <string name="zip_install_progress_title">正在安裝</string>
-    <string name="zip_install_unzip_zip_msg">正在解壓 zip 文件 …</string>
-    <string name="zip_install_process_zip_msg">正在處理 zip 文件 …</string>
+    <string name="zip_unzip_msg">正在解壓 zip 文件 …</string>
+    <string name="zip_process_msg">正在處理 zip 文件 …</string>
     <string name="zip_install_progress_msg">"正在安裝 %1$s …"</string>
     <string name="no_magisk_title">未安裝 Magisk！</string>
     <string name="no_magisk_msg">你想要下載並安裝 Magisk 嗎？</string>
@@ -186,5 +186,7 @@
     <string name="internal_storage">Zip 已被儲存到:[內部儲存空間]%1$1</string>
     <string name="ok">好</string>
     <string name="process_error">處裡失敗</string>
+    <string name="download">下載</string>
+    <string name="zip_process_title">處理中</string>
 
 </resources>

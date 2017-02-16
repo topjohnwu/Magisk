@@ -100,8 +100,8 @@
     <string name="reboot">다시 시작</string>
     <string name="copying_msg">임시 디렉터리에 zip 파일 복사 중</string>
     <string name="zip_install_progress_title">설치 중</string>
-    <string name="zip_install_unzip_zip_msg">zip 파일 압축 해제 중…</string>
-    <string name="zip_install_process_zip_msg">zip 파일 처리 중…</string>
+    <string name="zip_unzip_msg">zip 파일 압축 해제 중…</string>
+    <string name="zip_process_msg">zip 파일 처리 중…</string>
     <string name="zip_install_progress_msg">"%1$s 설치 중…"</string>
     <string name="no_magisk_title">Magisk가 설치되어 있지 않습니다!</string>
     <string name="no_magisk_msg">Magisk를 다운로드하고 설치하시겠습니까?</string>

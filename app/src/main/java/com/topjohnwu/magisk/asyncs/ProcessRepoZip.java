@@ -21,17 +21,19 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
     private Uri mUri;
     private ProgressDialog progressDialog;
+    private boolean mInstall;
 
-    public ProcessRepoZip(Activity context, Uri uri) {
+    public ProcessRepoZip(Activity context, Uri uri, boolean install) {
         super(context);
         mUri = uri;
+        mInstall = install;
     }
 
     @Override
     protected void onPreExecute() {
         progressDialog = ProgressDialog.show(activity,
-                activity.getString(R.string.zip_install_progress_title),
-                activity.getString(R.string.zip_install_process_zip_msg));
+                activity.getString(R.string.zip_process_title),
+                activity.getString(R.string.zip_process_msg));
     }
 
     @Override
@@ -101,7 +103,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
         if (result) {
-            if (Shell.rootAccess())
+            if (Shell.rootAccess() && mInstall)
                 new FlashZip(activity, mUri).exec();
             else
                 Utils.showUriSnack(activity, mUri);

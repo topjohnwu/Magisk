@@ -97,8 +97,8 @@
     <string name="reboot">Перезагрузка</string>
     <string name="copying_msg">Копирование архива во временную директорию</string>
     <string name="zip_install_progress_title">Установка</string>
-    <string name="zip_install_unzip_zip_msg">Распаковка zip-файла…</string>
-    <string name="zip_install_process_zip_msg">Обработка zip-файла…</string>
+    <string name="zip_unzip_msg">Распаковка zip-файла…</string>
+    <string name="zip_process_msg">Обработка zip-файла…</string>
     <string name="zip_install_progress_msg">"Установка %1$s…"</string>
     <string name="no_magisk_title">Magisk не установлен!</string>
     <string name="no_magisk_msg">Вы хотите скачать и установить Magisk?</string>

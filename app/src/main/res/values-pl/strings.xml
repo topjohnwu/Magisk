@@ -103,8 +103,8 @@
     <string name="reboot">Restart</string>
     <string name="copying_msg">Kopiowanie zip do katalogu temp</string>
     <string name="zip_install_progress_title">Instalacja</string>
-    <string name="zip_install_unzip_zip_msg">Rozpakowywanie pliku zip …</string>
-    <string name="zip_install_process_zip_msg">Przetwarzanie pliku zip …</string>
+    <string name="zip_unzip_msg">Rozpakowywanie pliku zip …</string>
+    <string name="zip_process_msg">Przetwarzanie pliku zip …</string>
     <string name="zip_install_progress_msg">"Instalowanie %1$s …"</string>
     <string name="no_magisk_title">Brak zainstalowanego Magisk!</string>
     <string name="no_magisk_msg">Chcesz pobrać i zainstalować Magisk?</string>

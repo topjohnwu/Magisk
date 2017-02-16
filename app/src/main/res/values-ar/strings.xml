@@ -69,8 +69,8 @@
     <string name="reboot_msg">هل تريد إعادة التشغيل الآن؟</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="zip_install_progress_title">تثبيت</string>
-    <string name="zip_install_unzip_zip_msg">فك الضغط عن الملف المضغوط …</string>
-    <string name="zip_install_process_zip_msg">معالجة الملف المضغوط …</string>
+    <string name="zip_unzip_msg">فك الضغط عن الملف المضغوط …</string>
+    <string name="zip_process_msg">معالجة الملف المضغوط …</string>
     <string name="zip_install_progress_msg">"تثبيت %1$s …"</string>
     <string name="no_magisk_title">لا يوجد Magisk مثبت!</string>
     <string name="no_magisk_msg">هل ترغب في تنزيل وتثبيت Magisk؟</string>

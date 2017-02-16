@@ -94,6 +94,7 @@
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s ?</string>
     <string name="download_install">Download &amp; install</string>
+    <string name="download">Download</string>
     <string name="goto_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
@@ -103,8 +104,8 @@
     <string name="reboot">Reboot</string>
     <string name="copying_msg">Copying zip to temp directory</string>
     <string name="zip_install_progress_title">Installing</string>
-    <string name="zip_install_unzip_zip_msg">Unzipping zip file …</string>
-    <string name="zip_install_process_zip_msg">Processing zip file …</string>
+    <string name="zip_unzip_msg">Unzipping zip file …</string>
+    <string name="zip_process_msg">Processing zip file …</string>
     <string name="zip_install_progress_msg">"Installing %1$s …"</string>
     <string name="no_magisk_title">No Magisk Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
@@ -121,6 +122,7 @@
     <string name="understand">I understand</string>
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
+    <string name="zip_process_title">Processing</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

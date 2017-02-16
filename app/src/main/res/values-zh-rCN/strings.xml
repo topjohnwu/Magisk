@@ -98,8 +98,8 @@
     <string name="reboot">重启</string>
     <string name="copying_msg">正在复制 zip 到临时目录</string>
     <string name="zip_install_progress_title">正在安装</string>
-    <string name="zip_install_unzip_zip_msg">正在解压 zip 文件 …</string>
-    <string name="zip_install_process_zip_msg">正在处理 zip 文件 …</string>
+    <string name="zip_unzip_msg">正在解压 zip 文件 …</string>
+    <string name="zip_process_msg">正在处理 zip 文件 …</string>
     <string name="zip_install_progress_msg">"正在安装 %1$s …"</string>
     <string name="no_magisk_title">未安装 Magisk！</string>
     <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>

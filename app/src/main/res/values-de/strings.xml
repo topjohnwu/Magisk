@@ -102,8 +102,8 @@
     <string name="reboot">Neustart</string>
     <string name="copying_msg">Kopiere Zip ins temp-Verzeichnis</string>
     <string name="zip_install_progress_title">Installiere</string>
-    <string name="zip_install_unzip_zip_msg">Entpacke Zip-Datei…</string>
-    <string name="zip_install_process_zip_msg">Verarbeite Zip-Datei…</string>
+    <string name="zip_unzip_msg">Entpacke Zip-Datei…</string>
+    <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
     <string name="zip_install_progress_msg">"Installiere %1$s…"</string>
     <string name="no_magisk_title">Magisk ist nicht installiert!</string>
     <string name="no_magisk_msg">Möchtest du Magisk herunterladen und installieren?</string>
