@@ -58,7 +58,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             Intent intent = new Intent(magiskManager, SplashActivity.class);
             intent.putExtra(MainActivity.SECTION, "install");
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(magiskManager);
-            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addParentStack(SplashActivity.class);
             stackBuilder.addNextIntent(intent);
             PendingIntent pendingIntent = stackBuilder.getPendingIntent(NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);

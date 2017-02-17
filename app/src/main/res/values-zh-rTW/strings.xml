@@ -42,7 +42,7 @@
     <string name="keep_dm_verity">保留 dm-verity</string>
     <string name="current_magisk_title">已安裝 Magisk 版本：v%1$s</string>
     <string name="install_magisk_title">最新的 Magisk 版本：v%1$.1f</string>
-    <string name="uninstall">卸載</string>
+    <string name="uninstall">解除安裝</string>
     <string name="reboot_countdown">將在 %1$d 後重啟</string>
 
     <!--Module Fragment-->
@@ -104,7 +104,7 @@
     <string name="no_magisk_msg">你想要下載並安裝 Magisk 嗎？</string>
     <string name="downloading_toast">正在下載 %1$s</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
-    <string name="settings_reboot_toast">勾選此項以啟用對所有 shell 命令及輸出的日誌記錄</string>
+    <string name="settings_reboot_toast">重啟以完成設定</string>
     <string name="release_notes">發布說明</string>
     <string name="repo_cache_cleared">資源庫暫存已清除</string>
     <string name="safetyNet_hide_notice">此應用使用了 SafetyNet\n已默認由 MagiskHide 處理</string>
@@ -186,5 +186,7 @@
     <string name="process_error">處裡失敗</string>
     <string name="download">下載</string>
     <string name="zip_process_title">處理中</string>
+    <string name="uninstall_magisk_title">解除安裝 Magisk</string>
+    <string name="uninstall_magisk_msg">這將會刪除所有模組，MagiskSU，並有可能在目前未加密的情況下加密的的資料\n你確定要繼續嗎？</string>
 
 </resources>

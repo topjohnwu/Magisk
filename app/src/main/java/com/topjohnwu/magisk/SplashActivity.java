@@ -64,7 +64,7 @@ public class SplashActivity extends Activity{
             }
         }.exec();
         new LoadApps(this).exec();
-        new CheckUpdates(this, !"install".equals(getIntent().getStringExtra(MainActivity.SECTION))){
+        new CheckUpdates(this, false){
             @Override
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);

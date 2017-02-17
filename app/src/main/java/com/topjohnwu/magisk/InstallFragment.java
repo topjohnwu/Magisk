@@ -98,8 +98,8 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
         } else {
             uninstallButton.setOnClickListener(vi -> {
                 new AlertDialogBuilder(getActivity())
-                        .setTitle("Uninstall Magisk")
-                        .setMessage("This will remove all modules, MagiskSU, and potentially re-encrypt your device\nAre you sure to process?")
+                        .setTitle(R.string.uninstall_magisk_title)
+                        .setMessage(R.string.uninstall_magisk_msg)
                         .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                             try {
                                 InputStream in = getActivity().getAssets().open(UNINSTALLER);

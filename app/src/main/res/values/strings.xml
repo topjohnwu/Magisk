@@ -47,6 +47,8 @@
     <string name="install_magisk_title">Latest Magisk Version: v%1$.1f</string>
     <string name="uninstall">Uninstall</string>
     <string name="reboot_countdown">Rebooting in %1$d</string>
+    <string name="uninstall_magisk_title">Uninstall Magisk</string>
+    <string name="uninstall_magisk_msg">This will remove all modules, MagiskSU, and potentially encrypt your data if not encrypted\nAre you sure to continue?</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>

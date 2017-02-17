@@ -78,9 +78,7 @@ public class MainActivity extends Activity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState != null)
-            navigate(savedInstanceState.getInt(SECTION, R.id.status));
-        else
+        if (savedInstanceState == null)
             navigate(getIntent().getStringExtra(SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -92,6 +90,12 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
         checkHideSection();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        navigate(savedInstanceState.getInt(SECTION, R.id.status));
     }
 
     @Override
