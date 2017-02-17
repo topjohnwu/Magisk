@@ -3,6 +3,8 @@
 
 
 
+
+
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigationsmenü öffnen</string>
     <string name="navigation_drawer_close">Navigationsmenü schließen</string>
@@ -15,12 +17,12 @@
     <string name="install">Installieren</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s ist installiert</string>
-    <string name="magisk_version_disable">Magisk v%1$s ist deaktiviert</string>
+    <string name="magisk_version">Magisk %1$s ist installiert</string>
+    <string name="magisk_version_disable">Magisk %1$s ist deaktiviert</string>
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
 
     <string name="checking_for_updates">Suche nach Updates…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f ist verfügbar!</string>
+    <string name="magisk_update_available">Magisk %1$.1f ist verfügbar!</string>
     <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
     <string name="up_to_date">Die neueste Version von %1$s ist bereits installiert</string>
     <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>
@@ -30,6 +32,7 @@
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
     <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>
+	
     <string name="safetyNet_error">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_fail">SafetyNet nicht bestanden: \"CTS profile mismatch\"</string>
     <string name="safetyNet_pass">SafetyNet bestanden</string>
@@ -39,11 +42,12 @@
     <string name="auto_detect">%1$s (autom.)</string>
     <string name="boot_image_title">Boot-Image-Pfad</string>
     <string name="detect_button">Automatisch</string>
-    <string name="advanced_settings_title">Erweiterte Einstellungen</string>
+    <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
-    <string name="current_magisk_title">Installierte Magisk-Version: v%1$s</string>
-    <string name="install_magisk_title">Neueste Magisk-Version: v%1$.1f</string>
+    <string name="current_magisk_title">Installierte Magisk-Version: %1$s</string>
+    <string name="install_magisk_title">Neueste Magisk-Version: %1$.1f</string>
+
 
     <string name="uninstall">Deinstallieren</string>
     <string name="reboot_countdown">Neustart in %1$d</string>
@@ -69,7 +73,7 @@
     <string name="menuSaveToSd">Log auf SD-Karte speichern</string>
     <string name="menuReload">Log erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
-    <string name="logs_cleared">Log erfolgreich gelöscht</string>
+    <string name="logs_cleared">Log gelöscht</string>
     <string name="log_is_empty">Log ist leer</string>
     <string name="logs_save_failed">Konnte den Log nicht auf der SD-Karte speichern:</string>
 
@@ -86,13 +90,15 @@
     <string name="support_thread">Hilfeforum</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Diese Funktion benötigt Rechte zum Schreiben auf dem externen Speicher.</string>
+    <string name="permissionNotGranted">Diese Funktion benötigt Rechte zum Schreiben auf den externen Speicher.</string>
     <string name="no_thanks">Nein danke</string>
     <string name="yes">Ja</string>
+    <string name="ok">OK</string>
+    <string name="close">Schließen</string>
     <string name="repo_install_title">Installiere %1$s</string>
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download_install">Herunterladen &amp; installieren</string>
-    <string name="goto_install">Zu \"Installieren\" wechseln</string>
+    <string name="download">Herunterladen</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="install_error">Fehler bei der Installation!</string>
     <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!</string>
@@ -114,10 +120,16 @@
     <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide gehandhabt</string>
     <string name="start_magiskhide">Starte Magisk Hide…</string>
 
-    <!--URL Templates-->
 
 
 
+
+    <string name="no_magisksu_title">Du benutzt nicht MagiskSU!</string>
+    <string name="no_magisksu_msg">Deine root-Lösung wird nicht offiziell unterstützt und Magisk Hide allein ist eventuell nicht ausreichend!\nEventuell benötigst du weitere Programme (z.B. \"suhide\"), um SafetyNet zu bestehen.</string>
+    <string name="understand">Ich verstehe</string>
+    <string name="process_error">Prozessfehler</string>
+    <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
+    <string name="zip_process_title">Verarbeite</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
@@ -160,6 +172,7 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Nachfragen</string>
     <string name="grant">Gewähren</string>
+
     <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>
     <string name="once">Nur diesmal</string>
