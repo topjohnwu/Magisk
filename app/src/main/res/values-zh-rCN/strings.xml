@@ -14,7 +14,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">已安装 Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s 已禁用</string>
+    <string name="magisk_version_disable">已禁用 Magisk v%1$s</string>
     <string name="magisk_version_error">未安装 Magisk</string>
 
     <string name="checking_for_updates">正在检查更新…</string>
@@ -39,11 +39,13 @@
     <string name="detect_button">检测</string>
     <string name="advanced_settings_title">高级设置</string>
     <string name="keep_force_encryption">保持强制加密</string>
-    <string name="keep_dm_verity">保持 dm-verity</string>
+    <string name="keep_dm_verity">保留 dm-verity</string>
     <string name="current_magisk_title">已安装 Magisk 版本：v%1$s</string>
     <string name="install_magisk_title">最新的 Magisk 版本：v%1$.1f</string>
     <string name="uninstall">卸载</string>
     <string name="reboot_countdown">将在 %1$d 后重启</string>
+    <string name="uninstall_magisk_title">卸载 Magisk</string>
+    <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -85,9 +87,12 @@
     <string name="permissionNotGranted">未授予写入外置存储权限，此功能无法正常工作。</string>
     <string name="no_thanks">不，谢谢</string>
     <string name="yes">是</string>
+    <string name="ok">确定</string>
+    <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">你想要安装 %1$s 吗？</string>
     <string name="download_install">下载并安装</string>
+    <string name="download">下载</string>
     <string name="goto_install">前往“安装”界面</string>
     <string name="download_file_error">下载文件时出错</string>
     <string name="install_error">安装出错！</string>
@@ -112,13 +117,16 @@
     <string name="no_magisksu_title">未使用 MagiskSU！</string>
     <string name="no_magisksu_msg">你未使用 MagiskSU 进行 ROOT，仅使用 MagiskHide 可能并不足够！\n官方并不支持，你需要额外的工具（如 suhide）才能通过 Safety Net。</string>
     <string name="understand">我明白</string>
+    <string name="process_error">处理失败</string>
+    <string name="internal_storage">Zip 已被储存到：\n[内部存储]%1$s</string>
+    <string name="zip_process_title">正在处理</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">深色主题</string>
     <string name="settings_dark_theme_summary">使用深色主题</string>
     <string name="settings_clear_cache_title">清除资源库缓存</string>
-    <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制应用刷新在线数据</string>
+    <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制刷新在线数据</string>
 
     <string name="settings_disable_title">禁用 Magisk</string>
     <string name="settings_disable_summary">除 ROOT (MagiskSU) 以外，其他都将被禁用</string>
@@ -143,10 +151,10 @@
     <string name="request_timeout_summary">%1$s 秒</string>
 
     <string name="settings_development_category">开发</string>
-    <string name="settings_developer_logging_title">启用高级调试日志记录</string>
+    <string name="settings_developer_logging_title">启用高级日志记录</string>
     <string name="settings_developer_logging_summary">勾选此项以启用更加详细的日志记录。</string>
-    <string name="settings_shell_logging_title">启用 shell 命令调试日志记录</string>
-    <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出的日志记录</string>
+    <string name="settings_shell_logging_title">启用 shell 命令日志记录</string>
+    <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出进行日志记录</string>
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
@@ -154,7 +162,7 @@
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
     <string name="grant">允许</string>
-    <string name="su_warning">将授予对你设备的完全访问权限。\n如果你不确定，请拒绝！</string>
+    <string name="su_warning">将授予对你设备的最高权限。\n如果你不确定，请拒绝！</string>
     <string name="forever">永久</string>
     <string name="once">一次</string>
     <string name="tenmin">10 分钟</string>
@@ -166,11 +174,11 @@
     <string name="no_apps_found">未找到应用</string>
     <string name="su_snack_grant">已授予 %1$s 超级用户权限</string>
     <string name="su_snack_deny">已拒绝 %1$s 超级用户权限</string>
-    <string name="su_snack_notif_on">%1$s 的通知已启用</string>
-    <string name="su_snack_notif_off">%1$s 的通知已禁用</string>
-    <string name="su_snack_log_on">对 %1$s 的日志记录已启用</string>
-    <string name="su_snack_log_off">对 %1$s 的日志记录已禁用</string>
-    <string name="su_snack_revoke">%1$s 的权限已撤销</string>
+    <string name="su_snack_notif_on">已启用 %1$s 的通知</string>
+    <string name="su_snack_notif_off">已禁用 %1$s 的通知</string>
+    <string name="su_snack_log_on">已启用对 %1$s 的日志记录</string>
+    <string name="su_snack_log_off">已禁用对 %1$s 的日志记录</string>
+    <string name="su_snack_revoke">已撤销 %1$s 的权限</string>
     <string name="su_revoke_title">撤销</string>
     <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
     <string name="toast">消息提示</string>
