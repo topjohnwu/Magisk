@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".MagiskManager"
@@ -60,7 +61,12 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".receivers.BootReceiver$BootupIntentService" />
+        <service android:name=".services.BootupIntentService" />
+
+        <service
+            android:name=".services.UpdateCheckService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

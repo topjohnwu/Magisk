@@ -29,8 +29,11 @@ import butterknife.ButterKnife;
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener<Void> {
 
+    public static final String SECTION = "section";
+
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
+    private int mDrawerItem;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
@@ -41,9 +44,9 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
-        prefs = getTopApplication().prefs;
+        prefs = getApplicationContext().prefs;
 
-        if (getTopApplication().isDarkTheme) {
+        if (getApplicationContext().isDarkTheme) {
             setTheme(R.style.AppTheme_Dark);
         }
         super.onCreate(savedInstanceState);
@@ -75,32 +78,31 @@ public class MainActivity extends Activity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigate(R.id.status);
+        if (savedInstanceState != null)
+            navigate(savedInstanceState.getInt(SECTION, R.id.status));
+        else
+            navigate(getIntent().getStringExtra(SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
-        getTopApplication().reloadMainActivity.register(this);
-
-        if (getTopApplication().updateCheckDone.isTriggered)
-            onTrigger(getTopApplication().updateCheckDone);
+        getApplicationContext().reloadMainActivity.register(this);
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getTopApplication().updateCheckDone.register(this);
         checkHideSection();
     }
 
     @Override
-    protected void onPause() {
-        getTopApplication().updateCheckDone.unRegister(this);
-        super.onPause();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SECTION, mDrawerItem);
     }
 
     @Override
     protected void onDestroy() {
-        getTopApplication().reloadMainActivity.unRegister(this);
+        getApplicationContext().reloadMainActivity.unRegister(this);
         super.onDestroy();
     }
 
@@ -122,28 +124,61 @@ public class MainActivity extends Activity
 
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
-        if (event == getTopApplication().updateCheckDone) {
-            Menu menu = navigationView.getMenu();
-            menu.findItem(R.id.install).setVisible(
-                    getTopApplication().remoteMagiskVersion > 0 && Shell.rootAccess());
-        } else if (event == getTopApplication().reloadMainActivity) {
-            recreate();
-        }
+        recreate();
     }
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
         if (Shell.rootAccess()) {
             menu.findItem(R.id.magiskhide).setVisible(
-                    getTopApplication().magiskVersion >= 8 && prefs.getBoolean("magiskhide", false));
-            menu.findItem(R.id.modules).setVisible(getTopApplication().magiskVersion >= 4);
-            menu.findItem(R.id.downloads).setVisible(getTopApplication().magiskVersion >= 4);
+                    getApplicationContext().magiskVersion >= 8 && prefs.getBoolean("magiskhide", false));
+            menu.findItem(R.id.modules).setVisible(getApplicationContext().magiskVersion >= 4);
+            menu.findItem(R.id.downloads).setVisible(getApplicationContext().magiskVersion >= 4);
             menu.findItem(R.id.log).setVisible(true);
-            menu.findItem(R.id.superuser).setVisible(getTopApplication().isSuClient);
+            menu.findItem(R.id.superuser).setVisible(getApplicationContext().isSuClient);
         }
+        menu.findItem(R.id.install).setVisible(getApplicationContext().remoteMagiskVersion > 0);
+    }
+
+    public void navigate(String item) {
+        int itemId = R.id.status;
+        if (item != null) {
+            switch (item) {
+                case "status":
+                    itemId = R.id.status;
+                    break;
+                case "install":
+                    itemId = R.id.install;
+                    break;
+                case "superuser":
+                    itemId = R.id.superuser;
+                    break;
+                case "modules":
+                    itemId = R.id.modules;
+                    break;
+                case "downloads":
+                    itemId = R.id.downloads;
+                    break;
+                case "magiskhide":
+                    itemId = R.id.magiskhide;
+                    break;
+                case "log":
+                    itemId = R.id.log;
+                    break;
+                case "settings":
+                    itemId = R.id.settings;
+                    break;
+                case "about":
+                    itemId = R.id.app_about;
+                    break;
+            }
+        }
+        navigate(itemId);
     }
 
     public void navigate(int itemId) {
+        mDrawerItem = itemId;
+        navigationView.setCheckedItem(itemId);
         switch (itemId) {
             case R.id.status:
                 displayFragment(new StatusFragment(), "status", true);
@@ -165,7 +200,6 @@ public class MainActivity extends Activity
                 break;
             case R.id.log:
                 displayFragment(new LogFragment(), "log", false);
-                toolbar.setElevation(0);
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -182,5 +216,6 @@ public class MainActivity extends Activity
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.replace(R.id.content_frame, navFragment, tag).commitNow();
         if (setElevation) toolbar.setElevation(toolbarElevation);
+        else toolbar.setElevation(0);
     }
 }

@@ -31,7 +31,7 @@ public class SettingsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getTopApplication().isDarkTheme) {
+        if (getApplicationContext().isDarkTheme) {
             setTheme(R.style.AppTheme_Dark);
         }
 
@@ -146,8 +146,9 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (getApplication().isDarkTheme != enabled) {
                         getApplication().isDarkTheme = enabled;
-                        getActivity().recreate();
                         getApplication().reloadMainActivity.trigger();
+                        getActivity().finish();
+                        getActivity().recreate();
                     }
                     break;
                 case "disable":

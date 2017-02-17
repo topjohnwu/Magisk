@@ -47,7 +47,7 @@ public class AboutActivity extends Activity {
         super.onCreate(savedInstanceState);
         String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
         Logger.dev("AboutActivity: Theme is " + theme);
-        if (getTopApplication().isDarkTheme) {
+        if (getApplicationContext().isDarkTheme) {
             setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_about);

@@ -1,12 +1,9 @@
 package com.topjohnwu.magisk;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,8 +55,6 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     @BindColor(android.R.color.transparent) int trans;
     int defaultColor;
 
-    private AlertDialog updateMagisk;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -94,6 +89,15 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             safetyNetIcon.setImageResource(0);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
             Utils.checkSafetyNet(getApplication());
+        });
+
+        magiskStatusContainer.setOnClickListener(view -> {
+            ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+            try {
+                transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
+            } catch (IllegalStateException ignored) {}
         });
 
         if (getApplication().magiskVersion < 0 && Shell.rootAccess() && !noDialog) {
@@ -229,32 +233,6 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
-
-        updateMagisk = new AlertDialogBuilder(getActivity())
-                .setTitle(R.string.magisk_update_title)
-                .setMessage(getString(R.string.magisk_update_message, getApplication().remoteMagiskVersion))
-                .setCancelable(true)
-                .setPositiveButton(R.string.goto_install, (dialogInterface, i) -> {
-                    ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
-                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                    transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                    try {
-                        transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
-                    } catch (IllegalStateException ignored) {}
-                })
-                .setNeutralButton(R.string.release_notes, (dialog, which) -> {
-                    getActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getApplication().releaseNoteLink)));
-                })
-                .setNegativeButton(R.string.no_thanks, null)
-                .create();
-
-        if (getApplication().magiskVersion < getApplication().remoteMagiskVersion && Shell.rootAccess()) {
-            magiskStatusContainer.setOnClickListener(view -> updateMagisk.show());
-            if (!noDialog) {
-                noDialog = true;
-                updateMagisk.show();
-            }
-        }
     }
 
     private void updateSafetyNetUI() {

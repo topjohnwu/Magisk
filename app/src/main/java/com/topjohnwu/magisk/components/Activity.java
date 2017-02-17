@@ -6,7 +6,8 @@ import com.topjohnwu.magisk.MagiskManager;
 
 public class Activity extends AppCompatActivity {
 
-    public MagiskManager getTopApplication() {
+    @Override
+    public MagiskManager getApplicationContext() {
         return (MagiskManager) getApplication();
     }
 }

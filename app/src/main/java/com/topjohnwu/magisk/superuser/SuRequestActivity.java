@@ -66,7 +66,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         pm = getPackageManager();
-        magiskManager = getTopApplication();
+        magiskManager = getApplicationContext();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");

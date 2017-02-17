@@ -183,7 +183,7 @@
     <string name="target_uid">目標 UID:\u0020</string>
     <string name="command">"指令: "</string>
     <string name="close">關閉</string>
-    <string name="internal_storage">Zip 已被儲存到:[內部儲存空間]%1$1</string>
+    <string name="internal_storage">Zip 已被儲存到:[內部儲存空間]%1$s</string>
     <string name="ok">好</string>
     <string name="process_error">處裡失敗</string>
     <string name="download">下載</string>

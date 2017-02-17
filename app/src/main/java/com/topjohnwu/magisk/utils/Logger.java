@@ -28,7 +28,7 @@ public class Logger {
 
     public static void dev(String msg) {
         if (MagiskManager.devLogging) {
-            Log.d(TAG, "DEBUG: " + msg);
+            Log.d(TAG, "DEV: " + msg);
         }
     }
 
