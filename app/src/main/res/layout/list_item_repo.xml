@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:orientation="vertical">
 
             <TextView
@@ -76,6 +77,7 @@
             android:background="@drawable/ic_file_download_black"
             android:backgroundTint="@color/icon_grey"
             android:clickable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:focusable="false"
             android:gravity="end" />
 
