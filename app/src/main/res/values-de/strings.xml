@@ -6,7 +6,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigationsmenü öffnen</string>
     <string name="navigation_drawer_close">Navigationsmenü schließen</string>
-    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Module</string>
     <string name="downloads">Download</string>
     <string name="superuser">Superuser</string>
@@ -37,7 +36,7 @@
     <string name="root_info_warning">Funktionalität stark eingeschränkt</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">"%1$s (autom.)"</string>
+    <string name="auto_detect">%1$s (autom.)</string>
     <string name="boot_image_title">Boot-Image-Pfad</string>
     <string name="detect_button">Automatisch</string>
     <string name="advanced_settings_title">Erweiterte Einstellungen</string>
@@ -104,12 +103,11 @@
     <string name="zip_install_progress_title">Installiere</string>
     <string name="zip_unzip_msg">Entpacke Zip-Datei…</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
-    <string name="zip_install_progress_msg">"Installiere %1$s…"</string>
+    <string name="zip_install_progress_msg">Installiere %1$s…</string>
     <string name="no_magisk_title">Magisk ist nicht installiert!</string>
     <string name="no_magisk_msg">Möchtest du Magisk herunterladen und installieren?</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
-    <string name="magisk_update_message">Magisk-Update v%1$.1f ist verfügbar, möchtest du es installieren?</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
     <string name="release_notes">Änderungen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>

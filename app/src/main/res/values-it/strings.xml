@@ -4,7 +4,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer di navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer di navigazione</string>
-    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Moduli</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -35,7 +34,7 @@
         
     
         <!--Install Fragment-->
-    <string name="auto_detect">"(Auto) %1$s"</string>
+    <string name="auto_detect">(Auto) %1$s</string>
     <string name="boot_image_title">Boot Image</string>
     <string name="detect_button">Identifica</string>
     <string name="advanced_settings_title">Impostazioni Avanzate</string>
@@ -94,7 +93,7 @@
     <string name="reboot_msg">Vuoi riavviare ora?</string>
     <string name="reboot">Riavvia</string>
     <string name="zip_install_progress_title">Installazione</string>
-    <string name="zip_install_progress_msg">"Installazione %1$s …"</string>
+    <string name="zip_install_progress_msg">Installazione %1$s …</string>
     <string name="no_magisk_title">Magisk non installato!</string>
     <string name="no_magisk_msg">Vuoi scaricare ed installare Magisk?</string>
 

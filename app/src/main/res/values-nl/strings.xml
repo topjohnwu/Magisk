@@ -67,7 +67,7 @@
     <string name="reboot_msg">Wilt u nu rebooten?</string>
     <string name="reboot">Reboot</string>
     <string name="zip_install_progress_title">Installeren</string>
-    <string name="zip_install_progress_msg">"Instalatievoortgang: %1$s …"</string>
+    <string name="zip_install_progress_msg">Instalatievoortgang: %1$s …</string>
     <string name="no_magisk_title">Geen Magisk geïnstalleerd!</string>
     <string name="no_magisk_msg">Wilt u Magisk downloaden en installeren?</string>
 

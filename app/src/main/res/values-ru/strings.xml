@@ -2,7 +2,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Открыть меню навигации</string>
     <string name="navigation_drawer_close">Закрыть меню навигации</string>
-    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Модули</string>
     <string name="downloads">Загрузки</string>
     <string name="superuser">Суперпользователь</string>
@@ -33,7 +32,7 @@
     <string name="root_info_warning">Функциональность значительно ограничена</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">"(Авто) %1$s"</string>
+    <string name="auto_detect">(Авто) %1$s</string>
     <string name="boot_image_title">Местоположение образа Boot</string>
     <string name="detect_button">Определить</string>
     <string name="advanced_settings_title">Дополнительные настройки</string>
@@ -99,12 +98,11 @@
     <string name="zip_install_progress_title">Установка</string>
     <string name="zip_unzip_msg">Распаковка zip-файла…</string>
     <string name="zip_process_msg">Обработка zip-файла…</string>
-    <string name="zip_install_progress_msg">"Установка %1$s…"</string>
+    <string name="zip_install_progress_msg">Установка %1$s…</string>
     <string name="no_magisk_title">Magisk не установлен!</string>
     <string name="no_magisk_msg">Вы хотите скачать и установить Magisk?</string>
     <string name="downloading_toast">Скачивание %1$s</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
-    <string name="magisk_update_message">Вышел Magisk версии v%1$.1f, установить?</string>
     <string name="settings_reboot_toast">Перезагрузитесь для применения изменений</string>
     <string name="release_notes">Примечания к выпуску</string>
     <string name="repo_cache_cleared">Кэш репозиториев очищен</string>

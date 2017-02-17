@@ -4,7 +4,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="magiskhide">Magisk 隐藏</string>
     <string name="modules">模块</string>
     <string name="downloads">下载</string>
     <string name="superuser">超级用户</string>
@@ -35,7 +34,7 @@
     <string name="root_info_warning">功能严重受限</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">"（自动） %1$s"</string>
+    <string name="auto_detect">（自动） %1$s</string>
     <string name="boot_image_title">Boot 镜像位置</string>
     <string name="detect_button">检测</string>
     <string name="advanced_settings_title">高级设置</string>
@@ -100,12 +99,11 @@
     <string name="zip_install_progress_title">正在安装</string>
     <string name="zip_unzip_msg">正在解压 zip 文件 …</string>
     <string name="zip_process_msg">正在处理 zip 文件 …</string>
-    <string name="zip_install_progress_msg">"正在安装 %1$s …"</string>
+    <string name="zip_install_progress_msg">正在安装 %1$s …</string>
     <string name="no_magisk_title">未安装 Magisk！</string>
     <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
-    <string name="magisk_update_message">Magisk 已有新版本 v%1$.1f，你想要安装吗？</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">资源库缓存已清除</string>

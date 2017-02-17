@@ -4,7 +4,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">내비게이션 서랍 열기</string>
     <string name="navigation_drawer_close">내비게이션 서랍 닫기</string>
-    <string name="magiskhide">Magisk 숨기기</string>
     <string name="modules">모듈</string>
     <string name="downloads">다운로드</string>
     <string name="superuser">슈퍼유저</string>
@@ -35,7 +34,7 @@
     <string name="root_info_warning">기능이 크게 제한됨</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">"(자동) %1$s"</string>
+    <string name="auto_detect">(자동) %1$s</string>
     <string name="boot_image_title">부트 이미지 위치</string>
     <string name="detect_button">감지</string>
     <string name="advanced_settings_title">고급 설정</string>
@@ -102,12 +101,11 @@
     <string name="zip_install_progress_title">설치 중</string>
     <string name="zip_unzip_msg">zip 파일 압축 해제 중…</string>
     <string name="zip_process_msg">zip 파일 처리 중…</string>
-    <string name="zip_install_progress_msg">"%1$s 설치 중…"</string>
+    <string name="zip_install_progress_msg">%1$s 설치 중…</string>
     <string name="no_magisk_title">Magisk가 설치되어 있지 않습니다!</string>
     <string name="no_magisk_msg">Magisk를 다운로드하고 설치하시겠습니까?</string>
     <string name="downloading_toast">%1$s 다운로드 중</string>
     <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
-    <string name="magisk_update_message">v%1$.1f 버전의 Magisk 업데이트가 있습니다 설치하시겠습니까?</string>
     <string name="settings_reboot_toast">기기를 다시 시작하면 설정이 적용됩니다.</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="repo_cache_cleared">저장소 캐시 비워짐</string>

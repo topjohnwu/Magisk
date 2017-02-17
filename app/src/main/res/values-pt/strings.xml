@@ -6,7 +6,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Abrir gaveta de notificação</string>
     <string name="navigation_drawer_close">Fechar gaveta de notificação</string>
-	<string name="magiskhide">Magisk Hide</string>
     <string name="modules">Módulos</string>
     <string name="downloads">Baixar</string>
 	<string name="superuser">Superusuário</string>
@@ -36,7 +35,7 @@
     <string name="root_info_warning">Funcionalidade muito limitada</string>
 
     <!--Install Fragment-->
-	<string name="auto_detect">"(Auto) %1$s"</string>
+	<string name="auto_detect">(Auto) %1$s</string>
     <string name="boot_image_title">Local da Boot Image</string>
     <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Configurações avançadas</string>
@@ -100,13 +99,12 @@
     <string name="zip_install_progress_title">Instalando</string>
 	<string name="zip_unzip_msg">Descompactando arquivo zip …</string>
     <string name="zip_process_msg">Processando arquivo zip …</string>
-    <string name="zip_install_progress_msg">"Instalando %1$s …"</string>
+    <string name="zip_install_progress_msg">Instalando %1$s …</string>
     <string name="no_magisk_title">Magisk Não Instalado!</string>
     <string name="no_magisk_msg">Você quer baixar e instalar o Magisk?</string>
 	<string name="downloading_toast">Baixando %1$s</string>
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
-    <string name="magisk_update_message">Magisk v%1$.1f Atualização está pronta, você quer instalar?</string>
-	<string name="settings_reboot_toast">Reinicie para aplicar configurações</string>
+    <string name="settings_reboot_toast">Reinicie para aplicar configurações</string>
     <string name="release_notes">Notas da atualização</string>
 	<string name="repo_cache_cleared">Cache do Repo. limpado</string>
     <string name="safetyNet_hide_notice">Este aplicativo usa SafetyNet\nJá manipulado pelo MagiskHide por padrão</string>

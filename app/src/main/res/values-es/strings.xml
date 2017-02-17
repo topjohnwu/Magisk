@@ -4,7 +4,6 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Abrir menú lateral</string>
     <string name="navigation_drawer_close">Cerrar menú lateral</string>
-    <string name="magiskhide">Magisk Hide</string>
     <string name="modules">Modulos</string>
     <string name="downloads">Descargas</string>
     <string name="log">Log</string>
@@ -69,7 +68,7 @@
     <string name="reboot_msg">¿Deseas reiniciar ahora?</string>
     <string name="reboot">Reinciar</string>
     <string name="zip_install_progress_title">Instalando</string>
-    <string name="zip_install_progress_msg">"Instalando %1$s …"</string>
+    <string name="zip_install_progress_msg">Instalando %1$s …</string>
     <string name="no_magisk_title">¡Magisk no instalado!</string>
     <string name="no_magisk_msg">¿Deseas descargar e instalar Magisk?</string>
 
