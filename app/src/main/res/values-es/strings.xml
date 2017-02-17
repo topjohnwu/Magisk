@@ -2,22 +2,48 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Abrir menú lateral</string>
-    <string name="navigation_drawer_close">Cerrar menú lateral</string>
-    <string name="modules">Modulos</string>
+    <string name="navigation_drawer_open">Abrir menú de navegación</string>
+    <string name="navigation_drawer_close">Cerrar menú de navegación</string>
+    <string name="modules">Módulos</string>
     <string name="downloads">Descargas</string>
-    <string name="log">Log</string>
+    <string name="superuser">Superusuario</string>
+    <string name="log">Registro</string>
     <string name="settings">Ajustes</string>
+    <string name="status">Estado</string>
+    <string name="install">Instalar</string>
 
     <!--Magisk Fragment-->
     <string name="magisk_version">Instalado Magisk v%1$s</string>
-    <string name="magisk_version_error">¿Has instalado Magisk?</string>
+    <string name="magisk_version_disable">Magisk v%1$s está deshabilitado</string>
+    <string name="magisk_version_error">Magisk no está instalado</string>
 
-    <string name="magisk_update_available">¡Actualización Magisk v%1$.1f!</string>
-    <string name="cannot_check_updates">No se pueden buscar actualizaciones</string>
+    <string name="checking_for_updates">Comprobando actualizaciones…</string>
+    <string name="magisk_update_available">¡Disponible Magisk v%1$.1f!</string>
+    <string name="cannot_check_updates">No se pueden comprobar actualizaciones ¿No tiene internet?</string>
     <string name="up_to_date">Última versión de %1$s instalada</string>
+    <string name="root_error">Rooteado pero sin permiso root, ¿No lo permitiste?</string>
+    <string name="not_rooted">No rooteado</string>
+    <string name="proper_root">Correctamente rooteado</string>
+    <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
+    <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
+    <string name="safetyNet_connection_failed">No puede conectar con la API de Google</string>
+    <string name="safetyNet_connection_suspended">La conexión con la API de Google API fue suspendida</string>
+    <string name="safetyNet_error">No puede comprobar SafetyNet, ¿No tiene internet?</string>
+    <string name="safetyNet_fail">SafetyNet falló: No coincide el perfil CTS</string>
+    <string name="safetyNet_pass">SafetyNet pasó</string>
+    <string name="root_info_warning">Funcionalidad enormemente limitada</string>
 
-    <!--Root Fragment-->
+    <!--Install Fragment-->
+    <string name="auto_detect">(Auto) %1$s</string>
+    <string name="boot_image_title">Ubicación de imagen boot</string>
+    <string name="detect_button">Detectar</string>
+    <string name="advanced_settings_title">Ajustes avanzados</string>
+    <string name="keep_force_encryption">Mantener cifrado forzado</string>
+    <string name="keep_dm_verity">Mantener dm-verity</string>
+    <string name="current_magisk_title">Versión de Magisk instalada: v%1$s</string>
+    <string name="install_magisk_title">Última versión de Magisk: v%1$.1f</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="reboot_countdown">Reiniciando en %1$d</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
@@ -28,7 +54,7 @@
     <string name="disable_file_created">El módulo se desactivará en el siguiente reinicio</string>
     <string name="disable_file_removed">El móodulo se activará en el siguiente reinicio</string>
     <string name="author">Creado por %1$s</string>
-    <string name="fab_flash_zip">Flashear Módulo Zip</string>
+    <string name="fab_flash_zip">Flashear el zip del módulo</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualización disponible</string>
@@ -36,19 +62,19 @@
     <string name="not_installed">No Instalado</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Salvar a SD</string>
+    <string name="menuSaveToSd">Guardar en la SD</string>
     <string name="menuReload">Recargar</string>
-    <string name="menuClearLog">Vaciar Log ahora</string>
-    <string name="logs_cleared">Log vaciado correctamente</string>
-    <string name="log_is_empty">El Log está vacio</string>
-    <string name="logs_save_failed">No se ha podido escribir el log en la tarjeta SD:</string>
+    <string name="menuClearLog">Limpiar registro ahora</string>
+    <string name="logs_cleared">Registro Limpiado correctamente</string>
+    <string name="log_is_empty">El registro está vacio</string>
+    <string name="logs_save_failed">No se ha podido escribir el registro en la tarjeta SD:</string>
 
     <!--About Activity-->
     <string name="about">Acerca de</string>
     <string name="app_developers">Desarroladores principales</string>
-    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-    <string name="app_changelog">Cambios en la aplicación</string>
-    <string name="translators">Gawenda, netizen</string>
+    <string name="app_developers_"><![CDATA[Aplicación creada por <a href="https://github.com/topjohnwu">topjohnwu</a> en colaboración con <a href="https://github.com/d8ahazard">Digitalhigh</a> y <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Registro de cambios de la aplicación</string>
+    <string name="translators"><![CDATA[Gawenda, netizen, <a href="https://github.com/DeicPro">Deiki</a>]]></string>
     <string name="app_version">Versión de la aplicación</string>
     <string name="app_source_code">Código fuente</string>
     <string name="donation">Donar</string>
@@ -56,41 +82,109 @@
     <string name="support_thread">Hilo de soporte</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa</string>
+    <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
     <string name="no_thanks">No gracias</string>
+    <string name="yes">Si</string>
+    <string name="ok">Vale</string>
+    <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>
     <string name="download_install">Descargar e instalar</string>
-    <string name="download_file_error">Error descargando fichero</string>
+    <string name="download">Descargar</string>
+    <string name="goto_install">Ir a la sección \"Instalar\"</string>
+    <string name="download_file_error">Error descargando archivo</string>
     <string name="install_error">¡Error en la instalación!</string>
-    <string name="invalid_zip">¡El zip no es un Módulo Magisk!</string>
+    <string name="invalid_zip">¡El zip no es un módulo Magisk!</string>
     <string name="reboot_title">¡Instalación correcta!</string>
     <string name="reboot_msg">¿Deseas reiniciar ahora?</string>
-    <string name="reboot">Reinciar</string>
+    <string name="reboot">Reiniciar</string>
+    <string name="copying_msg">Copiando zip a un directorio temporal</string>
     <string name="zip_install_progress_title">Instalando</string>
+    <string name="zip_unzip_msg">Descomprimiendo archivo zip …</string>
+    <string name="zip_process_msg">Procesando archivo zip …</string>
     <string name="zip_install_progress_msg">Instalando %1$s …</string>
     <string name="no_magisk_title">¡Magisk no instalado!</string>
     <string name="no_magisk_msg">¿Deseas descargar e instalar Magisk?</string>
-
-    <!--URL Templates-->
+    <string name="downloading_toast">Descargando %1$s</string>
+    <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
+    <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
+    <string name="release_notes">Notas de lanzamiento</string>
+    <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
+    <string name="safetyNet_hide_notice">Esta aplicación usa SafetyNet\nYa manejado por defecto por MagiskHide</string>
+    <string name="start_magiskhide">Iniciando MagiskHide …</string>
+    <string name="no_magisksu_title">¡No está usando MagiskSU!</string>
+    <string name="no_magisksu_msg">No estás rooteado con MagiskSU, ¡Usando MagiskHide por si mismo podría no ser suficiente!\nNo está oficialmente soportado, y necesitaria herramientas adiccionales (ej. suhide) para pasar Safety Net.</string>
+    <string name="understand">Entiendo</string>
+    <string name="process_error">Error de proceso</string>
+    <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
+    <string name="zip_process_title">Procesando</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
-    <string name="settings_dark_theme_title">Tema</string>
-    <string name="settings_dark_theme_summary">Selecciona un tema</string>
+    <string name="settings_dark_theme_title">Tema oscuro</string>
+    <string name="settings_dark_theme_summary">Habilita el tema oscuro</string>
+    <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
+    <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
 
+    <string name="settings_disable_title">Deshabilitar Magisk</string>
+    <string name="settings_disable_summary">Todo será desactivado excepto el root (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_busybox_title">Habilitar BusyBox</string>
     <string name="settings_busybox_summary">Montar el busybox interno de Magisk en xbin</string>
-    <string name="settings_hosts_title">Habilitar fichero hosts fuera de la partición de sistema</string>
+    <string name="settings_hosts_title">Habilitar archivo hosts fuera de la partición de sistema</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partición de sistema</string>
 
-    <string name="settings_development_category">Desarrollo</string>
-    <string name="settings_developer_logging_title">Habilitar información de depuración en el log</string>
-    <string name="settings_developer_logging_summary">Activar esto para grabar más información en el log</string>
-    <string name="settings_shell_logging_title">Grabar comandos de terminal en el log</string>
+    <string name="settings_su_app_adb">Aplicaciones y ADB</string>
+    <string name="settings_su_app">Sólo aplicaciones</string>
+    <string name="settings_su_adb">Sólo ADB</string>
+    <string name="settings_su_disable">Deshabilitado</string>
+    <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_20">20 segundos</string>
+    <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_60">60 segundos</string>
+    <string name="superuser_access">Acceso de superusuario</string>
+    <string name="auto_response">Respuesta automática</string>
+    <string name="request_timeout">Tiempo de petición</string>
+    <string name="superuser_notification">Notificación de superusuario</string>
+    <string name="request_timeout_summary">%1$s segundos</string>
+
+    <string name="settings_development_category">Desarrollo de la aplicación</string>
+    <string name="settings_developer_logging_title">Habilitar información avanzada de depuración en el registro</string>
+    <string name="settings_developer_logging_summary">Activar esto para grabar más información en el registro</string>
+    <string name="settings_shell_logging_title">Grabar comandos de terminal en el registro</string>
     <string name="settings_shell_logging_summary">Activar esto para grabar en el log todos los comandos ejecutados y su resultado</string>
 
-    <string name="settings_reboot_toast">Reiniciar para aplicar ajustes</string>
+    <!--Superuser-->
+    <string name="su_request_title">Petición de superusuario</string>
+    <string name="deny_with_str">Denegar%1$s</string>
+    <string name="deny">Denegrar</string>
+    <string name="prompt">Preguntar</string>
+    <string name="grant">Permitir</string>
+    <string name="su_warning">Permite acceso total a tu dispositivo.\n¡Denegar si no está seguro!</string>
+    <string name="forever">Siempre</string>
+    <string name="once">Una vez</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">Permitidos derechos de superusuario para %1$s</string>
+    <string name="su_deny_toast">Denegados derechos de superusuario para %1$s</string>
+    <string name="no_apps_found">No se encontraron aplicaciones</string>
+    <string name="su_snack_grant">Derechos de superusuario para %1$s permitidos</string>
+    <string name="su_snack_deny">Derechos de superusuario para %1$s denegados</string>
+    <string name="su_snack_notif_on">Noticiaciones de %1$s habilitadas</string>
+    <string name="su_snack_notif_off">Notificaciones de %1$s deshabilitadas</string>
+    <string name="su_snack_log_on">Registros de %1$s habilitados</string>
+    <string name="su_snack_log_off">Registros de %1$s deshabilitados</string>
+    <string name="su_snack_revoke">Anulados derechos de %1$s</string>
+    <string name="su_revoke_title">¿Anular?</string>
+    <string name="su_revoke_msg">¿Confirmar para anular derechos de %1$s?</string>
+    <string name="toast">Aviso</string>
+    <string name="none">Nada</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">UID de objetivo:\u0020</string>
+    <string name="command">Comando:\u0020</string>
 
 </resources>
