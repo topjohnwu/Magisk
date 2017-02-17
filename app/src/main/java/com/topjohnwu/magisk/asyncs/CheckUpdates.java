@@ -25,7 +25,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     public CheckUpdates(Context context, boolean b) {
         this(context);
-        showNotification = b && !magiskManager.isNotified;
+        showNotification = b;
     }
 
     public CheckUpdates(Context context) {
@@ -49,7 +49,6 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         if (magiskManager.magiskVersion < magiskManager.remoteMagiskVersion && showNotification) {
-            magiskManager.isNotified = true;
             NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager);
             builder.setSmallIcon(R.drawable.ic_magisk)
                     .setContentTitle(magiskManager.getString(R.string.magisk_update_title))

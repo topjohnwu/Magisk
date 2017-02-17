@@ -47,7 +47,6 @@ public class MagiskManager extends Application {
     public boolean isSuClient = false;
     public String suVersion = null;
     public boolean disabled = false;
-    public boolean isNotified = false;
 
     // Data
     public ValueSortedMap<String, Repo> repoMap;

@@ -39,14 +39,16 @@ public class SplashActivity extends Activity{
         boolean started = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
 
         // Initialize the update check service, notify every 3 hours
-        ComponentName service = new ComponentName(magiskManager, UpdateCheckService.class);
-        JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true)
-                .setPeriodic(3 * 60 * 60 * 1000)
-                .build();
-        JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        scheduler.schedule(jobInfo);
+        if (!"install".equals(getIntent().getStringExtra(MainActivity.SECTION))) {
+            ComponentName service = new ComponentName(magiskManager, UpdateCheckService.class);
+            JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setPersisted(true)
+                    .setPeriodic(3 * 60 * 60 * 1000)
+                    .build();
+            JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            scheduler.schedule(jobInfo);
+        }
 
         // Now fire all async tasks
         new GetBootBlocks(this).exec();
@@ -62,7 +64,7 @@ public class SplashActivity extends Activity{
             }
         }.exec();
         new LoadApps(this).exec();
-        new CheckUpdates(this, true){
+        new CheckUpdates(this, !"install".equals(getIntent().getStringExtra(MainActivity.SECTION))){
             @Override
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);
