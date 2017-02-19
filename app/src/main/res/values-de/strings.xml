@@ -3,11 +3,10 @@
 
 
 
-
-
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigationsmenü öffnen</string>
     <string name="navigation_drawer_close">Navigationsmenü schließen</string>
+
     <string name="modules">Module</string>
     <string name="downloads">Download</string>
     <string name="superuser">Superuser</string>
@@ -31,8 +30,7 @@
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
-    <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>
-	
+    <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>	
     <string name="safetyNet_error">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_fail">SafetyNet nicht bestanden: \"CTS profile mismatch\"</string>
     <string name="safetyNet_pass">SafetyNet bestanden</string>
@@ -47,11 +45,11 @@
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
     <string name="current_magisk_title">Installierte Magisk-Version: %1$s</string>
     <string name="install_magisk_title">Neueste Magisk-Version: %1$s</string>
-
-
     <string name="uninstall">Deinstallieren</string>
     <string name="reboot_countdown">Neustart in %1$d</string>
-
+    <string name="uninstall_magisk_title">Magisk deinstallieren</string>
+    <string name="uninstall_magisk_msg">Dies entfernt alle Module, MagiskSU und verschlüsselt unter Umständen deine Daten, falls nicht bereits verschlüsselt.\nMöchtest du wirklich fortfahren?</string>
+    <string name="version_none">(keine)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>
@@ -99,6 +97,7 @@
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download_install">Herunterladen &amp; installieren</string>
     <string name="download">Herunterladen</string>
+    <string name="goto_install">Zu \"Installieren\" wechseln</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="install_error">Fehler bei der Installation!</string>
     <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!</string>
@@ -119,11 +118,6 @@
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
     <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide gehandhabt</string>
     <string name="start_magiskhide">Starte Magisk Hide…</string>
-
-
-
-
-
     <string name="no_magisksu_title">Du benutzt nicht MagiskSU!</string>
     <string name="no_magisksu_msg">Deine root-Lösung wird nicht offiziell unterstützt und Magisk Hide allein ist eventuell nicht ausreichend!\nEventuell benötigst du weitere Programme (z.B. \"suhide\"), um SafetyNet zu bestehen.</string>
     <string name="understand">Ich verstehe</string>
