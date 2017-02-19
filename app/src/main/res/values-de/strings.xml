@@ -46,7 +46,7 @@
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
     <string name="current_magisk_title">Installierte Magisk-Version: %1$s</string>
-    <string name="install_magisk_title">Neueste Magisk-Version: %1$.1f</string>
+    <string name="install_magisk_title">Neueste Magisk-Version: %1$s</string>
 
 
     <string name="uninstall">Deinstallieren</string>

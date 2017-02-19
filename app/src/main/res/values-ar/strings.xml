@@ -105,7 +105,7 @@
     <string name="copying_msg">نسخ الملف المضغوط إلى دليل مؤقت</string>
     <string name="detect_button">تحقق</string>
     <string name="downloading_toast">جاري التنزيل %1$s</string>
-    <string name="install_magisk_title">تثبيت Magisk الإصدار: v%1$.1f</string>
+    <string name="install_magisk_title">تثبيت Magisk الإصدار: %1$s</string>
     <string name="keep_force_encryption">إبقاء التشفير القوى</string>
     <string name="keep_dm_verity">إبقاء dm-verity</string>
     <string name="root_error">مروت لكن لا يوجد إذن الروت، غير مسموح به؟</string>

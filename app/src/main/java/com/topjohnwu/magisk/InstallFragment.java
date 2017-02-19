@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,8 +57,11 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
         View v = inflater.inflate(R.layout.fragment_install, container, false);
         unbinder = ButterKnife.bind(this, v);
         detectButton.setOnClickListener(v1 -> toAutoDetect());
-        currentVersionTitle.setText(getString(R.string.current_magisk_title, getApplication().magiskVersionString));
-        installTitle.setText(getString(R.string.install_magisk_title, getApplication().remoteMagiskVersion));
+        if (getApplication().magiskVersion < 0)
+            currentVersionTitle.setText(getString(R.string.current_magisk_title, getString(R.string.version_none)));
+        else
+            currentVersionTitle.setText(getString(R.string.current_magisk_title, "v" + getApplication().magiskVersionString));
+        installTitle.setText(getString(R.string.install_magisk_title, "v" + String.format(Locale.US, "%.1f", getApplication().remoteMagiskVersion)));
         flashButton.setOnClickListener(v1 -> {
             String bootImage;
             if (getApplication().bootBlock != null) {
@@ -73,7 +77,7 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                     .setMessage(getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
-                    .setPositiveButton(R.string.download_install, (dialogInterface, i) -> Utils.dlAndReceive(
+                    .setPositiveButton(R.string.install, (dialogInterface, i) -> Utils.dlAndReceive(
                             getActivity(),
                             new DownloadReceiver() {
                                 private String boot = bootImage;

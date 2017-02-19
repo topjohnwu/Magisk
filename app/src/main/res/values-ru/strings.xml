@@ -38,8 +38,8 @@
     <string name="advanced_settings_title">Дополнительные настройки</string>
     <string name="keep_force_encryption">Оставить шифрование</string>
     <string name="keep_dm_verity">Оставить dm-verity</string>
-    <string name="current_magisk_title">Установленная версия Magisk: v%1$s</string>
-    <string name="install_magisk_title">Последняя версия Magisk: v%1$.1f</string>
+    <string name="current_magisk_title">Установленная версия Magisk: %1$s</string>
+    <string name="install_magisk_title">Последняя версия Magisk: %1$s</string>
     <string name="uninstall">Удалить</string>
     <string name="reboot_countdown">Перезагрузка через %1$d</string>
 

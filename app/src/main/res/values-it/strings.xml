@@ -40,8 +40,8 @@
     <string name="advanced_settings_title">Impostazioni Avanzate</string>
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni dm-verity</string>
-    <string name="current_magisk_title">Versione Magisk installata: v%1$s</string>
-    <string name="install_magisk_title">Ultima versione Magisk: v%1$.1f</string>
+    <string name="current_magisk_title">Versione Magisk installata: %1$s</string>
+    <string name="install_magisk_title">Ultima versione Magisk: %1$s</string>
 
 
     <!--Module Fragment-->

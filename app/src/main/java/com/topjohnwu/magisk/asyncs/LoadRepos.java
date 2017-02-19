@@ -42,24 +42,26 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
         SharedPreferences prefs = magiskManager.prefs;
 
+        RepoDatabaseHelper dbHelper = new RepoDatabaseHelper(magiskManager);
+
         // Legacy data cleanup
-        new File(prefsPath, "RepoMap.xml").delete();
-        prefs.edit().remove("version").remove("repomap").apply();
+        File old = new File(prefsPath, "RepoMap.xml");
+        if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {
+            old.delete();
+            prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
+            dbHelper.clearRepo();
+        }
 
         Map<String, String> header = new HashMap<>();
         // Get cached ETag to add in the request header
         String etag = prefs.getString(ETAG_KEY, "");
-
-        // Add header only if db exists
-        if (magiskManager.getDatabasePath("repo.db").exists())
-            header.put("If-None-Match", etag);
+        header.put("If-None-Match", etag);
 
         magiskManager.repoMap = new ValueSortedMap<>();
 
         // Make a request to main URL for repo info
         String jsonString = WebService.request(REPO_URL, WebService.GET, null, header, false);
 
-        RepoDatabaseHelper dbHelper = new RepoDatabaseHelper(magiskManager);
         ValueSortedMap<String, Repo> cached = dbHelper.getRepoMap();
 
         if (!TextUtils.isEmpty(jsonString)) {

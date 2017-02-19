@@ -42,8 +42,8 @@
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
-    <string name="current_magisk_title">Zainstalowana Wersja Magisk: v%1$s</string>
-    <string name="install_magisk_title">Ostatnia Wersja Magisk: v%1$.1f</string>
+    <string name="current_magisk_title">Zainstalowana Wersja Magisk: %1$s</string>
+    <string name="install_magisk_title">Ostatnia Wersja Magisk: %1$s</string>
    
     <string name="uninstall">Odinstaluj</string>
     <string name="reboot_countdown">Restartuj do %1$d</string>

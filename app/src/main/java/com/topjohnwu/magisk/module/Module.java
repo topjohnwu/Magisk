@@ -16,15 +16,15 @@ public class Module extends BaseModule {
         mDisableFile = path + "/disable";
         mUpdateFile = path + "/update";
 
-        if (mId == null) {
+        if (getId() == null) {
             int sep = path.lastIndexOf('/');
-            mId = path.substring(sep + 1);
+            setId(path.substring(sep + 1));
         }
 
-        if (mName == null)
-            mName = mId;
+        if (getName() == null)
+            setName(getId());
 
-        Logger.dev("Creating Data, id: " + mId);
+        Logger.dev("Creating Module, id: " + getId());
 
         mEnable = !Utils.itemExist(mDisableFile);
         mRemove = Utils.itemExist(mRemoveFile);

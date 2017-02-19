@@ -60,7 +60,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                     .setTitle(mContext.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(mContext.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
-                    .setPositiveButton(R.string.download_install, (d, i) -> Utils.dlAndReceive(
+                    .setPositiveButton(R.string.install, (d, i) -> Utils.dlAndReceive(
                             mContext,
                             new DownloadReceiver() {
                                 @Override

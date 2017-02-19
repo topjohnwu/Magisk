@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
 
 import java.util.Collection;
@@ -65,6 +66,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
                 repo = new Repo(c);
+                Logger.dev("Load from cache: " + repo.getId());
                 ret.put(repo.getId(), repo);
             }
         }

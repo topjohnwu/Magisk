@@ -38,7 +38,7 @@ public class MagiskManager extends Application {
 
     // Info
     public double magiskVersion;
-    public String magiskVersionString = "(none)";
+    public String magiskVersionString;
     public double remoteMagiskVersion = -1;
     public String magiskLink;
     public String releaseNoteLink;
@@ -46,7 +46,8 @@ public class MagiskManager extends Application {
     public String bootBlock = null;
     public boolean isSuClient = false;
     public String suVersion = null;
-    public boolean disabled = false;
+    public boolean disabled;
+    public boolean magiskHideStarted;
 
     // Data
     public ValueSortedMap<String, Repo> repoMap;
@@ -90,6 +91,8 @@ public class MagiskManager extends Application {
         devLogging = prefs.getBoolean("developer_logging", false);
         shellLogging = prefs.getBoolean("shell_logging", false);
         magiskHide = prefs.getBoolean("magiskhide", false);
+        // Always start a new root shell manually, just for safety
+        Shell.init();
         updateMagiskInfo();
         initSuAccess();
         initSuConfigs();
@@ -149,6 +152,15 @@ public class MagiskManager extends Application {
         } catch (NumberFormatException e) {
             disabled = false;
         }
+        ret = Shell.sh("getprop persist.magisk.hide");
+        try {
+            magiskHideStarted = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
+        } catch (NumberFormatException e) {
+            magiskHideStarted = false;
+        }
+
+        if (!magiskHide && magiskHideStarted)
+            magiskHide = true;
         
     }
 

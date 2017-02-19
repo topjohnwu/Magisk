@@ -15,10 +15,6 @@ import com.topjohnwu.magisk.asyncs.LoadRepos;
 import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.services.UpdateCheckService;
-import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
-
-import java.util.List;
 
 public class SplashActivity extends Activity{
 
@@ -33,10 +29,6 @@ public class SplashActivity extends Activity{
 
         // Init the info and configs and root shell
         magiskManager.init();
-
-        // Check MagiskHide status
-        List<String> ret = Shell.sh("getprop persist.magisk.hide");
-        boolean started = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
 
         // Initialize the update check service, notify every 3 hours
         if (!"install".equals(getIntent().getStringExtra(MainActivity.SECTION))) {
@@ -53,7 +45,7 @@ public class SplashActivity extends Activity{
         // Now fire all async tasks
         new GetBootBlocks(this).exec();
         if (magiskManager.magiskHide && !magiskManager.disabled &&
-                magiskManager.magiskVersion > 11 && !started) {
+                magiskManager.magiskVersion > 11 && !magiskManager.magiskHideStarted) {
             new MagiskHide().enable();
         }
         new LoadModules(this) {

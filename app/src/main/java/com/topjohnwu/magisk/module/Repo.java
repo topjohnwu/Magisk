@@ -23,12 +23,7 @@ public class Repo extends BaseModule {
     }
 
     public Repo(Cursor c) {
-        mId = c.getString(c.getColumnIndex("id"));
-        mName = c.getString(c.getColumnIndex("name"));
-        mVersion = c.getString(c.getColumnIndex("version"));
-        mVersionCode = c.getInt(c.getColumnIndex("versionCode"));
-        mAuthor = c.getString(c.getColumnIndex("author"));
-        mDescription = c.getString(c.getColumnIndex("description"));
+        super(c);
         repoName = c.getString(c.getColumnIndex("repo_name"));
         mLastUpdate = new Date(c.getLong(c.getColumnIndex("last_update")));
     }
@@ -50,12 +45,12 @@ public class Repo extends BaseModule {
 
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
-        values.put("id", mId);
-        values.put("name", mName);
-        values.put("version", mVersion);
-        values.put("versionCode", mVersionCode);
-        values.put("author", mAuthor);
-        values.put("description", mDescription);
+        values.put("id", getId());
+        values.put("name", getName());
+        values.put("version", getVersion());
+        values.put("versionCode", getVersionCode());
+        values.put("author", getAuthor());
+        values.put("description", getDescription());
         values.put("repo_name", repoName);
         values.put("last_update", mLastUpdate.getTime());
         return values;
