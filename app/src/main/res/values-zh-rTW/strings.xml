@@ -35,7 +35,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
-    <string name="boot_image_title">Boot 鏡像位置</string>
+    <string name="boot_image_title">Boot 映像位置</string>
     <string name="detect_button">偵測</string>
     <string name="advanced_settings_title">高級設置</string>
     <string name="keep_force_encryption">保持強制加密</string>
@@ -181,13 +181,15 @@
     <string name="target_uid">目標 UID:\u0020</string>
     <string name="command">"指令: "</string>
     <string name="close">關閉</string>
-    <string name="internal_storage">Zip 已被儲存到:[內部儲存空間]%1$s</string>
+    <string name="internal_storage">Zip 已被儲存到:\n[內部儲存空間]%1$s</string>
     <string name="ok">好</string>
     <string name="process_error">處裡失敗</string>
     <string name="download">下載</string>
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
-    <string name="uninstall_magisk_msg">這將會刪除所有模組，MagiskSU，並有可能在目前未加密的情況下加密的的資料\n你確定要繼續嗎？</string>
+    <string name="uninstall_magisk_msg">這將會刪除所有模組，MagiskSU，並有可能在目前資料未加密的情況下進行加密\n你確定要繼續嗎？</string>
     <string name="version_none">(無)</string>
+    <string name="manual_boot_image">請手動選取 boot 映像位置</string>
+    <string name="cannot_auto_detect">(無法自動偵測)</string>
 
 </resources>

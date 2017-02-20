@@ -162,8 +162,9 @@ public class MagiskLogFragment extends Fragment {
                         return false;
                     }
 
-                    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                         return false;
+                    }
 
                     Calendar now = Calendar.getInstance();
                     String filename = String.format(
@@ -175,8 +176,9 @@ public class MagiskLogFragment extends Fragment {
                     targetFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MagiskManager/" + filename);
 
                     if ((!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs())
-                            || (targetFile.exists() && !targetFile.delete()))
+                            || (targetFile.exists() && !targetFile.delete())) {
                         return false;
+                    }
 
                     List<String> in = Utils.readFile(MAGISK_LOG);
 
@@ -214,10 +216,11 @@ public class MagiskLogFragment extends Fragment {
                     break;
                 case 2:
                     bool = (boolean) o;
-                    if (bool)
+                    if (bool) {
                         Toast.makeText(getActivity(), targetFile.toString(), Toast.LENGTH_LONG).show();
-                    else
+                    } else {
                         Toast.makeText(getActivity(), getString(R.string.logs_save_failed), Toast.LENGTH_LONG).show();
+                    }
                     break;
             }
         }

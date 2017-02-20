@@ -10,8 +10,9 @@ public class CallbackEvent<Result> {
     private Set<Listener<Result>> listeners;
 
     public void register(Listener<Result> l) {
-        if (listeners == null)
+        if (listeners == null) {
             listeners = new HashSet<>();
+        }
         listeners.add(l);
     }
 
@@ -20,8 +21,9 @@ public class CallbackEvent<Result> {
     }
 
     public void unRegister(Listener<Result> l) {
-        if (listeners != null)
+        if (listeners != null) {
             listeners.remove(l);
+        }
     }
 
     public void trigger() {
@@ -32,8 +34,9 @@ public class CallbackEvent<Result> {
         result = r;
         isTriggered = true;
         if (listeners != null) {
-            for (Listener<Result> listener : listeners)
+            for (Listener<Result> listener : listeners) {
                 listener.onTrigger(this);
+            }
         }
     }
 

@@ -25,14 +25,17 @@ public class SuLogDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(
-                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
-                "to_uid INT, action INT, time INT, command TEXT)");
+        onUpgrade(db, 0, DATABASE_VER);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion == 0) {
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
+                    "to_uid INT, action INT, time INT, command TEXT)");
+        }
         // Currently new database, no upgrading
     }
 
@@ -63,8 +66,9 @@ public class SuLogDatabaseHelper extends SQLiteOpenHelper {
         db.delete(TABLE_NAME, "time < ?", new String[] { String.valueOf(
                 System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
         try (Cursor c = db.query(TABLE_NAME, null, selection, null, null, null, "time DESC")) {
-            while (c.moveToNext())
+            while (c.moveToNext()) {
                 ret.add(new SuLogEntry(c));
+            }
         }
         db.close();
         return ret;

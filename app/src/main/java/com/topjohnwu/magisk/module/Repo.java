@@ -60,10 +60,6 @@ public class Repo extends BaseModule {
         return String.format(ZIP_URL, repoName);
     }
 
-    public String getLogUrl() {
-        return String.format(FILE_URL, repoName, "changelog.txt");
-    }
-
     public String getManifestUrl() {
         return String.format(FILE_URL, repoName, "module.prop");
     }

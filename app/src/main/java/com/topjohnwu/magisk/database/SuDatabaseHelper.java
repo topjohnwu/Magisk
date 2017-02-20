@@ -22,15 +22,18 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(
-                "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
-                "(uid INT, package_name TEXT, app_name TEXT, policy INT, " +
-                "until INT, logging INT, notification INT, " +
-                "PRIMARY KEY(uid))");
+        onUpgrade(db, 0, DATABASE_VER);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion == 0) {
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
+                    "(uid INT, package_name TEXT, app_name TEXT, policy INT, " +
+                    "until INT, logging INT, notification INT, " +
+                    "PRIMARY KEY(uid))");
+        }
         // Currently new database, no upgrading
     }
 
@@ -45,8 +48,9 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         Policy policy = null;
         SQLiteDatabase db = getReadableDatabase();
         try (Cursor c = db.query(TABLE_NAME, null, "uid=?", new String[] { String.valueOf(uid) }, null, null, null)) {
-            if (c.moveToNext())
+            if (c.moveToNext()) {
                 policy = new Policy(c);
+            }
         }
         db.close();
         return policy;

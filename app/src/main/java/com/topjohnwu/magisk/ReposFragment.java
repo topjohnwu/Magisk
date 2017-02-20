@@ -133,10 +133,11 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
         for (Repo repo : getApplication().repoMap.values()) {
             Module module = getApplication().moduleMap.get(repo.getId());
             if (module != null) {
-                if (repo.getVersionCode() > module.getVersionCode())
+                if (repo.getVersionCode() > module.getVersionCode()) {
                     mUpdateRepos.add(repo);
-                else
+                } else {
                     mInstalledRepos.add(repo);
+                }
             } else {
                 mOthersRepos.add(repo);
             }

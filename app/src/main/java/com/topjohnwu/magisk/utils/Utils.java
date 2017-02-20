@@ -114,8 +114,9 @@ public class Utils {
                 "echo \"${BOOTIMAGE##*/}\""
         };
         List<String> ret = Shell.su(commands);
-        if (isValidShellResponse(ret))
+        if (isValidShellResponse(ret)) {
             return ret.get(0);
+        }
         return null;
     }
 

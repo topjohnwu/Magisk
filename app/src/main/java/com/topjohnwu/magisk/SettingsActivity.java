@@ -112,10 +112,12 @@ public class SettingsActivity extends Activity {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
             } else {
-                if (!getApplication().isSuClient)
+                if (!getApplication().isSuClient) {
                     prefScreen.removePreference(suCategory);
-                if (getApplication().magiskVersion < 11)
+                }
+                if (getApplication().magiskVersion < 11) {
                     prefScreen.removePreference(magiskCategory);
+                }
                 if (getApplication().disabled) {
                     busybox.setEnabled(false);
                     magiskHide.setEnabled(false);
@@ -146,8 +148,8 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (getApplication().isDarkTheme != enabled) {
                         getApplication().isDarkTheme = enabled;
-                        getActivity().finish();
                         getApplication().reloadMainActivity.trigger();
+                        getActivity().recreate();
                     }
                     break;
                 case "disable":
@@ -195,9 +197,12 @@ public class SettingsActivity extends Activity {
                                     .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide().enable())
                                     .setCancelable(false)
                                     .show();
-                        } else new MagiskHide().enable();
-                    } else
+                        } else {
+                            new MagiskHide().enable();
+                        }
+                    } else {
                         new MagiskHide().disable();
+                    }
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);

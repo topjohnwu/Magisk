@@ -22,8 +22,9 @@ public class LoadApps extends ParallelTask<Void, Void, Void> {
         List<ApplicationInfo> list = pm.getInstalledApplications(0);
         for (Iterator<ApplicationInfo> i = list.iterator(); i.hasNext(); ) {
             ApplicationInfo info = i.next();
-            if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled)
+            if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled) {
                 i.remove();
+            }
         }
         Collections.sort(list, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                 .compareTo(b.loadLabel(pm).toString().toLowerCase()));

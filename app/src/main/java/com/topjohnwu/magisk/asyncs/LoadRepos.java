@@ -96,8 +96,9 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
                             Logger.dev("LoadRepos: Update cached repo " + id);
                             repo.update(updatedDate);
                         }
-                        if (repo.getId() != null)
+                        if (repo.getId() != null) {
                             magiskManager.repoMap.put(id, repo);
+                        }
                     } catch (BaseModule.CacheModException ignored) {}
                 }
 

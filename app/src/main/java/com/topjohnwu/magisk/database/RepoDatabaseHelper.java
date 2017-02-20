@@ -40,8 +40,9 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     public void addRepoMap(ValueSortedMap<String, Repo> map) {
         SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
-        for (Repo repo : list)
+        for (Repo repo : list) {
             db.replace(TABLE_NAME, null, repo.getContentValues());
+        }
         db.close();
     }
 
@@ -54,8 +55,9 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     public void removeRepo(ValueSortedMap<String, Repo> map) {
         SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
-        for (Repo repo : list)
+        for (Repo repo : list) {
             db.delete(TABLE_NAME, "id=?", new String[] { repo.getId() });
+        }
         db.close();
     }
 

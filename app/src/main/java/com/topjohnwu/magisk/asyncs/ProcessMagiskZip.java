@@ -45,7 +45,8 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
                 ZipUtils.unzip(magiskManager.getContentResolver().openInputStream(mUri), tempdir);
                 // Running in parallel mode, open new shell
                 Shell.su(true,
-                        "echo \"BOOTIMAGE=/dev/block/" + mBoot + "\" > /dev/.magisk",
+                        "rm -f /dev/.magisk",
+                        (mBoot != null) ? "echo \"BOOTIMAGE=/dev/block/" + mBoot + "\" >> /dev/.magisk" : "",
                         "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
                         "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk",
                         "mkdir -p " + MagiskManager.TMP_FOLDER_PATH,
@@ -66,13 +67,14 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
-        if (result)
+        if (result) {
             new FlashZip(activity, mUri) {
                 @Override
                 protected boolean unzipAndCheck() throws Exception {
                     // Don't need to check, as it is downloaded in correct form
                     return true;
                 }
+
                 @Override
                 protected void onSuccess() {
                     new SerialTask<Void, Void, Void>(activity) {
@@ -87,7 +89,8 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
                     super.onSuccess();
                 }
             }.exec();
-        else
+        } else {
             Utils.showUriSnack(activity, mUri);
+        }
     }
 }

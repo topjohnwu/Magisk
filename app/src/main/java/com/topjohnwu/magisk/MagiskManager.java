@@ -125,9 +125,9 @@ public class MagiskManager extends Application {
         }
         if (isSuClient) {
             ret = Shell.sh("getprop persist.sys.root_access");
-            if (Utils.isValidShellResponse(ret))
+            if (Utils.isValidShellResponse(ret)) {
                 suAccessState = Integer.parseInt(ret.get(0));
-            else {
+            } else {
                 Shell.su(true, "setprop persist.sys.root_access 3");
                 suAccessState = 3;
             }
@@ -160,8 +160,9 @@ public class MagiskManager extends Application {
             magiskHideStarted = false;
         }
 
-        if (!magiskHide && magiskHideStarted)
+        if (magiskHideStarted) {
             magiskHide = true;
+        }
         
     }
 

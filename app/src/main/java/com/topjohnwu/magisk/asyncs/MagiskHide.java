@@ -21,15 +21,17 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
     protected Void doInBackground(Object... params) {
         String command = (String) params[0];
         List<String> ret = Shell.su(MagiskManager.MAGISK_HIDE_PATH + command);
-        if (isList)
+        if (isList) {
             magiskManager.magiskHideList = ret;
+        }
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        if (isList)
+        if (isList) {
             magiskManager.magiskHideDone.trigger();
+        }
     }
 
     public void add(CharSequence packageName) {
@@ -50,8 +52,7 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
 
     public void list() {
         isList = true;
-        if (magiskManager == null)
-            return;
+        if (magiskManager == null) return;
         exec("list");
     }
 

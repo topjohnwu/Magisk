@@ -159,7 +159,7 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/flash_button"
+                android:id="@+id/install_button"
                 android:layout_gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="@string/download_install"
+                        android:id="@+id/install_text"
                         android:ems="10"
                         android:gravity="center"
                         android:layout_weight="1"

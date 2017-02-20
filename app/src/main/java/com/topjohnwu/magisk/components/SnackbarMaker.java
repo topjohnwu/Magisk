@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.components;
 import android.app.Activity;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -34,8 +33,7 @@ public class SnackbarMaker {
 
     private static void setup(Snackbar snack) {
         TextView text = ButterKnife.findById(snack.getView(), android.support.design.R.id.snackbar_text);
-        text.setMaxLines(2);
-        text.setEllipsize(TextUtils.TruncateAt.START);
+        text.setMaxLines(Integer.MAX_VALUE);
     }
 
 }

@@ -120,11 +120,13 @@ public class Shell {
         StreamGobbler STDOUT;
 
         // Create the default shell if not init
-        if (!newShell && !isInit)
+        if (!newShell && !isInit) {
             init();
+        }
 
-        if (!newShell && !rootAccess())
+        if (!newShell && !rootAccess()) {
             return null;
+        }
 
         if (newShell) {
             res = Collections.synchronizedList(new ArrayList<String>());

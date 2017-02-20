@@ -131,14 +131,16 @@ public class MainActivity extends Activity
 
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        if (Shell.rootAccess()) {
-            menu.findItem(R.id.magiskhide).setVisible(
-                    getApplicationContext().magiskVersion >= 8 && prefs.getBoolean("magiskhide", false));
-            menu.findItem(R.id.modules).setVisible(getApplicationContext().magiskVersion >= 4);
-            menu.findItem(R.id.downloads).setVisible(getApplicationContext().magiskVersion >= 4);
-            menu.findItem(R.id.log).setVisible(true);
-            menu.findItem(R.id.superuser).setVisible(getApplicationContext().isSuClient);
-        }
+        menu.findItem(R.id.magiskhide).setVisible(
+                Shell.rootAccess() && getApplicationContext().magiskVersion >= 8
+                        && prefs.getBoolean("magiskhide", false));
+        menu.findItem(R.id.modules).setVisible(
+                Shell.rootAccess() && getApplicationContext().magiskVersion >= 4);
+        menu.findItem(R.id.downloads).setVisible(
+                Shell.rootAccess() && getApplicationContext().magiskVersion >= 4);
+        menu.findItem(R.id.log).setVisible(Shell.rootAccess());
+        menu.findItem(R.id.superuser).setVisible(
+                Shell.rootAccess() && getApplicationContext().isSuClient);
         menu.findItem(R.id.install).setVisible(getApplicationContext().remoteMagiskVersion > 0);
     }
 
@@ -179,6 +181,7 @@ public class MainActivity extends Activity
     }
 
     public void navigate(int itemId) {
+        int bak = mDrawerItem;
         mDrawerItem = itemId;
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
@@ -205,9 +208,11 @@ public class MainActivity extends Activity
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
+                mDrawerItem = bak;
                 break;
             case R.id.app_about:
                 startActivity(new Intent(this, AboutActivity.class));
+                mDrawerItem = bak;
                 break;
         }
     }

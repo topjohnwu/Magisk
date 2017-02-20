@@ -76,8 +76,9 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
             @Override
             public void onEvent(int fileEvent, String path) {
                 if (fileEvent == FileObserver.DELETE_SELF) {
-                    if (event != null)
+                    if (event != null) {
                         event.trigger();
+                    }
                     finish();
                 }
             }
@@ -147,8 +148,9 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
     public void onTrigger(CallbackEvent<Policy> event) {
         Policy policy = event.getResult();
         String response = "socket:DENY";
-        if (policy != null &&policy.policy == Policy.ALLOW )
+        if (policy != null &&policy.policy == Policy.ALLOW ) {
             response = "socket:ALLOW";
+        }
         try {
             socket.getOutputStream().write((response).getBytes());
         } catch (Exception ignored) {}
@@ -176,7 +178,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            try{
+            try {
                 socket = new LocalSocket();
                 socket.connect(new LocalSocketAddress(socketPath, LocalSocketAddress.Namespace.FILESYSTEM));
 

@@ -21,8 +21,9 @@ public class Module extends BaseModule {
             setId(path.substring(sep + 1));
         }
 
-        if (getName() == null)
+        if (getName() == null) {
             setName(getId());
+        }
 
         Logger.dev("Creating Module, id: " + getId());
 

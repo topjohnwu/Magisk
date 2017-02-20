@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class StatusFragment extends Fragment implements CallbackEvent.Listener<Void> {
@@ -53,7 +54,27 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     @BindColor(R.color.grey500) int colorNeutral;
     @BindColor(R.color.blue500) int colorInfo;
     @BindColor(android.R.color.transparent) int trans;
-    int defaultColor;
+
+    @OnClick(R.id.safetyNet_container)
+    public void safetyNet() {
+        safetyNetProgress.setVisibility(View.VISIBLE);
+        safetyNetContainer.setBackgroundColor(trans);
+        safetyNetIcon.setImageResource(0);
+        safetyNetStatusText.setText(R.string.checking_safetyNet_status);
+        Utils.checkSafetyNet(getApplication());
+    }
+
+    @OnClick(R.id.magisk_status_container)
+    public void magisk() {
+        ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        try {
+            transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
+        } catch (IllegalStateException ignored) {}
+    }
+
+    private int defaultColor;
 
     @Nullable
     @Override
@@ -81,23 +102,6 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
             updateUI();
             new CheckUpdates(getActivity()).exec();
-        });
-
-        safetyNetContainer.setOnClickListener(view -> {
-            safetyNetProgress.setVisibility(View.VISIBLE);
-            safetyNetContainer.setBackgroundColor(trans);
-            safetyNetIcon.setImageResource(0);
-            safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            Utils.checkSafetyNet(getApplication());
-        });
-
-        magiskStatusContainer.setOnClickListener(view -> {
-            ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-            try {
-                transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
-            } catch (IllegalStateException ignored) {}
         });
 
         if (getApplication().magiskVersion < 0 && Shell.rootAccess() && !noDialog) {

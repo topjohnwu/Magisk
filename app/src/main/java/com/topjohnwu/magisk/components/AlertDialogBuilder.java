@@ -93,8 +93,9 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
         positive.setText(text);
         positiveListener = listener;
         positive.setOnClickListener((v) -> {
-            if (positiveListener != null)
+            if (positiveListener != null) {
                 positiveListener.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
+            }
             dialog.dismiss();
         });
         return this;
@@ -112,8 +113,9 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
         negative.setText(text);
         negativeListener = listener;
         negative.setOnClickListener((v) -> {
-            if (negativeListener != null)
+            if (negativeListener != null) {
                 negativeListener.onClick(dialog, DialogInterface.BUTTON_NEGATIVE);
+            }
             dialog.dismiss();
         });
         return this;
@@ -131,8 +133,9 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
         neutral.setText(text);
         neutralListener = listener;
         neutral.setOnClickListener((v) -> {
-            if (neutralListener != null)
+            if (neutralListener != null) {
                 neutralListener.onClick(dialog, DialogInterface.BUTTON_NEUTRAL);
+            }
             dialog.dismiss();
         });
         return this;

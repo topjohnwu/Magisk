@@ -13,10 +13,9 @@ public class GetBootBlocks extends SerialTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        if (Shell.rootAccess()) {
-            magiskManager.blockList = Shell.su("ls /dev/block | grep mmc");
-            if (magiskManager.bootBlock == null)
-                magiskManager.bootBlock = Utils.detectBootImage();
+        magiskManager.blockList = Shell.su("ls /dev/block | grep mmc");
+        if (magiskManager.bootBlock == null) {
+            magiskManager.bootBlock = Utils.detectBootImage();
         }
         return null;
     }

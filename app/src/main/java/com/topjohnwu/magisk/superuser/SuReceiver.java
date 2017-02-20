@@ -38,10 +38,12 @@ public class SuReceiver extends BroadcastReceiver {
 
         SuDatabaseHelper suDbHelper = new SuDatabaseHelper(context);
         policy = suDbHelper.getPolicy(fromUid);
-        if (policy == null) try {
-            policy = new Policy(fromUid, context.getPackageManager());
-        } catch (Throwable throwable) {
-            return;
+        if (policy == null) {
+            try {
+                policy = new Policy(fromUid, context.getPackageManager());
+            } catch (Throwable throwable) {
+                return;
+            }
         }
 
         magiskManager.initSuConfigs();

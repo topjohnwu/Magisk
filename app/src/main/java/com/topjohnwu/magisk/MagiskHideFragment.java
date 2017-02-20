@@ -71,8 +71,9 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
             }
         };
 
-        if (getApplication().magiskHideDone.isTriggered)
+        if (getApplication().magiskHideDone.isTriggered) {
             onTrigger(getApplication().magiskHideDone);
+        }
 
         return view;
     }

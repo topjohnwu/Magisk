@@ -103,10 +103,11 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
         if (result) {
-            if (Shell.rootAccess() && mInstall)
+            if (Shell.rootAccess() && mInstall) {
                 new FlashZip(activity, mUri).exec();
-            else
+            } else {
                 Utils.showUriSnack(activity, mUri);
+            }
 
         } else {
             Toast.makeText(activity, R.string.process_error, Toast.LENGTH_LONG).show();

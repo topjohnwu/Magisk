@@ -112,14 +112,17 @@ public class ZipUtils {
                 // Remove the top directory from the path
                 path = entry.getName().substring(entry.getName().indexOf("/") + 1);
                 // If it's the top folder, ignore it
-                if (path.isEmpty())
+                if (path.isEmpty()) {
                     continue;
+                }
                 // Don't include placeholder
-                if (path.contains("system/placeholder"))
+                if (path.contains("system/placeholder")) {
                     continue;
+                }
                 dest.putNextEntry(new JarEntry(path));
-                while((size = source.read(buffer, 0, 2048)) != -1)
+                while((size = source.read(buffer, 0, 2048)) != -1) {
                     dest.write(buffer, 0, size);
+                }
             }
             source.close();
             dest.close();
@@ -149,17 +152,20 @@ public class ZipUtils {
             Enumeration<JarEntry> e = zipfile.entries();
             while(e.hasMoreElements()) {
                 entry = e.nextElement();
-                if (!entry.getName().contains(path) || entry.isDirectory())
+                if (!entry.getName().contains(path) || entry.isDirectory()){
                     // Ignore directories, only create files
                     continue;
+                }
                 Logger.dev("ZipUtils: Extracting: " + entry);
                 is = zipfile.getInputStream(entry);
                 dest = new File(folder, entry.getName());
-                if (dest.getParentFile().mkdirs())
+                if (dest.getParentFile().mkdirs()) {
                     dest.createNewFile();
+                }
                 out = new FileOutputStream(dest);
-                while ((count = is.read(data, 0, 4096)) != -1)
+                while ((count = is.read(data, 0, 4096)) != -1) {
                     out.write(data, 0, count);
+                }
                 out.flush();
                 out.close();
                 is.close();
@@ -178,16 +184,19 @@ public class ZipUtils {
         byte data[] = new byte[4096];
         try (JarInputStream zipfile = new JarInputStream(file)) {
             while((entry = zipfile.getNextJarEntry()) != null) {
-                if (!entry.getName().contains(path) || entry.isDirectory())
+                if (!entry.getName().contains(path) || entry.isDirectory()) {
                     // Ignore directories, only create files
                     continue;
+                }
                 Logger.dev("ZipUtils: Extracting: " + entry);
                 dest = new File(folder, entry.getName());
-                if (dest.getParentFile().mkdirs())
+                if (dest.getParentFile().mkdirs()) {
                     dest.createNewFile();
+                }
                 out = new FileOutputStream(dest);
-                while ((count = zipfile.read(data, 0, 4096)) != -1)
+                while ((count = zipfile.read(data, 0, 4096)) != -1) {
                     out.write(data, 0, count);
+                }
                 out.flush();
                 out.close();
             }
