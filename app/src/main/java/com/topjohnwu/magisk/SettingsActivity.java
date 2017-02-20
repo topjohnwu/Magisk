@@ -146,9 +146,8 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (getApplication().isDarkTheme != enabled) {
                         getApplication().isDarkTheme = enabled;
-                        getApplication().reloadMainActivity.trigger();
                         getActivity().finish();
-                        getActivity().recreate();
+                        getApplication().reloadMainActivity.trigger();
                     }
                     break;
                 case "disable":

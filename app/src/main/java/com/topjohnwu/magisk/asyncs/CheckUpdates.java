@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 
-import com.topjohnwu.magisk.MainActivity;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.utils.Utils;
@@ -56,7 +56,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                     .setVibrate(new long[]{0, 100, 100, 100})
                     .setAutoCancel(true);
             Intent intent = new Intent(magiskManager, SplashActivity.class);
-            intent.putExtra(MainActivity.SECTION, "install");
+            intent.putExtra(MagiskManager.INTENT_SECTION, "install");
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(magiskManager);
             stackBuilder.addParentStack(SplashActivity.class);
             stackBuilder.addNextIntent(intent);

@@ -31,7 +31,7 @@ public class SplashActivity extends Activity{
         magiskManager.init();
 
         // Initialize the update check service, notify every 3 hours
-        if (!"install".equals(getIntent().getStringExtra(MainActivity.SECTION))) {
+        if (!"install".equals(getIntent().getStringExtra(MagiskManager.INTENT_SECTION))) {
             ComponentName service = new ComponentName(magiskManager, UpdateCheckService.class);
             JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -60,8 +60,11 @@ public class SplashActivity extends Activity{
             @Override
             protected void onPostExecute(Void v) {
                 super.onPostExecute(v);
-                Intent intent = getIntent().setClass(magiskManager, MainActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);
+                Intent intent = new Intent(magiskManager, MainActivity.class);
+                if (section != null) {
+                    intent.putExtra(MagiskManager.INTENT_SECTION, section);
+                }
                 startActivity(intent);
                 finish();
             }

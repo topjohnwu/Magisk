@@ -29,8 +29,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener<Void> {
 
-    public static final String SECTION = "section";
-
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
     private int mDrawerItem;
@@ -79,7 +77,7 @@ public class MainActivity extends Activity
         toggle.syncState();
 
         if (savedInstanceState == null)
-            navigate(getIntent().getStringExtra(SECTION));
+            navigate(getIntent().getStringExtra(MagiskManager.INTENT_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
         getApplicationContext().reloadMainActivity.register(this);
@@ -95,13 +93,13 @@ public class MainActivity extends Activity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        navigate(savedInstanceState.getInt(SECTION, R.id.status));
+        navigate(savedInstanceState.getInt(MagiskManager.INTENT_SECTION, R.id.status));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(SECTION, mDrawerItem);
+        outState.putInt(MagiskManager.INTENT_SECTION, mDrawerItem);
     }
 
     @Override

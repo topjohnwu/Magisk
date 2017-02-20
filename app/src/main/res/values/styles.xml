@@ -15,8 +15,6 @@
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/dark_primary</item>
-        <item name="colorPrimaryDark">@color/dark_primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorAccentFallback">@color/accentFallback</item>
         <item name="windowActionModeOverlay">true</item>

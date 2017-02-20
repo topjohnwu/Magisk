@@ -25,6 +25,7 @@ public class MagiskManager extends Application {
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_PATH = "/magisk";
+    public static final String INTENT_SECTION = "section";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
