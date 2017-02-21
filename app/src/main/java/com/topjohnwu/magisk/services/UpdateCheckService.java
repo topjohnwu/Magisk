@@ -12,6 +12,7 @@ public class UpdateCheckService extends JobService {
             @Override
             protected Void doInBackground(Void... voids) {
                 magiskManager.updateMagiskInfo();
+                magiskManager.updateNotification = magiskManager.prefs.getBoolean("notification", true);
                 return super.doInBackground(voids);
             }
 

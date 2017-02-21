@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,13 +64,8 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     }
 
     @OnClick(R.id.magisk_status_container)
-    public void magisk() {
-        ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        try {
-            transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
-        } catch (IllegalStateException ignored) {}
+    public void gotoInstall() {
+        ((MainActivity) getActivity()).navigate(R.id.install);
     }
 
     private int defaultColor;
@@ -110,14 +104,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.goto_install, (dialogInterface, i) -> {
-                        ((MainActivity) getActivity()).navigationView.setCheckedItem(R.id.install);
-                        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                        try {
-                            transaction.replace(R.id.content_frame, new InstallFragment(), "install").commit();
-                        } catch (IllegalStateException ignored) {}
-                    })
+                    .setPositiveButton(R.string.goto_install, (d, i) -> gotoInstall())
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }

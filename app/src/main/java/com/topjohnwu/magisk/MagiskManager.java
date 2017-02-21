@@ -63,6 +63,7 @@ public class MagiskManager extends Application {
 
     public boolean magiskHide;
     public boolean isDarkTheme;
+    public boolean updateNotification;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -92,6 +93,7 @@ public class MagiskManager extends Application {
         devLogging = prefs.getBoolean("developer_logging", false);
         shellLogging = prefs.getBoolean("shell_logging", false);
         magiskHide = prefs.getBoolean("magiskhide", false);
+        updateNotification = prefs.getBoolean("notification", true);
         // Always start a new root shell manually, just for safety
         Shell.init();
         updateMagiskInfo();
@@ -101,6 +103,7 @@ public class MagiskManager extends Application {
         prefs.edit()
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
+                .putBoolean("notification", updateNotification)
                 .putBoolean("busybox", Utils.commandExists("busybox"))
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
                 .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))

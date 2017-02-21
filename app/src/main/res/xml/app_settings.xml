@@ -10,6 +10,11 @@
             android:summary="@string/settings_dark_theme_summary"
             android:key="dark_theme" />
 
+        <CheckBoxPreference
+            android:title="@string/settings_notification_title"
+            android:summary="@string/settings_notification_summary"
+            android:key="notification" />
+
         <Preference
             android:key="clear"
             android:title="@string/settings_clear_cache_title"

@@ -191,5 +191,7 @@
     <string name="version_none">(無)</string>
     <string name="manual_boot_image">請手動選取 boot 映像位置</string>
     <string name="cannot_auto_detect">(無法自動偵測)</string>
+    <string name="settings_notification_summary">有更新的時候顯示通知</string>
+    <string name="settings_notification_title">更新通知</string>
 
 </resources>
