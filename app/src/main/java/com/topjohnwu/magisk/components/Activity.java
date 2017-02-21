@@ -8,6 +8,6 @@ public class Activity extends AppCompatActivity {
 
     @Override
     public MagiskManager getApplicationContext() {
-        return (MagiskManager) getApplication();
+        return (MagiskManager) super.getApplicationContext();
     }
 }
