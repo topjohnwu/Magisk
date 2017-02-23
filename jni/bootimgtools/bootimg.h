@@ -28,6 +28,9 @@ typedef struct boot_img_hdr boot_img_hdr;
 #define BOOT_ARGS_SIZE 512
 #define BOOT_EXTRA_ARGS_SIZE 1024
 
+#define CHROMEOS_MAGIC "CHROMEOS"
+#define CHROMEOS_MAGIC_SIZE 8
+
 struct boot_img_hdr
 {
     uint8_t magic[BOOT_MAGIC_SIZE];
@@ -43,7 +46,14 @@ struct boot_img_hdr
 
     uint32_t tags_addr;    /* physical addr for kernel tags */
     uint32_t page_size;    /* flash page size we assume */
-    uint32_t unused[2];    /* future expansion: should be 0 */
+    uint32_t dt_size;      /* device tree in bytes */
+
+    /* operating system version and security patch level; for
+     * version "A.B.C" and patch level "Y-M-D":
+     * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
+     * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
+     * os_version = ver << 11 | lvl */
+    uint32_t os_version;
 
     uint8_t name[BOOT_NAME_SIZE]; /* asciiz product name */
 
@@ -83,8 +93,8 @@ struct boot_img_hdr
 **    else: jump to kernel_addr
 */
 
-int extract(char *image);
-int repack(char *image);
+int extract(const char *image);
+int repack(const char *image);
 int hexpatch(char *image, char *from, char *to);
 
 #endif

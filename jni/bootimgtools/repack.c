@@ -11,134 +11,147 @@
 
 #include "bootimg.h"
 
-off_t file_size(char *filename) {
-	struct stat st;
-	if(stat(filename, &st))
-		exit(1);
-	return st.st_size;
-}
+// Global pointer of current positions
+void *ibase, *ipos;
+int ofd, opos;
 
-int append_file(int ofd, char *filename, off_t pos) {
-	lseek(ofd, pos, SEEK_SET);
+static size_t dump(const char *filename) {
 	int fd = open(filename, O_RDONLY);
-	int size = lseek(fd, 0, SEEK_END);
+	if (fd < 0) {
+		fprintf(stderr, "Cannot open %s\n", filename);
+		exit(1);
+	}
+	size_t size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	sendfile(ofd, fd, NULL, size);
+	if (sendfile(ofd, fd, NULL, size) < 0) {
+		fprintf(stderr, "Cannot write %s\n", filename);
+		exit(1);
+	}
 	close(fd);
+	opos += size;
 	return size;
 }
 
-int append_ramdisk(int ofd, off_t pos) {
-	if(access("ramdisk-mtk", R_OK) == 0) {
-		char buf[512];
-		off_t size = file_size("ramdisk.gz");
-		memcpy(buf, "\x88\x16\x88\x58", 4);
-		uint32_t v = size;
-		memcpy(buf+4, &v, sizeof(v)); //Should convert to LE
-
-		//TODO: RECOVERY OR ROOTFS?
-		char str[32];
-		memset(str, 0, sizeof(str));
-		if(access("ramdisk-mtk-boot", R_OK)==0) {
-			strcpy(str, "ROOTFS");
-		} else if(access("ramdisk-mtk-recovery", R_OK)==0) {
-			strcpy(str, "RECOVERY");
-		} else {
-			exit(1);
-		}
-		memcpy(buf+8, str, sizeof(str));
-
-		memset(buf+8+sizeof(str), 0xff, 512-8-sizeof(str));
-
-		pwrite(ofd, buf, sizeof(buf), pos);
-
-		return append_file(ofd, "ramdisk.gz", pos + 512) + 512;
-	} else if(access("ramdisk.gz", R_OK) == 0) {
-		return append_file(ofd, "ramdisk.gz", pos);
-	} else {
-		return append_file(ofd, "ramdisk", pos);
-	}
-}
-
-void post_process(struct boot_img_hdr *hdr, int ofd, int pos) {
-	if(access("rkcrc", R_OK) == 0) {
-		fprintf(stderr, "Rockchip CRCs not supported yet\n");
+static void dump_buf(size_t size, const void *buf) {
+	if (write(ofd, buf, size) < 0) {
+		fprintf(stderr, "Cannot dump from input file\n");
 		exit(1);
 	}
-	//Round up the file size
-	ftruncate(ofd, pos);
+	opos += size;
 }
 
-int repack(char *image) {
-
-	//TODO: Merge with extract.c?
-	//{
-	int ifd = open(image, O_RDONLY);
-	off_t isize = lseek(ifd, 0, SEEK_END);
-	lseek(ifd, 0, SEEK_SET);
-	uint8_t *iorig = mmap(NULL, isize, PROT_READ, MAP_SHARED, ifd, 0);
-	uint8_t *ibase = iorig;
-	assert(ibase);
-
-	while(ibase<(iorig+isize)) {
-		if(memcmp(ibase, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0)
-			break;
-		ibase += 256;
+static void in_page_align(uint32_t pagesize) {
+	uint32_t itemsize = ipos - ibase, pagemask = pagesize - 1L;
+	if (itemsize & pagemask) {
+		ipos += pagesize - (itemsize & pagemask);
 	}
-	assert(ibase < (iorig+isize));
-	//}
-	//
-	struct boot_img_hdr *ihdr = (struct boot_img_hdr*) ibase;
-	assert(
-			ihdr->page_size == 2048 ||
-			ihdr->page_size == 4096 ||
-			ihdr->page_size == 16384
-			);
+}
 
-	unlink("new-boot.img");
-	int ofd = open("new-boot.img", O_RDWR|O_CREAT, 0644);
-	ftruncate(ofd, ihdr->page_size);
-	//Write back original header, we'll change it later
-	write(ofd, ihdr, sizeof(*ihdr));
+static void out_page_align(uint32_t pagesize) {
+	uint32_t pagemask = pagesize - 1L;
+	if (opos & pagemask) {
+		opos += pagesize - (opos & pagemask);
+	}
+	ftruncate(ofd, opos);
+	lseek(ofd, 0, SEEK_END);
+}
 
-	struct boot_img_hdr *hdr = mmap(NULL, sizeof(*ihdr), PROT_READ|PROT_WRITE, MAP_SHARED, ofd, 0);
-	//First set everything to zero, so we know where we are at.
-	hdr->kernel_size = 0;
-	hdr->ramdisk_size = 0;
-	hdr->second_size = 0;
-	hdr->unused[0] = 0;
-	memset(hdr->id, 0, sizeof(hdr->id)); //Setting id to 0 might be wrong?
+static int aosp() {
+	printf("AOSP Boot Image Detected\n");
 
-	int pos = hdr->page_size;
-	int size = 0;
+	char *name;
+	struct boot_img_hdr hdr, ihdr;
 
-	size = append_file(ofd, "kernel", pos);
-	pos += size + hdr->page_size - 1;
-	pos &= ~(hdr->page_size-1);
-	hdr->kernel_size = size;
+	// Read the original header
+	memcpy(&ihdr, ibase, sizeof(ihdr));
+	hdr = ihdr;
 
-	size = append_ramdisk(ofd, pos);
-	pos += size + hdr->page_size - 1;
-	pos &= ~(hdr->page_size-1);
-	hdr->ramdisk_size = size;
+	// Set all sizes to 0
+	hdr.kernel_size = 0;
+	hdr.ramdisk_size = 0;
+	hdr.second_size = 0;
+	hdr.dt_size = 0;
 
-	if(access("second", R_OK) == 0) {
-		size = append_file(ofd, "second", pos);
-		pos += size + hdr->page_size - 1;
-		pos &= ~(hdr->page_size-1);
-		hdr->second_size = size;
+	// Skip a page
+	ftruncate(ofd, hdr.page_size);
+	lseek(ofd, 0, SEEK_END);
+	opos += hdr.page_size;
+	ipos = ibase + hdr.page_size;
+
+	// Dump zImage
+	if (memcmp(ipos, "\x88\x16\x88\x58", 4) == 0) {
+		printf("Dumping MTK header back to zImage\n");
+		dump_buf(512, ipos);
+		hdr.kernel_size += 512;
+	}
+	hdr.kernel_size += dump("kernel");
+	ipos += ihdr.kernel_size;
+	in_page_align(hdr.page_size);
+	out_page_align(hdr.page_size);
+
+	// Dump ramdisk
+	if (memcmp(ipos, "\x88\x16\x88\x58", 4) == 0) {
+		printf("Dumping MTK header back to ramdisk\n");
+		dump_buf(512, ipos);
+		hdr.ramdisk_size += 512;
+	}
+	if (access("ramdisk.gz", R_OK) == 0) {
+		name = "ramdisk.gz";
+	} else if (access("ramdisk.lzo", R_OK) == 0) {
+		name = "ramdisk.lzo";
+	} else if (access("ramdisk.xz", R_OK) == 0) {
+		name = "ramdisk.xz";
+	} else if (access("ramdisk.lzma", R_OK) == 0) {
+		name = "ramdisk.lzma";
+	} else if (access("ramdisk.bz2", R_OK) == 0) {
+		name = "ramdisk.bz2";
+	} else if (access("ramdisk.lz4", R_OK) == 0) {
+		name = "ramdisk.lz4";
+	} else {
+		fprintf(stderr, "Ramdisk file doesn't exist!\n");
+		return 1;
+	}
+	hdr.ramdisk_size += dump(name);
+	out_page_align(hdr.page_size);
+
+	// Dump second
+	if (access("second", R_OK) == 0) {
+		hdr.second_size += dump("second");
+		out_page_align(hdr.page_size);
 	}
 
-	if(access("dt", R_OK) == 0) {
-		size = append_file(ofd, "dt", pos);
-		pos += size + hdr->page_size - 1;
-		pos &= ~(hdr->page_size-1);
-		hdr->unused[0] = size;
+	// Dump dtb
+	if (access("dtb", R_OK) == 0) {
+		hdr.dt_size += dump("dtb");
+		out_page_align(hdr.page_size);
 	}
 
-	post_process(hdr, ofd, pos);
-	munmap(hdr, sizeof(*ihdr));
-	close(ofd);
+	// Write header back
+	lseek(ofd, 0, SEEK_SET);
+	write(ofd, &hdr, sizeof(hdr));
 
 	return 0;
+}
+
+int repack(const char* image) {
+	// Load original boot
+	int ifd = open(image, O_RDONLY), ret = -1;
+	size_t isize = lseek(ifd, 0, SEEK_END);
+	lseek(ifd, 0, SEEK_SET);
+	void *orig = mmap(NULL, isize, PROT_READ, MAP_SHARED, ifd, 0);
+
+	// Create new boot image
+	unlink("new-boot.img");
+	ofd = open("new-boot.img", O_RDWR | O_CREAT, 0644);
+
+	// Check headers
+	for(ibase = orig; ibase < (orig + isize); ibase += 256) {
+		if (memcmp(ibase, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
+			ret = aosp();
+			break;
+		}
+	}
+	munmap(orig, isize);
+	close(ifd);
+	return ret;
 }
