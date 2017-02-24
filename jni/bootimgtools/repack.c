@@ -12,8 +12,8 @@
 #include "bootimg.h"
 
 // Global pointer of current positions
-void *ibase, *ipos;
-int ofd, opos;
+static void *ibase, *ipos;
+static int ofd, opos;
 
 static size_t dump(const char *filename) {
 	int fd = open(filename, O_RDONLY);
@@ -60,7 +60,7 @@ static int aosp() {
 	printf("AOSP Boot Image Detected\n");
 
 	char *name;
-	struct boot_img_hdr hdr, ihdr;
+	boot_img_hdr hdr, ihdr;
 
 	// Read the original header
 	memcpy(&ihdr, ibase, sizeof(ihdr));

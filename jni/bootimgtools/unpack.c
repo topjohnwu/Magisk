@@ -12,7 +12,7 @@
 #include "bootimg.h"
 
 // Global pointer of current positions
-unsigned char *base, *pos;
+static unsigned char *base, *pos;
 
 static void dump(size_t size, const char *filename) {
 	unlink(filename);
@@ -37,7 +37,7 @@ static int aosp() {
 	char name[PATH_MAX], *ext;
 
 	// Read the header
-	struct boot_img_hdr hdr;
+	boot_img_hdr hdr;
 	memcpy(&hdr, base, sizeof(hdr));
 
 	pos = base + hdr.page_size;
@@ -108,7 +108,7 @@ static int aosp() {
 	return 0;
 }
 
-int extract(const char* image) {
+int unpack(const char* image) {
 	int fd = open(image, O_RDONLY), ret = 0;
 	size_t size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);

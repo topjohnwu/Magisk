@@ -9,7 +9,7 @@
 
 #include "bootimg.h"
 
-int hex2int(char c) {
+static int hex2int(char c) {
 	int first = c / 16 - 3;
 	int second = c % 16;
 	int result = first * 10 + second;
@@ -17,13 +17,13 @@ int hex2int(char c) {
 	return result;
 }
 
-int hex2ascii(char c, char d) {
+static int hex2ascii(char c, char d) {
 	int high = hex2int(c) * 16;
 	int low = hex2int(d);
 	return high+low;
 }
 
-void hexstr2str(char *hex, char *str) {
+static void hexstr2str(char *hex, char *str) {
 	char buf = 0;
 	for(int i = 0, length = strlen(hex); i < length; ++i){
 		if(i % 2){

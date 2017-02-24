@@ -93,7 +93,7 @@ struct boot_img_hdr
 **    else: jump to kernel_addr
 */
 
-int extract(const char *image);
+int unpack(const char *image);
 int repack(const char *image);
 int hexpatch(char *image, char *from, char *to);
 
