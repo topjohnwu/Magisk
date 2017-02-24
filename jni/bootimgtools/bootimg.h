@@ -93,8 +93,20 @@ struct boot_img_hdr
 **    else: jump to kernel_addr
 */
 
+
+/* Self defined stuffs */
+
+// Global pointers to mmap
+unsigned char *base, *kernel, *ramdisk, *second, *dtb;
+// Parsed header
+boot_img_hdr hdr;
+
 int unpack(const char *image);
 int repack(const char *image);
 int hexpatch(char *image, char *from, char *to);
+void error(int rc, const char *msg, ...);
+void print_header();
+void parse_elf();
+void parse_aosp();
 
 #endif
