@@ -22,6 +22,8 @@
 ** +-----------------+
 ** | program header  | dtb info
 ** +-----------------+
+** | program header  | (possible) cmdline info
+** +-----------------+
 **          ~
 ** +-----------------+
 ** | section header  | cmdline info

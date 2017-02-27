@@ -28,9 +28,6 @@ typedef struct boot_img_hdr boot_img_hdr;
 #define BOOT_ARGS_SIZE 512
 #define BOOT_EXTRA_ARGS_SIZE 1024
 
-#define CHROMEOS_MAGIC "CHROMEOS"
-#define CHROMEOS_MAGIC_SIZE 8
-
 struct boot_img_hdr
 {
     uint8_t magic[BOOT_MAGIC_SIZE];
@@ -76,10 +73,13 @@ struct boot_img_hdr
 ** +-----------------+
 ** | second stage    | o pages
 ** +-----------------+
+** | device tree     | p pages
+** +-----------------+
 **
 ** n = (kernel_size + page_size - 1) / page_size
 ** m = (ramdisk_size + page_size - 1) / page_size
 ** o = (second_size + page_size - 1) / page_size
+** p = (dt_size + page_size - 1) / page_size
 **
 ** 0. all entities are page_size aligned in flash
 ** 1. kernel and ramdisk are required (size != 0)
@@ -92,21 +92,5 @@ struct boot_img_hdr
 ** 6. if second_size != 0: jump to second_addr
 **    else: jump to kernel_addr
 */
-
-
-/* Self defined stuffs */
-
-// Global pointers to mmap
-unsigned char *base, *kernel, *ramdisk, *second, *dtb;
-// Parsed header
-boot_img_hdr hdr;
-
-int unpack(const char *image);
-int repack(const char *image);
-int hexpatch(char *image, char *from, char *to);
-void error(int rc, const char *msg, ...);
-void print_header();
-void parse_elf();
-void parse_aosp();
 
 #endif

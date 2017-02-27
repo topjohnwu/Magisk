@@ -1,14 +1,4 @@
-#include <getopt.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-
-#include "bootimg.h"
+#include "magiskboot.h"
 
 static int hex2int(char c) {
 	int first = c / 16 - 3;
@@ -35,7 +25,7 @@ static void hexstr2str(char *hex, unsigned char *str) {
 	}
 }
 
-int hexpatch(char * image, char *from, char *to) {
+void hexpatch(char * image, char *from, char *to) {
 	int fd = open(image, O_RDWR), patternsize = strlen(from) / 2, patchsize = strlen(to) / 2;
 	size_t filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
@@ -57,5 +47,4 @@ int hexpatch(char * image, char *from, char *to) {
 	free(pattern);
 	free(patch);
 	close(fd);
-	return 0;
 }

@@ -6,8 +6,14 @@
 
 #include "bootimg.h"
 #include "elf.h"
+#include "magiskboot.h"
 
-void print_header() {
+unsigned char *base, *kernel, *ramdisk, *second, *dtb;
+boot_img_hdr hdr;
+int mtk_kernel = 0, mtk_ramdisk = 0;
+file_t boot_type, ramdisk_type, dtb_type;
+
+static void check_headers() {
 	printf("KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
 	printf("RAMDISK [%d] @ 0x%08x\n", hdr.ramdisk_size, hdr.ramdisk_addr);
 	printf("SECOND [%d] @ 0x%08x\n", hdr.second_size, hdr.second_addr);
@@ -30,6 +36,58 @@ void print_header() {
 	}
 	printf("NAME [%s]\n", hdr.name);
 	printf("CMDLINE [%s]\n", hdr.cmdline);
+
+	// Check compression
+	if (memcmp(ramdisk, "\x1f\x8b\x08\x00", 4) == 0) {
+		// gzip header
+		printf("COMPRESSION [gzip]\n");
+		ramdisk_type = GZIP;
+	} else if (memcmp(ramdisk, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
+		// lzop header
+		printf("COMPRESSION [lzop]\n");
+		ramdisk_type = LZOP;
+	} else if (memcmp(ramdisk, "\xfd""7zXZ\x00", 6) == 0) {
+		// xz header
+		printf("COMPRESSION [xz]\n");
+		ramdisk_type = XZ;
+	} else if (memcmp(ramdisk, "\x5d\x00\x00", 3) == 0 
+			&& (ramdisk[12] == (unsigned char) '\xff' || ramdisk[12] == (unsigned char) '\x00')) {
+		// lzma header
+		printf("COMPRESSION [lzma]\n");
+		ramdisk_type = LZMA;
+	} else if (memcmp(ramdisk, "BZh", 3) == 0) {
+		// bzip2 header
+		printf("COMPRESSION [bzip2]\n");
+		ramdisk_type = BZIP2;
+	} else if ( (  memcmp(ramdisk, "\x04\x22\x4d\x18", 4) == 0 
+				|| memcmp(ramdisk, "\x03\x21\x4c\x18", 4) == 0) 
+				|| memcmp(ramdisk, "\x02\x21\x4c\x18", 4) == 0) {
+		// lz4 header
+		printf("COMPRESSION [lz4]\n");
+		ramdisk_type = LZ4;
+
+	} else {
+		error(1, "Unknown ramdisk format!");
+	}
+
+	// Check MTK
+	if (memcmp(kernel, "\x88\x16\x88\x58", 4) == 0) {
+		printf("MTK header found in kernel\n");
+		mtk_kernel = 1;
+	}
+	if (memcmp(ramdisk, "\x88\x16\x88\x58", 4) == 0) {
+		printf("MTK header found in ramdisk\n");
+		mtk_kernel = 1;
+	}
+
+	// Check dtb
+	if (boot_type == ELF && hdr.dt_size) {
+		if (memcmp(dtb, "QCDT", 4) == 0) {
+			dtb_type = QCDT;
+		} else if (memcmp(dtb, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
+			dtb_type = ELF;
+		}
+	}
 }
 
 static void page_align(unsigned char **pos) {
@@ -120,7 +178,7 @@ static void elf_set(int i, size_t size, size_t offset, size_t addr) {
 	}
 }
 
-void parse_elf() {
+static void parse_elf() {
 
 	// Reset boot image header
 	memset(&hdr, 0, sizeof(hdr));
@@ -191,10 +249,10 @@ void parse_elf() {
 			error(1, "ELF format error!");
 	}
 
-	print_header();
+	check_headers();
 }
 
-void parse_aosp() {
+static void parse_aosp() {
 
 	printf("IMG [AOSP]\n");
 
@@ -228,5 +286,21 @@ void parse_aosp() {
 		page_align(&pos);
 	}
 
-	print_header();
+	check_headers();
+}
+
+void parse_img(unsigned char *orig, size_t size) {
+	for(base = orig; base < (orig + size); base += 256) {
+		if (memcmp(base, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
+			boot_type = CHROMEOS;
+		} else if (memcmp(base, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
+			if (boot_type != CHROMEOS) boot_type = AOSP;
+			parse_aosp();
+			break;
+		} else if (memcmp(base, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
+			boot_type = ELF;
+			parse_elf();
+			break;
+		}
+	}
 }

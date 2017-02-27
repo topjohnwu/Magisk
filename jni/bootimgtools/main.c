@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bootimg.h"
+#include "magiskboot.h"
 
 /********************
   Patch Boot Image

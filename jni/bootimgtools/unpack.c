@@ -1,20 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/sendfile.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <assert.h>
-#include <string.h>
-
-#include "bootimg.h"
-#include "elf.h"
+#include "magiskboot.h"
 
 static void dump(unsigned char *buf, size_t size, const char *filename) {
-	unlink(filename);
-	int ofd = open(filename, O_WRONLY | O_CREAT, 0644);
+	int ofd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (ofd < 0)
 		error(1, "Cannot open %s", filename);
 	if (write(ofd, buf, size) != size)
@@ -22,8 +9,8 @@ static void dump(unsigned char *buf, size_t size, const char *filename) {
 	close(ofd);
 }
 
-int unpack(const char* image) {
-	int fd = open(image, O_RDONLY), ret = 0;
+void unpack(const char* image) {
+	int fd = open(image, O_RDONLY);
 	if (fd < 0)
 		error(1, "Cannot open %s", image);
 
@@ -31,81 +18,75 @@ int unpack(const char* image) {
 	lseek(fd, 0, SEEK_SET);
 	unsigned char *orig = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
 
-	// Parse images
-	for(base = orig; base < (orig + size); base += 256) {
-		if (memcmp(base, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
-			dump(base, 0, "chromeos");
-		} else if (memcmp(base, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
-			parse_aosp();
-			break;
-		} else if (memcmp(base, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
-			parse_elf();
-			break;
-		}
+	// Parse image
+	parse_img(orig, size);
+
+	if (boot_type == CHROMEOS) {
+		// The caller should know it's chromeos, as it needs additional signing
+		dump(base, 0, "chromeos");
 	}
 
-	char name[PATH_MAX], *ext;
+	char name[PATH_MAX];
 
 	// Dump kernel
-	if (memcmp(kernel, "\x88\x16\x88\x58", 4) == 0) {
-		printf("MTK header found in kernel\n");
+	if (mtk_kernel) {
 		kernel += 512;
 		hdr.kernel_size -= 512;
 	}
-	dump(kernel, hdr.kernel_size, "kernel");
+	dump(kernel, hdr.kernel_size, KERNEL_FILE);
 
 	// Dump ramdisk
-	if (memcmp(ramdisk, "\x88\x16\x88\x58", 4) == 0) {
-		printf("MTK header found in ramdisk\n");
+	if (mtk_ramdisk) {
 		ramdisk += 512;
 		hdr.ramdisk_size -= 512;
 	}
-	// Compression detection
-	if (memcmp(ramdisk, "\x1f\x8b\x08\x00", 4) == 0) {
-		// gzip header
-		printf("COMPRESSION [gzip]\n");
-		ext = "gz";
-	} else if (memcmp(ramdisk, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
-		// lzop header
-		printf("COMPRESSION [lzop]\n");
-		ext = "lzo";
-	} else if (memcmp(ramdisk, "\xfd""7zXZ\x00", 6) == 0) {
-		// xz header
-		printf("COMPRESSION [xz]\n");
-		ext = "xz";
-	} else if (memcmp(ramdisk, "\x5d\x00\x00", 3) == 0 
-			&& (ramdisk[12] == (unsigned char) '\xff' || ramdisk[12] == (unsigned char) '\x00')) {
-		// lzma header
-		printf("COMPRESSION [lzma]\n");
-		ext = "lzma";
-	} else if (memcmp(ramdisk, "BZh", 3) == 0) {
-		// bzip2 header
-		printf("COMPRESSION [bzip2]\n");
-		ext = "bz2";
-	} else if ( (  memcmp(ramdisk, "\x04\x22\x4d\x18", 4) == 0 
-				|| memcmp(ramdisk, "\x03\x21\x4c\x18", 4) == 0) 
-				|| memcmp(ramdisk, "\x02\x21\x4c\x18", 4) == 0) {
-		// lz4 header
-		printf("COMPRESSION [lz4]\n");
-		ext = "lz4";
-	} else {
-		error(1, "Unknown ramdisk format!");
+
+	switch (ramdisk_type) {
+		case GZIP:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "gz");
+			gzip(1, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
+			break;
+		case LZOP:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
+			break;
+		case XZ:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
+			break;
+		case LZMA:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
+			break;
+		case BZIP2:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
+			break;
+		case LZ4:
+			sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");
+			break;
+		default:
+			// Never happens
+			break;
 	}
-	sprintf(name, "%s.%s", "ramdisk", ext);
+	// Dump the compressed ramdisk, just in case
 	dump(ramdisk, hdr.ramdisk_size, name);
 
 	if (hdr.second_size) {
 		// Dump second
-		dump(second, hdr.second_size, "second");
+		dump(second, hdr.second_size, SECOND_FILE);
 	}
 
 	if (hdr.dt_size) {
-		// Dump dtb
-		dump(dtb, hdr.dt_size, "dtb");
+		if (boot_type == ELF && (dtb_type != QCDT && dtb_type != ELF	)) {
+			printf("Non QC dtb found in ELF kernel, recreate kernel\n");
+			gzip(0, KERNEL_FILE, kernel, hdr.kernel_size);
+			int kfp = open(KERNEL_FILE, O_WRONLY | O_APPEND);
+			write(kfp, dtb, hdr.dt_size);
+			close(kfp);
+		} else {
+			// Dump dtb
+			dump(dtb, hdr.dt_size, DTB_FILE);
+		}
 	}
 
 	munmap(orig, size);
 	close(fd);
-	return ret;
 }
 
