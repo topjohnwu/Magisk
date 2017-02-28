@@ -10,7 +10,6 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <string.h>
-#include <zlib.h>
 
 #include "bootimg.h"
 
@@ -58,5 +57,6 @@ void parse_img(unsigned char *orig, size_t size);
 
 // Compressions
 void gzip(int dec, const char* filename, unsigned char* buf, size_t size);
+void lzma(int dec, const char* filename, unsigned char* buf, size_t size);
 
 #endif

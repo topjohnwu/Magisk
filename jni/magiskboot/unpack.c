@@ -51,6 +51,7 @@ void unpack(const char* image) {
 			break;
 		case XZ:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
+			lzma(1, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
 			break;
 		case LZMA:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
