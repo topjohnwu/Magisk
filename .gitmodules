@@ -7,3 +7,6 @@
 [submodule "jni/su"]
 	path = jni/su
 	url = https://github.com/topjohnwu/MagiskSU.git
+[submodule "jni/ndk-compression"]
+	path = jni/ndk-compression
+	url = https://github.com/topjohnwu/ndk-compression.git
