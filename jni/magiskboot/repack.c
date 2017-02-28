@@ -94,16 +94,18 @@ void repack(const char* image) {
 		switch (ramdisk_type) {
 			case GZIP:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "gz");
-				gzip(0, name, cpio, cpio_size);
+				gzip(1, name, cpio, cpio_size);
 				break;
 			case LZOP:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
 				break;
 			case XZ:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
+				lzma(1, name, cpio, cpio_size);
 				break;
 			case LZMA:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
+				lzma(2, name, cpio, cpio_size);
 				break;
 			case BZIP2:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");

@@ -56,7 +56,7 @@ void error(int rc, const char *msg, ...);
 void parse_img(unsigned char *orig, size_t size);
 
 // Compressions
-void gzip(int dec, const char* filename, unsigned char* buf, size_t size);
-void lzma(int dec, const char* filename, unsigned char* buf, size_t size);
+void gzip(int mode, const char* filename, unsigned char* buf, size_t size);
+void lzma(int mode, const char* filename, unsigned char* buf, size_t size);
 
 #endif

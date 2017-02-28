@@ -44,17 +44,18 @@ void unpack(const char* image) {
 	switch (ramdisk_type) {
 		case GZIP:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "gz");
-			gzip(1, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
+			gzip(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
 			break;
 		case LZOP:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
 			break;
 		case XZ:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
-			lzma(1, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
+			lzma(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
 			break;
 		case LZMA:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
+			lzma(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
 			break;
 		case BZIP2:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
@@ -77,7 +78,7 @@ void unpack(const char* image) {
 	if (hdr.dt_size) {
 		if (boot_type == ELF && (dtb_type != QCDT && dtb_type != ELF	)) {
 			printf("Non QC dtb found in ELF kernel, recreate kernel\n");
-			gzip(0, KERNEL_FILE, kernel, hdr.kernel_size);
+			gzip(1, KERNEL_FILE, kernel, hdr.kernel_size);
 			int kfp = open(KERNEL_FILE, O_WRONLY | O_APPEND);
 			write(kfp, dtb, hdr.dt_size);
 			close(kfp);

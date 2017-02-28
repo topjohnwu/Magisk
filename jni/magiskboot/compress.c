@@ -3,8 +3,9 @@
 
 #include "magiskboot.h"
 
-void gzip(int dec, const char* filename, unsigned char* buf, size_t size) {
-	int ret, flush, have, pos = 0;
+// Mode: 0 = decode gz; 1 = encode gz
+void gzip(int mode, const char* filename, unsigned char* buf, size_t size) {
+	size_t ret, flush, have, pos = 0;
 	z_stream strm;
 	unsigned char out[CHUNK];
 
@@ -17,10 +18,15 @@ void gzip(int dec, const char* filename, unsigned char* buf, size_t size) {
 	strm.zfree = Z_NULL;
 	strm.opaque = Z_NULL;
 
-	if (dec) {
-		ret = inflateInit2(&strm, windowBits | ZLIB_GZIP);
-	} else {
-		ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
+	switch(mode) {
+		case 0:
+			ret = inflateInit2(&strm, windowBits | ZLIB_GZIP);
+			break;
+		case 1:
+			ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
+			break;
+		default:
+			error(1, "Unsupported gzip mode!");
 	}
 
 	if (ret != Z_OK)
@@ -41,28 +47,40 @@ void gzip(int dec, const char* filename, unsigned char* buf, size_t size) {
 		do {
 			strm.avail_out = CHUNK;
 			strm.next_out = out;
-			if (dec) {
-				inflate(&strm, flush);
-			} else {
-				deflate(&strm, flush);
+			switch(mode) {
+				case 0:
+					ret = inflate(&strm, flush);
+					break;
+				case 1:
+					ret = deflate(&strm, flush);
+					break;
 			}
+			if (ret == Z_STREAM_ERROR)
+				error(1, "Error when running gzip");
+
 			have = CHUNK - strm.avail_out;
 			if (write(fd, out, have) != have)
-				error(1, "Error in writing %s", filename);
+				error(1, "Error when writing %s", filename);
+
 		} while (strm.avail_out == 0);
 
 	} while(pos < size);
 
-	if (dec) {
-		inflateEnd(&strm);
-	} else {
-		deflateEnd(&strm);
+	switch(mode) {
+		case 0:
+			inflateEnd(&strm);
+			break;
+		case 1:
+			deflateEnd(&strm);
+			break;
 	}
 	close(fd);
 }
 
-void lzma(int dec, const char* filename, unsigned char* buf, size_t size) {
-	int have, pos = 0;
+
+// Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
+void lzma(int mode, const char* filename, unsigned char* buf, size_t size) {
+	size_t have, pos = 0;
 	lzma_ret ret;
 	lzma_stream strm = LZMA_STREAM_INIT;
 	lzma_options_lzma opt;
@@ -74,16 +92,27 @@ void lzma(int dec, const char* filename, unsigned char* buf, size_t size) {
 	if (fd < 0)
 		error(1, "Unable to create %s", filename);
 
-	if (dec) {
-		ret = lzma_auto_decoder(&strm, UINT64_MAX, 0);
-	} else {
-		lzma_lzma_preset(&opt, LZMA_PRESET_DEFAULT);
-		lzma_filter filters[] = {
-			{ .id = LZMA_FILTER_LZMA2, .options = &opt },
-			{ .id = LZMA_VLI_UNKNOWN, .options = NULL },
-		};
-		ret = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC64);
+	// Initialize preset
+	lzma_lzma_preset(&opt, LZMA_PRESET_DEFAULT);
+	lzma_filter filters[] = {
+		{ .id = LZMA_FILTER_LZMA2, .options = &opt },
+		{ .id = LZMA_VLI_UNKNOWN, .options = NULL },
+	};
+
+	switch(mode) {
+		case 0:
+			ret = lzma_auto_decoder(&strm, UINT64_MAX, 0);
+			break;
+		case 1:
+			ret = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC64);
+			break;
+		case 2:
+			ret = lzma_alone_encoder(&strm, &opt);
+			break;
+		default:
+			error(1, "Unsupported lzma mode!");
 	}
+
 
 	if (ret != LZMA_OK)
 		error(1, "Unable to init lzma");
