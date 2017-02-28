@@ -183,7 +183,8 @@ static void parse_elf() {
 	// Reset boot image header
 	memset(&hdr, 0, sizeof(hdr));
 
-	// Hardcode pagesize
+	// Hardcode header magic and pagesize
+	memcpy(hdr.magic, BOOT_MAGIC, BOOT_MAGIC_SIZE);
 	hdr.page_size = 4096;
 
 	switch(base[EI_CLASS]) {
@@ -296,11 +297,12 @@ void parse_img(unsigned char *orig, size_t size) {
 		} else if (memcmp(base, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
 			if (boot_type != CHROMEOS) boot_type = AOSP;
 			parse_aosp();
-			break;
+			return;
 		} else if (memcmp(base, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
 			boot_type = ELF;
 			parse_elf();
-			break;
+			return;
 		}
 	}
+	error(1, "No boot image magic found!");
 }
