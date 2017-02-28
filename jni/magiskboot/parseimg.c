@@ -77,7 +77,7 @@ static void check_headers() {
 	}
 	if (memcmp(ramdisk, "\x88\x16\x88\x58", 4) == 0) {
 		printf("MTK header found in ramdisk\n");
-		mtk_kernel = 1;
+		mtk_ramdisk = 1;
 	}
 
 	// Check dtb
