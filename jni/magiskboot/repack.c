@@ -110,7 +110,7 @@ void repack(const char* image) {
 				break;
 			case BZIP2:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
-				error(1, "Unsupported format! Please compress manually!");
+				bzip2(1, name, cpio, cpio_size);
 				break;
 			case LZ4:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");

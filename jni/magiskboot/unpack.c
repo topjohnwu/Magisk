@@ -49,6 +49,8 @@ void unpack(const char* image) {
 		case LZOP:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
 			printf("Unsupported format! Please decompress manually!\n");
+			// Dump the compressed ramdisk
+			dump(ramdisk, hdr.ramdisk_size, name);
 			break;
 		case XZ:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
@@ -60,7 +62,7 @@ void unpack(const char* image) {
 			break;
 		case BZIP2:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
-			printf("Unsupported format! Please decompress manually!\n");
+			bzip2(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
 			break;
 		case LZ4:
 			sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");
@@ -70,8 +72,6 @@ void unpack(const char* image) {
 			// Never happens
 			break;
 	}
-	// Dump the compressed ramdisk, just in case
-	dump(ramdisk, hdr.ramdisk_size, name);
 
 	if (hdr.second_size) {
 		// Dump second

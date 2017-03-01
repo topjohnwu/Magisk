@@ -60,5 +60,6 @@ void parse_img(unsigned char *orig, size_t size);
 void gzip(int mode, const char* filename, unsigned char* buf, size_t size);
 void lzma(int mode, const char* filename, unsigned char* buf, size_t size);
 void lz4(int mode, const char* filename, unsigned char* buf, size_t size);
+void bzip2(int mode, const char* filename, unsigned char* buf, size_t size);
 
 #endif

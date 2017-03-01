@@ -1,6 +1,7 @@
 #include <zlib.h>
 #include <lzma.h>
 #include <lz4frame.h>
+#include <bzlib.h>
 
 #include "magiskboot.h"
 
@@ -11,7 +12,7 @@ static int open_new(const char *filename) {
 	return fd;
 }
 
-static void write_file(const int fd, const unsigned char *buf, const size_t size, const char *filename) {
+static void write_file(const int fd, const void *buf, const size_t size, const char *filename) {
 	if (write(fd, buf, size) != size)
 		error(1, "Error in writing %s", filename);
 }
@@ -271,4 +272,72 @@ void lz4(int mode, const char* filename, unsigned char* buf, size_t size) {
 	}
 
 	free(out);
+}
+
+// Mode: 0 = decode; 1 = encode
+void bzip2(int mode, const char* filename, unsigned char* buf, size_t size) {
+	size_t ret = 0, action, have, pos = 0;
+	bz_stream strm;
+	char out[CHUNK];
+
+	report(mode, filename);
+	int fd = open_new(filename);
+
+	strm.bzalloc = NULL;
+	strm.bzfree = NULL;
+	strm.opaque = NULL;
+
+	switch(mode) {
+		case 0:
+			ret = BZ2_bzDecompressInit(&strm, 0, 0);
+			break;
+		case 1:
+			ret = BZ2_bzCompressInit(&strm, 9, 0, 0);
+			break;
+		default:
+			error(1, "Unsupported bzip2 mode!");
+	}
+
+	if (ret != BZ_OK)
+		error(1, "Unable to init bzlib stream");
+
+	do {
+		strm.next_in = (char *) buf + pos;
+		if (pos + CHUNK >= size) {
+			strm.avail_in = size - pos;
+			action = BZ_FINISH;
+		} else {
+			strm.avail_in = CHUNK;
+			action = BZ_RUN;
+		}
+		pos += strm.avail_in;
+
+		do {
+			strm.avail_out = CHUNK;
+			strm.next_out = out;
+			switch(mode) {
+				case 0:
+					ret = BZ2_bzDecompress(&strm);
+					break;
+				case 1:
+					ret = BZ2_bzCompress(&strm, action);
+					break;
+			}
+
+			have = CHUNK - strm.avail_out;
+			write_file(fd, out, have, filename);
+
+		} while (strm.avail_out == 0);
+
+	} while(pos < size);
+
+	switch(mode) {
+		case 0:
+			BZ2_bzDecompressEnd(&strm);
+			break;
+		case 1:
+			BZ2_bzCompressEnd(&strm);
+			break;
+	}
+	close(fd);
 }
