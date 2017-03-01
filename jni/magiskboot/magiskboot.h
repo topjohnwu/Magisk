@@ -1,5 +1,5 @@
-#ifndef _ARCHIVE_H_
-#define _ARCHIVE_H_
+#ifndef _MAGISKBOOT_H_
+#define _MAGISKBOOT_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +17,9 @@
 #define ZLIB_GZIP 16
 #define memLevel 8
 #define CHUNK 0x40000
+
+#define LZ4_HEADER_SIZE 19
+#define LZ4_FOOTER_SIZE 4
 
 #define CHROMEOS_MAGIC      "CHROMEOS"
 #define CHROMEOS_MAGIC_SIZE 8
@@ -51,12 +54,11 @@ void unpack(const char *image);
 void repack(const char *image);
 void hexpatch(char *image, char *from, char *to);
 void error(int rc, const char *msg, ...);
-
-// Parse image
 void parse_img(unsigned char *orig, size_t size);
 
 // Compressions
 void gzip(int mode, const char* filename, unsigned char* buf, size_t size);
 void lzma(int mode, const char* filename, unsigned char* buf, size_t size);
+void lz4(int mode, const char* filename, unsigned char* buf, size_t size);
 
 #endif

@@ -98,6 +98,7 @@ void repack(const char* image) {
 				break;
 			case LZOP:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
+				error(1, "Unsupported format! Please compress manually!");
 				break;
 			case XZ:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
@@ -109,16 +110,17 @@ void repack(const char* image) {
 				break;
 			case BZIP2:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
+				error(1, "Unsupported format! Please compress manually!");
 				break;
 			case LZ4:
 				sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");
+				lz4(1, name, cpio, cpio_size);
 				break;
 			default:
 				// Never happens
 				break;
 		}
 
-		printf("Re-compressed %s to %s\n", RAMDISK_FILE, name);
 		munmap(cpio, cpio_size);
 		close(rfd);
 	} else {
