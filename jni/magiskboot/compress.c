@@ -341,3 +341,57 @@ void bzip2(int mode, const char* filename, unsigned char* buf, size_t size) {
 	}
 	close(fd);
 }
+
+int decomp(file_t type, const char *to, unsigned char *from, size_t size) {
+	switch (type) {
+		case GZIP:
+			gzip(0, to, from, size);
+			break;
+		case XZ:
+			lzma(0, to, from, size);
+			break;
+		case LZMA:
+			lzma(0, to, from, size);
+			break;
+		case BZIP2:
+			bzip2(0, to, from, size);
+			break;
+		case LZ4:
+			lz4(0, to, from, size);
+			break;
+		default:
+			// Unsupported
+			return 1;
+	}
+	return 0;
+}
+
+int comp(file_t type, const char *to, unsigned char *from, size_t size) {
+	char name[PATH_MAX];
+	switch (type) {
+		case GZIP:
+			sprintf(name, "%s.%s", to, "gz");
+			gzip(1, name, from, size);
+			break;
+		case XZ:
+			sprintf(name, "%s.%s", to, "xz");
+			lzma(1, name, from, size);
+			break;
+		case LZMA:
+			sprintf(name, "%s.%s", to, "lzma");
+			lzma(2, name, from, size);
+			break;
+		case BZIP2:
+			sprintf(name, "%s.%s", to, "bz2");
+			bzip2(1, name, from, size);
+			break;
+		case LZ4:
+			sprintf(name, "%s.%s", to, "lz4");
+			lz4(1, name, from, size);
+			break;
+		default:
+			// Unsupported
+			return 1;
+	}
+	return 0;
+}

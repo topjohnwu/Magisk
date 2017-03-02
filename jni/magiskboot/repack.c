@@ -82,7 +82,7 @@ void repack(const char* image) {
 	}
 
 	if (access(RAMDISK_FILE, R_OK) == 0) {
-		// If we found raw cpio, recompress to original format
+		// If we found raw cpio, compress to original format
 		int rfd = open(RAMDISK_FILE, O_RDONLY);
 		if (rfd < 0)
 			error(1, "Cannot open " RAMDISK_FILE);
@@ -91,52 +91,23 @@ void repack(const char* image) {
 		lseek(rfd, 0, SEEK_SET);
 		unsigned char *cpio = mmap(NULL, cpio_size, PROT_READ, MAP_SHARED, rfd, 0);
 
-		switch (ramdisk_type) {
-			case GZIP:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "gz");
-				gzip(1, name, cpio, cpio_size);
-				break;
-			case LZOP:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
-				error(1, "Unsupported format! Please compress manually!");
-				break;
-			case XZ:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
-				lzma(1, name, cpio, cpio_size);
-				break;
-			case LZMA:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
-				lzma(2, name, cpio, cpio_size);
-				break;
-			case BZIP2:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
-				bzip2(1, name, cpio, cpio_size);
-				break;
-			case LZ4:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");
-				lz4(1, name, cpio, cpio_size);
-				break;
-			default:
-				// Never happens
-				break;
-		}
+		if (comp(ramdisk_type, RAMDISK_FILE, cpio, cpio_size))
+			error(1, "Unsupported format! Please compress manually!\n");
 
 		munmap(cpio, cpio_size);
 		close(rfd);
-	} else {
-		// If no raw cpio found, find compressed ones
-		int found = 0;
-		for (int i = 0; i < EXT_NUM; ++i) {
-			sprintf(name, "%s.%s", RAMDISK_FILE, ext_list[i]);
-			if (access(name, R_OK) == 0) {
-				found = 1;
-				break;
-			}
-		}
-		if (!found) {
-			error(1, "No ramdisk exists!");
+	}
+
+	int found = 0;
+	for (int i = 0; i < EXT_NUM; ++i) {
+		sprintf(name, "%s.%s", RAMDISK_FILE, ext_list[i]);
+		if (access(name, R_OK) == 0) {
+			found = 1;
+			break;
 		}
 	}
+	if (!found)
+		error(1, "No ramdisk exists!");
 
 	hdr.ramdisk_size += restore(name);
 	page_align();

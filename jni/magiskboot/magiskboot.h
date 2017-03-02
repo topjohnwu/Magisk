@@ -30,7 +30,7 @@
 #define DTB_FILE            "dtb"
 
 typedef enum {
-    DONTCARE,
+    UNKNOWN,
     CHROMEOS,
     AOSP,
     ELF,
@@ -40,6 +40,7 @@ typedef enum {
     LZMA,
     BZIP2,
     LZ4,
+    MTK,
     QCDT,
 } file_t;
 
@@ -55,11 +56,14 @@ void repack(const char *image);
 void hexpatch(char *image, char *from, char *to);
 void error(int rc, const char *msg, ...);
 void parse_img(unsigned char *orig, size_t size);
+file_t check_type(unsigned char *buf);
 
 // Compressions
 void gzip(int mode, const char* filename, unsigned char* buf, size_t size);
 void lzma(int mode, const char* filename, unsigned char* buf, size_t size);
 void lz4(int mode, const char* filename, unsigned char* buf, size_t size);
 void bzip2(int mode, const char* filename, unsigned char* buf, size_t size);
+int comp(file_t type, const char *to, unsigned char *from, size_t size);
+int decomp(file_t type, const char *to, unsigned char *from, size_t size);
 
 #endif

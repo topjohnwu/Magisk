@@ -13,6 +13,37 @@ boot_img_hdr hdr;
 int mtk_kernel = 0, mtk_ramdisk = 0;
 file_t boot_type, ramdisk_type, dtb_type;
 
+file_t check_type(unsigned char *buf) {
+	if (memcmp(buf, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
+		return CHROMEOS;
+	} else if (memcmp(buf, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
+		return AOSP;
+	} else if (memcmp(buf, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
+		return ELF;
+	} else if (memcmp(buf, "\x1f\x8b\x08\x00", 4) == 0) {
+		return GZIP;
+	} else if (memcmp(buf, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
+		return LZOP;
+	} else if (memcmp(buf, "\xfd""7zXZ\x00", 6) == 0) {
+		return XZ;
+	} else if (memcmp(buf, "\x5d\x00\x00", 3) == 0 
+			&& (buf[12] == (unsigned char) '\xff' || buf[12] == (unsigned char) '\x00')) {
+		return LZMA;
+	} else if (memcmp(buf, "BZh", 3) == 0) {
+		return BZIP2;
+	} else if ( (  memcmp(buf, "\x04\x22\x4d\x18", 4) == 0 
+				|| memcmp(buf, "\x03\x21\x4c\x18", 4) == 0) 
+				|| memcmp(buf, "\x02\x21\x4c\x18", 4) == 0) {
+		return LZ4;
+	} else if (memcmp(buf, "\x88\x16\x88\x58", 4) == 0) {
+		return MTK;
+	} else if (memcmp(buf, "QCDT", 4) == 0) {
+		return QCDT;
+	} else {
+		return UNKNOWN;
+	}
+}
+
 static void check_headers() {
 	printf("KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
 	printf("RAMDISK [%d] @ 0x%08x\n", hdr.ramdisk_size, hdr.ramdisk_addr);
@@ -37,56 +68,44 @@ static void check_headers() {
 	printf("NAME [%s]\n", hdr.name);
 	printf("CMDLINE [%s]\n", hdr.cmdline);
 
-	// Check compression
-	if (memcmp(ramdisk, "\x1f\x8b\x08\x00", 4) == 0) {
-		// gzip header
-		printf("COMPRESSION [gzip]\n");
-		ramdisk_type = GZIP;
-	} else if (memcmp(ramdisk, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
-		// lzop header
-		printf("COMPRESSION [lzop]\n");
-		ramdisk_type = LZOP;
-	} else if (memcmp(ramdisk, "\xfd""7zXZ\x00", 6) == 0) {
-		// xz header
-		printf("COMPRESSION [xz]\n");
-		ramdisk_type = XZ;
-	} else if (memcmp(ramdisk, "\x5d\x00\x00", 3) == 0 
-			&& (ramdisk[12] == (unsigned char) '\xff' || ramdisk[12] == (unsigned char) '\x00')) {
-		// lzma header
-		printf("COMPRESSION [lzma]\n");
-		ramdisk_type = LZMA;
-	} else if (memcmp(ramdisk, "BZh", 3) == 0) {
-		// bzip2 header
-		printf("COMPRESSION [bzip2]\n");
-		ramdisk_type = BZIP2;
-	} else if ( (  memcmp(ramdisk, "\x04\x22\x4d\x18", 4) == 0 
-				|| memcmp(ramdisk, "\x03\x21\x4c\x18", 4) == 0) 
-				|| memcmp(ramdisk, "\x02\x21\x4c\x18", 4) == 0) {
-		// lz4 header
-		printf("COMPRESSION [lz4]\n");
-		ramdisk_type = LZ4;
+	ramdisk_type = check_type(ramdisk);
 
-	} else {
-		error(1, "Unknown ramdisk format!");
+	switch (ramdisk_type) {
+		case GZIP:
+			printf("COMPRESSION [%s]\n", "gzip");
+			break;
+		case LZOP:
+			printf("COMPRESSION [%s]\n", "lzop");
+			break;
+		case XZ:
+			printf("COMPRESSION [%s]\n", "xz");
+			break;
+		case LZMA:
+			printf("COMPRESSION [%s]\n", "lzma");
+			break;
+		case BZIP2:
+			printf("COMPRESSION [%s]\n", "bzip2");
+			break;
+		case LZ4:
+			printf("COMPRESSION [%s]\n", "lz4");
+			break;
+		default:
+			error(1, "Unknown ramdisk format!");
 	}
 
 	// Check MTK
-	if (memcmp(kernel, "\x88\x16\x88\x58", 4) == 0) {
+	if (check_type(kernel) == MTK) {
 		printf("MTK header found in kernel\n");
 		mtk_kernel = 1;
 	}
-	if (memcmp(ramdisk, "\x88\x16\x88\x58", 4) == 0) {
+	if (check_type(ramdisk) == MTK) {
 		printf("MTK header found in ramdisk\n");
 		mtk_ramdisk = 1;
 	}
 
-	// Check dtb
+	// Check dtb if ELF boot
 	if (boot_type == ELF && hdr.dt_size) {
-		if (memcmp(dtb, "QCDT", 4) == 0) {
-			dtb_type = QCDT;
-		} else if (memcmp(dtb, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
-			dtb_type = ELF;
-		}
+		dtb_type = check_type(dtb);
 	}
 }
 
@@ -292,16 +311,22 @@ static void parse_aosp() {
 
 void parse_img(unsigned char *orig, size_t size) {
 	for(base = orig; base < (orig + size); base += 256) {
-		if (memcmp(base, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
-			boot_type = CHROMEOS;
-		} else if (memcmp(base, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
-			if (boot_type != CHROMEOS) boot_type = AOSP;
-			parse_aosp();
-			return;
-		} else if (memcmp(base, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
-			boot_type = ELF;
-			parse_elf();
-			return;
+		switch (check_type(base)) {
+			case CHROMEOS:
+				boot_type = CHROMEOS;
+				continue;
+			case AOSP:
+				// Don't override CHROMEOS
+				if (boot_type != CHROMEOS)
+					boot_type = AOSP;
+				parse_aosp();
+				return;
+			case ELF:
+				boot_type = ELF;
+				parse_elf();
+				return;
+			default:
+				continue;
 		}
 	}
 	error(1, "No boot image magic found!");

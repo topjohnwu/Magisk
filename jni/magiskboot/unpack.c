@@ -41,36 +41,18 @@ void unpack(const char* image) {
 		hdr.ramdisk_size -= 512;
 	}
 
-	switch (ramdisk_type) {
-		case GZIP:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "gz");
-			gzip(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
-			break;
-		case LZOP:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
-			printf("Unsupported format! Please decompress manually!\n");
-			// Dump the compressed ramdisk
-			dump(ramdisk, hdr.ramdisk_size, name);
-			break;
-		case XZ:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "xz");
-			lzma(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
-			break;
-		case LZMA:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "lzma");
-			lzma(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
-			break;
-		case BZIP2:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "bz2");
-			bzip2(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
-			break;
-		case LZ4:
-			sprintf(name, "%s.%s", RAMDISK_FILE, "lz4");
-			lz4(0, RAMDISK_FILE, ramdisk, hdr.ramdisk_size);
-			break;
-		default:
-			// Never happens
-			break;
+	if (decomp(ramdisk_type, RAMDISK_FILE, ramdisk, hdr.ramdisk_size)) {
+		printf("Unsupported format! Please decompress manually!\n");
+		switch (ramdisk_type) {
+			case LZOP:
+				sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
+				break;
+			default:
+				// Never happens
+				break;
+		}
+		// Dump the compressed ramdisk
+		dump(ramdisk, hdr.ramdisk_size, name);
 	}
 
 	if (hdr.second_size) {
@@ -79,7 +61,7 @@ void unpack(const char* image) {
 	}
 
 	if (hdr.dt_size) {
-		if (boot_type == ELF && (dtb_type != QCDT && dtb_type != ELF	)) {
+		if (boot_type == ELF && (dtb_type != QCDT && dtb_type != ELF)) {
 			printf("Non QC dtb found in ELF kernel, recreate kernel\n");
 			gzip(1, KERNEL_FILE, kernel, hdr.kernel_size);
 			int kfp = open(KERNEL_FILE, O_WRONLY | O_APPEND);
