@@ -57,10 +57,10 @@ EXIT /B %ERRORLEVEL%
   COPY /Y libs\arm64-v8a\* zip_static\arm64
   COPY /Y libs\x86\* zip_static\x86
   COPY /Y libs\x86_64\* zip_static\x64
-  CALL :mkcp libs\armeabi-v7a\bootimgtools uninstaller\arm
-  CALL :mkcp libs\arm64-v8a\bootimgtools uninstaller\arm64
-  CALL :mkcp libs\x86\bootimgtools uninstaller\x86
-  CALL :mkcp libs\x86_64\bootimgtools uninstaller\x64
+  CALL :mkcp libs\armeabi-v7a\magiskboot uninstaller\arm
+  CALL :mkcp libs\arm64-v8a\magiskboot uninstaller\arm64
+  CALL :mkcp libs\x86\magiskboot uninstaller\x86
+  CALL :mkcp libs\x86_64\magiskboot uninstaller\x64
   EXIT /B %ERRORLEVEL%
 
 :clean
@@ -94,7 +94,7 @@ EXIT /B %ERRORLEVEL%
     CALL :usage
     EXIT /B %ERRORLEVEL%
   )
-  IF NOT EXIST "zip_static\arm\bootimgtools" CALL :error "Missing binaries! Please run '%me% build' before zipping!"
+  IF NOT EXIST "zip_static\arm\magiskboot" CALL :error "Missing binaries! Please run '%me% build' before zipping!"
   IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Adding version info
@@ -124,7 +124,7 @@ EXIT /B %ERRORLEVEL%
 
 :uninstaller
   SET OK=y
-  IF NOT EXIST "uninstaller\arm\bootimgtools" CALL :error "Missing binaries! Please run '%me% build' before zipping!"
+  IF NOT EXIST "uninstaller\arm\magiskboot" CALL :error "Missing binaries! Please run '%me% build' before zipping!"
   IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying Files
