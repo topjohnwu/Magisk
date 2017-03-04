@@ -1,29 +1,23 @@
 #include "magiskboot.h"
 
 static void dump(unsigned char *buf, size_t size, const char *filename) {
-	int ofd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (ofd < 0)
-		error(1, "Cannot open %s", filename);
-	if (write(ofd, buf, size) != size)
+	int fd = open_new(filename);
+	if (write(fd, buf, size) != size)
 		error(1, "Cannot dump %s", filename);
-	close(ofd);
+	close(fd);
 }
 
 void unpack(const char* image) {
-	int fd = open(image, O_RDONLY);
-	if (fd < 0)
-		error(1, "Cannot open %s", image);
-
-	size_t size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	unsigned char *orig = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+	size_t size;
+	unsigned char *orig;
+	mmap_ro(image, &orig, &size);
 
 	// Parse image
 	parse_img(orig, size);
 
 	if (boot_type == CHROMEOS) {
 		// The caller should know it's chromeos, as it needs additional signing
-		dump(base, 0, "chromeos");
+		dump(orig, 0, "chromeos");
 	}
 
 	char name[PATH_MAX];
@@ -74,6 +68,5 @@ void unpack(const char* image) {
 	}
 
 	munmap(orig, size);
-	close(fd);
 }
 

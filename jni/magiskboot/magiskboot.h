@@ -45,7 +45,7 @@ typedef enum {
 } file_t;
 
 // Global variables
-extern unsigned char *base, *kernel, *ramdisk, *second, *dtb;
+extern unsigned char *kernel, *ramdisk, *second, *dtb;
 extern boot_img_hdr hdr;
 extern file_t boot_type, ramdisk_type, dtb_type;
 extern int mtk_kernel, mtk_ramdisk;
@@ -53,17 +53,25 @@ extern int mtk_kernel, mtk_ramdisk;
 // Main entries
 void unpack(const char *image);
 void repack(const char *image);
-void hexpatch(char *image, char *from, char *to);
+void hexpatch(const char *image, const char *from, const char *to);
+void cpio(const char *filename);
 void error(int rc, const char *msg, ...);
 void parse_img(unsigned char *orig, size_t size);
-file_t check_type(unsigned char *buf);
 
 // Compressions
-void gzip(int mode, const char* filename, unsigned char* buf, size_t size);
-void lzma(int mode, const char* filename, unsigned char* buf, size_t size);
-void lz4(int mode, const char* filename, unsigned char* buf, size_t size);
-void bzip2(int mode, const char* filename, unsigned char* buf, size_t size);
-int comp(file_t type, const char *to, unsigned char *from, size_t size);
-int decomp(file_t type, const char *to, unsigned char *from, size_t size);
+void gzip(int mode, const char* filename, const unsigned char* buf, size_t size);
+void lzma(int mode, const char* filename, const unsigned char* buf, size_t size);
+void lz4(int mode, const char* filename, const unsigned char* buf, size_t size);
+void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size);
+int comp(file_t type, const char *to, const unsigned char *from, size_t size);
+int decomp(file_t type, const char *to, const unsigned char *from, size_t size);
+
+// Utils
+void mmap_ro(const char *filename, unsigned char **buf, size_t *size);
+void mmap_rw(const char *filename, unsigned char **buf, size_t *size);
+file_t check_type(const unsigned char *buf);
+void mem_align(size_t *pos, size_t align);
+void file_align(int fd, size_t align);
+int open_new(const char *filename);
 
 #endif

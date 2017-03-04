@@ -14,7 +14,7 @@ static unsigned hex2ascii(char c, char d) {
 	return high + low;
 }
 
-static void hexstr2str(char *hex, unsigned char *str) {
+static void hexstr2str(const char *hex, unsigned char *str) {
 	char buf = 0;
 	for(int i = 0, length = strlen(hex); i < length; ++i){
 		if(i % 2){
@@ -25,12 +25,11 @@ static void hexstr2str(char *hex, unsigned char *str) {
 	}
 }
 
-void hexpatch(char * image, char *from, char *to) {
-	int fd = open(image, O_RDWR), patternsize = strlen(from) / 2, patchsize = strlen(to) / 2;
-	size_t filesize = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
+void hexpatch(const char *image, const char *from, const char *to) {
+	int patternsize = strlen(from) / 2, patchsize = strlen(to) / 2;
+	size_t filesize;
 	unsigned char *file, *pattern, *patch;
-	file = mmap(NULL, filesize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	mmap_rw(image, &file, &filesize);
 	pattern = malloc(patternsize);
 	patch = malloc(patchsize);
 	hexstr2str(from, pattern);
@@ -46,5 +45,4 @@ void hexpatch(char * image, char *from, char *to) {
 	munmap(file, filesize);
 	free(pattern);
 	free(patch);
-	close(fd);
 }

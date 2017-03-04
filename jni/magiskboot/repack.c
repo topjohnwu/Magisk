@@ -1,61 +1,41 @@
 #include "magiskboot.h"
 
-// Global pointer of output
-static int ofd, opos;
+static size_t restore(const char *filename, int fd) {
+	int ifd = open(filename, O_RDONLY);
+	if (ifd < 0)
+		error(1, "Cannot open %s\n", filename);
 
-static size_t restore(const char *filename) {
-	int fd = open(filename, O_RDONLY);
-	if (fd < 0) {
-		fprintf(stderr, "Cannot open %s\n", filename);
-		exit(1);
+	size_t size = lseek(ifd, 0, SEEK_END);
+	lseek(ifd, 0, SEEK_SET);
+	if (sendfile(fd, ifd, NULL, size) != size) {
+		error(1, "Cannot write %s\n", filename);
 	}
-	size_t size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	if (sendfile(ofd, fd, NULL, size) < 0) {
-		fprintf(stderr, "Cannot write %s\n", filename);
-		exit(1);
-	}
-	close(fd);
-	opos += size;
+	close(ifd);
 	return size;
 }
 
-static void restore_buf(size_t size, const void *buf) {
-	if (write(ofd, buf, size) != size) {
-		fprintf(stderr, "Cannot dump from input file\n");
-		exit(1);
+static void restore_buf(const void *buf, size_t size, int fd) {
+	if (write(fd, buf, size) != size) {
+		error(1, "Cannot dump from input file\n");
 	}
-	opos += size;
-}
-
-static void page_align() {
-	uint32_t pagemask = hdr.page_size - 1L;
-	if (opos & pagemask) {
-		opos += hdr.page_size - (opos & pagemask);
-	}
-	ftruncate(ofd, opos);
-	lseek(ofd, 0, SEEK_END);
 }
 
 void repack(const char* image) {
-	// Load original image
-	int ifd = open(image, O_RDONLY);
-	if (ifd < 0)
-		error(1, "Cannot open %s", image);
-	size_t isize = lseek(ifd, 0, SEEK_END);
-	lseek(ifd, 0, SEEK_SET);
-	unsigned char *orig = mmap(NULL, isize, PROT_READ, MAP_SHARED, ifd, 0);
-
-	// Parse original image
-	parse_img(orig, isize);
-
-	// Create new boot image
-	ofd = open("new-boot.img", O_RDWR | O_CREAT | O_TRUNC, 0644);
-
+	size_t size;
+	unsigned char *orig;
 	char name[PATH_MAX];
 	#define EXT_NUM 6
 	char *ext_list[EXT_NUM] = { "gz", "lzo", "xz", "lzma", "bz2", "lz4" };
-	
+
+	// Load original image
+	mmap_ro(image, &orig, &size);
+
+	// Parse original image
+	parse_img(orig, size);
+
+	// Create new image
+	int fd = open_new("new-boot.img");
+
 	// Set all sizes to 0
 	hdr.kernel_size = 0;
 	hdr.ramdisk_size = 0;
@@ -63,39 +43,33 @@ void repack(const char* image) {
 	hdr.dt_size = 0;
 
 	// Skip a page for header
-	ftruncate(ofd, hdr.page_size);
-	lseek(ofd, 0, SEEK_END);
-	opos += hdr.page_size;
+	ftruncate(fd, hdr.page_size);
+	lseek(fd, 0, SEEK_END);
 
 	// Restore kernel
 	if (mtk_kernel) {
-		restore_buf(512, kernel);
+		restore_buf(kernel, 512, fd);
 		hdr.kernel_size += 512;
 	}
-	hdr.kernel_size += restore(KERNEL_FILE);
-	page_align();
+	hdr.kernel_size += restore(KERNEL_FILE, fd);
+	file_align(fd, hdr.page_size);
 
 	// Restore ramdisk
 	if (mtk_ramdisk) {
-		restore_buf(512, ramdisk);
+		restore_buf(ramdisk, 512, fd);
 		hdr.ramdisk_size += 512;
 	}
 
 	if (access(RAMDISK_FILE, R_OK) == 0) {
 		// If we found raw cpio, compress to original format
-		int rfd = open(RAMDISK_FILE, O_RDONLY);
-		if (rfd < 0)
-			error(1, "Cannot open " RAMDISK_FILE);
-
-		size_t cpio_size = lseek(rfd, 0, SEEK_END);
-		lseek(rfd, 0, SEEK_SET);
-		unsigned char *cpio = mmap(NULL, cpio_size, PROT_READ, MAP_SHARED, rfd, 0);
+		size_t cpio_size;
+		unsigned char *cpio;
+		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
 
 		if (comp(ramdisk_type, RAMDISK_FILE, cpio, cpio_size))
-			error(1, "Unsupported format! Please compress manually!\n");
+			error(1, "Unsupported format! Please compress manually!");
 
 		munmap(cpio, cpio_size);
-		close(rfd);
 	}
 
 	int found = 0;
@@ -109,29 +83,28 @@ void repack(const char* image) {
 	if (!found)
 		error(1, "No ramdisk exists!");
 
-	hdr.ramdisk_size += restore(name);
-	page_align();
+	hdr.ramdisk_size += restore(name, fd);
+	file_align(fd, hdr.page_size);
 
 	// Restore second
 	if (access(SECOND_FILE, R_OK) == 0) {
-		hdr.second_size += restore(SECOND_FILE);
-		page_align();
+		hdr.second_size += restore(SECOND_FILE, fd);
+		file_align(fd, hdr.page_size);
 	}
 
 	// Restore dtb
 	if (access(DTB_FILE, R_OK) == 0) {
-		hdr.dt_size += restore(DTB_FILE);
-		page_align();
+		hdr.dt_size += restore(DTB_FILE, fd);
+		file_align(fd, hdr.page_size);
 	}
 
 	// Write header back
-	lseek(ofd, 0, SEEK_SET);
-	write(ofd, &hdr, sizeof(hdr));
+	lseek(fd, 0, SEEK_SET);
+	write(fd, &hdr, sizeof(hdr));
 
-	munmap(orig, isize);
-	close(ifd);
-	close(ofd);
-	if (opos > isize) {
+	munmap(orig, size);
+	if (lseek(fd, 0, SEEK_CUR) > size) {
 		error(2, "Boot partition too small!");
 	}
+	close(fd);
 }

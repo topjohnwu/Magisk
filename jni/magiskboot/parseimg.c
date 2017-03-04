@@ -1,48 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <string.h>
-
 #include "bootimg.h"
 #include "elf.h"
 #include "magiskboot.h"
 
-unsigned char *base, *kernel, *ramdisk, *second, *dtb;
+unsigned char *kernel, *ramdisk, *second, *dtb;
 boot_img_hdr hdr;
 int mtk_kernel = 0, mtk_ramdisk = 0;
 file_t boot_type, ramdisk_type, dtb_type;
-
-file_t check_type(unsigned char *buf) {
-	if (memcmp(buf, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
-		return CHROMEOS;
-	} else if (memcmp(buf, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
-		return AOSP;
-	} else if (memcmp(buf, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
-		return ELF;
-	} else if (memcmp(buf, "\x1f\x8b\x08\x00", 4) == 0) {
-		return GZIP;
-	} else if (memcmp(buf, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
-		return LZOP;
-	} else if (memcmp(buf, "\xfd""7zXZ\x00", 6) == 0) {
-		return XZ;
-	} else if (memcmp(buf, "\x5d\x00\x00", 3) == 0 
-			&& (buf[12] == (unsigned char) '\xff' || buf[12] == (unsigned char) '\x00')) {
-		return LZMA;
-	} else if (memcmp(buf, "BZh", 3) == 0) {
-		return BZIP2;
-	} else if ( (  memcmp(buf, "\x04\x22\x4d\x18", 4) == 0 
-				|| memcmp(buf, "\x03\x21\x4c\x18", 4) == 0) 
-				|| memcmp(buf, "\x02\x21\x4c\x18", 4) == 0) {
-		return LZ4;
-	} else if (memcmp(buf, "\x88\x16\x88\x58", 4) == 0) {
-		return MTK;
-	} else if (memcmp(buf, "QCDT", 4) == 0) {
-		return QCDT;
-	} else {
-		return UNKNOWN;
-	}
-}
 
 static void check_headers() {
 	printf("KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
@@ -109,13 +72,6 @@ static void check_headers() {
 	}
 }
 
-static void page_align(unsigned char **pos) {
-	uint32_t itemsize = *pos - base, pagemask = hdr.page_size - 1L;
-	if (itemsize & pagemask) {
-		*pos += hdr.page_size - (itemsize & pagemask);
-	}
-}
-
 static void elf_header_check(void *elf, int is64) {
 
 	size_t e_size, mach, ver, p_size, p_num, s_size, s_num;
@@ -167,7 +123,7 @@ static void elf_header_check(void *elf, int is64) {
 		error(1, "More than one section header");
 }
 
-static void elf_set(int i, size_t size, size_t offset, size_t addr) {
+static void elf_set(int i, unsigned char *base, size_t size, size_t offset, size_t addr) {
 	if (size <= 4096) {
 		// Possible cmdline
 		memset(hdr.cmdline, 0, BOOT_ARGS_SIZE);
@@ -197,7 +153,7 @@ static void elf_set(int i, size_t size, size_t offset, size_t addr) {
 	}
 }
 
-static void parse_elf() {
+static void parse_elf(unsigned char *base) {
 
 	// Reset boot image header
 	memset(&hdr, 0, sizeof(hdr));
@@ -224,7 +180,7 @@ static void parse_elf() {
 			sh32 = (elf32_shdr *) (base + elf32->e_shoff);
 
 			for (int i = 0; i < elf32->e_phnum; ++i) {
-				elf_set(i, ph32[i].p_filesz, ph32[i].p_offset, ph32[i].p_paddr);
+				elf_set(i, base, ph32[i].p_filesz, ph32[i].p_offset, ph32[i].p_paddr);
 			}
 
 			if (elf32->e_shnum) {
@@ -253,7 +209,7 @@ static void parse_elf() {
 			sh64 = (elf64_shdr *) (base + elf64->e_shoff);
 
 			for (int i = 0; i < elf64->e_phnum; ++i) {
-				elf_set(i, ph64[i].p_filesz, ph64[i].p_offset, ph64[i].p_paddr);
+				elf_set(i, base, ph64[i].p_filesz, ph64[i].p_offset, ph64[i].p_paddr);
 			}
 
 			if (elf64->e_shnum) {
@@ -272,44 +228,45 @@ static void parse_elf() {
 	check_headers();
 }
 
-static void parse_aosp() {
+static void parse_aosp(unsigned char *base) {
 
 	printf("IMG [AOSP]\n");
 
-	unsigned char *pos = base;
+	size_t pos = 0;
 
 	// Read the header
-	memcpy(&hdr, pos, sizeof(hdr));
+	memcpy(&hdr, base, sizeof(hdr));
 	pos += hdr.page_size;
 
 	// Kernel position
-	kernel = pos;
+	kernel = base + pos;
 	pos += hdr.kernel_size;
-	page_align(&pos);
+	mem_align(&pos, hdr.page_size);
 
 	// Ramdisk position
-	ramdisk = pos;
+	ramdisk = base + pos;
 	pos += hdr.ramdisk_size;
-	page_align(&pos);
+	mem_align(&pos, hdr.page_size);
 
 	if (hdr.second_size) {
 		// Second position
-		second = pos;
+		second = base + pos;
 		pos += hdr.second_size;
-		page_align(&pos);
+		mem_align(&pos, hdr.page_size);
 	}
 
 	if (hdr.dt_size) {
 		// dtb position
-		dtb = pos;
+		dtb = base + pos;
 		pos += hdr.dt_size;
-		page_align(&pos);
+		mem_align(&pos, hdr.page_size);
 	}
 
 	check_headers();
 }
 
 void parse_img(unsigned char *orig, size_t size) {
+	unsigned char *base;
 	for(base = orig; base < (orig + size); base += 256) {
 		switch (check_type(base)) {
 			case CHROMEOS:
@@ -319,11 +276,11 @@ void parse_img(unsigned char *orig, size_t size) {
 				// Don't override CHROMEOS
 				if (boot_type != CHROMEOS)
 					boot_type = AOSP;
-				parse_aosp();
+				parse_aosp(base);
 				return;
 			case ELF:
 				boot_type = ELF;
-				parse_elf();
+				parse_elf(base);
 				return;
 			default:
 				continue;

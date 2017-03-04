@@ -5,13 +5,6 @@
 
 #include "magiskboot.h"
 
-static int open_new(const char *filename) {
-	int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd < 0)
-		error(1, "Unable to create %s", filename);
-	return fd;
-}
-
 static void write_file(const int fd, const void *buf, const size_t size, const char *filename) {
 	if (write(fd, buf, size) != size)
 		error(1, "Error in writing %s", filename);
@@ -29,7 +22,7 @@ static void report(const int mode, const char* filename) {
 }
 
 // Mode: 0 = decode; 1 = encode
-void gzip(int mode, const char* filename, unsigned char* buf, size_t size) {
+void gzip(int mode, const char* filename, const unsigned char* buf, size_t size) {
 	size_t ret = 0, flush, have, pos = 0;
 	z_stream strm;
 	unsigned char out[CHUNK];
@@ -100,7 +93,7 @@ void gzip(int mode, const char* filename, unsigned char* buf, size_t size) {
 
 
 // Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
-void lzma(int mode, const char* filename, unsigned char* buf, size_t size) {
+void lzma(int mode, const char* filename, const unsigned char* buf, size_t size) {
 	size_t have, pos = 0;
 	lzma_ret ret = 0;
 	lzma_stream strm = LZMA_STREAM_INIT;
@@ -164,7 +157,7 @@ void lzma(int mode, const char* filename, unsigned char* buf, size_t size) {
 }
 
 // Mode: 0 = decode; 1 = encode
-void lz4(int mode, const char* filename, unsigned char* buf, size_t size) {
+void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) {
 	LZ4F_decompressionContext_t dctx;
 	LZ4F_compressionContext_t cctx;
 	LZ4F_frameInfo_t info;
@@ -275,7 +268,7 @@ void lz4(int mode, const char* filename, unsigned char* buf, size_t size) {
 }
 
 // Mode: 0 = decode; 1 = encode
-void bzip2(int mode, const char* filename, unsigned char* buf, size_t size) {
+void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size) {
 	size_t ret = 0, action, have, pos = 0;
 	bz_stream strm;
 	char out[CHUNK];
@@ -342,7 +335,7 @@ void bzip2(int mode, const char* filename, unsigned char* buf, size_t size) {
 	close(fd);
 }
 
-int decomp(file_t type, const char *to, unsigned char *from, size_t size) {
+int decomp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	switch (type) {
 		case GZIP:
 			gzip(0, to, from, size);
@@ -366,7 +359,7 @@ int decomp(file_t type, const char *to, unsigned char *from, size_t size) {
 	return 0;
 }
 
-int comp(file_t type, const char *to, unsigned char *from, size_t size) {
+int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	char name[PATH_MAX];
 	switch (type) {
 		case GZIP:
