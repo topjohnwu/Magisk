@@ -13,6 +13,7 @@ void unpack(const char* image) {
 	mmap_ro(image, &orig, &size);
 
 	// Parse image
+	printf("\nParsing boot image: [%s]\n\n", image);
 	parse_img(orig, size);
 
 	if (boot_type == CHROMEOS) {
@@ -34,19 +35,10 @@ void unpack(const char* image) {
 		ramdisk += 512;
 		hdr.ramdisk_size -= 512;
 	}
-
 	if (decomp(ramdisk_type, RAMDISK_FILE, ramdisk, hdr.ramdisk_size)) {
-		printf("Unsupported format! Please decompress manually!\n");
-		switch (ramdisk_type) {
-			case LZOP:
-				sprintf(name, "%s.%s", RAMDISK_FILE, "lzo");
-				break;
-			default:
-				// Never happens
-				break;
-		}
 		// Dump the compressed ramdisk
-		dump(ramdisk, hdr.ramdisk_size, name);
+		dump(ramdisk, hdr.ramdisk_size, RAMDISK_FILE ".unsupport");
+		error(1, "Unsupported ramdisk format! Dumped to %s", RAMDISK_FILE ".unsupport");
 	}
 
 	if (hdr.second_size) {

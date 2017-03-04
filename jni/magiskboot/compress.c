@@ -359,6 +359,7 @@ int decomp(file_t type, const char *to, const unsigned char *from, size_t size) 
 	return 0;
 }
 
+// Output will be to.ext
 int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	char name[PATH_MAX];
 	switch (type) {
@@ -388,3 +389,75 @@ int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	}
 	return 0;
 }
+
+void decomp_file(char *from) {
+	int ok = 1;
+	unsigned char *file;
+	size_t size;
+	mmap_ro(from, &file, &size);
+	file_t type = check_type(file);
+	char *ext;
+	ext = strrchr(from, '.');
+	if (ext == NULL)
+		error(1, "Bad filename extention");
+
+	// File type and extension should match
+	switch (type) {
+		case GZIP:
+			if (strcmp(ext, ".gz") != 0)
+				ok = 0;
+			break;
+		case XZ:
+			if (strcmp(ext, ".xz") != 0)
+				ok = 0;
+			break;
+		case LZMA:
+			if (strcmp(ext, ".lzma") != 0)
+				ok = 0;
+			break;
+		case BZIP2:
+			if (strcmp(ext, ".bz2") != 0)
+				ok = 0;
+			break;
+		case LZ4:
+			if (strcmp(ext, ".lz4") != 0)
+				ok = 0;
+			break;
+		default:
+			error(1, "Provided file \'%s\' is not a supported archive format", from);
+	}
+	if (ok) {
+		// If all match, strip out the suffix
+		*ext = '\0';
+		decomp(type, from, file, size);
+		*ext = '.';
+		unlink(from);
+	} else {
+		error(1, "Bad filename extention \'%s\'", ext);
+	}
+	munmap(file, size);
+}
+
+void comp_file(const char *method, const char *from) {
+	file_t type;
+	if (strcmp(method, "gzip") == 0) {
+		type = GZIP;
+	} else if (strcmp(method, "xz") == 0) {
+		type = XZ;
+	} else if (strcmp(method, "lzma") == 0) {
+		type = LZMA;
+	} else if (strcmp(method, "lz4") == 0) {
+		type = LZ4;
+	} else if (strcmp(method, "bzip2") == 0) {
+		type = BZIP2;
+	} else {
+		error(1, "Only support following methods: " SUP_LIST);
+	}
+	unsigned char *file;
+	size_t size;
+	mmap_ro(from, &file, &size);
+	comp(type, from, file, size);
+	munmap(file, size);
+	unlink(from);
+}
+

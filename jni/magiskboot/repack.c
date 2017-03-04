@@ -24,17 +24,16 @@ void repack(const char* image) {
 	size_t size;
 	unsigned char *orig;
 	char name[PATH_MAX];
-	#define EXT_NUM 6
-	char *ext_list[EXT_NUM] = { "gz", "lzo", "xz", "lzma", "bz2", "lz4" };
 
 	// Load original image
 	mmap_ro(image, &orig, &size);
 
 	// Parse original image
+	printf("\nParsing boot image: [%s]\n\n", image);
 	parse_img(orig, size);
 
 	// Create new image
-	int fd = open_new("new-boot.img");
+	int fd = open_new(NEW_BOOT);
 
 	// Set all sizes to 0
 	hdr.kernel_size = 0;
@@ -62,27 +61,34 @@ void repack(const char* image) {
 
 	if (access(RAMDISK_FILE, R_OK) == 0) {
 		// If we found raw cpio, compress to original format
+
+		// Before we start, clean up previous compressed files
+		for (int i = 0; i < SUP_NUM; ++i) {
+			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
+			unlink(name);
+		}
+
 		size_t cpio_size;
 		unsigned char *cpio;
 		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
 
 		if (comp(ramdisk_type, RAMDISK_FILE, cpio, cpio_size))
-			error(1, "Unsupported format! Please compress manually!");
+			error(1, "Unsupported ramdisk format!");
 
 		munmap(cpio, cpio_size);
 	}
 
 	int found = 0;
-	for (int i = 0; i < EXT_NUM; ++i) {
-		sprintf(name, "%s.%s", RAMDISK_FILE, ext_list[i]);
+	for (int i = 0; i < SUP_NUM; ++i) {
+		sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 		if (access(name, R_OK) == 0) {
+			ramdisk_type = SUP_TYPE_LIST[i];
 			found = 1;
 			break;
 		}
 	}
 	if (!found)
 		error(1, "No ramdisk exists!");
-
 	hdr.ramdisk_size += restore(name, fd);
 	file_align(fd, hdr.page_size);
 
@@ -99,6 +105,8 @@ void repack(const char* image) {
 	}
 
 	// Write header back
+	printf("\nRepack to boot image: [%s]\n\n", NEW_BOOT);
+	print_info();
 	lseek(fd, 0, SEEK_SET);
 	write(fd, &hdr, sizeof(hdr));
 
