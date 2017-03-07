@@ -20,20 +20,20 @@ static void restore_buf(const void *buf, size_t size, int fd) {
 	}
 }
 
-void repack(const char* image) {
+void repack(const char* orig_image, const char* out_image) {
 	size_t size;
 	unsigned char *orig;
 	char name[PATH_MAX];
 
 	// Load original image
-	mmap_ro(image, &orig, &size);
+	mmap_ro(orig_image, &orig, &size);
 
 	// Parse original image
-	printf("\nParsing boot image: [%s]\n\n", image);
+	printf("\nParsing boot image: [%s]\n\n", orig_image);
 	parse_img(orig, size);
 
 	// Create new image
-	int fd = open_new(NEW_BOOT);
+	int fd = open_new(out_image);
 
 	// Set all sizes to 0
 	hdr.kernel_size = 0;
@@ -51,7 +51,7 @@ void repack(const char* image) {
 		hdr.kernel_size += 512;
 	}
 	hdr.kernel_size += restore(KERNEL_FILE, fd);
-	file_align(fd, hdr.page_size);
+	file_align(fd, hdr.page_size, 1);
 
 	// Restore ramdisk
 	if (mtk_ramdisk) {
@@ -90,22 +90,22 @@ void repack(const char* image) {
 	if (!found)
 		error(1, "No ramdisk exists!");
 	hdr.ramdisk_size += restore(name, fd);
-	file_align(fd, hdr.page_size);
+	file_align(fd, hdr.page_size, 1);
 
 	// Restore second
 	if (access(SECOND_FILE, R_OK) == 0) {
 		hdr.second_size += restore(SECOND_FILE, fd);
-		file_align(fd, hdr.page_size);
+		file_align(fd, hdr.page_size, 1);
 	}
 
 	// Restore dtb
 	if (access(DTB_FILE, R_OK) == 0) {
 		hdr.dt_size += restore(DTB_FILE, fd);
-		file_align(fd, hdr.page_size);
+		file_align(fd, hdr.page_size, 1);
 	}
 
 	// Write header back
-	printf("\nRepack to boot image: [%s]\n\n", NEW_BOOT);
+	printf("\nRepack to boot image: [%s]\n\n", out_image);
 	print_info();
 	lseek(fd, 0, SEEK_SET);
 	write(fd, &hdr, sizeof(hdr));

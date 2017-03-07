@@ -62,13 +62,15 @@ void mem_align(size_t *pos, size_t align) {
 	}
 }
 
-void file_align(int fd, size_t align) {
+void file_align(int fd, size_t align, int out) {
 	size_t pos = lseek(fd, 0, SEEK_CUR);
 	size_t mask = align - 1;
 	if (pos & mask) {
 		pos += align - (pos & mask);
-		ftruncate(fd, pos);
-		lseek(fd, 0, SEEK_END);
+		if (out) {
+			ftruncate(fd, pos);
+		}
+		lseek(fd, pos, SEEK_SET);
 	}
 }
 
@@ -137,4 +139,28 @@ void cleanup() {
 		sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 		unlink(name);
 	}
+}
+
+void vec_init(vector *v) {
+	vec_size(v) = 0;
+	vec_cap(v) = 1;
+	vec_entry(v) = malloc(sizeof(void*));
+}
+
+void vec_push_back(vector *v, void *p) {
+	if (v == NULL) return;
+	if (vec_size(v) == vec_cap(v)) {
+		vec_cap(v) *= 2;
+		vec_entry(v) = realloc(vec_entry(v), sizeof(void*) * vec_cap(v));
+	}
+	vec_entry(v)[vec_size(v)] = p;
+	++vec_size(v);
+}
+
+void vec_destroy(vector *v) {
+	// Will not free each entry!
+	// Manually free each entry, then call this function
+	vec_size(v) = 0;
+	vec_cap(v) = 0;
+	free(v->data);
 }

@@ -1,27 +1,11 @@
 #include "magiskboot.h"
 
-static int hex2int(char c) {
-	int first = c / 16 - 3;
-	int second = c % 16;
-	int result = first * 10 + second;
-	if(result > 9) result--;
-	return result;
-}
-
-static unsigned hex2ascii(char c, char d) {
-	int high = hex2int(c) * 16;
-	int low = hex2int(d);
-	return high + low;
-}
-
-static void hexstr2str(const char *hex, unsigned char *str) {
-	char buf = 0;
-	for(int i = 0, length = strlen(hex); i < length; ++i){
-		if(i % 2){
-			str[i / 2] = hex2ascii(buf, hex[i]);
-		} else{
-			buf = hex[i];
-		}
+static void hex2byte(const char *hex, unsigned char *str) {
+	char high, low;
+	for (int i = 0, length = strlen(hex); i < length; i += 2) {
+		high = toupper(hex[i]) - '0';
+		low = toupper(hex[i + 1]) - '0';
+		str[i / 2] = ((high > 9 ? high - 7 : high) << 4) + (low > 9 ? low - 7 : low);
 	}
 }
 
@@ -32,8 +16,8 @@ void hexpatch(const char *image, const char *from, const char *to) {
 	mmap_rw(image, &file, &filesize);
 	pattern = malloc(patternsize);
 	patch = malloc(patchsize);
-	hexstr2str(from, pattern);
-	hexstr2str(to, patch);
+	hex2byte(from, pattern);
+	hex2byte(to, patch);
 	for (size_t i = 0; i < filesize - patternsize; ++i) {
 		if (memcmp(file + i, pattern, patternsize) == 0) {
 			printf("Pattern %s found!\nPatching to %s\n", from, to);
