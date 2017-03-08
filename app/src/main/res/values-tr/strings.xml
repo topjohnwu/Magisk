@@ -1,0 +1,196 @@
+ <resources>
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Gezinti çekmecesini aç</string>
+    <string name="navigation_drawer_close">Gezinti çekmecesini kapat</string>
+    <string name="magiskhide" translatable="false">Magisk Hide</string>
+    <string name="modules">Modüller</string>
+    <string name="downloads">İndir</string>
+    <string name="superuser">Yetkili kullanıcı</string>
+    <string name="log">Günlük</string>
+    <string name="settings">Ayarlar</string>
+    <string name="status">Durum</string>
+    <string name="install">Yükle</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">Magisk v%1$s yüklü</string>
+    <string name="magisk_version_disable">Magisk v%1$s devre dışı</string>
+    <string name="magisk_version_error">Magisk yüklü değil</string>
+
+    <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
+    <string name="magisk_update_available">Magisk v%1$.1f mevcut!</string>
+    <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet yok mu?</string>
+    <string name="up_to_date">%1$s'in son sürümü yüklü</string>
+    <string name="root_error">Rootlu ama root izni yok, izin verilmedi mi?</string>
+    <string name="not_rooted">Rootlu değil</string>
+    <string name="proper_root">Düzgünce rootlandı</string>
+    <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
+    <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
+    <string name="safetyNet_connection_failed">"Google API'ye bağlanılamıyor"</string>
+    <string name="safetyNet_connection_suspended">Google API bağlantısı askıya alındı</string>
+    <string name="safetyNet_error">SafetyNet kontrol edilemiyor, İnternet yok mu?</string>
+    <string name="safetyNet_fail">SafetyNet başarısız: CTS profili uyumsuzluğu</string>
+    <string name="safetyNet_pass">SafetyNet Geçti</string>
+    <string name="root_info_warning">İşlevsellik çok sınırlıdır</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">(Otomatik) %1$s</string>
+    <string name="cannot_auto_detect">(Otomatik algılanamıyor)</string>
+    <string name="boot_image_title">Boot İmajı Konumu</string>
+    <string name="detect_button">Algıla</string>
+    <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
+    <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
+    <string name="keep_dm_verity">"Dm-verity'yi koru"</string>
+    <string name="current_magisk_title">Yüklenmiş Magisk Sürümü: %1$s</string>
+    <string name="install_magisk_title">Son Magisk Sürümü: %1$s</string>
+    <string name="uninstall">Kaldır</string>
+    <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
+    <string name="uninstall_magisk_title">"Magisk'i kaldır"</string>
+    <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
+    <string name="version_none">(Hiçbiri)</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
+    <string name="no_modules_found">Modül yok</string>
+    <string name="update_file_created">Modül sonraki yeniden başlatmada güncellenecek</string>
+    <string name="remove_file_created">Modül sonraki yeniden başlatmada kaldırılacak</string>
+    <string name="remove_file_deleted">Modül sonraki yeniden başlatmada kaldırılmayacak</string>
+    <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak</string>
+    <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
+    <string name="author">Yapımcı: %1$s</string>
+    <string name="fab_flash_zip">"Modül Zip'ini Yükle"</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Güncelleme Mevcut</string>
+    <string name="installed">Yüklenmiş</string>
+    <string name="not_installed">Yüklenmemiş</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">"SD'ye kaydet"</string>
+    <string name="menuReload">Yenile</string>
+    <string name="menuClearLog">Günlüğü temizle</string>
+    <string name="logs_cleared">Günlük başarıyla temizlendi</string>
+    <string name="log_is_empty">Günlük boş</string>
+    <string name="logs_save_failed">Günlük SD karta yazılamadı:</string>
+
+    <!--About Activity-->
+    <string name="about">Hakkında</string>
+    <string name="app_developers">Ana geliştiriciler</string>
+    <string name="app_developers_">"<![CDATA[<a href="https://github.com/topjohnwu">topjohnwu</a> tarafından <a href="https://github.com/d8ahazard">Digitalhigh</a> ve <a href="https://github.com/dvdandroid">Dvdandroid</a>]]>'in katkılarıyla oluşturuldu"</string>
+    <string name="app_changelog">Uygulama değişiklikleri</string>
+    <string name="translators">Fatih Fırıncı</string>
+    <string name="app_version">Uygulama sürümü</string>
+    <string name="app_source_code">Kaynak kodu</string>
+    <string name="donation">Bağış</string>
+    <string name="app_translators">Çevirmen</string>
+    <string name="support_thread">Destek konusu</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
+    <string name="no_thanks">Hayır teşekkürler</string>
+    <string name="yes">Evet</string>
+    <string name="ok">Tamam</string>
+    <string name="close">Kapat</string>
+    <string name="repo_install_title">%1$s yükle</string>
+    <string name="repo_install_msg">%1$s yüklensin mi?</string>
+    <string name="download_install">İndir &amp; Yükle</string>
+    <string name="download">İndir</string>
+    <string name="goto_install">\"Yükleme\" bölümüne git</string>
+    <string name="download_file_error">Dosya indirme hatası</string>
+    <string name="install_error">Yükleme hatası!</string>
+    <string name="invalid_zip">Zip Magisk Modülü değil!!</string>
+    <string name="reboot_title">Yükleme başarılı!</string>
+    <string name="reboot_msg">Şimdi yeniden başlatmak istiyor musunuz?</string>
+    <string name="reboot">Yeniden başlat</string>
+    <string name="copying_msg">Zip geçici klasöre kopyalanıyor</string>
+    <string name="zip_install_progress_title">Yükleniyor</string>
+    <string name="zip_unzip_msg">Zip dosyası açılıyor …</string>
+    <string name="zip_process_msg">Zip dosyası işleniyor …</string>
+    <string name="zip_install_progress_msg">%1$s yükleniyor …</string>
+    <string name="no_magisk_title">Magisk Yüklü Değil!</string>
+    <string name="no_magisk_msg">"Magisk'i indirip yüklemek istiyor musunuz?"</string>
+    <string name="downloading_toast">%1$s indiriliyor</string>
+    <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
+    <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
+    <string name="release_notes">Sürüm notları</string>
+    <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
+    <string name="safetyNet_hide_notice">Bu uygulama, SafetyNet kullanıyor\nZaten MagiskHide tarafından varsayılan olarak ele alındı</string>
+    <string name="start_magiskhide">MagiskHide başlatılıyor …</string>
+    <string name="no_magisksu_title">MagiskSU kullanılmıyor!</string>
+    <string name="no_magisksu_msg">"MagiskSU ile rootlu değilsiniz, MagiskHide'ın kendisini kullanmak yeterli olmayabilir!\nResmi olarak desteklenmez ve SafetyNet'i geçmek için ek araçlar (ör. suhide) gerekir."</string>
+    <string name="understand">Anladım</string>
+    <string name="process_error">İşlem hatası</string>
+    <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
+    <string name="zip_process_title">İşleniyor</string>
+    <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Genel</string>
+    <string name="settings_dark_theme_title">Karanlık Tema</string>
+    <string name="settings_dark_theme_summary">Karanlık temayı etkinleştir</string>
+    <string name="settings_notification_title">Güncelleme Bildirimi</string>
+    <string name="settings_notification_summary">Yeni sürüm kullanılabilir olduğunda güncelleme bildirimlerini göster</string>
+    <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
+    <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
+
+    <string name="settings_disable_title">"Magisk'i devre dışı bırak"</string>
+    <string name="settings_disable_summary">Root (MagiskSU) dışında her şey devre dışı bırakılır</string>
+    <string name="settings_magiskhide_summary">"Magisk'i çeşitli algılamalardan gizle"</string>
+    <string name="settings_busybox_title">"BusyBox'ı etkinleştir"</string>
+    <string name="settings_busybox_summary">"Magisk'in dahili busybox'ını xbin'e bağla"</string>
+    <string name="settings_hosts_title">Sistemsiz host</string>
+    <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
+
+    <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
+    <string name="settings_su_app">Sadece uygulamalar</string>
+    <string name="settings_su_adb">Sadece ADB</string>
+    <string name="settings_su_disable">Devre dışı</string>
+    <string name="settings_su_request_10">10 saniye</string>
+    <string name="settings_su_request_20">20 saniye</string>
+    <string name="settings_su_request_30">30 saniye</string>
+    <string name="settings_su_request_60">60 saniye</string>
+    <string name="superuser_access">Yetkili Kullanıcı Erişimi</string>
+    <string name="auto_response">Otomatik Yanıt</string>
+    <string name="request_timeout">İstek Zaman Aşımı</string>
+    <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
+    <string name="request_timeout_summary">%1$s saniye</string>
+
+    <string name="settings_development_category">Uygulama Geliştirme</string>
+    <string name="settings_developer_logging_title">Gelişmiş hata ayıklama günlüğünü etkinleştir</string>
+    <string name="settings_developer_logging_summary">Ayrıntılı günlüğü etkinleştirmek için bunu işaretleyin</string>
+    <string name="settings_shell_logging_title">Kabuk komut hata ayıklama günlüğünü etkinleştir</string>
+    <string name="settings_shell_logging_summary">Tüm kabuk komutlarını ve çıktısını günlüğe kaydetmeyi etkinleştirmek için bunu işaretleyin</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
+    <string name="deny_with_str">Reddet%1$s</string>
+    <string name="deny">Reddet</string>
+    <string name="prompt">Sor</string>
+    <string name="grant">İzin ver</string>
+    <string name="su_warning">Cihazınıza tam erişim izni verir.\nEmin değilseniz, reddedin!</string>
+    <string name="forever">Daima</string>
+    <string name="once">Bir kere</string>
+    <string name="tenmin">10 dak</string>
+    <string name="twentymin">20 dak</string>
+    <string name="thirtymin">30 dak</string>
+    <string name="sixtymin">60 dak</string>
+    <string name="su_allow_toast">%1$s için yetkili kullanıcı hakları verildi</string>
+    <string name="su_deny_toast">%1$s için yetkili kullanıcı hakları reddedildi</string>
+    <string name="no_apps_found">Hiçbir uygulama bulunamadı</string>
+    <string name="su_snack_grant">%1$s için yetkili kullanıcı hakları verildi</string>
+    <string name="su_snack_deny">%1$s için yetkili kullanıcı hakları reddedildi</string>
+    <string name="su_snack_notif_on">%1$s için bildirimler etkin</string>
+    <string name="su_snack_notif_off">%1$s için bildirimler devre dışı</string>
+    <string name="su_snack_log_on">%1$s için günlük etkin</string>
+    <string name="su_snack_log_off">%1$s için günlük devre dışı</string>
+    <string name="su_snack_revoke">%1$s hakları geri alındı</string>
+    <string name="su_revoke_title">Geri alınsın mı?</string>
+    <string name="su_revoke_msg">%1$s hakları geri alınsın mı?</string>
+    <string name="toast">Pencere</string>
+    <string name="none">Hiçbiri</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Hedef UID:\u0020</string>
+    <string name="command">Komut:\u0020</string>
+
+</resources>
