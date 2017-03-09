@@ -18,7 +18,7 @@ typedef struct cpio_file {
 	uint32_t namesize;
 	// uint32_t check;
 	char *filename;
-	void *data;
+	char *data;
 	int remove;
 } cpio_file;
 

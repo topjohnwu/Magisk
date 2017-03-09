@@ -13,7 +13,7 @@ void unpack(const char* image) {
 	mmap_ro(image, &orig, &size);
 
 	// Parse image
-	printf("\nParsing boot image: [%s]\n\n", image);
+	printf("Parsing boot image: [%s]\n\n", image);
 	parse_img(orig, size);
 
 	if (boot_type == CHROMEOS) {

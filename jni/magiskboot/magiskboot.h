@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "bootimg.h"
+#include "sha1.h"
 
 #define windowBits 15
 #define ZLIB_GZIP 16
@@ -54,7 +55,11 @@ typedef enum {
     NONE,
     RM,
     MKDIR,
-    ADD
+    ADD,
+    EXTRACT,
+    TEST,
+    DMVERITY,
+    FORCEENCRYPT
 } command_t;
 
 extern char *SUP_EXT_LIST[SUP_NUM];
@@ -71,6 +76,7 @@ typedef struct vector {
 } vector;
 void vec_init(vector *v);
 void vec_push_back(vector *v, void *p);
+void vec_sort(vector *v, int (*compar)(const void *, const void *));
 void vec_destroy(vector *v);
 
 #define vec_size(v) (v)->size
@@ -93,6 +99,7 @@ void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
 void error(int rc, const char *msg, ...);
 void parse_img(unsigned char *orig, size_t size);
+int cpio_commands(const char *command, int argc, char *argv[]);
 void cleanup();
 
 // Compressions
@@ -104,14 +111,6 @@ int comp(file_t type, const char *to, const unsigned char *from, size_t size);
 void comp_file(const char *method, const char *from);
 int decomp(file_t type, const char *to, const unsigned char *from, size_t size);
 void decomp_file(char *from);
-
-// CPIO
-void parse_cpio(const char *filename, vector *v);
-void dump_cpio(const char *filename, vector *v);
-void cpio_vec_destroy(vector *v);
-void cpio_rm(int recursive, const char *entry, vector *v);
-void cpio_mkdir(mode_t mode, const char *entry, vector *v);
-void cpio_add(mode_t mode, const char *entry, const char *filename, vector *v);
 
 // Utils
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size);

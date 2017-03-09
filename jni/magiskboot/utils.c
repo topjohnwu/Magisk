@@ -124,6 +124,7 @@ void print_info() {
 		default:
 			fprintf(stderr, "Unknown ramdisk format!\n");
 	}
+	printf("\n");
 }
 
 void cleanup() {
@@ -155,6 +156,10 @@ void vec_push_back(vector *v, void *p) {
 	}
 	vec_entry(v)[vec_size(v)] = p;
 	++vec_size(v);
+}
+
+void vec_sort(vector *v, int (*compar)(const void *, const void *)) {
+	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);
 }
 
 void vec_destroy(vector *v) {

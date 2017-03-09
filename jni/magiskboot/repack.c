@@ -29,7 +29,7 @@ void repack(const char* orig_image, const char* out_image) {
 	mmap_ro(orig_image, &orig, &size);
 
 	// Parse original image
-	printf("\nParsing boot image: [%s]\n\n", orig_image);
+	printf("Parsing boot image: [%s]\n\n", orig_image);
 	parse_img(orig, size);
 
 	// Create new image
@@ -105,7 +105,7 @@ void repack(const char* orig_image, const char* out_image) {
 	}
 
 	// Write header back
-	printf("\nRepack to boot image: [%s]\n\n", out_image);
+	printf("Repack to boot image: [%s]\n\n", out_image);
 	print_info();
 	lseek(fd, 0, SEEK_SET);
 	write(fd, &hdr, sizeof(hdr));
