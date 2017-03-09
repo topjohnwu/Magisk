@@ -63,7 +63,7 @@ run_scripts() {
         chmod 755 $MOD/$1.sh
         chcon u:object_r:system_file:s0 $MOD/$1.sh
         log_print "$1: $MOD/$1.sh"
-        sh $MOD/$1.sh
+        sh $MOD/$1.sh &
       fi
     fi
   done
@@ -72,7 +72,7 @@ run_scripts() {
       chmod 755 $SCRIPT
       chcon u:object_r:system_file:s0 $SCRIPT
       log_print "${1}.d: $SCRIPT"
-      sh $SCRIPT
+      sh $SCRIPT &
     fi
   done
 }
