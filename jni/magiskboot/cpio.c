@@ -17,6 +17,14 @@ static uint32_t x8u(char *hex) {
   return val;
 }
 
+static void cpio_free(cpio_file *f) {
+	if (f) {
+		free(f->filename);
+		free(f->data);
+		free(f);
+	}
+}
+
 static void cpio_vec_insert(vector *v, cpio_file *n) {
 	cpio_file *f, *t;
 	int shift = 0;
@@ -30,9 +38,7 @@ static void cpio_vec_insert(vector *v, cpio_file *n) {
 		t = f;
 		if (strcmp(f->filename, n->filename) == 0) {
 			// Replace, then all is done
-			free(f->filename);
-			free(f->data);
-			free(f);
+			cpio_free(f);
 			vec_entry(v)[_i] = n;
 			return;
 		} else if (strcmp(f->filename, n->filename) > 0) {
@@ -42,7 +48,10 @@ static void cpio_vec_insert(vector *v, cpio_file *n) {
 			shift = 1;
 		}
 	}
-	vec_push_back(v, t);
+	if (shift)
+		vec_push_back(v, t);
+	else
+		vec_push_back(v, n);
 }
 
 static int cpio_compare(const void *a, const void *b) {
@@ -76,9 +85,8 @@ static void parse_cpio(const char *filename, vector *v) {
 		read(fd, f->filename, f->namesize);
 		file_align(fd, 4, 0);
 		if (strcmp(f->filename, "TRAILER!!!") == 0 || strcmp(f->filename, ".") == 0) {
-			free(f->filename);
-			free(f);
-			break;
+			cpio_free(f);
+			continue;
 		}
 		if (f->filesize) {
 			f->data = malloc(f->filesize);
@@ -93,7 +101,7 @@ static void parse_cpio(const char *filename, vector *v) {
 }
 
 static void dump_cpio(const char *filename, vector *v) {
-	printf("Dump cpio: [%s]\n\n", filename);
+	printf("\nDump cpio: [%s]\n\n", filename);
 	int fd = open_new(filename);
 	unsigned inode = 300000;
 	char header[111];
@@ -128,15 +136,14 @@ static void dump_cpio(const char *filename, vector *v) {
 	write(fd, header, 110);
 	write(fd, "TRAILER!!!\0", 11);
 	file_align(fd, 4, 1);
+	close(fd);
 }
 
 static void cpio_vec_destroy(vector *v) {
 	// Free each cpio_file
 	cpio_file *f;
 	vec_for_each(v, f) {
-		free(f->filename);
-		free(f->data);
-		free(f);
+		cpio_free(f);
 	}
 	vec_destroy(v);
 }
@@ -146,7 +153,11 @@ static void cpio_rm(int recursive, const char *entry, vector *v) {
 	vec_for_each(v, f) {
 		if ((recursive && strncmp(f->filename, entry, strlen(entry)) == 0)
 			|| (strcmp(f->filename, entry) == 0) ) {
-			f->remove = 1;
+			if (!f->remove) {
+				printf("Remove [%s]\n", entry);
+				f->remove = 1;
+			}
+			if (!recursive) return;
 		}
 	}
 }
@@ -158,6 +169,7 @@ static void cpio_mkdir(mode_t mode, const char *entry, vector *v) {
 	f->filename = malloc(f->namesize);
 	memcpy(f->filename, entry, f->namesize);
 	cpio_vec_insert(v, f);
+	printf("Create directory [%s] (%04o)\n",entry, mode);
 }
 
 static void cpio_add(mode_t mode, const char *entry, const char *filename, vector *v) {
@@ -173,7 +185,9 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, vecto
 	lseek(fd, 0, SEEK_SET);
 	f->data = malloc(f->filesize);
 	read(fd, f->data, f->filesize);
+	close(fd);
 	cpio_vec_insert(v, f);
+	printf("Add entry [%s] (%04o)\n", entry, mode);
 }
 
 static void cpio_test(vector *v) {
@@ -222,7 +236,6 @@ static void cpio_dmverity(vector *v) {
 			break;
 		}
 	}
-	printf("\n");
 }
 
 static void cpio_forceencrypt(vector *v) {
@@ -247,14 +260,13 @@ static void cpio_forceencrypt(vector *v) {
 			f->filesize = write;
 		}
 	}
-	printf("\n");
 }
 
 static void cpio_extract(const char *entry, const char *filename, vector *v) {
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
-			printf("Extracting [%s] to [%s]\n\n", entry, filename);
+			printf("Extracting [%s] to [%s]\n", entry, filename);
 			int fd = open_new(filename);
 			write(fd, f->data, f->filesize);
 			fchmod(fd, f->mode);
@@ -264,6 +276,134 @@ static void cpio_extract(const char *entry, const char *filename, vector *v) {
 		}
 	}
 	error(1, "Cannot find the file entry [%s]", entry);
+}
+
+static void cpio_backup(const char *orig, vector *v) {
+	vector o_body, *o = &o_body, bak;
+	cpio_file *m, *n, *dir, *rem;
+	char chk1[21], chk2[21], buf[PATH_MAX];
+	int res, doBak;
+
+	dir = calloc(sizeof(*dir), 1);
+	rem = calloc(sizeof(*rem), 1);
+	vec_init(o);
+	vec_init(&bak);
+	// First push back the directory and the rmlist
+	vec_push_back(&bak, dir);
+	vec_push_back(&bak, rem);
+	parse_cpio(orig, o);
+	// Remove possible backups in original ramdisk
+	cpio_rm(1, ".backup", o);
+	cpio_rm(1, ".backup", v);
+
+	// Init the directory and rmlist
+	dir->filename = strdup(".backup");
+	dir->namesize = strlen(dir->filename) + 1;
+	dir->mode = S_IFDIR;
+	rem->filename = strdup(".backup/.rmlist");
+	rem->namesize = strlen(rem->filename) + 1;
+	rem->mode = S_IFREG;
+
+	// Start comparing
+	size_t i = 0, j = 0;
+	while(i != vec_size(o) || j != vec_size(v)) {
+		doBak = 0;
+		if (i != vec_size(o) && j != vec_size(v)) {
+			m = vec_entry(o)[i];
+			n = vec_entry(v)[j];
+			res = strcmp(m->filename, n->filename);
+		} else if (i == vec_size(o)) {
+			n = vec_entry(v)[j];
+			res = 1;
+		} else if (j == vec_size(v)) {
+			m = vec_entry(o)[i];
+			res = -1;
+		}
+
+		if (res < 0) {
+			// Something is missing in new ramdisk, backup!
+			++i;
+			doBak = 1;
+			printf("Entry [%s] is missing\n", m->filename);
+		} else if (res == 0) {
+			// Do SHA1 checksum to check if file is identical
+			++i; ++j;
+			SHA1(chk1, m->data, m->filesize);
+			SHA1(chk2, n->data, n->filesize);
+			if (strcmp(chk1, chk2) != 0) {
+				// Not the same!
+				doBak = 1;
+				printf("Entry [%s] checksum missmatch\n", m->filename);
+			}
+		} else {
+			// Someting new in ramdisk, record in rem
+			++j;
+			if (n->remove) continue;
+			rem->data = realloc(rem->data, rem->filesize + n->namesize);
+			memcpy(rem->data + rem->filesize, n->filename, n->namesize);
+			rem->filesize += n->namesize;
+			printf("Entry [%s] is new\n", n->filename);
+		}
+		if (doBak) {
+			m->namesize += 8;
+			m->filename = realloc(m->filename, m->namesize);
+			strcpy(buf, m->filename);
+			sprintf(m->filename, ".backup/%s", buf);
+			vec_push_back(&bak, m);
+			// NULL the original entry, so it won't be freed
+			vec_entry(o)[i - 1] = NULL;
+		}
+	}
+
+	// Add the backup files to the original ramdisk
+	vec_for_each(&bak, m) {
+		vec_push_back(v, m);
+	}
+
+	// Don't include if empty
+	if (rem->filesize == 0) {
+		rem->remove = 1;
+		if (bak.size == 2)
+			dir->remove = 1;
+	}
+
+	// Sort
+	vec_sort(v, cpio_compare);
+
+	// Cleanup
+	cpio_vec_destroy(o);
+}
+
+static void cpio_restore(vector *v) {
+	cpio_file *f, *n;
+	vec_for_each(v, f) {
+		if (strstr(f->filename, ".backup") != NULL) {
+			f->remove = 1;
+			if (strcmp(f->filename, ".backup") == 0) continue;
+			if (strcmp(f->filename, ".backup/.rmlist") == 0) {
+				int pos = 0;
+				while(pos < f->filesize) {
+					cpio_rm(0, f->data + pos, v);
+					pos += strlen(f->data + pos) + 1;
+				}
+				continue;
+			}
+			n = calloc(sizeof(*n), 1);
+			memcpy(n, f, sizeof(*f));
+			n->namesize -= 8;
+			n->filename = malloc(n->namesize);
+			memcpy(n->filename, f->filename + 8, n->namesize);
+			n->data = malloc(n->filesize);
+			memcpy(n->data, f->data, n->filesize);
+			n->remove = 0;
+			printf("Restoring [%s] -> [%s]\n", f->filename, n->filename);
+			cpio_vec_insert(v, n);
+		}
+	}
+	// Some known stuff we can remove
+	cpio_rm(0, "sbin/magic_mask.sh", v);
+	cpio_rm(0, "init.magisk.rc", v);
+	cpio_rm(0, "magisk", v);
 }
 
 int cpio_commands(const char *command, int argc, char *argv[]) {
@@ -278,8 +418,10 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		cmd = DMVERITY;
 	} else if (strcmp(command, "patch-forceencrypt") == 0) {
 		cmd = FORCEENCRYPT;
-	} else if (argc == 2 && strcmp(command, "extract") == 0) {
-		cmd = EXTRACT;
+	} else if (strcmp(command, "restore") == 0) {
+		cmd = RESTORE;
+	} else if (argc == 1 && strcmp(command, "backup") == 0) {
+		cmd = BACKUP;
 	} else if (argc > 0 && strcmp(command, "rm") == 0) {
 		cmd = RM;
 		if (argc == 2 && strcmp(argv[0], "-r") == 0) {
@@ -287,6 +429,8 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 			++argv;
 			--argc;
 		}
+	} else if (argc == 2 && strcmp(command, "extract") == 0) {
+		cmd = EXTRACT;
 	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
 		cmd = MKDIR;
 	} else if (argc == 3 && strcmp(command, "add") == 0) {
@@ -308,11 +452,16 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		case FORCEENCRYPT:
 			cpio_forceencrypt(&v);
 			break;
-		case EXTRACT:
-			cpio_extract(argv[0], argv[1], &v);
+		case RESTORE:
+			cpio_restore(&v);
 			break;
+		case BACKUP:
+			cpio_backup(argv[0], &v);
 		case RM:
 			cpio_rm(recursive, argv[0], &v);
+			break;
+		case EXTRACT:
+			cpio_extract(argv[0], argv[1], &v);
 			break;
 		case MKDIR:
 			cpio_mkdir(strtoul(argv[0], NULL, 8), argv[1], &v);

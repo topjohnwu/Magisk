@@ -59,7 +59,9 @@ typedef enum {
     EXTRACT,
     TEST,
     DMVERITY,
-    FORCEENCRYPT
+    FORCEENCRYPT,
+    BACKUP,
+    RESTORE
 } command_t;
 
 extern char *SUP_EXT_LIST[SUP_NUM];

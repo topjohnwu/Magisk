@@ -30,6 +30,8 @@ static void usage(char *arg0) {
 	fprintf(stderr, "  --cpio-test <incpio>\n    Return value: 0/not patched 1/Magisk 2/SuperSU\n");
 	fprintf(stderr, "  --cpio-patch-dmverity <incpio>\n    Remove dm-verity\n");
 	fprintf(stderr, "  --cpio-patch-forceencrypt <incpio>\n    Change forceencrypt flag to encryptable\n");
+	fprintf(stderr, "  --cpio-backup <incpio> <origcpio>\n    Create ramdisk backups into <incpio> from <origcpio>\n");
+	fprintf(stderr, "  --cpio-restore <incpio>\n    Restore ramdisk from ramdisk backup within <incpio>\n");
 	fprintf(stderr, "\n");
 
 	fprintf(stderr, "%s --compress[=method] <file>\n", arg0);
