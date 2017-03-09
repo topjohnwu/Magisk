@@ -11,7 +11,7 @@ log_print() {
 }
 
 # Only disable when MagiskHide is started
-ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 || exit
+$TOOLPATH/ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 || exit
 
 log_print "Stopping MagiskHide daemon"
 
