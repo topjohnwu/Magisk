@@ -58,17 +58,17 @@ build_bin() {
   echo "* Copying binaries"
   echo "************************"
   mkcp "libs/armeabi-v7a/*" zip_static/arm
-  mkcp libs/armeabi-v7a/bootimgtools uninstaller/arm
+  mkcp libs/armeabi-v7a/magiskboot uninstaller/arm
   mkcp "libs/arm64-v8a/*" zip_static/arm64
-  mkcp libs/arm64-v8a/bootimgtools uninstaller/arm64
+  mkcp libs/arm64-v8a/magiskboot uninstaller/arm64
   mkcp "libs/x86/*" zip_static/x86
-  mkcp libs/x86/bootimgtools uninstaller/x86
+  mkcp libs/x86/magiskboot uninstaller/x86
   mkcp "libs/x86_64/*" zip_static/x64
-  mkcp libs/x86_64/bootimgtools uninstaller/x64
+  mkcp libs/x86_64/magiskboot uninstaller/x64
 }
 
 zip_package() {
-  [ ! -f "zip_static/arm/bootimgtools" ] && error "Missing binaries!! Please run '$0 build' before zipping"
+  [ ! -f "zip_static/arm/magiskboot" ] && error "Missing binaries!! Please run '$0 build' before zipping"
   echo "************************"
   echo "* Adding version info"
   echo "************************"
@@ -98,7 +98,7 @@ zip_package() {
 }
 
 zip_uninstaller() {
-  [ ! -f "uninstaller/arm/bootimgtools" ] && error "Missing binaries!! Please run '$0 build' before zipping"
+  [ ! -f "uninstaller/arm/magiskboot" ] && error "Missing binaries!! Please run '$0 build' before zipping"
   echo "************************"
   echo "* Copying files"
   echo "************************"
