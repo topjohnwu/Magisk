@@ -121,7 +121,7 @@ travel() {
         elif [ -L "$ITEM" ]; then
           # Copy symlinks
           mkdir -p "$DUMMDIR/$1" 2>/dev/null
-          cp -afc "$ITEM" $"DUMMDIR/$1/$ITEM"
+          cp -afc "$ITEM" "$DUMMDIR/$1/$ITEM"
         else
           # Create new dummy file and mount it
           mktouch "$DUMMDIR/$1/$ITEM"
