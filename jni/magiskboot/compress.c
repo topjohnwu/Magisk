@@ -362,25 +362,33 @@ int decomp(file_t type, const char *to, const unsigned char *from, size_t size) 
 // Output will be to.ext
 int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	char name[PATH_MAX];
+	const char *ext = strrchr(to, '.');
+	if (ext == NULL) ext = to;
+	strcpy(name, to);
 	switch (type) {
 		case GZIP:
-			sprintf(name, "%s.%s", to, "gz");
+			if (strcmp(ext, ".gz") != 0)
+				sprintf(name, "%s.%s", to, "gz");
 			gzip(1, name, from, size);
 			break;
 		case XZ:
-			sprintf(name, "%s.%s", to, "xz");
+			if (strcmp(ext, ".xz") != 0)
+				sprintf(name, "%s.%s", to, "xz");
 			lzma(1, name, from, size);
 			break;
 		case LZMA:
-			sprintf(name, "%s.%s", to, "lzma");
+			if (strcmp(ext, ".lzma") != 0)
+				sprintf(name, "%s.%s", to, "lzma");
 			lzma(2, name, from, size);
 			break;
 		case BZIP2:
-			sprintf(name, "%s.%s", to, "bz2");
+			if (strcmp(ext, ".bz2") != 0)
+				sprintf(name, "%s.%s", to, "bz2");
 			bzip2(1, name, from, size);
 			break;
 		case LZ4:
-			sprintf(name, "%s.%s", to, "lz4");
+			if (strcmp(ext, ".lz4") != 0)
+				sprintf(name, "%s.%s", to, "lz4");
 			lz4(1, name, from, size);
 			break;
 		default:
@@ -390,7 +398,7 @@ int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	return 0;
 }
 
-void decomp_file(char *from) {
+void decomp_file(char *from, const char *to) {
 	int ok = 1;
 	unsigned char *file;
 	size_t size;
@@ -428,17 +436,22 @@ void decomp_file(char *from) {
 	}
 	if (ok) {
 		// If all match, strip out the suffix
-		*ext = '\0';
-		decomp(type, from, file, size);
-		*ext = '.';
-		unlink(from);
+		if (!to) {
+			*ext = '\0';
+			to = from;
+		}
+		decomp(type, to, file, size);
+		if (to == from) {
+			*ext = '.';
+			unlink(from);
+		}
 	} else {
 		error(1, "Bad filename extention \'%s\'", ext);
 	}
 	munmap(file, size);
 }
 
-void comp_file(const char *method, const char *from) {
+void comp_file(const char *method, const char *from, const char *to) {
 	file_t type;
 	if (strcmp(method, "gzip") == 0) {
 		type = GZIP;
@@ -456,8 +469,11 @@ void comp_file(const char *method, const char *from) {
 	unsigned char *file;
 	size_t size;
 	mmap_ro(from, &file, &size);
-	comp(type, from, file, size);
+	if (!to)
+		to = from;
+	comp(type, to, file, size);
 	munmap(file, size);
-	unlink(from);
+	if (to == from)
+		unlink(from);
 }
 

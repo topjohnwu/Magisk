@@ -34,12 +34,12 @@ static void usage(char *arg0) {
 	fprintf(stderr, "  --cpio-restore <incpio>\n    Restore ramdisk from ramdisk backup within <incpio>\n");
 	fprintf(stderr, "\n");
 
-	fprintf(stderr, "%s --compress[=method] <file>\n", arg0);
-	fprintf(stderr, "  Compress <file> with [method], or gzip if not specified.\n  Supported methods: " SUP_LIST "\n");
+	fprintf(stderr, "%s --compress[=method] <infile> [outfile]\n", arg0);
+	fprintf(stderr, "  Compress <infile> with [method](default: gzip), optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
 	fprintf(stderr, "\n");
 
-	fprintf(stderr, "%s --decompress <file>\n", arg0);
-	fprintf(stderr, "  Auto check file type, and decompress <file> accordingly\n  Supported methods: " SUP_LIST "\n");
+	fprintf(stderr, "%s --decompress <infile> [outfile]\n", arg0);
+	fprintf(stderr, "  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
 	fprintf(stderr, "\n");
 
 	fprintf(stderr, "%s --sha1 <file>\n", arg0);
@@ -81,13 +81,13 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
-		decomp_file(argv[2]);
+		decomp_file(argv[2], argc > 3 ? argv[3] : NULL);
 	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {
 		char *method;
 		method = strchr(argv[1], '=');
 		if (method == NULL) method = "gzip";
 		else method++;
-		comp_file(method, argv[2]);
+		comp_file(method, argv[2], argc > 3 ? argv[3] : NULL);
 	} else if (argc > 4 && strcmp(argv[1], "--hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
 	} else if (argc > 2 && strncmp(argv[1], "--cpio", 6) == 0) {

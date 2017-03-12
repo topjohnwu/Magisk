@@ -104,6 +104,14 @@ void repack(const char* orig_image, const char* out_image) {
 		file_align(fd, hdr.page_size, 1);
 	}
 
+	// Check extra info, currently only for LG Bump and Samsung SEANDROIDENFORCE
+	if (extra) {
+		if (memcmp(extra, "SEANDROIDENFORCE", 16) == 0 || 
+			memcmp(extra, "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79", 16) == 0 ) {
+			restore_buf(extra, 16, fd);
+		}
+	}
+
 	// Write header back
 	printf("Repack to boot image: [%s]\n\n", out_image);
 	print_info();

@@ -266,13 +266,13 @@ static void cpio_extract(const char *entry, const char *filename, vector *v) {
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
-			printf("Extracting [%s] to [%s]\n", entry, filename);
+			printf("Extracting [%s] to [%s]\n\n", entry, filename);
 			int fd = open_new(filename);
 			write(fd, f->data, f->filesize);
 			fchmod(fd, f->mode);
 			fchown(fd, f->uid, f->gid);
 			close(fd);
-			return;
+			exit(0);
 		}
 	}
 	error(1, "Cannot find the file entry [%s]", entry);
@@ -374,18 +374,17 @@ static void cpio_backup(const char *orig, vector *v) {
 	cpio_vec_destroy(o);
 }
 
-static void cpio_restore(vector *v) {
+static int cpio_restore(vector *v) {
 	cpio_file *f, *n;
+	int ret = 1;
 	vec_for_each(v, f) {
 		if (strstr(f->filename, ".backup") != NULL) {
+			ret = 0;
 			f->remove = 1;
 			if (strcmp(f->filename, ".backup") == 0) continue;
 			if (strcmp(f->filename, ".backup/.rmlist") == 0) {
-				int pos = 0;
-				while(pos < f->filesize) {
+				for (int pos = 0; pos < f->filesize; pos += strlen(f->data + pos) + 1)
 					cpio_rm(0, f->data + pos, v);
-					pos += strlen(f->data + pos) + 1;
-				}
 				continue;
 			}
 			n = calloc(sizeof(*n), 1);
@@ -404,10 +403,11 @@ static void cpio_restore(vector *v) {
 	cpio_rm(0, "sbin/magic_mask.sh", v);
 	cpio_rm(0, "init.magisk.rc", v);
 	cpio_rm(0, "magisk", v);
+	return ret;
 }
 
 int cpio_commands(const char *command, int argc, char *argv[]) {
-	int recursive = 0;
+	int recursive = 0, ret = 0;
 	command_t cmd;
 	char *incpio = argv[0];
 	++argv;
@@ -453,7 +453,7 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 			cpio_forceencrypt(&v);
 			break;
 		case RESTORE:
-			cpio_restore(&v);
+			ret = cpio_restore(&v);
 			break;
 		case BACKUP:
 			cpio_backup(argv[0], &v);
@@ -475,5 +475,5 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	}
 	dump_cpio(incpio, &v);
 	cpio_vec_destroy(&v);
-	return 0;
+	exit(ret);
 }

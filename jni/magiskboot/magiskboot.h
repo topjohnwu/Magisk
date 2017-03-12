@@ -90,7 +90,7 @@ void vec_destroy(vector *v);
     for (size_t _i = 0; _i < (v)->size; ++_i, e = (v)->data[_i])
 
 // Global variables
-extern unsigned char *kernel, *ramdisk, *second, *dtb;
+extern unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
 extern boot_img_hdr hdr;
 extern file_t boot_type, ramdisk_type, dtb_type;
 extern int mtk_kernel, mtk_ramdisk;
@@ -110,9 +110,9 @@ void lzma(int mode, const char* filename, const unsigned char* buf, size_t size)
 void lz4(int mode, const char* filename, const unsigned char* buf, size_t size);
 void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size);
 int comp(file_t type, const char *to, const unsigned char *from, size_t size);
-void comp_file(const char *method, const char *from);
+void comp_file(const char *method, const char *from, const char *to);
 int decomp(file_t type, const char *to, const unsigned char *from, size_t size);
-void decomp_file(char *from);
+void decomp_file(char *from, const char *to);
 
 // Utils
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size);

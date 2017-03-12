@@ -2,7 +2,7 @@
 #include "elf.h"
 #include "magiskboot.h"
 
-unsigned char *kernel, *ramdisk, *second, *dtb;
+unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
 boot_img_hdr hdr;
 int mtk_kernel = 0, mtk_ramdisk = 0;
 file_t boot_type, ramdisk_type, dtb_type;
@@ -186,7 +186,7 @@ static void parse_elf(unsigned char *base) {
 	check_headers();
 }
 
-static void parse_aosp(unsigned char *base) {
+static void parse_aosp(unsigned char *base, size_t size) {
 
 	printf("IMG [AOSP]\n");
 
@@ -220,12 +220,16 @@ static void parse_aosp(unsigned char *base) {
 		mem_align(&pos, hdr.page_size);
 	}
 
+	if (pos < size) {
+		extra = base + pos;
+	}
+
 	check_headers();
 }
 
 void parse_img(unsigned char *orig, size_t size) {
-	unsigned char *base;
-	for(base = orig; base < (orig + size); base += 256) {
+	unsigned char *base, *end;
+	for(base = orig, end = orig + size; base < end; base += 256, size -= 256) {
 		switch (check_type(base)) {
 			case CHROMEOS:
 				boot_type = CHROMEOS;
@@ -234,7 +238,7 @@ void parse_img(unsigned char *orig, size_t size) {
 				// Don't override CHROMEOS
 				if (boot_type != CHROMEOS)
 					boot_type = AOSP;
-				parse_aosp(base);
+				parse_aosp(base, size);
 				return;
 			case ELF:
 				boot_type = ELF;
