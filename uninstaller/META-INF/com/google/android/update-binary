@@ -49,20 +49,6 @@ ui_print() {
   echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
 }
 
-getvar() {
-  local VARNAME=$1
-  local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /data/.magisk /cache/.magisk /system/.magisk; do
-    if [ -z "$VALUE" ]; then
-      LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
-      if [ ! -z "$LINE" ]; then
-        VALUE=${LINE#*=}
-      fi
-    fi
-  done
-  eval $VARNAME=\$VALUE
-}
-
 is_mounted() {
   if [ ! -z "$2" ]; then
     cat /proc/mounts | grep $1 | grep $2, >/dev/null
@@ -105,10 +91,10 @@ if [ ! -f '/system/build.prop' ]; then
   exit 1
 fi
 
-API=$(grep_prop ro.build.version.sdk)
-ABI=$(grep_prop ro.product.cpu.abi | cut -c-3)
-ABI2=$(grep_prop ro.product.cpu.abi2 | cut -c-3)
-ABILONG=$(grep_prop ro.product.cpu.abi)
+API=`grep_prop ro.build.version.sdk`
+ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
+ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
+ABILONG=`grep_prop ro.product.cpu.abi`
 
 ARCH=arm
 IS64BIT=false
@@ -129,15 +115,8 @@ cp -af $BINDIR/* $CHROMEDIR /data/magisk
 # Detection all done, start installing
 ##########################################################################################
 
-ui_print "- Found Boot Image: $BOOTIMAGE"
-
 if (is_mounted /data); then
-  ui_print "- Running uninstaller scripts"
-  sh $INSTALLER/common/magisk_uninstaller.sh
-  if [ $? -ne 0 ]; then
-    ui_print "! Magisk is not installed or an error occurred"
-    exit 1
-  fi
+  . $INSTALLER/common/magisk_uninstaller.sh
 else
   ui_print "! Data unavailable"
   ui_print "! Placing uninstall script to /cache"

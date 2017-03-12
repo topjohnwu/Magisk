@@ -75,10 +75,8 @@ EXIT /B %ERRORLEVEL%
   2>NUL RMDIR /S /Q zip_static\x64
   2>NUL RMDIR /S /Q zip_static\chromeos
   2>NUL DEL zip_static\META-INF\com\google\android\update-binary
-  2>NUL DEL zip_static\common\custom_ramdisk_patch.sh
-  2>NUL DEL zip_static\common\magisksu.sh
-  2>NUL DEL zip_static\common\init.magisk.rc
-  2>NUL DEL zip_static\common\magic_mask.sh
+  2>NUL DEL zip_static\common\*.sh
+  2>NUL DEL zip_static\common\*.rc
   2>NUL RMDIR /S /Q uninstaller\common
   2>NUL RMDIR /S /Q uninstaller\arm
   2>NUL RMDIR /S /Q uninstaller\arm64
@@ -104,7 +102,7 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying Files
   ECHO ************************
-  COPY /Y scripts\custom_ramdisk_patch.sh zip_static\common\custom_ramdisk_patch.sh
+  COPY /Y scripts\ramdisk_patch.sh zip_static\common\ramdisk_patch.sh
   COPY /Y scripts\magisksu.sh zip_static\common\magisksu.sh
   COPY /Y scripts\init.magisk.rc zip_static\common\init.magisk.rc
   COPY /Y binaries\busybox-arm zip_static\arm\busybox

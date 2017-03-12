@@ -17,8 +17,6 @@ ziptools/zipadjust
 
 # Generated scripts
 uninstaller/common/
-zip_static/common/magic_mask.sh
-zip_static/common/magisksu.sh
-zip_static/common/init.magisk.rc
-zip_static/common/custom_ramdisk_patch.sh
+zip_static/common/*.sh
+zip_static/common/*.rc
 zip_static/META-INF/com/google/android/update-binary
