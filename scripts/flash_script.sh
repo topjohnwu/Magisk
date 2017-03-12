@@ -198,12 +198,8 @@ getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
 getvar BOOTIMAGE
 
-if [ -z "$KEEPVERITY" ]; then
-  KEEPVERITY=false
-fi
-if [ -z "$KEEPFORCEENCRYPT" ]; then
-  KEEPFORCEENCRYPT=false
-fi
+[ -z $KEEPVERITY ] && KEEPVERITY=false
+[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 
 # Check if system root is installed and remove
 remove_system_su
@@ -229,13 +225,13 @@ fi
 ui_print "- Device platform: $ARCH"
 
 BINDIR=$INSTALLER/$ARCH
-chmod -R 755 $CHROMEDIR/futility $BINDIR
+chmod -R 755 $CHROMEDIR $BINDIR
 
 SYSTEMLIB=/system/lib
 $IS64BIT && SYSTEMLIB=/system/lib64
 
 find_boot_image
-if [ -z "$BOOTIMAGE" ]; then
+if [ -z $BOOTIMAGE ]; then
   ui_print "! Unable to detect boot image"
   exit 1
 fi
@@ -258,6 +254,7 @@ chmod -R 755 $MAGISKBIN
 chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
 
 # Temporary busybox for installation
+rm -rf $TMPDIR/busybox 2>/dev/null
 mkdir -p $TMPDIR/busybox
 $BINDIR/busybox --install -s $TMPDIR/busybox
 rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
@@ -456,9 +453,9 @@ esac
 
 # Sign chromeos boot
 if [ -f chromeos ]; then
-  cp -af $CHROMEDIR/. $MAGISKBIN/chromeos 
-  echo " " > config
-  echo " " > bootloader
+  cp -af $CHROMEDIR/. $MAGISKBIN/chromeos
+  echo > config
+  echo > bootloader
   LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
   rm -f new-boot.img
   mv new-boot.img.signed new-boot.img

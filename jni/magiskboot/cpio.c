@@ -196,7 +196,7 @@ static void cpio_test(vector *v) {
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, "sbin/launch_daemonsu.sh") == 0) {
 			if (!ret) ret = 2;
-		} else if (strcmp(f->filename, "magisk") == 0) {
+		} else if (strcmp(f->filename, "init.magisk.rc") == 0) {
 			ret = 1;
 			break;
 		}

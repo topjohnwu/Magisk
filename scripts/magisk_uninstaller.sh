@@ -114,12 +114,11 @@ esac
 
 # Sign chromeos boot
 if [ -f chromeos ]; then
-  cp -af $CHROMEDIR/. $MAGISKBIN/chromeos 
   echo > config
   echo > bootloader
-  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
-  rm -f new-boot.img
-  mv new-boot.img.signed new-boot.img
+  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack stock_boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz stock_boot.img --config config --arch arm --bootloader bootloader --flags 0x1
+  rm -f stock_boot.img
+  mv stock_boot.img.signed stock_boot.img
 fi
 
 ui_print_wrapper "- Flashing stock/reverted image"
