@@ -3,6 +3,7 @@
 
 char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4" };
 file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4 };
+int zero = -1;
 
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size) {
 	int fd = open(filename, O_RDONLY);
@@ -65,12 +66,18 @@ void mem_align(size_t *pos, size_t align) {
 void file_align(int fd, size_t align, int out) {
 	size_t pos = lseek(fd, 0, SEEK_CUR);
 	size_t mask = align - 1;
+	size_t off;
 	if (pos & mask) {
-		pos += align - (pos & mask);
+		off = align - (pos & mask);
 		if (out) {
-			ftruncate(fd, pos);
+			if (zero < 0) {
+				zero = open("/dev/zero", O_RDONLY);
+				if (zero < 0) error(1, "Cannot open /dev/zero");
+			}
+			sendfile(fd, zero, NULL, off);
+		} else {
+			lseek(fd, pos + off, SEEK_SET);
 		}
-		lseek(fd, pos, SEEK_SET);
 	}
 }
 

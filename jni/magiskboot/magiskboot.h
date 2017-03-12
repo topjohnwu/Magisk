@@ -94,6 +94,7 @@ extern unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
 extern boot_img_hdr hdr;
 extern file_t boot_type, ramdisk_type, dtb_type;
 extern int mtk_kernel, mtk_ramdisk;
+extern int zero;
 
 // Main entries
 void unpack(const char *image);

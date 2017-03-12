@@ -66,7 +66,7 @@ typedef uint64_t	elf64_xword;
 #define EM_ARM			40
 #define EI_NIDENT		16
 
-typedef struct elf32_ehdr{
+typedef struct elf32_ehdr {
 	unsigned char	e_ident[EI_NIDENT];
 	elf32_half		e_type;
 	elf32_half		e_machine;
@@ -100,7 +100,7 @@ typedef struct elf64_ehdr {
 	elf64_half		e_shstrndx;
 } elf64_ehdr;
 
-typedef struct elf32_phdr{
+typedef struct elf32_phdr {
 	elf32_word		p_type;
 	elf32_off		p_offset;
 	elf32_addr		p_vaddr;

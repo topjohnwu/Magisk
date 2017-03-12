@@ -14,16 +14,23 @@ static size_t restore(const char *filename, int fd) {
 	return size;
 }
 
-static void restore_buf(const void *buf, size_t size, int fd) {
+static void restore_buf(int fd, const void *buf, size_t size) {
 	if (write(fd, buf, size) != size) {
 		error(1, "Cannot dump from input file\n");
 	}
 }
 
 void repack(const char* orig_image, const char* out_image) {
+	zero = open("/dev/zero", O_RDONLY);
+	if (zero < 0) error(1, "Cannot open /dev/zero");
+
 	size_t size;
 	unsigned char *orig;
 	char name[PATH_MAX];
+
+	// There are possible two MTK headers
+	mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
+	size_t mtk_kernel_off, mtk_ramdisk_off;
 
 	// Load original image
 	mmap_ro(orig_image, &orig, &size);
@@ -31,6 +38,8 @@ void repack(const char* orig_image, const char* out_image) {
 	// Parse original image
 	printf("Parsing boot image: [%s]\n\n", orig_image);
 	parse_img(orig, size);
+
+	printf("Repack to boot image: [%s]\n\n", out_image);
 
 	// Create new image
 	int fd = open_new(out_image);
@@ -42,23 +51,23 @@ void repack(const char* orig_image, const char* out_image) {
 	hdr.dt_size = 0;
 
 	// Skip a page for header
-	ftruncate(fd, hdr.page_size);
-	lseek(fd, 0, SEEK_END);
+	sendfile(fd, zero, NULL, hdr.page_size);
 
 	// Restore kernel
 	if (mtk_kernel) {
-		restore_buf(kernel, 512, fd);
-		hdr.kernel_size += 512;
+		mtk_kernel_off = lseek(fd, 0, SEEK_CUR);
+		sendfile(fd, zero, NULL, 512);
+		memcpy(&mtk_kernel_hdr, kernel, sizeof(mtk_kernel_hdr));
 	}
-	hdr.kernel_size += restore(KERNEL_FILE, fd);
+	hdr.kernel_size = restore(KERNEL_FILE, fd);
 	file_align(fd, hdr.page_size, 1);
 
 	// Restore ramdisk
 	if (mtk_ramdisk) {
-		restore_buf(ramdisk, 512, fd);
-		hdr.ramdisk_size += 512;
+		mtk_ramdisk_off = lseek(fd, 0, SEEK_CUR);
+		sendfile(fd, zero, NULL, 512);
+		memcpy(&mtk_ramdisk_hdr, ramdisk, sizeof(mtk_ramdisk_hdr));
 	}
-
 	if (access(RAMDISK_FILE, R_OK) == 0) {
 		// If we found raw cpio, compress to original format
 
@@ -89,18 +98,18 @@ void repack(const char* orig_image, const char* out_image) {
 	}
 	if (!found)
 		error(1, "No ramdisk exists!");
-	hdr.ramdisk_size += restore(name, fd);
+	hdr.ramdisk_size = restore(name, fd);
 	file_align(fd, hdr.page_size, 1);
 
 	// Restore second
 	if (access(SECOND_FILE, R_OK) == 0) {
-		hdr.second_size += restore(SECOND_FILE, fd);
+		hdr.second_size = restore(SECOND_FILE, fd);
 		file_align(fd, hdr.page_size, 1);
 	}
 
 	// Restore dtb
 	if (access(DTB_FILE, R_OK) == 0) {
-		hdr.dt_size += restore(DTB_FILE, fd);
+		hdr.dt_size = restore(DTB_FILE, fd);
 		file_align(fd, hdr.page_size, 1);
 	}
 
@@ -108,18 +117,32 @@ void repack(const char* orig_image, const char* out_image) {
 	if (extra) {
 		if (memcmp(extra, "SEANDROIDENFORCE", 16) == 0 || 
 			memcmp(extra, "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79", 16) == 0 ) {
-			restore_buf(extra, 16, fd);
+			restore_buf(fd, extra, 16);
 		}
 	}
 
-	// Write header back
-	printf("Repack to boot image: [%s]\n\n", out_image);
-	print_info();
+	// Write headers back
+	if (mtk_kernel) {
+		lseek(fd, mtk_kernel_off, SEEK_SET);
+		mtk_kernel_hdr.size = hdr.kernel_size;
+		hdr.kernel_size += 512;
+		restore_buf(fd, &mtk_kernel_hdr, sizeof(mtk_kernel_hdr));
+	}
+	if (mtk_ramdisk) {
+		lseek(fd, mtk_ramdisk_off, SEEK_SET);
+		mtk_ramdisk_hdr.size = hdr.ramdisk_size;
+		hdr.ramdisk_size += 512;
+		restore_buf(fd, &mtk_ramdisk_hdr, sizeof(mtk_ramdisk_hdr));
+	}
+	// Main header
 	lseek(fd, 0, SEEK_SET);
-	write(fd, &hdr, sizeof(hdr));
+	restore_buf(fd, &hdr, sizeof(hdr));
+
+	// Print new image info
+	print_info();
 
 	munmap(orig, size);
-	if (lseek(fd, 0, SEEK_CUR) > size) {
+	if (lseek(fd, 0, SEEK_END) > size) {
 		error(2, "Boot partition too small!");
 	}
 	close(fd);

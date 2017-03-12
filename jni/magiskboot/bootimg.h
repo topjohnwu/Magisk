@@ -93,4 +93,10 @@ struct boot_img_hdr
 **    else: jump to kernel_addr
 */
 
+typedef struct mtk_hdr {
+   uint8_t magic[4];    /* MTK magic */
+   uint32_t size;       /* Size of the content */
+   uint8_t name[32];    /* The type of the header */
+} mtk_hdr;
+
 #endif
