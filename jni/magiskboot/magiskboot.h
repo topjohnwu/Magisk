@@ -94,7 +94,6 @@ extern unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
 extern boot_img_hdr hdr;
 extern file_t boot_type, ramdisk_type, dtb_type;
 extern int mtk_kernel, mtk_ramdisk;
-extern int zero;
 
 // Main entries
 void unpack(const char *image);
@@ -119,6 +118,7 @@ void decomp_file(char *from, const char *to);
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size);
 void mmap_rw(const char *filename, unsigned char **buf, size_t *size);
 file_t check_type(const unsigned char *buf);
+void write_zero(int fd, size_t size);
 void mem_align(size_t *pos, size_t align);
 void file_align(int fd, size_t align, int out);
 int open_new(const char *filename);
