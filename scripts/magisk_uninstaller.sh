@@ -15,7 +15,7 @@ SYSTEMLIB=/system/lib
 umask 022
 
 ui_print_wrapper() {
-  type ui_print_wrapper >/dev/null && ui_print "$1" || echo "$1"
+  type ui_print >/dev/null && ui_print "$1" || echo "$1"
 }
 
 grep_prop() {
