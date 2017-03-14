@@ -55,6 +55,30 @@ unblock() {
   exit
 }
 
+bind_mount() {
+  if [ -e "$1" -a -e "$2" ]; then
+    mount -o bind "$1" "$2" || log_print "Mount Fail: $1 -> $2"
+  fi
+}
+
+loopsetup() {
+  LOOPDEVICE=
+  for DEV in `ls /dev/block/loop*`; do
+    if losetup $DEV $1; then
+      LOOPDEVICE=$DEV
+      break
+    fi
+  done
+}
+
+target_size_check() {
+  e2fsck -p -f "$1"
+  curBlocks=`e2fsck -n $1 2>/dev/null | cut -d, -f3 | cut -d\  -f2`;
+  curUsedM=$((`echo "$curBlocks" | cut -d/ -f1` * 4 / 1024));
+  curSizeM=$((`echo "$curBlocks" | cut -d/ -f2` * 4 / 1024));
+  curFreeM=$((curSizeM - curUsedM));
+}
+
 run_scripts() {
   BASE=$MOUNTPOINT
   for MOD in $BASE/* ; do
@@ -77,53 +101,40 @@ run_scripts() {
   done
 }
 
-loopsetup() {
-  LOOPDEVICE=
-  for DEV in `ls /dev/block/loop*`; do
-    if losetup $DEV $1; then
-      LOOPDEVICE=$DEV
-      break
-    fi
-  done
-}
-
-target_size_check() {
-  e2fsck -p -f "$1"
-  curBlocks=`e2fsck -n $1 2>/dev/null | cut -d, -f3 | cut -d\  -f2`;
-  curUsedM=$((`echo "$curBlocks" | cut -d/ -f1` * 4 / 1024));
-  curSizeM=$((`echo "$curBlocks" | cut -d/ -f2` * 4 / 1024));
-  curFreeM=$((curSizeM - curUsedM));
-}
-
 travel() {
-  # Ignore /system/vendor, we will handle it differently
-  [ "$1" = "system/vendor" ] && return
-
   cd "$TRAVEL_ROOT/$1"
   if [ -f .replace ]; then
+    log_print "Replace: /$1"
     rm -rf "$MOUNTINFO/$1"
     mktouch "$MOUNTINFO/$1" "$TRAVEL_ROOT"
   else
     for ITEM in * ; do
-      # This means it an empty folder (shouldn't happen, but better to be safe)
-      [ "$ITEM" = "*" ] && return;
+      # This means it's an empty folder (shouldn't happen, but better to be safe)
+      [ "$ITEM" = "*" ] && return
+      # Ignore /system/vendor since we will handle it differently
+      [ "$1" = "system" -a "$ITEM" = "vendor" ] && continue
+
       # Target not found or target/file is a symlink
       if [ ! -e "/$1/$ITEM" -o -L "/$1/$ITEM" -o -L "$ITEM" ]; then
         # If we are in a higher level, delete the lower levels
         rm -rf "$MOUNTINFO/dummy/$1" 2>/dev/null
         # Mount the dummy parent
+        log_print "Replace with dummy: /$1"
         mktouch "$MOUNTINFO/dummy/$1"
 
-        if [ -d "$ITEM" ]; then
-          # Create new dummy directory and mount it
-          mkdir -p "$DUMMDIR/$1/$ITEM"
-          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
-        elif [ -L "$ITEM" ]; then
+        if [ -L "$ITEM" ]; then
           # Copy symlinks
+          log_print "Symlink: /$1/$ITEM"
           mkdir -p "$DUMMDIR/$1" 2>/dev/null
           cp -afc "$ITEM" $"DUMMDIR/$1/$ITEM"
+        elif [ -d "$ITEM" ]; then
+          # Create new dummy directory and mount it
+          log_print "New directory: /$1/$ITEM"
+          mkdir -p "$DUMMDIR/$1/$ITEM"
+          mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         else
           # Create new dummy file and mount it
+          log_print "New file: /$1/$ITEM"
           mktouch "$DUMMDIR/$1/$ITEM"
           mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         fi
@@ -133,6 +144,7 @@ travel() {
           (travel "$1/$ITEM")
         elif [ ! -L "$ITEM" ]; then
           # Mount this file
+          log_print "Replace: /$1/$ITEM"
           mktouch "$MOUNTINFO/$1/$ITEM" "$TRAVEL_ROOT"
         fi
       fi
@@ -164,22 +176,14 @@ clone_dummy() {
           else
             mktouch "$DUMMDIR$REAL"
           fi
-          [ ! -e "$MOUNTINFO$REAL" ] && mktouch "$MOUNTINFO/mirror$REAL"
+          if [ ! -e "$MOUNTINFO$REAL" ]; then
+            log_print "Clone skeleton: $REAL"
+            mktouch "$MOUNTINFO/mirror$REAL"
+          fi
         fi
       fi
     fi
   done
-}
-
-bind_mount() {
-  if [ -e "$1" -a -e "$2" ]; then
-    mount -o bind "$1" "$2"
-    if [ $? -eq 0 ]; then 
-      log_print "Mount: $1"
-    else 
-      log_print "Mount Fail: $1"
-    fi 
-  fi
 }
 
 merge_image() {
@@ -396,6 +400,7 @@ case $1 in
       # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
         if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
+          log_print "Analyzing module: $MOD"
           TRAVEL_ROOT=$MOD
           (travel system)
           rm -f $MOD/vendor 2>/dev/null
