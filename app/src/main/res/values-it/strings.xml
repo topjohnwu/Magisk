@@ -1,9 +1,13 @@
 <resources>
     <!--Universal-->
 
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+    
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer di navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer di navigazione</string>
+    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Moduli</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -16,6 +20,7 @@
     
     <string name="magisk_version">Versione Magisk: v%1$s</string>
     <string name="magisk_version_error">Hai installato Magisk?</string>
+    <string name="magisk_version_disable">Magisk v%1$s disabilitato</string>
     <string name="checking_for_updates">Controlla aggiornamenti…</string>
     <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
@@ -35,14 +40,19 @@
     
         <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
-    <string name="boot_image_title">Boot Image</string>
+    <string name="cannot_auto_detect">(Cannot auto detect)</string>
+    <string name="boot_image_title">Immagine Boot</string>
     <string name="detect_button">Identifica</string>
     <string name="advanced_settings_title">Impostazioni Avanzate</string>
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni dm-verity</string>
     <string name="current_magisk_title">Versione Magisk installata: %1$s</string>
     <string name="install_magisk_title">Ultima versione Magisk: %1$s</string>
-
+ <string name="uninstall">Disinstalla</string>
+    <string name="reboot_countdown">Riavvio in %1$d</string>
+    <string name="uninstall_magisk_title">Disinstalla Magisk</string>
+    <string name="uninstall_magisk_msg">Questo rimuoverà tutti i moduli, MagiskSU, e potenzialmente crittografare i dati, se non crittografati/nVuoi continuare?</string>
+<string name="version_none">(None)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
@@ -83,41 +93,111 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Questa funzione non funziona senza il permesso di scrivere sulla memoria di archiviazione esterna</string>
     <string name="no_thanks">No grazie</string>
+    <string name="yes">Sì</string>
+    <string name="ok">OK</string>
+    <string name="close">Chiuso</string>
     <string name="repo_install_title">Installazione %1$s</string>
     <string name="repo_install_msg">Vuoi installare %1$s ?</string>
     <string name="download_install">Scarica e installa</string>
+    <string name="download">Download</string>
+<string name="goto_install">Valla alla sezione \"Install\"</string>
     <string name="download_file_error">Errore nel download del file</string>
     <string name="install_error">Errore di installazione!</string>
     <string name="invalid_zip">Lo zip non è un Modulo Magisk!!</string>
     <string name="reboot_title">Installazione completata</string>
     <string name="reboot_msg">Vuoi riavviare ora?</string>
     <string name="reboot">Riavvia</string>
+    <string name="copying_msg">Copia Zip in una directory temporanea</string>
     <string name="zip_install_progress_title">Installazione</string>
+    <string name="zip_unzip_msg">Unzip zip file …</string>
+    <string name="zip_process_msg">Elaborazione file Zip …</string>
     <string name="zip_install_progress_msg">Installazione %1$s …</string>
     <string name="no_magisk_title">Magisk non installato!</string>
     <string name="no_magisk_msg">Vuoi scaricare ed installare Magisk?</string>
+     <string name="downloading_toast">Download %1$s</string>
+    <string name="magisk_update_title">Nuovo aggiornamento Magisk disponibile!</string>
+    <string name="settings_reboot_toast">Riavvia per applicare</string>
+    <string name="release_notes">Note di Rilascio</string>
+    <string name="repo_cache_cleared">Cache Repo cancellata</string>
+    <string name="safetyNet_hide_notice">Quest\'app usa SafetyNet\nè già gestita da Magisk Hide</string>
+    <string name="start_magiskhide">Avvio MagiskHide …</string>
+    <string name="no_magisksu_title">MagiskSU non in uso!</string>
+    <string name="no_magisksu_msg">You are not rooted with MagiskSU, using MagiskHide itself might not be enough!\nIt\'s not officially supported, and you would need additional tools (e.g suhide) to pass Safety Net.</string>
+    <string name="understand">Capisco</string>
+    <string name="process_error">Errore di processo</string>
+    <string name="internal_storage">Lo zip si trova in:\n[Internal Storage]%1$s</string>
+    <string name="zip_process_title">Elaborazione</string>
+<string name="manual_boot_image">Seleziona manualmente l'immagine di Boot!</string>
 
-    <!--URL Templates-->
 
-    <!--Settings Fragment -->
-    <string name="settings_general_category">Generali</string>
-    <string name="settings_dark_theme_title">Tema</string>
-    <string name="settings_dark_theme_summary">Scegli un tema</string>
+    <!--Settings Activity -->
+    <string name="settings_general_category">General</string>
+    <string name="settings_dark_theme_title">Tema Scuro</string>
+    <string name="settings_dark_theme_summary">Abilita Tema Scuro</string>
+    <string name="settings_notification_title">Notifica Aggiornamento</string>
+    <string name="settings_notification_summary">Mostra notifiche quando sono diponibili nuovi aggiornamenti</string>
+    <string name="settings_clear_cache_title">Pulisci Cache Repo</string>
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
 
+    <string name="settings_disable_title">Disabilita Magisk</string>
+    <string name="settings_disable_summary">Tutto sarà disattivato tranne il Root (MagiskSU)</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Abilita BusyBox</string>
+    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
 
-    <string name="settings_development_category">Development</string>
-    <string name="settings_developer_logging_title">Abilita Debug log avanzato</string>
-    <string name="settings_developer_logging_summary">Abilita questa funzione per avere un log più dettagliato.</string>
-    <string name="settings_shell_logging_title">Abilita shell di registrazione dei comandi di debug</string>
-    <string name="settings_shell_logging_summary">Abilita questa funzione per abilitare la registrazione tutti i comandi e l\'output della shell</string>
+    <string name="settings_su_app_adb">Apps e ADB</string>
+    <string name="settings_su_app">Solo Apps</string>
+    <string name="settings_su_adb">Solo ADB</string>
+    <string name="settings_su_disable">Disabilitato</string>
+    <string name="settings_su_request_10">10 secondi</string>
+    <string name="settings_su_request_20">20 secondi</string>
+    <string name="settings_su_request_30">30 secondi</string>
+    <string name="settings_su_request_60">60 secondi</string>
+    <string name="superuser_access">Accesso Superuser</string>
+    <string name="auto_response">Risposta Automatica</string>
+    <string name="request_timeout">Timeout richiesto</string>
+    <string name="superuser_notification">Notifica Superuser</string>
+    <string name="request_timeout_summary">%1$s secondi</string>
 
-    <!-- Strings related to Settings -->
+    <string name="settings_development_category">App Development</string>
+    <string name="settings_developer_logging_title">Abilita Debug Log Avanzato</string>
+    <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>
+    <string name="settings_shell_logging_title">Abilita comandi shell debug log</string>
+    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and its output</string>
 
-    <!-- Example General settings -->
+    <!--Superuser-->
+    <string name="su_request_title">Richiesta Superuser</string>
+    <string name="deny_with_str">Nega%1$s</string>
+    <string name="deny">Nega</string>
+    <string name="prompt">Prompt</string>
+    <string name="grant">Concedi</string>
+    <string name="su_warning">Concede il pieno accesso al dispositivo.\nNega se non sei sicuro</string>
+    <string name="forever">Sempre</string>
+    <string name="once">Una volta</string>
+    <string name="tenmin">10 minuti</string>
+    <string name="twentymin">20 minuti</string>
+    <string name="thirtymin">30 minuti</string>
+    <string name="sixtymin">60 minuti</string>
+    <string name="su_allow_toast">%1$s ha ottenuto i permessi Superuser</string>
+    <string name="su_deny_toast">%1$s non ha ottenuto i permessi Superuser</string>
+    <string name="no_apps_found">Nessuna app trovata</string>
+    <string name="su_snack_grant">Permessi Superuser per %1$s ottenuti</string>
+    <string name="su_snack_deny">Permessi Superuser per %1$s non ottenuti</string>
+    <string name="su_snack_notif_on">Notifiche per %1$s abilitate</string>
+    <string name="su_snack_notif_off">Notifiche per %1$s disabilitate</string>
+    <string name="su_snack_log_on">Log per %1$s è abilitato</string>
+    <string name="su_snack_log_off">Log per  %1$s è disabilitato</string>
+    <string name="su_snack_revoke">%1$s rights are revoked</string>
+    <string name="su_revoke_title">Revoke?</string>
+    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+    <string name="toast">Toast</string>
+    <string name="none">Nessuno</string>
 
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Target UID:\u0020</string>
+<string name="command">Command:\u0020</string>
 
 </resources>
