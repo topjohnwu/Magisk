@@ -17,6 +17,7 @@ ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/magisk
+COMMONDIR=$INSTALLER/common
 BOOTTMP=$TMPDIR/boottmp
 COREDIR=/magisk/.core
 CHROMEDIR=$INSTALLER/chromeos
@@ -178,7 +179,7 @@ ui_print "*****************************"
 ui_print "MAGISK_VERSION_STUB"
 ui_print "*****************************"
 
-if [ ! -d "$INSTALLER/common" ]; then
+if [ ! -d "$COMMONDIR" ]; then
   ui_print "! Failed: Unable to extract zip file!"
   exit 1
 fi
@@ -248,8 +249,8 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/magiskboot \
-       $INSTALLER/common/ramdisk_patch.sh $INSTALLER/common/init.magisk.rc \
-       $INSTALLER/common/magic_mask.sh $MAGISKBIN
+       $COMMONDIR/ramdisk_patch.sh $COMMONDIR/init.magisk.rc \
+       $COMMONDIR/magic_mask.sh $COMMONDIR/magisk.apk $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
 
@@ -332,7 +333,7 @@ case $? in
     SUPERSU=true
     ui_print "- SuperSU patched boot detected!"
     ui_print "- Adding auto patch script for SuperSU"
-    cp -af $INSTALLER/common/ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+    cp -af $COMMONDIR/ramdisk_patch.sh /data/custom_ramdisk_patch.sh
     is_mounted /data && SUIMG=/data/su.img || SUIMG=/cache/su.img
     mount_image $SUIMG /su
     SUPERSULOOP=$LOOPDEVICE
@@ -373,7 +374,7 @@ esac
 
 # All ramdisk patch commands are stored in a separate script
 ui_print "- Patching ramdisk"
-. $INSTALLER/common/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
+. $COMMONDIR/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
 
 cd $BOOTTMP
 # Create ramdisk backups
@@ -403,7 +404,7 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  make_ext4fs -l 64M -a /magisk -S $INSTALLER/common/file_contexts_image $IMG
+  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
 fi
 
 mount_image $IMG /magisk
@@ -415,14 +416,14 @@ MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
 mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-cp -af $INSTALLER/common/magiskhide/. $BINDIR/magiskhide $COREDIR/magiskhide
+cp -af $COMMONDIR/magiskhide/. $BINDIR/magiskhide $COREDIR/magiskhide
 chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 
 if ! $SUPERSU; then
   ui_print "- Installing MagiskSU"
   mkdir -p $COREDIR/su 2>/dev/null
-  cp -af $BINDIR/su $INSTALLER/common/magisksu.sh $COREDIR/su
+  cp -af $BINDIR/su $COMMONDIR/magisksu.sh $COREDIR/su
   chmod -R 755 $COREDIR/su
   chown -R 0.0 $COREDIR/su
 fi

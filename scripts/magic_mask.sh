@@ -293,10 +293,7 @@ case $1 in
       log_print "** Magisk post-fs-data mode running..."
 
       # Cache support
-      mv /cache/stock_boot.img /data/stock_boot.img 2>/dev/null
-      mv /cache/magisk.apk /data/magisk.apk 2>/dev/null
-      mv /cache/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh 2>/dev/null
-
+      mv /cache/stock_boot* /data 2>/dev/null
       if [ -d /cache/data_bin ]; then
         rm -rf $BINPATH
         mv /cache/data_bin $BINPATH
@@ -311,7 +308,7 @@ case $1 in
       if [ -f $UNINSTALLER ]; then
         touch /dev/.magisk.unblock
         chcon u:object_r:device:s0 /dev/.magisk.unblock
-        BOOTMODE=true sh $UNINSTALLER
+        sh $UNINSTALLER
         exit
       fi
 
@@ -383,9 +380,6 @@ case $1 in
       [ -f $DISABLEFILE ] && unblock
 
       log_print "* Preparing modules"
-
-      mkdir -p $DUMMDIR
-      mkdir -p $MIRRDIR/system
 
       # Remove crap folder
       rm -rf $MOUNTPOINT/lost+found
@@ -479,10 +473,10 @@ case $1 in
         bind_mount $COREDIR/hosts /system/etc/hosts
       fi
 
-      if [ -f /data/magisk.apk ]; then
+      if [ -f /data/magisk/magisk.apk ]; then
         if [ -z `ls /data/app | grep com.topjohnwu.magisk` ]; then
           mkdir /data/app/com.topjohnwu.magisk-1
-          cp /data/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          cp /data/magisk/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
           chmod 755 /data/app/com.topjohnwu.magisk-1
@@ -490,7 +484,7 @@ case $1 in
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
         fi
-        rm -f /data/magisk.apk 2>/dev/null
+        rm -f /data/magisk/magisk.apk 2>/dev/null
       fi
 
       for MOD in $MOUNTPOINT/* ; do
