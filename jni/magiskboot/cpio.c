@@ -84,9 +84,13 @@ static void parse_cpio(const char *filename, vector *v) {
 		f->filename = malloc(f->namesize);
 		read(fd, f->filename, f->namesize);
 		file_align(fd, 4, 0);
-		if (strcmp(f->filename, "TRAILER!!!") == 0 || strcmp(f->filename, ".") == 0) {
+		if (strcmp(f->filename, ".") == 0 || strcmp(f->filename, "..") == 0) {
 			cpio_free(f);
 			continue;
+		}
+		if (strcmp(f->filename, "TRAILER!!!") == 0) {
+			cpio_free(f);
+			break;
 		}
 		if (f->filesize) {
 			f->data = malloc(f->filesize);
@@ -326,15 +330,12 @@ static void cpio_backup(const char *orig, vector *v) {
 			doBak = 1;
 			printf("Entry [%s] is missing\n", m->filename);
 		} else if (res == 0) {
-			// Do SHA1 checksum to check if file is identical
 			++i; ++j;
-			SHA1(chk1, m->data, m->filesize);
-			SHA1(chk2, n->data, n->filesize);
-			if (strcmp(chk1, chk2) != 0) {
-				// Not the same!
-				doBak = 1;
-				printf("Entry [%s] checksum missmatch\n", m->filename);
-			}
+			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
+				continue;
+			// Not the same!
+			doBak = 1;
+			printf("Entry [%s] missmatch\n", m->filename);
 		} else {
 			// Someting new in ramdisk, record in rem
 			++j;
