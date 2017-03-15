@@ -95,7 +95,6 @@ struct su_request {
     int login;
     int keepenv;
     char *shell;
-    char *context;
     char *command;
     char **argv;
     int argc;
