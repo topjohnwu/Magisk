@@ -125,6 +125,7 @@ void exec_logw(const char* fmt, ...) {
 }
 
 void exec_logd(const char* fmt, ...) {
+#ifdef DEBUG
     va_list args;
 
     char logline[PATH_MAX];
@@ -132,6 +133,7 @@ void exec_logd(const char* fmt, ...) {
     vsnprintf(logline, PATH_MAX, fmt, args);
     va_end(args);
     exec_log("d", logline);
+#endif
 }
 
 static int from_init(struct su_initiator *from) {
