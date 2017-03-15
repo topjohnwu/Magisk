@@ -585,7 +585,8 @@ static void fork_for_samsung(void)
     }
 }
 
-static void concat_commands(char* command, int argc, char *argv[]) {
+static char *concat_commands(int argc, char *argv[]) {
+    char command[ARG_MAX];
     int i;
     command[0] = '\0';
     for (i = optind - 1; i < argc; ++i) {
@@ -594,6 +595,7 @@ static void concat_commands(char* command, int argc, char *argv[]) {
         else
             sprintf(command, "%s", argv[i]);
     }
+    return strdup(command);
 }
 
 int main(int argc, char *argv[]) {
@@ -720,9 +722,7 @@ int su_main_nodaemon(int argc, char **argv) {
         switch(c) {
             case 'c':
                 ctx.to.shell = DEFAULT_SHELL;
-                char command[ARG_MAX];
-                concat_commands(command, argc, argv);
-                ctx.to.command = command;
+                ctx.to.command = concat_commands(argc, argv);
                 optind = argc;
                 break;
             case 'h':
