@@ -1,0 +1,200 @@
+<resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Otevřít postranní panel</string>
+    <string name="navigation_drawer_close">Zavřít postranní panel</string>
+    <string name="magiskhide" translatable="false">Magisk Hide</string>
+    <string name="modules">Moduly</string>
+    <string name="downloads">Stahování</string>
+    <string name="superuser">Superuser</string>
+    <string name="log">Log</string>
+    <string name="settings">Nastavení</string>
+    <string name="status">Stav</string>
+    <string name="install">Instalovat</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">Nainstalován Magisk v%1$s</string>
+    <string name="magisk_version_disable">Magisk v%1$s deaktivován</string>
+    <string name="magisk_version_error">Magisk není nainstalován</string>
+
+    <string name="checking_for_updates">Kontrola aktualizací…</string>
+    <string name="magisk_update_available">Magisk v%1$.1f je dostupný!</string>
+    <string name="cannot_check_updates">Nelze zkontrolovat aktualizace. Jste připojeni k Internetu?</string>
+    <string name="up_to_date">Poslední verze z %1$s nainstalovaných</string>
+    <string name="root_error">Zařízení s rootem ale chybí root povolení, máte jej zpřístupněno?</string>
+    <string name="not_rooted">Nemáte root</string>
+    <string name="proper_root">Správně provedený root</string>
+    <string name="safetyNet_check_text">Kliknutím zahájíte SafetyNet kontrolu</string>
+    <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
+    <string name="safetyNet_connection_failed">Nelze se spojit s Google API</string>
+    <string name="safetyNet_connection_suspended">Spojení s Google API bylo přerušeno</string>
+    <string name="safetyNet_error">Nelze zkontrolovat SafetyNet. Jste připojeni k Internetu?</string>
+    <string name="safetyNet_fail">SafetyNet dopadl neúspěšně: CTS profile mismatch</string>
+    <string name="safetyNet_pass">SafetyNet Schváleno</string>
+    <string name="root_info_warning">Funkčnost omezena</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">(Auto) %1$s</string>
+    <string name="cannot_auto_detect">(Nelze zjistit automaticky)</string>
+    <string name="boot_image_title">Umístění Boot Image</string>
+    <string name="detect_button">Zjistit</string>
+    <string name="advanced_settings_title">Pokročilá Nastavení</string>
+    <string name="keep_force_encryption">Udržet "force encryption"</string>
+    <string name="keep_dm_verity">Udržet dm-verity</string>
+    <string name="current_magisk_title">Nainstalovaná verze Magisk: %1$s</string>
+    <string name="install_magisk_title">Poslední verze Magisk: %1$s</string>
+    <string name="uninstall">Odinstalovat</string>
+    <string name="reboot_countdown">Restart za %1$d</string>
+    <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
+    <string name="uninstall_magisk_msg">Tímto odstraníte veškeré moduly, MagiskSU a potencionálně zašifrujete svá data pokud ještě nejsou\nOpravdu chcete pokračovat?</string>
+    <string name="version_none">(Žádná)</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Žádné info)</string>
+    <string name="no_modules_found">Žádný modul nenalezen</string>
+    <string name="update_file_created">Modul bude aktualizován během příštího restartu</string>
+    <string name="remove_file_created">Modul bude smazán během příštího restartu</string>
+    <string name="remove_file_deleted">Modul nebude smazán během příštího restartu</string>
+    <string name="disable_file_created">Modul bude zakázán během příštího restartu</string>
+    <string name="disable_file_removed">Modul bude povolen během příštího restartu</string>
+    <string name="author">Vytvořeno %1$s</string>
+    <string name="fab_flash_zip">Flash Zip Modulu</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Dostupná Aktualizace</string>
+    <string name="installed">Nainstalováno</string>
+    <string name="not_installed">Nenainstalováno</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Uložit na SD</string>
+    <string name="menuReload">Aktualizovat</string>
+    <string name="menuClearLog">Smazat Log</string>
+    <string name="logs_cleared">Log byl smazán</string>
+    <string name="log_is_empty">Log je prázdný</string>
+    <string name="logs_save_failed">Nezdařilo se Log uložit na SD kartu:</string>
+
+    <!--About Activity-->
+    <string name="about">O aplikaci</string>
+    <string name="app_developers">Hlavní vývojáři</string>
+    <string name="app_developers_"><![CDATA[Aplikaci vytvořil <a href="https://github.com/topjohnwu">topjohnwu</a> ve spolupráci s <a href="https://github.com/d8ahazard">Digitalhigh</a> a <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Seznam změn</string>
+    <string name="translators" />
+    <string name="app_version">Verze aplikace</string>
+    <string name="app_source_code">Zdrojový kód</string>
+    <string name="donation">Příspěvek</string>
+    <string name="app_translators">Překladatelé aplikace</string>
+    <string name="support_thread">Vlákno podpory na fóru</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Tato funkce nebude fungovat bez povolení k zápisu na externí úložiště.</string>
+    <string name="no_thanks">Ne, díky</string>
+    <string name="yes">Ano</string>
+    <string name="ok">OK</string>
+    <string name="close">Zavřít</string>
+    <string name="repo_install_title">Instalovat %1$s</string>
+    <string name="repo_install_msg">Chcete nainstalovat %1$s ?</string>
+    <string name="download_install">Stažení &amp; Instalace</string>
+    <string name="download">Stáhnout</string>
+    <string name="goto_install">Jděte do sekce \"Instalovat\"</string>
+    <string name="download_file_error">Chyba při Stahování souboru</string>
+    <string name="install_error">Chyba při Instalaci!</string>
+    <string name="invalid_zip">Soubor zip není Magisk Modul!!</string>
+    <string name="reboot_title">Instalace proběhla úspěšně!</string>
+    <string name="reboot_msg">Chcete nyní restartovat vaše zařízení?</string>
+    <string name="reboot">Restart</string>
+    <string name="copying_msg">Kopírovat zip do temp adresáře</string>
+    <string name="zip_install_progress_title">Instalování</string>
+    <string name="zip_unzip_msg">Extrahování zip souboru …</string>
+    <string name="zip_process_msg">Zpracování zip souboru …</string>
+    <string name="zip_install_progress_msg">Instalování %1$s …</string>
+    <string name="no_magisk_title">Magisk není Nainstalován!</string>
+    <string name="no_magisk_msg">Chcete stáhnout a nainstalovat Magisk?</string>
+    <string name="downloading_toast">Stahování %1$s</string>
+    <string name="magisk_update_title">K dispozici je aktualizace Magisk!</string>
+    <string name="settings_reboot_toast">Restartovat pro použití nastavení</string>
+    <string name="release_notes">Poznámky k vydání</string>
+    <string name="repo_cache_cleared">Mezipaměť smazána</string>
+    <string name="safetyNet_hide_notice">Tato aplikace využívá SafetyNet\nVe výchozím nastavení již ovládaný skrze MagiskHide</string>
+    <string name="start_magiskhide">Spouštění MagiskHide …</string>
+    <string name="no_magisksu_title">Nepoužíváte MagiskSU!</string>
+    <string name="no_magisksu_msg">Nemáte root s MagiskSU, používání MagiskHide samotného nebude stačit!\nNení to oficiálně podporováno a potřebovali byste další nástroje (např. suhide) k prolomení Safety Net.</string>
+    <string name="understand">Rozumím</string>
+    <string name="process_error">Chyba při Zpracování</string>
+    <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
+    <string name="zip_process_title">Zpracování</string>
+    <string name="manual_boot_image">Ručně vyberte boot image!</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Obecné</string>
+    <string name="settings_dark_theme_title">Tmavý Vzhled</string>
+    <string name="settings_dark_theme_summary">Povolit tmavý vzhled</string>
+    <string name="settings_notification_title">Oznámení o Aktualizaci</string>
+    <string name="settings_notification_summary">Zobrazí oznámení aktualizace, když je k dispozici nová verze</string>
+    <string name="settings_clear_cache_title">Smazat Uchovanou Mezipaměť</string>
+    <string name="settings_clear_cache_summary">Smaže informace online použití v Mezipaměti, donutí aplikaci obnovit informace online</string>
+
+    <string name="settings_disable_title">Zakázat Magisk</string>
+    <string name="settings_disable_summary">Všechno kromě rootu (MagiskSU) bude deaktivováno</string>
+    <string name="settings_magiskhide_summary">Skryje root (MagiskSU) před různými aplikacemi</string>
+    <string name="settings_busybox_title">Povolit BusyBox</string>
+    <string name="settings_busybox_summary">Nasadí vestavěný Magisk busybox do xbin</string>
+    <string name="settings_hosts_title">Nesystémová "hosts" data</string>
+    <string name="settings_hosts_summary">Podpora nesystémových dat "hosts" pro Adblock aplikace</string>
+
+    <string name="settings_su_app_adb">Aplikace i ADB</string>
+    <string name="settings_su_app">Pouze aplikace</string>
+    <string name="settings_su_adb">Pouze ADB</string>
+    <string name="settings_su_disable">Zakázáno</string>
+    <string name="settings_su_request_10">10 sekund</string>
+    <string name="settings_su_request_20">20 sekund</string>
+    <string name="settings_su_request_30">30 sekund</string>
+    <string name="settings_su_request_60">60 sekund</string>
+    <string name="superuser_access">Přístup Superuser</string>
+    <string name="auto_response">Automatická Reakce</string>
+    <string name="request_timeout">Časový limit Požadavku</string>
+    <string name="superuser_notification">Oznámení Superuser</string>
+    <string name="request_timeout_summary">%1$s sekund</string>
+
+    <string name="settings_development_category">Vývoj aplikace</string>
+    <string name="settings_developer_logging_title">Povolit pokročilé ladění logování</string>
+    <string name="settings_developer_logging_summary">Zkuste zapnout toto pro rozsáhlejší logování</string>
+    <string name="settings_shell_logging_title">Povolit logování pro příkazy shellu</string>
+    <string name="settings_shell_logging_summary">Logování všech příkazů shellu a jejich výstup</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Požadavek Superuser</string>
+    <string name="deny_with_str">Zamítnout%1$s</string>
+    <string name="deny">Zamítnout</string>
+    <string name="prompt">Dotaz</string>
+    <string name="grant">Povolit</string>
+    <string name="su_warning">Povolí plný přístup k vašemu zařízení.\nZamítněte pokud si nejste jisti!</string>
+    <string name="forever">Navždy</string>
+    <string name="once">Jednou</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">Pro %1$s bylo oprávnění Superuser povoleno</string>
+    <string name="su_deny_toast">Pro %1$s bylo oprávnění Superuser zamítnuto</string>
+    <string name="no_apps_found">Zatím zde není žádná aplikace</string>
+    <string name="su_snack_grant">Superuser oprávnění pro %1$s je povoleno</string>
+    <string name="su_snack_deny">Superuser oprávnění pro %1$s je zamítnuto</string>
+    <string name="su_snack_notif_on">Oznámení pro %1$s je povoleno</string>
+    <string name="su_snack_notif_off">Oznámení pro %1$s je zakázáno</string>
+    <string name="su_snack_log_on">Logování %1$s je povoleno</string>
+    <string name="su_snack_log_off">Logování %1$s je zakázáno</string>
+    <string name="su_snack_revoke">Záznamy oprávnění %1$s jsou smazány</string>
+    <string name="su_revoke_title">Smazat?</string>
+    <string name="su_revoke_msg">Smazat záznam ohledně oprávnění pro %1$s?</string>
+    <string name="toast">Toast</string>
+    <string name="none">Žádné</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Cílové UID:\u0020</string>
+    <string name="command">Příkaz:\u0020</string>
+
+</resources>
