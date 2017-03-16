@@ -38,6 +38,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">%1$s (autom.)</string>
+    <string name="cannot_auto_detect">(Erkennung nicht möglich)</string>
     <string name="boot_image_title">Boot-Image-Pfad</string>
     <string name="detect_button">Automatisch</string>
     <string name="advanced_settings_title">Erweiterte Optionen</string>
@@ -124,11 +125,14 @@
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_process_title">Verarbeite</string>
+    <string name="manual_boot_image">Bitte Boot-Image auswählen!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
     <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
+    <string name="settings_notification_title">Update-Benachrichtigung</string>
+    <string name="settings_notification_summary">Benachrichtigung, wenn eine neue Version verfügbar ist</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
@@ -166,7 +170,6 @@
     <string name="deny">Verweigern</string>
     <string name="prompt">Nachfragen</string>
     <string name="grant">Gewähren</string>
-
     <string name="su_warning">Erlaubt den vollen Zugriff auf das Gerät.\nVerweigere, wenn du dir unsicher bist!</string>
     <string name="forever">Dauerhaft</string>
     <string name="once">Nur diesmal</string>
