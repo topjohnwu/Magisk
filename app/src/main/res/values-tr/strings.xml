@@ -2,8 +2,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Gezinti çekmecesini aç</string>
     <string name="navigation_drawer_close">Gezinti çekmecesini kapat</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
-    <string name="modules">Modüller</string>
+     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
     <string name="log">Günlük</string>
@@ -19,7 +18,7 @@
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$.1f mevcut!</string>
     <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet yok mu?</string>
-    <string name="up_to_date">%1$s'in son sürümü yüklü</string>
+    <string name="up_to_date">%1$s\'in son sürümü yüklü</string>
     <string name="root_error">Rootlu ama root izni yok, izin verilmedi mi?</string>
     <string name="not_rooted">Rootlu değil</string>
     <string name="proper_root">Düzgünce rootlandı</string>

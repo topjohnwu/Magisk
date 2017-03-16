@@ -1,12 +1,9 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Otevřít postranní panel</string>
     <string name="navigation_drawer_close">Zavřít postranní panel</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Moduly</string>
     <string name="downloads">Stahování</string>
     <string name="superuser">Superuser</string>

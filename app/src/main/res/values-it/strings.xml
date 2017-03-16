@@ -1,13 +1,9 @@
 <resources>
     <!--Universal-->
 
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
-    
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer di navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer di navigazione</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Moduli</string>
     <string name="downloads">Downloads</string>
     <string name="log">Log</string>
@@ -127,7 +123,7 @@
     <string name="process_error">Errore di processo</string>
     <string name="internal_storage">Lo zip si trova in:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Elaborazione</string>
-<string name="manual_boot_image">Seleziona manualmente l'immagine di Boot!</string>
+<string name="manual_boot_image">Seleziona manualmente l\'immagine di Boot!</string>
 
 
     <!--Settings Activity -->
