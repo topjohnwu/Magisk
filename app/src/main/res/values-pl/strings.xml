@@ -6,6 +6,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Otwórz szufladę nawigacji</string>
     <string name="navigation_drawer_close">Zamknij szufladę nawigacji</string>
+    
     <string name="modules">Moduły</string>
     <string name="downloads">Pobieranie</string>
     <string name="superuser">Superuser</string>
@@ -37,6 +38,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
+    <string name="cannot_auto_detect">(Nie można automatycznie wykryć)</string>
     <string name="boot_image_title">Lokalizacja Boot Image</string>
     <string name="detect_button">Wykryj</string>
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
@@ -44,9 +46,11 @@
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="current_magisk_title">Zainstalowana Wersja Magisk: %1$s</string>
     <string name="install_magisk_title">Ostatnia Wersja Magisk: %1$s</string>
-   
     <string name="uninstall">Odinstaluj</string>
     <string name="reboot_countdown">Restartuj do %1$d</string>
+    <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
+    <string name="uninstall_magisk_msg">Spowoduje to usunięcie wszystkich modułów, MagiskSU i potencjalnie szyfrowanie danych jeśli nie były szyfrowane \ nCzy na pewno kontynuować?</string>
+    <string name="version_none">(Brak)</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
@@ -121,11 +125,14 @@
     <string name="process_error">Błąd procesu</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     <string name="zip_process_title">Przetwarzanie</string>
+    <string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
 	
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
+    <string name="settings_notification_title">Powiadomienie o Aktualizacji</string>
+    <string name="settings_notification_summary">Pokaż powiadomienie o aktualizacji kiedy będzie dostępna nowa wersja</string>
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
 
