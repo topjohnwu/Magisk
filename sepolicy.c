@@ -1,4 +1,4 @@
-#include "sepolicy-inject.h"
+#include "magiskpolicy.h"
 
 static void *cmalloc(size_t s) {
 	void *t = malloc(s);

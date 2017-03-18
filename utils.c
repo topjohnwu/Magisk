@@ -1,4 +1,4 @@
-#include "sepolicy-inject.h"
+#include "magiskpolicy.h"
 
 void vec_init(vector *v) {
 	v->size = 0;

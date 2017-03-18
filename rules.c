@@ -1,4 +1,4 @@
-#include "sepolicy-inject.h"
+#include "magiskpolicy.h"
 
 void samsung() {
 	deny("init", "kernel", "security", "load_policy");

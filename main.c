@@ -1,34 +1,36 @@
-#include "sepolicy-inject.h"
+#include "magiskpolicy.h"
 
 static int syntax_err = 0;
 static char err_msg[ARG_MAX];
 
 static void statements() {
-	fprintf(stderr, "\nSupported policy statements:\n\n");
-	fprintf(stderr, "\"allow #source-class #target-class permission-class #permission\"\n");
-	fprintf(stderr, "\"deny #source-class #target-class permission-class #permission\"\n");
-	fprintf(stderr, "\"auditallow #source-class #target-class permission-class #permission\"\n");
-	fprintf(stderr, "\"auditdeny #source-class #target-class permission-class #permission\"\n");
-	fprintf(stderr, "\"create #class\"\n");
-	fprintf(stderr, "\"permissive #class\"\n");
-	fprintf(stderr, "\"enforcing #class\"\n");
-	fprintf(stderr, "\"attradd #class #attribute\"\n");
-	fprintf(stderr, "\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n");
-	fprintf(stderr, "\nsource-class and target-class can be attributes (patches the whole group)\n");
-	fprintf(stderr, "All sections (except typetrans) can be replaced with \'*\' to patch every possible matches\n");
-	fprintf(stderr, "Sections marked with \'#\' can be replaced with collections in curly brackets\n");
-	fprintf(stderr, "e.g: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n");
-	fprintf(stderr, "Will be expanded to:\n");
 	fprintf(stderr, 
-"allow source1 target1 permission-class permission1\n\
-allow source1 target1 permission-class permission2\n\
-allow source1 target2 permission-class permission1\n\
-allow source1 target2 permission-class permission2\n\
-allow source2 target1 permission-class permission1\n\
-allow source2 target1 permission-class permission2\n\
-allow source2 target2 permission-class permission1\n\
-allow source2 target2 permission-class permission2\n");
-	fprintf(stderr, "\n");
+		"\nSupported policy statements:\n"
+		"\n"
+		"\"allow #source-class #target-class permission-class #permission\"\n"
+		"\"deny #source-class #target-class permission-class #permission\"\n"
+		"\"auditallow #source-class #target-class permission-class #permission\"\n"
+		"\"auditdeny #source-class #target-class permission-class #permission\"\n"
+		"\"create #class\"\n"
+		"\"permissive #class\"\n"
+		"\"enforcing #class\"\n"
+		"\"attradd #class #attribute\"\n"
+		"\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n"
+		"\nsource-class and target-class can be attributes (patches the whole group)\n"
+		"All sections (except typetrans) can be replaced with \'*\' to patch every possible matches\n"
+		"Sections marked with \'#\' can be replaced with collections in curly brackets\n"
+		"e.g: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n"
+		"Will be expanded to:\n"
+		"allow source1 target1 permission-class permission1\n"
+		"allow source1 target1 permission-class permission2\n"
+		"allow source1 target2 permission-class permission1\n"
+		"allow source1 target2 permission-class permission2\n"
+		"allow source2 target1 permission-class permission1\n"
+		"allow source2 target1 permission-class permission2\n"
+		"allow source2 target2 permission-class permission1\n"
+		"allow source2 target2 permission-class permission2\n"
+		"\n"
+	);
 }
 
 static void usage(char *arg0) {

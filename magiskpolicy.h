@@ -1,5 +1,5 @@
-#ifndef SEPOLICY_INJECT_H
-#define SEPOLICY_INJECT_H
+#ifndef MAGISKPOLICY_H
+#define MAGISKPOLICY_H
 
 #define ALL NULL
 
