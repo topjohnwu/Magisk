@@ -14,11 +14,33 @@ log_print() {
 # Only enable when isn't started
 ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 && exit
 
-log_print "Removing tampered read-only system props"
+if [ ! -d /sbin_orig ]; then
+  log_print "Moving and re-linking /sbin binaries"
+  mount -o rw,remount rootfs /
+  mv -f /sbin /sbin_orig
+  mkdir /sbin
+  mount -o ro,remount rootfs /
+  mkdir -p /dev/sbin_bind
+  chmod 755 /dev/sbin_bind
+  ln -s /sbin_orig/* /dev/sbin_bind
+  chcon -h u:object_r:rootfs:s0 /dev/sbin_bind /dev/sbin_bind/*
+  mount -o bind /dev/sbin_bind /sbin
+fi
+
+# Sammy device like these permissions
+chmod 640 /sys/fs/selinux/enforce
+chmod 440 /sys/fs/selinux/policy
+
+log_print "Removing dangerous read-only system props"
 
 VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
 FLASHLOCKED=`getprop ro.boot.flash.locked`
 VERITYMODE=`getprop ro.boot.veritymode`
+DEBUGGABLE=`getprop ro.debuggable`
+SECURE=`getprop ro.secure`
+BUILDTYPE=`getprop ro.build.type`
+BUILDTAGS=`getprop ro.build.tags`
+BUILDSELINUX=`getprop ro.build.selinux`
 
 [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
@@ -26,6 +48,16 @@ log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
 log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
 [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
+[ ! -z "$DEBUGGABLE" -a "$DEBUGGABLE" != "0" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.debuggable 0`"
+[ ! -z "$SECURE" -a "$SECURE" != "1" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.secure 1`"
+[ ! -z "$BUILDTYPE" -a "$BUILDTYPE" != "user" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.build.type user`"
+[ ! -z "$BUILDTAGS" -a "$BUILDTAGS" != "release-keys" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.build.tags release-keys`"
+[ ! -z "$BUILDSELINUX" -a "$BUILDSELINUX" != "0" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.build.selinux 0`"
 
 touch $MODDIR/hidelist
 chmod -R 755 $MODDIR
@@ -40,4 +72,4 @@ while read PROCESS; do
 done < $MODDIR/hidelist
 
 log_print "Starting MagiskHide daemon"
-$MODDIR/magiskhide --daemon
+$BINPATH/magiskhide --daemon

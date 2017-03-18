@@ -248,9 +248,11 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
-cp -af $BINDIR/busybox $BINDIR/magiskpolicy $BINDIR/resetprop $BINDIR/magiskboot \
-       $COMMONDIR/ramdisk_patch.sh $COMMONDIR/init.magisk.rc \
-       $COMMONDIR/magic_mask.sh $COMMONDIR/magisk.apk $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/ramdisk_patch.sh $COMMONDIR/magic_mask.sh \
+       $COMMONDIR/init.magisk.rc $COMMONDIR/magisk.apk $MAGISKBIN
+# Legacy support
+ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
+
 chmod -R 755 $MAGISKBIN
 chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
 
@@ -416,17 +418,9 @@ MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
 mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-cp -af $COMMONDIR/magiskhide/. $BINDIR/magiskhide $COREDIR/magiskhide
+cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
 chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-
-if ! $SUPERSU; then
-  ui_print "- Installing MagiskSU"
-  mkdir -p $COREDIR/su 2>/dev/null
-  cp -af $BINDIR/su $COMMONDIR/magisksu.sh $COREDIR/su
-  chmod -R 755 $COREDIR/su
-  chown -R 0.0 $COREDIR/su
-fi
 
 ##########################################################################################
 # Repack and flash

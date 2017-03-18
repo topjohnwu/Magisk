@@ -171,7 +171,7 @@ clone_dummy() {
         cp -afc "$ITEM" "$DUMMDIR$REAL"
       else
         if $LINK && [ ! -e "$MOUNTINFO$REAL" ]; then
-          ln -s "$MIRRDIR$REAL" "$DUMMDIR$REAL"
+          ln -sf "$MIRRDIR$REAL" "$DUMMDIR$REAL"
         else
           if [ -d "$ITEM" ]; then
             mkdir -p "$DUMMDIR$REAL"
@@ -317,7 +317,7 @@ case $1 in
       # Set up environment
       mkdir -p $TOOLPATH
       $BINPATH/busybox --install -s $TOOLPATH
-      ln -s $BINPATH/busybox $TOOLPATH/busybox
+      ln -sf $BINPATH/busybox $TOOLPATH/busybox
       # Prevent issues
       rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
       chmod -R 755 $TOOLPATH
@@ -346,7 +346,7 @@ case $1 in
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
       rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror \
-             $COREDIR/busybox /data/magisk/*.img /data/busybox 2>/dev/null
+             $COREDIR/busybox $COREDIR/su /data/magisk/*.img /data/busybox 2>/dev/null
 
       # Remove modules that are labeled to be removed
       for MOD in $MOUNTPOINT/* ; do
@@ -374,10 +374,21 @@ case $1 in
         fi
       fi
 
-      # Start MagiskSU if no SuperSU
-      export PATH=$OLDPATH
-      [ ! -f /sbin/launch_daemonsu.sh ] && sh $COREDIR/su/magisksu.sh
-      export PATH=$TOOLPATH:$OLDPATH
+      log_print "* Linking binaries to /sbin"
+      mount -o rw,remount rootfs /
+      chmod 755 /sbin
+      ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
+      ln -sf $BINPATH/magiskpolicy /sbin/sepolicy-inject
+      ln -sf $BINPATH/resetprop /sbin/resetprop
+      if [ ! -f /sbin/launch_daemonsu.sh ]; then
+        log_print "* Starting MagiskSU"
+        export PATH=$OLDPATH
+        ln -sf $BINPATH/su /sbin/su
+        ln -sf $BINPATH/magiskpolicy /sbin/supolicy
+        /sbin/su --daemon
+        export PATH=$TOOLPATH:$OLDPATH
+      fi
+      mount -o ro,remount rootfs /
 
       [ -f $DISABLEFILE ] && unblock
 
@@ -389,7 +400,7 @@ case $1 in
       # Link vendor if not exist
       if [ ! -e /vendor ]; then
         mount -o rw,remount rootfs /
-        ln -s /system/vendor /vendor
+        ln -sf /system/vendor /vendor
         mount -o ro,remount rootfs /
       fi
 
@@ -402,7 +413,7 @@ case $1 in
             (travel system)
             rm -f $MOD/vendor 2>/dev/null
             if [ -d $MOD/system/vendor ]; then
-              ln -s $MOD/system/vendor $MOD/vendor
+              ln -sf $MOD/system/vendor $MOD/vendor
               (travel vendor)
             fi
           fi
@@ -434,7 +445,7 @@ case $1 in
         mkdir -p $MIRRDIR/vendor
         mount -o ro $VENDORBLOCK $MIRRDIR/vendor
       else
-        ln -s $MIRRDIR/system/vendor $MIRRDIR/vendor
+        ln -sf $MIRRDIR/system/vendor $MIRRDIR/vendor
       fi
 
       # Since mirrors always exist, we load libraries and binaries from mirrors

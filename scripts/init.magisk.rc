@@ -3,13 +3,12 @@
 on post-fs
     start magisk_pfs
     wait /dev/.magisk.unblock 20
-    rm /dev/.magisk.unblock
 
 on post-fs-data
+    rm /dev/.magisk.unblock
     load_persist_props
     start magisk_pfsd
     wait /dev/.magisk.unblock 60
-    rm /dev/.magisk.unblock
 
 on property:magisk.restart_pfsd=1
     trigger post-fs-data
