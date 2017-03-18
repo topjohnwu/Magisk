@@ -153,13 +153,13 @@ int x_property_set(const char *name, const char *value)
 }
 
 int read_prop_file(const char* filename) {
-    printf("   Attempting to read props from \'%s\'\n", filename);
+    printf("Attempting to read props from \'%s\'\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
         fprintf(stderr, "Cannot open \'%s\'\n", filename);
         return 1;
     }
-    char *line = NULL, *pch, name[PROP_NAME_MAX], value[PROP_VALUE_MAX];
+    char *line = NULL, *pch;
     size_t len;
     ssize_t read;
     int comment = 0, i;

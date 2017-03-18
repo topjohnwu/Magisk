@@ -71,12 +71,14 @@ loopsetup() {
   done
 }
 
-target_size_check() {
-  e2fsck -p -f "$1"
+image_size_check() {
+  e2fsck -yf $1
   curBlocks=`e2fsck -n $1 2>/dev/null | cut -d, -f3 | cut -d\  -f2`;
-  curUsedM=$((`echo "$curBlocks" | cut -d/ -f1` * 4 / 1024));
-  curSizeM=$((`echo "$curBlocks" | cut -d/ -f2` * 4 / 1024));
-  curFreeM=$((curSizeM - curUsedM));
+  curUsedM=`echo "$curBlocks" | cut -d/ -f1`
+  curSizeM=`echo "$curBlocks" | cut -d/ -f1`
+  curFreeM=$(((curSizeM - curUsedM) * 4 / 1024))
+  curUsedM=$((curUsedM * 4 / 1024 + 1))
+  curSizeM=$((curSizeM * 4 / 1024))
 }
 
 run_scripts() {
@@ -193,11 +195,11 @@ merge_image() {
       log_print "$IMG found, attempt to merge"
 
       # Handle large images
-      target_size_check $1
-      MERGEUSED=$curUsedM
-      target_size_check $IMG
-      if [ "$MERGEUSED" -gt "$curFreeM" ]; then
-        NEWDATASIZE=$((((MERGEUSED + curUsedM) / 32 + 2) * 32))
+      image_size_check $1
+      mergeUsedM=$curUsedM
+      image_size_check $IMG
+      if [ "$mergeUsedM" -gt "$curFreeM" ]; then
+        NEWDATASIZE=$(((mergeUsedM + curUsedM) / 32 * 32 + 32))
         log_print "Expanding $IMG to ${NEWDATASIZE}M..."
         resize2fs $IMG ${NEWDATASIZE}M
       fi
@@ -358,8 +360,8 @@ case $1 in
       # Unmount, shrink, remount
       if umount $MOUNTPOINT; then
         losetup -d $LOOPDEVICE 2>/dev/null
-        target_size_check $IMG
-        NEWDATASIZE=$(((curUsedM / 32 + 2) * 32))
+        image_size_check $IMG
+        NEWDATASIZE=$((curUsedM / 32 * 32 + 32))
         if [ "$curSizeM" -gt "$NEWDATASIZE" ]; then
           log_print "Shrinking $IMG to ${NEWDATASIZE}M..."
           resize2fs $IMG ${NEWDATASIZE}M
@@ -391,16 +393,23 @@ case $1 in
         mount -o ro,remount rootfs /
       fi
 
-      # Travel through all mods
       for MOD in $MOUNTPOINT/* ; do
-        if [ -f $MOD/auto_mount -a -d $MOD/system -a ! -f $MOD/disable ]; then
-          log_print "Analyzing module: $MOD"
-          TRAVEL_ROOT=$MOD
-          (travel system)
-          rm -f $MOD/vendor 2>/dev/null
-          if [ -d $MOD/system/vendor ]; then
-            ln -s $MOD/system/vendor $MOD/vendor
-            (travel vendor)
+        if [ ! -f $MOD/disable ]; then
+          # Travel through all mods
+          if [ -f $MOD/auto_mount -a -d $MOD/system ]; then
+            log_print "Analyzing module: $MOD"
+            TRAVEL_ROOT=$MOD
+            (travel system)
+            rm -f $MOD/vendor 2>/dev/null
+            if [ -d $MOD/system/vendor ]; then
+              ln -s $MOD/system/vendor $MOD/vendor
+              (travel vendor)
+            fi
+          fi
+          # Read in defined system props
+          if [ -f $MOD/system.prop ]; then
+            log_print "* Reading props from $MOD/system.prop"
+            $BINPATH/resetprop --file $MOD/system.prop
           fi
         fi
       done
@@ -486,14 +495,6 @@ case $1 in
         fi
         rm -f /data/magisk/magisk.apk 2>/dev/null
       fi
-
-      for MOD in $MOUNTPOINT/* ; do
-        # Read in defined system props
-        if [ -f $MOD/system.prop ]; then
-          log_print "* Reading props from $MOD/system.prop"
-          /data/magisk/resetprop --file $MOD/system.prop
-        fi
-      done
 
       # Expose busybox
       [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox

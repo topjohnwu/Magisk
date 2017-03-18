@@ -374,7 +374,7 @@ esac
 
 # All ramdisk patch commands are stored in a separate script
 ui_print "- Patching ramdisk"
-. $COMMONDIR/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
+source $COMMONDIR/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
 
 cd $BOOTTMP
 # Create ramdisk backups
