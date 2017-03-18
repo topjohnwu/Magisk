@@ -248,7 +248,7 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
-cp -af $BINDIR/busybox $BINDIR/sepolicy-inject $BINDIR/resetprop $BINDIR/magiskboot \
+cp -af $BINDIR/busybox $BINDIR/magiskpolicy $BINDIR/resetprop $BINDIR/magiskboot \
        $COMMONDIR/ramdisk_patch.sh $COMMONDIR/init.magisk.rc \
        $COMMONDIR/magic_mask.sh $COMMONDIR/magisk.apk $MAGISKBIN
 chmod -R 755 $MAGISKBIN
@@ -391,7 +391,7 @@ rm -f ramdisk.cpio.orig
 ##########################################################################################
 
 # Fix SuperSU.....
-$BOOTMODE && $BINDIR/sepolicy-inject --live "allow fsck * * *"
+$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
 
 if (is_mounted /data); then
   IMG=/data/magisk.img

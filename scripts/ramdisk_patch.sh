@@ -43,7 +43,7 @@ cpio_add 750 init.rc init.rc
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
-LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/sepolicy-inject --load sepolicy --save sepolicy --minimal
+LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskpolicy --load sepolicy --save sepolicy --minimal
 cpio_add 644 sepolicy sepolicy
 
 # Add new items

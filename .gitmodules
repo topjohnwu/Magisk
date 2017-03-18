@@ -1,6 +1,3 @@
-[submodule "jni/sepolicy-inject"]
-	path = jni/sepolicy-inject
-	url = https://github.com/topjohnwu/sepolicy-inject
 [submodule "jni/selinux"]
 	path = jni/selinux
 	url = https://github.com/topjohnwu/selinux.git
@@ -10,3 +7,6 @@
 [submodule "jni/ndk-compression"]
 	path = jni/ndk-compression
 	url = https://github.com/topjohnwu/ndk-compression.git
+[submodule "jni/magiskpolicy"]
+	path = jni/magiskpolicy
+	url = https://github.com/topjohnwu/magiskpolicy.git

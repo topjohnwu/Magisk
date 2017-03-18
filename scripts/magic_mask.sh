@@ -305,7 +305,7 @@ case $1 in
       chown -R 0.0 $BINPATH
 
       # Live patch sepolicy
-      $BINPATH/sepolicy-inject --live
+      $BINPATH/magiskpolicy --live
 
       if [ -f $UNINSTALLER ]; then
         touch /dev/.magisk.unblock
