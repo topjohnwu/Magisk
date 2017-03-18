@@ -76,7 +76,6 @@ zip_package() {
   echo "* Copying files"
   echo "************************"
   cp -afv scripts/ramdisk_patch.sh zip_static/common/ramdisk_patch.sh
-  cp -afv scripts/magisksu.sh zip_static/common/magisksu.sh
   cp -afv scripts/init.magisk.rc zip_static/common/init.magisk.rc
   cp -afv binaries/busybox-arm zip_static/arm/busybox
   cp -afv binaries/busybox-arm64 zip_static/arm64/busybox
