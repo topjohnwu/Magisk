@@ -175,6 +175,7 @@ void su_rules() {
 
 	// Allow chcon to anything
 	allow(ALL, "labeledfs", "filesystem", "associate");
+	allow(ALL, "tmpfs", "filesystem", "associate");
 }
 
 // Minimal to run Magisk script before live patching
