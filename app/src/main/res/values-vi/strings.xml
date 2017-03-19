@@ -82,7 +82,6 @@
     <string name="app_developers_"><![CDATA[Ứng dụng do <a href="https://github.com/topjohnwu">topjohnwu</a> viết, phối hợp với <a href="https://github.com/d8ahazard">Digitalhigh</a> và <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
     <string name="translators"><![CDATA[<a href="https://github.com/thanhtai2009">thanhtai2009@tekcafe.vn</a>]]></string>
-    <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
     <string name="app_version">Phiên bản ứng dụng</string>
     <string name="app_source_code">Mã nguồn</string>
     <string name="donation">Ủng hộ</string>
@@ -113,7 +112,7 @@
     <string name="zip_install_progress_msg">Đang cài đặt %1$s …</string>
     <string name="no_magisk_title">Chưa cài Magisk!</string>
     <string name="no_magisk_msg">Bạn muốn tải xuống và cài đặt Magisk chứ?</string>
-    <string name="downloading_toast"Đang tải xuống %1$s</string>
+    <string name="downloading_toast">Đang tải xuống %1$s</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Ghi chú phát hành</string>
@@ -197,5 +196,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>
     <string name="command">Command:\u0020</string>
-
-</resources> 
+    
+</resources>
