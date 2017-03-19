@@ -196,5 +196,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>
     <string name="command">Command:\u0020</string>
-    
+
 </resources>

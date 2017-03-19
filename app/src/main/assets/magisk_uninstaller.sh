@@ -1,21 +1,20 @@
-#!/system/bin/sh
-
 [ -z $BOOTMODE ] && BOOTMODE=false
-TMPDIR=/tmp
-($BOOTMODE) && TMPDIR=/dev/tmp
 
-BINDIR=/data/magisk
-CHROMEDIR=$BINDIR/chromeos
+# This path should work in any cases
+TMPDIR=/dev/tmp
 
-NEWBOOT=$TMPDIR/boottmp/new-boot.img
-UNPACKDIR=$TMPDIR/boottmp/bootunpack
-RAMDISK=$TMPDIR/boottmp/ramdisk
+BOOTTMP=$TMPDIR/boottmp
+MAGISKBIN=/data/magisk
+CHROMEDIR=$MAGISKBIN/chromeos
 
 SYSTEMLIB=/system/lib
 [ -d /system/lib64 ] && SYSTEMLIB=/system/lib64
 
-ui_print() {
-  echo "$1"
+# Default permissions
+umask 022
+
+ui_print_wrapper() {
+  type ui_print >/dev/null && ui_print "$1" || echo "$1"
 }
 
 grep_prop() {
@@ -25,7 +24,7 @@ grep_prop() {
   if [ -z "$FILES" ]; then
     FILES='/system/build.prop'
   fi
-  cat $FILES 2>/dev/null | sed -n $REGEX | head -n 1
+  cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
 
 find_boot_image() {
@@ -42,109 +41,93 @@ find_boot_image() {
   fi
 }
 
-unpack_boot() {
-  rm -rf $UNPACKDIR $RAMDISK 2>/dev/null
-  mkdir -p $UNPACKDIR
-  mkdir -p $RAMDISK
-  cd $UNPACKDIR
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --extract $1
-
-  cd $RAMDISK
-  $BINDIR/busybox gunzip -c < $UNPACKDIR/ramdisk.gz | cpio -i
-}
-
-repack_boot() {
-  cd $RAMDISK
-  find . | cpio -o -H newc 2>/dev/null | gzip -9 > $UNPACKDIR/ramdisk.gz
-  cd $UNPACKDIR
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --repack $BOOTIMAGE
-  if [ -f chromeos ]; then
-    echo " " > config
-    echo " " > bootloader
-    LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
-    rm -f new-boot.img
-    mv new-boot.img.signed new-boot.img
-  fi
-  if ($SAMSUNG); then
-    SAMSUNG_CHECK=$(cat new-boot.img | grep SEANDROIDENFORCE)
-    if [ $? -ne 0 ]; then
-      echo -n "SEANDROIDENFORCE" >> new-boot.img
-    fi
-  fi
-  if ($LGE_G); then
-    # Prevent secure boot error on LG G2/G3.
-    # Just for know, It's a pattern which bootloader verifies at boot. Thanks to LG hackers.
-    echo -n -e "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79" >> new-boot.img
-  fi
-  mv new-boot.img $NEWBOOT
-}
-
+# Environments
 # Set permissions
-chmod -R 755 $CHROMEDIR/futility $BINDIR
+chmod -R 755 $CHROMEDIR/futility $MAGISKBIN 2>/dev/null
+# Temporary busybox for installation
+mkdir -p $TMPDIR/busybox
+$MAGISKBIN/busybox --install -s $TMPDIR/busybox
+rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
+PATH=$TMPDIR/busybox:$PATH
 
 # Find the boot image
 find_boot_image
 if [ -z "$BOOTIMAGE" ]; then
-  ui_print "! Unable to detect boot image"
+  ui_print_wrapper "! Unable to detect boot image"
   exit 1
 fi
 
-ui_print "- Found Boot Image: $BOOTIMAGE"
+ui_print_wrapper "- Found Boot Image: $BOOTIMAGE"
 
-# Detect special vendors 
-SAMSUNG=false
-SAMSUNG_CHECK=$(cat /system/build.prop | grep "ro.build.fingerprint=" | grep -i "samsung")
-if [ $? -eq 0 ]; then
-  SAMSUNG=true
-fi
-LGE_G=false
-RBRAND=$(grep_prop ro.product.brand)
-RMODEL=$(grep_prop ro.product.device)
-if [ "$RBRAND" = "lge" ] || [ "$RBRAND" = "LGE" ];  then 
-  if [ "$RMODEL" = "*D80*" ] || 
-     [ "$RMODEL" = "*S98*" ] || 
-     [ "$RMODEL" = "*D85*" ] ||
-     [ "$RMODEL" = "*F40*" ]; then
-    LGE_G=true
-    ui_print "! Bump device detected"
-  fi
+rm -rf $BOOTTMP 2>/dev/null
+mkdir -p $BOOTTMP
+cd $BOOTTMP
+
+ui_print_wrapper "- Unpacking boot image"
+LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --unpack $BOOTIMAGE
+if [ $? -ne 0 ]; then
+  ui_print_wrapper "! Unable to unpack boot image"
+  exit 1
 fi
 
-# First unpack the boot image
-unpack_boot $BOOTIMAGE
+# Update our previous backup to new format if exists
+if [ -f /data/stock_boot.img ]; then
+  SHA1=`LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
+  STOCKDUMP=/data/stock_boot_${SHA1}.img
+  mv /data/stock_boot.img $STOCKDUMP
+  LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --compress $STOCKDUMP
+fi
 
-SUPERSU=false
-[ -f sbin/launch_daemonsu.sh ] && SUPERSU=true
-
-if ($SUPERSU); then
-  ui_print "- SuperSU patched image detected"
-  rm -f magisk sbin/init.magisk.rc sbin/magic_mask.sh
-  repack_boot
-else
-  if [ -f /data/stock_boot.img ]; then
-    ui_print "- Boot image backup found!"
-    NEWBOOT=/data/stock_boot.img
-  else
-    ui_print "! Boot image backup unavailable"
-    if [ -d ".backup" ]; then
-      ui_print "- Restoring ramdisk with backup"
-      cp -af .backup/. .
+# Detect boot image state
+LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-test ramdisk.cpio
+case $? in
+  0 )
+    ui_print_wrapper "! Magisk is not installed!"
+    ui_print_wrapper "! Nothing to uninstall"
+    exit
+    ;;
+  1 )
+    # Find SHA1 of stock boot image
+    if [ -z $SHA1 ]; then
+      LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc
+      SHA1=`grep_prop "# STOCKSHA1" init.magisk.rc`
+      [ ! -z $SHA1 ] && STOCKDUMP=/data/stock_boot_${SHA1}.img
+      rm -f init.magisk.rc
     fi
-    rm -f magisk sbin/init.magisk.rc sbin/magic_mask.sh
-    repack_boot
-  fi
+    if [ -f ${STOCKDUMP}.gz ]; then
+      ui_print_wrapper "- Boot image backup found!"
+      LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
+    else
+      ui_print_wrapper "! Boot image backup unavailable"
+      ui_print_wrapper "- Restoring ramdisk with backup"
+      LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-restore ramdisk.cpio
+      LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --repack $BOOTIMAGE stock_boot.img
+    fi
+    ;;
+  2 )
+    ui_print_wrapper "- SuperSU patched image detected"
+    LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-restore ramdisk.cpio
+    LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --repack $BOOTIMAGE stock_boot.img
+    ;;
+esac
+
+# Sign chromeos boot
+if [ -f chromeos ]; then
+  echo > config
+  echo > bootloader
+  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack stock_boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz stock_boot.img --config config --arch arm --bootloader bootloader --flags 0x1
+  rm -f stock_boot.img
+  mv stock_boot.img.signed stock_boot.img
 fi
 
-chmod 644 $NEWBOOT
-
-ui_print "- Flashing stock/reverted image"
+ui_print_wrapper "- Flashing stock/reverted image"
 [ ! -L "$BOOTIMAGE" ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
-dd if=$NEWBOOT of=$BOOTIMAGE bs=4096
+dd if=stock_boot.img of=$BOOTIMAGE bs=4096
 
-ui_print "- Removing Magisk files"
+ui_print_wrapper "- Removing Magisk files"
 rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
         /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
         /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img \
         /data/busybox /data/magisk /data/custom_ramdisk_patch.sh 2>/dev/null
 
-($BOOTMODE) && reboot
+$BOOTMODE && reboot
