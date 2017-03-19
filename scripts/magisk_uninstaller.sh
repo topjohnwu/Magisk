@@ -1,5 +1,4 @@
-# Detect whether in boot mode
-ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
+[ -z $BOOTMODE ] && BOOTMODE=false
 
 # This path should work in any cases
 TMPDIR=/dev/tmp

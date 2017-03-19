@@ -310,7 +310,7 @@ case $1 in
       if [ -f $UNINSTALLER ]; then
         touch /dev/.magisk.unblock
         chcon u:object_r:device:s0 /dev/.magisk.unblock
-        sh $UNINSTALLER
+        BOOTMODE=true sh $UNINSTALLER
         exit
       fi
 
@@ -493,10 +493,10 @@ case $1 in
         bind_mount $COREDIR/hosts /system/etc/hosts
       fi
 
-      if [ -f /data/magisk/magisk.apk ]; then
-        if [ -z `ls /data/app | grep com.topjohnwu.magisk` ]; then
+      if [ -f $BINPATH/magisk.apk ]; then
+        if ! ls /data/app | grep com.topjohnwu.magisk; then
           mkdir /data/app/com.topjohnwu.magisk-1
-          cp /data/magisk/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          cp $BINPATH/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
           chmod 755 /data/app/com.topjohnwu.magisk-1
@@ -504,7 +504,7 @@ case $1 in
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
         fi
-        rm -f /data/magisk/magisk.apk 2>/dev/null
+        rm -f $BINPATH/magisk.apk 2>/dev/null
       fi
 
       # Expose busybox
