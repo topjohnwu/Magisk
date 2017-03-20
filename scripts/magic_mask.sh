@@ -128,7 +128,7 @@ travel() {
           # Copy symlinks
           log_print "Symlink: /$1/$ITEM"
           mkdir -p "$DUMMDIR/$1" 2>/dev/null
-          cp -afc "$ITEM" $"DUMMDIR/$1/$ITEM"
+          cp -afc "$ITEM" "$DUMMDIR/$1/$ITEM"
         elif [ -d "$ITEM" ]; then
           # Create new dummy directory and mount it
           log_print "New directory: /$1/$ITEM"
