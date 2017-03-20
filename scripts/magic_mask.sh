@@ -73,7 +73,7 @@ loopsetup() {
 
 image_size_check() {
   e2fsck -yf $1
-  curBlocks=`e2fsck -n $1 2>/dev/null | cut -d, -f3 | cut -d\  -f2`;
+  curBlocks=`e2fsck -n $1 2>/dev/null | grep $1 | cut -d, -f3 | cut -d\  -f2`;
   curUsedM=`echo "$curBlocks" | cut -d/ -f1`
   curSizeM=`echo "$curBlocks" | cut -d/ -f1`
   curFreeM=$(((curSizeM - curUsedM) * 4 / 1024))
@@ -324,6 +324,24 @@ case $1 in
       chown -R 0.0 $TOOLPATH
       find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
+      log_print "* Linking binaries to /sbin"
+      mount -o rw,remount rootfs /
+      chmod 755 /sbin
+      ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
+      ln -sf $BINPATH/magiskpolicy /sbin/sepolicy-inject
+      ln -sf $BINPATH/resetprop /sbin/resetprop
+      if [ ! -f /sbin/launch_daemonsu.sh ]; then
+        log_print "* Starting MagiskSU"
+        export PATH=$OLDPATH
+        ln -sf $BINPATH/su /sbin/su
+        ln -sf $BINPATH/magiskpolicy /sbin/supolicy
+        /sbin/su --daemon
+        export PATH=$TOOLPATH:$OLDPATH
+      fi
+      mount -o ro,remount rootfs /
+
+      [ -f $DISABLEFILE ] && unblock
+
       # Multirom functions should go here, not available right now
       MULTIROM=false
 
@@ -373,24 +391,6 @@ case $1 in
           unblock
         fi
       fi
-
-      log_print "* Linking binaries to /sbin"
-      mount -o rw,remount rootfs /
-      chmod 755 /sbin
-      ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
-      ln -sf $BINPATH/magiskpolicy /sbin/sepolicy-inject
-      ln -sf $BINPATH/resetprop /sbin/resetprop
-      if [ ! -f /sbin/launch_daemonsu.sh ]; then
-        log_print "* Starting MagiskSU"
-        export PATH=$OLDPATH
-        ln -sf $BINPATH/su /sbin/su
-        ln -sf $BINPATH/magiskpolicy /sbin/supolicy
-        /sbin/su --daemon
-        export PATH=$TOOLPATH:$OLDPATH
-      fi
-      mount -o ro,remount rootfs /
-
-      [ -f $DISABLEFILE ] && unblock
 
       log_print "* Preparing modules"
 

@@ -56,8 +56,8 @@ log_print "`$BINPATH/resetprop -v -n ro.secure 1`"
 log_print "`$BINPATH/resetprop -v -n ro.build.type user`"
 [ ! -z "$BUILDTAGS" -a "$BUILDTAGS" != "release-keys" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.build.tags release-keys`"
-[ ! -z "$BUILDSELINUX" -a "$BUILDSELINUX" != "0" ] && \
-log_print "`$BINPATH/resetprop -v -n ro.build.selinux 0`"
+[ ! -z "$BUILDSELINUX" -a "$BUILDSELINUX" != "1" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.build.selinux 1`"
 
 touch $MODDIR/hidelist
 chmod -R 755 $MODDIR
