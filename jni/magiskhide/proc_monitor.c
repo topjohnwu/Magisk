@@ -27,7 +27,7 @@ void monitor_proc() {
 	fprintf(logfile, "\n");
 
 	// Monitor am_proc_start
-	p = popen("while true; do logcat -b events -c; logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
+	p = popen("logcat -b events -v raw -s am_proc_start", "r");
 
 	while(!feof(p)) {
 		//Format of am_proc_start is (as of Android 5.1 and 6.0)
@@ -43,7 +43,7 @@ void monitor_proc() {
 		}
 
 		char processName[256];
-		int ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
+		int ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
 
 		if(ret != 2)
 			continue;
