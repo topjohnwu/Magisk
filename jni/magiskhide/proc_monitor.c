@@ -1,7 +1,7 @@
 #include "magiskhide.h"
 
 void monitor_proc() {
-	int pid, badns, zygote_num = 0;
+	int pid, badns, i, zygote_num = 0;
 	char init_ns[32], zygote_ns[2][32];
 
 	// Get the mount namespace of init
@@ -26,12 +26,30 @@ void monitor_proc() {
 		fprintf(logfile, "Zygote(%d) ns=%s ", i, zygote_ns[i]);
 	fprintf(logfile, "\n");
 
+	// get a sample line from am_proc_start
+	p = popen("logcat -b events -v raw -s am_proc_start -t 1", "r");
+
+	/**
+	 *	Format of am_proc_start is (as of Android 5.1 and 6.0)
+	 *	UserID, pid, unix uid, processName, hostingType, hostingName
+	 *	but sometimes can have 7 fields, with processName as 5th field
+	 */
+	fgets(buffer, sizeof(buffer), p);
+	int commas = 0;
+	char *s = buffer;
+	for (i = 0;s[i] != '\0';i++) {
+		if (s[i] == ',')
+			commas++;
+
+	}
+	int numFields = commas + 1;
+
+	pclose(p);
+
 	// Monitor am_proc_start
-	p = popen("logcat -b events -v raw -s am_proc_start", "r");
+	p = popen("logcat -b events -c; logcat -b events -v raw -s am_proc_start", "r");
 
 	while(!feof(p)) {
-		//Format of am_proc_start is (as of Android 5.1 and 6.0)
-		//UserID, pid, unix uid, processName, hostingType, hostingName
 		fgets(buffer, sizeof(buffer), p);
 
 		char *pos = buffer;
@@ -43,7 +61,13 @@ void monitor_proc() {
 		}
 
 		char processName[256];
-		int ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
+		int ret;
+
+		if (numFields == 7) {
+			ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
+		} else {
+			ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
+		}
 
 		if(ret != 2)
 			continue;
