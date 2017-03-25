@@ -57,7 +57,7 @@ unblock() {
 
 bind_mount() {
   if [ -e "$1" -a -e "$2" ]; then
-    $BINPATH/busybox mount -o bind "$1" "$2" || log_print "Mount Fail: $1 -> $2"
+    mount -o bind "$1" "$2" || $BINPATH/busybox mount -o bind "$1" "$2" || log_print "Mount Fail: $1 -> $2"
   fi
 }
 
