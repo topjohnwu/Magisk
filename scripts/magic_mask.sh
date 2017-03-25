@@ -66,6 +66,7 @@ loopsetup() {
   for DEV in `ls /dev/block/loop*`; do
     if losetup $DEV $1; then
       LOOPDEVICE=$DEV
+      log_print "magisk: used loopdevice $DEV for $1"
       break
     fi
   done
@@ -286,6 +287,7 @@ case $1 in
 
   post-fs-data )
     # /data not mounted yet
+    log_print "** Magisk post-fs-data mode starting..."
     ! mount | grep " /data " >/dev/null && unblock
     mount | grep " /data " | grep "tmpfs" >/dev/null && unblock
 
@@ -315,6 +317,7 @@ case $1 in
       fi
 
       # Set up environment
+      log_print "* Magisk: Setting up environment"
       mkdir -p $TOOLPATH
       $BINPATH/busybox --install -s $TOOLPATH
       ln -sf $BINPATH/busybox $TOOLPATH/busybox
@@ -324,7 +327,7 @@ case $1 in
       chown -R 0.0 $TOOLPATH
       find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
-      log_print "* Linking binaries to /sbin"
+      log_print "* Magisk: Linking binaries to /sbin"
       mount -o rw,remount rootfs /
       chmod 755 /sbin
       ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
@@ -352,6 +355,7 @@ case $1 in
 
       # Mount magisk.img
       [ ! -d $MOUNTPOINT ] && mkdir -p $MOUNTPOINT
+      log_print "magisk: trying to mount magisk.img (1)"
       if ! mount | grep $MOUNTPOINT; then
         loopsetup $IMG
         [ ! -z $LOOPDEVICE ] && mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT

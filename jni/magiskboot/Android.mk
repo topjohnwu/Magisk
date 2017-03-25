@@ -11,6 +11,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := main.c unpack.c repack.c hexpatch.c parseimg.c compress.c utils.c cpio.c sha1.c
 LOCAL_CFLAGS += -DZLIB_CONST
+LOCAL_LDFLAGS += -static
 include $(BUILD_EXECUTABLE)
 
 include jni/ndk-compression/zlib/Android.mk

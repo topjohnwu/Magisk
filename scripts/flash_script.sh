@@ -21,9 +21,21 @@ COMMONDIR=$INSTALLER/common
 BOOTTMP=$TMPDIR/boottmp
 COREDIR=/magisk/.core
 CHROMEDIR=$INSTALLER/chromeos
+SYSTEM=/system
 
 # Default permissions
 umask 022
+
+ABDeviceCheck=$(cat /proc/cmdline | grep slot_suffix | wc -l)
+if [ $ABDeviceCheck -gt 0 ];
+then
+  isABDevice=true
+  SLOT=$(for i in `cat /proc/cmdline`; do echo $i | grep slot_suffix | awk -F "=" '{print $2}';done)
+  SYSTEM=/system/system
+else
+  isABDevice=false
+fi
+
 
 ##########################################################################################
 # Flashable update-binary preparation
@@ -68,7 +80,7 @@ ui_print() {
 getvar() {
   local VARNAME=$1
   local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /dev/.magisk /data/.magisk /cache/.magisk /system/.magisk; do
+  for FILE in /dev/.magisk /data/.magisk /cache/.magisk $SYSTEM/.magisk; do
     if [ -z "$VALUE" ]; then
       LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
       if [ ! -z "$LINE" ]; then
@@ -80,8 +92,13 @@ getvar() {
 }
 
 find_boot_image() {
+  srch_str="kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX"
+  if $isABDevice
+  then
+    srch_str="boot_$SLOT BOOT_$SLOT kern-$SLOT KERN-$SLOT"+$srch_str
+  fi
   if [ -z "$BOOTIMAGE" ]; then
-    for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
+    for PARTITION in $srch_str; do
       BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION`
       if [ ! -z "$BOOTIMAGE" ]; then break; fi
     done
@@ -121,10 +138,10 @@ mount_image() {
         if [ "$?" -eq "0" ]; then
           mount -t ext4 -o loop $LOOPDEVICE $2
           if (! is_mounted $2); then
-            /system/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE $2
+            $SYSTEM/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE $2
           fi
           if (! is_mounted $2); then
-            /system/bin/toybox mount -t ext4 -o loop $LOOPDEVICE $2
+            $SYSTEM/bin/toybox mount -t ext4 -o loop $LOOPDEVICE $2
           fi
         fi
         if (is_mounted $2); then
@@ -141,33 +158,33 @@ grep_prop() {
   shift
   FILES=$@
   if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
+    FILES="$SYSTEM/build.prop"
   fi
   cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
 
 remove_system_su() {
-  if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
+  if [ -f $SYSTEM/bin/su -o -f $SYSTEM/xbin/su ] && [ ! -f /su/bin/su ]; then
     ui_print "! System installed root detected, mount rw :("
     mount -o rw,remount /system
     # SuperSU
-    if [ -e /system/bin/.ext/.su ]; then
-      mv -f /system/bin/app_process32_original /system/bin/app_process32 2>/dev/null
-      mv -f /system/bin/app_process64_original /system/bin/app_process64 2>/dev/null
-      mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh 2>/dev/null
-      cd /system/bin
+    if [ -e $SYSTEM/bin/.ext/.su ]; then
+      mv -f $SYSTEM/bin/app_process32_original $SYSTEM/bin/app_process32 2>/dev/null
+      mv -f $SYSTEM/bin/app_process64_original $SYSTEM/bin/app_process64 2>/dev/null
+      mv -f $SYSTEM/bin/install-recovery_original.sh $SYSTEM/bin/install-recovery.sh 2>/dev/null
+      cd $SYSTEM/bin
       if [ -e app_process64 ]; then
         ln -sf app_process64 app_process
       else
         ln -sf app_process32 app_process
       fi
     fi
-    rm -rf /system/.pin /system/bin/.ext /system/etc/.installed_su_daemon /system/etc/.has_su_daemon \
-    /system/xbin/daemonsu /system/xbin/su /system/xbin/sugote /system/xbin/sugote-mksh /system/xbin/supolicy \
-    /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
-    /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
-    /system/.supersu /cache/.supersu /data/.supersu \
-    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
+    rm -rf $SYSTEM/.pin $SYSTEM/bin/.ext $SYSTEM/etc/.installed_su_daemon $SYSTEM/etc/.has_su_daemon \
+    $SYSTEM/xbin/daemonsu $SYSTEM/xbin/su $SYSTEM/xbin/sugote $SYSTEM/xbin/sugote-mksh $SYSTEM/xbin/supolicy \
+    $SYSTEM/bin/app_process_init $SYSTEM/bin/su /cache/su $SYSTEM/lib/libsupol.so $SYSTEM/lib64/libsupol.so \
+    $SYSTEM/su.d $SYSTEM/etc/install-recovery.sh $SYSTEM/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
+    $SYSTEM/.supersu /cache/.supersu /data/.supersu \
+    $SYSTEM/app/Superuser.apk $SYSTEM/app/SuperSU /cache/Superuser.apk  2>/dev/null
   fi
 }
 
@@ -186,10 +203,15 @@ fi
 
 ui_print "- Mounting /system(ro), /cache, /data"
 mount -o ro /system 2>/dev/null
+if $isABDevice
+then
+  mount -o rw,remount /system 2>/dev/null
+#  mount  /vendor 2>/dev/null
+fi
 mount /cache 2>/dev/null
 mount /data 2>/dev/null
 
-if [ ! -f '/system/build.prop' ]; then
+if [ ! -f "$SYSTEM/build.prop" ]; then
   ui_print "! Failed: /system could not be mounted!"
   exit 1
 fi
@@ -228,8 +250,8 @@ ui_print "- Device platform: $ARCH"
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
 
-SYSTEMLIB=/system/lib
-$IS64BIT && SYSTEMLIB=/system/lib64
+SYSTEMLIB=$SYSTEM/lib
+$IS64BIT && SYSTEMLIB=$SYSTEM/lib64
 
 find_boot_image
 if [ -z $BOOTIMAGE ]; then
@@ -378,6 +400,18 @@ esac
 ui_print "- Patching ramdisk"
 source $COMMONDIR/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
 
+if $isABDevice
+then
+  LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskpolicy --load /system/sepolicy --save /system/sepolicy --minimal
+  mkdir -p /system/magisk 2>/dev/null
+  cp -af $INSTALLER/common/init.magisk.rc /system/init.magisk.rc
+  cp -af $INSTALLER/common/magic_mask.sh /system/sbin/magic_mask.sh
+  chmod 0755 /system/magisk
+  chmod 0750 /system/init.magisk.rc /system/sbin/magic_mask.sh
+  chown 0.0 /system/magisk /system/init.magisk.rc /system/sbin/magic_mask.sh
+  grep "import /init.magisk.rc" /system/init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' /system/init.rc
+fi
+
 cd $BOOTTMP
 # Create ramdisk backups
 if $SUPERSU; then
@@ -465,7 +499,7 @@ cd /
 if ! $BOOTMODE; then
   ui_print "- Unmounting partitions"
   umount /magisk
-  losetup -d $MAGISKLOOP
+  losetup -d $MAGISKLOOP 2>/dev/null
   rmdir /magisk
   if $SUPERSU; then
     umount /su
@@ -474,6 +508,15 @@ if ! $BOOTMODE; then
   fi
   umount /system
 fi
+
+#umount /system 2>/dev/null
+if $isABDevice
+then
+  mount -o ro /system 2>/dev/null
+#  umount /vendor 2>/dev/null
+fi
+umount /cache 2>/dev/null
+umount /data 2>/dev/null
 
 ui_print "- Done"
 exit 0
