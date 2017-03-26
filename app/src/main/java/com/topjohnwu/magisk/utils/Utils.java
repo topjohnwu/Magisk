@@ -91,10 +91,12 @@ public class Utils {
         isDownloading = true;
 
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-        request.setDestinationUri(Uri.fromFile(file));
 
-        receiver.setDownloadID(downloadManager.enqueue(request));
+        if (link != null) {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
+            request.setDestinationUri(Uri.fromFile(file));
+            receiver.setDownloadID(downloadManager.enqueue(request));
+        }
         receiver.setFilename(filename);
         context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
