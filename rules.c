@@ -173,9 +173,6 @@ void su_rules() {
 	attradd("su_device", "mlstrustedobject");
 	attradd("su", "mlstrustedsubject");
 
-	// Allow chcon to anything
-	allow(ALL, "labeledfs", "filesystem", "associate");
-	allow(ALL, "tmpfs", "filesystem", "associate");
 }
 
 // Minimal to run Magisk script before live patching
