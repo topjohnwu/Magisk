@@ -264,6 +264,40 @@ rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
 PATH=$TMPDIR/busybox:$PATH
 
 ##########################################################################################
+# Magisk Image
+##########################################################################################
+
+# Fix SuperSU.....
+$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
+
+if (is_mounted /data); then
+  IMG=/data/magisk.img
+else
+  IMG=/cache/magisk.img
+  ui_print "- Data unavailable, use cache workaround"
+fi
+
+if [ -f $IMG ]; then
+  ui_print "- $IMG detected!"
+else
+  ui_print "- Creating $IMG"
+  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
+fi
+
+mount_image $IMG /magisk
+if (! is_mounted /magisk); then
+  ui_print "! Magisk image mount failed..."
+  exit 1
+fi
+MAGISKLOOP=$LOOPDEVICE
+
+# Core folders and scripts
+mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
+chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+
+##########################################################################################
 # Unpack boot
 ##########################################################################################
 
@@ -371,7 +405,7 @@ case $? in
 esac
 
 ##########################################################################################
-# Ramdisk patch
+# Boot image patches
 ##########################################################################################
 
 # All ramdisk patch commands are stored in a separate script
@@ -389,43 +423,17 @@ fi
 rm -f ramdisk.cpio.orig
 
 ##########################################################################################
-# Magisk Image
-##########################################################################################
-
-# Fix SuperSU.....
-$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
-
-if (is_mounted /data); then
-  IMG=/data/magisk.img
-else
-  IMG=/cache/magisk.img
-  ui_print "- Data unavailable, use cache workaround"
-fi
-
-if [ -f $IMG ]; then
-  ui_print "- $IMG detected!"
-else
-  ui_print "- Creating $IMG"
-  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
-fi
-
-mount_image $IMG /magisk
-if (! is_mounted /magisk); then
-  ui_print "! Magisk image mount failed..."
-  exit 1
-fi
-MAGISKLOOP=$LOOPDEVICE
-
-# Core folders and scripts
-mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
-chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-
-##########################################################################################
 # Repack and flash
 ##########################################################################################
 
+# Hexpatches
+
+# Remove Samsung RKP in stock kernel
+LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/bootimgtools --hexpatch kernel \
+49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
+A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
+
+ui_print "- Repacking boot image"
 LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --repack $BOOTIMAGE
 
 case $? in
