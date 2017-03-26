@@ -7,7 +7,6 @@ IMG=/data/magisk.img
 WHITELIST="/system/bin"
 
 MOUNTPOINT=/magisk
-
 COREDIR=$MOUNTPOINT/.core
 
 TMPDIR=/dev/magisk
@@ -18,7 +17,8 @@ MOUNTINFO=$TMPDIR/mnt
 # Use the included busybox for maximum compatibility and reliable results
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
 TOOLPATH=/dev/busybox
-BINPATH=/data/magisk
+DATABIN=/data/magisk
+MAGISKBIN=$COREDIR/bin
 OLDPATH=$PATH
 export PATH=$TOOLPATH:$OLDPATH
 
@@ -297,15 +297,22 @@ case $1 in
       # Cache support
       mv /cache/stock_boot* /data 2>/dev/null
       if [ -d /cache/data_bin ]; then
-        rm -rf $BINPATH
-        mv /cache/data_bin $BINPATH
+        rm -rf $DATABIN
+        mv /cache/data_bin $DATABIN
+        chmod -R 755 $DATABIN
+        chown -R 0.0 $DATABIN
       fi
 
-      chmod -R 755 $BINPATH
-      chown -R 0.0 $BINPATH
-
       # Live patch sepolicy
-      $BINPATH/magiskpolicy --live
+      $DATABIN/magiskpolicy --live
+
+      # Set up environment
+      mkdir -p $TOOLPATH
+      $DATABIN/busybox --install -s $TOOLPATH
+      ln -sf $DATABIN/busybox $TOOLPATH/busybox
+      # Prevent issues
+      rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
+      find $DATABIN $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
       if [ -f $UNINSTALLER ]; then
         touch /dev/.magisk.unblock
@@ -313,38 +320,6 @@ case $1 in
         BOOTMODE=true sh $UNINSTALLER
         exit
       fi
-
-      # Set up environment
-      mkdir -p $TOOLPATH
-      $BINPATH/busybox --install -s $TOOLPATH
-      ln -sf $BINPATH/busybox $TOOLPATH/busybox
-      # Prevent issues
-      rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
-      chmod -R 755 $TOOLPATH
-      chown -R 0.0 $TOOLPATH
-      find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
-
-      log_print "* Linking binaries to /sbin"
-      mount -o rw,remount rootfs /
-      chmod 755 /sbin
-      ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
-      ln -sf $BINPATH/magiskpolicy /sbin/sepolicy-inject
-      ln -sf $BINPATH/resetprop /sbin/resetprop
-      if [ ! -f /sbin/launch_daemonsu.sh ]; then
-        log_print "* Starting MagiskSU"
-        export PATH=$OLDPATH
-        ln -sf $BINPATH/su /sbin/su
-        ln -sf $BINPATH/magiskpolicy /sbin/supolicy
-        /sbin/su --daemon
-        export PATH=$TOOLPATH:$OLDPATH
-      fi
-      mount -o ro,remount rootfs /
-
-      # Exit if disabled
-      [ -f $DISABLEFILE ] && unblock
-
-      # Multirom functions should go here, not available right now
-      MULTIROM=false
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
@@ -364,7 +339,7 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror \
+      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/dummy $COREDIR/mirror \
              $COREDIR/busybox $COREDIR/su /data/magisk/*.img /data/busybox 2>/dev/null
 
       # Remove modules that are labeled to be removed
@@ -392,6 +367,28 @@ case $1 in
           unblock
         fi
       fi
+
+      log_print "* Linking binaries to /sbin"
+      mount -o rw,remount rootfs /
+      chmod 755 /sbin
+      ln -sf $DATABIN/magiskpolicy /sbin/magiskpolicy
+      ln -sf $DATABIN/magiskpolicy /sbin/sepolicy-inject
+      ln -sf $MAGISKBIN/resetprop /sbin/resetprop
+      if [ ! -f /sbin/launch_daemonsu.sh ]; then
+        log_print "* Starting MagiskSU"
+        export PATH=$OLDPATH
+        ln -sf $MAGISKBIN/su /sbin/su
+        ln -sf $DATABIN/magiskpolicy /sbin/supolicy
+        /sbin/su --daemon
+        export PATH=$TOOLPATH:$OLDPATH
+      fi
+      mount -o ro,remount rootfs /
+
+      # Exit if disabled
+      [ -f $DISABLEFILE ] && unblock
+
+      # Multirom functions should go here, not available right now
+      MULTIROM=false
 
       log_print "* Preparing modules"
 
@@ -421,7 +418,7 @@ case $1 in
           # Read in defined system props
           if [ -f $MOD/system.prop ]; then
             log_print "* Reading props from $MOD/system.prop"
-            $BINPATH/resetprop --file $MOD/system.prop
+            $MAGISKBIN/resetprop --file $MOD/system.prop
           fi
         fi
       done
@@ -494,10 +491,10 @@ case $1 in
         bind_mount $COREDIR/hosts /system/etc/hosts
       fi
 
-      if [ -f $BINPATH/magisk.apk ]; then
+      if [ -f $DATABIN/magisk.apk ]; then
         if ! ls /data/app | grep com.topjohnwu.magisk; then
           mkdir /data/app/com.topjohnwu.magisk-1
-          cp $BINPATH/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          cp $DATABIN/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1
           chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
           chmod 755 /data/app/com.topjohnwu.magisk-1
@@ -505,7 +502,7 @@ case $1 in
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
           chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
         fi
-        rm -f $BINPATH/magisk.apk 2>/dev/null
+        rm -f $DATABIN/magisk.apk 2>/dev/null
       fi
 
       # Expose busybox

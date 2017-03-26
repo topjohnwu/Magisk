@@ -248,8 +248,8 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
-cp -af $BINDIR/. $COMMONDIR/ramdisk_patch.sh $COMMONDIR/magic_mask.sh \
-       $COMMONDIR/init.magisk.rc $COMMONDIR/magisk.apk $MAGISKBIN
+cp -af $BINDIR/busybox $BINDIR/magiskboot $BINDIR/magiskpolicy $COMMONDIR/magisk.apk \
+       $COMMONDIR/init.magisk.rc  $COMMONDIR/ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
 # Legacy support
 ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
 
@@ -292,10 +292,13 @@ fi
 MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
-mkdir -p $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+mkdir -p $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
-chmod -R 755 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+cp -af $BINDIR/resetprop $BINDIR/magiskhide $BINDIR/su $COREDIR/bin
+# Legacy support
+ln -sf $COREDIR/bin/resetprop $MAGISKBIN/resetprop
+chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 
 ##########################################################################################
 # Unpack boot

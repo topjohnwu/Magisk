@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 MODDIR=/magisk/.core/magiskhide
-BINPATH=/data/magisk
+BINPATH=/magisk/.core/bin
 LOGFILE=/cache/magisk.log
 TOOLPATH=/dev/busybox
 
@@ -23,7 +23,7 @@ if [ ! -d /sbin_orig ]; then
   mkdir -p /dev/sbin_bind
   chmod 755 /dev/sbin_bind
   ln -s /sbin_orig/* /dev/sbin_bind
-  chcon -h u:object_r:rootfs:s0 /dev/sbin_bind /dev/sbin_bind/*
+  chcon -h u:object_r:system_file:s0 /dev/sbin_bind /dev/sbin_bind/*
   mount -o bind /dev/sbin_bind /sbin
 fi
 
