@@ -340,6 +340,7 @@ case $1 in
       fi
       mount -o ro,remount rootfs /
 
+      # Exit if disabled
       [ -f $DISABLEFILE ] && unblock
 
       # Multirom functions should go here, not available right now
@@ -528,14 +529,17 @@ case $1 in
     # Version info
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
+
+    # Start MagiskHide
+    [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
+
     if [ -f $DISABLEFILE ]; then
+      # Let MagiskManager know
       setprop ro.magisk.disable 1
       exit
     fi
-    run_scripts service
     
-    # Start MagiskHide
-    [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
+    run_scripts service    
     ;;
 
 esac
