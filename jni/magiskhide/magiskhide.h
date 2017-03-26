@@ -24,6 +24,9 @@
 #define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
 #define SEPOLICY_INJECT "/data/magisk/magiskpolicy"
 
+#define EVENT_SIZE  (sizeof(struct inotify_event))
+#define BUF_LEN     (1024 * (EVENT_SIZE + 16))
+
 // Main thread
 void monitor_proc();
 
