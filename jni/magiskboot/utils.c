@@ -1,8 +1,8 @@
 #include "magiskboot.h"
 #include "elf.h"
 
-char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4" };
-file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4 };
+char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4" };
+file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY };
 
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size) {
 	int fd = open(filename, O_RDONLY);
@@ -42,10 +42,10 @@ file_t check_type(const unsigned char *buf) {
 		return LZMA;
 	} else if (memcmp(buf, "BZh", 3) == 0) {
 		return BZIP2;
-	} else if ( (  memcmp(buf, "\x04\x22\x4d\x18", 4) == 0 
-				|| memcmp(buf, "\x03\x21\x4c\x18", 4) == 0) 
-				|| memcmp(buf, "\x02\x21\x4c\x18", 4) == 0) {
+	} else if (memcmp(buf, "\x04\x22\x4d\x18", 4) == 0) {
 		return LZ4;
+	} else if (memcmp(buf, "\x02\x21\x4c\x18", 4) == 0) {
+		return LZ4_LEGACY;
 	} else if (memcmp(buf, "\x88\x16\x88\x58", 4) == 0) {
 		return MTK;
 	} else if (memcmp(buf, "QCDT", 4) == 0) {
@@ -128,6 +128,9 @@ void print_info() {
 			break;
 		case LZ4:
 			printf("COMPRESSION [%s]\n", "lz4");
+			break;
+		case LZ4_LEGACY:
+			printf("COMPRESSION [%s]\n", "lz4_legacy");
 			break;
 		default:
 			fprintf(stderr, "Unknown ramdisk format!\n");

@@ -35,7 +35,7 @@ static void usage(char *arg0) {
 	fprintf(stderr, "\n");
 
 	fprintf(stderr, "%s --compress[=method] <infile> [outfile]\n", arg0);
-	fprintf(stderr, "  Compress <infile> with [method](default: gzip), optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
+	fprintf(stderr, "  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
 	fprintf(stderr, "\n");
 
 	fprintf(stderr, "%s --decompress <infile> [outfile]\n", arg0);
