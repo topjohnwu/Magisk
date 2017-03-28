@@ -53,7 +53,7 @@ void repack(const char* orig_image, const char* out_image) {
 	// Restore kernel
 	if (mtk_kernel) {
 		mtk_kernel_off = lseek(fd, 0, SEEK_CUR);
-		write_zero(fd, 512);
+		restore_buf(fd, kernel, 512);
 		memcpy(&mtk_kernel_hdr, kernel, sizeof(mtk_kernel_hdr));
 	}
 	hdr.kernel_size = restore(KERNEL_FILE, fd);
@@ -62,7 +62,7 @@ void repack(const char* orig_image, const char* out_image) {
 	// Restore ramdisk
 	if (mtk_ramdisk) {
 		mtk_ramdisk_off = lseek(fd, 0, SEEK_CUR);
-		write_zero(fd, 512);
+		restore_buf(fd, ramdisk, 512);
 		memcpy(&mtk_ramdisk_hdr, ramdisk, sizeof(mtk_ramdisk_hdr));
 	}
 	if (access(RAMDISK_FILE, R_OK) == 0) {
