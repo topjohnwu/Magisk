@@ -72,4 +72,4 @@ while read PROCESS; do
 done < $MODDIR/hidelist
 
 log_print "Starting MagiskHide daemon"
-$BINPATH/magiskhide --daemon
+su -c $BINPATH/magiskhide --daemon
