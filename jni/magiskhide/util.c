@@ -60,25 +60,37 @@ void run_as_daemon() {
 
 void manage_selinux() {
 	char *argv[] = { SEPOLICY_INJECT, "--live", "permissive *", NULL };
-	char str[20];
+	char val[1];
 	int fd, ret;
-	fd = open(ENFORCE_FILE, O_RDONLY);
+	fd = open(ENFORCE_FILE, O_RDWR);
 	if (fd < 0)
 		return;
-	ret = read(fd, str, 20);
-	close(fd);
-	if (ret < 1)
+	if (read(fd, val, 1) < 1)
 		return;
+	lseek(fd, 0, SEEK_SET);
 	// Permissive
-	if (str[0] == '0') {
-		fprintf(logfile, "MagiskHide: Permissive detected, switching to pseudo enforced\n");
-		fd = open(ENFORCE_FILE, O_RDWR);
-		if (fd < 0)
+	if (val[0] == '0') {
+
+		fprintf(logfile, "MagiskHide: Permissive detected\n");
+
+		if (write(fd, "1", 1) < 1)
 			return;
-		ret = write(fd, "1", 1);
+		lseek(fd, 0, SEEK_SET);
+
+		if (read(fd, val, 1) < 1)
+			return;
+		lseek(fd, 0, SEEK_SET);
 		close(fd);
-		if (ret < 1)
+
+		if (val[0] == '0') {
+			fprintf(logfile, "MagiskHide: Unable to set to enforce, hide the state\n");
+			chmod(ENFORCE_FILE, 0640);
+			chmod(POLICY_FILE, 0440);
 			return;
+		}
+
+		fprintf(logfile, "MagiskHide: Calling magiskpolicy for pseudo enforce mode\n");
+
 		switch(fork()) {
 			case -1:
 				return;

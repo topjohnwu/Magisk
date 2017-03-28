@@ -22,6 +22,7 @@
 #define HIDELIST 		"/magisk/.core/magiskhide/hidelist"
 #define DUMMYPATH		"/dev/magisk/dummy"
 #define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
+#define POLICY_FILE 	"/sys/fs/selinux/policy"
 #define SEPOLICY_INJECT "/data/magisk/magiskpolicy"
 
 // Main thread

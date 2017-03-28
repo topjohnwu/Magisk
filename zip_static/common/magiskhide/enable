@@ -27,10 +27,6 @@ if [ ! -d /sbin_orig ]; then
   mount -o bind /dev/sbin_bind /sbin
 fi
 
-# Sammy device like these permissions
-chmod 640 /sys/fs/selinux/enforce
-chmod 440 /sys/fs/selinux/policy
-
 log_print "Removing dangerous read-only system props"
 
 VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
@@ -40,7 +36,6 @@ DEBUGGABLE=`getprop ro.debuggable`
 SECURE=`getprop ro.secure`
 BUILDTYPE=`getprop ro.build.type`
 BUILDTAGS=`getprop ro.build.tags`
-BUILDSELINUX=`getprop ro.build.selinux`
 
 [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
@@ -56,8 +51,6 @@ log_print "`$BINPATH/resetprop -v -n ro.secure 1`"
 log_print "`$BINPATH/resetprop -v -n ro.build.type user`"
 [ ! -z "$BUILDTAGS" -a "$BUILDTAGS" != "release-keys" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.build.tags release-keys`"
-[ ! -z "$BUILDSELINUX" -a "$BUILDSELINUX" != "1" ] && \
-log_print "`$BINPATH/resetprop -v -n ro.build.selinux 1`"
 
 touch $MODDIR/hidelist
 chmod -R 755 $MODDIR
