@@ -129,7 +129,7 @@ void otherToSU() {
 		allow("audioserver", "audioserver", "process", "execmem");
 }
 
-void su_rules() {
+void full_rules() {
 	// Samsung specific
 	// Prevent system from loading policy
 	if(exists("knox_system_app"))

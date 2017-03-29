@@ -34,9 +34,16 @@ static void statements() {
 }
 
 static void usage(char *arg0) {
-	fprintf(stderr, "%s [--live] [--minimal] [--load <infile>] [--save <outfile>] [policystatement...]\n\n", arg0);
-	fprintf(stderr, "  --live: directly load patched policy to device\n");
-	fprintf(stderr, "  --minimal: minimal patches for boot image to let Magisk live patch on boot\n");
+	fprintf(stderr,
+		"%s [--options...] [policystatements...]\n\n"
+		"Options:\n"
+		"  --live: directly load patched policy to device\n"
+		"  --magisk: complete (very large!) patches for Magisk and MagiskSU\n"
+		"  --minimal: minimal patches, used for boot image patches\n"
+		"  --load <infile>: load policies from <infile>\n"
+		"                   (load from current policies if not specified)"
+		"  --save <outfile>: save policies to <outfile>\n"
+		, arg0);
 	statements();
 	exit(1);
 }
@@ -248,7 +255,7 @@ static void syntax_error_msg() {
 
 int main(int argc, char *argv[]) {
 	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
-	int live = 0, minimal = 0;
+	int live = 0, minimal = 0, full = 0;
 	struct vector rules;
 
 	vec_init(&rules);
@@ -258,6 +265,8 @@ int main(int argc, char *argv[]) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			if (strcmp(argv[i], "--live") == 0)
 				live = 1;
+			else if (strcmp(argv[i], "--magisk") == 0)
+				full = 1;
 			else if (strcmp(argv[i], "--minimal") == 0)
 				minimal = 1;
 			else if (strcmp(argv[i], "--load") == 0) {
@@ -294,8 +303,8 @@ int main(int argc, char *argv[]) {
 	if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
-	if (!minimal && rules.size == 0) su_rules();
-	if (minimal) min_rules();
+	if (full) full_rules();
+	else if (minimal) min_rules();
 
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages

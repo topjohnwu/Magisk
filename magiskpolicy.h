@@ -63,7 +63,7 @@ void vec_push_back(vector *v, char* s);
 void vec_destroy(vector *v);
 
 // Built in rules
-void su_rules();
+void full_rules();
 void min_rules();
 
 #endif
