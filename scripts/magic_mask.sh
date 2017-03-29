@@ -51,7 +51,6 @@ in_list() {
 
 unblock() {
   touch /dev/.magisk.unblock
-  chcon u:object_r:device:s0 /dev/.magisk.unblock
   exit
 }
 
@@ -81,18 +80,19 @@ image_size_check() {
   curSizeM=$((curSizeM * 4 / 1024))
 }
 
-run_scripts() {
+module_scripts() {
   BASE=$MOUNTPOINT
   for MOD in $BASE/* ; do
-    if [ ! -f $MOD/disable ]; then
-      if [ -f $MOD/$1.sh ]; then
-        chmod 755 $MOD/$1.sh
-        chcon u:object_r:system_file:s0 $MOD/$1.sh
-        log_print "$1: $MOD/$1.sh"
-        sh $MOD/$1.sh
-      fi
+    if [ ! -f $MOD/disable -a -f $MOD/$1.sh ]; then
+      chmod 755 $MOD/$1.sh
+      chcon u:object_r:system_file:s0 $MOD/$1.sh
+      log_print "$1: $MOD/$1.sh"
+      sh $MOD/$1.sh
     fi
   done
+}
+
+general_scripts() {
   for SCRIPT in $COREDIR/${1}.d/* ; do
     if [ -f "$SCRIPT" ]; then
       chmod 755 $SCRIPT
@@ -303,9 +303,6 @@ case $1 in
         chown -R 0.0 $DATABIN
       fi
 
-      # Live patch sepolicy
-      $DATABIN/magiskpolicy --live
-
       # Set up environment
       mkdir -p $TOOLPATH
       $DATABIN/busybox --install -s $TOOLPATH
@@ -316,8 +313,7 @@ case $1 in
 
       if [ -f $UNINSTALLER ]; then
         touch /dev/.magisk.unblock
-        chcon u:object_r:device:s0 /dev/.magisk.unblock
-        BOOTMODE=true sh $UNINSTALLER
+        (BOOTMODE=true sh $UNINSTALLER) &
         exit
       fi
 
@@ -368,24 +364,15 @@ case $1 in
         fi
       fi
 
-      log_print "* Linking binaries to /sbin"
-      mount -o rw,remount rootfs /
-      chmod 755 /sbin
-      ln -sf $DATABIN/magiskpolicy /sbin/magiskpolicy
-      ln -sf $DATABIN/magiskpolicy /sbin/sepolicy-inject
-      ln -sf $MAGISKBIN/resetprop /sbin/resetprop
-      if [ ! -f /sbin/launch_daemonsu.sh ]; then
-        log_print "* Starting MagiskSU"
-        export PATH=$OLDPATH
-        ln -sf $MAGISKBIN/su /sbin/su
-        ln -sf $DATABIN/magiskpolicy /sbin/supolicy
-        /sbin/su --daemon
-        export PATH=$TOOLPATH:$OLDPATH
-      fi
-      mount -o ro,remount rootfs /
+      log_print "* Running post-fs-data.d"
+      general_scripts post-fs-data
 
       # Exit if disabled
       [ -f $DISABLEFILE ] && unblock
+      
+      ######################
+      # Core features done #
+      ######################
 
       # Multirom functions should go here, not available right now
       MULTIROM=false
@@ -474,8 +461,8 @@ case $1 in
       done
 
       # Stage 4
-      log_print "* Stage 4: Execute scripts"
-      run_scripts post-fs-data
+      log_print "* Stage 4: Execute module scripts"
+      module_scripts post-fs-data
 
       # Stage 5
       log_print "* Stage 5: Mount mirrored items back to dummy"
@@ -527,6 +514,28 @@ case $1 in
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
 
+    # Live patch sepolicy
+    $MAGISKBIN/magiskpolicy --live --magisk
+
+    log_print "* Linking binaries to /sbin"
+    mount -o rw,remount rootfs /
+    chmod 755 /sbin
+    ln -sf $MAGISKBIN/magiskpolicy /sbin/magiskpolicy
+    ln -sf $MAGISKBIN/magiskpolicy /sbin/sepolicy-inject
+    ln -sf $MAGISKBIN/resetprop /sbin/resetprop
+    if [ ! -f /sbin/launch_daemonsu.sh ]; then
+      log_print "* Starting MagiskSU"
+      export PATH=$OLDPATH
+      ln -sf $MAGISKBIN/su /sbin/su
+      ln -sf $MAGISKBIN/magiskpolicy /sbin/supolicy
+      /sbin/su --daemon
+      export PATH=$TOOLPATH:$OLDPATH
+    fi
+    mount -o ro,remount rootfs /
+
+    log_print "* Running service.d"
+    general_scripts service
+
     # Start MagiskHide
     [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
 
@@ -536,7 +545,7 @@ case $1 in
       exit
     fi
     
-    run_scripts service    
+    module_scripts service
     ;;
 
 esac
