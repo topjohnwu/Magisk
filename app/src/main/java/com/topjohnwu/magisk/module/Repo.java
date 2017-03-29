@@ -53,6 +53,7 @@ public class Repo extends BaseModule {
         values.put("description", getDescription());
         values.put("repo_name", repoName);
         values.put("last_update", mLastUpdate.getTime());
+        values.put("template", getTemplateVersion());
         return values;
     }
 

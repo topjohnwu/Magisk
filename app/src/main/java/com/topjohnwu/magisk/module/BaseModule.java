@@ -11,7 +11,7 @@ import java.util.List;
 public abstract class BaseModule implements Comparable<BaseModule> {
 
     private String mId, mName, mVersion, mAuthor, mDescription;
-    private int mVersionCode = 0;
+    private int mVersionCode = 0, templateVersion = 0;
 
     protected BaseModule() {}
 
@@ -22,6 +22,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         mVersionCode = c.getInt(c.getColumnIndex("versionCode"));
         mAuthor = c.getString(c.getColumnIndex("author"));
         mDescription = c.getString(c.getColumnIndex("description"));
+        templateVersion = c.getInt(c.getColumnIndex("template"));
     }
 
     protected void parseProps(List<String> props) throws CacheModException { parseProps(props.toArray(new String[props.size()])); }
@@ -57,6 +58,10 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                 case "description":
                     mDescription = prop[1];
                     break;
+                case "template":
+                    try {
+                        templateVersion = Integer.parseInt(prop[1]);
+                    } catch (NumberFormatException ignored) {}
                 case "cacheModule":
                     if (Boolean.parseBoolean(prop[1]))
                         throw new CacheModException(mId);
@@ -97,6 +102,10 @@ public abstract class BaseModule implements Comparable<BaseModule> {
 
     public int getVersionCode() {
         return mVersionCode;
+    }
+
+    public int getTemplateVersion() {
+        return templateVersion;
     }
 
     public static class CacheModException extends Exception {

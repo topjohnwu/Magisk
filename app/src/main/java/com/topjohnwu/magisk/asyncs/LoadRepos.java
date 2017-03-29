@@ -57,12 +57,10 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
         String etag = prefs.getString(ETAG_KEY, "");
         header.put("If-None-Match", etag);
 
-        magiskManager.repoMap = new ValueSortedMap<>();
-
         // Make a request to main URL for repo info
         String jsonString = WebService.request(REPO_URL, WebService.GET, null, header, false);
 
-        ValueSortedMap<String, Repo> cached = dbHelper.getRepoMap();
+        ValueSortedMap<String, Repo> cached = dbHelper.getRepoMap(false), fetched = new ValueSortedMap<>();
 
         if (!TextUtils.isEmpty(jsonString)) {
             try {
@@ -97,27 +95,24 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
                             repo.update(updatedDate);
                         }
                         if (repo.getId() != null) {
-                            magiskManager.repoMap.put(id, repo);
+                            fetched.put(id, repo);
                         }
                     } catch (BaseModule.CacheModException ignored) {}
+
+                    // Update the database
+                    dbHelper.addRepoMap(fetched);
+                    // The leftover cached are those removed remote, cleanup db
+                    dbHelper.removeRepo(cached);
+                    // Update ETag
+                    prefs.edit().putString(ETAG_KEY, etag).apply();
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else {
-            // Use cached if no internet or no updates
-            Logger.dev("LoadRepos: No updates, use cached");
-            magiskManager.repoMap.putAll(cached);
-            cached.clear();
         }
 
-        // Update the database
-        dbHelper.addRepoMap(magiskManager.repoMap);
-        // The leftover cached are those removed remote, cleanup db
-        dbHelper.removeRepo(cached);
-        // Update ETag
-        prefs.edit().putString(ETAG_KEY, etag).apply();
+        magiskManager.repoMap = dbHelper.getRepoMap();
 
         Logger.dev("LoadRepos: Repo load done");
         return null;

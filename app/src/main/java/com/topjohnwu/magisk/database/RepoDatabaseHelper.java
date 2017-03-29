@@ -13,7 +13,7 @@ import java.util.Collection;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VER = 1;
+    private static final int DATABASE_VER = 2;
     private static final String TABLE_NAME = "repos";
 
     public RepoDatabaseHelper(Context context) {
@@ -33,8 +33,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                     "(id TEXT, name TEXT, version TEXT, versionCode INT, " +
                     "author TEXT, description TEXT, repo_name TEXT, last_update INT, " +
                     "PRIMARY KEY(id))");
+            oldVersion++;
         }
-        // No upgrades yet
+        if (oldVersion == 1) {
+            db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD template INT");
+            oldVersion++;
+        }
     }
 
     public void addRepoMap(ValueSortedMap<String, Repo> map) {
@@ -62,6 +66,10 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ValueSortedMap<String, Repo> getRepoMap() {
+        return getRepoMap(true);
+    }
+
+    public ValueSortedMap<String, Repo> getRepoMap(boolean filtered) {
         ValueSortedMap<String, Repo> ret = new ValueSortedMap<>();
         SQLiteDatabase db = getReadableDatabase();
         Repo repo;
@@ -69,6 +77,10 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 repo = new Repo(c);
                 Logger.dev("Load from cache: " + repo.getId());
+                if (repo.getTemplateVersion() < 3 && filtered) {
+                    Logger.dev("Outdated repo: " + repo.getId());
+                    continue;
+                }
                 ret.put(repo.getId(), repo);
             }
         }
