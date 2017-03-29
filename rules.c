@@ -194,6 +194,8 @@ void min_rules() {
 
 	// Misc: basic shell scripts, prop management etc.
 	allow("su", "property_socket", "sock_file", "write");
+	if (exists("default_prop"))
+		allow("su", "default_prop", "property_service", "set");
 	allow("su", "init", "unix_stream_socket", "connectto");
 	allow("su", "su", "unix_dgram_socket", ALL);
 	allow("su", "su", "unix_stream_socket", ALL);
