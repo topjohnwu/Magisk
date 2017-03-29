@@ -135,10 +135,10 @@ void su_rules() {
 	if(exists("knox_system_app"))
 		samsung();
 
+	// Min rules first
+	min_rules();
+
 	// Create domains if they don't exist
-	if (!exists("su"))
-		create("su");
-	permissive("su");
 	if (!exists("su_device"))
 		create("su_device");
 	enforce("su_device");
@@ -185,14 +185,15 @@ void min_rules() {
 
 	attradd("su", "mlstrustedsubject");
 
+	// Let init run stuffs in su context
 	allow("kernel", "su", "fd", "use");
 	allow("init", "su", "process", ALL);
 	allow("init", "system_file", "dir", ALL);
 	allow("init", "system_file", "lnk_file", ALL);
 	allow("init", "system_file", "file", ALL);
 
+	// Misc: basic shell scripts, prop management etc.
 	allow("su", "property_socket", "sock_file", "write");
-	allow("su", "shell_exec", "file", ALL);
 	allow("su", "init", "unix_stream_socket", "connectto");
 	allow("su", "su", "unix_dgram_socket", ALL);
 	allow("su", "su", "unix_stream_socket", ALL);
@@ -203,67 +204,25 @@ void min_rules() {
 	allow("su", "su", "lnk_file", ALL);
 	allow("su", "su", "dir", ALL);
 
-	// vold, bootanim, surfaceflinger might require mounts in multirom
-	allow("su", "vold_exec", "file", ALL);
-	allow("su", "bootanim_exec", "file", ALL);
-	allow("su", "surfaceflinger_exec", "file", ALL);
-
-	// Access toolbox/toybox tools
-	allow("su", "toolbox_exec", "file", ALL);
-	allow("su", "toolbox_exec", "lnk_file", ALL);
-
-	// For /dev 
-	allow("su", "device", "file", ALL);
-	allow("su", "device", "fifo_file", ALL);
-	allow("su", "device", "lnk_file", ALL);
-	allow("su", "device", "dir", ALL);
-
-	// For rootfs
-	allow("su", "rootfs", "file", ALL);
-	allow("su", "rootfs", "fifo_file", ALL);
-	allow("su", "rootfs", "lnk_file", ALL);
-	allow("su", "rootfs", "dir", ALL);
-
-	// For system/cache/data files
-	allow("su", "system_file", "file", ALL);
-	allow("su", "system_file", "fifo_file", ALL);
-	allow("su", "system_file", "lnk_file", ALL);
-	allow("su", "system_file", "dir", ALL);
-	allow("su", "system_data_file", "file", ALL);
-	allow("su", "system_data_file", "fifo_file", ALL);
-	allow("su", "system_data_file", "lnk_file", ALL);
-	allow("su", "system_data_file", "dir", ALL);
-	allow("su", "cache_file", "file", ALL);
-	allow("su", "cache_file", "fifo_file", ALL);
-	allow("su", "cache_file", "lnk_file", ALL);
-	allow("su", "cache_file", "dir", ALL);
+	// Allow su to do anything to files/dir/links
+	allow("su", ALL, "file", ALL);
+	allow("su", ALL, "dir", ALL);
+	allow("su", ALL, "lnk_file", ALL);
 
 	// For sepolicy live patching
 	allow("su", "kernel", "security", "read_policy");
 	allow("su", "kernel", "security", "load_policy");
-	allow("su", "selinuxfs", "file", ALL);
 
-	// For detecting current mount status
-	allow("su", "storage_file", "file", ALL);
-	allow("su", "storage_file", "fifo_file", ALL);
-	allow("su", "storage_file", "lnk_file", ALL);
-	allow("su", "storage_file", "dir", ALL);
-	allow("su", "sysfs", "file", ALL);
-	allow("su", "sysfs", "fifo_file", ALL);
-	allow("su", "sysfs", "lnk_file", ALL);
-	allow("su", "sysfs", "dir", ALL);
-	allow("su", "block_device", "file", ALL);
-	allow("su", "block_device", "fifo_file", ALL);
-	allow("su", "block_device", "lnk_file", ALL);
-	allow("su", "block_device", "dir", ALL);
-	
+	// For mounting loop devices and mirrors
+	allow("su", "kernel", "process", "setsched");
+	allow("su", "labeledfs", "filesystem", "mount");
+	allow("su", "labeledfs", "filesystem", "unmount");
+	allow("su", "loop_device", "blk_file", ALL);
+	allow("su", "block_device", "blk_file", ALL);
+	allow("su", "system_block_device", "blk_file", ALL);
+
 	// Xposed
 	allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	allow("system_server", "dex2oat_exec", "file", ALL);
 
-	// SuperSU
-	allow("init", "system_file", "file", "execute_no_trans");
-	allow("init", "su", "fd", "use");
-	allow("init", "kernel", "security", "read_policy");
-	allow("init", "kernel", "security", "load_policy");
 }
