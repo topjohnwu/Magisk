@@ -367,6 +367,14 @@ case $1 in
       log_print "* Running post-fs-data.d"
       general_scripts post-fs-data
 
+      log_print "* Loading core props"
+      for PROP in $COREDIR/props/* ; do
+        if [ -f $PROP ]; then
+          log_print "Load prop: $PROP"
+          $MAGISKBIN/resetprop --file $PROP
+        fi
+      done
+
       # Exit if disabled
       [ -f $DISABLEFILE ] && unblock
       
