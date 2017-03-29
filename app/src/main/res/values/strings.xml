@@ -17,7 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Installed Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s disabled</string>
+    <string name="magisk_version_core_only">Installed Magisk v%1$s (Core Only Mode)</string>
     <string name="magisk_version_error">Magisk not installed</string>
 
     <string name="checking_for_updates">Checking for updates…</string>
@@ -136,8 +136,8 @@
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
 
-    <string name="settings_disable_title">Disable Magisk</string>
-    <string name="settings_disable_summary">Everything will be disabled except root (MagiskSU)</string>
+    <string name="settings_core_only_title">Magisk Core Only Mode</string>
+    <string name="settings_core_only_summary">Enable only core features, all modules will not be loaded. MagiskSU, MagiskHide, systemless hosts, and busybox will still be enabled</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Enable BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>

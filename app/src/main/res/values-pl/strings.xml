@@ -17,7 +17,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Zainstalowany Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s wyłaczony</string>
     <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
@@ -136,8 +135,6 @@
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
 
-    <string name="settings_disable_title">Wyłącz Magisk</string>
-    <string name="settings_disable_summary">Wszystko zostanie wyłączone za wyjątkiem roota (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
     <string name="settings_busybox_summary">Zmień montowanie Magisk z wbudowanego busybox do xbin</string>

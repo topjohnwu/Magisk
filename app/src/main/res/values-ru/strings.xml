@@ -12,7 +12,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Установлен Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s выключен</string>
     <string name="magisk_version_error">Magisk не установлен</string>
 
     <string name="checking_for_updates">Проверка обновлений…</string>
@@ -119,8 +118,6 @@
     <string name="settings_clear_cache_title">Очистить кэш репозиториев</string>
     <string name="settings_clear_cache_summary">Удалить сохранённую информацию о сетевых репозиториях, чтобы приложение обновило информацию из сети</string>
 
-    <string name="settings_disable_title">Отключить Magisk</string>
-    <string name="settings_disable_summary">Будет выключено все, кроме рута (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Скрыть Magisk от различных проверок</string>
     <string name="settings_busybox_title">Включить BusyBox</string>
     <string name="settings_busybox_summary">Примонтировать встроенный busybox из Magisk в xbin</string>

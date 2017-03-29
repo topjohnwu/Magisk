@@ -14,7 +14,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">已安裝 Magisk v%1$s</string>
-    <string name="magisk_version_disable">已禁用 Magisk v%1$s</string>
     <string name="magisk_version_error">未安裝 Magisk</string>
 
     <string name="checking_for_updates">正在檢查更新…</string>
@@ -120,8 +119,7 @@
     <string name="settings_clear_cache_title">清除資源庫快取</string>
     <string name="settings_clear_cache_summary">清除已暫存的在線資源庫快取，強制刷新在線數據</string>
 
-    <string name="settings_disable_title">禁用 Magisk</string>
-    <string name="settings_disable_summary">除 ROOT (MagiskSU) 以外，其他都將被禁用</string>
+    <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 使其不被多種方法檢測到</string>
     <string name="settings_busybox_title">啟用 BusyBox</string>
     <string name="settings_busybox_summary">將 Magisk 內置的 Busybox 掛載到 xbin</string>
@@ -193,5 +191,7 @@
     <string name="cannot_auto_detect">(無法自動偵測)</string>
     <string name="settings_notification_summary">有更新的時候顯示通知</string>
     <string name="settings_notification_title">更新通知</string>
+    <string name="magisk_version_core_only">已安裝 Magisk v%1$s (僅核心功能)</string>
+    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide、systemless hosts、和 busybox 仍會持續運作</string>
 
 </resources>

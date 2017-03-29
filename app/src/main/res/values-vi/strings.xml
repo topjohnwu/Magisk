@@ -1,12 +1,9 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Mở thanh điều hướng</string>
     <string name="navigation_drawer_close">Đóng thanh điều hướng</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Mô-đun</string>
     <string name="downloads">Tải xuống</string>
     <string name="superuser">Superuser</string>
@@ -17,7 +14,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Đã cài Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s disabled</string>
     <string name="magisk_version_error">Magisk chưa được cài đặt</string>
 
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
@@ -136,8 +132,6 @@
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
     <string name="settings_clear_cache_summary">Xoá thông tin truy cập nhật về các kho mô-đun, buộc ứng dụng làm mới trực tuyến</string>
 
-    <string name="settings_disable_title">Vô hiệu Magisk</string>
-    <string name="settings_disable_summary">Vô hiệu tất cả trừ root (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_busybox_title">Dùng BusyBox</string>
     <string name="settings_busybox_summary">Gắn kết busy có sẵn của Magisk tới xbin</string>

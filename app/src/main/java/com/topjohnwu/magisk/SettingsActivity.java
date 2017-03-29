@@ -89,10 +89,6 @@ public class SettingsActivity extends Activity {
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             prefScreen = getPreferenceScreen();
 
-            SwitchPreference busybox = (SwitchPreference) findPreference("busybox");
-            SwitchPreference magiskHide = (SwitchPreference) findPreference("magiskhide");
-            SwitchPreference hosts = (SwitchPreference) findPreference("hosts");
-
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
 
@@ -117,11 +113,6 @@ public class SettingsActivity extends Activity {
                 }
                 if (getApplication().magiskVersion < 11) {
                     prefScreen.removePreference(magiskCategory);
-                }
-                if (getApplication().disabled) {
-                    busybox.setEnabled(false);
-                    magiskHide.setEnabled(false);
-                    hosts.setEnabled(false);
                 }
             }
         }

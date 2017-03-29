@@ -81,6 +81,7 @@ public class MainActivity extends Activity
 
         navigationView.setNavigationItemSelectedListener(this);
         getApplicationContext().reloadMainActivity.register(this);
+        getApplicationContext().updateCheckDone.register(this);
 
     }
 
@@ -105,6 +106,7 @@ public class MainActivity extends Activity
     @Override
     protected void onDestroy() {
         getApplicationContext().reloadMainActivity.unRegister(this);
+        getApplicationContext().updateCheckDone.unRegister(this);
         super.onDestroy();
     }
 
@@ -126,7 +128,11 @@ public class MainActivity extends Activity
 
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
-        recreate();
+        if (event == getApplicationContext().reloadMainActivity) {
+            recreate();
+        } else if (event == getApplicationContext().updateCheckDone) {
+            checkHideSection();
+        }
     }
 
     private void checkHideSection() {

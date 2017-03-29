@@ -14,7 +14,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Nainstalován Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s deaktivován</string>
     <string name="magisk_version_error">Magisk není nainstalován</string>
 
     <string name="checking_for_updates">Kontrola aktualizací…</string>
@@ -133,8 +132,6 @@
     <string name="settings_clear_cache_title">Smazat Uchovanou Mezipaměť</string>
     <string name="settings_clear_cache_summary">Smaže informace online použití v Mezipaměti, donutí aplikaci obnovit informace online</string>
 
-    <string name="settings_disable_title">Zakázat Magisk</string>
-    <string name="settings_disable_summary">Všechno kromě rootu (MagiskSU) bude deaktivováno</string>
     <string name="settings_magiskhide_summary">Skryje root (MagiskSU) před různými aplikacemi</string>
     <string name="settings_busybox_title">Povolit BusyBox</string>
     <string name="settings_busybox_summary">Nasadí vestavěný Magisk busybox do xbin</string>
@@ -193,5 +190,6 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Cílové UID:\u0020</string>
     <string name="command">Příkaz:\u0020</string>
+    <string name="settings_core_only_summary"></string>
 
 </resources>

@@ -10,7 +10,7 @@
             android:summary="@string/settings_dark_theme_summary"
             android:key="dark_theme" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:title="@string/settings_notification_title"
             android:summary="@string/settings_notification_summary"
             android:key="notification" />
@@ -28,8 +28,8 @@
 
         <CheckBoxPreference
             android:key="disable"
-            android:title="@string/settings_disable_title"
-            android:summary="@string/settings_disable_summary" />
+            android:title="@string/settings_core_only_title"
+            android:summary="@string/settings_core_only_summary" />
 
         <SwitchPreference
             android:key="busybox"

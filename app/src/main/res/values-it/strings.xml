@@ -16,7 +16,6 @@
     
     <string name="magisk_version">Versione Magisk: v%1$s</string>
     <string name="magisk_version_error">Hai installato Magisk?</string>
-    <string name="magisk_version_disable">Magisk v%1$s disabilitato</string>
     <string name="checking_for_updates">Controlla aggiornamenti…</string>
     <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
@@ -135,8 +134,6 @@
     <string name="settings_clear_cache_title">Pulisci Cache Repo</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
 
-    <string name="settings_disable_title">Disabilita Magisk</string>
-    <string name="settings_disable_summary">Tutto sarà disattivato tranne il Root (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_busybox_title">Abilita BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>

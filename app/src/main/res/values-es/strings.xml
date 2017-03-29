@@ -14,7 +14,6 @@
 
     <!--Magisk Fragment-->
     <string name="magisk_version">Instalado Magisk v%1$s</string>
-    <string name="magisk_version_disable">Magisk v%1$s está deshabilitado</string>
     <string name="magisk_version_error">Magisk no está instalado</string>
 
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
@@ -126,8 +125,6 @@
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
 
-    <string name="settings_disable_title">Deshabilitar Magisk</string>
-    <string name="settings_disable_summary">Todo será desactivado excepto el root (MagiskSU)</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_busybox_title">Habilitar BusyBox</string>
     <string name="settings_busybox_summary">Montar el busybox interno de Magisk en xbin</string>

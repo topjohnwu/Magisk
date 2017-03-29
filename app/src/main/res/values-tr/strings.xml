@@ -12,8 +12,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s yüklü</string>
-    <string name="magisk_version_disable">Magisk v%1$s devre dışı</string>
-    <string name="magisk_version_error">Magisk yüklü değil</string>
+     <string name="magisk_version_error">Magisk yüklü değil</string>
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$.1f mevcut!</string>
@@ -131,9 +130,7 @@
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
 
-    <string name="settings_disable_title">"Magisk'i devre dışı bırak"</string>
-    <string name="settings_disable_summary">Root (MagiskSU) dışında her şey devre dışı bırakılır</string>
-    <string name="settings_magiskhide_summary">"Magisk'i çeşitli algılamalardan gizle"</string>
+     <string name="settings_magiskhide_summary">"Magisk'i çeşitli algılamalardan gizle"</string>
     <string name="settings_busybox_title">"BusyBox'ı etkinleştir"</string>
     <string name="settings_busybox_summary">"Magisk'in dahili busybox'ını xbin'e bağla"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>

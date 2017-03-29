@@ -65,7 +65,9 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
     @OnClick(R.id.magisk_status_container)
     public void gotoInstall() {
-        ((MainActivity) getActivity()).navigate(R.id.install);
+        if (getApplication().remoteMagiskVersion > 0) {
+            ((MainActivity) getActivity()).navigate(R.id.install);
+        }
     }
 
     private int defaultColor;
@@ -159,7 +161,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
         if (getApplication().magiskVersion < 0) {
             magiskVersionText.setText(R.string.magisk_version_error);
         } else if (getApplication().disabled) {
-            magiskVersionText.setText(getString(R.string.magisk_version_disable, getApplication().magiskVersionString));
+            magiskVersionText.setText(getString(R.string.magisk_version_core_only, getApplication().magiskVersionString));
         } else {
             magiskVersionText.setText(getString(R.string.magisk_version, getApplication().magiskVersionString));
         }
@@ -211,9 +213,6 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
         if (getApplication().magiskVersion < 0) {
             color = colorBad;
-            image = R.drawable.ic_cancel;
-        } else if (getApplication().disabled) {
-            color = colorNeutral;
             image = R.drawable.ic_cancel;
         }
 

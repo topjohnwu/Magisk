@@ -180,8 +180,6 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Alvo UID:\u0020</string>
     <string name="command">Comando:\u0020</string>
-	<string name="settings_disable_title">Desativar Magic Mount</string>
-    <string name="settings_disable_summary">Desativa Magic Mount, Isso impedirá que todos os módulos funcionem</string>
-	
-	
+
+
 </resources>
