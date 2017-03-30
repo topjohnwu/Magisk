@@ -292,7 +292,7 @@ fi
 MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
-mkdir -p $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
 cp -af $BINDIR/resetprop $BINDIR/magiskhide $BINDIR/su $BINDIR/magiskpolicy $COREDIR/bin
 # Legacy support

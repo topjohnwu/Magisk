@@ -317,6 +317,20 @@ case $1 in
         exit
       fi
 
+      if [ -f $DATABIN/magisk.apk ]; then
+        if ! ls /data/app | grep com.topjohnwu.magisk; then
+          mkdir /data/app/com.topjohnwu.magisk-1
+          cp $DATABIN/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
+          chmod 755 /data/app/com.topjohnwu.magisk-1
+          chmod 644 /data/app/com.topjohnwu.magisk-1/base.apk
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
+        fi
+        rm -f $DATABIN/magisk.apk 2>/dev/null
+      fi
+
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
       merge_image /cache/magisk.img
@@ -480,29 +494,6 @@ case $1 in
         bind_mount "$ORIG" "$TARGET"
       done
 
-      # Bind hosts for Adblock apps
-      if [ -f $COREDIR/hosts ]; then
-        log_print "* Enabling systemless hosts file support"
-        bind_mount $COREDIR/hosts /system/etc/hosts
-      fi
-
-      if [ -f $DATABIN/magisk.apk ]; then
-        if ! ls /data/app | grep com.topjohnwu.magisk; then
-          mkdir /data/app/com.topjohnwu.magisk-1
-          cp $DATABIN/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
-          chown 1000.1000 /data/app/com.topjohnwu.magisk-1
-          chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
-          chmod 755 /data/app/com.topjohnwu.magisk-1
-          chmod 644 /data/app/com.topjohnwu.magisk-1/base.apk
-          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
-          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
-        fi
-        rm -f $DATABIN/magisk.apk 2>/dev/null
-      fi
-
-      # Expose busybox
-      [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
-
       # Restart post-fs-data if necessary (multirom)
       $MULTIROM && setprop magisk.restart_pfsd 1
 
@@ -521,6 +512,14 @@ case $1 in
     # Version info
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
+
+    # Bind hosts for Adblock apps
+    if [ -f $COREDIR/hosts ]; then
+      log_print "* Enabling systemless hosts file support"
+      bind_mount $COREDIR/hosts /system/etc/hosts
+    fi
+    # Expose busybox
+    [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
 
     # Live patch sepolicy
     $MAGISKBIN/magiskpolicy --live --magisk
@@ -545,7 +544,10 @@ case $1 in
     general_scripts service
 
     # Start MagiskHide
-    [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
+    if [ "`getprop persist.magisk.hide`" = "1" ]; then
+      log_print "* Starting MagiskHide"
+      sh $COREDIR/magiskhide/enable
+    fi
 
     if [ -f $DISABLEFILE ]; then
       # Let MagiskManager know
