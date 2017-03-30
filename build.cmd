@@ -102,7 +102,7 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying Files
   ECHO ************************
-  COPY /Y scripts\ramdisk_patch.sh zip_static\common\ramdisk_patch.sh
+  COPY /Y scripts\custom_ramdisk_patch.sh zip_static\common\custom_ramdisk_patch.sh
   COPY /Y scripts\init.magisk.rc zip_static\common\init.magisk.rc
   COPY /Y binaries\busybox-arm zip_static\arm\busybox
   COPY /Y binaries\busybox-arm64 zip_static\arm64\busybox

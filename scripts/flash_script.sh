@@ -171,6 +171,21 @@ remove_system_su() {
   fi
 }
 
+# --cpio-add <incpio> <mode> <entry> <infile>
+cpio_add() {
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-add ramdisk.cpio $1 $2 $3
+}
+
+# --cpio-extract <incpio> <entry> <outfile>
+cpio_extract() {
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-extract ramdisk.cpio $1 $2
+}
+
+# --cpio-mkdir <incpio> <mode> <entry>
+cpio_mkdir() {
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-mkdir ramdisk.cpio $1 $2
+}
+
 ##########################################################################################
 # Detection
 ##########################################################################################
@@ -249,7 +264,7 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/busybox $BINDIR/magiskboot $BINDIR/magiskpolicy $COMMONDIR/magisk.apk \
-       $COMMONDIR/init.magisk.rc  $COMMONDIR/ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
+       $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
 # Legacy support
 ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
 
@@ -372,8 +387,9 @@ case $? in
   2 ) # SuperSU patched
     SUPERSU=true
     ui_print "- SuperSU patched boot detected!"
-    ui_print "- Adding auto patch script for SuperSU"
-    cp -af $COMMONDIR/ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+    ui_print "- Adding ramdisk patch script for SuperSU"
+    cp -af $COMMONDIR/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
+    ui_print "- We are using SuperSU's own tools, mounting su.img"
     is_mounted /data && SUIMG=/data/su.img || SUIMG=/cache/su.img
     mount_image $SUIMG /su
     SUPERSULOOP=$LOOPDEVICE
@@ -390,21 +406,15 @@ case $? in
           rm stock_boot.img
         else
           ui_print "! Cannot find stock boot image backup"
-          ui_print "! Will still try to complete installation"
-          # Since no backup at all, let's try our best...
-          LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-restore ramdisk.cpio
-          cp -af ramdisk.cpio ramdisk.cpio.orig
+          exit 1
         fi
       fi
     else
       ui_print "! SuperSU image mount failed..."
-      ui_print "! Will still try to complete installation"
-      # Since we cannot rely on sukernel, do it outselves...
-      LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-restore ramdisk.cpio
-      cp -af ramdisk.cpio ramdisk.cpio.orig
+      ui_print "! Magisk scripts are placed correctly"
+      ui_print "! Flash SuperSU immediately to finish installation"
+      exit 1
     fi
-    # Remove SuperSU backups, since we are recreating it
-    LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-rm ramdisk.cpio -r .subackup
     ;;
 esac
 
@@ -414,13 +424,39 @@ esac
 
 # All ramdisk patch commands are stored in a separate script
 ui_print "- Patching ramdisk"
-source $COMMONDIR/ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
 
-cd $BOOTTMP
-# Create ramdisk backups
 if $SUPERSU; then
-  [ -f /su/bin/sukernel ] && LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-backup ramdisk.cpio.orig ramdisk.cpio ramdisk.cpio
+  # Use sukernel to patch ramdisk, so we can use its own tools to backup
+  sh $COMMONDIR/custom_ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
+
+  # Create ramdisk backups
+  LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-backup ramdisk.cpio.orig ramdisk.cpio ramdisk.cpio
+
 else
+  # The common patches
+  $KEEPVERITY || LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-patch-dmverity ramdisk.cpio
+  $KEEPFORCEENCRYPT || LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-patch-forceencrypt ramdisk.cpio
+
+  # Add magisk entrypoint
+  cpio_extract init.rc init.rc
+  grep "import /init.magisk.rc" init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' init.rc
+  sed -i "/selinux.reload_policy/d" init.rc
+  cpio_add 750 init.rc init.rc
+
+  # sepolicy patches
+  cpio_extract sepolicy sepolicy
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskpolicy --load sepolicy --save sepolicy --minimal
+  cpio_add 644 sepolicy sepolicy
+
+  # Add new items
+  cpio_mkdir 755 magisk
+
+  [ ! -z $SHA1 ] && echo "# STOCKSHA1=$SHA1" >> $COMMONDIR/init.magisk.rc
+  cpio_add 750 init.magisk.rc $COMMONDIR/init.magisk.rc
+
+  cpio_add 750 sbin/magic_mask.sh $COMMONDIR/magic_mask.sh
+
+  # Create ramdisk backups
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
 fi
 
