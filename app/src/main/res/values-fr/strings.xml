@@ -1,11 +1,8 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Ouvrir le menu de navigation</string>
     <string name="navigation_drawer_close">Fermer le menu de navigation</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
     <string name="superuser">Superuser</string>
@@ -17,7 +14,7 @@
     <string name="magisk_version">Magisk v%1$s installée</string>
     <string name="magisk_version_core_only">Magisk v%1$s installée (Mode Core uniquement)</string>
     <string name="magisk_version_error">Magisk non installé</string>
-    <string name="checking_for_updates">Vérification de mises à jour...</string>
+    <string name="checking_for_updates">Vérification de mises à jour…</string>
     <string name="magisk_update_available">Magisk v%1$.1f disponible !</string>
     <string name="cannot_check_updates">Impossible de vérifier les mises à jour, pas d\'Internet ?</string>
     <string name="up_to_date">Dernière version %1$s installée</string>
@@ -25,7 +22,7 @@
     <string name="not_rooted">Non rooté</string>
     <string name="proper_root">Correctement rooté</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
-    <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet...</string>
+    <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_connection_failed">Impossible de se connecter à l\'API Google</string>
     <string name="safetyNet_connection_suspended">La connexion à l\'API Google a été suspendue</string>
     <string name="safetyNet_error">Impossible de contrôler SafetyNet, pas d\'Internet?</string>
@@ -92,15 +89,15 @@
     <string name="goto_install">Aller à la section \"Installer\"</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
     <string name="install_error">Échec de l\'installation !</string>
-    <string name="invalid_zip">Ce zip n'est pas un Module Magisk !!</string>
+    <string name="invalid_zip">Ce zip n\'est pas un Module Magisk !!</string>
     <string name="reboot_title">Installation réussie !</string>
     <string name="reboot_msg">Voulez-vous redémarrer maintenant ?</string>
     <string name="reboot">Redémarrer</string>
     <string name="copying_msg">Copie du zip dans le répertoire temp</string>
     <string name="zip_install_progress_title">Installation</string>
-    <string name="zip_unzip_msg">Décompression du fichier zip...</string>
-    <string name="zip_process_msg">Exécution du fichier zip...</string>
-    <string name="zip_install_progress_msg">Installation %1$s...</string>
+    <string name="zip_unzip_msg">Décompression du fichier zip…</string>
+    <string name="zip_process_msg">Exécution du fichier zip…</string>
+    <string name="zip_install_progress_msg">Installation %1$s…</string>
     <string name="no_magisk_title">Magisk non installé !</string>
     <string name="no_magisk_msg">Voulez-vous télécharger et installer Magisk ?</string>
     <string name="downloading_toast">Téléchargement %1$s</string>

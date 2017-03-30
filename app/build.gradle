@@ -8,8 +8,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 26
-        versionName "4.2.7"
+        versionCode 27
+        versionName "4.3.0"
         jackOptions {
             enabled true
             jackInProcess true
@@ -47,10 +47,10 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:recyclerview-v7:25.3.0'
-    compile 'com.android.support:cardview-v7:25.3.0'
-    compile 'com.android.support:design:25.3.0'
-    compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
     compile 'com.jakewharton:butterknife:8.5.1'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.thoughtbot:expandablerecyclerview:1.4'
