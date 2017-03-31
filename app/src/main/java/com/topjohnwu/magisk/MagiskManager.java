@@ -64,6 +64,7 @@ public class MagiskManager extends Application {
     public boolean magiskHide;
     public boolean isDarkTheme;
     public boolean updateNotification;
+    public boolean busybox;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -104,7 +105,7 @@ public class MagiskManager extends Application {
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
-                .putBoolean("busybox", Utils.commandExists("busybox"))
+                .putBoolean("busybox", busybox)
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
                 .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
@@ -149,6 +150,12 @@ public class MagiskManager extends Application {
                 // Custom version don't need to receive updates
                 magiskVersion = Double.POSITIVE_INFINITY;
             }
+        }
+        ret = Shell.sh("getprop persist.magisk.busybox");
+        try {
+            busybox = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
+        } catch (NumberFormatException e) {
+            busybox = false;
         }
         ret = Shell.sh("getprop ro.magisk.disable");
         try {
