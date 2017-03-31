@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
@@ -10,10 +11,6 @@ android {
         targetSdkVersion 25
         versionCode 28
         versionName "4.3.1"
-        jackOptions {
-            enabled true
-            jackInProcess true
-        }
         ndk {
             moduleName 'zipadjust'
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -37,6 +34,14 @@ android {
         cmake {
             path 'src/main/jni/CMakeLists.txt'
         }
+    }
+    lintOptions {
+        disable 'MissingTranslation'
+    }
+    retrolambda {
+        javaVersion JavaVersion.VERSION_1_7
+        defaultMethods false
+        incremental true
     }
 }
 repositories {
