@@ -126,7 +126,7 @@
     <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide, les hosts systemless et busybox restent activés</string>
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
     <string name="settings_busybox_title">Activer BusyBox</string>
-    <string name="settings_busybox_summary">Relier le busybox de Magisk à xbin</string>
+    <string name="settings_busybox_summary">Monter le busybox de Magisk sur xbin</string>
     <string name="settings_hosts_title">Hosts systemless</string>
     <string name="settings_hosts_summary">Support hosts systemless pour les applications type Adblock</string>
     <string name="settings_su_app_adb">Applications et ADB</string>
