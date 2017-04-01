@@ -14,6 +14,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s 설치됨</string>
+    <string name="magisk_version_core_only">Magisk v%1$s 설치됨 (핵심 기능 모드)</string>
     <string name="magisk_version_error">Magisk가 설치되지 않음</string>
 
     <string name="checking_for_updates">업데이트 확인 중…</string>
@@ -34,6 +35,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">(자동) %1$s</string>
+    <string name="cannot_auto_detect">(자동 감지 실패)</string>
     <string name="boot_image_title">부트 이미지 위치</string>
     <string name="detect_button">감지</string>
     <string name="advanced_settings_title">고급 설정</string>
@@ -43,6 +45,9 @@
     <string name="install_magisk_title">최신 Magisk 버전: %1$s</string>
     <string name="uninstall">제거</string>
     <string name="reboot_countdown">%1$d초 안에 다시 시작됨</string>
+    <string name="uninstall_magisk_title">Magisk 제거</string>
+    <string name="uninstall_magisk_msg">모든 모듈과 MagiskSU를 제거합니다. 또한 데이터가 암호화되어 있지 않은 경우 암호화될 가능성이 있습니다.\n정말 계속하시겠습니까?</string>
+    <string name="version_none">(없음)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(제공된 정보 없음)</string>
@@ -115,19 +120,25 @@
     <string name="understand">알겠습니다</string>
     <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
+    <string name="zip_process_title">처리 중</string>
+    <string name="manual_boot_image">부트 이미지를 직접 선택해 주세요!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">일반</string>
     <string name="settings_dark_theme_title">어두운 테마</string>
     <string name="settings_dark_theme_summary">어두운 테마 사용</string>
+    <string name="settings_notification_title">업데이트 알림</string>
+    <string name="settings_notification_summary">새 버전을 사용할 수 있을 때 업데이트 알림 표시</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
     <string name="settings_clear_cache_summary">온라인 저장소에 대해 캐시된 정보를 지우고, 온라인에서 정보를 강제로 새로 고칩니다.</string>
 
+    <string name="settings_core_only_title">Magisk 핵심 기능 모드</string>
+    <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈은 로드하지 않습니다. MagiskSU, MagiskHide, systemless hosts 및 busybox는 계속 사용할 수 있습니다.</string>
     <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>
     <string name="settings_busybox_title">BusyBox 사용</string>
     <string name="settings_busybox_summary">xbin 디렉터리에 Magisk의 빌트인 busybox를 바인드합니다.</string>
-    <string name="settings_hosts_title">시스템리스 hosts</string>
-    <string name="settings_hosts_summary">애드블록 앱들에서 사용하는 시스템리스 hosts를 지원합니다.</string>
+    <string name="settings_hosts_title">systemless hosts</string>
+    <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
 
     <string name="settings_su_app_adb">앱 및 ADB</string>
     <string name="settings_su_app">앱만</string>
