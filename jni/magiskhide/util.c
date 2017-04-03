@@ -1,5 +1,7 @@
 #include "magiskhide.h"
 
+static int isMocked = 0;
+
 char **file_to_str_arr(FILE *fp, int *size) {
 	int allocated = 16;
 	char *line = NULL, **array;
@@ -59,45 +61,20 @@ void run_as_daemon() {
 }
 
 void manage_selinux() {
-	char *argv[] = { SEPOLICY_INJECT, "--live", "permissive *", NULL };
+	if (isMocked) return;
 	char val[1];
-	int fd, ret;
-	fd = open(ENFORCE_FILE, O_RDWR);
+	int fd = open(ENFORCE_FILE, O_RDONLY);
 	if (fd < 0)
 		return;
 	if (read(fd, val, 1) < 1)
 		return;
-	lseek(fd, 0, SEEK_SET);
+	close(fd);
 	// Permissive
 	if (val[0] == '0') {
+		fprintf(logfile, "MagiskHide: Permissive detected, hide the state\n");
 
-		fprintf(logfile, "MagiskHide: Permissive detected\n");
-
-		if (write(fd, "1", 1) < 1)
-			return;
-		lseek(fd, 0, SEEK_SET);
-
-		if (read(fd, val, 1) < 1)
-			return;
-		lseek(fd, 0, SEEK_SET);
-		close(fd);
-
-		if (val[0] == '0') {
-			fprintf(logfile, "MagiskHide: Unable to set to enforce, hide the state\n");
-			chmod(ENFORCE_FILE, 0640);
-			chmod(POLICY_FILE, 0440);
-			return;
-		}
-
-		fprintf(logfile, "MagiskHide: Calling magiskpolicy for pseudo enforce mode\n");
-
-		switch(fork()) {
-			case -1:
-				return;
-			case 0:
-				execvp(argv[0], argv);
-			default:
-				return;
-		}
+		chmod(ENFORCE_FILE, 0640);
+		chmod(POLICY_FILE, 0440);
+		isMocked = 1;
 	}
 }
