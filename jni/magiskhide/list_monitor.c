@@ -5,7 +5,9 @@ void *monitor_list(void *path) {
 	signal(SIGQUIT, quit_pthread);
 
 	int inotifyFd = -1;
+	int length;
 	char str[512];
+	char buffer[BUF_LEN];
 
 	while(1) {
 		if (inotifyFd == -1 || read(inotifyFd, str, sizeof(str)) == -1) {
@@ -20,7 +22,10 @@ void *monitor_list(void *path) {
 				exit(1);
 			}
 		}
-		update_list(listpath);
+
+		length = read(inotifyFd, buffer, BUF_LEN);
+		if (length > 0)
+			update_list(listpath);
 	}
 
 	return NULL;
