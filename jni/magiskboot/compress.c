@@ -1,9 +1,19 @@
 #include <zlib.h>
 #include <lzma.h>
+#include <lz4.h>
 #include <lz4frame.h>
 #include <bzlib.h>
 
 #include "magiskboot.h"
+
+#define windowBits 15
+#define ZLIB_GZIP 16
+#define memLevel 8
+#define CHUNK 0x40000
+
+#define LZ4_HEADER_SIZE 19
+#define LZ4_FOOTER_SIZE 4
+#define LZ4_LEGACY_BLOCKSIZE  0x800000
 
 static void write_file(const int fd, const void *buf, const size_t size, const char *filename) {
 	if (write(fd, buf, size) != size)
@@ -154,6 +164,7 @@ void lzma(int mode, const char* filename, const unsigned char* buf, size_t size)
 	} while (pos < size);
 
 	lzma_end(&strm);
+	close(fd);
 }
 
 // Mode: 0 = decode; 1 = encode
@@ -265,6 +276,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 	}
 
 	free(out);
+	close(fd);
 }
 
 // Mode: 0 = decode; 1 = encode
@@ -335,6 +347,75 @@ void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size
 	close(fd);
 }
 
+// Mode: 0 = decode; 1 = encode
+void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t size) {
+	size_t pos = 0;
+	int have;
+	char *out;
+	unsigned block_size, insize;
+	unsigned char block_size_le[4];
+
+
+	report(mode, filename);
+	int fd = open_new(filename);
+
+	switch(mode) {
+		case 0:
+			out = malloc(LZ4_LEGACY_BLOCKSIZE);
+			// Skip magic
+			pos += 4;
+			break;
+		case 1:
+			out = malloc(LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
+			// Write magic
+			write_file(fd, "\x02\x21\x4c\x18", 4, filename);
+			break;
+		default:
+			error(1, "Unsupported lz4_legacy mode!");
+	}
+
+	if (!out)
+		error(1, "lz4_legacy malloc error");
+
+	do {
+		switch(mode) {
+			case 0:
+				block_size = buf[pos];
+				block_size += (buf[pos + 1]<<8);
+				block_size += (buf[pos + 2]<<16);
+				block_size += ((unsigned)buf[pos + 3])<<24;
+				pos += 4;
+				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
+					error(1, "lz4_legacy block size too large!");
+				have = LZ4_decompress_safe((const char*) (buf + pos), out, block_size, LZ4_LEGACY_BLOCKSIZE);
+				if (have < 0)
+					error(1, "Cannot decode lz4_legacy block");
+				pos += block_size;
+				break;
+			case 1:
+				if (pos + LZ4_LEGACY_BLOCKSIZE >= size)
+					insize = size - pos;
+				else
+					insize = LZ4_LEGACY_BLOCKSIZE;
+				have = LZ4_compress_default((const char*) (buf + pos), out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
+				if (have == 0)
+					error(1, "lz4_legacy compression error");
+				pos += insize;
+				block_size_le[0] = (unsigned char)have;
+				block_size_le[1] = (unsigned char)(have >> 8);
+				block_size_le[2] = (unsigned char)(have >> 16);
+				block_size_le[3] = (unsigned char)(have >> 24);
+				write_file(fd, block_size_le, 4, filename);
+				break;
+		}
+		// Write main data
+		write_file(fd, out, have, filename);
+	} while(pos < size);
+
+	free(out);
+	close(fd);
+}
+
 int decomp(file_t type, const char *to, const unsigned char *from, size_t size) {
 	switch (type) {
 		case GZIP:
@@ -351,6 +432,9 @@ int decomp(file_t type, const char *to, const unsigned char *from, size_t size) 
 			break;
 		case LZ4:
 			lz4(0, to, from, size);
+			break;
+		case LZ4_LEGACY:
+			lz4_legacy(0, to, from, size);
 			break;
 		default:
 			// Unsupported
@@ -391,6 +475,11 @@ int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 				sprintf(name, "%s.%s", to, "lz4");
 			lz4(1, name, from, size);
 			break;
+		case LZ4_LEGACY:
+			if (strcmp(ext, ".lz4") != 0)
+				sprintf(name, "%s.%s", to, "lz4");
+			lz4_legacy(1, name, from, size);
+			break;
 		default:
 			// Unsupported
 			return 1;
@@ -427,6 +516,7 @@ void decomp_file(char *from, const char *to) {
 			if (strcmp(ext, ".bz2") != 0)
 				ok = 0;
 			break;
+		case LZ4_LEGACY:
 		case LZ4:
 			if (strcmp(ext, ".lz4") != 0)
 				ok = 0;
@@ -461,6 +551,8 @@ void comp_file(const char *method, const char *from, const char *to) {
 		type = LZMA;
 	} else if (strcmp(method, "lz4") == 0) {
 		type = LZ4;
+	} else if (strcmp(method, "lz4_legacy") == 0) {
+		type = LZ4_LEGACY;
 	} else if (strcmp(method, "bzip2") == 0) {
 		type = BZIP2;
 	} else {

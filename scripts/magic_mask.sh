@@ -7,7 +7,6 @@ IMG=/data/magisk.img
 WHITELIST="/system/bin"
 
 MOUNTPOINT=/magisk
-
 COREDIR=$MOUNTPOINT/.core
 
 TMPDIR=/dev/magisk
@@ -18,7 +17,8 @@ MOUNTINFO=$TMPDIR/mnt
 # Use the included busybox for maximum compatibility and reliable results
 # e.g. we rely on the option "-c" for cp (reserve contexts), and -exec for find
 TOOLPATH=/dev/busybox
-BINPATH=/data/magisk
+DATABIN=/data/magisk
+MAGISKBIN=$COREDIR/bin
 OLDPATH=$PATH
 export PATH=$TOOLPATH:$OLDPATH
 
@@ -51,7 +51,6 @@ in_list() {
 
 unblock() {
   touch /dev/.magisk.unblock
-  chcon u:object_r:device:s0 /dev/.magisk.unblock
   exit
 }
 
@@ -66,7 +65,6 @@ loopsetup() {
   for DEV in `ls /dev/block/loop*`; do
     if losetup $DEV $1; then
       LOOPDEVICE=$DEV
-      log_print "magisk: used loopdevice $DEV for $1"
       break
     fi
   done
@@ -82,18 +80,19 @@ image_size_check() {
   curSizeM=$((curSizeM * 4 / 1024))
 }
 
-run_scripts() {
+module_scripts() {
   BASE=$MOUNTPOINT
   for MOD in $BASE/* ; do
-    if [ ! -f $MOD/disable ]; then
-      if [ -f $MOD/$1.sh ]; then
-        chmod 755 $MOD/$1.sh
-        chcon u:object_r:system_file:s0 $MOD/$1.sh
-        log_print "$1: $MOD/$1.sh"
-        sh $MOD/$1.sh
-      fi
+    if [ ! -f $MOD/disable -a -f $MOD/$1.sh ]; then
+      chmod 755 $MOD/$1.sh
+      chcon u:object_r:system_file:s0 $MOD/$1.sh
+      log_print "$1: $MOD/$1.sh"
+      sh $MOD/$1.sh
     fi
   done
+}
+
+general_scripts() {
   for SCRIPT in $COREDIR/${1}.d/* ; do
     if [ -f "$SCRIPT" ]; then
       chmod 755 $SCRIPT
@@ -287,7 +286,6 @@ case $1 in
 
   post-fs-data )
     # /data not mounted yet
-    log_print "** Magisk post-fs-data mode starting..."
     ! mount | grep " /data " >/dev/null && unblock
     mount | grep " /data " | grep "tmpfs" >/dev/null && unblock
 
@@ -299,54 +297,39 @@ case $1 in
       # Cache support
       mv /cache/stock_boot* /data 2>/dev/null
       if [ -d /cache/data_bin ]; then
-        rm -rf $BINPATH
-        mv /cache/data_bin $BINPATH
-      fi
-
-      chmod -R 755 $BINPATH
-      chown -R 0.0 $BINPATH
-
-      # Live patch sepolicy
-      $BINPATH/magiskpolicy --live
-
-      if [ -f $UNINSTALLER ]; then
-        touch /dev/.magisk.unblock
-        chcon u:object_r:device:s0 /dev/.magisk.unblock
-        BOOTMODE=true sh $UNINSTALLER
-        exit
+        rm -rf $DATABIN
+        mv /cache/data_bin $DATABIN
+        chmod -R 755 $DATABIN
+        chown -R 0.0 $DATABIN
       fi
 
       # Set up environment
-      log_print "* Magisk: Setting up environment"
       mkdir -p $TOOLPATH
-      $BINPATH/busybox --install -s $TOOLPATH
-      ln -sf $BINPATH/busybox $TOOLPATH/busybox
+      $DATABIN/busybox --install -s $TOOLPATH
+      ln -sf $DATABIN/busybox $TOOLPATH/busybox
       # Prevent issues
       rm -f $TOOLPATH/su $TOOLPATH/sh $TOOLPATH/reboot
-      chmod -R 755 $TOOLPATH
-      chown -R 0.0 $TOOLPATH
-      find $BINPATH $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
+      find $DATABIN $TOOLPATH -exec chcon -h u:object_r:system_file:s0 {} \;
 
-      log_print "* Magisk: Linking binaries to /sbin"
-      mount -o rw,remount rootfs /
-      chmod 755 /sbin
-      ln -sf $BINPATH/magiskpolicy /sbin/magiskpolicy
-      ln -sf $BINPATH/magiskpolicy /sbin/sepolicy-inject
-      ln -sf $BINPATH/resetprop /sbin/resetprop
-      if [ ! -f /sbin/launch_daemonsu.sh ]; then
-        log_print "* Starting MagiskSU"
-        export PATH=$OLDPATH
-        ln -sf $BINPATH/su /sbin/su
-        ln -sf $BINPATH/magiskpolicy /sbin/supolicy
-        /sbin/su --daemon
-        export PATH=$TOOLPATH:$OLDPATH
+      if [ -f $UNINSTALLER ]; then
+        touch /dev/.magisk.unblock
+        (BOOTMODE=true sh $UNINSTALLER) &
+        exit
       fi
-      mount -o ro,remount rootfs /
 
-      [ -f $DISABLEFILE ] && unblock
-
-      # Multirom functions should go here, not available right now
-      MULTIROM=false
+      if [ -f $DATABIN/magisk.apk ]; then
+        if ! ls /data/app | grep com.topjohnwu.magisk; then
+          mkdir /data/app/com.topjohnwu.magisk-1
+          cp $DATABIN/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1
+          chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
+          chmod 755 /data/app/com.topjohnwu.magisk-1
+          chmod 644 /data/app/com.topjohnwu.magisk-1/base.apk
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
+          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
+        fi
+        rm -f $DATABIN/magisk.apk 2>/dev/null
+      fi
 
       # Image merging
       chmod 644 $IMG /cache/magisk.img /data/magisk_merge.img 2>/dev/null
@@ -355,7 +338,6 @@ case $1 in
 
       # Mount magisk.img
       [ ! -d $MOUNTPOINT ] && mkdir -p $MOUNTPOINT
-      log_print "magisk: trying to mount magisk.img (1)"
       if ! mount | grep $MOUNTPOINT; then
         loopsetup $IMG
         [ ! -z $LOOPDEVICE ] && mount -t ext4 -o rw,noatime $LOOPDEVICE $MOUNTPOINT
@@ -367,7 +349,7 @@ case $1 in
 
       # Remove empty directories, legacy paths, symlinks, old temporary images
       find $MOUNTPOINT -type d -depth ! -path "*core*" -exec rmdir {} \; 2>/dev/null
-      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/bin $COREDIR/dummy $COREDIR/mirror \
+      rm -rf $MOUNTPOINT/zzsupersu $MOUNTPOINT/phh $COREDIR/dummy $COREDIR/mirror \
              $COREDIR/busybox $COREDIR/su /data/magisk/*.img /data/busybox 2>/dev/null
 
       # Remove modules that are labeled to be removed
@@ -395,6 +377,27 @@ case $1 in
           unblock
         fi
       fi
+
+      log_print "* Running post-fs-data.d"
+      general_scripts post-fs-data
+
+      log_print "* Loading core props"
+      for PROP in $COREDIR/props/* ; do
+        if [ -f $PROP ]; then
+          log_print "Load prop: $PROP"
+          $MAGISKBIN/resetprop --file $PROP
+        fi
+      done
+
+      # Exit if disabled
+      [ -f $DISABLEFILE ] && unblock
+      
+      ######################
+      # Core features done #
+      ######################
+
+      # Multirom functions should go here, not available right now
+      MULTIROM=false
 
       log_print "* Preparing modules"
 
@@ -424,7 +427,7 @@ case $1 in
           # Read in defined system props
           if [ -f $MOD/system.prop ]; then
             log_print "* Reading props from $MOD/system.prop"
-            $BINPATH/resetprop --file $MOD/system.prop
+            $MAGISKBIN/resetprop --file $MOD/system.prop
           fi
         fi
       done
@@ -480,8 +483,8 @@ case $1 in
       done
 
       # Stage 4
-      log_print "* Stage 4: Execute scripts"
-      run_scripts post-fs-data
+      log_print "* Stage 4: Execute module scripts"
+      module_scripts post-fs-data
 
       # Stage 5
       log_print "* Stage 5: Mount mirrored items back to dummy"
@@ -490,29 +493,6 @@ case $1 in
         ORIG="$MIRRDIR$TARGET"
         bind_mount "$ORIG" "$TARGET"
       done
-
-      # Bind hosts for Adblock apps
-      if [ -f $COREDIR/hosts ]; then
-        log_print "* Enabling systemless hosts file support"
-        bind_mount $COREDIR/hosts /system/etc/hosts
-      fi
-
-      if [ -f $BINPATH/magisk.apk ]; then
-        if ! ls /data/app | grep com.topjohnwu.magisk; then
-          mkdir /data/app/com.topjohnwu.magisk-1
-          cp $BINPATH/magisk.apk /data/app/com.topjohnwu.magisk-1/base.apk
-          chown 1000.1000 /data/app/com.topjohnwu.magisk-1
-          chown 1000.1000 /data/app/com.topjohnwu.magisk-1/base.apk
-          chmod 755 /data/app/com.topjohnwu.magisk-1
-          chmod 644 /data/app/com.topjohnwu.magisk-1/base.apk
-          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1
-          chcon u:object_r:apk_data_file:s0 /data/app/com.topjohnwu.magisk-1/base.apk
-        fi
-        rm -f $BINPATH/magisk.apk 2>/dev/null
-      fi
-
-      # Expose busybox
-      [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
 
       # Restart post-fs-data if necessary (multirom)
       $MULTIROM && setprop magisk.restart_pfsd 1
@@ -532,14 +512,50 @@ case $1 in
     # Version info
     MAGISK_VERSION_STUB
     log_print "** Magisk late_start service mode running..."
+
+    # Bind hosts for Adblock apps
+    if [ -f $COREDIR/hosts ]; then
+      log_print "* Enabling systemless hosts file support"
+      bind_mount $COREDIR/hosts /system/etc/hosts
+    fi
+    # Expose busybox
+    [ "`getprop persist.magisk.busybox`" = "1" ] && sh /sbin/magic_mask.sh mount_busybox
+
+    # Live patch sepolicy
+    $MAGISKBIN/magiskpolicy --live --magisk
+
+    log_print "* Linking binaries to /sbin"
+    mount -o rw,remount rootfs /
+    chmod 755 /sbin
+    ln -sf $MAGISKBIN/magiskpolicy /sbin/magiskpolicy
+    ln -sf $MAGISKBIN/magiskpolicy /sbin/sepolicy-inject
+    ln -sf $MAGISKBIN/resetprop /sbin/resetprop
+    if [ ! -f /sbin/launch_daemonsu.sh ]; then
+      log_print "* Starting MagiskSU"
+      export PATH=$OLDPATH
+      ln -sf $MAGISKBIN/su /sbin/su
+      ln -sf $MAGISKBIN/magiskpolicy /sbin/supolicy
+      /sbin/su --daemon
+      export PATH=$TOOLPATH:$OLDPATH
+    fi
+    mount -o ro,remount rootfs /
+
+    log_print "* Running service.d"
+    general_scripts service
+
+    # Start MagiskHide
+    if [ "`getprop persist.magisk.hide`" = "1" ]; then
+      log_print "* Starting MagiskHide"
+      sh $COREDIR/magiskhide/enable
+    fi
+
     if [ -f $DISABLEFILE ]; then
+      # Let MagiskManager know
       setprop ro.magisk.disable 1
       exit
     fi
-    run_scripts service
     
-    # Start MagiskHide
-    [ "`getprop persist.magisk.hide`" = "1" ] && sh $COREDIR/magiskhide/enable
+    module_scripts service
     ;;
 
 esac

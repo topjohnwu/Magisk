@@ -1,7 +1,7 @@
 #!/system/bin/sh
 
 MODDIR=/magisk/.core/magiskhide
-BINPATH=/data/magisk
+BINPATH=/magisk/.core/bin
 LOGFILE=/cache/magisk.log
 TOOLPATH=/dev/busybox
 
@@ -12,7 +12,7 @@ log_print() {
 }
 
 # Only enable when isn't started
-ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 && exit
+$TOOLPATH/ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 && exit
 
 if [ ! -d /sbin_orig ]; then
   log_print "Moving and re-linking /sbin binaries"
@@ -35,24 +35,19 @@ else
   mkdir -p /dev/sbin_bind
   chmod 755 /dev/sbin_bind
   ln -s /sbin_orig/* /dev/sbin_bind
-  chcon -h u:object_r:rootfs:s0 /dev/sbin_bind /dev/sbin_bind/*
+  chcon -h u:object_r:system_file:s0 /dev/sbin_bind /dev/sbin_bind/*
   mount -o bind /dev/sbin_bind /sbin
 fi
-
-# Sammy device like these permissions
-chmod 640 /sys/fs/selinux/enforce
-chmod 440 /sys/fs/selinux/policy
 
 log_print "Removing dangerous read-only system props"
 
 VERIFYBOOT=`getprop ro.boot.verifiedbootstate`
 FLASHLOCKED=`getprop ro.boot.flash.locked`
 VERITYMODE=`getprop ro.boot.veritymode`
+KNOX1=`getprop ro.boot.warranty_bit`
+KNOX2=`getprop ro.warranty_bit`
 DEBUGGABLE=`getprop ro.debuggable`
 SECURE=`getprop ro.secure`
-BUILDTYPE=`getprop ro.build.type`
-BUILDTAGS=`getprop ro.build.tags`
-BUILDSELINUX=`getprop ro.build.selinux`
 
 [ ! -z "$VERIFYBOOT" -a "$VERIFYBOOT" != "green" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
@@ -60,16 +55,14 @@ log_print "`$BINPATH/resetprop -v -n ro.boot.verifiedbootstate green`"
 log_print "`$BINPATH/resetprop -v -n ro.boot.flash.locked 1`"
 [ ! -z "$VERITYMODE" -a "$VERITYMODE" != "enforcing" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.boot.veritymode enforcing`"
+[ ! -z "$KNOX1" -a "$KNOX1" != "0" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.boot.warranty_bit 0`"
+[ ! -z "$KNOX2" -a "$KNOX2" != "0" ] && \
+log_print "`$BINPATH/resetprop -v -n ro.warranty_bit 0`"
 [ ! -z "$DEBUGGABLE" -a "$DEBUGGABLE" != "0" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.debuggable 0`"
 [ ! -z "$SECURE" -a "$SECURE" != "1" ] && \
 log_print "`$BINPATH/resetprop -v -n ro.secure 1`"
-[ ! -z "$BUILDTYPE" -a "$BUILDTYPE" != "user" ] && \
-log_print "`$BINPATH/resetprop -v -n ro.build.type user`"
-[ ! -z "$BUILDTAGS" -a "$BUILDTAGS" != "release-keys" ] && \
-log_print "`$BINPATH/resetprop -v -n ro.build.tags release-keys`"
-[ ! -z "$BUILDSELINUX" -a "$BUILDSELINUX" != "1" ] && \
-log_print "`$BINPATH/resetprop -v -n ro.build.selinux 1`"
 
 touch $MODDIR/hidelist
 chmod -R 755 $MODDIR
@@ -84,4 +77,4 @@ while read PROCESS; do
 done < $MODDIR/hidelist
 
 log_print "Starting MagiskHide daemon"
-$BINPATH/magiskhide --daemon
+($BINPATH/magiskhide --daemon)

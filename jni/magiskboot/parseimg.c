@@ -16,9 +16,10 @@ static void check_headers() {
 		printf("MTK header found in kernel\n");
 		mtk_kernel = 1;
 	}
-	if (check_type(ramdisk) == MTK) {
+	if (ramdisk_type == MTK) {
 		printf("MTK header found in ramdisk\n");
 		mtk_ramdisk = 1;
+		ramdisk_type = check_type(ramdisk + 512);
 	}
 
 	// Check dtb if ELF boot

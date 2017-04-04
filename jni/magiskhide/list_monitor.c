@@ -15,7 +15,7 @@ void *monitor_list(void *path) {
 				fprintf(logfile, "MagiskHide: Unable to watch %s\n", listpath);
 				exit(1);
 			}
-			if (inotify_add_watch(inotifyFd, listpath, IN_MODIFY) == -1) {
+			if (inotify_add_watch(inotifyFd, listpath, IN_CLOSE_WRITE) == -1) {
 				fprintf(logfile, "MagiskHide: Unable to watch %s\n", listpath);
 				exit(1);
 			}

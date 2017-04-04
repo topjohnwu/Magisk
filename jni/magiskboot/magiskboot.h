@@ -16,14 +16,6 @@
 #include "bootimg.h"
 #include "sha1.h"
 
-#define windowBits 15
-#define ZLIB_GZIP 16
-#define memLevel 8
-#define CHUNK 0x40000
-
-#define LZ4_HEADER_SIZE 19
-#define LZ4_FOOTER_SIZE 4
-
 #define CHROMEOS_MAGIC      "CHROMEOS"
 #define CHROMEOS_MAGIC_SIZE 8
 
@@ -32,9 +24,6 @@
 #define SECOND_FILE         "second"
 #define DTB_FILE            "dtb"
 #define NEW_BOOT            "new-boot.img"
-
-#define SUP_LIST "gzip, xz, lzma, lz4, bzip2"
-#define SUP_NUM 5
 
 typedef enum {
     UNKNOWN,
@@ -47,6 +36,7 @@ typedef enum {
     LZMA,
     BZIP2,
     LZ4,
+    LZ4_LEGACY,
     MTK,
     QCDT,
 } file_t;
@@ -64,11 +54,14 @@ typedef enum {
     RESTORE
 } command_t;
 
+#define SUP_LIST "gzip, xz, lzma, bzip2, lz4, lz4_legacy"
+#define SUP_NUM 6
+
+// Cannot declare in header, but place a copy here for convenience
+// char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4" };
+// file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY };
 extern char *SUP_EXT_LIST[SUP_NUM];
 extern file_t SUP_TYPE_LIST[SUP_NUM];
-// Cannot declare in header, but place a copy here for convenience
-// char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4" };
-// file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4 };
 
 // Vector
 typedef struct vector {
@@ -109,6 +102,7 @@ void gzip(int mode, const char* filename, const unsigned char* buf, size_t size)
 void lzma(int mode, const char* filename, const unsigned char* buf, size_t size);
 void lz4(int mode, const char* filename, const unsigned char* buf, size_t size);
 void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size);
+void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t size);
 int comp(file_t type, const char *to, const unsigned char *from, size_t size);
 void comp_file(const char *method, const char *from, const char *to);
 int decomp(file_t type, const char *to, const unsigned char *from, size_t size);

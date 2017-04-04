@@ -1,5 +1,7 @@
 #include "magiskhide.h"
 
+static int isMocked = 0;
+
 char **file_to_str_arr(FILE *fp, int *size) {
 	int allocated = 16;
 	char *line = NULL, **array;
@@ -59,33 +61,20 @@ void run_as_daemon() {
 }
 
 void manage_selinux() {
-	char *argv[] = { SEPOLICY_INJECT, "--live", "permissive *", NULL };
-	char str[20];
-	int fd, ret;
-	fd = open(ENFORCE_FILE, O_RDONLY);
+	if (isMocked) return;
+	char val[1];
+	int fd = open(ENFORCE_FILE, O_RDONLY);
 	if (fd < 0)
 		return;
-	ret = read(fd, str, 20);
-	close(fd);
-	if (ret < 1)
+	if (read(fd, val, 1) < 1)
 		return;
+	close(fd);
 	// Permissive
-	if (str[0] == '0') {
-		fprintf(logfile, "MagiskHide: Permissive detected, switching to pseudo enforced\n");
-		fd = open(ENFORCE_FILE, O_RDWR);
-		if (fd < 0)
-			return;
-		ret = write(fd, "1", 1);
-		close(fd);
-		if (ret < 1)
-			return;
-		switch(fork()) {
-			case -1:
-				return;
-			case 0:
-				execvp(argv[0], argv);
-			default:
-				return;
-		}
+	if (val[0] == '0') {
+		fprintf(logfile, "MagiskHide: Permissive detected, hide the state\n");
+
+		chmod(ENFORCE_FILE, 0640);
+		chmod(POLICY_FILE, 0440);
+		isMocked = 1;
 	}
 }
