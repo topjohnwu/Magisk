@@ -3,7 +3,7 @@
  * resetprop.cpp
  * 
  * Copyright 2016 nkk71     <nkk71x@gmail.com>
- * Copyright 2016 topjohnwu <topjohnwu#gmail.com>
+ * Copyright 2016 topjohnwu <topjohnwu@gmail.com>
  *
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,15 @@
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "_system_properties.h"
 #include <sys/system_properties.h>
+
+#ifdef INDEP_BINARY
+int resetprop_main(int argc, char *argv[]);
+int main(int argc, char *argv[]) {
+    return resetprop_main(argc, argv);
+}
+#else
+#include "magisk.h"
+#endif
 
 /* Info:
  * 
@@ -205,8 +214,7 @@ int usage(char* name) {
     return 1;
 }
 
-int main(int argc, char *argv[])
-{
+int resetprop_main(int argc, char *argv[]) {
     
     int exp_arg = 2, stdout_bak, null;
     char *name, *value, *filename;
