@@ -45,6 +45,12 @@
 #include "su.h"
 #include "utils.h"
 
+#ifdef INDEP_BINARY
+int main(int argc, char *argv[]) {
+    return su_main(argc, argv);
+}
+#endif
+
 extern int is_daemon;
 extern int daemon_from_uid;
 extern int daemon_from_pid;
@@ -595,16 +601,12 @@ static char *concat_commands(int argc, char *argv[]) {
     return strdup(command);
 }
 
-int main(int argc, char *argv[]) {
+int su_main(int argc, char *argv[]) {
     if (argc == 2 && strcmp(argv[1], "--daemon") == 0) {
         //Everything we'll exec will be in su, not su_daemon
         setexeccon("u:r:su:s0");
         return run_daemon();
     }
-    return su_main(argc, argv);
-}
-
-int su_main(int argc, char *argv[]) {
     int ppid = getppid();
     if ((geteuid() != AID_ROOT && getuid() != AID_ROOT) ||
             (get_api_version() >= 18 && getuid() == AID_SHELL) ||
@@ -863,7 +865,7 @@ int su_main_nodaemon(int argc, char **argv) {
 
     mkdir(REQUESTOR_CACHE_PATH, 0770);
     if (chown(REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid)) {
-        PLOGE("chown (%s, %ld, %ld)", REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid);
+        PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid);
         deny(&ctx);
     }
 
@@ -872,11 +874,11 @@ int su_main_nodaemon(int argc, char **argv) {
         deny(&ctx);
     }
     if (setegid(st.st_gid)) {
-        PLOGE("setegid (%lu)", st.st_gid);
+        PLOGE("setegid (%u)", st.st_gid);
         deny(&ctx);
     }
     if (seteuid(st.st_uid)) {
-        PLOGE("seteuid (%lu)", st.st_uid);
+        PLOGE("seteuid (%u)", st.st_uid);
         deny(&ctx);
     }
 
