@@ -22,6 +22,8 @@
 #include <sepol/policydb/conditional.h>
 #include <sepol/policydb/constraint.h>
 
+#include "vector.h"
+
 // hashtab traversal macro
 #define hashtab_for_each(table, ptr) \
 	for (int _i = 0; _i < table->size; ++_i) \
@@ -51,16 +53,6 @@ int permissive(char *s);
 int enforce(char *s);
 int attradd(char *s, char *a);
 int exists(char *source);
-
-// Vector of char*
-typedef struct vector {
-	size_t size;
-	size_t cap;
-	char **data;
-} vector;
-void vec_init(vector *v);
-void vec_push_back(vector *v, char* s);
-void vec_destroy(vector *v);
 
 // Built in rules
 void full_rules();

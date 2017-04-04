@@ -1,4 +1,14 @@
+#include "vector.h"
 #include "magiskpolicy.h"
+
+#ifdef INDEP_BINARY
+int magiskpolicy_main(int argc, char *argv[]);
+int main(int argc, char *argv[]) {
+	return magiskpolicy_main(argc, argv);
+}
+#else
+#include "magisk.h"
+#endif
 
 static int syntax_err = 0;
 static char err_msg[ARG_MAX];
@@ -52,7 +62,7 @@ static void usage(char *arg0) {
 static int parse_pattern_1(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *class, *saveptr;
-	vector source, target, permission, *temp;
+	struct vector source, target, permission, *temp;
 	vec_init(&source);
 	vec_init(&target);
 	vec_init(&permission);
@@ -130,7 +140,7 @@ static int parse_pattern_1(int action, char* statement) {
 static int parse_pattern_2(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *saveptr;
-	vector class, attribute, *temp;
+	struct vector class, attribute, *temp;
 	vec_init(&class);
 	vec_init(&attribute);
 	tok = strtok_r(statement, " ", &saveptr);
@@ -185,7 +195,7 @@ static int parse_pattern_2(int action, char* statement) {
 // Pattern 3: action { type }
 static int parse_pattern_3(int action, char* statement) {
 	char *tok, *saveptr;
-	vector classes;
+	struct vector classes;
 	vec_init(&classes);
 	tok = strtok_r(statement, " {}", &saveptr);
 	while (tok != NULL) {
@@ -253,7 +263,7 @@ static void syntax_error_msg() {
 	syntax_err = 1;
 }
 
-int main(int argc, char *argv[]) {
+int magiskpolicy_main(int argc, char *argv[]) {
 	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
 	int live = 0, minimal = 0, full = 0;
 	struct vector rules;
