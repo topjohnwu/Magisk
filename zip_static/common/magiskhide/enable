@@ -17,8 +17,20 @@ $TOOLPATH/ps | grep "magiskhide --daemon" | grep -v grep >/dev/null 2>&1 && exit
 if [ ! -d /sbin_orig ]; then
   log_print "Moving and re-linking /sbin binaries"
   mount -o rw,remount rootfs /
-  mv -f /sbin /sbin_orig
-  mkdir /sbin
+  mkdir /sbin_orig 2>/dev/null
+  cp -a /sbin/* /sbin_orig/
+  rm -f /sbin/magiskpolicy /sbin/sepolicy-inject /sbin/resetprop /sbin/su /sbin/supolicy
+#  mv -f /sbin /sbin_orig
+#  mkdir /sbin
+  mount -o ro,remount rootfs /
+  mkdir -p /dev/sbin_bind
+  chmod 755 /dev/sbin_bind
+  ln -s /sbin_orig/* /dev/sbin_bind
+  chcon -h u:object_r:rootfs:s0 /dev/sbin_bind /dev/sbin_bind/*
+  mount -o bind /dev/sbin_bind /sbin
+else
+  mount -o rw,remount rootfs /
+  rm -f /sbin/magiskpolicy /sbin/sepolicy-inject /sbin/resetprop /sbin/su /sbin/supolicy
   mount -o ro,remount rootfs /
   mkdir -p /dev/sbin_bind
   chmod 755 /dev/sbin_bind
