@@ -25,5 +25,3 @@
 -keep class org.spongycastle.** { *; }
 -dontwarn javax.naming.**
 
-# retrolambda
--dontwarn java.lang.invoke.*

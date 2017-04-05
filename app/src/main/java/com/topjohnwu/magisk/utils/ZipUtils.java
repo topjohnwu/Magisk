@@ -997,7 +997,7 @@ public class ZipUtils {
                 return manifest;
             }
             public Enumeration<JarEntry> entries() {
-                Iterator<Entry<String, Pair<JarEntry, ByteArrayOutputStream> >> i = entrySet().iterator();
+                Iterator<Map.Entry<String, Pair<JarEntry, ByteArrayOutputStream> >> i = entrySet().iterator();
                 ArrayList<JarEntry> list = new ArrayList<>();
                 while (i.hasNext())
                     list.add(i.next().getValue().first);

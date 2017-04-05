@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "26.0.0-rc1"
 
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
@@ -38,11 +37,6 @@ android {
     lintOptions {
         disable 'MissingTranslation'
     }
-    retrolambda {
-        javaVersion JavaVersion.VERSION_1_7
-        defaultMethods false
-        incremental true
-    }
 }
 repositories {
     jcenter()
@@ -57,7 +51,6 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.jakewharton:butterknife:8.5.1'
-    compile 'com.github.clans:fab:1.6.4'
     compile 'com.thoughtbot:expandablerecyclerview:1.4'
     compile 'us.feras.mdv:markdownview:1.1.0'
     compile 'com.madgag.spongycastle:core:1.54.0.0'
