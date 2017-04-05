@@ -4,39 +4,44 @@
 #include "utils.h"
 #include "magisk.h"
 
-// Global buffer
 char magiskbuf[BUF_SIZE];
+char *argv0;
 
 void stub(const char *fmt, ...) {}
 
 int main(int argc, char *argv[]) {
-	char * argv0 = strrchr(argv[0], '/');
-	if (argv0) argv[0] = argv0 + 1;
-	if (strcmp(argv[0], "magisk") == 0) {
-		if (strcmp(argv[1], "--daemon") == 0) {
-			// Start daemon
+	argv0 = argv[0];
+	char * arg = strrchr(argv[0], '/');
+	if (arg) ++arg;
+	if (strcmp(arg, "magisk") == 0) {
+		if (strcmp(argv[1], "--post-fs") == 0) {
+			// TODO: post-fs mode
+			return 0;
+		} else if (strcmp(argv[1], "--post-fs-data") == 0) {
+			// TODO: post-fs-data mode
 			return 0;
 		} else if (strcmp(argv[1], "--install") == 0) {
-			// Install symlinks
+			// TODO: Install symlinks
 			return 0;
 		} else {
 			// It's calling applets
 			--argc;
 			++argv;
+			arg = argv[0];
 		}
 	}
 
 	// Applets
-	if (strcmp(argv[0], "magiskhide") == 0) {
-		magiskhide_main(argc, argv);
-	} else if (strcmp(argv[0], "magiskpolicy") == 0) {
-		magiskpolicy_main(argc, argv);
-	} else if (strcmp(argv[0], "resetprop") == 0) {
-		resetprop_main(argc, argv);
-	} else if (strcmp(argv[0], "su") == 0) {
-		su_main(argc, argv);
+	if (strcmp(arg, "su") == 0) {
+		return su_main(argc, argv);
+	} else if (strcmp(arg, "magiskpolicy") == 0) {
+		return magiskpolicy_main(argc, argv);
+	} else if (strcmp(arg, "resetprop") == 0) {
+		return resetprop_main(argc, argv);
+	} else if (strcmp(arg, "magiskhide") == 0) {
+		return magiskhide_main(argc, argv);
 	} else {
-		fprintf(stderr, "Applet \'%s\' not found\n", argv[0]);
+		fprintf(stderr, "Applet \'%s\' not found\n", arg);
 	}
-	return 0;
+	return 1;
 }

@@ -15,6 +15,7 @@ void vec_init(struct vector *v);
 void vec_push_back(struct vector *v, void *p);
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *));
 void vec_destroy(struct vector *v);
+void vec_deep_destroy(struct vector *v);
 #define vec_size(v) (v)->size
 #define vec_cap(v) (v)->cap
 #define vec_entry(v) (v)->data
@@ -22,5 +23,9 @@ void vec_destroy(struct vector *v);
 #define vec_for_each(v, e) \
 	e = (v)->data[0]; \
 	for (size_t _ = 0; _ < (v)->size; ++_, e = (v)->data[_])
+
+#define vec_for_each_r(v, e) \
+	e = (v)->data[(v)->size - 1]; \
+	for (size_t _ = (v)->size - 1; _ >= 0; --_, e = (v)->data[_])
 
 #endif

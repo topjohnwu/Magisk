@@ -1,106 +1,133 @@
+/* proc_monitor.c - Monitor am_proc_start events
+ * 
+ * We monitor the logcat am_proc_start events, pause it,
+ * and send the target PID to hide daemon ASAP
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <pthread.h>
+#include <sys/types.h>
+
+#include "magisk.h"
+#include "utils.h"
 #include "magiskhide.h"
 
-void monitor_proc() {
-	int pid, badns, i, zygote_num = 0;
-	char init_ns[32], zygote_ns[2][32];
+/* WTF... the macro in the NDK pthread.h is broken.... */
+#define pthread_cleanup_push_fix(routine, arg)  \
+pthread_cleanup_push(routine, arg) } while(0);
+
+static void read_namespace(const int pid, char* target, const size_t size) {
+	char path[32];
+	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
+	ssize_t len = readlink(path, target, size);
+	target[len] = '\0';
+}
+
+// Workaround for the lack of pthread_cancel
+static void quit_pthread(int sig) {
+	pthread_exit(NULL);
+}
+
+static void cleanup_handler(void *arg) {
+	vec_deep_destroy(hide_list);
+	vec_deep_destroy(new_list);
+	free(hide_list);
+	free(new_list);
+	hide_list = new_list = NULL;
+}
+
+void *proc_monitor(void *args) {
+	// Register the cancel signal
+	signal(SIGUSR1, quit_pthread);
+	pthread_cleanup_push_fix(cleanup_handler, NULL);
+
+	int pid, zygote_num = 0;
+	char init_ns[32], zygote_ns[2][32], buffer[512];
+	FILE *p;
 
 	// Get the mount namespace of init
 	read_namespace(1, init_ns, 32);
-
-	printf("%s\n", init_ns);
+	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
 	// Get the mount namespace of zygote
-	FILE *p = popen("ps | grep zygote | grep -v grep", "r");
+	// TODO: Crawl through /proc to get process names
+
+	switch(zygote_num) {
+	case 1:
+		LOGI("proc_monitor: zygote ns=%s\n", zygote_ns[0]);
+		break;
+	case 2:
+		LOGI("proc_monitor: zygote (1) ns=%s (2) ns=%s\n", zygote_ns[0], zygote_ns[1]);
+		break;
+	}
+
+	// Monitor am_proc_start (the command shall never end)
+	p = popen("while true; do logcat -b events -c; logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
+
 	while(fgets(buffer, sizeof(buffer), p)) {
-		if (zygote_num == 2) break;
-		sscanf(buffer, "%d", &pid);
-		do {
-			usleep(500);
-			read_namespace(pid, zygote_ns[zygote_num], 32);
-		} while (strcmp(zygote_ns[zygote_num], init_ns) == 0);
-		++zygote_num;
-	}
-	pclose(p);
+		int ret, comma = 0;
+		char *pos = buffer, *line, processName[256];
+		struct vector *temp = NULL;
 
-	for (i = 0; i < zygote_num; ++i)
-		fprintf(logfile, "Zygote(%d) ns=%s ", i, zygote_ns[i]);
-	fprintf(logfile, "\n");
-
-	// get a sample line from am_proc_start
-	p = popen("logcat -b events -v raw -s am_proc_start -t 1", "r");
-
-	/**
-	 *	Format of am_proc_start is (as of Android 5.1 and 6.0)
-	 *	UserID, pid, unix uid, processName, hostingType, hostingName
-	 *	but sometimes can have 7 fields, with processName as 5th field
-	 */
-	fgets(buffer, sizeof(buffer), p);
-	int commas = 0;
-	char *s = buffer;
-	for (i = 0;s[i] != '\0';i++) {
-		if (s[i] == ',')
-			commas++;
-
-	}
-	int numFields = commas + 1;
-
-	pclose(p);
-
-	// Monitor am_proc_start
-	p = popen("logcat -b events -c; logcat -b events -v raw -s am_proc_start", "r");
-
-	while(!feof(p)) {
-		fgets(buffer, sizeof(buffer), p);
-
-		char *pos = buffer;
 		while(1) {
 			pos = strchr(pos, ',');
 			if(pos == NULL)
 				break;
 			pos[0] = ' ';
+			++comma;
 		}
 
-		char processName[256];
-		int ret;
-
-		if (numFields == 7) {
+		if (comma == 6)
 			ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
-		} else {
+		else
 			ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
-		}
 
 		if(ret != 2)
 			continue;
 
-		pthread_mutex_lock(&mutex);
-		for (i = 0; i < list_size; ++i) {
-			if(strcmp(processName, hide_list[i]) == 0) {
+		// Should be thread safe
+		if (hide_list != new_list) {
+			temp = hide_list;
+			hide_list = new_list;
+		}
+
+		vec_for_each(hide_list, line) {
+			if (strcmp(processName, line) == 0) {
+				read_namespace(pid, buffer, 32);
 				while(1) {
-					badns = 0;
-					read_namespace(pid, buffer, 32);
-					for (i = 0; i < zygote_num; ++i) {
+					ret = 1;
+					for (int i = 0; i < zygote_num; ++i) {
 						if (strcmp(buffer, zygote_ns[i]) == 0) {
 							usleep(500);
-							badns = 1;
+							ret = 0;
 							break;
 						}
 					}
-					if (!badns) break;
+					if (ret) break;
 				}
 
 				// Send pause signal ASAP
 				if (kill(pid, SIGSTOP) == -1) continue;
 
-				fprintf(logfile, "MagiskHide: %s(PID=%d ns=%s)\n", processName, pid, buffer);
+				LOGI("proc_monitor: %s(PID=%d ns=%s)\n", processName, pid, buffer);
 
 				// Unmount start
-				write(pipefd[1], &pid, sizeof(pid));
+				xwrite(pipefd[1], &pid, sizeof(pid));
 				break;
 			}
 		}
-		pthread_mutex_unlock(&mutex);
+		if (temp) {
+			vec_deep_destroy(temp);
+			free(temp);
+		}
 	}
 
-	// Close the logcat monitor
+	// Should never be here
 	pclose(p);
+	quit_pthread(SIGUSR1);
+	return NULL;
 }

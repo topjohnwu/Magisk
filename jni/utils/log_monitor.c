@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <pthread.h>
 
+#include "magisk.h"
 #include "utils.h"
 
 static void *logger_thread(void *args) {
@@ -23,10 +24,8 @@ static void *logger_thread(void *args) {
 	return NULL;
 }
 
-/* Start a new thread to monitor logcat and dump to file */
+/* Start a new thread to monitor logcat and dump to logfile */
 void monitor_logs() {
 	pthread_t log_monitor;
 	pthread_create(&log_monitor, NULL, logger_thread, NULL);
-	printf("Hello :)\n");
-	pthread_join(log_monitor, NULL);
 }

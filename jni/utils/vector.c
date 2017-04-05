@@ -25,10 +25,23 @@ void vec_sort(struct vector *v, int (*compar)(const void *, const void *)) {
 	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);
 }
 
+/* Will cleanup only the vector itself
+ * use in cases when each element requires special cleanup 
+ */
 void vec_destroy(struct vector *v) {
-	// Will not free each entry!
-	// Manually free each entry, then call this function
 	vec_size(v) = 0;
 	vec_cap(v) = 0;
-	free(v->data);
+	free(vec_entry(v));
+	vec_entry(v) = NULL; // Prevent double destroy segfault
+}
+
+/* Will cleanup each element AND the vector itself
+ * Shall be the general case
+ */
+void vec_deep_destroy(struct vector *v) {
+	void *e;
+	vec_for_each(v, e) {
+		free(e);
+	}
+	vec_destroy(v);
 }

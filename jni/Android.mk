@@ -13,14 +13,13 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	main.c \
-	utils/log_monitor.c \
+	utils/misc.c \
 	utils/vector.c \
 	utils/xwrap.c \
+	utils/log_monitor.c \
 	magiskhide/magiskhide.c \
-	magiskhide/hide.c \
-	magiskhide/list_monitor.c \
+	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \
-	magiskhide/util.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
