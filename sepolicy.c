@@ -357,15 +357,16 @@ int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
 		return 1;
 	}
 
-	filename_trans_t *new_transition = cmalloc(sizeof(*new_transition));
-	new_transition->stype = src->s.value;
-	new_transition->ttype = tgt->s.value;
-	new_transition->tclass = cls->s.value;
-	new_transition->otype = def->s.value;
-	new_transition->name = strdup(filename);
-	new_transition->next = policy->filename_trans;
+	filename_trans_t *new_trans_key = cmalloc(sizeof(*new_trans_key));
+	new_trans_key->stype = src->s.value;
+	new_trans_key->ttype = tgt->s.value;
+	new_trans_key->tclass = cls->s.value;
+	new_trans_key->name = strdup(filename);
 
-	policy->filename_trans = new_transition;
+	filename_trans_datum_t *new_trans_datam = cmalloc(sizeof(*new_trans_datam));
+	new_trans_datam->otype = def->s.value;
+
+	hashtab_insert(policy->filename_trans, (hashtab_key_t) new_trans_key, new_trans_datam);
 
 	return 0;
 }
