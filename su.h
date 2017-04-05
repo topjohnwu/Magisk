@@ -18,12 +18,7 @@
 #ifndef SU_h 
 #define SU_h 1
 
-#ifdef INDEP_BINARY
-#include "indep_bin.h"
-#else
 #include "magisk.h"
-#endif
-
 
 #ifndef AID_SHELL
 #define AID_SHELL (get_shell_uid())
@@ -166,10 +161,6 @@ static inline char *get_command(const struct su_request *to)
         return ret;
     return DEFAULT_SHELL;
 }
-
-void exec_loge(const char* fmt, ...);
-void exec_logw(const char* fmt, ...);
-void exec_logd(const char* fmt, ...);
 
 int run_daemon();
 int connect_daemon(int argc, char *argv[], int ppid);

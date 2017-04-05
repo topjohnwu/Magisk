@@ -45,12 +45,6 @@
 #include "su.h"
 #include "utils.h"
 
-#ifdef INDEP_BINARY
-int main(int argc, char *argv[]) {
-    return su_main(argc, argv);
-}
-#endif
-
 extern int is_daemon;
 extern int daemon_from_uid;
 extern int daemon_from_pid;
@@ -94,52 +88,6 @@ int fork_zero_fucks() {
             exit(0);
         return 0;
     }
-}
-
-void exec_log(char *priority, char* logline) {
-  int pid;
-  if ((pid = fork()) == 0) {
-      int null = open("/dev/null", O_WRONLY | O_CLOEXEC);
-      dup2(null, STDIN_FILENO);
-      dup2(null, STDOUT_FILENO);
-      dup2(null, STDERR_FILENO);
-      execl("/system/bin/log", "/system/bin/log", "-p", priority, "-t", LOG_TAG, logline, NULL);
-      _exit(0);
-  }
-  int status;
-  waitpid(pid, &status, 0);
-}
-
-void exec_loge(const char* fmt, ...) {
-    va_list args;
-
-    char logline[PATH_MAX];
-    va_start(args, fmt);
-    vsnprintf(logline, PATH_MAX, fmt, args);
-    va_end(args);
-    exec_log("e", logline);
-}
-
-void exec_logw(const char* fmt, ...) {
-    va_list args;
-
-    char logline[PATH_MAX];
-    va_start(args, fmt);
-    vsnprintf(logline, PATH_MAX, fmt, args);
-    va_end(args);
-    exec_log("w", logline);
-}
-
-void exec_logd(const char* fmt, ...) {
-#ifdef DEBUG
-    va_list args;
-
-    char logline[PATH_MAX];
-    va_start(args, fmt);
-    vsnprintf(logline, PATH_MAX, fmt, args);
-    va_end(args);
-    exec_log("d", logline);
-#endif
 }
 
 static int from_init(struct su_initiator *from) {
