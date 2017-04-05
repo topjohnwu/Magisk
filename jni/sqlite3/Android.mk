@@ -1,10 +1,10 @@
 LOCAL_PATH:= $(call my-dir)
 
 ##
-# libsqlite3.a
+# libsqlite.so
 #
 
 include $(CLEAR_VARS)
-LOCAL_MODULE:= libsqlite3
+LOCAL_MODULE:= libsqlite
 LOCAL_SRC_FILES := sqlite3.c shell.c
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)

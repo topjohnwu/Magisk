@@ -2,7 +2,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libselinux libsepol libsqlite3
+LOCAL_STATIC_LIBRARIES := libsepol
+LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/utils \
@@ -34,7 +35,7 @@ LOCAL_SRC_FILES := \
 	su/utils.c \
 	su/pts.c
 
-LOCAL_CFLAGS := -static -Wno-implicit-exception-spec-mismatch
+LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
 LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)
