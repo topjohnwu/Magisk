@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <signal.h>
+#include <sys/types.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -16,6 +18,10 @@ int pipefd[2];
 struct vector *hide_list, *new_list;
 
 static pthread_t proc_monitor_thread;
+
+static void kill_proc(int pid) {
+	kill(pid, SIGTERM);
+}
 
 void launch_magiskhide() {
 	/*
@@ -36,9 +42,15 @@ void launch_magiskhide() {
 	FILE *fp = xfopen(HIDELIST, "r");
 	file_to_vector(hide_list, fp);
 	fclose(fp);
+	char *line;
+	vec_for_each(hide_list, line) {
+		LOGI("hide_list: [%s]\n", line);
+		ps_filter_proc_name(line, kill_proc);
+	}
 
 	// Start a new thread to monitor processes
 	pthread_create(&proc_monitor_thread, NULL, proc_monitor, NULL);
+	pthread_join(proc_monitor_thread, NULL);
 }
 
 void stop_magiskhide() {

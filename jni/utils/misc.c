@@ -97,6 +97,7 @@ static void proc_name_filter(int pid) {
 		fdreadline(fd, buf, sizeof(buf));
 	}
 	if (strstr(buf, ps_filter_pattern)) {
+		// printf("%d: %s\n", pid, buf);
 		ps_filter_cb(pid);
 	}
 	close(fd);
