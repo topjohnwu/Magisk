@@ -20,6 +20,9 @@
 #define pthread_cleanup_push_fix(routine, arg)  \
 pthread_cleanup_push(routine, arg) } while(0);
 
+static int zygote_num = 0;
+static char init_ns[32], zygote_ns[2][32];
+
 static void read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
 	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
@@ -40,13 +43,21 @@ static void cleanup_handler(void *arg) {
 	hide_list = new_list = NULL;
 }
 
+static void store_zygote_ns(int pid) {
+	do {
+		usleep(500);
+		read_namespace(pid, zygote_ns[zygote_num], 32);
+	} while (strcmp(zygote_ns[zygote_num], init_ns) == 0);
+	++zygote_num;
+}
+
 void *proc_monitor(void *args) {
 	// Register the cancel signal
 	signal(SIGUSR1, quit_pthread);
 	pthread_cleanup_push_fix(cleanup_handler, NULL);
 
-	int pid, zygote_num = 0;
-	char init_ns[32], zygote_ns[2][32], buffer[512];
+	int pid;
+	char buffer[512];
 	FILE *p;
 
 	// Get the mount namespace of init
@@ -54,7 +65,7 @@ void *proc_monitor(void *args) {
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
 	// Get the mount namespace of zygote
-	// TODO: Crawl through /proc to get process names
+	ps_filter_proc_name("zygote", store_zygote_ns);
 
 	switch(zygote_num) {
 	case 1:

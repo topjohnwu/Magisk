@@ -9,10 +9,10 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <sys/prctl.h>
 
 #include "magisk.h"
 #include "utils.h"
