@@ -26,6 +26,6 @@ void vec_deep_destroy(struct vector *v);
 
 #define vec_for_each_r(v, e) \
 	e = (v)->data[(v)->size - 1]; \
-	for (size_t _ = (v)->size - 1; _ >= 0; --_, e = (v)->data[_])
+	for (size_t _ = (v)->size; _ > 0; --_, e = (v)->data[_ - 1])
 
 #endif
