@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -60,7 +62,6 @@ ssize_t xxread(int fd, void *buf, size_t count) {
 int xpipe(int pipefd[2]) {
 	if (pipe(pipefd) == -1) {
 		PLOGE("pipe");
-		exit(1);
 	}
 	return 0;
 }
@@ -70,5 +71,22 @@ int xsetns(int fd, int nstype) {
 		PLOGE("setns");
 	}
 	return 0;
+}
+
+DIR *xopendir(const char *name) {
+	DIR *d = opendir(name);
+	if (d == NULL) {
+		PLOGE("opendir");
+	}
+	return d;
+}
+
+struct dirent *xreaddir(DIR *dirp) {
+	errno = 0;
+	struct dirent *e = readdir(dirp);
+	if (errno && e == NULL) {
+		PLOGE("readdir");
+	}
+	return e;
 }
 
