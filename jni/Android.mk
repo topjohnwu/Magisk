@@ -7,6 +7,7 @@ LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/utils \
+	$(LOCAL_PATH)/daemon \
 	$(LOCAL_PATH)/selinux/libselinux/include \
 	$(LOCAL_PATH)/selinux/libsepol/include \
 	$(LOCAL_PATH)/sqlite3
@@ -17,6 +18,8 @@ LOCAL_SRC_FILES := \
 	utils/vector.c \
 	utils/xwrap.c \
 	utils/log_monitor.c \
+	daemon/daemon.c \
+	daemon/socket_trans.c \
 	magiskhide/magiskhide.c \
 	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \
@@ -26,13 +29,13 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/utils.c \
 	resetprop/resetprop.cpp \
 	resetprop/libc_logging.cpp \
-	resetprop/system_properties.cpp \
-	su/su.c \
-	su/daemon.c \
-	su/activity.c \
-	su/db.c \
-	su/utils.c \
-	su/pts.c
+	resetprop/system_properties.cpp
+	# su/su.c \
+	# su/daemon.c \
+	# su/activity.c \
+	# su/db.c \
+	# su/utils.c \
+	# su/pts.c
 
 LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
 LOCAL_LDLIBS := -llog

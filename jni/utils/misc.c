@@ -10,6 +10,7 @@
 
 #include <sys/types.h>
 
+#include "magisk.h"
 #include "utils.h"
 
 int check_data() {
