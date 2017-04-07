@@ -4,11 +4,12 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#include <sys/types.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
-#include "magisk.h"
+#include "vector.h"
 
 // xwrap.c
 
@@ -21,10 +22,18 @@ int xpipe(int pipefd[2]);
 int xsetns(int fd, int nstype);
 DIR *xopendir(const char *name);
 struct dirent *xreaddir(DIR *dirp);
-
-// vector.c
-
-#include "vector.h"
+pid_t xsetsid();
+int xsetcon(char *context);
+int xsocket(int domain, int type, int protocol);
+int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+int xlisten(int sockfd, int backlog);
+int xaccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+void *xmalloc(size_t size);
+void *xcalloc(size_t nmemb, size_t size);
+void *xrealloc(void *ptr, size_t size);
+ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
+ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 
 // log_monitor.c
 

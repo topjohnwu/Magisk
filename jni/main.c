@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "magisk.h"
+#include "daemon.h"
 
 char magiskbuf[BUF_SIZE];
 char *argv0;
@@ -23,6 +24,11 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[1], "--install") == 0) {
 			// TODO: Install symlinks
 			return 0;
+		} else if (strcmp(argv[1], "--test") == 0) {
+			// Temporary testing entry
+			int fd = connect_daemon();
+			write_string(fd, argv[2]);
+			return 0;
 		} else {
 			// It's calling applets
 			--argc;
@@ -33,7 +39,7 @@ int main(int argc, char *argv[]) {
 
 	// Applets
 	if (strcmp(arg, "su") == 0) {
-		return su_main(argc, argv);
+		// return su_main(argc, argv);
 	} else if (strcmp(arg, "magiskpolicy") == 0) {
 		return magiskpolicy_main(argc, argv);
 	} else if (strcmp(arg, "resetprop") == 0) {

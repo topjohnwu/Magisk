@@ -11,6 +11,14 @@
 #include <string.h>
 #include <android/log.h>
 
+#define AID_SHELL  (get_shell_uid())
+#define AID_ROOT   0
+#define AID_SYSTEM (get_system_uid())
+#define AID_RADIO  (get_radio_uid())
+
+#define REQUESTOR_DAEMON_PATH "\0MAGISK"
+#define REQUESTOR_DAEMON_PATH_LEN 7
+
 #define LOG_TAG    "Magisk"
 
 #ifdef DEBUG
@@ -35,7 +43,7 @@ extern char *argv0;     /* For changing process name */
 // Multi-call entrypoints
 int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
-int su_main(int argc, char *argv[]);
+// int su_main(int argc, char *argv[]);
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +52,13 @@ int resetprop_main(int argc, char *argv[]);
 #ifdef __cplusplus
 }
 #endif
+
+/*****************
+ * Magisk Daemon *
+ *****************/
+
+void start_daemon();
+int connect_daemon();
 
 /**************
  * MagiskHide *

@@ -55,6 +55,8 @@ void hide_daemon() {
 	}
 
 	close(pipefd[1]);
+
+	// Set the process name
 	strcpy(argv0, "magiskhide_daemon");
 	
 	int pid, fd;
