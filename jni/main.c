@@ -1,6 +1,9 @@
 /* main.c - The entry point, should be multi-call
  */
 
+#include <stdlib.h>
+#include <pthread.h>
+
 #include "utils.h"
 #include "magisk.h"
 #include "daemon.h"
@@ -10,8 +13,22 @@ char *argv0;
 
 void stub(const char *fmt, ...) {}
 
+// Global error hander function
+// Should be changed each thread/process
+__thread void (*err_handler)(void);
+
+void exit_proc() {
+	exit(-1);
+}
+
+void exit_thread() {
+	pthread_exit(NULL);
+}
+
 int main(int argc, char *argv[]) {
 	argv0 = argv[0];
+	// Exit the whole app if error occurs by default
+	err_handler = exit_proc;
 	char * arg = strrchr(argv[0], '/');
 	if (arg) ++arg;
 	if (strcmp(arg, "magisk") == 0) {
@@ -27,8 +44,9 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[1], "--test") == 0) {
 			// Temporary testing entry
 			int fd = connect_daemon();
+			write_int(fd, TEST);
 			write_string(fd, argv[2]);
-			return 0;
+			return read_int(fd);
 		} else {
 			// It's calling applets
 			--argc;

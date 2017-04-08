@@ -39,10 +39,11 @@ int xopen(const char *pathname, int flags) {
 }
 
 ssize_t xwrite(int fd, const void *buf, size_t count) {
-	if (count != write(fd, buf, count)) {
+	int ret = write(fd, buf, count);
+	if (count != ret) {
 		PLOGE("write");
 	}
-	return count;
+	return ret;
 }
 
 // Read error other than EOF
@@ -56,24 +57,27 @@ ssize_t xread(int fd, void *buf, size_t count) {
 
 // Read exact same size as count
 ssize_t xxread(int fd, void *buf, size_t count) {
-	if (count != read(fd, buf, count)) {
+	int ret = read(fd, buf, count);
+	if (count != ret) {
 		PLOGE("read");
 	}
-	return count;
+	return ret;
 }
 
 int xpipe(int pipefd[2]) {
-	if (pipe(pipefd) == -1) {
+	int ret = pipe(pipefd);
+	if (ret == -1) {
 		PLOGE("pipe");
 	}
-	return 0;
+	return ret;
 }
 
 int xsetns(int fd, int nstype) {
-	if (setns(fd, nstype) == -1) {
+	int ret = setns(fd, nstype);
+	if (ret == -1) {
 		PLOGE("setns");
 	}
-	return 0;
+	return ret;
 }
 
 DIR *xopendir(const char *name) {
@@ -102,10 +106,11 @@ pid_t xsetsid() {
 }
 
 int xsetcon(char *context) {
-	if (setcon(context) == -1) {
+	int ret = setcon(context);
+	if (ret == -1) {
 		PLOGE("setcon: %s", context);
 	}
-	return 0;
+	return ret;
 }
 
 int xsocket(int domain, int type, int protocol) {
@@ -117,24 +122,27 @@ int xsocket(int domain, int type, int protocol) {
 }
 
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-	if (bind(sockfd, addr, addrlen) == -1) {
+	int ret = bind(sockfd, addr, addrlen);
+	if (ret == -1) {
 		PLOGE("bind");
 	}
-	return 0;
+	return ret;
 }
 
 int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-	if (connect(sockfd, addr, addrlen) == -1) {
+	int ret = connect(sockfd, addr, addrlen);
+	if (ret == -1) {
 		PLOGE("bind");
 	}
-	return 0;
+	return ret;
 }
 
 int xlisten(int sockfd, int backlog) {
-	if (listen(sockfd, backlog) == -1) {
+	int ret = listen(sockfd, backlog);
+	if (ret == -1) {
 		PLOGE("listen");
 	}
-	return 0;
+	return ret;
 }
 
 int xaccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
@@ -183,6 +191,23 @@ ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags) {
 		PLOGE("recvmsg");
 	}
 	return rec;
+}
+
+int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                          void *(*start_routine) (void *), void *arg) {
+	errno = pthread_create(thread, attr, start_routine, arg);
+	if (errno) {
+		PLOGE("pthread_create");
+	}
+	return errno;
+}
+
+int xsocketpair(int domain, int type, int protocol, int sv[2]) {
+	int ret = socketpair(domain, type, protocol, sv);
+	if (ret == -1) {
+		PLOGE("socketpair");
+	}
+	return ret;
 }
 
 

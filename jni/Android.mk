@@ -37,7 +37,7 @@ LOCAL_SRC_FILES := \
 	# su/utils.c \
 	# su/pts.c
 
-LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
+LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DDEBUG
 LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)

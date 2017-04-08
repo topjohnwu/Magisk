@@ -6,13 +6,16 @@
 #define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
 #define POLICY_FILE 	"/sys/fs/selinux/policy"
 
+// Kill process
+void kill_proc(int pid);
+
 // Hide daemon
-void hide_daemon();
+int hide_daemon();
 
 // Process monitor
 void *proc_monitor(void *args);
 
-extern int pipefd[2];
+extern int sv[2], hide_pid, isEnabled;
 extern struct vector *hide_list, *new_list;
 
 #endif

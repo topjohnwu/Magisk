@@ -11,14 +11,11 @@
 #include <signal.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #include "magisk.h"
 #include "utils.h"
 #include "magiskhide.h"
-
-/* WTF... the macro in the NDK pthread.h is broken.... */
-#define pthread_cleanup_push_fix(routine, arg)  \
-pthread_cleanup_push(routine, arg) } while(0);
 
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
@@ -32,15 +29,21 @@ static void read_namespace(const int pid, char* target, const size_t size) {
 
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
-	pthread_exit(NULL);
-}
-
-static void cleanup_handler(void *arg) {
+	LOGD("proc_monitor: running cleanup\n");
+	char *line;
+	vec_for_each(hide_list, line) {
+		ps_filter_proc_name(line, kill_proc);
+	}
 	vec_deep_destroy(hide_list);
-	vec_deep_destroy(new_list);
 	free(hide_list);
-	free(new_list);
+	if (new_list != hide_list) {
+		vec_deep_destroy(new_list);
+		free(new_list);
+	}
 	hide_list = new_list = NULL;
+	isEnabled = 0;
+	LOGD("proc_monitor: terminating...\n");
+	pthread_exit(NULL);
 }
 
 static void store_zygote_ns(int pid) {
@@ -51,10 +54,21 @@ static void store_zygote_ns(int pid) {
 	++zygote_num;
 }
 
+static void proc_monitor_err() {
+	LOGD("proc_monitor: error occured, stopping magiskhide services\n");
+	int kill = -1;
+	// If process monitor dies, kill hide daemon too
+	write(sv[0], &kill, sizeof(kill));
+	close(sv[0]);
+	waitpid(hide_pid, NULL, 0);
+	quit_pthread(SIGUSR1);
+}
+
 void *proc_monitor(void *args) {
 	// Register the cancel signal
 	signal(SIGUSR1, quit_pthread);
-	pthread_cleanup_push_fix(cleanup_handler, NULL);
+	// The error handler should only exit the thread, not the whole process
+	err_handler = proc_monitor_err;
 
 	int pid;
 	char buffer[512];
@@ -106,6 +120,8 @@ void *proc_monitor(void *args) {
 			hide_list = new_list;
 		}
 
+		ret = 0;
+
 		vec_for_each(hide_list, line) {
 			if (strcmp(processName, line) == 0) {
 				read_namespace(pid, buffer, 32);
@@ -121,13 +137,19 @@ void *proc_monitor(void *args) {
 					if (ret) break;
 				}
 
+				ret = 0;
+
 				// Send pause signal ASAP
 				if (kill(pid, SIGSTOP) == -1) continue;
 
 				LOGI("proc_monitor: %s(PID=%d ns=%s)\n", processName, pid, buffer);
 
 				// Unmount start
-				xwrite(pipefd[1], &pid, sizeof(pid));
+				xwrite(sv[0], &pid, sizeof(pid));
+
+				// Get the hide daemon return code
+				xxread(sv[0], &ret, sizeof(ret));
+				LOGD("proc_monitor: hide daemon response code: %d\n", ret);
 				break;
 			}
 		}
@@ -135,10 +157,15 @@ void *proc_monitor(void *args) {
 			vec_deep_destroy(temp);
 			free(temp);
 		}
+		if (ret) {
+			// Wait hide process to kill itself
+			waitpid(hide_pid, NULL, 0);
+			quit_pthread(SIGUSR1);
+		}
 	}
 
 	// Should never be here
 	pclose(p);
-	quit_pthread(SIGUSR1);
+	pthread_exit(NULL);
 	return NULL;
 }
