@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
@@ -34,6 +35,9 @@ void *xcalloc(size_t nmemb, size_t size);
 void *xrealloc(void *ptr, size_t size);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
+int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
+                          void *(*start_routine) (void *), void *arg);
+int xsocketpair(int domain, int type, int protocol, int sv[2]);
 
 // log_monitor.c
 

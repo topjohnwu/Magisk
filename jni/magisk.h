@@ -9,6 +9,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <pthread.h>
 #include <android/log.h>
 
 #define AID_SHELL  (get_shell_uid())
@@ -21,6 +22,13 @@
 
 #define LOG_TAG    "Magisk"
 
+// Global handler for PLOGE
+extern __thread void (*err_handler)(void);
+
+// Two common error handlers
+void exit_proc();
+void exit_thread();
+
 #ifdef DEBUG
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #else
@@ -30,14 +38,14 @@
 #define LOGW(...)  __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno)); exit(1)
-#define PLOGEV(fmt, err, args...) LOGE(fmt " failed with %d: %s", ##args, err, strerror(err)); exit(1)
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno)); err_handler()
 
 void stub(const char *fmt, ...);
 
 // Global buffer (only for main thread!!)
 #define BUF_SIZE 4096
 extern char magiskbuf[BUF_SIZE];
+
 extern char *argv0;     /* For changing process name */
 
 // Multi-call entrypoints
@@ -53,19 +61,12 @@ int resetprop_main(int argc, char *argv[]);
 }
 #endif
 
-/*****************
- * Magisk Daemon *
- *****************/
-
-void start_daemon();
-int connect_daemon();
-
 /**************
  * MagiskHide *
  **************/
 
-void launch_magiskhide();
-void stop_magiskhide();
+void launch_magiskhide(int client);
+void stop_magiskhide(int client);
 
 
 #endif

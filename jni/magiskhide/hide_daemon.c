@@ -18,7 +18,7 @@
 #include "utils.h"
 #include "magiskhide.h"
 
-static int isMocked = 0;
+static int isMocked = 0, pid;
 
 static void manage_selinux() {
 	if (isMocked) return;
@@ -43,23 +43,36 @@ static void lazy_unmount(const char* mountpoint) {
 		LOGI("hide_daemon: Unmount Failed (%s)\n", mountpoint);
 }
 
-void hide_daemon() {
+static void hide_daemon_err() {
+	LOGD("hide_daemon: error occured, stopping magiskhide services\n");
+	// Resume process if possible
+	kill(pid, SIGCONT);
+	int err = 1;
+	write(sv[1], &err, sizeof(err));
+	_exit(-1);
+}
+
+int hide_daemon() {
 	// Fork to a new process
-	switch(fork()) {
+	hide_pid = fork();
+	switch(hide_pid) {
 	case -1:
 		PLOGE("fork");
+		return 1;
 	case 0:
 		break;
 	default:
-		return;
+		return 0;
 	}
 
-	close(pipefd[1]);
+	close(sv[0]);
 
 	// Set the process name
 	strcpy(argv0, "magiskhide_daemon");
+	// When an error occurs, report its failure to main process
+	err_handler = hide_daemon_err;
 	
-	int pid, fd;
+	int fd;
 	FILE *fp;
 	char cache_block[256], *line;
 	struct vector mount_list;
@@ -67,9 +80,12 @@ void hide_daemon() {
 	cache_block[0] = '\0';
 
 	while(1) {
-		xxread(pipefd[0], &pid, sizeof(pid));
+		xxread(sv[1], &pid, sizeof(pid));
 		// Termination called
-		if(pid == -1) exit(0);
+		if(pid == -1) {
+			LOGD("hide_daemon: received termination request\n");
+			_exit(0);
+		}
 
 		snprintf(magiskbuf, BUF_SIZE, "/proc/%d/ns/mnt", pid);
 		if(access(magiskbuf, F_OK) == -1) continue; // Maybe process died..
@@ -95,7 +111,7 @@ void hide_daemon() {
 				}
 			}
 		}
-		
+
 		// First unmount the dummy skeletons, cache mounts, and /sbin links
 		vec_for_each_r(&mount_list, line) {
 			if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
@@ -125,6 +141,10 @@ void hide_daemon() {
 
 		// All done, send resume signal
 		kill(pid, SIGCONT);
+
+		// Tell main process all is well
+		pid = 0;
+		xwrite(sv[1], &pid, sizeof(pid));
 	}
 
 	// Should never go here

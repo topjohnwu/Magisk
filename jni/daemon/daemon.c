@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -18,12 +19,33 @@
 #include "daemon.h"
 
 static void request_handler(int client) {
-	/* TODO: Put all function entrypoints here
-	   it'll currently just log the input string */
-	char *s = read_string(client);
+	client_request req = read_int(client);
+	char *s;
+	int pid, status, code;
+	switch (req) {
+	case LAUNCH_MAGISKHIDE:
+		launch_magiskhide(client);
+		break;
+	case STOP_MAGISKHIDE:
+		stop_magiskhide(client);
+		break;
+	case ADD_HIDELIST:
+		// TODO: Add hidelist
+		break;
+	case RM_HIDELIST:
+		// TODO: Remove hidelist
+		break;
+	case SUPERUSER:
+		// TODO: Run su
+		break;
+	case TEST:
+		s = read_string(client);
+		LOGI("%s\n", s);
+		free(s);
+		write_int(client, 0);
+		break;
+	}
 	close(client);
-	LOGI("%s\n", s);
-	free(s);
 }
 
 /* Setup the address and return socket fd */
@@ -39,10 +61,14 @@ static int setup_socket(struct sockaddr_un *sun) {
 	return fd;
 }
 
+
+static void do_nothing() {}
+
 void start_daemon() {
 	// Launch the daemon, create new session, set proper context
 	if (getuid() != AID_ROOT || getgid() != AID_ROOT) {
-		PLOGE("daemon requires root. uid/gid not root");
+		fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
+		PLOGE("start daemon");
 	}
 	switch (fork()) {
 	case -1:
@@ -63,6 +89,12 @@ void start_daemon() {
 
 	// Change process name
 	strcpy(argv0, "magisk_daemon");
+	// The root daemon should not do anything if an error occurs
+	// It should stay intact in any circumstances
+	err_handler = do_nothing;
+
+	// Start log monitor
+	monitor_logs();
 
 	// Loop forever to listen to requests
 	while(1) {

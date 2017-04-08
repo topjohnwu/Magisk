@@ -12,8 +12,8 @@
 #include "utils.h"
 
 static void *logger_thread(void *args) {
-	rename("/cache/magisk.log", "/cache/last_magisk.log");
-	FILE *logfile = xfopen("/cache/magisk.log", "w");
+	// rename("/cache/magisk.log", "/cache/last_magisk.log");
+	FILE *logfile = xfopen("/cache/magisk_test.log", "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat
