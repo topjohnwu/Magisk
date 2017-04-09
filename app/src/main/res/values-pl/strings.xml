@@ -17,6 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Zainstalowany Magisk v%1$s</string>
+	<string name="magisk_version_core_only">Zainstalowany Magisk v%1$s (Tylko Tryb Rdzeni)</string>
     <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
@@ -135,6 +136,8 @@
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
 
+	    <string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
+    <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide, systemless hosts i BusyBox nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
     <string name="settings_busybox_summary">Zmień montowanie Magisk z wbudowanego busybox do xbin</string>
