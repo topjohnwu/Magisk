@@ -1,49 +1,9 @@
-/*
- *
- * resetprop.cpp
+/* resetprop.cpp - Manipulate any system props
  * 
  * Copyright 2016 nkk71     <nkk71x@gmail.com>
  * Copyright 2016 topjohnwu <topjohnwu@gmail.com>
- *
  * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- * 
- */
-
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-
-#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include "_system_properties.h"
-#include <sys/system_properties.h>
-
-#ifdef INDEP_BINARY
-int resetprop_main(int argc, char *argv[]);
-int main(int argc, char *argv[]) {
-    return resetprop_main(argc, argv);
-}
-#else
-#include "magisk.h"
-#endif
-
-/* Info:
+ * Info:
  * 
  * all changes are in
  *
@@ -90,11 +50,36 @@ int main(int argc, char *argv[]) {
  *
  */
 
-int verbose = 0, del = 0, file = 0, trigger = 1;
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/types.h>
 
-static bool is_legal_property_name(const char* name, size_t namelen)
-{
-    size_t i;
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include "_system_properties.h"
+#include <sys/system_properties.h>
+
+#ifdef INDEP_BINARY
+
+int resetprop_main(int argc, char *argv[]);
+int main(int argc, char *argv[]) {
+    return resetprop_main(argc, argv);
+}
+#define LOGD(...)  if (verbose) printf(__VA_ARGS__)
+#define LOGE(...)  fprintf(stderr, __VA_ARGS__)
+
+#else
+#include "magisk.h"
+#endif
+
+#include "resetprop.h"
+
+static int verbose = 0;
+
+static bool is_legal_property_name(const char* name, size_t namelen) {
     if (namelen >= PROP_NAME_MAX) return false;
     if (namelen < 1) return false;
     if (name[0] == '.') return false;
@@ -102,10 +87,10 @@ static bool is_legal_property_name(const char* name, size_t namelen)
 
     /* Only allow alphanumeric, plus '.', '-', or '_' */
     /* Don't allow ".." to appear in a property name */
-    for (i = 0; i < namelen; i++) {
+    for (size_t i = 0; i < namelen; i++) {
         if (name[i] == '.') {
             // i=0 is guaranteed to never have a dot. See above.
-            if (name[i-1] == '.') return false;
+            if (name[i - 1] == '.') return false;
             continue;
         }
         if (name[i] == '_' || name[i] == '-') continue;
@@ -118,54 +103,89 @@ static bool is_legal_property_name(const char* name, size_t namelen)
     return true;
 }
 
-int x_property_set(const char *name, const char *value)
-{
+static int usage(char* arg0) {
+    fprintf(stderr,
+        "Usage: %s [options] [args...]\n"
+        "%s <name> <value>:      Set property entry <name> with <value>\n"
+        "%s --file <prop file>:  Load props from <prop file>\n"
+        "%s --delete <name>:     Remove prop entry <name>\n"
+        "\n"
+        "Options:\n"
+        "   -v          verbose output\n"
+        "   -n          don't trigger events when changing props\n"
+    , arg0, arg0, arg0, arg0);
+    return 1;
+}
+
+int init_resetprop() {
+    LOGD("resetprop: Initializing...\n");
+    if (__system_properties_init()) {
+        LOGE("resetprop: Initialize error\n");
+        return -1;
+    }
+    return 0;
+}
+
+// Get prop by name, return string (should free manually!)
+char *getprop(const char *name) {
+    char value[PROP_VALUE_MAX];
+    LOGD("restprop: getprop [%s]\n", name);
+    if (__system_property_get(name, value) == 0) {
+        LOGE("resetprop: prop not found: [%s]\n", name);
+        return NULL;
+    }
+    return strdup(value);
+}
+
+int setprop(const char *name, const char *value) {
+    return setprop2(name, value, 1);
+}
+
+int setprop2(const char *name, const char *value, int trigger) {
     int ret;
-    char value_read[PROP_VALUE_MAX];
-
-    size_t namelen = strlen(name);
-    size_t valuelen = strlen(value);
-
-    if (trigger) {
-        printf("Set with property_service: '%s'='%s'\n", name, value);
-    } else {
-        printf("Modify data structure: '%s'='%s'\n", name, value);
-    }
-
-    __system_property_get(name, value_read);
-
-    if(strlen(value_read)) {
-        printf("Existing property: '%s'='%s'\n", name, value_read);
+    
+    char *check = getprop(name);
+    if (check) {
+        LOGD("resetprop: prop [%s] has existing value [%s]\n", name, value);
+        free(check);
         if (trigger) {
-            if (!strncmp(name, "ro.", 3)) __system_property_del(name); // Only delete ro props
+            if (!strncmp(name, "ro.", 3)) deleteprop(name);
             ret = __system_property_set(name, value);
         } else {
-            ret = __system_property_update((prop_info*) __system_property_find(name), value, valuelen);
+            ret = __system_property_update((prop_info*) __system_property_find(name), value, strlen(value));
         }
     } else {
+        LOGD("resetprop: New prop [%s]\n", name);
         if (trigger) {
             ret = __system_property_set(name, value);
         } else {
-            ret = __system_property_add(name, namelen, value, valuelen);
+            ret = __system_property_add(name, strlen(name), value, strlen(value));
         }
     }
 
-    if (ret != 0) {
-        fprintf(stderr, "Failed to set '%s'='%s'\n", name, value);
-        return ret;
+    LOGD("resetprop: setprop [%s]: [%s] by %s\n", name, value,
+        trigger ? "property_service" : "modifing prop data structure");
+
+    if (ret)
+        LOGE("resetprop: setprop error\n");
+
+    return ret;
+}
+
+int deleteprop(const char *name) {
+    LOGD("resetprop: deleteprop [%s]\n", name);
+    if (__system_property_del(name)) {
+        LOGE("resetprop: delete prop: [%s] error\n", name);
+        return -1;
     }
-
-    __system_property_get(name, value_read);
-    printf("Recheck property: '%s'='%s'\n", name, value_read);
-
     return 0;
 }
 
 int read_prop_file(const char* filename) {
-    printf("Attempting to read props from \'%s\'\n", filename);
+    LOGD("resetprop: Load prop file [%s]\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
-        fprintf(stderr, "Cannot open \'%s\'\n", filename);
+        LOGE("Cannot open [%s]\n", filename);
         return 1;
     }
     char *line = NULL, *pch;
@@ -194,27 +214,16 @@ int read_prop_file(const char* filename) {
         if ( ((pch == NULL) || (i >= (pch - line))) || (pch >= line + read - 1) ) continue;
         // Separate the string
         *pch = '\0';
-        x_property_set(line + i, pch + 1);
+        setprop(line + i, pch + 1);
     }
     free(line);
     fclose(fp);
     return 0;
 }
 
-int usage(char* name) {
-    fprintf(stderr, "usage: %s [-v] [-n] [--file propfile] [--delete name] [ name value ] \n", name);
-    fprintf(stderr, "   -v :\n");
-    fprintf(stderr, "      verbose output (Default: Disabled)\n");
-    fprintf(stderr, "   -n :\n");
-    fprintf(stderr, "      no event triggers when changing props (Default: Will trigger events)\n");
-    fprintf(stderr, "   --file propfile :\n");
-    fprintf(stderr, "      Read props from prop files (e.g. build.prop)\n");
-    fprintf(stderr, "   --delete name :\n");
-    fprintf(stderr, "      Remove a prop entry\n\n");
-    return 1;
-}
-
 int resetprop_main(int argc, char *argv[]) {
+
+    int del = 0, file = 0, trigger = 1;
     
     int exp_arg = 2, stdout_bak, null;
     char *name, *value, *filename;
@@ -243,13 +252,13 @@ int resetprop_main(int argc, char *argv[]) {
                 break;
             } else {
                 if(!is_legal_property_name(argv[i], strlen(argv[i]))) {
-                    fprintf(stderr, "Illegal property name \'%s\'\n", argv[i]);
+                    LOGE("Illegal property name: [%s]\n", argv[i]);
                     return 1;
                 }
                 name = argv[i];
                 if (exp_arg > 1) {
                     if (strlen(argv[i + 1]) >= PROP_VALUE_MAX) {
-                        fprintf(stderr, "Value too long \'%s\'\n", argv[i + 1]);
+                        LOGE("Value too long: [%s]\n", argv[i + 1]);
                         return 1;
                     }
                     value = argv[i + 1];
@@ -259,30 +268,18 @@ int resetprop_main(int argc, char *argv[]) {
         }
     }
 
-    if (!verbose) {
-        fflush(stdout);
-        stdout_bak = dup(1);
-        null = open("/dev/null", O_WRONLY);
-        dup2(null, 1);
-    }
+    LOGD("resetprop by nkk71 & topjohnwu\n");
 
-    printf("resetprop by nkk71 & topjohnwu\n");
-
-    printf("Initializing...\n");
-    if (__system_properties_init()) {
-        fprintf(stderr, "Error during init\n");
-        return 1;
-    }
+    if (init_resetprop())
+        return -1;
 
     if (file) {
-        if (read_prop_file(filename)) return 1;
+        return read_prop_file(filename);
     } else if (del) {
-        printf("Attempting to delete '%s'\n", name);
-        if (__system_property_del(name)) return 1;
+        return deleteprop(name);
     } else {
-        if(x_property_set(name, value)) return 1;
+        return setprop2(name, value, trigger);
     }
-    printf("Done!\n\n");
-    return 0;
 
+    return 0;
 }
