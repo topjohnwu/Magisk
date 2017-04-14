@@ -36,23 +36,31 @@ static void request_handler(int client) {
 		// TODO: Remove hidelist
 		break;
 	case SUPERUSER:
-		// TODO: Run su
+		su_daemon_receiver(client);
+		break;
+	case CHECK_VERSION:
+		write_string(client, VERSION_STR);
+		close(client);
+		break;
+	case CHECK_VERSION_CODE:
+		write_int(client, VERSION_CODE);
+		close(client);
 		break;
 	case TEST:
 		s = read_string(client);
 		LOGI("%s\n", s);
 		free(s);
 		write_int(client, 0);
+		close(client);
 		break;
 	}
-	close(client);
 }
 
 /* Setup the address and return socket fd */
 static int setup_socket(struct sockaddr_un *sun) {
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM, 0);
 	if (fcntl(fd, F_SETFD, FD_CLOEXEC)) {
-	    PLOGE("fcntl FD_CLOEXEC");
+		PLOGE("fcntl FD_CLOEXEC");
 	}
 
 	memset(sun, 0, sizeof(*sun));
@@ -66,7 +74,7 @@ static void do_nothing() {}
 
 void start_daemon() {
 	// Launch the daemon, create new session, set proper context
-	if (getuid() != AID_ROOT || getgid() != AID_ROOT) {
+	if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
 		fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
 		PLOGE("start daemon");
 	}
@@ -90,7 +98,7 @@ void start_daemon() {
 	// Change process name
 	strcpy(argv0, "magisk_daemon");
 	// The root daemon should not do anything if an error occurs
-	// It should stay intact in any circumstances
+	// It should stay intact under any circumstances
 	err_handler = do_nothing;
 
 	// Start log monitor

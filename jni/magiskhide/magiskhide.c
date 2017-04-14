@@ -83,9 +83,11 @@ void launch_magiskhide(int client) {
 
 	isEnabled = 1;
 	write_int(client, 0);
+	close(client);
 	return;
 error:
 	write_int(client, 1);
+	close(client);
 	return;
 }
 
@@ -106,6 +108,7 @@ void stop_magiskhide(int client) {
 
 	isEnabled = 0;
 	write_int(client, 0);
+	close(client);
 }
 
 int magiskhide_main(int argc, char *argv[]) {
@@ -123,8 +126,9 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = RM_HIDELIST;
 	} else if (strcmp(argv[1], "--ls") == 0) {
 		FILE *fp = xfopen(HIDELIST, "r");
-		while (fgets(magiskbuf, BUF_SIZE, fp)) {
-			printf("%s", magiskbuf);
+		char buffer[512];
+		while (fgets(buffer, sizeof(buffer), fp)) {
+			printf("%s", buffer);
 		}
 		fclose(fp);
 		return 0;

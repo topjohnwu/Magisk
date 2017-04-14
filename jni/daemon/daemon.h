@@ -1,6 +1,9 @@
 /* daemon.h - Utility functions for daemon-client communication
  */
 
+#ifndef _DAEMON_H_
+#define _DAEMON_H_
+
 
 // Commands require connecting to daemon
 typedef enum {
@@ -9,6 +12,8 @@ typedef enum {
 	ADD_HIDELIST,
 	RM_HIDELIST,
 	SUPERUSER,
+	CHECK_VERSION,
+	CHECK_VERSION_CODE,
 	TEST
 } client_request;
 
@@ -25,3 +30,9 @@ int read_int(int fd);
 void write_int(int fd, int val);
 char* read_string(int fd);
 void write_string(int fd, const char* val);
+
+// log_monitor.c
+
+void monitor_logs();
+
+#endif

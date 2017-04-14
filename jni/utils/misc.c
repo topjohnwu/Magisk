@@ -7,17 +7,42 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
-
+#include <pwd.h>
 #include <sys/types.h>
 
 #include "magisk.h"
 #include "utils.h"
 
+unsigned get_shell_uid() {
+	struct passwd* ppwd = getpwnam("shell");
+	if (NULL == ppwd)
+		return 2000;
+
+	return ppwd->pw_uid;
+}
+
+unsigned get_system_uid() {
+	struct passwd* ppwd = getpwnam("system");
+	if (NULL == ppwd)
+		return 1000;
+
+	return ppwd->pw_uid;
+}
+
+unsigned get_radio_uid() {
+	struct passwd* ppwd = getpwnam("radio");
+	if (NULL == ppwd)
+		return 1001;
+
+	return ppwd->pw_uid;
+}
+
 int check_data() {
+	char buffer[4096];
 	FILE *fp = xfopen("/proc/mounts", "r");
-	while (fgets(magiskbuf, BUF_SIZE, fp)) {
-		if (strstr(magiskbuf, " /data ")) {
-			if (strstr(magiskbuf, "tmpfs"))
+	while (fgets(buffer, sizeof(buffer), fp)) {
+		if (strstr(buffer, " /data ")) {
+			if (strstr(buffer, "tmpfs"))
 				return 0;
 			else
 				return 1;

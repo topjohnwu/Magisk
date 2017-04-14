@@ -74,7 +74,7 @@ int hide_daemon() {
 	
 	int fd;
 	FILE *fp;
-	char cache_block[256], *line;
+	char buffer[4096], cache_block[256], *line;
 	struct vector mount_list;
 	
 	cache_block[0] = '\0';
@@ -87,18 +87,18 @@ int hide_daemon() {
 			_exit(0);
 		}
 
-		snprintf(magiskbuf, BUF_SIZE, "/proc/%d/ns/mnt", pid);
-		if(access(magiskbuf, F_OK) == -1) continue; // Maybe process died..
+		snprintf(buffer, sizeof(buffer), "/proc/%d/ns/mnt", pid);
+		if(access(buffer, F_OK) == -1) continue; // Maybe process died..
 
-		fd = xopen(magiskbuf, O_RDONLY);
+		fd = xopen(buffer, O_RDONLY);
 		// Switch to its namespace
 		xsetns(fd, 0);
 		close(fd);
 
 		manage_selinux();
 
-		snprintf(magiskbuf, BUF_SIZE, "/proc/%d/mounts", pid);
-		fp = xfopen(magiskbuf, "r");
+		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
+		fp = xfopen(buffer, "r");
 		vec_init(&mount_list);
 		file_to_vector(&mount_list, fp);
 
@@ -116,8 +116,8 @@ int hide_daemon() {
 		vec_for_each_r(&mount_list, line) {
 			if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
 				|| (strstr(line, cache_block) && strstr(line, "/system/")) ) {
-				sscanf(line, "%*s %512s", magiskbuf);
-				lazy_unmount(magiskbuf);
+				sscanf(line, "%*s %512s", buffer);
+				lazy_unmount(buffer);
 			}
 			free(line);
 		}
@@ -132,8 +132,8 @@ int hide_daemon() {
 		// Unmount loop mounts
 		vec_for_each_r(&mount_list, line) {
 			if (strstr(line, "/dev/block/loop") && !strstr(line, DUMMYPATH)) {
-				sscanf(line, "%*s %512s", magiskbuf);
-				lazy_unmount(magiskbuf);
+				sscanf(line, "%*s %512s", buffer);
+				lazy_unmount(buffer);
 			}
 			free(line);
 		}

@@ -9,8 +9,14 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 
 #include "vector.h"
+
+#define UID_SHELL  (get_shell_uid())
+#define UID_ROOT   0
+#define UID_SYSTEM (get_system_uid())
+#define UID_RADIO  (get_radio_uid())
 
 // xwrap.c
 
@@ -38,13 +44,14 @@ ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
                           void *(*start_routine) (void *), void *arg);
 int xsocketpair(int domain, int type, int protocol, int sv[2]);
-
-// log_monitor.c
-
-void monitor_logs();
+int xstat(const char *pathname, struct stat *buf);
+int xdup2(int oldfd, int newfd);
 
 // misc.c
 
+unsigned get_shell_uid();
+unsigned get_system_uid();
+unsigned get_radio_uid();
 int check_data();
 void file_to_vector(struct vector *v, FILE *fp);
 int isNum(const char *s);
