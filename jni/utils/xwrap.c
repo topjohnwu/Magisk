@@ -210,4 +210,20 @@ int xsocketpair(int domain, int type, int protocol, int sv[2]) {
 	return ret;
 }
 
+int xstat(const char *pathname, struct stat *buf) {
+	int ret = stat(pathname, buf);
+	if (ret == -1) {
+		PLOGE("stat %s", pathname);
+	}
+	return ret;
+}
+
+int xdup2(int oldfd, int newfd) {
+	int ret = dup2(oldfd, newfd);
+	if (ret == -1) {
+		PLOGE("dup2");
+	}
+	return ret;
+}
+
 
