@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/mount.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -139,14 +141,40 @@ void ps_filter_proc_name(const char *pattern, void (*func)(int)) {
 int create_links(const char *bin, const char *path) {
 	char self[PATH_MAX], linkpath[PATH_MAX];
 	if (bin == NULL) {
-		xreadlink("/proc/self/exe", self, PATH_MAX);
+		xreadlink("/proc/self/exe", self, sizeof(self));
 		bin = self;
 	}
 	int ret = 0;
 	for (int i = 0; applet[i]; ++i) {
-		snprintf(linkpath, PATH_MAX, "%s/%s", path, applet[i]);
+		snprintf(linkpath, sizeof(linkpath), "%s/%s", path, applet[i]);
 		unlink(linkpath);
 		ret |= symlink(bin, linkpath);
 	}
 	return ret;
+}
+
+#define DEV_BLOCK "/dev/block"
+
+void unlock_blocks() {	
+	char path[PATH_MAX];
+	DIR *dir;
+	struct dirent *entry;
+	int fd, OFF = 0;
+
+	if (!(dir = xopendir(DEV_BLOCK)))
+		return;
+
+	while((entry = readdir(dir))) {
+		if (entry->d_type == DT_BLK && strstr(entry->d_name, "mmc") != NULL) {
+			snprintf(path, sizeof(path), "%s/%s", DEV_BLOCK, entry->d_name);
+			if ((fd = xopen(path, O_RDONLY)) < 0)
+				continue;
+
+			if (ioctl(fd, BLKROSET, &OFF) == -1)
+				PLOGE("ioctl");
+			close(fd);
+		}
+	}
+
+	closedir(dir);
 }
