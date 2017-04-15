@@ -256,65 +256,69 @@ fi
 # Environment
 ##########################################################################################
 
-ui_print "- Constructing environment"
+# TODO: Environment
 
-is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
+# ui_print "- Constructing environment"
 
-# Copy required files
-rm -rf $MAGISKBIN 2>/dev/null
-mkdir -p $MAGISKBIN
-cp -af $BINDIR/busybox $BINDIR/magiskboot $BINDIR/magiskpolicy $COMMONDIR/magisk.apk \
-       $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
-# Legacy support
-ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
+# is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
-chmod -R 755 $MAGISKBIN
-chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
+# # Copy required files
+# rm -rf $MAGISKBIN 2>/dev/null
+# mkdir -p $MAGISKBIN
+# cp -af $BINDIR/busybox $BINDIR/magiskboot $BINDIR/magiskpolicy $COMMONDIR/magisk.apk \
+#        $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
+# # Legacy support
+# ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
 
-# Temporary busybox for installation
-rm -rf $TMPDIR/busybox 2>/dev/null
-mkdir -p $TMPDIR/busybox
-$BINDIR/busybox --install -s $TMPDIR/busybox
-rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
-PATH=$TMPDIR/busybox:$PATH
+# chmod -R 755 $MAGISKBIN
+# chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
+
+# # Temporary busybox for installation
+# rm -rf $TMPDIR/busybox 2>/dev/null
+# mkdir -p $TMPDIR/busybox
+# $BINDIR/busybox --install -s $TMPDIR/busybox
+# rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
+# PATH=$TMPDIR/busybox:$PATH
 
 ##########################################################################################
 # Magisk Image
 ##########################################################################################
 
-# Fix SuperSU.....
-$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
+# TODO: Magisk Image
 
-if (is_mounted /data); then
-  IMG=/data/magisk.img
-else
-  IMG=/cache/magisk.img
-  ui_print "- Data unavailable, use cache workaround"
-fi
+# # Fix SuperSU.....
+# $BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
 
-if [ -f $IMG ]; then
-  ui_print "- $IMG detected!"
-else
-  ui_print "- Creating $IMG"
-  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
-fi
+# if (is_mounted /data); then
+#   IMG=/data/magisk.img
+# else
+#   IMG=/cache/magisk.img
+#   ui_print "- Data unavailable, use cache workaround"
+# fi
 
-mount_image $IMG /magisk
-if (! is_mounted /magisk); then
-  ui_print "! Magisk image mount failed..."
-  exit 1
-fi
-MAGISKLOOP=$LOOPDEVICE
+# if [ -f $IMG ]; then
+#   ui_print "- $IMG detected!"
+# else
+#   ui_print "- Creating $IMG"
+#   make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
+# fi
 
-# Core folders and scripts
-mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
-cp -af $BINDIR/resetprop $BINDIR/magiskhide $BINDIR/su $BINDIR/magiskpolicy $COREDIR/bin
-# Legacy support
-ln -sf $COREDIR/bin/resetprop $MAGISKBIN/resetprop
+# mount_image $IMG /magisk
+# if (! is_mounted /magisk); then
+#   ui_print "! Magisk image mount failed..."
+#   exit 1
+# fi
+# MAGISKLOOP=$LOOPDEVICE
 
-chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+# # Core folders and scripts
+# mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+# cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
+# cp -af $BINDIR/resetprop $BINDIR/magiskhide $BINDIR/su $BINDIR/magiskpolicy $COREDIR/bin
+# # Legacy support
+# ln -sf $COREDIR/bin/resetprop $MAGISKBIN/resetprop
+
+# chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+# chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 
 ##########################################################################################
 # Unpack boot
@@ -445,7 +449,7 @@ else
 
   # sepolicy patches
   cpio_extract sepolicy sepolicy
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskpolicy --load sepolicy --save sepolicy --minimal
+  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magisk magiskpolicy --load sepolicy --save sepolicy --minimal
   cpio_add 644 sepolicy sepolicy
 
   # Add new items
@@ -454,7 +458,8 @@ else
   [ ! -z $SHA1 ] && echo "# STOCKSHA1=$SHA1" >> $COMMONDIR/init.magisk.rc
   cpio_add 750 init.magisk.rc $COMMONDIR/init.magisk.rc
 
-  cpio_add 750 sbin/magic_mask.sh $COMMONDIR/magic_mask.sh
+  # cpio_add 750 sbin/magic_mask.sh $COMMONDIR/magic_mask.sh
+  cpio_add 755 sbin/magisk $BINDIR/magisk
 
   # Create ramdisk backups
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig

@@ -16,19 +16,19 @@ on property:magisk.restart_pfsd=1
 # Services
 
 # launch post-fs script
-service magisk_pfs /sbin/magic_mask.sh post-fs
+service magisk_pfs /sbin/magisk --post-fs
     user root
     seclabel u:r:su:s0
     oneshot
 
 # launch post-fs-data script
-service magisk_pfsd /sbin/magic_mask.sh post-fs-data
+service magisk_pfsd /sbin/magisk --post-fs-data
     user root
     seclabel u:r:su:s0
     oneshot
 
 # launch late_start script
-service magisk_service /sbin/magic_mask.sh service
+service magisk_service /sbin/magisk  --service
     class late_start
     user root
     seclabel u:r:su:s0

@@ -55,13 +55,17 @@ build_bin() {
   echo "************************"
   echo "* Copying binaries"
   echo "************************"
-  mkcp "libs/armeabi-v7a/*" zip_static/arm
+  mkcp libs/armeabi-v7a/magisk zip_static/arm
+  mkcp libs/armeabi-v7a/magiskboot zip_static/arm
+  mkcp libs/arm64-v8a/magisk zip_static/arm64
+  mkcp libs/arm64-v8a/magiskboot zip_static/arm64
+  mkcp libs/x86/magisk zip_static/x86
+  mkcp libs/x86/magiskboot zip_static/x86
+  mkcp libs/x86_64/magisk zip_static/x64
+  mkcp libs/x86_64/magiskboot zip_static/x64
   mkcp libs/armeabi-v7a/magiskboot uninstaller/arm
-  mkcp "libs/arm64-v8a/*" zip_static/arm64
   mkcp libs/arm64-v8a/magiskboot uninstaller/arm64
-  mkcp "libs/x86/*" zip_static/x86
   mkcp libs/x86/magiskboot uninstaller/x86
-  mkcp "libs/x86_64/*" zip_static/x64
   mkcp libs/x86_64/magiskboot uninstaller/x64
 }
 
