@@ -53,10 +53,14 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying binaries
   ECHO ************************
-  CALL :mkcp libs\armeabi-v7a\* zip_static\arm
-  CALL :mkcp libs\arm64-v8a\* zip_static\arm64
-  CALL :mkcp libs\x86\* zip_static\x86
-  CALL :mkcp libs\x86_64\* zip_static\x64
+  CALL :mkcp libs\armeabi-v7a\magisk zip_static\arm
+  CALL :mkcp libs\armeabi-v7a\magiskboot zip_static\arm
+  CALL :mkcp libs\arm64-v8a\magisk zip_static\arm64
+  CALL :mkcp libs\arm64-v8a\magiskboot zip_static\arm64
+  CALL :mkcp libs\x86\magisk zip_static\x86
+  CALL :mkcp libs\x86\magiskboot zip_static\x86
+  CALL :mkcp libs\x86_64\magisk zip_static\x64
+  CALL :mkcp libs\x86_64\magiskboot zip_static\x64
   CALL :mkcp libs\armeabi-v7a\magiskboot uninstaller\arm
   CALL :mkcp libs\arm64-v8a\magiskboot uninstaller\arm64
   CALL :mkcp libs\x86\magiskboot uninstaller\x86
