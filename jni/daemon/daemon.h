@@ -14,6 +14,9 @@ typedef enum {
 	SUPERUSER,
 	CHECK_VERSION,
 	CHECK_VERSION_CODE,
+	POST_FS,
+	POST_FS_DATA,
+	LATE_START_SERVICE,
 	TEST
 } client_request;
 
@@ -34,5 +37,19 @@ void write_string(int fd, const char* val);
 // log_monitor.c
 
 void monitor_logs();
+
+
+/**************
+ * MagiskHide *
+ **************/
+
+void launch_magiskhide(int client);
+void stop_magiskhide(int client);
+
+/*************
+ * Superuser *
+ *************/
+
+void su_daemon_receiver(int client);
 
 #endif
