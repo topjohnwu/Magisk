@@ -8,6 +8,11 @@
 
 #define ALL NULL
 
+// policydb functions
+int load_policydb(const char *filename);
+int dump_policydb(const char *filename);
+void destroy_policydb();
+
 // Handy functions
 int sepol_allow(char *s, char *t, char *c, char *p);
 int sepol_deny(char *s, char *t, char *c, char *p);
@@ -21,7 +26,8 @@ int sepol_attradd(char *s, char *a);
 int sepol_exists(char *source);
 
 // Built in rules
-void sepol_full_rules();
 void sepol_min_rules();
+void sepol_med_rules();
+void sepol_full_rules();
 
 #endif

@@ -65,14 +65,16 @@ void samsung() {
 }
 
 void allowSuClient(char *target) {
-	sepol_allow(target, "rootfs", "file", "execute_no_trans");
-	sepol_allow(target, "rootfs", "file", "execute");
+	sepol_allow(target, "rootfs", "file", ALL);
+	sepol_allow(target, "rootfs", "lnk_file", ALL);
 	sepol_allow(target, "su", "unix_stream_socket", "connectto");
 	sepol_allow(target, "su", "unix_stream_socket", "getopt");
 	sepol_allow(target, "su_device", "dir", "search");
 	sepol_allow(target, "su_device", "dir", "read");
 	sepol_allow(target, "su_device", "sock_file", "read");
 	sepol_allow(target, "su_device", "sock_file", "write");
+	sepol_allow("su", target, "fd", "use");
+	sepol_allow("su", target, "fifo_file", ALL);
 }
 
 void suRights() {
@@ -83,6 +85,16 @@ void suRights() {
 	sepol_allow("servicemanager", "su", "process", "getattr");
 	sepol_allow("servicemanager", "su", "binder", "transfer");
 	sepol_allow("system_server", "su", "binder", "call");
+
+	sepol_allow("su", "servicemanager", "dir", "search");
+	sepol_allow("su", "servicemanager", "dir", "read");
+	sepol_allow("su", "servicemanager", "file", "open");
+	sepol_allow("su", "servicemanager", "file", "read");
+	sepol_allow("su", "servicemanager", "process", "getattr");
+	sepol_allow("su", "servicemanager", "binder", "transfer");
+	sepol_allow("su", "servicemanager", "binder", "call");
+	sepol_allow("su", "system_server", "binder", "transfer");
+	sepol_allow("su", "system_server", "binder", "call");
 }
 
 void otherToSU() {
@@ -129,61 +141,17 @@ void otherToSU() {
 		sepol_allow("audioserver", "audioserver", "process", "execmem");
 }
 
-void sepol_full_rules() {
-	// Samsung specific
-	// Prevent system from loading policy
-	if(sepol_exists("knox_system_app"))
-		samsung();
-
-	// Min rules first
-	sepol_min_rules();
-
-	// Create domains if they don't exist
-	if (!sepol_exists("su_device"))
-		sepol_create("su_device");
-	sepol_enforce("su_device");
-
-	// Patch su to everything
-	sepol_allow("su", ALL, ALL, ALL);
-
-	// Autotransition su's socket to su_device
-	sepol_typetrans("su", "device", "file", "su_device", NULL);
-	sepol_typetrans("su", "device", "dir", "su_device", NULL);
-	sepol_allow("su_device", "tmpfs", "filesystem", "associate");
-
-	// Transition from untrusted_app to su_client
-	allowSuClient("shell");
-	allowSuClient("untrusted_app");
-	allowSuClient("system_app");
-	allowSuClient("platform_app");
-	if (sepol_exists("priv_app"))
-		allowSuClient("priv_app");
-	if (sepol_exists("ssd_tool"))
-		allowSuClient("ssd_tool");
-
-	// Allow init to execute su daemon/transition
-	sepol_allow("init", "su", "process", "transition");
-	sepol_allow("init", "su", "process", "rlimitinh");
-	sepol_allow("init", "su", "process", "siginh");
-	sepol_allow("init", "su", "process", "noatsecure");
-	suRights();
-	otherToSU();
-
-	// Need to set su_device/su as trusted to be accessible from other categories
-	sepol_attradd("su_device", "mlstrustedobject");
-	sepol_attradd("su", "mlstrustedsubject");
-
-}
-
-// Minimal to run Magisk script before live patching
+// Minimal boot image patch, Samsung requires these patches
 void sepol_min_rules() {
-
 	if (!sepol_exists("su"))
 		sepol_create("su");
+	if (!sepol_exists("su_device"))
+		sepol_create("su_device");
 	sepol_permissive("su");
 	sepol_permissive("init");
 
 	sepol_attradd("su", "mlstrustedsubject");
+	sepol_attradd("su_device", "mlstrustedobject");
 
 	// Let init run stuffs in su context
 	sepol_allow("kernel", "su", "fd", "use");
@@ -192,11 +160,27 @@ void sepol_min_rules() {
 	sepol_allow("init", "system_file", "lnk_file", ALL);
 	sepol_allow("init", "system_file", "file", ALL);
 
-	// Misc: basic shell scripts, prop management etc.
+	// Samsung specific
+	// Prevent system from loading policy
+	if(sepol_exists("knox_system_app"))
+		samsung();
+
+	// Shell, prop management, simple su rights
 	sepol_allow("su", "property_socket", "sock_file", "write");
 	if (sepol_exists("default_prop"))
 		sepol_allow("su", "default_prop", "property_service", "set");
 	sepol_allow("su", "init", "unix_stream_socket", "connectto");
+	sepol_allow("su", "rootfs", "file", "entrypoint");
+	sepol_allow("su", "devpts", "chr_file", ALL);
+	sepol_allow("su", "untrusted_app_devpts", "chr_file", ALL);
+	sepol_allow("su", "su_device", "dir", ALL);
+	sepol_allow("su", "su_device", "sock_file", ALL);
+	sepol_allow("su", "zygote_exec", "file", ALL);
+	sepol_allow("su", "zygote_exec", "lnk_file", ALL);
+	sepol_allow("su", "app_data_file", "dir", ALL);
+	sepol_allow("su", "app_data_file", "file", ALL);
+	sepol_allow("su", "toolbox_exec", "file", ALL);
+	sepol_allow("su", "shell_exec", "file", ALL);
 	sepol_allow("su", "su", "unix_dgram_socket", ALL);
 	sepol_allow("su", "su", "unix_stream_socket", ALL);
 	sepol_allow("su", "su", "process", ALL);
@@ -206,10 +190,10 @@ void sepol_min_rules() {
 	sepol_allow("su", "su", "lnk_file", ALL);
 	sepol_allow("su", "su", "dir", ALL);
 
-	// Allow su to do anything to files/dir/links
-	sepol_allow("su", ALL, "file", ALL);
-	sepol_allow("su", ALL, "dir", ALL);
-	sepol_allow("su", ALL, "lnk_file", ALL);
+	// Autotransition su socket to su_device
+	sepol_typetrans("su", "device", "file", "su_device", NULL);
+	sepol_typetrans("su", "device", "dir", "su_device", NULL);
+	sepol_allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// For sepolicy live patching
 	sepol_allow("su", "kernel", "security", "read_policy");
@@ -226,5 +210,32 @@ void sepol_min_rules() {
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
-
 }
+
+void sepol_med_rules() {
+	sepol_min_rules();
+
+	// Allow su to do anything to any files/dir/links
+	sepol_allow("su", ALL, "file", ALL);
+	sepol_allow("su", ALL, "dir", ALL);
+	sepol_allow("su", ALL, "lnk_file", ALL);
+
+	// Allow these client to access su
+	allowSuClient("shell");
+	allowSuClient("untrusted_app");
+	allowSuClient("system_app");
+	allowSuClient("platform_app");
+	if (sepol_exists("priv_app"))
+		allowSuClient("priv_app");
+	if (sepol_exists("ssd_tool"))
+		allowSuClient("ssd_tool");
+
+	suRights();
+	otherToSU();
+}
+
+void sepol_full_rules() {
+	// Patch su to everything
+	sepol_allow("su", ALL, ALL, ALL);
+}
+

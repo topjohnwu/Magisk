@@ -53,10 +53,10 @@ static void usage(char *arg0) {
 		"%s [--options...] [policystatements...]\n\n"
 		"Options:\n"
 		"  --live: directly load patched policy to device\n"
-		"  --magisk: complete (very large!) patches for Magisk and MagiskSU\n"
+		// "  --magisk: complete (very large!) patches for Magisk and MagiskSU\n"
 		"  --minimal: minimal patches, used for boot image patches\n"
 		"  --load <infile>: load policies from <infile>\n"
-		"                   (load from current policies if not specified)"
+		"                   (load from current policies if not specified)\n"
 		"  --save <outfile>: save policies to <outfile>\n"
 		, arg0);
 	statements();
@@ -270,7 +270,7 @@ static void syntax_error_msg() {
 
 int magiskpolicy_main(int argc, char *argv[]) {
 	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
-	int live = 0, minimal = 0, full = 0;
+	int live = 0, minimal = 0;
 	struct vector rules;
 
 	vec_init(&rules);
@@ -280,8 +280,6 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			if (strcmp(argv[i], "--live") == 0)
 				live = 1;
-			else if (strcmp(argv[i], "--magisk") == 0)
-				full = 1;
 			else if (strcmp(argv[i], "--minimal") == 0)
 				minimal = 1;
 			else if (strcmp(argv[i], "--load") == 0) {
@@ -298,28 +296,17 @@ int magiskpolicy_main(int argc, char *argv[]) {
 			vec_push_back(&rules, argv[i]);
 	}
 
-	policydb_t policydb;
-	sidtab_t sidtab;
-
-	policy = &policydb;
-
 	// Use current policy if not specified
 	if(!infile)
 		infile = "/sys/fs/selinux/policy";
 
-	sepol_set_policydb(&policydb);
-	sepol_set_sidtab(&sidtab);
-
-	if (load_policy(infile)) {
+	if (load_policydb(infile)) {
 		fprintf(stderr, "Could not load policy\n");
 		return 1;
 	}
 
-	if (policydb_load_isids(&policydb, &sidtab))
-		return 1;
-
-	if (full) sepol_full_rules();
-	else if (minimal) sepol_min_rules();
+	if (minimal)
+		sepol_min_rules();
 
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages
@@ -363,15 +350,15 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	vec_destroy(&rules);
 
 	if (live)
-		if (dump_policy("/sys/fs/selinux/load"))
+		if (dump_policydb("/sys/fs/selinux/load"))
 			return 1;
 
 	if (outfile) {
 		unlink(outfile);
-		if (dump_policy(outfile))
+		if (dump_policydb(outfile))
 			return 1;
 	}
 
-	policydb_destroy(&policydb);
+	destroy_policydb();
 	return 0;
 }

@@ -33,16 +33,16 @@
 		for (*ptr = table->htable[_i]; *ptr != NULL; *ptr = (*ptr)->next)
 
 // Global policydb
-policydb_t *policy;
+extern policydb_t *policydb;
 
 // sepolicy manipulation functions
-int load_policy(const char *filename);
-int dump_policy(const char *filename);
 int create_domain(char *d);
 int set_domain_state(char* s, int state);
 int add_transition(char *s, char *t, char *c, char *d);
 int add_file_transition(char *s, char *t, char *c, char *d, char* filename);
 int add_typeattribute(char *domainS, char *attr);
 int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
+
+extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
 
 #endif
