@@ -73,6 +73,7 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "su_device", "dir", "read");
 	sepol_allow(target, "su_device", "sock_file", "read");
 	sepol_allow(target, "su_device", "sock_file", "write");
+	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow("su", target, "fd", "use");
 	sepol_allow("su", target, "fifo_file", ALL);
 }
@@ -85,6 +86,7 @@ void suRights() {
 	sepol_allow("servicemanager", "su", "process", "getattr");
 	sepol_allow("servicemanager", "su", "binder", "transfer");
 	sepol_allow("system_server", "su", "binder", "call");
+	sepol_allow("system_server", "su", "fd", "use");
 
 	sepol_allow("su", "servicemanager", "dir", "search");
 	sepol_allow("su", "servicemanager", "dir", "read");
@@ -229,6 +231,8 @@ void sepol_med_rules() {
 		allowSuClient("priv_app");
 	if (sepol_exists("ssd_tool"))
 		allowSuClient("ssd_tool");
+	if (sepol_exists("untrusted_app_25"))
+		allowSuClient("untrusted_app_25");
 
 	suRights();
 	otherToSU();
