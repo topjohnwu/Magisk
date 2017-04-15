@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -45,6 +46,15 @@ static void request_handler(int client) {
 	case CHECK_VERSION_CODE:
 		write_int(client, VERSION_CODE);
 		close(client);
+		break;
+	case POST_FS:
+		// TODO: post-fs
+		break;
+	case POST_FS_DATA:
+		// TODO: post-fs-data
+		break;
+	case LATE_START_SERVICE:
+		// TODO: late_start service
 		break;
 	case TEST:
 		s = read_string(client);
@@ -106,6 +116,11 @@ void start_daemon() {
 
 	// Unlock all blocks for rw
 	unlock_blocks();
+
+	// Setup links under /sbin
+	mount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	create_links(NULL, "/sbin");
+	mount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	// Loop forever to listen to requests
 	while(1) {

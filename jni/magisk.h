@@ -62,18 +62,4 @@ int resetprop_main(int argc, char *argv[]);
 }
 #endif
 
-/**************
- * MagiskHide *
- **************/
-
-void launch_magiskhide(int client);
-void stop_magiskhide(int client);
-
-/*************
- * Superuser *
- *************/
-
-void su_daemon_receiver(int client);
-
-
 #endif
