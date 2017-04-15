@@ -1,5 +1,7 @@
-#include "vector.h"
-#include "magiskpolicy.h"
+/* magiskpolicy.c - Main function for policy patching
+ *
+ * Includes all the parsing logic for the policy statements
+ */
 
 #ifdef INDEP_BINARY
 int magiskpolicy_main(int argc, char *argv[]);
@@ -9,6 +11,9 @@ int main(int argc, char *argv[]) {
 #else
 #include "magisk.h"
 #endif
+
+#include "magiskpolicy.h"
+#include "sepolicy.h"
 
 static int syntax_err = 0;
 static char err_msg[ARG_MAX];
@@ -112,19 +117,19 @@ static int parse_pattern_1(int action, char* statement) {
 			for (int k = 0; k < permission.size; ++k)
 				switch (action) {
 					case 0:
-						if (allow(source.data[i], target.data[j], class, permission.data[k]))
+						if (sepol_allow(source.data[i], target.data[j], class, permission.data[k]))
 							fprintf(stderr, "Error in: allow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 1:
-						if (deny(source.data[i], target.data[j], class, permission.data[k]))
+						if (sepol_deny(source.data[i], target.data[j], class, permission.data[k]))
 							fprintf(stderr, "Error in: deny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 2:
-						if (auditallow(source.data[i], target.data[j], class, permission.data[k]))
+						if (sepol_auditallow(source.data[i], target.data[j], class, permission.data[k]))
 							fprintf(stderr, "Error in: auditallow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					case 3:
-						if (auditdeny(source.data[i], target.data[j], class, permission.data[k]))
+						if (sepol_auditdeny(source.data[i], target.data[j], class, permission.data[k]))
 							fprintf(stderr, "Error in: auditdeny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
 						break;
 					default:
@@ -181,7 +186,7 @@ static int parse_pattern_2(int action, char* statement) {
 		for (int j = 0; j < attribute.size; ++j)
 			switch (action) {
 				case 0:
-					if (attradd(class.data[i], attribute.data[j]))
+					if (sepol_attradd(class.data[i], attribute.data[j]))
 						fprintf(stderr, "Error in: attradd %s %s\n", class.data[i], attribute.data[j]);
 					break;
 				default:
@@ -206,15 +211,15 @@ static int parse_pattern_3(int action, char* statement) {
 	for (int i = 0; i < classes.size; ++i) {
 		switch (action) {
 			case 0:
-				if (create(classes.data[i]))
+				if (sepol_create(classes.data[i]))
 					fprintf(stderr, "Domain %s already exists\n", classes.data[i]);
 				break;
 			case 1:
-				if (permissive(classes.data[i]))
+				if (sepol_permissive(classes.data[i]))
 					fprintf(stderr, "Error in: permissive %s\n", classes.data[i]);
 				break;
 			case 2:
-				if (enforce(classes.data[i]))
+				if (sepol_enforce(classes.data[i]))
 					fprintf(stderr, "Error in: enforce %s\n", classes.data[i]);
 				break;
 		}
@@ -253,7 +258,7 @@ static int parse_pattern_4(int action, char* statement) {
 		++state;
 	}
 	if (state < 4) return 1;
-	if (typetrans(source, target, class, def, filename))
+	if (sepol_typetrans(source, target, class, def, filename))
 		fprintf(stderr, "Error in: typetrans %s %s %s %s %s\n", source, target, class, def, filename ? filename : "");
 	return 0;
 }
@@ -313,8 +318,8 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	if (policydb_load_isids(&policydb, &sidtab))
 		return 1;
 
-	if (full) full_rules();
-	else if (minimal) min_rules();
+	if (full) sepol_full_rules();
+	else if (minimal) sepol_min_rules();
 
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages
