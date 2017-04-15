@@ -4,6 +4,9 @@
 #ifndef _DAEMON_H_
 #define _DAEMON_H_
 
+#include <pthread.h>
+
+extern pthread_t sepol_patch;
 
 // Commands require connecting to daemon
 typedef enum {
@@ -16,7 +19,7 @@ typedef enum {
 	CHECK_VERSION_CODE,
 	POST_FS,
 	POST_FS_DATA,
-	LATE_START_SERVICE,
+	LATE_START,
 	TEST
 } client_request;
 
@@ -38,6 +41,13 @@ void write_string(int fd, const char* val);
 
 void monitor_logs();
 
+/***************
+ * Boot Stages *
+ ***************/
+
+void post_fs(int client);
+void post_fs_data(int client);
+void late_start(int client);
 
 /**************
  * MagiskHide *

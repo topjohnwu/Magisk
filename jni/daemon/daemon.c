@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <pthread.h>
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -18,6 +19,9 @@
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
+#include "magiskpolicy.h"
+
+pthread_t sepol_patch;
 
 static void request_handler(int client) {
 	client_request req = read_int(client);
@@ -48,13 +52,13 @@ static void request_handler(int client) {
 		close(client);
 		break;
 	case POST_FS:
-		// TODO: post-fs
+		post_fs(client);
 		break;
 	case POST_FS_DATA:
-		// TODO: post-fs-data
+		post_fs_data(client);
 		break;
-	case LATE_START_SERVICE:
-		// TODO: late_start service
+	case LATE_START:
+		late_start(client);
 		break;
 	case TEST:
 		s = read_string(client);
@@ -82,6 +86,16 @@ static int setup_socket(struct sockaddr_un *sun) {
 
 static void do_nothing() {}
 
+static void *large_sepol_patch(void *args) {
+	LOGD("sepol: Starting large patch thread\n");
+	// Patch su to everything
+	sepol_allow("su", ALL, ALL, ALL);
+	dump_policydb("/sys/fs/selinux/load");
+	LOGD("sepol: Large patch done\n");
+	destroy_policydb();
+	return NULL;
+}
+
 void start_daemon() {
 	// Launch the daemon, create new session, set proper context
 	if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
@@ -99,6 +113,14 @@ void start_daemon() {
 	xsetsid();
 	xsetcon("u:r:su:s0");
 
+	// Patch selinux with medium patch, blocking
+	load_policydb("/sys/fs/selinux/policy");
+	sepol_med_rules();
+	dump_policydb("/sys/fs/selinux/load");
+
+	// Continue the larger patch in another thread, will join later
+	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
+
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
 	
@@ -114,12 +136,15 @@ void start_daemon() {
 	// Start log monitor
 	monitor_logs();
 
+	LOGI("Magisk v" xstr(VERSION) " daemon started\n");
+
 	// Unlock all blocks for rw
 	unlock_blocks();
 
 	// Setup links under /sbin
 	mount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
+	chmod("/sbin", 0755);
 	mount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	// Loop forever to listen to requests
