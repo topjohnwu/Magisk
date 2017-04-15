@@ -19,6 +19,7 @@
 
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
+static FILE *p;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
@@ -43,6 +44,7 @@ static void quit_pthread(int sig) {
 	hide_list = new_list = NULL;
 	isEnabled = 0;
 	LOGD("proc_monitor: terminating...\n");
+	pclose(p);
 	pthread_exit(NULL);
 }
 
@@ -72,7 +74,6 @@ void *proc_monitor(void *args) {
 
 	int pid;
 	char buffer[512];
-	FILE *p;
 
 	// Get the mount namespace of init
 	read_namespace(1, init_ns, 32);
