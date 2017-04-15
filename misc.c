@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #include "magisk.h"
 #include "su.h"
@@ -52,3 +53,15 @@ char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
+int fork_zero_fucks() {
+	int pid = fork();
+	if (pid) {
+		int status;
+		waitpid(pid, &status, 0);
+		return pid;
+	} else {
+		if (fork() != 0)
+			exit(0);
+		return 0;
+	}
+}

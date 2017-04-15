@@ -20,31 +20,12 @@
 #include "su.h"
 #include "pts.h"
 
+// Constants for the atty bitfield
+#define ATTY_IN     1
+#define ATTY_OUT    2
+#define ATTY_ERR    4
+
 int from_uid, from_pid;
-
-struct su_daemon_info {
-	int child;
-	int client;
-};
-
-static void *wait_result(void *args) {
-	struct su_daemon_info *info = args;
-	LOGD("su: wait_result waiting for %d\n", info->child);
-	err_handler = exit_thread;
-	int status, code;
-
-	if (waitpid(info->child, &status, 0) > 0)
-		code = WEXITSTATUS(status);
-	else
-		code = -1;
-
-	// Pass the return code back to the client
-	write_int(info->client, code);
-	LOGD("su: return code to client: %d\n", code);
-	close(info->client);
-	free(info);
-	return NULL;
-}
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -71,27 +52,46 @@ static void sighandler(int sig) {
 
 void su_daemon_receiver(int client) {
 	LOGD("su: get request\n");
+
+	if (fork_zero_fucks()) {
+		// Root daemon
+		close(client);
+		return;
+	}
+
+	// Set the error handler back to normal
+	err_handler = exit_proc;
+
 	// Fork a new process, the child process will need to setsid,
 	// open a pseudo-terminal, and will eventually run exec
-	// The parent process (the root daemon) will open a new thread to
+	// The parent process will wait for the result and
 	// send the return code back to our client
 	int child = fork();
 	if (child < 0) {
-		PLOGE("fork");
 		write(client, &child, sizeof(child));
 		close(client);
+		PLOGE("fork");
 		return;
 	} else if (child != 0) {
-		pthread_t wait_thread;
 
-		struct su_daemon_info *info = xmalloc(sizeof(*info));
-		info->client = client;
-		info->child = child;
+		// Wait result
+		LOGD("su: wait_result waiting for %d\n", child);
+		int status, code;
 
-		// In parent, open a new thread to wait for the child to exit,
-		// and send the exit code across the wire.
-		xpthread_create(&wait_thread, NULL, wait_result, info);
-		return;
+		// Change to a fancy name
+		strcpy(argv0, "magisksu");
+
+		if (waitpid(child, &status, 0) > 0)
+			code = WEXITSTATUS(status);
+		else
+			code = -1;
+
+		// Pass the return code back to the client
+		write_int(client, code);
+		LOGD("su: return code to client: %d\n", code);
+		close(client);
+
+		exit(code);
 	}
 
 	LOGD("su: child process started\n");
@@ -99,9 +99,6 @@ void su_daemon_receiver(int client) {
 	// ack
 	write_int(client, 1);
 
-	// Here we're in the child
-	// Set the error handler back to normal
-	err_handler = exit_proc;
 	// Become session leader
 	xsetsid();
 
@@ -139,33 +136,50 @@ void su_daemon_receiver(int client) {
 	char *pts_slave = read_string(client);
 	LOGD("su: pts_slave=[%s]\n", pts_slave);
 
+	// The the FDs for each of the streams
+	int infd  = recv_fd(client);
+	int outfd = recv_fd(client);
+	int errfd = recv_fd(client);
+
 	// We no longer need the access to socket in the child, close it
 	close(client);
 
-	//Check pts_slave file is owned by daemon_from_uid
-	int ptsfd;
-	struct stat stbuf;
-	int res = xstat(pts_slave, &stbuf);
+	if (pts_slave[0]) {
+		//Check pts_slave file is owned by daemon_from_uid
+		struct stat stbuf;
+		xstat(pts_slave, &stbuf);
 
-	//If caller is not root, ensure the owner of pts_slave is the caller
-	if(stbuf.st_uid != credentials.uid && credentials.uid != 0) {
-		LOGE("Wrong permission of pts_slave");
-		exit(1);
+		//If caller is not root, ensure the owner of pts_slave is the caller
+		if(stbuf.st_uid != credentials.uid && credentials.uid != 0) {
+			LOGE("su: Wrong permission of pts_slave");
+			exit(1);
+		}
+
+		// Opening the TTY has to occur after the
+		// fork() and setsid() so that it becomes
+		// our controlling TTY and not the daemon's
+		int ptsfd = xopen(pts_slave, O_RDWR);
+
+		if (infd < 0)  {
+			LOGD("su: stdin using PTY");
+			infd  = ptsfd;
+		}
+		if (outfd < 0) {
+			LOGD("su: stdout using PTY");
+			outfd = ptsfd;
+		}
+		if (errfd < 0) {
+			LOGD("su: stderr using PTY");
+			errfd = ptsfd;
+		}
 	}
-
-	// Opening the TTY has to occur after the
-	// fork() and setsid() so that it becomes
-	// our controlling TTY and not the daemon's
-	ptsfd = xopen(pts_slave, O_RDWR);
 
 	free(pts_slave);
 
 	// Swap out stdin, stdout, stderr
-	xdup2(ptsfd, STDIN_FILENO);
-	xdup2(ptsfd, STDOUT_FILENO);
-	xdup2(ptsfd, STDERR_FILENO);
-
-	close(ptsfd);
+	xdup2(infd, STDIN_FILENO);
+	xdup2(outfd, STDOUT_FILENO);
+	xdup2(errfd, STDERR_FILENO);
 
 	su_daemon_main(argc, argv);
 }
@@ -195,19 +209,59 @@ int su_client_main(int argc, char *argv[]) {
 	getcwd(buffer, sizeof(buffer));
 	write_string(socketfd, buffer);
 
-	// We need a PTY. Get one.
-	ptmx = pts_open(buffer, sizeof(buffer));
-	watch_sigwinch_async(STDOUT_FILENO, ptmx);
+	// Determine which one of our streams are attached to a TTY
+	int atty = 0;
+	if (isatty(STDIN_FILENO))  atty |= ATTY_IN;
+	if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
+	if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
 
-	// Send the slave path to the daemon
+	if (atty) {
+		// We need a PTY. Get one.
+		ptmx = pts_open(buffer, sizeof(buffer));
+	} else {
+		buffer[0] = '\0';
+	}
+
+	// Send the pts_slave path to the daemon
 	write_string(socketfd, buffer);
+
+	// Send stdin
+	if (atty & ATTY_IN) {
+		// Using PTY
+		send_fd(socketfd, -1);
+	} else {
+		send_fd(socketfd, STDIN_FILENO);
+	}
+
+	// Send stdout
+	if (atty & ATTY_OUT) {
+		// Forward SIGWINCH
+		watch_sigwinch_async(STDOUT_FILENO, ptmx);
+
+		// Using PTY
+		send_fd(socketfd, -1);
+	} else {
+		send_fd(socketfd, STDOUT_FILENO);
+	}
+
+	// Send stderr
+	if (atty & ATTY_ERR) {
+		// Using PTY
+		send_fd(socketfd, -1);
+	} else {
+		send_fd(socketfd, STDERR_FILENO);
+	}
 
 	// Wait for acknowledgement from daemon
 	read_int(socketfd);
 
-	setup_sighandlers(sighandler);
-	pump_stdin_async(ptmx);
-	pump_stdout_blocking(ptmx);
+	if (atty & ATTY_IN) {
+		setup_sighandlers(sighandler);
+		pump_stdin_async(ptmx);
+	}
+	if (atty & ATTY_OUT) {
+		pump_stdout_blocking(ptmx);
+	}
 
 	// Get the exit code
 	int code = read_int(socketfd);

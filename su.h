@@ -130,5 +130,6 @@ policy_t database_check(struct su_context *ctx);
 void setup_sighandlers(void (*handler)(int));
 void set_identity(unsigned uid);
 char *get_command(const struct su_request *to);
+int fork_zero_fucks();
 
 #endif
