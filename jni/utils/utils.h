@@ -61,5 +61,6 @@ ssize_t fdreadline(int fd, char *buf, size_t size);
 void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
+void unlock_blocks();
 
 #endif

@@ -104,6 +104,9 @@ void start_daemon() {
 	// Start log monitor
 	monitor_logs();
 
+	// Unlock all blocks for rw
+	unlock_blocks();
+
 	// Loop forever to listen to requests
 	while(1) {
 		request_handler(xaccept(fd, NULL, NULL));
