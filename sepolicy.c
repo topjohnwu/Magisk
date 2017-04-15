@@ -185,6 +185,7 @@ int load_policydb(const char *filename) {
 		return 1;
 	}
 
+	munmap(map, sb.st_size);
 	close(fd);
 
 	return 0;
