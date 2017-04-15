@@ -135,3 +135,18 @@ void ps_filter_proc_name(const char *pattern, void (*func)(int)) {
 	ps_filter_pattern = ((pattern == NULL) ? "" : pattern);
 	ps(proc_name_filter);
 }
+
+int create_links(const char *bin, const char *path) {
+	char self[PATH_MAX], linkpath[PATH_MAX];
+	if (bin == NULL) {
+		xreadlink("/proc/self/exe", self, PATH_MAX);
+		bin = self;
+	}
+	int ret = 0;
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(linkpath, PATH_MAX, "%s/%s", path, applet[i]);
+		unlink(linkpath);
+		ret |= symlink(bin, linkpath);
+	}
+	return ret;
+}

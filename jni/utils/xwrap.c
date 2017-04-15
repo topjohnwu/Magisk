@@ -226,4 +226,22 @@ int xdup2(int oldfd, int newfd) {
 	return ret;
 }
 
+ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
+	ssize_t ret = readlink(pathname, buf, bufsiz);
+	if (ret == -1) {
+		PLOGE("readlink %s", pathname);
+	} else {
+		buf[ret] = '\0';
+	}
+	return ret;
+}
+
+int xsymlink(const char *target, const char *linkpath) {
+	int ret = symlink(target, linkpath);
+	if (ret == -1) {
+		PLOGE("symlink %s->%s", target, linkpath);
+	}
+	return ret;
+}
+
 
