@@ -46,6 +46,8 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 int xsocketpair(int domain, int type, int protocol, int sv[2]);
 int xstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
+ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
+int xsymlink(const char *target, const char *linkpath);
 
 // misc.c
 
@@ -58,5 +60,6 @@ int isNum(const char *s);
 ssize_t fdreadline(int fd, char *buf, size_t size);
 void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
+int create_links(const char *bin, const char *path);
 
 #endif

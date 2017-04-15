@@ -46,6 +46,9 @@ static inline void stub(const char *fmt, ...) {}
 
 extern char *argv0;     /* For changing process name */
 
+extern char *applet[];
+extern int (*applet_main[]) (int, char *[]);
+
 // Multi-call entrypoints
 int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
