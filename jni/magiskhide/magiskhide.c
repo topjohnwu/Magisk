@@ -17,7 +17,7 @@
 #include "magiskhide.h"
 #include "daemon.h"
 
-int sv[2], hide_pid;
+int sv[2], hide_pid = -1;
 struct vector *hide_list, *new_list;
 
 int isEnabled = 0;
@@ -88,6 +88,13 @@ void launch_magiskhide(int client) {
 error:
 	write_int(client, 1);
 	close(client);
+	if (hide_pid != -1) {
+		int kill = -1;
+		// Kill hide daemon
+		write(sv[0], &kill, sizeof(kill));
+		close(sv[0]);
+		waitpid(hide_pid, NULL, 0);
+	}
 	return;
 }
 
