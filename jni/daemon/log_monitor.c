@@ -16,7 +16,8 @@
 static void *logger_thread(void *args) {
 	char buffer[PATH_MAX];
 	// rename("/cache/magisk.log", "/cache/last_magisk.log");
-	FILE *logfile = xfopen("/cache/magisk_test.log", "w");
+	// FILE *logfile = xfopen("/cache/magisk_test.log", "w");
+	FILE *logfile = xfopen("/cache/magisk.log", "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat

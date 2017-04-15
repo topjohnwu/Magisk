@@ -178,3 +178,8 @@ void unlock_blocks() {
 
 	closedir(dir);
 }
+
+void unblock_boot_process() {
+	int fd = open("/dev/.magisk.unblock", O_RDONLY | O_CREAT);
+	close(fd);
+}

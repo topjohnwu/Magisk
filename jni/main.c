@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
 	err_handler = exit_proc;
 	char * arg = strrchr(argv[0], '/');
 	if (arg) ++arg;
+	else arg = argv[0];
 	if (strcmp(arg, "magisk") == 0) {
 		if (argc < 2) usage();
 		if (strcmp(argv[1], "-v") == 0) {
@@ -78,14 +79,17 @@ int main(int argc, char *argv[]) {
 				printf("%s\n", applet[i]);
 			return 0;
 		} else if (strcmp(argv[1], "--post-fs") == 0) {
-			// TODO: post-fs mode
-			return 0;
+			int fd = connect_daemon();
+			write_int(fd, POST_FS);
+			return read_int(fd);
 		} else if (strcmp(argv[1], "--post-fs-data") == 0) {
-			// TODO: post-fs-data mode
-			return 0;
+			int fd = connect_daemon();
+			write_int(fd, POST_FS_DATA);
+			return read_int(fd);
 		} else if (strcmp(argv[1], "--service") == 0) {
-			// TODO: late_start service mode
-			return 0;
+			int fd = connect_daemon();
+			write_int(fd, LATE_START);
+			return read_int(fd);
 		} else if (strcmp(argv[1], "--test") == 0) {
 			// Temporary testing entry
 			int fd = connect_daemon();

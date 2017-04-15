@@ -9,6 +9,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/utils \
 	$(LOCAL_PATH)/daemon \
 	$(LOCAL_PATH)/resetprop \
+	$(LOCAL_PATH)/magiskpolicy \
 	$(LOCAL_PATH)/selinux/libselinux/include \
 	$(LOCAL_PATH)/selinux/libsepol/include \
 	$(LOCAL_PATH)/sqlite3
@@ -21,13 +22,16 @@ LOCAL_SRC_FILES := \
 	daemon/daemon.c \
 	daemon/socket_trans.c \
 	daemon/log_monitor.c \
+	daemon/post_fs.c \
+	daemon/post_fs_data.c \
+	daemon/late_start.c \
 	magiskhide/magiskhide.c \
 	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
-	magiskpolicy/utils.c \
+	magiskpolicy/api.c \
 	resetprop/resetprop.cpp \
 	resetprop/libc_logging.cpp \
 	resetprop/system_properties.cpp \
@@ -58,4 +62,4 @@ include jni/sqlite3/Android.mk
 # include jni/magiskpolicy/Android.mk
 
 # Build magiskboot
-# include jni/magiskboot/Android.mk
+include jni/magiskboot/Android.mk
