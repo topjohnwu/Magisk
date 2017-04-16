@@ -311,6 +311,36 @@ int su_daemon_main(int argc, char **argv) {
 		optind++;
 	}
 
+	// The su_context setup is done, now every error leads to deny
+	err_handler = deny;
+
+	// It's in multiuser mode
+	if (ctx.from.uid > 99999) {
+		ctx.user.android_user_id = ctx.from.uid / 100000;
+		if (ctx.user.multiuser_mode == MULTIUSER_MODE_USER) {
+			snprintf(ctx.user.database_path, PATH_MAX, "%s/%d/%s",
+				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR_DATABASE_PATH);
+			snprintf(ctx.user.base_path, PATH_MAX, "%s/%d/%s",
+				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR);
+		}
+	}
+
+	// verify superuser is installed
+	xstat(ctx.user.base_path, &st);
+
+	// odd perms on superuser data dir
+	if (st.st_gid != st.st_uid) {
+		LOGE("Bad uid/gid %d/%d for Superuser Requestor application",
+				(int)st.st_uid, (int)st.st_gid);
+		deny();
+	}
+
+	// always allow if this is the superuser uid
+	// superuser needs to be able to reenable itself when disabled...
+	if (ctx.from.uid == st.st_uid) {
+		allow();
+	}
+
 	// Check property of root configuration
 	char *root_prop = getprop(ROOT_ACCESS_PROP);
 	if (root_prop) {
@@ -335,38 +365,8 @@ int su_daemon_main(int argc, char **argv) {
 	}
 	free(root_prop);
 
-	// The su_context setup is done, now every error leads to deny
-	err_handler = deny;
-
-	// It's in multiuser mode
-	if (ctx.from.uid > 99999) {
-		ctx.user.android_user_id = ctx.from.uid / 100000;
-		if (ctx.user.multiuser_mode == MULTIUSER_MODE_USER) {
-			snprintf(ctx.user.database_path, PATH_MAX, "%s/%d/%s",
-				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR_DATABASE_PATH);
-			snprintf(ctx.user.base_path, PATH_MAX, "%s/%d/%s",
-				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR);
-		}
-	}
-
 	// Allow root to start root
 	if (ctx.from.uid == UID_ROOT) {
-		allow();
-	}
-
-	// verify superuser is installed
-	xstat(ctx.user.base_path, &st);
-
-	// odd perms on superuser data dir
-	if (st.st_gid != st.st_uid) {
-		LOGE("Bad uid/gid %d/%d for Superuser Requestor application",
-				(int)st.st_uid, (int)st.st_gid);
-		deny();
-	}
-
-	// always allow if this is the superuser uid
-	// superuser needs to be able to reenable itself when disabled...
-	if (ctx.from.uid == st.st_uid) {
 		allow();
 	}
 
