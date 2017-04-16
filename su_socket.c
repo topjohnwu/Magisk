@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <endian.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
