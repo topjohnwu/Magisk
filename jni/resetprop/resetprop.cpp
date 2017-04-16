@@ -80,7 +80,6 @@ int main(int argc, char *argv[]) {
 static int verbose = 0;
 
 static bool is_legal_property_name(const char* name, size_t namelen) {
-    if (namelen >= PROP_NAME_MAX) return false;
     if (namelen < 1) return false;
     if (name[0] == '.') return false;
     if (name[namelen - 1] == '.') return false;
@@ -126,14 +125,20 @@ int init_resetprop() {
     return 0;
 }
 
+static void read_prop_info(void* cookie, const char *name, const char *value, uint32_t serial) {
+    strcpy((char *) cookie, value);
+}
+
 // Get prop by name, return string (should free manually!)
 char *getprop(const char *name) {
-    char value[PROP_VALUE_MAX];
-    LOGD("restprop: getprop [%s]\n", name);
-    if (__system_property_get(name, value) == 0) {
+    const prop_info *pi = __system_property_find(name);
+    if (pi == NULL) {
         LOGE("resetprop: prop not found: [%s]\n", name);
         return NULL;
     }
+    char value[PROP_VALUE_MAX];
+    __system_property_read_callback(pi, read_prop_info, value);
+    LOGD("resetprop: getprop [%s]: [%s]\n", name, value);
     return strdup(value);
 }
 
@@ -146,7 +151,6 @@ int setprop2(const char *name, const char *value, int trigger) {
     
     char *check = getprop(name);
     if (check) {
-        LOGD("resetprop: prop [%s] has existing value [%s]\n", name, value);
         free(check);
         if (trigger) {
             if (!strncmp(name, "ro.", 3)) deleteprop(name);
