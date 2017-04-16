@@ -23,6 +23,10 @@
 
 #define LOG_TAG    "Magisk"
 
+#ifndef ARG_MAX
+#define ARG_MAX 4096
+#endif
+
 // Global handler for PLOGE
 extern __thread void (*err_handler)(void);
 
