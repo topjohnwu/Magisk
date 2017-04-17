@@ -191,10 +191,6 @@ void sepol_min_rules() {
 	sepol_allow("su", "su", "fifo_file", ALL);
 	sepol_allow("su", "su", "lnk_file", ALL);
 	sepol_allow("su", "su", "dir", ALL);
-
-	// Autotransition su socket to su_device
-	sepol_typetrans("su", "device", "file", "su_device", NULL);
-	sepol_typetrans("su", "device", "dir", "su_device", NULL);
 	sepol_allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// For sepolicy live patching
