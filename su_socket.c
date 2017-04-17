@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -39,6 +40,9 @@ int socket_create_temp(char *path, size_t len) {
 
     xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
     xlisten(fd, 1);
+
+    // Set context to su_device, so apps can access it
+    setfilecon(sun.sun_path, "u:object_r:su_device:s0");
 
     return fd;
 }
