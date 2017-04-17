@@ -19,13 +19,11 @@
 
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
-static FILE *p;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
 	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
-	ssize_t len = readlink(path, target, size);
-	target[len] = '\0';
+	xreadlink(path, target, size);
 }
 
 // Workaround for the lack of pthread_cancel
@@ -44,7 +42,6 @@ static void quit_pthread(int sig) {
 	hide_list = new_list = NULL;
 	isEnabled = 0;
 	LOGD("proc_monitor: terminating...\n");
-	pclose(p);
 	pthread_exit(NULL);
 }
 
@@ -80,7 +77,11 @@ void *proc_monitor(void *args) {
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
 	// Get the mount namespace of zygote
-	ps_filter_proc_name("zygote", store_zygote_ns);
+	while(!zygote_num) {
+		// Check zygote every 2 secs
+		sleep(2);
+		ps_filter_proc_name("zygote", store_zygote_ns);
+	}
 
 	switch(zygote_num) {
 	case 1:
@@ -92,7 +93,7 @@ void *proc_monitor(void *args) {
 	}
 
 	// Monitor am_proc_start (the command shall never end)
-	p = popen("while true; do logcat -b events -c; logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
+	FILE *p = popen("while true; do logcat -b events -c; logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
 
 	while(fgets(buffer, sizeof(buffer), p)) {
 		int ret, comma = 0;
@@ -130,7 +131,7 @@ void *proc_monitor(void *args) {
 					ret = 1;
 					for (int i = 0; i < zygote_num; ++i) {
 						if (strcmp(buffer, zygote_ns[i]) == 0) {
-							usleep(500);
+							usleep(50);
 							ret = 0;
 							break;
 						}

@@ -286,39 +286,36 @@ fi
 
 # TODO: Magisk Image
 
-# # Fix SuperSU.....
-# $BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
+# Fix SuperSU.....
+$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
 
-# if (is_mounted /data); then
-#   IMG=/data/magisk.img
-# else
-#   IMG=/cache/magisk.img
-#   ui_print "- Data unavailable, use cache workaround"
-# fi
+if (is_mounted /data); then
+  IMG=/data/magisk.img
+else
+  IMG=/cache/magisk.img
+  ui_print "- Data unavailable, use cache workaround"
+fi
 
-# if [ -f $IMG ]; then
-#   ui_print "- $IMG detected!"
-# else
-#   ui_print "- Creating $IMG"
-#   make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
-# fi
+if [ -f $IMG ]; then
+  ui_print "- $IMG detected!"
+else
+  ui_print "- Creating $IMG"
+  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
+fi
 
-# mount_image $IMG /magisk
-# if (! is_mounted /magisk); then
-#   ui_print "! Magisk image mount failed..."
-#   exit 1
-# fi
-# MAGISKLOOP=$LOOPDEVICE
+mount_image $IMG /magisk
+if (! is_mounted /magisk); then
+  ui_print "! Magisk image mount failed..."
+  exit 1
+fi
+MAGISKLOOP=$LOOPDEVICE
 
-# # Core folders and scripts
-# mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-# cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
-# cp -af $BINDIR/resetprop $BINDIR/magiskhide $BINDIR/su $BINDIR/magiskpolicy $COREDIR/bin
-# # Legacy support
-# ln -sf $COREDIR/bin/resetprop $MAGISKBIN/resetprop
+# Core folders and scripts
+mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
 
-# chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-# chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
 
 ##########################################################################################
 # Unpack boot

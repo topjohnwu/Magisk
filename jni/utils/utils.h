@@ -18,6 +18,8 @@
 #define UID_SYSTEM (get_system_uid())
 #define UID_RADIO  (get_radio_uid())
 
+extern int quit_signals[];
+
 // xwrap.c
 
 FILE *xfopen(const char *pathname, const char *mode);
@@ -42,12 +44,18 @@ void *xrealloc(void *ptr, size_t size);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                          void *(*start_routine) (void *), void *arg);
+	void *(*start_routine) (void *), void *arg);
 int xsocketpair(int domain, int type, int protocol, int sv[2]);
 int xstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
 int xsymlink(const char *target, const char *linkpath);
+int xmount(const char *source, const char *target,
+	const char *filesystemtype, unsigned long mountflags,
+	const void *data);
+int xchmod(const char *pathname, mode_t mode);
+int xrename(const char *oldpath, const char *newpath);
+int xmkdir(const char *pathname, mode_t mode);
 
 // misc.c
 
@@ -63,5 +71,6 @@ void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
 void unlock_blocks();
 void unblock_boot_process();
+void setup_sighandlers(void (*handler)(int));
 
 #endif

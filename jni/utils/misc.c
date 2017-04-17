@@ -8,12 +8,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pwd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
 
 #include "magisk.h"
 #include "utils.h"
+
+int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -171,7 +174,7 @@ void unlock_blocks() {
 				continue;
 
 			if (ioctl(fd, BLKROSET, &OFF) == -1)
-				PLOGE("ioctl");
+				PLOGE("unlock %s", path);
 			close(fd);
 		}
 	}
@@ -182,4 +185,18 @@ void unlock_blocks() {
 void unblock_boot_process() {
 	int fd = open("/dev/.magisk.unblock", O_RDONLY | O_CREAT);
 	close(fd);
+}
+
+void setup_sighandlers(void (*handler)(int)) {
+	struct sigaction act;
+
+	// Install the termination handlers
+	// Note: we're assuming that none of these signal handlers are already trapped.
+	// If they are, we'll need to modify this code to save the previous handler and
+	// call it after we restore stdin to its previous state.
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = handler;
+	for (int i = 0; quit_signals[i]; ++i) {
+		sigaction(quit_signals[i], &act, NULL);
+	}
 }

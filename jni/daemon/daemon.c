@@ -83,7 +83,6 @@ static int setup_socket(struct sockaddr_un *sun) {
 	return fd;
 }
 
-
 static void do_nothing() {}
 
 static void *large_sepol_patch(void *args) {
@@ -142,10 +141,10 @@ void start_daemon() {
 	unlock_blocks();
 
 	// Setup links under /sbin
-	mount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
 	chmod("/sbin", 0755);
-	mount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	// Loop forever to listen to requests
 	while(1) {
@@ -157,14 +156,16 @@ void start_daemon() {
 int connect_daemon() {
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
+	// LOGD("client: trying to connect socket\n");
 	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
 		/* If we cannot access the daemon, we start the daemon
 		 * since there is no clear entry point when the daemon should be started
 		 */
+		LOGD("client: connect fail, try launching new daemon process\n");
 		start_daemon();
 		do {
 			// Wait for 10ms
-			usleep(10000);
+			usleep(10);
 		} while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)));
 	}
 	return fd;

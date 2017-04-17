@@ -15,6 +15,11 @@ int hide_daemon();
 // Process monitor
 void *proc_monitor(void *args);
 
+// Preprocess
+void manage_selinux();
+void hide_sensitive_props();
+void relink_sbin();
+
 extern int sv[2], hide_pid, isEnabled;
 extern struct vector *hide_list, *new_list;
 
