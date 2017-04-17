@@ -103,7 +103,6 @@ typedef enum {
 } policy_t;
 
 extern int from_uid, from_pid;
-extern int quit_signals[];
 
 // su.c
 
@@ -127,7 +126,6 @@ policy_t database_check(struct su_context *ctx);
 
 // misc.c
 
-void setup_sighandlers(void (*handler)(int));
 void set_identity(unsigned uid);
 char *get_command(const struct su_request *to);
 int fork_zero_fucks();

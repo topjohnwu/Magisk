@@ -13,22 +13,6 @@
 #include "magisk.h"
 #include "su.h"
 
-int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
-
-void setup_sighandlers(void (*handler)(int)) {
-	struct sigaction act;
-
-	// Install the termination handlers
-	// Note: we're assuming that none of these signal handlers are already trapped.
-	// If they are, we'll need to modify this code to save the previous handler and
-	// call it after we restore stdin to its previous state.
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = handler;
-	for (int i = 0; quit_signals[i]; ++i) {
-		sigaction(quit_signals[i], &act, NULL);
-	}
-}
-
 void set_identity(unsigned uid) {
 	/*
 	 * Set effective uid back to root, otherwise setres[ug]id will fail
