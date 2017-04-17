@@ -18,23 +18,7 @@
 #include "utils.h"
 #include "magiskhide.h"
 
-static int isMocked = 0, pid;
-
-static void manage_selinux() {
-	if (isMocked) return;
-	char val[1];
-	int fd = xopen(ENFORCE_FILE, O_RDONLY);
-	xxread(fd, val, 1);
-	close(fd);
-	// Permissive
-	if (val[0] == '0') {
-		LOGI("hide_daemon: Permissive detected, hide the state\n");
-
-		chmod(ENFORCE_FILE, 0640);
-		chmod(POLICY_FILE, 0440);
-		isMocked = 1;
-	}
-}
+static int pid;
 
 static void lazy_unmount(const char* mountpoint) {
 	if (umount2(mountpoint, MNT_DETACH) != -1)
@@ -87,6 +71,9 @@ int hide_daemon() {
 			_exit(0);
 		}
 
+		manage_selinux();
+		relink_sbin();
+
 		snprintf(buffer, sizeof(buffer), "/proc/%d/ns/mnt", pid);
 		if(access(buffer, F_OK) == -1) continue; // Maybe process died..
 
@@ -94,8 +81,6 @@ int hide_daemon() {
 		// Switch to its namespace
 		xsetns(fd, 0);
 		close(fd);
-
-		manage_selinux();
 
 		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
 		fp = xfopen(buffer, "r");

@@ -1,5 +1,3 @@
 #!/system/bin/sh
 
-HIDELIST=/magisk/.core/magiskhide/hidelist
-
-cat $HIDELIST
+magiskhide --ls

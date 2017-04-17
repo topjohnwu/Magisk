@@ -4,9 +4,11 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "magisk.h"
 #include "daemon.h"
 
 void late_start(int client) {
+	LOGI("** late_start service mode running\n");
 	// ack
 	write_int(client, 0);
 	// TODO: Do something

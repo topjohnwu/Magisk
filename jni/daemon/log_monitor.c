@@ -15,14 +15,13 @@
 
 static void *logger_thread(void *args) {
 	char buffer[PATH_MAX];
-	// rename("/cache/magisk.log", "/cache/last_magisk.log");
-	// FILE *logfile = xfopen("/cache/magisk_test.log", "w");
+	xrename("/cache/magisk.log", "/cache/last_magisk.log");
 	FILE *logfile = xfopen("/cache/magisk.log", "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat
-	FILE *p = popen("logcat -s Magisk", "r");
-	while (fgets(buffer, sizeof(buffer), p)) {
+	FILE *log_monitor = popen("logcat -s Magisk -v time", "r");
+	while (fgets(buffer, sizeof(buffer), log_monitor)) {
 		fprintf(logfile, "%s", buffer);
 	}
 	return NULL;
@@ -30,6 +29,6 @@ static void *logger_thread(void *args) {
 
 /* Start a new thread to monitor logcat and dump to logfile */
 void monitor_logs() {
-	pthread_t log_monitor;
-	pthread_create(&log_monitor, NULL, logger_thread, NULL);
+	pthread_t log_monitor_thread;
+	pthread_create(&log_monitor_thread, NULL, logger_thread, NULL);
 }

@@ -52,6 +52,8 @@ void launch_magiskhide(int client) {
 
 	LOGI("* Starting MagiskHide\n");
 
+	hide_sensitive_props();
+
 	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
 		goto error;
 
@@ -94,6 +96,7 @@ error:
 		write(sv[0], &kill, sizeof(kill));
 		close(sv[0]);
 		waitpid(hide_pid, NULL, 0);
+		hide_pid = -1;
 	}
 	return;
 }

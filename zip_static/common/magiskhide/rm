@@ -1,14 +1,5 @@
 #!/system/bin/sh
 
-HIDELIST=/magisk/.core/magiskhide/hidelist
-PROCESS=$1
-TOOLPATH=/dev/busybox
+PROCESS="$1"
 
-if [ ! -z "$PROCESS" ]; then
-  cp -af $HIDELIST $HIDELIST.tmp
-  cat $HIDELIST.tmp | grep -v "^$PROCESS$" > $HIDELIST
-  rm -f $HIDELIST.tmp
-  set --
-  set `$TOOLPATH/ps -o pid,args | grep "$PROCESS" | grep -v grep` >/dev/null
-  [ ! -z "$1" ] && kill "$1"
-fi
+magiskhide --rm "$PROCESS"

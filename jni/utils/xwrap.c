@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mount.h>
 #include <selinux/selinux.h>
 
 #include "magisk.h"
@@ -232,6 +233,7 @@ ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
 		PLOGE("readlink %s", pathname);
 	} else {
 		buf[ret] = '\0';
+		++ret;
 	}
 	return ret;
 }
@@ -240,6 +242,40 @@ int xsymlink(const char *target, const char *linkpath) {
 	int ret = symlink(target, linkpath);
 	if (ret == -1) {
 		PLOGE("symlink %s->%s", target, linkpath);
+	}
+	return ret;
+}
+
+int xmount(const char *source, const char *target,
+	const char *filesystemtype, unsigned long mountflags,
+	const void *data) {
+	int ret = mount(source, target, filesystemtype, mountflags, data);
+	if (ret == -1) {
+		PLOGE("mount %s->%s", source, target);
+	}
+	return ret;
+}
+
+int xchmod(const char *pathname, mode_t mode) {
+	int ret = chmod(pathname, mode);
+	if (ret == -1) {
+		PLOGE("chmod %s %u", pathname, mode);
+	}
+	return ret;
+}
+
+int xrename(const char *oldpath, const char *newpath) {
+	int ret = rename(oldpath, newpath);
+	if (ret == -1) {
+		PLOGE("rename %s->%s", oldpath, newpath);
+	}
+	return ret;
+}
+
+int xmkdir(const char *pathname, mode_t mode) {
+	int ret = mkdir(pathname, mode);
+	if (ret == -1) {
+		PLOGE("mkdir %s %u", pathname, mode);
 	}
 	return ret;
 }

@@ -28,6 +28,7 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.c \
 	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \
+	magiskhide/pre_process.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
