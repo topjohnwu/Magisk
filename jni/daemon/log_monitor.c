@@ -20,8 +20,10 @@ static void *logger_thread(void *args) {
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat
-	FILE *log_monitor = popen("logcat -s Magisk -v time", "r");
-	while (fgets(buffer, sizeof(buffer), log_monitor)) {
+	char *const command[] = { "logcat", "-s", "Magisk", "-v", "time", NULL };
+	int fd;
+	run_command(&fd, "/system/bin/logcat", command);
+	while (fdgets(buffer, sizeof(buffer), fd)) {
 		fprintf(logfile, "%s", buffer);
 	}
 	return NULL;

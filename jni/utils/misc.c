@@ -81,19 +81,16 @@ int isNum(const char *s) {
 }
 
 /* Read a whole line from file descriptor */
-ssize_t fdreadline(int fd, char *buf, size_t size) {
+ssize_t fdgets(char *buf, const size_t size, int fd) {
 	ssize_t read = 0;
 	buf[0] = '\0';
-	while (xread(fd, buf + read, 1)) {
-		if (buf[read] == '\n')
+	while (xread(fd, buf + read, 1) && read < size - 1) {
+		if (buf[read] == '\0' || buf[read++] == '\n') {
 			buf[read] = '\0';
-		if (buf[read++] == '\0')
-			break;
-		if (read == size) {
-			buf[read - 1] = '\0';
 			break;
 		}
 	}
+	buf[size - 1] = '\0';
 	return read;
 }
 
@@ -121,11 +118,11 @@ static void proc_name_filter(int pid) {
 	char buf[64];
 	snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
 	int fd = xopen(buf, O_RDONLY);
-	if (fdreadline(fd, buf, sizeof(buf)) == 0) {
+	if (fdgets(buf, sizeof(buf), fd) == 0) {
 		snprintf(buf, sizeof(buf), "/proc/%d/comm", pid);
 		close(fd);
 		fd = xopen(buf, O_RDONLY);
-		fdreadline(fd, buf, sizeof(buf));
+		fdgets(buf, sizeof(buf), fd);
 	}
 	if (strstr(buf, ps_filter_pattern)) {
 		// printf("%d: %s\n", pid, buf);
@@ -189,14 +186,31 @@ void unblock_boot_process() {
 
 void setup_sighandlers(void (*handler)(int)) {
 	struct sigaction act;
-
-	// Install the termination handlers
-	// Note: we're assuming that none of these signal handlers are already trapped.
-	// If they are, we'll need to modify this code to save the previous handler and
-	// call it after we restore stdin to its previous state.
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = handler;
 	for (int i = 0; quit_signals[i]; ++i) {
 		sigaction(quit_signals[i], &act, NULL);
 	}
+}
+
+int run_command(int *fd, const char *path, char *const argv[]) {
+	int sv[2];
+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
+		return -1;
+	// We use sv[0], give them sv[1] for communication
+	*fd = sv[1];
+
+	int pid = fork();
+	if (pid != 0) {
+		close(sv[0]);
+		return pid;
+	}
+
+	close(sv[1]);
+	dup2(sv[0], STDIN_FILENO);
+	dup2(sv[0], STDOUT_FILENO);
+	dup2(sv[0], STDERR_FILENO);
+	execv(path, argv);
+	PLOGE("execv");
+	return -1;
 }

@@ -37,7 +37,7 @@ static char *loopsetup(const char *img) {
 char *mount_image(const char *img, const char *target) {
 	char *device = loopsetup(img);
 	if (device)
-		mount(device, target, "ext4", 0, NULL);
+		xmount(device, target, "ext4", 0, NULL);
 	return device;
 }
 

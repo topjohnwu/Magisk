@@ -65,12 +65,13 @@ unsigned get_radio_uid();
 int check_data();
 void file_to_vector(struct vector *v, FILE *fp);
 int isNum(const char *s);
-ssize_t fdreadline(int fd, char *buf, size_t size);
+ssize_t fdgets(char *buf, size_t size, int fd);
 void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
 void unlock_blocks();
 void unblock_boot_process();
 void setup_sighandlers(void (*handler)(int));
+int run_command(int *fd, const char *path, char *const argv[]);
 
 #endif
