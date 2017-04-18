@@ -44,11 +44,11 @@ static void request_handler(int client) {
 		su_daemon_receiver(client);
 		break;
 	case CHECK_VERSION:
-		write_string(client, VERSION_STR);
+		write_string(client, MAGISK_VER_STR);
 		close(client);
 		break;
 	case CHECK_VERSION_CODE:
-		write_int(client, VERSION_CODE);
+		write_int(client, MAGISK_VER_CODE);
 		close(client);
 		break;
 	case POST_FS:
