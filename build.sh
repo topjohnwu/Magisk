@@ -1,13 +1,15 @@
 #!/bin/bash
 
 usage() {
-  echo "$0 all <version name>"
+  echo "$0 all <version name> <version code>"
   echo -e "\tBuild binaries, zip, and sign Magisk"
   echo -e "\tThis is equlivant to first <build>, then <zip>"
   echo "$0 clean"
   echo -e "\tCleanup compiled / generated files"
-  echo "$0 build"
+  echo "$0 build <verison name> <version code>"
   echo -e "\tBuild the binaries with ndk"
+  echo "$0 debug"
+  echo -e "\tBuild the binaries with the debug flag on\n\tCall <zip> afterwards if you want to flash on device"
   echo "$0 zip <version name>"
   echo -e "\tZip and sign Magisk"
   echo "$0 uninstaller"
@@ -48,10 +50,10 @@ error() {
 
 build_bin() {
   echo "************************"
-  echo "* Building binaries"
+  echo "* Building: VERSION=$1 CODE=$2"
   echo "************************"
   [ -z `which ndk-build` ] && error "Please add ndk-build to PATH!"
-  ndk-build -j4 || error "Magisk binary tools build failed...."
+  ndk-build APP_CFLAGS="-DMAGISK_VERSION=$1 -DMAGISK_VER_CODE=$2 $DEBUG" -j${CPUNUM} || error "Magisk binary tools build failed...."
   echo "************************"
   echo "* Copying binaries"
   echo "************************"
@@ -150,21 +152,28 @@ sign_zip() {
 
 DIR="$(cd "$(dirname "$0")"; pwd)"
 cd "$DIR"
+DEBUG=
+CPUNUM=`getconf _NPROCESSORS_ONLN`
 
 case $1 in
   "all" )
-    [ -z "$2" ] && echo -e "! Missing version number\n" && usage
-    build_bin
+    [ -z "$2" -o -z "$3" ] && echo -e "! Missing version info\n" && usage
+    build_bin $2 $3
     zip_package $2
     ;;
   "clean" )
     cleanup
     ;;
   "build" )
-    build_bin
+    [ -z "$2" -o -z "$3" ] && echo -e "! Missing version info\n" && usage
+    build_bin $2 $3
+    ;;
+  "debug" )
+    DEBUG="-DDEBUG"
+    build_bin "VER_DEBUG" "99999"
     ;;
   "zip" )
-    [ -z "$2" ] && echo -e "! Missing version number\n" && usage
+    [ -z "$2" ] && echo -e "! Missing version info\n" && usage
     zip_package $2
     ;;
   "uninstaller" )

@@ -4,22 +4,25 @@ SET me=%~nx0
 SET parent=%~dp0
 SET tab=	
 SET OK=
+SET DEBUG=
 
 CD %parent%
 
-call :%~1 "%~2"
+call :%~1 "%~2" "%~3"
 IF NOT DEFINED OK CALL :usage
 
 EXIT /B %ERRORLEVEL%
-
 :usage
-  ECHO %me% all ^<version name^>
+  ECHO %me% all ^<version name^> ^<version code^>
   ECHO %tab%Build binaries, zip, and sign Magisk
   ECHO %tab%This is equlivant to first ^<build^>, then ^<zip^>
   ECHO %me% clean
   ECHO %tab%Cleanup compiled / generated files
-  ECHO %me% build
+  ECHO %me% build ^<version name^> ^<version code^>
   ECHO %tab%Build the binaries with ndk
+  ECHO %me% debug
+  ECHO %tab%Build the binaries with the debug flag on
+  ECHO %tab%Call ^<zip^> afterwards if you want to flash on device
   ECHO %me% zip ^<version name^>
   ECHO %tab%Zip and sign Magisk
   ECHO %me% uninstaller
@@ -29,18 +32,39 @@ EXIT /B %ERRORLEVEL%
 :all
   SET OK=y
   IF [%~1] == [] (
-    CALL :error "Missing version number"
+    CALL :error "Missing version info"
     CALL :usage
     EXIT /B %ERRORLEVEL%
   )
-  CALL :build
+  IF [%~2] == [] (
+    CALL :error "Missing version info"
+    CALL :usage
+    EXIT /B %ERRORLEVEL%
+  )
+  CALL :build "%~1" "%~2"
   CALL :zip "%~1"
+  EXIT /B %ERRORLEVEL%
+
+:debug
+  SET OK=y
+  SET DEBUG=-DDEBUG
+  CALL :build "VER_DEBUG" "99999"
   EXIT /B %ERRORLEVEL%
 
 :build
   SET OK=y
+  IF [%~1] == [] (
+    CALL :error "Missing version info"
+    CALL :usage
+    EXIT /B %ERRORLEVEL%
+  )
+  IF [%~2] == [] (
+    CALL :error "Missing version info"
+    CALL :usage
+    EXIT /B %ERRORLEVEL%
+  )
   ECHO ************************
-  ECHO * Building binaries
+  ECHO * Building: VERSION=%~1 CODE=%~2
   ECHO ************************
   FOR /F "tokens=* USEBACKQ" %%F IN (`where ndk-build`) DO (
     IF [%%F] == [] (
@@ -48,7 +72,7 @@ EXIT /B %ERRORLEVEL%
       EXIT /B 1
     )
   )
-  CALL ndk-build -j4 || CALL :error "Magisk binary tools build failed...."
+  CALL ndk-build APP_CFLAGS="-DMAGISK_VERSION=%~1 -DMAGISK_VER_CODE=%~2 %DEBUG%" -j%NUMBER_OF_PROCESSORS% || CALL :error "Magisk binary tools build failed...."
   IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Copying binaries
@@ -92,7 +116,7 @@ EXIT /B %ERRORLEVEL%
 :zip
   SET OK=y
   IF [%~1] == [] (
-    CALL :error "Missing version number"
+    CALL :error "Missing version info"
     CALL :usage
     EXIT /B %ERRORLEVEL%
   )
