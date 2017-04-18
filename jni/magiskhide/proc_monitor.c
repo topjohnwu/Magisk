@@ -19,6 +19,7 @@
 
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
+static int log_pid = 0, log_fd;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
@@ -41,11 +42,24 @@ static void quit_pthread(int sig) {
 	}
 	hide_list = new_list = NULL;
 	isEnabled = 0;
+	// Kill the logging if possible
+	if (log_pid) {
+		kill(log_pid, SIGTERM);
+		waitpid(log_pid, NULL, 0);
+		close(log_fd);
+		log_pid = 0;
+	}
+	int kill = -1;
+	// If process monitor dies, kill hide daemon too
+	write(sv[0], &kill, sizeof(kill));
+	close(sv[0]);
+	waitpid(hide_pid, NULL, 0);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
 }
 
 static void store_zygote_ns(int pid) {
+	if (zygote_num == 2) return;
 	do {
 		usleep(500);
 		read_namespace(pid, zygote_ns[zygote_num], 32);
@@ -55,11 +69,6 @@ static void store_zygote_ns(int pid) {
 
 static void proc_monitor_err() {
 	LOGD("proc_monitor: error occured, stopping magiskhide services\n");
-	int kill = -1;
-	// If process monitor dies, kill hide daemon too
-	write(sv[0], &kill, sizeof(kill));
-	close(sv[0]);
-	waitpid(hide_pid, NULL, 0);
 	quit_pthread(SIGUSR1);
 }
 
@@ -92,10 +101,12 @@ void *proc_monitor(void *args) {
 		break;
 	}
 
-	// Monitor am_proc_start (the command shall never end)
-	FILE *p = popen("while true; do logcat -b events -c; logcat -b events -v raw -s am_proc_start; sleep 1; done", "r");
+	// Monitor am_proc_start
+	system("logcat -b events -c");
+	char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
+	log_pid = run_command(&log_fd, "/system/bin/logcat", command);
 
-	while(fgets(buffer, sizeof(buffer), p)) {
+	while(fdgets(buffer, sizeof(buffer), log_fd)) {
 		int ret, comma = 0;
 		char *pos = buffer, *line, processName[256];
 		struct vector *temp = NULL;
@@ -167,7 +178,6 @@ void *proc_monitor(void *args) {
 	}
 
 	// Should never be here
-	pclose(p);
-	pthread_exit(NULL);
+	quit_pthread(SIGUSR1);
 	return NULL;
 }

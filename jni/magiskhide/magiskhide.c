@@ -41,10 +41,8 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
-	if (isEnabled) {
-		write_int(client, 0);
-		return;
-	}
+	if (isEnabled)
+		goto success;
 	/*
 	 * The setns system call do not support multithread processes
 	 * We have to fork a new process, and communicate with pipe
@@ -84,6 +82,7 @@ void launch_magiskhide(int client) {
 		goto error;
 
 	isEnabled = 1;
+success:
 	write_int(client, 0);
 	close(client);
 	return;
@@ -107,12 +106,6 @@ void stop_magiskhide(int client) {
 
 	LOGI("* Stopping MagiskHide\n");
 
-	int kill = -1;
-	// Terminate hide daemon
-	write(sv[0], &kill, sizeof(kill));
-	close(sv[0]);
-	waitpid(hide_pid, NULL, 0);
-	// Stop process monitor
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 	pthread_join(proc_monitor_thread, NULL);
 
