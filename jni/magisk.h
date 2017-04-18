@@ -10,10 +10,13 @@
 #include <pthread.h>
 #include <android/log.h>
 
-
-#define VERSION_CODE 130
-#define VERSION      13.0
-#define VERSION_STR  xstr(VERSION) ":MAGISK"
+#ifndef MAGISK_VER_CODE
+#define MAGISK_VER_CODE 99999
+#endif
+#ifndef MAGISK_VERSION
+#define MAGISK_VERSION  VER_DEBUG
+#endif
+#define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
 
 #define str(a) #a
 #define xstr(a) str(a)

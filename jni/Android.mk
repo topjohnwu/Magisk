@@ -44,7 +44,7 @@ LOCAL_SRC_FILES := \
 	su/su_client.c \
 	su/su_socket.c
 
-LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DDEBUG
+LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
 LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)

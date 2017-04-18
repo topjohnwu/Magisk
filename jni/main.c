@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 	if (strcmp(arg, "magisk") == 0) {
 		if (argc < 2) usage();
 		if (strcmp(argv[1], "-v") == 0) {
-			printf("Client: %s\n", VERSION_STR);
+			printf("Client: %s\n", MAGISK_VER_STR);
 			int fd = connect_daemon();
 			write_int(fd, CHECK_VERSION);
 			char *v = read_string(fd);
