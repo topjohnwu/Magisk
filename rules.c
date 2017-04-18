@@ -73,7 +73,7 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "su_device", "dir", "read");
 	sepol_allow(target, "su_device", "sock_file", "read");
 	sepol_allow(target, "su_device", "sock_file", "write");
-	sepol_allow(target, "devpts", "chr_file", "ioctl");
+	sepol_allow(target, "devpts", "chr_file", ALL);
 	sepol_allow("su", target, "fd", "use");
 	sepol_allow("su", target, "fifo_file", ALL);
 }
@@ -167,12 +167,19 @@ void sepol_min_rules() {
 	if(sepol_exists("knox_system_app"))
 		samsung();
 
-	// Shell, prop management, simple su rights
+	// Shell, prop management, simple su rights, logs
 	sepol_allow("su", "property_socket", "sock_file", "write");
-	if (sepol_exists("default_prop"))
+	if (sepol_exists("default_prop")) {
 		sepol_allow("su", "default_prop", "property_service", "set");
+		sepol_allow("su", "default_prop", "file", "write");
+	}
+	if (sepol_exists("properties_serial"))
+		sepol_allow("su", "properties_serial", "file", "write");
 	sepol_allow("su", "init", "unix_stream_socket", "connectto");
 	sepol_allow("su", "rootfs", "file", "entrypoint");
+	sepol_allow("su", "rootfs", "file", "getattr");
+	sepol_allow("su", "rootfs", "file", "read");
+	sepol_allow("su", "rootfs", "filesystem", "remount");
 	sepol_allow("su", "devpts", "chr_file", ALL);
 	sepol_allow("su", "untrusted_app_devpts", "chr_file", ALL);
 	sepol_allow("su", "su_device", "dir", ALL);
@@ -191,19 +198,24 @@ void sepol_min_rules() {
 	sepol_allow("su", "su", "fifo_file", ALL);
 	sepol_allow("su", "su", "lnk_file", ALL);
 	sepol_allow("su", "su", "dir", ALL);
+	if (sepol_exists("logdr_socket"))
+		sepol_allow("su", "logdr_socket", "sock_file", "write");
+	if (sepol_exists("logd"))
+		sepol_allow("su", "logd", "unix_stream_socket", "connectto");
 	sepol_allow("su_device", "tmpfs", "filesystem", "associate");
 
 	// For sepolicy live patching
 	sepol_allow("su", "kernel", "security", "read_policy");
 	sepol_allow("su", "kernel", "security", "load_policy");
+	sepol_allow("su", "selinuxfs", "file", "read");
+	sepol_allow("su", "selinuxfs", "file", "open");
+	sepol_allow("su", "selinuxfs", "file", "write");
 
 	// For mounting loop devices and mirrors
 	sepol_allow("su", "kernel", "process", "setsched");
 	sepol_allow("su", "labeledfs", "filesystem", "mount");
 	sepol_allow("su", "labeledfs", "filesystem", "unmount");
-	sepol_allow("su", "loop_device", "blk_file", ALL);
-	sepol_allow("su", "block_device", "blk_file", ALL);
-	sepol_allow("su", "system_block_device", "blk_file", ALL);
+	sepol_allow("kernel", "system_data_file", "file", "read");
 
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
@@ -217,6 +229,7 @@ void sepol_med_rules() {
 	sepol_allow("su", ALL, "file", ALL);
 	sepol_allow("su", ALL, "dir", ALL);
 	sepol_allow("su", ALL, "lnk_file", ALL);
+	sepol_allow("su", ALL, "blk_file", ALL);
 
 	// Allow these client to access su
 	allowSuClient("shell");
