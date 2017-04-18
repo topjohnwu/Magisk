@@ -253,10 +253,10 @@ int su_daemon_main(int argc, char **argv) {
 			ctx.to.shell = optarg;
 			break;
 		case 'V':
-			printf("%d\n", VERSION_CODE);
+			printf("%d\n", MAGISK_VER_CODE);
 			exit(EXIT_SUCCESS);
 		case 'v':
-			printf("%s\n", SU_VERSION_STR);
+			printf("%s\n", MAGISKSU_VER_STR);
 			exit(EXIT_SUCCESS);
 		case 'u':
 			switch (ctx.user.multiuser_mode) {

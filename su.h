@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <sys/types.h>
 
-#define SU_VERSION_STR  xstr(VERSION) ":MAGISKSU (topjohnwu)"
+#define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
 
 // Property check for root access
 #define ROOT_ACCESS_PROP          "persist.sys.root_access"

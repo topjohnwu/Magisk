@@ -69,8 +69,8 @@ static int get_owner_login_user_args(struct su_context *ctx, char* user, int use
 }
 
 void app_send_result(struct su_context *ctx, policy_t policy) {
-	char binary_version[256];
-	sprintf(binary_version, "%d", VERSION_CODE);
+	// char binary_version[256];
+	// sprintf(binary_version, "%d", VERSION_CODE);
 
 	char uid[256];
 	sprintf(uid, "%d", ctx->from.uid);
