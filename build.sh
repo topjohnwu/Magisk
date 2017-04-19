@@ -1,18 +1,18 @@
 #!/bin/bash
 
 usage() {
-  echo "$0 all <version name> <version code>"
+  echo "$ME all <version name> <version code>"
   echo -e "\tBuild binaries, zip, and sign Magisk"
   echo -e "\tThis is equlivant to first <build>, then <zip>"
-  echo "$0 clean"
+  echo "$ME clean"
   echo -e "\tCleanup compiled / generated files"
-  echo "$0 build <verison name> <version code>"
+  echo "$ME build <verison name> <version code>"
   echo -e "\tBuild the binaries with ndk"
-  echo "$0 debug"
+  echo "$ME debug <verison name> <version code>"
   echo -e "\tBuild the binaries with the debug flag on\n\tCall <zip> afterwards if you want to flash on device"
-  echo "$0 zip <version name>"
+  echo "$ME zip <version name>"
   echo -e "\tZip and sign Magisk"
-  echo "$0 uninstaller"
+  echo "$ME uninstaller"
   echo -e "\tZip and sign the uninstaller"
   exit 1
 }
@@ -49,8 +49,11 @@ error() {
 }
 
 build_bin() {
+  [ -z "$1" -o -z "$2" ] && echo -e "! Missing version info\n" && usage
+  BUILD="Build"
+  [ -z "DEBUG" ] || BUILD="Debug"
   echo "************************"
-  echo "* Building: VERSION=$1 CODE=$2"
+  echo "* $BUILD: VERSION=$1 CODE=$2"
   echo "************************"
   [ -z `which ndk-build` ] && error "Please add ndk-build to PATH!"
   ndk-build APP_CFLAGS="-DMAGISK_VERSION=$1 -DMAGISK_VER_CODE=$2 $DEBUG" -j${CPUNUM} || error "Magisk binary tools build failed...."
@@ -72,6 +75,7 @@ build_bin() {
 }
 
 zip_package() {
+  [ -z "$1" ] && echo -e "! Missing version info\n" && usage
   [ ! -f "zip_static/arm/magiskboot" ] && error "Missing binaries!! Please run '$0 build' before zipping"
   echo "************************"
   echo "* Adding version info"
@@ -154,10 +158,10 @@ DIR="$(cd "$(dirname "$0")"; pwd)"
 cd "$DIR"
 DEBUG=
 CPUNUM=`getconf _NPROCESSORS_ONLN`
+ME=$0
 
 case $1 in
   "all" )
-    [ -z "$2" -o -z "$3" ] && echo -e "! Missing version info\n" && usage
     build_bin $2 $3
     zip_package $2
     ;;
@@ -165,12 +169,11 @@ case $1 in
     cleanup
     ;;
   "build" )
-    [ -z "$2" -o -z "$3" ] && echo -e "! Missing version info\n" && usage
     build_bin $2 $3
     ;;
   "debug" )
     DEBUG="-DDEBUG"
-    build_bin "VER_DEBUG" "99999"
+    build_bin $2 $3
     ;;
   "zip" )
     [ -z "$2" ] && echo -e "! Missing version info\n" && usage

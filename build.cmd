@@ -31,16 +31,6 @@ EXIT /B %ERRORLEVEL%
 
 :all
   SET OK=y
-  IF [%~1] == [] (
-    CALL :error "Missing version info"
-    CALL :usage
-    EXIT /B %ERRORLEVEL%
-  )
-  IF [%~2] == [] (
-    CALL :error "Missing version info"
-    CALL :usage
-    EXIT /B %ERRORLEVEL%
-  )
   CALL :build "%~1" "%~2"
   CALL :zip "%~1"
   EXIT /B %ERRORLEVEL%
@@ -48,7 +38,7 @@ EXIT /B %ERRORLEVEL%
 :debug
   SET OK=y
   SET DEBUG=-DDEBUG
-  CALL :build "VER_DEBUG" "99999"
+  CALL :build "%~1" "%~2"
   EXIT /B %ERRORLEVEL%
 
 :build
@@ -63,8 +53,12 @@ EXIT /B %ERRORLEVEL%
     CALL :usage
     EXIT /B %ERRORLEVEL%
   )
+  SET BUILD=Build
+  IF NOT [%DEBUG%] == [] (
+    SET BUILD=Debug
+  )
   ECHO ************************
-  ECHO * Building: VERSION=%~1 CODE=%~2
+  ECHO * %BUILD%: VERSION=%~1 CODE=%~2
   ECHO ************************
   FOR /F "tokens=* USEBACKQ" %%F IN (`where ndk-build`) DO (
     IF [%%F] == [] (
