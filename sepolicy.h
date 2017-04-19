@@ -42,6 +42,7 @@ int add_transition(char *s, char *t, char *c, char *d);
 int add_file_transition(char *s, char *t, char *c, char *d, char* filename);
 int add_typeattribute(char *domainS, char *attr);
 int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
+int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not);
 
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
 

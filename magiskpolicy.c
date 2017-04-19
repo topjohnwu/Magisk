@@ -26,11 +26,14 @@ static void statements() {
 		"\"deny #source-class #target-class permission-class #permission\"\n"
 		"\"auditallow #source-class #target-class permission-class #permission\"\n"
 		"\"auditdeny #source-class #target-class permission-class #permission\"\n"
+		"\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n"
+		"\"allowxperm #source-class #target-class #permission-class ioctl range\"\n"
+		"\"auditallowxperm #source-class #target-class #permission-class ioctl range\"\n"
+		"\"dontauditxperm #source-class #target-class #permission-class ioctl range\"\n"
 		"\"create #class\"\n"
 		"\"permissive #class\"\n"
 		"\"enforcing #class\"\n"
 		"\"attradd #class #attribute\"\n"
-		"\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n"
 		"\nsource-class and target-class can be attributes (patches the whole group)\n"
 		"All sections (except typetrans) can be replaced with \'*\' to patch every possible matches\n"
 		"Sections marked with \'#\' can be replaced with collections in curly brackets\n"
@@ -263,6 +266,84 @@ static int parse_pattern_4(int action, char* statement) {
 	return 0;
 }
 
+// Pattern 5: action { source } { target } { class } ioctl range
+static int parse_pattern_5(int action, char* statement) {
+	int state = 0, in_bracket = 0;
+	char *tok, *range, *saveptr;
+	struct vector source, target, class, *temp;
+	vec_init(&source);
+	vec_init(&target);
+	vec_init(&class);
+	tok = strtok_r(statement, " ", &saveptr);
+	while (tok != NULL) {
+		if (tok[0] == '{') {
+			if (in_bracket || state == 3 || state == 4) return 1;
+			in_bracket = 1;
+			if (tok[1]) {
+				++tok;
+				continue;
+			}
+		} else if (tok[strlen(tok) - 1] == '}') {
+			if (!in_bracket || state == 3 || state == 4) return 1;
+			in_bracket = 0;
+			if (strlen(tok) - 1) {
+				tok[strlen(tok) - 1] = '\0';
+				continue;
+			}
+		} else {
+			if (tok[0] == '*') tok = ALL;
+			switch (state) {
+				case 0:
+					temp = &source;
+					break;
+				case 1:
+					temp = &target;
+					break;
+				case 2:
+					temp = &class;
+					break;
+				case 3:
+					// Should always be ioctl
+					temp = NULL;
+					break;
+				case 4:
+					temp = NULL;
+					range = tok;
+					break;
+				default:
+					return 1;
+			}
+			vec_push_back(temp, tok);
+		}
+		if (!in_bracket) ++state;
+		tok = strtok_r(NULL, " ", &saveptr);
+	}
+	if (state != 5) return 1;
+	for(int i = 0; i < source.size; ++i)
+		for (int j = 0; j < target.size; ++j)
+			for (int k = 0; k < class.size; ++k)
+				switch (action) {
+					case 0:
+						if (sepol_allowxperm(source.data[i], target.data[j], class.data[k], range))
+							fprintf(stderr, "Error in: allowxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
+						break;
+					case 1:
+						if (sepol_auditallowxperm(source.data[i], target.data[j], class.data[k], range))
+							fprintf(stderr, "Error in: auditallowxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
+						break;
+					case 2:
+						if (sepol_dontauditxperm(source.data[i], target.data[j], class.data[k], range))
+							fprintf(stderr, "Error in: dontauditxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
+						break;
+					default:
+						return 1;
+				}
+	vec_destroy(&source);
+	vec_destroy(&target);
+	vec_destroy(&class);
+	return 0;
+}
+
 static void syntax_error_msg() {
 	fprintf(stderr, "Syntax error in \"%s\"\n", err_msg);
 	syntax_err = 1;
@@ -338,6 +419,15 @@ int magiskpolicy_main(int argc, char *argv[]) {
 				syntax_error_msg();
 		} else if (strcmp(tok, "typetrans") == 0) {
 			if (parse_pattern_4(0, rules.data[i] + strlen(tok) + 1))
+				syntax_error_msg();
+		} else if (strcmp(tok, "allowxperm") == 0) {
+			if (parse_pattern_5(0, rules.data[i] + strlen(tok) + 1))
+				syntax_error_msg();
+		} else if (strcmp(tok, "auditallowxperm") == 0) {
+			if (parse_pattern_5(1, rules.data[i] + strlen(tok) + 1))
+				syntax_error_msg();
+		} else if (strcmp(tok, "dontauditxperm") == 0) {
+			if (parse_pattern_5(2, rules.data[i] + strlen(tok) + 1))
 				syntax_error_msg();
 		} else {
 			syntax_error_msg();

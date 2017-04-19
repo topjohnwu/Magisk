@@ -50,7 +50,7 @@ static int set_attr(char *type, int value) {
 	return 0;
 }
 
-static int add_irule(int s, int t, int c, int p, int effect, int not) {
+static int __add_rule(int s, int t, int c, int p, int effect, int not) {
 	avtab_key_t key;
 	avtab_datum_t *av;
 	int new_rule = 0;
@@ -106,10 +106,90 @@ static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 	} else if (cls == NULL) {
 		hashtab_for_each(policydb->p_classes.table, &cur) {
 			cls = cur->datum;
-			ret |= add_irule(src->s.value, tgt->s.value, cls->s.value, -1, effect, not);
+			ret |= __add_rule(src->s.value, tgt->s.value, cls->s.value, -1, effect, not);
 		}
 	} else {
-		return add_irule(src->s.value, tgt->s.value, cls->s.value, perm ? perm->s.value : -1, effect, not);
+		return __add_rule(src->s.value, tgt->s.value, cls->s.value, perm ? perm->s.value : -1, effect, not);
+	}
+	return ret;
+}
+
+#define ioctl_driver(x) (x>>8 & 0xFF)
+#define ioctl_func(x) (x & 0xFF)
+
+static int __add_xperm_rule(int s, int t, int c, uint16_t low, uint16_t high, int effect, int not) {
+	avtab_key_t key;
+	avtab_datum_t *av;
+	int new_rule = 0;
+
+	key.source_type = s;
+	key.target_type = t;
+	key.target_class = c;
+	key.specified = effect;
+
+	av = avtab_search(&policydb->te_avtab, &key);
+	if (av == NULL) {
+		av = cmalloc(sizeof(*av));
+		av->xperms = cmalloc(sizeof(avtab_extended_perms_t));
+		new_rule = 1;
+		if (ioctl_driver(low) != ioctl_driver(high)) {
+			av->xperms->specified = AVTAB_XPERMS_IOCTLDRIVER;
+			av->xperms->driver = 0;
+		} else {
+			av->xperms->specified = AVTAB_XPERMS_IOCTLFUNCTION;
+			av->xperms->driver = ioctl_driver(low);
+		}
+	}
+
+	if (av->xperms->specified == AVTAB_XPERMS_IOCTLDRIVER) {
+		for (unsigned i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
+			if (not)
+				xperm_clear(i, av->xperms->perms);
+			else
+				xperm_set(i, av->xperms->perms);
+		}
+	} else {
+		for (unsigned i = ioctl_func(low); i <= ioctl_func(high); ++i) {
+			if (not)
+				xperm_clear(i, av->xperms->perms);
+			else
+				xperm_set(i, av->xperms->perms);
+		}
+	}
+
+	if (new_rule) {
+		if (avtab_insert(&policydb->te_avtab, &key, av)) {
+			fprintf(stderr, "Error inserting into avtab\n");
+			return 1;
+		}
+		free(av);
+	}
+
+	return 0;
+}
+
+static int add_xperm_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls,
+			uint16_t low, uint16_t high, int effect, int not) {
+	hashtab_ptr_t cur;
+	int ret = 0;
+
+	if (src == NULL) {
+		hashtab_for_each(policydb->p_types.table, &cur) {
+			src = cur->datum;
+			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
+		}
+	} else if (tgt == NULL) {
+		hashtab_for_each(policydb->p_types.table, &cur) {
+			tgt = cur->datum;
+			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
+		}
+	} else if (cls == NULL) {
+		hashtab_for_each(policydb->p_classes.table, &cur) {
+			cls = cur->datum;
+			ret |= __add_xperm_rule(src->s.value, tgt->s.value, cls->s.value, low, high, effect, not);
+		}
+	} else {
+		return __add_xperm_rule(src->s.value, tgt->s.value, cls->s.value, low, high, effect, not);
 	}
 	return ret;
 }
@@ -307,7 +387,6 @@ int add_transition(char *s, char *t, char *c, char *d) {
 	key.target_class = cls->s.value;
 	key.specified = AVTAB_TRANSITION;
 	av = avtab_search(&policydb->te_avtab, &key);
-
 	if (av == NULL) {
 		av = cmalloc(sizeof(*av));
 		new_rule = 1;
@@ -445,4 +524,49 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, int not) {
 		}
 	}
 	return add_rule_auto(src, tgt, cls, perm, effect, not);
+}
+
+int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not) {
+	type_datum_t *src = NULL, *tgt = NULL;
+	class_datum_t *cls = NULL;
+
+	if (s) {
+		src = hashtab_search(policydb->p_types.table, s);
+		if (src == NULL) {
+			fprintf(stderr, "source type %s does not exist\n", s);
+			return 1;
+		}
+	}
+
+	if (t) {
+		tgt = hashtab_search(policydb->p_types.table, t);
+		if (tgt == NULL) {
+			fprintf(stderr, "target type %s does not exist\n", t);
+			return 1;
+		}
+	}
+
+	if (c) {
+		cls = hashtab_search(policydb->p_classes.table, c);
+		if (cls == NULL) {
+			fprintf(stderr, "class %s does not exist\n", c);
+			return 1;
+		}
+	}
+
+	uint16_t low, high;
+
+	if (range) {
+		if (strchr(range, '-')){
+			sscanf(range, "%hx-%hx", &low, &high);
+		} else {
+			sscanf(range, "%hx", &low);
+			high = low;
+		}
+	} else {
+		low = 0;
+		high = 0xFFFF;
+	}
+
+	return add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
 }

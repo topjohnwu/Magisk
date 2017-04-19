@@ -31,6 +31,21 @@ int sepol_typetrans(char *s, char *t, char *c, char *d, char *o) {
 	}
 }
 
+int sepol_allowxperm(char *s, char *t, char *c, char *range) {
+	// printf("allowxperm %s %s %s %s\n", s, t, c, range);
+	return add_xperm_rule(s, t, c, range, AVTAB_XPERMS_ALLOWED, 0);
+}
+
+int sepol_auditallowxperm(char *s, char *t, char *c, char *range) {
+	// printf("auditallowxperm %s %s %s %s\n", s, t, c, range);
+	return add_xperm_rule(s, t, c, range, AVTAB_XPERMS_AUDITALLOW, 0);
+}
+
+int sepol_dontauditxperm(char *s, char *t, char *c, char *range) {
+	// printf("dontauditxperm %s %s %s %s\n", s, t, c, range);
+	return add_xperm_rule(s, t, c, range, AVTAB_XPERMS_DONTAUDIT, 0);
+}
+
 int sepol_permissive(char *s) {
 	// printf("permissive %s\n", s);
 	return set_domain_state(s, 1);
