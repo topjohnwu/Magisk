@@ -1,4 +1,5 @@
 #include "magiskpolicy.h"
+#include "sepolicy.h"
 
 void samsung() {
 	sepol_deny("init", "kernel", "security", "load_policy");
@@ -73,7 +74,7 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "su_device", "dir", "read");
 	sepol_allow(target, "su_device", "sock_file", "read");
 	sepol_allow(target, "su_device", "sock_file", "write");
-	sepol_allow(target, "devpts", "chr_file", ALL);
+	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow("su", target, "fd", "use");
 	sepol_allow("su", target, "fifo_file", ALL);
 }
@@ -220,6 +221,9 @@ void sepol_min_rules() {
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
+
+	// xperms
+	sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
 }
 
 void sepol_med_rules() {
