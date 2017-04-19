@@ -4,7 +4,7 @@
 policydb_t *policydb = NULL;
 
 static void *cmalloc(size_t s) {
-	void *t = malloc(s);
+	void *t = calloc(s, 1);
 	if (t == NULL) {
 		fprintf(stderr, "Out of memory\n");
 		exit(1);
@@ -21,7 +21,6 @@ static int get_attr(char *type, int value) {
 		return 1;
 
 	return !! ebitmap_get_bit(&policydb->attr_type_map[attr->s.value-1], value-1);
-	//return !! ebitmap_get_bit(&policydb->type_attr_map[value-1], attr->s.value-1);
 }
 
 static int get_attr_id(char *type) {
@@ -52,30 +51,41 @@ static int set_attr(char *type, int value) {
 }
 
 static int add_irule(int s, int t, int c, int p, int effect, int not) {
-	avtab_datum_t *av;
 	avtab_key_t key;
+	avtab_datum_t *av;
+	int new_rule = 0;
 
 	key.source_type = s;
 	key.target_type = t;
 	key.target_class = c;
 	key.specified = effect;
-	av = avtab_search(&policydb->te_avtab, &key);
 
+	av = avtab_search(&policydb->te_avtab, &key);
 	if (av == NULL) {
 		av = cmalloc(sizeof(*av));
-		memset(av, 0, sizeof(*av));
-		av->data |= 1U << (p - 1);
-		int ret = avtab_insert(&policydb->te_avtab, &key, av);
-		if (ret) {
+		new_rule = 1;
+	}
+
+	if(not) {
+		if (p < 0)
+			av->data = 0U;
+		else
+			av->data &= ~(1U << (p - 1));
+	} else {
+		if (p < 0)
+			av->data = ~0U;
+		else
+			av->data |= 1U << (p - 1);
+	}
+
+	if (new_rule) {
+		if (avtab_insert(&policydb->te_avtab, &key, av)) {
 			fprintf(stderr, "Error inserting into avtab\n");
 			return 1;
 		}
+		free(av);
 	}
 
-	if(not)
-		av->data &= ~(1U << (p - 1));
-	else
-		av->data |= 1U << (p - 1);
 	return 0;
 }
 
@@ -86,56 +96,20 @@ static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 	if (src == NULL) {
 		hashtab_for_each(policydb->p_types.table, &cur) {
 			src = cur->datum;
-			if(add_rule_auto(src, tgt, cls, perm, effect, not))
-				return 1;
+			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
 		}
 	} else if (tgt == NULL) {
 		hashtab_for_each(policydb->p_types.table, &cur) {
 			tgt = cur->datum;
-			if(add_rule_auto(src, tgt, cls, perm, effect, not))
-				return 1;
+			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
 		}
 	} else if (cls == NULL) {
 		hashtab_for_each(policydb->p_classes.table, &cur) {
 			cls = cur->datum;
-			if(add_rule_auto(src, tgt, cls, perm, effect, not))
-				return 1;
-		}
-	} else if (perm == NULL) {
-		hashtab_for_each(cls->permissions.table, &cur) {
-			perm = cur->datum;
-			if(add_rule_auto(src, tgt, cls, perm, effect, not))
-				return 1;
-		}
-
-		if (cls->comdatum != NULL) {
-			hashtab_for_each(cls->comdatum->permissions.table, &cur) {
-				perm = cur->datum;
-				if(add_rule_auto(src, tgt, cls, perm, effect, not))
-					return 1;
-			}
+			ret |= add_irule(src->s.value, tgt->s.value, cls->s.value, -1, effect, not);
 		}
 	} else {
-		ebitmap_node_t *s_node, *t_node;
-		int i, j;
-		if (src->flavor == TYPE_ATTRIB) {
-			if (tgt->flavor == TYPE_ATTRIB) {
-				ebitmap_for_each_bit(&policydb->attr_type_map[src->s.value-1], s_node, i) 
-					ebitmap_for_each_bit(&policydb->attr_type_map[tgt->s.value-1], t_node, j)
-						if(ebitmap_node_get_bit(s_node, i) && ebitmap_node_get_bit(t_node, j))
-							ret |= add_irule(i + 1, j + 1, cls->s.value, perm->s.value, effect, not);
-					
-			} else {
-				ebitmap_for_each_bit(&policydb->attr_type_map[src->s.value-1], s_node, i)
-					if(ebitmap_node_get_bit(s_node, i))
-						ret |= add_irule(i + 1, tgt->s.value, cls->s.value, perm->s.value, effect, not);
-			}
-		} else if (tgt->flavor == TYPE_ATTRIB) {
-			ebitmap_for_each_bit(&policydb->attr_type_map[tgt->s.value-1], t_node, j)
-				if(ebitmap_node_get_bit(t_node, j))
-					ret |= add_irule(src->s.value, j + 1, cls->s.value, perm->s.value, effect, not);
-		} else
-			ret = add_irule(src->s.value, tgt->s.value, cls->s.value, perm->s.value, effect, not);
+		return add_irule(src->s.value, tgt->s.value, cls->s.value, perm ? perm->s.value : -1, effect, not);
 	}
 	return ret;
 }
@@ -225,24 +199,26 @@ void destroy_policydb() {
 
 int create_domain(char *d) {
 	symtab_datum_t *src = hashtab_search(policydb->p_types.table, d);
-	if(src)
+	if(src) {
+		fprintf(stderr, "Domain %s already exists\n", d);
 		return 1;
+	}
 
-	type_datum_t *typdatum = (type_datum_t *) malloc(sizeof(type_datum_t));
-	type_datum_init(typdatum);
-	typdatum->primary = 1;
-	typdatum->flavor = TYPE_TYPE;
+	type_datum_t *typedatum = (type_datum_t *) malloc(sizeof(type_datum_t));
+	type_datum_init(typedatum);
+	typedatum->primary = 1;
+	typedatum->flavor = TYPE_TYPE;
 
 	uint32_t value = 0;
-	int r = symtab_insert(policydb, SYM_TYPES, strdup(d), typdatum, SCOPE_DECL, 1, &value);
-	typdatum->s.value = value;
+	int r = symtab_insert(policydb, SYM_TYPES, strdup(d), typedatum, SCOPE_DECL, 1, &value);
+	typedatum->s.value = value;
 
 	if (ebitmap_set_bit(&policydb->global->branch_list->declared.scope[SYM_TYPES], value - 1, 1)) {
 		return 1;
 	}
 
-	policydb->type_attr_map = realloc(policydb->type_attr_map, sizeof(ebitmap_t)*policydb->p_types.nprim);
-	policydb->attr_type_map = realloc(policydb->attr_type_map, sizeof(ebitmap_t)*policydb->p_types.nprim);
+	policydb->type_attr_map = realloc(policydb->type_attr_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
+	policydb->attr_type_map = realloc(policydb->attr_type_map, sizeof(ebitmap_t) * policydb->p_types.nprim);
 	ebitmap_init(&policydb->type_attr_map[value-1]);
 	ebitmap_init(&policydb->attr_type_map[value-1]);
 	ebitmap_set_bit(&policydb->type_attr_map[value-1], value-1, 1);
@@ -301,8 +277,9 @@ int add_transition(char *s, char *t, char *c, char *d) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
-	avtab_datum_t *av;
 	avtab_key_t key;
+	avtab_datum_t *av;
+	int new_rule = 0;
 
 	src = hashtab_search(policydb->p_types.table, s);
 	if (src == NULL) {
@@ -333,17 +310,18 @@ int add_transition(char *s, char *t, char *c, char *d) {
 
 	if (av == NULL) {
 		av = cmalloc(sizeof(*av));
-		av->data = def->s.value;
-		int ret = avtab_insert(&policydb->te_avtab, &key, av);
-		if (ret) {
+		new_rule = 1;
+	}
+
+	av->data = def->s.value;
+
+	if (new_rule) {
+		if (avtab_insert(&policydb->te_avtab, &key, av)) {
 			fprintf(stderr, "Error inserting into avtab\n");
 			return 1;
 		}
-	} else {
-		fprintf(stderr, "Warning, rule already defined! Won't override.\n");
-		fprintf(stderr, "Previous value = %d, wanted value = %d\n", av->data, def->s.value);
+		free(av);
 	}
-
 	return 0;
 }
 
@@ -372,17 +350,22 @@ int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
 		return 1;
 	}
 
-	filename_trans_t *new_trans_key = cmalloc(sizeof(*new_trans_key));
-	new_trans_key->stype = src->s.value;
-	new_trans_key->ttype = tgt->s.value;
-	new_trans_key->tclass = cls->s.value;
-	new_trans_key->name = strdup(filename);
+	filename_trans_t trans_key;
+	trans_key.stype = src->s.value;
+	trans_key.ttype = tgt->s.value;
+	trans_key.tclass = cls->s.value;
+	trans_key.name = filename;
 
-	filename_trans_datum_t *new_trans_datam = cmalloc(sizeof(*new_trans_datam));
-	new_trans_datam->otype = def->s.value;
+	filename_trans_datum_t *trans_datum;
+	trans_datum = hashtab_search(policydb->p_types.table, (hashtab_key_t) &trans_key);
 
-	hashtab_insert(policydb->filename_trans, (hashtab_key_t) new_trans_key, new_trans_datam);
+	if (trans_datum == NULL) {
+		trans_datum = cmalloc(sizeof(*trans_datum));
+		hashtab_insert(policydb->filename_trans, (hashtab_key_t) &trans_key, trans_datum);
+	}
 
+	// Overwrite existing
+	trans_datum->otype = def->s.value;
 	return 0;
 }
 
