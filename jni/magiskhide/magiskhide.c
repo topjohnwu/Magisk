@@ -16,12 +16,14 @@
 #include "utils.h"
 #include "magiskhide.h"
 #include "daemon.h"
+#include "resetprop.h"
 
 int sv[2], hide_pid = -1;
-struct vector *hide_list, *new_list;
+struct vector *hide_list = NULL;
 
-int isEnabled = 0;
+int hideEnabled = 0;
 static pthread_t proc_monitor_thread;
+pthread_mutex_t lock;
 
 void kill_proc(int pid) {
 	kill(pid, SIGTERM);
@@ -41,7 +43,7 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
-	if (isEnabled)
+	if (hideEnabled)
 		goto success;
 	/*
 	 * The setns system call do not support multithread processes
@@ -49,6 +51,9 @@ void launch_magiskhide(int client) {
 	 */
 
 	LOGI("* Starting MagiskHide\n");
+
+	hideEnabled = 1;
+	setprop("persist.magisk.hide", "1");
 
 	hide_sensitive_props();
 
@@ -62,31 +67,23 @@ void launch_magiskhide(int client) {
 	close(sv[1]);
 
 	// Initialize the hide list
-	hide_list = new_list = xmalloc(sizeof(*hide_list));
-	if (hide_list == NULL)
+	if (init_list())
 		goto error;
-	vec_init(hide_list);
-	FILE *fp = xfopen(HIDELIST, "r");
-	if (fp == NULL)
-		goto error;
-	file_to_vector(hide_list, fp);
-	fclose(fp);
-	char *line;
-	vec_for_each(hide_list, line) {
-		LOGI("hide_list: [%s]\n", line);
-		ps_filter_proc_name(line, kill_proc);
-	}
+
+	// Add SafetyNet by default
+	add_list(strdup("com.google.android.gms.unstable"));
 
 	// Start a new thread to monitor processes
+	pthread_mutex_init(&lock, NULL);
 	if (xpthread_create(&proc_monitor_thread, NULL, proc_monitor, NULL))
 		goto error;
 
-	isEnabled = 1;
 success:
 	write_int(client, 0);
 	close(client);
 	return;
 error:
+	hideEnabled = 0;
 	write_int(client, 1);
 	close(client);
 	if (hide_pid != -1) {
@@ -101,7 +98,7 @@ error:
 }
 
 void stop_magiskhide(int client) {
-	if (!isEnabled)
+	if (!hideEnabled)
 		return;
 
 	LOGI("* Stopping MagiskHide\n");
@@ -109,7 +106,8 @@ void stop_magiskhide(int client) {
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 	pthread_join(proc_monitor_thread, NULL);
 
-	isEnabled = 0;
+	hideEnabled = 0;
+	setprop("persist.magisk.hide", "0");
 	write_int(client, 0);
 	close(client);
 }

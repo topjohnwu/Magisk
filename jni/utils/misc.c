@@ -57,10 +57,14 @@ int check_data() {
 }
 
 /* All the string should be freed manually!! */
-void file_to_vector(struct vector *v, FILE *fp) {
+int file_to_vector(const char* filename, struct vector *v) {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
+
+	FILE *fp = xfopen(filename, "r");
+	if (fp == NULL)
+		return 1;
 
 	while ((read = getline(&line, &len, fp)) != -1) {
 		// Remove end newline
@@ -69,6 +73,20 @@ void file_to_vector(struct vector *v, FILE *fp) {
 		vec_push_back(v, line);
 		line = NULL;
 	}
+	fclose(fp);
+	return 0;
+}
+
+int vector_to_file(const char *filename, struct vector *v) {
+	FILE *fp = xfopen(filename, "w");
+	if (fp == NULL)
+		return 1;
+	char *line;
+	vec_for_each(v, line) {
+		fprintf(fp, "%s\n", line);
+	}
+	fclose(fp);
+	return 0;
 }
 
 /* Check if the string only contains digits */

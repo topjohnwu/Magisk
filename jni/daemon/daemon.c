@@ -35,10 +35,10 @@ static void request_handler(int client) {
 		stop_magiskhide(client);
 		break;
 	case ADD_HIDELIST:
-		// TODO: Add hidelist
+		add_hide_list(client);
 		break;
 	case RM_HIDELIST:
-		// TODO: Remove hidelist
+		rm_hide_list(client);
 		break;
 	case SUPERUSER:
 		su_daemon_receiver(client);
@@ -135,7 +135,7 @@ void start_daemon() {
 	// Start log monitor
 	monitor_logs();
 
-	LOGI("Magisk v" xstr(VERSION) " daemon started\n");
+	LOGI("Magisk v" xstr(MAGISK_VERSION) " daemon started\n");
 
 	// Unlock all blocks for rw
 	unlock_blocks();

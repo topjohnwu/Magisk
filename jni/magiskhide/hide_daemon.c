@@ -83,9 +83,8 @@ int hide_daemon() {
 		close(fd);
 
 		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-		fp = xfopen(buffer, "r");
 		vec_init(&mount_list);
-		file_to_vector(&mount_list, fp);
+		file_to_vector(buffer, &mount_list);
 
 		// Find the cache block name if not found yet
 		if (strlen(cache_block) == 0) {
@@ -109,10 +108,9 @@ int hide_daemon() {
 		vec_destroy(&mount_list);
 
 		// Re-read mount infos
-		fseek(fp, 0, SEEK_SET);
+		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
 		vec_init(&mount_list);
-		file_to_vector(&mount_list, fp);
-		fclose(fp);
+		file_to_vector(buffer, &mount_list);
 
 		// Unmount loop mounts
 		vec_for_each_r(&mount_list, line) {

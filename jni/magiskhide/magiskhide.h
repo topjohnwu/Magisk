@@ -1,6 +1,8 @@
 #ifndef MAGISK_HIDE_H
 #define MAGISK_HIDE_H
 
+#include <pthread.h>
+
 #define HIDELIST		"/magisk/.core/magiskhide/hidelist"
 #define DUMMYPATH		"/dev/magisk/dummy"
 #define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
@@ -20,7 +22,14 @@ void manage_selinux();
 void hide_sensitive_props();
 void relink_sbin();
 
-extern int sv[2], hide_pid, isEnabled;
-extern struct vector *hide_list, *new_list;
+// List managements
+int add_list(char *proc);
+int rm_list(char *proc);
+int init_list();
+int destroy_list();
+
+extern int sv[2], hide_pid, hideEnabled;
+extern struct vector *hide_list;
+extern pthread_mutex_t lock;
 
 #endif
