@@ -30,18 +30,8 @@ static void read_namespace(const int pid, char* target, const size_t size) {
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
 	LOGD("proc_monitor: running cleanup\n");
-	char *line;
-	vec_for_each(hide_list, line) {
-		ps_filter_proc_name(line, kill_proc);
-	}
-	vec_deep_destroy(hide_list);
-	free(hide_list);
-	if (new_list != hide_list) {
-		vec_deep_destroy(new_list);
-		free(new_list);
-	}
-	hide_list = new_list = NULL;
-	isEnabled = 0;
+	destroy_list();
+	hideEnabled = 0;
 	// Kill the logging if possible
 	if (log_pid) {
 		kill(log_pid, SIGTERM);
@@ -54,6 +44,7 @@ static void quit_pthread(int sig) {
 	write(sv[0], &kill, sizeof(kill));
 	close(sv[0]);
 	waitpid(hide_pid, NULL, 0);
+	pthread_mutex_destroy(&lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
 }
@@ -109,7 +100,6 @@ void *proc_monitor(void *args) {
 	while(fdgets(buffer, sizeof(buffer), log_fd)) {
 		int ret, comma = 0;
 		char *pos = buffer, *line, processName[256];
-		struct vector *temp = NULL;
 
 		while(1) {
 			pos = strchr(pos, ',');
@@ -127,14 +117,10 @@ void *proc_monitor(void *args) {
 		if(ret != 2)
 			continue;
 
-		// Should be thread safe
-		if (hide_list != new_list) {
-			temp = hide_list;
-			hide_list = new_list;
-		}
-
 		ret = 0;
 
+		// Critical region
+		pthread_mutex_lock(&lock);
 		vec_for_each(hide_list, line) {
 			if (strcmp(processName, line) == 0) {
 				read_namespace(pid, buffer, 32);
@@ -166,10 +152,8 @@ void *proc_monitor(void *args) {
 				break;
 			}
 		}
-		if (temp) {
-			vec_deep_destroy(temp);
-			free(temp);
-		}
+		pthread_mutex_unlock(&lock);
+
 		if (ret) {
 			// Wait hide process to kill itself
 			waitpid(hide_pid, NULL, 0);

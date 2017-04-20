@@ -55,6 +55,8 @@ void late_start(int client);
 
 void launch_magiskhide(int client);
 void stop_magiskhide(int client);
+void add_hide_list(int client);
+void rm_hide_list(int client);
 
 /*************
  * Superuser *
