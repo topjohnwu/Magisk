@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -117,7 +118,8 @@ void ps(void (*func)(int)) {
 	DIR *dir;
 	struct dirent *entry;
 
-	dir = xopendir("/proc");
+	if (!(dir = xopendir("/proc")))
+		return;
 
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
@@ -216,22 +218,60 @@ void setup_sighandlers(void (*handler)(int)) {
 
 int run_command(int *fd, const char *path, char *const argv[]) {
 	int sv[2];
-	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
-		return -1;
-	// We use sv[0], give them sv[1] for communication
-	*fd = sv[1];
+
+	if (fd) {
+		if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
+			return -1;
+		// We use sv[0], give them sv[1] for communication
+		*fd = sv[1];
+	}
 
 	int pid = fork();
 	if (pid != 0) {
-		close(sv[0]);
+		if (fd) close(sv[0]);
 		return pid;
 	}
 
-	close(sv[1]);
-	dup2(sv[0], STDIN_FILENO);
-	dup2(sv[0], STDOUT_FILENO);
-	dup2(sv[0], STDERR_FILENO);
+	if (fd) {
+		close(sv[1]);
+		xdup2(sv[0], STDIN_FILENO);
+		xdup2(sv[0], STDOUT_FILENO);
+		xdup2(sv[0], STDERR_FILENO);
+	} else {
+		int null = open("/dev/null", O_RDWR);
+		xdup2(null, STDIN_FILENO);
+		xdup2(null, STDOUT_FILENO);
+		xdup2(null, STDERR_FILENO);
+	}
+
 	execv(path, argv);
 	PLOGE("execv");
 	return -1;
+}
+
+#define MAGISK_CORE "/magisk/.core/"
+
+void exec_common_script(const char* stage) {
+	DIR *dir;
+	struct dirent *entry;
+	char buf[PATH_MAX];
+	snprintf(buf, sizeof(buf), MAGISK_CORE "%s.d", stage);
+
+	if (!(dir = opendir(buf)))
+		return;
+
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_REG) {
+			snprintf(buf, sizeof(buf), MAGISK_CORE "%s.d/%s", stage, entry->d_name);
+			if (access(buf, X_OK) == -1)
+				continue;
+			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
+			char *const command[] = { "sh", buf, NULL };
+			int pid = run_command(NULL, "/system/bin/sh", command);
+			if (pid != -1)
+				waitpid(pid, NULL, 0);
+		}
+	}
+
+	closedir(dir);
 }

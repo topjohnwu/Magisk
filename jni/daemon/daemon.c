@@ -24,6 +24,9 @@
 pthread_t sepol_patch;
 
 static void *request_handler(void *args) {
+	// Setup the default error handler for threads
+	err_handler = exit_thread;
+
 	int client = *((int *) args);
 	free(args);
 	client_request req = read_int(client);

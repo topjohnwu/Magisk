@@ -46,7 +46,6 @@ void hide_sensitive_props() {
 	LOGI("hide_pre_proc: Hiding sensitive props\n");
 
 	// Hide all sensitive props
-	init_resetprop();
 	char *value;
 	for (int i = 0; prop_key[i]; ++i) {
 		value = getprop(prop_key[i]);
