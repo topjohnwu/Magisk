@@ -23,7 +23,7 @@ struct vector *hide_list = NULL;
 
 int hideEnabled = 0;
 static pthread_t proc_monitor_thread;
-pthread_mutex_t lock;
+pthread_mutex_t hide_lock;
 
 void kill_proc(int pid) {
 	kill(pid, SIGTERM);
@@ -43,12 +43,11 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
-	if (hideEnabled)
-		goto success;
-	/*
-	 * The setns system call do not support multithread processes
-	 * We have to fork a new process, and communicate with pipe
-	 */
+	if (hideEnabled) {
+		write_int(client, 0);
+		close(client);
+		return;
+	}
 
 	LOGI("* Starting MagiskHide\n");
 
@@ -60,7 +59,11 @@ void launch_magiskhide(int client) {
 	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
 		goto error;
 
-	// Launch the hide daemon
+	/*
+	 * The setns system call do not support multithread processes
+	 * We have to fork a new process, and communicate with sockets
+	 */
+
 	if (hide_daemon())
 		goto error;
 
@@ -73,15 +76,18 @@ void launch_magiskhide(int client) {
 	// Add SafetyNet by default
 	add_list(strdup("com.google.android.gms.unstable"));
 
-	// Start a new thread to monitor processes
-	pthread_mutex_init(&lock, NULL);
-	if (xpthread_create(&proc_monitor_thread, NULL, proc_monitor, NULL))
-		goto error;
+	// Initialize the mutex lock
+	pthread_mutex_init(&hide_lock, NULL);
 
-success:
 	write_int(client, 0);
 	close(client);
+
+	// Get thread reference
+	proc_monitor_thread = pthread_self();
+	// Start monitoring
+	proc_monitor();
 	return;
+
 error:
 	hideEnabled = 0;
 	write_int(client, 1);
@@ -98,16 +104,18 @@ error:
 }
 
 void stop_magiskhide(int client) {
-	if (!hideEnabled)
+	if (!hideEnabled) {
+		write_int(client, 0);
+		close(client);
 		return;
+	}
 
 	LOGI("* Stopping MagiskHide\n");
 
-	pthread_kill(proc_monitor_thread, SIGUSR1);
-	pthread_join(proc_monitor_thread, NULL);
-
 	hideEnabled = 0;
 	setprop("persist.magisk.hide", "0");
+	pthread_kill(proc_monitor_thread, SIGUSR1);
+
 	write_int(client, 0);
 	close(client);
 }

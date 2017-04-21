@@ -32,5 +32,6 @@ static void *logger_thread(void *args) {
 /* Start a new thread to monitor logcat and dump to logfile */
 void monitor_logs() {
 	pthread_t log_monitor_thread;
-	pthread_create(&log_monitor_thread, NULL, logger_thread, NULL);
+	xpthread_create(&log_monitor_thread, NULL, logger_thread, NULL);
+	pthread_detach(log_monitor_thread);
 }

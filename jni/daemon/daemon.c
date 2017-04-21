@@ -23,7 +23,9 @@
 
 pthread_t sepol_patch;
 
-static void request_handler(int client) {
+static void *request_handler(void *args) {
+	int client = *((int *) args);
+	free(args);
 	client_request req = read_int(client);
 	char *s;
 	int pid, status, code;
@@ -68,6 +70,7 @@ static void request_handler(int client) {
 		close(client);
 		break;
 	}
+	return NULL;
 }
 
 /* Setup the address and return socket fd */
@@ -112,12 +115,12 @@ void start_daemon() {
 	xsetsid();
 	xsetcon("u:r:su:s0");
 
-	// Patch selinux with medium patch, blocking
+	// Patch selinux with medium patch before we do anything
 	load_policydb("/sys/fs/selinux/policy");
 	sepol_med_rules();
 	dump_policydb("/sys/fs/selinux/load");
 
-	// Continue the larger patch in another thread, will join later
+	// Continue the larger patch in another thread, we will need to join later
 	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
 	struct sockaddr_un sun;
@@ -144,11 +147,18 @@ void start_daemon() {
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
 	chmod("/sbin", 0755);
+	mkdir("/magisk", 0755);
+	chmod("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	// Loop forever to listen to requests
 	while(1) {
-		request_handler(xaccept(fd, NULL, NULL));
+		int *client = xmalloc(sizeof(int));
+		*client = xaccept(fd, NULL, NULL);
+		pthread_t thread;
+		xpthread_create(&thread, NULL, request_handler, client);
+		// Detach the thread, we will never join it
+		pthread_detach(thread);
 	}
 }
 
