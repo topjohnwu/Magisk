@@ -6,6 +6,7 @@
 #include "vector.h"
 
 void vec_init(struct vector *v) {
+	if (v == NULL) return;
 	vec_size(v) = 0;
 	vec_cap(v) = 1;
 	vec_entry(v) = malloc(sizeof(void*));
@@ -22,6 +23,7 @@ void vec_push_back(struct vector *v, void *p) {
 }
 
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *)) {
+	if (v == NULL) return;
 	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);
 }
 
@@ -29,6 +31,7 @@ void vec_sort(struct vector *v, int (*compar)(const void *, const void *)) {
  * use in cases when each element requires special cleanup 
  */
 void vec_destroy(struct vector *v) {
+	if (v == NULL) return;
 	vec_size(v) = 0;
 	vec_cap(v) = 0;
 	free(vec_entry(v));
@@ -39,6 +42,7 @@ void vec_destroy(struct vector *v) {
  * Shall be the general case
  */
 void vec_deep_destroy(struct vector *v) {
+	if (v == NULL) return;
 	void *e;
 	vec_for_each(v, e) {
 		free(e);

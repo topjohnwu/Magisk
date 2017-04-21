@@ -8,6 +8,15 @@
 #define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
 #define POLICY_FILE 	"/sys/fs/selinux/policy"
 
+typedef enum {
+	HIDE_ERROR = -1,
+	HIDE_SUCCESS = 0,
+	HIDE_IS_ENABLED,
+	HIDE_NOT_ENABLED,
+	HIDE_ITEM_EXIST,
+	HIDE_ITEM_NOT_EXIST
+} hide_ret;
+
 // Kill process
 void kill_proc(int pid);
 
