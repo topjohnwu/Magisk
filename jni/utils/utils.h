@@ -74,5 +74,6 @@ void unlock_blocks();
 void unblock_boot_process();
 void setup_sighandlers(void (*handler)(int));
 int run_command(int *fd, const char *path, char *const argv[]);
+void exec_common_script(const char* stage);
 
 #endif

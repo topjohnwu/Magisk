@@ -52,7 +52,8 @@ void launch_magiskhide(int client) {
 	LOGI("* Starting MagiskHide\n");
 
 	hideEnabled = 1;
-	setprop("persist.magisk.hide", "1");
+	init_resetprop();
+	setprop2("persist.magisk.hide", "1", 0);
 
 	hide_sensitive_props();
 

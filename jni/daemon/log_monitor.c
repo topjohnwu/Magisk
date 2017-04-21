@@ -14,8 +14,11 @@
 #include "daemon.h"
 
 static void *logger_thread(void *args) {
+	// Setup error handler
+	err_handler = exit_thread;
+
 	char buffer[PATH_MAX];
-	xrename("/cache/magisk.log", "/cache/last_magisk.log");
+	rename("/cache/magisk.log", "/cache/last_magisk.log");
 	FILE *logfile = xfopen("/cache/magisk.log", "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
