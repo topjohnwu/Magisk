@@ -170,6 +170,7 @@ void sepol_min_rules() {
 
 	// Shell, prop management, simple su rights, logs
 	sepol_allow("su", "property_socket", "sock_file", "write");
+	sepol_allow("su", "properties_device", "file", "write");
 	if (sepol_exists("default_prop")) {
 		sepol_allow("su", "default_prop", "property_service", "set");
 		sepol_allow("su", "default_prop", "file", "write");
@@ -189,7 +190,6 @@ void sepol_min_rules() {
 	sepol_allow("su", "zygote_exec", "lnk_file", ALL);
 	sepol_allow("su", "app_data_file", "dir", ALL);
 	sepol_allow("su", "app_data_file", "file", ALL);
-	sepol_allow("su", "toolbox_exec", "file", ALL);
 	sepol_allow("su", "shell_exec", "file", ALL);
 	sepol_allow("su", "su", "unix_dgram_socket", ALL);
 	sepol_allow("su", "su", "unix_stream_socket", ALL);
@@ -199,6 +199,8 @@ void sepol_min_rules() {
 	sepol_allow("su", "su", "fifo_file", ALL);
 	sepol_allow("su", "su", "lnk_file", ALL);
 	sepol_allow("su", "su", "dir", ALL);
+	if (sepol_exists("toolbox_exec"))
+		sepol_allow("su", "toolbox_exec", "file", ALL);
 	if (sepol_exists("logdr_socket"))
 		sepol_allow("su", "logdr_socket", "sock_file", "write");
 	if (sepol_exists("logd"))
@@ -223,7 +225,8 @@ void sepol_min_rules() {
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
 
 	// xperms
-	sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
+	if (policydb->policyvers >= 30)
+		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
 }
 
 void sepol_med_rules() {
