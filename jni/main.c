@@ -22,7 +22,7 @@ __thread void (*err_handler)(void);
 
 static void usage() {
 	fprintf(stderr,
-		"Magisk v" xstr(VERSION) " multi-call binary\n"
+		"Magisk v" xstr(MAGISK_VERSION) " multi-call binary\n"
 		"\n"
 		"Usage: %s [applet [arguments]...]\n"
 		"   or: %s --install [SOURCE] <DIR> \n"

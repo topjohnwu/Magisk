@@ -134,12 +134,15 @@ static void (*ps_filter_cb)(int);
 static const char *ps_filter_pattern;
 static void proc_name_filter(int pid) {
 	char buf[64];
+	int fd;
 	snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-	int fd = xopen(buf, O_RDONLY);
+	if ((fd = open(buf, O_RDONLY)) == -1)
+		return;
 	if (fdgets(buf, sizeof(buf), fd) == 0) {
 		snprintf(buf, sizeof(buf), "/proc/%d/comm", pid);
 		close(fd);
-		fd = xopen(buf, O_RDONLY);
+		if ((fd = open(buf, O_RDONLY)) == -1)
+			return;
 		fdgets(buf, sizeof(buf), fd);
 	}
 	if (strstr(buf, ps_filter_pattern)) {
