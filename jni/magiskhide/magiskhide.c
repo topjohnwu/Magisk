@@ -44,7 +44,7 @@ static void usage(char *arg0) {
 
 void launch_magiskhide(int client) {
 	if (hideEnabled) {
-		write_int(client, 0);
+		write_int(client, HIDE_IS_ENABLED);
 		close(client);
 		return;
 	}
@@ -79,7 +79,7 @@ void launch_magiskhide(int client) {
 	// Initialize the mutex lock
 	pthread_mutex_init(&hide_lock, NULL);
 
-	write_int(client, 0);
+	write_int(client, HIDE_SUCCESS);
 	close(client);
 
 	// Get thread reference
@@ -90,7 +90,7 @@ void launch_magiskhide(int client) {
 
 error:
 	hideEnabled = 0;
-	write_int(client, 1);
+	write_int(client, HIDE_ERROR);
 	close(client);
 	if (hide_pid != -1) {
 		int kill = -1;
@@ -105,7 +105,7 @@ error:
 
 void stop_magiskhide(int client) {
 	if (!hideEnabled) {
-		write_int(client, 0);
+		write_int(client, HIDE_NOT_ENABLED);
 		close(client);
 		return;
 	}
@@ -116,7 +116,7 @@ void stop_magiskhide(int client) {
 	setprop("persist.magisk.hide", "0");
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 
-	write_int(client, 0);
+	write_int(client, HIDE_SUCCESS);
 	close(client);
 }
 
@@ -147,10 +147,26 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
 	}
-	int code = read_int(fd);
+	hide_ret code = read_int(fd);
 	close(fd);
-	if (code) {
-		fprintf(stderr, "Error occured in MagiskHide daemon\n");
+	switch (code) {
+	case HIDE_ERROR:
+		fprintf(stderr, "Error occured in daemon...\n");
+		break;
+	case HIDE_SUCCESS:
+		break;
+	case HIDE_NOT_ENABLED:
+		fprintf(stderr, "Magisk hide is not enabled yet\n");
+		break;
+	case HIDE_IS_ENABLED:
+		fprintf(stderr, "Magisk hide is already enabled\n");
+		break;
+	case HIDE_ITEM_EXIST:
+		fprintf(stderr, "Process [%s] already exists in hide list\n", argv[2]);
+		break;
+	case HIDE_ITEM_NOT_EXIST:
+		fprintf(stderr, "Process [%s] does not exist in hide list\n", argv[2]);
+		break;
 	}
 	return code;
 }

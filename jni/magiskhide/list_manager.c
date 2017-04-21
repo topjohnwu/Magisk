@@ -11,14 +11,16 @@
 #include "magiskhide.h"
 
 int add_list(char *proc) {
-	if (!hideEnabled)
-		return 1;
+	if (!hideEnabled) {
+		free(proc);
+		return HIDE_NOT_ENABLED;
+	}
 
 	char *line;
 	struct vector *new_list, *temp = hide_list;
 	new_list = xmalloc(sizeof(*new_list));
 	if (new_list == NULL)
-		return 1;
+		return HIDE_ERROR;
 	vec_init(new_list);
 
 	vec_for_each(hide_list, line) {
@@ -27,7 +29,7 @@ int add_list(char *proc) {
 			free(proc);
 			vec_destroy(new_list);
 			free(new_list);
-			return 2;
+			return HIDE_ITEM_EXIST;
 		}
 		vec_push_back(new_list, line);
 	}
@@ -45,19 +47,22 @@ int add_list(char *proc) {
 	vec_destroy(temp);
 	free(temp);
 	if (vector_to_file(HIDELIST, hide_list))
-		return 1;
-	return 0;
+		return HIDE_ERROR;
+	return HIDE_SUCCESS;
 }
 
 int rm_list(char *proc) {
-	if (!hideEnabled)
-		return 1;
+	if (!hideEnabled) {
+		free(proc);
+		return HIDE_NOT_ENABLED;
+	}
 
+	hide_ret ret = HIDE_ERROR;
 	char *line;
 	struct vector *new_list, *temp;
 	temp = new_list = xmalloc(sizeof(*new_list));
 	if (new_list == NULL)
-		return 1;
+		goto error;
 	vec_init(new_list);
 
 	vec_for_each(hide_list, line) {
@@ -77,14 +82,18 @@ int rm_list(char *proc) {
 		pthread_mutex_lock(&hide_lock);
 		hide_list = new_list;
 		pthread_mutex_unlock(&hide_lock);
+		ret = HIDE_SUCCESS;
 		if (vector_to_file(HIDELIST, hide_list))
-			return 1;
+			ret = HIDE_ERROR;
+	} else {
+		ret = HIDE_ITEM_NOT_EXIST;
 	}
 
+error:
 	free(proc);
 	vec_destroy(temp);
 	free(temp);
-	return 0;
+	return ret;
 }
 
 int init_list() {

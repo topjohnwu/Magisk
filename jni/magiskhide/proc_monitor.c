@@ -141,7 +141,7 @@ void proc_monitor() {
 				// Send pause signal ASAP
 				if (kill(pid, SIGSTOP) == -1) continue;
 
-				LOGI("proc_monitor: %s(PID=%d ns=%s)\n", processName, pid, buffer);
+				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, buffer);
 
 				// Unmount start
 				xwrite(sv[0], &pid, sizeof(pid));
