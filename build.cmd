@@ -95,7 +95,6 @@ EXIT /B %ERRORLEVEL%
   2>NUL RMDIR /S /Q zip_static\arm64
   2>NUL RMDIR /S /Q zip_static\x86
   2>NUL RMDIR /S /Q zip_static\x64
-  2>NUL RMDIR /S /Q zip_static\chromeos
   2>NUL DEL zip_static\META-INF\com\google\android\update-binary
   2>NUL DEL zip_static\common\*.sh
   2>NUL DEL zip_static\common\*.rc
@@ -104,7 +103,6 @@ EXIT /B %ERRORLEVEL%
   2>NUL RMDIR /S /Q uninstaller\arm64
   2>NUL RMDIR /S /Q uninstaller\x86
   2>NUL RMDIR /S /Q uninstaller\x64
-  2>NUL RMDIR /S /Q uninstaller\chromeos
   EXIT /B 0
 
 :zip
@@ -119,18 +117,13 @@ EXIT /B %ERRORLEVEL%
   ECHO ************************
   ECHO * Adding version info
   ECHO ************************
-  powershell.exe -nologo -noprofile -command "(gc -Raw scripts\flash_script.sh) -replace 'MAGISK_VERSION_STUB', 'Magisk v%~1 Boot Image Patcher' | sc zip_static\META-INF\com\google\android\update-binary"
-  powershell.exe -nologo -noprofile -command "(gc -Raw scripts\magic_mask.sh) -replace 'MAGISK_VERSION_STUB', 'setprop magisk.version \"%~1\"' | sc zip_static\common\magic_mask.sh"
+  powershell.exe -nologo -noprofile -command "(gc -Raw scripts\flash_script.sh) -replace 'MAGISK_VERSION_STUB', 'Magisk v%~1 Installer' | sc zip_static\META-INF\com\google\android\update-binary"
+  rem powershell.exe -nologo -noprofile -command "(gc -Raw scripts\magic_mask.sh) -replace 'MAGISK_VERSION_STUB', 'setprop magisk.version \"%~1\"' | sc zip_static\common\magic_mask.sh"
   ECHO ************************
   ECHO * Copying Files
   ECHO ************************
   COPY /Y scripts\custom_ramdisk_patch.sh zip_static\common\custom_ramdisk_patch.sh
   COPY /Y scripts\init.magisk.rc zip_static\common\init.magisk.rc
-  COPY /Y binaries\busybox-arm zip_static\arm\busybox
-  COPY /Y binaries\busybox-arm64 zip_static\arm64\busybox
-  COPY /Y binaries\busybox-x86 zip_static\x86\busybox
-  COPY /Y binaries\busybox-x64 zip_static\x64\busybox
-  CALL :mkcp binaries\chromeos zip_static\chromeos
   ECHO ************************
   ECHO * Zipping Magisk v%~1
   ECHO ************************
@@ -149,11 +142,6 @@ EXIT /B %ERRORLEVEL%
   ECHO * Copying Files
   ECHO ************************
   CALL :mkcp scripts\magisk_uninstaller.sh uninstaller\common
-  COPY /Y binaries\busybox-arm uninstaller\arm\busybox
-  COPY /Y binaries\busybox-arm64 uninstaller\arm64\busybox
-  COPY /Y binaries\busybox-x86 uninstaller\x86\busybox
-  COPY /Y binaries\busybox-x64 uninstaller\x64\busybox
-  CALL :mkcp binaries\chromeos uninstaller\chromeos
   ECHO ************************
   ECHO * Zipping uninstaller
   ECHO ************************

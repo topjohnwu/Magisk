@@ -10,7 +10,8 @@
 *.cmd text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
-binaries/** binary
+zip_static/chromeos/** binary
+uninstaller/chromeos/** binary
 *.jar binary
 *.exe binary
 *.apk binary

@@ -44,11 +44,6 @@ find_boot_image() {
 # Environments
 # Set permissions
 chmod -R 755 $CHROMEDIR/futility $MAGISKBIN 2>/dev/null
-# Temporary busybox for installation
-mkdir -p $TMPDIR/busybox
-$MAGISKBIN/busybox --install -s $TMPDIR/busybox
-rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
-PATH=$TMPDIR/busybox:$PATH
 
 # Find the boot image
 find_boot_image

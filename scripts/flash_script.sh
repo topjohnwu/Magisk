@@ -190,9 +190,9 @@ cpio_mkdir() {
 # Detection
 ##########################################################################################
 
-ui_print "*****************************"
-ui_print "MAGISK_VERSION_STUB"
-ui_print "*****************************"
+ui_print "************************"
+ui_print "* MAGISK_VERSION_STUB"
+ui_print "************************"
 
 if [ ! -d "$COMMONDIR" ]; then
   ui_print "! Failed: Unable to extract zip file!"
@@ -256,35 +256,21 @@ fi
 # Environment
 ##########################################################################################
 
-# TODO: Environment
+ui_print "- Constructing environment"
 
-# ui_print "- Constructing environment"
+is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
-# is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
+# Copy required files
+rm -rf $MAGISKBIN 2>/dev/null
+mkdir -p $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/magisk.apk $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $MAGISKBIN
 
-# # Copy required files
-# rm -rf $MAGISKBIN 2>/dev/null
-# mkdir -p $MAGISKBIN
-# cp -af $BINDIR/busybox $BINDIR/magiskboot $BINDIR/magiskpolicy $COMMONDIR/magisk.apk \
-#        $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $COMMONDIR/magic_mask.sh $MAGISKBIN
-# # Legacy support
-# ln -sf /data/magisk/magiskpolicy $MAGISKBIN/sepolicy-inject
-
-# chmod -R 755 $MAGISKBIN
-# chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
-
-# # Temporary busybox for installation
-# rm -rf $TMPDIR/busybox 2>/dev/null
-# mkdir -p $TMPDIR/busybox
-# $BINDIR/busybox --install -s $TMPDIR/busybox
-# rm -f $TMPDIR/busybox/su $TMPDIR/busybox/sh $TMPDIR/busybox/reboot
-# PATH=$TMPDIR/busybox:$PATH
+chmod -R 755 $MAGISKBIN
+chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
 
 ##########################################################################################
 # Magisk Image
 ##########################################################################################
-
-# TODO: Magisk Image
 
 # Fix SuperSU.....
 $BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
@@ -311,7 +297,7 @@ fi
 MAGISKLOOP=$LOOPDEVICE
 
 # Core folders and scripts
-mkdir -p $COREDIR/bin $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
+mkdir -p $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
 
 chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
@@ -450,12 +436,8 @@ else
   cpio_add 644 sepolicy sepolicy
 
   # Add new items
-  cpio_mkdir 755 magisk
-
   [ ! -z $SHA1 ] && echo "# STOCKSHA1=$SHA1" >> $COMMONDIR/init.magisk.rc
   cpio_add 750 init.magisk.rc $COMMONDIR/init.magisk.rc
-
-  # cpio_add 750 sbin/magic_mask.sh $COMMONDIR/magic_mask.sh
   cpio_add 755 sbin/magisk $BINDIR/magisk
 
   # Create ramdisk backups

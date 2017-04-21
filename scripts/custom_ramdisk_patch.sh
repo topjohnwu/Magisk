@@ -47,11 +47,10 @@ cpio_add 750 init.rc init.rc
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
-LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskpolicy --load sepolicy --save sepolicy --minimal
+LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magisk magiskpolicy --load sepolicy --save sepolicy --minimal
 cpio_add 644 sepolicy sepolicy
 
 # Add new items
-cpio_mkdir 755 magisk
 cpio_add 750 init.magisk.rc $MAGISKBIN/init.magisk.rc
-cpio_add 750 sbin/magic_mask.sh $MAGISKBIN/magic_mask.sh
+cpio_add 755 sbin/magisk $MAGISKBIN/magisk
 
