@@ -37,9 +37,9 @@ int add_list(char *proc) {
 	ps_filter_proc_name(proc, kill_proc);
 
 	// Critical region
-	pthread_mutex_lock(&lock);
+	pthread_mutex_lock(&hide_lock);
 	hide_list = new_list;
-	pthread_mutex_unlock(&lock);
+	pthread_mutex_unlock(&hide_lock);
 
 	// Free old list
 	vec_destroy(temp);
@@ -74,9 +74,9 @@ int rm_list(char *proc) {
 		LOGI("hide_list rm: [%s]\n", proc);
 		ps_filter_proc_name(proc, kill_proc);
 		// Critical region
-		pthread_mutex_lock(&lock);
+		pthread_mutex_lock(&hide_lock);
 		hide_list = new_list;
-		pthread_mutex_unlock(&lock);
+		pthread_mutex_unlock(&hide_lock);
 		if (vector_to_file(HIDELIST, hide_list))
 			return 1;
 	}

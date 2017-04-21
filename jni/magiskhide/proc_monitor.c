@@ -44,7 +44,7 @@ static void quit_pthread(int sig) {
 	write(sv[0], &kill, sizeof(kill));
 	close(sv[0]);
 	waitpid(hide_pid, NULL, 0);
-	pthread_mutex_destroy(&lock);
+	pthread_mutex_destroy(&hide_lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
 }
@@ -63,7 +63,7 @@ static void proc_monitor_err() {
 	quit_pthread(SIGUSR1);
 }
 
-void *proc_monitor(void *args) {
+void proc_monitor() {
 	// Register the cancel signal
 	signal(SIGUSR1, quit_pthread);
 	// The error handler should only exit the thread, not the whole process
@@ -120,7 +120,7 @@ void *proc_monitor(void *args) {
 		ret = 0;
 
 		// Critical region
-		pthread_mutex_lock(&lock);
+		pthread_mutex_lock(&hide_lock);
 		vec_for_each(hide_list, line) {
 			if (strcmp(processName, line) == 0) {
 				read_namespace(pid, buffer, 32);
@@ -152,7 +152,7 @@ void *proc_monitor(void *args) {
 				break;
 			}
 		}
-		pthread_mutex_unlock(&lock);
+		pthread_mutex_unlock(&hide_lock);
 
 		if (ret) {
 			// Wait hide process to kill itself
@@ -163,5 +163,4 @@ void *proc_monitor(void *args) {
 
 	// Should never be here
 	quit_pthread(SIGUSR1);
-	return NULL;
 }

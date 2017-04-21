@@ -15,7 +15,7 @@ void kill_proc(int pid);
 int hide_daemon();
 
 // Process monitor
-void *proc_monitor(void *args);
+void proc_monitor();
 
 // Preprocess
 void manage_selinux();
@@ -30,6 +30,6 @@ int destroy_list();
 
 extern int sv[2], hide_pid, hideEnabled;
 extern struct vector *hide_list;
-extern pthread_mutex_t lock;
+extern pthread_mutex_t hide_lock;
 
 #endif
