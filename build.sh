@@ -26,7 +26,6 @@ cleanup() {
   rm -rfv zip_static/arm64
   rm -rfv zip_static/x86
   rm -rfv zip_static/x64
-  rm -rfv zip_static/chromeos
   rm -rfv zip_static/META-INF/com/google/android/update-binary
   rm -rfv zip_static/common/*.sh
   rm -rfv zip_static/common/*.rc
@@ -35,7 +34,6 @@ cleanup() {
   rm -rfv uninstaller/arm64
   rm -rfv uninstaller/x86
   rm -rfv uninstaller/x64
-  rm -rfv uninstaller/chromeos
 }
 
 mkcp() {
@@ -76,22 +74,17 @@ build_bin() {
 
 zip_package() {
   [ -z "$1" ] && echo -e "! Missing version info\n" && usage
-  [ ! -f "zip_static/arm/magiskboot" ] && error "Missing binaries!! Please run '$0 build' before zipping"
+  [ ! -f "zip_static/arm/magiskboot" ] && error "Missing binaries!! Please run '$ME build' before zipping"
   echo "************************"
   echo "* Adding version info"
   echo "************************"
-  sed "s/MAGISK_VERSION_STUB/Magisk v$1 Boot Image Patcher/g" scripts/flash_script.sh > zip_static/META-INF/com/google/android/update-binary
-  sed "s/MAGISK_VERSION_STUB/setprop magisk.version \"$1\"/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
+  sed "s/MAGISK_VERSION_STUB/Magisk v$1 Installer/g" scripts/flash_script.sh > zip_static/META-INF/com/google/android/update-binary
+  # sed "s/MAGISK_VERSION_STUB/setprop magisk.version \"$1\"/g" scripts/magic_mask.sh > zip_static/common/magic_mask.sh
   echo "************************"
   echo "* Copying files"
   echo "************************"
   cp -afv scripts/custom_ramdisk_patch.sh zip_static/common/custom_ramdisk_patch.sh
   cp -afv scripts/init.magisk.rc zip_static/common/init.magisk.rc
-  cp -afv binaries/busybox-arm zip_static/arm/busybox
-  cp -afv binaries/busybox-arm64 zip_static/arm64/busybox
-  cp -afv binaries/busybox-x86 zip_static/x86/busybox
-  cp -afv binaries/busybox-x64 zip_static/x64/busybox
-  cp -afv binaries/chromeos/. zip_static/chromeos
   echo "************************"
   echo "* Zipping Magisk v$1"
   echo "************************"
@@ -110,15 +103,9 @@ zip_uninstaller() {
   echo "* Copying files"
   echo "************************"
   mkcp scripts/magisk_uninstaller.sh uninstaller/common
-  cp -afv binaries/busybox-arm uninstaller/arm/busybox
-  cp -afv binaries/busybox-arm64 uninstaller/arm64/busybox
-  cp -afv binaries/busybox-x86 uninstaller/x86/busybox
-  cp -afv binaries/busybox-x64 uninstaller/x64/busybox
-  cp -afv binaries/chromeos/. zip_static/chromeos
   echo "************************"
   echo "* Zipping uninstaller"
   echo "************************"
-  mkcp scripts/magisk_uninstaller.sh uninstaller/common
   cd uninstaller
   find . -type f -exec chmod 644 {} \;
   find . -type d -exec chmod 755 {} \;
@@ -155,7 +142,6 @@ sign_zip() {
 }
 
 DIR="$(cd "$(dirname "$0")"; pwd)"
-cd "$DIR"
 DEBUG=
 CPUNUM=`getconf _NPROCESSORS_ONLN`
 ME=$0

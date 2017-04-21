@@ -7,12 +7,10 @@ zip_static/arm/*
 zip_static/arm64/*
 zip_static/x86/*
 zip_static/x64/*
-zip_static/chromeos/*
 uninstaller/arm/*
 uninstaller/arm64/*
 uninstaller/x86/*
 uninstaller/x64/*
-uninstaller/chromeos/*
 ziptools/zipadjust
 
 # Generated scripts
