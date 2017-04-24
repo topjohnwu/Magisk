@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <zlib.h>
+#include <string.h>
 #include "zipadjust.h"
 
 size_t insize = 0, outsize = 0, alloc = 0;

@@ -20,8 +20,10 @@
                 android:id="@+id/txtLog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="monospace"
                 android:padding="8dp"
-                android:textIsSelectable="true"/>
+                android:textIsSelectable="true"
+                android:textSize="10sp" />
 
             <ProgressBar
                 android:id="@+id/progressBar"
