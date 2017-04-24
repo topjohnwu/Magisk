@@ -214,7 +214,7 @@ int su_daemon_main(int argc, char **argv) {
 			.database_path = APPLICATION_DATA_PATH REQUESTOR_DATABASE_PATH,
 			.base_path = APPLICATION_DATA_PATH REQUESTOR
 		},
-		.umask = umask(022),
+		.umask = 022,
 	};
 	su_ctx = &ctx;
 
