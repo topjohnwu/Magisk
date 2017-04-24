@@ -6,6 +6,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Abrir gaveta de notificação</string>
     <string name="navigation_drawer_close">Fechar gaveta de notificação</string>
+	
     <string name="modules">Módulos</string>
     <string name="downloads">Baixar</string>
 	<string name="superuser">Superusuário</string>
@@ -16,6 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s Instalado</string>
+	<string name="magisk_version_core_only">Magisk v%1$s Instalado(Somente em modo Core)</string>
     <string name="magisk_version_error">Magisk não instalado</string>
 
 	<string name="checking_for_updates">Checando por atualizações…</string>
@@ -36,6 +38,7 @@
 
     <!--Install Fragment-->
 	<string name="auto_detect">(Auto) %1$s</string>
+	<string name="cannot_auto_detect">(Não foi auto detectado)</string>
     <string name="boot_image_title">Local da Boot Image</string>
     <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Configurações avançadas</string>
@@ -43,8 +46,12 @@
     <string name="keep_dm_verity">Keep dm-verity</string>
     <string name="current_magisk_title">Versão instalada do Magisk: %1$s</string>
     <string name="install_magisk_title">Última versão do Magisk: %1$s</string>
+	<string name="uninstall">Desinstalar</string>
+    <string name="reboot_countdown">Reiniciando em %1$d</string>
+    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
+    <string name="uninstall_magisk_msg">Isso removerá todos os módulos, MagiskSU, e Potencialmente criptografar seus dados se não criptografados\nVocê deseja continuar?</string>
+    <string name="version_none">(Nenhum)</string>
 
-	
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
@@ -85,9 +92,12 @@
     <string name="permissionNotGranted">Este recurso não funcionará sem permissão de escrita do armazenamento externo.</string>
     <string name="no_thanks">Não, Obrigado</string>
 	<string name="yes">Sim</string>
+	<string name="ok">OK</string>
+    <string name="close">Fechar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Você deseja instalar%1$s ?</string>
     <string name="download_install">Baixar &amp; instalar</string>
+	<string name="download">Baixar</string>
 	<string name="goto_install">Ir na seção \"Instalar\"</string>
     <string name="download_file_error">Erro ao baixar o arquivo</string>
     <string name="install_error">Erro na instalação!</string>
@@ -109,19 +119,25 @@
 	<string name="repo_cache_cleared">Cache do Repo. limpado</string>
     <string name="safetyNet_hide_notice">Este aplicativo usa SafetyNet\nJá manipulado pelo MagiskHide por padrão</string>
     <string name="start_magiskhide">Iniciando MagiskHide …</string>
-	
-	
-	
-	
-	
+	<string name="no_magisksu_title">Não está usando MagiskSU!</string>
+    <string name="no_magisksu_msg">Você não está rooteado com MagiskSU, Usar MagiskHide em si pode não ser suficiente!\Ele não é oficialmente suportado, E você precisaria de ferramentas adicionais (ex: suhide) para passar pelo Safety Net.</string>
+    <string name="understand">Eu entendo</string>
+    <string name="process_error">Erro no processo</string>
+    <string name="internal_storage">O zip foi salvo em:\n[Armazenamento interno]%1$s</string>
+    <string name="zip_process_title">Processando</string>
+    <string name="manual_boot_image">Por Favor, selecione manualmente a Boot Image</string>
 	
     <!--Settings Fragment -->
     <string name="settings_general_category">Geral</string>
     <string name="settings_dark_theme_title">Tema escuro</string>
     <string name="settings_dark_theme_summary">Ativa o tema escuro</string>
+	<string name="settings_notification_title">Notificação de Atualização</string>
+    <string name="settings_notification_summary">Mostrar notificações de atualização quando a nova versão estiver disponível</string>
     <string name="settings_clear_cache_title">Limpar Repo Cache</string>
     <string name="settings_clear_cache_summary">Limpe as informações armazenadas em cache para repos. online, forçando o aplicativo a atualizar online</string>
 
+	<string name="settings_core_only_title">Magisk modo somente Core</string>
+    <string name="settings_core_only_summary">Ativar somente recursos principais, todos os módulos não serão carregados. MagiskSU, MagiskHide, systemless hosts, e busybox ainda estará ativado</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
     <string name="settings_busybox_summary">Monta a busybox interna do Magisk\'s para xbin</string>
@@ -152,7 +168,7 @@
 	<string name="su_request_title">Solicitação de superusuário</string>
     <string name="deny_with_str">Negar%1$s</string>
     <string name="deny">Negar</string>
-    <string name="prompt">Painel</string>
+    <string name="prompt">Perguntar</string>
     <string name="grant">Permitir</string>
     <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se você não tiver certeza!</string>
     <string name="forever">Sempre</string>
@@ -173,7 +189,7 @@
     <string name="su_snack_revoke">%1$s Direitos foi revogados</string>
     <string name="su_revoke_title">Revogar?</string>
     <string name="su_revoke_msg">Revogar os diretos do %1$s, Confirmar?</string>
-    <string name="toast">Notificação simples</string>
+    <string name="toast">Notificação(Toast)</string>
     <string name="none">Nenhum</string>
 
     <!--Superuser logs-->
