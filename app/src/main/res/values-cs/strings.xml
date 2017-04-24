@@ -190,6 +190,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Cílové UID:\u0020</string>
     <string name="command">Příkaz:\u0020</string>
-    <string name="settings_core_only_summary"></string>
 
 </resources>

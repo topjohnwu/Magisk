@@ -17,7 +17,7 @@
     <string name="magisk_version_core_only">Magisk v%1$sインストールされた (コアのみモード)</string>
     <string name="magisk_version_error">Magisk がインストールされていない</string>
 
-    <string name="checking_for_updates">更新をチェック中...</string>
+    <string name="checking_for_updates">更新をチェック中…</string>
     <string name="magisk_update_available">Magisk v%1$.1fが利用可能！</string>
     <string name="cannot_check_updates">更新を確認できない、インターネット接続なし？</string>
     <string name="up_to_date">%1$sの最新バージョンがインストールされている</string>
@@ -25,7 +25,7 @@
     <string name="not_rooted">rootされていない</string>
     <string name="proper_root">正しくrootされた</string>
     <string name="safetyNet_check_text">タップして、SafetyNetチェックを開始</string>
-    <string name="checking_safetyNet_status">SafetyNetの状態を確認している...</string>
+    <string name="checking_safetyNet_status">SafetyNetの状態を確認している…</string>
     <string name="safetyNet_connection_failed">Google APIに接続できない</string>
     <string name="safetyNet_connection_suspended">Google APIへの接続が中断された</string>
     <string name="safetyNet_error">SafetyNetチェックできない、ネットがないか？</string>
@@ -40,7 +40,7 @@
     <string name="detect_button">検出</string>
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を保持する</string>
-    <string name="keep_dm_verity">dm-verityを保留する/string>
+    <string name="keep_dm_verity">dm-verityを保留する</string>
     <string name="current_magisk_title">インストールされたMagiskバージョン： %1$s</string>
     <string name="install_magisk_title">最新のMagiskバージョン： %1$s</string>
     <string name="uninstall">アンインストール</string>
@@ -103,19 +103,19 @@
     <string name="reboot_msg">今すぐ再起動しますか？</string>
     <string name="reboot">リブート</string>
     <string name="copying_msg">一時ディレクトリへのzipをコピーしている</string>
-    <string name="zip_install_progress_title">インストール中...</string>
-    <string name="zip_unzip_msg">ZIPファイル解凍中...</string>
-    <string name="zip_process_msg">ZIPファイル処理中...</string>
-    <string name="zip_install_progress_msg">%1$sインストール中...</string>
+    <string name="zip_install_progress_title">インストール中…</string>
+    <string name="zip_unzip_msg">ZIPファイル解凍中…</string>
+    <string name="zip_process_msg">ZIPファイル処理中…</string>
+    <string name="zip_install_progress_msg">%1$sインストール中…</string>
     <string name="no_magisk_title">Magiskがインストールされていない</string>
     <string name="no_magisk_msg"> Magiskをダウンロードしてインストールしますか？</string>
-    <string name="downloading_toast">%1$sをダウンロード中...</string>
+    <string name="downloading_toast">%1$sをダウンロード中…</string>
     <string name="magisk_update_title">新しいMagisk更新が利用可能！</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">リリースノート</string>
     <string name="repo_cache_cleared">リポジトリキャッシュが消去された</string>
     <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用している。\n既定ではMagiskHideで既に処理された</string>
-    <string name="start_magiskhide">MagiskHide開始... </string>
+    <string name="start_magiskhide">MagiskHide開始… </string>
     <string name="no_magisksu_title">MagiskSUを使用してない！</string>
     <string name="no_magisksu_msg">あなたのデバイスはMagiskSUにrootされていない、MagiskHideを使用するだけでは十分ではない。\nそれは正式にサポートされていなくて、あなたはSafetyNetを通過するための追加ツール（例えばsuhide）が必要です。</string>
     <string name="understand">わかった</string>
@@ -132,7 +132,7 @@
     <string name="settings_notification_summary">新しいバージョンが利用可能に更新通知を表示する</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報をクリアし、アプリをオンラインで更新する</string>
-　　<string name="settings_core_only_title">Magiskコアのみのモード</string>
+    <string name="settings_core_only_title">Magiskコアのみのモード</string>
     <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされません。 MagiskSU、MagiskHide、systemless hosts、BusyBoxは引き続き有効になります。</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠す</string>
     <string name="settings_busybox_title">BusyBoxを有効にする</string>
@@ -158,7 +158,7 @@
     <string name="settings_developer_logging_title">高度なデバッグログを有効にする</string>
     <string name="settings_developer_logging_summary">詳細ログを有効にするにはこれをチェック</string>
     <string name="settings_shell_logging_title">ェルコマンドデバッグログを有効にする</string>
-    <string name="settings_shell_logging_summary">これをチェックすると、すべてのシェルコマンドとその出力をログに記録することができる/string>
+    <string name="settings_shell_logging_summary">これをチェックすると、すべてのシェルコマンドとその出力をログに記録することができる</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>
@@ -177,7 +177,7 @@
     <string name="su_deny_toast">％1$s はスーパーユーザー権限を許可された</string>
     <string name="no_apps_found">​​アプリが見つからない。</string>
     <string name="su_snack_grant">のスーパーユーザー権限が許可されました</string>
-    <string name="su_snack_deny">%1$s のスーパーユーザー権限が拒否されました/string>
+    <string name="su_snack_deny">%1$s のスーパーユーザー権限が拒否されました</string>
     <string name="su_snack_notif_on">%1$の通知は有効になって。</string>
     <string name="su_snack_notif_off">%1$の通知は無効になって。</string>
     <string name="su_snack_log_on">%1$s のログは有効になって。</string>

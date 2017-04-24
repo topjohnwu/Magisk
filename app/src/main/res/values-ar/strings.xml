@@ -101,7 +101,7 @@
     <string name="proper_root">مروت فعلاً</string>
     <string name="advanced_settings_title">إعدادات متقدمة</string>
     <string name="boot_image_title">موقع ملف الإقلاع</string>
-    <string name="checking_safetyNet_status">التحقق من حالة SafetyNet...</string>
+    <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="copying_msg">نسخ الملف المضغوط إلى دليل مؤقت</string>
     <string name="detect_button">تحقق</string>
     <string name="downloading_toast">جاري التنزيل %1$s</string>
