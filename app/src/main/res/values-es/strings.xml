@@ -28,13 +28,13 @@
     <string name="safetyNet_connection_failed">No puede conectar con la API de Google</string>
     <string name="safetyNet_connection_suspended">La conexión con la API de Google API fue suspendida</string>
     <string name="safetyNet_error">No puede comprobar SafetyNet, ¿No tiene internet?</string>
-    <string name="safetyNet_fail">SafetyNet falló: No coincide el perfil CTS</string>
-    <string name="safetyNet_pass">SafetyNet pasó</string>
+    <string name="safetyNet_fail">SafetyNet: Error, no coincide el perfil CTS</string>
+    <string name="safetyNet_pass">SafetyNet: Correcto</string>
     <string name="root_info_warning">Funcionalidad enormemente limitada</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
-    <string name="boot_image_title">Ubicación de imagen boot</string>
+    <string name="boot_image_title">Ubicación de la imagen boot</string>
     <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
@@ -49,9 +49,9 @@
     <string name="no_modules_found">No se han encontrado módulos</string>
     <string name="update_file_created">El módulo se actualizará en el siguiente reinicio</string>
     <string name="remove_file_created">El módulo se eliminará en el siguiente reinicio</string>
-    <string name="remove_file_deleted">El módulo no se eliminirá en el siguiente reinicio</string>
+    <string name="remove_file_deleted">El módulo no se eliminará en el siguiente reinicio</string>
     <string name="disable_file_created">El módulo se desactivará en el siguiente reinicio</string>
-    <string name="disable_file_removed">El móodulo se activará en el siguiente reinicio</string>
+    <string name="disable_file_removed">El módulo se activará en el siguiente reinicio</string>
     <string name="author">Creado por %1$s</string>
     <string name="fab_flash_zip">Flashear el zip del módulo</string>
 
@@ -64,7 +64,7 @@
     <string name="menuSaveToSd">Guardar en la SD</string>
     <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
-    <string name="logs_cleared">Registro Limpiado correctamente</string>
+    <string name="logs_cleared">Registro limpiado correctamente</string>
     <string name="log_is_empty">El registro está vacio</string>
     <string name="logs_save_failed">No se ha podido escribir el registro en la tarjeta SD:</string>
 
@@ -73,7 +73,7 @@
     <string name="app_developers">Desarroladores principales</string>
     <string name="app_developers_"><![CDATA[Aplicación creada por <a href="https://github.com/topjohnwu">topjohnwu</a> en colaboración con <a href="https://github.com/d8ahazard">Digitalhigh</a> y <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Registro de cambios de la aplicación</string>
-    <string name="translators"><![CDATA[Gawenda, netizen, <a href="https://github.com/DeicPro">Deiki</a>]]></string>
+    <string name="translators">Gawenda, netizen, Deiki, Nosi></string>
     <string name="app_version">Versión de la aplicación</string>
     <string name="app_source_code">Código fuente</string>
     <string name="donation">Donar</string>
@@ -83,8 +83,8 @@
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
     <string name="no_thanks">No gracias</string>
-    <string name="yes">Si</string>
-    <string name="ok">Vale</string>
+    <string name="yes">Sí</string>
+    <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>
@@ -113,7 +113,7 @@
     <string name="start_magiskhide">Iniciando MagiskHide …</string>
     <string name="no_magisksu_title">¡No está usando MagiskSU!</string>
     <string name="no_magisksu_msg">No estás rooteado con MagiskSU, ¡Usando MagiskHide por si mismo podría no ser suficiente!\nNo está oficialmente soportado, y necesitaria herramientas adiccionales (ej. suhide) para pasar Safety Net.</string>
-    <string name="understand">Entiendo</string>
+    <string name="understand">Entendido</string>
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Procesando</string>
@@ -154,7 +154,7 @@
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
     <string name="deny_with_str">Denegar%1$s</string>
-    <string name="deny">Denegrar</string>
+    <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permitir</string>
     <string name="su_warning">Permite acceso total a tu dispositivo.\n¡Denegar si no está seguro!</string>
@@ -169,13 +169,13 @@
     <string name="no_apps_found">No se encontraron aplicaciones</string>
     <string name="su_snack_grant">Derechos de superusuario para %1$s permitidos</string>
     <string name="su_snack_deny">Derechos de superusuario para %1$s denegados</string>
-    <string name="su_snack_notif_on">Noticiaciones de %1$s habilitadas</string>
+    <string name="su_snack_notif_on">Notificaciones de %1$s habilitadas</string>
     <string name="su_snack_notif_off">Notificaciones de %1$s deshabilitadas</string>
     <string name="su_snack_log_on">Registros de %1$s habilitados</string>
     <string name="su_snack_log_off">Registros de %1$s deshabilitados</string>
     <string name="su_snack_revoke">Anulados derechos de %1$s</string>
-    <string name="su_revoke_title">¿Anular?</string>
-    <string name="su_revoke_msg">¿Confirmar para anular derechos de %1$s?</string>
+    <string name="su_revoke_title">¿Revocar?</string>
+    <string name="su_revoke_msg">¿Confirmar para revocar derechos de %1$s?</string>
     <string name="toast">Aviso</string>
     <string name="none">Nada</string>
 
