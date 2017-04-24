@@ -43,6 +43,9 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
+	// We manually handle crashes
+	err_handler = do_nothing;
+
 	if (hideEnabled) {
 		write_int(client, HIDE_IS_ENABLED);
 		close(client);
@@ -52,8 +55,12 @@ void launch_magiskhide(int client) {
 	LOGI("* Starting MagiskHide\n");
 
 	hideEnabled = 1;
-	init_resetprop();
-	setprop2("persist.magisk.hide", "1", 0);
+
+	if (init_resetprop())
+		goto error;
+
+	if (setprop2("persist.magisk.hide", "1", 0))
+		goto error;
 
 	hide_sensitive_props();
 

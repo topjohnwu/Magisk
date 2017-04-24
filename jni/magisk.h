@@ -33,9 +33,10 @@
 // Global handler for PLOGE
 extern __thread void (*err_handler)(void);
 
-// Two common error handlers
+// Common error handlers
 static inline void exit_proc() { exit(1); }
 static inline void exit_thread() { pthread_exit(NULL); }
+static inline void do_nothing() {}
 
 // Dummy function to depress debug message
 static inline void stub(const char *fmt, ...) {}

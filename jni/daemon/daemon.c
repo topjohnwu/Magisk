@@ -89,8 +89,6 @@ static int setup_socket(struct sockaddr_un *sun) {
 	return fd;
 }
 
-static void do_nothing() {}
-
 static void *large_sepol_patch(void *args) {
 	LOGD("sepol: Starting large patch thread\n");
 	// Patch su to everything
@@ -117,6 +115,7 @@ void start_daemon() {
 	}
 	xsetsid();
 	xsetcon("u:r:su:s0");
+	umask(022);
 
 	// Patch selinux with medium patch before we do anything
 	load_policydb("/sys/fs/selinux/policy");

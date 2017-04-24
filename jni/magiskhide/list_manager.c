@@ -102,7 +102,7 @@ int init_list() {
 		return 1;
 	vec_init(hide_list);
 
-	// Might return 1 if first time
+	// Might error if file doesn't exist, no need to report
 	file_to_vector(HIDELIST, hide_list);
 
 	char *line;

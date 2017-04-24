@@ -66,7 +66,7 @@ static void proc_monitor_err() {
 void proc_monitor() {
 	// Register the cancel signal
 	signal(SIGUSR1, quit_pthread);
-	// The error handler should only exit the thread, not the whole process
+	// The error handler should stop magiskhide services
 	err_handler = proc_monitor_err;
 
 	int pid;
