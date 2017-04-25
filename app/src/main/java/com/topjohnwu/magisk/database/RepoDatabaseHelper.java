@@ -15,6 +15,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VER = 2;
     private static final String TABLE_NAME = "repos";
+    private static final int MIN_TEMPLATE_VER = 3;
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
@@ -45,6 +46,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
         for (Repo repo : list) {
+            Logger.dev("Add to DB: " + repo.getId());
             db.replace(TABLE_NAME, null, repo.getContentValues());
         }
         db.close();
@@ -60,6 +62,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
         for (Repo repo : list) {
+            Logger.dev("Remove from DB: " + repo.getId());
             db.delete(TABLE_NAME, "id=?", new String[] { repo.getId() });
         }
         db.close();
@@ -76,12 +79,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
                 repo = new Repo(c);
-                Logger.dev("Load from cache: " + repo.getId());
-                if (repo.getTemplateVersion() < 3 && filtered) {
+                if (repo.getTemplateVersion() < MIN_TEMPLATE_VER && filtered) {
                     Logger.dev("Outdated repo: " + repo.getId());
-                    continue;
+                } else {
+                    // Logger.dev("Load from DB: " + repo.getId());
+                    ret.put(repo.getId(), repo);
                 }
-                ret.put(repo.getId(), repo);
             }
         }
         db.close();

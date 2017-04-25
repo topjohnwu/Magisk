@@ -29,14 +29,13 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws CacheModException {
-        Logger.dev("Repo: Re-fetch prop");
-        String props = WebService.request(getManifestUrl(), WebService.GET, true);
+        String props = WebService.request(getManifestUrl(), WebService.GET);
         String lines[] = props.split("\\n");
         parseProps(lines);
+        Logger.dev("Repo: Fetching prop: " + getId());
     }
 
     public void update(Date lastUpdate) throws CacheModException {
-        Logger.dev("Repo: Local: " + mLastUpdate + " Remote: " + lastUpdate);
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();

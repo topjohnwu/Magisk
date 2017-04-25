@@ -12,14 +12,15 @@ import com.topjohnwu.magisk.utils.ValueSortedMap;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -27,94 +28,156 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
     public static final String ETAG_KEY = "ETag";
 
-    private static final String REPO_URL = "https://api.github.com/orgs/Magisk-Modules-Repo/repos";
+    private static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
+    private static final String IF_NONE_MATCH = "If-None-Match";
+    private static final String LINK_KEY = "Link";
 
-    private String prefsPath;
+    private static final int CHECK_ETAG = 0;
+    private static final int LOAD_NEXT = 1;
+    private static final int LOAD_PREV = 2;
+
+    private List<String> etags;
+    private ValueSortedMap<String, Repo> cached, fetched;
+    private RepoDatabaseHelper repoDB;
+    private SharedPreferences prefs;
 
     public LoadRepos(Activity context) {
         super(context);
-        prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
+        prefs = magiskManager.prefs;
+        String prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
+        repoDB = new RepoDatabaseHelper(magiskManager);
+        // Legacy data cleanup
+        File old = new File(prefsPath, "RepoMap.xml");
+        if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {
+            old.delete();
+            prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
+            repoDB.clearRepo();
+        }
+        etags = new ArrayList<>(
+                Arrays.asList(magiskManager.prefs.getString(ETAG_KEY, "").split(",")));
+    }
+
+    private void loadJSON(String jsonString) throws Exception {
+        JSONArray jsonArray = new JSONArray(jsonString);
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonobject = jsonArray.getJSONObject(i);
+            String id = jsonobject.getString("description");
+            String name = jsonobject.getString("name");
+            String lastUpdate = jsonobject.getString("pushed_at");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+            Date updatedDate = format.parse(lastUpdate);
+            Repo repo = cached.get(id);
+            try {
+                if (repo == null) {
+                    Logger.dev("LoadRepos: Create new repo " + id);
+                    repo = new Repo(name, updatedDate);
+                } else {
+                    // Popout from cached
+                    cached.remove(id);
+                    repo.update(updatedDate);
+                }
+                if (repo.getId() != null) {
+                    fetched.put(id, repo);
+                }
+            } catch (BaseModule.CacheModException ignored) {}
+        }
+    }
+
+    private boolean loadPage(int page, String url, int mode) {
+        Logger.dev("LoadRepos: Loading page: " + (page + 1));
+        Map<String, String> header = new HashMap<>();
+        if (mode == CHECK_ETAG && page < etags.size() && !TextUtils.isEmpty(etags.get(page))) {
+            Logger.dev("ETAG: " + etags.get(page));
+            header.put(IF_NONE_MATCH, etags.get(page));
+        }
+        if (url == null) {
+            url = String.format(Locale.US, REPO_URL, page + 1);
+        }
+        String jsonString = WebService.request(url, WebService.GET, header, true);
+        if (TextUtils.isEmpty(jsonString)) {
+            // At least check the pages we know
+            return page + 1 < etags.size() && loadPage(page + 1, null, CHECK_ETAG);
+        }
+
+        // The request succeed, parse the new stuffs
+        try {
+            loadJSON(jsonString);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // Update the ETAG
+        String newEtag = header.get(ETAG_KEY);
+        newEtag = newEtag.substring(newEtag.indexOf('\"'), newEtag.lastIndexOf('\"') + 1);
+        Logger.dev("New ETAG: " + newEtag);
+        if (page < etags.size()) {
+            etags.set(page, newEtag);
+        } else {
+            etags.add(newEtag);
+        }
+
+        String links = header.get(LINK_KEY);
+        if (links != null) {
+            if (mode == CHECK_ETAG || mode == LOAD_NEXT) {
+                // Try to check next page URL
+                url = null;
+                for (String s : links.split(", ")) {
+                    if (s.contains("next")) {
+                        url = s.substring(s.indexOf("<") + 1, s.indexOf(">; "));
+                        break;
+                    }
+                }
+                if (url != null) {
+                    loadPage(page + 1, url, LOAD_NEXT);
+                }
+            }
+
+            if (mode == CHECK_ETAG || mode == LOAD_PREV) {
+                // Try to check prev page URL
+                url = null;
+                for (String s : links.split(", ")) {
+                    if (s.contains("prev")) {
+                        url = s.substring(s.indexOf("<") + 1, s.indexOf(">; "));
+                        break;
+                    }
+                }
+                if (url != null) {
+                    loadPage(page - 1, url, LOAD_PREV);
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
         Logger.dev("LoadRepos: Loading repos");
 
-        SharedPreferences prefs = magiskManager.prefs;
+        cached = repoDB.getRepoMap(false);
+        fetched = new ValueSortedMap<>();
 
-        RepoDatabaseHelper dbHelper = new RepoDatabaseHelper(magiskManager);
-
-        // Legacy data cleanup
-        File old = new File(prefsPath, "RepoMap.xml");
-        if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {
-            old.delete();
-            prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
-            dbHelper.clearRepo();
+        if (!loadPage(0, null, CHECK_ETAG)) {
+            magiskManager.repoMap = repoDB.getRepoMap();
+            Logger.dev("LoadRepos: No updates, use DB");
+            return null;
         }
 
-        Map<String, String> header = new HashMap<>();
-        // Get cached ETag to add in the request header
-        String etag = prefs.getString(ETAG_KEY, "");
-        header.put("If-None-Match", etag);
+        repoDB.addRepoMap(fetched);
+        repoDB.removeRepo(cached);
 
-        // Make a request to main URL for repo info
-        String jsonString = WebService.request(REPO_URL, WebService.GET, null, header, false);
-
-        ValueSortedMap<String, Repo> cached = dbHelper.getRepoMap(false), fetched = new ValueSortedMap<>();
-
-        if (!TextUtils.isEmpty(jsonString)) {
-            try {
-                JSONArray jsonArray = new JSONArray(jsonString);
-                // If it gets to this point, the response is valid, update ETag
-                etag = WebService.getLastResponseHeader().get(ETAG_KEY).get(0);
-                // Maybe bug in Android build tools, sometimes the ETag has crap in it...
-                etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
-
-                // Update repo info
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonobject = jsonArray.getJSONObject(i);
-                    String id = jsonobject.getString("description");
-                    String name = jsonobject.getString("name");
-                    String lastUpdate = jsonobject.getString("pushed_at");
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-                    Date updatedDate;
-                    try {
-                        updatedDate = format.parse(lastUpdate);
-                    } catch (ParseException e) {
-                        continue;
-                    }
-                    Repo repo = cached.get(id);
-                    try {
-                        if (repo == null) {
-                            Logger.dev("LoadRepos: Create new repo " + id);
-                            repo = new Repo(name, updatedDate);
-                        } else {
-                            // Popout from cached
-                            cached.remove(id);
-                            Logger.dev("LoadRepos: Update cached repo " + id);
-                            repo.update(updatedDate);
-                        }
-                        if (repo.getId() != null) {
-                            fetched.put(id, repo);
-                        }
-                    } catch (BaseModule.CacheModException ignored) {}
-
-                    // Update the database
-                    dbHelper.addRepoMap(fetched);
-                    // The leftover cached are those removed remote, cleanup db
-                    dbHelper.removeRepo(cached);
-                    // Update ETag
-                    prefs.edit().putString(ETAG_KEY, etag).apply();
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        // Update ETag
+        StringBuilder etagBuilder = new StringBuilder();
+        for (int i = 0; i < etags.size(); ++i) {
+            if (i != 0) etagBuilder.append(",");
+            etagBuilder.append(etags.get(i));
         }
+        prefs.edit().putString(ETAG_KEY, etagBuilder.toString()).apply();
 
-        magiskManager.repoMap = dbHelper.getRepoMap();
-
-        Logger.dev("LoadRepos: Repo load done");
+        magiskManager.repoMap = repoDB.getRepoMap();
+        Logger.dev("LoadRepos: Done");
         return null;
     }
 

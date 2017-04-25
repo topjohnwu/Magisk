@@ -1,13 +1,9 @@
 package com.topjohnwu.magisk.utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +14,6 @@ public class WebService {
     public final static int GET = 1;
     public final static int POST = 2;
 
-    private static Map<String, List<String>> responseHeader;
-
     /**
      * Making web service call
      *
@@ -27,11 +21,11 @@ public class WebService {
      * @requestmethod - http request method
      */
     public static String request(String url, int method) {
-        return request(url, method, null, null, false);
+        return request(url, method, null, true);
     }
 
     public static String request(String url, int method, boolean newline) {
-        return request(url, method, null, null, newline);
+        return request(url, method, null, newline);
     }
 
     /**
@@ -44,8 +38,7 @@ public class WebService {
      * @newline - true to append a newline each line
      */
     public static String request(String urlAddress, int method,
-                                 Map<String, String> params, Map<String, String> header,
-                                 boolean newline) {
+                                 Map<String, String> header, boolean newline) {
         Logger.dev("WebService: Service call " + urlAddress);
         URL url;
         StringBuilder response = new StringBuilder();
@@ -69,32 +62,6 @@ public class WebService {
                 }
             }
 
-            if (params != null) {
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(
-                        new OutputStreamWriter(os, "UTF-8"));
-
-                StringBuilder result = new StringBuilder();
-                boolean first = true;
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        result.append("&");
-                    }
-
-                    result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-                    result.append("=");
-                    result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-                }
-
-                writer.write(result.toString());
-
-                writer.flush();
-                writer.close();
-                os.close();
-            }
-
             int responseCode = conn.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
@@ -107,19 +74,19 @@ public class WebService {
                         response.append(line);
                     }
                 }
-                responseHeader = conn.getHeaderFields();
-            } else {
-                responseHeader = null;
+                if (header != null) {
+                    header.clear();
+                    for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+                        List<String> l = entry.getValue();
+                        header.put(entry.getKey(), l.get(l.size() - 1));
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return response.toString();
-    }
-
-    public static Map<String, List<String>> getLastResponseHeader() {
-        return responseHeader;
     }
 
 }
