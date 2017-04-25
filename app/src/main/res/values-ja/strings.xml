@@ -2,83 +2,83 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">ナビゲーション• ドロワーを開く</string>
-    <string name="navigation_drawer_close">ナビゲーション• ドロワーを閉じる</string>
+    <string name="navigation_drawer_open">ナビゲーションドロワーを開く</string>
+    <string name="navigation_drawer_close">ナビゲーションドロワーを閉じる</string>
     <string name="modules">モジュール</string>
     <string name="downloads">ダウンロード</string>
     <string name="superuser">スーパーユーザー</string>
     <string name="log">ログ</string>
     <string name="settings">設定</string>
-    <string name="status">状態</string>
+    <string name="status">ステータス</string>
     <string name="install">インストール</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$sインストールされた</string>
-    <string name="magisk_version_core_only">Magisk v%1$sインストールされた (コアのみモード)</string>
+    <string name="magisk_version">Magisk v%1$s がインストール済</string>
+    <string name="magisk_version_core_only">Magisk v%1$s がインストール済（コアモード）</string>
     <string name="magisk_version_error">Magisk がインストールされていない</string>
 
-    <string name="checking_for_updates">更新をチェック中…</string>
-    <string name="magisk_update_available">Magisk v%1$.1fが利用可能！</string>
-    <string name="cannot_check_updates">更新を確認できない、インターネット接続なし？</string>
-    <string name="up_to_date">%1$sの最新バージョンがインストールされている</string>
-    <string name="root_error">root権限は許可されていない。許可してないか？</string>
-    <string name="not_rooted">rootされていない</string>
-    <string name="proper_root">正しくrootされた</string>
-    <string name="safetyNet_check_text">タップして、SafetyNetチェックを開始</string>
-    <string name="checking_safetyNet_status">SafetyNetの状態を確認している…</string>
-    <string name="safetyNet_connection_failed">Google APIに接続できない</string>
-    <string name="safetyNet_connection_suspended">Google APIへの接続が中断された</string>
-    <string name="safetyNet_error">SafetyNetチェックできない、ネットがないか？</string>
-    <string name="safetyNet_fail">SafetyNet失敗: CTSプロファイルが不一致</string>
-    <string name="safetyNet_pass">SafetyNet通過した</string>
-    <string name="root_info_warning">機能が大幅に制限されている。</string>
+    <string name="checking_for_updates">更新を確認中...</string>
+    <string name="magisk_update_available">Magisk v%1$.1f が利用可能です！</string>
+    <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
+    <string name="up_to_date">最新の %1$s がインストール済</string>
+    <string name="root_error">Root化はされていますが権限がありません。拒否していませんか？</string>
+    <string name="not_rooted">Root化されていません</string>
+    <string name="proper_root">正しくroot化済</string>
+    <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
+    <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
+    <string name="safetyNet_connection_failed">Google APIに接続できませんでした</string>
+    <string name="safetyNet_connection_suspended">Google APIへの接続が中断されました</string>
+    <string name="safetyNet_error">SafetyNetをチェックできませんでした。インターネットに接続されていますか？</string>
+    <string name="safetyNet_fail">SafetyNet Failed: CTSプロファイルが不一致</string>
+    <string name="safetyNet_pass">SafetyNet Passed</string>
+    <string name="root_info_warning">機能が大幅に制限されています</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
-    <string name="cannot_auto_detect">(自動検出できない)</string>
-    <string name="boot_image_title">Boot イメージ場所</string>
+    <string name="cannot_auto_detect">(自動検出が不能)</string>
+    <string name="boot_image_title">Bootイメージの位置</string>
     <string name="detect_button">検出</string>
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を保持する</string>
     <string name="keep_dm_verity">dm-verityを保留する</string>
-    <string name="current_magisk_title">インストールされたMagiskバージョン： %1$s</string>
-    <string name="install_magisk_title">最新のMagiskバージョン： %1$s</string>
+    <string name="current_magisk_title">インストール済のMagiskバージョン: %1$s</string>
+    <string name="install_magisk_title">最新のMagiskバージョン: %1$s</string>
     <string name="uninstall">アンインストール</string>
     <string name="reboot_countdown">%1$dでリブートする</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
-    <string name="uninstall_magisk_msg">これにより、すべてのモジュールとMagiskSUを削除する、暗号化されていないデータが暗号化される可能性があります。\ n続行しますか？</string>
+    <string name="uninstall_magisk_msg">これにより、すべてのモジュールとMagiskSUを削除します。暗号化されていないデータが暗号化される可能性があります。\ n続行しますか？</string>
     <string name="version_none">(なし)</string>
 
     <!--Module Fragment-->
-    <string name="no_info_provided">(情報を提供されない)</string>
-    <string name="no_modules_found">モジュールが見つかない/string>
-    <string name="update_file_created">>次の再起動時にモジュールを更新する</string>
+    <string name="no_info_provided">(情報がありません)</string>
+    <string name="no_modules_found">モジュールが見つかりません</string>
+    <string name="update_file_created">次の再起動時にモジュールを更新する</string>
     <string name="remove_file_created">次の再起動時にモジュールを削除する</string>
     <string name="remove_file_deleted">次の再起動時にモジュールを削除しない</string>
     <string name="disable_file_created">次の再起動時にモジュールを無効にする</string>
     <string name="disable_file_removed">次の再起動時にモジュールを有効にする</string>
-    <string name="author">%1$sに作成された</string>
-    <string name="fab_flash_zip">モジュールジップを焼く</string>
+    <string name="author">作者: %1$s</string>
+    <string name="fab_flash_zip">モジュールのzipを焼く</string>
 
     <!--Repo Fragment-->
     <string name="update_available">利用可能な更新</string>
-    <string name="installed">インストールされた</string>
-    <string name="not_installed">いんすとーるさていない</string>
+    <string name="installed">インストール済</string>
+    <string name="not_installed">未インストール</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">SDカードに保存</string>
     <string name="menuReload">リロード</string>
     <string name="menuClearLog">ログを消去する</string>
-    <string name="logs_cleared">ログを正常にクリアされた</string>
+    <string name="logs_cleared">ログは正常にクリアされました</string>
     <string name="log_is_empty">ログは空です</string>
-    <string name="logs_save_failed">SDカードにログを書き込むことができない</string>
+    <string name="logs_save_failed">SDカードにログを書き込むことができません:</string>
 
     <!--About Activity-->
-    <string name="about">説明</string>
+    <string name="about">このアプリについて</string>
     <string name="app_developers">主な開発者</string>
-    <string name="app_developers_"><![CDATA[このアプリは<a href="https://github.com/topjohnwu">topjohnwu</a>と<a href="https://github.com/d8ahazard">Digitalhigh</a>と<a href="https://github.com/dvdandroid">に作成された</a>.]]></string>
-    <string name="app_changelog">アプリのチェンジログ</string>
-    <string name="translators" />神楽坂桜（Sakura_Sa233#Twitter）</string>
+    <string name="app_developers_"><![CDATA[このアプリは<a href="https://github.com/topjohnwu">topjohnwu</a>と<a href="https://github.com/d8ahazard">Digitalhigh</a>と<a href="https://github.com/dvdandroid">Dvdandroid</a>によって作られました。]]></string>
+    <string name="app_changelog">アプリの更新履歴</string>
+    <string name="translators">神楽坂桜（Sakura_Sa233#Twitter）/ hota (@lindwurm)</string>
     <string name="app_version">アプリのバージョン</string>
     <string name="app_source_code">ソースコード</string>
     <string name="donation">寄付</string>
@@ -86,41 +86,41 @@
     <string name="support_thread">サポートスレッド</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">この機能は外部ストレージを書き込む権限がないと作動しない</string>
+    <string name="permissionNotGranted">この機能は外部ストレージを書き込む権限がないと作動しません</string>
     <string name="no_thanks">いいえ</string>
     <string name="yes">はい</string>
     <string name="ok">OK</string>
     <string name="close">閉じる</string>
-    <string name="repo_install_title">インストール %1$s</string>
-    <string name="repo_install_msg">%1$sをインストールしますか？</string>
+    <string name="repo_install_title">%1$s をインストール</string>
+    <string name="repo_install_msg">%1$s をインストールしますか？</string>
     <string name="download_install">ダウンロードとインストール</string>
     <string name="download">ダウンロード</string>
     <string name="goto_install">インストール画面に移動する</string>
-    <string name="download_file_error">ダウンロード中にエラーが発生した</string>
+    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
     <string name="install_error">インストールエラー！</string>
-    <string name="invalid_zip">このジップはMagiskモジュールじゃない</string>
-    <string name="reboot_title">インストール成功した！</string>
+    <string name="invalid_zip">このzipはMagiskモジュールではありません</string>
+    <string name="reboot_title">インストールに成功しました！</string>
     <string name="reboot_msg">今すぐ再起動しますか？</string>
-    <string name="reboot">リブート</string>
-    <string name="copying_msg">一時ディレクトリへのzipをコピーしている</string>
+    <string name="reboot">再起動</string>
+    <string name="copying_msg">一時ディレクトリへのzipをコピー中</string>
     <string name="zip_install_progress_title">インストール中…</string>
-    <string name="zip_unzip_msg">ZIPファイル解凍中…</string>
-    <string name="zip_process_msg">ZIPファイル処理中…</string>
-    <string name="zip_install_progress_msg">%1$sインストール中…</string>
-    <string name="no_magisk_title">Magiskがインストールされていない</string>
+    <string name="zip_unzip_msg">zipファイルの解凍中…</string>
+    <string name="zip_process_msg">zipファイルの処理中…</string>
+    <string name="zip_install_progress_msg">%1$s をインストール中…</string>
+    <string name="no_magisk_title">Magiskがインストールされていません！</string>
     <string name="no_magisk_msg"> Magiskをダウンロードしてインストールしますか？</string>
-    <string name="downloading_toast">%1$sをダウンロード中…</string>
-    <string name="magisk_update_title">新しいMagisk更新が利用可能！</string>
+    <string name="downloading_toast">%1$s をダウンロード中...</string>
+    <string name="magisk_update_title">新しいMagiskの更新が利用可能です！</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">リリースノート</string>
     <string name="repo_cache_cleared">リポジトリキャッシュが消去された</string>
-    <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用している。\n既定ではMagiskHideで既に処理された</string>
-    <string name="start_magiskhide">MagiskHide開始… </string>
-    <string name="no_magisksu_title">MagiskSUを使用してない！</string>
-    <string name="no_magisksu_msg">あなたのデバイスはMagiskSUにrootされていない、MagiskHideを使用するだけでは十分ではない。\nそれは正式にサポートされていなくて、あなたはSafetyNetを通過するための追加ツール（例えばsuhide）が必要です。</string>
-    <string name="understand">わかった</string>
+    <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用しています。\n既定ではMagiskHideで既に処理されています</string>
+    <string name="start_magiskhide">MagiskHideを開始中…</string>
+    <string name="no_magisksu_title">MagiskSUを使用していません！</string>
+    <string name="no_magisksu_msg">あなたのデバイスはMagiskSUにrootされていません。MagiskHideを使用するだけでは十分ではありません。\nそれは正式にサポートされておらず、あなたはSafetyNetを通過するために追加ツール（例えばsuhide）が必要です。</string>
+    <string name="understand">了解</string>
     <string name="process_error">プロセスエラー</string>
-    <string name="internal_storage">ジップは:\n[Internal Storage]%1$sに保存されている</string>
+    <string name="internal_storage">zipは:\n[Internal Storage]%1$sに保存されます</string>
     <string name="zip_process_title">処理</string>
     <string name="manual_boot_image">ブートイメージを手動で選択してください！</string>
 
@@ -129,16 +129,18 @@
     <string name="settings_dark_theme_title">ダークテーマ</string>
     <string name="settings_dark_theme_summary">ダークテーマを有効にする</string>
     <string name="settings_notification_title">更新通知</string>
-    <string name="settings_notification_summary">新しいバージョンが利用可能に更新通知を表示する</string>
+    <string name="settings_notification_summary">新しいバージョンが利用可能になったときに通知する</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報をクリアし、アプリをオンラインで更新する</string>
-    <string name="settings_core_only_title">Magiskコアのみのモード</string>
-    <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされません。 MagiskSU、MagiskHide、systemless hosts、BusyBoxは引き続き有効になります。</string>
+
+    <string name="settings_core_only_title">Magisk コアモード</string>
+    <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされなくなります。 MagiskSU、MagiskHide、systemless hosts、busyboxは引き続き有効になります。</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠す</string>
     <string name="settings_busybox_title">BusyBoxを有効にする</string>
     <string name="settings_busybox_summary">Magiskに搭載するBusyBoxをxbinにバインドする</string>
+
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hostsにAdblockアプリのサポート</string>
+    <string name="settings_hosts_summary">AdblockのためのSystemless hostsサポート</string>
 
     <string name="settings_su_app_adb">アプリとADB</string>
     <string name="settings_su_app">アプリのみ</string>
@@ -156,9 +158,9 @@
 
     <string name="settings_development_category">アプリケーション開発</string>
     <string name="settings_developer_logging_title">高度なデバッグログを有効にする</string>
-    <string name="settings_developer_logging_summary">詳細ログを有効にするにはこれをチェック</string>
-    <string name="settings_shell_logging_title">ェルコマンドデバッグログを有効にする</string>
-    <string name="settings_shell_logging_summary">これをチェックすると、すべてのシェルコマンドとその出力をログに記録することができる</string>
+    <string name="settings_developer_logging_summary">詳細ログを有効にするにはここをチェック</string>
+    <string name="settings_shell_logging_title">シェルコマンドのデバッグログを有効にする</string>
+    <string name="settings_shell_logging_summary">すべてのシェルコマンドとその出力をログに記録するようになります</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>
@@ -166,25 +168,25 @@
     <string name="deny">拒否</string>
     <string name="prompt">プロンプト</string>
     <string name="grant">許可</string>
-    <string name="su_warning">デバイスへのフルアクセスを許可する。\nもし確信が持てないなら拒否して！</string>
-    <string name="forever">永久</string>
-    <string name="once">一度</string>
+    <string name="su_warning">デバイスへのフルアクセスを許可します。\nもし確信が持てなければ拒否してください！</string>
+    <string name="forever">今後も</string>
+    <string name="once">一度だけ</string>
     <string name="tenmin">10分</string>
     <string name="twentymin">20分</string>
     <string name="thirtymin">30分</string>
     <string name="sixtymin">60分</string>
-    <string name="su_allow_toast">％1$s はスーパーユーザー権限を許可された</string>
-    <string name="su_deny_toast">％1$s はスーパーユーザー権限を許可された</string>
-    <string name="no_apps_found">​​アプリが見つからない。</string>
-    <string name="su_snack_grant">のスーパーユーザー権限が許可されました</string>
-    <string name="su_snack_deny">%1$s のスーパーユーザー権限が拒否されました</string>
-    <string name="su_snack_notif_on">%1$の通知は有効になって。</string>
-    <string name="su_snack_notif_off">%1$の通知は無効になって。</string>
-    <string name="su_snack_log_on">%1$s のログは有効になって。</string>
-    <string name="su_snack_log_off">%1$s のログは無効になって。</string>
-    <string name="su_snack_revoke">％1$ sの権限を取り消されます</string>
+    <string name="su_allow_toast">％1$s はスーパーユーザー権限を許可されました</string>
+    <string name="su_deny_toast">％1$s はスーパーユーザー権限を拒否されました</string>
+    <string name="no_apps_found">​​アプリが見つかりません</string>
+    <string name="su_snack_grant">%1$sのスーパーユーザー権限が許可されました</string>
+    <string name="su_snack_deny">%1$s のスーパーユーザー権限は拒否されました</string>
+    <string name="su_snack_notif_on">%1$s の通知は有効です</string>
+    <string name="su_snack_notif_off">%1$s の通知は無効です</string>
+    <string name="su_snack_log_on">%1$s のログは有効です</string>
+    <string name="su_snack_log_off">%1$s のログは無効です</string>
+    <string name="su_snack_revoke">％1$s の権限は取り消されました</string>
     <string name="su_revoke_title">取り消し？</string>
-    <string name="su_revoke_msg">%1$sの権利を取り消すことを確認しますか？</string>
+    <string name="su_revoke_msg">%1$s の権限を取り消すことを承認しますか？</string>
     <string name="toast">通知</string>
     <string name="none">なし</string>
 
