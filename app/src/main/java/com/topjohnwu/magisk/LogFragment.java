@@ -31,13 +31,13 @@ public class LogFragment extends Fragment {
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 
-        adapter.addTab(new MagiskLogFragment(), getString(R.string.magisk));
-
         if (getApplication().isSuClient) {
             adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
             tab.setupWithViewPager(viewPager);
             tab.setVisibility(View.VISIBLE);
         }
+
+        adapter.addTab(new MagiskLogFragment(), getString(R.string.magisk));
 
         viewPager.setAdapter(adapter);
 
