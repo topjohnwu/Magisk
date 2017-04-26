@@ -14,7 +14,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">已安装 Magisk v%1$s</string>
-    <string name="magisk_version_core_only">已安装 Magisk v%1$s (仅核心功能)</string>
+    <string name="magisk_version_core_only">已安装 Magisk v%1$s （仅核心功能）</string>
     <string name="magisk_version_error">未安装 Magisk</string>
 
     <string name="checking_for_updates">正在检查更新…</string>
@@ -35,6 +35,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">（自动） %1$s</string>
+    <string name="cannot_auto_detect">（无法自动检测）</string>
     <string name="boot_image_title">Boot 镜像位置</string>
     <string name="detect_button">检测</string>
     <string name="advanced_settings_title">高级设置</string>
@@ -46,6 +47,7 @@
     <string name="reboot_countdown">将在 %1$d 后重启</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
+    <string name="version_none">（无）</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -120,15 +122,19 @@
     <string name="process_error">处理失败</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储]%1$s</string>
     <string name="zip_process_title">正在处理</string>
+    <string name="manual_boot_image">请手动选择 Boot 镜像位置！</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">深色主题</string>
     <string name="settings_dark_theme_summary">使用深色主题</string>
+    <string name="settings_notification_title">更新通知</string>
+    <string name="settings_notification_summary">当有新版本可用时显示更新通知</string>
     <string name="settings_clear_cache_title">清除资源库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制刷新在线数据</string>
 
-    <string name="settings_core_only_summary">仅启用核心功能，所有模组将不会被载入。MagiskSU丶MagiskHide丶systemless hosts丶和 busybox 仍会持续运作</string>
+    <string name="settings_core_only_title">Magisk 核心功能模式</string>
+    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide、systemless hosts 和 busybox 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
     <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
@@ -187,6 +193,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">目标 UID:\u0020</string>
     <string name="command">命令:\u0020</string>
-    <string name="settings_core_only_title">Magisk 核心功能模式</string>
 
 </resources>
