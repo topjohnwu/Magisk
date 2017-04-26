@@ -1,15 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.0-rc1"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30
-        versionName "4.3.2"
+        versionCode 31
+        versionName "4.3.3"
         ndk {
             moduleName 'zipadjust'
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -36,6 +37,11 @@ android {
     }
     lintOptions {
         disable 'MissingTranslation'
+    }
+    retrolambda {
+        javaVersion JavaVersion.VERSION_1_7
+        defaultMethods false
+        incremental true
     }
 }
 repositories {
