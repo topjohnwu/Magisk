@@ -108,6 +108,7 @@ static bool is_legal_property_name(const char* name, size_t namelen) {
 
 static int usage(char* arg0) {
     fprintf(stderr,
+        "resetprop v" xstr(MAGISK_VERSION) " (by topjohnwu & nkk71) - System Props Modification Tool\n\n"
         "Usage: %s [options] [args...]\n"
         "%s <name> <value>:      Set property entry <name> with <value>\n"
         "%s --file <prop file>:  Load props from <prop file>\n"

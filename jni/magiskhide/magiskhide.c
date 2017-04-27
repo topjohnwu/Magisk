@@ -31,6 +31,7 @@ void kill_proc(int pid) {
 
 static void usage(char *arg0) {
 	fprintf(stderr,
+		"MagiskHide v" xstr(MAGISK_VERSION) " (by topjohnwu) - Hide Magisk!\n\n"
 		"%s [--options [arguments...] ]\n\n"
 		"Options:\n"
 		"  --enable: Start the magiskhide daemon\n"
