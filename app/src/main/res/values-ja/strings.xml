@@ -15,15 +15,15 @@
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s がインストール済</string>
     <string name="magisk_version_core_only">Magisk v%1$s がインストール済（コアモード）</string>
-    <string name="magisk_version_error">Magisk がインストールされていない</string>
+    <string name="magisk_version_error">Magisk がインストールされていません</string>
 
     <string name="checking_for_updates">更新を確認中...</string>
     <string name="magisk_update_available">Magisk v%1$.1f が利用可能です！</string>
     <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
-    <string name="up_to_date">最新の %1$s がインストール済</string>
+    <string name="up_to_date">最新の %1$s がインストール済です</string>
     <string name="root_error">Root化はされていますが権限がありません。拒否していませんか？</string>
     <string name="not_rooted">Root化されていません</string>
-    <string name="proper_root">正しくroot化済</string>
+    <string name="proper_root">正常にroot化済</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
     <string name="safetyNet_connection_failed">Google APIに接続できませんでした</string>
@@ -35,16 +35,16 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
-    <string name="cannot_auto_detect">(自動検出が不能)</string>
+    <string name="cannot_auto_detect">(自動検出に失敗)</string>
     <string name="boot_image_title">Bootイメージの位置</string>
     <string name="detect_button">検出</string>
     <string name="advanced_settings_title">高度な設定</string>
-    <string name="keep_force_encryption">強制的な暗号化を保持する</string>
-    <string name="keep_dm_verity">dm-verityを保留する</string>
-    <string name="current_magisk_title">インストール済のMagiskバージョン: %1$s</string>
-    <string name="install_magisk_title">最新のMagiskバージョン: %1$s</string>
+    <string name="keep_force_encryption">強制的な暗号化を維持する</string>
+    <string name="keep_dm_verity">dm-verityを維持する</string>
+    <string name="current_magisk_title">インストール済のMagisk: %1$s</string>
+    <string name="install_magisk_title">最新のMagisk: %1$s</string>
     <string name="uninstall">アンインストール</string>
-    <string name="reboot_countdown">%1$dでリブートする</string>
+    <string name="reboot_countdown">%1$dで再起動します</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
     <string name="uninstall_magisk_msg">これにより、すべてのモジュールとMagiskSUを削除します。暗号化されていないデータが暗号化される可能性があります。\ n続行しますか？</string>
     <string name="version_none">(なし)</string>
@@ -86,14 +86,14 @@
     <string name="support_thread">サポートスレッド</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">この機能は外部ストレージを書き込む権限がないと作動しません</string>
+    <string name="permissionNotGranted">この機能は外部ストレージへの書き込み権限がないと作動しません</string>
     <string name="no_thanks">いいえ</string>
     <string name="yes">はい</string>
     <string name="ok">OK</string>
     <string name="close">閉じる</string>
     <string name="repo_install_title">%1$s をインストール</string>
     <string name="repo_install_msg">%1$s をインストールしますか？</string>
-    <string name="download_install">ダウンロードとインストール</string>
+    <string name="download_install">ダウンロード &amp; インストール</string>
     <string name="download">ダウンロード</string>
     <string name="goto_install">インストール画面に移動する</string>
     <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
@@ -109,11 +109,11 @@
     <string name="zip_install_progress_msg">%1$s をインストール中…</string>
     <string name="no_magisk_title">Magiskがインストールされていません！</string>
     <string name="no_magisk_msg"> Magiskをダウンロードしてインストールしますか？</string>
-    <string name="downloading_toast">%1$s をダウンロード中...</string>
+    <string name="downloading_toast">%1$s をダウンロード中</string>
     <string name="magisk_update_title">新しいMagiskの更新が利用可能です！</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">リリースノート</string>
-    <string name="repo_cache_cleared">リポジトリキャッシュが消去された</string>
+    <string name="repo_cache_cleared">リポジトリキャッシュを消去しました</string>
     <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用しています。\n既定ではMagiskHideで既に処理されています</string>
     <string name="start_magiskhide">MagiskHideを開始中…</string>
     <string name="no_magisksu_title">MagiskSUを使用していません！</string>
@@ -138,7 +138,6 @@
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠す</string>
     <string name="settings_busybox_title">BusyBoxを有効にする</string>
     <string name="settings_busybox_summary">Magiskに搭載するBusyBoxをxbinにバインドする</string>
-
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">AdblockのためのSystemless hostsサポート</string>
 
@@ -158,36 +157,36 @@
 
     <string name="settings_development_category">アプリケーション開発</string>
     <string name="settings_developer_logging_title">高度なデバッグログを有効にする</string>
-    <string name="settings_developer_logging_summary">詳細ログを有効にするにはここをチェック</string>
+    <string name="settings_developer_logging_summary">詳細なログを有効にするにはここをチェック</string>
     <string name="settings_shell_logging_title">シェルコマンドのデバッグログを有効にする</string>
-    <string name="settings_shell_logging_summary">すべてのシェルコマンドとその出力をログに記録するようになります</string>
+    <string name="settings_shell_logging_summary">すべてのシェルコマンドとその出力をログに記録します</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>
-    <string name="deny_with_str">%1$sを拒否した</string>
+    <string name="deny_with_str">拒否 %1$s</string>
     <string name="deny">拒否</string>
     <string name="prompt">プロンプト</string>
     <string name="grant">許可</string>
-    <string name="su_warning">デバイスへのフルアクセスを許可します。\nもし確信が持てなければ拒否してください！</string>
+    <string name="su_warning">端末への完全なアクセスを許可します。\nもし確信が持てなければ拒否してください！</string>
     <string name="forever">今後も</string>
     <string name="once">一度だけ</string>
     <string name="tenmin">10分</string>
     <string name="twentymin">20分</string>
     <string name="thirtymin">30分</string>
     <string name="sixtymin">60分</string>
-    <string name="su_allow_toast">％1$s はスーパーユーザー権限を許可されました</string>
-    <string name="su_deny_toast">％1$s はスーパーユーザー権限を拒否されました</string>
-    <string name="no_apps_found">​​アプリが見つかりません</string>
-    <string name="su_snack_grant">%1$sのスーパーユーザー権限が許可されました</string>
+    <string name="su_allow_toast">%1$s はスーパーユーザー権限を許可されました</string>
+    <string name="su_deny_toast">%1$s はスーパーユーザー権限を拒否されました</string>
+    <string name="no_apps_found">アプリが見つかりません</string>
+    <string name="su_snack_grant">%1$s のスーパーユーザー権限が許可されました</string>
     <string name="su_snack_deny">%1$s のスーパーユーザー権限は拒否されました</string>
     <string name="su_snack_notif_on">%1$s の通知は有効です</string>
     <string name="su_snack_notif_off">%1$s の通知は無効です</string>
     <string name="su_snack_log_on">%1$s のログは有効です</string>
     <string name="su_snack_log_off">%1$s のログは無効です</string>
-    <string name="su_snack_revoke">％1$s の権限は取り消されました</string>
-    <string name="su_revoke_title">取り消し？</string>
+    <string name="su_snack_revoke">%1$s の権限は取り消されました</string>
+    <string name="su_revoke_title">確認</string>
     <string name="su_revoke_msg">%1$s の権限を取り消すことを承認しますか？</string>
-    <string name="toast">通知</string>
+    <string name="toast">トースト通知</string>
     <string name="none">なし</string>
 
     <!--Superuser logs-->
