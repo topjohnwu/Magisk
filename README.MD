@@ -35,6 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 * Copyright 2015, Pierre-Hugues Husson (phh@phh.me)
 * Copyright 2015, Joshua Brindle (@joshua_brindle)
 
+**MagiskHide** (`jni/magiskhide`)
+* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016, Pierre-Hugues Husson (phh@phh.me) (original hidesu)
+
 **resetprop** (`jni/resetprop`)
  * Copyright 2016-2017 John Wu (@topjohnwu)
  * Copyright 2016 nkk71 (nkk71x@gmail.com)
