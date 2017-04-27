@@ -53,6 +53,7 @@ static void statements() {
 
 static void usage(char *arg0) {
 	fprintf(stderr,
+		"MagiskPolicy v" xstr(MAGISK_VERSION) " (by topjohnwu & phh) - SEPolicy Modification Tool\n\n"
 		"%s [--options...] [policystatements...]\n\n"
 		"Options:\n"
 		"  --live: directly load patched policy to device\n"
