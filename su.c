@@ -33,6 +33,7 @@ static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
 	fprintf(stream,
+	"MagiskSU v" xstr(MAGISK_VERSION) "\n\n"
 	"Usage: su [options] [--] [-] [LOGIN] [--] [args...]\n\n"
 	"Options:\n"
 	"  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
