@@ -69,7 +69,7 @@ void repack(const char* orig_image, const char* out_image) {
 		// If we found raw cpio, compress to original format
 
 		// Before we start, clean up previous compressed files
-		for (int i = 0; i < SUP_NUM; ++i) {
+		for (int i = 0; SUP_EXT_LIST[i]; ++i) {
 			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 			unlink(name);
 		}
@@ -85,7 +85,7 @@ void repack(const char* orig_image, const char* out_image) {
 	}
 
 	int found = 0;
-	for (int i = 0; i < SUP_NUM; ++i) {
+	for (int i = 0; SUP_EXT_LIST[i]; ++i) {
 		sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 		if (access(name, R_OK) == 0) {
 			ramdisk_type = SUP_TYPE_LIST[i];

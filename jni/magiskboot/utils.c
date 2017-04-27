@@ -1,8 +1,8 @@
 #include "magiskboot.h"
-#include "elf.h"
 
-char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4" };
-file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY };
+char *SUP_LIST[] = { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL };
+char *SUP_EXT_LIST[] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL };
+file_t SUP_TYPE_LIST[] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY, 0 };
 
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size) {
 	int fd = open(filename, O_RDONLY);
@@ -25,12 +25,14 @@ void mmap_rw(const char *filename, unsigned char **buf, size_t *size) {
 }
 
 file_t check_type(const unsigned char *buf) {
-	if (memcmp(buf, CHROMEOS_MAGIC, CHROMEOS_MAGIC_SIZE) == 0) {
+	if (memcmp(buf, CHROMEOS_MAGIC, 8) == 0) {
 		return CHROMEOS;
 	} else if (memcmp(buf, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
 		return AOSP;
-	} else if (memcmp(buf, ELF_MAGIC, ELF_MAGIC_SIZE) == 0) {
-		return ELF;
+	} else if (memcmp(buf, ELF32_MAGIC, 5) == 0) {
+		return ELF32;
+	} else if (memcmp(buf, ELF64_MAGIC, 5) == 0) {
+		return ELF64;
 	} else if (memcmp(buf, "\x1f\x8b\x08\x00", 4) == 0) {
 		return GZIP;
 	} else if (memcmp(buf, "\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a", 9) == 0) {
@@ -48,8 +50,6 @@ file_t check_type(const unsigned char *buf) {
 		return LZ4_LEGACY;
 	} else if (memcmp(buf, "\x88\x16\x88\x58", 4) == 0) {
 		return MTK;
-	} else if (memcmp(buf, "QCDT", 4) == 0) {
-		return QCDT;
 	} else {
 		return UNKNOWN;
 	}
@@ -147,36 +147,8 @@ void cleanup() {
 	unlink(SECOND_FILE);
 	unlink(DTB_FILE);
 	unlink(NEW_BOOT);
-	for (int i = 0; i < SUP_NUM; ++i) {
+	for (int i = 0; SUP_EXT_LIST[i]; ++i) {
 		sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 		unlink(name);
 	}
-}
-
-void vec_init(vector *v) {
-	vec_size(v) = 0;
-	vec_cap(v) = 1;
-	vec_entry(v) = malloc(sizeof(void*));
-}
-
-void vec_push_back(vector *v, void *p) {
-	if (v == NULL) return;
-	if (vec_size(v) == vec_cap(v)) {
-		vec_cap(v) *= 2;
-		vec_entry(v) = realloc(vec_entry(v), sizeof(void*) * vec_cap(v));
-	}
-	vec_entry(v)[vec_size(v)] = p;
-	++vec_size(v);
-}
-
-void vec_sort(vector *v, int (*compar)(const void *, const void *)) {
-	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);
-}
-
-void vec_destroy(vector *v) {
-	// Will not free each entry!
-	// Manually free each entry, then call this function
-	vec_size(v) = 0;
-	vec_cap(v) = 0;
-	free(v->data);
 }

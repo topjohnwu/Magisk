@@ -556,7 +556,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 	} else if (strcmp(method, "bzip2") == 0) {
 		type = BZIP2;
 	} else {
-		error(1, "Only support following methods: " SUP_LIST);
+		error(1, "Only support following methods: ");
 	}
 	unsigned char *file;
 	size_t size;

@@ -1,5 +1,6 @@
 #include "magiskboot.h"
 #include "cpio.h"
+#include "vector.h"
 
 static uint32_t x8u(char *hex) {
   uint32_t val, inpos = 8, outpos;
@@ -25,13 +26,13 @@ static void cpio_free(cpio_file *f) {
 	}
 }
 
-static void cpio_vec_insert(vector *v, cpio_file *n) {
+static void cpio_vec_insert(struct vector *v, cpio_file *n) {
 	cpio_file *f, *t;
 	int shift = 0;
 	// Insert in alphabet order
 	vec_for_each(v, f) {
 		if (shift) {
-			vec_entry(v)[_i] = t;
+			vec_entry(v)[_] = t;
 			t = f;
 			continue;
 		}
@@ -39,11 +40,11 @@ static void cpio_vec_insert(vector *v, cpio_file *n) {
 		if (strcmp(f->filename, n->filename) == 0) {
 			// Replace, then all is done
 			cpio_free(f);
-			vec_entry(v)[_i] = n;
+			vec_entry(v)[_] = n;
 			return;
 		} else if (strcmp(f->filename, n->filename) > 0) {
 			// Insert, then start shifting
-			vec_entry(v)[_i] = n;
+			vec_entry(v)[_] = n;
 			t = f;
 			shift = 1;
 		}
@@ -59,7 +60,7 @@ static int cpio_compare(const void *a, const void *b) {
 }
 
 // Parse cpio file to a vector of cpio_file
-static void parse_cpio(const char *filename, vector *v) {
+static void parse_cpio(const char *filename, struct vector *v) {
 	printf("Loading cpio: [%s]\n\n", filename);
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0)
@@ -104,7 +105,7 @@ static void parse_cpio(const char *filename, vector *v) {
 	vec_sort(v, cpio_compare);
 }
 
-static void dump_cpio(const char *filename, vector *v) {
+static void dump_cpio(const char *filename, struct vector *v) {
 	printf("\nDump cpio: [%s]\n\n", filename);
 	int fd = open_new(filename);
 	unsigned inode = 300000;
@@ -143,7 +144,7 @@ static void dump_cpio(const char *filename, vector *v) {
 	close(fd);
 }
 
-static void cpio_vec_destroy(vector *v) {
+static void cpio_vec_destroy(struct vector *v) {
 	// Free each cpio_file
 	cpio_file *f;
 	vec_for_each(v, f) {
@@ -152,7 +153,7 @@ static void cpio_vec_destroy(vector *v) {
 	vec_destroy(v);
 }
 
-static void cpio_rm(int recursive, const char *entry, vector *v) {
+static void cpio_rm(int recursive, const char *entry, struct vector *v) {
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if ((recursive && strncmp(f->filename, entry, strlen(entry)) == 0)
@@ -166,7 +167,7 @@ static void cpio_rm(int recursive, const char *entry, vector *v) {
 	}
 }
 
-static void cpio_mkdir(mode_t mode, const char *entry, vector *v) {
+static void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
 	cpio_file *f = calloc(sizeof(*f), 1);
 	f->mode = S_IFDIR | mode;
 	f->namesize = strlen(entry) + 1;
@@ -176,7 +177,7 @@ static void cpio_mkdir(mode_t mode, const char *entry, vector *v) {
 	printf("Create directory [%s] (%04o)\n",entry, mode);
 }
 
-static void cpio_add(mode_t mode, const char *entry, const char *filename, vector *v) {
+static void cpio_add(mode_t mode, const char *entry, const char *filename, struct vector *v) {
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0)
 		error(1, "Cannot open %s", filename);
@@ -194,7 +195,7 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, vecto
 	printf("Add entry [%s] (%04o)\n", entry, mode);
 }
 
-static void cpio_test(vector *v) {
+static void cpio_test(struct vector *v) {
 	#define MAGISK_PATCH  0x1
 	#define SUPERSU_PATCH 0x2
 	int ret = 0;
@@ -221,7 +222,7 @@ static int check_verity_pattern(const char *s) {
 	return pos;
 }
 
-static void cpio_dmverity(vector *v) {
+static void cpio_dmverity(struct vector *v) {
 	cpio_file *f;
 	size_t read, write;
 	int skip;
@@ -243,7 +244,7 @@ static void cpio_dmverity(vector *v) {
 	}
 }
 
-static void cpio_forceencrypt(vector *v) {
+static void cpio_forceencrypt(struct vector *v) {
 	cpio_file *f;
 	size_t read, write;
 	#define ENCRYPT_LIST_SIZE 2
@@ -267,7 +268,7 @@ static void cpio_forceencrypt(vector *v) {
 	}
 }
 
-static void cpio_extract(const char *entry, const char *filename, vector *v) {
+static void cpio_extract(const char *entry, const char *filename, struct vector *v) {
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
@@ -283,8 +284,8 @@ static void cpio_extract(const char *entry, const char *filename, vector *v) {
 	error(1, "Cannot find the file entry [%s]", entry);
 }
 
-static void cpio_backup(const char *orig, vector *v) {
-	vector o_body, *o = &o_body, bak;
+static void cpio_backup(const char *orig, struct vector *v) {
+	struct vector o_body, *o = &o_body, bak;
 	cpio_file *m, *n, *dir, *rem;
 	char chk1[21], chk2[21], buf[PATH_MAX];
 	int res, doBak;
@@ -329,14 +330,14 @@ static void cpio_backup(const char *orig, vector *v) {
 			// Something is missing in new ramdisk, backup!
 			++i;
 			doBak = 1;
-			printf("Entry [%s] is missing\n", m->filename);
+			printf("Backup missing entry: ");
 		} else if (res == 0) {
 			++i; ++j;
 			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
 				continue;
 			// Not the same!
 			doBak = 1;
-			printf("Entry [%s] missmatch\n", m->filename);
+			printf("Backup mismatch entry: ");
 		} else {
 			// Someting new in ramdisk, record in rem
 			++j;
@@ -344,13 +345,14 @@ static void cpio_backup(const char *orig, vector *v) {
 			rem->data = realloc(rem->data, rem->filesize + n->namesize);
 			memcpy(rem->data + rem->filesize, n->filename, n->namesize);
 			rem->filesize += n->namesize;
-			printf("Entry [%s] is new\n", n->filename);
+			printf("Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
 		}
 		if (doBak) {
 			m->namesize += 8;
 			m->filename = realloc(m->filename, m->namesize);
 			strcpy(buf, m->filename);
 			sprintf(m->filename, ".backup/%s", buf);
+			printf("[%s] -> [%s]\n", buf, m->filename);
 			vec_push_back(&bak, m);
 			// NULL the original entry, so it won't be freed
 			vec_entry(o)[i - 1] = NULL;
@@ -376,7 +378,7 @@ static void cpio_backup(const char *orig, vector *v) {
 	cpio_vec_destroy(o);
 }
 
-static int cpio_restore(vector *v) {
+static int cpio_restore(struct vector *v) {
 	cpio_file *f, *n;
 	int ret = 1;
 	vec_for_each(v, f) {
@@ -441,7 +443,7 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		cmd = NONE;
 		return 1;
 	}
-	vector v;
+	struct vector v;
 	vec_init(&v);
 	parse_cpio(incpio, &v);
 	switch(cmd) {

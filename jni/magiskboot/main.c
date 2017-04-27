@@ -5,50 +5,55 @@
 *********************/
 
 static void usage(char *arg0) {
-	fprintf(stderr, "%s --unpack <bootimg>\n", arg0);
-	fprintf(stderr, "  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb) into the\n  current directory\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --repack <origbootimg> [outbootimg]\n", arg0);
-	fprintf(stderr, "  Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n");
-	fprintf(stderr, "  to [outbootimg], or new-boot.img if not specified.\n");
-	fprintf(stderr, "  It will compress ramdisk.cpio with the same method used in <origbootimg>\n");
-	fprintf(stderr, "  if exists, or attempt to find ramdisk.cpio.[ext], and repack\n");
-	fprintf(stderr, "  directly with the compressed ramdisk file\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --hexpatch <file> <hexpattern1> <hexpattern2>\n", arg0);
-	fprintf(stderr, "  Search <hexpattern1> in <file>, and replace with <hexpattern2>\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --cpio-<cmd> <incpio> [flags...] [params...]\n", arg0);
-	fprintf(stderr, "  Do cpio related cmds to <incpio> (modifications are done directly)\n  Supported commands:\n");
-	fprintf(stderr, "  --cpio-rm <incpio> [-r] <entry>\n    Remove entry from cpio, flag -r to remove recursively\n");
-	fprintf(stderr, "  --cpio-mkdir <incpio> <mode> <entry>\n    Create directory as an <entry>\n");
-	fprintf(stderr, "  --cpio-add <incpio> <mode> <entry> <infile>\n    Add <infile> as an <entry>; replaces <entry> if already exists\n");
-	fprintf(stderr, "  --cpio-extract <incpio> <entry> <outfile>\n    Extract <entry> to <outfile>\n");
-	fprintf(stderr, "  --cpio-test <incpio>\n    Return value: 0/not patched 1/Magisk 2/SuperSU\n");
-	fprintf(stderr, "  --cpio-patch-dmverity <incpio>\n    Remove dm-verity\n");
-	fprintf(stderr, "  --cpio-patch-forceencrypt <incpio>\n    Change forceencrypt flag to encryptable\n");
-	fprintf(stderr, "  --cpio-backup <incpio> <origcpio>\n    Create ramdisk backups into <incpio> from <origcpio>\n");
-	fprintf(stderr, "  --cpio-restore <incpio>\n    Restore ramdisk from ramdisk backup within <incpio>\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --compress[=method] <infile> [outfile]\n", arg0);
-	fprintf(stderr, "  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --decompress <infile> [outfile]\n", arg0);
-	fprintf(stderr, "  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: " SUP_LIST "\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --sha1 <file>\n", arg0);
-	fprintf(stderr, "  Print the SHA1 checksum for <file>\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "%s --cleanup\n", arg0);
-	fprintf(stderr, "  Cleanup the current working directory\n");
-	fprintf(stderr, "\n");
+	fprintf(stderr,
+		"%s --unpack <bootimg>\n"
+		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb) into the\n  current directory\n"
+		"\n"
+		"%s --repack <origbootimg> [outbootimg]\n"
+		"  Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
+		"  to [outbootimg], or new-boot.img if not specified.\n"
+		"  It will compress ramdisk.cpio with the same method used in <origbootimg>\n"
+		"  if exists, or attempt to find ramdisk.cpio.[ext], and repack\n"
+		"  directly with the compressed ramdisk file\n"
+		"\n"
+		"%s --hexpatch <file> <hexpattern1> <hexpattern2>\n"
+		"  Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
+		"\n"
+		"%s --cpio-<cmd> <incpio> [flags...] [params...]\n"
+		"  Do cpio related cmds to <incpio> (modifications are done directly)\n  Supported commands:\n"
+		"  --cpio-rm <incpio> [-r] <entry>\n    Remove entry from cpio, flag -r to remove recursively\n"
+		"  --cpio-mkdir <incpio> <mode> <entry>\n    Create directory as an <entry>\n"
+		"  --cpio-add <incpio> <mode> <entry> <infile>\n    Add <infile> as an <entry>; replaces <entry> if already exists\n"
+		"  --cpio-extract <incpio> <entry> <outfile>\n    Extract <entry> to <outfile>\n"
+		"  --cpio-test <incpio>\n    Return value: 0/not patched 1/Magisk 2/SuperSU\n"
+		"  --cpio-patch-dmverity <incpio>\n    Remove dm-verity\n"
+		"  --cpio-patch-forceencrypt <incpio>\n    Change forceencrypt flag to encryptable\n"
+		"  --cpio-backup <incpio> <origcpio>\n    Create ramdisk backups into <incpio> from <origcpio>\n"
+		"  --cpio-restore <incpio>\n    Restore ramdisk from ramdisk backup within <incpio>\n"
+		"\n"
+		"%s --compress[=method] <infile> [outfile]\n"
+		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n  Supported methods: "
+	, arg0, arg0, arg0, arg0, arg0);
+	for (int i = 0; SUP_LIST[i]; ++i)
+		fprintf(stderr, "%s ", SUP_LIST[i]);
+	fprintf(stderr,
+		"\n"
+		"\n"
+		"%s --decompress <infile> [outfile]\n"
+		"  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: "
+	, arg0);
+	for (int i = 0; SUP_LIST[i]; ++i)
+		fprintf(stderr, "%s ", SUP_LIST[i]);
+	fprintf(stderr,
+		"\n"
+		"\n"
+		"%s --sha1 <file>\n"
+		"  Print the SHA1 checksum for <file>\n"
+		"\n"
+		"%s --cleanup\n"
+		"  Cleanup the current working directory\n"
+		"\n"
+	, arg0, arg0);
 
 	exit(1);
 }
@@ -63,7 +68,7 @@ void error(int rc, const char *msg, ...) {
 }
 
 int main(int argc, char *argv[]) {
-	printf("MagiskBoot (by topjohnwu) - Boot Image Modification Tool\n\n");
+	printf("MagiskBoot v" xstr(MAGISK_VERSION) " (by topjohnwu) - Boot Image Modification Tool\n\n");
 
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
 		cleanup();

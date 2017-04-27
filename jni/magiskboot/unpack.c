@@ -16,11 +16,6 @@ void unpack(const char* image) {
 	printf("Parsing boot image: [%s]\n\n", image);
 	parse_img(orig, size);
 
-	if (boot_type == CHROMEOS) {
-		// The caller should know it's chromeos, as it needs additional signing
-		dump(orig, 0, "chromeos");
-	}
-
 	char name[PATH_MAX];
 
 	// Dump kernel
@@ -47,16 +42,8 @@ void unpack(const char* image) {
 	}
 
 	if (hdr.dt_size) {
-		if (boot_type == ELF && (dtb_type != QCDT && dtb_type != ELF)) {
-			printf("Non QC dtb found in ELF kernel, recreate kernel\n");
-			gzip(1, KERNEL_FILE, kernel, hdr.kernel_size);
-			int kfp = open(KERNEL_FILE, O_WRONLY | O_APPEND);
-			write(kfp, dtb, hdr.dt_size);
-			close(kfp);
-		} else {
-			// Dump dtb
-			dump(dtb, hdr.dt_size, DTB_FILE);
-		}
+		// Dump dtb
+		dump(dtb, hdr.dt_size, DTB_FILE);
 	}
 
 	munmap(orig, size);

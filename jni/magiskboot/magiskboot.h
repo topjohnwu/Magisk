@@ -16,8 +16,9 @@
 #include "bootimg.h"
 #include "sha1.h"
 
-#define CHROMEOS_MAGIC      "CHROMEOS"
-#define CHROMEOS_MAGIC_SIZE 8
+#define CHROMEOS_MAGIC  "CHROMEOS"
+#define ELF32_MAGIC     "\x7f""ELF\x01"
+#define ELF64_MAGIC     "\x7f""ELF\x02"
 
 #define KERNEL_FILE         "kernel"
 #define RAMDISK_FILE        "ramdisk.cpio"
@@ -25,11 +26,15 @@
 #define DTB_FILE            "dtb"
 #define NEW_BOOT            "new-boot.img"
 
+#define str(a) #a
+#define xstr(a) str(a)
+
 typedef enum {
     UNKNOWN,
     CHROMEOS,
     AOSP,
-    ELF,
+    ELF32,
+    ELF64,
     GZIP,
     LZOP,
     XZ,
@@ -37,8 +42,7 @@ typedef enum {
     BZIP2,
     LZ4,
     LZ4_LEGACY,
-    MTK,
-    QCDT,
+    MTK
 } file_t;
 
 typedef enum {
@@ -54,38 +58,14 @@ typedef enum {
     RESTORE
 } command_t;
 
-#define SUP_LIST "gzip, xz, lzma, bzip2, lz4, lz4_legacy"
-#define SUP_NUM 6
-
-// Cannot declare in header, but place a copy here for convenience
-// char *SUP_EXT_LIST[SUP_NUM] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4" };
-// file_t SUP_TYPE_LIST[SUP_NUM] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY };
-extern char *SUP_EXT_LIST[SUP_NUM];
-extern file_t SUP_TYPE_LIST[SUP_NUM];
-
-// Vector
-typedef struct vector {
-    size_t size;
-    size_t cap;
-    void **data;
-} vector;
-void vec_init(vector *v);
-void vec_push_back(vector *v, void *p);
-void vec_sort(vector *v, int (*compar)(const void *, const void *));
-void vec_destroy(vector *v);
-
-#define vec_size(v) (v)->size
-#define vec_cap(v) (v)->cap
-#define vec_entry(v) (v)->data
-// vec_for_each(vector *v, void *e)
-#define vec_for_each(v, e) \
-    e = (v)->data[0]; \
-    for (size_t _i = 0; _i < (v)->size; ++_i, e = (v)->data[_i])
+extern char *SUP_LIST[];
+extern char *SUP_EXT_LIST[];
+extern file_t SUP_TYPE_LIST[];
 
 // Global variables
 extern unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
 extern boot_img_hdr hdr;
-extern file_t boot_type, ramdisk_type, dtb_type;
+extern file_t ramdisk_type;
 extern int mtk_kernel, mtk_ramdisk;
 
 // Main entries
