@@ -68,11 +68,15 @@ int resetprop_main(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
     return resetprop_main(argc, argv);
 }
-#define LOGD(...)  if (verbose) printf(__VA_ARGS__)
-#define LOGE(...)  fprintf(stderr, __VA_ARGS__)
+#define PRINT_D(...)  if (verbose) printf(__VA_ARGS__)
+#define PRINT_E(...)  fprintf(stderr, __VA_ARGS__)
 
 #else
 #include "magisk.h"
+
+#define PRINT_D(...)  { LOGD(__VA_ARGS__); if (verbose) printf(__VA_ARGS__); }
+#define PRINT_E(...)  { LOGE(__VA_ARGS__); fprintf(stderr, __VA_ARGS__); }
+
 #endif
 
 #include "resetprop.h"
@@ -117,9 +121,9 @@ static int usage(char* arg0) {
 }
 
 int init_resetprop() {
-    LOGD("resetprop: Initializing...\n");
+    PRINT_D("resetprop: Initializing...\n");
     if (__system_properties_init()) {
-        LOGE("resetprop: Initialize error\n");
+        PRINT_E("resetprop: Initialize error\n");
         return -1;
     }
     return 0;
@@ -133,12 +137,12 @@ static void read_prop_info(void* cookie, const char *name, const char *value, ui
 char *getprop(const char *name) {
     const prop_info *pi = __system_property_find(name);
     if (pi == NULL) {
-        LOGE("resetprop: prop not found: [%s]\n", name);
+        PRINT_E("resetprop: prop not found: [%s]\n", name);
         return NULL;
     }
     char value[PROP_VALUE_MAX];
     __system_property_read_callback(pi, read_prop_info, value);
-    LOGD("resetprop: getprop [%s]: [%s]\n", name, value);
+    PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
     return strdup(value);
 }
 
@@ -159,7 +163,7 @@ int setprop2(const char *name, const char *value, int trigger) {
             ret = __system_property_update((prop_info*) __system_property_find(name), value, strlen(value));
         }
     } else {
-        LOGD("resetprop: New prop [%s]\n", name);
+        PRINT_D("resetprop: New prop [%s]\n", name);
         if (trigger) {
             ret = __system_property_set(name, value);
         } else {
@@ -167,29 +171,29 @@ int setprop2(const char *name, const char *value, int trigger) {
         }
     }
 
-    LOGD("resetprop: setprop [%s]: [%s] by %s\n", name, value,
+    PRINT_D("resetprop: setprop [%s]: [%s] by %s\n", name, value,
         trigger ? "property_service" : "modifing prop data structure");
 
     if (ret)
-        LOGE("resetprop: setprop error\n");
+        PRINT_E("resetprop: setprop error\n");
 
     return ret;
 }
 
 int deleteprop(const char *name) {
-    LOGD("resetprop: deleteprop [%s]\n", name);
+    PRINT_D("resetprop: deleteprop [%s]\n", name);
     if (__system_property_del(name)) {
-        LOGE("resetprop: delete prop: [%s] error\n", name);
+        PRINT_E("resetprop: delete prop: [%s] error\n", name);
         return -1;
     }
     return 0;
 }
 
 int read_prop_file(const char* filename) {
-    LOGD("resetprop: Load prop file [%s]\n", filename);
+    PRINT_D("resetprop: Load prop file [%s]\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
-        LOGE("Cannot open [%s]\n", filename);
+        PRINT_E("Cannot open [%s]\n", filename);
         return 1;
     }
     char *line = NULL, *pch;
@@ -256,13 +260,13 @@ int resetprop_main(int argc, char *argv[]) {
                 break;
             } else {
                 if(!is_legal_property_name(argv[i], strlen(argv[i]))) {
-                    LOGE("Illegal property name: [%s]\n", argv[i]);
+                    PRINT_E("Illegal property name: [%s]\n", argv[i]);
                     return 1;
                 }
                 name = argv[i];
                 if (exp_arg > 1) {
                     if (strlen(argv[i + 1]) >= PROP_VALUE_MAX) {
-                        LOGE("Value too long: [%s]\n", argv[i + 1]);
+                        PRINT_E("Value too long: [%s]\n", argv[i + 1]);
                         return 1;
                     }
                     value = argv[i + 1];
@@ -272,7 +276,7 @@ int resetprop_main(int argc, char *argv[]) {
         }
     }
 
-    LOGD("resetprop by nkk71 & topjohnwu\n");
+    PRINT_D("resetprop by nkk71 & topjohnwu\n");
 
     if (init_resetprop())
         return -1;
