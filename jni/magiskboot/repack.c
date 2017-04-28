@@ -1,23 +1,16 @@
 #include "magiskboot.h"
 
 static size_t restore(const char *filename, int fd) {
-	int ifd = open(filename, O_RDONLY);
-	if (ifd < 0)
-		error(1, "Cannot open %s\n", filename);
-
+	int ifd = xopen(filename, O_RDONLY);
 	size_t size = lseek(ifd, 0, SEEK_END);
 	lseek(ifd, 0, SEEK_SET);
-	if (sendfile(fd, ifd, NULL, size) != size) {
-		error(1, "Cannot write %s\n", filename);
-	}
+	xsendfile(fd, ifd, NULL, size);
 	close(ifd);
 	return size;
 }
 
 static void restore_buf(int fd, const void *buf, size_t size) {
-	if (write(fd, buf, size) != size) {
-		error(1, "Cannot dump from input file\n");
-	}
+	xwrite(fd, buf, size);
 }
 
 void repack(const char* orig_image, const char* out_image) {
@@ -79,7 +72,7 @@ void repack(const char* orig_image, const char* out_image) {
 		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
 
 		if (comp(ramdisk_type, RAMDISK_FILE, cpio, cpio_size))
-			error(1, "Unsupported ramdisk format!");
+			LOGE(1, "Unsupported ramdisk format!\n");
 
 		munmap(cpio, cpio_size);
 	}
@@ -94,7 +87,7 @@ void repack(const char* orig_image, const char* out_image) {
 		}
 	}
 	if (!found)
-		error(1, "No ramdisk exists!");
+		LOGE(1, "No ramdisk exists!\n");
 	hdr.ramdisk_size = restore(name, fd);
 	file_align(fd, hdr.page_size, 1);
 
@@ -140,7 +133,7 @@ void repack(const char* orig_image, const char* out_image) {
 
 	munmap(orig, size);
 	if (lseek(fd, 0, SEEK_END) > size) {
-		error(2, "Boot partition too small!");
+		LOGE(2, "Boot partition too small!\n");
 	}
 	close(fd);
 }

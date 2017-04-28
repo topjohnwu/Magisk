@@ -5,22 +5,18 @@ char *SUP_EXT_LIST[] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL };
 file_t SUP_TYPE_LIST[] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY, 0 };
 
 void mmap_ro(const char *filename, unsigned char **buf, size_t *size) {
-	int fd = open(filename, O_RDONLY);
-	if (fd < 0)
-		error(1, "Cannot open %s", filename);
+	int fd = xopen(filename, O_RDONLY);
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	*buf = mmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0);
+	*buf = xmmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0);
 	close(fd);
 }
 
 void mmap_rw(const char *filename, unsigned char **buf, size_t *size) {
-	int fd = open(filename, O_RDWR);
-	if (fd < 0)
-		error(1, "Cannot open %s", filename);
+	int fd = xopen(filename, O_RDWR);
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	*buf = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	*buf = xmmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 }
 
@@ -83,10 +79,7 @@ void file_align(int fd, size_t align, int out) {
 }
 
 int open_new(const char *filename) {
-	int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd < 0)
-		error(1, "Unable to create %s", filename);
-	return fd;
+	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 }
 
 void print_info() {

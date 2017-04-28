@@ -8,23 +8,24 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/sendfile.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <string.h>
 
 #include "bootimg.h"
 #include "sha1.h"
+#include "magisk.h"
+#include "utils.h"
 
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define ELF32_MAGIC     "\x7f""ELF\x01"
 #define ELF64_MAGIC     "\x7f""ELF\x02"
 
-#define KERNEL_FILE         "kernel"
-#define RAMDISK_FILE        "ramdisk.cpio"
-#define SECOND_FILE         "second"
-#define DTB_FILE            "dtb"
-#define NEW_BOOT            "new-boot.img"
+#define KERNEL_FILE     "kernel"
+#define RAMDISK_FILE    "ramdisk.cpio"
+#define SECOND_FILE     "second"
+#define DTB_FILE        "dtb"
+#define NEW_BOOT        "new-boot.img"
 
 #define str(a) #a
 #define xstr(a) str(a)
@@ -72,7 +73,6 @@ extern int mtk_kernel, mtk_ramdisk;
 void unpack(const char *image);
 void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
-void error(int rc, const char *msg, ...);
 void parse_img(unsigned char *orig, size_t size);
 int cpio_commands(const char *command, int argc, char *argv[]);
 void cleanup();

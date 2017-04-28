@@ -2,8 +2,7 @@
 
 static void dump(unsigned char *buf, size_t size, const char *filename) {
 	int fd = open_new(filename);
-	if (write(fd, buf, size) != size)
-		error(1, "Cannot dump %s", filename);
+	xwrite(fd, buf, size);
 	close(fd);
 }
 
@@ -33,7 +32,7 @@ void unpack(const char* image) {
 	if (decomp(ramdisk_type, RAMDISK_FILE, ramdisk, hdr.ramdisk_size)) {
 		// Dump the compressed ramdisk
 		dump(ramdisk, hdr.ramdisk_size, RAMDISK_FILE ".unsupport");
-		error(1, "Unsupported ramdisk format! Dumped to %s", RAMDISK_FILE ".unsupport");
+		LOGE(1, "Unsupported ramdisk format! Dumped to %s\n", RAMDISK_FILE ".unsupport");
 	}
 
 	if (hdr.second_size) {

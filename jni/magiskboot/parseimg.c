@@ -87,5 +87,5 @@ void parse_img(unsigned char *orig, size_t size) {
 			continue;
 		}
 	}
-	error(1, "No boot image magic found!");
+	LOGE(1, "No boot image magic found!\n");
 }

@@ -18,7 +18,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <selinux/selinux.h>
+#include <sys/mman.h>
+#include <sys/sendfile.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -31,8 +32,16 @@ FILE *xfopen(const char *pathname, const char *mode) {
 	return fp;
 }
 
-int xopen(const char *pathname, int flags) {
+int xopen2(const char *pathname, int flags) {
 	int fd = open(pathname, flags);
+	if (fd < 0) {
+		PLOGE("open: %s", pathname);
+	}
+	return fd;
+}
+
+int xopen3(const char *pathname, int flags, mode_t mode) {
+	int fd = open(pathname, flags, mode);
 	if (fd < 0) {
 		PLOGE("open: %s", pathname);
 	}
@@ -104,14 +113,6 @@ pid_t xsetsid() {
 		PLOGE("setsid");
 	}
 	return pid;
-}
-
-int xsetcon(char *context) {
-	int ret = setcon(context);
-	if (ret == -1) {
-		PLOGE("setcon: %s", context);
-	}
-	return ret;
 }
 
 int xsocket(int domain, int type, int protocol) {
@@ -276,6 +277,23 @@ int xmkdir(const char *pathname, mode_t mode) {
 	int ret = mkdir(pathname, mode);
 	if (ret == -1) {
 		PLOGE("mkdir %s %u", pathname, mode);
+	}
+	return ret;
+}
+
+void *xmmap(void *addr, size_t length, int prot, int flags,
+	int fd, off_t offset) {
+	void *ret = mmap(addr, length, prot, flags, fd, offset);
+	if (ret == MAP_FAILED) {
+		PLOGE("mmap");
+	}
+	return ret;
+}
+
+ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
+	ssize_t ret = sendfile(out_fd, in_fd, offset, count);
+	if (count != ret) {
+		PLOGE("sendfile");
 	}
 	return ret;
 }

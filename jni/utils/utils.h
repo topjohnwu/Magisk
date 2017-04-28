@@ -23,7 +23,10 @@ extern int quit_signals[];
 // xwrap.c
 
 FILE *xfopen(const char *pathname, const char *mode);
-int xopen(const char *pathname, int flags);
+#define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+#define xopen(...) GET_MACRO(__VA_ARGS__, xopen3, xopen2)(__VA_ARGS__)
+int xopen2(const char *pathname, int flags);
+int xopen3(const char *pathname, int flags, mode_t mode);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
@@ -32,7 +35,6 @@ int xsetns(int fd, int nstype);
 DIR *xopendir(const char *name);
 struct dirent *xreaddir(DIR *dirp);
 pid_t xsetsid();
-int xsetcon(char *context);
 int xsocket(int domain, int type, int protocol);
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
@@ -56,6 +58,9 @@ int xmount(const char *source, const char *target,
 int xchmod(const char *pathname, mode_t mode);
 int xrename(const char *oldpath, const char *newpath);
 int xmkdir(const char *pathname, mode_t mode);
+void *xmmap(void *addr, size_t length, int prot, int flags,
+	int fd, off_t offset);
+ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 
 // misc.c
 

@@ -20,6 +20,7 @@ LOCAL_SRC_FILES := \
 	utils.c \
 	cpio.c \
 	sha1.c \
+	../utils/xwrap.c \
 	../utils/vector.c
 LOCAL_CFLAGS += -DZLIB_CONST
 include $(BUILD_EXECUTABLE)

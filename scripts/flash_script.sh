@@ -243,8 +243,7 @@ ui_print "- Device platform: $ARCH"
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
 
-SYSTEMLIB=/system/lib
-$IS64BIT && SYSTEMLIB=/system/lib64
+$IS64BIT && SYSTEMLIB=/system/lib64 || SYSTEMLIB=/system/lib
 
 find_boot_image
 if [ -z $BOOTIMAGE ]; then
@@ -315,10 +314,22 @@ cd $BOOTTMP
 
 ui_print "- Unpacking boot image"
 LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --unpack $BOOTIMAGE
-if [ $? -ne 0 ]; then
-  ui_print "! Unable to unpack boot image"
-  exit 1
-fi
+
+case $? in
+  1 )
+    ui_print "! Unable to unpack boot image"
+    exit 1
+    ;;
+  2 )
+    ui_print "! Sony ELF32 format detected"
+    ui_print "! Please use BootBridge from @AdrianDC to flash Magisk"
+    exit 1
+    ;;
+  3 )
+    ui_print "! Sony ELF64 format detected"
+    ui_print "! Stock kernel cannot be patched, please use a custom kernel"
+    exit 1
+esac
 
 ##########################################################################################
 # Ramdisk restores
@@ -497,11 +508,11 @@ cd /
 if ! $BOOTMODE; then
   ui_print "- Unmounting partitions"
   umount /magisk
-  losetup -d $MAGISKLOOP
+  losetup -d $MAGISKLOOP 2>/dev/null
   rmdir /magisk
   if $SUPERSU; then
     umount /su
-    losetup -d $SUPERSULOOP
+    losetup -d $SUPERSULOOP 2>/dev/null
     rmdir /su
   fi
   umount /system

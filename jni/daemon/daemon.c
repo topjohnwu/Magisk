@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -114,7 +115,7 @@ void start_daemon() {
 		return;
 	}
 	xsetsid();
-	xsetcon("u:r:su:s0");
+	setcon("u:r:su:s0");
 	umask(022);
 
 	// Patch selinux with medium patch before we do anything

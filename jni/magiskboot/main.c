@@ -58,15 +58,6 @@ static void usage(char *arg0) {
 	exit(1);
 }
 
-void error(int rc, const char *msg, ...) {
-	va_list	ap;
-	va_start(ap, msg);
-	vfprintf(stderr, msg, ap);
-	fprintf(stderr,"\n\n");
-	va_end(ap);
-	exit(rc);
-}
-
 int main(int argc, char *argv[]) {
 	printf("MagiskBoot v" xstr(MAGISK_VERSION) " (by topjohnwu) - Boot Image Modification Tool\n\n");
 

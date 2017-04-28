@@ -16,8 +16,7 @@
 #define LZ4_LEGACY_BLOCKSIZE  0x800000
 
 static void write_file(const int fd, const void *buf, const size_t size, const char *filename) {
-	if (write(fd, buf, size) != size)
-		error(1, "Error in writing %s", filename);
+	xwrite(fd, buf, size);
 }
 
 static void report(const int mode, const char* filename) {
@@ -52,11 +51,11 @@ void gzip(int mode, const char* filename, const unsigned char* buf, size_t size)
 			ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
 			break;
 		default:
-			error(1, "Unsupported gzip mode!");
+			LOGE(1, "Unsupported gzip mode!\n");
 	}
 
 	if (ret != Z_OK)
-		error(1, "Unable to init zlib stream");
+		LOGE(1, "Unable to init zlib stream\n");
 
 	do {
 		strm.next_in = buf + pos;
@@ -81,7 +80,7 @@ void gzip(int mode, const char* filename, const unsigned char* buf, size_t size)
 					break;
 			}
 			if (ret == Z_STREAM_ERROR)
-				error(1, "Error when running gzip");
+				LOGE(1, "Error when running gzip\n");
 
 			have = CHUNK - strm.avail_out;
 			write_file(fd, out, have, filename);
@@ -132,12 +131,12 @@ void lzma(int mode, const char* filename, const unsigned char* buf, size_t size)
 			ret = lzma_alone_encoder(&strm, &opt);
 			break;
 		default:
-			error(1, "Unsupported lzma mode!");
+			LOGE(1, "Unsupported lzma mode!\n");
 	}
 
 
 	if (ret != LZMA_OK)
-		error(1, "Unable to init lzma stream");
+		LOGE(1, "Unable to init lzma stream\n");
 
 	do {
 		strm.next_in = buf + pos;
@@ -159,7 +158,7 @@ void lzma(int mode, const char* filename, const unsigned char* buf, size_t size)
 		} while (strm.avail_out == 0 && ret == LZMA_OK);
 
 		if (ret != LZMA_OK && ret != LZMA_STREAM_END)
-			error(1, "LZMA error %d!", ret);
+			LOGE(1, "LZMA error %d!\n", ret);
 
 	} while (pos < size);
 
@@ -189,11 +188,11 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 			ret = LZ4F_createCompressionContext(&cctx, LZ4F_VERSION);
 			break;
 		default:
-			error(1, "Unsupported lz4 mode!");
+			LOGE(1, "Unsupported lz4 mode!\n");
 	}
 	
 	if (LZ4F_isError(ret))
-		error(1, "Context creation error: %s\n", LZ4F_getErrorName(ret));
+		LOGE(1, "Context creation error: %s\n", LZ4F_getErrorName(ret));
 
 	// Allocate out buffer
 	switch(mode) {
@@ -202,7 +201,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 			read = CHUNK;
 			ret = LZ4F_getFrameInfo(dctx, &info, buf, &read);
 			if (LZ4F_isError(ret))
-				error(1, "LZ4F_getFrameInfo error: %s\n", LZ4F_getErrorName(ret));
+				LOGE(1, "LZ4F_getFrameInfo error: %s\n", LZ4F_getErrorName(ret));
 			switch (info.blockSizeID) {
 				case LZ4F_default:
 				case LZ4F_max64KB:  outCapacity = 1 << 16; break;
@@ -210,7 +209,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 				case LZ4F_max1MB:   outCapacity = 1 << 20; break;
 				case LZ4F_max4MB:   outCapacity = 1 << 22; break;
 				default:
-					error(1, "Impossible unless more block sizes are allowed\n");
+					LOGE(1, "Impossible unless more block sizes are allowed\n");
 			}
 			pos += read;
 			break;
@@ -219,15 +218,13 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 			break;
 	}
 
-	out = malloc(outCapacity);
-	if (!out)
-		error(1, "LZ4 malloc error!");
+	out = xmalloc(outCapacity);
 
 	// Write header
 	if (mode == 1) {
 		have = ret = LZ4F_compressBegin(cctx, out, size, NULL);
 		if (LZ4F_isError(ret))
-			error(1, "Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
+			LOGE(1, "Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
 		write_file(fd, out, have, filename);
 	}
 
@@ -250,7 +247,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 					break;
 			}
 			if (LZ4F_isError(ret))
-				error(1, "LZ4 coding error: %s\n", LZ4F_getErrorName(ret));
+				LOGE(1, "LZ4 coding error: %s\n", LZ4F_getErrorName(ret));
 
 			write_file(fd, out, have, filename);
 			// Update status
@@ -267,7 +264,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 		case 1:
 			have = ret = LZ4F_compressEnd(cctx, out, outCapacity, NULL);
 			if (LZ4F_isError(ret))
-				error(1, "Failed to end compression: error %s\n", LZ4F_getErrorName(ret));
+				LOGE(1, "Failed to end compression: error %s\n", LZ4F_getErrorName(ret));
 
 			write_file(fd, out, have, filename);
 
@@ -300,11 +297,11 @@ void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size
 			ret = BZ2_bzCompressInit(&strm, 9, 0, 0);
 			break;
 		default:
-			error(1, "Unsupported bzip2 mode!");
+			LOGE(1, "Unsupported bzip2 mode!\n");
 	}
 
 	if (ret != BZ_OK)
-		error(1, "Unable to init bzlib stream");
+		LOGE(1, "Unable to init bzlib stream\n");
 
 	do {
 		strm.next_in = (char *) buf + pos;
@@ -361,21 +358,18 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 
 	switch(mode) {
 		case 0:
-			out = malloc(LZ4_LEGACY_BLOCKSIZE);
+			out = xmalloc(LZ4_LEGACY_BLOCKSIZE);
 			// Skip magic
 			pos += 4;
 			break;
 		case 1:
-			out = malloc(LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
+			out = xmalloc(LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
 			// Write magic
 			write_file(fd, "\x02\x21\x4c\x18", 4, filename);
 			break;
 		default:
-			error(1, "Unsupported lz4_legacy mode!");
+			LOGE(1, "Unsupported lz4_legacy mode!\n");
 	}
-
-	if (!out)
-		error(1, "lz4_legacy malloc error");
 
 	do {
 		switch(mode) {
@@ -386,10 +380,10 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 				block_size += ((unsigned)buf[pos + 3])<<24;
 				pos += 4;
 				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
-					error(1, "lz4_legacy block size too large!");
+					LOGE(1, "lz4_legacy block size too large!\n");
 				have = LZ4_decompress_safe((const char*) (buf + pos), out, block_size, LZ4_LEGACY_BLOCKSIZE);
 				if (have < 0)
-					error(1, "Cannot decode lz4_legacy block");
+					LOGE(1, "Cannot decode lz4_legacy block\n");
 				pos += block_size;
 				break;
 			case 1:
@@ -399,7 +393,7 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 					insize = LZ4_LEGACY_BLOCKSIZE;
 				have = LZ4_compress_default((const char*) (buf + pos), out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
 				if (have == 0)
-					error(1, "lz4_legacy compression error");
+					LOGE(1, "lz4_legacy compression error\n");
 				pos += insize;
 				block_size_le[0] = (unsigned char)have;
 				block_size_le[1] = (unsigned char)(have >> 8);
@@ -496,7 +490,7 @@ void decomp_file(char *from, const char *to) {
 	char *ext;
 	ext = strrchr(from, '.');
 	if (ext == NULL)
-		error(1, "Bad filename extention");
+		LOGE(1, "Bad filename extention\n");
 
 	// File type and extension should match
 	switch (type) {
@@ -522,7 +516,7 @@ void decomp_file(char *from, const char *to) {
 				ok = 0;
 			break;
 		default:
-			error(1, "Provided file \'%s\' is not a supported archive format", from);
+			LOGE(1, "Provided file \'%s\' is not a supported archive format\n", from);
 	}
 	if (ok) {
 		// If all match, strip out the suffix
@@ -536,7 +530,7 @@ void decomp_file(char *from, const char *to) {
 			unlink(from);
 		}
 	} else {
-		error(1, "Bad filename extention \'%s\'", ext);
+		LOGE(1, "Bad filename extention \'%s\'\n", ext);
 	}
 	munmap(file, size);
 }
@@ -556,7 +550,11 @@ void comp_file(const char *method, const char *from, const char *to) {
 	} else if (strcmp(method, "bzip2") == 0) {
 		type = BZIP2;
 	} else {
-		error(1, "Only support following methods: ");
+		fprintf(stderr, "Only support following methods: ");
+		for (int i = 0; SUP_LIST[i]; ++i)
+			fprintf(stderr, "%s ", SUP_LIST[i]);
+		fprintf(stderr, "\n");
+		exit(1);
 	}
 	unsigned char *file;
 	size_t size;

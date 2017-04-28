@@ -14,8 +14,8 @@ void hexpatch(const char *image, const char *from, const char *to) {
 	size_t filesize;
 	unsigned char *file, *pattern, *patch;
 	mmap_rw(image, &file, &filesize);
-	pattern = malloc(patternsize);
-	patch = malloc(patchsize);
+	pattern = xmalloc(patternsize);
+	patch = xmalloc(patchsize);
 	hex2byte(from, pattern);
 	hex2byte(to, patch);
 	for (size_t i = 0; i < filesize - patternsize; ++i) {
