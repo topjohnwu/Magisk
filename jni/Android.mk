@@ -22,9 +22,7 @@ LOCAL_SRC_FILES := \
 	daemon/daemon.c \
 	daemon/socket_trans.c \
 	daemon/log_monitor.c \
-	daemon/post_fs.c \
-	daemon/post_fs_data.c \
-	daemon/late_start.c \
+	daemon/bootstages.c \
 	magiskhide/magiskhide.c \
 	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \

@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <signal.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
@@ -238,10 +239,9 @@ int run_command(int *fd, const char *path, char *const argv[]) {
 		xdup2(sv[0], STDOUT_FILENO);
 		xdup2(sv[0], STDERR_FILENO);
 	} else {
-		int null = open("/dev/null", O_RDWR);
-		xdup2(null, STDIN_FILENO);
-		xdup2(null, STDOUT_FILENO);
-		xdup2(null, STDERR_FILENO);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
 	}
 
 	execv(path, argv);
@@ -249,29 +249,33 @@ int run_command(int *fd, const char *path, char *const argv[]) {
 	return -1;
 }
 
-#define MAGISK_CORE "/magisk/.core/"
-
-void exec_common_script(const char* stage) {
-	DIR *dir;
-	struct dirent *entry;
-	char buf[PATH_MAX];
-	snprintf(buf, sizeof(buf), MAGISK_CORE "%s.d", stage);
-
-	if (!(dir = opendir(buf)))
-		return;
-
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_REG) {
-			snprintf(buf, sizeof(buf), MAGISK_CORE "%s.d/%s", stage, entry->d_name);
-			if (access(buf, X_OK) == -1)
-				continue;
-			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			char *const command[] = { "sh", buf, NULL };
-			int pid = run_command(NULL, "/system/bin/sh", command);
-			if (pid != -1)
-				waitpid(pid, NULL, 0);
+int mkdir_p(const char *pathname, mode_t mode) {
+	char *path = strdup(pathname), *p;
+	errno = 0;
+	for (p = path + 1; *p; ++p) {
+		if (*p == '/') {
+			*p = '\0';
+			if (mkdir(path, mode) == -1) {
+				if (errno != EEXIST)
+					return -1;
+			}
+			*p = '/';
 		}
 	}
+	if (mkdir(path, mode) == -1) {
+		if (errno != EEXIST)
+			return -1;
+	}
+	free(path);
+	return 0;
+}
 
-	closedir(dir);
+int bind_mount(const char *from, const char *to) {
+	int ret = xmount(from, to, NULL, MS_BIND, NULL);
+	LOGD("bind_mount: %s -> %s\n", from, to);
+	return ret;
+}
+
+int open_new(const char *filename) {
+	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 }

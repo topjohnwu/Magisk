@@ -29,15 +29,15 @@ static int isMocked = 0;
 void manage_selinux() {
 	if (isMocked) return;
 	char val[1];
-	int fd = xopen(ENFORCE_FILE, O_RDONLY);
+	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
 	xxread(fd, val, 1);
 	close(fd);
 	// Permissive
 	if (val[0] == '0') {
 		LOGI("hide_daemon: Permissive detected, hide the state\n");
 
-		chmod(ENFORCE_FILE, 0640);
-		chmod(POLICY_FILE, 0440);
+		chmod(SELINUX_ENFORCE, 0640);
+		chmod(SELINUX_POLICY, 0440);
 		isMocked = 1;
 	}
 }

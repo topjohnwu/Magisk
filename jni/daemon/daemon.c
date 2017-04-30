@@ -31,8 +31,6 @@ static void *request_handler(void *args) {
 	int client = *((int *) args);
 	free(args);
 	client_request req = read_int(client);
-	char *s;
-	int pid, status, code;
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
 		launch_magiskhide(client);
@@ -67,11 +65,7 @@ static void *request_handler(void *args) {
 		late_start(client);
 		break;
 	case TEST:
-		s = read_string(client);
-		LOGI("%s\n", s);
-		free(s);
-		write_int(client, 0);
-		close(client);
+		// test(client);
 		break;
 	}
 	return NULL;
@@ -94,7 +88,7 @@ static void *large_sepol_patch(void *args) {
 	LOGD("sepol: Starting large patch thread\n");
 	// Patch su to everything
 	sepol_allow("su", ALL, ALL, ALL);
-	dump_policydb("/sys/fs/selinux/load");
+	dump_policydb(SELINUX_LOAD);
 	LOGD("sepol: Large patch done\n");
 	destroy_policydb();
 	return NULL;
@@ -117,11 +111,14 @@ void start_daemon() {
 	xsetsid();
 	setcon("u:r:su:s0");
 	umask(022);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
 	// Patch selinux with medium patch before we do anything
-	load_policydb("/sys/fs/selinux/policy");
+	load_policydb(SELINUX_POLICY);
 	sepol_med_rules();
-	dump_policydb("/sys/fs/selinux/load");
+	dump_policydb(SELINUX_LOAD);
 
 	// Continue the larger patch in another thread, we will need to join later
 	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);

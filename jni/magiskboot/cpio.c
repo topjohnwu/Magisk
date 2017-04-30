@@ -283,7 +283,7 @@ static void cpio_extract(const char *entry, const char *filename, struct vector 
 static void cpio_backup(const char *orig, struct vector *v) {
 	struct vector o_body, *o = &o_body, bak;
 	cpio_file *m, *n, *dir, *rem;
-	char chk1[21], chk2[21], buf[PATH_MAX];
+	char buf[PATH_MAX];
 	int res, doBak;
 
 	dir = xcalloc(sizeof(*dir), 1);

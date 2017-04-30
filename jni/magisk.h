@@ -10,12 +10,6 @@
 #include <pthread.h>
 #include <android/log.h>
 
-#ifndef MAGISK_VER_CODE
-#define MAGISK_VER_CODE 99999
-#endif
-#ifndef MAGISK_VERSION
-#define MAGISK_VERSION  VER_DEBUG
-#endif
 #define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
 
 #define str(a) #a
@@ -29,6 +23,11 @@
 #ifndef ARG_MAX
 #define ARG_MAX 4096
 #endif
+
+#define SELINUX_PATH        "/sys/fs/selinux/"
+#define SELINUX_ENFORCE     SELINUX_PATH "enforce"
+#define SELINUX_POLICY      SELINUX_PATH "policy"
+#define SELINUX_LOAD        SELINUX_PATH "load"
 
 // Global handler for PLOGE
 extern __thread void (*err_handler)(void);

@@ -35,7 +35,8 @@ static void usage() {
 		"       post-fs, post-fs-data, service\n"
 		"\n"
 		"Options:\n"
-		"       -v            print client and daemon version\n"
+		"       -c            print client version\n"
+		"       -v            print daemon version\n"
 		"       -V            print daemon version code\n"
 		"\n"
 		"Supported applets:\n"
@@ -57,12 +58,14 @@ int main(int argc, char *argv[]) {
 	else arg = argv[0];
 	if (strcmp(arg, "magisk") == 0) {
 		if (argc < 2) usage();
-		if (strcmp(argv[1], "-v") == 0) {
-			printf("Client: %s\n", MAGISK_VER_STR);
+		if (strcmp(argv[1], "-c") == 0) {
+			printf("%s\n", MAGISK_VER_STR);
+			return 0;
+		} else if (strcmp(argv[1], "-v") == 0) {
 			int fd = connect_daemon();
 			write_int(fd, CHECK_VERSION);
 			char *v = read_string(fd);
-			printf("Daemon: %s\n", v);
+			printf("%s\n", v);
 			free(v);
 			return 0;
 		} else if (strcmp(argv[1], "-V") == 0) {
@@ -92,10 +95,11 @@ int main(int argc, char *argv[]) {
 			return read_int(fd);
 		} else if (strcmp(argv[1], "--test") == 0) {
 			// Temporary testing entry
-			int fd = connect_daemon();
-			write_int(fd, TEST);
-			write_string(fd, argv[2]);
-			return read_int(fd);
+			// int fd = connect_daemon();
+			// write_int(fd, TEST);
+			// return read_int(fd);
+			// test();
+			return 0;
 		} else {
 			// It's calling applets
 			--argc;

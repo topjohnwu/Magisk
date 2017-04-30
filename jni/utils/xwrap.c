@@ -298,4 +298,10 @@ ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
 	return ret;
 }
 
-
+int xmkdir_p(const char *pathname, mode_t mode) {
+	int ret = mkdir_p(pathname, mode);
+	if (ret == -1) {
+		PLOGE("mkdir_p %s", pathname);
+	}
+	return ret;
+}

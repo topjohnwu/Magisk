@@ -21,11 +21,11 @@ void vec_deep_destroy(struct vector *v);
 #define vec_entry(v) (v)->data
 /* Usage: vec_for_each(vector *v, void *e) */
 #define vec_for_each(v, e) \
-	e = (v)->data[0]; \
-	for (size_t _ = 0; _ < (v)->size; ++_, e = (v)->data[_])
+	e = v ? (v)->data[0] : NULL; \
+	for (size_t _ = 0; v && _ < (v)->size; ++_, e = (v)->data[_])
 
 #define vec_for_each_r(v, e) \
-	e = (v)->data[(v)->size - 1]; \
-	for (size_t _ = (v)->size; _ > 0; --_, e = (v)->data[_ - 1])
+	e = v ? (v)->data[(v)->size - 1] : NULL; \
+	for (size_t _ = (v)->size; v && _ > 0; --_, e = (v)->data[_ - 1])
 
 #endif

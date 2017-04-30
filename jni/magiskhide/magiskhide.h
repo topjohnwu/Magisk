@@ -5,8 +5,6 @@
 
 #define HIDELIST		"/magisk/.core/magiskhide/hidelist"
 #define DUMMYPATH		"/dev/magisk/dummy"
-#define ENFORCE_FILE 	"/sys/fs/selinux/enforce"
-#define POLICY_FILE 	"/sys/fs/selinux/policy"
 
 typedef enum {
 	HIDE_ERROR = -1,

@@ -61,6 +61,7 @@ int xmkdir(const char *pathname, mode_t mode);
 void *xmmap(void *addr, size_t length, int prot, int flags,
 	int fd, off_t offset);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
+int xmkdir_p(const char *pathname, mode_t mode);
 
 // misc.c
 
@@ -79,6 +80,8 @@ void unlock_blocks();
 void unblock_boot_process();
 void setup_sighandlers(void (*handler)(int));
 int run_command(int *fd, const char *path, char *const argv[]);
-void exec_common_script(const char* stage);
+int mkdir_p(const char *pathname, mode_t mode);
+int bind_mount(const char *from, const char *to);
+int open_new(const char *filename);
 
 #endif

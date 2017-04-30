@@ -60,8 +60,10 @@ void launch_magiskhide(int client) {
 	if (init_resetprop())
 		goto error;
 
-	if (setprop2("persist.magisk.hide", "1", 0))
-		goto error;
+	if (client != -1) {
+		if (setprop("persist.magisk.hide", "1"))
+			goto error;
+	}
 
 	hide_sensitive_props();
 

@@ -10,9 +10,10 @@ extern "C" {
 
 int init_resetprop();
 int setprop(const char *name, const char *value);
-int setprop2(const char *name, const char *value, int trigger);
+int setprop2(const char *name, const char *value, const int trigger);
 char *getprop(const char *name);
 int deleteprop(const char *name);
+int read_prop_file(const char* filename, const int trigger);
 
 #ifdef __cplusplus
 }

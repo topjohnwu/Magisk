@@ -151,7 +151,7 @@ int setprop(const char *name, const char *value) {
     return setprop2(name, value, 1);
 }
 
-int setprop2(const char *name, const char *value, int trigger) {
+int setprop2(const char *name, const char *value, const int trigger) {
     int ret;
     
     char *check = getprop(name);
@@ -190,7 +190,7 @@ int deleteprop(const char *name) {
     return 0;
 }
 
-int read_prop_file(const char* filename) {
+int read_prop_file(const char* filename, const int trigger) {
     PRINT_D("resetprop: Load prop file [%s]\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -223,7 +223,7 @@ int read_prop_file(const char* filename) {
         if ( ((pch == NULL) || (i >= (pch - line))) || (pch >= line + read - 1) ) continue;
         // Separate the string
         *pch = '\0';
-        setprop(line + i, pch + 1);
+        setprop2(line + i, pch + 1, trigger);
     }
     free(line);
     fclose(fp);
@@ -234,7 +234,7 @@ int resetprop_main(int argc, char *argv[]) {
 
     int del = 0, file = 0, trigger = 1;
     
-    int exp_arg = 2, stdout_bak, null;
+    int exp_arg = 2;
     char *name, *value, *filename;
 
     if (argc < 3) {
@@ -283,7 +283,7 @@ int resetprop_main(int argc, char *argv[]) {
         return -1;
 
     if (file) {
-        return read_prop_file(filename);
+        return read_prop_file(filename, trigger);
     } else if (del) {
         return deleteprop(name);
     } else {
