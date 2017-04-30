@@ -8,6 +8,10 @@ int magiskpolicy_main(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
 	return magiskpolicy_main(argc, argv);
 }
+#define SELINUX_PATH        "/sys/fs/selinux/"
+#define SELINUX_ENFORCE     SELINUX_PATH "enforce"
+#define SELINUX_POLICY      SELINUX_PATH "policy"
+#define SELINUX_LOAD        SELINUX_PATH "load"
 #else
 #include "magisk.h"
 #endif
@@ -380,7 +384,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 
 	// Use current policy if not specified
 	if(!infile)
-		infile = "/sys/fs/selinux/policy";
+		infile = SELINUX_POLICY;
 
 	if (load_policydb(infile)) {
 		fprintf(stderr, "Could not load policy\n");
@@ -441,7 +445,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	vec_destroy(&rules);
 
 	if (live)
-		if (dump_policydb("/sys/fs/selinux/load"))
+		if (dump_policydb(SELINUX_LOAD))
 			return 1;
 
 	if (outfile) {
