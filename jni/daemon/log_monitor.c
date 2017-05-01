@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -29,6 +30,7 @@ static void *logger_thread(void *args) {
 	while (fdgets(buffer, sizeof(buffer), fd)) {
 		fprintf(logfile, "%s", buffer);
 	}
+	close(fd);
 	return NULL;
 }
 

@@ -45,17 +45,18 @@ unsigned get_radio_uid() {
 }
 
 int check_data() {
+	int ret = 0;
 	char buffer[4096];
 	FILE *fp = xfopen("/proc/mounts", "r");
 	while (fgets(buffer, sizeof(buffer), fp)) {
 		if (strstr(buffer, " /data ")) {
-			if (strstr(buffer, "tmpfs"))
-				return 0;
-			else
-				return 1;
+			if (strstr(buffer, "tmpfs") == NULL)
+				ret = 1;
+			break;
 		}
 	}
-	return 0;
+	fclose(fp);
+	return ret;
 }
 
 /* All the string should be freed manually!! */
@@ -238,10 +239,6 @@ int run_command(int *fd, const char *path, char *const argv[]) {
 		xdup2(sv[0], STDIN_FILENO);
 		xdup2(sv[0], STDOUT_FILENO);
 		xdup2(sv[0], STDERR_FILENO);
-	} else {
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		close(STDERR_FILENO);
 	}
 
 	execv(path, argv);

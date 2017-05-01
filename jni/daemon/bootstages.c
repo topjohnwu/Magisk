@@ -62,6 +62,8 @@ static char *loopsetup(const char *img) {
 		return NULL;
 	strcpy((char *) info.lo_file_name, img);
 	ioctl(lfd, LOOP_SET_STATUS64, &info);
+	close(lfd);
+	close(ffd);
 	return strdup(device);
 }
 
@@ -241,6 +243,7 @@ static void clone_skeleton(struct node_entry *node, const char *real_path) {
 			insert_child(node, dummy);
 		}
 	}
+	closedir(dir);
 
 	snprintf(buf, PATH_MAX, "/dev/magisk/dummy%s", real_path);
 	xmkdir_p(buf, 0755);

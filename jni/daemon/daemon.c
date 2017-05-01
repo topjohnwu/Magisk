@@ -23,6 +23,7 @@
 #include "magiskpolicy.h"
 
 pthread_t sepol_patch;
+int null_fd;
 
 static void *request_handler(void *args) {
 	// Setup the default error handler for threads
@@ -111,9 +112,10 @@ void start_daemon() {
 	xsetsid();
 	setcon("u:r:su:s0");
 	umask(022);
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
+	null_fd = xopen("/dev/null", O_RDWR);
+	xdup2(null_fd, STDIN_FILENO);
+	xdup2(null_fd, STDOUT_FILENO);
+	xdup2(null_fd, STDERR_FILENO);
 
 	// Patch selinux with medium patch before we do anything
 	load_policydb(SELINUX_POLICY);
