@@ -49,7 +49,7 @@ error() {
 build_bin() {
   [ -z "$1" -o -z "$2" ] && echo -e "! Missing version info\n" && usage
   BUILD="Build"
-  [ -z "DEBUG" ] || BUILD="Debug"
+  [ -z "$DEBUG" ] || BUILD="Debug"
   echo "************************"
   echo "* $BUILD: VERSION=$1 CODE=$2"
   echo "************************"
