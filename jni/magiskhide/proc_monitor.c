@@ -123,10 +123,10 @@ void proc_monitor() {
 		pthread_mutex_lock(&hide_lock);
 		vec_for_each(hide_list, line) {
 			if (strcmp(processName, line) == 0) {
-				read_namespace(pid, buffer, 32);
 				while(1) {
 					ret = 1;
 					for (int i = 0; i < zygote_num; ++i) {
+						read_namespace(pid, buffer, 32);
 						if (strcmp(buffer, zygote_ns[i]) == 0) {
 							usleep(50);
 							ret = 0;
