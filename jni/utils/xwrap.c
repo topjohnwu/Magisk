@@ -220,6 +220,14 @@ int xstat(const char *pathname, struct stat *buf) {
 	return ret;
 }
 
+int xlstat(const char *pathname, struct stat *buf) {
+	int ret = lstat(pathname, buf);
+	if (ret == -1) {
+		PLOGE("lstat %s", pathname);
+	}
+	return ret;
+}
+
 int xdup2(int oldfd, int newfd) {
 	int ret = dup2(oldfd, newfd);
 	if (ret == -1) {
@@ -253,6 +261,22 @@ int xmount(const char *source, const char *target,
 	int ret = mount(source, target, filesystemtype, mountflags, data);
 	if (ret == -1) {
 		PLOGE("mount %s->%s", source, target);
+	}
+	return ret;
+}
+
+int xumount(const char *target) {
+	int ret = umount(target);
+	if (ret == -1) {
+		PLOGE("umount %s", target);
+	}
+	return ret;
+}
+
+int xumount2(const char *target, int flags) {
+	int ret = umount2(target, flags);
+	if (ret == -1) {
+		PLOGE("umount2 %s", target);
 	}
 	return ret;
 }

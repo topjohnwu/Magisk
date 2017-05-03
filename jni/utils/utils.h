@@ -49,12 +49,15 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine) (void *), void *arg);
 int xsocketpair(int domain, int type, int protocol, int sv[2]);
 int xstat(const char *pathname, struct stat *buf);
+int xlstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
 int xsymlink(const char *target, const char *linkpath);
 int xmount(const char *source, const char *target,
 	const char *filesystemtype, unsigned long mountflags,
 	const void *data);
+int xumount(const char *target);
+int xumount2(const char *target, int flags);
 int xchmod(const char *pathname, mode_t mode);
 int xrename(const char *oldpath, const char *newpath);
 int xmkdir(const char *pathname, mode_t mode);
@@ -77,11 +80,13 @@ void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
 void unlock_blocks();
-void unblock_boot_process();
 void setup_sighandlers(void (*handler)(int));
 int run_command(int *fd, const char *path, char *const argv[]);
 int mkdir_p(const char *pathname, mode_t mode);
 int bind_mount(const char *from, const char *to);
 int open_new(const char *filename);
+int cp_afc(const char *source, const char *target);
+int clone_dir(const char *source, const char *target);
+int rm_rf(const char *target);
 
 #endif

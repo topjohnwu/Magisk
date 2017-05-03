@@ -14,6 +14,8 @@
 #include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -204,11 +206,6 @@ void unlock_blocks() {
 	closedir(dir);
 }
 
-void unblock_boot_process() {
-	int fd = open("/dev/.magisk.unblock", O_RDONLY | O_CREAT);
-	close(fd);
-}
-
 void setup_sighandlers(void (*handler)(int)) {
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
@@ -275,4 +272,111 @@ int bind_mount(const char *from, const char *to) {
 
 int open_new(const char *filename) {
 	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+}
+
+// file/link -> file/link only!!
+int cp_afc(const char *source, const char *target) {
+	struct stat buf;
+	xlstat(source, &buf);
+	unlink(target);
+	char *con;
+	if (S_ISREG(buf.st_mode)) {
+		int sfd, tfd;
+		sfd = xopen(source, O_RDONLY);
+		tfd = xopen(target, O_WRONLY | O_CREAT | O_TRUNC);
+		xsendfile(tfd, sfd, NULL, buf.st_size);
+		fchmod(tfd, buf.st_mode & 0777);
+		fchown(tfd, buf.st_uid, buf.st_gid);
+		fgetfilecon(sfd, &con);
+		fsetfilecon(tfd, con);
+		free(con);
+		close(sfd);
+		close(tfd);
+	} else if (S_ISLNK(buf.st_mode)) {
+		char buffer[PATH_MAX];
+		xreadlink(source, buffer, sizeof(buffer));
+		xsymlink(buffer, target);
+		lgetfilecon(source, &con);
+		lsetfilecon(target, con);
+		free(con);
+	} else {
+		return 1;
+	}
+	return 0;
+}
+
+int clone_dir(const char *source, const char *target) {
+	DIR *dir;
+	struct dirent *entry;
+	char *s_path, *t_path, *con;
+
+	if (!(dir = xopendir(source)))
+		return 1;
+
+	s_path = xmalloc(PATH_MAX);
+	t_path = xmalloc(PATH_MAX);
+
+	struct stat buf;
+	xstat(source, &buf);
+	mkdir_p(target, buf.st_mode & 0777);
+	xchmod(target, buf.st_mode & 0777);
+	lgetfilecon(source, &con);
+	lsetfilecon(target, con);
+	free(con);
+
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		snprintf(s_path, PATH_MAX, "%s/%s", source, entry->d_name);
+		snprintf(t_path, PATH_MAX, "%s/%s", target, entry->d_name);
+		switch (entry->d_type) {
+		case DT_DIR:
+			clone_dir(s_path, t_path);
+			break;
+		case DT_REG:
+		case DT_LNK:
+			cp_afc(s_path, t_path);
+			break;
+		}
+	}
+	free(s_path);
+	free(t_path);
+
+	closedir(dir);
+	return 0;
+}
+
+int rm_rf(const char *target) {
+	struct stat buf;
+	xlstat(target, &buf);
+	char *next;
+	if (S_ISDIR(buf.st_mode)) {
+		DIR *dir;
+		struct dirent *entry;
+		if (!(dir = xopendir(target)))
+			return 1;
+		next = xmalloc(PATH_MAX);
+		while ((entry = xreaddir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			snprintf(next, PATH_MAX, "%s/%s", target, entry->d_name);
+			switch (entry->d_type) {
+			case DT_DIR:
+				rm_rf(next);
+				break;
+			case DT_REG:
+			case DT_LNK:
+				unlink(next);
+				break;
+			}
+		}
+		free(next);
+		closedir(dir);
+		rmdir(target);
+	} else if (S_ISREG(buf.st_mode) || S_ISLNK(buf.st_mode)) {
+		unlink(target);
+	} else {
+		return 1;
+	}
+	return 0;
 }

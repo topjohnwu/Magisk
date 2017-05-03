@@ -24,6 +24,18 @@
 #define ARG_MAX 4096
 #endif
 
+#define LOGFILE         "/cache/magisk.log"
+#define LASTLOG         "/cache/last_magisk.log"
+#define UNBLOCKFILE     "/dev/.magisk.unblock"
+#define DISABLEFILE     "/cache/.disable_magisk"
+#define UNINSTALLER     "/cache/magisk_uninstaller.sh"
+#define MOUNTPOINT      "/magisk"
+#define MAINIMG         "/data/magisk.img"
+#define DATABIN         "/data/magisk"
+#define MAGISKTMP       "/dev/magisk"
+#define MIRRDIR         MAGISKTMP "/mirror"
+#define DUMMDIR         MAGISKTMP "/dummy"
+
 #define SELINUX_PATH        "/sys/fs/selinux/"
 #define SELINUX_ENFORCE     SELINUX_PATH "enforce"
 #define SELINUX_POLICY      SELINUX_PATH "policy"

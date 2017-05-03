@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <limits.h>
 #include <pthread.h>
-#include <unistd.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -19,8 +18,8 @@ static void *logger_thread(void *args) {
 	err_handler = exit_thread;
 
 	char buffer[PATH_MAX];
-	rename("/cache/magisk.log", "/cache/last_magisk.log");
-	FILE *logfile = xfopen("/cache/magisk.log", "w");
+	rename(LOGFILE, LASTLOG);
+	FILE *logfile = xfopen(LOGFILE, "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat
@@ -30,7 +29,6 @@ static void *logger_thread(void *args) {
 	while (fdgets(buffer, sizeof(buffer), fd)) {
 		fprintf(logfile, "%s", buffer);
 	}
-	close(fd);
 	return NULL;
 }
 
