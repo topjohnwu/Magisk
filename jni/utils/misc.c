@@ -267,6 +267,7 @@ int mkdir_p(const char *pathname, mode_t mode) {
 int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, NULL, MS_BIND, NULL);
 	LOGD("bind_mount: %s -> %s\n", from, to);
+	LOGI("bind_mount: %s\n", to);
 	return ret;
 }
 

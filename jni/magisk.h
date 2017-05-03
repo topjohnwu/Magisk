@@ -35,6 +35,7 @@
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define DUMMDIR         MAGISKTMP "/dummy"
+#define CACHEMOUNT      "/cache/magisk_mount"
 
 #define SELINUX_PATH        "/sys/fs/selinux/"
 #define SELINUX_ENFORCE     SELINUX_PATH "enforce"

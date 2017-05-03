@@ -93,13 +93,6 @@ int main(int argc, char *argv[]) {
 			int fd = connect_daemon();
 			write_int(fd, LATE_START);
 			return read_int(fd);
-		} else if (strcmp(argv[1], "--test") == 0) {
-			// Temporary testing entry
-			// int fd = connect_daemon();
-			// write_int(fd, TEST);
-			// return read_int(fd);
-			// test();
-			return 0;
 		} else {
 			// It's calling applets
 			--argc;

@@ -11,6 +11,7 @@
 #include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -140,7 +141,7 @@ static int merge_img(const char *source, const char *target) {
 
 	DIR *dir;
 	struct dirent *entry;
-	if (!(dir = xopendir("/cache/source")))
+	if (!(dir = opendir("/cache/source")))
 		return 1;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
@@ -286,7 +287,7 @@ static void construct_tree(const char *module, const char *path, struct node_ent
 
 	snprintf(buf, PATH_MAX, "%s/%s/%s", MOUNTPOINT, module, path);
 
-	if (!(dir = xopendir(buf)))
+	if (!(dir = opendir(buf)))
 		return;
 
 	while ((entry = xreaddir(dir))) {
@@ -335,7 +336,8 @@ static void clone_skeleton(struct node_entry *node, const char *real_path) {
 	struct node_entry *dummy, *child;
 
 	// Clone the structure
-	dir = xopendir(real_path);
+	if (!(dir = opendir(real_path)))
+		return;
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
@@ -380,7 +382,7 @@ static void clone_skeleton(struct node_entry *node, const char *real_path) {
 			xreadlink(buf2, temp, PATH_MAX);
 			symlink(temp, buf);
 			free(temp);
-			LOGD("cplink: %s -> %s\n", buf2, buf);
+			LOGI("cplink: %s -> %s\n", buf2, buf);
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", real_path, child->name);
 			bind_mount(buf2, buf);
@@ -416,6 +418,50 @@ static void magic_mount(struct node_entry *node) {
 }
 
 /****************
+ * Simple Mount *
+ ****************/
+
+static void simple_mount(const char *path) {
+	DIR *dir;
+	struct dirent *entry;
+
+	snprintf(buf, PATH_MAX, "%s%s", CACHEMOUNT, path);
+	if (!(dir = opendir(buf)))
+		return;
+
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		// Target file path
+		snprintf(buf2, PATH_MAX, "%s/%s", path, entry->d_name);
+		// Only mount existing file
+		if (access(buf2, F_OK) == -1)
+			continue;
+		if (entry->d_type == DT_DIR) {
+			char *new_path = strdup(buf2);
+			simple_mount(new_path);
+			free(new_path);
+		} else if (entry->d_type == DT_REG) {
+			// Actual file path
+			snprintf(buf, PATH_MAX, "%s/%s", buf, entry->d_name);
+			// Clone all attributes
+			struct stat s;
+			xstat(buf2, &s);
+			chmod(buf, s.st_mode & 0777);
+			chown(buf, s.st_uid, s.st_gid);
+			char *con;
+			getfilecon(buf2, &con);
+			setfilecon(buf, con);
+			free(con);
+			// Finally, mount the file
+			bind_mount(buf, buf2);
+		}
+	}
+
+	closedir(dir);
+}
+
+/****************
  * Entry points *
  ****************/
 
@@ -441,11 +487,12 @@ void post_fs(int client) {
 	if (access(UNINSTALLER, F_OK) == 0 || access(DISABLEFILE, F_OK) == 0)
 		goto unblock;
 
-	// TODO: Simple bind mounts
-
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
 	buf2 = xmalloc(PATH_MAX);
+
+	simple_mount("/system");
+	simple_mount("/vendor");
 
 unblock:
 	unblock_boot_process();
@@ -506,8 +553,7 @@ void post_fs_data(int client) {
 	char *module;
 	struct node_entry *sys_root, *ven_root = NULL, *child;
 
-	if (!(dir = xopendir(MOUNTPOINT)))
-		goto unblock;
+	dir = xopendir(MOUNTPOINT);
 
 	// Create the system root entry
 	sys_root = xcalloc(sizeof(*sys_root), 1);
@@ -586,7 +632,7 @@ void post_fs_data(int client) {
 				snprintf(buf2, PATH_MAX, "%s/system", MIRRDIR);
 				xmkdir_p(buf2, 0755);
 				xmount(buf, buf2, "ext4", MS_RDONLY, NULL);
-				LOGD("mount: %s -> %s\n", buf, buf2);
+				LOGI("mount: %s -> %s\n", buf, buf2);
 				continue;
 			}
 			if (strstr(line, " /vendor ")) {
@@ -595,7 +641,7 @@ void post_fs_data(int client) {
 				snprintf(buf2, PATH_MAX, "%s/vendor", MIRRDIR);
 				xmkdir_p(buf2, 0755);
 				xmount(buf, buf2, "ext4", MS_RDONLY, NULL);
-				LOGD("mount: %s -> %s\n", buf, buf2);
+				LOGI("mount: %s -> %s\n", buf, buf2);
 				continue;
 			}
 		}
@@ -604,7 +650,7 @@ void post_fs_data(int client) {
 			snprintf(buf, PATH_MAX, "%s/system/vendor", MIRRDIR);
 			snprintf(buf2, PATH_MAX, "%s/vendor", MIRRDIR);
 			symlink(buf, buf2);
-			LOGD("link: %s -> %s\n", buf, buf2);
+			LOGI("link: %s -> %s\n", buf, buf2);
 		}
 
 		// Magic!!
