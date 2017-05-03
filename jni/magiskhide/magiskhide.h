@@ -37,6 +37,6 @@ int destroy_list();
 
 extern int sv[2], hide_pid, hideEnabled;
 extern struct vector *hide_list;
-extern pthread_mutex_t hide_lock;
+extern pthread_mutex_t hide_lock, file_lock;
 
 #endif

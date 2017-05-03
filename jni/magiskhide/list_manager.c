@@ -17,8 +17,7 @@ int add_list(char *proc) {
 	}
 
 	char *line;
-	struct vector *new_list, *temp = hide_list;
-	new_list = xmalloc(sizeof(*new_list));
+	struct vector *new_list = xmalloc(sizeof(*new_list));
 	if (new_list == NULL)
 		return HIDE_ERROR;
 	vec_init(new_list);
@@ -40,14 +39,17 @@ int add_list(char *proc) {
 
 	// Critical region
 	pthread_mutex_lock(&hide_lock);
+	vec_destroy(hide_list);
+	free(hide_list);
 	hide_list = new_list;
 	pthread_mutex_unlock(&hide_lock);
 
-	// Free old list
-	vec_destroy(temp);
-	free(temp);
-	if (vector_to_file(HIDELIST, hide_list))
+	pthread_mutex_lock(&file_lock);
+	if (vector_to_file(HIDELIST, hide_list)) {
+		pthread_mutex_unlock(&file_lock);
 		return HIDE_ERROR;
+	}
+	pthread_mutex_unlock(&file_lock);
 	return HIDE_SUCCESS;
 }
 
@@ -59,8 +61,8 @@ int rm_list(char *proc) {
 
 	hide_ret ret = HIDE_ERROR;
 	char *line;
-	struct vector *new_list, *temp;
-	temp = new_list = xmalloc(sizeof(*new_list));
+	int do_rm = 0;
+	struct vector *new_list = xmalloc(sizeof(*new_list));
 	if (new_list == NULL)
 		goto error;
 	vec_init(new_list);
@@ -69,30 +71,35 @@ int rm_list(char *proc) {
 		if (strcmp(line, proc) == 0) {
 			free(proc);
 			proc = line;
-			temp = hide_list;
+			do_rm = 1;
 			continue;
 		}
 		vec_push_back(new_list, line);
 	}
 
-	if (temp == hide_list) {
+	if (do_rm) {
 		LOGI("hide_list rm: [%s]\n", proc);
 		ps_filter_proc_name(proc, kill_proc);
 		// Critical region
 		pthread_mutex_lock(&hide_lock);
+		vec_destroy(hide_list);
+		free(hide_list);
 		hide_list = new_list;
 		pthread_mutex_unlock(&hide_lock);
+
 		ret = HIDE_SUCCESS;
+		pthread_mutex_lock(&file_lock);
 		if (vector_to_file(HIDELIST, hide_list))
 			ret = HIDE_ERROR;
+		pthread_mutex_unlock(&file_lock);
 	} else {
 		ret = HIDE_ITEM_NOT_EXIST;
+		vec_destroy(new_list);
+		free(new_list);
 	}
 
 error:
 	free(proc);
-	vec_destroy(temp);
-	free(temp);
 	return ret;
 }
 
@@ -125,6 +132,7 @@ int destroy_list() {
 }
 
 void add_hide_list(int client) {
+	err_handler = do_nothing;
 	char *proc = read_string(client);
 	// ack
 	write_int(client, add_list(proc));
@@ -132,6 +140,7 @@ void add_hide_list(int client) {
 }
 
 void rm_hide_list(int client) {
+	err_handler = do_nothing;
 	char *proc = read_string(client);
 	// ack
 	write_int(client, rm_list(proc));

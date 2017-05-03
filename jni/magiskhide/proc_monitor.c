@@ -70,7 +70,7 @@ void proc_monitor() {
 	err_handler = proc_monitor_err;
 
 	int pid;
-	char buffer[512];
+	char buffer[4096];
 
 	// Get the mount namespace of init
 	read_namespace(1, init_ns, 32);
@@ -82,13 +82,14 @@ void proc_monitor() {
 		sleep(2);
 		ps_filter_proc_name("zygote", store_zygote_ns);
 	}
+	ps_filter_proc_name("zygote64", store_zygote_ns);
 
 	switch(zygote_num) {
 	case 1:
 		LOGI("proc_monitor: zygote ns=%s\n", zygote_ns[0]);
 		break;
 	case 2:
-		LOGI("proc_monitor: zygote (1) ns=%s (2) ns=%s\n", zygote_ns[0], zygote_ns[1]);
+		LOGI("proc_monitor: zygote (32-bit) ns=%s (64-bit) ns=%s\n", zygote_ns[0], zygote_ns[1]);
 		break;
 	}
 

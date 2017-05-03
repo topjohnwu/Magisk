@@ -151,8 +151,7 @@ static void proc_name_filter(int pid) {
 			return;
 		fdgets(buf, sizeof(buf), fd);
 	}
-	if (strstr(buf, ps_filter_pattern)) {
-		// printf("%d: %s\n", pid, buf);
+	if (strcmp(buf, ps_filter_pattern) == 0) {
 		ps_filter_cb(pid);
 	}
 	close(fd);

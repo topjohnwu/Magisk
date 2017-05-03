@@ -23,7 +23,7 @@ struct vector *hide_list = NULL;
 
 int hideEnabled = 0;
 static pthread_t proc_monitor_thread;
-pthread_mutex_t hide_lock;
+pthread_mutex_t hide_lock, file_lock;
 
 void kill_proc(int pid) {
 	kill(pid, SIGTERM);
@@ -89,6 +89,7 @@ void launch_magiskhide(int client) {
 
 	// Initialize the mutex lock
 	pthread_mutex_init(&hide_lock, NULL);
+	pthread_mutex_init(&file_lock, NULL);
 
 	write_int(client, HIDE_SUCCESS);
 	close(client);
