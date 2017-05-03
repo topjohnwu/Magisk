@@ -187,7 +187,7 @@ static void trim_img(const char *img) {
 void exec_common_script(const char* stage) {
 	DIR *dir;
 	struct dirent *entry;
-	snprintf(buf, PATH_MAX, "%s/.core/%s.d", MOUNTPOINT, stage);
+	snprintf(buf, PATH_MAX, "%s/%s.d", COREDIR, stage);
 
 	if (!(dir = opendir(buf)))
 		return;
@@ -676,6 +676,12 @@ void post_fs_data(int client) {
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
+
+	// Systemless hosts
+	if (access(HOSTSFILE, F_OK) == 0) {
+		LOGI("* Enabling systemless hosts file support");
+		bind_mount(HOSTSFILE, "/system/etc/hosts");
+	}
 
 	// Start magiskhide if enabled
 	char *hide_prop = getprop("persist.magisk.hide");

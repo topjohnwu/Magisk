@@ -30,6 +30,8 @@
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"
 #define MOUNTPOINT      "/magisk"
+#define COREDIR         MOUNTPOINT "/.core"
+#define HOSTSFILE       COREDIR "/hosts"
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
 #define MAGISKTMP       "/dev/magisk"
