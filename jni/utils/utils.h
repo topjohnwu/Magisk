@@ -88,5 +88,6 @@ int open_new(const char *filename);
 int cp_afc(const char *source, const char *target);
 int clone_dir(const char *source, const char *target);
 int rm_rf(const char *target);
+void clone_attr(const char *source, const char *target);
 
 #endif

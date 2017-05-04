@@ -57,9 +57,6 @@ void launch_magiskhide(int client) {
 
 	hideEnabled = 1;
 
-	if (init_resetprop())
-		goto error;
-
 	if (client != -1) {
 		if (setprop("persist.magisk.hide", "1"))
 			goto error;

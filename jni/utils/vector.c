@@ -2,6 +2,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "vector.h"
 
@@ -48,4 +49,13 @@ void vec_deep_destroy(struct vector *v) {
 		free(e);
 	}
 	vec_destroy(v);
+}
+
+struct vector *vec_dup(struct vector *v) {
+	struct vector *ret = malloc(sizeof(*ret));
+	vec_size(ret) = vec_size(v);
+	vec_cap(ret) = vec_cap(v);
+	vec_entry(v) = malloc(sizeof(void*) * vec_cap(ret));
+	memcpy(vec_entry(ret), vec_entry(v), sizeof(void*) * vec_cap(ret));
+	return ret;
 }

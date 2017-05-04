@@ -285,7 +285,7 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  make_ext4fs -l 64M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
+  make_ext4fs -l 32M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
 fi
 
 mount_image $IMG /magisk

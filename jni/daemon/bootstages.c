@@ -109,10 +109,9 @@ static int get_img_size(const char *img, int *used, int *total) {
 #define round_size(a) ((((a) / 32) + 1) * 32)
 
 static int resize_img(const char *img, int size) {
-	char buffer[ARG_MAX];
 	LOGI("resize %s to %dM\n", img, size);
-	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s && resize2fs %s %dM;", img, img, size);
-	return system(buffer);
+	snprintf(buf, PATH_MAX, "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
+	return system(buf);
 }
 
 static int merge_img(const char *source, const char *target) {
@@ -194,11 +193,11 @@ void exec_common_script(const char* stage) {
 
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_REG) {
-			snprintf(buf, PATH_MAX, "%s/%s", buf, entry->d_name);
-			if (access(buf, X_OK) == -1)
+			snprintf(buf2, PATH_MAX, "%s/%s", buf, entry->d_name);
+			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			char *const command[] = { "sh", buf, NULL };
+			char *const command[] = { "sh", buf2, NULL };
 			int pid = run_command(NULL, "/system/bin/sh", command);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
@@ -249,13 +248,14 @@ static char *get_full_path(struct node_entry *node) {
 	return strdup(buffer);
 }
 
+// Free the node and all children recursively
 static void destroy_subtree(struct node_entry *node) {
 	// Never free parent, since it shall be freed by themselves
-	free(node->name);
 	struct node_entry *e;
 	vec_for_each(node->children, e) {
 		destroy_subtree(e);
 	}
+	free(node->name);
 	vec_destroy(node->children);
 	free(node->children);
 	free(node);
@@ -271,7 +271,9 @@ static void insert_child(struct node_entry *p, struct node_entry *c) {
 	vec_for_each(p->children, e) {
 		if (strcmp(e->name, c->name) == 0) {
 			// Exist duplicate, replace
-			destroy_subtree(e);
+			c->children = e->children;
+			free(e->name);
+			free(e);
 			vec_entry(p->children)[_] = c;
 			return;
 		}
@@ -353,7 +355,8 @@ static void clone_skeleton(struct node_entry *node, const char *real_path) {
 	closedir(dir);
 
 	snprintf(buf, PATH_MAX, "%s%s", DUMMDIR, real_path);
-	xmkdir_p(buf, 0755);
+	mkdir_p(buf, 0755);
+	clone_attr(real_path, buf);
 	bind_mount(buf, real_path);
 
 	vec_for_each(node->children, child) {
@@ -445,14 +448,7 @@ static void simple_mount(const char *path) {
 			// Actual file path
 			snprintf(buf, PATH_MAX, "%s/%s", buf, entry->d_name);
 			// Clone all attributes
-			struct stat s;
-			xstat(buf2, &s);
-			chmod(buf, s.st_mode & 0777);
-			chown(buf, s.st_uid, s.st_gid);
-			char *con;
-			getfilecon(buf2, &con);
-			setfilecon(buf, con);
-			free(con);
+			clone_attr(buf2, buf);
 			// Finally, mount the file
 			bind_mount(buf, buf2);
 		}
@@ -689,6 +685,7 @@ void post_fs_data(int client) {
 		if (strcmp(hide_prop, "1") == 0) {
 			pthread_t thread;
 			xpthread_create(&thread, NULL, start_magisk_hide, NULL);
+			pthread_detach(thread);
 		}
 		free(hide_prop);
 	}
@@ -702,6 +699,10 @@ void late_start(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	// Allocate buffer
+	if (buf == NULL) buf = xmalloc(PATH_MAX);
+	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
 	pthread_join(sepol_patch, NULL);

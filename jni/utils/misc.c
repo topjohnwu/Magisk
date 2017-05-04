@@ -308,7 +308,7 @@ int cp_afc(const char *source, const char *target) {
 int clone_dir(const char *source, const char *target) {
 	DIR *dir;
 	struct dirent *entry;
-	char *s_path, *t_path, *con;
+	char *s_path, *t_path;
 
 	if (!(dir = xopendir(source)))
 		return 1;
@@ -316,13 +316,8 @@ int clone_dir(const char *source, const char *target) {
 	s_path = xmalloc(PATH_MAX);
 	t_path = xmalloc(PATH_MAX);
 
-	struct stat buf;
-	xstat(source, &buf);
-	mkdir_p(target, buf.st_mode & 0777);
-	xchmod(target, buf.st_mode & 0777);
-	lgetfilecon(source, &con);
-	lsetfilecon(target, con);
-	free(con);
+	mkdir_p(target, 0755);
+	clone_attr(source, target);
 
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -379,4 +374,15 @@ int rm_rf(const char *target) {
 		return 1;
 	}
 	return 0;
+}
+
+void clone_attr(const char *source, const char *target) {
+	struct stat buf;
+	xstat(source, &buf);
+	chmod(target, buf.st_mode & 0777);
+	chown(target, buf.st_uid, buf.st_gid);
+	char *con;
+	lgetfilecon(source, &con);
+	lsetfilecon(target, con);
+	free(con);
 }

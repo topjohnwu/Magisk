@@ -277,11 +277,6 @@ int resetprop_main(int argc, char *argv[]) {
         }
     }
 
-    PRINT_D("resetprop by nkk71 & topjohnwu\n");
-
-    if (init_resetprop())
-        return -1;
-
     if (file) {
         return read_prop_file(filename, trigger);
     } else if (del) {
