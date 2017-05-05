@@ -32,6 +32,27 @@ static void *request_handler(void *args) {
 	int client = *((int *) args);
 	free(args);
 	client_request req = read_int(client);
+
+	struct ucred credentials;
+	get_client_cred(client, &credentials);
+
+	switch (req) {
+	case LAUNCH_MAGISKHIDE:
+	case STOP_MAGISKHIDE:
+	case ADD_HIDELIST:
+	case RM_HIDELIST:
+	case POST_FS:
+	case POST_FS_DATA:
+	case LATE_START:
+		if (credentials.uid != 0) {
+			write_int(client, ROOT_REQUIRED);
+			close(client);
+			return NULL;
+		}
+	default:
+		break;
+	}
+
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
 		launch_magiskhide(client);
@@ -65,9 +86,8 @@ static void *request_handler(void *args) {
 	case LATE_START:
 		late_start(client);
 		break;
-	case TEST:
-		// test(client);
-		break;
+	default:
+		close(client);
 	}
 	return NULL;
 }

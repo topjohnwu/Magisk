@@ -10,6 +10,7 @@ extern pthread_t sepol_patch;
 
 // Commands require connecting to daemon
 typedef enum {
+	DO_NOTHING = 0,
 	LAUNCH_MAGISKHIDE,
 	STOP_MAGISKHIDE,
 	ADD_HIDELIST,
@@ -22,6 +23,17 @@ typedef enum {
 	LATE_START,
 	TEST
 } client_request;
+
+// Return codes for daemon
+typedef enum {
+	DAEMON_ERROR = -1,
+	DAEMON_SUCCESS = 0,
+	ROOT_REQUIRED,
+	HIDE_IS_ENABLED,
+	HIDE_NOT_ENABLED,
+	HIDE_ITEM_EXIST,
+	HIDE_ITEM_NOT_EXIST,
+} daemon_response;
 
 // daemon.c
 

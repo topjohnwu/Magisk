@@ -1,8 +1,6 @@
 /* magiskhide.c - initialize the environment for Magiskhide
  */
 
-// TODO: Functions to modify hiding list
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -88,7 +86,7 @@ void launch_magiskhide(int client) {
 	pthread_mutex_init(&hide_lock, NULL);
 	pthread_mutex_init(&file_lock, NULL);
 
-	write_int(client, HIDE_SUCCESS);
+	write_int(client, DAEMON_SUCCESS);
 	close(client);
 
 	// Get thread reference
@@ -99,7 +97,7 @@ void launch_magiskhide(int client) {
 
 error:
 	hideEnabled = 0;
-	write_int(client, HIDE_ERROR);
+	write_int(client, DAEMON_ERROR);
 	close(client);
 	if (hide_pid != -1) {
 		int kill = -1;
@@ -125,7 +123,7 @@ void stop_magiskhide(int client) {
 	setprop("persist.magisk.hide", "0");
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 
-	write_int(client, HIDE_SUCCESS);
+	write_int(client, DAEMON_SUCCESS);
 	close(client);
 }
 
@@ -133,7 +131,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (argc < 2) {
 		usage(argv[0]);
 	}
-	client_request req;
+	client_request req = DO_NOTHING;
 	if (strcmp(argv[1], "--enable") == 0) {
 		req = LAUNCH_MAGISKHIDE;
 	} else if (strcmp(argv[1], "--disable") == 0) {
@@ -156,13 +154,16 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
 	}
-	hide_ret code = read_int(fd);
+	daemon_response code = read_int(fd);
 	close(fd);
 	switch (code) {
-	case HIDE_ERROR:
+	case DAEMON_ERROR:
 		fprintf(stderr, "Error occured in daemon...\n");
 		break;
-	case HIDE_SUCCESS:
+	case DAEMON_SUCCESS:
+		break;
+	case ROOT_REQUIRED:
+		fprintf(stderr, "Root is required for this operation\n");
 		break;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "Magisk hide is not enabled yet\n");

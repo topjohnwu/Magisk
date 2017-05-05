@@ -19,7 +19,7 @@ int add_list(char *proc) {
 	char *line;
 	struct vector *new_list = xmalloc(sizeof(*new_list));
 	if (new_list == NULL)
-		return HIDE_ERROR;
+		return DAEMON_ERROR;
 	vec_init(new_list);
 
 	vec_for_each(hide_list, line) {
@@ -47,10 +47,10 @@ int add_list(char *proc) {
 	pthread_mutex_lock(&file_lock);
 	if (vector_to_file(HIDELIST, hide_list)) {
 		pthread_mutex_unlock(&file_lock);
-		return HIDE_ERROR;
+		return DAEMON_ERROR;
 	}
 	pthread_mutex_unlock(&file_lock);
-	return HIDE_SUCCESS;
+	return DAEMON_SUCCESS;
 }
 
 int rm_list(char *proc) {
@@ -59,7 +59,7 @@ int rm_list(char *proc) {
 		return HIDE_NOT_ENABLED;
 	}
 
-	hide_ret ret = HIDE_ERROR;
+	daemon_response ret = DAEMON_ERROR;
 	char *line;
 	int do_rm = 0;
 	struct vector *new_list = xmalloc(sizeof(*new_list));
@@ -87,10 +87,10 @@ int rm_list(char *proc) {
 		hide_list = new_list;
 		pthread_mutex_unlock(&hide_lock);
 
-		ret = HIDE_SUCCESS;
+		ret = DAEMON_SUCCESS;
 		pthread_mutex_lock(&file_lock);
 		if (vector_to_file(HIDELIST, hide_list))
-			ret = HIDE_ERROR;
+			ret = DAEMON_ERROR;
 		pthread_mutex_unlock(&file_lock);
 	} else {
 		ret = HIDE_ITEM_NOT_EXIST;
