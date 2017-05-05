@@ -104,9 +104,7 @@ void su_daemon_receiver(int client) {
 
 	// Check the credentials
 	struct ucred credentials;
-	socklen_t ucred_length = sizeof(struct ucred);
-	if(getsockopt(client, SOL_SOCKET, SO_PEERCRED, &credentials, &ucred_length))
-		PLOGE("getsockopt");
+	get_client_cred(client, &credentials);
 
 	from_uid = credentials.uid;
 	from_pid = credentials.pid;
