@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -17,18 +18,22 @@ static void *logger_thread(void *args) {
 	// Setup error handler
 	err_handler = exit_thread;
 
-	char buffer[PATH_MAX];
+	char *buffer = xmalloc(PATH_MAX);
 	rename(LOGFILE, LASTLOG);
-	FILE *logfile = xfopen(LOGFILE, "w");
+	FILE *logfile = xfdopen(xopen(LOGFILE, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644), "w");
 	// Disable buffering
 	setbuf(logfile, NULL);
 	// Start logcat
 	char *const command[] = { "logcat", "-s", "Magisk", "-v", "time", NULL };
 	int fd;
 	run_command(&fd, "/system/bin/logcat", command);
-	while (fdgets(buffer, sizeof(buffer), fd)) {
+	while (fdgets(buffer, PATH_MAX, fd)) {
 		fprintf(logfile, "%s", buffer);
 	}
+	// Should never be here, but well...
+	free(buffer);
+	close(fd);
+	fclose(logfile);
 	return NULL;
 }
 

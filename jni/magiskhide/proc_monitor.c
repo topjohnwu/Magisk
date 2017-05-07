@@ -20,6 +20,7 @@
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
 static int log_pid = 0, log_fd;
+static char *buffer;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
@@ -31,8 +32,9 @@ static void read_namespace(const int pid, char* target, const size_t size) {
 static void quit_pthread(int sig) {
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
+	free(buffer);
 	hideEnabled = 0;
-	// Kill the logging if possible
+	// Kill the logging if needed
 	if (log_pid) {
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, NULL, 0);
@@ -45,6 +47,7 @@ static void quit_pthread(int sig) {
 	close(sv[0]);
 	waitpid(hide_pid, NULL, 0);
 	pthread_mutex_destroy(&hide_lock);
+	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
 }
@@ -65,12 +68,16 @@ static void proc_monitor_err() {
 
 void proc_monitor() {
 	// Register the cancel signal
-	signal(SIGUSR1, quit_pthread);
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = quit_pthread;
+	sigaction(SIGPIPE, &act, NULL);
+
 	// The error handler should stop magiskhide services
 	err_handler = proc_monitor_err;
 
 	int pid;
-	char buffer[4096];
+	buffer = xmalloc(PATH_MAX);
 
 	// Get the mount namespace of init
 	read_namespace(1, init_ns, 32);
@@ -98,7 +105,7 @@ void proc_monitor() {
 	char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
 	log_pid = run_command(&log_fd, "/system/bin/logcat", command);
 
-	while(fdgets(buffer, sizeof(buffer), log_fd)) {
+	while(fdgets(buffer, PATH_MAX, log_fd)) {
 		int ret, comma = 0;
 		char *pos = buffer, *line, processName[256];
 

@@ -57,7 +57,6 @@ int hide_daemon() {
 	err_handler = hide_daemon_err;
 	
 	int fd;
-	FILE *fp;
 	char buffer[4096], cache_block[256], *line;
 	struct vector mount_list;
 	

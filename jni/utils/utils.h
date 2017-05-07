@@ -23,6 +23,7 @@ extern int quit_signals[];
 // xwrap.c
 
 FILE *xfopen(const char *pathname, const char *mode);
+FILE *xfdopen(int fd, const char *mode);
 #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
 #define xopen(...) GET_MACRO(__VA_ARGS__, xopen3, xopen2)(__VA_ARGS__)
 int xopen2(const char *pathname, int flags);

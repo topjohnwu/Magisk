@@ -221,6 +221,8 @@ int run_command(int *fd, const char *path, char *const argv[]) {
 		if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
 			return -1;
 		// We use sv[0], give them sv[1] for communication
+		if (fcntl(sv[1], F_SETFD, FD_CLOEXEC))
+			PLOGE("fcntl FD_CLOEXEC");
 		*fd = sv[1];
 	}
 

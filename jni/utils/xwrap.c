@@ -32,6 +32,14 @@ FILE *xfopen(const char *pathname, const char *mode) {
 	return fp;
 }
 
+FILE *xfdopen(int fd, const char *mode) {
+	FILE *fp = fdopen(fd, mode);
+	if (fp == NULL) {
+		PLOGE("fopen");
+	}
+	return fp;
+}
+
 int xopen2(const char *pathname, int flags) {
 	int fd = open(pathname, flags);
 	if (fd < 0) {

@@ -37,7 +37,7 @@ typedef enum {
 
 // daemon.c
 
-void start_daemon();
+void start_daemon(int client);
 int connect_daemon();
 
 // socket_trans.c

@@ -87,17 +87,18 @@ static void *request_handler(void *args) {
 		late_start(client);
 		break;
 	default:
-		close(client);
+		break;
 	}
+	// Just in case
+	close(client);
 	return NULL;
 }
 
 /* Setup the address and return socket fd */
 static int setup_socket(struct sockaddr_un *sun) {
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM, 0);
-	if (fcntl(fd, F_SETFD, FD_CLOEXEC)) {
+	if (fcntl(fd, F_SETFD, FD_CLOEXEC))
 		PLOGE("fcntl FD_CLOEXEC");
-	}
 
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
@@ -115,12 +116,13 @@ static void *large_sepol_patch(void *args) {
 	return NULL;
 }
 
-void start_daemon() {
+void start_daemon(int client) {
 	// Launch the daemon, create new session, set proper context
 	if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
 		fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
 		PLOGE("start daemon");
 	}
+
 	switch (fork()) {
 	case -1:
 		PLOGE("fork");
@@ -129,10 +131,13 @@ void start_daemon() {
 	default:
 		return;
 	}
+
+	// First close the client, it's useless for us
+	close(client);
 	xsetsid();
 	setcon("u:r:su:s0");
 	umask(022);
-	null_fd = xopen("/dev/null", O_RDWR);
+	null_fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(null_fd, STDIN_FILENO);
 	xdup2(null_fd, STDOUT_FILENO);
 	xdup2(null_fd, STDERR_FILENO);
@@ -142,12 +147,12 @@ void start_daemon() {
 	sepol_med_rules();
 	dump_policydb(SELINUX_LOAD);
 
-	// Continue the larger patch in another thread, we will need to join later
+	// Continue the larger patch in another thread, we will join later
 	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
-	
+
 	xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
 	xlisten(fd, 10);
 
@@ -168,15 +173,17 @@ void start_daemon() {
 	// Setup links under /sbin
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
-	chmod("/sbin", 0755);
-	mkdir("/magisk", 0755);
-	chmod("/magisk", 0755);
+	xchmod("/sbin", 0755);
+	xmkdir("/magisk", 0755);
+	xchmod("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
-	// Loop forever to listen to requests
+	// Loop forever to listen for requests
 	while(1) {
 		int *client = xmalloc(sizeof(int));
 		*client = xaccept(fd, NULL, NULL);
+		// Just in case, set to close on exec
+		fcntl(*client, F_SETFD, FD_CLOEXEC);
 		pthread_t thread;
 		xpthread_create(&thread, NULL, request_handler, client);
 		// Detach the thread, we will never join it
@@ -194,7 +201,7 @@ int connect_daemon() {
 		 * since there is no clear entry point when the daemon should be started
 		 */
 		LOGD("client: connect fail, try launching new daemon process\n");
-		start_daemon();
+		start_daemon(fd);
 		do {
 			// Wait for 10ms
 			usleep(10);
