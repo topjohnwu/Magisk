@@ -25,7 +25,7 @@
 #define ATTY_OUT    2
 #define ATTY_ERR    4
 
-int from_uid, from_pid;
+struct ucred su_credentials;
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -50,20 +50,15 @@ static void sighandler(int sig) {
 	}
 }
 
+static void sigpipe_handler(int sig) {
+	LOGD("su: Client killed unexpectedly\n");
+}
+
 void su_daemon_receiver(int client) {
-	LOGD("su: get request\n");
-
-	if (fork_zero_fucks()) {
-		// Root daemon
-		close(client);
-		return;
-	}
-
-	// Set the error handler back to normal
-	err_handler = exit_proc;
+	LOGD("su: get request from client: %d\n", client);
 
 	// Fork a new process, the child process will need to setsid,
-	// open a pseudo-terminal, and will eventually run exec
+	// open a pseudo-terminal if needed, and will eventually run exec
 	// The parent process will wait for the result and
 	// send the return code back to our client
 	int child = fork();
@@ -78,8 +73,11 @@ void su_daemon_receiver(int client) {
 		LOGD("su: wait_result waiting for %d\n", child);
 		int status, code;
 
-		// Change to a fancy name
-		strcpy(argv0, "magisksu");
+		// Handle SIGPIPE, since we don't want to crash our daemon
+		struct sigaction act;
+		memset(&act, 0, sizeof(act));
+		act.sa_handler = sigpipe_handler;
+		sigaction(SIGPIPE, &act, NULL);
 
 		if (waitpid(child, &status, 0) > 0)
 			code = WEXITSTATUS(status);
@@ -91,7 +89,7 @@ void su_daemon_receiver(int client) {
 		LOGD("su: return code to client: %d\n", code);
 		close(client);
 
-		exit(code);
+		return;
 	}
 
 	LOGD("su: child process started\n");
@@ -102,12 +100,8 @@ void su_daemon_receiver(int client) {
 	// Become session leader
 	xsetsid();
 
-	// Check the credentials
-	struct ucred credentials;
-	get_client_cred(client, &credentials);
-
-	from_uid = credentials.uid;
-	from_pid = credentials.pid;
+	// Get the credentials
+	get_client_cred(client, &su_credentials);
 
 	// Let's read some info from the socket
 	int argc = read_int(client);
@@ -138,6 +132,7 @@ void su_daemon_receiver(int client) {
 	int infd  = recv_fd(client);
 	int outfd = recv_fd(client);
 	int errfd = recv_fd(client);
+	int ptsfd = -1;
 
 	// We no longer need the access to socket in the child, close it
 	close(client);
@@ -148,7 +143,7 @@ void su_daemon_receiver(int client) {
 		xstat(pts_slave, &stbuf);
 
 		//If caller is not root, ensure the owner of pts_slave is the caller
-		if(stbuf.st_uid != credentials.uid && credentials.uid != 0) {
+		if(stbuf.st_uid != su_credentials.uid && su_credentials.uid != 0) {
 			LOGE("su: Wrong permission of pts_slave");
 			exit(1);
 		}
@@ -156,7 +151,7 @@ void su_daemon_receiver(int client) {
 		// Opening the TTY has to occur after the
 		// fork() and setsid() so that it becomes
 		// our controlling TTY and not the daemon's
-		int ptsfd = xopen(pts_slave, O_RDWR);
+		ptsfd = xopen(pts_slave, O_RDWR);
 
 		if (infd < 0)  {
 			LOGD("su: stdin using PTY");
@@ -178,6 +173,8 @@ void su_daemon_receiver(int client) {
 	xdup2(infd, STDIN_FILENO);
 	xdup2(outfd, STDOUT_FILENO);
 	xdup2(errfd, STDERR_FILENO);
+
+	close(ptsfd);
 
 	su_daemon_main(argc, argv);
 }

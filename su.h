@@ -102,7 +102,7 @@ typedef enum {
 	ALLOW = 2,
 } policy_t;
 
-extern int from_uid, from_pid;
+extern struct ucred su_credentials;
 
 // su.c
 

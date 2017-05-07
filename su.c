@@ -197,8 +197,8 @@ int su_daemon_main(int argc, char **argv) {
 	// Default values
 	struct su_context ctx = {
 		.from = {
-			.pid = from_pid,
-			.uid = from_uid,
+			.pid = su_credentials.pid,
+			.uid = su_credentials.uid,
 		},
 		.to = {
 			.uid = UID_ROOT,
