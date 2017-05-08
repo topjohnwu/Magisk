@@ -25,20 +25,24 @@ static struct vector module_list;
  * Node structure *
  ******************/
 
+// Precedence: MODULE > SKEL > DUMMY
 #define DO_NOTHING 0x0    /* intermediate node */
-
-#define IS_MODULE  0x1    /* mount from module */
-#define IS_DUMMY   0x2    /* mount from mirror */
-#define IS_SKEL    0x4    /* mount from skeleton */
+#define IS_DUMMY   0x1    /* mount from mirror */
+#define IS_SKEL    0x2    /* mount from skeleton */
+#define IS_MODULE  0x4    /* mount from module */
 
 struct node_entry {
-	const char *module;
+	const char *module;    /* Only used when status & IS_MODULE */
 	char *name;
 	uint8_t type;
 	uint8_t status;
 	struct node_entry *parent;
 	struct vector *children;
 };
+
+#define IS_DIR(n)  (n->type == DT_DIR)
+#define IS_LNK(n)  (n->type == DT_LNK)
+#define IS_REG(n)  (n->type == DT_REG)
 
 /******************
  * Image handling *
@@ -226,15 +230,6 @@ void exec_module_script(const char* stage) {
  * Magic Mount *
  ***************/
 
-static int hasChild(struct node_entry *node, const char *name) {
-	struct node_entry *child;
-	vec_for_each(node->children, child) {
-		if (strcmp(child->name, name) == 0)
-			return 1;
-	}
-	return 0;
-}
-
 static char *get_full_path(struct node_entry *node) {
 	char buffer[PATH_MAX], temp[PATH_MAX];
 	// Concat the paths
@@ -248,6 +243,14 @@ static char *get_full_path(struct node_entry *node) {
 	return strdup(buffer);
 }
 
+// Free the node
+static void destroy_node(struct node_entry *node) {
+	free(node->name);
+	vec_destroy(node->children);
+	free(node->children);
+	free(node);
+}
+
 // Free the node and all children recursively
 static void destroy_subtree(struct node_entry *node) {
 	// Never free parent, since it shall be freed by themselves
@@ -255,13 +258,11 @@ static void destroy_subtree(struct node_entry *node) {
 	vec_for_each(node->children, e) {
 		destroy_subtree(e);
 	}
-	free(node->name);
-	vec_destroy(node->children);
-	free(node->children);
-	free(node);
+	destroy_node(node);
 }
 
-static void insert_child(struct node_entry *p, struct node_entry *c) {
+// Return the child
+static struct node_entry *insert_child(struct node_entry *p, struct node_entry *c) {
 	c->parent = p;
 	if (p->children == NULL) {
 		p->children = xmalloc(sizeof(struct vector));
@@ -270,27 +271,36 @@ static void insert_child(struct node_entry *p, struct node_entry *c) {
 	struct node_entry *e;
 	vec_for_each(p->children, e) {
 		if (strcmp(e->name, c->name) == 0) {
-			// Exist duplicate, replace
-			c->children = e->children;
-			free(e->name);
-			free(e);
-			vec_entry(p->children)[_] = c;
-			return;
+			// Exist duplicate
+			if (c->status > e->status) {
+				// Precedence is higher, replace with new node
+				c->children = e->children;  // Preserve all children
+				free(e->name);
+				free(e);
+				vec_entry(p->children)[_] = c;
+				return c;
+			} else {
+				// Free the new entry, return old
+				destroy_node(c);
+				return e;
+			}
 		}
 	}
 	// New entry, push back
 	vec_push_back(p->children, c);
+	return c;
 }
 
-static void construct_tree(const char *module, const char *path, struct node_entry *parent) {
+static void construct_tree(const char *module, struct node_entry *parent) {
 	DIR *dir;
 	struct dirent *entry;
 	struct node_entry *node;
 
-	snprintf(buf, PATH_MAX, "%s/%s/%s", MOUNTPOINT, module, path);
+	char *parent_path = get_full_path(parent);
+	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, parent_path);
 
 	if (!(dir = opendir(buf)))
-		return;
+		goto cleanup;
 
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -300,86 +310,83 @@ static void construct_tree(const char *module, const char *path, struct node_ent
 		node->module = module;
 		node->name = strdup(entry->d_name);
 		node->type = entry->d_type;
-		insert_child(parent, node);
-		char *real_path = get_full_path(node);
+		snprintf(buf, PATH_MAX, "%s/%s", parent_path, node->name);
 		// Check if the entry has a correspond target
-		if (entry->d_type == DT_LNK || access(real_path, F_OK) == -1) {
+		if (IS_LNK(node) || access(buf, F_OK) == -1) {
 			// Mark the parent folder as a skeleton
-			parent->status = IS_SKEL;
-			node->status = IS_MODULE;
-		} else {
-			if (entry->d_type == DT_DIR) {
-				// Check if marked as replace
-				snprintf(buf2, PATH_MAX, "%s/%s/%s/%s/.replace", MOUNTPOINT, module, path, entry->d_name);
-				if (access(buf2, F_OK) == 0) {
-					// Replace everything, mark as leaf
-					node->status = IS_MODULE;
-				} else {
-					// Travel deeper
-					snprintf(buf2, PATH_MAX, "%s/%s", path, entry->d_name);
-					char *new_path = strdup(buf2);
-					construct_tree(module, new_path, node);
-					free(new_path);
-				}
-			} else if (entry->d_type == DT_REG) {
-				// This is a leaf, mark as target
-				node->status = IS_MODULE;
+			parent->status |= IS_SKEL;
+			node->status |= IS_MODULE;
+		} else if (IS_DIR(node)) {
+			// Check if marked as replace
+			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MOUNTPOINT, module, buf);
+			if (access(buf2, F_OK) == 0) {
+				// Replace everything, mark as leaf
+				node->status |= IS_MODULE;
 			}
+		} else if (IS_REG(node)) {
+			// This is a leaf, mark as target
+			node->status |= IS_MODULE;
 		}
-		free(real_path);
+		node = insert_child(parent, node);
+		if (node->status == DO_NOTHING) {
+			// Intermediate node, travel deeper
+			construct_tree(module, node);
+		}
 	}
 	
 	closedir(dir);
+
+cleanup:
+	free(parent_path);
 }
 
-static void clone_skeleton(struct node_entry *node, const char *real_path) {
+static void clone_skeleton(struct node_entry *node) {
 	DIR *dir;
 	struct dirent *entry;
 	struct node_entry *dummy, *child;
 
 	// Clone the structure
-	if (!(dir = opendir(real_path)))
-		return;
+	char *full_path = get_full_path(node);
+	if (!(dir = opendir(full_path)))
+		goto cleanup;
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
-		if (!hasChild(node, entry->d_name)) {
-			// Create dummy node
-			dummy = xcalloc(sizeof(*dummy), 1);
-			dummy->name = strdup(entry->d_name);
-			dummy->type = entry->d_type;
-			dummy->status = IS_DUMMY;
-			insert_child(node, dummy);
-		}
+		// Create dummy node
+		dummy = xcalloc(sizeof(*dummy), 1);
+		dummy->name = strdup(entry->d_name);
+		dummy->type = entry->d_type;
+		dummy->status |= IS_DUMMY;
+		insert_child(node, dummy);
 	}
 	closedir(dir);
 
-	snprintf(buf, PATH_MAX, "%s%s", DUMMDIR, real_path);
+	snprintf(buf, PATH_MAX, "%s%s", DUMMDIR, full_path);
 	mkdir_p(buf, 0755);
-	clone_attr(real_path, buf);
-	bind_mount(buf, real_path);
+	clone_attr(full_path, buf);
+	bind_mount(buf, full_path);
 
 	vec_for_each(node->children, child) {
-		snprintf(buf, PATH_MAX, "%s%s/%s", DUMMDIR, real_path, child->name);
-		if (child->type == DT_DIR) {
+		snprintf(buf, PATH_MAX, "%s%s/%s", DUMMDIR, full_path, child->name);
+		// Create the dummy file/directory
+		if (IS_DIR(child))
 			xmkdir(buf, 0755);
-		} else if (child->type == DT_REG) {
+		else if (IS_REG(child))
 			close(open_new(buf));
-		}
-		if (child->status == IS_MODULE) {
+
+		if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
-			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, real_path, child->name);
-		} else if (child->status == IS_DUMMY) {
-			// Mount from mirror to dummy file
-			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, real_path, child->name);
-		} else if (child->status == IS_SKEL) {
+			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
+		} else if (child->status & IS_SKEL) {
 			// It's another skeleton, recursive call and end
-			char *s = get_full_path(child);
-			clone_skeleton(child, s);
-			free(s);
+			clone_skeleton(child);
 			continue;
+		} else if (child->status & IS_DUMMY) {
+			// Mount from mirror to dummy file
+			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, full_path, child->name);
 		}
-		if (child->type == DT_LNK) {
+
+		if (IS_LNK(child)) {
 			// Symlink special treatments
 			char *temp = xmalloc(PATH_MAX);
 			xreadlink(buf2, temp, PATH_MAX);
@@ -387,10 +394,13 @@ static void clone_skeleton(struct node_entry *node, const char *real_path) {
 			free(temp);
 			LOGI("cplink: %s -> %s\n", buf2, buf);
 		} else {
-			snprintf(buf, PATH_MAX, "%s/%s", real_path, child->name);
+			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
 			bind_mount(buf2, buf);
 		}
 	}
+
+cleanup:
+	free(full_path);
 }
 
 static void magic_mount(struct node_entry *node) {
@@ -405,18 +415,22 @@ static void magic_mount(struct node_entry *node) {
 		return;
 	}
 
-	if (node->status == DO_NOTHING) {
-		vec_for_each(node->children, child)
-			magic_mount(child);
-	} else {
-		real_path = get_full_path(node);
-		if (node->status == IS_MODULE) {
+	if (node->status) {
+		if (node->status & IS_MODULE) {
+			// The real deal, mount module item
+			real_path = get_full_path(node);
 			snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, node->module, real_path);
 			bind_mount(buf, real_path);
-		} else if (node->status == IS_SKEL) {
-			clone_skeleton(node, real_path);
+			free(real_path);
+		} else if (node->status & IS_SKEL) {
+			// The node is labeled to be cloned with skeleton, lets do it
+			clone_skeleton(node);
 		}
-		free(real_path);
+		// We should not see dummies, so no need to handle it here
+	} else {
+		// It's an intermediate node, travel deeper
+		vec_for_each(node->children, child)
+			magic_mount(child);
 	}
 }
 
@@ -599,7 +613,7 @@ void post_fs_data(int client) {
 			// Construct structure
 			has_modules = 1;
 			LOGI("%s: constructing magic mount structure\n", module);
-			construct_tree(module, "system", sys_root);
+			construct_tree(module, sys_root);
 		}
 	}
 
