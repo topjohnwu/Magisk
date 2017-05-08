@@ -26,6 +26,7 @@
 #define ATTY_ERR    4
 
 struct ucred su_credentials;
+static __thread int client_fd;
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -52,6 +53,8 @@ static void sighandler(int sig) {
 
 static void sigpipe_handler(int sig) {
 	LOGD("su: Client killed unexpectedly\n");
+	close(client_fd);
+	pthread_exit(NULL);
 }
 
 void su_daemon_receiver(int client) {
@@ -68,6 +71,9 @@ void su_daemon_receiver(int client) {
 		PLOGE("fork");
 		return;
 	} else if (child != 0) {
+
+		// For sighandler to close it
+		client_fd = client;
 
 		// Wait result
 		LOGD("su: wait_result waiting for %d\n", child);
