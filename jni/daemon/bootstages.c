@@ -727,6 +727,26 @@ void late_start(int client) {
 	LOGI("* Running module service scripts\n");
 	exec_module_script("service");
 
+	// Install Magisk Manager if exists
+	if (access(MANAGERAPK, F_OK) == 0) {
+		while(1) {
+			sleep(5);
+			char *const command[] = { "sh", "-c", 
+				"CLASSPATH=/system/framework/pm.jar "
+				"/system/bin/app_process /system/bin "
+				"com.android.commands.pm.Pm install -r " MANAGERAPK, NULL };
+			int apk_res, pid;
+			pid = run_command(&apk_res, "/system/bin/sh", command);
+			waitpid(pid, NULL, 0);
+			fdgets(buf, PATH_MAX, apk_res);
+			close(apk_res);
+			// Keep trying until pm is started
+			if (strstr(buf, "Error:") == NULL)
+				break;
+		}
+		unlink(MANAGERAPK);
+	}
+
 	// All boot stage done, cleanup everything
 	free(buf);
 	free(buf2);

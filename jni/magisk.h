@@ -34,6 +34,7 @@
 #define HOSTSFILE       COREDIR "/hosts"
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
+#define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define DUMMDIR         MAGISKTMP "/dummy"
