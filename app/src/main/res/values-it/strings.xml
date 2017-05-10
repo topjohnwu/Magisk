@@ -117,7 +117,7 @@
     <string name="safetyNet_hide_notice">Quest\'app usa SafetyNet\ned è già gestita da MagiskHide</string>
     <string name="start_magiskhide">Avvio MagiskHide…</string>
     <string name="no_magisksu_title">MagiskSU non in uso!</string>
-    <string name="no_magisksu_msg">Non hai rootato con MagiskSU. L'uso del solo MagiskHide potrebbe non essere suffciiente!\nNon è ufficialmente supportato, e potrebbe richiedere altri strumenti (es. suhide) per passare il test Safety Net.</string>
+    <string name="no_magisksu_msg">Non hai rootato con MagiskSU. L\'uso del solo MagiskHide potrebbe non essere suffciiente!\nNon è ufficialmente supportato, e potrebbe richiedere altri strumenti (es. suhide) per passare il test Safety Net.</string>
     <string name="understand">Accetto</string>
     <string name="process_error">Errore di elaborazione</string>
     <string name="internal_storage">Lo ZIP si trova in:\n[memoria interna]%1$s</string>
