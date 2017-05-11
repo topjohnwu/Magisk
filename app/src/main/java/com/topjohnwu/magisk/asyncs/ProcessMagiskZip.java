@@ -81,7 +81,7 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
                         @Override
                         protected Void doInBackground(Void... params) {
                             Shell.su("setprop magisk.version "
-                                    + String.valueOf(magiskManager.remoteMagiskVersion));
+                                    + String.valueOf(magiskManager.remoteMagiskVersionCode));
                             magiskManager.updateCheckDone.trigger();
                             return null;
                         }

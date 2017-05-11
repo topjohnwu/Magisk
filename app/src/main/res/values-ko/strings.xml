@@ -18,7 +18,7 @@
     <string name="magisk_version_error">Magisk가 설치되지 않음</string>
 
     <string name="checking_for_updates">업데이트 확인 중…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f 사용 가능!</string>
+    <string name="magisk_update_available">Magisk v%1$s 사용 가능!</string>
     <string name="cannot_check_updates">업데이트를 확인할 수 없음. 인터넷 연결을 확인하세요.</string>
     <string name="up_to_date">최신 버전의 %1$s 설치됨</string>
     <string name="root_error">루팅은 되어 있으나 루트 권한을 얻을 수 없음. 루트 권한 허용 상태를 확인하세요.</string>

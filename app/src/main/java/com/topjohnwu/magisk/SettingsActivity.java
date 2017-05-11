@@ -90,6 +90,7 @@ public class SettingsActivity extends Activity {
 
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
+            PreferenceCategory developer = (PreferenceCategory) findPreference("developer");
 
             suAccess = (ListPreference) findPreference("su_access");
             autoRes = (ListPreference) findPreference("su_auto_response");
@@ -103,6 +104,10 @@ public class SettingsActivity extends Activity {
                 return true;
             });
 
+            if (!BuildConfig.DEBUG) {
+                prefScreen.removePreference(developer);
+            }
+
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
@@ -110,7 +115,7 @@ public class SettingsActivity extends Activity {
                 if (!getApplication().isSuClient) {
                     prefScreen.removePreference(suCategory);
                 }
-                if (getApplication().magiskVersion < 11) {
+                if (getApplication().magiskVersionCode < 130) {
                     prefScreen.removePreference(magiskCategory);
                 }
             }

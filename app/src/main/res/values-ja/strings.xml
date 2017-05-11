@@ -18,7 +18,7 @@
     <string name="magisk_version_error">Magisk がインストールされていません</string>
 
     <string name="checking_for_updates">更新を確認中...</string>
-    <string name="magisk_update_available">Magisk v%1$.1f が利用可能です！</string>
+    <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
     <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
     <string name="up_to_date">最新の %1$s がインストール済です</string>
     <string name="root_error">Root化はされていますが権限がありません。拒否していませんか？</string>

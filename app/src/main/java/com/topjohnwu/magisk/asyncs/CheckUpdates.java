@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
-    private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/updates/magisk_update.json";
+    private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/magisk_update.json";
     private static final int NOTIFICATION_ID = 1;
 
     private boolean showNotification = false;
@@ -38,22 +38,22 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         try {
             JSONObject json = new JSONObject(jsonStr);
             JSONObject magisk = json.getJSONObject("magisk");
-            magiskManager.remoteMagiskVersion = magisk.getDouble("versionCode");
+            magiskManager.remoteMagiskVersionString = magisk.getString("version");
+            magiskManager.remoteMagiskVersionCode = magisk.getInt("versionCode");
             magiskManager.magiskLink = magisk.getString("link");
             magiskManager.releaseNoteLink = magisk.getString("note");
-        } catch (JSONException ignored) {
-        }
+        } catch (JSONException ignored) {}
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        if (magiskManager.magiskVersion < magiskManager.remoteMagiskVersion
+        if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode
                 && showNotification && magiskManager.updateNotification) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager);
             builder.setSmallIcon(R.drawable.ic_magisk)
                     .setContentTitle(magiskManager.getString(R.string.magisk_update_title))
-                    .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersion))
+                    .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersionString))
                     .setVibrate(new long[]{0, 100, 100, 100})
                     .setAutoCancel(true);
             Intent intent = new Intent(magiskManager, SplashActivity.class);

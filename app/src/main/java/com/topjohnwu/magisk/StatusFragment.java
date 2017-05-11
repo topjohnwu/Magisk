@@ -65,7 +65,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
     @OnClick(R.id.magisk_status_container)
     public void gotoInstall() {
-        if (getApplication().remoteMagiskVersion > 0) {
+        if (getApplication().remoteMagiskVersionCode > 0) {
             ((MainActivity) getActivity()).navigate(R.id.install);
         }
     }
@@ -100,7 +100,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             new CheckUpdates(getActivity()).exec();
         });
 
-        if (getApplication().magiskVersion < 0 && Shell.rootAccess() && !noDialog) {
+        if (getApplication().magiskVersionCode < 0 && Shell.rootAccess() && !noDialog) {
             noDialog = true;
             new AlertDialogBuilder(getActivity())
                     .setTitle(R.string.no_magisk_title)
@@ -158,7 +158,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
         getApplication().updateMagiskInfo();
 
-        if (getApplication().magiskVersion < 0) {
+        if (getApplication().magiskVersionCode < 0) {
             magiskVersionText.setText(R.string.magisk_version_error);
         } else if (getApplication().disabled) {
             magiskVersionText.setText(getString(R.string.magisk_version_core_only, getApplication().magiskVersionString));
@@ -197,21 +197,21 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     private void updateCheckUI() {
         int image, color;
 
-        if (getApplication().remoteMagiskVersion < 0) {
+        if (getApplication().remoteMagiskVersionCode < 0) {
             color = colorNeutral;
             image = R.drawable.ic_help;
             magiskUpdateText.setText(R.string.cannot_check_updates);
-        } else if (getApplication().remoteMagiskVersion > getApplication().magiskVersion) {
+        } else if (getApplication().remoteMagiskVersionCode > getApplication().magiskVersionCode) {
             color = colorInfo;
             image = R.drawable.ic_update;
-            magiskUpdateText.setText(getString(R.string.magisk_update_available, getApplication().remoteMagiskVersion));
+            magiskUpdateText.setText(getString(R.string.magisk_update_available, getApplication().remoteMagiskVersionString));
         } else {
             color = colorOK;
             image = R.drawable.ic_check_circle;
             magiskUpdateText.setText(getString(R.string.up_to_date, getString(R.string.magisk)));
         }
 
-        if (getApplication().magiskVersion < 0) {
+        if (getApplication().magiskVersionCode < 0) {
             color = colorBad;
             image = R.drawable.ic_cancel;
         }

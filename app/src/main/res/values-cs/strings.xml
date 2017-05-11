@@ -17,7 +17,7 @@
     <string name="magisk_version_error">Magisk není nainstalován</string>
 
     <string name="checking_for_updates">Kontrola aktualizací…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f je dostupný!</string>
+    <string name="magisk_update_available">Magisk v%1$s je dostupný!</string>
     <string name="cannot_check_updates">Nelze zkontrolovat aktualizace. Jste připojeni k Internetu?</string>
     <string name="up_to_date">Poslední verze z %1$s nainstalovaných</string>
     <string name="root_error">Zařízení s rootem ale chybí root povolení, máte jej zpřístupněno?</string>

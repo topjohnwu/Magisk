@@ -79,7 +79,7 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
             }
         }
         final String finalBootImage = bootImage;
-        String filename = "Magisk-v" + magiskManager.remoteMagiskVersion + ".zip";
+        String filename = "Magisk-v" + magiskManager.remoteMagiskVersionCode + ".zip";
         new AlertDialogBuilder(getActivity())
                 .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
                 .setMessage(getString(R.string.repo_install_msg, filename))
@@ -160,12 +160,12 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
         View v = inflater.inflate(R.layout.fragment_install, container, false);
         unbinder = ButterKnife.bind(this, v);
         magiskManager = getApplication();
-        if (magiskManager.magiskVersion < 0) {
+        if (magiskManager.magiskVersionCode < 0) {
             currentVersionTitle.setText(getString(R.string.current_magisk_title, getString(R.string.version_none)));
         } else {
             currentVersionTitle.setText(getString(R.string.current_magisk_title, "v" + magiskManager.magiskVersionString));
         }
-        installTitle.setText(getString(R.string.install_magisk_title, "v" + String.format(Locale.US, "%.1f", magiskManager.remoteMagiskVersion)));
+        installTitle.setText(getString(R.string.install_magisk_title, "v" + magiskManager.remoteMagiskVersionString));
 
         updateUI();
         return v;
@@ -185,7 +185,7 @@ public class InstallFragment extends Fragment implements CallbackEvent.Listener<
             keepVerityChkbox.setEnabled(false);
             spinner.setEnabled(false);
         } else {
-            uninstallButton.setVisibility(magiskManager.magiskVersion > 10.3 ? View.VISIBLE : View.GONE);
+            uninstallButton.setVisibility(magiskManager.magiskVersionCode >= 130 ? View.VISIBLE : View.GONE);
             installText.setText(R.string.download_install);
             detectButton.setEnabled(true);
             keepEncChkbox.setEnabled(true);

@@ -15,7 +15,7 @@
     <string name="magisk_version_core_only">Magisk v%1$s installée (Mode Core uniquement)</string>
     <string name="magisk_version_error">Magisk non installé</string>
     <string name="checking_for_updates">Vérification de mises à jour…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f disponible !</string>
+    <string name="magisk_update_available">Magisk v%1$s disponible !</string>
     <string name="cannot_check_updates">Impossible de vérifier les mises à jour, pas d\'Internet ?</string>
     <string name="up_to_date">Dernière version %1$s installée</string>
     <string name="root_error">Rooté mais aucune permission root, non acceptée ?</string>

@@ -138,16 +138,16 @@ public class MainActivity extends Activity
     private void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersion >= 8
+                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 130
                         && prefs.getBoolean("magiskhide", false));
         menu.findItem(R.id.modules).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersion >= 4);
+                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersion >= 4);
+                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(
                 Shell.rootAccess() && getApplicationContext().isSuClient);
-        menu.findItem(R.id.install).setVisible(getApplicationContext().remoteMagiskVersion > 0);
+        menu.findItem(R.id.install).setVisible(getApplicationContext().remoteMagiskVersionCode > 0);
     }
 
     public void navigate(String item) {

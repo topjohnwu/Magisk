@@ -21,7 +21,7 @@
     <string name="magisk_version_error">Magisk not installed</string>
 
     <string name="checking_for_updates">Checking for updates…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f available!</string>
+    <string name="magisk_update_available">Magisk v%1$s available!</string>
     <string name="cannot_check_updates">Cannot check for updates, no Internet?</string>
     <string name="up_to_date">Latest version of %1$s installed</string>
     <string name="root_error">Rooted but no root permission, not allowed?</string>

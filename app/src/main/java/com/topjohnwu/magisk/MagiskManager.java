@@ -38,9 +38,10 @@ public class MagiskManager extends Application {
     public final SparseArray<CallbackEvent<Policy>> uidSuRequest = new SparseArray<>();
 
     // Info
-    public double magiskVersion;
     public String magiskVersionString;
-    public double remoteMagiskVersion = -1;
+    public int magiskVersionCode = -1;
+    public String remoteMagiskVersionString;
+    public int remoteMagiskVersionCode = -1;
     public String magiskLink;
     public String releaseNoteLink;
     public int SNCheckResult = -1;
@@ -91,8 +92,13 @@ public class MagiskManager extends Application {
 
     public void init() {
         isDarkTheme = prefs.getBoolean("dark_theme", false);
-        devLogging = prefs.getBoolean("developer_logging", false);
-        shellLogging = prefs.getBoolean("shell_logging", false);
+        if (BuildConfig.DEBUG) {
+            devLogging = prefs.getBoolean("developer_logging", false);
+            shellLogging = prefs.getBoolean("shell_logging", false);
+        } else {
+            devLogging = false;
+            shellLogging = false;
+        }
         magiskHide = prefs.getBoolean("magiskhide", false);
         updateNotification = prefs.getBoolean("notification", true);
         // Always start a new root shell manually, just for safety
@@ -139,17 +145,22 @@ public class MagiskManager extends Application {
     }
 
     public void updateMagiskInfo() {
-        List<String> ret = Shell.sh("getprop magisk.version");
+        List<String> ret;
+        ret = Shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
-            magiskVersion = -1;
-        } else {
-            try {
-                magiskVersionString = ret.get(0);
-                magiskVersion = Double.parseDouble(ret.get(0));
-            } catch (NumberFormatException e) {
-                // Custom version don't need to receive updates
-                magiskVersion = Double.POSITIVE_INFINITY;
+            ret = Shell.sh("getprop magisk.version");
+            if (Utils.isValidShellResponse(ret)) {
+                try {
+                    magiskVersionString = ret.get(0);
+                    magiskVersionCode = (int) Double.parseDouble(ret.get(0)) * 10;
+                } catch (NumberFormatException ignored) {}
             }
+        } else {
+            magiskVersionString = ret.get(0).split(":")[0];
+            ret = Shell.sh("magisk -V");
+            try {
+                magiskVersionCode = Integer.parseInt(ret.get(0));
+            } catch (NumberFormatException ignored) {}
         }
         ret = Shell.sh("getprop persist.magisk.busybox");
         try {

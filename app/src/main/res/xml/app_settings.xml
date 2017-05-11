@@ -82,6 +82,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="developer"
         android:title="@string/settings_development_category">
 
         <SwitchPreference

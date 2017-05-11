@@ -20,7 +20,7 @@
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
 
     <string name="checking_for_updates">Suche nach Updates…</string>
-    <string name="magisk_update_available">Magisk %1$.1f ist verfügbar!</string>
+    <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
     <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
     <string name="up_to_date">Die neueste Version von %1$s ist bereits installiert</string>
     <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>

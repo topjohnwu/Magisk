@@ -44,10 +44,6 @@ public class SplashActivity extends Activity{
 
         // Now fire all async tasks
         new GetBootBlocks(this).exec();
-        if (magiskManager.magiskHide && magiskManager.magiskVersion > 11 &&
-                !magiskManager.magiskHideStarted) {
-            new MagiskHide().enable();
-        }
         new LoadModules(this) {
             @Override
             protected void onPostExecute(Void v) {

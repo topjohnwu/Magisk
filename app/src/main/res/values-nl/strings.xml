@@ -13,7 +13,6 @@
     <string name="magisk_version">Geïnstalleerde Magisk: v%1$s</string>
     <string name="magisk_version_error">Heb jij Magisk wel geïnstalleerd?</string>
 
-    <string name="magisk_update_available">Magisk v%1$.1f update!</string>
     <string name="cannot_check_updates">Kan niet controleren op updates.</string>
     <string name="up_to_date">Nieuwste versie van %1$s geïnstalleerd</string>
 

@@ -21,7 +21,7 @@
     <string name="magisk_version_error">Magisk não instalado</string>
 
 	<string name="checking_for_updates">Checando por atualizações…</string>
-    <string name="magisk_update_available">Magisk v%1$.1f disponível!</string>
+    <string name="magisk_update_available">Magisk v%1$s disponível!</string>
     <string name="cannot_check_updates">Não é possível verificar se há atualizações</string>
     <string name="up_to_date">Última versão do %1$s instalado</string>
     <string name="root_error">Rooteado mas sem permissão de root, o acesso foi permitido?</string>

@@ -21,7 +21,7 @@ public class BootupIntentService extends IntentService {
         magiskManager.initSuAccess();
         magiskManager.updateMagiskInfo();
         if (magiskManager.prefs.getBoolean("magiskhide", false) &&
-                !magiskManager.disabled && !magiskManager.magiskHideStarted && magiskManager.magiskVersion > 11) {
+                !magiskManager.disabled && !magiskManager.magiskHideStarted && magiskManager.magiskVersionCode >= 130) {
             magiskManager.toast(R.string.start_magiskhide, Toast.LENGTH_LONG);
             Shell.su(true, MagiskManager.MAGISK_HIDE_PATH + "enable",
                     "setprop persist.magisk.hide 1");

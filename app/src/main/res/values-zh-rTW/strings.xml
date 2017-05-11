@@ -17,7 +17,7 @@
     <string name="magisk_version_error">未安裝 Magisk</string>
 
     <string name="checking_for_updates">正在檢查更新…</string>
-    <string name="magisk_update_available">Magisk 可更新到 v%1$.1f！</string>
+    <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="cannot_check_updates">無法檢查更新，沒有網絡連線？</string>
     <string name="up_to_date">已安裝最新版本的 %1$s</string>
     <string name="root_error">已 ROOT 但沒有 ROOT 權限，未授予權限？</string>

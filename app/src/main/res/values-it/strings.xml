@@ -18,7 +18,7 @@
     <string name="magisk_version_error">Hai installato Magisk?</string>
 
     <string name="checking_for_updates">Controllo aggiornamenti…</string>
-    <string name="magisk_update_available">È disponibile Magisk v%1$.1f!</string>
+    <string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
     <string name="cannot_check_updates">Impossibile controllare aggiornamenti</string>
     <string name="up_to_date">La versione di %1$s è aggiornata</string>
     <string name="root_error">Rootato ma senza permessi. Non sei autorizzato?</string>
