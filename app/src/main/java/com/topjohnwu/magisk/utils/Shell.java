@@ -40,7 +40,6 @@ public class Shell {
 
         // Setup umask and PATH
         su("umask 022");
-        su("PATH=`[ -e /dev/busybox ] && echo /dev/busybox || echo /data/busybox`:$PATH");
 
         List<String> ret = su("echo -BOC-", "id");
 
@@ -137,9 +136,6 @@ public class Shell {
 
                 // Run the new shell with busybox and proper umask
                 STDIN.write(("umask 022\n").getBytes("UTF-8"));
-                STDIN.flush();
-                STDIN.write(("PATH=`[ -e /dev/busybox ] && echo /dev/busybox || " +
-                        "echo /data/busybox`:$PATH\n").getBytes("UTF-8"));
                 STDIN.flush();
             } catch (IOException err) {
                 return null;

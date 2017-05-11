@@ -68,7 +68,7 @@ public class FlashZip extends SerialTask<Void, String, Integer> {
         }
     }
 
-    protected boolean unzipAndCheck() throws Exception {
+    private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
         List<String> ret;
         ret = Utils.readFile(mCheckFile.getPath());

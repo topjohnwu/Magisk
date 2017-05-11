@@ -31,11 +31,12 @@
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
 
-        <SwitchPreference
-            android:key="busybox"
-            android:defaultValue="false"
-            android:title="@string/settings_busybox_title"
-            android:summary="@string/settings_busybox_summary" />
+        <!-- No more busybox -->
+        <!--<SwitchPreference-->
+            <!--android:key="busybox"-->
+            <!--android:defaultValue="false"-->
+            <!--android:title="@string/settings_busybox_title"-->
+            <!--android:summary="@string/settings_busybox_summary" />-->
 
         <SwitchPreference
             android:key="magiskhide"

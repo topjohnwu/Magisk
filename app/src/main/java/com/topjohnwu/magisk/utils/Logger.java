@@ -34,7 +34,7 @@ public class Logger {
 
     public static void shell(boolean root, String msg) {
         if (MagiskManager.shellLogging) {
-            Log.d(TAG, root ? "MANAGERSU" : "MANAGERSH" + msg);
+            Log.d(TAG, (root ? "MANAGERSU " : "MANAGERSH ") + msg);
         }
     }
 }

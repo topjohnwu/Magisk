@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -26,6 +28,7 @@ public class MagiskManager extends Application {
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_PATH = "/magisk";
     public static final String INTENT_SECTION = "section";
+    public static final String BUSYBOX_VERSION = "1.26.2";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
@@ -65,7 +68,6 @@ public class MagiskManager extends Application {
     public boolean magiskHide;
     public boolean isDarkTheme;
     public boolean updateNotification;
-    public boolean busybox;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -106,19 +108,31 @@ public class MagiskManager extends Application {
         updateMagiskInfo();
         initSuAccess();
         initSuConfigs();
+        // Initialize busybox
+        File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
+        if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
+            busybox.getParentFile().mkdirs();
+            Shell.su(
+                    "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
+                    "chmod -R 755 " + busybox.getParent(),
+                    busybox + " --install -s " + busybox.getParent()
+            );
+        }
         // Initialize prefs
         prefs.edit()
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
-                .putBoolean("busybox", busybox)
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
                 .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
                 .putString("su_auto_response", String.valueOf(suResponseType))
                 .putString("su_notification", String.valueOf(suNotificationType))
                 .putString("su_access", String.valueOf(suAccessState))
+                .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
+        // Add busybox to PATH
+        Shell.su("PATH=$PATH:" + busybox.getParent());
     }
 
     public void initSuConfigs() {
@@ -161,12 +175,6 @@ public class MagiskManager extends Application {
             try {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
-        }
-        ret = Shell.sh("getprop persist.magisk.busybox");
-        try {
-            busybox = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
-        } catch (NumberFormatException e) {
-            busybox = false;
         }
         ret = Shell.sh("getprop ro.magisk.disable");
         try {

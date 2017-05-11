@@ -38,27 +38,13 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         if (Shell.rootAccess()) {
-            try {
-                // We might not have busybox yet, unzip with Java
-                // We shall have complete busybox after Magisk installation
-                File tempdir = new File(magiskManager.getCacheDir(), "magisk");
-                ZipUtils.unzip(magiskManager.getContentResolver().openInputStream(mUri), tempdir);
-                // Running in parallel mode, open new shell
-                Shell.su(true,
-                        "rm -f /dev/.magisk",
-                        (mBoot != null) ? "echo \"BOOTIMAGE=/dev/block/" + mBoot + "\" >> /dev/.magisk" : "",
-                        "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
-                        "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk",
-                        "mkdir -p " + MagiskManager.TMP_FOLDER_PATH,
-                        "cp -af " + tempdir + "/. " + MagiskManager.TMP_FOLDER_PATH + "/magisk",
-                        "mv -f " + tempdir + "/META-INF " + magiskManager.getCacheDir() + "/META-INF",
-                        "rm -rf " + tempdir
-                );
-            } catch (Exception e) {
-                Logger.error("ProcessMagiskZip: Error!");
-                e.printStackTrace();
-                return false;
-            }
+            // Running in parallel mode, open new shell
+            Shell.su(true,
+                    "rm -f /dev/.magisk",
+                    (mBoot != null) ? "echo \"BOOTIMAGE=/dev/block/" + mBoot + "\" >> /dev/.magisk" : "",
+                    "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
+                    "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk"
+            );
             return true;
         }
         return false;
@@ -68,27 +54,7 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         progressDialog.dismiss();
         if (result) {
-            new FlashZip(activity, mUri) {
-                @Override
-                protected boolean unzipAndCheck() throws Exception {
-                    // Don't need to check, as it is downloaded in correct form
-                    return true;
-                }
-
-                @Override
-                protected void onSuccess() {
-                    new SerialTask<Void, Void, Void>(activity) {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            Shell.su("setprop magisk.version "
-                                    + String.valueOf(magiskManager.remoteMagiskVersionCode));
-                            magiskManager.updateCheckDone.trigger();
-                            return null;
-                        }
-                    }.exec();
-                    super.onSuccess();
-                }
-            }.exec();
+            new FlashZip(activity, mUri).exec();
         } else {
             Utils.showUriSnack(activity, mUri);
         }
