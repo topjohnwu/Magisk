@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
     @Override
     protected Void doInBackground(Object... params) {
         String command = (String) params[0];
-        List<String> ret = Shell.su(MagiskManager.MAGISK_HIDE_PATH + command);
+        List<String> ret = Shell.su("magiskhide --" + command);
         if (isList) {
             magiskManager.magiskHideList = ret;
         }
@@ -43,17 +42,17 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
     }
 
     public void enable() {
-        exec("enable; setprop persist.magisk.hide 1");
+        exec("enable");
     }
 
     public void disable() {
-        exec("disable; setprop persist.magisk.hide 0");
+        exec("disable");
     }
 
     public void list() {
         isList = true;
         if (magiskManager == null) return;
-        exec("list");
+        exec("ls");
     }
 
 }
