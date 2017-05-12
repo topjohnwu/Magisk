@@ -30,6 +30,7 @@ static void read_namespace(const int pid, char* target, const size_t size) {
 
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
+	err_handler = do_nothing;
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
 	free(buffer);
@@ -71,7 +72,7 @@ void proc_monitor() {
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = quit_pthread;
-	sigaction(SIGPIPE, &act, NULL);
+	sigaction(SIGUSR1, &act, NULL);
 
 	// The error handler should stop magiskhide services
 	err_handler = proc_monitor_err;

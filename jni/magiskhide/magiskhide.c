@@ -75,16 +75,16 @@ void launch_magiskhide(int client) {
 
 	close(sv[1]);
 
+	// Initialize the mutex lock
+	pthread_mutex_init(&hide_lock, NULL);
+	pthread_mutex_init(&file_lock, NULL);
+
 	// Initialize the hide list
 	if (init_list())
 		goto error;
 
 	// Add SafetyNet by default
 	add_list(strdup("com.google.android.gms.unstable"));
-
-	// Initialize the mutex lock
-	pthread_mutex_init(&hide_lock, NULL);
-	pthread_mutex_init(&file_lock, NULL);
 
 	write_int(client, DAEMON_SUCCESS);
 	close(client);
