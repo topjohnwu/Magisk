@@ -1,0 +1,195 @@
+<resources>
+    <!--Welcome Activity-->
+    <string name="navigation_drawer_open">Deschide sertarul de navigare</string>
+    <string name="navigation_drawer_close">Închide sertarul de navigare</string>
+    <string name="modules">Module</string>
+    <string name="downloads">Descărcări</string>
+    <string name="superuser">Superuser</string>
+    <string name="log">Jurnal</string>
+    <string name="settings">Setări</string>
+    <string name="status">Stare</string>
+    <string name="install">Instalare</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version">Magisk instalat v%1$s</string>
+    <string name="magisk_version_core_only">Magisk instalat v%1$s (Mod Doar Nucleu)</string>
+    <string name="magisk_version_error">Magisk nu este instalat</string>
+
+    <string name="checking_for_updates">Verificare actualizări…</string>
+    <string name="magisk_update_available">Magisk v%1$s disponibil!</string>
+    <string name="cannot_check_updates">Nu se pot verifica actualizările, nu este internet?</string>
+    <string name="up_to_date">Ultima versiune a %1$s este instalată</string>
+    <string name="root_error">Root obţinut, dar fără permisiune root, nu este permis?</string>
+    <string name="not_rooted">Nu este obţinut root</string>
+    <string name="proper_root">Root obţinut corect</string>
+    <string name="safetyNet_check_text">Apăsați pentru a începe verificarea SafetyNet</string>
+    <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
+    <string name="safetyNet_connection_failed">Nu se poate conecta la Google API</string>
+    <string name="safetyNet_connection_suspended">Conexiunea la API-ul Google a fost suspendată</string>
+    <string name="safetyNet_error">Nu se poate verifica SafetyNet, nu este internet?</string>
+    <string name="safetyNet_fail">SafetyNet eșuat: nepotrivire profil CTS</string>
+    <string name="safetyNet_pass">SafetyNet a trecut</string>
+    <string name="root_info_warning">Funcționalitatea este foarte limitată</string>
+
+    <!--Install Fragment-->
+    <string name="auto_detect">(Auto) %1$s</string>
+    <string name="cannot_auto_detect">(Nu se poate detecta automat)</string>
+    <string name="boot_image_title">Locaţie imagine Boot</string>
+    <string name="detect_button">Detectare</string>
+    <string name="advanced_settings_title">Setări avansate</string>
+    <string name="keep_force_encryption">Păstrare criptare forţată</string>
+    <string name="keep_dm_verity">Păstrare dm-verity</string>
+    <string name="current_magisk_title">Versiune Magisk instalată: %1$s</string>
+    <string name="install_magisk_title">Ultima versiune Magisk: %1$s</string>
+    <string name="uninstall">Dezinstalare</string>
+    <string name="reboot_countdown">Repornire în %1$d</string>
+    <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
+    <string name="uninstall_magisk_msg">Aceasta va elimina toate modulele, MagiskSU, şi potențial să cripteze datele, dacă nu sunt criptate\nContinuaţi?</string>
+    <string name="version_none">(Niciuna)</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nu sunt furnizate informații)</string>
+    <string name="no_modules_found">Niciun modul</string>
+    <string name="update_file_created">Modulul va fi actualizat la următoarea repornire</string>
+    <string name="remove_file_created">Modulul va fi eliminat la următoarea repornire</string>
+    <string name="remove_file_deleted">Modulul nu va fi eliminat la următoarea repornire</string>
+    <string name="disable_file_created">Modulul va fi dezactivat la următoarea repornire</string>
+    <string name="disable_file_removed">Modulul va fi activat la următoarea repornire</string>
+    <string name="author">Creat de %1$s</string>
+    <string name="fab_flash_zip">Modul Zip</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Actualizare disponibilă</string>
+    <string name="installed">Instalat</string>
+    <string name="not_installed">Nu este instalat</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveToSd">Salvare pe cardul SD</string>
+    <string name="menuReload">Reîncărcare</string>
+    <string name="menuClearLog">Șterge jurnal acum</string>
+    <string name="logs_cleared">Jurnal şters</string>
+    <string name="log_is_empty">Jurnal gol</string>
+    <string name="logs_save_failed">Nu s-a putut scrie jurnalul pe cardul SD:</string>
+
+    <!--About Activity-->
+    <string name="about">Despre</string>
+    <string name="app_developers">Dezvoltatori principali</string>
+    <string name="app_developers_"><![CDATA[Aplicație creată de <a href="https://github.com/topjohnwu">topjohnwu</a> în colaborare cu <a href="https://github.com/d8ahazard">Digitalhigh</a> şi <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_changelog">Lista modificărilor</string>
+    <string name="translators" />
+    <string name="app_version">Versiune aplicaţie</string>
+    <string name="app_source_code">Cod sursă</string>
+    <string name="donation">Donaţie</string>
+    <string name="app_translators">Traducători</string>
+    <string name="support_thread">Pagina de suport</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
+    <string name="no_thanks">Nu, mulţumesc</string>
+    <string name="yes">Da</string>
+    <string name="ok">OK</string>
+    <string name="close">Închide</string>
+    <string name="repo_install_title">Instalare %1$s</string>
+    <string name="repo_install_msg">Instalaţi %1$s?</string>
+    <string name="download_install">Descărcare şi instalare</string>
+    <string name="download">Descărcare</string>
+    <string name="goto_install">Accesaţi secţiunea \"Instalare\"</string>
+    <string name="download_file_error">Eroare la descărcarea fișierului</string>
+    <string name="install_error">Eroare de instalare!</string>
+    <string name="invalid_zip">Zip-ul nu este un modul Magisk!!</string>
+    <string name="reboot_title">Instalarea a reușit!</string>
+    <string name="reboot_msg">Reporniţi acum?</string>
+    <string name="reboot">Repornire</string>
+    <string name="copying_msg">Copierea zip-ului în dosarul temp</string>
+    <string name="zip_install_progress_title">Instalare</string>
+    <string name="zip_unzip_msg">Dezarhivarea fișierului zip…</string>
+    <string name="zip_process_msg">Procesare fişierului zip…</string>
+    <string name="zip_install_progress_msg">Instalare %1$s…</string>
+    <string name="no_magisk_title">Magisk nu este instalat!</string>
+    <string name="no_magisk_msg">Doriți să descărcați și să instalați Magisk?</string>
+    <string name="downloading_toast">Descărcare %1$s</string>
+    <string name="magisk_update_title">O nouă actualizare Magisk este disponibilă!</string>
+    <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
+    <string name="release_notes">Note de lansare</string>
+    <string name="repo_cache_cleared">Arhive cache eliminate</string>
+    <string name="safetyNet_hide_notice">Această aplicație utilizează SafetyNet\nDeja manipulat de MagiskHide în mod implicit</string>
+    <string name="start_magiskhide">Pornire MagiskHide…</string>
+    <string name="no_magisksu_title">Nu se utilizează MagiskSU!</string>
+    <string name="no_magisksu_msg">Nu aţi obţinut root cu MagiskSU, utilizarea MagiskHide s-ar putea să nu fie suficientă!\nNu este susținută oficial și veți avea nevoie de instrumente suplimentare (de ex. suhide) pentru a trece Safety Net.</string>
+    <string name="understand">Înţeleg</string>
+    <string name="process_error">Eroare de proces</string>
+    <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
+    <string name="zip_process_title">Procesare</string>
+    <string name="manual_boot_image">Selectați manual o imagine de boot!</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">General</string>
+    <string name="settings_dark_theme_title">Temă întunecată</string>
+    <string name="settings_dark_theme_summary">Activare temă întunecată</string>
+    <string name="settings_notification_title">Notificare actualizare</string>
+    <string name="settings_notification_summary">Se afișează notificări de actualizare atunci când este disponibilă o nouă versiune</string>
+    <string name="settings_clear_cache_title">Eliminare cache</string>
+    <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
+
+    <string name="settings_core_only_title">Mod Doar nucleu</string>
+    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide, systemless hosts şi busybox vor fi în continuare activate</string>
+    <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
+    <string name="settings_busybox_title">Activare BusyBox</string>
+    <string name="settings_busybox_summary">Montare busybox Magisk în xbin</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts suport pentru aplicațiile Adblock</string>
+
+    <string name="settings_su_app_adb">Aplicaţii şi ADB</string>
+    <string name="settings_su_app">Doar aplicaţii</string>
+    <string name="settings_su_adb">Doar ADB</string>
+    <string name="settings_su_disable">Dezactivat</string>
+    <string name="settings_su_request_10">10 secunde</string>
+    <string name="settings_su_request_20">20 de secunde</string>
+    <string name="settings_su_request_30">30 de secunde</string>
+    <string name="settings_su_request_60">60 de secunde</string>
+    <string name="superuser_access">Acces Superuser</string>
+    <string name="auto_response">Răspuns automat</string>
+    <string name="request_timeout">Expirare</string>
+    <string name="superuser_notification">Notificare Superuser</string>
+    <string name="request_timeout_summary">%1$s secunde</string>
+
+    <string name="settings_development_category">Dezvoltare aplicaţie</string>
+    <string name="settings_developer_logging_title">Activați logarea avansată de depanare</string>
+    <string name="settings_developer_logging_summary">Bifați această opțiune pentru a activa înregistrarea detaliată</string>
+    <string name="settings_shell_logging_title">Activați logarea comenzilor shell</string>
+    <string name="settings_shell_logging_summary">Bifați această opțiune pentru a permite logarea tuturor comenzilor shell și ieșirea acestora</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Solicitare Superuser</string>
+    <string name="deny_with_str">Refuzaţi %1$s</string>
+    <string name="deny">Refuzaţi</string>
+    <string name="prompt">Solicitare</string>
+    <string name="grant">Permiteţi</string>
+    <string name="su_warning">Acordă acces complet la dispozitivul dvs..\nRefuzaţi dacă nu sunteţi sigur!</string>
+    <string name="forever">Pentru totdeauna</string>
+    <string name="once">O singura dată</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s i-au fost acordate drepturi Superuser</string>
+    <string name="su_deny_toast">%1$s i-au fost refuzate drepturi Superuser</string>
+    <string name="no_apps_found">Nicio aplicaţie</string>
+    <string name="su_snack_grant">Drepturile Superuser pentru %1$s au fost acordate</string>
+    <string name="su_snack_deny">Drepturile Superuser pentru %1$s au fost refuzate</string>
+    <string name="su_snack_notif_on">Notificările pentru %1$s au fost acordate</string>
+    <string name="su_snack_notif_off">Notificările pentru %1$s au fost refuzate</string>
+    <string name="su_snack_log_on">Logarea pentru %1$s a fost activată</string>
+    <string name="su_snack_log_off">Logarea pentru %1$s a fost dezactivată</string>
+    <string name="su_snack_revoke">Drepturile pentru %1$s sunt revocate</string>
+    <string name="su_revoke_title">Revocaţi?</string>
+    <string name="su_revoke_msg">Confirmați revocarea drepturilor pentru %1$s?</string>
+    <string name="toast">Mesaj</string>
+    <string name="none">Nimic</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">UID:\u0020</string>
+    <string name="command">Comandă:\u0020</string>
+
+</resources>
