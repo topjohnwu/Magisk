@@ -1,97 +1,200 @@
 <resources>
     <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Open navigatie</string>
-    <string name="navigation_drawer_close">Sluit navigatie</string>
+    <string name="navigation_drawer_open">Navigatielade openen</string>
+    <string name="navigation_drawer_close">Navigatielade sluiten</string>
+    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
+    <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Instellingen</string>
+    <string name="status">Status</string>
+    <string name="install">Installeren</string>
 
-    <!--Magisk Fragment-->
-    <string name="magisk_version">Geïnstalleerde Magisk: v%1$s</string>
-    <string name="magisk_version_error">Heb jij Magisk wel geïnstalleerd?</string>
+    <!--Status Fragment-->
+    <string name="magisk_version">Magisk v%1$s geïnstalleerd</string>
+    <string name="magisk_version_core_only">Magisk v%1$s geïnstalleerd (Core Only modus)</string>
+    <string name="magisk_version_error">Magisk niet geïnstalleerd</string>
 
-    <string name="cannot_check_updates">Kan niet controleren op updates.</string>
-    <string name="up_to_date">Nieuwste versie van %1$s geïnstalleerd</string>
+    <string name="checking_for_updates">Controleren op updates…</string>
+    <string name="magisk_update_available">Magisk v%1$s beschikbaar!</string>
+    <string name="cannot_check_updates">Kan niet controleren op updates. Geen internet?</string>
+    <string name="up_to_date">Laatste versie van %1$s geïnstalleerd</string>
+    <string name="root_error">Geroot, maar geen root-permissie. Niet toegestaan?</string>
+    <string name="not_rooted">Niet geroot</string>
+    <string name="proper_root">Correct geroot</string>
+    <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
+    <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
+    <string name="safetyNet_connection_failed">Kan niet verbinden met Google API</string>
+    <string name="safetyNet_connection_suspended">Verbinding met Google API was geschorst</string>
+    <string name="safetyNet_error">Kan SafetyNet niet controleren. Geen internet?</string>
+    <string name="safetyNet_fail">SafetyNet gefaald</string>
+    <string name="safetyNet_pass">SafetyNet geslaagd</string>
+    <string name="root_info_warning">Functionaliteit zeer beperkt</string>
 
-    <!--Root Fragment-->
+    <!--Install Fragment-->
+    <string name="auto_detect">(Auto) %1$s</string>
+    <string name="cannot_auto_detect">(Kan niet auto-detecteren)</string>
+    <string name="boot_image_title">Boot image locatie</string>
+    <string name="detect_button">Detecteren</string>
+    <string name="advanced_settings_title">Geavanceerde instellingen</string>
+    <string name="keep_force_encryption">Behoud afgedwongen versleuteling</string>
+    <string name="keep_dm_verity">Behoud dm-verity</string>
+    <string name="current_magisk_title">Geïnstalleerde Magisk versie: %1$s</string>
+    <string name="install_magisk_title">Recentste Magisk versie: %1$s</string>
+    <string name="uninstall">Deïnstalleren</string>
+    <string name="reboot_countdown">Herstarten in %1$d</string>
+    <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
+    <string name="uninstall_magisk_msg">Dit verwijdert alle modules, MagiskSU, en versleutelt mogelijk alle niet-versleutelde data\nZeker weten voortzetten?</string>
+    <string name="version_none">(Geen)</string>
 
     <!--Module Fragment-->
-    <string name="no_info_provided">(Geen informatie gegeven)</string>
+    <string name="no_info_provided">(Geen info verstrekt)</string>
     <string name="no_modules_found">Geen modules gevonden</string>
-    <string name="update_file_created">Module wordt geüpdatet bij de volgende reboot.</string>
-    <string name="remove_file_created">Module wordt verwijderd bij de volgende reboot.</string>
-    <string name="remove_file_deleted">Module wordt niet verwijderd bij de volgende reboot.</string>
-    <string name="disable_file_created">Module wordt uitgeschakeld bij de volgende reboot.</string>
-    <string name="disable_file_removed">Module wordt ingeschakeld bij de volgende reboot.</string>
-    <string name="author">Gemaakt door: %1$s</string>
+    <string name="update_file_created">Module wordt bijgewerkt bij volgende herstart</string>
+    <string name="remove_file_created">Module wordt verwijderd bij volgende herstart</string>
+    <string name="remove_file_deleted">Module wordt niet verwijderd bij volgende herstart</string>
+    <string name="disable_file_created">Module wordt uitgeschakeld bij volgende herstart</string>
+    <string name="disable_file_removed">Module wordt ingeschakeld bij volgende herstart</string>
+    <string name="author">Gemaakt door %1$s</string>
+    <string name="fab_flash_zip">Module zip flashen</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Update Beschikbaar</string>
+    <string name="update_available">Update beschikbaar</string>
     <string name="installed">Geïnstalleerd</string>
     <string name="not_installed">Niet geïnstalleerd</string>
 
     <!--Log Fragment-->
     <string name="menuSaveToSd">Opslaan op SD-kaart</string>
     <string name="menuReload">Herladen</string>
-    <string name="menuClearLog">Maak log leeg</string>
-    <string name="logs_cleared">Log succesvol geleegd</string>
+    <string name="menuClearLog">Log nu wissen</string>
+    <string name="logs_cleared">Log succesvol gewist</string>
     <string name="log_is_empty">Log is leeg</string>
-    <string name="logs_save_failed">Kon niet naar SD-kaart schrijven:</string>
+    <string name="logs_save_failed">Kon log niet naar SD-kaart schrijven:</string>
 
     <!--About Activity-->
     <string name="about">Over</string>
-    <string name="app_developers">Hoofddevelopers</string>
-    <string name="app_developers_"><![CDATA[App gemaakt door <a href="https://github.com/topjohnwu">topjohnwu</a> in samenwerking met <a href="https://github.com/d8ahazard">Digitalhigh</a> en <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_developers">Hoofdontwikkelaars</string>
+    <string name="app_developers_"><![CDATA[App gemaakt door <a href="https://github.com/topjohnwu">Topjohnwu</a> in samenwerking met <a href="https://github.com/d8ahazard">Digitalhigh</a> en <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">App\'s changelog</string>
-    <string name="translators">NaamloosDT, Klaessen</string>
+    <string name="translators" />
     <string name="app_version">App\'s versie</string>
-    <string name="app_source_code">Source code</string>
+    <string name="app_source_code">Broncode</string>
     <string name="donation">Donatie</string>
     <string name="app_translators">App\'s vertalers</string>
-    <string name="support_thread">Support thread</string>
+    <string name="support_thread">Hulp thread</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Deze feature zal niet werken zonder permissie om op de externe opslag te schrijven.</string>
+    <string name="permissionNotGranted">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
     <string name="no_thanks">Nee bedankt</string>
-    <string name="repo_install_title">Installeer %1$s</string>
-    <string name="repo_install_msg">Wilt u  %1$s installeren?</string>
-    <string name="download_install">Downloaden en installeren</string>
-    <string name="download_file_error">Er is een fout opgetreden bij het downloaden van het bestand</string>
-    <string name="install_error">Er is een fout opgetreden in de installatie</string>
-    <string name="invalid_zip">Zip bestand is geen Magisk Module!</string>
-    <string name="reboot_title">Installatie succesvol!</string>
-    <string name="reboot_msg">Wilt u nu rebooten?</string>
-    <string name="reboot">Reboot</string>
+    <string name="yes">Ja</string>
+    <string name="ok">Oké</string>
+    <string name="close">Sluiten</string>
+    <string name="repo_install_title">%1$s installeren</string>
+    <string name="repo_install_msg">Zeker weten %1$s installeren?</string>
+    <string name="download_install">Downloaden &amp; installeren</string>
+    <string name="download">Downloaden</string>
+    <string name="goto_install">Ga naar \"Installeren\" sectie</string>
+    <string name="download_file_error">Fout tijdens downloaden</string>
+    <string name="install_error">Installatiefout!</string>
+    <string name="invalid_zip">De zip is geen Magisk module!</string>
+    <string name="reboot_title">Installatie geslaagd!</string>
+    <string name="reboot_msg">Wil je nu herstarten?</string>
+    <string name="reboot">Herstarten</string>
+    <string name="copying_msg">Zip naar tijdelijke map kopiëren</string>
     <string name="zip_install_progress_title">Installeren</string>
-    <string name="zip_install_progress_msg">Instalatievoortgang: %1$s …</string>
+    <string name="zip_unzip_msg">Zip-bestand uitpakken…</string>
+    <string name="zip_process_msg">Zip-bestand verwerken…</string>
+    <string name="zip_install_progress_msg">%1$s installeren…</string>
     <string name="no_magisk_title">Geen Magisk geïnstalleerd!</string>
-    <string name="no_magisk_msg">Wilt u Magisk downloaden en installeren?</string>
+    <string name="no_magisk_msg">Wil je Magisk downloaden en installeren?</string>
+    <string name="downloading_toast">%1$s downloaden</string>
+    <string name="magisk_update_title">Nieuwe Magisk update beschikbaar!</string>
+    <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
+    <string name="release_notes">Publicatie notities</string>
+    <string name="repo_cache_cleared">Opslagcache gewist</string>
+    <string name="safetyNet_hide_notice">Deze app gebruikt SafetyNet\nReeds afgehandeld door standaard MagiskHide</string>
+    <string name="start_magiskhide">MagiskHide starten…</string>
+    <string name="no_magisksu_title">Geen gebruik van MagiskSU!</string>
+    <string name="no_magisksu_msg">Je bent niet geroot met MagiskSU, waardoor alleen MagiskHide mogelijk onvoldoende is!\nHet wordt niet officieel ondersteund, waardoor aanvullende acties (bijv. suhide) benodigd zijn om te slagen voor SafetyNet.</string>
+    <string name="understand">Ik begrijp het</string>
+    <string name="process_error">Verwerkingsfout</string>
+    <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
+    <string name="zip_process_title">Verwerken</string>
+    <string name="manual_boot_image">Gelieve handmatig een boot image te selecteren!</string>
 
-    <!--URL Templates-->
-
-    <!--Settings Fragment -->
+    <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
-    <string name="settings_dark_theme_title">Thema</string>
-    <string name="settings_dark_theme_summary">Selecteer een thema</string>
+    <string name="settings_dark_theme_title">Donker thema</string>
+    <string name="settings_dark_theme_summary">Donker thema inschakelen</string>
+    <string name="settings_notification_title">Update melding</string>
+    <string name="settings_notification_summary">Een update melding weergeven wanneer een nieuwe versie beschikbaar is</string>
+    <string name="settings_clear_cache_title">Opslagcache wissen</string>
+    <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
 
-    <string name="settings_busybox_title">Schakel BusyBox in</string>
+    <string name="settings_core_only_title">Magisk Core Only modus</string>
+    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, systeemloze hosts, en busybox blijven ingeschakeld</string>
+    <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
+    <string name="settings_busybox_title">Busybox inschakelen</string>
+    <string name="settings_busybox_summary">Magisk\'s ingebouwde busybox naar xbin bind mounten</string>
+    <string name="settings_hosts_title">Systeemloze hosts</string>
+    <string name="settings_hosts_summary">Systemloze hosts ondersteuning voor Adblock apps</string>
 
-    <string name="settings_development_category">Development</string>
-    <string name="settings_developer_logging_title">Geavanceerde debug logging</string>
-    <string name="settings_developer_logging_summary">Schakel dit in voor uitgebreidere logging.</string>
-    <string name="settings_shell_logging_title">Shell command debug loggin</string>
-    <string name="settings_shell_logging_summary">Schakel dit in om alle shell commands en output te loggen</string>
-    <string name="settings_magiskhide_summary">Reboot om de instellingen toe te passen</string>
+    <string name="settings_su_app_adb">Apps en ADB</string>
+    <string name="settings_su_app">Alleen apps</string>
+    <string name="settings_su_adb">Alleen ADB</string>
+    <string name="settings_su_disable">Uitgeschakeld</string>
+    <string name="settings_su_request_10">10 seconden</string>
+    <string name="settings_su_request_20">20 seconden</string>
+    <string name="settings_su_request_30">30 seconden</string>
+    <string name="settings_su_request_60">60 seconden</string>
+    <string name="superuser_access">Superuser toegang</string>
+    <string name="auto_response">Automatisch antwoord</string>
+    <string name="request_timeout">Verzoek time-out</string>
+    <string name="superuser_notification">Superuser melding</string>
+    <string name="request_timeout_summary">%1$s seconden</string>
 
-    <!-- Strings related to Settings -->
+    <string name="settings_development_category">App ontwikkeling</string>
+    <string name="settings_developer_logging_title">Geavanceerde debug loggen inschakelen</string>
+    <string name="settings_developer_logging_summary">Aanvinken om uitgebreide loggen in te schakelen</string>
+    <string name="settings_shell_logging_title">Shell-opdrachten debug loggen inschakelen</string>
+    <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer loggen in te schakelen</string>
 
-    <!-- Example General settings -->
+    <!--Superuser-->
+    <string name="su_request_title">Superuser verzoek</string>
+    <string name="deny_with_str">Weigeren %1$s</string>
+    <string name="deny">Weigeren</string>
+    <string name="prompt">Prompt</string>
+    <string name="grant">Toestaan</string>
+    <string name="su_warning">Verleent volledige toegang aan je apparaat.\nWeigeren als je het niet zeker weet!</string>
+    <string name="forever">Altijd</string>
+    <string name="once">Eénmalig</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">Superuser rechten voor %1$s toegestaan</string>
+    <string name="su_deny_toast">Superuser rechten voor %1$s geweigerd</string>
+    <string name="no_apps_found">Geen apps gevonden</string>
+    <string name="su_snack_grant">Superuser rechten van %1$s toegestaan</string>
+    <string name="su_snack_deny">Superuser rechten van %1$s geweigerd</string>
+    <string name="su_snack_notif_on">Meldingen van %1$s ingeschakeld</string>
+    <string name="su_snack_notif_off">Meldingen van %1$s uitgeschakeld</string>
+    <string name="su_snack_log_on">Loggen van %1$s ingeschakeld</string>
+    <string name="su_snack_log_off">Loggen of %1$s uitgeschakeld</string>
+    <string name="su_snack_revoke">%1$s rechten zijn ingetrokken</string>
+    <string name="su_revoke_title">Intrekken?</string>
+    <string name="su_revoke_msg">De rechten van %1$s intrekken?</string>
+    <string name="toast">Toast</string>
+    <string name="none">Geen</string>
 
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Doel UID:\u0020</string>
+    <string name="command">Opdracht:\u0020</string>
 
 </resources>
