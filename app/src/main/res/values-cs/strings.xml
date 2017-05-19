@@ -27,7 +27,7 @@
     <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
     <string name="safetyNet_connection_failed">Nelze se spojit s Google API</string>
     <string name="safetyNet_connection_suspended">Spojení s Google API bylo přerušeno</string>
-    <string name="safetyNet_error">Nelze zkontrolovat SafetyNet. Jste připojeni k Internetu?</string>
+    <string name="safetyNet_no_response">Nelze zkontrolovat SafetyNet. Jste připojeni k Internetu?</string>
     <string name="safetyNet_fail">SafetyNet dopadl neúspěšně: CTS profile mismatch</string>
     <string name="safetyNet_pass">SafetyNet Schváleno</string>
     <string name="root_info_warning">Funkčnost omezena</string>

@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
@@ -46,7 +47,7 @@ public class MagiskManager extends Application {
     public int remoteMagiskVersionCode = -1;
     public String magiskLink;
     public String releaseNoteLink;
-    public int SNCheckResult = -1;
+    public SafetyNetHelper.Result SNCheckResult;
     public String bootBlock = null;
     public boolean isSuClient = false;
     public String suVersion = null;

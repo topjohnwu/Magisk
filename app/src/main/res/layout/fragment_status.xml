@@ -21,170 +21,244 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
+                style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:layout_marginLeft="5dip"
-                android:layout_marginRight="5dip"
-                android:layout_marginTop="6dp"
-                style="?attr/cardStyle"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="4dp"
                 app:cardUseCompatPadding="true">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ProgressBar
-                        android:id="@+id/magisk_check_updates_progress"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_margin="15dp" />
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:id="@+id/magisk_update_icon"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
+                        android:layout_centerVertical="true"
                         android:layout_margin="15dp"
+                        android:layout_toStartOf="@+id/magisk_update_status"
+                        android:src="@drawable/ic_refresh"
                         android:visibility="gone" />
+
+                    <ProgressBar
+                        android:id="@+id/magisk_check_updates_progress"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="15dp"
+                        android:layout_toStartOf="@+id/magisk_update_status" />
 
                     <TextView
                         android:id="@+id/magisk_update_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:minWidth="225dp"
-                        android:layout_gravity="center"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
                         android:gravity="center"
+                        android:minWidth="225dp"
                         android:padding="6dp"
-                        android:textStyle="bold"
-                        android:text="@string/checking_for_updates" />
+                        android:text="@string/checking_for_updates"
+                        android:textStyle="bold" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:layout_marginLeft="5dip"
-                android:layout_marginRight="5dip"
-                android:layout_marginTop="6dp"
-                style="?attr/cardStyle"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="4dp"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/magisk_status_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_margin="15dp" />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="15dp"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/magisk_version"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="225dp"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:padding="6dp"
-                        android:textStyle="bold" />
+                        <ImageView
+                            android:id="@+id/magisk_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:layout_marginStart="15dp"
+                            android:layout_toStartOf="@+id/magisk_version" />
+
+                        <TextView
+                            android:id="@+id/magisk_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:minWidth="225dp"
+                            android:padding="6dp"
+                            android:textStyle="bold" />
+
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/root_status_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="15dp"
+                            android:layout_marginStart="15dp"
+                            android:layout_toStartOf="@+id/root_status" />
+
+                        <TextView
+                            android:id="@+id/root_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:minWidth="225dp"
+                            android:padding="6dp"
+                            android:textStyle="bold" />
+
+                    </RelativeLayout>
 
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginLeft="5dip"
-                android:layout_marginRight="5dip"
-                android:layout_marginTop="6dp"
                 style="?attr/cardStyle"
-                app:cardUseCompatPadding="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/root_status_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_margin="15dp" />
-
-                    <TextView
-                        android:id="@+id/root_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="225dp"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:padding="6dp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/safetyNetView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:layout_marginBottom="4dp"
-                android:layout_marginLeft="5dip"
-                android:layout_marginRight="5dip"
-                android:layout_marginTop="6dp"
-                style="?attr/cardStyle"
-                app:cardUseCompatPadding="true">
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="5dp"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <FrameLayout
-                        android:id="@+id/safetyNet_container"
+                    <RelativeLayout
+                        android:id="@+id/safetyNet_title"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:foregroundGravity="center"
-                        android:orientation="vertical"
-                        android:background="@color/grey500">
+                        android:layout_height="match_parent">
 
                         <ImageView
-                            android:id="@+id/safetyNet_icon"
-                            android:layout_width="84dp"
-                            android:layout_height="84dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_safetynet"/>
+                            android:id="@+id/safetyNet_refresh"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="15dp"
+                            android:layout_toStartOf="@+id/safetyNet_status"
+                            android:src="@drawable/ic_refresh" />
 
                         <ProgressBar
                             android:id="@+id/safetyNet_check_progress"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_margin="15dp"
+                            android:layout_toStartOf="@+id/safetyNet_status"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/safetyNet_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:visibility="gone"/>
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:minWidth="175dp"
+                            android:padding="6dp"
+                            android:text="@string/safetyNet_check_text"
+                            android:textStyle="bold" />
 
-                    </FrameLayout>
+                    </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/safetyNet_status"
+                    <LinearLayout
+                        android:id="@+id/expand_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:padding="6dp"
-                        android:textStyle="bold"
-                        android:text="@string/safetyNet_check_text" />
+                        android:orientation="vertical"
+                        android:paddingEnd="10dp"
+                        android:paddingStart="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/cts_status_icon"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_marginBottom="5dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="5dp" />
+
+                            <TextView
+                                android:id="@+id/cts_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:minWidth="150dp"
+                                android:padding="6dp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/basic_status_icon"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_margin="10dp" />
+
+                            <TextView
+                                android:id="@+id/basic_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:minWidth="150dp"
+                                android:padding="6dp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

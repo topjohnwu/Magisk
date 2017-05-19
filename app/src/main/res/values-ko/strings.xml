@@ -28,7 +28,7 @@
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
     <string name="safetyNet_connection_failed">Google API에 연결할 수 없음</string>
     <string name="safetyNet_connection_suspended">Google API에 대한 연결이 일시 중지됨</string>
-    <string name="safetyNet_error">SafetyNet 체크 실패. 인터넷 연결을 확인하세요.</string>
+    <string name="safetyNet_no_response">SafetyNet 체크 실패. 인터넷 연결을 확인하세요.</string>
     <string name="safetyNet_fail">SafetyNet 실패: CTS 프로필 불일치</string>
     <string name="safetyNet_pass">SafetyNet 통과</string>
     <string name="root_info_warning">기능이 크게 제한됨</string>

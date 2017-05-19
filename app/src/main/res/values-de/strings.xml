@@ -30,7 +30,7 @@
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
     <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>	
-    <string name="safetyNet_error">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
+    <string name="safetyNet_no_response">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_fail">SafetyNet nicht bestanden: \"CTS profile mismatch\"</string>
     <string name="safetyNet_pass">SafetyNet bestanden</string>
     <string name="root_info_warning">Funktionalität stark eingeschränkt</string>

@@ -28,7 +28,7 @@
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
     <string name="safetyNet_connection_failed">Google APIに接続できませんでした</string>
     <string name="safetyNet_connection_suspended">Google APIへの接続が中断されました</string>
-    <string name="safetyNet_error">SafetyNetをチェックできませんでした。インターネットに接続されていますか？</string>
+    <string name="safetyNet_no_response">SafetyNetをチェックできませんでした。インターネットに接続されていますか？</string>
     <string name="safetyNet_fail">SafetyNet Failed: CTSプロファイルが不一致</string>
     <string name="safetyNet_pass">SafetyNet Passed</string>
     <string name="root_info_warning">機能が大幅に制限されています</string>

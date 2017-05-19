@@ -25,7 +25,7 @@
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_connection_failed">"Google API'ye bağlanılamıyor"</string>
     <string name="safetyNet_connection_suspended">Google API bağlantısı askıya alındı</string>
-    <string name="safetyNet_error">SafetyNet kontrol edilemiyor, İnternet yok mu?</string>
+    <string name="safetyNet_no_response">SafetyNet kontrol edilemiyor, İnternet yok mu?</string>
     <string name="safetyNet_fail">SafetyNet başarısız: CTS profili uyumsuzluğu</string>
     <string name="safetyNet_pass">SafetyNet Geçti</string>
     <string name="root_info_warning">İşlevsellik çok sınırlıdır</string>

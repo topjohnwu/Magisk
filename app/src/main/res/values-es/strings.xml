@@ -27,7 +27,7 @@
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_connection_failed">No puede conectar con la API de Google</string>
     <string name="safetyNet_connection_suspended">La conexión con la API de Google API fue suspendida</string>
-    <string name="safetyNet_error">No puede comprobar SafetyNet, ¿No tiene internet?</string>
+    <string name="safetyNet_no_response">No puede comprobar SafetyNet, ¿No tiene internet?</string>
     <string name="safetyNet_fail">SafetyNet: Error, no coincide el perfil CTS</string>
     <string name="safetyNet_pass">SafetyNet: Correcto</string>
     <string name="root_info_warning">Funcionalidad enormemente limitada</string>

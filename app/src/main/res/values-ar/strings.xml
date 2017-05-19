@@ -110,7 +110,7 @@
     <string name="keep_dm_verity">إبقاء dm-verity</string>
     <string name="root_error">مروت لكن لا يوجد إذن الروت، غير مسموح به؟</string>
     <string name="root_info_warning">وظائف محدودة إلى حد كبير</string>
-    <string name="safetyNet_error">تعذر التحقق من SafetyNet، لا يوجد إنترنت؟</string>
+    <string name="safetyNet_no_response">تعذر التحقق من SafetyNet، لا يوجد إنترنت؟</string>
     <string name="safetyNet_pass">SafetyNet تخطى</string>
     <string name="safetyNet_fail">فشل SafetyNet: عدم تطابق التشكيل الجانبي CTS</string>
     <string name="status">الحالة</string>

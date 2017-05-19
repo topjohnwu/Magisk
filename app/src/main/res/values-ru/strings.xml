@@ -25,7 +25,7 @@
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_connection_failed">Невозможно соединиться с API Google</string>
     <string name="safetyNet_connection_suspended">Соединение с API Google было приостановлено</string>
-    <string name="safetyNet_error">Невозможно выполнить проверку SafetyNet, нет соединения?</string>
+    <string name="safetyNet_no_response">Невозможно выполнить проверку SafetyNet, нет соединения?</string>
     <string name="safetyNet_fail">SafetyNet не пройден: несовпадение профиля CTS</string>
     <string name="safetyNet_pass">SafetyNet пройден</string>
     <string name="root_info_warning">Функциональность значительно ограничена</string>

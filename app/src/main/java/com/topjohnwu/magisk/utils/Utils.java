@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -144,12 +145,12 @@ public class Utils {
         return (MagiskManager) context.getApplicationContext();
     }
 
-    public static void checkSafetyNet(MagiskManager magiskManager) {
-        new SafetyNetHelper(magiskManager) {
+    public static void checkSafetyNet(FragmentActivity activity) {
+        new SafetyNetHelper(activity) {
             @Override
-            public void handleResults(int i) {
-                magiskManager.SNCheckResult = i;
-                magiskManager.safetyNetDone.trigger();
+            public void handleResults(Result result) {
+                getMagiskManager(mActivity).SNCheckResult = result;
+                getMagiskManager(mActivity).safetyNetDone.trigger();
             }
         }.requestTest();
     }

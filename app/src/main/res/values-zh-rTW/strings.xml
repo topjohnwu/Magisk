@@ -27,7 +27,7 @@
     <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
     <string name="safetyNet_connection_failed">無法連接至 Google API</string>
     <string name="safetyNet_connection_suspended">與 Google API 的連接已暫停</string>
-    <string name="safetyNet_error">無法檢查 SafetyNet，沒有網絡連線？</string>
+    <string name="safetyNet_no_response">無法檢查 SafetyNet，沒有網絡連線？</string>
     <string name="safetyNet_fail">SafetyNet 失敗：CTS 配置文件不匹配</string>
     <string name="safetyNet_pass">SafetyNet 已通過</string>
     <string name="root_info_warning">功能嚴重受限</string>

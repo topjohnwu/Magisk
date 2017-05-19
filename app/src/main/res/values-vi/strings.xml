@@ -27,7 +27,7 @@
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
     <string name="safetyNet_connection_failed">Không thể kết nối với API của Google</string>
     <string name="safetyNet_connection_suspended">Kết nối với API của Google đã dừng</string>
-    <string name="safetyNet_error">Không thể kiểm tra SafetyNet, không có Internet?</string>
+    <string name="safetyNet_no_response">Không thể kiểm tra SafetyNet, không có Internet?</string>
     <string name="safetyNet_fail">SafetyNet thất bại: cấu hình CTS không phù hợp</string>
     <string name="safetyNet_pass">SafetyNet thành công</string>
     <string name="root_info_warning">Tính năng bị hạn chế rất nhiều</string>
