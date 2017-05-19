@@ -21,7 +21,6 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
-                android:id="@+id/magiskStatusView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
@@ -33,44 +32,28 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/magisk_version"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:padding="6dp"
-                        android:textStyle="bold"/>
+                    <ProgressBar
+                        android:id="@+id/magisk_check_updates_progress"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_margin="15dp" />
 
-                    <FrameLayout
-                        android:id="@+id/magisk_status_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:foregroundGravity="center"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/magisk_status_icon"
-                            android:layout_width="84dp"
-                            android:layout_height="84dp"
-                            android:layout_gravity="center"/>
-
-                        <ProgressBar
-                            android:id="@+id/magisk_check_updates_progress"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
-
-                    </FrameLayout>
+                    <ImageView
+                        android:id="@+id/magisk_update_icon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_margin="15dp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/magisk_update_status"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="225dp"
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:padding="6dp"
@@ -82,7 +65,6 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/rootStatusView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
@@ -94,42 +76,61 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/magisk_status_icon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_margin="15dp" />
+
+                    <TextView
+                        android:id="@+id/magisk_version"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="225dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="6dp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="5dip"
+                android:layout_marginRight="5dip"
+                android:layout_marginTop="6dp"
+                style="?attr/cardStyle"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/root_status_icon"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_margin="15dp" />
 
                     <TextView
                         android:id="@+id/root_status"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="225dp"
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:padding="6dp"
-                        android:textStyle="bold"/>
-
-                    <FrameLayout
-                        android:id="@+id/root_status_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:foregroundGravity="center"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/root_status_icon"
-                            android:layout_width="84dp"
-                            android:layout_height="84dp"
-                            android:layout_gravity="center" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/root_info"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:padding="6dp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

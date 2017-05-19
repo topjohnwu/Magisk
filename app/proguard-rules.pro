@@ -16,11 +16,6 @@
 #   public *;
 #}
 
--keep class android.support.v7.internal.** { *; }
--keep interface android.support.v7.internal.** { *; }
--keep class android.support.v7.** { *; }
--keep interface android.support.v7.** { *; }
-
 # SpongyCastle
 -keep class org.spongycastle.** { *; }
 -dontwarn javax.naming.**

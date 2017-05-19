@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.asyncs.GetBootBlocks;
 import com.topjohnwu.magisk.asyncs.LoadApps;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.LoadRepos;
-import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 

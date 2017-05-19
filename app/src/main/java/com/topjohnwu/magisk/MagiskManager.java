@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.utils.CallbackEvent;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;

@@ -4,14 +4,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ZipUtils;
-
-import java.io.File;
 
 public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
 
