@@ -1,12 +1,9 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Navigatielade openen</string>
     <string name="navigation_drawer_close">Navigatielade sluiten</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
@@ -31,7 +28,7 @@
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
     <string name="safetyNet_connection_failed">Kan niet verbinden met Google API</string>
     <string name="safetyNet_connection_suspended">Verbinding met Google API was geschorst</string>
-    <string name="safetyNet_error">Kan SafetyNet niet controleren. Geen internet?</string>
+    <string name="safetyNet_no_response">Kan SafetyNet niet controleren. Geen internet?</string>
     <string name="safetyNet_fail">SafetyNet gefaald</string>
     <string name="safetyNet_pass">SafetyNet geslaagd</string>
     <string name="root_info_warning">Functionaliteit zeer beperkt</string>

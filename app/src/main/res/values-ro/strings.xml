@@ -26,7 +26,7 @@
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
     <string name="safetyNet_connection_failed">Nu se poate conecta la Google API</string>
     <string name="safetyNet_connection_suspended">Conexiunea la API-ul Google a fost suspendată</string>
-    <string name="safetyNet_error">Nu se poate verifica SafetyNet, nu este internet?</string>
+    <string name="safetyNet_no_response">Nu se poate verifica SafetyNet, nu este internet?</string>
     <string name="safetyNet_fail">SafetyNet eșuat: nepotrivire profil CTS</string>
     <string name="safetyNet_pass">SafetyNet a trecut</string>
     <string name="root_info_warning">Funcționalitatea este foarte limitată</string>
