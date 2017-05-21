@@ -6,15 +6,9 @@
         android:id="@+id/main_group">
 
         <item
-            android:id="@+id/status"
-            android:icon="@drawable/ic_device_information"
-            android:title="@string/status"/>
-
-        <item
-            android:id="@+id/install"
+            android:id="@+id/magisk"
             android:icon="@drawable/ic_magisk"
-            android:title="@string/install"
-            android:visible="false"/>
+            android:title="@string/magisk"/>
 
         <item
             android:id="@+id/superuser"

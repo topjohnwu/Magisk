@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <zlib.h>
 #include "zipadjust.h"
 

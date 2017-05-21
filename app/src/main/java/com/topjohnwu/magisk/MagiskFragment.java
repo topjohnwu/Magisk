@@ -2,25 +2,44 @@ package com.topjohnwu.magisk;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
+import com.topjohnwu.magisk.asyncs.ProcessMagiskZip;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.CallbackEvent;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -28,11 +47,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class StatusFragment extends Fragment implements CallbackEvent.Listener<Void> {
+public class MagiskFragment extends Fragment implements CallbackEvent.Listener<Void> {
 
     private static boolean noDialog = false;
+    private static int expandHeight = 0;
+    private static boolean mExpanded = false;
 
+    private MagiskManager magiskManager;
     private Unbinder unbinder;
+
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
@@ -54,6 +77,16 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     @BindView(R.id.basic_status_icon) ImageView basicStatusIcon;
     @BindView(R.id.basic_status) TextView basicStatusText;
 
+    @BindView(R.id.bootimage_card) CardView bootImageCard;
+    @BindView(R.id.block_spinner) Spinner spinner;
+    @BindView(R.id.detect_bootimage) Button detectButton;
+    @BindView(R.id.install_option_card) CardView installOptionCard;
+    @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
+    @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
+    @BindView(R.id.install_button) CardView installButton;
+    @BindView(R.id.install_text) TextView installText;
+    @BindView(R.id.uninstall_button) CardView uninstallButton;
+
     @BindColor(R.color.red500) int colorBad;
     @BindColor(R.color.green500) int colorOK;
     @BindColor(R.color.yellow500) int colorWarn;
@@ -69,20 +102,108 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
         collapse();
     }
 
-    public void gotoInstall() {
-        if (magiskManager.remoteMagiskVersionCode > 0) {
-            ((MainActivity) getActivity()).navigate(R.id.install);
+    @OnClick(R.id.detect_bootimage)
+    public void toAutoDetect() {
+        if (magiskManager.bootBlock != null) {
+            spinner.setSelection(0);
         }
     }
 
-    private MagiskManager magiskManager;
-    private static int expandHeight = 0;
-    private static boolean mExpanded = false;
+    @OnClick(R.id.install_button)
+    public void install() {
+        String bootImage = null;
+        if (magiskManager.blockList != null) {
+            int idx = spinner.getSelectedItemPosition();
+            if (magiskManager.bootBlock != null) {
+                bootImage = magiskManager.bootBlock;
+            } else {
+                if (idx > 0)  {
+                    bootImage = magiskManager.blockList.get(idx - 1);
+                } else {
+                    SnackbarMaker.make(getActivity(), R.string.manual_boot_image, Snackbar.LENGTH_LONG);
+                    return;
+                }
+            }
+        }
+        final String finalBootImage = bootImage;
+        String filename = "Magisk-v" + magiskManager.remoteMagiskVersionString + ".zip";
+        new AlertDialogBuilder(getActivity())
+                .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
+                .setMessage(getString(R.string.repo_install_msg, filename))
+                .setCancelable(true)
+                .setPositiveButton(Shell.rootAccess() ? R.string.install : R.string.download,
+                        (dialogInterface, i) -> Utils.dlAndReceive(
+                                getActivity(),
+                                new DownloadReceiver() {
+                                    private String boot = finalBootImage;
+                                    private boolean enc = keepEncChkbox.isChecked();
+                                    private boolean verity = keepVerityChkbox.isChecked();
+
+                                    @Override
+                                    public void onDownloadDone(Uri uri) {
+                                        new ProcessMagiskZip(getActivity(), uri, boot, enc, verity).exec();
+                                    }
+                                },
+                                magiskManager.magiskLink,
+                                Utils.getLegalFilename(filename)))
+                .setNeutralButton(R.string.release_notes, (dialog, which) -> {
+                    if (magiskManager.releaseNoteLink != null) {
+                        Intent openReleaseNoteLink = new Intent(Intent.ACTION_VIEW, Uri.parse(magiskManager.releaseNoteLink));
+                        openReleaseNoteLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        magiskManager.startActivity(openReleaseNoteLink);
+                    }
+                })
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
+    }
+
+    @OnClick(R.id.uninstall_button)
+    public void uninstall() {
+        new AlertDialogBuilder(getActivity())
+                .setTitle(R.string.uninstall_magisk_title)
+                .setMessage(R.string.uninstall_magisk_msg)
+                .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
+                    try {
+                        InputStream in = magiskManager.getAssets().open(MagiskManager.UNINSTALLER);
+                        File uninstaller = new File(magiskManager.getCacheDir(), MagiskManager.UNINSTALLER);
+                        FileOutputStream out = new FileOutputStream(uninstaller);
+                        byte[] bytes = new byte[1024];
+                        int read;
+                        while ((read = in.read(bytes)) != -1) {
+                            out.write(bytes, 0, read);
+                        }
+                        in.close();
+                        out.close();
+                        ProgressDialog progress = new ProgressDialog(getActivity());
+                        progress.setTitle(R.string.reboot);
+                        progress.show();
+                        new CountDownTimer(5000, 1000) {
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+                                progress.setMessage(getString(R.string.reboot_countdown, millisUntilFinished / 1000));
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                progress.setMessage(getString(R.string.reboot_countdown, 0));
+                                Shell.su(true,
+                                        "mv -f " + uninstaller + " /cache/" + MagiskManager.UNINSTALLER,
+                                        "reboot"
+                                );
+                            }
+                        }.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_status, container, false);
+        View v = inflater.inflate(R.layout.fragment_magisk, container, false);
         unbinder = ButterKnife.bind(this, v);
         magiskManager = getApplication();
 
@@ -115,7 +236,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
             collapse();
             noDialog = false;
 
-            updateUI();
+            updateVersionUI();
             new CheckUpdates(getActivity()).exec();
         });
 
@@ -125,17 +246,19 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
                     .setTitle(R.string.no_magisk_title)
                     .setMessage(R.string.no_magisk_msg)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.goto_install, (d, i) -> gotoInstall())
+                    .setPositiveButton(R.string.goto_install, (d, i) -> {})
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         }
 
-        updateUI();
+        updateVersionUI();
 
         if (magiskManager.updateCheckDone.isTriggered)
             updateCheckUI();
         if (magiskManager.safetyNetDone.isTriggered)
             updateSafetyNetUI();
+        if (magiskManager.blockDetectionDone.isTriggered)
+            updateInstallUI();
 
         return v;
     }
@@ -143,11 +266,11 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
         if (event == magiskManager.updateCheckDone) {
-            Logger.dev("StatusFragment: Update Check UI refresh triggered");
             updateCheckUI();
         } else if (event == magiskManager.safetyNetDone) {
-            Logger.dev("StatusFragment: SafetyNet UI refresh triggered");
             updateSafetyNetUI();
+        } else if (event == magiskManager.blockDetectionDone) {
+            updateInstallUI();
         }
     }
 
@@ -156,13 +279,15 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
         super.onStart();
         magiskManager.updateCheckDone.register(this);
         magiskManager.safetyNetDone.register(this);
-        getActivity().setTitle(R.string.status);
+        magiskManager.blockDetectionDone.register(this);
+        getActivity().setTitle(R.string.magisk);
     }
 
     @Override
     public void onStop() {
         magiskManager.updateCheckDone.unRegister(this);
         magiskManager.safetyNetDone.unRegister(this);
+        magiskManager.blockDetectionDone.unRegister(this);
         super.onStop();
     }
 
@@ -172,7 +297,7 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
         unbinder.unbind();
     }
 
-    private void updateUI() {
+    private void updateVersionUI() {
         int image, color;
 
         magiskManager.updateMagiskInfo();
@@ -233,6 +358,34 @@ public class StatusFragment extends Fragment implements CallbackEvent.Listener<V
 
         magiskCheckUpdatesProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void updateInstallUI() {
+        if (!Shell.rootAccess()) {
+            installText.setText(R.string.download);
+            bootImageCard.setVisibility(View.GONE);
+            installOptionCard.setVisibility(View.GONE);
+            uninstallButton.setVisibility(View.GONE);
+        } else {
+            bootImageCard.setVisibility(View.VISIBLE);
+            installOptionCard.setVisibility(View.VISIBLE);
+            uninstallButton.setVisibility(magiskManager.magiskVersionCode >= 130 ? View.VISIBLE : View.GONE);
+            installText.setText(R.string.download_install);
+
+            List<String> items = new ArrayList<>();
+            if (magiskManager.bootBlock != null) {
+                items.add(getString(R.string.auto_detect, magiskManager.bootBlock));
+                spinner.setEnabled(false);
+            } else {
+                items.add(getString(R.string.cannot_auto_detect));
+                items.addAll(magiskManager.blockList);
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                    android.R.layout.simple_spinner_item, items);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+            toAutoDetect();
+        }
     }
 
     private void updateSafetyNetUI() {

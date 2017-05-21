@@ -94,7 +94,7 @@ public class MainActivity extends Activity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        navigate(savedInstanceState.getInt(MagiskManager.INTENT_SECTION, R.id.status));
+        navigate(savedInstanceState.getInt(MagiskManager.INTENT_SECTION, R.id.magisk));
     }
 
     @Override
@@ -147,18 +147,14 @@ public class MainActivity extends Activity
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(
                 Shell.rootAccess() && getApplicationContext().isSuClient);
-        menu.findItem(R.id.install).setVisible(getApplicationContext().remoteMagiskVersionCode > 0);
     }
 
     public void navigate(String item) {
-        int itemId = R.id.status;
+        int itemId = R.id.magisk;
         if (item != null) {
             switch (item) {
-                case "status":
-                    itemId = R.id.status;
-                    break;
-                case "install":
-                    itemId = R.id.install;
+                case "magisk":
+                    itemId = R.id.magisk;
                     break;
                 case "superuser":
                     itemId = R.id.superuser;
@@ -191,11 +187,8 @@ public class MainActivity extends Activity
         mDrawerItem = itemId;
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
-            case R.id.status:
-                displayFragment(new StatusFragment(), "status", true);
-                break;
-            case R.id.install:
-                displayFragment(new InstallFragment(), "install", true);
+            case R.id.magisk:
+                displayFragment(new MagiskFragment(), "magisk", true);
                 break;
             case R.id.superuser:
                 displayFragment(new SuperuserFragment(), "superuser", true);

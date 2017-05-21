@@ -27,6 +27,7 @@ public class MagiskManager extends Application {
     public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_PATH = "/magisk";
+    public static final String UNINSTALLER = "magisk_uninstaller.sh";
     public static final String INTENT_SECTION = "section";
     public static final String BUSYBOX_VERSION = "1.26.2";
 
