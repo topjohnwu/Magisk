@@ -13,9 +13,9 @@
     <string name="install">Installa</string>
 
      <!--Status Fragment-->
-    <string name="magisk_version">Versione Magisk: v. %1$s</string>
-    <string name="magisk_version_core_only">Versione Magisk v. %1$s (modo core)</string>
-    <string name="magisk_version_error">Hai installato Magisk?</string>
+    <string name="magisk_version">Versione Magisk: v%1$s</string>
+    <string name="magisk_version_core_only">Versione Magisk v%1$s (modo core)</string>
+    <string name="magisk_version_error">Magisk non installato</string>
 
     <string name="checking_for_updates">Controllo aggiornamenti…</string>
     <string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
@@ -25,14 +25,18 @@
     <string name="not_rooted">Non rootato</string>
     <string name="proper_root">Rootato correttamente</string>
     <string name="safetyNet_check_text">Tocca per avviare controllo SafetyNet</string>
-    <string name="checking_safetyNet_status">Controllo SafetyNet</string>
+    <string name="checking_safetyNet_status">Controllo stato SafetyNet</string>
+    <string name="safetyNet_check_success">Controllo SafetyNet OK</string>
     <string name="safetyNet_connection_failed">Impossibile collegarsi alle API Google</string>
     <string name="safetyNet_connection_suspended">Connessione alle API Google sospesa</string>
     <string name="safetyNet_no_response">Impossibile controllare SafetyNet. Nessuna connessione internet?</string>
     <string name="safetyNet_fail">Errore SafetyNet. Il profilo CTS non corrisponde</string>
     <string name="safetyNet_pass">Controllo SafetyNet OK</string>
+    <string name="safetyNet_network_loss">persa conenssioen di rete</string>
+    <string name="safetyNet_service_disconnected">Ils ervizio è stato terminato</string>
+    <string name="safetyNet_res_invalid">La risposta non è valida</string>
     <string name="root_info_warning">Funzionalità molto limitata</string>
-            
+
     <!--Install Fragment-->
     <string name="auto_detect">%1$s (auto)</string>
     <string name="cannot_auto_detect">(impossibile rilevare automaticamente)</string>
@@ -47,7 +51,7 @@
     <string name="reboot_countdown">Riavvio tra %1$d</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Questo rimuoverà tutti i moduli, MagiskSU, e potenzialmente crittograferà i dati, se non crittografati/nVuoi continuare?</string>
-    <string name="version_none">(nessuno)</string>
+    <string name="version_none">(nessuna)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(nessuna informazione)</string>
@@ -59,7 +63,7 @@
     <string name="disable_file_removed">Il modulo sarà abilitato al prossimo riavvio</string>
     <string name="author">Creato da: %1$s</string>
     <string name="fab_flash_zip">Flasha modulo ZIP</string>
-    
+
     <!--Repo Fragment-->
     <string name="update_available">Aggiornamento disponibile</string>
     <string name="installed">Installato</string>
@@ -71,7 +75,7 @@
     <string name="menuClearLog">Azzera registro eventi</string>
     <string name="logs_cleared">Registro eventi creato correttamente</string>
     <string name="log_is_empty">Il registro eventi è vuoto</string>
-    <string name="logs_save_failed">Impossibile scrivere il registro eventi nella SD</string>
+    <string name="logs_save_failed">Impossibile scrivere registro eventi nella SD</string>
 
     <!--About Activity-->
     <string name="about">Informazioni</string>
