@@ -26,11 +26,15 @@
     <string name="proper_root">Correct geroot</string>
     <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
+    <string name="safetyNet_check_success">SafetyNet controle succesvol</string>
     <string name="safetyNet_connection_failed">Kan niet verbinden met Google API</string>
     <string name="safetyNet_connection_suspended">Verbinding met Google API was geschorst</string>
     <string name="safetyNet_no_response">Kan SafetyNet niet controleren. Geen internet?</string>
     <string name="safetyNet_fail">SafetyNet gefaald</string>
     <string name="safetyNet_pass">SafetyNet geslaagd</string>
+    <string name="safetyNet_network_loss">Netwerkverbinding verloren</string>
+    <string name="safetyNet_service_disconnected">Service was beëindigd</string>
+    <string name="safetyNet_res_invalid">De reactie is ongeldig</string>
     <string name="root_info_warning">Functionaliteit zeer beperkt</string>
 
     <!--Install Fragment-->
@@ -155,11 +159,11 @@
     <string name="superuser_notification">Superuser melding</string>
     <string name="request_timeout_summary">%1$s seconden</string>
 
-    <string name="settings_development_category">App ontwikkeling</string>
-    <string name="settings_developer_logging_title">Geavanceerde debug loggen inschakelen</string>
-    <string name="settings_developer_logging_summary">Aanvinken om uitgebreide loggen in te schakelen</string>
-    <string name="settings_shell_logging_title">Shell-opdrachten debug loggen inschakelen</string>
-    <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer loggen in te schakelen</string>
+    <string name="settings_development_category">App-ontwikkeling</string>
+    <string name="settings_developer_logging_title">Geavanceerde debug logs inschakelen</string>
+    <string name="settings_developer_logging_summary">Aanvinken om uitgebreide logs in te schakelen</string>
+    <string name="settings_shell_logging_title">Shell-opdracht debug logs inschakelen</string>
+    <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer logs in te schakelen</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
