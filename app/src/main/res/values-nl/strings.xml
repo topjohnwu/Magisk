@@ -33,8 +33,8 @@
     <string name="safetyNet_fail">SafetyNet gefaald</string>
     <string name="safetyNet_pass">SafetyNet geslaagd</string>
     <string name="safetyNet_network_loss">Netwerkverbinding verloren</string>
-    <string name="safetyNet_service_disconnected">Service was beëindigd</string>
-    <string name="safetyNet_res_invalid">De reactie is ongeldig</string>
+    <string name="safetyNet_service_disconnected">Service is beëindigd</string>
+    <string name="safetyNet_res_invalid">Reactie is ongeldig</string>
     <string name="root_info_warning">Functionaliteit zeer beperkt</string>
 
     <!--Install Fragment-->
