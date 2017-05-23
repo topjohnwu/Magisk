@@ -22,6 +22,7 @@ import android.view.View;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,7 +82,6 @@ public class MainActivity extends Activity
 
         navigationView.setNavigationItemSelectedListener(this);
         getApplicationContext().reloadMainActivity.register(this);
-        getApplicationContext().updateCheckDone.register(this);
 
     }
 
@@ -106,16 +106,18 @@ public class MainActivity extends Activity
     @Override
     protected void onDestroy() {
         getApplicationContext().reloadMainActivity.unRegister(this);
-        getApplicationContext().updateCheckDone.unRegister(this);
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(navigationView))
+        if (drawer.isDrawerOpen(navigationView)) {
             drawer.closeDrawer(navigationView);
-        else
+        } else if (mDrawerItem != R.id.magisk) {
+            navigate(R.id.magisk);
+        } else {
             finish();
+        }
     }
 
     @Override
@@ -128,21 +130,17 @@ public class MainActivity extends Activity
 
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
-        if (event == getApplicationContext().reloadMainActivity) {
-            recreate();
-        } else if (event == getApplicationContext().updateCheckDone) {
-            checkHideSection();
-        }
+        recreate();
     }
 
-    private void checkHideSection() {
+    public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
                 Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 130
                         && prefs.getBoolean("magiskhide", false));
         menu.findItem(R.id.modules).setVisible(
                 Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(
+        menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus(this) &&
                 Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(
@@ -154,6 +152,7 @@ public class MainActivity extends Activity
         if (item != null) {
             switch (item) {
                 case "magisk":
+                case "install":
                     itemId = R.id.magisk;
                     break;
                 case "superuser":

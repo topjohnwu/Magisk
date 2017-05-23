@@ -58,16 +58,17 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
+    @BindView(R.id.magisk_update_card) CardView magiskUpdateCard;
     @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
     @BindView(R.id.magisk_update_status) TextView magiskUpdateText;
-    @BindView(R.id.magisk_check_updates_progress) ProgressBar magiskCheckUpdatesProgress;
+    @BindView(R.id.magisk_update_progress) ProgressBar magiskUpdateProgress;
 
     @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
     @BindView(R.id.magisk_version) TextView magiskVersionText;
-
     @BindView(R.id.root_status_icon) ImageView rootStatusIcon;
     @BindView(R.id.root_status) TextView rootStatusText;
 
+    @BindView(R.id.safetyNet_card) CardView safetyNetCard;
     @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
     @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
     @BindView(R.id.safetyNet_check_progress) ProgressBar safetyNetProgress;
@@ -226,18 +227,27 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
                 });
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            updateUI();
+
             magiskUpdateText.setText(R.string.checking_for_updates);
-            magiskCheckUpdatesProgress.setVisibility(View.VISIBLE);
+            magiskUpdateProgress.setVisibility(View.VISIBLE);
             magiskUpdateIcon.setVisibility(View.GONE);
 
             safetyNetStatusText.setText(R.string.safetyNet_check_text);
 
             magiskManager.safetyNetDone.isTriggered = false;
+            magiskManager.updateCheckDone.isTriggered = false;
+            magiskManager.remoteMagiskVersionString = null;
+            magiskManager.remoteMagiskVersionCode = -1;
             collapse();
             noDialog = false;
 
-            updateVersionUI();
-            new CheckUpdates(getActivity()).exec();
+            // Trigger state check
+            if (Utils.checkNetworkStatus(magiskManager)) {
+                new CheckUpdates(getActivity()).exec();
+            } else {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
         });
 
         if (magiskManager.magiskVersionCode < 0 && Shell.rootAccess() && !noDialog) {
@@ -251,14 +261,7 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
                     .show();
         }
 
-        updateVersionUI();
-
-        if (magiskManager.updateCheckDone.isTriggered)
-            updateCheckUI();
-        if (magiskManager.safetyNetDone.isTriggered)
-            updateSafetyNetUI();
-        if (magiskManager.blockDetectionDone.isTriggered)
-            updateInstallUI();
+        updateUI();
 
         return v;
     }
@@ -277,6 +280,13 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
     @Override
     public void onStart() {
         super.onStart();
+        // Manual trigger if already done
+        if (magiskManager.updateCheckDone.isTriggered)
+            updateCheckUI();
+        if (magiskManager.safetyNetDone.isTriggered)
+            updateSafetyNetUI();
+        if (magiskManager.blockDetectionDone.isTriggered)
+            updateInstallUI();
         magiskManager.updateCheckDone.register(this);
         magiskManager.safetyNetDone.register(this);
         magiskManager.blockDetectionDone.register(this);
@@ -295,6 +305,22 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    private void updateUI() {
+        ((MainActivity) getActivity()).checkHideSection();
+        final int ROOT = 0x1, NETWORK = 0x2, UPTODATE = 0x4;
+        int status = 0;
+        status |= Shell.rootAccess() ? ROOT : 0;
+        status |= Utils.checkNetworkStatus(magiskManager) ? NETWORK : 0;
+        status |= magiskManager.magiskVersionCode >= 130 ? UPTODATE : 0;
+        magiskUpdateCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
+        safetyNetCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
+        bootImageCard.setVisibility(Utils.checkBits(status, NETWORK, ROOT) ? View.VISIBLE : View.GONE);
+        installOptionCard.setVisibility(Utils.checkBits(status, NETWORK, ROOT) ? View.VISIBLE : View.GONE);
+        installButton.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
+        uninstallButton.setVisibility(Utils.checkBits(status, UPTODATE, ROOT) ? View.VISIBLE : View.GONE);
+        updateVersionUI();
     }
 
     private void updateVersionUI() {
@@ -356,20 +382,14 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
         magiskUpdateIcon.setColorFilter(color);
         magiskUpdateIcon.setVisibility(View.VISIBLE);
 
-        magiskCheckUpdatesProgress.setVisibility(View.GONE);
+        magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     private void updateInstallUI() {
         if (!Shell.rootAccess()) {
             installText.setText(R.string.download);
-            bootImageCard.setVisibility(View.GONE);
-            installOptionCard.setVisibility(View.GONE);
-            uninstallButton.setVisibility(View.GONE);
         } else {
-            bootImageCard.setVisibility(View.VISIBLE);
-            installOptionCard.setVisibility(View.VISIBLE);
-            uninstallButton.setVisibility(magiskManager.magiskVersionCode >= 130 ? View.VISIBLE : View.GONE);
             installText.setText(R.string.download_install);
 
             List<String> items = new ArrayList<>();

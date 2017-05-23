@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.OpenableColumns;
@@ -185,5 +187,19 @@ public class Utils {
                 "/MagiskManager/" + Utils.getNameFromUri(activity, uri)),
                 Snackbar.LENGTH_LONG)
                 .setAction(R.string.ok, (v)->{}).show();
+    }
+
+    public static boolean checkNetworkStatus(Context context) {
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    public static boolean checkBits(int bits, int... masks) {
+        for (int mask : masks) {
+            if ((bits & mask) == 0)
+                return false;
+        }
+        return true;
     }
 }

@@ -21,6 +21,7 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
+                android:id="@+id/magisk_update_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,7 +47,7 @@
                         android:visibility="gone" />
 
                     <ProgressBar
-                        android:id="@+id/magisk_check_updates_progress"
+                        android:id="@+id/magisk_update_progress"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_centerVertical="true"
@@ -149,6 +150,7 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/safetyNet_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
