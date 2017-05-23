@@ -26,11 +26,15 @@
     <string name="proper_root">已正确 ROOT</string>
     <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
+    <string name="safetyNet_check_success">SafetyNet 检查成功</string>
     <string name="safetyNet_connection_failed">无法连接至 Google API</string>
     <string name="safetyNet_connection_suspended">与 Google API 的连接已暂停</string>
     <string name="safetyNet_no_response">无法检查 SafetyNet，没有网络连接？</string>
     <string name="safetyNet_fail">SafetyNet 失败：CTS 配置文件不匹配</string>
     <string name="safetyNet_pass">SafetyNet 已通过</string>
+    <string name="safetyNet_network_loss">网络断线</string>
+    <string name="safetyNet_service_disconnected">服务已被取消</string>
+    <string name="safetyNet_res_invalid">回传值无效</string>
     <string name="root_info_warning">功能严重受限</string>
 
     <!--Install Fragment-->
