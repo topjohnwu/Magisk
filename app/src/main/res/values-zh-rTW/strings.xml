@@ -193,5 +193,9 @@
     <string name="settings_notification_title">更新通知</string>
     <string name="magisk_version_core_only">已安裝 Magisk v%1$s (僅核心功能)</string>
     <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide、systemless hosts、和 busybox 仍會持續運作</string>
+    <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
+    <string name="safetyNet_network_loss">網路斷線</string>
+    <string name="safetyNet_res_invalid">回傳值無效</string>
+    <string name="safetyNet_service_disconnected">服務已被取消</string>
 
 </resources>
