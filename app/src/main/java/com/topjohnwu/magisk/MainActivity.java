@@ -92,18 +92,6 @@ public class MainActivity extends Activity
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        navigate(savedInstanceState.getInt(MagiskManager.INTENT_SECTION, R.id.magisk));
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(MagiskManager.INTENT_SECTION, mDrawerItem);
-    }
-
-    @Override
     protected void onDestroy() {
         getApplicationContext().reloadMainActivity.unRegister(this);
         super.onDestroy();

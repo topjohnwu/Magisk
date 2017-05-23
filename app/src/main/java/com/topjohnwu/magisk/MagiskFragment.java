@@ -47,7 +47,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class MagiskFragment extends Fragment implements CallbackEvent.Listener<Void> {
+public class MagiskFragment extends Fragment
+        implements CallbackEvent.Listener<Void>, SwipeRefreshLayout.OnRefreshListener {
 
     private static boolean noDialog = false;
     private static int expandHeight = 0;
@@ -226,29 +227,7 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
 
                 });
 
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            updateUI();
-
-            magiskUpdateText.setText(R.string.checking_for_updates);
-            magiskUpdateProgress.setVisibility(View.VISIBLE);
-            magiskUpdateIcon.setVisibility(View.GONE);
-
-            safetyNetStatusText.setText(R.string.safetyNet_check_text);
-
-            magiskManager.safetyNetDone.isTriggered = false;
-            magiskManager.updateCheckDone.isTriggered = false;
-            magiskManager.remoteMagiskVersionString = null;
-            magiskManager.remoteMagiskVersionCode = -1;
-            collapse();
-            noDialog = false;
-
-            // Trigger state check
-            if (Utils.checkNetworkStatus(magiskManager)) {
-                new CheckUpdates(getActivity()).exec();
-            } else {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        });
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         if (magiskManager.magiskVersionCode < 0 && Shell.rootAccess() && !noDialog) {
             noDialog = true;
@@ -264,6 +243,31 @@ public class MagiskFragment extends Fragment implements CallbackEvent.Listener<V
         updateUI();
 
         return v;
+    }
+
+    @Override
+    public void onRefresh() {
+        updateUI();
+
+        magiskUpdateText.setText(R.string.checking_for_updates);
+        magiskUpdateProgress.setVisibility(View.VISIBLE);
+        magiskUpdateIcon.setVisibility(View.GONE);
+
+        safetyNetStatusText.setText(R.string.safetyNet_check_text);
+
+        magiskManager.safetyNetDone.isTriggered = false;
+        magiskManager.updateCheckDone.isTriggered = false;
+        magiskManager.remoteMagiskVersionString = null;
+        magiskManager.remoteMagiskVersionCode = -1;
+        collapse();
+        noDialog = false;
+
+        // Trigger state check
+        if (Utils.checkNetworkStatus(magiskManager)) {
+            new CheckUpdates(getActivity()).exec();
+        } else {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
