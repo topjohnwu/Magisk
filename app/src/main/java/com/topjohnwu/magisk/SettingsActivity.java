@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.MagiskHide;
@@ -53,20 +52,6 @@ public class SettingsActivity extends Activity {
             getFragmentManager().beginTransaction().add(R.id.container, new SettingsFragment()).commit();
         }
 
-    }
-
-    public void setFloating() {
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
-        if (isTablet) {
-            WindowManager.LayoutParams params = getWindow().getAttributes();
-            params.height = getResources().getDimensionPixelSize(R.dimen.floating_height);
-            params.width = getResources().getDimensionPixelSize(R.dimen.floating_width);
-            params.alpha = 1.0f;
-            params.dimAmount = 0.6f;
-            params.flags |= 2;
-            getWindow().setAttributes(params);
-            setFinishOnTouchOutside(true);
-        }
     }
 
     public static class SettingsFragment extends PreferenceFragment

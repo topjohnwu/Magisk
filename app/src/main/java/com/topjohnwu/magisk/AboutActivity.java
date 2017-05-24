@@ -13,7 +13,6 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.components.AboutCardRow;
@@ -133,20 +132,6 @@ public class AboutActivity extends Activity {
         donation.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(DONATION_URL))));
 
         setFloating();
-    }
-
-    public void setFloating() {
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
-        if (isTablet) {
-            WindowManager.LayoutParams params = getWindow().getAttributes();
-            params.height = getResources().getDimensionPixelSize(R.dimen.floating_height);
-            params.width = getResources().getDimensionPixelSize(R.dimen.floating_width);
-            params.alpha = 1.0f;
-            params.dimAmount = 0.6f;
-            params.flags |= 2;
-            getWindow().setAttributes(params);
-            setFinishOnTouchOutside(true);
-        }
     }
 
 }
