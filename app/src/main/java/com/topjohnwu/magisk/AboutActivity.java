@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 
 public class AboutActivity extends Activity {
 
-    private static final String DONATION_URL = "http://topjohnwu.github.io/donate";
+    private static final String DONATION_URL = "https://www.paypal.me/topjohnwu";
     private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
     private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
 
@@ -44,10 +44,8 @@ public class AboutActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String theme = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("theme", "");
-        Logger.dev("AboutActivity: Theme is " + theme);
         if (getApplicationContext().isDarkTheme) {
-            setTheme(R.style.AppTheme_Dark);
+            setTheme(R.style.AppTheme_Transparent_Dark);
         }
         setContentView(R.layout.activity_about);
         ButterKnife.bind(this);

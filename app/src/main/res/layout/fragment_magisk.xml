@@ -178,7 +178,8 @@
                             android:layout_centerVertical="true"
                             android:layout_margin="15dp"
                             android:layout_toStartOf="@+id/safetyNet_status"
-                            android:src="@drawable/ic_refresh" />
+                            android:src="@drawable/ic_refresh"
+                            android:tint="?attr/imageColorTint" />
 
                         <ProgressBar
                             android:id="@+id/safetyNet_check_progress"

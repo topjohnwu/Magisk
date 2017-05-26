@@ -12,6 +12,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="imageColorTint">@android:color/background_dark</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -24,6 +25,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:textColorSecondary">@color/dark_secondary_text</item>
+        <item name="imageColorTint">@android:color/background_light</item>
     </style>
 
     <style name="CardViewStyle.Dark" parent="CardView">
@@ -35,6 +37,10 @@
     </style>
 
     <style name="AppTheme.Transparent" parent="AppTheme">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+
+    <style name="AppTheme.Transparent.Dark" parent="AppTheme.Dark">
         <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
 

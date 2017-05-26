@@ -30,10 +30,10 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getApplicationContext().isDarkTheme) {
-            setTheme(R.style.AppTheme_Dark);
+            setTheme(R.style.AppTheme_Transparent_Dark);
         }
 
-        setContentView(R.layout.activity_container);
+        setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);

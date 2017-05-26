@@ -9,4 +9,12 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.Transparent.Dark" parent="AppTheme.Dark">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
 </resources>
