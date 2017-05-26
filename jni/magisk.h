@@ -45,6 +45,8 @@
 #define SELINUX_POLICY      SELINUX_PATH "policy"
 #define SELINUX_LOAD        SELINUX_PATH "load"
 
+#define MAGISKHIDE_PROP     "persist.magisk.hide"
+
 // Global handler for PLOGE
 extern __thread void (*err_handler)(void);
 

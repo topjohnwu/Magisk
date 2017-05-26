@@ -56,7 +56,7 @@ void launch_magiskhide(int client) {
 	hideEnabled = 1;
 
 	if (client != -1) {
-		if (setprop("persist.magisk.hide", "1"))
+		if (setprop(MAGISKHIDE_PROP, "1"))
 			goto error;
 	}
 
@@ -120,7 +120,7 @@ void stop_magiskhide(int client) {
 	LOGI("* Stopping MagiskHide\n");
 
 	hideEnabled = 0;
-	setprop("persist.magisk.hide", "0");
+	setprop(MAGISKHIDE_PROP, "0");
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 
 	write_int(client, DAEMON_SUCCESS);

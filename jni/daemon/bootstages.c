@@ -110,7 +110,7 @@ static int get_img_size(const char *img, int *used, int *total) {
 	return 0;
 }
 
-#define round_size(a) ((((a) / 32) + 1) * 32)
+#define round_size(a) ((((a) / 32) + 2) * 32)
 
 static int resize_img(const char *img, int size) {
 	LOGI("resize %s to %dM\n", img, size);
@@ -179,7 +179,7 @@ static void trim_img(const char *img) {
 	int used, total, new_size;
 	get_img_size(img, &used, &total);
 	new_size = round_size(used);
-	if (new_size < total)
+	if (new_size != total)
 		resize_img(img, new_size);
 }
 
@@ -694,7 +694,7 @@ void post_fs_data(int client) {
 	}
 
 	// Start magiskhide if enabled
-	char *hide_prop = getprop("persist.magisk.hide");
+	char *hide_prop = getprop(MAGISKHIDE_PROP);
 	if (hide_prop) {
 		if (strcmp(hide_prop, "1") == 0) {
 			pthread_t thread;
