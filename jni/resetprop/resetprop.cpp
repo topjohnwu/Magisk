@@ -138,7 +138,6 @@ static void read_prop_info(void* cookie, const char *name, const char *value, ui
 char *getprop(const char *name) {
     const prop_info *pi = __system_property_find(name);
     if (pi == NULL) {
-        PRINT_E("resetprop: prop not found: [%s]\n", name);
         return NULL;
     }
     char value[PROP_VALUE_MAX];
