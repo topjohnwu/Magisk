@@ -62,8 +62,13 @@ static char *concat_commands(int argc, char *argv[]) {
 }
 
 static int get_multiuser_mode() {
-	// TODO: Multiuser support
-	return MULTIUSER_MODE_NONE;
+	char *prop = getprop(MULTIUSER_MODE_PROP);
+	if (prop) {
+		int ret = atoi(prop);
+		free(prop);
+		return ret;
+	}
+	return MULTIUSER_MODE_OWNER_ONLY;
 }
 
 static void populate_environment(const struct su_context *ctx) {
@@ -212,8 +217,8 @@ int su_daemon_main(int argc, char **argv) {
 		.user = {
 			.android_user_id = 0,
 			.multiuser_mode = get_multiuser_mode(),
-			.database_path = APPLICATION_DATA_PATH REQUESTOR_DATABASE_PATH,
-			.base_path = APPLICATION_DATA_PATH REQUESTOR
+			.database_path = APP_DATA_PATH REQUESTOR_DATABASE_PATH,
+			.base_path = APP_DATA_PATH REQUESTOR
 		},
 		.umask = 022,
 	};
@@ -262,16 +267,13 @@ int su_daemon_main(int argc, char **argv) {
 		case 'u':
 			switch (ctx.user.multiuser_mode) {
 			case MULTIUSER_MODE_USER:
-				printf("%s\n", MULTIUSER_VALUE_USER);
+				printf("Owner only: Only owner has root access\n");
 				break;
 			case MULTIUSER_MODE_OWNER_MANAGED:
-				printf("%s\n", MULTIUSER_VALUE_OWNER_MANAGED);
+				printf("Owner managed: Only owner can manage root access and receive request prompts\n");
 				break;
 			case MULTIUSER_MODE_OWNER_ONLY:
-				printf("%s\n", MULTIUSER_VALUE_OWNER_ONLY);
-				break;
-			case MULTIUSER_MODE_NONE:
-				printf("%s\n", MULTIUSER_VALUE_NONE);
+				printf("User independent: The user has its own separate root rules\n");
 				break;
 			}
 			exit(EXIT_SUCCESS);
@@ -318,15 +320,20 @@ int su_daemon_main(int argc, char **argv) {
 	// It's in multiuser mode
 	if (ctx.from.uid > 99999) {
 		ctx.user.android_user_id = ctx.from.uid / 100000;
-		if (ctx.user.multiuser_mode == MULTIUSER_MODE_USER) {
+		ctx.from.uid %= 100000;
+		switch (ctx.user.multiuser_mode) {
+		case MULTIUSER_MODE_OWNER_ONLY:
+			deny();
+		case MULTIUSER_MODE_USER:
 			snprintf(ctx.user.database_path, PATH_MAX, "%s/%d/%s",
 				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR_DATABASE_PATH);
 			snprintf(ctx.user.base_path, PATH_MAX, "%s/%d/%s",
 				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR);
+			break;
 		}
 	}
 
-	// verify superuser is installed
+	// verify if Magisk Manager is installed
 	xstat(ctx.user.base_path, &st);
 
 	// odd perms on superuser data dir
@@ -334,12 +341,6 @@ int su_daemon_main(int argc, char **argv) {
 		LOGE("Bad uid/gid %d/%d for Superuser Requestor application",
 				(int)st.st_uid, (int)st.st_gid);
 		deny();
-	}
-
-	// always allow if this is the superuser uid
-	// superuser needs to be able to reenable itself when disabled...
-	if (ctx.from.uid == st.st_uid) {
-		allow();
 	}
 
 	// Check property of root configuration
@@ -361,19 +362,21 @@ int su_daemon_main(int argc, char **argv) {
 		default:
 			break;
 		}
+		free(root_prop);
 	} else {
-		exit(EXIT_FAILURE);
+		// Not initialized yet, set the prop to allow everything by default
+		setprop(ROOT_ACCESS_PROP, xstr(ROOT_ACCESS_APPS_AND_ADB));
 	}
-	free(root_prop);
+
+	// always allow if this is the superuser uid
+	// superuser needs to be able to reenable itself when disabled...
+	if (ctx.from.uid == st.st_uid) {
+		allow();
+	}
 
 	// Allow root to start root
 	if (ctx.from.uid == UID_ROOT) {
 		allow();
-	}
-
-	// deny if this is a non owner request and owner mode only
-	if (ctx.user.multiuser_mode == MULTIUSER_MODE_OWNER_ONLY && ctx.user.android_user_id != 0) {
-		deny();
 	}
 
 	mkdir(REQUESTOR_CACHE_PATH, 0770);
