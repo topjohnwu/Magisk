@@ -49,4 +49,16 @@
         <item>@string/toast</item>
     </string-array>
 
+    <string-array name="multiuser_mode">
+        <item>@string/settings_owner_only</item>
+        <item>@string/settings_owner_manage</item>
+        <item>@string/settings_user_independent</item>
+    </string-array>
+
+    <string-array name="multiuser_summary">
+        <item>@string/owner_only_summary</item>
+        <item>@string/owner_manage_summary</item>
+        <item>@string/user_indepenent_summary</item>
+    </string-array>
+
 </resources>

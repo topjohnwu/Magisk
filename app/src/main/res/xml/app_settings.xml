@@ -31,13 +31,6 @@
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
 
-        <!-- No more busybox -->
-        <!--<SwitchPreference-->
-            <!--android:key="busybox"-->
-            <!--android:defaultValue="false"-->
-            <!--android:title="@string/settings_busybox_title"-->
-            <!--android:summary="@string/settings_busybox_summary" />-->
-
         <SwitchPreference
             android:key="magiskhide"
             android:defaultValue="false"
@@ -60,6 +53,12 @@
             android:key="su_access"
             android:title="@string/superuser_access"
             android:entries="@array/su_access"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
+            android:key="multiuser_mode"
+            android:title="@string/multiuser_mode"
+            android:entries="@array/multiuser_mode"
             android:entryValues="@array/value_array" />
 
         <ListPreference

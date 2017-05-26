@@ -201,4 +201,12 @@
     <string name="target_uid">Target UID:\u0020</string>
     <string name="command">Command:\u0020</string>
 
+    <string name="multiuser_mode">Multiuser Mode</string>
+    <string name="settings_owner_only">Device Owner Only</string>
+    <string name="settings_owner_manage">Device Owner Managed</string>
+    <string name="settings_user_independent">User Independent</string>
+    <string name="owner_only_summary">Only owner has root access</string>
+    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
+    <string name="user_indepenent_summary">Each user has its own separate root rules</string>
+
 </resources>

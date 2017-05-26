@@ -30,6 +30,10 @@ public class MagiskManager extends Application {
     public static final String UNINSTALLER = "magisk_uninstaller.sh";
     public static final String INTENT_SECTION = "section";
     public static final String BUSYBOX_VERSION = "1.26.2";
+    public static final String ROOT_ACCESS_PROP = "persist.magisk.root";
+    public static final String MULTIUSER_MODE_PROP = "persist.magisk.multiuser";
+    public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
+    public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
@@ -53,7 +57,6 @@ public class MagiskManager extends Application {
     public boolean isSuClient = false;
     public String suVersion = null;
     public boolean disabled;
-    public boolean magiskHideStarted;
 
     // Data
     public ValueSortedMap<String, Repo> repoMap;
@@ -72,6 +75,7 @@ public class MagiskManager extends Application {
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
+    public int multiuserMode;
     public int suResponseType;
     public int suNotificationType;
 
@@ -130,6 +134,7 @@ public class MagiskManager extends Application {
                 .putString("su_auto_response", String.valueOf(suResponseType))
                 .putString("su_notification", String.valueOf(suNotificationType))
                 .putString("su_access", String.valueOf(suAccessState))
+                .putString("multiuser_mode", String.valueOf(multiuserMode))
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
@@ -149,12 +154,17 @@ public class MagiskManager extends Application {
             isSuClient = suVersion.toUpperCase().contains("MAGISK");
         }
         if (isSuClient) {
-            ret = Shell.sh("getprop persist.sys.root_access");
+            ret = Shell.sh("getprop " + ROOT_ACCESS_PROP);
             if (Utils.isValidShellResponse(ret)) {
                 suAccessState = Integer.parseInt(ret.get(0));
             } else {
-                Shell.su(true, "setprop persist.sys.root_access 3");
-                suAccessState = 3;
+                suAccessState = 0;
+            }
+            ret = Shell.sh("getprop " + MULTIUSER_MODE_PROP);
+            if (Utils.isValidShellResponse(ret)) {
+                multiuserMode = Integer.parseInt(ret.get(0));
+            } else {
+                multiuserMode = 0;
             }
         }
     }
@@ -177,21 +187,17 @@ public class MagiskManager extends Application {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
         }
-        ret = Shell.sh("getprop ro.magisk.disable");
+        ret = Shell.sh("getprop " + DISABLE_INDICATION_PROP);
         try {
             disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             disabled = false;
         }
-        ret = Shell.sh("getprop persist.magisk.hide");
+        ret = Shell.sh("getprop " + MAGISKHIDE_PROP);
         try {
-            magiskHideStarted = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
+            magiskHide = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
-            magiskHideStarted = false;
-        }
-
-        if (magiskHideStarted) {
-            magiskHide = true;
+            magiskHide = false;
         }
         
     }

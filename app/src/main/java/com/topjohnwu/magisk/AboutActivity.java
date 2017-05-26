@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
-import com.topjohnwu.magisk.utils.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -60,11 +60,8 @@ public class SettingsActivity extends Activity {
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
 
-        private ListPreference suAccess, autoRes, suNotification, requestTimeout;
-
-        private MagiskManager getApplication() {
-            return Utils.getMagiskManager(getActivity());
-        }
+        private ListPreference suAccess, autoRes, suNotification, requestTimeout, multiuserMode;
+        private MagiskManager magiskManager;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +69,7 @@ public class SettingsActivity extends Activity {
             addPreferencesFromResource(R.xml.app_settings);
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             prefScreen = getPreferenceScreen();
+            magiskManager = Utils.getMagiskManager(getActivity());
 
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
@@ -81,6 +79,7 @@ public class SettingsActivity extends Activity {
             autoRes = (ListPreference) findPreference("su_auto_response");
             requestTimeout = (ListPreference) findPreference("su_request_timeout");
             suNotification = (ListPreference) findPreference("su_notification");
+            multiuserMode = (ListPreference) findPreference("multiuser_mode");
 
             setSummary();
 
@@ -97,10 +96,10 @@ public class SettingsActivity extends Activity {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
             } else {
-                if (!getApplication().isSuClient) {
+                if (!magiskManager.isSuClient) {
                     prefScreen.removePreference(suCategory);
                 }
-                if (getApplication().magiskVersionCode < 130) {
+                if (magiskManager.magiskVersionCode < 130) {
                     prefScreen.removePreference(magiskCategory);
                 }
             }
@@ -126,9 +125,9 @@ public class SettingsActivity extends Activity {
             switch (key) {
                 case "dark_theme":
                     enabled = prefs.getBoolean("dark_theme", false);
-                    if (getApplication().isDarkTheme != enabled) {
-                        getApplication().isDarkTheme = enabled;
-                        getApplication().reloadMainActivity.trigger();
+                    if (magiskManager.isDarkTheme != enabled) {
+                        magiskManager.isDarkTheme = enabled;
+                        magiskManager.reloadMainActivity.trigger();
                         getActivity().recreate();
                     }
                     break;
@@ -148,29 +147,10 @@ public class SettingsActivity extends Activity {
                     }.exec();
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
-                case "busybox":
-                    enabled = prefs.getBoolean("busybox", false);
-                    new SerialTask<Void, Void, Void>() {
-                        private boolean enable = enabled;
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            if (enable) {
-                                Shell.su(
-                                        "setprop persist.magisk.busybox 1",
-                                        "sh /sbin/magic_mask.sh mount_busybox");
-                            } else {
-                                Shell.su(
-                                        "setprop persist.magisk.busybox 0",
-                                        "umount /system/xbin");
-                            }
-                            return null;
-                        }
-                    }.exec();
-                    break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        if (!getApplication().isSuClient) {
+                        if (!magiskManager.isSuClient) {
                             new AlertDialogBuilder(getActivity())
                                     .setTitle(R.string.no_magisksu_title)
                                     .setMessage(R.string.no_magisksu_msg)
@@ -202,17 +182,32 @@ public class SettingsActivity extends Activity {
                     }.exec();
                     break;
                 case "su_access":
-                    getApplication().suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
-                    Shell.su("setprop persist.sys.root_access " + getApplication().suAccessState);
+                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
+                    new SerialTask<Void, Void, Void>(getActivity()) {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            Shell.su("setprop " + MagiskManager.ROOT_ACCESS_PROP + " " + magiskManager.suAccessState);
+                            return null;
+                        }
+                    }.exec();
                     break;
+                case "multiuser_mode":
+                    magiskManager.multiuserMode = Utils.getPrefsInt(prefs, "multiuser_mode", 0);
+                    new SerialTask<Void, Void, Void>(getActivity()) {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            Shell.su("setprop " + MagiskManager.MULTIUSER_MODE_PROP + " " + magiskManager.multiuserMode);
+                            return null;
+                        }
+                    }.exec();
                 case "su_request_timeout":
-                    getApplication().suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+                    magiskManager.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
                     break;
                 case "su_auto_response":
-                    getApplication().suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+                    magiskManager.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
                     break;
                 case "su_notification":
-                    getApplication().suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+                    magiskManager.suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
                     break;
                 case "developer_logging":
                     MagiskManager.devLogging = prefs.getBoolean("developer_logging", false);
@@ -226,13 +221,15 @@ public class SettingsActivity extends Activity {
 
         private void setSummary() {
             suAccess.setSummary(getResources()
-                    .getStringArray(R.array.su_access)[getApplication().suAccessState]);
+                    .getStringArray(R.array.su_access)[magiskManager.suAccessState]);
             autoRes.setSummary(getResources()
-                    .getStringArray(R.array.auto_response)[getApplication().suResponseType]);
+                    .getStringArray(R.array.auto_response)[magiskManager.suResponseType]);
             suNotification.setSummary(getResources()
-                    .getStringArray(R.array.su_notification)[getApplication().suNotificationType]);
+                    .getStringArray(R.array.su_notification)[magiskManager.suNotificationType]);
             requestTimeout.setSummary(
                     getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
+            multiuserMode.setSummary(getResources()
+                    .getStringArray(R.array.multiuser_summary)[magiskManager.multiuserMode]);
         }
     }
 
