@@ -23,6 +23,12 @@ void vec_push_back(struct vector *v, void *p) {
 	++vec_size(v);
 }
 
+void *vec_pop_back(struct vector *v) {
+	void *ret = vec_entry(v)[vec_size(v) - 1];
+	--vec_size(v);
+	return ret;
+}
+
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *)) {
 	if (v == NULL) return;
 	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);

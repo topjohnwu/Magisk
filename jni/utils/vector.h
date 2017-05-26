@@ -14,6 +14,7 @@ struct vector {
 
 void vec_init(struct vector *v);
 void vec_push_back(struct vector *v, void *p);
+void *vec_pop_back(struct vector *v);
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *));
 void vec_destroy(struct vector *v);
 void vec_deep_destroy(struct vector *v);
