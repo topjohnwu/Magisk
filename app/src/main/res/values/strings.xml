@@ -162,6 +162,15 @@
     <string name="superuser_notification">Superuser Notification</string>
     <string name="request_timeout_summary">%1$s seconds</string>
 
+    <string name="multiuser_mode">Multiuser Mode</string>
+    <string name="settings_owner_only">Device Owner Only</string>
+    <string name="settings_owner_manage">Device Owner Managed</string>
+    <string name="settings_user_independent">User Independent</string>
+    <string name="owner_only_summary">Only owner has root access</string>
+    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
+    <string name="user_indepenent_summary">Each user has its own separate root rules</string>
+    <string name="multiuser_hint_owner_request">A request has been sent to the device owner. Please switch to the owner and grant the permission</string>
+
     <string name="settings_development_category">App Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>
@@ -200,13 +209,5 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>
     <string name="command">Command:\u0020</string>
-
-    <string name="multiuser_mode">Multiuser Mode</string>
-    <string name="settings_owner_only">Device Owner Only</string>
-    <string name="settings_owner_manage">Device Owner Managed</string>
-    <string name="settings_user_independent">User Independent</string>
-    <string name="owner_only_summary">Only owner has root access</string>
-    <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
-    <string name="user_indepenent_summary">Each user has its own separate root rules</string>
 
 </resources>

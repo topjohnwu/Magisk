@@ -55,6 +55,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
     private MagiskManager magiskManager;
 
     private int uid;
+    private boolean hasTimeout;
     private Policy policy;
     private CountDownTimer timer;
     private CallbackEvent.Listener<Policy> self;
@@ -70,6 +71,7 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
+        hasTimeout = intent.getBooleanExtra("timeout", true);
         self = this;
 
         new FileObserver(socketPath) {
@@ -87,7 +89,13 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
         new SocketManager(this).exec();
     }
 
-    void showRequest() {
+    private boolean cancelTimeout() {
+        timer.cancel();
+        deny_btn.setText(getString(R.string.deny));
+        return false;
+    }
+
+    private void showRequest() {
 
         switch (magiskManager.suResponseType) {
             case AUTO_DENY:
@@ -126,17 +134,14 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
         grant_btn.setOnClickListener(v -> handleAction(Policy.ALLOW));
         deny_btn.setOnClickListener(v -> handleAction(Policy.DENY));
-        suPopup.setOnClickListener((v) -> {
-            timer.cancel();
-            deny_btn.setText(getString(R.string.deny));
-        });
-        timeout.setOnTouchListener((v, event) -> {
-            timer.cancel();
-            deny_btn.setText(getString(R.string.deny));
-            return false;
-        });
+        suPopup.setOnClickListener((v) -> cancelTimeout());
+        timeout.setOnTouchListener((v, event) -> cancelTimeout());
 
-        timer.start();
+        if (hasTimeout) {
+            timer.start();
+        } else {
+            cancelTimeout();
+        }
     }
 
     @Override

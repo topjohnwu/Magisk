@@ -17,17 +17,27 @@ public class SuReceiver extends BroadcastReceiver {
 
     private static final int NO_NOTIFICATION = 0;
     private static final int TOAST = 1;
-
+    private static final int NOTIFY_NORMAL_LOG = 0;
+    private static final int NOTIFY_USER_TOASTS = 1;
+    private static final int NOTIFY_USER_TO_OWNER = 2;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int fromUid, toUid, pid;
+        int fromUid, toUid, pid, mode;
         String command, action;
         Policy policy;
 
         MagiskManager magiskManager = (MagiskManager) context.getApplicationContext();
 
         if (intent == null) return;
+
+        mode = intent.getIntExtra("mode", -1);
+        if (mode < 0) return;
+
+        if (mode == NOTIFY_USER_TO_OWNER) {
+            magiskManager.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
+            return;
+        }
 
         fromUid = intent.getIntExtra("from.uid", -1);
         if (fromUid < 0) return;
@@ -64,10 +74,11 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
         }
 
-        if (policy.notification && magiskManager.suNotificationType == TOAST)
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        if (policy.notification && magiskManager.suNotificationType == TOAST) {
+            magiskManager.toast(message, Toast.LENGTH_SHORT);
+        }
 
-        if (policy.logging) {
+        if (mode == NOTIFY_NORMAL_LOG && policy.logging) {
             toUid = intent.getIntExtra("to.uid", -1);
             if (toUid < 0) return;
             pid = intent.getIntExtra("pid", -1);

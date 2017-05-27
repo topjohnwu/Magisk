@@ -83,6 +83,12 @@ public class SettingsActivity extends Activity {
 
             setSummary();
 
+            // Disable dangerous settings in user mode if selected owner manage
+            if (getActivity().getApplicationInfo().uid > 99999) {
+                prefScreen.removePreference(magiskCategory);
+                prefScreen.removePreference(suCategory);
+            }
+
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 Utils.clearRepoCache(getActivity());
                 return true;
