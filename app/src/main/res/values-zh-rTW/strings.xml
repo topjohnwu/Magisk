@@ -197,5 +197,13 @@
     <string name="safetyNet_network_loss">網路斷線</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
     <string name="safetyNet_service_disconnected">服務已被取消</string>
+    <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>
+    <string name="multiuser_mode">多使用者設定</string>
+    <string name="owner_manage_summary">僅裝置擁有者帳戶能管理超級用戶權限並接收權限請求通知</string>
+    <string name="owner_only_summary">僅裝置擁有者帳戶有超級用戶權限</string>
+    <string name="user_indepenent_summary">每一位使用者有獨立的權限規則</string>
+    <string name="settings_user_independent">各使用者獨立</string>
+    <string name="settings_owner_only">僅裝置擁有者</string>
+    <string name="settings_owner_manage">由裝置擁有者管理</string>
 
 </resources>
