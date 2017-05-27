@@ -39,16 +39,17 @@ static void silent_run(char* const args[]) {
 	_exit(EXIT_FAILURE);
 }
 
-static void setup_user(struct su_context *ctx, char* user) {
+static int setup_user(struct su_context *ctx, char* user) {
 	switch (ctx->user.multiuser_mode) {
 	case MULTIUSER_MODE_OWNER_ONLY:   /* Should already be denied if not owner */
 	case MULTIUSER_MODE_OWNER_MANAGED:
 		sprintf(user, "%d", 0);
-		break;
+		return ctx->user.android_user_id;
 	case MULTIUSER_MODE_USER:
 		sprintf(user, "%d", ctx->user.android_user_id);
 		break;
 	}
+	return 0;
 }
 
 void app_send_result(struct su_context *ctx, policy_t policy) {
@@ -62,11 +63,17 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	sprintf(pid, "%d", ctx->from.pid);
 
 	char user[16];
-	setup_user(ctx, user);
+	int notify = setup_user(ctx, user);
 
+	// Send notice to manager, enable logging
 	char *result_command[] = {
 		AM_PATH,
 		ACTION_RESULT,
+		"--user",
+		user,
+		"--ei",
+		"mode",
+		"0",
 		"--ei",
 		"from.uid",
 		fromUid,
@@ -82,27 +89,65 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 		"--es",
 		"action",
 		policy == ALLOW ? "allow" : "deny",
-		"--user",
-		user,
 		NULL
 	};
 	silent_run(result_command);
+
+	// Send notice to user (if needed) to create toasts
+	if (notify) {
+		sprintf(user, "%d", notify);
+		char *notify_command[] = {
+			AM_PATH,
+			ACTION_RESULT,
+			"--user",
+			user,
+			"--ei",
+			"mode",
+			"1",
+			"--ei",
+			"from.uid",
+			fromUid,
+			"--es",
+			"action",
+			policy == ALLOW ? "allow" : "deny",
+			NULL
+		};
+		silent_run(notify_command);
+	}
 }
 
 void app_send_request(struct su_context *ctx) {
-	char user[64];
-	setup_user(ctx, user);
+	char user[16];
+	int notify = setup_user(ctx, user);
 
 	char *request_command[] = {
 		AM_PATH,
 		ACTION_REQUEST,
+		"--user",
+		user,
 		"--es",
 		"socket",
 		ctx->sock_path,
-		"--user",
-		user,
+		"--ez",
+		"timeout",
+		notify ? "false" : "true",
 		NULL
 	};
-
 	silent_run(request_command);
+
+	// Send notice to user to tell them root is managed by owner
+	if (notify) {
+		sprintf(user, "%d", notify);
+		char *notify_command[] = {
+			AM_PATH,
+			ACTION_RESULT,
+			"--user",
+			user,
+			"--ei",
+			"mode",
+			"2",
+			NULL
+		};
+		silent_run(notify_command);
+	}
 }

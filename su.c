@@ -273,7 +273,7 @@ int su_daemon_main(int argc, char **argv) {
 				printf("Owner managed: Only owner can manage root access and receive request prompts\n");
 				break;
 			case MULTIUSER_MODE_OWNER_ONLY:
-				printf("User independent: The user has its own separate root rules\n");
+				printf("User independent: Each user has its own separate root rules\n");
 				break;
 			}
 			exit(EXIT_SUCCESS);
@@ -336,6 +336,11 @@ int su_daemon_main(int argc, char **argv) {
 	// verify if Magisk Manager is installed
 	xstat(ctx.user.base_path, &st);
 
+	// always allow if this is Magisk Manager
+	if (ctx.from.uid == (st.st_uid % 100000)) {
+		allow();
+	}
+
 	// odd perms on superuser data dir
 	if (st.st_gid != st.st_uid) {
 		LOGE("Bad uid/gid %d/%d for Superuser Requestor application",
@@ -366,12 +371,6 @@ int su_daemon_main(int argc, char **argv) {
 	} else {
 		// Not initialized yet, set the prop to allow everything by default
 		setprop(ROOT_ACCESS_PROP, xstr(ROOT_ACCESS_APPS_AND_ADB));
-	}
-
-	// always allow if this is the superuser uid
-	// superuser needs to be able to reenable itself when disabled...
-	if (ctx.from.uid == st.st_uid) {
-		allow();
 	}
 
 	// Allow root to start root
