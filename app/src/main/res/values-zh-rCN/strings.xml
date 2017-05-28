@@ -159,6 +159,15 @@
     <string name="superuser_notification">超级用户通知</string>
     <string name="request_timeout_summary">%1$s 秒</string>
 
+    <string name="multiuser_mode">多用户模式</string>
+    <string name="settings_owner_only">仅设备所有者</string>
+    <string name="settings_owner_manage">由设备所有者管理</string>
+    <string name="settings_user_independent">各用户独立</string>
+    <string name="owner_only_summary">仅设备所有者账户有超级用户权限</string>
+    <string name="owner_manage_summary">仅设备所有者账户能管理超级用户并接收权限请求提示</string>
+    <string name="user_indepenent_summary">每个用户有独立的权限规则</string>
+    <string name="multiuser_hint_owner_request">已发送权限请求到设备所有者账户中。请切换到所有者账户授予权限</string>
+
     <string name="settings_development_category">开发</string>
     <string name="settings_developer_logging_title">启用高级日志记录</string>
     <string name="settings_developer_logging_summary">勾选此项以启用更加详细的日志记录。</string>
