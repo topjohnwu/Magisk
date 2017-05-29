@@ -60,7 +60,7 @@ include jni/sqlite3/Android.mk
 # Then, uncomment the line you want below
 #####################################################################
 # include jni/resetprop/Android.mk
-# include jni/magiskpolicy/Android.mk
+include jni/magiskpolicy/Android.mk
 
 # Build magiskboot
 include jni/magiskboot/Android.mk

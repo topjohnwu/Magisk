@@ -9,4 +9,4 @@
 	url = https://github.com/topjohnwu/ndk-compression.git
 [submodule "jni/magiskpolicy"]
 	path = jni/magiskpolicy
-	url = https://github.com/topjohnwu/magiskpolicy.git
+	url = https://github.com/goodwin/magiskpolicy.git
