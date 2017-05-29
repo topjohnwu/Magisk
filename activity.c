@@ -54,13 +54,13 @@ static int setup_user(struct su_context *ctx, char* user) {
 
 void app_send_result(struct su_context *ctx, policy_t policy) {
 	char fromUid[16];
-	sprintf(fromUid, "%d", ctx->from.uid);
+	sprintf(fromUid, "%d", ctx->info->uid);
 
 	char toUid[16];
 	sprintf(toUid, "%d", ctx->to.uid);
 
 	char pid[16];
-	sprintf(pid, "%d", ctx->from.pid);
+	sprintf(pid, "%d", ctx->info->pid);
 
 	char user[16];
 	int notify = setup_user(ctx, user);

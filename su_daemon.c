@@ -1,11 +1,12 @@
 /* su_client.c - The entrypoint for su, connect to daemon and send correct info
  */
 
-
+#define _GNU_SOURCE 
 #include <limits.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -16,17 +17,24 @@
 
 #include "magisk.h"
 #include "daemon.h"
+#include "resetprop.h"
 #include "utils.h"
 #include "su.h"
 #include "pts.h"
+#include "list.h"
 
 // Constants for the atty bitfield
 #define ATTY_IN     1
 #define ATTY_OUT    2
 #define ATTY_ERR    4
 
-struct ucred su_credentials;
-static __thread int client_fd;
+#define TIMEOUT     3
+
+static struct list_head active_list, waiting_list;
+static pthread_t su_collector = 0;
+static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
+
+int pipefd[2];
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -53,27 +61,181 @@ static void sighandler(int sig) {
 
 static void sigpipe_handler(int sig) {
 	LOGD("su: Client killed unexpectedly\n");
-	close(client_fd);
-	pthread_exit(NULL);
+}
+
+static int get_multiuser_mode() {
+	char *prop = getprop(MULTIUSER_MODE_PROP);
+	if (prop) {
+		int ret = atoi(prop);
+		free(prop);
+		return ret;
+	}
+	return MULTIUSER_MODE_OWNER_ONLY;
+}
+
+
+// Maintain the lists periodically
+static void *collector(void *args) {
+	LOGD("su: collector started\n");
+	struct list_head *pos, *temp;
+	struct su_initiator *node;
+	while(1) {
+		sleep(1);
+		pthread_mutex_lock(&list_lock);
+		list_for_each(pos, &active_list) {
+			node = list_entry(pos, struct su_initiator, pos);
+			--node->clock;
+			// Timeout, move to waiting list
+			if (node->clock == 0) {
+				temp = pos;
+				pos = pos->prev;
+				list_pop(temp);
+				list_insert_end(&waiting_list, temp);
+			}
+		}
+		list_for_each(pos, &waiting_list) {
+			node = list_entry(pos, struct su_initiator, pos);
+			// Nothing is using the info, remove it
+			if (node->count == 0) {
+				temp = pos;
+				pos = pos->prev;
+				list_pop(temp);
+				pthread_mutex_destroy(&node->lock);
+				free(node);
+			}
+		}
+		pthread_mutex_unlock(&list_lock);
+	}
 }
 
 void su_daemon_receiver(int client) {
-	LOGD("su: get request from client: %d\n", client);
+	LOGD("su: request from client: %d\n", client);
+
+	struct su_initiator *info = NULL, *node;
+	struct list_head *pos;
+	int new_request = 0;
+
+	pthread_mutex_lock(&list_lock);
+
+	if (!su_collector) {
+		init_list_head(&active_list);
+		init_list_head(&waiting_list);
+		xpthread_create(&su_collector, NULL, collector, NULL);
+	}
+
+	// Get client credntial
+	struct ucred credential;
+	get_client_cred(client, &credential);
+
+	// Search for existing in the active list
+	list_for_each(pos, &active_list) {
+		node = list_entry(pos, struct su_initiator, pos);
+		if (node->uid == credential.uid)
+			info = node;
+	}
+
+	// If no exist, create a new request
+	if (info == NULL) {
+		new_request = 1;
+		info = malloc(sizeof(*info));
+		info->uid = credential.uid;
+		info->policy = QUERY;
+		info->count = 0;
+		pthread_mutex_init(&info->lock, NULL);
+		list_insert_end(&active_list, &info->pos);
+	}
+	info->clock = TIMEOUT;  /* Reset timer */
+	++info->count;  /* Increment reference count */
+
+	pthread_mutex_unlock(&list_lock);
+
+	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, info->count);
+
+	// Lock before the policy is determined
+	pthread_mutex_lock(&info->lock);
+
+	info->pid = credential.pid;
+
+	// Default values
+	struct su_context ctx = {
+		.info = info,
+		.to = {
+			.uid = UID_ROOT,
+			.login = 0,
+			.keepenv = 0,
+			.shell = DEFAULT_SHELL,
+			.command = NULL,
+		},
+		.user = {
+			.android_user_id = info->uid / 100000,
+			.multiuser_mode = get_multiuser_mode(),
+		},
+		.umask = 022,
+		.notify = new_request,
+	};
+	su_ctx = &ctx;
+
+	snprintf(su_ctx->user.database_path, PATH_MAX, "%s/%d/%s",
+		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR_DATABASE_PATH);
+	snprintf(su_ctx->user.base_path, PATH_MAX, "%s/%d/%s",
+		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR);
+
+	// verify if Magisk Manager is installed
+	struct stat st;
+	xstat(su_ctx->user.base_path, &st);
+	// odd perms on superuser data dir
+	if (st.st_gid != st.st_uid) {
+		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", st.st_uid, st.st_gid);
+		info->policy = DENY;
+	}
+
+	// Not cached, do the checks
+	if (info->policy == QUERY) {
+		if (su_ctx->user.android_user_id &&
+			su_ctx->user.multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
+			info->policy = DENY;
+			su_ctx->notify = 0;
+		}
+
+		// always allow if this is Magisk Manager
+		if (info->policy == QUERY && (info->uid % 100000) == (st.st_uid % 100000)) {
+			info->policy = ALLOW;
+			su_ctx->notify = 0;
+		}
+
+		// always allow if it's root
+		if (info->uid == UID_ROOT) {
+			info->policy = ALLOW;
+			su_ctx->notify = 0;
+		}
+
+		// If not determined, check database
+		if (info->policy == QUERY)
+			database_check(su_ctx);
+
+		// If still not determined, open a pipe and wait for results
+		if (info->policy == QUERY)
+			pipe2(pipefd, O_CLOEXEC);
+	}
 
 	// Fork a new process, the child process will need to setsid,
 	// open a pseudo-terminal if needed, and will eventually run exec
 	// The parent process will wait for the result and
 	// send the return code back to our client
 	int child = fork();
-	if (child < 0) {
-		write(client, &child, sizeof(child));
-		close(client);
+	if (child < 0)
 		PLOGE("fork");
-		return;
-	} else if (child != 0) {
 
-		// For sighandler to close it
-		client_fd = client;
+	if (child) {
+		// Wait for results
+		if (info->policy == QUERY) {
+			xxread(pipefd[0], &info->policy, sizeof(info->policy));
+			close(pipefd[0]);
+			close(pipefd[1]);
+		}
+
+		// The policy is determined, unlock
+		pthread_mutex_unlock(&info->lock);
 
 		// Wait result
 		LOGD("su: wait_result waiting for %d\n", child);
@@ -91,9 +253,12 @@ void su_daemon_receiver(int client) {
 			code = -1;
 
 		// Pass the return code back to the client
-		write_int(client, code);
+		write(client, &code, sizeof(code));   /* Might SIGPIPE, ignored */
 		LOGD("su: return code to client: %d\n", code);
 		close(client);
+
+		// Decrement reference count
+		--info->count;
 
 		return;
 	}
@@ -106,14 +271,11 @@ void su_daemon_receiver(int client) {
 	// Become session leader
 	xsetsid();
 
-	// Get the credentials
-	get_client_cred(client, &su_credentials);
-
 	// Let's read some info from the socket
 	int argc = read_int(client);
 	if (argc < 0 || argc > 512) {
 		LOGE("unable to allocate args: %d", argc);
-		exit(1);
+		exit2(1);
 	}
 	LOGD("su: argc=[%d]\n", argc);
 
@@ -149,9 +311,9 @@ void su_daemon_receiver(int client) {
 		xstat(pts_slave, &stbuf);
 
 		//If caller is not root, ensure the owner of pts_slave is the caller
-		if(stbuf.st_uid != su_credentials.uid && su_credentials.uid != 0) {
+		if(stbuf.st_uid != credential.uid && credential.uid != 0) {
 			LOGE("su: Wrong permission of pts_slave");
-			exit(1);
+			exit2(1);
 		}
 
 		// Opening the TTY has to occur after the
@@ -181,6 +343,20 @@ void su_daemon_receiver(int client) {
 	xdup2(errfd, STDERR_FILENO);
 
 	close(ptsfd);
+
+	mkdir(REQUESTOR_CACHE_PATH, 0770);
+
+	if (chown(REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid))
+		PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid);
+
+	if (setgroups(0, NULL))
+		PLOGE("setgroups");
+
+	if (setegid(st.st_gid))
+		PLOGE("setegid (%u)", st.st_gid);
+
+	if (seteuid(st.st_uid))
+		PLOGE("seteuid (%u)", st.st_uid);
 
 	su_daemon_main(argc, argv);
 }

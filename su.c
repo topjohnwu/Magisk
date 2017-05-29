@@ -27,7 +27,7 @@
 #include "resetprop.h"
 #include "su.h"
 
-static struct su_context *su_ctx;
+struct su_context *su_ctx;
 
 static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
@@ -46,7 +46,7 @@ static void usage(int status) {
 	"  -v, --version                 display version number and exit\n"
 	"  -V                            display version code and exit,\n"
 	"                                this is used almost exclusively by Superuser.apk\n");
-	exit(status);
+	exit2(status);
 }
 
 static char *concat_commands(int argc, char *argv[]) {
@@ -59,16 +59,6 @@ static char *concat_commands(int argc, char *argv[]) {
 			sprintf(command, "%s", argv[i]);
 	}
 	return strdup(command);
-}
-
-static int get_multiuser_mode() {
-	char *prop = getprop(MULTIUSER_MODE_PROP);
-	if (prop) {
-		int ret = atoi(prop);
-		free(prop);
-		return ret;
-	}
-	return MULTIUSER_MODE_OWNER_ONLY;
 }
 
 static void populate_environment(const struct su_context *ctx) {
@@ -96,8 +86,7 @@ static __attribute__ ((noreturn)) void allow() {
 
 	umask(su_ctx->umask);
 
-	// no need to log if called by root
-	if (su_ctx->from.uid != UID_ROOT)
+	if (su_ctx->notify)
 		app_send_result(su_ctx, ALLOW);
 
 	char *binary = su_ctx->to.shell;
@@ -129,11 +118,10 @@ static __attribute__ ((noreturn)) void allow() {
 }
 
 static __attribute__ ((noreturn)) void deny() {
-	// no need to log if called by root
-	if (su_ctx->from.uid != UID_ROOT)
+	if (su_ctx->notify)
 		app_send_result(su_ctx, DENY);
 
-	LOGW("su: request rejected (%u->%u)", su_ctx->from.uid, su_ctx->to.uid);
+	LOGW("su: request rejected (%u->%u)", su_ctx->info->uid, su_ctx->to.uid);
 	fprintf(stderr, "%s\n", strerror(EACCES));
 	exit(EXIT_FAILURE);
 }
@@ -147,7 +135,17 @@ static void socket_cleanup() {
 
 static void cleanup_signal(int sig) {
 	socket_cleanup();
-	exit(EXIT_FAILURE);
+	exit2(EXIT_FAILURE);
+}
+
+__attribute__ ((noreturn)) void exit2(int status) {
+	// Handle the pipe, or the daemon will get stuck
+	if (su_ctx->info->policy == QUERY) {
+		xwrite(pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+		close(pipefd[0]);
+		close(pipefd[1]);
+	}
+	exit(status);
 }
 
 int su_daemon_main(int argc, char **argv) {
@@ -199,35 +197,8 @@ int su_daemon_main(int argc, char **argv) {
 		}
 	}
 
-	// Default values
-	struct su_context ctx = {
-		.from = {
-			.pid = su_credentials.pid,
-			.uid = su_credentials.uid,
-		},
-		.to = {
-			.uid = UID_ROOT,
-			.login = 0,
-			.keepenv = 0,
-			.shell = DEFAULT_SHELL,
-			.command = NULL,
-			.argv = argv,
-			.argc = argc,
-		},
-		.user = {
-			.android_user_id = 0,
-			.multiuser_mode = get_multiuser_mode(),
-			.database_path = APP_DATA_PATH REQUESTOR_DATABASE_PATH,
-			.base_path = APP_DATA_PATH REQUESTOR
-		},
-		.umask = 022,
-	};
-	su_ctx = &ctx;
-
-	struct stat st;
 	int c, socket_serv_fd, fd;
 	char result[64];
-	policy_t dballow;
 	struct option long_opts[] = {
 		{ "command",                required_argument,  NULL, 'c' },
 		{ "help",                   no_argument,        NULL, 'h' },
@@ -242,30 +213,31 @@ int su_daemon_main(int argc, char **argv) {
 	while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:", long_opts, NULL)) != -1) {
 		switch (c) {
 		case 'c':
-			ctx.to.command = concat_commands(argc, argv);
+			su_ctx->to.command = concat_commands(argc, argv);
 			optind = argc;
+			su_ctx->notify = 1;
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
 			break;
 		case 'l':
-			ctx.to.login = 1;
+			su_ctx->to.login = 1;
 			break;
 		case 'm':
 		case 'p':
-			ctx.to.keepenv = 1;
+			su_ctx->to.keepenv = 1;
 			break;
 		case 's':
-			ctx.to.shell = optarg;
+			su_ctx->to.shell = optarg;
 			break;
 		case 'V':
 			printf("%d\n", MAGISK_VER_CODE);
-			exit(EXIT_SUCCESS);
+			exit2(EXIT_SUCCESS);
 		case 'v':
 			printf("%s\n", MAGISKSU_VER_STR);
-			exit(EXIT_SUCCESS);
+			exit2(EXIT_SUCCESS);
 		case 'u':
-			switch (ctx.user.multiuser_mode) {
+			switch (su_ctx->user.multiuser_mode) {
 			case MULTIUSER_MODE_USER:
 				printf("Owner only: Only owner has root access\n");
 				break;
@@ -276,7 +248,7 @@ int su_daemon_main(int argc, char **argv) {
 				printf("User independent: Each user has its own separate root rules\n");
 				break;
 			}
-			exit(EXIT_SUCCESS);
+			exit2(EXIT_SUCCESS);
 		case 'z':
 			// Do nothing, placed here for legacy support :)
 			break;
@@ -286,8 +258,12 @@ int su_daemon_main(int argc, char **argv) {
 			usage(2);
 		}
 	}
+
+	su_ctx->to.argc = argc;
+	su_ctx->to.argv = argv;
+
 	if (optind < argc && !strcmp(argv[optind], "-")) {
-		ctx.to.login = 1;
+		su_ctx->to.login = 1;
 		optind++;
 	}
 	/* username or uid */
@@ -299,14 +275,14 @@ int su_daemon_main(int argc, char **argv) {
 
 			/* It seems we shouldn't do this at all */
 			errno = 0;
-			ctx.to.uid = strtoul(argv[optind], &endptr, 10);
+			su_ctx->to.uid = strtoul(argv[optind], &endptr, 10);
 			if (errno || *endptr) {
 				LOGE("Unknown id: %s\n", argv[optind]);
 				fprintf(stderr, "Unknown id: %s\n", argv[optind]);
 				exit(EXIT_FAILURE);
 			}
 		} else {
-			ctx.to.uid = pw->pw_uid;
+			su_ctx->to.uid = pw->pw_uid;
 		}
 		optind++;
 	}
@@ -314,39 +290,8 @@ int su_daemon_main(int argc, char **argv) {
 		optind++;
 	}
 
-	// The su_context setup is done, now every error leads to deny
+	// Setup done, now every error leads to deny
 	err_handler = deny;
-
-	// It's in multiuser mode
-	if (ctx.from.uid > 99999) {
-		ctx.user.android_user_id = ctx.from.uid / 100000;
-		ctx.from.uid %= 100000;
-		switch (ctx.user.multiuser_mode) {
-		case MULTIUSER_MODE_OWNER_ONLY:
-			deny();
-		case MULTIUSER_MODE_USER:
-			snprintf(ctx.user.database_path, PATH_MAX, "%s/%d/%s",
-				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR_DATABASE_PATH);
-			snprintf(ctx.user.base_path, PATH_MAX, "%s/%d/%s",
-				USER_DATA_PATH, ctx.user.android_user_id, REQUESTOR);
-			break;
-		}
-	}
-
-	// verify if Magisk Manager is installed
-	xstat(ctx.user.base_path, &st);
-
-	// always allow if this is Magisk Manager
-	if (ctx.from.uid == (st.st_uid % 100000)) {
-		allow();
-	}
-
-	// odd perms on superuser data dir
-	if (st.st_gid != st.st_uid) {
-		LOGE("Bad uid/gid %d/%d for Superuser Requestor application",
-				(int)st.st_uid, (int)st.st_gid);
-		deny();
-	}
 
 	// Check property of root configuration
 	char *root_prop = getprop(ROOT_ACCESS_PROP);
@@ -354,14 +299,19 @@ int su_daemon_main(int argc, char **argv) {
 		int prop_status = atoi(root_prop);
 		switch (prop_status) {
 		case ROOT_ACCESS_DISABLED:
+			LOGE("Root access is disabled!\n");
 			exit(EXIT_FAILURE);
 		case ROOT_ACCESS_APPS_ONLY:
-			if (ctx.from.uid == UID_SHELL)
+			if (su_ctx->info->uid == UID_SHELL) {
+				LOGE("Root access is disabled for ADB!\n");
 				exit(EXIT_FAILURE);
+			}
 			break;
 		case ROOT_ACCESS_ADB_ONLY:
-			if (ctx.from.uid != UID_SHELL)
+			if (su_ctx->info->uid != UID_SHELL) {
+				LOGE("Root access limited to ADB only!\n");
 				exit(EXIT_FAILURE);
+			}
 			break;
 		case ROOT_ACCESS_APPS_AND_ADB:
 		default:
@@ -373,62 +323,38 @@ int su_daemon_main(int argc, char **argv) {
 		setprop(ROOT_ACCESS_PROP, xstr(ROOT_ACCESS_APPS_AND_ADB));
 	}
 
-	// Allow root to start root
-	if (ctx.from.uid == UID_ROOT) {
+	// New request or no db exist, notify user for response
+	if (su_ctx->info->policy == QUERY) {
+		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
+		setup_sighandlers(cleanup_signal);
+
+		// Start activity
+		app_send_request(su_ctx);
+
+		atexit(socket_cleanup);
+
+		fd = socket_accept(socket_serv_fd);
+		socket_send_request(fd, su_ctx);
+		socket_receive_result(fd, result, sizeof(result));
+
+		close(fd);
+		close(socket_serv_fd);
+		socket_cleanup();
+
+		if (strcmp(result, "socket:ALLOW") == 0)
+			su_ctx->info->policy = ALLOW;
+		else
+			su_ctx->info->policy = DENY;
+
+		// Report the policy to main daemon
+		xwrite(pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+		close(pipefd[0]);
+		close(pipefd[1]);
+	}
+
+	if (su_ctx->info->policy == ALLOW)
 		allow();
-	}
-
-	mkdir(REQUESTOR_CACHE_PATH, 0770);
-	if (chown(REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid)) {
-		PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid);
-	}
-
-	if (setgroups(0, NULL)) {
-		PLOGE("setgroups");
-	}
-	if (setegid(st.st_gid)) {
-		PLOGE("setegid (%u)", st.st_gid);
-	}
-	if (seteuid(st.st_uid)) {
-		PLOGE("seteuid (%u)", st.st_uid);
-	}
-
-	// If db exits, check directly instead query application
-	dballow = database_check(&ctx);
-	switch (dballow) {
-	case INTERACTIVE:
-		break;
-	case ALLOW:
-		allow();
-	case DENY:
-	default:
+	else
 		deny();
-	}
-
-	// New request or no db exist, notify app for response
-	socket_serv_fd = socket_create_temp(ctx.sock_path, sizeof(ctx.sock_path));
-	setup_sighandlers(cleanup_signal);
-
-	// Start activity
-	app_send_request(su_ctx);
-
-	atexit(socket_cleanup);
-
-	fd = socket_accept(socket_serv_fd);
-	socket_send_request(fd, &ctx);
-	socket_receive_result(fd, result, sizeof(result));
-
-	close(fd);
-	close(socket_serv_fd);
-	socket_cleanup();
-
-	if (strcmp(result, "socket:DENY") == 0) {
-		deny();
-	} else if (strcmp(result, "socket:ALLOW") == 0) {
-		allow();
-	} else {
-		LOGE("unknown response from Superuser Requestor: %s", result);
-		deny();
-	}
 }
 

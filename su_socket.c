@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <selinux/selinux.h>
+#include <syscall.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -28,7 +29,7 @@ int socket_create_temp(char *path, size_t len) {
 
     memset(&sun, 0, sizeof(sun));
     sun.sun_family = AF_LOCAL;
-    snprintf(path, len, "%s/.socket%d", REQUESTOR_CACHE_PATH, getpid());
+    snprintf(path, len, "%s/.socket%d", REQUESTOR_CACHE_PATH, (int) syscall(SYS_gettid));
     snprintf(sun.sun_path, sizeof(sun.sun_path), "%s", path);
 
     /*
@@ -52,8 +53,8 @@ int socket_accept(int serv_fd) {
     fd_set fds;
     int rc;
 
-    /* Wait 20 seconds for a connection, then give up. */
-    tv.tv_sec = 20;
+    /* Wait 60 seconds for a connection, then give up. */
+    tv.tv_sec = 60;
     tv.tv_usec = 0;
     FD_ZERO(&fds);
     FD_SET(serv_fd, &fds);
@@ -95,7 +96,7 @@ do {                                        \
 } while (0)
 
 void socket_send_request(int fd, const struct su_context *ctx) {
-    write_token(fd, "uid", ctx->from.uid);
+    write_token(fd, "uid", ctx->info->uid);
     write_token(fd, "eof", 1);
 }
 

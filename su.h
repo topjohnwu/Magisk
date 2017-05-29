@@ -7,6 +7,8 @@
 #include <limits.h>
 #include <sys/types.h>
 
+#include "list.h"
+
 #define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
 
 // Property check for root access
@@ -43,9 +45,20 @@
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
+typedef enum {
+    QUERY = 0,
+    DENY = 1,
+    ALLOW = 2,
+} policy_t;
+
 struct su_initiator {
     pid_t pid;
     unsigned uid;
+    policy_t policy;
+    pthread_mutex_t lock;
+    int count;
+    int clock;
+    struct list_head pos;
 };
 
 struct su_request {
@@ -76,24 +89,21 @@ struct su_user_info {
 };
 
 struct su_context {
-    struct su_initiator from;
+    struct su_initiator *info;
     struct su_request to;
     struct su_user_info user;
+    int notify;
     mode_t umask;
     char sock_path[PATH_MAX];
 };
 
-typedef enum {
-    INTERACTIVE = 0,
-    DENY = 1,
-    ALLOW = 2,
-} policy_t;
-
-extern struct ucred su_credentials;
+extern struct su_context *su_ctx;
+extern int pipefd[2];
 
 // su.c
 
 int su_daemon_main(int argc, char **argv);
+__attribute__ ((noreturn)) void exit2(int status);
 
 // su_client.c
 
@@ -109,7 +119,7 @@ void app_send_request(struct su_context *ctx);
 
 // db.c
 
-policy_t database_check(struct su_context *ctx);
+void database_check(struct su_context *ctx);
 
 // misc.c
 
