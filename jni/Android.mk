@@ -19,6 +19,7 @@ LOCAL_SRC_FILES := \
 	utils/misc.c \
 	utils/vector.c \
 	utils/xwrap.c \
+	utils/list.c \
 	daemon/daemon.c \
 	daemon/socket_trans.c \
 	daemon/log_monitor.c \
@@ -40,7 +41,7 @@ LOCAL_SRC_FILES := \
 	su/db.c \
 	su/misc.c \
 	su/pts.c \
-	su/su_client.c \
+	su/su_daemon.c \
 	su/su_socket.c
 
 LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
