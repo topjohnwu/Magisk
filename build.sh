@@ -62,6 +62,7 @@ build_bin() {
   mkcp libs/armeabi-v7a/magiskboot zip_static/arm
   mkcp libs/arm64-v8a/magisk zip_static/arm64
   mkcp libs/arm64-v8a/magiskboot zip_static/arm64
+  mkcp libs/arm64-v8a/magiskpolicy zip_static/arm64
   mkcp libs/x86/magisk zip_static/x86
   mkcp libs/x86/magiskboot zip_static/x86
   mkcp libs/x86_64/magisk zip_static/x64
