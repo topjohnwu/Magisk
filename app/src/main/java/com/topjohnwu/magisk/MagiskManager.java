@@ -108,11 +108,10 @@ public class MagiskManager extends Application {
         }
         magiskHide = prefs.getBoolean("magiskhide", false);
         updateNotification = prefs.getBoolean("notification", true);
+        initSU();
         // Always start a new root shell manually, just for safety
         Shell.init();
         updateMagiskInfo();
-        initSuAccess();
-        initSuConfigs();
         // Initialize busybox
         File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
         if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
@@ -141,13 +140,14 @@ public class MagiskManager extends Application {
         Shell.su("PATH=$PATH:" + busybox.getParent());
     }
 
-    public void initSuConfigs() {
+    public void initSU() {
+        // Create the app data directory, so su binary can work properly
+        new File(getApplicationInfo().dataDir).mkdirs();
+
         suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
         suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
         suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
-    }
 
-    public void initSuAccess() {
         List<String> ret = Shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);

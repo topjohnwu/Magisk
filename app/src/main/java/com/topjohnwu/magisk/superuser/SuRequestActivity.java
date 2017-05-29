@@ -23,20 +23,18 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Logger;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SuRequestActivity extends Activity implements CallbackEvent.Listener<Policy> {
+public class SuRequestActivity extends Activity {
 
     private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
-    private static final int SU_PROTOCOL_PARAM_MAX = 20;
-    private static final int SU_PROTOCOL_NAME_MAX = 20;
-    private static final int SU_PROTOCOL_VALUE_MAX = 256;
-
     private static final int PROMPT = 0;
     private static final int AUTO_DENY = 1;
     private static final int AUTO_ALLOW = 2;
@@ -53,13 +51,11 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
     private LocalSocket socket;
     private PackageManager pm;
     private MagiskManager magiskManager;
+    private SuDatabaseHelper suDB;
 
-    private int uid;
     private boolean hasTimeout;
     private Policy policy;
     private CountDownTimer timer;
-    private CallbackEvent.Listener<Policy> self;
-    private CallbackEvent<Policy> event = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,19 +64,16 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
         pm = getPackageManager();
         magiskManager = getApplicationContext();
+        suDB = new SuDatabaseHelper(this);
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
         hasTimeout = intent.getBooleanExtra("timeout", true);
-        self = this;
 
         new FileObserver(socketPath) {
             @Override
             public void onEvent(int fileEvent, String path) {
                 if (fileEvent == FileObserver.DELETE_SELF) {
-                    if (event != null) {
-                        event.trigger();
-                    }
                     finish();
                 }
             }
@@ -97,6 +90,8 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
     private void showRequest() {
 
+        Logger.debug("Show request");
+
         switch (magiskManager.suResponseType) {
             case AUTO_DENY:
                 handleAction(Policy.DENY, 0);
@@ -106,6 +101,12 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
                 return;
             case PROMPT:
             default:
+        }
+
+        // If not interactive, response directly
+        if (policy.policy != Policy.INTERACTIVE) {
+            handleAction();
+            return;
         }
 
         setContentView(R.layout.activity_request);
@@ -128,13 +129,19 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
             @Override
             public void onFinish() {
                 deny_btn.setText(getString(R.string.deny_with_str, "(0)"));
-                event.trigger();
+                handleAction(Policy.DENY);
             }
         };
 
-        grant_btn.setOnClickListener(v -> handleAction(Policy.ALLOW));
-        deny_btn.setOnClickListener(v -> handleAction(Policy.DENY));
-        suPopup.setOnClickListener((v) -> cancelTimeout());
+        grant_btn.setOnClickListener(v -> {
+            handleAction(Policy.ALLOW);
+            timer.cancel();
+        });
+        deny_btn.setOnClickListener(v -> {
+            handleAction(Policy.DENY);
+            timer.cancel();
+        });
+        suPopup.setOnClickListener(v -> cancelTimeout());
         timeout.setOnTouchListener((v, event) -> cancelTimeout());
 
         if (hasTimeout) {
@@ -146,19 +153,25 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
     @Override
     public void onBackPressed() {
-        event.trigger();
+        if (policy != null) {
+            handleAction(Policy.DENY);
+        }
+        finish();
     }
 
-    @Override
-    public void onTrigger(CallbackEvent<Policy> event) {
-        Policy policy = event.getResult();
-        String response = "socket:DENY";
-        if (policy != null &&policy.policy == Policy.ALLOW ) {
+    void handleAction() {
+        String response;
+        if (policy.policy == Policy.ALLOW) {
             response = "socket:ALLOW";
+        } else {
+            response = "socket:DENY";
         }
         try {
             socket.getOutputStream().write((response).getBytes());
-        } catch (Exception ignored) {}
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         finish();
     }
 
@@ -168,16 +181,16 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
     void handleAction(int action, int time) {
         policy.policy = action;
-        event.trigger(policy);
         if (time >= 0) {
-            policy.until = time == 0 ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
+            policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
             new SuDatabaseHelper(this).addPolicy(policy);
         }
+        handleAction();
     }
 
     private class SocketManager extends ParallelTask<Void, Void, Boolean> {
 
-        public SocketManager(Activity context) {
+        SocketManager(Activity context) {
             super(context);
         }
 
@@ -188,40 +201,33 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
                 socket.connect(new LocalSocketAddress(socketPath, LocalSocketAddress.Namespace.FILESYSTEM));
 
                 DataInputStream is = new DataInputStream(socket.getInputStream());
-
                 ContentValues payload = new ContentValues();
 
-                for (int i = 0; i < SU_PROTOCOL_PARAM_MAX; i++) {
-
+                while (true) {
                     int nameLen = is.readInt();
-                    if (nameLen > SU_PROTOCOL_NAME_MAX)
-                        throw new IllegalArgumentException("name length too long: " + nameLen);
-
                     byte[] nameBytes = new byte[nameLen];
                     is.readFully(nameBytes);
-
                     String name = new String(nameBytes);
-
                     if (TextUtils.equals(name, "eof"))
                         break;
 
                     int dataLen = is.readInt();
-                    if (dataLen > SU_PROTOCOL_VALUE_MAX)
-                        throw new IllegalArgumentException(name + " data length too long: " + dataLen);
-
                     byte[] dataBytes = new byte[dataLen];
                     is.readFully(dataBytes);
-
                     String data = new String(dataBytes);
-
                     payload.put(name, data);
                 }
 
-                if (payload.getAsInteger("uid") == null)
+                if (payload.getAsInteger("uid") == null) {
                     return false;
-                uid = payload.getAsInteger("uid");
+                }
 
-            } catch (IOException e) {
+                int uid = payload.getAsInteger("uid");
+                policy = suDB.getPolicy(uid);
+                if (policy == null) {
+                    policy = new Policy(uid, pm);
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
@@ -230,35 +236,10 @@ public class SuRequestActivity extends Activity implements CallbackEvent.Listene
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if (!result) {
+            if (result) {
+                showRequest();
+            } else {
                 finish();
-                return;
-            }
-            boolean showRequest = false;
-            event = magiskManager.uidSuRequest.get(uid);
-            if (event == null) {
-                showRequest = true;
-                event = new CallbackEvent<Policy>() {
-                    @Override
-                    public void trigger(Policy result) {
-                        super.trigger(result);
-                        unRegister();
-                        magiskManager.uidSuRequest.remove(uid);
-                    }
-                };
-                magiskManager.uidSuRequest.put(uid, event);
-            }
-            event.register(self);
-            try {
-                if (showRequest) {
-                    policy = new Policy(uid, pm);
-                    showRequest();
-                } else {
-                    finish();
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-                event.trigger();
             }
         }
     }

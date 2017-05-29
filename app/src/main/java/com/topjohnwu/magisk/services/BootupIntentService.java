@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.services;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.topjohnwu.magisk.MagiskManager;
+
 public class BootupIntentService extends IntentService {
 
     public BootupIntentService() {
@@ -11,10 +13,6 @@ public class BootupIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        /* Currently no bootup task to do
-         MagiskManager magiskManager = Utils.getMagiskManager(this);
-         magiskManager.initSuAccess();
-         magiskManager.updateMagiskInfo();
-         */
+        ((MagiskManager) getApplication()).initSU();
     }
 }

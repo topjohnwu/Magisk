@@ -11,7 +11,7 @@ public class Policy {
     public static final int DENY = 1;
     public static final int ALLOW = 2;
 
-    public int uid, policy;
+    public int uid, policy = INTERACTIVE;
     public long until;
     public boolean logging = true, notification = true;
     public String packageName, appName;
