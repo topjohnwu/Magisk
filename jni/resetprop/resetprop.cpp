@@ -11,7 +11,7 @@
  *
  * Functions that need to be patched/added in system_properties.cpp
  *
- * int __system_properties_init()
+ * int __system_properties_init2()
  *     on android 7, first tear down the everything then let it initialize again:
  *         if (initialized) {
  *             //list_foreach(contexts, [](context_node* l) { l->reset_access(); });
@@ -123,7 +123,7 @@ static int usage(char* arg0) {
 
 int init_resetprop() {
     PRINT_D("resetprop: Initializing...\n");
-    if (__system_properties_init()) {
+    if (__system_properties_init2()) {
         PRINT_E("resetprop: Initialize error\n");
         return -1;
     }
@@ -136,12 +136,12 @@ static void read_prop_info(void* cookie, const char *name, const char *value, ui
 
 // Get prop by name, return string (should free manually!)
 char *getprop(const char *name) {
-    const prop_info *pi = __system_property_find(name);
+    const prop_info *pi = __system_property_find2(name);
     if (pi == NULL) {
         return NULL;
     }
     char value[PROP_VALUE_MAX];
-    __system_property_read_callback(pi, read_prop_info, value);
+    __system_property_read_callback2(pi, read_prop_info, value);
     PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
     return strdup(value);
 }
@@ -158,16 +158,16 @@ int setprop2(const char *name, const char *value, const int trigger) {
         free(check);
         if (trigger) {
             if (!strncmp(name, "ro.", 3)) deleteprop(name);
-            ret = __system_property_set(name, value);
+            ret = __system_property_set2(name, value);
         } else {
-            ret = __system_property_update((prop_info*) __system_property_find(name), value, strlen(value));
+            ret = __system_property_update2((prop_info*) __system_property_find2(name), value, strlen(value));
         }
     } else {
         PRINT_D("resetprop: New prop [%s]\n", name);
         if (trigger) {
-            ret = __system_property_set(name, value);
+            ret = __system_property_set2(name, value);
         } else {
-            ret = __system_property_add(name, strlen(name), value, strlen(value));
+            ret = __system_property_add2(name, strlen(name), value, strlen(value));
         }
     }
 
@@ -275,6 +275,8 @@ int resetprop_main(int argc, char *argv[]) {
             }
         }
     }
+
+    init_resetprop();
 
     if (file) {
         return read_prop_file(filename, trigger);

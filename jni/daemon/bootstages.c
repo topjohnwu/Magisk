@@ -693,6 +693,9 @@ void post_fs_data(int client) {
 		bind_mount(HOSTSFILE, "/system/etc/hosts");
 	}
 
+	// Initialize resetprop for the daemon
+	init_resetprop();
+
 	// Start magiskhide if enabled
 	char *hide_prop = getprop(MAGISKHIDE_PROP);
 	if (hide_prop) {

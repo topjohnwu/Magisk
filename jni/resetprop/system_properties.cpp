@@ -54,11 +54,12 @@
 #include "_system_properties.h"
 #include "system_properties.h"
 
+// #include <async_safe/log.h>
+
 #include "ErrnoRestorer.h"
 #include "bionic_futex.h"
 #include "bionic_lock.h"
 #include "bionic_macros.h"
-#include "libc_logging.h"
 
 static constexpr int PROP_FILENAME_MAX = 1024;
 
@@ -89,6 +90,16 @@ static const char* kServiceVersionPropertyName = "ro.property_service.version";
  *                  | net |   | sys |     | com |            |     1     |
  *                  +-----+   +-----+     +-----+            +===========+
  */
+
+// This is a alternative implementation for async_safe_format_buffer
+// A workaround to not include the async_safe header
+static int async_safe_format_buffer(char * s, size_t n, const char * format, ...) {
+  va_list vl;
+  va_start(vl, format);
+  int ret = vsnprintf(s, n, format, vl);
+  va_end(vl);
+  return ret;
+}
 
 // Represents a node in the trie.
 struct prop_bt {
@@ -202,17 +213,9 @@ struct prop_info {
   DISALLOW_IMPLICIT_CONSTRUCTORS(prop_info);
 };
 
-struct find_nth_cookie {
-  uint32_t count;
-  const uint32_t n;
-  const prop_info* pi;
-
-  explicit find_nth_cookie(uint32_t n) : count(0), n(n), pi(nullptr) {
-  }
-};
-
 // This is public because it was exposed in the NDK. As of 2017-01, ~60 apps reference this symbol.
-prop_area* __system_property_area__ = nullptr;
+// Change to static, we don't want to use the global libc reference
+static prop_area* __system_property_area__ = nullptr;
 
 static char property_filename[PROP_FILENAME_MAX] = PROP_FILENAME;
 static size_t pa_data_size;
@@ -238,8 +241,8 @@ static prop_area* map_prop_area_rw(const char* filename, const char* context,
 
   if (context) {
     if (fsetxattr(fd, XATTR_NAME_SELINUX, context, strlen(context) + 1, 0) != 0) {
-      __libc_format_log(ANDROID_LOG_ERROR, "libc",
-                        "fsetxattr failed to set context (%s) for \"%s\"", context, filename);
+      // async_safe_format_log(ANDROID_LOG_ERROR, "libc",
+      //                       "fsetxattr failed to set context (%s) for \"%s\"", context, filename);
       /*
        * fsetxattr() will fail during system properties tests due to selinux policy.
        * We do not want to create a custom policy for the tester, so we will continue in
@@ -694,22 +697,14 @@ static int send_prop_msg(const prop_msg* msg) {
       // ms so callers who do read-after-write can reliably see
       // what they've written.  Most of the time.
       // TODO: fix the system properties design.
-      __libc_format_log(ANDROID_LOG_WARN, "libc",
-                        "Property service has timed out while trying to set \"%s\" to \"%s\"",
-                        msg->name, msg->value);
+      // async_safe_format_log(ANDROID_LOG_WARN, "libc",
+      //                       "Property service has timed out while trying to set \"%s\" to \"%s\"",
+      //                       msg->name, msg->value);
       result = 0;
     }
   }
 
   return result;
-}
-
-static void find_nth_fn(const prop_info* pi, void* ptr) {
-  find_nth_cookie* cookie = reinterpret_cast<find_nth_cookie*>(ptr);
-
-  if (cookie->n == cookie->count) cookie->pi = pi;
-
-  cookie->count++;
 }
 
 bool prop_area::foreach_property(prop_bt* const trie,
@@ -872,7 +867,8 @@ bool context_node::open(bool access_rw, bool* fsetxattr_failed) {
   }
 
   char filename[PROP_FILENAME_MAX];
-  int len = __libc_format_buffer(filename, sizeof(filename), "%s/%s", property_filename, context_);
+  int len = async_safe_format_buffer(filename, sizeof(filename), "%s/%s", property_filename,
+                                     context_);
   if (len < 0 || len > PROP_FILENAME_MAX) {
     lock_.unlock();
     return false;
@@ -907,7 +903,8 @@ void context_node::reset_access() {
 
 bool context_node::check_access() {
   char filename[PROP_FILENAME_MAX];
-  int len = __libc_format_buffer(filename, sizeof(filename), "%s/%s", property_filename, context_);
+  int len = async_safe_format_buffer(filename, sizeof(filename), "%s/%s", property_filename,
+                                     context_);
   if (len < 0 || len > PROP_FILENAME_MAX) {
     return false;
   }
@@ -930,7 +927,8 @@ void context_node::unmap() {
 static bool map_system_property_area(bool access_rw, bool* fsetxattr_failed) {
   char filename[PROP_FILENAME_MAX];
   int len =
-      __libc_format_buffer(filename, sizeof(filename), "%s/properties_serial", property_filename);
+      async_safe_format_buffer(filename, sizeof(filename), "%s/properties_serial",
+                               property_filename);
   if (len < 0 || len > PROP_FILENAME_MAX) {
     __system_property_area__ = nullptr;
     return false;
@@ -1145,7 +1143,7 @@ static void free_and_unmap_contexts() {
   }
 }
 
-int __system_properties_init() {
+int __system_properties_init2() {
   // This is called from __libc_init_common, and should leave errno at 0 (http://b/37248982).
   ErrnoRestorer errno_restorer;
 
@@ -1175,7 +1173,7 @@ int __system_properties_init() {
   return 0;
 }
 
-int __system_property_set_filename(const char* filename) {
+int __system_property_set_filename2(const char* filename) {
   size_t len = strlen(filename);
   if (len >= sizeof(property_filename)) return -1;
 
@@ -1183,7 +1181,7 @@ int __system_property_set_filename(const char* filename) {
   return 0;
 }
 
-int __system_property_area_init() {
+int __system_property_area_init2() {
   free_and_unmap_contexts();
   mkdir(property_filename, S_IRWXU | S_IXGRP | S_IXOTH);
   if (!initialize_properties()) {
@@ -1204,23 +1202,23 @@ int __system_property_area_init() {
   return fsetxattr_failed ? -2 : 0;
 }
 
-uint32_t __system_property_area_serial() {
+uint32_t __system_property_area_serial2() {
   prop_area* pa = __system_property_area__;
   if (!pa) {
     return -1;
   }
-  // Make sure this read fulfilled before __system_property_serial
+  // Make sure this read fulfilled before __system_property_serial2
   return atomic_load_explicit(pa->serial(), memory_order_acquire);
 }
 
-const prop_info* __system_property_find(const char* name) {
+const prop_info* __system_property_find2(const char* name) {
   if (!__system_property_area__) {
     return nullptr;
   }
 
   prop_area* pa = get_prop_area_for_name(name);
   if (!pa) {
-    __libc_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
+    // async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
     return nullptr;
   }
 
@@ -1234,7 +1232,6 @@ int __system_property_del(const char *name) {
 
   prop_area* pa = get_prop_area_for_name(name);
   if (!pa) {
-    __libc_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
     return 1;
   }
 
@@ -1257,9 +1254,9 @@ static inline uint_least32_t load_const_atomic(const atomic_uint_least32_t* s, m
   return atomic_load_explicit(non_const_s, mo);
 }
 
-int __system_property_read(const prop_info* pi, char* name, char* value) {
+int __system_property_read2(const prop_info* pi, char* name, char* value) {
   while (true) {
-    uint32_t serial = __system_property_serial(pi);  // acquire semantics
+    uint32_t serial = __system_property_serial2(pi);  // acquire semantics
     size_t len = SERIAL_VALUE_LEN(serial);
     memcpy(value, pi->value, len + 1);
     // TODO: Fix the synchronization scheme here.
@@ -1274,34 +1271,34 @@ int __system_property_read(const prop_info* pi, char* name, char* value) {
     if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
       if (name != nullptr) {
         size_t namelen = strlcpy(name, pi->name, PROP_NAME_MAX);
-        if (namelen >= PROP_NAME_MAX) {
-          __libc_format_log(ANDROID_LOG_ERROR, "libc",
-                            "The property name length for \"%s\" is >= %d;"
-                            " please use __system_property_read_callback"
-                            " to read this property. (the name is truncated to \"%s\")",
-                            pi->name, PROP_NAME_MAX - 1, name);
-        }
+        // if (namelen >= PROP_NAME_MAX) {
+        //   async_safe_format_log(ANDROID_LOG_ERROR, "libc",
+        //                         "The property name length for \"%s\" is >= %d;"
+        //                         " please use __system_property_read_callback2"
+        //                         " to read this property. (the name is truncated to \"%s\")",
+        //                         pi->name, PROP_NAME_MAX - 1, name);
+        // }
       }
       return len;
     }
   }
 }
 
-void __system_property_read_callback(const prop_info* pi,
+void __system_property_read_callback2(const prop_info* pi,
                                      void (*callback)(void* cookie,
                                                       const char* name,
                                                       const char* value,
                                                       uint32_t serial),
                                      void* cookie) {
   while (true) {
-    uint32_t serial = __system_property_serial(pi);  // acquire semantics
+    uint32_t serial = __system_property_serial2(pi);  // acquire semantics
     size_t len = SERIAL_VALUE_LEN(serial);
     char value_buf[len + 1];
 
     memcpy(value_buf, pi->value, len);
     value_buf[len] = '\0';
 
-    // TODO: see todo in __system_property_read function
+    // TODO: see todo in __system_property_read2 function
     atomic_thread_fence(memory_order_acquire);
     if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
       callback(cookie, pi->name, value_buf, serial);
@@ -1310,11 +1307,11 @@ void __system_property_read_callback(const prop_info* pi,
   }
 }
 
-int __system_property_get(const char* name, char* value) {
-  const prop_info* pi = __system_property_find(name);
+int __system_property_get2(const char* name, char* value) {
+  const prop_info* pi = __system_property_find2(name);
 
   if (pi != 0) {
-    return __system_property_read(pi, nullptr, value);
+    return __system_property_read2(pi, nullptr, value);
   } else {
     value[0] = 0;
     return 0;
@@ -1328,25 +1325,25 @@ static atomic_uint_least32_t g_propservice_protocol_version = 0;
 
 static void detect_protocol_version() {
   char value[PROP_VALUE_MAX];
-  if (__system_property_get(kServiceVersionPropertyName, value) == 0) {
+  if (__system_property_get2(kServiceVersionPropertyName, value) == 0) {
     g_propservice_protocol_version = kProtocolVersion1;
-    __libc_format_log(ANDROID_LOG_WARN, "libc",
-                      "Using old property service protocol (\"%s\" is not set)",
-                      kServiceVersionPropertyName);
+    // async_safe_format_log(ANDROID_LOG_WARN, "libc",
+    //                       "Using old property service protocol (\"%s\" is not set)",
+    //                       kServiceVersionPropertyName);
   } else {
     uint32_t version = static_cast<uint32_t>(atoll(value));
     if (version >= kProtocolVersion2) {
       g_propservice_protocol_version = kProtocolVersion2;
     } else {
-      __libc_format_log(ANDROID_LOG_WARN, "libc",
-                        "Using old property service protocol (\"%s\"=\"%s\")",
-                        kServiceVersionPropertyName, value);
+      // async_safe_format_log(ANDROID_LOG_WARN, "libc",
+      //                       "Using old property service protocol (\"%s\"=\"%s\")",
+      //                       kServiceVersionPropertyName, value);
       g_propservice_protocol_version = kProtocolVersion1;
     }
   }
 }
 
-int __system_property_set(const char* key, const char* value) {
+int __system_property_set2(const char* key, const char* value) {
   if (key == nullptr) return -1;
   if (value == nullptr) value = "";
   if (strlen(value) >= PROP_VALUE_MAX) return -1;
@@ -1370,50 +1367,50 @@ int __system_property_set(const char* key, const char* value) {
     // Use proper protocol
     PropertyServiceConnection connection;
     if (!connection.IsValid()) {
-      errno = connection.GetLastError();
-      __libc_format_log(ANDROID_LOG_WARN,
-                        "libc",
-                        "Unable to set property \"%s\" to \"%s\": connection failed; errno=%d (%s)",
-                        key,
-                        value,
-                        errno,
-                        strerror(errno));
+      // errno = connection.GetLastError();
+      // async_safe_format_log(ANDROID_LOG_WARN,
+      //                       "libc",
+      //                       "Unable to set property \"%s\" to \"%s\": connection failed; errno=%d (%s)",
+      //                       key,
+      //                       value,
+      //                       errno,
+      //                       strerror(errno));
       return -1;
     }
 
     SocketWriter writer(&connection);
     if (!writer.WriteUint32(PROP_MSG_SETPROP2).WriteString(key).WriteString(value).Send()) {
-      errno = connection.GetLastError();
-      __libc_format_log(ANDROID_LOG_WARN,
-                        "libc",
-                        "Unable to set property \"%s\" to \"%s\": write failed; errno=%d (%s)",
-                        key,
-                        value,
-                        errno,
-                        strerror(errno));
+      // errno = connection.GetLastError();
+      // async_safe_format_log(ANDROID_LOG_WARN,
+      //                       "libc",
+      //                       "Unable to set property \"%s\" to \"%s\": write failed; errno=%d (%s)",
+      //                       key,
+      //                       value,
+      //                       errno,
+      //                       strerror(errno));
       return -1;
     }
 
     int result = -1;
     if (!connection.RecvInt32(&result)) {
-      errno = connection.GetLastError();
-      __libc_format_log(ANDROID_LOG_WARN,
-                        "libc",
-                        "Unable to set property \"%s\" to \"%s\": recv failed; errno=%d (%s)",
-                        key,
-                        value,
-                        errno,
-                        strerror(errno));
+      // errno = connection.GetLastError();
+      // async_safe_format_log(ANDROID_LOG_WARN,
+      //                       "libc",
+      //                       "Unable to set property \"%s\" to \"%s\": recv failed; errno=%d (%s)",
+      //                       key,
+      //                       value,
+      //                       errno,
+      //                       strerror(errno));
       return -1;
     }
 
     if (result != PROP_SUCCESS) {
-      __libc_format_log(ANDROID_LOG_WARN,
-                        "libc",
-                        "Unable to set property \"%s\" to \"%s\": error code: 0x%x",
-                        key,
-                        value,
-                        result);
+      // async_safe_format_log(ANDROID_LOG_WARN,
+      //                       "libc",
+      //                       "Unable to set property \"%s\" to \"%s\": error code: 0x%x",
+      //                       key,
+      //                       value,
+      //                       result);
       return -1;
     }
 
@@ -1421,7 +1418,7 @@ int __system_property_set(const char* key, const char* value) {
   }
 }
 
-int __system_property_update(prop_info* pi, const char* value, unsigned int len) {
+int __system_property_update2(prop_info* pi, const char* value, unsigned int len) {
   if (len >= PROP_VALUE_MAX) {
     return -1;
   }
@@ -1451,7 +1448,7 @@ int __system_property_update(prop_info* pi, const char* value, unsigned int len)
   return 0;
 }
 
-int __system_property_add(const char* name, unsigned int namelen, const char* value,
+int __system_property_add2(const char* name, unsigned int namelen, const char* value,
                           unsigned int valuelen) {
   if (valuelen >= PROP_VALUE_MAX) {
     return -1;
@@ -1468,7 +1465,7 @@ int __system_property_add(const char* name, unsigned int namelen, const char* va
   prop_area* pa = get_prop_area_for_name(name);
 
   if (!pa) {
-    __libc_format_log(ANDROID_LOG_ERROR, "libc", "Access denied adding property \"%s\"", name);
+    // async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied adding property \"%s\"", name);
     return -1;
   }
 
@@ -1488,7 +1485,7 @@ int __system_property_add(const char* name, unsigned int namelen, const char* va
 }
 
 // Wait for non-locked serial, and retrieve it with acquire semantics.
-uint32_t __system_property_serial(const prop_info* pi) {
+uint32_t __system_property_serial2(const prop_info* pi) {
   uint32_t serial = load_const_atomic(&pi->serial, memory_order_acquire);
   while (SERIAL_DIRTY(serial)) {
     __futex_wait(const_cast<_Atomic(uint_least32_t)*>(&pi->serial), serial, nullptr);
@@ -1497,13 +1494,13 @@ uint32_t __system_property_serial(const prop_info* pi) {
   return serial;
 }
 
-uint32_t __system_property_wait_any(uint32_t old_serial) {
+uint32_t __system_property_wait_any2(uint32_t old_serial) {
   uint32_t new_serial;
-  __system_property_wait(nullptr, old_serial, &new_serial, nullptr);
+  __system_property_wait2(nullptr, old_serial, &new_serial, nullptr);
   return new_serial;
 }
 
-bool __system_property_wait(const prop_info* pi,
+bool __system_property_wait2(const prop_info* pi,
                             uint32_t old_serial,
                             uint32_t* new_serial_ptr,
                             const timespec* relative_timeout) {
@@ -1529,33 +1526,30 @@ bool __system_property_wait(const prop_info* pi,
   return true;
 }
 
-/* Deprecated, we won't use it anyways */
+const prop_info* __system_property_find_nth2(unsigned n) {
+  struct find_nth {
+    const uint32_t sought;
+    uint32_t current;
+    const prop_info* result;
 
-// const prop_info* __system_property_find_nth(unsigned n) {
-//   if (bionic_get_application_target_sdk_version() >= __ANDROID_API_O__) {
-//     __libc_fatal(
-//         "__system_property_find_nth is not supported since Android O,"
-//         " please use __system_property_foreach instead.");
-//   }
+    explicit find_nth(uint32_t n) : sought(n), current(0), result(nullptr) {}
+    static void fn(const prop_info* pi, void* ptr) {
+      find_nth* self = reinterpret_cast<find_nth*>(ptr);
+      if (self->current++ == self->sought) self->result = pi;
+    }
+  } state(n);
+  __system_property_foreach2(find_nth::fn, &state);
+  return state.result;
+}
 
-//   find_nth_cookie cookie(n);
-
-//   const int err = __system_property_foreach(find_nth_fn, &cookie);
-//   if (err < 0) {
-//     return nullptr;
-//   }
-
-//   return cookie.pi;
-// }
-
-int __system_property_foreach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
+int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
   if (!__system_property_area__) {
     return -1;
   }
 
   list_foreach(contexts, [propfn, cookie](context_node* l) {
     if (l->check_access_and_open()) {
-      l->pa()->foreach (propfn, cookie);
+      l->pa()->foreach(propfn, cookie);
     }
   });
   return 0;

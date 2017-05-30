@@ -34,7 +34,6 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/sepolicy.c \
 	magiskpolicy/api.c \
 	resetprop/resetprop.cpp \
-	resetprop/libc_logging.cpp \
 	resetprop/system_properties.cpp \
 	su/su.c \
 	su/activity.c \
