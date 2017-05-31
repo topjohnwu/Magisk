@@ -12,6 +12,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Установлен Magisk v%1$s</string>
+    <string name="magisk_version_core_only">Установлен v%1$s (Базовый режим)</string>
     <string name="magisk_version_error">Magisk не установлен</string>
 
     <string name="checking_for_updates">Проверка обновлений…</string>
@@ -23,15 +24,20 @@
     <string name="proper_root">Рут получен правильно</string>
     <string name="safetyNet_check_text">Нажмите для запуска проверки SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
+    <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
     <string name="safetyNet_connection_failed">Невозможно соединиться с API Google</string>
     <string name="safetyNet_connection_suspended">Соединение с API Google было приостановлено</string>
     <string name="safetyNet_no_response">Невозможно выполнить проверку SafetyNet, нет соединения?</string>
     <string name="safetyNet_fail">SafetyNet не пройден: несовпадение профиля CTS</string>
     <string name="safetyNet_pass">SafetyNet пройден</string>
+    <string name="safetyNet_network_loss">Потеря сетевого соединения</string>
+    <string name="safetyNet_service_disconnected">Служба была остановлена</string>
+    <string name="safetyNet_res_invalid">Некорректный ответ</string>
     <string name="root_info_warning">Функциональность значительно ограничена</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Авто) %1$s</string>
+    <string name="cannot_auto_detect">(Невозможно определить)</string>
     <string name="boot_image_title">Местоположение образа Boot</string>
     <string name="detect_button">Определить</string>
     <string name="advanced_settings_title">Дополнительные настройки</string>
@@ -41,6 +47,9 @@
     <string name="install_magisk_title">Последняя версия Magisk: %1$s</string>
     <string name="uninstall">Удалить</string>
     <string name="reboot_countdown">Перезагрузка через %1$d</string>
+    <string name="uninstall_magisk_title">Удалить Magisk</string>
+    <string name="uninstall_magisk_msg">Это удалит все модули, MagiskSU, и может зашифровать ваши данные, если они не зашифрованы\nПродолжить?</string>
+    <string name="version_none">(Нет)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
@@ -51,7 +60,7 @@
     <string name="disable_file_created">Модуль будет выключён при перезагрузке</string>
     <string name="disable_file_removed">Модуль будет включён при перезагрузке</string>
     <string name="author">Автор: %1$s</string>
-    <string name="fab_flash_zip">Прошить модуль из zip-архива</string>
+    <string name="fab_flash_zip">Прошить zip-архив</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступно обновление</string>
@@ -82,13 +91,15 @@
     <string name="permissionNotGranted">Это не будет работать без доступа к внешнему хранилищу</string>
     <string name="no_thanks">Нет, спасибо</string>
     <string name="yes">Да</string>
+    <string name="ok">OK</string>
+    <string name="close">Закрыть</string>
     <string name="repo_install_title">Установить %1$s</string>
     <string name="repo_install_msg">Вы хотите установить %1$s ?</string>
     <string name="download_install">Скачать и установить</string>
+    <string name="download">Скачать</string>
     <string name="goto_install">Перейти в раздел «Установка»</string>
     <string name="download_file_error">Ошибка при скачивании файла</string>
     <string name="install_error">Ошибка при установке!</string>
-    а
     <string name="invalid_zip">Этот архив не содержит модуль Magisk!!</string>
     <string name="reboot_title">Установка успешна!</string>
     <string name="reboot_msg">Вы хотите перезагрузиться?</string>
@@ -110,14 +121,22 @@
     <string name="no_magisksu_title">MagiskSU не используется!</string>
     <string name="no_magisksu_msg">Если рут получен не через MagiskSU, использования MagiskHide может не хватить!\nЭто официально не поддерживается, и вам могут понадобиться дополнительные инструменты (например, suhide), чтобы пройти SafetyNet.</string>
     <string name="understand">Я понимаю</string>
+    <string name="process_error">Ошибка обработки</string>
+    <string name="internal_storage">Этот архив расположен в:\n[Внутреннее хранилище]%1$s</string>
+    <string name="zip_process_title">Обработка</string>
+    <string name="manual_boot_image">Выберите образ Boot вручную!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить тёмную тему</string>
+    <string name="settings_notification_title">Уведомления об обновлениях</string>
+    <string name="settings_notification_summary">Показывать уведомления при наличии новых версий</string>
     <string name="settings_clear_cache_title">Очистить кэш репозиториев</string>
     <string name="settings_clear_cache_summary">Удалить сохранённую информацию о сетевых репозиториях, чтобы приложение обновило информацию из сети</string>
 
+    <string name="settings_core_only_title">Базовый режим</string>
+    <string name="settings_core_only_summary">Включить только основные функции, не загружать модули. MagiskSU, MagiskHide, Systemless hosts, и BusyBox будут включены</string>
     <string name="settings_magiskhide_summary">Скрыть Magisk от различных проверок</string>
     <string name="settings_busybox_title">Включить BusyBox</string>
     <string name="settings_busybox_summary">Примонтировать встроенный busybox из Magisk в xbin</string>
@@ -149,7 +168,7 @@
     <string name="deny_with_str">Отказать %1$s</string>
     <string name="deny">Отказать</string>
     <string name="prompt">Запрос</string>
-    <string name="grant">Предоставить</string>
+    <string name="grant">Разрешить</string>
     <string name="su_warning">Предоставить полный доступ к устройству.\nОтклоните, если не уверены!</string>
     <string name="forever">Навсегда</string>
     <string name="once">Один раз</string>
@@ -174,7 +193,7 @@
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Идентификатор UID:\u0020</string>
+    <string name="target_uid">UID:\u0020</string>
     <string name="command">Команда:\u0020</string>
 
 </resources>
