@@ -161,6 +161,8 @@
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
     <string name="request_timeout_summary">%1$s seconds</string>
+    <string name="settings_su_reauth_title">Re-authenticate after upgrade</string>
+    <string name="settings_su_reauth_summary">Re-authenticate superuser permissions after an application upgrades</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>

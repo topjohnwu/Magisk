@@ -5,15 +5,14 @@
         android:title="@string/settings_general_category">
 
         <SwitchPreference
-            android:defaultValue="false"
+            android:key="dark_theme"
             android:title="@string/settings_dark_theme_title"
-            android:summary="@string/settings_dark_theme_summary"
-            android:key="dark_theme" />
+            android:summary="@string/settings_dark_theme_summary" />
 
         <SwitchPreference
+            android:key="notification"
             android:title="@string/settings_notification_title"
-            android:summary="@string/settings_notification_summary"
-            android:key="notification" />
+            android:summary="@string/settings_notification_summary" />
 
         <Preference
             android:key="clear"
@@ -33,13 +32,11 @@
 
         <SwitchPreference
             android:key="magiskhide"
-            android:defaultValue="false"
             android:title="@string/magiskhide"
             android:summary="@string/settings_magiskhide_summary" />
 
         <SwitchPreference
             android:key="hosts"
-            android:defaultValue="false"
             android:title="@string/settings_hosts_title"
             android:summary="@string/settings_hosts_summary" />
 
@@ -78,6 +75,11 @@
             android:title="@string/superuser_notification"
             android:entries="@array/su_notification"
             android:entryValues="@array/value_array" />
+
+        <SwitchPreference
+            android:key="su_reauth"
+            android:title="@string/settings_su_reauth_title"
+            android:summary="@string/settings_su_reauth_summary"/>
 
     </PreferenceCategory>
 

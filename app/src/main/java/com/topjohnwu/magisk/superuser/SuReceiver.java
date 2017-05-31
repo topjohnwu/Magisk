@@ -56,7 +56,7 @@ public class SuReceiver extends BroadcastReceiver {
             }
         }
 
-        magiskManager.initSU();
+        magiskManager.initSUConfig();
 
         SuLogEntry log = new SuLogEntry(policy);
 

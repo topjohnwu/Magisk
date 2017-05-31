@@ -72,7 +72,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
                     SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.addPolicy(policy);
+                    dbHelper.updatePolicy(policy);
                 }
             });
             holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
@@ -82,7 +82,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
                     SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.addPolicy(policy);
+                    dbHelper.updatePolicy(policy);
                 }
             });
             holder.loggingSwitch.setOnCheckedChangeListener((v, isChecked) -> {
@@ -92,7 +92,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     String message = v.getContext().getString(
                             isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
                     SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.addPolicy(policy);
+                    dbHelper.updatePolicy(policy);
                 }
             });
             holder.delete.setOnClickListener(v -> new AlertDialogBuilder(v.getContext())
@@ -104,7 +104,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                         notifyItemRangeChanged(position, policyList.size());
                         SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
                                 Snackbar.LENGTH_SHORT).show();
-                        dbHelper.deletePolicy(policy.uid);
+                        dbHelper.deletePolicy(policy);
                     })
                     .setNegativeButton(R.string.no_thanks, null)
                     .setCancelable(true)
@@ -118,7 +118,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
 
         } catch (PackageManager.NameNotFoundException e) {
             policyList.remove(position);
-            dbHelper.deletePolicy(policy.uid);
+            dbHelper.deletePolicy(policy);
             onBindViewHolder(holder, position);
         }
     }

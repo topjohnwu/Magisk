@@ -37,11 +37,11 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         // Currently new database, no upgrading
     }
 
-    public boolean deletePolicy(int uid) {
+    public boolean deletePolicy(Policy policy) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, "uid=?", new String[] { String.valueOf(uid) });
+        db.delete(TABLE_NAME, "package_name=?", new String[] { policy.packageName });
         db.close();
-        return getPolicy(uid) == null;
+        return getPolicy(policy.packageName) == null;
     }
 
     public Policy getPolicy(int uid) {
@@ -56,9 +56,28 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         return policy;
     }
 
+    public Policy getPolicy(String pkg) {
+        Policy policy = null;
+        SQLiteDatabase db = getReadableDatabase();
+        try (Cursor c = db.query(TABLE_NAME, null, "package_name=?", new String[] { pkg }, null, null, null)) {
+            if (c.moveToNext()) {
+                policy = new Policy(c);
+            }
+        }
+        db.close();
+        return policy;
+    }
+
     public void addPolicy(Policy policy) {
         SQLiteDatabase db = getWritableDatabase();
         db.replace(TABLE_NAME, null, policy.getContentValues());
+        db.close();
+    }
+
+    public void updatePolicy(Policy policy) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.update(TABLE_NAME, policy.getContentValues(), "package_name=?",
+                new String[] { policy.packageName });
         db.close();
     }
 
@@ -67,16 +86,12 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         Policy policy;
         // Clear outdated policies
-        db.delete(TABLE_NAME, "until > 0 and until < ?", new String[] { String.valueOf(System.currentTimeMillis()) });
+        db.delete(TABLE_NAME, "until > 0 AND until < ?",
+                new String[] { String.valueOf(System.currentTimeMillis()) });
         try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, "app_name ASC")) {
             while (c.moveToNext()) {
                 policy = new Policy(c);
-                // Package is uninstalled
-                if (pm.getPackagesForUid(policy.uid) == null) {
-                    deletePolicy(policy.uid);
-                } else {
-                    ret.add(policy);
-                }
+                ret.add(policy);
             }
         }
         db.close();

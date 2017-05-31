@@ -89,9 +89,6 @@ public class SuRequestActivity extends Activity {
     }
 
     private void showRequest() {
-
-        Logger.debug("Show request");
-
         switch (magiskManager.suResponseType) {
             case AUTO_DENY:
                 handleAction(Policy.DENY, 0);

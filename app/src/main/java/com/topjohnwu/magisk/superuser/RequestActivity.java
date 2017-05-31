@@ -17,7 +17,7 @@ public class RequestActivity extends Activity {
             return;
         }
 
-        getApplicationContext().initSU();
+        getApplicationContext().initSUConfig();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).setClass(this, SuRequestActivity.class);
         startActivity(intent);
         finish();

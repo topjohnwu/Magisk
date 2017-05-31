@@ -72,6 +72,7 @@ public class MagiskManager extends Application {
     public boolean magiskHide;
     public boolean isDarkTheme;
     public boolean updateNotification;
+    public boolean suReauth;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -129,6 +130,7 @@ public class MagiskManager extends Application {
                 .putBoolean("notification", updateNotification)
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
                 .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
+                .putBoolean("su_reauth", suReauth)
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
                 .putString("su_auto_response", String.valueOf(suResponseType))
                 .putString("su_notification", String.valueOf(suNotificationType))
@@ -140,13 +142,18 @@ public class MagiskManager extends Application {
         Shell.su("PATH=$PATH:" + busybox.getParent());
     }
 
+    public void initSUConfig() {
+        suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+        suReauth = prefs.getBoolean("su_reauth", false);
+    }
+
     public void initSU() {
         // Create the app data directory, so su binary can work properly
         new File(getApplicationInfo().dataDir).mkdirs();
 
-        suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
-        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
-        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+        initSUConfig();
 
         List<String> ret = Shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
