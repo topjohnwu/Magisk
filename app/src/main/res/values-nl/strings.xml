@@ -158,12 +158,23 @@
     <string name="request_timeout">Verzoek time-out</string>
     <string name="superuser_notification">Superuser melding</string>
     <string name="request_timeout_summary">%1$s seconden</string>
+    <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
+    <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
 
     <string name="settings_development_category">App-ontwikkeling</string>
     <string name="settings_developer_logging_title">Geavanceerde debug logs inschakelen</string>
     <string name="settings_developer_logging_summary">Aanvinken om uitgebreide logs in te schakelen</string>
     <string name="settings_shell_logging_title">Shell-opdracht debug logs inschakelen</string>
     <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer logs in te schakelen</string>
+    
+    <string name="multiuser_mode">Multi-gebruiker modus</string>
+    <string name="settings_owner_only">Alleen apparaateigenaar</string>
+    <string name="settings_owner_manage">Beheerd door apparaateigenaar</string>
+    <string name="settings_user_independent">Gebruiker onafhankelijk</string>
+    <string name="owner_only_summary">Alleen eigenaar heeft roottoegang</string>
+    <string name="owner_manage_summary">Alleen eigenaar kan roottoegang beheren en prompt verzoeken ontvangen</string>
+    <string name="user_indepenent_summary">Iedere gebruiker heeft eigen afzonderlijke rootregels</string>
+    <string name="multiuser_hint_owner_request">Een verzoek is naar de apparaateigenaar verstuurd. Wissel van gebruiker en sta de rechten toe</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
