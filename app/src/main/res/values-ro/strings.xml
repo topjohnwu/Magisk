@@ -12,7 +12,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk instalat v%1$s</string>
-    <string name="magisk_version_core_only">Magisk instalat v%1$s (Mod Doar Nucleu)</string>
+    <string name="magisk_version_core_only">Magisk instalat v%1$s (Mod de bază)</string>
     <string name="magisk_version_error">Magisk nu este instalat</string>
 
     <string name="checking_for_updates">Verificare actualizări…</string>
@@ -112,10 +112,10 @@
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>
     <string name="repo_cache_cleared">Arhive cache eliminate</string>
-    <string name="safetyNet_hide_notice">Această aplicație utilizează SafetyNet\nDeja manipulat de MagiskHide în mod implicit</string>
+    <string name="safetyNet_hide_notice">Această aplicație utilizează SafetyNet\nDeja gestionat de MagiskHide în mod implicit</string>
     <string name="start_magiskhide">Pornire MagiskHide…</string>
     <string name="no_magisksu_title">Nu se utilizează MagiskSU!</string>
-    <string name="no_magisksu_msg">Nu aţi obţinut root cu MagiskSU, utilizarea MagiskHide s-ar putea să nu fie suficientă!\nNu este susținută oficial și veți avea nevoie de instrumente suplimentare (de ex. suhide) pentru a trece Safety Net.</string>
+    <string name="no_magisksu_msg">Nu aţi obţinut acces la root cu MagiskSU, utilizarea MagiskHide s-ar putea să nu fie suficientă!\nNu este susținută oficial și veți avea nevoie de instrumente suplimentare (de ex. suhide) pentru a trece Safety Net.</string>
     <string name="understand">Înţeleg</string>
     <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
@@ -131,7 +131,7 @@
     <string name="settings_clear_cache_title">Eliminare cache</string>
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
 
-    <string name="settings_core_only_title">Mod Doar nucleu</string>
+    <string name="settings_core_only_title">Mod de bază</string>
     <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide, systemless hosts şi busybox vor fi în continuare activate</string>
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
     <string name="settings_busybox_title">Activare BusyBox</string>
@@ -152,6 +152,17 @@
     <string name="request_timeout">Expirare</string>
     <string name="superuser_notification">Notificare Superuser</string>
     <string name="request_timeout_summary">%1$s secunde</string>
+    <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
+    <string name="settings_su_reauth_summary">Reautentificare permisiuni pentru superuser după o actualizare a aplicației</string>
+ 
+    <string name="multiuser_mode">Mod Multiutilizator</string>
+    <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
+    <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>
+    <string name="settings_user_independent">Utilizator independent</string>
+    <string name="owner_only_summary">Numai proprietarul are acces la root</string>
+    <string name="owner_manage_summary">Numai proprietarul poate gestiona accesul la root și să primească solicitări</string>
+    <string name="user_indepenent_summary">Fiecare utilizator are propriile reguli de acces la root</string>
+    <string name="multiuser_hint_owner_request">A fost trimisă o solicitare proprietarului dispozitivului. Comutaţi la proprietar și acordați permisiunea</string>
 
     <string name="settings_development_category">Dezvoltare aplicaţie</string>
     <string name="settings_developer_logging_title">Activați logarea avansată de depanare</string>
