@@ -15,6 +15,7 @@ import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -188,24 +189,12 @@ public class SettingsActivity extends Activity {
                     }.exec();
                     break;
                 case "su_access":
-                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access", 0);
-                    new SerialTask<Void, Void, Void>(getActivity()) {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            Shell.su("setprop " + MagiskManager.ROOT_ACCESS_PROP + " " + magiskManager.suAccessState);
-                            return null;
-                        }
-                    }.exec();
+                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access", 3);
+                    magiskManager.suDB.setSettings(SuDatabaseHelper.ROOT_ACCESS, magiskManager.suAccessState);
                     break;
                 case "multiuser_mode":
                     magiskManager.multiuserMode = Utils.getPrefsInt(prefs, "multiuser_mode", 0);
-                    new SerialTask<Void, Void, Void>(getActivity()) {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            Shell.su("setprop " + MagiskManager.MULTIUSER_MODE_PROP + " " + magiskManager.multiuserMode);
-                            return null;
-                        }
-                    }.exec();
+                    magiskManager.suDB.setSettings(SuDatabaseHelper.MULTIUSER_MODE, magiskManager.multiuserMode);
                 case "su_request_timeout":
                     magiskManager.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
                     break;

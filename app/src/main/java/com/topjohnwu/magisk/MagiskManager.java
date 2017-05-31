@@ -161,18 +161,8 @@ public class MagiskManager extends Application {
             isSuClient = suVersion.toUpperCase().contains("MAGISK");
         }
         if (isSuClient) {
-            ret = Shell.sh("getprop " + ROOT_ACCESS_PROP);
-            if (Utils.isValidShellResponse(ret)) {
-                suAccessState = Integer.parseInt(ret.get(0));
-            } else {
-                suAccessState = 0;
-            }
-            ret = Shell.sh("getprop " + MULTIUSER_MODE_PROP);
-            if (Utils.isValidShellResponse(ret)) {
-                multiuserMode = Integer.parseInt(ret.get(0));
-            } else {
-                multiuserMode = 0;
-            }
+            suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, 3);
+            multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, 0);
         }
     }
 

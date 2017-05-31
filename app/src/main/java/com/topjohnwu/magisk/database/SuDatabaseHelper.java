@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -17,6 +18,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class SuDatabaseHelper extends SQLiteOpenHelper {
+
+    public static final String ROOT_ACCESS = "root_access";
+    public static final String MULTIUSER_MODE = "multiuser_mode";
 
     private static final int DATABASE_VER = 2;
     private static final String POLICY_TABLE = "policies";
@@ -205,5 +209,26 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(LOG_TABLE, null, null);
         db.close();
+    }
+
+    public void setSettings(String key, int value) {
+        ContentValues data = new ContentValues();
+        data.put("key", key);
+        data.put("value", value);
+        SQLiteDatabase db = getWritableDatabase();
+        db.replace(SETTINGS_TABLE, null, data);
+        db.close();
+    }
+
+    public int getSettings(String key, int defaultValue) {
+        SQLiteDatabase db = getReadableDatabase();
+        int value = defaultValue;
+        try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?", new String[] { key }, null, null, null)) {
+            while (c.moveToNext()) {
+                value = c.getInt(c.getColumnIndex("value"));
+            }
+        }
+        db.close();
+        return value;
     }
 }
