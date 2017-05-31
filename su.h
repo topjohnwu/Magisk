@@ -12,14 +12,14 @@
 #define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
 
 // Property check for root access
-#define ROOT_ACCESS_PROP          "persist.magisk.root"
+#define ROOT_ACCESS_ENTRY         "root_access"
 #define ROOT_ACCESS_DISABLED      0
 #define ROOT_ACCESS_APPS_ONLY     1
 #define ROOT_ACCESS_ADB_ONLY      2
 #define ROOT_ACCESS_APPS_AND_ADB  3
 
 // Property for multiuser
-#define MULTIUSER_MODE_PROP             "persist.magisk.multiuser"
+#define MULTIUSER_MODE_ENTRY            "multiuser_mode"
 #define MULTIUSER_MODE_OWNER_ONLY       0
 #define MULTIUSER_MODE_OWNER_MANAGED    1
 #define MULTIUSER_MODE_USER             2
@@ -51,13 +51,14 @@ typedef enum {
     ALLOW = 2,
 } policy_t;
 
-struct su_initiator {
-    pid_t pid;
+struct su_info {
     unsigned uid;
     policy_t policy;
     pthread_mutex_t lock;
     int count;
     int clock;
+    int multiuser_mode;
+    int root_access;
     struct list_head pos;
 };
 
@@ -75,8 +76,6 @@ struct su_user_info {
     // the user in android userspace (multiuser)
     // that invoked this action.
     unsigned android_user_id;
-    // how su behaves with multiuser. see enum below.
-    int multiuser_mode;
     // path to superuser directory. this is populated according
     // to the multiuser mode.
     // this is used to check uid/gid for protecting socket.
@@ -89,9 +88,10 @@ struct su_user_info {
 };
 
 struct su_context {
-    struct su_initiator *info;
+    struct su_info *info;
     struct su_request to;
     struct su_user_info user;
+    pid_t pid;
     int notify;
     mode_t umask;
     char sock_path[PATH_MAX];

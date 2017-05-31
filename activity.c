@@ -40,7 +40,7 @@ static void silent_run(char* const args[]) {
 }
 
 static int setup_user(struct su_context *ctx, char* user) {
-	switch (ctx->user.multiuser_mode) {
+	switch (ctx->info->multiuser_mode) {
 	case MULTIUSER_MODE_OWNER_ONLY:   /* Should already be denied if not owner */
 	case MULTIUSER_MODE_OWNER_MANAGED:
 		sprintf(user, "%d", 0);
@@ -60,7 +60,7 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	sprintf(toUid, "%d", ctx->to.uid);
 
 	char pid[16];
-	sprintf(pid, "%d", ctx->info->pid);
+	sprintf(pid, "%d", ctx->pid);
 
 	char user[16];
 	int notify = setup_user(ctx, user);

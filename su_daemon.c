@@ -63,27 +63,16 @@ static void sigpipe_handler(int sig) {
 	LOGD("su: Client killed unexpectedly\n");
 }
 
-static int get_multiuser_mode() {
-	char *prop = getprop(MULTIUSER_MODE_PROP);
-	if (prop) {
-		int ret = atoi(prop);
-		free(prop);
-		return ret;
-	}
-	return MULTIUSER_MODE_OWNER_ONLY;
-}
-
-
 // Maintain the lists periodically
 static void *collector(void *args) {
 	LOGD("su: collector started\n");
 	struct list_head *pos, *temp;
-	struct su_initiator *node;
+	struct su_info *node;
 	while(1) {
 		sleep(1);
 		pthread_mutex_lock(&list_lock);
 		list_for_each(pos, &active_list) {
-			node = list_entry(pos, struct su_initiator, pos);
+			node = list_entry(pos, struct su_info, pos);
 			--node->clock;
 			// Timeout, move to waiting list
 			if (node->clock == 0) {
@@ -94,7 +83,7 @@ static void *collector(void *args) {
 			}
 		}
 		list_for_each(pos, &waiting_list) {
-			node = list_entry(pos, struct su_initiator, pos);
+			node = list_entry(pos, struct su_info, pos);
 			// Nothing is using the info, remove it
 			if (node->count == 0) {
 				temp = pos;
@@ -111,7 +100,7 @@ static void *collector(void *args) {
 void su_daemon_receiver(int client) {
 	LOGD("su: request from client: %d\n", client);
 
-	struct su_initiator *info = NULL, *node;
+	struct su_info *info = NULL, *node;
 	struct list_head *pos;
 	int new_request = 0;
 
@@ -129,7 +118,7 @@ void su_daemon_receiver(int client) {
 
 	// Search for existing in the active list
 	list_for_each(pos, &active_list) {
-		node = list_entry(pos, struct su_initiator, pos);
+		node = list_entry(pos, struct su_info, pos);
 		if (node->uid == credential.uid)
 			info = node;
 	}
@@ -154,8 +143,6 @@ void su_daemon_receiver(int client) {
 	// Lock before the policy is determined
 	pthread_mutex_lock(&info->lock);
 
-	info->pid = credential.pid;
-
 	// Default values
 	struct su_context ctx = {
 		.info = info,
@@ -168,8 +155,8 @@ void su_daemon_receiver(int client) {
 		},
 		.user = {
 			.android_user_id = info->uid / 100000,
-			.multiuser_mode = get_multiuser_mode(),
 		},
+		.pid = credential.pid,
 		.umask = 022,
 		.notify = new_request,
 	};
@@ -191,8 +178,12 @@ void su_daemon_receiver(int client) {
 
 	// Not cached, do the checks
 	if (info->policy == QUERY) {
+		// Get data from database
+		database_check(su_ctx);
+
+		// Handle multiuser denies
 		if (su_ctx->user.android_user_id &&
-			su_ctx->user.multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
+			su_ctx->info->multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
 			info->policy = DENY;
 			su_ctx->notify = 0;
 		}
@@ -200,18 +191,16 @@ void su_daemon_receiver(int client) {
 		// always allow if this is Magisk Manager
 		if (info->policy == QUERY && (info->uid % 100000) == (st.st_uid % 100000)) {
 			info->policy = ALLOW;
+			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 			su_ctx->notify = 0;
 		}
 
 		// always allow if it's root
 		if (info->uid == UID_ROOT) {
 			info->policy = ALLOW;
+			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 			su_ctx->notify = 0;
 		}
-
-		// If not determined, check database
-		if (info->policy == QUERY)
-			database_check(su_ctx);
 
 		// If still not determined, open a pipe and wait for results
 		if (info->policy == QUERY)

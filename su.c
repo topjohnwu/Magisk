@@ -237,7 +237,7 @@ int su_daemon_main(int argc, char **argv) {
 			printf("%s\n", MAGISKSU_VER_STR);
 			exit2(EXIT_SUCCESS);
 		case 'u':
-			switch (su_ctx->user.multiuser_mode) {
+			switch (su_ctx->info->multiuser_mode) {
 			case MULTIUSER_MODE_USER:
 				printf("Owner only: Only owner has root access\n");
 				break;
@@ -293,34 +293,26 @@ int su_daemon_main(int argc, char **argv) {
 	// Setup done, now every error leads to deny
 	err_handler = deny;
 
-	// Check property of root configuration
-	char *root_prop = getprop(ROOT_ACCESS_PROP);
-	if (root_prop) {
-		int prop_status = atoi(root_prop);
-		switch (prop_status) {
-		case ROOT_ACCESS_DISABLED:
-			LOGE("Root access is disabled!\n");
+	// Check root_access configuration
+	switch (su_ctx->info->root_access) {
+	case ROOT_ACCESS_DISABLED:
+		LOGE("Root access is disabled!\n");
+		exit(EXIT_FAILURE);
+	case ROOT_ACCESS_APPS_ONLY:
+		if (su_ctx->info->uid == UID_SHELL) {
+			LOGE("Root access is disabled for ADB!\n");
 			exit(EXIT_FAILURE);
-		case ROOT_ACCESS_APPS_ONLY:
-			if (su_ctx->info->uid == UID_SHELL) {
-				LOGE("Root access is disabled for ADB!\n");
-				exit(EXIT_FAILURE);
-			}
-			break;
-		case ROOT_ACCESS_ADB_ONLY:
-			if (su_ctx->info->uid != UID_SHELL) {
-				LOGE("Root access limited to ADB only!\n");
-				exit(EXIT_FAILURE);
-			}
-			break;
-		case ROOT_ACCESS_APPS_AND_ADB:
-		default:
-			break;
 		}
-		free(root_prop);
-	} else {
-		// Not initialized yet, set the prop to allow everything by default
-		setprop(ROOT_ACCESS_PROP, xstr(ROOT_ACCESS_APPS_AND_ADB));
+		break;
+	case ROOT_ACCESS_ADB_ONLY:
+		if (su_ctx->info->uid != UID_SHELL) {
+			LOGE("Root access limited to ADB only!\n");
+			exit(EXIT_FAILURE);
+		}
+		break;
+	case ROOT_ACCESS_APPS_AND_ADB:
+	default:
+		break;
 	}
 
 	// New request or no db exist, notify user for response
