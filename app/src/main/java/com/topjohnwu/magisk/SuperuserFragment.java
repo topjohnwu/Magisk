@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.Policy;
 
 import java.util.List;
@@ -33,15 +32,15 @@ public class SuperuserFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         PackageManager pm = getActivity().getPackageManager();
+        MagiskManager magiskManager = getApplication();
 
-        SuDatabaseHelper dbHelper = new SuDatabaseHelper(getActivity());
-        List<Policy> policyList = dbHelper.getPolicyList(pm);
+        List<Policy> policyList = magiskManager.suDB.getPolicyList(pm);
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(new PolicyAdapter(policyList, dbHelper, pm));
+            recyclerView.setAdapter(new PolicyAdapter(policyList, magiskManager.suDB, pm));
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

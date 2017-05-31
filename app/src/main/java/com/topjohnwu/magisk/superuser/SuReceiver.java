@@ -3,13 +3,12 @@ package com.topjohnwu.magisk.superuser;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Process;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.database.SuLogDatabaseHelper;
 
 import java.util.Date;
 
@@ -46,12 +45,12 @@ public class SuReceiver extends BroadcastReceiver {
         action = intent.getStringExtra("action");
         if (action == null) return;
 
-        SuDatabaseHelper suDbHelper = new SuDatabaseHelper(context);
-        policy = suDbHelper.getPolicy(fromUid);
+        policy = magiskManager.suDB.getPolicy(fromUid);
         if (policy == null) {
             try {
                 policy = new Policy(fromUid, context.getPackageManager());
-            } catch (Throwable throwable) {
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
                 return;
             }
         }
@@ -89,8 +88,7 @@ public class SuReceiver extends BroadcastReceiver {
             log.fromPid = pid;
             log.command = command;
             log.date = new Date();
-            SuLogDatabaseHelper logDbHelper = new SuLogDatabaseHelper(context);
-            logDbHelper.addLog(log);
+            magiskManager.suDB.addLog(log);
         }
     }
 }

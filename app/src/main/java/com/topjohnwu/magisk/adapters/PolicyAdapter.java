@@ -49,78 +49,72 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Policy policy = policyList.get(position);
-        try {
-            holder.setExpanded(expandList.contains(policy));
 
-            holder.itemView.setOnClickListener(view -> {
-                if (holder.mExpanded) {
-                    holder.collapse();
-                    expandList.remove(policy);
-                } else {
-                    holder.expand();
-                    expandList.add(policy);
-                }
-            });
+        holder.setExpanded(expandList.contains(policy));
 
-            holder.appName.setText(policy.appName);
-            holder.packageName.setText(policy.packageName);
-            holder.appIcon.setImageDrawable(pm.getPackageInfo(policy.packageName, 0).applicationInfo.loadIcon(pm));
-            holder.masterSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if ((isChecked && policy.policy == Policy.DENY) ||
-                        (!isChecked && policy.policy == Policy.ALLOW)) {
-                    policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
-                    String message = v.getContext().getString(
-                            isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
-                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.updatePolicy(policy);
-                }
-            });
-            holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if ((isChecked && !policy.notification) ||
-                        (!isChecked && policy.notification)) {
-                    policy.notification = isChecked;
-                    String message = v.getContext().getString(
-                            isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
-                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.updatePolicy(policy);
-                }
-            });
-            holder.loggingSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-                if ((isChecked && !policy.logging) ||
-                        (!isChecked && policy.logging)) {
-                    policy.logging = isChecked;
-                    String message = v.getContext().getString(
-                            isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
-                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                    dbHelper.updatePolicy(policy);
-                }
-            });
-            holder.delete.setOnClickListener(v -> new AlertDialogBuilder(v.getContext())
-                    .setTitle(R.string.su_revoke_title)
-                    .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
-                    .setPositiveButton(R.string.yes, (dialog, which) -> {
-                        policyList.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, policyList.size());
-                        SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
-                                Snackbar.LENGTH_SHORT).show();
-                        dbHelper.deletePolicy(policy);
-                    })
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .setCancelable(true)
-                    .show());
-            holder.masterSwitch.setChecked(policy.policy == Policy.ALLOW);
-            holder.notificationSwitch.setChecked(policy.notification);
-            holder.loggingSwitch.setChecked(policy.logging);
+        holder.itemView.setOnClickListener(view -> {
+            if (holder.mExpanded) {
+                holder.collapse();
+                expandList.remove(policy);
+            } else {
+                holder.expand();
+                expandList.add(policy);
+            }
+        });
 
-            // Hide for now
-            holder.moreInfo.setVisibility(View.GONE);
+        holder.appName.setText(policy.appName);
+        holder.packageName.setText(policy.packageName);
+        holder.appIcon.setImageDrawable(policy.info.loadIcon(pm));
+        holder.masterSwitch.setOnCheckedChangeListener((v, isChecked) -> {
+            if ((isChecked && policy.policy == Policy.DENY) ||
+                    (!isChecked && policy.policy == Policy.ALLOW)) {
+                policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
+                String message = v.getContext().getString(
+                        isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
+                SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                dbHelper.updatePolicy(policy);
+            }
+        });
+        holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
+            if ((isChecked && !policy.notification) ||
+                    (!isChecked && policy.notification)) {
+                policy.notification = isChecked;
+                String message = v.getContext().getString(
+                        isChecked ? R.string.su_snack_notif_on : R.string.su_snack_notif_off, policy.appName);
+                SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                dbHelper.updatePolicy(policy);
+            }
+        });
+        holder.loggingSwitch.setOnCheckedChangeListener((v, isChecked) -> {
+            if ((isChecked && !policy.logging) ||
+                    (!isChecked && policy.logging)) {
+                policy.logging = isChecked;
+                String message = v.getContext().getString(
+                        isChecked ? R.string.su_snack_log_on : R.string.su_snack_log_off, policy.appName);
+                SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                dbHelper.updatePolicy(policy);
+            }
+        });
+        holder.delete.setOnClickListener(v -> new AlertDialogBuilder(v.getContext())
+                .setTitle(R.string.su_revoke_title)
+                .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
+                .setPositiveButton(R.string.yes, (dialog, which) -> {
+                    policyList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, policyList.size());
+                    SnackbarMaker.make(holder.itemView, v.getContext().getString(R.string.su_snack_revoke, policy.appName),
+                            Snackbar.LENGTH_SHORT).show();
+                    dbHelper.deletePolicy(policy);
+                })
+                .setNegativeButton(R.string.no_thanks, null)
+                .setCancelable(true)
+                .show());
+        holder.masterSwitch.setChecked(policy.policy == Policy.ALLOW);
+        holder.notificationSwitch.setChecked(policy.notification);
+        holder.loggingSwitch.setChecked(policy.logging);
 
-        } catch (PackageManager.NameNotFoundException e) {
-            policyList.remove(position);
-            dbHelper.deletePolicy(policy);
-            onBindViewHolder(holder, position);
-        }
+        // Hide for now
+        holder.moreInfo.setVisibility(View.GONE);
     }
 
     @Override

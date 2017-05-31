@@ -21,13 +21,9 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.utils.CallbackEvent;
-import com.topjohnwu.magisk.utils.Logger;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,7 +47,6 @@ public class SuRequestActivity extends Activity {
     private LocalSocket socket;
     private PackageManager pm;
     private MagiskManager magiskManager;
-    private SuDatabaseHelper suDB;
 
     private boolean hasTimeout;
     private Policy policy;
@@ -64,7 +59,6 @@ public class SuRequestActivity extends Activity {
 
         pm = getPackageManager();
         magiskManager = getApplicationContext();
-        suDB = new SuDatabaseHelper(this);
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
@@ -109,7 +103,7 @@ public class SuRequestActivity extends Activity {
         setContentView(R.layout.activity_request);
         ButterKnife.bind(this);
 
-        appIcon.setImageDrawable(policy.info.applicationInfo.loadIcon(pm));
+        appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);
         packageNameView.setText(policy.packageName);
 
@@ -180,7 +174,7 @@ public class SuRequestActivity extends Activity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            new SuDatabaseHelper(this).addPolicy(policy);
+            magiskManager.suDB.addPolicy(policy);
         }
         handleAction();
     }
@@ -220,7 +214,7 @@ public class SuRequestActivity extends Activity {
                 }
 
                 int uid = payload.getAsInteger("uid");
-                policy = suDB.getPolicy(uid);
+                policy = magiskManager.suDB.getPolicy(uid);
                 if (policy == null) {
                     policy = new Policy(uid, pm);
                 }

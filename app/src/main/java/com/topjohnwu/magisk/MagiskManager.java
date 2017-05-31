@@ -6,12 +6,11 @@ import android.content.pm.ApplicationInfo;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.superuser.Policy;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
@@ -24,7 +23,6 @@ import java.util.List;
 public class MagiskManager extends Application {
 
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
-    public static final String MAGISK_HIDE_PATH = "/magisk/.core/magiskhide/";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_PATH = "/magisk";
     public static final String UNINSTALLER = "magisk_uninstaller.sh";
@@ -43,7 +41,6 @@ public class MagiskManager extends Application {
     public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();
     public final CallbackEvent<Void> updateCheckDone = new CallbackEvent<>();
     public final CallbackEvent<Void> safetyNetDone = new CallbackEvent<>();
-    public final SparseArray<CallbackEvent<Policy>> uidSuRequest = new SparseArray<>();
 
     // Info
     public String magiskVersionString;
@@ -80,7 +77,9 @@ public class MagiskManager extends Application {
     public int suResponseType;
     public int suNotificationType;
 
+    // Global resources
     public SharedPreferences prefs;
+    public SuDatabaseHelper suDB;
 
     private static Handler mHandler = new Handler();
 
@@ -88,6 +87,7 @@ public class MagiskManager extends Application {
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        suDB = new SuDatabaseHelper(this);
     }
 
     public void toast(String msg, int duration) {
