@@ -243,12 +243,11 @@ static void cpio_dmverity(struct vector *v) {
 static void cpio_forceencrypt(struct vector *v) {
 	cpio_file *f;
 	size_t read, write;
-	#define ENCRYPT_LIST_SIZE 2
-	const char *ENCRYPT_LIST[ENCRYPT_LIST_SIZE] = { "forceencrypt", "forcefdeorfbe" };
+	const char *ENCRYPT_LIST[] = { "forceencrypt", "forcefdeorfbe", "fileencryptioninline", NULL };
 	vec_for_each(v, f) {
 		if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
 			for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
-				for (int i = 0 ; i < ENCRYPT_LIST_SIZE; ++i) {
+				for (int i = 0 ; ENCRYPT_LIST[i]; ++i) {
 					if (strncmp(f->data + read, ENCRYPT_LIST[i], strlen(ENCRYPT_LIST[i])) == 0) {
 						memcpy(f->data + write, "encryptable", 11);
 						printf("Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);

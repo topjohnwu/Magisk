@@ -139,7 +139,6 @@ void cleanup() {
 	unlink(RAMDISK_FILE ".unsupport");
 	unlink(SECOND_FILE);
 	unlink(DTB_FILE);
-	unlink(NEW_BOOT);
 	for (int i = 0; SUP_EXT_LIST[i]; ++i) {
 		sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 		unlink(name);

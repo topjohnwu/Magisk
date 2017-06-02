@@ -132,8 +132,5 @@ void repack(const char* orig_image, const char* out_image) {
 	print_info();
 
 	munmap(orig, size);
-	if (lseek(fd, 0, SEEK_END) > size) {
-		LOGE(2, "Boot partition too small!\n");
-	}
 	close(fd);
 }
