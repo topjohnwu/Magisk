@@ -15,8 +15,6 @@ void unpack(const char* image) {
 	printf("Parsing boot image: [%s]\n\n", image);
 	parse_img(orig, size);
 
-	char name[PATH_MAX];
-
 	// Dump kernel
 	if (mtk_kernel) {
 		kernel += 512;

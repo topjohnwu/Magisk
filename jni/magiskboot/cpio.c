@@ -193,18 +193,20 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, struc
 
 static void cpio_test(struct vector *v) {
 	#define MAGISK_PATCH  0x1
-	#define SUPERSU_PATCH 0x2
+	#define OTHER_PATCH 0x2
 	int ret = 0;
 	cpio_file *f;
+	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "init.supersu.rc", NULL };
 	vec_for_each(v, f) {
-		if (strcmp(f->filename, "sbin/launch_daemonsu.sh") == 0) {
-			ret |= SUPERSU_PATCH;
-		} else if (strcmp(f->filename, "init.magisk.rc") == 0) {
-			ret |= MAGISK_PATCH;
+		for (int i = 0; OTHER_LIST[i]; ++i) {
+			if (strcmp(f->filename, OTHER_LIST[i]) == 0)
+				ret |= OTHER_PATCH;
 		}
+		if (strcmp(f->filename, "init.magisk.rc") == 0)
+			ret |= OTHER_PATCH;
 	}
 	cpio_vec_destroy(v);
-	exit((ret & SUPERSU_PATCH) ? SUPERSU_PATCH : (ret & MAGISK_PATCH));
+	exit((ret & OTHER_PATCH) ? OTHER_PATCH : (ret & MAGISK_PATCH));
 }
 
 static int check_verity_pattern(const char *s) {
