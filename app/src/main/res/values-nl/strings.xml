@@ -14,7 +14,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s geïnstalleerd</string>
-    <string name="magisk_version_core_only">Magisk v%1$s geïnstalleerd (Core Only modus)</string>
+    <string name="magisk_version_core_only">Magisk v%1$s geïnstalleerd (basismodus)</string>
     <string name="magisk_version_error">Magisk niet geïnstalleerd</string>
 
     <string name="checking_for_updates">Controleren op updates…</string>
@@ -137,7 +137,7 @@
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
 
-    <string name="settings_core_only_title">Magisk Core Only modus</string>
+    <string name="settings_core_only_title">Magisk basismodus</string>
     <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, systeemloze hosts, en busybox blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
     <string name="settings_busybox_title">Busybox inschakelen</string>
