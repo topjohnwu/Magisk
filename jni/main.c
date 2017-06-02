@@ -27,7 +27,13 @@ static void usage() {
 		"Usage: %s [applet [arguments]...]\n"
 		"   or: %s --install [SOURCE] <DIR> \n"
 		"   or: %s --list\n"
-		"   or: %s --[boot stage]    start boot stage service\n"
+		"   or: %s --createimg <PATH> <SIZE>\n"
+		"       create ext4 image, SIZE is interpreted in MB\n"
+		"   or: %s --imgsize <PATH>\n"
+		"   or: %s --resizeimg <PATH> <SIZE>\n"
+		"       SIZE is interpreted in MB\n"
+		"   or: %s --[boot stage]\n"
+		"       start boot stage service\n"
 		"   or: %s [options]\n"
 		"   or: applet [arguments]...\n"
 		"\n"
@@ -40,7 +46,7 @@ static void usage() {
 		"       -V            print daemon version code\n"
 		"\n"
 		"Supported applets:\n"
-	, argv0, argv0, argv0, argv0, argv0);
+	, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0);
 
 	for (int i = 0; applet[i]; ++i) {
 		fprintf(stderr, i ? ", %s" : "       %s", applet[i]);
@@ -81,6 +87,33 @@ int main(int argc, char *argv[]) {
 			for (int i = 0; applet[i]; ++i)
 				printf("%s\n", applet[i]);
 			return 0;
+		} else if (strcmp(argv[1], "--createimg") == 0) {
+			if (argc < 4) usage();
+			int size;
+			sscanf(argv[3], "%d", &size);
+			return create_img(argv[2], size);
+		} else if (strcmp(argv[1], "--imgsize") == 0) {
+			if (argc < 3) usage();
+			int used, total;
+			if (get_img_size(argv[2], &used, &total)) {
+				fprintf(stderr, "Cannot check %s size\n", argv[2]);
+				return 1;
+			}
+			printf("Used: %dM\tTotal: %dM\n", used, total);
+			return 0;
+		} else if (strcmp(argv[1], "--resizeimg") == 0) {
+			if (argc < 4) usage();
+			int used, total, size;
+			sscanf(argv[3], "%d", &size);
+			if (get_img_size(argv[2], &used, &total)) {
+				fprintf(stderr, "Cannot check %s size\n", argv[2]);
+				return 1;
+			}
+			if (size <= used) {
+				fprintf(stderr, "Cannot resize smaller than %dM\n", used);
+				return 1;
+			}
+			return resize_img(argv[2], size);
 		} else if (strcmp(argv[1], "--post-fs") == 0) {
 			int fd = connect_daemon();
 			write_int(fd, POST_FS);

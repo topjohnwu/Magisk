@@ -86,37 +86,7 @@ static void umount_image(const char *target, const char *device) {
 	close(fd);
 }
 
-static int get_img_size(const char *img, int *used, int *total) {
-	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer), "e2fsck -n %s 2>/dev/null | tail -n 1", img);
-	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, fd;
-	pid = run_command(&fd, "/system/bin/sh", command);
-	fdgets(buffer, sizeof(buffer), fd);
-	close(fd);
-	if (pid == -1)
-		return 1;
-	waitpid(pid, NULL, 0);
-	char *tok;
-	tok = strtok(buffer, ",");
-	while(tok != NULL) {
-		if (strstr(tok, "blocks"))
-			break;
-		tok = strtok(NULL, ",");
-	}
-	sscanf(tok, "%d/%d", used, total);
-	*used = *used / 256 + 1;
-	*total /= 256;
-	return 0;
-}
-
 #define round_size(a) ((((a) / 32) + 2) * 32)
-
-static int resize_img(const char *img, int size) {
-	LOGI("resize %s to %dM\n", img, size);
-	snprintf(buf, PATH_MAX, "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
-	return system(buf);
-}
 
 static int merge_img(const char *source, const char *target) {
 	if (access(source, F_OK) == -1)
@@ -542,6 +512,9 @@ void post_fs_data(int client) {
 	if (merge_img("/cache/magisk.img", MAINIMG))
 		goto unblock;
 	if (merge_img("/data/magisk_merge.img", MAINIMG))
+		goto unblock;
+
+	if (access(MAINIMG, F_OK) == -1 && create_img(MAINIMG, 64))
 		goto unblock;
 
 	LOGI("* Mounting " MAINIMG "\n");

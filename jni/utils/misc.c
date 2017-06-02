@@ -397,3 +397,53 @@ void get_client_cred(int fd, struct ucred *cred) {
 	if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length))
 		PLOGE("getsockopt");
 }
+
+int create_img(const char *img, int size) {
+	unlink(img);
+	LOGI("Create %s with size %dM\n", img, size);
+	// Create a temp file with the file contexts
+	char file_contexts[] = "/magisk(/.*)? u:object_r:system_file:s0\n";
+	int fd = xopen("/dev/file_contexts_image", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	xwrite(fd, file_contexts, sizeof(file_contexts));
+	close(fd);
+
+	char command[PATH_MAX];
+	snprintf(command, sizeof(command),
+		"make_ext4fs -l %dM -a /magisk -S /dev/file_contexts_image %s", size, img);
+	int ret = system(command);
+	unlink("/dev/file_contexts_image");
+	return ret;
+}
+
+int get_img_size(const char *img, int *used, int *total) {
+	if (access(img, R_OK) == -1)
+		return 1;
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "e2fsck -n %s 2>/dev/null | tail -n 1", img);
+	char *const command[] = { "sh", "-c", buffer, NULL };
+	int pid, fd;
+	pid = run_command(&fd, "/system/bin/sh", command);
+	fdgets(buffer, sizeof(buffer), fd);
+	close(fd);
+	if (pid == -1)
+		return 1;
+	waitpid(pid, NULL, 0);
+	char *tok;
+	tok = strtok(buffer, ",");
+	while(tok != NULL) {
+		if (strstr(tok, "blocks"))
+			break;
+		tok = strtok(NULL, ",");
+	}
+	sscanf(tok, "%d/%d", used, total);
+	*used = *used / 256 + 1;
+	*total /= 256;
+	return 0;
+}
+
+int resize_img(const char *img, int size) {
+	LOGI("Resize %s to %dM\n", img, size);
+	char buffer[PATH_MAX];
+	snprintf(buffer, PATH_MAX, "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
+	return system(buffer);
+}
