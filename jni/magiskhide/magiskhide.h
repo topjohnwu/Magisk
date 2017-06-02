@@ -3,9 +3,6 @@
 
 #include <pthread.h>
 
-#define HIDELIST		"/magisk/.core/magiskhide/hidelist"
-#define DUMMYPATH		"/dev/magisk/dummy"
-
 // Kill process
 void kill_proc(int pid);
 

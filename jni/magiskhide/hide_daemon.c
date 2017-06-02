@@ -113,7 +113,7 @@ int hide_daemon() {
 
 		// Unmount loop mounts
 		vec_for_each_r(&mount_list, line) {
-			if (strstr(line, "/dev/block/loop") && !strstr(line, DUMMYPATH)) {
+			if (strstr(line, "/dev/block/loop") && !strstr(line, DUMMDIR)) {
 				sscanf(line, "%*s %512s", buffer);
 				lazy_unmount(buffer);
 			}

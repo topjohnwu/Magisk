@@ -67,7 +67,7 @@ int file_to_vector(const char* filename, struct vector *v) {
 	size_t len = 0;
 	ssize_t read;
 
-	FILE *fp = xfopen(filename, "r");
+	FILE *fp = fopen(filename, "r");
 	if (fp == NULL)
 		return 1;
 
@@ -105,16 +105,16 @@ int isNum(const char *s) {
 
 /* Read a whole line from file descriptor */
 ssize_t fdgets(char *buf, const size_t size, int fd) {
-	ssize_t read = 0;
+	ssize_t len = 0;
 	buf[0] = '\0';
-	while (xread(fd, buf + read, 1) && read < size - 1) {
-		if (buf[read] == '\0' || buf[read++] == '\n') {
-			buf[read] = '\0';
+	while (read(fd, buf + len, 1) >= 0 && len < size - 1) {
+		if (buf[len] == '\0' || buf[len++] == '\n') {
+			buf[len] = '\0';
 			break;
 		}
 	}
 	buf[size - 1] = '\0';
-	return read;
+	return len;
 }
 
 /* Call func for each process */

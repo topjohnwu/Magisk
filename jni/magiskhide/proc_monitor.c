@@ -101,75 +101,82 @@ void proc_monitor() {
 		break;
 	}
 
-	// Monitor am_proc_start
-	system("logcat -b events -c");
-	char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
-	log_pid = run_command(&log_fd, "/system/bin/logcat", command);
+	while (1) {
+		// Clear previous buffer
+		system("logcat -b events -c");
 
-	while(fdgets(buffer, PATH_MAX, log_fd)) {
-		int ret, comma = 0;
-		char *pos = buffer, *line, processName[256];
+		// Monitor am_proc_start
+		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
+		log_pid = run_command(&log_fd, "/system/bin/logcat", command);
 
-		while(1) {
-			pos = strchr(pos, ',');
-			if(pos == NULL)
-				break;
-			pos[0] = ' ';
-			++comma;
-		}
+		while(fdgets(buffer, PATH_MAX, log_fd)) {
+			int ret, comma = 0;
+			char *pos = buffer, *line, processName[256];
 
-		if (comma == 6)
-			ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
-		else
-			ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
+			while(1) {
+				pos = strchr(pos, ',');
+				if(pos == NULL)
+					break;
+				pos[0] = ' ';
+				++comma;
+			}
 
-		if(ret != 2)
-			continue;
+			if (comma == 6)
+				ret = sscanf(buffer, "[%*d %d %*d %*d %256s", &pid, processName);
+			else
+				ret = sscanf(buffer, "[%*d %d %*d %256s", &pid, processName);
 
-		ret = 0;
+			if(ret != 2)
+				continue;
 
-		// Critical region
-		pthread_mutex_lock(&hide_lock);
-		vec_for_each(hide_list, line) {
-			if (strcmp(processName, line) == 0) {
-				while(1) {
-					ret = 1;
-					for (int i = 0; i < zygote_num; ++i) {
-						read_namespace(pid, buffer, 32);
-						if (strcmp(buffer, zygote_ns[i]) == 0) {
-							usleep(50);
-							ret = 0;
-							break;
+			ret = 0;
+
+			// Critical region
+			pthread_mutex_lock(&hide_lock);
+			vec_for_each(hide_list, line) {
+				if (strcmp(processName, line) == 0) {
+					while(1) {
+						ret = 1;
+						for (int i = 0; i < zygote_num; ++i) {
+							read_namespace(pid, buffer, 32);
+							if (strcmp(buffer, zygote_ns[i]) == 0) {
+								usleep(50);
+								ret = 0;
+								break;
+							}
 						}
+						if (ret) break;
 					}
-					if (ret) break;
+
+					ret = 0;
+
+					// Send pause signal ASAP
+					if (kill(pid, SIGSTOP) == -1) continue;
+
+					LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, buffer);
+
+					// Unmount start
+					xwrite(sv[0], &pid, sizeof(pid));
+
+					// Get the hide daemon return code
+					xxread(sv[0], &ret, sizeof(ret));
+					LOGD("proc_monitor: hide daemon response code: %d\n", ret);
+					break;
 				}
+			}
+			pthread_mutex_unlock(&hide_lock);
 
-				ret = 0;
-
-				// Send pause signal ASAP
-				if (kill(pid, SIGSTOP) == -1) continue;
-
-				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, buffer);
-
-				// Unmount start
-				xwrite(sv[0], &pid, sizeof(pid));
-
-				// Get the hide daemon return code
-				xxread(sv[0], &ret, sizeof(ret));
-				LOGD("proc_monitor: hide daemon response code: %d\n", ret);
-				break;
+			if (ret) {
+				// Wait hide process to kill itself
+				waitpid(hide_pid, NULL, 0);
+				quit_pthread(SIGUSR1);
 			}
 		}
-		pthread_mutex_unlock(&hide_lock);
 
-		if (ret) {
-			// Wait hide process to kill itself
-			waitpid(hide_pid, NULL, 0);
-			quit_pthread(SIGUSR1);
-		}
+		// For some reason it went here, restart logging
+		kill(log_pid, SIGTERM);
+		waitpid(log_pid, NULL, 0);
+		close(log_fd);
+		log_pid = 0;
 	}
-
-	// Should never be here
-	quit_pthread(SIGUSR1);
 }
