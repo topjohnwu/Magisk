@@ -347,6 +347,8 @@ int clone_dir(const char *source, const char *target) {
 }
 
 int rm_rf(const char *target) {
+	if (access(target, F_OK) == -1)
+		return 0;
 	struct stat buf;
 	xlstat(target, &buf);
 	char *next;

@@ -505,8 +505,16 @@ void post_fs_data(int client) {
 	if (access("/cache/data_bin", F_OK) == 0) {
 		rm_rf(DATABIN);
 		rename("/cache/data_bin", DATABIN);
-		system("mv /cache/stock_boot* /data");   // Lazy.... use bash glob....
 	}
+
+	// Magisk Manual Injector support
+	if (access("/data/local/tmp/magisk", F_OK) == 0) {
+		rm_rf(DATABIN);
+		rename("/data/local/tmp/magisk", DATABIN);
+	}
+
+	// Lazy.... use shell blob
+	system("mv /data/magisk/stock_boot* /data;");
 
 	// Merge images
 	if (merge_img("/cache/magisk.img", MAINIMG))
@@ -514,14 +522,26 @@ void post_fs_data(int client) {
 	if (merge_img("/data/magisk_merge.img", MAINIMG))
 		goto unblock;
 
-	if (access(MAINIMG, F_OK) == -1 && create_img(MAINIMG, 64))
-		goto unblock;
+	int new_img = 0;
+
+	if (access(MAINIMG, F_OK) == -1) {
+		if (create_img(MAINIMG, 64))
+			goto unblock;
+		new_img = 1;
+	}
 
 	LOGI("* Mounting " MAINIMG "\n");
 	// Mounting magisk image
 	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
 	if (magiskloop == NULL)
 		goto unblock;
+
+	if (new_img) {
+		mkdir(COREDIR, 0755);
+		mkdir(COREDIR "/post-fs-data.d", 0755);
+		mkdir(COREDIR "/service.d", 0755);
+		mkdir(COREDIR "/props", 0755);
+	}
 
 	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");

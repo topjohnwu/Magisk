@@ -141,7 +141,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "--rm") == 0 && argc > 2) {
 		req = RM_HIDELIST;
 	} else if (strcmp(argv[1], "--ls") == 0) {
-		FILE *fp = xfopen(HIDELIST, "r");
+		FILE *fp = fopen(HIDELIST, "r");
+		if (fp == NULL)
+			return 1;
 		char buffer[512];
 		while (fgets(buffer, sizeof(buffer), fp)) {
 			printf("%s", buffer);
