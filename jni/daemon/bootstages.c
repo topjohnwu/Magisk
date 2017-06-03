@@ -492,7 +492,7 @@ void post_fs_data(int client) {
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
-		char *const command[] = { "sh", UNBLOCKFILE, NULL };
+		char *const command[] = { "sh", "-c", "BOOTMODE=true sh " UNBLOCKFILE, NULL };
 		run_command(NULL, "/system/bin/sh", command);
 		return;
 	}
