@@ -1,15 +1,34 @@
 # Magisk
 
-### How to build Magisk
+## How to build Magisk
 
-1. Download and install NDK
-2. Add the NDK directory into `PATH`
-To check if the `PATH` environment variable is set correctly, try calling `which ndk-build` (`where ndk-build` on Windows) and see if it shows the NDK directory you've just configured
-3. Unix-like users (e.g. Linux & MacOS) please execute `build.sh` through shell  
-Windows users please execute `build.cmd` through cmd
-4. The scripts will show you further instructions and details
+#### Building has been tested on 3 major platforms:
 
-### License
+***macOS 10.12.5***  
+***Ubuntu 17.04 x64***  
+***Windows 10 Creators Update x64***  
+
+#### Environment Requirements
+
+1. Python 3 **(>= 3.5)**: `python3` (or in some cases `python`) should be accessible  
+2. Java runtime: `java` should be accessible  
+3. (Unix only) C compiler: `gcc` should be accessible  
+4. Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder  
+5. NDK: Install NDK using `sdkmanager`, or through Android SDK Manager  
+6. Android build-tools: Should have build-tools version matching `MagiskManager/app/build.gradle` installed  
+
+#### Instructions and Notes
+
+1. The python build script uses ANSI color codes to change the color of the terminal output. For Windows, this **only** works on Windows 10, as previous Windows console do not support them. If you insist to use an older Windows version, a quick Google search should provide many workarounds  
+2. After installing the latest Python 3 on Windows (allow the installer to add Python to PATH, or you'll have to manually set the environment), instead of calling `python3` like most Unix environment, you should call `python` in shell (cmd or Powershell both OK). You can double check the version by `python --version`  
+3. The build script will do several checks, it will refuse to run if the environment doesn't meet the requirements  
+4. For further instructions, please check the built in help message by `python3 build.py -h`  
+(Unix users can simply `./build.py -h`, Windows users, as mentioned, call `python` instead)  
+5. Each action has its own help message, access them by commands like `python3 build.py all -h`  
+6. To build Magisk for release (enabled through the `--release` flag, the script builds in debug mode by default), you will need to provide a Java keystore file, and place it in `release_signature.jks` to sign Magisk Manager APK for release builds. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually)
+7. To properly setup the Android SDK environment, the easiest way is to use Android Studio and open Magisk Manager. If gradle sync passed, your build-tools etc. should be set properly. You can also access SDK Manager GUI within Android Studio to download NDK. Don't forget to add Android Studio's SDK path into environment variable ANDROID_HOME.  
+
+## License
 
 Magisk, including all subprojects (git submodule) is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -21,7 +40,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-### Credits
+## Credits
+
+**MagiskManager** (`MagiskManager`)
+* Copyright 2016-2017, John Wu (@topjohnwu)
+* All contributors and translators
 
 **MagiskSU** (`jni/su`)
 * Copyright 2016-2017, John Wu (@topjohnwu)
@@ -51,5 +74,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 * Makefile for NDK: Copyright 2017, John Wu (@topjohnwu)
 * Each library has its own copyright message in each directories
 
-**Anything Not Mentioned**
+**Others Not Mentioned**
 * Copyright 2016-2017, John Wu (@topjohnwu)
