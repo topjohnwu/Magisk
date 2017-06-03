@@ -203,7 +203,7 @@ static void cpio_test(struct vector *v) {
 				ret |= OTHER_PATCH;
 		}
 		if (strcmp(f->filename, "init.magisk.rc") == 0)
-			ret |= OTHER_PATCH;
+			ret |= MAGISK_PATCH;
 	}
 	cpio_vec_destroy(v);
 	exit((ret & OTHER_PATCH) ? OTHER_PATCH : (ret & MAGISK_PATCH));
