@@ -1,17 +1,17 @@
 #!/sbin/sh
 ##########################################################################################
 #
-# Magisk Boot Image Patcher
+# Magisk Flash Script
 # by topjohnwu
 # 
-# This zip will patch your boot image with Magisk support
+# This script will detect, construct the environment for Magisk
+# It will then call boot_patch.sh to patch the boot image
 #
 ##########################################################################################
 
-MAGISK=true
-
 # Detect whether in boot mode
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
+$BOOTMODE || ps -A | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
 # This path should work in any cases
 TMPDIR=/dev/tmp
@@ -171,21 +171,6 @@ remove_system_su() {
   fi
 }
 
-# --cpio-add <incpio> <mode> <entry> <infile>
-cpio_add() {
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-add ramdisk.cpio $1 $2 $3
-}
-
-# --cpio-extract <incpio> <entry> <outfile>
-cpio_extract() {
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-extract ramdisk.cpio $1 $2
-}
-
-# --cpio-mkdir <incpio> <mode> <entry>
-cpio_mkdir() {
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-mkdir ramdisk.cpio $1 $2
-}
-
 ##########################################################################################
 # Detection
 ##########################################################################################
@@ -213,9 +198,6 @@ fi
 getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
 getvar BOOTIMAGE
-
-[ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 
 # Check if system root is installed and remove
 remove_system_su
@@ -262,10 +244,10 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
-cp -af $BINDIR/. $COMMONDIR/magisk.apk $COMMONDIR/init.magisk.rc  $COMMONDIR/custom_ramdisk_patch.sh $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
 
 chmod -R 755 $MAGISKBIN
-chcon -h u:object_r:system_file:s0 $MAGISKBIN $MAGISKBIN/*
+chcon -hR u:object_r:system_file:s0 $MAGISKBIN
 
 ##########################################################################################
 # Magisk Image
@@ -285,7 +267,7 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  make_ext4fs -l 32M -a /magisk -S $COMMONDIR/file_contexts_image $IMG
+  $BINDIR/magisk --createimg $IMG 64M
 fi
 
 mount_image $IMG /magisk
@@ -295,45 +277,21 @@ if (! is_mounted /magisk); then
 fi
 MAGISKLOOP=$LOOPDEVICE
 
-# Core folders and scripts
-mkdir -p $COREDIR/props $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-cp -af $COMMONDIR/magiskhide/. $COREDIR/magiskhide
+# Core folders
+mkdir -p $COREDIR/props $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 
-chmod -R 755 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/bin $COREDIR/magiskhide $COREDIR/post-fs-data.d $COREDIR/service.d
+chmod -R 755 $COREDIR/post-fs-data.d $COREDIR/service.d
+chown -R 0.0 $COREDIR/post-fs-data.d $COREDIR/service.d
+
+# Legacy cleanup
+mv $COREDIR/magiskhide/hidelist $COREDIR/hidelist 2>/dev/null
+rm -rf $COREDIR/magiskhide $COREDIR/bin
 
 ##########################################################################################
 # Unpack boot
 ##########################################################################################
 
 ui_print "- Found Boot Image: $BOOTIMAGE"
-
-rm -rf $BOOTTMP 2>/dev/null
-mkdir -p $BOOTTMP
-cd $BOOTTMP
-
-ui_print "- Unpacking boot image"
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --unpack $BOOTIMAGE
-
-case $? in
-  1 )
-    ui_print "! Unable to unpack boot image"
-    exit 1
-    ;;
-  2 )
-    ui_print "! Sony ELF32 format detected"
-    ui_print "! Please use BootBridge from @AdrianDC to flash Magisk"
-    exit 1
-    ;;
-  3 )
-    ui_print "! Sony ELF64 format detected"
-    ui_print "! Stock kernel cannot be patched, please use a custom kernel"
-    exit 1
-esac
-
-##########################################################################################
-# Ramdisk restores
-##########################################################################################
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
@@ -343,165 +301,36 @@ if [ -f /data/stock_boot.img ]; then
   LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --compress $STOCKDUMP
 fi
 
-# Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
-SUPERSU=false
-ui_print "- Checking patch status"
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-test ramdisk.cpio
-case $? in
-  0 )  # Stock boot
-    ui_print "- Backing up stock boot image"
-    rm -f /data/stock_boot*
-    SHA1=`LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --sha1 $BOOTIMAGE | tail -n 1`
-    is_mounted /data && STOCKDUMP=/data/stock_boot_${SHA1}.img || STOCKDUMP=/cache/stock_boot_${SHA1}.img
-    dd if=$BOOTIMAGE of=$STOCKDUMP
-    LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --compress $STOCKDUMP
-    cp -af ramdisk.cpio ramdisk.cpio.orig
-    ;;
-  1 )  # Magisk patched
-    # Find SHA1 of stock boot image
-    if [ -z $SHA1 ]; then
-      LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc
-      SHA1=`grep_prop "# STOCKSHA1" init.magisk.rc`
-      [ ! -z $SHA1 ] && STOCKDUMP=/data/stock_boot_${SHA1}.img
-      rm -f init.magisk.rc
-    fi
-    ui_print "- Restoring ramdisk backup"
-    LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-restore ramdisk.cpio
-    if [ $? -ne 0 ]; then
-      # Restore failed, try to find original 
-      ui_print "! Cannot restore from ramdisk backup"
-      ui_print "- Finding stock boot image backup"
-      if [ -f ${STOCKDUMP}.gz ]; then
-        LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
-        LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --unpack stock_boot.img
-        rm -f stock_boot.img
-      else
-        ui_print "! Cannot find stock boot image backup"
-        ui_print "! Will still try to complete installation"
-      fi
-    fi
-    cp -af ramdisk.cpio ramdisk.cpio.orig
-    ;;
-  2 ) # SuperSU patched
-    SUPERSU=true
-    ui_print "- SuperSU patched boot detected!"
-    ui_print "- Adding ramdisk patch script for SuperSU"
-    cp -af $COMMONDIR/custom_ramdisk_patch.sh /data/custom_ramdisk_patch.sh
-    ui_print "- We are using SuperSU's own tools, mounting su.img"
-    is_mounted /data && SUIMG=/data/su.img || SUIMG=/cache/su.img
-    mount_image $SUIMG /su
-    SUPERSULOOP=$LOOPDEVICE
-    if (is_mounted /su); then
-      ui_print "- Restoring ramdisk backup with sukernel"
-      LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-restore ramdisk.cpio ramdisk.cpio.orig
-      if [ $? -ne 0 ]; then
-        ui_print "! Cannot restore from ramdisk"
-        ui_print "- Finding stock boot image backup with sukernel"
-        LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --restore ramdisk.cpio stock_boot.img
-        if [ $? -eq 0 ]; then
-          LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --unpack stock_boot.img
-          cp -af ramdisk.cpio ramdisk.cpio.orig
-          rm stock_boot.img
-        else
-          ui_print "! Cannot find stock boot image backup"
-          exit 1
-        fi
-      fi
-    else
-      ui_print "! SuperSU image mount failed..."
-      ui_print "! Magisk scripts are placed correctly"
-      ui_print "! Flash SuperSU immediately to finish installation"
-      exit 1
-    fi
-    ;;
-esac
+SOURCEDMODE=true
+cd $MAGISKBIN
 
-##########################################################################################
-# Boot image patches
-##########################################################################################
-
-# All ramdisk patch commands are stored in a separate script
-ui_print "- Patching ramdisk"
-
-if $SUPERSU; then
-  # Use sukernel to patch ramdisk, so we can use its own tools to backup
-  sh $COMMONDIR/custom_ramdisk_patch.sh $BOOTTMP/ramdisk.cpio
-
-  # Create ramdisk backups
-  LD_LIBRARY_PATH=$SYSTEMLIB /su/bin/sukernel --cpio-backup ramdisk.cpio.orig ramdisk.cpio ramdisk.cpio
-
-else
-  # The common patches
-  $KEEPVERITY || LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-patch-dmverity ramdisk.cpio
-  $KEEPFORCEENCRYPT || LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-patch-forceencrypt ramdisk.cpio
-
-  # Add magisk entrypoint
-  cpio_extract init.rc init.rc
-  grep "import /init.magisk.rc" init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' init.rc
-  sed -i "/selinux.reload_policy/d" init.rc
-  cpio_add 750 init.rc init.rc
-
-  # sepolicy patches
-  cpio_extract sepolicy sepolicy
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magisk magiskpolicy --load sepolicy --save sepolicy --minimal
-  cpio_add 644 sepolicy sepolicy
-
-  # Add new items
-  [ ! -z $SHA1 ] && echo "# STOCKSHA1=$SHA1" >> $COMMONDIR/init.magisk.rc
-  cpio_add 750 init.magisk.rc $COMMONDIR/init.magisk.rc
-  cpio_add 755 sbin/magisk $BINDIR/magisk
-
-  # Create ramdisk backups
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
-fi
-
-rm -f ramdisk.cpio.orig
-
-##########################################################################################
-# Repack and flash
-##########################################################################################
-
-# Hexpatches
-
-# Remove Samsung RKP in stock kernel
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --hexpatch kernel \
-49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
-A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
-
-ui_print "- Repacking boot image"
-LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --repack $BOOTIMAGE
-
-case $? in
-  1 )
-    ui_print "! Unable to repack boot image!"
-    exit 1
-    ;;
-  2 )
-    ui_print "! Boot partition space insufficient"
-    ui_print "! Remove ramdisk backups and try again"
-    LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --cpio-rm ramdisk.cpio -r .backup
-    LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --repack $BOOTIMAGE
-    if [ $? -eq 2 ]; then
-      ui_print "! Boot partition size still too small..."
-      ui_print "! Unable to install Magisk"
-      exit 1
-    fi
-    ;;
-esac
+# Source the boot patcher
+. $COMMONDIR/boot_patch.sh $BOOTIMAGE
 
 # Sign chromeos boot
 if [ -f chromeos ]; then
-  cp -af $CHROMEDIR/. $MAGISKBIN/chromeos
-  echo > config
-  echo > bootloader
-  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk --version 1 --vmlinuz new-boot.img --config config --arch arm --bootloader bootloader --flags 0x1
-  rm -f new-boot.img
+  echo > empty
+
+  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
+  --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
+  --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
+
+  rm -f empty new-boot.img
   mv new-boot.img.signed new-boot.img
 fi
 
+if is_mounted /data; then
+  rm -f /data/stock_boot*
+  mv stock_boot* /data
+fi
+
 ui_print "- Flashing new boot image"
-[ ! -L $BOOTIMAGE ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
-dd if=new-boot.img of=$BOOTIMAGE bs=4096
+if [ -L $BOOTIMAGE ]; then
+  dd if=new-boot.img of=$BOOTIMAGE bs=4096
+else
+  cat new-boot.img /dev/zero | dd of=$BOOTIMAGE bs=4096
+fi
+rm -f new-boot.img
 
 cd /
 
@@ -510,11 +339,6 @@ if ! $BOOTMODE; then
   umount /magisk
   losetup -d $MAGISKLOOP 2>/dev/null
   rmdir /magisk
-  if $SUPERSU; then
-    umount /su
-    losetup -d $SUPERSULOOP 2>/dev/null
-    rmdir /su
-  fi
   umount /system
 fi
 

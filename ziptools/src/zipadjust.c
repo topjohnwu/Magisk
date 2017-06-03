@@ -162,10 +162,6 @@ static int xdecompress(int fdIn, int fdOut, off_t offsetIn, off_t offsetOut, siz
 	
 	do {
 		strm.avail_in = read(fdIn, in, CHUNK);
-		if (strm.avail_in < 0) {
-			(void)inflateEnd(&strm);
-			return xerror("Read failed");
-		}
 		if (strm.avail_in == 0) break;
 		strm.next_in = in;
 		

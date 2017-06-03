@@ -1,5 +1,0 @@
-#!/system/bin/sh
-
-PROCESS="$1"
-
-magiskhide --rm "$PROCESS"

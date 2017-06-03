@@ -10,3 +10,6 @@
 [submodule "jni/magiskpolicy"]
 	path = jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
+[submodule "MagiskManager"]
+	path = MagiskManager
+	url = https://github.com/topjohnwu/MagiskManager.git

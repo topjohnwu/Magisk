@@ -13,8 +13,10 @@ SYSTEMLIB=/system/lib
 # Default permissions
 umask 022
 
-ui_print_wrapper() {
-  type ui_print >/dev/null && ui_print "$1" || echo "$1"
+# Call ui_print_wrap if exists, or else simply use echo
+# Useful when wrapped in flashable zip
+ui_print_wrap() {
+  type ui_print >/dev/null 2>&1 && ui_print "$1" || echo "$1"
 }
 
 grep_prop() {
@@ -48,20 +50,20 @@ chmod -R 755 $CHROMEDIR/futility $MAGISKBIN 2>/dev/null
 # Find the boot image
 find_boot_image
 if [ -z "$BOOTIMAGE" ]; then
-  ui_print_wrapper "! Unable to detect boot image"
+  ui_print_wrap "! Unable to detect boot image"
   exit 1
 fi
 
-ui_print_wrapper "- Found Boot Image: $BOOTIMAGE"
+ui_print_wrap "- Found Boot Image: $BOOTIMAGE"
 
 rm -rf $BOOTTMP 2>/dev/null
 mkdir -p $BOOTTMP
 cd $BOOTTMP
 
-ui_print_wrapper "- Unpacking boot image"
+ui_print_wrap "- Unpacking boot image"
 LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --unpack $BOOTIMAGE
 if [ $? -ne 0 ]; then
-  ui_print_wrapper "! Unable to unpack boot image"
+  ui_print_wrap "! Unable to unpack boot image"
   exit 1
 fi
 
@@ -77,8 +79,8 @@ fi
 LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )
-    ui_print_wrapper "! Magisk is not installed!"
-    ui_print_wrapper "! Nothing to uninstall"
+    ui_print_wrap "! Magisk is not installed!"
+    ui_print_wrap "! Nothing to uninstall"
     exit
     ;;
   1 )
@@ -90,17 +92,17 @@ case $? in
       rm -f init.magisk.rc
     fi
     if [ -f ${STOCKDUMP}.gz ]; then
-      ui_print_wrapper "- Boot image backup found!"
+      ui_print_wrap "- Boot image backup found!"
       LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
     else
-      ui_print_wrapper "! Boot image backup unavailable"
-      ui_print_wrapper "- Restoring ramdisk with backup"
+      ui_print_wrap "! Boot image backup unavailable"
+      ui_print_wrap "- Restoring ramdisk with backup"
       LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-restore ramdisk.cpio
       LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --repack $BOOTIMAGE stock_boot.img
     fi
     ;;
   2 )
-    ui_print_wrapper "- SuperSU patched image detected"
+    ui_print_wrap "- SuperSU patched image detected"
     LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --cpio-restore ramdisk.cpio
     LD_LIBRARY_PATH=$SYSTEMLIB $MAGISKBIN/magiskboot --repack $BOOTIMAGE stock_boot.img
     ;;
@@ -115,11 +117,11 @@ if [ -f chromeos ]; then
   mv stock_boot.img.signed stock_boot.img
 fi
 
-ui_print_wrapper "- Flashing stock/reverted image"
+ui_print_wrap "- Flashing stock/reverted image"
 [ ! -L "$BOOTIMAGE" ] && dd if=/dev/zero of=$BOOTIMAGE bs=4096 2>/dev/null
 dd if=stock_boot.img of=$BOOTIMAGE bs=4096
 
-ui_print_wrapper "- Removing Magisk files"
+ui_print_wrap "- Removing Magisk files"
 rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
         /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
         /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img \

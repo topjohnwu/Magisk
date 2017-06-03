@@ -1,20 +1,7 @@
 obj/
 libs/
 *.zip
+*.jks
 
 # Copied binaries
-zip_static/arm/*
-zip_static/arm64/*
-zip_static/x86/*
-zip_static/x64/*
-uninstaller/arm/*
-uninstaller/arm64/*
-uninstaller/x86/*
-uninstaller/x64/*
 ziptools/zipadjust
-
-# Generated scripts
-uninstaller/common/
-zip_static/common/*.sh
-zip_static/common/*.rc
-zip_static/META-INF/com/google/android/update-binary
