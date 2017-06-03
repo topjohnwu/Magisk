@@ -4,7 +4,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer navigazione</string>
-    <string name="modules">Moduli</string>
+   <string name="modules">Moduli</string>
     <string name="downloads">Download</string>
     <string name="superuser">Superuser</string>
     <string name="log">Registro eventi</string>
@@ -158,6 +158,17 @@
     <string name="request_timeout">Timeout richiesta</string>
     <string name="superuser_notification">Notifica Superuser</string>
     <string name="request_timeout_summary">%1$s secondi</string>
+    <string name="settings_su_reauth_title">Ri-autentifica dopo aggironamento</string>
+    <string name="settings_su_reauth_summary">Ri-autentifica permessi superuser dopo aggiornamento applicazione</string>
+
+    <string name="multiuser_mode">Modo multiutente</string>
+    <string name="settings_owner_only">Solo proprietario dispositivo</string>
+    <string name="settings_owner_manage">gestito da propietario utente</string>
+    <string name="settings_user_independent">Utente indipendente</string>
+    <string name="owner_only_summary">Solo proprietario che ha accesso root</string>
+    <string name="owner_manage_summary">Solo il propietario può gestire accesso root e ricevere richieste</string>
+    <string name="user_indepenent_summary">Ogni utente ha le sue regole di root separate</string>
+    <string name="multiuser_hint_owner_request">Una richiestà è stata inviata al propietario dipositivo. Accedi come propietario dispositivo e concedi i permessi.</string>
 
     <string name="settings_development_category">Sviluppo app</string>
     <string name="settings_developer_logging_title">Abilita registro eventi avanzato debug</string>
