@@ -57,7 +57,7 @@ def build_binary(args):
 	header('* Building Magisk binaries')
 
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
-	debug_flag = '-DDEBUG' if args.debug else ''
+	debug_flag = '' if args.release else '-DDEBUG'
 	proc = subprocess.run('{} APP_CFLAGS=\"-DMAGISK_VERSION={} -DMAGISK_VER_CODE={} {}\" -j{}'.format(
 		ndk_build, args.versionString, args.versionCode, debug_flag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
@@ -67,11 +67,7 @@ def build_apk(args):
 	header('* Building Magisk Manager')
 
 	os.chdir('MagiskManager')
-	if args.debug:
-		proc = subprocess.run('gradlew assembleDebug', shell=True)
-		if proc.returncode != 0:
-			error('Build Magisk Manager failed!')
-	else:
+	if args.release:
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
@@ -104,7 +100,11 @@ def build_apk(args):
 
 		silentremove(unsigned)
 		silentremove(aligned)
-	
+	else:
+		proc = subprocess.run('gradlew assembleDebug', shell=True)
+		if proc.returncode != 0:
+			error('Build Magisk Manager failed!')
+
 	# Return to upper directory
 	os.chdir('..')
 
@@ -153,7 +153,7 @@ def zip_main(args):
 				zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk', 'app-debug.apk' if args.debug else 'app-release.apk')
+		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk', 'app-release.apk' if args.release else 'app-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
 
@@ -229,7 +229,7 @@ def cleanup(args):
 				silentremove(f)
 
 parser = argparse.ArgumentParser(description='Magisk build script')
-parser.add_argument('--debug', action='store_true', help='compile Magisk in debug mode')
+parser.add_argument('--release', action='store_true', help='compile Magisk for release')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser('all', help='build everything and create flashable zip')
