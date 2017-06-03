@@ -68,14 +68,14 @@ def build_apk(args):
 
 	os.chdir('MagiskManager')
 	if args.debug:
-		proc = subprocess.run(['gradlew', 'assembleDebug'])
+		proc = subprocess.run('gradlew assembleDebug', shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 	else:
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
-		proc = subprocess.run(['gradlew', 'assembleRelease'])
+		proc = subprocess.run('gradlew assembleRelease', shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -95,10 +95,10 @@ def build_apk(args):
 		if proc.returncode != 0:
 			error('Zipalign Magisk Manager failed!')
 
-		proc = subprocess.run([
+		proc = subprocess.run('{} sign --ks {} --out {} {}'.format(
 			os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool, 'apksigner'),
-			'sign', '--ks', os.path.join('..', 'release_signature.jks'), '--out',
-			release, aligned])
+			os.path.join('..', 'release_signature.jks'),
+			release, aligned), shell=True)
 		if proc.returncode != 0:
 			error('Release sign Magisk Manager failed!')
 
@@ -213,12 +213,12 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning Magisk binaries')
-		subprocess.run([os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build'), 'clean'])
+		subprocess.run(os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build') + ' clean', shell=True)
 
 	if 'apk' in args.target:
 		header('* Cleaning Magisk Manager')
 		os.chdir('MagiskManager')
-		subprocess.run(['gradlew', 'clean'])
+		subprocess.run('gradlew clean', shell=True)
 		os.chdir('..')
 
 	if 'zip' in args.target:
