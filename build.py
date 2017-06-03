@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 import subprocess
@@ -72,7 +72,7 @@ def build_apk(args):
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
-		proc = subprocess.run('gradlew assembleRelease', shell=True)
+		proc = subprocess.run('{} assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -102,7 +102,7 @@ def build_apk(args):
 		silentremove(unsigned)
 		silentremove(aligned)
 	else:
-		proc = subprocess.run('gradlew assembleDebug', shell=True)
+		proc = subprocess.run('{} assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -223,7 +223,7 @@ def cleanup(args):
 	if 'apk' in args.target:
 		header('* Cleaning Magisk Manager')
 		os.chdir('MagiskManager')
-		subprocess.run('gradlew clean', shell=True)
+		subprocess.run('{} clean'.format(os.path.join('.', 'gradlew')), shell=True)
 		os.chdir('..')
 
 	if 'zip' in args.target:
