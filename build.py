@@ -237,7 +237,7 @@ parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('--release', action='store_true', help='compile Magisk for release')
 subparsers = parser.add_subparsers(title='actions')
 
-all_parser = subparsers.add_parser('all', help='build everything and create flashable zip')
+all_parser = subparsers.add_parser('all', help='build everything and create flashable zip and uninstaller')
 all_parser.add_argument('versionString')
 all_parser.add_argument('versionCode', type=int)
 all_parser.set_defaults(func=build_all)
