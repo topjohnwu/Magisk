@@ -52,6 +52,7 @@ def build_all(args):
 	build_binary(args)
 	build_apk(args)
 	zip_main(args)
+	zip_uninstaller(args)
 
 def build_binary(args):
 	header('* Building Magisk binaries')
@@ -197,6 +198,10 @@ def zip_uninstaller(args):
 			zip_with_msg(zipf, source, target)
 
 		source = os.path.join('scripts', 'magisk_uninstaller.sh')
+		target = 'magisk_uninstaller.sh'
+		zip_with_msg(zipf, source, target)
+
+		source = os.path.join('scripts', 'uninstaller_loader.sh')
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
 		zip_with_msg(zipf, source, target)
 

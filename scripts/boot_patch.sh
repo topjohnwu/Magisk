@@ -155,7 +155,7 @@ case $? in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 ) # Other patched
-    ui_print_wrap "! Other patched boot detected!"
+    ui_print_wrap "! Boot image patched by other programs!"
     ui_print_wrap "! Please restore stock boot image"
     exit 1
     ;;
