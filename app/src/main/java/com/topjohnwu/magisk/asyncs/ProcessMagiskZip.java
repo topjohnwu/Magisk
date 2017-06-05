@@ -33,13 +33,13 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         if (Shell.rootAccess()) {
-            // Running in parallel mode, open new shell
-            Shell.su(true,
-                    "rm -f /dev/.magisk",
-                    (mBoot != null) ? "echo \"BOOTIMAGE=/dev/block/" + mBoot + "\" >> /dev/.magisk" : "",
-                    "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
-                    "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk"
-            );
+            synchronized (Shell.lock) {
+                Shell.su("rm -f /dev/.magisk",
+                        (mBoot != null) ? "echo \"BOOTIMAGE=" + mBoot + "\" >> /dev/.magisk" : "",
+                        "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
+                        "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk"
+                );
+            }
             return true;
         }
         return false;
@@ -53,5 +53,6 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
         } else {
             Utils.showUriSnack(activity, mUri);
         }
+        super.onPostExecute(result);
     }
 }

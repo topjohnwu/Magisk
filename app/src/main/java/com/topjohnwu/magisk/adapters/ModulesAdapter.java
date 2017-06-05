@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.Shell;
@@ -53,44 +52,31 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
-        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> new SerialTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                if (isChecked) {
-                    module.removeDisableFile();
-                } else {
-                    module.createDisableFile();
-                }
-                return null;
+        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+            int snack;
+            if (isChecked) {
+                module.removeDisableFile();
+                snack = R.string.disable_file_removed;
+            } else {
+                module.createDisableFile();
+                snack = R.string.disable_file_created;
             }
+            SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
+        });
 
-            @Override
-            protected void onPostExecute(Void v) {
-                int snack = isChecked ? R.string.disable_file_removed : R.string.disable_file_created;
-                SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
+        holder.delete.setOnClickListener(v -> {
+            boolean removed = module.willBeRemoved();
+            int snack;
+            if (removed) {
+                module.deleteRemoveFile();
+                snack = R.string.remove_file_deleted;
+            } else {
+                module.createRemoveFile();
+                snack = R.string.remove_file_created;
             }
-        }.exec());
-
-        holder.delete.setOnClickListener(v -> new SerialTask<Void, Void, Void>() {
-            private final boolean removed = module.willBeRemoved();
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                if (removed) {
-                    module.deleteRemoveFile();
-                } else {
-                    module.createRemoveFile();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void v) {
-                int snack = removed ? R.string.remove_file_deleted : R.string.remove_file_created;
-                SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
-                updateDeleteButton(holder, module);
-            }
-        }.exec());
+            SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
+            updateDeleteButton(holder, module);
+        });
 
         if (module.isUpdated()) {
             holder.notice.setVisibility(View.VISIBLE);

@@ -9,14 +9,14 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
 
-public class LoadModules extends SerialTask<Void, Void, Void> {
+public class LoadModules extends RootTask<Void, Void, Void> {
 
     public LoadModules(Activity context) {
         super(context);
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
+    protected Void doInRoot(Void... voids) {
         Logger.dev("LoadModules: Loading modules");
 
         magiskManager.moduleMap = new ValueSortedMap<>();
@@ -37,5 +37,6 @@ public class LoadModules extends SerialTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         magiskManager.moduleLoadDone.trigger();
+        super.onPostExecute(v);
     }
 }

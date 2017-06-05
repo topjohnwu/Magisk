@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.List;
 
-public class MagiskHide extends SerialTask<Object, Void, Void> {
+public class MagiskHide extends RootTask<Object, Void, Void> {
 
     private boolean isList = false;
 
@@ -17,7 +17,7 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Object... params) {
+    protected Void doInRoot(Object... params) {
         String command = (String) params[0];
         List<String> ret = Shell.su("magiskhide --" + command);
         if (isList) {
@@ -31,6 +31,7 @@ public class MagiskHide extends SerialTask<Object, Void, Void> {
         if (isList) {
             magiskManager.magiskHideDone.trigger();
         }
+        super.onPostExecute(v);
     }
 
     public void add(CharSequence packageName) {

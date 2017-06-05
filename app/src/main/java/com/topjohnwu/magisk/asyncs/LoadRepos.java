@@ -184,5 +184,6 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         magiskManager.repoLoadDone.trigger();
+        super.onPostExecute(v);
     }
 }

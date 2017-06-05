@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.MagiskHide;
-import com.topjohnwu.magisk.asyncs.SerialTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
@@ -140,18 +139,11 @@ public class SettingsActivity extends Activity {
                     break;
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
-                    new SerialTask<Void, Void, Void>() {
-                        private boolean enable = enabled;
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            if (enable) {
-                                Utils.createFile(MagiskManager.MAGISK_DISABLE_FILE);
-                            } else {
-                                Utils.removeItem(MagiskManager.MAGISK_DISABLE_FILE);
-                            }
-                            return null;
-                        }
-                    }.exec();
+                    if (enabled) {
+                        Utils.createFile(MagiskManager.MAGISK_DISABLE_FILE);
+                    } else {
+                        Utils.removeItem(MagiskManager.MAGISK_DISABLE_FILE);
+                    }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "magiskhide":
@@ -173,20 +165,15 @@ public class SettingsActivity extends Activity {
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
-                    new SerialTask<Void, Void, Void>() {
-                        private boolean enable = enabled;
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            if (enable) {
-                                Shell.su("cp -af /system/etc/hosts /magisk/.core/hosts",
-                                        "mount -o bind /magisk/.core/hosts /system/etc/hosts");
-                            } else {
-                                Shell.su("umount -l /system/etc/hosts",
-                                        "rm -f /magisk/.core/hosts");
-                            }
-                            return null;
-                        }
-                    }.exec();
+                    if (enabled) {
+                        Shell.su_async(null,
+                                "cp -af /system/etc/hosts /magisk/.core/hosts",
+                                "mount -o bind /magisk/.core/hosts /system/etc/hosts");
+                    } else {
+                        Shell.su_async(null,
+                                "umount -l /system/etc/hosts",
+                                "rm -f /magisk/.core/hosts");
+                    }
                     break;
                 case "su_access":
                     magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access", 3);

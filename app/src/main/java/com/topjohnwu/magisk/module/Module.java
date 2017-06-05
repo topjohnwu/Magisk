@@ -33,11 +33,13 @@ public class Module extends BaseModule {
     }
 
     public void createDisableFile() {
-        mEnable = !Utils.createFile(mDisableFile);
+        mEnable = false;
+        Utils.createFile(mDisableFile);
     }
 
     public void removeDisableFile() {
-        mEnable = Utils.removeItem(mDisableFile);
+        mEnable = true;
+        Utils.removeItem(mDisableFile);
     }
 
     public boolean isEnabled() {
@@ -45,11 +47,13 @@ public class Module extends BaseModule {
     }
 
     public void createRemoveFile() {
-        mRemove = Utils.createFile(mRemoveFile);
+        mRemove = true;
+        Utils.createFile(mRemoveFile);
     }
 
     public void deleteRemoveFile() {
-        mRemove = !Utils.removeItem(mRemoveFile);
+        mRemove = false;
+        Utils.removeItem(mRemoveFile);
     }
 
     public boolean willBeRemoved() {

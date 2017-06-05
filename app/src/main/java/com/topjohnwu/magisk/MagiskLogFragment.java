@@ -24,7 +24,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.asyncs.SerialTask;
+import com.topjohnwu.magisk.asyncs.RootTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Shell;
@@ -127,14 +127,14 @@ public class MagiskLogFragment extends Fragment {
         }
     }
 
-    public class LogManager extends SerialTask<Object, Void, Object> {
+    private class LogManager extends RootTask<Object, Void, Object> {
 
         int mode;
         File targetFile;
 
         @SuppressLint("DefaultLocale")
         @Override
-        protected Object doInBackground(Object... params) {
+        protected Object doInRoot(Object... params) {
             mode = (int) params[0];
             switch (mode) {
                 case 0:

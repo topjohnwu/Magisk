@@ -68,5 +68,6 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             notificationManager.notify(NOTIFICATION_ID, builder.build());
         }
         magiskManager.updateCheckDone.trigger();
+        super.onPostExecute(v);
     }
 }

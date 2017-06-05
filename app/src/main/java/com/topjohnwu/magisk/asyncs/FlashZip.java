@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public class FlashZip extends SerialTask<Void, String, Integer> {
+public class FlashZip extends RootTask<Void, String, Integer> {
 
     private Uri mUri;
     private File mCachedFile, mScriptFile, mCheckFile;
@@ -96,7 +96,7 @@ public class FlashZip extends SerialTask<Void, String, Integer> {
     }
 
     @Override
-    protected Integer doInBackground(Void... voids) {
+    protected Integer doInRoot(Void... voids) {
         Logger.dev("FlashZip Running... " + mFilename);
         List<String> ret;
         try {
@@ -124,7 +124,6 @@ public class FlashZip extends SerialTask<Void, String, Integer> {
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        super.onPostExecute(result);
         progress.dismiss();
         switch (result) {
             case -1:
@@ -138,6 +137,7 @@ public class FlashZip extends SerialTask<Void, String, Integer> {
                 onSuccess();
                 break;
         }
+        super.onPostExecute(result);
     }
 
     protected void onSuccess() {

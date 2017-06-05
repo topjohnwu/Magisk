@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
+import com.topjohnwu.magisk.asyncs.RootTask;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ public class Shell {
 
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted
     public static int rootStatus;
+    public static final Object lock = new Object();
 
     private static boolean isInit = false;
     private static Process rootShell;
@@ -211,5 +214,16 @@ public class Shell {
         }
 
         return new ArrayList<>(res);
+    }
+
+    public static void su_async(List<String> result, String... commands) {
+        new RootTask<Void, Void, Void>() {
+            @Override
+            protected Void doInRoot(Void... params) {
+                List<String> ret = Shell.su(commands);
+                if (result != null) result.addAll(ret);
+                return null;
+            }
+        }.exec();
     }
 }

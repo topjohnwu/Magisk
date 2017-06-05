@@ -39,23 +39,15 @@ public class Utils {
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
-    public static boolean commandExists(String s) {
-        String command = "if [ -z $(which " + s + ") ]; then echo false; else echo true; fi";
-        List<String> ret = Shell.sh(command);
-        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
-    }
-
-    public static boolean createFile(String path) {
+    public static void createFile(String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
         String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
-        List<String> ret = Shell.su(command);
-        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
+        Shell.su_async(null, command);
     }
 
-    public static boolean removeItem(String path) {
+    public static void removeItem(String path) {
         String command = "rm -rf " + path + " 2>/dev/null; if [ -e " + path + " ]; then echo false; else echo true; fi";
-        List<String> ret = Shell.su(command);
-        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
+        Shell.su_async(null, command);
     }
 
     public static List<String> getModList(String path) {
@@ -116,7 +108,7 @@ public class Utils {
                 "BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION`",
                 "if [ ! -z \"$BOOTIMAGE\" ]; then break; fi",
                 "done",
-                "echo \"${BOOTIMAGE##*/}\""
+                "echo \"$BOOTIMAGE\""
         };
         List<String> ret = Shell.su(commands);
         if (isValidShellResponse(ret)) {

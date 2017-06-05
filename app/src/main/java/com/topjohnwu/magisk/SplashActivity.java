@@ -25,28 +25,18 @@ public class SplashActivity extends Activity{
 
         super.onCreate(savedInstanceState);
 
-        MagiskManager magiskManager = getApplicationContext();
-
         // Init the info and configs and root shell
-        magiskManager.init();
+        getApplicationContext().init();
 
         // Now fire all async tasks
         new GetBootBlocks(this).exec();
-        new LoadModules(this) {
-            @Override
-            protected void onPostExecute(Void v) {
-                super.onPostExecute(v);
-                if (Utils.checkNetworkStatus(activity)) {
-                    new LoadRepos(activity).exec();
-                }
-            }
-        }.exec();
+        new LoadModules(this).setCallBack(() -> new LoadRepos(this).exec()).exec();
         new LoadApps(this).exec();
 
         if (Utils.checkNetworkStatus(this)) {
             // Initialize the update check service, notify every 12 hours
             if (!TextUtils.equals("install", getIntent().getStringExtra(MagiskManager.INTENT_SECTION))) {
-                ComponentName service = new ComponentName(magiskManager, UpdateCheckService.class);
+                ComponentName service = new ComponentName(this, UpdateCheckService.class);
                 JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                         .setPersisted(true)
@@ -57,7 +47,7 @@ public class SplashActivity extends Activity{
             }
         }
 
-        Intent intent = new Intent(magiskManager, MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);
         if (section != null) {
             intent.putExtra(MagiskManager.INTENT_SECTION, section);

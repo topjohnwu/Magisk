@@ -7,8 +7,11 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Utils;
 
 public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
+
     protected Activity activity;
     protected MagiskManager magiskManager;
+
+    private Runnable callback = null;
 
     public ParallelTask() {}
 
@@ -17,8 +20,18 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
         magiskManager = Utils.getMagiskManager(context);
     }
 
-    @SafeVarargs
-    public final void exec(Params... params) {
+    @SuppressWarnings("unchecked")
+    public void exec(Params... params) {
         executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
+    }
+
+    @Override
+    protected void onPostExecute(Result result) {
+        if (callback != null) callback.run();
+    }
+
+    public ParallelTask<Params, Progress, Result> setCallBack(Runnable next) {
+        callback = next;
+        return this;
     }
 }
