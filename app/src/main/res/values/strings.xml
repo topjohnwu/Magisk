@@ -130,6 +130,8 @@
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Processing</string>
     <string name="manual_boot_image">Please manually select a boot image!</string>
+    <string name="manager_update_title">New Magisk Manager Update Available!</string>
+    <string name="manager_download_install">Press to download and install</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

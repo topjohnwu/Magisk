@@ -34,13 +34,13 @@ public class SplashActivity extends Activity{
         new LoadApps(this).exec();
 
         if (Utils.checkNetworkStatus(this)) {
-            // Initialize the update check service, notify every 12 hours
+            // Initialize the update check service, notify every 8 hours
             if (!TextUtils.equals("install", getIntent().getStringExtra(MagiskManager.INTENT_SECTION))) {
                 ComponentName service = new ComponentName(this, UpdateCheckService.class);
                 JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                         .setPersisted(true)
-                        .setPeriodic(12 * 60 * 60 * 1000)
+                        .setPeriodic(8 * 60 * 60 * 1000)
                         .build();
                 JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 scheduler.schedule(jobInfo);

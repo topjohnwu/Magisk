@@ -1,15 +1,8 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.app.NotificationCompat;
 
-import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -19,7 +12,7 @@ import org.json.JSONObject;
 public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/magisk_update.json";
-    private static final int NOTIFICATION_ID = 1;
+
 
     private boolean showNotification = false;
 
@@ -42,30 +35,23 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             magiskManager.remoteMagiskVersionCode = magisk.getInt("versionCode");
             magiskManager.magiskLink = magisk.getString("link");
             magiskManager.releaseNoteLink = magisk.getString("note");
+            JSONObject manager = json.getJSONObject("app");
+            magiskManager.remoteManagerVersionString = manager.getString("version");
+            magiskManager.remoteManagerVersionCode = manager.getInt("versionCode");
+            magiskManager.managerLink = manager.getString("link");
         } catch (JSONException ignored) {}
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode
-                && showNotification && magiskManager.updateNotification) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager);
-            builder.setSmallIcon(R.drawable.ic_magisk)
-                    .setContentTitle(magiskManager.getString(R.string.magisk_update_title))
-                    .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersionString))
-                    .setVibrate(new long[]{0, 100, 100, 100})
-                    .setAutoCancel(true);
-            Intent intent = new Intent(magiskManager, SplashActivity.class);
-            intent.putExtra(MagiskManager.INTENT_SECTION, "install");
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(magiskManager);
-            stackBuilder.addParentStack(SplashActivity.class);
-            stackBuilder.addNextIntent(intent);
-            PendingIntent pendingIntent = stackBuilder.getPendingIntent(NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(pendingIntent);
-            NotificationManager notificationManager =
-                    (NotificationManager) magiskManager.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(NOTIFICATION_ID, builder.build());
+        if (showNotification && magiskManager.updateNotification) {
+            if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode) {
+                Utils.showMagiskUpdate(magiskManager);
+            }
+            if (BuildConfig.VERSION_CODE < magiskManager.remoteManagerVersionCode) {
+                Utils.showManagerUpdate(magiskManager);
+            }
         }
         magiskManager.updateCheckDone.trigger();
         super.onPostExecute(v);

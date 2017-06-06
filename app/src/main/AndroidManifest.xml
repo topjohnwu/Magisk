@@ -52,8 +52,7 @@
             android:taskAffinity="internal.superuser"
             android:theme="@style/SuRequest" />
 
-        <receiver
-            android:name=".superuser.SuReceiver" />
+        <receiver android:name=".superuser.SuReceiver" />
 
         <receiver android:name=".receivers.BootReceiver">
             <intent-filter>
@@ -68,6 +67,8 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".receivers.ManagerUpdate" />
 
         <service android:name=".services.BootupIntentService" />
 

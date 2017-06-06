@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -65,6 +66,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             new DownloadReceiver() {
                                 @Override
                                 public void onDownloadDone(Uri uri) {
+                                    Activity activity = (Activity) mContext;
                                     new ProcessRepoZip(activity, uri, true).exec();
                                 }
                             },
@@ -75,6 +77,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             new DownloadReceiver() {
                                 @Override
                                 public void onDownloadDone(Uri uri) {
+                                    Activity activity = (Activity) mContext;
                                     new ProcessRepoZip(activity, uri, false).exec();
                                 }
                             },
