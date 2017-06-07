@@ -105,7 +105,7 @@ public class SettingsActivity extends Activity {
                 if (!magiskManager.isSuClient) {
                     prefScreen.removePreference(suCategory);
                 }
-                if (magiskManager.magiskVersionCode < 130) {
+                if (magiskManager.magiskVersionCode < 1300) {
                     prefScreen.removePreference(magiskCategory);
                 }
             }

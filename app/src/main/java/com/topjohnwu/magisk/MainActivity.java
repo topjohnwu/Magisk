@@ -124,7 +124,7 @@ public class MainActivity extends Activity
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 130
+                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 1300
                         && prefs.getBoolean("magiskhide", false));
         menu.findItem(R.id.modules).setVisible(
                 Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
