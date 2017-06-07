@@ -142,6 +142,13 @@ void otherToSU() {
 	// suMiscL6
 	if (sepol_exists("audioserver"))
 		sepol_allow("audioserver", "audioserver", "process", "execmem");
+
+	// Liveboot
+	sepol_allow("surfaceflinger", "su", "process", "ptrace");
+	sepol_allow("surfaceflinger", "su", "binder", "transfer");
+	sepol_allow("surfaceflinger", "su", "binder", "call");
+	sepol_allow("surfaceflinger", "su", "fd", "use");
+	sepol_allow("debuggerd", "su", "process", "ptrace");
 }
 
 // Minimal boot image patch, Samsung requires these patches
