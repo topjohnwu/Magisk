@@ -121,6 +121,8 @@
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
     <string name="zip_process_title">Procesare</string>
     <string name="manual_boot_image">Selectați manual o imagine de boot!</string>
+    <string name="manager_update_title">O nouă actualizare pentru Magisk Manager este disponibilă!</string>
+    <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
