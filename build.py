@@ -59,7 +59,7 @@ def build_binary(args):
 
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 	debug_flag = '' if args.release else '-DDEBUG'
-	proc = subprocess.run('{} APP_CFLAGS=\"-DMAGISK_VERSION={} -DMAGISK_VER_CODE={} {}\" -j{}'.format(
+	proc = subprocess.run('{} APP_CFLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\" -j{}'.format(
 		ndk_build, args.versionString, args.versionCode, debug_flag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
