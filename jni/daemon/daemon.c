@@ -162,9 +162,6 @@ void start_daemon(int client) {
 	// It should stay intact under any circumstances
 	err_handler = do_nothing;
 
-	// Start log monitor
-	monitor_logs();
-
 	LOGI("Magisk v" xstr(MAGISK_VERSION) " daemon started\n");
 
 	// Unlock all blocks for rw
@@ -174,7 +171,7 @@ void start_daemon(int client) {
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
 	xchmod("/sbin", 0755);
-	xmkdir("/magisk", 0755);
+	mkdir("/magisk", 0755);
 	xchmod("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 

@@ -172,7 +172,7 @@ void exec_common_script(const char* stage) {
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			char *const command[] = { "sh", buf2, NULL };
-			int pid = run_command(NULL, "/system/bin/sh", command);
+			int pid = run_command(0, NULL, "/system/bin/sh", command);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -189,7 +189,7 @@ void exec_module_script(const char* stage) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		char *const command[] = { "sh", buf, NULL };
-		int pid = run_command(NULL, "/system/bin/sh", command);
+		int pid = run_command(0, NULL, "/system/bin/sh", command);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
@@ -458,6 +458,10 @@ static void unblock_boot_process() {
 void post_fs(int client) {
 	// Error handler
 	err_handler = unblock_boot_process;
+
+	// Start log monitor
+	monitor_logs();
+
 	LOGI("** post-fs mode running\n");
 	// ack
 	write_int(client, 0);
@@ -730,8 +734,8 @@ void late_start(int client) {
 				"CLASSPATH=/system/framework/pm.jar "
 				"/system/bin/app_process /system/bin "
 				"com.android.commands.pm.Pm install -r " MANAGERAPK, NULL };
-			int apk_res, pid;
-			pid = run_command(&apk_res, "/system/bin/sh", command);
+			int apk_res = 0, pid;
+			pid = run_command(1, &apk_res, "/system/bin/sh", command);
 			waitpid(pid, NULL, 0);
 			fdgets(buf, PATH_MAX, apk_res);
 			close(apk_res);
@@ -746,4 +750,12 @@ void late_start(int client) {
 	free(buf);
 	free(buf2);
 	vec_deep_destroy(&module_list);
+
+#ifdef DEBUG
+	// Stop recording the boot logcat after every boot task is done
+	extern int debug_log_pid, debug_log_fd;
+	kill(debug_log_pid, SIGTERM);
+	waitpid(debug_log_pid, NULL, 0);
+	close(debug_log_fd);
+#endif
 }

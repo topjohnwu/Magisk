@@ -148,7 +148,7 @@ rm -f stock_boot.img
 ui_print_wrap "- Removing Magisk files"
 rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
         /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
-        /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img \
+        /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
         /data/busybox /data/magisk /data/custom_ramdisk_patch.sh 2>/dev/null
 
 $BOOTMODE && reboot

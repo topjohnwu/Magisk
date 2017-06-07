@@ -19,7 +19,7 @@
 
 static int zygote_num = 0;
 static char init_ns[32], zygote_ns[2][32];
-static int log_pid = 0, log_fd;
+static int log_pid = 0, log_fd = 0;
 static char *buffer;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
@@ -40,7 +40,7 @@ static void quit_pthread(int sig) {
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, NULL, 0);
 		close(log_fd);
-		log_pid = 0;
+		log_fd = log_pid = 0;
 	}
 	int kill = -1;
 	// If process monitor dies, kill hide daemon too
@@ -107,7 +107,7 @@ void proc_monitor() {
 
 		// Monitor am_proc_start
 		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
-		log_pid = run_command(&log_fd, "/system/bin/logcat", command);
+		log_pid = run_command(0, &log_fd, "/system/bin/logcat", command);
 
 		while(fdgets(buffer, PATH_MAX, log_fd)) {
 			int ret, comma = 0;

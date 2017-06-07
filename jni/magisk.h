@@ -26,6 +26,7 @@
 
 #define LOGFILE         "/cache/magisk.log"
 #define LASTLOG         "/cache/last_magisk.log"
+#define DEBUG_LOG       "/data/magisk_debug.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"

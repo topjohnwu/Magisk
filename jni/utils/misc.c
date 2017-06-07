@@ -217,29 +217,34 @@ void setup_sighandlers(void (*handler)(int)) {
 	}
 }
 
-int run_command(int *fd, const char *path, char *const argv[]) {
-	int sv[2];
+/*
+   fd == NULL -> Ignore output
+  *fd == 0    -> Open pipe and set *fd to the read end
+  *fd != 0    -> STDOUT (or STDERR) will be redirected to *fd
+*/
+int run_command(int err, int *fd, const char *path, char *const argv[]) {
+	int pipefd[2], writeEnd = 0;
 
 	if (fd) {
-		if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
-			return -1;
-		// We use sv[0], give them sv[1] for communication
-		if (fcntl(sv[1], F_SETFD, FD_CLOEXEC))
-			PLOGE("fcntl FD_CLOEXEC");
-		*fd = sv[1];
+		if (*fd == 0) {
+			if (pipe(pipefd) == -1)
+				return -1;
+			writeEnd = pipefd[1];
+			// Give the read end of the pipe
+			*fd = pipefd[0];
+		}
 	}
 
 	int pid = fork();
 	if (pid != 0) {
-		if (fd) close(sv[0]);
+		if (writeEnd) close(writeEnd);
 		return pid;
 	}
 
 	if (fd) {
-		close(sv[1]);
-		xdup2(sv[0], STDIN_FILENO);
-		xdup2(sv[0], STDOUT_FILENO);
-		xdup2(sv[0], STDERR_FILENO);
+		if (writeEnd == 0) writeEnd = *fd;
+		xdup2(writeEnd, STDOUT_FILENO);
+		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}
 
 	execv(path, argv);
@@ -426,8 +431,8 @@ int get_img_size(const char *img, int *used, int *total) {
 	char buffer[PATH_MAX];
 	snprintf(buffer, sizeof(buffer), "e2fsck -n %s 2>/dev/null | tail -n 1", img);
 	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, fd;
-	pid = run_command(&fd, "/system/bin/sh", command);
+	int pid, fd = 0;
+	pid = run_command(0, &fd, "/system/bin/sh", command);
 	fdgets(buffer, sizeof(buffer), fd);
 	close(fd);
 	if (pid == -1)
