@@ -205,5 +205,9 @@
     <string name="settings_user_independent">各使用者獨立</string>
     <string name="settings_owner_only">僅裝置擁有者</string>
     <string name="settings_owner_manage">由裝置擁有者管理</string>
+    <string name="manager_download_install">點擊以下載並安裝</string>
+    <string name="manager_update_title">有 Magisk Manager 更新！</string>
+    <string name="settings_su_reauth_summary">應用程式更新後，重新認證root權限</string>
+    <string name="settings_su_reauth_title">更新後重新認證</string>
 
 </resources>
