@@ -529,6 +529,9 @@ void post_fs_data(int client) {
 		new_img = 1;
 	}
 
+	// Initialize resetprop for the daemon
+	init_resetprop();
+
 	LOGI("* Mounting " MAINIMG "\n");
 	// Mounting magisk image
 	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
@@ -684,9 +687,6 @@ void post_fs_data(int client) {
 		LOGI("* Enabling systemless hosts file support");
 		bind_mount(HOSTSFILE, "/system/etc/hosts");
 	}
-
-	// Initialize resetprop for the daemon
-	init_resetprop();
 
 	// Start magiskhide if enabled
 	char *hide_prop = getprop(MAGISKHIDE_PROP);
