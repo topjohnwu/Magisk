@@ -177,10 +177,10 @@
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
-    <string name="settings_ns_requester">Requester Namespace</string>
+    <string name="settings_ns_requester">Inherit Namespace</string>
     <string name="settings_ns_isolate">Isolated Namespace</string>
     <string name="global_summary">All root sessions use the global mount namespace</string>
-    <string name="requester_summary">Root sessions will use its requester\'s namespace</string>
+    <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
 
     <string name="settings_development_category">App Development</string>
