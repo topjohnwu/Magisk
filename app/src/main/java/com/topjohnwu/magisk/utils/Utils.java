@@ -237,6 +237,8 @@ public class Utils {
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, ManagerUpdate.class);
+        intent.putExtra("link", magiskManager.managerLink);
+        intent.putExtra("version", magiskManager.remoteManagerVersionString);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(magiskManager,
                 APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);

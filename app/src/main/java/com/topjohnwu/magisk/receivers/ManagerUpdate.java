@@ -15,9 +15,8 @@ import java.io.File;
 public class ManagerUpdate extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        MagiskManager magiskManager = Utils.getMagiskManager(context);
         Utils.dlAndReceive(
-                magiskManager,
+                context,
                 new DownloadReceiver() {
                     @Override
                     public void onDownloadDone(Uri uri) {
@@ -36,8 +35,8 @@ public class ManagerUpdate extends BroadcastReceiver {
                         }
                     }
                 },
-                magiskManager.managerLink,
+                intent.getStringExtra("link"),
                 Utils.getLegalFilename("MagiskManager-v" +
-                        magiskManager.remoteManagerVersionString + ".apk"));
+                        intent.getStringExtra("version") + ".apk"));
     }
 }
