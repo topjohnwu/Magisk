@@ -1,6 +1,7 @@
 /* misc.c - Store all functions that are unable to be catagorized clearly
  */
 
+#define _GNU_SOURCE
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,7 @@
 #include <pwd.h>
 #include <signal.h>
 #include <errno.h>
+#include <sched.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mount.h>
@@ -456,4 +458,18 @@ int resize_img(const char *img, int size) {
 	char buffer[PATH_MAX];
 	snprintf(buffer, PATH_MAX, "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
 	return system(buffer);
+}
+
+int switch_mnt_ns(int pid) {
+	char mnt[32];
+	snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+	if(access(mnt, R_OK) == -1) return 1; // Maybe process died..
+
+	int fd, ret;
+	fd = xopen(mnt, O_RDONLY);
+	if (fd < 0) return 1;
+	// Switch to its namespace
+	ret = setns(fd, 0);
+	close(fd);
+	return ret;
 }

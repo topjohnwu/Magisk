@@ -94,5 +94,6 @@ void get_client_cred(int fd, struct ucred *cred);
 int create_img(const char *img, int size);
 int get_img_size(const char *img, int *used, int *total);
 int resize_img(const char *img, int size);
+int switch_mnt_ns(int pid);
 
 #endif

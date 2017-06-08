@@ -56,7 +56,6 @@ int hide_daemon() {
 	// When an error occurs, report its failure to main process
 	err_handler = hide_daemon_err;
 	
-	int fd;
 	char buffer[4096], cache_block[256], *line;
 	struct vector mount_list;
 	
@@ -73,13 +72,8 @@ int hide_daemon() {
 		manage_selinux();
 		relink_sbin();
 
-		snprintf(buffer, sizeof(buffer), "/proc/%d/ns/mnt", pid);
-		if(access(buffer, F_OK) == -1) continue; // Maybe process died..
-
-		fd = xopen(buffer, O_RDONLY);
-		// Switch to its namespace
-		xsetns(fd, 0);
-		close(fd);
+		if (switch_mnt_ns(pid))
+			continue;
 
 		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
 		vec_init(&mount_list);
