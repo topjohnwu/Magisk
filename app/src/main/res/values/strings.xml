@@ -175,6 +175,14 @@
     <string name="user_indepenent_summary">Each user has its own separate root rules</string>
     <string name="multiuser_hint_owner_request">A request has been sent to the device owner. Please switch to the owner and grant the permission</string>
 
+    <string name="mount_namespace_mode">Mount Namespace Mode</string>
+    <string name="settings_ns_global">Global Namespace</string>
+    <string name="settings_ns_requester">Requester Namespace</string>
+    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="global_summary">All root sessions use the global mount namespace</string>
+    <string name="requester_summary">Root sessions will use its requester\'s namespace</string>
+    <string name="isolate_summary">Each root session will have its own isolated namespace</string>
+
     <string name="settings_development_category">App Development</string>
     <string name="settings_developer_logging_title">Enable advanced debug logging</string>
     <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>

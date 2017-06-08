@@ -61,4 +61,16 @@
         <item>@string/user_indepenent_summary</item>
     </string-array>
 
+    <string-array name="namespace">
+        <item>@string/settings_ns_global</item>
+        <item>@string/settings_ns_requester</item>
+        <item>@string/settings_ns_isolate</item>
+    </string-array>
+
+    <string-array name="namespace_summary">
+        <item>@string/global_summary</item>
+        <item>@string/requester_summary</item>
+        <item>@string/isolate_summary</item>
+    </string-array>
+
 </resources>

@@ -59,6 +59,12 @@
             android:entryValues="@array/value_array" />
 
         <ListPreference
+            android:key="mnt_ns"
+            android:title="@string/mount_namespace_mode"
+            android:entries="@array/namespace"
+            android:entryValues="@array/value_array" />
+
+        <ListPreference
             android:key="su_auto_response"
             android:title="@string/auto_response"
             android:entries="@array/auto_response"

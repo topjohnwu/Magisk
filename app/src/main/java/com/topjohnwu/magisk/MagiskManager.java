@@ -77,6 +77,7 @@ public class MagiskManager extends Application {
     public int multiuserMode;
     public int suResponseType;
     public int suNotificationType;
+    public int suNamespaceMode;
 
     // Global resources
     public SharedPreferences prefs;
@@ -137,6 +138,7 @@ public class MagiskManager extends Application {
                 .putString("su_notification", String.valueOf(suNotificationType))
                 .putString("su_access", String.valueOf(suAccessState))
                 .putString("multiuser_mode", String.valueOf(multiuserMode))
+                .putString("mnt_ns", String.valueOf(suNamespaceMode))
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
@@ -164,6 +166,7 @@ public class MagiskManager extends Application {
         if (isSuClient) {
             suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, 3);
             multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, 0);
+            suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, 1);
         }
     }
 

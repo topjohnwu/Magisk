@@ -21,6 +21,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ROOT_ACCESS = "root_access";
     public static final String MULTIUSER_MODE = "multiuser_mode";
+    public static final String MNT_NS = "mnt_ns";
 
     private static final int DATABASE_VER = 2;
     private static final String POLICY_TABLE = "policies";
