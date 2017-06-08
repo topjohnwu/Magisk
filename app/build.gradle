@@ -9,8 +9,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 40
-        versionName "5.0.0"
+        versionCode 41
+        versionName "5.0.1"
         ndk {
             moduleName 'zipadjust'
             abiFilters 'x86', 'armeabi-v7a'
