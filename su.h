@@ -11,18 +11,24 @@
 
 #define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
 
-// Property check for root access
+// DB settings for root access
 #define ROOT_ACCESS_ENTRY         "root_access"
 #define ROOT_ACCESS_DISABLED      0
 #define ROOT_ACCESS_APPS_ONLY     1
 #define ROOT_ACCESS_ADB_ONLY      2
 #define ROOT_ACCESS_APPS_AND_ADB  3
 
-// Property for multiuser
+// DB settings for multiuser
 #define MULTIUSER_MODE_ENTRY            "multiuser_mode"
 #define MULTIUSER_MODE_OWNER_ONLY       0
 #define MULTIUSER_MODE_OWNER_MANAGED    1
 #define MULTIUSER_MODE_USER             2
+
+// DB settings for namespace seperation
+#define NAMESPACE_MODE_ENTRY      "mnt_ns"
+#define NAMESPACE_MODE_GLOBAL     0
+#define NAMESPACE_MODE_REQUESTER  1
+#define NAMESPACE_MODE_ISOLATE    2
 
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
@@ -59,6 +65,7 @@ struct su_info {
     int clock;
     int multiuser_mode;
     int root_access;
+    int mnt_ns;
     struct list_head pos;
 };
 

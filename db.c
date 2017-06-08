@@ -46,6 +46,8 @@ static int settings_callback(void *v, int argc, char **argv, char **azColName) {
 				target = &ctx->info->root_access;
 			else if (strcmp(argv[i], MULTIUSER_MODE_ENTRY) == 0)
 				target = &ctx->info->multiuser_mode;
+			else if (strcmp(argv[i], NAMESPACE_MODE_ENTRY) == 0)
+				target = &ctx->info->mnt_ns;
 			entry = argv[i];
 		} else if (strcmp(azColName[i], "value") == 0) {
 			value = atoi(argv[i]);
@@ -62,6 +64,7 @@ void database_check(struct su_context *ctx) {
 	// Set default values
 	ctx->info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 	ctx->info->multiuser_mode = MULTIUSER_MODE_OWNER_ONLY;
+	ctx->info->mnt_ns = NAMESPACE_MODE_REQUESTER;
 	ctx->info->policy = QUERY;
 
 	// Check if file is readable

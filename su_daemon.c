@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
+#include <sched.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -259,6 +260,24 @@ void su_daemon_receiver(int client) {
 
 	// Become session leader
 	xsetsid();
+
+	// Handle namespaces
+	switch (info->mnt_ns) {
+	case NAMESPACE_MODE_GLOBAL:
+		LOGD("su: use global namespace\n");
+		break;
+	case NAMESPACE_MODE_REQUESTER:
+		LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
+		if (switch_mnt_ns(su_ctx->pid)) {
+			LOGD("su: setns failed, fallback to isolated\n");
+			unshare(CLONE_NEWNS);
+		}
+		break;
+	case NAMESPACE_MODE_ISOLATE:
+		LOGD("su: use new isolated namespace\n");
+		unshare(CLONE_NEWNS);
+		break;
+	}
 
 	// Let's read some info from the socket
 	int argc = read_int(client);
