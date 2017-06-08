@@ -15,10 +15,6 @@
 #include "utils.h"
 #include "daemon.h"
 
-#ifdef DEBUG
-int debug_log_pid, debug_log_fd;
-#endif
-
 static void *logger_thread(void *args) {
 	// Setup error handler
 	err_handler = exit_thread;
@@ -47,11 +43,4 @@ void monitor_logs() {
 	pthread_t thread;
 	xpthread_create(&thread, NULL, logger_thread, NULL);
 	pthread_detach(thread);
-
-#ifdef DEBUG
-	// Start debug logs in new process
-	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	char *const command[] = { "logcat", "-v", "brief", NULL };
-	debug_log_pid = run_command(0, &debug_log_fd, "/system/bin/logcat", command);
-#endif
 }

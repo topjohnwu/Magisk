@@ -21,6 +21,10 @@
 static char *buf, *buf2;
 static struct vector module_list;
 
+#ifdef DEBUG
+static int debug_log_pid, debug_log_fd;
+#endif
+
 /******************
  * Node structure *
  ******************/
@@ -485,11 +489,19 @@ unblock:
 void post_fs_data(int client) {
 	// Error handler
 	err_handler = unblock_boot_process;
+
 	// ack
 	write_int(client, 0);
 	close(client);
 	if (!check_data())
 		goto unblock;
+
+#ifdef DEBUG
+	// Start debug logs in new process
+	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
+	char *const command[] = { "logcat", "-v", "brief", NULL };
+	debug_log_pid = run_command(0, &debug_log_fd, "/system/bin/logcat", command);
+#endif
 
 	LOGI("** post-fs-data mode running\n");
 
