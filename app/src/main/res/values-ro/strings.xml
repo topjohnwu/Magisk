@@ -166,6 +166,14 @@
     <string name="user_indepenent_summary">Fiecare utilizator are propriile reguli de acces la root</string>
     <string name="multiuser_hint_owner_request">A fost trimisă o solicitare proprietarului dispozitivului. Comutaţi la proprietar și acordați permisiunea</string>
 
+    <string name="mount_namespace_mode">Mod montare spaţiu de nume</string>
+    <string name="settings_ns_global">Spaţiu de nume global</string>
+    <string name="settings_ns_requester">Spaţiu de nume moştenit</string>
+    <string name="settings_ns_isolate">Spațiu de nume izolat</string>
+    <string name="global_summary">Toate sesiunile de root utilizează spațiul de nume global</string>
+    <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
+    <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
+
     <string name="settings_development_category">Dezvoltare aplicaţie</string>
     <string name="settings_developer_logging_title">Activați logarea avansată de depanare</string>
     <string name="settings_developer_logging_summary">Bifați această opțiune pentru a activa înregistrarea detaliată</string>
