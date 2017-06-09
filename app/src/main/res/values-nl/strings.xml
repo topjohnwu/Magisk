@@ -160,12 +160,6 @@
     <string name="request_timeout_summary">%1$s seconden</string>
     <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
-
-    <string name="settings_development_category">App-ontwikkeling</string>
-    <string name="settings_developer_logging_title">Geavanceerde debug logs inschakelen</string>
-    <string name="settings_developer_logging_summary">Aanvinken om uitgebreide logs in te schakelen</string>
-    <string name="settings_shell_logging_title">Shell-opdracht debug logs inschakelen</string>
-    <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer logs in te schakelen</string>
     
     <string name="multiuser_mode">Multi-gebruiker modus</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
@@ -176,6 +170,20 @@
     <string name="user_indepenent_summary">Iedere gebruiker heeft eigen afzonderlijke rootregels</string>
     <string name="multiuser_hint_owner_request">Een verzoek is naar de apparaateigenaar verstuurd. Wissel van gebruiker en sta de rechten toe</string>
 
+    <string name="mount_namespace_mode">Naamruimte-mount modus</string>
+    <string name="settings_ns_global">Globale naamruimte</string>
+    <string name="settings_ns_requester">Verkrijg naamruimte</string>
+    <string name="settings_ns_isolate">Geïsoleerde naamruimte</string>
+    <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
+    <string name="requester_summary">Rootsessies verkrijgen de verzoeker\'s naamruimte</string>
+    <string name="isolate_summary">Iedere rootsessie heeft een eigen geïsoleerde naamruimte</string>
+    
+    <string name="settings_development_category">App-ontwikkeling</string>
+    <string name="settings_developer_logging_title">Geavanceerde debug logs inschakelen</string>
+    <string name="settings_developer_logging_summary">Aanvinken om uitgebreide logs in te schakelen</string>
+    <string name="settings_shell_logging_title">Shell-opdracht debug logs inschakelen</string>
+    <string name="settings_shell_logging_summary">Aanvinken om alle shell-opdracht en uitvoer logs in te schakelen</string>
+    
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
     <string name="deny_with_str">Weigeren %1$s</string>
