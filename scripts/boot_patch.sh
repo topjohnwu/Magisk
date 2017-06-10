@@ -29,7 +29,7 @@ cd `dirname $1`
 BOOTIMAGE="`pwd`/`basename $1`"
 cd "$CWD"
 
-if [ -z $BOOTIMAGE ]; then
+if [ -z "$BOOTIMAGE" ]; then
   ui_print_wrap "This script requires a boot image as a parameter"
   exit 1
 fi
@@ -59,17 +59,17 @@ grep_prop() {
 
 # --cpio-add <incpio> <mode> <entry> <infile>
 cpio_add() {
-  LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-add ramdisk.cpio $1 $2 $3
+  ./magiskboot --cpio-add ramdisk.cpio $1 $2 $3
 }
 
 # --cpio-extract <incpio> <entry> <outfile>
 cpio_extract() {
-  LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-extract ramdisk.cpio $1 $2
+  ./magiskboot --cpio-extract ramdisk.cpio $1 $2
 }
 
 # --cpio-mkdir <incpio> <mode> <entry>
 cpio_mkdir() {
-  LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-mkdir ramdisk.cpio $1 $2
+  ./magiskboot --cpio-mkdir ramdisk.cpio $1 $2
 }
 
 ##########################################################################################
@@ -80,11 +80,8 @@ cpio_mkdir() {
 [ -z $SOURCEDMODE ] && cd "`dirname "${BASH_SOURCE:-$0}"`"
 chmod +x ./*
 
-# Detect ARCH
-[ -d /system/lib64 ] && SYSTEMLIB=/system/lib64 || SYSTEMLIB=/system/lib
-
 ui_print_wrap "- Unpacking boot image"
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --unpack $BOOTIMAGE
+./magiskboot --unpack "$BOOTIMAGE"
 
 case $? in
   1 )
@@ -108,28 +105,28 @@ esac
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print_wrap "- Checking ramdisk status"
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-test ramdisk.cpio
+./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
     ui_print_wrap "- Stock boot image detected!"
     ui_print_wrap "- Backing up stock boot image"
-    SHA1=`LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --sha1 $BOOTIMAGE | tail -n 1`
+    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" | tail -n 1`
     STOCKDUMP=stock_boot_${SHA1}.img
-    dd if=$BOOTIMAGE of=$STOCKDUMP
-    LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --compress $STOCKDUMP
+    dd if="$BOOTIMAGE" of=$STOCKDUMP
+    ./magiskboot --compress $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
     ui_print_wrap "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
     if [ -z $SHA1 ]; then
-      LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc.old
+      ./magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc.old
       SHA1=`grep_prop "# STOCKSHA1" init.magisk.rc.old`
       rm -f init.magisk.rc.old
     fi
 
     OK=false
-    LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-restore ramdisk.cpio
+    ./magiskboot --cpio-restore ramdisk.cpio
     if [ $? -eq 0 ]; then
       ui_print_wrap "- Ramdisk restored from internal backup"
       OK=true
@@ -141,8 +138,8 @@ case $? in
         STOCKDUMP=/data/stock_boot_${SHA1}.img
         if [ -f ${STOCKDUMP}.gz ]; then
           ui_print_wrap "- Stock boot image backup found"
-          LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
-          LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --unpack stock_boot.img
+          ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
+          ./magiskboot --unpack stock_boot.img
           rm -f stock_boot.img
           OK=true
         fi
@@ -168,8 +165,8 @@ esac
 ui_print_wrap "- Patching ramdisk"
 
 # The common patches
-$KEEPVERITY || LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-patch-dmverity ramdisk.cpio
-$KEEPFORCEENCRYPT || LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-patch-forceencrypt ramdisk.cpio
+$KEEPVERITY || ./magiskboot --cpio-patch-dmverity ramdisk.cpio
+$KEEPFORCEENCRYPT || ./magiskboot --cpio-patch-forceencrypt ramdisk.cpio
 
 # Add magisk entrypoint
 cpio_extract init.rc init.rc
@@ -180,7 +177,7 @@ rm -f init.rc
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
-LD_LIBRARY_PATH=$SYSTEMLIB ./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
+./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
 cpio_add 644 sepolicy sepolicy
 rm -f sepolicy
 
@@ -194,7 +191,7 @@ cpio_add 750 init.magisk.rc init.magisk.rc
 cpio_add 755 sbin/magisk magisk
 
 # Create ramdisk backups
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
+./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
 
 rm -f ramdisk.cpio.orig
 
@@ -205,16 +202,16 @@ rm -f ramdisk.cpio.orig
 # Hexpatches
 
 # Remove Samsung RKP in stock kernel
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --hexpatch kernel \
+./magiskboot --hexpatch kernel \
 49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 ui_print_wrap "- Repacking boot image"
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --repack $BOOTIMAGE
+./magiskboot --repack "$BOOTIMAGE"
 
 if [ $? -ne 0 ]; then
   ui_print_wrap "! Unable to repack boot image!"
   exit 1
 fi
 
-LD_LIBRARY_PATH=$SYSTEMLIB ./magiskboot --cleanup
+./magiskboot --cleanup

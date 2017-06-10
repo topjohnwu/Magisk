@@ -11,16 +11,15 @@
 
 # Detect whether in boot mode
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-$BOOTMODE || ps -A | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
+$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
 
 # This path should work in any cases
 TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/magisk
 COMMONDIR=$INSTALLER/common
-BOOTTMP=$TMPDIR/boottmp
-COREDIR=/magisk/.core
 CHROMEDIR=$INSTALLER/chromeos
+COREDIR=/magisk/.core
 
 # Default permissions
 umask 022
@@ -81,16 +80,19 @@ getvar() {
 
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
-    for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
-      BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || readlink /dev/block/platform/*/by-name/$PARTITION || readlink /dev/block/platform/*/*/by-name/$PARTITION`
-      if [ ! -z "$BOOTIMAGE" ]; then break; fi
+    for PARTITION in kern-a android_boot kernel boot lnx; do
+      BOOTIMAGE=`find /dev -iname "$PARTITION"`
+      [ ! -z $BOOTIMAGE ] && break
     done
   fi
+  # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
-    FSTAB="/etc/recovery.fstab"
-    [ ! -f "$FSTAB" ] && FSTAB="/etc/recovery.fstab.bak"
-    [ -f "$FSTAB" ] && BOOTIMAGE=`grep -E '\b/boot\b' "$FSTAB" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+    for FSTAB in /etc/*fstab*; do
+      BOOTIMAGE=`grep -E '\b/boot\b' $FSTAB | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+      [ ! -z $BOOTIMAGE ] && break
+    done
   fi
+  [ -L "$BOOTIMAGE" ] && BOOTIMAGE=`readlink $BOOTIMAGE`
 }
 
 is_mounted() {
@@ -194,6 +196,12 @@ if [ ! -f '/system/build.prop' ]; then
   exit 1
 fi
 
+# Prefer binaries and libs in /system
+[ -e /vendor ] || ln -s /system/vendor /vendor
+export PATH=/system/bin:/system/xbin:/vendor/bin:$PATH
+export LD_LIBRARY_PATH=/system/lib:/vendor/lib:/sbin
+[ -d /system/lib64 ] && export LD_LIBRARY_PATH=/system/lib64:/vendor/lib64:/sbin
+
 # read override variables
 getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
@@ -295,23 +303,23 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
-  SHA1=`LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
+  SHA1=`$BINDIR/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
-  LD_LIBRARY_PATH=$SYSTEMLIB $BINDIR/magiskboot --compress $STOCKDUMP
+  $BINDIR/magiskboot --compress $STOCKDUMP
 fi
 
 SOURCEDMODE=true
 cd $MAGISKBIN
 
 # Source the boot patcher
-. $COMMONDIR/boot_patch.sh $BOOTIMAGE
+. $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
 
 # Sign chromeos boot
 if [ -f chromeos ]; then
   echo > empty
 
-  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
+  $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
   --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
   --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
 
@@ -320,15 +328,15 @@ if [ -f chromeos ]; then
 fi
 
 if is_mounted /data; then
-  rm -f /data/stock_boot*
-  mv stock_boot* /data
+  rm -f /data/stock_boot* 2>/dev/null
+  mv stock_boot* /data 2>/dev/null
 fi
 
 ui_print "- Flashing new boot image"
-if [ -L $BOOTIMAGE ]; then
-  dd if=new-boot.img of=$BOOTIMAGE bs=4096
+if [ -L "$BOOTIMAGE" ]; then
+  dd if=new-boot.img of="$BOOTIMAGE" bs=4096
 else
-  cat new-boot.img /dev/zero | dd of=$BOOTIMAGE bs=4096
+  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096
 fi
 rm -f new-boot.img
 
@@ -339,7 +347,7 @@ if ! $BOOTMODE; then
   umount /magisk
   losetup -d $MAGISKLOOP 2>/dev/null
   rmdir /magisk
-  umount /system
+  umount -l /system
 fi
 
 ui_print "- Done"
