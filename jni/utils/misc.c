@@ -419,12 +419,17 @@ int create_img(const char *img, int size) {
 	xwrite(fd, file_contexts, sizeof(file_contexts));
 	close(fd);
 
-	char command[PATH_MAX];
-	snprintf(command, sizeof(command),
-		"make_ext4fs -l %dM -a /magisk -S /dev/file_contexts_image %s", size, img);
-	int ret = system(command);
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer),
+		"make_ext4fs -l %dM -a /magisk -S /dev/file_contexts_image %s; e2fsck -yf %s;", size, img, img);
+	char *const command[] = { "sh", "-c", buffer, NULL };
+	int pid, status;
+	pid = run_command(0, NULL, "/system/bin/sh", command);
+	if (pid == -1)
+		return 1;
+	waitpid(pid, &status, 0);
 	unlink("/dev/file_contexts_image");
-	return ret;
+	return WEXITSTATUS(status);
 }
 
 int get_img_size(const char *img, int *used, int *total) {
@@ -433,22 +438,23 @@ int get_img_size(const char *img, int *used, int *total) {
 	char buffer[PATH_MAX];
 	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s", img);
 	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, fd = 0, ret = 1;
+	int pid, fd = 0, status = 1;
 	pid = run_command(1, &fd, "/system/bin/sh", command);
 	if (pid == -1)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd)) {
+		LOGD("magisk_img: %s", buffer);
 		if (strstr(buffer, img)) {
 			char *tok;
 			tok = strtok(buffer, ",");
 			while(tok != NULL) {
 				if (strstr(tok, "blocks")) {
-					ret = 0;
+					status = 0;
 					break;
 				}
 				tok = strtok(NULL, ",");
 			}
-			if (ret) continue;
+			if (status) continue;
 			sscanf(tok, "%d/%d", used, total);
 			*used = *used / 256 + 1;
 			*total /= 256;
@@ -456,15 +462,24 @@ int get_img_size(const char *img, int *used, int *total) {
 		}
 	}
 	close(fd);
-	waitpid(pid, NULL, 0);
-	return ret;
+	waitpid(pid, &status, 0);
+	return WEXITSTATUS(status);
 }
 
 int resize_img(const char *img, int size) {
 	LOGI("Resize %s to %dM\n", img, size);
 	char buffer[PATH_MAX];
-	snprintf(buffer, PATH_MAX, "resize2fs %s %dM;", img, size);
-	return system(buffer);
+	snprintf(buffer, sizeof(buffer), "resize2fs %s %dM; e2fsck -yf %s;", img, size, img);
+	char *const command[] = { "sh", "-c", buffer, NULL };
+	int pid, status, fd = 0;
+	pid = run_command(1, &fd, "/system/bin/sh", command);
+	if (pid == -1)
+		return 1;
+	while (fdgets(buffer, sizeof(buffer), fd))
+		LOGD("magisk_img: %s", buffer);
+	close(fd);
+	waitpid(pid, &status, 0);
+	return WEXITSTATUS(status);
 }
 
 int switch_mnt_ns(int pid) {

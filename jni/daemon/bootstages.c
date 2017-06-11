@@ -91,6 +91,8 @@ static void umount_image(const char *target, const char *device) {
 }
 
 #define round_size(a) ((((a) / 32) + 2) * 32)
+#define SOURCE_TMP "/dev/source"
+#define TARGET_TMP "/dev/target"
 
 static int merge_img(const char *source, const char *target) {
 	if (access(source, F_OK) == -1)
@@ -105,20 +107,20 @@ static int merge_img(const char *source, const char *target) {
 	if (get_img_size(source, &s_used, &s_total)) return 1;
 	if (get_img_size(target, &t_used, &t_total)) return 1;
 	n_total = round_size(s_used + t_used);
-	if (n_total != t_total && resize_img(target, n_total))
-		return 1;
+	if (n_total != t_total)
+		resize_img(target, n_total);
 
-	mkdir("/cache/source", 0755);
-	mkdir("/cache/target", 0755);
+	mkdir(SOURCE_TMP, 0755);
+	mkdir(TARGET_TMP, 0755);
 	char *s_loop, *t_loop;
-	s_loop = mount_image(source, "/cache/source");
+	s_loop = mount_image(source, SOURCE_TMP);
 	if (s_loop == NULL) return 1;
-	t_loop = mount_image(target, "/cache/target");
+	t_loop = mount_image(target, TARGET_TMP);
 	if (t_loop == NULL) return 1;
 
 	DIR *dir;
 	struct dirent *entry;
-	if (!(dir = opendir("/cache/source")))
+	if (!(dir = opendir(SOURCE_TMP)))
 		return 1;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
@@ -128,7 +130,7 @@ static int merge_img(const char *source, const char *target) {
 				strcmp(entry->d_name, "lost+found") == 0)
 				continue;
 			// Cleanup old module
-			snprintf(buf, PATH_MAX, "/cache/target/%s", entry->d_name);
+			snprintf(buf, PATH_MAX, "/dev/target/%s", entry->d_name);
 			if (access(buf, F_OK) == 0) {
 				LOGI("Upgrade module: %s\n", entry->d_name);
 				rm_rf(buf);
@@ -138,13 +140,13 @@ static int merge_img(const char *source, const char *target) {
 		}
 	}
 	closedir(dir);
-	clone_dir("/cache/source", "/cache/target");
+	clone_dir(SOURCE_TMP, TARGET_TMP);
 
 	// Unmount all loop devices
-	umount_image("/cache/source", s_loop);
-	umount_image("/cache/target", t_loop);
-	rmdir("/cache/source");
-	rmdir("/cache/target");
+	umount_image(SOURCE_TMP, s_loop);
+	umount_image(TARGET_TMP, t_loop);
+	rmdir(SOURCE_TMP);
+	rmdir(TARGET_TMP);
 	free(s_loop);
 	free(t_loop);
 	unlink(source);
@@ -550,9 +552,6 @@ void post_fs_data(int client) {
 			goto unblock;
 		new_img = 1;
 	}
-
-	// Initialize resetprop for the daemon
-	init_resetprop();
 
 	LOGI("* Mounting " MAINIMG "\n");
 	// Mounting magisk image
