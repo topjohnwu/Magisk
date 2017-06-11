@@ -121,13 +121,17 @@ static int usage(char* arg0) {
     return 1;
 }
 
-int init_resetprop() {
-    PRINT_D("resetprop: Initializing...\n");
+static int init_resetprop() {
     if (__system_properties_init2()) {
         PRINT_E("resetprop: Initialize error\n");
         return -1;
     }
     return 0;
+}
+
+int prop_exist(const char *name) {
+    if (init_resetprop()) return 0;
+    return __system_property_find2(name) != NULL;
 }
 
 static void read_prop_info(void* cookie, const char *name, const char *value, uint32_t serial) {
@@ -136,9 +140,10 @@ static void read_prop_info(void* cookie, const char *name, const char *value, ui
 
 // Get prop by name, return string (should free manually!)
 char *getprop(const char *name) {
+    if (init_resetprop()) return NULL;
     const prop_info *pi = __system_property_find2(name);
     if (pi == NULL) {
-        PRINT_D("resetprop: failed to get [%s]\n", name);
+        PRINT_D("resetprop: prop [%s] does not exist\n", name);
         return NULL;
     }
     char value[PROP_VALUE_MAX];
@@ -152,16 +157,16 @@ int setprop(const char *name, const char *value) {
 }
 
 int setprop2(const char *name, const char *value, const int trigger) {
+    if (init_resetprop()) return -1;
     int ret;
     
-    char *check = getprop(name);
-    if (check) {
-        free(check);
+    prop_info *pi = (prop_info*) __system_property_find2(name);
+    if (pi != NULL) {
         if (trigger) {
             if (!strncmp(name, "ro.", 3)) deleteprop(name);
             ret = __system_property_set2(name, value);
         } else {
-            ret = __system_property_update2((prop_info*) __system_property_find2(name), value, strlen(value));
+            ret = __system_property_update2(pi, value, strlen(value));
         }
     } else {
         PRINT_D("resetprop: New prop [%s]\n", name);
@@ -182,6 +187,7 @@ int setprop2(const char *name, const char *value, const int trigger) {
 }
 
 int deleteprop(const char *name) {
+    if (init_resetprop()) return -1;
     PRINT_D("resetprop: deleteprop [%s]\n", name);
     if (__system_property_del(name)) {
         PRINT_E("resetprop: delete prop: [%s] error\n", name);
@@ -191,6 +197,7 @@ int deleteprop(const char *name) {
 }
 
 int read_prop_file(const char* filename, const int trigger) {
+    if (init_resetprop()) return -1;
     PRINT_D("resetprop: Load prop file [%s]\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -276,8 +283,6 @@ int resetprop_main(int argc, char *argv[]) {
             }
         }
     }
-
-    init_resetprop();
 
     if (file) {
         return read_prop_file(filename, trigger);

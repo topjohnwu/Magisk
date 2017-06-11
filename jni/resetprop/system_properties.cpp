@@ -1149,9 +1149,7 @@ int __system_properties_init2() {
 
   if (initialized) {
     // list_foreach(contexts, [](context_node* l) { l->reset_access(); });    // resetprop remove
-    // return 0;                                                              // resetprop remove
-    free_and_unmap_contexts();                                                // resetprop add
-    initialized = false;                                                      // resetprop add
+    return 0;
   }
   if (is_dir(property_filename)) {
     if (!initialize_properties()) {

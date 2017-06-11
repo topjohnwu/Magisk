@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-int init_resetprop();
+int prop_exist(const char *name);
 int setprop(const char *name, const char *value);
 int setprop2(const char *name, const char *value, const int trigger);
 char *getprop(const char *name);
