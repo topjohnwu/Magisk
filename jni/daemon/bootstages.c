@@ -102,14 +102,14 @@ static int merge_img(const char *source, const char *target) {
 	
 	// resize target to worst case
 	int s_used, s_total, t_used, t_total, n_total;
-	get_img_size(source, &s_used, &s_total);
-	get_img_size(target, &t_used, &t_total);
+	if (get_img_size(source, &s_used, &s_total)) return 1;
+	if (get_img_size(target, &t_used, &t_total)) return 1;
 	n_total = round_size(s_used + t_used);
 	if (n_total != t_total && resize_img(target, n_total))
 		return 1;
 
-	xmkdir("/cache/source", 0755);
-	xmkdir("/cache/target", 0755);
+	mkdir("/cache/source", 0755);
+	mkdir("/cache/target", 0755);
 	char *s_loop, *t_loop;
 	s_loop = mount_image(source, "/cache/source");
 	if (s_loop == NULL) return 1;
@@ -130,8 +130,10 @@ static int merge_img(const char *source, const char *target) {
 			// Cleanup old module
 			snprintf(buf, PATH_MAX, "/cache/target/%s", entry->d_name);
 			if (access(buf, F_OK) == 0) {
-				LOGI("merge module %s\n", entry->d_name);
+				LOGI("Upgrade module: %s\n", entry->d_name);
 				rm_rf(buf);
+			} else {
+				LOGI("New module: %s\n", entry->d_name);
 			}
 		}
 	}
@@ -523,19 +525,23 @@ void post_fs_data(int client) {
 	}
 
 	// Magisk Manual Injector support
-	if (access("/data/local/tmp/magisk", F_OK) == 0) {
+	if (access("/data/local/tmp/magisk_inject", F_OK) == 0) {
 		rm_rf(DATABIN);
-		rename("/data/local/tmp/magisk", DATABIN);
+		rename("/data/local/tmp/magisk_inject", DATABIN);
 	}
 
 	// Lazy.... use shell blob
 	system("mv /data/magisk/stock_boot* /data;");
 
 	// Merge images
-	if (merge_img("/cache/magisk.img", MAINIMG))
+	if (merge_img("/cache/magisk.img", MAINIMG)) {
+		LOGE("Image merge %s -> %s failed!\n", "/cache/magisk.img", MAINIMG);
 		goto unblock;
-	if (merge_img("/data/magisk_merge.img", MAINIMG))
+	}
+	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
+		LOGE("Image merge %s -> %s failed!\n", "/data/magisk_merge.img", MAINIMG);
 		goto unblock;
+	}
 
 	int new_img = 0;
 
@@ -735,12 +741,19 @@ void late_start(int client) {
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");
 	exec_common_script("service");
+
+	// Core only mode
+	if (access(DISABLEFILE, F_OK) == 0) {
+		setprop("ro.magisk.disable", "1");
+		return;
+	}
+
 	LOGI("* Running module service scripts\n");
 	exec_module_script("service");
 
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
-		while(1) {
+		while (1) {
 			sleep(5);
 			char *const command[] = { "sh", "-c", 
 				"CLASSPATH=/system/framework/pm.jar "
@@ -765,7 +778,6 @@ void late_start(int client) {
 
 #ifdef DEBUG
 	// Stop recording the boot logcat after every boot task is done
-	extern int debug_log_pid, debug_log_fd;
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
 	close(debug_log_fd);

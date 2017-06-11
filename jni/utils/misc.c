@@ -277,11 +277,11 @@ int mkdir_p(const char *pathname, mode_t mode) {
 
 int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, NULL, MS_BIND, NULL);
-	#ifdef DEBUG
+#ifdef DEBUG
 	LOGD("bind_mount: %s -> %s\n", from, to);
-	#else
+#else
 	LOGI("bind_mount: %s\n", to);
-	#endif
+#endif
 	return ret;
 }
 
@@ -431,32 +431,39 @@ int get_img_size(const char *img, int *used, int *total) {
 	if (access(img, R_OK) == -1)
 		return 1;
 	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer), "e2fsck -n %s 2>/dev/null | tail -n 1", img);
+	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s", img);
 	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, fd = 0;
-	pid = run_command(0, &fd, "/system/bin/sh", command);
-	fdgets(buffer, sizeof(buffer), fd);
-	close(fd);
+	int pid, fd = 0, ret = 1;
+	pid = run_command(1, &fd, "/system/bin/sh", command);
 	if (pid == -1)
 		return 1;
-	waitpid(pid, NULL, 0);
-	char *tok;
-	tok = strtok(buffer, ",");
-	while(tok != NULL) {
-		if (strstr(tok, "blocks"))
+	while (fdgets(buffer, sizeof(buffer), fd)) {
+		if (strstr(buffer, img)) {
+			char *tok;
+			tok = strtok(buffer, ",");
+			while(tok != NULL) {
+				if (strstr(tok, "blocks")) {
+					ret = 0;
+					break;
+				}
+				tok = strtok(NULL, ",");
+			}
+			if (ret) continue;
+			sscanf(tok, "%d/%d", used, total);
+			*used = *used / 256 + 1;
+			*total /= 256;
 			break;
-		tok = strtok(NULL, ",");
+		}
 	}
-	sscanf(tok, "%d/%d", used, total);
-	*used = *used / 256 + 1;
-	*total /= 256;
-	return 0;
+	close(fd);
+	waitpid(pid, NULL, 0);
+	return ret;
 }
 
 int resize_img(const char *img, int size) {
 	LOGI("Resize %s to %dM\n", img, size);
 	char buffer[PATH_MAX];
-	snprintf(buffer, PATH_MAX, "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
+	snprintf(buffer, PATH_MAX, "resize2fs %s %dM;", img, size);
 	return system(buffer);
 }
 
