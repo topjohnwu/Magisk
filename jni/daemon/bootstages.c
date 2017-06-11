@@ -29,11 +29,13 @@ static int debug_log_pid, debug_log_fd;
  * Node structure *
  ******************/
 
-// Precedence: MODULE > SKEL > DUMMY
-#define DO_NOTHING 0x0    /* intermediate node */
-#define IS_DUMMY   0x1    /* mount from mirror */
-#define IS_SKEL    0x2    /* mount from skeleton */
-#define IS_MODULE  0x4    /* mount from module */
+// Precedence: MODULE > SKEL > INTER > DUMMY
+#define IS_DUMMY   0x01    /* mount from mirror */
+#define IS_INTER   0x02    /* intermediate node */
+#define IS_SKEL    0x04    /* mount from skeleton */
+#define IS_MODULE  0x08    /* mount from module */
+
+#define IS_VENDOR  0x10   /* special vendor placeholder */
 
 struct node_entry {
 	const char *module;    /* Only used when status & IS_MODULE */
@@ -252,9 +254,7 @@ static struct node_entry *insert_child(struct node_entry *p, struct node_entry *
 			// Exist duplicate
 			if (c->status > e->status) {
 				// Precedence is higher, replace with new node
-				c->children = e->children;  // Preserve all children
-				free(e->name);
-				free(e);
+				destroy_subtree(e);
 				vec_entry(p->children)[_] = c;
 				return c;
 			} else {
@@ -289,24 +289,43 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 		node->name = strdup(entry->d_name);
 		node->type = entry->d_type;
 		snprintf(buf, PATH_MAX, "%s/%s", parent_path, node->name);
-		// Check if the entry has a correspond target
+
+		/*
+		 * Clone the parent in the following condition:
+		 * 1. File in module is a symlink
+		 * 2. Target file do not exist
+		 * 3. Target file is a symlink, but not /system/vendor
+		 */ 
+		int clone = 0;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
+			clone = 1;
+		} else if (strcmp(parent->name, "/system") != 0 || strcmp(node->name, "vendor") != 0) {
+			struct stat s;
+			xstat(buf, &s);
+			if (S_ISLNK(s.st_mode))
+				clone = 1;
+		}
+
+		if (clone) {
 			// Mark the parent folder as a skeleton
-			parent->status |= IS_SKEL;
-			node->status |= IS_MODULE;
+			parent->status |= IS_SKEL;  /* This will not overwrite if parent is module */
+			node->status = IS_MODULE;
 		} else if (IS_DIR(node)) {
 			// Check if marked as replace
 			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MOUNTPOINT, module, buf);
 			if (access(buf2, F_OK) == 0) {
 				// Replace everything, mark as leaf
-				node->status |= IS_MODULE;
+				node->status = IS_MODULE;
+			} else {
+				// This will be an intermediate node
+				node->status = IS_INTER;
 			}
 		} else if (IS_REG(node)) {
 			// This is a leaf, mark as target
-			node->status |= IS_MODULE;
+			node->status = IS_MODULE;
 		}
 		node = insert_child(parent, node);
-		if (IS_DIR(node) && !(node->status & IS_MODULE)) {
+		if (node->status == IS_INTER) {
 			// Intermediate node, travel deeper
 			construct_tree(module, node);
 		}
@@ -325,7 +344,8 @@ static void clone_skeleton(struct node_entry *node) {
 
 	// Clone the structure
 	char *full_path = get_full_path(node);
-	if (!(dir = opendir(full_path)))
+	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path);
+	if (!(dir = opendir(buf)))
 		goto cleanup;
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -334,7 +354,7 @@ static void clone_skeleton(struct node_entry *node) {
 		dummy = xcalloc(sizeof(*dummy), 1);
 		dummy->name = strdup(entry->d_name);
 		dummy->type = entry->d_type;
-		dummy->status |= IS_DUMMY;
+		dummy->status = IS_DUMMY;
 		insert_child(node, dummy);
 	}
 	closedir(dir);
@@ -342,21 +362,31 @@ static void clone_skeleton(struct node_entry *node) {
 	snprintf(buf, PATH_MAX, "%s%s", DUMMDIR, full_path);
 	mkdir_p(buf, 0755);
 	clone_attr(full_path, buf);
-	bind_mount(buf, full_path);
+	if (node->status & IS_SKEL)
+		bind_mount(buf, full_path);
 
 	vec_for_each(node->children, child) {
 		snprintf(buf, PATH_MAX, "%s%s/%s", DUMMDIR, full_path, child->name);
+
 		// Create the dummy file/directory
 		if (IS_DIR(child))
-			xmkdir(buf, 0755);
+			mkdir(buf, 0755);
 		else if (IS_REG(child))
 			close(open_new(buf));
+		// Links will be handled later
 
-		if (child->status & IS_MODULE) {
+		if (child->status & IS_VENDOR) {
+			if (IS_LNK(child)) {
+				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
+				LOGI("cplink: %s -> %s\n", MIRRDIR "/system/vendor", "/system/vendor");
+			}
+			// Skip
+			continue;
+		} else if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
 			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
-		} else if (child->status & IS_SKEL) {
-			// It's another skeleton, recursive call and end
+		} else if (child->status & (IS_SKEL | IS_INTER)) {
+			// It's a intermediate folder, recursive clone
 			clone_skeleton(child);
 			continue;
 		} else if (child->status & IS_DUMMY) {
@@ -365,11 +395,8 @@ static void clone_skeleton(struct node_entry *node) {
 		}
 
 		if (IS_LNK(child)) {
-			// Symlink special treatments
-			char *temp = xmalloc(PATH_MAX);
-			xreadlink(buf2, temp, PATH_MAX);
-			symlink(temp, buf);
-			free(temp);
+			// Copy symlinks directly
+			cp_afc(buf2, buf);
 			LOGI("cplink: %s -> %s\n", buf2, buf);
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
@@ -385,31 +412,22 @@ static void magic_mount(struct node_entry *node) {
 	char *real_path;
 	struct node_entry *child;
 
-	if (strcmp(node->name, "vendor") == 0 && strcmp(node->parent->name, "/system") == 0) {
-		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MOUNTPOINT, node->module);
-		snprintf(buf2, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, node->module);
-		unlink(buf2);
-		symlink(buf, buf2);
-		return;
-	}
-
-	if (node->status) {
-		if (node->status & IS_MODULE) {
-			// The real deal, mount module item
-			real_path = get_full_path(node);
-			snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, node->module, real_path);
-			bind_mount(buf, real_path);
-			free(real_path);
-		} else if (node->status & IS_SKEL) {
-			// The node is labeled to be cloned with skeleton, lets do it
-			clone_skeleton(node);
-		}
-		// We should not see dummies, so no need to handle it here
-	} else {
+	if (node->status & IS_MODULE) {
+		// The real deal, mount module item
+		real_path = get_full_path(node);
+		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, node->module, real_path);
+		bind_mount(buf, real_path);
+		free(real_path);
+	} else if (node->status & IS_SKEL) {
+		// The node is labeled to be cloned with skeleton, lets do it
+		clone_skeleton(node);
+	} else if (node->status & IS_INTER) {
 		// It's an intermediate node, travel deeper
 		vec_for_each(node->children, child)
 			magic_mount(child);
 	}
+	// The only thing goes here should be vendor placeholder
+	// There should be no dummies, so don't need to handle it here
 }
 
 /****************
@@ -584,6 +602,7 @@ void post_fs_data(int client) {
 	// Create the system root entry
 	sys_root = xcalloc(sizeof(*sys_root), 1);
 	sys_root->name = strdup("/system");
+	sys_root->status = IS_INTER;
 
 	int has_modules = 0;
 
@@ -629,6 +648,13 @@ void post_fs_data(int client) {
 			// Construct structure
 			has_modules = 1;
 			LOGI("%s: constructing magic mount structure\n", module);
+			// If /system/vendor exists in module, create a link outside
+			snprintf(buf2, PATH_MAX, "%s/system/vendor", buf);
+			if (access(buf2, F_OK) == 0) {
+				snprintf(buf, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, module);
+				unlink(buf);
+				symlink(buf2, buf);
+			}
 			construct_tree(module, sys_root);
 		}
 	}
@@ -679,25 +705,30 @@ void post_fs_data(int client) {
 			LOGI("link: %s -> %s\n", buf, buf2);
 		}
 
-		// Magic!!
-
-		magic_mount(sys_root);
-		// Get the vendor node if exists
+		// Extract the vendor node out of system tree and swap with placeholder
 		vec_for_each(sys_root->children, child) {
 			if (strcmp(child->name, "vendor") == 0) {
 				ven_root = child;
-				free(ven_root->name);
+				child = xcalloc(sizeof(*child), 1);
+				child->type = seperate_vendor ? DT_LNK : DT_DIR;
+				child->parent = ven_root->parent;
+				child->name = ven_root->name;
+				child->status = IS_VENDOR;
+				vec_entry(sys_root->children)[_] = child;
 				ven_root->name = strdup("/vendor");
 				ven_root->parent = NULL;
 				break;
 			}
 		}
-		if (ven_root)
-			magic_mount(ven_root);
+
+		// Magic!!
+		magic_mount(sys_root);
+		if (ven_root) magic_mount(ven_root);
 	}
 
 	// Cleanup memory
 	destroy_subtree(sys_root);
+	if (ven_root) destroy_subtree(ven_root);
 
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");

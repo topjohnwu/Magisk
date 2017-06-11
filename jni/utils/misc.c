@@ -311,6 +311,7 @@ int cp_afc(const char *source, const char *target) {
 		char buffer[PATH_MAX];
 		xreadlink(source, buffer, sizeof(buffer));
 		xsymlink(buffer, target);
+		lchown(target, buf.st_uid, buf.st_gid);
 		lgetfilecon(source, &con);
 		lsetfilecon(target, con);
 		free(con);
