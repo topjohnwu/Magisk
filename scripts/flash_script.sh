@@ -81,7 +81,7 @@ getvar() {
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
     for PARTITION in kern-a android_boot kernel boot lnx; do
-      BOOTIMAGE=`find /dev -iname "$PARTITION"`
+      BOOTIMAGE=`find /dev/block -iname "$PARTITION" | head -n 1`
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
@@ -198,9 +198,8 @@ fi
 
 # Prefer binaries and libs in /system
 [ -e /vendor ] || ln -s /system/vendor /vendor
-export PATH=/system/bin:/system/xbin:/vendor/bin:$PATH
-export LD_LIBRARY_PATH=/system/lib:/vendor/lib:/sbin
-[ -d /system/lib64 ] && export LD_LIBRARY_PATH=/system/lib64:/vendor/lib64:/sbin
+ENV='LD_LIBRARY_PATH=/system/lib:/vendor/lib:/sbin PATH=/system/bin:/system/xbin:/sbin'
+[ -d /system/lib64 ] && ENV='LD_LIBRARY_PATH=/system/lib64:/vendor/lib64:/sbin PATH=/system/bin:/system/xbin:/sbin'
 
 # read override variables
 getvar KEEPVERITY
@@ -233,8 +232,6 @@ ui_print "- Device platform: $ARCH"
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
 
-$IS64BIT && SYSTEMLIB=/system/lib64 || SYSTEMLIB=/system/lib
-
 find_boot_image
 if [ -z $BOOTIMAGE ]; then
   ui_print "! Unable to detect boot image"
@@ -262,7 +259,7 @@ chcon -hR u:object_r:system_file:s0 $MAGISKBIN
 ##########################################################################################
 
 # Fix SuperSU.....
-$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
+$BOOTMODE && eval $ENV $BINDIR/magiskpolicy --live "allow fsck * * *"
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -275,7 +272,7 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  $BINDIR/magisk --createimg $IMG 64M
+  eval $ENV $BINDIR/magisk --createimg $IMG 64M
 fi
 
 mount_image $IMG /magisk
@@ -306,7 +303,7 @@ if [ -f /data/stock_boot.img ]; then
   SHA1=`$BINDIR/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
-  $BINDIR/magiskboot --compress $STOCKDUMP
+  eval $ENV $BINDIR/magiskboot --compress $STOCKDUMP
 fi
 
 SOURCEDMODE=true
@@ -319,7 +316,7 @@ cd $MAGISKBIN
 if [ -f chromeos ]; then
   echo > empty
 
-  $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
+  eval $ENV $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
   --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
   --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
 
