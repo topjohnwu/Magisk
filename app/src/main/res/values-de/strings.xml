@@ -8,15 +8,16 @@
     <string name="navigation_drawer_close">Navigationsmenü schließen</string>
 
     <string name="modules">Module</string>
-    <string name="downloads">Download</string>
+    <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Einstellungen</string>
-    <string name="status">Übersicht</string>
+    <string name="status">Status</string>
     <string name="install">Installieren</string>
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk %1$s ist installiert</string>
+    <string name="magisk_version_core_only">Magisk %1$s ist installiert (nur Kernfunktionen)</string>
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
 
     <string name="checking_for_updates">Suche nach Updates…</string>
@@ -28,11 +29,15 @@
     <string name="proper_root">Ordnungsgemäß gerootet</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
+    <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
     <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
     <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>	
     <string name="safetyNet_no_response">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_fail">SafetyNet nicht bestanden: \"CTS profile mismatch\"</string>
     <string name="safetyNet_pass">SafetyNet bestanden</string>
+    <string name="safetyNet_network_loss">Netzwerkverbindung verloren</string>
+    <string name="safetyNet_service_disconnected">Der Dienst wurde beendet</string>
+    <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
     <string name="root_info_warning">Funktionalität stark eingeschränkt</string>
 
     <!--Install Fragment-->
@@ -125,7 +130,9 @@
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_process_title">Verarbeite</string>
     <string name="manual_boot_image">Bitte Boot-Image auswählen!</string>
-
+    <string name="manager_update_title">Update für Magisk Manager verfügbar!</string>
+    <string name="manager_download_install">Herunterladen und installieren</string>
+	
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
@@ -135,6 +142,8 @@
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
+    <string name="settings_core_only_title">Nur Kernfunktionen</string>
+    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide, Systemless hosts und Busybox bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_busybox_title">BusyBox aktivieren</string>
     <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten</string>
@@ -154,7 +163,26 @@
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
     <string name="request_timeout_summary">%1$s Sekunden</string>
+    <string name="settings_su_reauth_title">Nach Updates erneut authentifizieren</string>
+    <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Updates erneut abfragen</string>
 
+    <string name="multiuser_mode">Mehrbenutzermodus</string>
+    <string name="settings_owner_only">Nur der Gerätebesitzer</string>
+    <string name="settings_owner_manage">Durch Gerätebesitzer verwaltet</string>
+    <string name="settings_user_independent">User Independent</string>
+    <string name="owner_only_summary">Nur der Besitzer hat root-Zugriff</string>
+    <string name="owner_manage_summary">Nur der Besitzer verwaltet den root-Zugriff und erhält Zugriffs-Anfragen</string>
+    <string name="user_indepenent_summary">Jeder Nutzer hat seine eingenen root-Regeln</string>
+    <string name="multiuser_hint_owner_request">Eine Anfrage wurde an den Gerätebesitzer gesendet. Bitte wechsle zum Bersitzerkonto und gewähre die Rechte</string>
+
+    <string name="mount_namespace_mode">Namensraum-Modus</string>
+    <string name="settings_ns_global">Globaler Namensraum</string>
+    <string name="settings_ns_requester">Geerbter Namensraum</string>
+    <string name="settings_ns_isolate">Isolierter Namensraum</string>
+    <string name="global_summary">Alle root-Sitzungen benutzen den global angelegten Namensraum</string>
+    <string name="requester_summary">Root-Sitzungen erben den Namensraum des Abfragenden</string>
+    <string name="isolate_summary">Jede root-Sitzung hat ihren isolierten Namensraum</string>
+	
     <string name="settings_development_category">Entwickler</string>
     <string name="settings_developer_logging_title">Erweiterte Fehlerprotokolle</string>
     <string name="settings_developer_logging_summary">Für ausführliches Logging aktivieren</string>
