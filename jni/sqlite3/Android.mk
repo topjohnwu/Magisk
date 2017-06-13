@@ -6,5 +6,5 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libsqlite
-LOCAL_SRC_FILES := sqlite3.c shell.c
+LOCAL_SRC_FILES := sqlite3.c
 include $(BUILD_SHARED_LIBRARY)
