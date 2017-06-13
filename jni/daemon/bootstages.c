@@ -325,8 +325,8 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 			node->status = IS_MODULE;
 		}
 		node = insert_child(parent, node);
-		if (node->status == IS_INTER) {
-			// Intermediate node, travel deeper
+		if (node->status & (IS_SKEL | IS_INTER)) {
+			// Intermediate folder, travel deeper
 			construct_tree(module, node);
 		}
 	}
