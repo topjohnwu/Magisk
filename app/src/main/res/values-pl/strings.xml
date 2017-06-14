@@ -17,7 +17,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Zainstalowany Magisk v%1$s</string>
-	<string name="magisk_version_core_only">Zainstalowany Magisk v%1$s (Tylko Tryb Rdzeni)</string>
+    <string name="magisk_version_core_only">Zainstalowany Magisk v%1$s (Tylko Tryb Rdzeni)</string>
     <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
@@ -29,11 +29,15 @@
     <string name="proper_root">Root Dostępny</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
+    <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>
     <string name="safetyNet_connection_failed">Nie można połączyć się z Google API</string>
     <string name="safetyNet_connection_suspended">Połączenie z Google API zostało zawieszone</string>
     <string name="safetyNet_no_response">Nie można sprawdzić SafetyNet bez internetu</string>
     <string name="safetyNet_fail">Błąd SafetyNet: Niezgodność profilu CTS</string>
     <string name="safetyNet_pass">SafetyNet Poprawny</string>
+    <string name="safetyNet_network_loss">Brak połączenia z internetem</string>
+    <string name="safetyNet_service_disconnected">Usługa została zamknięta</string>
+    <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
     <string name="root_info_warning">Funkcjonalność znacznie ograniczona</string>
 
     <!--Install Fragment-->
@@ -126,8 +130,10 @@
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     <string name="zip_process_title">Przetwarzanie</string>
     <string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
-	
-    <!--Settings Activity -->
+    <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
+    <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
+   
+   <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
@@ -136,7 +142,7 @@
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
 
-	    <string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
+    <string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide, systemless hosts i BusyBox nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
@@ -157,7 +163,26 @@
     <string name="request_timeout">Czas na decyzję</string>
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="request_timeout_summary">%1$s sekund</string>
+    <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
+    <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
+    
+    <string name="multiuser_mode">Tryb Multiusera</string>
+    <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
+    <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
+    <string name="settings_user_independent">Niezależny Użytkownik</string>
+    <string name="owner_only_summary">Tylko właściciel ma dostęp do roota</string>
+    <string name="owner_manage_summary">Tylko właściciel może zarządzać prawami dostępu użytkownika do roota iwyświetlać żądania dostępu</string>
+    <string name="user_indepenent_summary">Każdy użytkownik ma swoje własne odrębne ustawienia dostępu</string>
+    <string name="multiuser_hint_owner_request">Żądanie zostało wysłane do właściciela urządzenia. Proszę przejść do właściciela i udzielić pozwolenia</string>
 
+    <string name="mount_namespace_mode">Montuj Tryb Nazw</string>
+    <string name="settings_ns_global">Globalna Nazwa</string>
+    <string name="settings_ns_requester">Dziedziczenie Nazw</string>
+    <string name="settings_ns_isolate">Izolacja Nazw</string>
+    <string name="global_summary">Wszystkie sesje root za pomocą globalnej przestrzeni montowań nazw</string>
+    <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
+    <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
+	
     <string name="settings_development_category">Dla Developerów</string>
     <string name="settings_developer_logging_title">Włącz zaawansowane logowanie debugowania</string>
     <string name="settings_developer_logging_summary">Zaznacz, aby umożliwić pełne rejestrowanie</string>
