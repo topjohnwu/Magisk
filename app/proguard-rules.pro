@@ -20,6 +20,6 @@
 -keep class org.spongycastle.** { *; }
 -dontwarn javax.naming.**
 
-# retrolambda
--dontwarn java.lang.invoke.*
+-dontwarn android.content.**
+-dontwarn android.animation.**
 
