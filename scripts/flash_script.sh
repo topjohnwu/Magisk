@@ -173,6 +173,12 @@ remove_system_su() {
   fi
 }
 
+abort() {
+  ui_print "$1"
+  mv /sbin_tmp /sbin 2>/dev/null
+  exit 1
+}
+
 ##########################################################################################
 # Detection
 ##########################################################################################
@@ -181,25 +187,14 @@ ui_print "************************"
 ui_print "* MAGISK_VERSION_STUB"
 ui_print "************************"
 
-if [ ! -d "$COMMONDIR" ]; then
-  ui_print "! Failed: Unable to extract zip file!"
-  exit 1
-fi
+[ -d "$COMMONDIR" ] || abort "! Unable to extract zip file!"
 
 ui_print "- Mounting /system(ro), /cache, /data"
 mount -o ro /system 2>/dev/null
 mount /cache 2>/dev/null
 mount /data 2>/dev/null
 
-if [ ! -f '/system/build.prop' ]; then
-  ui_print "! Failed: /system could not be mounted!"
-  exit 1
-fi
-
-# Prefer binaries and libs in /system
-[ -e /vendor ] || ln -s /system/vendor /vendor
-ENV='LD_LIBRARY_PATH=/system/lib:/vendor/lib:/sbin PATH=/system/bin:/system/xbin:/sbin'
-[ -d /system/lib64 ] && ENV='LD_LIBRARY_PATH=/system/lib64:/vendor/lib64:/sbin PATH=/system/bin:/system/xbin:/sbin'
+[ -f /system/build.prop ] || abort "! /system could not be mounted!"
 
 # read override variables
 getvar KEEPVERITY
@@ -221,11 +216,7 @@ if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
 if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
 if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
 
-
-if [ "$API" -lt "21" ]; then
-  ui_print "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
-  exit 1
-fi
+[ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
 
 ui_print "- Device platform: $ARCH"
 
@@ -233,16 +224,23 @@ BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
 
 find_boot_image
-if [ -z $BOOTIMAGE ]; then
-  ui_print "! Unable to detect boot image"
-  exit 1
-fi
+[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 
 ##########################################################################################
 # Environment
 ##########################################################################################
 
 ui_print "- Constructing environment"
+
+if ! $BOOTMODE; then
+  # Completely use /system components
+  [ -e /vendor ] || ln -s /system/vendor /vendor
+  export PATH=/system/bin:/system/xbin:/vendor/bin
+  # Clear out possible lib paths, let the binary find them itself
+  export LD_LIBRARY_PATH=
+  # Completely block out all custom recovery binaries/libs
+  mv /sbin /sbin_tmp
+fi
 
 is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
@@ -259,7 +257,7 @@ chcon -hR u:object_r:system_file:s0 $MAGISKBIN
 ##########################################################################################
 
 # Fix SuperSU.....
-$BOOTMODE && eval $ENV $BINDIR/magiskpolicy --live "allow fsck * * *"
+$BOOTMODE && $BINDIR/magiskpolicy --live "allow fsck * * *"
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -272,21 +270,18 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  eval $ENV $BINDIR/magisk --createimg $IMG 64M
+  $BINDIR/magisk --createimg $IMG 64M
 fi
 
 mount_image $IMG /magisk
-if (! is_mounted /magisk); then
-  ui_print "! Magisk image mount failed..."
-  exit 1
-fi
+is_mounted /magisk || abort "! Magisk image mount failed..."
 MAGISKLOOP=$LOOPDEVICE
 
 # Core folders
 mkdir -p $COREDIR/props $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
 
-chmod -R 755 $COREDIR/post-fs-data.d $COREDIR/service.d
-chown -R 0.0 $COREDIR/post-fs-data.d $COREDIR/service.d
+chmod 755 $COREDIR/post-fs-data.d $COREDIR/service.d
+chown 0.0 $COREDIR/post-fs-data.d $COREDIR/service.d
 
 # Legacy cleanup
 mv $COREDIR/magiskhide/hidelist $COREDIR/hidelist 2>/dev/null
@@ -303,7 +298,7 @@ if [ -f /data/stock_boot.img ]; then
   SHA1=`$BINDIR/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
-  eval $ENV $BINDIR/magiskboot --compress $STOCKDUMP
+  $BINDIR/magiskboot --compress $STOCKDUMP
 fi
 
 SOURCEDMODE=true
@@ -316,7 +311,7 @@ cd $MAGISKBIN
 if [ -f chromeos ]; then
   echo > empty
 
-  eval $ENV $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
+  $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
   --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
   --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
 
@@ -340,6 +335,7 @@ rm -f new-boot.img
 cd /
 
 if ! $BOOTMODE; then
+  mv /sbin_tmp /sbin
   ui_print "- Unmounting partitions"
   umount /magisk
   losetup -d $MAGISKLOOP 2>/dev/null

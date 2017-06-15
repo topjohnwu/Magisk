@@ -42,14 +42,22 @@ fi
 # Detect whether running as root
 [ `id -u` -eq 0 ] && ROOT=true || ROOT=false
 
-# Prefer binaries and libs in /system
-ENV='LD_LIBRARY_PATH=/system/lib:/vendor/lib:/sbin PATH=/system/bin:/system/xbin:/sbin'
-[ -d /system/lib64 ] && ENV='LD_LIBRARY_PATH=/system/lib64:/vendor/lib64:/sbin PATH=/system/bin:/system/xbin:/sbin'
-
 # Call ui_print_wrap if exists, or else simply use echo
 # Useful when wrapped in flashable zip
 ui_print_wrap() {
   type ui_print >/dev/null 2>&1 && ui_print "$1" || echo "$1"
+}
+
+# Call abort if exists, or else show error message and exit
+# Essential when wrapped in flashable zip
+abort_wrap() {
+  type abort >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    ui_print_wrap "$1"
+    exit 1
+  else
+    abort "$1"
+  fi
 }
 
 grep_prop() {
@@ -64,17 +72,17 @@ grep_prop() {
 
 # --cpio-add <incpio> <mode> <entry> <infile>
 cpio_add() {
-  eval $ENV ./magiskboot --cpio-add ramdisk.cpio $1 $2 $3
+  ./magiskboot --cpio-add ramdisk.cpio $1 $2 $3
 }
 
 # --cpio-extract <incpio> <entry> <outfile>
 cpio_extract() {
-  eval $ENV ./magiskboot --cpio-extract ramdisk.cpio $1 $2
+  ./magiskboot --cpio-extract ramdisk.cpio $1 $2
 }
 
 # --cpio-mkdir <incpio> <mode> <entry>
 cpio_mkdir() {
-  eval $ENV ./magiskboot --cpio-mkdir ramdisk.cpio $1 $2
+  ./magiskboot --cpio-mkdir ramdisk.cpio $1 $2
 }
 
 ##########################################################################################
@@ -86,22 +94,19 @@ cpio_mkdir() {
 chmod +x ./*
 
 ui_print_wrap "- Unpacking boot image"
-eval $ENV ./magiskboot --unpack "$BOOTIMAGE"
+./magiskboot --unpack "$BOOTIMAGE"
 
 case $? in
   1 )
-    ui_print_wrap "! Unable to unpack boot image"
-    exit 1
+    abort_wrap "! Unable to unpack boot image"
     ;;
   2 )
     ui_print_wrap "! Sony ELF32 format detected"
-    ui_print_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
-    exit 1
+    abort_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
   3 )
     ui_print_wrap "! Sony ELF64 format detected"
-    ui_print_wrap "! Stock kernel cannot be patched, please use a custom kernel"
-    exit 1
+    abort_wrap "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
 ##########################################################################################
@@ -110,28 +115,28 @@ esac
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print_wrap "- Checking ramdisk status"
-eval $ENV ./magiskboot --cpio-test ramdisk.cpio
+./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
     ui_print_wrap "- Stock boot image detected!"
     ui_print_wrap "- Backing up stock boot image"
-    SHA1=`eval $ENV ./magiskboot --sha1 "$BOOTIMAGE" | tail -n 1`
+    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" | tail -n 1`
     STOCKDUMP=stock_boot_${SHA1}.img
     dd if="$BOOTIMAGE" of=$STOCKDUMP
-    eval $ENV ./magiskboot --compress $STOCKDUMP
+    ./magiskboot --compress $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
     ui_print_wrap "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
     if [ -z $SHA1 ]; then
-      eval $ENV ./magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc.old
+      ./magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc.old
       SHA1=`grep_prop "# STOCKSHA1" init.magisk.rc.old`
       rm -f init.magisk.rc.old
     fi
 
     OK=false
-    eval $ENV ./magiskboot --cpio-restore ramdisk.cpio
+    ./magiskboot --cpio-restore ramdisk.cpio
     if [ $? -eq 0 ]; then
       ui_print_wrap "- Ramdisk restored from internal backup"
       OK=true
@@ -143,8 +148,8 @@ case $? in
         STOCKDUMP=/data/stock_boot_${SHA1}.img
         if [ -f ${STOCKDUMP}.gz ]; then
           ui_print_wrap "- Stock boot image backup found"
-          eval $ENV ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
-          eval $ENV ./magiskboot --unpack stock_boot.img
+          ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
+          ./magiskboot --unpack stock_boot.img
           rm -f stock_boot.img
           OK=true
         fi
@@ -158,8 +163,7 @@ case $? in
     ;;
   2 ) # Other patched
     ui_print_wrap "! Boot image patched by other programs!"
-    ui_print_wrap "! Please restore stock boot image"
-    exit 1
+    abort_wrap "! Please restore stock boot image"
     ;;
 esac
 
@@ -170,8 +174,8 @@ esac
 ui_print_wrap "- Patching ramdisk"
 
 # The common patches
-$KEEPVERITY || eval $ENV ./magiskboot --cpio-patch-dmverity ramdisk.cpio
-$KEEPFORCEENCRYPT || eval $ENV ./magiskboot --cpio-patch-forceencrypt ramdisk.cpio
+$KEEPVERITY || ./magiskboot --cpio-patch-dmverity ramdisk.cpio
+$KEEPFORCEENCRYPT || ./magiskboot --cpio-patch-forceencrypt ramdisk.cpio
 
 # Add magisk entrypoint
 cpio_extract init.rc init.rc
@@ -182,7 +186,7 @@ rm -f init.rc
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
-eval $ENV ./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
+./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
 cpio_add 644 sepolicy sepolicy
 rm -f sepolicy
 
@@ -196,7 +200,7 @@ mv init.magisk.rc.bak init.magisk.rc 2>/dev/null
 cpio_add 755 sbin/magisk magisk
 
 # Create ramdisk backups
-eval $ENV ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
+./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
 
 rm -f ramdisk.cpio.orig
 
@@ -207,16 +211,13 @@ rm -f ramdisk.cpio.orig
 # Hexpatches
 
 # Remove Samsung RKP in stock kernel
-eval $ENV ./magiskboot --hexpatch kernel \
+./magiskboot --hexpatch kernel \
 49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 ui_print_wrap "- Repacking boot image"
-eval $ENV ./magiskboot --repack "$BOOTIMAGE"
+./magiskboot --repack "$BOOTIMAGE"
 
-if [ $? -ne 0 ]; then
-  ui_print_wrap "! Unable to repack boot image!"
-  exit 1
-fi
+[ $? -ne 0 ] && abort_wrap "! Unable to repack boot image!"
 
-eval $ENV ./magiskboot --cleanup
+./magiskboot --cleanup
