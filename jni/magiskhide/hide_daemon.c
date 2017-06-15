@@ -89,10 +89,10 @@ int hide_daemon() {
 			}
 		}
 
-		// First unmount the dummy skeletons, cache mounts, and /sbin links
+		// First unmount the mirror, dummy skeletons, cache mounts, and /sbin links
 		vec_for_each_r(&mount_list, line) {
 			if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
-				|| (strstr(line, cache_block) && strstr(line, "/system/")) ) {
+				|| (strstr(line, cache_block) && strstr(line, "/system/")) || strstr(line, MIRRDIR) ) {
 				sscanf(line, "%*s %512s", buffer);
 				lazy_unmount(buffer);
 			}
@@ -107,7 +107,7 @@ int hide_daemon() {
 
 		// Unmount loop mounts
 		vec_for_each_r(&mount_list, line) {
-			if (strstr(line, "/dev/block/loop") && !strstr(line, DUMMDIR)) {
+			if (strstr(line, "/dev/block/loop") || strstr(line, DUMMDIR)) {
 				sscanf(line, "%*s %512s", buffer);
 				lazy_unmount(buffer);
 			}
