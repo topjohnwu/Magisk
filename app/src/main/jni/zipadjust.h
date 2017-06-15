@@ -3,10 +3,7 @@
 
 #include <android/log.h>
 
-int zipadjust(int decompress);
-
-extern size_t insize, outsize, alloc;
-extern unsigned char *fin, *fout;
+int zipadjust(const char* filenameIn, const char* filenameOut, int decompress);
 
 #define  LOG_TAG    "zipadjust"
 

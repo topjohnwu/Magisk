@@ -1,9 +1,14 @@
 #include <stdlib.h>
+#include <fcntl.h>
+#include <string.h>
 #include <zlib.h>
+#include <unistd.h>
 #include "zipadjust.h"
 
-size_t insize = 0, outsize = 0, alloc = 0;
-unsigned char *fin = NULL, *fout = NULL;
+#ifndef O_BINARY
+#define O_BINARY  0
+#define O_TEXT    0
+#endif
 
 #pragma pack(1)
 struct local_header_struct {
@@ -81,41 +86,43 @@ static int xerror(char* message) {
     return 0;
 }
 
-static int xseekread(off_t offset, void* buf, size_t bytes) {
-    memcpy(buf, fin + offset, bytes);
+static int xseekread(int fd, off_t offset, void* buf, size_t bytes) {
+    if (lseek(fd, offset, SEEK_SET) == (off_t)-1) return xerror("Seek failed");
+    if (read(fd, buf, bytes) != bytes) return xerror("Read failed");
     return 1;
 }
 
-static int xseekwrite(off_t offset, const void* buf, size_t bytes) {
-    if (offset + bytes > outsize) outsize = offset + bytes;
-    if (outsize > alloc) {
-        fout = realloc(fout, outsize);
-        alloc = outsize;
-    }
-    memcpy(fout + offset, buf, bytes);
+static int xseekwrite(int fd, off_t offset, void* buf, size_t bytes) {
+    if (lseek(fd, offset, SEEK_SET) == (off_t)-1) return xerror("Seek failed");
+    if (write(fd, buf, bytes) != bytes) return xerror("Write failed");
     return 1;
 }
 
-static int xfilecopy(off_t offsetIn, off_t offsetOut, size_t bytes) {
-    unsigned int CHUNK = 256 * 1024;
-    unsigned char* buf = malloc(CHUNK);
+static int xfilecopy(int fdIn, int fdOut, off_t offsetIn, off_t offsetOut, size_t bytes) {
+    if ((offsetIn != (off_t)-1) && (lseek(fdIn, offsetIn, SEEK_SET) == (off_t)-1)) return xerror("Seek failed");
+    if ((offsetOut != (off_t)-1) && (lseek(fdOut, offsetOut, SEEK_SET) == (off_t)-1)) return xerror("Seek failed");
+
+    int CHUNK = 256 * 1024;
+    void* buf = malloc(CHUNK);
     if (buf == NULL) return xerror("malloc failed");
     size_t left = bytes;
     while (left > 0) {
         size_t wanted = (left < CHUNK) ? left : CHUNK;
-        xseekread(offsetIn, buf, wanted);
-        xseekwrite(offsetOut, buf, wanted);
-        offsetIn += wanted;
-        offsetOut += wanted;
-        left -= wanted;
+        size_t r = read(fdIn, buf, wanted);
+        if (r <= 0) return xerror("Read failed");
+        if (write(fdOut, buf, r) != r) return xerror("Write failed");
+        left -= r;
     }
     free(buf);
 
     return 1;
 }
 
-static int xdecompress(off_t offsetIn, off_t offsetOut, size_t bytes) {
-    unsigned int CHUNK = 256 * 1024;
+static int xdecompress(int fdIn, int fdOut, off_t offsetIn, off_t offsetOut, size_t bytes) {
+    if ((offsetIn != (off_t)-1) && (lseek(fdIn, offsetIn, SEEK_SET) == (off_t)-1)) return xerror("Seek failed");
+    if ((offsetOut != (off_t)-1) && (lseek(fdOut, offsetOut, SEEK_SET) == (off_t)-1)) return xerror("Seek failed");
+
+    int CHUNK = 256 * 1024;
 
     int ret;
     unsigned have;
@@ -132,12 +139,9 @@ static int xdecompress(off_t offsetIn, off_t offsetOut, size_t bytes) {
     if (ret != Z_OK) return xerror("ret != Z_OK");
 
     do {
-        strm.avail_in = insize - offsetIn;
+        strm.avail_in = read(fdIn, in, CHUNK);
         if (strm.avail_in == 0) break;
-        strm.avail_in = (strm.avail_in > CHUNK) ? CHUNK : strm.avail_in;
-        xseekread(offsetIn, in, strm.avail_in);
         strm.next_in = in;
-        offsetIn += strm.avail_in;
 
         do {
             strm.avail_out = CHUNK;
@@ -155,8 +159,10 @@ static int xdecompress(off_t offsetIn, off_t offsetOut, size_t bytes) {
             }
 
             have = CHUNK - strm.avail_out;
-            xseekwrite(offsetOut, out, have);
-            offsetOut += have;
+            if (write(fdOut, out, have) != have) {
+                (void)inflateEnd(&strm);
+                return xerror("Write failed");
+            }
         } while (strm.avail_out == 0);
     } while (ret != Z_STREAM_END);
     (void)inflateEnd(&strm);
@@ -164,118 +170,128 @@ static int xdecompress(off_t offsetIn, off_t offsetOut, size_t bytes) {
     return ret == Z_STREAM_END ? 1 : 0;
 }
 
-int zipadjust(int decompress) {
+int zipadjust(const char* filenameIn, const char* filenameOut, int decompress) {
     int ok = 0;
 
-    char filename[1024];
+    int fin = open(filenameIn, O_RDONLY | O_BINARY);
+    if (fin > 0) {
+        unsigned int size = lseek(fin, 0, SEEK_END);
+        lseek(fin, 0, SEEK_SET);
+        LOGD("%d bytes\n", size);
 
-    central_footer_t central_footer;
-    uint32_t central_directory_in_position = 0;
-    uint32_t central_directory_in_size = 0;
-    uint32_t central_directory_out_size = 0;
+        char filename[1024];
 
-    int i;
-    for (i = insize - 4; i >= 0; i--) {
-        uint32_t magic = 0;
-        if (!xseekread(i, &magic, sizeof(uint32_t))) return 0;
-        if (magic == MAGIC_CENTRAL_FOOTER) {
-            LOGD("central footer @ %08X\n", i);
-            if (!xseekread(i, &central_footer, sizeof(central_footer_t))) return 0;
+        central_footer_t central_footer;
+        uint32_t central_directory_in_position = 0;
+        uint32_t central_directory_in_size = 0;
+        uint32_t central_directory_out_size = 0;
 
-            central_header_t central_header;
-            if (!xseekread(central_footer.central_directory_offset, &central_header, sizeof(central_header_t))) return 0;
-            if ( central_header.signature == MAGIC_CENTRAL_HEADER ) {
-                central_directory_in_position = central_footer.central_directory_offset;
-                central_directory_in_size = insize - central_footer.central_directory_offset;
-                LOGD("central header @ %08X (%d)\n", central_footer.central_directory_offset, central_footer.central_directory_size);
-                break;
+        int i;
+        for (i = size - 4; i >= 0; i--) {
+            uint32_t magic = 0;
+            if (!xseekread(fin, i, &magic, sizeof(uint32_t))) return 0;
+            if (magic == MAGIC_CENTRAL_FOOTER) {
+                LOGD("central footer @ %08X\n", i);
+                if (!xseekread(fin, i, &central_footer, sizeof(central_footer_t))) return 0;
+
+                central_header_t central_header;
+                if (!xseekread(fin, central_footer.central_directory_offset, &central_header, sizeof(central_header_t))) return 0;
+                if ( central_header.signature == MAGIC_CENTRAL_HEADER ) {
+                    central_directory_in_position = central_footer.central_directory_offset;
+                    central_directory_in_size = size - central_footer.central_directory_offset;
+                    LOGD("central header @ %08X (%d)\n", central_footer.central_directory_offset, central_footer.central_directory_size);
+                    break;
+                }
             }
         }
+
+        if (central_directory_in_position == 0) return 0;
+
+        unsigned char* central_directory_in = (unsigned char*)malloc(central_directory_in_size);
+        unsigned char* central_directory_out = (unsigned char*)malloc(central_directory_in_size);
+        if (!xseekread(fin, central_directory_in_position, central_directory_in, central_directory_in_size)) return 0;
+        memset(central_directory_out, 0, central_directory_in_size);
+
+        unlink(filenameOut);
+        int fout = open(filenameOut, O_CREAT | O_WRONLY | O_BINARY, 0644);
+        if (fout > 0) {
+
+            uintptr_t central_directory_in_index = 0;
+            uintptr_t central_directory_out_index = 0;
+
+            central_header_t* central_header = NULL;
+
+            uint32_t out_index = 0;
+
+            while (1) {
+                central_header = (central_header_t*)&central_directory_in[central_directory_in_index];
+                if (central_header->signature != MAGIC_CENTRAL_HEADER) break;
+
+                filename[central_header->length_filename] = (char)0;
+                memcpy(filename, &central_directory_in[central_directory_in_index + sizeof(central_header_t)], central_header->length_filename);
+                LOGD("%s (%d --> %d) [%08X] (%d)\n", filename, central_header->size_uncompressed, central_header->size_compressed, central_header->crc32, central_header->length_extra + central_header->length_comment);
+
+                local_header_t local_header;
+                if (!xseekread(fin, central_header->offset, &local_header, sizeof(local_header_t))) return 0;
+
+                // save and update to next index before we clobber the data
+                uint16_t compression_method_old = central_header->compression_method;
+                uint32_t size_compressed_old = central_header->size_compressed;
+                uint32_t offset_old = central_header->offset;
+                uint32_t length_extra_old = central_header->length_extra;
+                central_directory_in_index += sizeof(central_header_t) + central_header->length_filename + central_header->length_extra + central_header->length_comment;
+
+                // copying, rewriting, and correcting local and central headers so all the information matches, and no data descriptors are necessary
+                central_header->offset = out_index;
+                central_header->flags = central_header->flags & !8;
+                if (decompress && (compression_method_old == 8)) {
+                    central_header->compression_method = 0;
+                    central_header->size_compressed = central_header->size_uncompressed;
+                }
+                central_header->length_extra = 0;
+                central_header->length_comment = 0;
+                local_header.compression_method = central_header->compression_method;
+                local_header.flags = central_header->flags;
+                local_header.crc32 = central_header->crc32;
+                local_header.size_uncompressed = central_header->size_uncompressed;
+                local_header.size_compressed = central_header->size_compressed;
+                local_header.length_extra = 0;
+
+                if (!xseekwrite(fout, out_index, &local_header, sizeof(local_header_t))) return 0;
+                out_index += sizeof(local_header_t);
+                if (!xseekwrite(fout, out_index, &filename[0], central_header->length_filename)) return 0;
+                out_index += central_header->length_filename;
+
+                if (decompress && (compression_method_old == 8)) {
+                    if (!xdecompress(fin, fout, offset_old + sizeof(local_header_t) + central_header->length_filename + length_extra_old, out_index, size_compressed_old)) return 0;
+                } else {
+                    if (!xfilecopy(fin, fout, offset_old + sizeof(local_header_t) + central_header->length_filename + length_extra_old, out_index, size_compressed_old)) return 0;
+                }
+                out_index += local_header.size_compressed;
+
+                memcpy(&central_directory_out[central_directory_out_index], central_header, sizeof(central_header_t) + central_header->length_filename);
+                central_directory_out_index += sizeof(central_header_t) + central_header->length_filename;
+            }
+
+            central_directory_out_size = central_directory_out_index;
+            central_footer.central_directory_size = central_directory_out_size;
+            central_footer.central_directory_offset = out_index;
+            central_footer.length_comment = 0;
+            if (!xseekwrite(fout, out_index, central_directory_out, central_directory_out_size)) return 0;
+            out_index += central_directory_out_size;
+            if (!xseekwrite(fout, out_index, &central_footer, sizeof(central_footer_t))) return 0;
+
+            LOGD("central header @ %08X (%d)\n", central_footer.central_directory_offset, central_footer.central_directory_size);
+            LOGD("central footer @ %08X\n", out_index);
+
+            close(fout);
+            ok = 1;
+        }
+
+        free(central_directory_in);
+        free(central_directory_out);
+        close(fin);
     }
 
-    if (central_directory_in_position == 0) return 0;
-
-    unsigned char* central_directory_in = (unsigned char*)malloc(central_directory_in_size);
-    unsigned char* central_directory_out = (unsigned char*)malloc(central_directory_in_size);
-    if (!xseekread(central_directory_in_position, central_directory_in, central_directory_in_size)) return 0;
-    memset(central_directory_out, 0, central_directory_in_size);
-
-
-
-    fout = (unsigned char*) malloc(insize);
-    alloc = insize;
-
-    uintptr_t central_directory_in_index = 0;
-    uintptr_t central_directory_out_index = 0;
-
-    central_header_t* central_header = NULL;
-
-    uint32_t out_index = 0;
-
-    while (1) {
-        central_header = (central_header_t*)&central_directory_in[central_directory_in_index];
-        if (central_header->signature != MAGIC_CENTRAL_HEADER) break;
-
-        filename[central_header->length_filename] = (char)0;
-        memcpy(filename, &central_directory_in[central_directory_in_index + sizeof(central_header_t)], central_header->length_filename);
-        LOGD("%s (%d --> %d) [%08X] (%d)\n", filename, central_header->size_uncompressed, central_header->size_compressed, central_header->crc32, central_header->length_extra + central_header->length_comment);
-
-        local_header_t local_header;
-        if (!xseekread(central_header->offset, &local_header, sizeof(local_header_t))) return 0;
-
-        // save and update to next index before we clobber the data
-        uint16_t compression_method_old = central_header->compression_method;
-        uint32_t size_compressed_old = central_header->size_compressed;
-        uint32_t offset_old = central_header->offset;
-        uint32_t length_extra_old = central_header->length_extra;
-        central_directory_in_index += sizeof(central_header_t) + central_header->length_filename + central_header->length_extra + central_header->length_comment;
-
-        // copying, rewriting, and correcting local and central headers so all the information matches, and no data descriptors are necessary
-        central_header->offset = out_index;
-        central_header->flags = central_header->flags & !8;
-        if (decompress && (compression_method_old == 8)) {
-            central_header->compression_method = 0;
-            central_header->size_compressed = central_header->size_uncompressed;
-        }
-        central_header->length_extra = 0;
-        central_header->length_comment = 0;
-        local_header.compression_method = central_header->compression_method;
-        local_header.flags = central_header->flags;
-        local_header.crc32 = central_header->crc32;
-        local_header.size_uncompressed = central_header->size_uncompressed;
-        local_header.size_compressed = central_header->size_compressed;
-        local_header.length_extra = 0;
-
-        if (!xseekwrite(out_index, &local_header, sizeof(local_header_t))) return 0;
-        out_index += sizeof(local_header_t);
-        if (!xseekwrite(out_index, &filename[0], central_header->length_filename)) return 0;
-        out_index += central_header->length_filename;
-
-        if (decompress && (compression_method_old == 8)) {
-            if (!xdecompress(offset_old + sizeof(local_header_t) + central_header->length_filename + length_extra_old, out_index, size_compressed_old)) return 0;
-        } else {
-            if (!xfilecopy(offset_old + sizeof(local_header_t) + central_header->length_filename + length_extra_old, out_index, size_compressed_old)) return 0;
-        }
-        out_index += local_header.size_compressed;
-
-        memcpy(&central_directory_out[central_directory_out_index], central_header, sizeof(central_header_t) + central_header->length_filename);
-        central_directory_out_index += sizeof(central_header_t) + central_header->length_filename;
-    }
-
-    central_directory_out_size = central_directory_out_index;
-    central_footer.central_directory_size = central_directory_out_size;
-    central_footer.central_directory_offset = out_index;
-    central_footer.length_comment = 0;
-    if (!xseekwrite(out_index, central_directory_out, central_directory_out_size)) return 0;
-    out_index += central_directory_out_size;
-    if (!xseekwrite(out_index, &central_footer, sizeof(central_footer_t))) return 0;
-
-    LOGD("central header @ %08X (%d)\n", central_footer.central_directory_offset, central_footer.central_directory_size);
-    LOGD("central footer @ %08X\n", out_index);
-
-    ok = 1;
-
-    free(central_directory_in);
-    free(central_directory_out);
     return ok;
 }
