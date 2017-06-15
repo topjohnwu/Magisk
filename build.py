@@ -76,9 +76,9 @@ def build_apk(args):
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
-		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'app-release-unsigned.apk')
-		aligned = os.path.join('app', 'build', 'outputs', 'apk', 'app-release-aligned.apk')
-		release = os.path.join('app', 'build', 'outputs', 'apk', 'app-release.apk')
+		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-unsigned.apk')
+		aligned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-aligned.apk')
+		release = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')
 
 		# Find the latest build tools
 		build_tool = sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1]
@@ -93,7 +93,7 @@ def build_apk(args):
 			error('Zipalign Magisk Manager failed!')
 
 		proc = subprocess.run('{} sign --ks {} --out {} {}'.format(
-			os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool, 'apksigner'),
+			'java -jar {}'.format(os.path.join('../ziptools/apksigner.jar')),
 			os.path.join('..', 'release_signature.jks'),
 			release, aligned), shell=True)
 		if proc.returncode != 0:
@@ -154,7 +154,8 @@ def zip_main(args):
 				zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk', 'app-release.apk' if args.release else 'app-debug.apk')
+		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk',
+			'release' if args.release else 'debug', 'app-release.apk' if args.release else 'app-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
 
