@@ -17,6 +17,7 @@ $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMO
 TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/magisk
+BUSYBOX=$TMPDIR/busybox
 COMMONDIR=$INSTALLER/common
 CHROMEDIR=$INSTALLER/chromeos
 COREDIR=/magisk/.core
@@ -47,9 +48,9 @@ if [ "$?" -eq "0" ]; then
   done
 fi
 
-mkdir -p $INSTALLER
-cd $INSTALLER
-unzip -o "$ZIP"
+rm -rf $TMPDIR 2>/dev/null
+mkdir -p $INSTALLER $BUSYBOX
+unzip -o "$ZIP" -d $INSTALLER
 
 ##########################################################################################
 # Functions
@@ -107,29 +108,18 @@ is_mounted() {
 mount_image() {
   if [ ! -d "$2" ]; then
     mount -o rw,remount rootfs /
-    mkdir -p $2 2>/dev/null
-    ($BOOTMODE) && mount -o ro,remount rootfs /
+    mkdir -p "$2" 2>/dev/null
+    $BOOTMODE && mount -o ro,remount rootfs /
     [ ! -d "$2" ] && return 1
   fi
-  if (! is_mounted $2); then
+  if ! is_mounted "$2"; then
     LOOPDEVICE=
     for LOOP in 0 1 2 3 4 5 6 7; do
-      if (! is_mounted $2); then
+      if ! is_mounted "$2"; then
         LOOPDEVICE=/dev/block/loop$LOOP
-        if [ ! -f "$LOOPDEVICE" ]; then
-          mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
-        fi
-        losetup $LOOPDEVICE $1
-        if [ "$?" -eq "0" ]; then
-          mount -t ext4 -o loop $LOOPDEVICE $2
-          if (! is_mounted $2); then
-            /system/bin/toolbox mount -t ext4 -o loop $LOOPDEVICE $2
-          fi
-          if (! is_mounted $2); then
-            /system/bin/toybox mount -t ext4 -o loop $LOOPDEVICE $2
-          fi
-        fi
-        if (is_mounted $2); then
+        [ -e $LOOPDEVICE ] || mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
+        losetup $LOOPDEVICE "$1" && mount -t ext4 -o loop $LOOPDEVICE "$2"
+        if is_mounted "$2"; then
           ui_print "- Mounting $1 to $2"
           break;
         fi
@@ -210,11 +200,11 @@ ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
 ABILONG=`grep_prop ro.product.cpu.abi`
 
 ARCH=arm
-IS64BIT=false
-if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
-if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
+BBPATH=armeabi-v7a
+if [ "$ABI" = "x86" ]; then ARCH=x86; BBPATH=x86; fi;
+if [ "$ABI2" = "x86" ]; then ARCH=x86; BBPATH=x86; fi;
+if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; fi;
+if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; BBPATH=x86; fi;
 
 [ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
 
@@ -233,12 +223,18 @@ find_boot_image
 ui_print "- Constructing environment"
 
 if ! $BOOTMODE; then
-  # Completely use /system components
-  [ -e /vendor ] || ln -s /system/vendor /vendor
-  export PATH=/system/bin:/system/xbin:/vendor/bin
+  # We are in custom recovery, don't trust anything in recovery, use those in /system
+  # Extract busybox from Magisk Manager, it's pure static binary so there will be no issues
+  unzip -o $COMMONDIR/magisk.apk lib/$BBPATH/libbusybox.so -d $BUSYBOX
+  mv $BUSYBOX/lib/*/libbusybox.so $BUSYBOX/busybox
+  rm -rf $BUSYBOX/lib
+  chmod +x $BUSYBOX/busybox
+  $BUSYBOX/busybox --install -s $BUSYBOX
+  # Prefer bin in /system, fallback to bundled busybox if a tool doesn't exist
+  export PATH=/system/bin:/system/xbin:$BUSYBOX
   # Clear out possible lib paths, let the binary find them itself
   export LD_LIBRARY_PATH=
-  # Completely block out all custom recovery binaries/libs
+  # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
 fi
 
