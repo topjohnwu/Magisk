@@ -160,22 +160,39 @@ def zip_main(args):
 		zip_with_msg(zipf, source, target)
 
 		# Scripts
+		# flash_script.sh
 		source = os.path.join('scripts', 'flash_script.sh')
-		with open(source, 'r') as flash_script:
+		with open(source, 'r') as script:
 			# Add version info into flash script
-			update_binary = flash_script.read().replace(
+			update_binary = script.read().replace(
 				'MAGISK_VERSION_STUB', 'Magisk v{} Installer'.format(args.versionString))
 			target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
 			print('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, update_binary)
+		# addon.d.sh
+		source = os.path.join('scripts', 'addon.d.sh')
+		with open(source, 'r') as script:
+			# Add version info addon.d.sh
+			addond = script.read().replace(
+				'MAGISK_VERSION_STUB', 'Magisk v{} addon.d'.format(args.versionString))
+			target = os.path.join('addon.d', '99-magisk.sh')
+			print('zip: ' + source + ' -> ' + target)
+			zipf.writestr(target, addond)
+		# updater-script
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'updater-script')
 		print('zip: ' + target)
 		zipf.writestr(target, '#MAGISK\n')
+		# init.magisk.rc
 		source = os.path.join('scripts', 'init.magisk.rc')
 		target = os.path.join('common', 'init.magisk.rc')
 		zip_with_msg(zipf, source, target)
+		# boot_patch.sh
 		source = os.path.join('scripts', 'boot_patch.sh')
 		target = os.path.join('common', 'boot_patch.sh')
+		zip_with_msg(zipf, source, target)
+		# util_functions.sh
+		source = os.path.join('scripts', 'util_functions.sh')
+		target = os.path.join('common', 'util_functions.sh')
 		zip_with_msg(zipf, source, target)
 
 		# Prebuilts

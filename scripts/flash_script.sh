@@ -53,125 +53,11 @@ mkdir -p $INSTALLER $BUSYBOX
 unzip -o "$ZIP" -d $INSTALLER
 
 ##########################################################################################
-# Functions
-##########################################################################################
-
-ui_print() {
-  if $BOOTMODE; then
-    echo "$1"
-  else 
-    echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
-    echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
-  fi
-}
-
-getvar() {
-  local VARNAME=$1
-  local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /dev/.magisk /data/.magisk /cache/.magisk /system/.magisk; do
-    if [ -z "$VALUE" ]; then
-      LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
-      if [ ! -z "$LINE" ]; then
-        VALUE=${LINE#*=}
-      fi
-    fi
-  done
-  eval $VARNAME=\$VALUE
-}
-
-find_boot_image() {
-  if [ -z "$BOOTIMAGE" ]; then
-    for PARTITION in kern-a android_boot kernel boot lnx; do
-      BOOTIMAGE=`find /dev/block -iname "$PARTITION" | head -n 1`
-      [ ! -z $BOOTIMAGE ] && break
-    done
-  fi
-  # Recovery fallback
-  if [ -z "$BOOTIMAGE" ]; then
-    for FSTAB in /etc/*fstab*; do
-      BOOTIMAGE=`grep -E '\b/boot\b' $FSTAB | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
-      [ ! -z $BOOTIMAGE ] && break
-    done
-  fi
-  [ -L "$BOOTIMAGE" ] && BOOTIMAGE=`readlink $BOOTIMAGE`
-}
-
-is_mounted() {
-  if [ ! -z "$2" ]; then
-    cat /proc/mounts | grep $1 | grep $2, >/dev/null
-  else
-    cat /proc/mounts | grep $1 >/dev/null
-  fi
-  return $?
-}
-
-mount_image() {
-  if [ ! -d "$2" ]; then
-    mount -o rw,remount rootfs /
-    mkdir -p "$2" 2>/dev/null
-    $BOOTMODE && mount -o ro,remount rootfs /
-    [ ! -d "$2" ] && return 1
-  fi
-  if ! is_mounted "$2"; then
-    LOOPDEVICE=
-    for LOOP in 0 1 2 3 4 5 6 7; do
-      if ! is_mounted "$2"; then
-        LOOPDEVICE=/dev/block/loop$LOOP
-        [ -e $LOOPDEVICE ] || mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
-        losetup $LOOPDEVICE "$1" && mount -t ext4 -o loop $LOOPDEVICE "$2"
-        if is_mounted "$2"; then
-          ui_print "- Mounting $1 to $2"
-          break;
-        fi
-      fi
-    done
-  fi
-}
-
-grep_prop() {
-  REGEX="s/^$1=//p"
-  shift
-  FILES=$@
-  if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
-  fi
-  cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
-}
-
-remove_system_su() {
-  if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
-    ui_print "! System installed root detected, mount rw :("
-    mount -o rw,remount /system
-    # SuperSU
-    if [ -e /system/bin/.ext/.su ]; then
-      mv -f /system/bin/app_process32_original /system/bin/app_process32 2>/dev/null
-      mv -f /system/bin/app_process64_original /system/bin/app_process64 2>/dev/null
-      mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh 2>/dev/null
-      cd /system/bin
-      if [ -e app_process64 ]; then
-        ln -sf app_process64 app_process
-      else
-        ln -sf app_process32 app_process
-      fi
-    fi
-    rm -rf /system/.pin /system/bin/.ext /system/etc/.installed_su_daemon /system/etc/.has_su_daemon \
-    /system/xbin/daemonsu /system/xbin/su /system/xbin/sugote /system/xbin/sugote-mksh /system/xbin/supolicy \
-    /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
-    /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
-    /system/.supersu /cache/.supersu /data/.supersu \
-    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
-  fi
-}
-
-abort() {
-  ui_print "$1"
-  mv /sbin_tmp /sbin 2>/dev/null
-  exit 1
-}
-
-##########################################################################################
 # Detection
 ##########################################################################################
+
+# Load all fuctions
+. $COMMONDIR/util_functions.sh
 
 ui_print "************************"
 ui_print "* MAGISK_VERSION_STUB"
@@ -248,6 +134,14 @@ cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 chcon -hR u:object_r:system_file:s0 $MAGISKBIN
 
+# addon.d
+if [ -d /system/addon.d ]; then
+  ui_print "- Adding addon.d survival script"
+  mount -o rw,remount /system
+  cp $INSTALLER/addon.d/99-magisk.sh /system/addon.d/99-magisk.sh
+  chmod 755 /system/addon.d/99-magisk.sh
+fi
+
 ##########################################################################################
 # Magisk Image
 ##########################################################################################
@@ -315,10 +209,7 @@ if [ -f chromeos ]; then
   mv new-boot.img.signed new-boot.img
 fi
 
-if is_mounted /data; then
-  rm -f /data/stock_boot* 2>/dev/null
-  mv stock_boot* /data 2>/dev/null
-fi
+[ -f stock_boot* ] && rm -f /data/stock_boot* 2>/dev/null
 
 ui_print "- Flashing new boot image"
 if [ -L "$BOOTIMAGE" ]; then
