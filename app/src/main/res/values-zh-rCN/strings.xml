@@ -127,6 +127,8 @@
     <string name="internal_storage">Zip 已被储存到：\n[内部存储]%1$s</string>
     <string name="zip_process_title">正在处理</string>
     <string name="manual_boot_image">请手动选择 Boot 镜像位置！</string>
+    <string name="manager_update_title">Magisk Manager 有更新！</string>
+    <string name="manager_download_install">点击以下载并安装</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -158,6 +160,8 @@
     <string name="request_timeout">请求超时</string>
     <string name="superuser_notification">超级用户通知</string>
     <string name="request_timeout_summary">%1$s 秒</string>
+    <string name="settings_su_reauth_title">更新后重新认证</string>
+    <string name="settings_su_reauth_summary">应用程序更新后，重新认证超级用户授权</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
@@ -167,6 +171,14 @@
     <string name="owner_manage_summary">仅设备所有者账户能管理超级用户并接收权限请求提示</string>
     <string name="user_indepenent_summary">每个用户有独立的权限规则</string>
     <string name="multiuser_hint_owner_request">已发送权限请求到设备所有者账户中。请切换到所有者账户授予权限</string>
+
+    <string name="mount_namespace_mode">挂载命名空间(Namespace)模式</string>
+    <string name="settings_ns_global">全局命名空间</string>
+    <string name="settings_ns_requester">继承命名空间</string>
+    <string name="settings_ns_isolate">独立命名空间</string>
+    <string name="global_summary">所有的 ROOT 工作使用全局挂载命名空间</string>
+    <string name="requester_summary">ROOT 工作继承原程序的命名空间</string>
+    <string name="isolate_summary">每一个 ROOT 工作使用自己独立的命名空间</string>
 
     <string name="settings_development_category">开发</string>
     <string name="settings_developer_logging_title">启用高级日志记录</string>
