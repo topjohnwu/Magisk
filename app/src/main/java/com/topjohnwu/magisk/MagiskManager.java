@@ -89,7 +89,6 @@ public class MagiskManager extends Application {
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        suDB = new SuDatabaseHelper(this);
     }
 
     public void toast(String msg, int duration) {
@@ -146,6 +145,7 @@ public class MagiskManager extends Application {
     }
 
     public void initSUConfig() {
+        suDB = new SuDatabaseHelper(this);
         suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
         suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
         suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);

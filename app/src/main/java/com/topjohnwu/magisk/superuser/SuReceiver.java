@@ -27,6 +27,7 @@ public class SuReceiver extends BroadcastReceiver {
         Policy policy;
 
         MagiskManager magiskManager = (MagiskManager) context.getApplicationContext();
+        magiskManager.initSUConfig();
 
         if (intent == null) return;
 
@@ -54,8 +55,6 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
             }
         }
-
-        magiskManager.initSUConfig();
 
         SuLogEntry log = new SuLogEntry(policy);
 

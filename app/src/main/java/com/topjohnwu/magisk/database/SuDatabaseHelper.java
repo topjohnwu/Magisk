@@ -35,6 +35,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         super(context, "su.db", null, DATABASE_VER);
         magiskManager = Utils.getMagiskManager(context);
         pm = context.getPackageManager();
+        cleanup();
     }
 
     @Override
@@ -91,6 +92,16 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 "(key TEXT, value INT, PRIMARY KEY(key))");
     }
 
+    private void cleanup() {
+        SQLiteDatabase db = getWritableDatabase();
+        // Clear outdated policies
+        db.delete(POLICY_TABLE, "until > 0 AND until < ?",
+                new String[] { String.valueOf(System.currentTimeMillis()) });
+        // Clear outdated logs
+        db.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
+                System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
+    }
+
     public void deletePolicy(Policy policy) {
         deletePolicy(policy.packageName);
     }
@@ -103,8 +114,12 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public void deletePolicy(int uid) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(POLICY_TABLE, "uid=?", new String[]{String.valueOf(uid)});
+        deletePolicy(db, uid);
         db.close();
+    }
+
+    private void deletePolicy(SQLiteDatabase db, int uid) {
+        db.delete(POLICY_TABLE, "uid=?", new String[]{String.valueOf(uid)});
     }
 
     public Policy getPolicy(int uid) {
@@ -145,18 +160,19 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public void updatePolicy(Policy policy) {
         SQLiteDatabase db = getWritableDatabase();
+        updatePolicy(db, policy);
+        db.close();
+    }
+
+    private void updatePolicy(SQLiteDatabase db, Policy policy) {
         db.update(POLICY_TABLE, policy.getContentValues(), "package_name=?",
                 new String[] { policy.packageName });
-        db.close();
     }
 
     public List<Policy> getPolicyList(PackageManager pm) {
         List<Policy> ret = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
         Policy policy;
-        // Clear outdated policies
-        db.delete(POLICY_TABLE, "until > 0 AND until < ?",
-                new String[] { String.valueOf(System.currentTimeMillis()) });
         try (Cursor c = db.query(POLICY_TABLE, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
                 try {
@@ -165,17 +181,18 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                     if (policy.info.uid != policy.uid) {
                         if (magiskManager.suReauth) {
                             // Reauth required, remove from DB
-                            deletePolicy(policy.uid);
+                            deletePolicy(db, policy.uid);
                             continue;
                         } else {
-                            // No reauth, we use the new UID
+                            // No reauth, update to use the new UID
                             policy.uid = policy.info.uid;
+                            updatePolicy(db, policy);
                         }
                     }
                     ret.add(policy);
                 } catch (PackageManager.NameNotFoundException e) {
                     // The app no longer exist, remove from DB
-                    deletePolicy(c.getString(c.getColumnIndex("package_name")));
+                    deletePolicy(db, c.getInt(c.getColumnIndex("uid")));
                 }
             }
         }
@@ -186,9 +203,6 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     private List<SuLogEntry> getLogList(SQLiteDatabase db, String selection) {
         List<SuLogEntry> ret = new ArrayList<>();
-        // Clear outdated logs
-        db.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
-                System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
         try (Cursor c = db.query(LOG_TABLE, null, selection, null, null, null, "time DESC")) {
             while (c.moveToNext()) {
                 ret.add(new SuLogEntry(c));
@@ -211,7 +225,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<SuLogEntry> getLogList(String selection) {
-        return getLogList(getWritableDatabase(), selection);
+        return getLogList(getReadableDatabase(), selection);
     }
 
     public void addLog(SuLogEntry log) {
