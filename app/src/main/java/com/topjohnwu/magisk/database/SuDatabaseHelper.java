@@ -159,11 +159,25 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(System.currentTimeMillis()) });
         try (Cursor c = db.query(POLICY_TABLE, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
-                policy = new Policy(c, pm);
-                ret.add(policy);
+                try {
+                    policy = new Policy(c, pm);
+                    // The application changed UID for some reason, check user config
+                    if (policy.info.uid != policy.uid) {
+                        if (magiskManager.suReauth) {
+                            // Reauth required, remove from DB
+                            deletePolicy(policy.uid);
+                            continue;
+                        } else {
+                            // No reauth, we use the new UID
+                            policy.uid = policy.info.uid;
+                        }
+                    }
+                    ret.add(policy);
+                } catch (PackageManager.NameNotFoundException e) {
+                    // The app no longer exist, remove from DB
+                    deletePolicy(c.getString(c.getColumnIndex("package_name")));
+                }
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
         }
         db.close();
         Collections.sort(ret);
