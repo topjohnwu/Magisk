@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.ExpandableViewHolder;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.Policy;
@@ -122,11 +123,10 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         return policyList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends ExpandableViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.package_name) TextView packageName;
-        @BindView(R.id.expand_layout) LinearLayout expandLayout;
         @BindView(R.id.app_icon) ImageView appIcon;
         @BindView(R.id.master_switch) Switch masterSwitch;
         @BindView(R.id.notification_switch) Switch notificationSwitch;
@@ -135,83 +135,14 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         @BindView(R.id.delete) ImageView delete;
         @BindView(R.id.more_info) ImageView moreInfo;
 
-        private ValueAnimator mAnimator;
-        private boolean mExpanded = false;
-        private static int expandHeight = 0;
-
-        ViewHolder(View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            expandLayout.getViewTreeObserver().addOnPreDrawListener(
-                    new ViewTreeObserver.OnPreDrawListener() {
-
-                        @Override
-                        public boolean onPreDraw() {
-                            if (expandHeight == 0) {
-                                final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                                final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                                expandLayout.measure(widthSpec, heightSpec);
-                                expandHeight = expandLayout.getMeasuredHeight();
-                            }
-
-                            expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                            expandLayout.setVisibility(View.GONE);
-                            mAnimator = slideAnimator(0, expandHeight);
-                            return true;
-                        }
-
-                    });
         }
 
-        private void setExpanded(boolean expanded) {
-            mExpanded = expanded;
-            ViewGroup.LayoutParams layoutParams = expandLayout.getLayoutParams();
-            layoutParams.height = expanded ? expandHeight : 0;
-            expandLayout.setLayoutParams(layoutParams);
-            expandLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        @Override
+        public void setExpandLayout(View itemView) {
+            expandLayout = itemView.findViewById(R.id.expand_layout);
         }
-
-        private void expand() {
-            expandLayout.setVisibility(View.VISIBLE);
-            mAnimator.start();
-            mExpanded = true;
-        }
-
-        private void collapse() {
-            if (!mExpanded) return;
-            int finalHeight = expandLayout.getHeight();
-            ValueAnimator mAnimator = slideAnimator(finalHeight, 0);
-            mAnimator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    expandLayout.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationStart(Animator animator) {}
-
-                @Override
-                public void onAnimationCancel(Animator animator) {}
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {}
-            });
-            mAnimator.start();
-            mExpanded = false;
-        }
-
-        private ValueAnimator slideAnimator(int start, int end) {
-
-            ValueAnimator animator = ValueAnimator.ofInt(start, end);
-
-            animator.addUpdateListener(valueAnimator -> {
-                int value = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = expandLayout.getLayoutParams();
-                layoutParams.height = value;
-                expandLayout.setLayoutParams(layoutParams);
-            });
-            return animator;
-        }
-
     }
 }
