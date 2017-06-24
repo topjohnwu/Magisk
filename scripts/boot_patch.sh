@@ -23,24 +23,9 @@
 # image placed under /data we've created when previously installing
 #
 ##########################################################################################
-
-# Workaround for getting the full path of BOOTIMAGE
-CWD=`pwd`
-cd `dirname $1`
-BOOTIMAGE="`pwd`/`basename $1`"
-cd "$CWD"
-
-if [ -z "$BOOTIMAGE" ]; then
-  ui_print_wrap "This script requires a boot image as a parameter"
-  exit 1
-fi
-
-# Presets
-[ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
-
-# Detect whether running as root
-[ `id -u` -eq 0 ] && ROOT=true || ROOT=false
+##########################################################################################
+# Functions
+##########################################################################################
 
 # Call ui_print_wrap if exists, or else simply use echo
 # Useful when wrapped in flashable zip
@@ -58,6 +43,21 @@ abort_wrap() {
   else
     abort "$1"
   fi
+}
+
+# Pure bash dirname implementation
+dirname_wrap() {
+  if echo $1 | grep "/" >/dev/null 2>&1; then
+    RES=${1%/*}
+    [ -z $RES ] && echo "/" || echo $RES
+  else
+    echo "."
+  fi
+}
+
+# Pure bash basename implementation
+basename_wrap() {
+  echo ${1##*/}
 }
 
 grep_prop() {
@@ -86,12 +86,33 @@ cpio_mkdir() {
 }
 
 ##########################################################################################
-# Prework
+# Initialization
 ##########################################################################################
 
+CWD=`pwd`
+cd "`dirname_wrap $1`"
+BOOTIMAGE="`pwd`/`basename_wrap $1`"
+cd "$CWD"
+
+if [ -z "$BOOTIMAGE" ]; then
+  ui_print_wrap "This script requires a boot image as a parameter"
+  exit 1
+fi
+
+# Presets
+[ -z $KEEPVERITY ] && KEEPVERITY=false
+[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+
+# Detect whether running as root
+[ `id -u` -eq 0 ] && ROOT=true || ROOT=false
+
 # Switch to the location of the script file
-[ -z $SOURCEDMODE ] && cd "`dirname "${BASH_SOURCE:-$0}"`"
+[ -z $SOURCEDMODE ] && cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
 chmod +x ./*
+
+##########################################################################################
+# Unpack
+##########################################################################################
 
 ui_print_wrap "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"

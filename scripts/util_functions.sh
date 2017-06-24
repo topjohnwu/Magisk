@@ -56,29 +56,6 @@ is_mounted() {
   return $?
 }
 
-mount_image() {
-  if [ ! -d "$2" ]; then
-    mount -o rw,remount rootfs /
-    mkdir -p "$2" 2>/dev/null
-    $BOOTMODE && mount -o ro,remount rootfs /
-    [ ! -d "$2" ] && return 1
-  fi
-  if ! is_mounted "$2"; then
-    LOOPDEVICE=
-    for LOOP in 0 1 2 3 4 5 6 7; do
-      if ! is_mounted "$2"; then
-        LOOPDEVICE=/dev/block/loop$LOOP
-        [ -e $LOOPDEVICE ] || mknod $LOOPDEVICE b 7 $LOOP 2>/dev/null
-        losetup $LOOPDEVICE "$1" && mount -t ext4 -o loop $LOOPDEVICE "$2"
-        if is_mounted "$2"; then
-          ui_print "- Mounting $1 to $2"
-          break;
-        fi
-      fi
-    done
-  fi
-}
-
 grep_prop() {
   REGEX="s/^$1=//p"
   shift
@@ -112,6 +89,15 @@ remove_system_su() {
     /system/.supersu /cache/.supersu /data/.supersu \
     /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
   fi
+}
+
+recovery_actions() {
+  # TWRP bug fix
+  mount -o bind /dev/urandom /dev/random
+  # Clear out possible lib paths, let the binaries find them itself
+  export LD_LIBRARY_PATH=
+  # Temporarily block out all custom recovery binaries/libs
+  mv /sbin /sbin_tmp
 }
 
 abort() {

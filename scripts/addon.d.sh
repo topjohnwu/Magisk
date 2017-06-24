@@ -20,6 +20,7 @@ main() {
   sleep 5
 
   mount -o ro /system 2>/dev/null
+  mount -o ro /vendor 2>/dev/null
   mount /data 2>/dev/null
 
   if [ ! -d $MAGISKBIN ]; then
@@ -36,14 +37,7 @@ main() {
   ui_print "* MAGISK_VERSION_STUB"
   ui_print "************************"
 
-  # Check if system root is installed and remove
-  remove_system_su
-  # Prefer bin in /system
-  export PATH=/system/bin:/system/xbin
-  # Clear out possible lib paths, let the binary find them itself
-  export LD_LIBRARY_PATH=
-  # Temporarily block out all custom recovery binaries/libs
-  mv /sbin /sbin_tmp
+  recovery_actions
 
   find_boot_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
@@ -53,7 +47,7 @@ main() {
   cd $MAGISKBIN
 
   # Source the boot patcher
-  . $MAGISKBIN/boot_patch.sh $BOOTIMAGE
+  . $MAGISKBIN/boot_patch.sh "$BOOTIMAGE"
 
   [ -f stock_boot* ] && rm -f /data/stock_boot* 2>/dev/null
 
