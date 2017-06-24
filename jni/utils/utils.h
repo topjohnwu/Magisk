@@ -91,9 +91,14 @@ int clone_dir(const char *source, const char *target);
 int rm_rf(const char *target);
 void clone_attr(const char *source, const char *target);
 void get_client_cred(int fd, struct ucred *cred);
+int switch_mnt_ns(int pid);
+
+// img.c
 int create_img(const char *img, int size);
 int get_img_size(const char *img, int *used, int *total);
 int resize_img(const char *img, int size);
-int switch_mnt_ns(int pid);
+char *loopsetup(const char *img);
+char *mount_image(const char *img, const char *target);
+void umount_image(const char *target, const char *device);
 
 #endif

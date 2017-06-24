@@ -54,44 +54,6 @@ struct node_entry {
  * Image handling *
  ******************/
 
-static char *loopsetup(const char *img) {
-	char device[20];
-	struct loop_info64 info;
-	int i, lfd, ffd;
-	memset(&info, 0, sizeof(info));
-	// First get an empty loop device
-	for (i = 0; i <= 7; ++i) {
-		sprintf(device, "/dev/block/loop%d", i);
-		lfd = xopen(device, O_RDWR);
-		if (ioctl(lfd, LOOP_GET_STATUS64, &info) == -1)
-			break;
-		close(lfd);
-	}
-	if (i == 8) return NULL;
-	ffd = xopen(img, O_RDWR);
-	if (ioctl(lfd, LOOP_SET_FD, ffd) == -1)
-		return NULL;
-	strcpy((char *) info.lo_file_name, img);
-	ioctl(lfd, LOOP_SET_STATUS64, &info);
-	close(lfd);
-	close(ffd);
-	return strdup(device);
-}
-
-static char *mount_image(const char *img, const char *target) {
-	char *device = loopsetup(img);
-	if (device)
-		xmount(device, target, "ext4", 0, NULL);
-	return device;
-}
-
-static void umount_image(const char *target, const char *device) {
-	xumount(target);
-	int fd = xopen(device, O_RDWR);
-	ioctl(fd, LOOP_CLR_FD);
-	close(fd);
-}
-
 #define round_size(a) ((((a) / 32) + 2) * 32)
 #define SOURCE_TMP "/dev/source"
 #define TARGET_TMP "/dev/target"

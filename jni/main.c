@@ -32,6 +32,9 @@ static void usage() {
 		"   or: %s --imgsize <PATH>\n"
 		"   or: %s --resizeimg <PATH> <SIZE>\n"
 		"       SIZE is interpreted in MB\n"
+		"   or: %s --mountimg <IMG> <PATH>\n"
+		"       Prints out the loop device\n"
+		"   or: %s --umountimg <PATH> <LOOP>\n"
 		"   or: %s --[boot stage]\n"
 		"       start boot stage service\n"
 		"   or: %s [options]\n"
@@ -46,7 +49,7 @@ static void usage() {
 		"       -V            print daemon version code\n"
 		"\n"
 		"Supported applets:\n"
-	, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0);
+	, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0);
 
 	for (int i = 0; applet[i]; ++i) {
 		fprintf(stderr, i ? ", %s" : "       %s", applet[i]);
@@ -99,7 +102,7 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr, "Cannot check %s size\n", argv[2]);
 				return 1;
 			}
-			printf("Used: %dM\tTotal: %dM\n", used, total);
+			printf("%d %d\n", used, total);
 			return 0;
 		} else if (strcmp(argv[1], "--resizeimg") == 0) {
 			if (argc < 4) usage();
@@ -114,6 +117,21 @@ int main(int argc, char *argv[]) {
 				return 1;
 			}
 			return resize_img(argv[2], size);
+		} else if (strcmp(argv[1], "--mountimg") == 0) {
+			if (argc < 4) usage();
+			char *loop = mount_image(argv[2], argv[3]);
+			if (loop == NULL) {
+				fprintf(stderr, "Cannot mount image!\n");
+				return 1;
+			} else {
+				printf("%s\n", loop);
+				free(loop);
+				return 0;
+			}
+		} else if (strcmp(argv[1], "--umountimg") == 0) {
+			if (argc < 4) usage();
+			umount_image(argv[2], argv[3]);
+			return 0;
 		} else if (strcmp(argv[1], "--post-fs") == 0) {
 			int fd = connect_daemon();
 			write_int(fd, POST_FS);

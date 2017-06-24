@@ -20,6 +20,7 @@ LOCAL_SRC_FILES := \
 	utils/vector.c \
 	utils/xwrap.c \
 	utils/list.c \
+	utils/img.c \
 	daemon/daemon.c \
 	daemon/socket_trans.c \
 	daemon/log_monitor.c \
