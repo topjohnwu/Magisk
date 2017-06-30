@@ -418,7 +418,7 @@ static void simple_mount(const char *path) {
 			free(new_path);
 		} else if (entry->d_type == DT_REG) {
 			// Actual file path
-			snprintf(buf, PATH_MAX, "%s/%s", buf, entry->d_name);
+			snprintf(buf, PATH_MAX, "%s%s", CACHEMOUNT, buf2);
 			// Clone all attributes
 			clone_attr(buf2, buf);
 			// Finally, mount the file
