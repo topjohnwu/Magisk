@@ -45,7 +45,7 @@ int get_img_size(const char *img, int *used, int *total) {
 	if (pid == -1)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd)) {
-		LOGD("magisk_img: %s", buffer);
+		// LOGD("magisk_img: %s", buffer);
 		if (strstr(buffer, img)) {
 			char *tok = strtok(buffer, ",");
 			while(tok != NULL) {
@@ -108,12 +108,25 @@ char *loopsetup(const char *img) {
 }
 
 char *mount_image(const char *img, const char *target) {
+	if (access(img, F_OK) == -1)
+		return NULL;
 	if (access(target, F_OK) == -1) {
-		if (mkdir(target, 0755) == -1) {
+		if (xmkdir(target, 0755) == -1) {
 			xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 			xmkdir(target, 0755);
+			xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 		}
 	}
+	// Check and repair ext4 image
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s", img);
+	int fd = 0;
+	char *const command[] = { "sh", "-c", buffer, NULL };
+	if (run_command(1, &fd, "/system/bin/sh", command) == -1)
+		return NULL;
+	while (fdgets(buffer, sizeof(buffer), fd))
+		LOGD("magisk_img: %s", buffer);
+	close(fd);
 	char *device = loopsetup(img);
 	if (device)
 		xmount(device, target, "ext4", 0, NULL);
