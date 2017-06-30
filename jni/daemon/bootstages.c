@@ -74,8 +74,8 @@ static int merge_img(const char *source, const char *target) {
 	if (n_total != t_total)
 		resize_img(target, n_total);
 
-	mkdir(SOURCE_TMP, 0755);
-	mkdir(TARGET_TMP, 0755);
+	xmkdir(SOURCE_TMP, 0755);
+	xmkdir(TARGET_TMP, 0755);
 	char *s_loop, *t_loop;
 	s_loop = mount_image(source, SOURCE_TMP);
 	if (s_loop == NULL) return 1;
@@ -332,7 +332,7 @@ static void clone_skeleton(struct node_entry *node) {
 
 		// Create the dummy file/directory
 		if (IS_DIR(child))
-			mkdir(buf, 0755);
+			xmkdir(buf, 0755);
 		else if (IS_REG(child))
 			close(open_new(buf));
 		// Links will be handled later
@@ -540,10 +540,10 @@ void post_fs_data(int client) {
 		goto unblock;
 
 	if (new_img) {
-		mkdir(COREDIR, 0755);
-		mkdir(COREDIR "/post-fs-data.d", 0755);
-		mkdir(COREDIR "/service.d", 0755);
-		mkdir(COREDIR "/props", 0755);
+		xmkdir(COREDIR, 0755);
+		xmkdir(COREDIR "/post-fs-data.d", 0755);
+		xmkdir(COREDIR "/service.d", 0755);
+		xmkdir(COREDIR "/props", 0755);
 	}
 
 	// Run common scripts

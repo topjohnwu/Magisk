@@ -307,7 +307,7 @@ int xrename(const char *oldpath, const char *newpath) {
 
 int xmkdir(const char *pathname, mode_t mode) {
 	int ret = mkdir(pathname, mode);
-	if (ret == -1) {
+	if (ret == -1 && errno != EEXIST) {
 		PLOGE("mkdir %s %u", pathname, mode);
 	}
 	return ret;

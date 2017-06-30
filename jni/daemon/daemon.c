@@ -171,7 +171,7 @@ void start_daemon(int client) {
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	create_links(NULL, "/sbin");
 	xchmod("/sbin", 0755);
-	mkdir("/magisk", 0755);
+	xmkdir("/magisk", 0755);
 	xchmod("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
