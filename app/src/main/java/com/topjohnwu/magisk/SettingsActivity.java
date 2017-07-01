@@ -1,12 +1,14 @@
 package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -81,6 +83,7 @@ public class SettingsActivity extends Activity {
             suNotification = (ListPreference) findPreference("su_notification");
             multiuserMode = (ListPreference) findPreference("multiuser_mode");
             namespaceMode = (ListPreference) findPreference("mnt_ns");
+            SwitchPreference reauth = (SwitchPreference) findPreference("su_reauth");
 
             setSummary();
 
@@ -88,6 +91,11 @@ public class SettingsActivity extends Activity {
             if (getActivity().getApplicationInfo().uid > 99999) {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
+            }
+
+            // Remove re-authentication option on Android O, it will not work
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                suCategory.removePreference(reauth);
             }
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {

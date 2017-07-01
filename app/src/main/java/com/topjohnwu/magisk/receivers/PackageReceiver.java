@@ -20,19 +20,21 @@ public class PackageReceiver extends BroadcastReceiver {
             return;
 
         switch (intent.getAction()) {
-            case Intent.ACTION_PACKAGE_ADDED:
-                int uid = intent.getIntExtra(Intent.EXTRA_UID, -1);
-                // Update the UID if available
-                if (uid > 0) {
-                    policy.uid = uid % 100000;
-                }
-                magiskManager.suDB.updatePolicy(policy);
-                return;
-            case Intent.ACTION_PACKAGE_REMOVED:
-                boolean isUpdate = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
-                if (!isUpdate || magiskManager.suReauth) {
+            case Intent.ACTION_PACKAGE_REPLACED:
+                // This will only work pre-O
+                if (magiskManager.suReauth) {
                     magiskManager.suDB.deletePolicy(policy);
+                } else {
+                    int uid = intent.getIntExtra(Intent.EXTRA_UID, -1);
+                    // Update the UID if available
+                    if (uid > 0) {
+                        policy.uid = uid % 100000;
+                    }
+                    magiskManager.suDB.updatePolicy(policy);
                 }
+                break;
+            case Intent.ACTION_PACKAGE_FULLY_REMOVED:
+                magiskManager.suDB.deletePolicy(policy);
                 break;
         }
     }
