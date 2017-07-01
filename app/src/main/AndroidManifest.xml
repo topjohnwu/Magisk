@@ -70,7 +70,7 @@
 
         <receiver android:name=".receivers.ManagerUpdate" />
 
-        <service android:name=".services.BootupIntentService" />
+        <service android:name=".services.OnBootIntentService" />
 
         <service
             android:name=".services.UpdateCheckService"
