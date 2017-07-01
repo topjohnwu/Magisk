@@ -108,7 +108,7 @@ public class MagiskManager extends Application {
             devLogging = false;
             shellLogging = false;
         }
-        magiskHide = prefs.getBoolean("magiskhide", false);
+        magiskHide = prefs.getBoolean("magiskhide", true);
         updateNotification = prefs.getBoolean("notification", true);
         initSU();
         // Always start a new root shell manually, just for safety
@@ -196,9 +196,9 @@ public class MagiskManager extends Application {
         }
         ret = Shell.sh("getprop " + MAGISKHIDE_PROP);
         try {
-            magiskHide = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
+            magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
-            magiskHide = false;
+            magiskHide = true;
         }
         
     }
