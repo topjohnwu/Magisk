@@ -702,16 +702,14 @@ void post_fs_data(int client) {
 		bind_mount(HOSTSFILE, "/system/etc/hosts");
 	}
 
-	// Start magiskhide if enabled
+	// Enable magiskhide by default, only disable when set explicitly
 	char *hide_prop = getprop(MAGISKHIDE_PROP);
-	if (hide_prop) {
-		if (strcmp(hide_prop, "1") == 0) {
-			pthread_t thread;
-			xpthread_create(&thread, NULL, start_magisk_hide, NULL);
-			pthread_detach(thread);
-		}
-		free(hide_prop);
+	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
+		pthread_t thread;
+		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
+		pthread_detach(thread);
 	}
+	free(hide_prop);
 
 unblock:
 	unblock_boot_process();
