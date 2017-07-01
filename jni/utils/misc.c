@@ -300,11 +300,7 @@ int cp_afc(const char *source, const char *target) {
 		sfd = xopen(source, O_RDONLY);
 		tfd = xopen(target, O_WRONLY | O_CREAT | O_TRUNC);
 		xsendfile(tfd, sfd, NULL, buf.st_size);
-		fchmod(tfd, buf.st_mode & 0777);
-		fchown(tfd, buf.st_uid, buf.st_gid);
-		fgetfilecon(sfd, &con);
-		fsetfilecon(tfd, con);
-		free(con);
+		fclone_attr(sfd, tfd);
 		close(sfd);
 		close(tfd);
 	} else if (S_ISLNK(buf.st_mode)) {
@@ -360,38 +356,10 @@ int clone_dir(const char *source, const char *target) {
 int rm_rf(const char *target) {
 	if (access(target, F_OK) == -1)
 		return 0;
-	struct stat buf;
-	xlstat(target, &buf);
-	char *next;
-	if (S_ISDIR(buf.st_mode)) {
-		DIR *dir;
-		struct dirent *entry;
-		if (!(dir = xopendir(target)))
-			return 1;
-		next = xmalloc(PATH_MAX);
-		while ((entry = xreaddir(dir))) {
-			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-				continue;
-			snprintf(next, PATH_MAX, "%s/%s", target, entry->d_name);
-			switch (entry->d_type) {
-			case DT_DIR:
-				rm_rf(next);
-				break;
-			case DT_REG:
-			case DT_LNK:
-				unlink(next);
-				break;
-			}
-		}
-		free(next);
-		closedir(dir);
-		rmdir(target);
-	} else if (S_ISREG(buf.st_mode) || S_ISLNK(buf.st_mode)) {
-		unlink(target);
-	} else {
-		return 1;
-	}
-	return 0;
+	// Use external rm command, saves a lot of headache and issues
+	char command[PATH_MAX];
+	snprintf(command, sizeof(command), "rm -rf %s", target);
+	return system(command);
 }
 
 void clone_attr(const char *source, const char *target) {
@@ -402,6 +370,17 @@ void clone_attr(const char *source, const char *target) {
 	char *con;
 	lgetfilecon(source, &con);
 	lsetfilecon(target, con);
+	free(con);
+}
+
+void fclone_attr(const int sourcefd, const int targetfd) {
+	struct stat buf;
+	fstat(sourcefd, &buf);
+	fchmod(targetfd, buf.st_mode & 0777);
+	fchown(targetfd, buf.st_uid, buf.st_gid);
+	char *con;
+	fgetfilecon(sourcefd, &con);
+	fsetfilecon(sourcefd, con);
 	free(con);
 }
 

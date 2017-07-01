@@ -68,8 +68,8 @@ static int merge_img(const char *source, const char *target) {
 	
 	// resize target to worst case
 	int s_used, s_total, t_used, t_total, n_total;
-	if (get_img_size(source, &s_used, &s_total)) return 1;
-	if (get_img_size(target, &t_used, &t_total)) return 1;
+	get_img_size(source, &s_used, &s_total);
+	get_img_size(target, &t_used, &t_total);
 	n_total = round_size(s_used + t_used);
 	if (n_total != t_total)
 		resize_img(target, n_total);
@@ -93,8 +93,8 @@ static int merge_img(const char *source, const char *target) {
 				strcmp(entry->d_name, ".core") == 0 ||
 				strcmp(entry->d_name, "lost+found") == 0)
 				continue;
-			// Cleanup old module
-			snprintf(buf, PATH_MAX, "/dev/target/%s", entry->d_name);
+			// Cleanup old module if exists
+			snprintf(buf, PATH_MAX, "%s/%s", TARGET_TMP, entry->d_name);
 			if (access(buf, F_OK) == 0) {
 				LOGI("Upgrade module: %s\n", entry->d_name);
 				rm_rf(buf);
