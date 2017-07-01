@@ -80,9 +80,6 @@ getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
 getvar BOOTIMAGE
 
-# Check if system root is installed and remove
-remove_system_su
-
 API=`grep_prop ro.build.version.sdk`
 ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
 ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
@@ -96,6 +93,9 @@ if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; fi;
 if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; fi;
 
 [ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
+
+# Check if system root is installed and remove
+remove_system_su
 
 ui_print "- Device platform: $ARCH"
 
