@@ -22,12 +22,6 @@ static char init_ns[32], zygote_ns[2][32];
 static int log_pid, log_fd;
 static char *buffer;
 
-static void read_namespace(const int pid, char* target, const size_t size) {
-	char path[32];
-	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
-	xreadlink(path, target, size);
-}
-
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
 	err_handler = do_nothing;
@@ -53,6 +47,22 @@ static void quit_pthread(int sig) {
 	pthread_exit(NULL);
 }
 
+static void proc_monitor_err() {
+	LOGD("proc_monitor: error occured, stopping magiskhide services\n");
+	quit_pthread(SIGUSR1);
+}
+
+static void read_namespace(const int pid, char* target, const size_t size) {
+	char path[32];
+	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
+	if (access(path, R_OK) == -1) {
+		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
+		proc_monitor_err();
+		return;
+	}
+	xreadlink(path, target, size);
+}
+
 static void store_zygote_ns(int pid) {
 	if (zygote_num == 2) return;
 	do {
@@ -60,11 +70,6 @@ static void store_zygote_ns(int pid) {
 		read_namespace(pid, zygote_ns[zygote_num], 32);
 	} while (strcmp(zygote_ns[zygote_num], init_ns) == 0);
 	++zygote_num;
-}
-
-static void proc_monitor_err() {
-	LOGD("proc_monitor: error occured, stopping magiskhide services\n");
-	quit_pthread(SIGUSR1);
 }
 
 void proc_monitor() {
