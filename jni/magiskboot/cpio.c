@@ -1,6 +1,7 @@
 #include "magiskboot.h"
 #include "cpio.h"
 #include "vector.h"
+#include "list.h"
 
 static uint32_t x8u(char *hex) {
   uint32_t val, inpos = 8, outpos;
@@ -220,47 +221,109 @@ static int check_verity_pattern(const char *s) {
 	return pos;
 }
 
-static void cpio_dmverity(struct vector *v) {
-	cpio_file *f;
-	size_t read, write;
-	int skip;
-	vec_for_each(v, f) {
-		if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-			for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
-				skip = check_verity_pattern(f->data + read);
-				if (skip > 0) {
-					printf("Remove pattern [%.*s] in [%s]\n", (int) skip, f->data + read, f->filename);
-					read += skip;
-				}
-				f->data[write] = f->data[read];
-			}
-			f->filesize = write;
-		} else if (strcmp(f->filename, "verity_key") == 0) {
-			f->remove = 1;
-			break;
-		}
+static struct list_head *block_to_list(char *data) {
+	struct list_head *head = xmalloc(sizeof(*head));
+	line_list *line;
+	init_list_head(head);
+	char *tok;
+	tok = strsep(&data, "\n");
+	while (tok) {
+		line = xcalloc(sizeof(*line), 1);
+		line->line = tok;
+		list_insert_end(head, &line->pos);
+		tok = strsep(&data, "\n");
 	}
+	return head;
 }
 
-static void cpio_forceencrypt(struct vector *v) {
+static char *list_to_block(struct list_head *head, uint32_t filesize) {
+	line_list *line;
+	char *data = xmalloc(filesize);
+	uint32_t off = 0;
+	list_for_each(line, head, line_list, pos) {
+		strcpy(data + off, line->line);
+		off += strlen(line->line);
+		data[off++] = '\n';
+	}
+	return data;
+}
+
+static void free_newline(line_list *line) {
+	if (line->isNew)
+		free(line->line);
+}
+
+static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
+	struct list_head *head;
+	line_list *line;
 	cpio_file *f;
+	int skip, injected = 0;
 	size_t read, write;
 	const char *ENCRYPT_LIST[] = { "forceencrypt", "forcefdeorfbe", "fileencryptioninline", NULL };
 	vec_for_each(v, f) {
-		if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-			for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
-				for (int i = 0 ; ENCRYPT_LIST[i]; ++i) {
-					if (strncmp(f->data + read, ENCRYPT_LIST[i], strlen(ENCRYPT_LIST[i])) == 0) {
-						memcpy(f->data + write, "encryptable", 11);
-						printf("Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);
-						write += 11;
-						read += strlen(ENCRYPT_LIST[i]);
-						break;
-					}
+		if (strcmp(f->filename, "init.rc") == 0) {
+			head = block_to_list(f->data);
+			list_for_each(line, head, line_list, pos) {
+				if (strstr(line->line, "import")) {
+					if (strstr(line->line, "init.magisk.rc"))
+						injected = 1;
+					if (injected)
+						continue;
+					// Inject magisk script as import
+					printf("Inject new line [import /init.magisk.rc] in [init.rc]\n");
+					line = xcalloc(sizeof(*line), 1);
+					line->line = strdup("import /init.magisk.rc");
+					line->isNew = 1;
+					f->filesize += 23;
+					list_insert(__->prev, &line->pos);
+					injected = 1;
+				} else if (strstr(line->line, "selinux.reload_policy")) {
+					// Remove this line
+					printf("Remove line [%s] in [init.rc]\n", line->line);
+					f->filesize -= strlen(line->line) + 1;
+					__ = list_pop(&line->pos);
+					free(line);
 				}
-				f->data[write] = f->data[read];
 			}
-			f->filesize = write;
+			char *temp = list_to_block(head, f->filesize);
+			free(f->data);
+			f->data = temp;
+			list_destory(head, list_head, pos, free_newline);
+			free(head);
+		} else {
+			if (!keepverity) {
+				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
+					for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
+						skip = check_verity_pattern(f->data + read);
+						if (skip > 0) {
+							printf("Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
+							read += skip;
+						}
+						f->data[write] = f->data[read];
+					}
+					f->filesize = write;
+				} else if (strcmp(f->filename, "verity_key") == 0) {
+					printf("Remove [verity_key]\n");
+					f->remove = 1;
+				}
+			}
+			if (!keepforceencrypt) {
+				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
+					for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
+						for (int i = 0 ; ENCRYPT_LIST[i]; ++i) {
+							if (strncmp(f->data + read, ENCRYPT_LIST[i], strlen(ENCRYPT_LIST[i])) == 0) {
+								memcpy(f->data + write, "encryptable", 11);
+								printf("Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);
+								write += 11;
+								read += strlen(ENCRYPT_LIST[i]);
+								break;
+							}
+						}
+						f->data[write] = f->data[read];
+					}
+					f->filesize = write;
+				}
+			}
 		}
 	}
 }
@@ -415,10 +478,6 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	--argc;
 	if (strcmp(command, "test") == 0) {
 		cmd = TEST;
-	} else if (strcmp(command, "patch-dmverity") == 0) {
-		cmd = DMVERITY;
-	} else if (strcmp(command, "patch-forceencrypt") == 0) {
-		cmd = FORCEENCRYPT;
 	} else if (strcmp(command, "restore") == 0) {
 		cmd = RESTORE;
 	} else if (argc == 1 && strcmp(command, "backup") == 0) {
@@ -430,6 +489,8 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 			++argv;
 			--argc;
 		}
+	} else if (argc == 2 && strcmp(command, "patch") == 0) {
+		cmd = PATCH;
 	} else if (argc == 2 && strcmp(command, "extract") == 0) {
 		cmd = EXTRACT;
 	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
@@ -438,41 +499,36 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		cmd = ADD;
 	} else {
 		cmd = NONE;
-		return 1;
 	}
 	struct vector v;
 	vec_init(&v);
 	parse_cpio(incpio, &v);
 	switch(cmd) {
-		case TEST:
-			cpio_test(&v);
-			break;
-		case DMVERITY:
-			cpio_dmverity(&v);
-			break;
-		case FORCEENCRYPT:
-			cpio_forceencrypt(&v);
-			break;
-		case RESTORE:
-			ret = cpio_restore(&v);
-			break;
-		case BACKUP:
-			cpio_backup(argv[0], &v);
-		case RM:
-			cpio_rm(recursive, argv[0], &v);
-			break;
-		case EXTRACT:
-			cpio_extract(argv[0], argv[1], &v);
-			break;
-		case MKDIR:
-			cpio_mkdir(strtoul(argv[0], NULL, 8), argv[1], &v);
-			break;
-		case ADD:
-			cpio_add(strtoul(argv[0], NULL, 8), argv[1], argv[2], &v);
-			break;
-		default:
-			// Never happen
-			break;
+	case TEST:
+		cpio_test(&v);
+		break;
+	case RESTORE:
+		ret = cpio_restore(&v);
+		break;
+	case BACKUP:
+		cpio_backup(argv[0], &v);
+	case RM:
+		cpio_rm(recursive, argv[0], &v);
+		break;
+	case PATCH:
+		cpio_patch(&v, strcmp(argv[0], "true") == 0, strcmp(argv[1], "true") == 0);
+		break;
+	case EXTRACT:
+		cpio_extract(argv[0], argv[1], &v);
+		break;
+	case MKDIR:
+		cpio_mkdir(strtoul(argv[0], NULL, 8), argv[1], &v);
+		break;
+	case ADD:
+		cpio_add(strtoul(argv[0], NULL, 8), argv[1], argv[2], &v);
+		break;
+	case NONE:
+		return 1;
 	}
 	dump_cpio(incpio, &v);
 	cpio_vec_destroy(&v);

@@ -194,16 +194,8 @@ esac
 
 ui_print_wrap "- Patching ramdisk"
 
-# The common patches
-$KEEPVERITY || ./magiskboot --cpio-patch-dmverity ramdisk.cpio
-$KEEPFORCEENCRYPT || ./magiskboot --cpio-patch-forceencrypt ramdisk.cpio
-
 # Add magisk entrypoint
-cpio_extract init.rc init.rc
-grep "import /init.magisk.rc" init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' init.rc
-sed -i "/selinux.reload_policy/d" init.rc
-cpio_add 750 init.rc init.rc
-rm -f init.rc
+./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
@@ -237,8 +229,6 @@ rm -f ramdisk.cpio.orig
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 ui_print_wrap "- Repacking boot image"
-./magiskboot --repack "$BOOTIMAGE"
-
-[ $? -ne 0 ] && abort_wrap "! Unable to repack boot image!"
+./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
 
 ./magiskboot --cleanup

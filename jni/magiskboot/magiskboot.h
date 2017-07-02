@@ -53,8 +53,7 @@ typedef enum {
     ADD,
     EXTRACT,
     TEST,
-    DMVERITY,
-    FORCEENCRYPT,
+    PATCH,
     BACKUP,
     RESTORE
 } command_t;

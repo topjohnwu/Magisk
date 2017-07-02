@@ -17,11 +17,12 @@ LOCAL_SRC_FILES := \
 	hexpatch.c \
 	parseimg.c \
 	compress.c \
-	utils.c \
+	boot_utils.c \
 	cpio.c \
 	sha1.c \
 	../utils/xwrap.c \
-	../utils/vector.c
+	../utils/vector.c \
+	../utils/list.c
 LOCAL_CFLAGS += -DZLIB_CONST
 include $(BUILD_EXECUTABLE)
 

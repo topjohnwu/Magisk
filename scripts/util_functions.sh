@@ -32,15 +32,15 @@ getvar() {
 
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
-    for PARTITION in kern-a android_boot kernel boot lnx; do
-      BOOTIMAGE=`find /dev/block -iname "$PARTITION" | head -n 1`
+    for BLOCK in boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
+      BOOTIMAGE=`ls /dev/block/by-name/$BLOCK || ls /dev/block/platform/*/by-name/$BLOCK || ls /dev/block/platform/*/*/by-name/$BLOCK` 2>/dev/null
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
   # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
     for FSTAB in /etc/*fstab*; do
-      BOOTIMAGE=`grep -E '\b/boot\b' $FSTAB | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+      BOOTIMAGE=`grep -E '\b/boot\b' $FSTAB | grep -v "#" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
@@ -91,13 +91,38 @@ remove_system_su() {
   fi
 }
 
+api_level_arch_detect() {
+  API=`grep_prop ro.build.version.sdk`
+  ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
+  ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
+  ABILONG=`grep_prop ro.product.cpu.abi`
+
+  ARCH=arm
+  IS64BIT=false
+  if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
+  if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
+  if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
+  if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
+}
+
 recovery_actions() {
   # TWRP bug fix
   mount -o bind /dev/urandom /dev/random
-  # Clear out possible lib paths, let the binaries find them itself
-  export LD_LIBRARY_PATH=
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
+  # Add all possible library paths
+  OLD_LD_PATH=$LD_LIBRARY_PATH
+  $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
+}
+
+recovery_cleanup() {
+  mv /sbin_tmp /sbin
+  # Clear LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$OLD_LD_PATH
+  ui_print "- Unmounting partitions"
+  umount -l /system
+  umount -l /vendor 2>/dev/null
+  umount -l /dev/random
 }
 
 abort() {

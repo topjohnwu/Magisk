@@ -16,17 +16,17 @@ main() {
   # This script always run in recovery
   BOOTMODE=false
 
+  if [ ! -d $MAGISKBIN ]; then
+    echo "! Cannot find Magisk binaries!"
+    exit 1
+  fi
+
   # Wait for post addon.d processes to finish
   sleep 5
 
   mount -o ro /system 2>/dev/null
   mount -o ro /vendor 2>/dev/null
   mount /data 2>/dev/null
-
-  if [ ! -d $MAGISKBIN ]; then
-    echo "! Cannot find Magisk binaries!"
-    exit 1
-  fi
 
   # Load all functions
   . $MAGISKBIN/util_functions.sh
@@ -36,6 +36,8 @@ main() {
   ui_print "************************"
   ui_print "* MAGISK_VERSION_STUB"
   ui_print "************************"
+
+  api_level_arch_detect
 
   recovery_actions
 
@@ -61,9 +63,7 @@ main() {
 
   cd /
 
-  mv /sbin_tmp /sbin
-  ui_print "- Unmounting partitions"
-  umount -l /system
+  recovery_cleanup
 
   ui_print "- Done"
   exit 0

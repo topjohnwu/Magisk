@@ -67,7 +67,7 @@ ui_print "************************"
 ui_print "* MAGISK_VERSION_STUB"
 ui_print "************************"
 
-ui_print "- Mounting /system(ro), /vendor(ro), /cache, /data"
+ui_print "- Mounting /system, /vendor, /cache, /data"
 mount -o ro /system 2>/dev/null
 mount -o ro /vendor 2>/dev/null
 mount /cache 2>/dev/null
@@ -83,17 +83,8 @@ getvar BOOTIMAGE
 # Check if system root is installed and remove
 remove_system_su
 
-API=`grep_prop ro.build.version.sdk`
-ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
-ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
-ABILONG=`grep_prop ro.product.cpu.abi`
-
-ARCH=arm
-BBPATH=armeabi-v7a
-if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
-if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; fi;
-if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; fi;
+# Detect version and architecture
+api_level_arch_detect
 
 [ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
 
@@ -110,8 +101,6 @@ find_boot_image
 ##########################################################################################
 
 ui_print "- Constructing environment"
-
-$BOOTMODE || recovery_actions
   
 is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
@@ -119,9 +108,7 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
-
 chmod -R 755 $MAGISKBIN
-chcon -hR u:object_r:system_file:s0 $MAGISKBIN
 
 # addon.d
 if [ -d /system/addon.d ]; then
@@ -134,6 +121,8 @@ fi
 ##########################################################################################
 # Magisk Image
 ##########################################################################################
+
+$BOOTMODE || recovery_actions
 
 # Fix SuperSU.....
 $BOOTMODE && $BINDIR/magisk magiskpolicy --live "allow fsck * * *"
@@ -206,19 +195,16 @@ ui_print "- Flashing new boot image"
 if [ -L "$BOOTIMAGE" ]; then
   dd if=new-boot.img of="$BOOTIMAGE" bs=4096
 else
-  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096
+  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
 fi
 rm -f new-boot.img
 
 cd /
 
 if ! $BOOTMODE; then
-  ui_print "- Unmounting partitions"
   $BINDIR/magisk --umountimg /magisk $MAGISKLOOP
   rmdir /magisk
-  mv /sbin_tmp /sbin
-  umount -l /system
-  umount -l /vendor 2>/dev/null
+  recovery_cleanup
 fi
 
 ui_print "- Done"
