@@ -46,16 +46,17 @@ void launch_magiskhide(int client) {
 	err_handler = do_nothing;
 
 	if (hideEnabled) {
-		write_int(client, HIDE_IS_ENABLED);
-		close(client);
+		if (client > 0) {
+			write_int(client, HIDE_IS_ENABLED);
+			close(client);
+		}
 		return;
 	}
 
+	hideEnabled = 1;
 	LOGI("* Starting MagiskHide\n");
 
-	hideEnabled = 1;
-
-	if (client != -1) {
+	if (client > 0) {
 		if (setprop(MAGISKHIDE_PROP, "1"))
 			goto error;
 	}

@@ -10,80 +10,22 @@
 #include "magisk.h"
 #include "utils.h"
 
-int create_img(const char *img, int size) {
-	unlink(img);
-	LOGI("Create %s with size %dM\n", img, size);
-	// Create a temp file with the file contexts
-	char file_contexts[] = "/magisk(/.*)? u:object_r:system_file:s0\n";
-	// If not root, attempt to create in current diretory
-	char *filename = getuid() == UID_ROOT ? "/dev/file_contexts_image" : "file_contexts_image";
-	int fd = xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	xwrite(fd, file_contexts, sizeof(file_contexts));
-	close(fd);
-
-	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer),
-		"make_ext4fs -l %dM -a /magisk -S %s %s; e2fsck -yf %s;", size, filename, img, img);
-	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, status;
-	pid = run_command(0, NULL, "/system/bin/sh", command);
-	if (pid == -1)
-		return 1;
-	waitpid(pid, &status, 0);
-	unlink(filename);
-	return WEXITSTATUS(status);
-}
-
-int get_img_size(const char *img, int *used, int *total) {
-	if (access(img, R_OK) == -1)
-		return 1;
-	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer), "e2fsck -n %s", img);
-	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, fd = 0, status = 1;
-	pid = run_command(1, &fd, "/system/bin/sh", command);
-	if (pid == -1)
-		return 1;
-	while (fdgets(buffer, sizeof(buffer), fd)) {
-		// LOGD("magisk_img: %s", buffer);
-		if (strstr(buffer, img)) {
-			char *tok = strtok(buffer, ",");
-			while(tok != NULL) {
-				if (strstr(tok, "blocks")) {
-					status = 0;
-					break;
-				}
-				tok = strtok(NULL, ",");
-			}
-			if (status) continue;
-			sscanf(tok, "%d/%d", used, total);
-			*used = *used / 256 + 1;
-			*total /= 256;
-			break;
-		}
-	}
-	close(fd);
-	waitpid(pid, &status, 0);
-	return WEXITSTATUS(status);
-}
-
-int resize_img(const char *img, int size) {
-	LOGI("Resize %s to %dM\n", img, size);
-	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s; resize2fs %s %dM;", img, img, size);
-	char *const command[] = { "sh", "-c", buffer, NULL };
-	int pid, status, fd = 0;
-	pid = run_command(1, &fd, "/system/bin/sh", command);
-	if (pid == -1)
+static int e2fsck(const char *img) {
+	// Check and repair ext4 image
+	char buffer[128];
+	int pid, fd = 0;
+	char *const command[] = { "e2fsck", "-yf", (char *) img, NULL };
+	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
+	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
 		LOGD("magisk_img: %s", buffer);
+	waitpid(pid, NULL, 0);
 	close(fd);
-	waitpid(pid, &status, 0);
-	return WEXITSTATUS(status);
+	return 0;
 }
 
-char *loopsetup(const char *img) {
+static char *loopsetup(const char *img) {
 	char device[20];
 	struct loop_info64 info;
 	int i, lfd, ffd;
@@ -107,6 +49,77 @@ char *loopsetup(const char *img) {
 	return strdup(device);
 }
 
+int create_img(const char *img, int size) {
+	unlink(img);
+	LOGI("Create %s with size %dM\n", img, size);
+	// Create a temp file with the file contexts
+	char file_contexts[] = "/magisk(/.*)? u:object_r:system_file:s0\n";
+	// If not root, attempt to create in current diretory
+	char *filename = getuid() == UID_ROOT ? "/dev/file_contexts_image" : "file_contexts_image";
+	int pid, status, fd = xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	xwrite(fd, file_contexts, sizeof(file_contexts));
+	close(fd);
+
+	char buffer[16];
+	snprintf(buffer, sizeof(buffer), "%dM", size);
+	char *const command[] = { "make_ext4fs", "-l", buffer, "-a", "/magisk", "-S", filename, (char *) img, NULL };
+	pid = run_command(0, NULL, "/system/bin/make_ext4fs", command);
+	if (pid < 0)
+		return 1;
+	waitpid(pid, &status, 0);
+	unlink(filename);
+	return WEXITSTATUS(status);
+}
+
+int get_img_size(const char *img, int *used, int *total) {
+	if (access(img, R_OK) == -1)
+		return 1;
+	char buffer[PATH_MAX];
+	int pid, fd = 0, status = 1;
+	char *const command[] = { "e2fsck", "-n", (char *) img, NULL };
+	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
+	if (pid < 0)
+		return 1;
+	while (fdgets(buffer, sizeof(buffer), fd)) {
+		if (strstr(buffer, img)) {
+			char *tok = strtok(buffer, ",");
+			while(tok != NULL) {
+				if (strstr(tok, "blocks")) {
+					status = 0;
+					break;
+				}
+				tok = strtok(NULL, ",");
+			}
+			if (status) continue;
+			sscanf(tok, "%d/%d", used, total);
+			*used = *used / 256 + 1;
+			*total /= 256;
+			break;
+		}
+	}
+	close(fd);
+	waitpid(pid, NULL, 0);
+	return 0;
+}
+
+int resize_img(const char *img, int size) {
+	LOGI("Resize %s to %dM\n", img, size);
+	if (e2fsck(img))
+		return 1;
+	char buffer[128];
+	int pid, status, fd = 0;
+	snprintf(buffer, sizeof(buffer), "%dM", size);
+	char *const command[] = { "resize2fs", (char *) img, buffer, NULL };
+	pid = run_command(1, &fd, "/system/bin/resize2fs", command);
+	if (pid < 0)
+		return 1;
+	while (fdgets(buffer, sizeof(buffer), fd))
+		LOGD("magisk_img: %s", buffer);
+	close(fd);
+	waitpid(pid, &status, 0);
+	return WEXITSTATUS(status);
+}
+
 char *mount_image(const char *img, const char *target) {
 	if (access(img, F_OK) == -1)
 		return NULL;
@@ -117,16 +130,10 @@ char *mount_image(const char *img, const char *target) {
 			xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 		}
 	}
-	// Check and repair ext4 image
-	char buffer[PATH_MAX];
-	snprintf(buffer, sizeof(buffer), "e2fsck -yf %s", img);
-	int fd = 0;
-	char *const command[] = { "sh", "-c", buffer, NULL };
-	if (run_command(1, &fd, "/system/bin/sh", command) == -1)
+
+	if (e2fsck(img))
 		return NULL;
-	while (fdgets(buffer, sizeof(buffer), fd))
-		LOGD("magisk_img: %s", buffer);
-	close(fd);
+
 	char *device = loopsetup(img);
 	if (device)
 		xmount(device, target, "ext4", 0, NULL);

@@ -17,9 +17,9 @@
 #include "utils.h"
 #include "magiskhide.h"
 
-static int zygote_num = 0;
+static int zygote_num;
 static char init_ns[32], zygote_ns[2][32];
-static int log_pid = 0, log_fd = 0;
+static int log_pid, log_fd;
 static char *buffer;
 
 static void read_namespace(const int pid, char* target, const size_t size) {
@@ -85,6 +85,7 @@ void proc_monitor() {
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
 	// Get the mount namespace of zygote
+	zygote_num = 0;
 	while(!zygote_num) {
 		// Check zygote every 2 secs
 		sleep(2);
@@ -107,7 +108,11 @@ void proc_monitor() {
 
 		// Monitor am_proc_start
 		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
+		log_fd = 0;
 		log_pid = run_command(0, &log_fd, "/system/bin/logcat", command);
+
+		if (log_pid < 0) continue;
+		if (kill(log_pid, 0)) continue;
 
 		while(fdgets(buffer, PATH_MAX, log_fd)) {
 			int ret, comma = 0;

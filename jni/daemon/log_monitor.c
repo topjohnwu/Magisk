@@ -28,13 +28,13 @@ static void *logger_thread(void *args) {
 		// Start logcat
 		char *const command[] = { "logcat", "-s", "Magisk", "-v", "thread", NULL };
 		log_pid = run_command(0, &log_fd, "/system/bin/logcat", command);
-		waitpid(log_pid, NULL, 0);
+		if (log_pid > 0)
+			waitpid(log_pid, NULL, 0);
 		// For some reason it went here, clear buffer and restart
 		system("logcat -c");
 	}
 
 	// Should never be here, but well...
-	close(log_fd);
 	return NULL;
 }
 

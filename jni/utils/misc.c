@@ -225,10 +225,12 @@ void setup_sighandlers(void (*handler)(int)) {
   *fd != 0    -> STDOUT (or STDERR) will be redirected to *fd
 */
 int run_command(int err, int *fd, const char *path, char *const argv[]) {
-	int pipefd[2], writeEnd = 0;
+	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
-		if (*fd == 0) {
+		if (*fd) {
+			writeEnd = *fd;
+		} else {
 			if (pipe(pipefd) == -1)
 				return -1;
 			writeEnd = pipefd[1];
@@ -239,12 +241,11 @@ int run_command(int err, int *fd, const char *path, char *const argv[]) {
 
 	int pid = fork();
 	if (pid != 0) {
-		if (writeEnd) close(writeEnd);
+		close(writeEnd);
 		return pid;
 	}
 
 	if (fd) {
-		if (writeEnd == 0) writeEnd = *fd;
 		xdup2(writeEnd, STDOUT_FILENO);
 		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}

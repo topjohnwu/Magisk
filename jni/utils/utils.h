@@ -98,7 +98,6 @@ int switch_mnt_ns(int pid);
 int create_img(const char *img, int size);
 int get_img_size(const char *img, int *used, int *total);
 int resize_img(const char *img, int size);
-char *loopsetup(const char *img);
 char *mount_image(const char *img, const char *target);
 void umount_image(const char *target, const char *device);
 
