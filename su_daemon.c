@@ -67,29 +67,21 @@ static void sigpipe_handler(int sig) {
 // Maintain the lists periodically
 static void *collector(void *args) {
 	LOGD("su: collector started\n");
-	struct list_head *pos, *temp;
 	struct su_info *node;
 	while(1) {
 		sleep(1);
 		pthread_mutex_lock(&list_lock);
-		list_for_each(pos, &active_list) {
-			node = list_entry(pos, struct su_info, pos);
-			--node->clock;
-			// Timeout, move to waiting list
-			if (node->clock == 0) {
-				temp = pos;
-				pos = pos->prev;
-				list_pop(temp);
-				list_insert_end(&waiting_list, temp);
+		list_for_each(node, &active_list, struct su_info, pos) {
+			if (--node->clock == 0) {
+				// Timeout, move to waiting list
+				__ = list_pop(&node->pos);
+				list_insert_end(&waiting_list, &node->pos);
 			}
 		}
-		list_for_each(pos, &waiting_list) {
-			node = list_entry(pos, struct su_info, pos);
-			// Nothing is using the info, remove it
+		list_for_each(node, &waiting_list, struct su_info, pos) {
 			if (node->count == 0) {
-				temp = pos;
-				pos = pos->prev;
-				list_pop(temp);
+				// Nothing is using the info, remove it
+				__ = list_pop(&node->pos);
 				pthread_mutex_destroy(&node->lock);
 				free(node);
 			}
@@ -102,7 +94,6 @@ void su_daemon_receiver(int client) {
 	LOGD("su: request from client: %d\n", client);
 
 	struct su_info *info = NULL, *node;
-	struct list_head *pos;
 	int new_request = 0;
 
 	pthread_mutex_lock(&list_lock);
@@ -118,8 +109,7 @@ void su_daemon_receiver(int client) {
 	get_client_cred(client, &credential);
 
 	// Search for existing in the active list
-	list_for_each(pos, &active_list) {
-		node = list_entry(pos, struct su_info, pos);
+	list_for_each(node, &active_list, struct su_info, pos) {
 		if (node->uid == credential.uid)
 			info = node;
 	}
