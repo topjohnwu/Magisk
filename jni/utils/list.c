@@ -24,15 +24,19 @@ void list_insert_end(struct list_head *head, struct list_head *node) {
 	list_insert(head->prev, node);
 }
 
-void list_pop(struct list_head *pos) {
+struct list_head *list_pop(struct list_head *pos) {
+	struct list_head *ret;
+	ret = pos->prev;
 	// Maintain the list
 	pos->prev->next = pos->next;
 	pos->next->prev = pos->prev;
 	// Remove references
 	pos->next = pos;
 	pos->prev = pos;
+	// Return the previous node in the list
+	return ret;
 }
 
-void list_pop_end(struct list_head *head) {
+struct list_head *list_pop_end(struct list_head *head) {
 	return list_pop(head->prev);
 }
