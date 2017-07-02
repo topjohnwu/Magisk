@@ -1,14 +1,94 @@
-/* list_manager.c - Hide list management
+/* hide_utils.c - Some utility functions for MagiskHide
  */
 
-#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <pthread.h>
+#include <errno.h>
+#include <dirent.h>
+#include <string.h>
+#include <sys/mount.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
-#include "daemon.h"
+#include "resetprop.h"
 #include "magiskhide.h"
+#include "daemon.h"
+
+static char *prop_key[] =
+	{ "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", 
+	  "ro.debuggable", "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", NULL };
+
+static char *prop_value[] =
+	{ "green", "1", "enforcing", "0", "0", "0", "1", "user", "release-keys", "0", NULL };
+
+static int mocked = 0;
+
+void manage_selinux() {
+	if (mocked) return;
+	char val[1];
+	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
+	xxread(fd, val, 1);
+	close(fd);
+	// Permissive
+	if (val[0] == '0') {
+		LOGI("hide_daemon: Permissive detected, hide the state\n");
+
+		chmod(SELINUX_ENFORCE, 0640);
+		chmod(SELINUX_POLICY, 0440);
+		mocked = 1;
+	}
+}
+
+void hide_sensitive_props() {
+	LOGI("hide_pre_proc: Hiding sensitive props\n");
+
+	// Hide all sensitive props
+	char *value;
+	for (int i = 0; prop_key[i]; ++i) {
+		value = getprop(prop_key[i]);
+		if (value) {
+			if (strcmp(value, prop_value[i]) != 0)
+				setprop2(prop_key[i], prop_value[i], 0);
+			free(value);
+		}
+	}
+}
+
+void relink_sbin() {
+	struct stat st;
+	if (stat("/sbin_orig", &st) == -1 && errno == ENOENT) {
+		// Re-link all binaries and bind mount 
+		DIR *dir;
+		struct dirent *entry;
+		char from[PATH_MAX], to[PATH_MAX];
+
+		LOGI("hide_pre_proc: Re-linking /sbin\n");
+
+		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+		xrename("/sbin", "/sbin_orig");
+		xmkdir("/sbin", 0755);
+		xchmod("/sbin", 0755);
+		xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+		xmkdir("/dev/sbin_bind", 0755);
+		xchmod("/dev/sbin_bind", 0755);
+		dir = xopendir("/sbin_orig");
+
+		while ((entry = xreaddir(dir))) {
+			snprintf(from, sizeof(from), "%s/%s", "/sbin_orig", entry->d_name);
+			snprintf(to, sizeof(to), "%s/%s", "/dev/sbin_bind", entry->d_name);
+			symlink(from, to);
+			lsetfilecon(to, "u:object_r:system_file:s0");
+		}
+		
+		closedir(dir);
+
+		xmount("/dev/sbin_bind", "/sbin", NULL, MS_BIND, NULL);
+	}
+}
 
 int add_list(char *proc) {
 	if (!hideEnabled) {
