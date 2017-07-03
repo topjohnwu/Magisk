@@ -172,13 +172,13 @@
     <string name="user_indepenent_summary">每个用户有独立的权限规则</string>
     <string name="multiuser_hint_owner_request">已发送权限请求到设备所有者账户中。请切换到所有者账户授予权限</string>
 
-    <string name="mount_namespace_mode">挂载命名空间(Namespace)模式</string>
+    <string name="mount_namespace_mode">挂载命名空间 模式</string>
     <string name="settings_ns_global">全局命名空间</string>
     <string name="settings_ns_requester">继承命名空间</string>
     <string name="settings_ns_isolate">独立命名空间</string>
-    <string name="global_summary">所有的 ROOT 工作使用全局挂载命名空间</string>
-    <string name="requester_summary">ROOT 工作继承原程序的命名空间</string>
-    <string name="isolate_summary">每一个 ROOT 工作使用自己独立的命名空间</string>
+    <string name="global_summary">所有的 ROOT 会话使用全局挂载命名空间</string>
+    <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
+    <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
 
     <string name="settings_development_category">开发</string>
     <string name="settings_developer_logging_title">启用高级日志记录</string>
