@@ -96,7 +96,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         // Clear outdated policies
         db.delete(POLICY_TABLE, "until > 0 AND until < ?",
-                new String[] { String.valueOf(System.currentTimeMillis()) });
+                new String[] { String.valueOf(System.currentTimeMillis() / 1000) });
         // Clear outdated logs
         db.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
                 System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
