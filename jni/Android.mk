@@ -10,9 +10,8 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/daemon \
 	$(LOCAL_PATH)/resetprop \
 	$(LOCAL_PATH)/magiskpolicy \
-	$(LOCAL_PATH)/selinux/libselinux/include \
-	$(LOCAL_PATH)/selinux/libsepol/include \
-	$(LOCAL_PATH)/sqlite3
+	$(LOCAL_PATH)/external \
+	$(LOCAL_PATH)/selinux/libsepol/include
 
 LOCAL_SRC_FILES := \
 	main.c \
@@ -48,14 +47,15 @@ LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)
 
-# Libraries
-include jni/selinux/libselinux/Android.mk
+# External shared libraries, build stub libraries for linking
+include jni/external/Android.mk
+
+# libsepol, static library
 include jni/selinux/libsepol/Android.mk
-include jni/sqlite3/Android.mk
 
 #####################################################################
 # In order to build separate binaries, please comment out everything 
-# starting from line 3 (including the 3 lines for libraries)
+# above (including the lines for libraries)
 # Then, uncomment the line you want below
 #####################################################################
 # include jni/resetprop/Android.mk
