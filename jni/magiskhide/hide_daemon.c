@@ -90,7 +90,7 @@ int hide_daemon() {
 		}
 
 		// First unmount dummy skeletons, /sbin links, cache mounts, and mirrors
-		vec_for_each_r(&mount_list, line) {
+		vec_for_each(&mount_list, line) {
 			if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
 				|| (strstr(line, cache_block) && (strstr(line, " /system") || strstr(line, " /vendor")))
 				|| strstr(line, MIRRDIR)) {
@@ -106,25 +106,9 @@ int hide_daemon() {
 		vec_init(&mount_list);
 		file_to_vector(buffer, &mount_list);
 
-		// Unmount loop mounts on /system, /vendor, /magisk
-		vec_for_each_r(&mount_list, line) {
-			if (strstr(line, "/dev/block/loop") 
-				&& (strstr(line, " /system") || strstr(line, " /vendor") || strstr(line, " /magisk"))) {
-				sscanf(line, "%*s %512s", buffer);
-				lazy_unmount(buffer);
-			}
-			free(line);
-		}
-		vec_destroy(&mount_list);
-
-		// Re-read mount infos
-		snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-		vec_init(&mount_list);
-		file_to_vector(buffer, &mount_list);
-
-		// Unmount remaining mounts on dummy skeletons
-		vec_for_each_r(&mount_list, line) {
-			if (strstr(line, DUMMDIR)) {
+		// Unmount any loop mounts and dummy mounts
+		vec_for_each(&mount_list, line) {
+			if (strstr(line, "/dev/block/loop") || strstr(line, DUMMDIR)) {
 				sscanf(line, "%*s %512s", buffer);
 				lazy_unmount(buffer);
 			}
