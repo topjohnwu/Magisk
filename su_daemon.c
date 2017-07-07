@@ -1,7 +1,7 @@
 /* su_client.c - The entrypoint for su, connect to daemon and send correct info
  */
 
-#define _GNU_SOURCE 
+#define _GNU_SOURCE
 #include <limits.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -10,7 +10,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
-#include <sched.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -159,11 +158,10 @@ void su_daemon_receiver(int client) {
 		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR);
 
 	// verify if Magisk Manager is installed
-	struct stat st;
-	xstat(su_ctx->user.base_path, &st);
+	xstat(su_ctx->user.base_path, &su_ctx->st);
 	// odd perms on superuser data dir
-	if (st.st_gid != st.st_uid) {
-		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", st.st_uid, st.st_gid);
+	if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
+		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
 		info->policy = DENY;
 	}
 
@@ -180,7 +178,7 @@ void su_daemon_receiver(int client) {
 		}
 
 		// always allow if this is Magisk Manager
-		if (info->policy == QUERY && (info->uid % 100000) == (st.st_uid % 100000)) {
+		if (info->policy == QUERY && (info->uid % 100000) == (su_ctx->st.st_uid % 100000)) {
 			info->policy = ALLOW;
 			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 			su_ctx->notify = 0;
@@ -251,24 +249,6 @@ void su_daemon_receiver(int client) {
 	// Become session leader
 	xsetsid();
 
-	// Handle namespaces
-	switch (info->mnt_ns) {
-	case NAMESPACE_MODE_GLOBAL:
-		LOGD("su: use global namespace\n");
-		break;
-	case NAMESPACE_MODE_REQUESTER:
-		LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
-		if (switch_mnt_ns(su_ctx->pid)) {
-			LOGD("su: setns failed, fallback to isolated\n");
-			unshare(CLONE_NEWNS);
-		}
-		break;
-	case NAMESPACE_MODE_ISOLATE:
-		LOGD("su: use new isolated namespace\n");
-		unshare(CLONE_NEWNS);
-		break;
-	}
-
 	// Let's read some info from the socket
 	int argc = read_int(client);
 	if (argc < 0 || argc > 512) {
@@ -282,13 +262,16 @@ void su_daemon_receiver(int client) {
 	for (int i = 0; i < argc; i++) {
 		argv[i] = read_string(client);
 		LOGD("su: argv[%d]=[%s]\n", i, argv[i]);
+		// Replace -cn with -z, -mm with -M for supporting getopt_long
+		if (strcmp(argv[i], "-cn") == 0)
+			strcpy(argv[i], "-z");
+		else if (strcmp(argv[i], "-mm") == 0)
+			strcpy(argv[i], "-M");
 	}
 
-	// Change directory to cwd
-	char *cwd = read_string(client);
-	LOGD("su: cwd=[%s]\n", cwd);
-	chdir(cwd);
-	free(cwd);
+	// Get cwd
+	su_ctx->cwd = read_string(client);
+	LOGD("su: cwd=[%s]\n", su_ctx->cwd);
 
 	// Get pts_slave
 	char *pts_slave = read_string(client);
@@ -341,20 +324,6 @@ void su_daemon_receiver(int client) {
 	xdup2(errfd, STDERR_FILENO);
 
 	close(ptsfd);
-
-	mkdir(REQUESTOR_CACHE_PATH, 0770);
-
-	if (chown(REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid))
-		PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, st.st_uid, st.st_gid);
-
-	if (setgroups(0, NULL))
-		PLOGE("setgroups");
-
-	if (setegid(st.st_gid))
-		PLOGE("setegid (%u)", st.st_gid);
-
-	if (seteuid(st.st_uid))
-		PLOGE("seteuid (%u)", st.st_uid);
 
 	su_daemon_main(argc, argv);
 }

@@ -8,6 +8,7 @@
 /* su.c - The main function running in the daemon
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,7 @@
 #include <pwd.h>
 #include <errno.h>
 #include <signal.h>
+#include <sched.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/auxv.h>
@@ -45,7 +47,10 @@ static void usage(int status) {
 	"  -u                            display the multiuser mode and exit\n"
 	"  -v, --version                 display version number and exit\n"
 	"  -V                            display version code and exit,\n"
-	"                                this is used almost exclusively by Superuser.apk\n");
+	"                                this is used almost exclusively by Superuser.apk\n"
+	"  -mm, -M,\n"
+	"  --mount-master                run in the global mount namespace,\n"
+	"                                use if you need to publicly apply mounts");
 	exit2(status);
 }
 
@@ -189,14 +194,6 @@ int su_daemon_main(int argc, char **argv) {
 		}
 	}
 
-	// Replace -cn with z, for CF compatibility
-	for (int i = 0; i < argc; ++i) {
-		if (strcmp(argv[i], "-cn") == 0) {
-			strcpy(argv[i], "-z");
-			break;
-		}
-	}
-
 	int c, socket_serv_fd, fd;
 	char result[64];
 	struct option long_opts[] = {
@@ -207,10 +204,11 @@ int su_daemon_main(int argc, char **argv) {
 		{ "shell",                  required_argument,  NULL, 's' },
 		{ "version",                no_argument,        NULL, 'v' },
 		{ "context",                required_argument,  NULL, 'z' },
+		{ "mount-master",           no_argument,        NULL, 'M' },
 		{ NULL, 0, NULL, 0 },
 	};
 
-	while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:", long_opts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:M", long_opts, NULL)) != -1) {
 		switch (c) {
 		case 'c':
 			su_ctx->to.command = concat_commands(argc, argv);
@@ -251,6 +249,9 @@ int su_daemon_main(int argc, char **argv) {
 			exit2(EXIT_SUCCESS);
 		case 'z':
 			// Do nothing, placed here for legacy support :)
+			break;
+		case 'M':
+			su_ctx->info->mnt_ns = NAMESPACE_MODE_GLOBAL;
 			break;
 		default:
 			/* Bionic getopt_long doesn't terminate its error output by newline */
@@ -293,6 +294,27 @@ int su_daemon_main(int argc, char **argv) {
 	// Setup done, now every error leads to deny
 	err_handler = deny;
 
+	// Handle namespaces
+	switch (su_ctx->info->mnt_ns) {
+	case NAMESPACE_MODE_GLOBAL:
+		LOGD("su: use global namespace\n");
+		break;
+	case NAMESPACE_MODE_REQUESTER:
+		LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
+		if (switch_mnt_ns(su_ctx->pid)) {
+			LOGD("su: setns failed, fallback to isolated\n");
+			unshare(CLONE_NEWNS);
+		}
+		break;
+	case NAMESPACE_MODE_ISOLATE:
+		LOGD("su: use new isolated namespace\n");
+		unshare(CLONE_NEWNS);
+		break;
+	}
+
+	// Change directory to cwd
+	chdir(su_ctx->cwd);
+
 	// Check root_access configuration
 	switch (su_ctx->info->root_access) {
 	case ROOT_ACCESS_DISABLED:
@@ -317,6 +339,19 @@ int su_daemon_main(int argc, char **argv) {
 
 	// New request or no db exist, notify user for response
 	if (su_ctx->info->policy == QUERY) {
+		mkdir(REQUESTOR_CACHE_PATH, 0770);
+		if (chown(REQUESTOR_CACHE_PATH, su_ctx->st.st_uid, su_ctx->st.st_gid))
+			PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, su_ctx->st.st_uid, su_ctx->st.st_gid);
+
+		if (setgroups(0, NULL))
+			PLOGE("setgroups");
+
+		if (setegid(su_ctx->st.st_gid))
+			PLOGE("setegid (%u)", su_ctx->st.st_gid);
+
+		if (seteuid(su_ctx->st.st_uid))
+			PLOGE("seteuid (%u)", su_ctx->st.st_uid);
+
 		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
 		setup_sighandlers(cleanup_signal);
 

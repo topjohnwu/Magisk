@@ -6,6 +6,7 @@
 
 #include <limits.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #include "list.h"
 
@@ -101,6 +102,8 @@ struct su_context {
     pid_t pid;
     int notify;
     mode_t umask;
+    char *cwd;
+    struct stat st;
     char sock_path[PATH_MAX];
 };
 
