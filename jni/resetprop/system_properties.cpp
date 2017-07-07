@@ -1205,7 +1205,7 @@ uint32_t __system_property_area_serial2() {
   if (!pa) {
     return -1;
   }
-  // Make sure this read fulfilled before __system_property_serial2
+  // Make sure this read fulfilled before __system_property_serial
   return atomic_load_explicit(pa->serial(), memory_order_acquire);
 }
 
@@ -1296,7 +1296,7 @@ void __system_property_read_callback2(const prop_info* pi,
     memcpy(value_buf, pi->value, len);
     value_buf[len] = '\0';
 
-    // TODO: see todo in __system_property_read2 function
+    // TODO: see todo in __system_property_read function
     atomic_thread_fence(memory_order_acquire);
     if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
       callback(cookie, pi->name, value_buf, serial);

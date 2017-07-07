@@ -73,22 +73,22 @@ int __system_property_area_init2();
 
 /* Read the global serial number of the system properties
 **
-** Called to predict if a series of cached __system_property_find2
-** objects will have seen __system_property_serial2 values change.
+** Called to predict if a series of cached __system_property_find
+** objects will have seen __system_property_serial values change.
 ** But also aids the converse, as changes in the global serial can
-** also be used to predict if a failed __system_property_find2
+** also be used to predict if a failed __system_property_find
 ** could in-turn now find a new object; thus preventing the
-** cycles of effort to poll __system_property_find2.
+** cycles of effort to poll __system_property_find.
 **
 ** Typically called at beginning of a cache cycle to signal if _any_ possible
 ** changes have occurred since last. If there is, one may check each individual
-** __system_property_serial2 to confirm dirty, or __system_property_find2
-** to check if the property now exists. If a call to __system_property_add2
-** or __system_property_update2 has completed between two calls to
-** __system_property_area_serial2 then the second call will return a larger
+** __system_property_serial to confirm dirty, or __system_property_find
+** to check if the property now exists. If a call to __system_property_add
+** or __system_property_update has completed between two calls to
+** __system_property_area_serial then the second call will return a larger
 ** value than the first call. Beware of race conditions as changes to the
 ** properties are not atomic, the main value of this call is to determine
-** whether the expensive __system_property_find2 is worth retrying to see if
+** whether the expensive __system_property_find is worth retrying to see if
 ** a property now exists.
 **
 ** Returns the serial number on success, -1 on error.
@@ -112,7 +112,7 @@ int __system_property_add2(const char *name, unsigned int namelen, const char *v
 int __system_property_del(const char *name);
 
 /* Update the value of a system property returned by
-** __system_property_find2.  Can only be done by a single process
+** __system_property_find.  Can only be done by a single process
 ** that has write access to the property area, and that process
 ** must handle sequencing to ensure that only one property is
 ** updated at a time.
@@ -122,7 +122,7 @@ int __system_property_del(const char *name);
 int __system_property_update2(prop_info *pi, const char *value, unsigned int len);
 
 /* Read the serial number of a system property returned by
-** __system_property_find2.
+** __system_property_find.
 **
 ** Returns the serial number on success, -1 on error.
 */
@@ -136,7 +136,7 @@ uint32_t __system_property_serial2(const prop_info* pi);
  */
 int __system_properties_init2();
 
-/* Deprecated: use __system_property_wait2 instead. */
+/* Deprecated: use __system_property_wait instead. */
 uint32_t __system_property_wait_any2(uint32_t old_serial);
 
 __END_DECLS

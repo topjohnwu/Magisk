@@ -17,6 +17,8 @@
 #ifndef _BIONIC_MACROS_H_
 #define _BIONIC_MACROS_H_
 
+#include <stdint.h>
+
 // Frameworks OpenGL code currently leaks this header and allows
 // collisions with other declarations, e.g., from libnativehelper.
 // TODO: Remove once cleaned up. b/18334516
@@ -45,5 +47,23 @@
   ((sizeof(value) == 8) \
     ? (1UL << (64 - __builtin_clzl(static_cast<unsigned long>(value)))) \
     : (1UL << (32 - __builtin_clz(static_cast<unsigned int>(value)))))
+
+static constexpr uintptr_t align_down(uintptr_t p, size_t align) {
+  return p & ~(align - 1);
+}
+
+static constexpr uintptr_t align_up(uintptr_t p, size_t align) {
+  return (p + align - 1) & ~(align - 1);
+}
+
+template <typename T>
+static inline T* align_down(T* p, size_t align) {
+  return reinterpret_cast<T*>(align_down(reinterpret_cast<uintptr_t>(p), align));
+}
+
+template <typename T>
+static inline T* align_up(T* p, size_t align) {
+  return reinterpret_cast<T*>(align_up(reinterpret_cast<uintptr_t>(p), align));
+}
 
 #endif // _BIONIC_MACROS_H_
