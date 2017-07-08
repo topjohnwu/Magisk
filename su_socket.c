@@ -22,7 +22,7 @@ int socket_create_temp(char *path, size_t len) {
     int fd;
     struct sockaddr_un sun;
 
-    fd = xsocket(AF_LOCAL, SOCK_STREAM, 0);
+    fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (fcntl(fd, F_SETFD, FD_CLOEXEC)) {
         PLOGE("fcntl FD_CLOEXEC");
     }
@@ -65,7 +65,7 @@ int socket_accept(int serv_fd) {
         PLOGE("select");
     }
 
-    return xaccept(serv_fd, NULL, NULL);
+    return xaccept4(serv_fd, NULL, NULL, SOCK_CLOEXEC);
 }
 
 #define write_data(fd, data, data_len)              \

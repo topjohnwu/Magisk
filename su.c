@@ -35,7 +35,7 @@ static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
 	fprintf(stream,
-	"MagiskSU v" xstr(MAGISK_VERSION) "\n\n"
+	"MagiskSU v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ")\n\n"
 	"Usage: su [options] [--] [-] [LOGIN] [--] [args...]\n\n"
 	"Options:\n"
 	"  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
@@ -50,7 +50,7 @@ static void usage(int status) {
 	"                                this is used almost exclusively by Superuser.apk\n"
 	"  -mm, -M,\n"
 	"  --mount-master                run in the global mount namespace,\n"
-	"                                use if you need to publicly apply mounts");
+	"                                use if you need to publicly apply mounts\n");
 	exit2(status);
 }
 
