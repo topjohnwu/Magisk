@@ -16,7 +16,6 @@
 #include "daemon.h"
 #include "resetprop.h"
 
-int sv[2], hide_pid = -1;
 struct vector *hide_list = NULL;
 
 int hideEnabled = 0;
@@ -29,7 +28,7 @@ void kill_proc(int pid) {
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskHide v" xstr(MAGISK_VERSION) " (by topjohnwu) - Hide Magisk!\n\n"
+		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Hide Magisk!\n\n"
 		"%s [--options [arguments...] ]\n\n"
 		"Options:\n"
 		"  --enable: Start the magiskhide daemon\n"
@@ -63,19 +62,6 @@ void launch_magiskhide(int client) {
 
 	hide_sensitive_props();
 
-	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sv) == -1)
-		goto error;
-
-	/*
-	 * The setns system call do not support multithread processes
-	 * We have to fork a new process, and communicate with sockets
-	 */
-
-	if (hide_daemon())
-		goto error;
-
-	close(sv[1]);
-
 	// Initialize the mutex lock
 	pthread_mutex_init(&hide_lock, NULL);
 	pthread_mutex_init(&file_lock, NULL);
@@ -87,8 +73,10 @@ void launch_magiskhide(int client) {
 	// Add SafetyNet by default
 	add_list(strdup("com.google.android.gms.unstable"));
 
-	write_int(client, DAEMON_SUCCESS);
-	close(client);
+	if (client > 0) {
+		write_int(client, DAEMON_SUCCESS);
+		close(client);
+	}
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
@@ -98,15 +86,9 @@ void launch_magiskhide(int client) {
 
 error:
 	hideEnabled = 0;
-	write_int(client, DAEMON_ERROR);
-	close(client);
-	if (hide_pid != -1) {
-		int kill = -1;
-		// Kill hide daemon
-		write(sv[0], &kill, sizeof(kill));
-		close(sv[0]);
-		waitpid(hide_pid, NULL, 0);
-		hide_pid = -1;
+	if (client > 0) {
+		write_int(client, DAEMON_ERROR);
+		close(client);
 	}
 	return;
 }

@@ -40,7 +40,7 @@ int xsocket(int domain, int type, int protocol);
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xlisten(int sockfd, int backlog);
-int xaccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
 void *xmalloc(size_t size);
 void *xcalloc(size_t nmemb, size_t size);
 void *xrealloc(void *ptr, size_t size);

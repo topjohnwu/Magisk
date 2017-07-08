@@ -155,8 +155,8 @@ int xlisten(int sockfd, int backlog) {
 	return ret;
 }
 
-int xaccept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
-	int fd = accept(sockfd, addr, addrlen);
+int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
+	int fd = accept4(sockfd, addr, addrlen, flags);
 	if (fd == -1) {
 		PLOGE("accept");
 	}

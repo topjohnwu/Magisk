@@ -53,6 +53,7 @@ int hide_daemon() {
 
 	// Set the process name
 	strcpy(argv0, "magiskhide_daemon");
+	LOGD("hide_daemon: listening for hide requests");
 	// When an error occurs, report its failure to main process
 	err_handler = hide_daemon_err;
 	

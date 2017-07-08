@@ -23,7 +23,6 @@
 #include "magiskpolicy.h"
 
 pthread_t sepol_patch;
-int null_fd;
 
 static void *request_handler(void *args) {
 	// Setup the default error handler for threads
@@ -89,17 +88,12 @@ static void *request_handler(void *args) {
 	default:
 		break;
 	}
-	// Just in case
-	close(client);
 	return NULL;
 }
 
 /* Setup the address and return socket fd */
 static int setup_socket(struct sockaddr_un *sun) {
-	int fd = xsocket(AF_LOCAL, SOCK_STREAM, 0);
-	if (fcntl(fd, F_SETFD, FD_CLOEXEC))
-		PLOGE("fcntl FD_CLOEXEC");
-
+	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
 	memcpy(sun->sun_path, REQUESTOR_DAEMON_PATH, REQUESTOR_DAEMON_PATH_LEN);
@@ -137,10 +131,11 @@ void start_daemon(int client) {
 	xsetsid();
 	setcon("u:r:su:s0");
 	umask(022);
-	null_fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-	xdup2(null_fd, STDIN_FILENO);
-	xdup2(null_fd, STDOUT_FILENO);
-	xdup2(null_fd, STDERR_FILENO);
+	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
+	xdup2(fd, STDIN_FILENO);
+	xdup2(fd, STDOUT_FILENO);
+	xdup2(fd, STDERR_FILENO);
+	close(fd);
 
 	// Patch selinux with medium patch before we do anything
 	load_policydb(SELINUX_POLICY);
@@ -151,7 +146,7 @@ void start_daemon(int client) {
 	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
 	struct sockaddr_un sun;
-	int fd = setup_socket(&sun);
+	fd = setup_socket(&sun);
 
 	xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
 	xlisten(fd, 10);
@@ -162,7 +157,7 @@ void start_daemon(int client) {
 	// It should stay intact under any circumstances
 	err_handler = do_nothing;
 
-	LOGI("Magisk v" xstr(MAGISK_VERSION) " daemon started\n");
+	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Unlock all blocks for rw
 	unlock_blocks();
@@ -178,9 +173,7 @@ void start_daemon(int client) {
 	// Loop forever to listen for requests
 	while(1) {
 		int *client = xmalloc(sizeof(int));
-		*client = xaccept(fd, NULL, NULL);
-		// Just in case, set to close on exec
-		fcntl(*client, F_SETFD, FD_CLOEXEC);
+		*client = xaccept4(fd, NULL, NULL, SOCK_CLOEXEC);
 		pthread_t thread;
 		xpthread_create(&thread, NULL, request_handler, client);
 		// Detach the thread, we will never join it
@@ -192,7 +185,6 @@ void start_daemon(int client) {
 int connect_daemon() {
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
-	// LOGD("client: trying to connect socket\n");
 	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
 		/* If we cannot access the daemon, we start the daemon
 		 * since there is no clear entry point when the daemon should be started

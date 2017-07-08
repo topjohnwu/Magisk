@@ -58,7 +58,7 @@ static void usage(char *arg0) {
 }
 
 int main(int argc, char *argv[]) {
-	printf("MagiskBoot v" xstr(MAGISK_VERSION) " (by topjohnwu) - Boot Image Modification Tool\n\n");
+	printf("MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
 
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
 		cleanup();

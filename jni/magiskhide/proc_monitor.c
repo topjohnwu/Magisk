@@ -22,6 +22,8 @@ static char init_ns[32], zygote_ns[2][32];
 static int log_pid, log_fd;
 static char *buffer;
 
+int sv[2], hide_pid = -1;
+
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
 	err_handler = do_nothing;
@@ -103,9 +105,21 @@ void proc_monitor() {
 		LOGI("proc_monitor: zygote ns=%s\n", zygote_ns[0]);
 		break;
 	case 2:
-		LOGI("proc_monitor: zygote (32-bit) ns=%s (64-bit) ns=%s\n", zygote_ns[0], zygote_ns[1]);
+		LOGI("proc_monitor: zygote ns=%s zygote64 ns=%s\n", zygote_ns[0], zygote_ns[1]);
 		break;
 	}
+
+	if (socketpair(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0, sv) == -1)
+		quit_pthread(SIGUSR1);
+
+	/*
+	 * The setns system call do not support multithread processes
+	 * We have to fork a new process, and communicate with sockets
+	 */
+	if (hide_daemon())
+		quit_pthread(SIGUSR1);
+
+	close(sv[1]);
 
 	while (1) {
 		// Clear previous buffer
