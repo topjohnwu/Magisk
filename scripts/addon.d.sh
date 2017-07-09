@@ -28,7 +28,7 @@ main() {
   mount -o ro /vendor 2>/dev/null
   mount /data 2>/dev/null
 
-  # Load all functions
+  # Load utility functions
   . $MAGISKBIN/util_functions.sh
 
   [ -f /system/build.prop ] || abort "! /system could not be mounted!"
@@ -57,7 +57,7 @@ main() {
   if [ -L "$BOOTIMAGE" ]; then
     dd if=new-boot.img of="$BOOTIMAGE" bs=4096
   else
-    cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096
+    cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
   fi
   rm -f new-boot.img
 

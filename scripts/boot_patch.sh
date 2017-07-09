@@ -4,7 +4,7 @@
 # Magisk Boot Image Patcher
 # by topjohnwu
 # 
-# This script should be placed in a directory with at least the following files:
+# This script should be placed in a directory with the following files:
 # 
 # File name       type      Description
 # 
@@ -14,9 +14,11 @@
 # magisk          binary    The main binary for all Magisk operations.
 #                           It is also used to patch the sepolicy in the ramdisk.
 # magiskboot      binary    A tool to unpack boot image, decompress ramdisk, extract ramdisk
-#                           and patch common patches such as forceencrypt, remove dm-verity.
+#                           , and patch the ramdisk for Magisk support
 # init.magisk.rc  script    A new line will be added to init.rc to import this script.
 #                           All magisk entrypoints are defined here
+# chromeos        folder    This folder should store all the utilities and keys to sign
+#               (optional)  a chromeos device, used in the tablet Pixel C
 # 
 # If the script is not running as root, then the input boot image should be a stock image
 # or have a backup included in ramdisk internally, since we cannot access the stock boot
@@ -230,5 +232,17 @@ A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 ui_print_wrap "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
+
+# Sign chromeos boot
+if [ -f chromeos ]; then
+  echo > empty
+
+  ./chromeos/futility vbutil_kernel --pack new-boot.img.signed \
+  --keyblock ./chromeos/kernel.keyblock --signprivate ./chromeos/kernel_data_key.vbprivk \
+  --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
+
+  rm -f empty new-boot.img
+  mv new-boot.img.signed new-boot.img
+fi
 
 ./magiskboot --cleanup

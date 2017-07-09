@@ -219,6 +219,10 @@ def zip_uninstaller(args):
 		target = 'magisk_uninstaller.sh'
 		zip_with_msg(zipf, source, target)
 
+		source = os.path.join('scripts', 'util_functions.sh')
+		target = 'util_functions.sh'
+		zip_with_msg(zipf, source, target)
+
 		source = os.path.join('scripts', 'uninstaller_loader.sh')
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
 		zip_with_msg(zipf, source, target)
@@ -226,6 +230,13 @@ def zip_uninstaller(args):
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'updater-script')
 		print('zip: ' + target)
 		zipf.writestr(target, '#MAGISK\n')
+
+		# Prebuilts
+		for chromeos in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
+			source = os.path.join('chromeos', chromeos)
+			zip_with_msg(zipf, source, source)
+
+		# End of zipping
 
 	output = 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d'))
 	sign_adjust_zip('tmp_unsigned.zip', output)

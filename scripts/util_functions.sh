@@ -3,9 +3,27 @@
 # Magisk General Utility Functions
 # by topjohnwu
 # 
-# Used in flash_script.sh and addon.d.sh
+# Used in flash_script.sh, addon.d.sh, magisk module installers, and uninstaller
 # 
 ##########################################################################################
+
+get_outfd() {
+  readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
+  if [ "$?" -eq "0" ]; then
+    OUTFD=0
+
+    for FD in `ls /proc/$$/fd`; do
+      readlink /proc/$$/fd/$FD 2>/dev/null | grep pipe >/dev/null
+      if [ "$?" -eq "0" ]; then
+        ps | grep " 3 $FD " | grep -v grep >/dev/null
+        if [ "$?" -eq "0" ]; then
+          OUTFD=$FD
+          break
+        fi
+      fi
+    done
+  fi
+}
 
 ui_print() {
   if $BOOTMODE; then
@@ -130,3 +148,45 @@ abort() {
   mv /sbin_tmp /sbin 2>/dev/null
   exit 1
 }
+
+set_perm() {
+  chown $2:$3 $1 || exit 1
+  chmod $4 $1 || exit 1
+  if [ ! -z $5 ]; then
+    chcon $5 $1 2>/dev/null
+  else
+    chcon 'u:object_r:system_file:s0' $1 2>/dev/null
+  fi
+}
+
+set_perm_recursive() {
+  find $1 -type d 2>/dev/null | while read dir; do
+    set_perm $dir $2 $3 $4 $6
+  done
+  find $1 -type f 2>/dev/null | while read file; do
+    set_perm $file $2 $3 $5 $6
+  done
+}
+
+mktouch() {
+  mkdir -p ${1%/*}
+  if [ -z "$2" ]; then
+    touch $1
+  else
+    echo $2 > $1
+  fi
+  chmod 644 $1
+}
+
+request_size_check() {
+  reqSizeM=`du -s $1 | cut -f1`
+  reqSizeM=$((reqSizeM / 1024 + 1))
+}
+
+image_size_check() {
+  SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
+  curUsedM=`echo "$SIZE" | cut -d" " -f1`
+  curSizeM=`echo "$SIZE" | cut -d" " -f2`
+  curFreeM=$((curSizeM - curUsedM))
+}
+

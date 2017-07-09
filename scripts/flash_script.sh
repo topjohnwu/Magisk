@@ -9,6 +9,10 @@
 #
 ##########################################################################################
 
+##########################################################################################
+# Preparation
+##########################################################################################
+
 # Detect whether in boot mode
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
 $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
@@ -16,7 +20,7 @@ $BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMO
 # This path should work in any cases
 TMPDIR=/dev/tmp
 
-INSTALLER=$TMPDIR/magisk
+INSTALLER=$TMPDIR/install
 COMMONDIR=$INSTALLER/common
 CHROMEDIR=$INSTALLER/chromeos
 COREDIR=/magisk/.core
@@ -24,44 +28,26 @@ COREDIR=/magisk/.core
 # Default permissions
 umask 022
 
-##########################################################################################
-# Flashable update-binary preparation
-##########################################################################################
-
 OUTFD=$2
 ZIP=$3
 
-readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
-if [ "$?" -eq "0" ]; then
-  OUTFD=0
-
-  for FD in `ls /proc/$$/fd`; do
-    readlink /proc/$$/fd/$FD 2>/dev/null | grep pipe >/dev/null
-    if [ "$?" -eq "0" ]; then
-      ps | grep " 3 $FD " | grep -v grep >/dev/null
-      if [ "$?" -eq "0" ]; then
-        OUTFD=$FD
-        break
-      fi
-    fi
-  done
-fi
-
 rm -rf $TMPDIR 2>/dev/null
 mkdir -p $INSTALLER
-unzip -o "$ZIP" -d $INSTALLER
-
-##########################################################################################
-# Detection
-##########################################################################################
+unzip -o "$ZIP" -d $INSTALLER 2>/dev/null
 
 if [ ! -d "$COMMONDIR" ]; then
   echo "! Unable to extract zip file!"
   exit 1
 fi
 
-# Load all fuctions
+# Load utility fuctions
 . $COMMONDIR/util_functions.sh
+
+get_outfd
+
+##########################################################################################
+# Detection
+##########################################################################################
 
 ui_print "************************"
 ui_print "* MAGISK_VERSION_STUB"
@@ -108,6 +94,7 @@ is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
+cp -af $CHROMEDIR $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
@@ -125,7 +112,7 @@ fi
 $BOOTMODE || recovery_actions
 
 # Fix SuperSU.....
-$BOOTMODE && $BINDIR/magisk magiskpolicy --live "allow fsck * * *"
+$BOOTMODE && $MAGISKBIN/magisk magiskpolicy --live "allow fsck * * *"
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -138,12 +125,12 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  $BINDIR/magisk --createimg $IMG 64M
+  $MAGISKBIN/magisk --createimg $IMG 64M
 fi
 
 if ! is_mounted /magisk; then
   ui_print "- Mounting $IMG to /magisk"
-  MAGISKLOOP=`$BINDIR/magisk --mountimg $IMG /magisk`
+  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG /magisk`
 fi
 is_mounted /magisk || abort "! Magisk image mount failed..."
 
@@ -165,10 +152,10 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
-  SHA1=`$BINDIR/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
+  SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
-  $BINDIR/magiskboot --compress $STOCKDUMP
+  $MAGISKBIN/magiskboot --compress $STOCKDUMP
 fi
 
 SOURCEDMODE=true
@@ -177,19 +164,10 @@ cd $MAGISKBIN
 # Source the boot patcher
 . $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
 
-# Sign chromeos boot
-if [ -f chromeos ]; then
-  echo > empty
-
-  $CHROMEDIR/futility vbutil_kernel --pack new-boot.img.signed \
-  --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
-  --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
-
-  rm -f empty new-boot.img
-  mv new-boot.img.signed new-boot.img
+if [ -f stock_boot* ]; then
+  rm -f /data/stock_boot* 2>/dev/null
+  mv stock_boot* /data
 fi
-
-[ -f stock_boot* ] && rm -f /data/stock_boot* 2>/dev/null
 
 ui_print "- Flashing new boot image"
 if [ -L "$BOOTIMAGE" ]; then
@@ -202,7 +180,7 @@ rm -f new-boot.img
 cd /
 
 if ! $BOOTMODE; then
-  $BINDIR/magisk --umountimg /magisk $MAGISKLOOP
+  $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
   rmdir /magisk
   recovery_cleanup
 fi
