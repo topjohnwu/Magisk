@@ -1,7 +1,8 @@
-/* proc_monitor.c - Monitor am_proc_start events
+/* proc_monitor.c - Monitor am_proc_start events and unmount
  * 
- * We monitor the logcat am_proc_start events, pause it,
- * and send the target PID to hide daemon ASAP
+ * We monitor the logcat am_proc_start events. When a target starts up,
+ * we pause it ASAP, and fork a new process to join its mount namespace
+ * and do all the unmounting/mocking
  */
 
 #include <stdlib.h>
@@ -12,17 +13,16 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/mount.h>
 
 #include "magisk.h"
 #include "utils.h"
 #include "magiskhide.h"
 
 static int zygote_num;
-static char init_ns[32], zygote_ns[2][32];
-static int log_pid, log_fd;
+static char init_ns[32], zygote_ns[2][32], cache_block[256];
+static int log_pid, log_fd, target_pid;
 static char *buffer;
-
-int sv[2], hide_pid = -1;
 
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
@@ -32,17 +32,14 @@ static void quit_pthread(int sig) {
 	free(buffer);
 	hideEnabled = 0;
 	// Kill the logging if needed
-	if (log_pid) {
+	if (log_pid > 0) {
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, NULL, 0);
 		close(log_fd);
-		log_fd = log_pid = 0;
 	}
-	int kill = -1;
-	// If process monitor dies, kill hide daemon too
-	write(sv[0], &kill, sizeof(kill));
-	close(sv[0]);
-	waitpid(hide_pid, NULL, 0);
+	// Resume process if possible
+	if (target_pid > 0)
+		kill(target_pid, SIGCONT);
 	pthread_mutex_destroy(&hide_lock);
 	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
@@ -54,15 +51,13 @@ static void proc_monitor_err() {
 	quit_pthread(SIGUSR1);
 }
 
-static void read_namespace(const int pid, char* target, const size_t size) {
+static int read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
 	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
-	if (access(path, R_OK) == -1) {
-		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
-		proc_monitor_err();
-		return;
-	}
+	if (access(path, R_OK) == -1)
+		return 1;
 	xreadlink(path, target, size);
+	return 0;
 }
 
 static void store_zygote_ns(int pid) {
@@ -74,6 +69,76 @@ static void store_zygote_ns(int pid) {
 	++zygote_num;
 }
 
+static void lazy_unmount(const char* mountpoint) {
+	if (umount2(mountpoint, MNT_DETACH) != -1)
+		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
+	else
+		LOGD("hide_daemon: Unmount Failed (%s)\n", mountpoint);
+}
+
+static void hide_daemon_err() {
+	LOGD("hide_daemon: error occured, stopping magiskhide services\n");
+	_exit(-1);
+}
+
+static void hide_daemon(int pid) {
+	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
+	// When an error occurs, report its failure to main process
+	err_handler = hide_daemon_err;
+
+	char *line;
+	struct vector mount_list;
+
+	manage_selinux();
+	relink_sbin();
+
+	if (switch_mnt_ns(pid))
+		return;
+
+	snprintf(buffer, PATH_MAX, "/proc/%d/mounts", pid);
+	vec_init(&mount_list);
+	file_to_vector(buffer, &mount_list);
+
+	// Find the cache block name if not found yet
+	if (cache_block[0] == '\0') {
+		vec_for_each(&mount_list, line) {
+			if (strstr(line, " /cache ")) {
+				sscanf(line, "%256s", cache_block);
+				break;
+			}
+		}
+	}
+
+	// First unmount dummy skeletons, /sbin links, cache mounts, and mirrors
+	vec_for_each(&mount_list, line) {
+		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
+			|| (strstr(line, cache_block) && (strstr(line, " /system") || strstr(line, " /vendor")))
+			|| strstr(line, MIRRDIR)) {
+			sscanf(line, "%*s %4096s", buffer);
+			lazy_unmount(buffer);
+		}
+		free(line);
+	}
+	vec_destroy(&mount_list);
+
+	// Re-read mount infos
+	snprintf(buffer, PATH_MAX, "/proc/%d/mounts", pid);
+	vec_init(&mount_list);
+	file_to_vector(buffer, &mount_list);
+
+	// Unmount any loop mounts and dummy mounts
+	vec_for_each(&mount_list, line) {
+		if (strstr(line, "/dev/block/loop") || strstr(line, DUMMDIR)) {
+			sscanf(line, "%*s %4096s", buffer);
+			lazy_unmount(buffer);
+		}
+		free(line);
+	}
+
+	// Free uo memory
+	vec_destroy(&mount_list);
+}
+
 void proc_monitor() {
 	// Register the cancel signal
 	struct sigaction act;
@@ -83,12 +148,16 @@ void proc_monitor() {
 
 	// The error handler should stop magiskhide services
 	err_handler = proc_monitor_err;
+	log_pid = target_pid = -1;
 
-	int pid;
 	buffer = xmalloc(PATH_MAX);
+	cache_block[0] = '\0';
 
 	// Get the mount namespace of init
-	read_namespace(1, init_ns, 32);
+	if (read_namespace(1, init_ns, 32)) {
+		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
+		proc_monitor_err();
+	}
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
 	// Get the mount namespace of zygote
@@ -109,20 +178,8 @@ void proc_monitor() {
 		break;
 	}
 
-	if (socketpair(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0, sv) == -1)
-		quit_pthread(SIGUSR1);
-
-	/*
-	 * The setns system call do not support multithread processes
-	 * We have to fork a new process, and communicate with sockets
-	 */
-	if (hide_daemon())
-		quit_pthread(SIGUSR1);
-
-	close(sv[1]);
-
 	while (1) {
-		// Clear previous buffer
+		// Clear previous logcat buffer
 		system("logcat -b events -c");
 
 		// Monitor am_proc_start
@@ -134,7 +191,7 @@ void proc_monitor() {
 		if (kill(log_pid, 0)) continue;
 
 		while(fdgets(buffer, PATH_MAX, log_fd)) {
-			int ret, comma = 0;
+			int pid, ret, comma = 0;
 			char *pos = buffer, *line, processName[256];
 
 			while(1) {
@@ -159,10 +216,11 @@ void proc_monitor() {
 			pthread_mutex_lock(&hide_lock);
 			vec_for_each(hide_list, line) {
 				if (strcmp(processName, line) == 0) {
+					target_pid = pid;
 					while(1) {
 						ret = 1;
 						for (int i = 0; i < zygote_num; ++i) {
-							read_namespace(pid, buffer, 32);
+							read_namespace(target_pid, buffer, 32);
 							if (strcmp(buffer, zygote_ns[i]) == 0) {
 								usleep(50);
 								ret = 0;
@@ -172,29 +230,39 @@ void proc_monitor() {
 						if (ret) break;
 					}
 
-					ret = 0;
-
 					// Send pause signal ASAP
-					if (kill(pid, SIGSTOP) == -1) continue;
+					if (kill(target_pid, SIGSTOP) == -1) continue;
 
-					LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, buffer);
+					LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, target_pid, buffer);
 
-					// Unmount start
-					xwrite(sv[0], &pid, sizeof(pid));
+					/*
+					 * The setns system call do not support multithread processes
+					 * We have to fork a new process, setns, then do the unmounts
+					 */
+					int hide_pid = fork();
+					switch(hide_pid) {
+					case -1:
+						PLOGE("fork");
+						return;
+					case 0:
+						hide_daemon(target_pid);
+						_exit(0);
+					default:
+						break;
+					}
 
-					// Get the hide daemon return code
-					xxread(sv[0], &ret, sizeof(ret));
-					LOGD("proc_monitor: hide daemon response code: %d\n", ret);
+					// Wait till the unmount process is done
+					waitpid(hide_pid, &ret, 0);
+					if (WEXITSTATUS(ret))
+						quit_pthread(SIGUSR1);
+
+					// All done, send resume signal
+					kill(target_pid, SIGCONT);
+					target_pid = -1;
 					break;
 				}
 			}
 			pthread_mutex_unlock(&hide_lock);
-
-			if (ret) {
-				// Wait hide process to kill itself
-				waitpid(hide_pid, NULL, 0);
-				quit_pthread(SIGUSR1);
-			}
 		}
 
 		// For some reason it went here, restart logging

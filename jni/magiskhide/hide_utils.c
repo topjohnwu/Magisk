@@ -44,7 +44,7 @@ void manage_selinux() {
 }
 
 void hide_sensitive_props() {
-	LOGI("hide_pre_proc: Hiding sensitive props\n");
+	LOGI("hide_utils: Hiding sensitive props\n");
 
 	// Hide all sensitive props
 	char *value;
@@ -66,7 +66,7 @@ void relink_sbin() {
 		struct dirent *entry;
 		char from[PATH_MAX], to[PATH_MAX];
 
-		LOGI("hide_pre_proc: Re-linking /sbin\n");
+		LOGI("hide_utils: Re-linking /sbin\n");
 
 		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 		xrename("/sbin", "/sbin_orig");

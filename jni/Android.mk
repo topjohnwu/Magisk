@@ -25,7 +25,6 @@ LOCAL_SRC_FILES := \
 	daemon/log_monitor.c \
 	daemon/bootstages.c \
 	magiskhide/magiskhide.c \
-	magiskhide/hide_daemon.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
 	magiskpolicy/magiskpolicy.c \
