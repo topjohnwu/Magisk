@@ -192,9 +192,13 @@ def zip_main(args):
 		zip_with_msg(zipf, source, target)
 		# util_functions.sh
 		source = os.path.join('scripts', 'util_functions.sh')
-		target = os.path.join('common', 'util_functions.sh')
-		zip_with_msg(zipf, source, target)
-
+		with open(source, 'r') as script:
+			# Add version info util_functions.sh
+			util_func = script.read().replace(
+				'MAGISK_VERSION_STUB', 'SCRIPT_VERSION={}'.format(args.versionCode))
+			target = os.path.join('common', 'util_functions.sh')
+			print('zip: ' + source + ' -> ' + target)
+			zipf.writestr(target, util_func)
 		# Prebuilts
 		for chromeos in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
 			source = os.path.join('chromeos', chromeos)
@@ -219,9 +223,15 @@ def zip_uninstaller(args):
 		target = 'magisk_uninstaller.sh'
 		zip_with_msg(zipf, source, target)
 
+		# util_functions.sh
 		source = os.path.join('scripts', 'util_functions.sh')
-		target = 'util_functions.sh'
-		zip_with_msg(zipf, source, target)
+		with open(source, 'r') as script:
+			# Remove the stub
+			util_func = script.read().replace(
+				'MAGISK_VERSION_STUB', '')
+			target = os.path.join('util_functions.sh')
+			print('zip: ' + source + ' -> ' + target)
+			zipf.writestr(target, util_func)
 
 		source = os.path.join('scripts', 'uninstaller_loader.sh')
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
@@ -281,12 +291,13 @@ apk_parser.set_defaults(func=build_apk)
 
 zip_parser = subparsers.add_parser('zip', help='zip and sign Magisk into a flashable zip')
 zip_parser.add_argument('versionString')
+zip_parser.add_argument('versionCode', type=int)
 zip_parser.set_defaults(func=zip_main)
 
 uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
 uninstaller_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='clean [target...] Targets: binary apk zip (default: all)')
+clean_parser = subparsers.add_parser('clean', help='clean [target...] targets: binary apk zip')
 clean_parser.add_argument('target', nargs='*')
 clean_parser.set_defaults(func=cleanup)
 

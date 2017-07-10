@@ -7,6 +7,8 @@
 # 
 ##########################################################################################
 
+MAGISK_VERSION_STUB
+
 get_outfd() {
   readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
   if [ "$?" -eq "0" ]; then
