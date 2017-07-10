@@ -13,7 +13,7 @@
 static int e2fsck(const char *img) {
 	// Check and repair ext4 image
 	char buffer[128];
-	int pid, fd = 0;
+	int pid, fd = -1;
 	char *const command[] = { "e2fsck", "-yf", (char *) img, NULL };
 	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
 	if (pid < 0)
@@ -75,7 +75,7 @@ int get_img_size(const char *img, int *used, int *total) {
 	if (access(img, R_OK) == -1)
 		return 1;
 	char buffer[PATH_MAX];
-	int pid, fd = 0, status = 1;
+	int pid, fd = -1, status = 1;
 	char *const command[] = { "e2fsck", "-n", (char *) img, NULL };
 	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
 	if (pid < 0)
@@ -107,7 +107,7 @@ int resize_img(const char *img, int size) {
 	if (e2fsck(img))
 		return 1;
 	char buffer[128];
-	int pid, status, fd = 0;
+	int pid, status, fd = -1;
 	snprintf(buffer, sizeof(buffer), "%dM", size);
 	char *const command[] = { "resize2fs", (char *) img, buffer, NULL };
 	pid = run_command(1, &fd, "/system/bin/resize2fs", command);

@@ -127,7 +127,7 @@ void proc_monitor() {
 
 		// Monitor am_proc_start
 		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
-		log_fd = 0;
+		log_fd = -1;
 		log_pid = run_command(0, &log_fd, "/system/bin/logcat", command);
 
 		if (log_pid < 0) continue;

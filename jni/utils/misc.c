@@ -221,21 +221,21 @@ void setup_sighandlers(void (*handler)(int)) {
 
 /*
    fd == NULL -> Ignore output
-  *fd == 0    -> Open pipe and set *fd to the read end
-  *fd != 0    -> STDOUT (or STDERR) will be redirected to *fd
+  *fd < 0     -> Open pipe and set *fd to the read end
+  *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
 */
 int run_command(int err, int *fd, const char *path, char *const argv[]) {
 	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
-		if (*fd) {
-			writeEnd = *fd;
-		} else {
-			if (pipe(pipefd) == -1)
+		if (*fd < 0) {
+			if (xpipe2(pipefd, O_CLOEXEC) == -1)
 				return -1;
 			writeEnd = pipefd[1];
 			// Give the read end of the pipe
 			*fd = pipefd[0];
+		} else {
+			writeEnd = *fd;
 		}
 	}
 

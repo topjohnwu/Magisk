@@ -31,7 +31,7 @@ int xopen3(const char *pathname, int flags, mode_t mode);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
-int xpipe(int pipefd[2]);
+int xpipe2(int pipefd[2], int flags);
 int xsetns(int fd, int nstype);
 DIR *xopendir(const char *name);
 struct dirent *xreaddir(DIR *dirp);

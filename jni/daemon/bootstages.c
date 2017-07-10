@@ -749,7 +749,7 @@ void late_start(int client) {
 				"CLASSPATH=/system/framework/pm.jar "
 				"/system/bin/app_process /system/bin "
 				"com.android.commands.pm.Pm install -r " MANAGERAPK, NULL };
-			int apk_res = 0, pid;
+			int apk_res = -1, pid;
 			pid = run_command(1, &apk_res, "/system/bin/sh", command);
 			waitpid(pid, NULL, 0);
 			fdgets(buf, PATH_MAX, apk_res);

@@ -82,10 +82,10 @@ ssize_t xxread(int fd, void *buf, size_t count) {
 	return ret;
 }
 
-int xpipe(int pipefd[2]) {
-	int ret = pipe(pipefd);
+int xpipe2(int pipefd[2], int flags) {
+	int ret = pipe2(pipefd, flags);
 	if (ret == -1) {
-		PLOGE("pipe");
+		PLOGE("pipe2");
 	}
 	return ret;
 }
