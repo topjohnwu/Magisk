@@ -298,7 +298,7 @@ public class MagiskFragment extends Fragment
             updateCheckUI();
         if (magiskManager.safetyNetDone.isTriggered)
             updateSafetyNetUI();
-        if (magiskManager.blockDetectionDone.isTriggered)
+        if (magiskManager.blockDetectionDone.isTriggered || !Shell.rootAccess())
             updateInstallUI();
         magiskManager.updateCheckDone.register(this);
         magiskManager.safetyNetDone.register(this);
