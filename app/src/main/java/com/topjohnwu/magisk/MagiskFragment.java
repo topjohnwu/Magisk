@@ -176,6 +176,14 @@ public class MagiskFragment extends Fragment
                         }
                         in.close();
                         out.close();
+                        in = magiskManager.getAssets().open(MagiskManager.UTIL_FUNCTIONS);
+                        File utils = new File(magiskManager.getCacheDir(), MagiskManager.UTIL_FUNCTIONS);
+                        out = new FileOutputStream(utils);
+                        while ((read = in.read(bytes)) != -1) {
+                            out.write(bytes, 0, read);
+                        }
+                        in.close();
+                        out.close();
                         ProgressDialog progress = new ProgressDialog(getActivity());
                         progress.setTitle(R.string.reboot);
                         progress.show();
@@ -190,6 +198,7 @@ public class MagiskFragment extends Fragment
                                 progress.setMessage(getString(R.string.reboot_countdown, 0));
                                 Shell.su(true,
                                         "mv -f " + uninstaller + " /cache/" + MagiskManager.UNINSTALLER,
+                                        "mv -f " + utils + " /data/magisk/" + MagiskManager.UTIL_FUNCTIONS,
                                         "reboot"
                                 );
                             }
