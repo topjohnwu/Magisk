@@ -211,7 +211,7 @@
     <string name="settings_su_reauth_title">更新後重新認證</string>
     <string name="global_summary">所有 root 工作使用全域 mount namespace</string>
     <string name="isolate_summary">每一 root 工作有自己獨立的 namespace</string>
-    <string name="mount_namespace_mode">Mount Namespace 模式</string>
+    <string name="mount_namespace_mode">掛載命名空間(Namespace)模式</string>
     <string name="requester_summary">Root 工作繼承原程式之 namespace</string>
     <string name="settings_ns_global">全域 Namespace</string>
     <string name="settings_ns_isolate">獨立 Namespace</string>
