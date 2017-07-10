@@ -768,6 +768,7 @@ void late_start(int client) {
 	// All boot stage done, cleanup everything
 	free(buf);
 	free(buf2);
+	buf = buf2 = NULL;
 	vec_deep_destroy(&module_list);
 
 #ifdef DEBUG
