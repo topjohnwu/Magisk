@@ -1,4 +1,8 @@
-/* post_fs_data.c - post-fs-data actions
+/* bootstages.c - Core bootstage operations
+ *
+ * All bootstage operations, including simple mount in post-fs,
+ * magisk mount in post-fs-data, various image handling, script
+ * execution, load modules, install Magisk Manager etc.
  */
 
 #include <stdlib.h>
