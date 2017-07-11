@@ -556,7 +556,7 @@ void post_fs_data(int client) {
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
-		goto unblock;
+		goto skip_modules;
 
 	DIR *dir;
 	struct dirent *entry;
@@ -700,6 +700,7 @@ void post_fs_data(int client) {
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
 
+skip_modules:
 	// Systemless hosts
 	if (access(HOSTSFILE, F_OK) == 0) {
 		LOGI("* Enabling systemless hosts file support");

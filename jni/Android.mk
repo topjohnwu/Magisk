@@ -59,6 +59,7 @@ include jni/selinux/libsepol/Android.mk
 #####################################################################
 # include jni/resetprop/Android.mk
 # include jni/magiskpolicy/Android.mk
+include jni/magiskpolicy/Android.mk
 
 # Build magiskboot
 include jni/magiskboot/Android.mk
