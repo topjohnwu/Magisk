@@ -55,6 +55,10 @@ umask 022
 # Load utility functions
 . $MAGISKBIN/util_functions.sh
 
+isABDevice=false
+SYSTEM=/system
+ABdevice_check
+
 # Find the boot image
 find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
