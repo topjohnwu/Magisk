@@ -119,15 +119,19 @@ chmod +x ./*
 ui_print_wrap "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
 
+CHROMEOS=false
 case $? in
   1 )
     abort_wrap "! Unable to unpack boot image"
     ;;
   2 )
+    CHROMEOS=true
+    ;;
+  3 )
     ui_print_wrap "! Sony ELF32 format detected"
     abort_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
-  3 )
+  4 )
     ui_print_wrap "! Sony ELF64 format detected"
     abort_wrap "! Stock kernel cannot be patched, please use a custom kernel"
 esac
@@ -234,7 +238,7 @@ ui_print_wrap "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
 
 # Sign chromeos boot
-if [ -f chromeos ]; then
+if $CHROMEOS; then
   echo > empty
 
   ./chromeos/futility vbutil_kernel --pack new-boot.img.signed \
