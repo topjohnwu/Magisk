@@ -71,6 +71,14 @@ static inline void stub(const char *fmt, ...) {}
 
 #define PLOGE(fmt, args...) { LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno)); err_handler(); }
 
+#ifdef STATIC
+#define LOGD(...) stub(__VA_ARGS__)
+#define LOGI(...) stub(__VA_ARGS__)
+#define LOGW(...) stub(__VA_ARGS__)
+#define LOGE(...) stub(__VA_ARGS__)
+#define PLOGE(...) stub(__VA_ARGS__)
+#endif
+
 extern char *argv0;     /* For changing process name */
 
 extern char *applet[];

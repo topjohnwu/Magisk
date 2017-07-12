@@ -39,7 +39,7 @@ ui_print() {
 getvar() {
   local VARNAME=$1
   local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /dev/.magisk /data/.magisk /cache/.magisk /system/.magisk; do
+  for FILE in /dev/.magisk /data/.magisk /cache/.magisk $SYSTEM/.magisk; do
     if [ -z "$VALUE" ]; then
       LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
       if [ ! -z "$LINE" ]; then
@@ -52,7 +52,12 @@ getvar() {
 
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
-    for BLOCK in boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
+    srch_str="boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX"
+    if $isABDevice
+    then
+      srch_str="boot_$SLOT BOOT_$SLOT kern-$SLOT KERN-$SLOT"+$srch_str
+    fi
+    for BLOCK in $srch_str; do
       BOOTIMAGE=`ls /dev/block/by-name/$BLOCK || ls /dev/block/platform/*/by-name/$BLOCK || ls /dev/block/platform/*/*/by-name/$BLOCK` 2>/dev/null
       [ ! -z $BOOTIMAGE ] && break
     done
@@ -81,33 +86,33 @@ grep_prop() {
   shift
   FILES=$@
   if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
+    FILES="$SYSTEM/build.prop"
   fi
   cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
 
 remove_system_su() {
-  if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
+  if [ -f $SYSTEM/bin/su -o -f $SYSTEM/xbin/su ] && [ ! -f /su/bin/su ]; then
     ui_print "! System installed root detected, mount rw :("
     mount -o rw,remount /system
     # SuperSU
-    if [ -e /system/bin/.ext/.su ]; then
-      mv -f /system/bin/app_process32_original /system/bin/app_process32 2>/dev/null
-      mv -f /system/bin/app_process64_original /system/bin/app_process64 2>/dev/null
-      mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh 2>/dev/null
-      cd /system/bin
+    if [ -e $SYSTEM/bin/.ext/.su ]; then
+      mv -f $SYSTEM/bin/app_process32_original $SYSTEM/bin/app_process32 2>/dev/null
+      mv -f $SYSTEM/bin/app_process64_original $SYSTEM/bin/app_process64 2>/dev/null
+      mv -f $SYSTEM/bin/install-recovery_original.sh $SYSTEM/bin/install-recovery.sh 2>/dev/null
+      cd $SYSTEM/bin
       if [ -e app_process64 ]; then
         ln -sf app_process64 app_process
       else
         ln -sf app_process32 app_process
       fi
     fi
-    rm -rf /system/.pin /system/bin/.ext /system/etc/.installed_su_daemon /system/etc/.has_su_daemon \
-    /system/xbin/daemonsu /system/xbin/su /system/xbin/sugote /system/xbin/sugote-mksh /system/xbin/supolicy \
-    /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
-    /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
-    /system/.supersu /cache/.supersu /data/.supersu \
-    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk  2>/dev/null
+    rm -rf $SYSTEM/.pin $SYSTEM/bin/.ext $SYSTEM/etc/.installed_su_daemon $SYSTEM/etc/.has_su_daemon \
+    $SYSTEM/xbin/daemonsu $SYSTEM/xbin/su $SYSTEM/xbin/sugote $SYSTEM/xbin/sugote-mksh $SYSTEM/xbin/supolicy \
+    $SYSTEM/bin/app_process_init $SYSTEM/bin/su /cache/su $SYSTEM/lib/libsupol.so $SYSTEM/lib64/libsupol.so \
+    $SYSTEM/su.d $SYSTEM/etc/install-recovery.sh $SYSTEM/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
+    $SYSTEM/.supersu /cache/.supersu /data/.supersu \
+    $SYSTEM/app/Superuser.apk $SYSTEM/app/SuperSU /cache/Superuser.apk  2>/dev/null
   fi
 }
 
@@ -132,7 +137,7 @@ recovery_actions() {
   mv /sbin /sbin_tmp
   # Add all possible library paths
   OLD_LD_PATH=$LD_LIBRARY_PATH
-  $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
+  $IS64BIT && export LD_LIBRARY_PATH=$SYSTEM/lib64:$SYSTEM/vendor/lib64 || export LD_LIBRARY_PATH=$SYSTEM/lib:$SYSTEM/vendor/lib
 }
 
 recovery_cleanup() {
@@ -186,9 +191,26 @@ request_size_check() {
 }
 
 image_size_check() {
-  SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
+  if $isABDevice
+  then
+    SIZE="`$MAGISKBIN/magisk_utils --imgsize $IMG`"
+  else
+    SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
+  fi
   curUsedM=`echo "$SIZE" | cut -d" " -f1`
   curSizeM=`echo "$SIZE" | cut -d" " -f2`
   curFreeM=$((curSizeM - curUsedM))
 }
 
+ABdevice_check() {
+  SYSTEM=/system
+  ABDeviceCheck=$(cat /proc/cmdline | grep slot_suffix | wc -l)
+  if [ $ABDeviceCheck -gt 0 ];
+  then
+    isABDevice=true
+    SLOT=$(for i in `cat /proc/cmdline`; do echo $i | grep slot_suffix | awk -F "=" '{print $2}';done)
+    SYSTEM=$SYSTEM/system
+  else
+    isABDevice=false
+  fi
+}

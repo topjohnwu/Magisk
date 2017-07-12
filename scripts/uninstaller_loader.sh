@@ -32,6 +32,10 @@ fi
 # Load utility functions
 . $INSTALLER/util_functions.sh
 
+isABDevice=false
+SYSTEM=/system
+ABdevice_check
+
 get_outfd
 
 ##########################################################################################

@@ -30,6 +30,9 @@ main() {
 
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
+  isABDevice=false
+  SYSTEM=/system
+  ABdevice_check
 
   [ -f /system/build.prop ] || abort "! /system could not be mounted!"
 

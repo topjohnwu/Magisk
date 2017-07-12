@@ -43,7 +43,16 @@ fi
 # Load utility fuctions
 . $COMMONDIR/util_functions.sh
 
+isABDevice=false
+SYSTEM=/system
+ABdevice_check
+
 get_outfd
+
+if $isABDevice
+then
+  cat $COMMONDIR/init.magisk.rc.pixel > $COMMONDIR/init.magisk.rc
+fi
 
 ##########################################################################################
 # Detection
@@ -55,11 +64,15 @@ ui_print "************************"
 
 ui_print "- Mounting /system, /vendor, /cache, /data"
 mount -o ro /system 2>/dev/null
+if $isABDevice
+then
+  mount -o rw,remount /system 2>/dev/null
+fi
 mount -o ro /vendor 2>/dev/null
 mount /cache 2>/dev/null
 mount /data 2>/dev/null
 
-[ -f /system/build.prop ] || abort "! /system could not be mounted!"
+[ -f $SYSTEM/build.prop ] || abort "! /system could not be mounted!"
 
 # read override variables
 getvar KEEPVERITY
@@ -98,21 +111,29 @@ cp -af $CHROMEDIR $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
-if [ -d /system/addon.d ]; then
+if [ -d $SYSTEM/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
-  cp $INSTALLER/addon.d/99-magisk.sh /system/addon.d/99-magisk.sh
-  chmod 755 /system/addon.d/99-magisk.sh
+  cp $INSTALLER/addon.d/99-magisk.sh $SYSTEM/addon.d/99-magisk.sh
+  chmod 755 $SYSTEM/addon.d/99-magisk.sh
 fi
 
 ##########################################################################################
 # Magisk Image
 ##########################################################################################
 
-$BOOTMODE || recovery_actions
+if ! $isABDevice
+then
+  $BOOTMODE || recovery_actions
+fi
 
 # Fix SuperSU.....
-$BOOTMODE && $MAGISKBIN/magisk magiskpolicy --live "allow fsck * * *"
+if $isABDevice
+then
+  $BOOTMODE && $MAGISKBIN/magisk magiskpolicy --live "allow fsck * * *"
+else
+  $BOOTMODE && $MAGISKBIN/magiskpolicy --live "allow fsck * * *"
+fi
 
 if (is_mounted /data); then
   IMG=/data/magisk.img
@@ -125,12 +146,22 @@ if [ -f $IMG ]; then
   ui_print "- $IMG detected!"
 else
   ui_print "- Creating $IMG"
-  $MAGISKBIN/magisk --createimg $IMG 64M
+  if $isABDevice
+  then
+    $MAGISKBIN/magisk_utils --createimg $IMG 64M
+  else
+    $MAGISKBIN/magisk --createimg $IMG 64M
+  fi
 fi
 
 if ! is_mounted /magisk; then
   ui_print "- Mounting $IMG to /magisk"
-  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG /magisk`
+  if $isABDevice
+  then
+    MAGISKLOOP=`$MAGISKBIN/magisk_utils --mountimg $IMG /magisk`
+  else
+    MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG /magisk`
+  fi
 fi
 is_mounted /magisk || abort "! Magisk image mount failed..."
 
@@ -164,6 +195,18 @@ cd $MAGISKBIN
 # Source the boot patcher
 . $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
 
+if $isABDevice
+then
+  $MAGISKBIN/magiskpolicy --load /system/sepolicy --save /system/sepolicy --minimal
+  mkdir -p /system/magisk 2>/dev/null
+  cp -af $COMMONDIR/init.magisk.rc /system/init.magisk.rc
+  cp -af $BINDIR/magisk /system/sbin/magisk
+  chmod 0755 /system/magisk
+  chmod 0750 /system/init.magisk.rc
+  chown 0.0 /system/magisk /system/init.magisk.rc
+  grep "import /init.magisk.rc" /system/init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' /system/init.rc
+fi
+
 if [ -f stock_boot* ]; then
   rm -f /data/stock_boot* 2>/dev/null
   mv stock_boot* /data
@@ -180,10 +223,22 @@ rm -f new-boot.img
 cd /
 
 if ! $BOOTMODE; then
-  $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
+  if $isABDevice
+  then
+    $MAGISKBIN/magisk_utils --umountimg /magisk $MAGISKLOOP
+  else
+    $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
+  fi
   rmdir /magisk
   recovery_cleanup
 fi
+
+if $isABDevice
+then
+  mount -o ro /system 2>/dev/null
+fi
+umount /cache 2>/dev/null
+umount /data 2>/dev/null
 
 ui_print "- Done"
 exit 0
