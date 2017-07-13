@@ -66,13 +66,13 @@ getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
 getvar BOOTIMAGE
 
-# Check if system root is installed and remove
-remove_system_su
-
 # Detect version and architecture
 api_level_arch_detect
 
 [ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
+
+# Check if system root is installed and remove
+remove_system_su
 
 ui_print "- Device platform: $ARCH"
 
