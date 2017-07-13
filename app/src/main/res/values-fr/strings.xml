@@ -123,7 +123,7 @@
     <string name="settings_clear_cache_title">Effacer le cache du dépôt</string>
     <string name="settings_clear_cache_summary">Effacer les informations en cache des dépôts en ligne, pour forcer une actualisation de l\'application</string>
     <string name="settings_core_only_title">Mode Magisk Core uniquement</string>
-    <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide, les hosts systemless et busybox restent activés</string>
+    <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide et les hosts systemless restent activés</string>
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
     <string name="settings_busybox_title">Activer BusyBox</string>
     <string name="settings_busybox_summary">Monter le busybox de Magisk sur xbin</string>

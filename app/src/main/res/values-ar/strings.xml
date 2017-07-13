@@ -138,7 +138,7 @@
     <string name="settings_clear_cache_summary">حذف المعلومات المخزنة مؤقتا للمستودع على الانترنت، يجبر التطبيق لتحديث عبر الانترنت</string>
 
     <string name="settings_core_only_title">Magisk الوضع الأساسي فقط</string>
-    <string name="settings_core_only_summary">تمكين الميزات الأساسية فقط، لن يتم تحميل جميع الإضافات. MagiskSU، MagiskHide، systemless hosts، و busybox لا يزال ممكنا</string>
+    <string name="settings_core_only_summary">تمكين الميزات الأساسية فقط، لن يتم تحميل جميع الإضافات. MagiskSU، MagiskHide، systemless hosts، و لا يزال ممكنا</string>
     <string name="settings_magiskhide_summary">إخفاء Magisk من مختلف الاكتشافات</string>
     <string name="settings_busybox_title">تفعيل BusyBox</string>
     <string name="settings_busybox_summary">ربط تحميل Magisk\'s المدمج في busybox إلى xbin</string>

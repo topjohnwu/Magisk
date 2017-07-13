@@ -138,7 +138,7 @@
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για online repos, αναγκάζει την εφαρμογή να ανανεώσει online</string>
 
     <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
-    <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, όλες οι ενότητες δεν θα ενεργοποιηθούν. Τα MagiskSU, MagiskHide, systemless hosts, και busybox θα παραμείνουν ενεργά</string>
+    <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, όλες οι ενότητες δεν θα ενεργοποιηθούν. Τα MagiskSU, MagiskHide, και systemless hosts θα παραμείνουν ενεργά</string>
     <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
     <string name="settings_busybox_title">Ενεργοποίηση BusyBox</string>
     <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>

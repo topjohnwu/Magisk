@@ -134,7 +134,7 @@
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
 
     <string name="settings_core_only_title">Mod de bază</string>
-    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide, systemless hosts şi busybox vor fi în continuare activate</string>
+    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide şi systemless hosts vor fi în continuare activate</string>
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
     <string name="settings_busybox_title">Activare BusyBox</string>
     <string name="settings_busybox_summary">Montare busybox Magisk în xbin</string>

@@ -138,7 +138,7 @@
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
 
     <string name="settings_core_only_title">Magisk basismodus</string>
-    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, systeemloze hosts, en busybox blijven ingeschakeld</string>
+    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
     <string name="settings_busybox_title">Busybox inschakelen</string>
     <string name="settings_busybox_summary">Magisk\'s ingebouwde busybox naar xbin bind mounten</string>

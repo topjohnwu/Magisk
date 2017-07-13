@@ -138,7 +138,7 @@
     <string name="settings_clear_cache_summary">Azzera le informazioni nella cache per i repository online, e forza l\'aggiornamento online dell\'app</string>
 
     <string name="settings_core_only_title">Solo modo core Magisk</string>
-    <string name="settings_core_only_summary">Abilita solo le funzioni principali. Non tutti i moduli verranno caricati. MagiskSU, MagiskHide, host systemless, e busybox rimarranno abilitati</string>
+    <string name="settings_core_only_summary">Abilita solo le funzioni principali. Non tutti i moduli verranno caricati. MagiskSU, MagiskHide, e host systemless rimarranno abilitati</string>
     <string name="settings_magiskhide_summary">Nasconde Magisk da numerose rilevazioni</string>
     <string name="settings_busybox_title">Abilita BusyBox</string>
     <string name="settings_busybox_summary">Collega il mount della busybox interna di Magisk a xbin</string>

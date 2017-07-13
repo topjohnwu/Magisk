@@ -143,7 +143,7 @@
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
 
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
-    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide, Systemless hosts und Busybox bleiben weiterhin aktiv</string>
+    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_busybox_title">BusyBox aktivieren</string>
     <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten</string>

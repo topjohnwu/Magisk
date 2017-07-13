@@ -137,7 +137,7 @@
     <string name="settings_clear_cache_summary">Apaga a informação cache de repositórios online. online, forçando a aplicação a atualizar online</string>
 
 	<string name="settings_core_only_title">Magisk somente em Modo Core</string>
-    <string name="settings_core_only_summary">Ativar somente funcionalidades principais, todos os módulos não serão carregados. MagiskSU, MagiskHide, systemless hosts, e busybox ainda estará ativado</string>
+    <string name="settings_core_only_summary">Ativar somente funcionalidades principais, todos os módulos não serão carregados. MagiskSU, MagiskHide, e systemless hosts ainda estará ativado</string>
     <string name="settings_magiskhide_summary">Oculta Magisk de várias deteções</string>
     <string name="settings_busybox_title">Ativar BusyBox</string>
     <string name="settings_busybox_summary">Ativar systemless hosts</string>

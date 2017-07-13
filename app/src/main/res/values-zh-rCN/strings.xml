@@ -140,7 +140,7 @@
     <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制刷新在线数据</string>
 
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
-    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide、systemless hosts 和 busybox 仍会持续运作</string>
+    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_busybox_title">启用 BusyBox</string>
     <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>

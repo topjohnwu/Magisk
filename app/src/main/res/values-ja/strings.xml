@@ -134,7 +134,7 @@
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報をクリアし、アプリをオンラインで更新する</string>
 
     <string name="settings_core_only_title">Magisk コアモード</string>
-    <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされなくなります。 MagiskSU、MagiskHide、systemless hosts、busyboxは引き続き有効になります。</string>
+    <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされなくなります。 MagiskSU、MagiskHide、systemless hostsは引き続き有効になります。</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠す</string>
     <string name="settings_busybox_title">BusyBoxを有効にする</string>
     <string name="settings_busybox_summary">Magiskに搭載するBusyBoxをxbinにバインドする</string>
