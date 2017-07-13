@@ -132,6 +132,7 @@
     <string name="manual_boot_image">Please manually select a boot image!</string>
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install</string>
+    <string name="magisk_updates">Magisk Updates</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

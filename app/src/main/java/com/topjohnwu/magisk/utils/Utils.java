@@ -105,7 +105,7 @@ public class Utils {
             receiver.setDownloadID(downloadManager.enqueue(request));
         }
         receiver.setFilename(filename);
-        context.registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        context.getApplicationContext().registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     public static String getLegalFilename(CharSequence filename) {
@@ -214,6 +214,7 @@ public class Utils {
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(magiskManager.getString(R.string.magisk_update_title))
                 .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersionString))
+                .setChannelId(MagiskManager.NOTIFICATION_CHANNEL)
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, SplashActivity.class);
@@ -234,6 +235,7 @@ public class Utils {
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(magiskManager.getString(R.string.manager_update_title))
                 .setContentText(magiskManager.getString(R.string.manager_download_install))
+                .setChannelId(MagiskManager.NOTIFICATION_CHANNEL)
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, ManagerUpdate.class);

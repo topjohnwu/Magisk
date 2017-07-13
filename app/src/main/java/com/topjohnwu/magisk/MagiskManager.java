@@ -1,8 +1,12 @@
 package com.topjohnwu.magisk;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -31,6 +35,7 @@ public class MagiskManager extends Application {
     public static final String BUSYBOX_VERSION = "1.26.2";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
+    public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
 
     // Events
     public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
@@ -143,6 +148,14 @@ public class MagiskManager extends Application {
                 .apply();
         // Add busybox to PATH
         Shell.su("PATH=$PATH:" + busybox.getParent());
+
+        // Create notification channel on Android O
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
+                    getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+        }
+
     }
 
     public void initSUConfig() {
