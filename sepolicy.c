@@ -255,7 +255,7 @@ int dump_policydb(const char *filename) {
 		return 1;
 	}
 
-	fd = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	fd = open(filename, O_RDWR | O_CREAT, 0644);
 	if (fd < 0) {
 		fprintf(stderr, "Can't open '%s':  %s\n",
 		        filename, strerror(errno));
@@ -290,7 +290,7 @@ int create_domain(char *d) {
 	typedatum->flavor = TYPE_TYPE;
 
 	uint32_t value = 0;
-	int r = symtab_insert(policydb, SYM_TYPES, strdup(d), typedatum, SCOPE_DECL, 1, &value);
+	symtab_insert(policydb, SYM_TYPES, strdup(d), typedatum, SCOPE_DECL, 1, &value);
 	typedatum->s.value = value;
 
 	if (ebitmap_set_bit(&policydb->global->branch_list->declared.scope[SYM_TYPES], value - 1, 1)) {
@@ -302,14 +302,6 @@ int create_domain(char *d) {
 	ebitmap_init(&policydb->type_attr_map[value-1]);
 	ebitmap_init(&policydb->attr_type_map[value-1]);
 	ebitmap_set_bit(&policydb->type_attr_map[value-1], value-1, 1);
-
-	//Add the domain to all roles
-	for(unsigned i=0; i<policydb->p_roles.nprim; ++i) {
-		//Not sure all those three calls are needed
-		ebitmap_set_bit(&policydb->role_val_to_struct[i]->types.negset, value-1, 0);
-		ebitmap_set_bit(&policydb->role_val_to_struct[i]->types.types, value-1, 1);
-		type_set_expand(&policydb->role_val_to_struct[i]->types, &policydb->role_val_to_struct[i]->cache, policydb, 0);
-	}
 
 	src = hashtab_search(policydb->p_types.table, d);
 	if(!src)
@@ -323,6 +315,14 @@ int create_domain(char *d) {
 
 	if(policydb_index_others(NULL, policydb, 0))
 		return 1;
+
+	//Add the domain to all roles
+	for(unsigned i=0; i<policydb->p_roles.nprim; ++i) {
+		//Not sure all those three calls are needed
+		ebitmap_set_bit(&policydb->role_val_to_struct[i]->types.negset, value-1, 0);
+		ebitmap_set_bit(&policydb->role_val_to_struct[i]->types.types, value-1, 1);
+		type_set_expand(&policydb->role_val_to_struct[i]->types, &policydb->role_val_to_struct[i]->cache, policydb, 0);
+	}
 
 	return set_attr("domain", value);
 }

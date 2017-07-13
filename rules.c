@@ -232,7 +232,7 @@ void sepol_min_rules() {
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
 
 	// xperms
-	if (policydb->policyvers >= 30)
+	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
 		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
 }
 
