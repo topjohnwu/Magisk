@@ -1,12 +1,9 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Открыть меню навигации</string>
     <string name="navigation_drawer_close">Закрыть меню навигации</string>
-    <string name="magiskhide" translatable="false">MagiskHide</string>
     <string name="modules">Модули</string>
     <string name="downloads">Загрузки</string>
     <string name="superuser">Суперпользователь</string>
