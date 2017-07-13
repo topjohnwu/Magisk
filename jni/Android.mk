@@ -52,13 +52,5 @@ include jni/external/Android.mk
 # libsepol, static library
 include jni/selinux/libsepol/Android.mk
 
-#####################################################################
-# In order to build separate binaries, please comment out everything 
-# above (including the lines for libraries)
-# Then, uncomment the line you want below
-#####################################################################
-# include jni/resetprop/Android.mk
-# include jni/magiskpolicy/Android.mk
-
 # Build magiskboot
 include jni/magiskboot/Android.mk

@@ -60,26 +60,12 @@
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "_system_properties.h"
-#include <sys/system_properties.h>
-
-#ifdef INDEP_BINARY
-
-int resetprop_main(int argc, char *argv[]);
-int main(int argc, char *argv[]) {
-    return resetprop_main(argc, argv);
-}
-#define PRINT_D(...)  if (verbose) printf(__VA_ARGS__)
-#define PRINT_E(...)  fprintf(stderr, __VA_ARGS__)
-
-#else
+#include "system_properties.h"
 #include "magisk.h"
+#include "resetprop.h"
 
 #define PRINT_D(...)  { LOGD(__VA_ARGS__); if (verbose) printf(__VA_ARGS__); }
 #define PRINT_E(...)  { LOGE(__VA_ARGS__); fprintf(stderr, __VA_ARGS__); }
-
-#endif
-
-#include "resetprop.h"
 
 static int verbose = 0;
 
