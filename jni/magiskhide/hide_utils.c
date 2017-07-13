@@ -78,10 +78,14 @@ void relink_sbin() {
 		dir = xopendir("/sbin_orig");
 
 		while ((entry = xreaddir(dir))) {
-			snprintf(from, sizeof(from), "%s/%s", "/sbin_orig", entry->d_name);
-			snprintf(to, sizeof(to), "%s/%s", "/dev/sbin_bind", entry->d_name);
+			if (strcmp(entry->d_name, "..") == 0)
+				continue;
+			snprintf(from, sizeof(from), "/sbin_orig/%s", entry->d_name);
+			if (entry->d_type == DT_LNK)
+				xreadlink(from, from, sizeof(from));
+			snprintf(to, sizeof(to), "/dev/sbin_bind/%s", entry->d_name);
 			symlink(from, to);
-			lsetfilecon(to, "u:object_r:system_file:s0");
+			lsetfilecon(to, "u:object_r:rootfs:s0");
 		}
 		
 		closedir(dir);
