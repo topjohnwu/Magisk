@@ -13,7 +13,6 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/magisk_update.json";
 
-
     private boolean showNotification = false;
 
     public CheckUpdates(Context context, boolean b) {
@@ -46,11 +45,10 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         if (showNotification && magiskManager.updateNotification) {
-            if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode) {
-                Utils.showMagiskUpdate(magiskManager);
-            }
             if (BuildConfig.VERSION_CODE < magiskManager.remoteManagerVersionCode) {
                 Utils.showManagerUpdate(magiskManager);
+            } else if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode) {
+                Utils.showMagiskUpdate(magiskManager);
             }
         }
         magiskManager.updateCheckDone.trigger();
