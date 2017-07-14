@@ -18,19 +18,19 @@ public class ManagerUpdate extends BroadcastReceiver {
                 context,
                 new DownloadReceiver() {
                     @Override
-                    public void onDownloadDone(Uri uri) {
+                    public void onDownloadDone(Uri uri, Context context) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                             install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            Uri content = FileProvider.getUriForFile(mContext,
+                            Uri content = FileProvider.getUriForFile(context,
                                     "com.topjohnwu.magisk.provider", new File(uri.getPath()));
                             install.setData(content);
-                            mContext.startActivity(install);
+                            context.startActivity(install);
                         } else {
                             Intent install = new Intent(Intent.ACTION_VIEW);
                             install.setDataAndType(uri, "application/vnd.android.package-archive");
                             install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            mContext.startActivity(install);
+                            context.startActivity(install);
                         }
                     }
                 },

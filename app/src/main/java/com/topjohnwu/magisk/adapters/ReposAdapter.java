@@ -65,9 +65,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             mContext,
                             new DownloadReceiver() {
                                 @Override
-                                public void onDownloadDone(Uri uri) {
-                                    Activity activity = (Activity) mContext;
-                                    new ProcessRepoZip(activity, uri, true).exec();
+                                public void onDownloadDone(Uri uri, Context context) {
+                                    new ProcessRepoZip((Activity) mContext, uri, true).exec();
                                 }
                             },
                             repo.getZipUrl(),
@@ -76,9 +75,8 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
                             mContext,
                             new DownloadReceiver() {
                                 @Override
-                                public void onDownloadDone(Uri uri) {
-                                    Activity activity = (Activity) mContext;
-                                    new ProcessRepoZip(activity, uri, false).exec();
+                                public void onDownloadDone(Uri uri, Context context) {
+                                    new ProcessRepoZip((Activity) mContext, uri, false).exec();
                                 }
                             },
                             repo.getZipUrl(),

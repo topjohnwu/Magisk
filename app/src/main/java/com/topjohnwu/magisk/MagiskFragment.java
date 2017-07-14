@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -142,7 +143,7 @@ public class MagiskFragment extends Fragment
                                     private boolean verity = keepVerityChkbox.isChecked();
 
                                     @Override
-                                    public void onDownloadDone(Uri uri) {
+                                    public void onDownloadDone(Uri uri, Context context) {
                                         new ProcessMagiskZip(getActivity(), uri, boot, enc, verity).exec();
                                     }
                                 },

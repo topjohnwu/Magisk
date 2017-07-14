@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
 public abstract class DownloadReceiver extends BroadcastReceiver {
-    public Context mContext;
     public String mFilename;
     long downloadID;
 
@@ -20,7 +19,6 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mContext = context;
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         String action = intent.getAction();
         if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(action)) {
@@ -33,7 +31,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                 switch (status) {
                     case DownloadManager.STATUS_SUCCESSFUL:
                         Uri uri = Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
-                        onDownloadDone(uri);
+                        onDownloadDone(uri, context);
                         break;
                     default:
                         Toast.makeText(context, R.string.download_file_error, Toast.LENGTH_LONG).show();
@@ -54,5 +52,5 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
         mFilename = filename;
     }
 
-    public abstract void onDownloadDone(Uri uri);
+    public abstract void onDownloadDone(Uri uri, Context context);
 }
