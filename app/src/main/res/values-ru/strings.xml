@@ -24,7 +24,7 @@
     <string name="root_error">Root присутствует, но отсутствует разрешение</string>
     <string name="not_rooted">Root отсутствует</string>
     <string name="proper_root">Корректный root-доступ</string>
-    <string name="safetyNet_check_text">Нажмите, чтобы начать проверку SafetyNet</string>
+    <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
     <string name="safetyNet_connection_failed">Невозможно подключиться к Google API</string>
