@@ -31,7 +31,10 @@ static void *logger_thread(void *args) {
 		if (log_pid > 0)
 			waitpid(log_pid, NULL, 0);
 		// For some reason it went here, clear buffer and restart
-		system("logcat -c");
+		char *const restart[] = { "logcat", "-c", NULL };
+		log_pid = run_command(0, NULL, "/system/bin/logcat", restart);
+		if (log_pid > 0)
+			waitpid(log_pid, NULL, 0);
 	}
 
 	// Should never be here, but well...

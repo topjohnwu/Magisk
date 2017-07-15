@@ -489,6 +489,7 @@ void post_fs_data(int client) {
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 	char *const command[] = { "logcat", "-v", "brief", NULL };
 	debug_log_pid = run_command(0, &debug_log_fd, "/system/bin/logcat", command);
+	close(debug_log_fd);
 #endif
 
 	LOGI("** post-fs-data mode running\n");
@@ -776,6 +777,5 @@ void late_start(int client) {
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
-	close(debug_log_fd);
 #endif
 }
