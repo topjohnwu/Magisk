@@ -33,13 +33,11 @@ public class ProcessMagiskZip extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         if (Shell.rootAccess()) {
-            synchronized (Shell.lock) {
-                Shell.su("rm -f /dev/.magisk",
-                        (mBoot != null) ? "echo \"BOOTIMAGE=" + mBoot + "\" >> /dev/.magisk" : "",
-                        "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
-                        "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk"
-                );
-            }
+            magiskManager.rootShell.su("rm -f /dev/.magisk",
+                    (mBoot != null) ? "echo \"BOOTIMAGE=" + mBoot + "\" >> /dev/.magisk" : "",
+                    "echo \"KEEPFORCEENCRYPT=" + String.valueOf(mEnc) + "\" >> /dev/.magisk",
+                    "echo \"KEEPVERITY=" + String.valueOf(mVerity) + "\" >> /dev/.magisk"
+            );
             return true;
         }
         return false;

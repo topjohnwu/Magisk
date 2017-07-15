@@ -11,23 +11,39 @@ public class Logger {
     public static final String MAIN_TAG = "Magisk";
     public static final String DEBUG_TAG = "MagiskManager";
 
+    public static void debug(String line) {
+        Log.d(DEBUG_TAG, "DEBUG: " + line);
+    }
+
     public static void debug(String fmt, Object... args) {
-        Log.d(DEBUG_TAG, "DEBUG: " + String.format(Locale.US, fmt, args));
+        debug(String.format(Locale.US, fmt, args));
+    }
+
+    public static void error(String line) {
+        Log.e(MAIN_TAG, "MANAGERERROR: " + line);
     }
 
     public static void error(String fmt, Object... args) {
-        Log.e(MAIN_TAG, "MANAGERERROR: " + String.format(Locale.US, fmt, args));
+        error(String.format(Locale.US, fmt, args));
+    }
+
+    public static void dev(String line) {
+        if (MagiskManager.devLogging) {
+            Log.d(DEBUG_TAG, line);
+        }
     }
 
     public static void dev(String fmt, Object... args) {
-        if (MagiskManager.devLogging) {
-            Log.d(DEBUG_TAG, String.format(Locale.US, fmt, args));
+        dev(String.format(Locale.US, fmt, args));
+    }
+
+    public static void shell(boolean root, String line) {
+        if (MagiskManager.shellLogging) {
+            Log.d(DEBUG_TAG, (root ? "MANAGERSU: " : "MANAGERSH: ") + line);
         }
     }
 
     public static void shell(boolean root, String fmt, Object... args) {
-        if (MagiskManager.shellLogging) {
-            Log.d(DEBUG_TAG, (root ? "MANAGERSU: " : "MANAGERSH: ") + String.format(Locale.US, fmt, args));
-        }
+        shell(root, String.format(Locale.US, fmt, args));
     }
 }

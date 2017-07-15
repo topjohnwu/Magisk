@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,10 +25,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.asyncs.RootTask;
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class MagiskLogFragment extends Fragment {
 
         txtLog.setTextIsSelectable(true);
 
-        new LogManager().read();
+        new LogManager(getActivity()).read();
 
         return view;
     }
@@ -81,7 +81,7 @@ public class MagiskLogFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        new LogManager().read();
+        new LogManager(getActivity()).read();
     }
 
     @Override
@@ -100,13 +100,13 @@ public class MagiskLogFragment extends Fragment {
         mClickedMenuItem = item;
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                new LogManager().read();
+                new LogManager(getActivity()).read();
                 return true;
             case R.id.menu_save:
-                new LogManager().save();
+                new LogManager(getActivity()).save();
                 return true;
             case R.id.menu_clear:
-                new LogManager().clear();
+                new LogManager(getActivity()).clear();
                 return true;
             default:
                 return true;
@@ -127,18 +127,22 @@ public class MagiskLogFragment extends Fragment {
         }
     }
 
-    private class LogManager extends RootTask<Object, Void, Object> {
+    private class LogManager extends ParallelTask<Object, Void, Object> {
 
         int mode;
         File targetFile;
 
+        LogManager(Activity activity) {
+            super(activity);
+        }
+
         @SuppressLint("DefaultLocale")
         @Override
-        protected Object doInRoot(Object... params) {
+        protected Object doInBackground(Object... params) {
             mode = (int) params[0];
             switch (mode) {
                 case 0:
-                    List<String> logList = Utils.readFile(MAGISK_LOG);
+                    List<String> logList = Utils.readFile(magiskManager.rootShell, MAGISK_LOG);
 
                     if (Utils.isValidShellResponse(logList)) {
                         StringBuilder llog = new StringBuilder(15 * 10 * 1024);
@@ -150,7 +154,7 @@ public class MagiskLogFragment extends Fragment {
                     return "";
 
                 case 1:
-                    Shell.su("echo > " + MAGISK_LOG);
+                    magiskManager.rootShell.su("echo > " + MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
@@ -180,7 +184,7 @@ public class MagiskLogFragment extends Fragment {
                         return false;
                     }
 
-                    List<String> in = Utils.readFile(MAGISK_LOG);
+                    List<String> in = Utils.readFile(magiskManager.rootShell, MAGISK_LOG);
 
                     if (Utils.isValidShellResponse(in)) {
                         try (FileWriter out = new FileWriter(targetFile)) {

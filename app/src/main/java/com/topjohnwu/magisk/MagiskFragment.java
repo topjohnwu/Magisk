@@ -197,7 +197,7 @@ public class MagiskFragment extends Fragment
                             @Override
                             public void onFinish() {
                                 progress.setMessage(getString(R.string.reboot_countdown, 0));
-                                Shell.su(true,
+                                magiskManager.rootShell.su(
                                         "mv -f " + uninstaller + " /cache/" + MagiskManager.UNINSTALLER,
                                         "mv -f " + utils + " /data/magisk/" + MagiskManager.UTIL_FUNCTIONS,
                                         "reboot"

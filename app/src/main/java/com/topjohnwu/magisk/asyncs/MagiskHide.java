@@ -2,11 +2,9 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.magisk.utils.Shell;
-
 import java.util.List;
 
-public class MagiskHide extends RootTask<Object, Void, Void> {
+public class MagiskHide extends ParallelTask<Object, Void, Void> {
 
     private boolean isList = false;
 
@@ -17,9 +15,9 @@ public class MagiskHide extends RootTask<Object, Void, Void> {
     }
 
     @Override
-    protected Void doInRoot(Object... params) {
+    protected Void doInBackground(Object... params) {
         String command = (String) params[0];
-        List<String> ret = Shell.su("magiskhide --" + command);
+        List<String> ret = magiskManager.rootShell.su("magiskhide --" + command);
         if (isList) {
             magiskManager.magiskHideList = ret;
         }

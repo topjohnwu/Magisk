@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
+import android.text.TextUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,10 +45,10 @@ public class StreamGobbler extends Thread {
         try {
             String line;
             while ((line = reader.readLine()) != null) {
+                if (TextUtils.equals(line, "-root-done-"))
+                    return;
                 writer.add(line);
-                if (!line.equals("-root-done-") && !line.isEmpty()) {
-                    Logger.shell(isRoot, "OUT: " + line);
-                }
+                Logger.shell(isRoot, "OUT: " + line);
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

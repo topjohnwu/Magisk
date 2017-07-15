@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.ArrayList;
 import java.util.List;

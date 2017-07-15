@@ -88,13 +88,16 @@ public class MagiskManager extends Application {
     // Global resources
     public SharedPreferences prefs;
     public SuDatabaseHelper suDB;
+    public Shell rootShell;
 
     private static Handler mHandler = new Handler();
 
     @Override
     public void onCreate() {
         super.onCreate();
+        new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        rootShell = Shell.getRootShell();
     }
 
     public void toast(String msg, int duration) {
@@ -117,14 +120,12 @@ public class MagiskManager extends Application {
         magiskHide = prefs.getBoolean("magiskhide", true);
         updateNotification = prefs.getBoolean("notification", true);
         initSU();
-        // Always start a new root shell manually, just for safety
-        Shell.init();
         updateMagiskInfo();
         // Initialize busybox
         File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
         if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
             busybox.getParentFile().mkdirs();
-            Shell.su(
+            rootShell.su(
                     "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
                     "chmod -R 755 " + busybox.getParent(),
                     busybox + " --install -s " + busybox.getParent()
@@ -136,7 +137,7 @@ public class MagiskManager extends Application {
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
-                .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
+                .putBoolean("disable", Utils.itemExist(rootShell, MAGISK_DISABLE_FILE))
                 .putBoolean("su_reauth", suReauth)
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
                 .putString("su_auto_response", String.valueOf(suResponseType))
@@ -147,7 +148,7 @@ public class MagiskManager extends Application {
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
-        Shell.su("PATH=$PATH:" + busybox.getParent());
+        rootShell.su("PATH=$PATH:" + busybox.getParent());
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -167,9 +168,6 @@ public class MagiskManager extends Application {
     }
 
     public void initSU() {
-        // Create the app data directory, so su binary can work properly
-        new File(getApplicationInfo().dataDir).mkdirs();
-
         initSUConfig();
 
         List<String> ret = Shell.sh("su -v");

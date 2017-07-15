@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.module;
 
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {
@@ -8,9 +9,9 @@ public class Module extends BaseModule {
     private String mRemoveFile, mDisableFile, mUpdateFile;
     private boolean mEnable, mRemove, mUpdated;
 
-    public Module(String path) throws CacheModException {
+    public Module(Shell shell, String path) throws CacheModException {
 
-        parseProps(Utils.readFile(path + "/module.prop"));
+        parseProps(Utils.readFile(shell, path + "/module.prop"));
 
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";
@@ -27,33 +28,33 @@ public class Module extends BaseModule {
 
         Logger.dev("Creating Module, id: " + getId());
 
-        mEnable = !Utils.itemExist(mDisableFile);
-        mRemove = Utils.itemExist(mRemoveFile);
-        mUpdated = Utils.itemExist(mUpdateFile);
+        mEnable = !Utils.itemExist(shell, mDisableFile);
+        mRemove = Utils.itemExist(shell, mRemoveFile);
+        mUpdated = Utils.itemExist(shell, mUpdateFile);
     }
 
-    public void createDisableFile() {
+    public void createDisableFile(Shell shell) {
         mEnable = false;
-        Utils.createFile(mDisableFile);
+        Utils.createFile(shell, mDisableFile);
     }
 
-    public void removeDisableFile() {
+    public void removeDisableFile(Shell shell) {
         mEnable = true;
-        Utils.removeItem(mDisableFile);
+        Utils.removeItem(shell, mDisableFile);
     }
 
     public boolean isEnabled() {
         return mEnable;
     }
 
-    public void createRemoveFile() {
+    public void createRemoveFile(Shell shell) {
         mRemove = true;
-        Utils.createFile(mRemoveFile);
+        Utils.createFile(shell, mRemoveFile);
     }
 
-    public void deleteRemoveFile() {
+    public void deleteRemoveFile(Shell shell) {
         mRemove = false;
-        Utils.removeItem(mRemoveFile);
+        Utils.removeItem(shell, mRemoveFile);
     }
 
     public boolean willBeRemoved() {

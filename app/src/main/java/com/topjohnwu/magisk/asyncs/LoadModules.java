@@ -9,23 +9,22 @@ import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ValueSortedMap;
 
-public class LoadModules extends RootTask<Void, Void, Void> {
+public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     public LoadModules(Activity context) {
         super(context);
     }
 
     @Override
-    protected Void doInRoot(Void... voids) {
+    protected Void doInBackground(Void... voids) {
         Logger.dev("LoadModules: Loading modules");
 
         magiskManager.moduleMap = new ValueSortedMap<>();
 
-        for (String path : Utils.getModList(MagiskManager.MAGISK_PATH)) {
+        for (String path : Utils.getModList(magiskManager.rootShell, MagiskManager.MAGISK_PATH)) {
             Logger.dev("LoadModules: Adding modules from " + path);
-            Module module;
             try {
-                module = new Module(path);
+                Module module = new Module(magiskManager.rootShell, path);
                 magiskManager.moduleMap.put(module.getId(), module);
             } catch (BaseModule.CacheModException ignored) {}
         }

@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -21,7 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public class FlashZip extends RootTask<Void, String, Integer> {
+public class FlashZip extends ParallelTask<Void, String, Integer> {
 
     private Uri mUri;
     private File mCachedFile, mScriptFile, mCheckFile;
@@ -71,12 +70,12 @@ public class FlashZip extends RootTask<Void, String, Integer> {
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
         List<String> ret;
-        ret = Utils.readFile(mCheckFile.getPath());
+        ret = Utils.readFile(magiskManager.rootShell, mCheckFile.getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
 
     private int cleanup(int ret) {
-        Shell.su(
+        magiskManager.rootShell.su(
                 "rm -rf " + mCachedFile.getParent() + "/*",
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );
@@ -96,14 +95,14 @@ public class FlashZip extends RootTask<Void, String, Integer> {
     }
 
     @Override
-    protected Integer doInRoot(Void... voids) {
+    protected Integer doInBackground(Void... voids) {
         Logger.dev("FlashZip Running... " + mFilename);
         List<String> ret;
         try {
             copyToCache();
             if (!unzipAndCheck()) return cleanup(0);
             publishProgress(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
-            ret = Shell.su(
+            ret = magiskManager.rootShell.su(
                     "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile,
                     "if [ $? -eq 0 ]; then echo true; else echo false; fi"
             );
@@ -147,7 +146,7 @@ public class FlashZip extends RootTask<Void, String, Integer> {
         new AlertDialogBuilder(activity)
                 .setTitle(R.string.reboot_title)
                 .setMessage(R.string.reboot_msg)
-                .setPositiveButton(R.string.reboot, (dialogInterface, i) -> Shell.su(true, "reboot"))
+                .setPositiveButton(R.string.reboot, (dialogInterface, i) -> magiskManager.rootShell.su("reboot"))
                 .setNegativeButton(R.string.no_thanks, null)
                 .show();
     }

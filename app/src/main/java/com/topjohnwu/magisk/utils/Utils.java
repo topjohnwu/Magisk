@@ -43,33 +43,33 @@ public class Utils {
     private static final int MAGISK_UPDATE_NOTIFICATION_ID = 1;
     private static final int APK_UPDATE_NOTIFICATION_ID = 2;
 
-    public static boolean itemExist(String path) {
+    public static boolean itemExist(Shell shell, String path) {
         String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
-        List<String> ret = Shell.su(command);
+        List<String> ret = shell.su(command);
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
-    public static void createFile(String path) {
+    public static void createFile(Shell shell, String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
         String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
-        Shell.su_async(null, command);
+        shell.su(command);
     }
 
-    public static void removeItem(String path) {
+    public static void removeItem(Shell shell, String path) {
         String command = "rm -rf " + path + " 2>/dev/null; if [ -e " + path + " ]; then echo false; else echo true; fi";
-        Shell.su_async(null, command);
+        shell.su(command);
     }
 
-    public static List<String> getModList(String path) {
+    public static List<String> getModList(Shell shell, String path) {
         String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
-        return Shell.su(command);
+        return shell.su(command);
     }
 
-    public static List<String> readFile(String path) {
+    public static List<String> readFile(Shell shell, String path) {
         List<String> ret;
         String command = "cat " + path;
         if (Shell.rootAccess()) {
-            ret = Shell.su(command);
+            ret = shell.su(command);
         } else {
             ret = Shell.sh(command);
         }
@@ -114,7 +114,7 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("*", "");
     }
 
-    public static String detectBootImage() {
+    public static String detectBootImage(Shell shell) {
         String[] commands = {
                 "for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",
                 "BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || " +
@@ -124,7 +124,7 @@ public class Utils {
                 "done",
                 "echo \"$BOOTIMAGE\""
         };
-        List<String> ret = Shell.su(commands);
+        List<String> ret = shell.su(commands);
         if (isValidShellResponse(ret)) {
             return ret.get(0);
         }
