@@ -29,13 +29,17 @@ public class StreamGobbler extends Thread {
      * @param outputList  {@literal List<String>} to write to, or null
      */
     public StreamGobbler(InputStream inputStream, List<String> outputList) {
+        try {
+            while (inputStream.available() != 0) {
+                inputStream.skip(inputStream.available());
+            }
+        } catch (IOException ignored) {}
         reader = new BufferedReader(new InputStreamReader(inputStream));
         writer = outputList;
     }
 
     public StreamGobbler(InputStream inputStream, List<String> outputList, boolean root) {
-        reader = new BufferedReader(new InputStreamReader(inputStream));
-        writer = outputList;
+        this(inputStream, outputList);
         isRoot = root;
     }
 
@@ -48,7 +52,7 @@ public class StreamGobbler extends Thread {
                 if (TextUtils.equals(line, "-root-done-"))
                     return;
                 writer.add(line);
-                Logger.shell(isRoot, "OUT: " + line);
+                Logger.shell(isRoot, line);
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

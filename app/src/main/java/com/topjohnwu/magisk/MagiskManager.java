@@ -125,7 +125,7 @@ public class MagiskManager extends Application {
         File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
         if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
             busybox.getParentFile().mkdirs();
-            rootShell.su(
+            rootShell.su_raw(
                     "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
                     "chmod -R 755 " + busybox.getParent(),
                     busybox + " --install -s " + busybox.getParent()
@@ -148,7 +148,7 @@ public class MagiskManager extends Application {
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
-        rootShell.su("PATH=$PATH:" + busybox.getParent());
+        rootShell.su_raw("PATH=$PATH:" + busybox.getParent());
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

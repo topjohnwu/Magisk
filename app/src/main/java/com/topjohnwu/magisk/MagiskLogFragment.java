@@ -154,7 +154,7 @@ public class MagiskLogFragment extends Fragment {
                     return "";
 
                 case 1:
-                    magiskManager.rootShell.su("echo > " + MAGISK_LOG);
+                    magiskManager.rootShell.su_raw("echo > " + MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 

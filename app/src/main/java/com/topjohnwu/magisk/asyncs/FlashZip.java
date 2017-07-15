@@ -75,7 +75,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     }
 
     private int cleanup(int ret) {
-        magiskManager.rootShell.su(
+        magiskManager.rootShell.su_raw(
                 "rm -rf " + mCachedFile.getParent() + "/*",
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );
@@ -146,7 +146,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
         new AlertDialogBuilder(activity)
                 .setTitle(R.string.reboot_title)
                 .setMessage(R.string.reboot_msg)
-                .setPositiveButton(R.string.reboot, (dialogInterface, i) -> magiskManager.rootShell.su("reboot"))
+                .setPositiveButton(R.string.reboot, (dialogInterface, i) -> magiskManager.rootShell.su_raw("reboot"))
                 .setNegativeButton(R.string.no_thanks, null)
                 .show();
     }

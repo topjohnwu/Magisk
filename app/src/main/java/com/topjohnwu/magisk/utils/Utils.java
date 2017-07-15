@@ -52,12 +52,12 @@ public class Utils {
     public static void createFile(Shell shell, String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
         String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
-        shell.su(command);
+        shell.su_raw(command);
     }
 
     public static void removeItem(Shell shell, String path) {
         String command = "rm -rf " + path + " 2>/dev/null; if [ -e " + path + " ]; then echo false; else echo true; fi";
-        shell.su(command);
+        shell.su_raw(command);
     }
 
     public static List<String> getModList(Shell shell, String path) {
@@ -66,14 +66,8 @@ public class Utils {
     }
 
     public static List<String> readFile(Shell shell, String path) {
-        List<String> ret;
         String command = "cat " + path;
-        if (Shell.rootAccess()) {
-            ret = shell.su(command);
-        } else {
-            ret = Shell.sh(command);
-        }
-        return ret;
+        return shell.su(command);
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {

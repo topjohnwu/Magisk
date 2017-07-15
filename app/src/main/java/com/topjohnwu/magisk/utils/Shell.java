@@ -18,11 +18,11 @@ public class Shell {
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted
     public static int rootStatus;
 
-    private static boolean isInit = false;
-
     private final Process rootShell;
     private final DataOutputStream rootSTDIN;
     private final DataInputStream rootSTDOUT;
+
+    private boolean isValid;
 
     private Shell() {
         Process process;
@@ -34,15 +34,17 @@ public class Shell {
             rootShell = null;
             rootSTDIN = null;
             rootSTDOUT = null;
+            isValid = false;
             return;
         }
 
         rootStatus = 1;
+        isValid = true;
         rootShell = process;
         rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
         rootSTDOUT = new DataInputStream(rootShell.getInputStream());
 
-        su("umask 022");
+        su_raw("umask 022");
         List<String> ret = su("echo -BOC-", "id");
 
         if (ret.isEmpty()) {
@@ -118,33 +120,43 @@ public class Shell {
     }
 
     public List<String> su(String... commands) {
+        if (!isValid) return null;
         List<String> res = new ArrayList<>();
         su(res, commands);
         return res;
     }
 
-    public void su(List<String> res, String... commands) {
-        try {
-            rootShell.exitValue();
-            return;  // The process is dead, return
-        } catch (IllegalThreadStateException ignored) {
-            // This should be the expected result
-        }
+    public void su_raw(String... commands) {
+        if (!isValid) return;
         synchronized (rootShell) {
-            StreamGobbler STDOUT = new StreamGobbler(rootSTDOUT, Collections.synchronizedList(res), true);
-            STDOUT.start();
             try {
                 for (String command : commands) {
                     rootSTDIN.write((command + "\n").getBytes("UTF-8"));
                     rootSTDIN.flush();
                 }
-                rootSTDIN.write(("echo \'-root-done-\'\n").getBytes("UTF-8"));
-                rootSTDIN.flush();
-                STDOUT.join();
-            } catch (InterruptedException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 rootShell.destroy();
+                isValid = false;
             }
+        }
+    }
+
+    public void su(List<String> output, String... commands) {
+        if (!isValid) return;
+        try {
+            rootShell.exitValue();
+            isValid = false;
+            return;  // The process is dead, return
+        } catch (IllegalThreadStateException ignored) {
+            // This should be the expected result
+        }
+        synchronized (rootShell) {
+            StreamGobbler STDOUT = new StreamGobbler(rootSTDOUT, output, true);
+            STDOUT.start();
+            su_raw(commands);
+            su_raw("echo \'-root-done-\'");
+            try { STDOUT.join(); } catch (InterruptedException ignored) {}
         }
     }
 }

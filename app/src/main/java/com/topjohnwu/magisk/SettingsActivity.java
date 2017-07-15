@@ -175,11 +175,11 @@ public class SettingsActivity extends Activity {
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
-                        magiskManager.rootShell.su(
+                        magiskManager.rootShell.su_raw(
                                 "cp -af /system/etc/hosts /magisk/.core/hosts",
                                 "mount -o bind /magisk/.core/hosts /system/etc/hosts");
                     } else {
-                        magiskManager.rootShell.su(
+                        magiskManager.rootShell.su_raw(
                                 "umount -l /system/etc/hosts",
                                 "rm -f /magisk/.core/hosts");
                     }
