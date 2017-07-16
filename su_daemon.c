@@ -30,6 +30,11 @@
 
 #define TIMEOUT     3
 
+#define LOCK_LIST()    pthread_mutex_lock(&list_lock)
+#define LOCK_UID()     pthread_mutex_lock(&info->lock)
+#define UNLOCK_LIST()  pthread_mutex_unlock(&list_lock)
+#define UNLOCK_UID()   pthread_mutex_unlock(&info->lock)
+
 static struct list_head active_list, waiting_list;
 static pthread_t su_collector = 0;
 static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -59,17 +64,13 @@ static void sighandler(int sig) {
 	}
 }
 
-static void sigpipe_handler(int sig) {
-	LOGD("su: Client killed unexpectedly\n");
-}
-
 // Maintain the lists periodically
 static void *collector(void *args) {
 	LOGD("su: collector started\n");
 	struct su_info *node;
 	while(1) {
 		sleep(1);
-		pthread_mutex_lock(&list_lock);
+		LOCK_LIST();
 		list_for_each(node, &active_list, struct su_info, pos) {
 			if (--node->clock == 0) {
 				// Timeout, move to waiting list
@@ -78,14 +79,14 @@ static void *collector(void *args) {
 			}
 		}
 		list_for_each(node, &waiting_list, struct su_info, pos) {
-			if (node->count == 0) {
+			if (node->ref == 0) {
 				// Nothing is using the info, remove it
 				__ = list_pop(&node->pos);
 				pthread_mutex_destroy(&node->lock);
 				free(node);
 			}
 		}
-		pthread_mutex_unlock(&list_lock);
+		UNLOCK_LIST();
 	}
 }
 
@@ -95,7 +96,7 @@ void su_daemon_receiver(int client) {
 	struct su_info *info = NULL, *node;
 	int new_request = 0;
 
-	pthread_mutex_lock(&list_lock);
+	LOCK_LIST();
 
 	if (!su_collector) {
 		init_list_head(&active_list);
@@ -109,8 +110,10 @@ void su_daemon_receiver(int client) {
 
 	// Search for existing in the active list
 	list_for_each(node, &active_list, struct su_info, pos) {
-		if (node->uid == credential.uid)
+		if (node->uid == credential.uid) {
 			info = node;
+			break;
+		}
 	}
 
 	// If no exist, create a new request
@@ -119,19 +122,17 @@ void su_daemon_receiver(int client) {
 		info = malloc(sizeof(*info));
 		info->uid = credential.uid;
 		info->policy = QUERY;
+		info->ref = 0;
 		info->count = 0;
 		pthread_mutex_init(&info->lock, NULL);
 		list_insert_end(&active_list, &info->pos);
 	}
 	info->clock = TIMEOUT;  /* Reset timer */
-	++info->count;  /* Increment reference count */
+	++info->ref;  /* Increment reference count */
 
-	pthread_mutex_unlock(&list_lock);
+	UNLOCK_LIST();
 
-	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, info->count);
-
-	// Lock before the policy is determined
-	pthread_mutex_lock(&info->lock);
+	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
 
 	// Default values
 	struct su_context ctx = {
@@ -165,6 +166,9 @@ void su_daemon_receiver(int client) {
 		info->policy = DENY;
 	}
 
+	// Lock before the policy is determined
+	LOCK_UID();
+
 	// Not cached, do the checks
 	if (info->policy == QUERY) {
 		// Get data from database
@@ -193,7 +197,7 @@ void su_daemon_receiver(int client) {
 
 		// If still not determined, open a pipe and wait for results
 		if (info->policy == QUERY)
-			pipe2(pipefd, O_CLOEXEC);
+			xpipe2(pipefd, O_CLOEXEC);
 	}
 
 	// Fork a new process, the child process will need to setsid,
@@ -213,35 +217,45 @@ void su_daemon_receiver(int client) {
 		}
 
 		// The policy is determined, unlock
-		pthread_mutex_unlock(&info->lock);
+		UNLOCK_UID();
 
 		// Wait result
-		LOGD("su: wait_result waiting for %d\n", child);
+		LOGD("su: waiting child: [%d]\n", child);
 		int status, code;
-
-		// Handle SIGPIPE, since we don't want to crash our daemon
-		struct sigaction act;
-		memset(&act, 0, sizeof(act));
-		act.sa_handler = sigpipe_handler;
-		sigaction(SIGPIPE, &act, NULL);
 
 		if (waitpid(child, &status, 0) > 0)
 			code = WEXITSTATUS(status);
 		else
 			code = -1;
 
-		// Pass the return code back to the client
-		write(client, &code, sizeof(code));   /* Might SIGPIPE, ignored */
-		LOGD("su: return code to client: %d\n", code);
+		/* Passing the return code back to the client:
+		 * The client might be closed unexpectedly (e.g. swipe a root app out of recents)
+		 * In that case, writing to the client (which doesn't exist) will result in SIGPIPE
+		 * Here we simply just ignore the situation.
+		 */
+		struct sigaction act;
+		memset(&act, 0, sizeof(act));
+		act.sa_handler = SIG_IGN;
+		sigaction(SIGPIPE, &act, NULL);
+
+		LOGD("su: return code: [%d]\n", code);
+		write(client, &code, sizeof(code));
 		close(client);
 
+		// Restore default handler for SIGPIPE
+		act.sa_handler = SIG_DFL;
+		sigaction(SIGPIPE, &act, NULL);
+
 		// Decrement reference count
-		--info->count;
+		LOCK_LIST();
+		--info->ref;
+		UNLOCK_LIST();
 
 		return;
 	}
 
 	LOGD("su: child process started\n");
+	UNLOCK_UID();
 
 	// ack
 	write_int(client, 1);

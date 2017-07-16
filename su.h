@@ -59,15 +59,20 @@ typedef enum {
 } policy_t;
 
 struct su_info {
-    unsigned uid;
+    unsigned uid;  /* Key to find su_info */
+    pthread_mutex_t lock;  /* Internal lock */
+    int count;  /* Just a count for debugging purpose */
+
+    /* These values should be guarded with internal lock */
     policy_t policy;
-    pthread_mutex_t lock;
-    int count;
-    int clock;
     int multiuser_mode;
     int root_access;
     int mnt_ns;
+
+    /* These should be guarded with global list lock */
     struct list_head pos;
+    int ref;
+    int clock;
 };
 
 struct su_request {
