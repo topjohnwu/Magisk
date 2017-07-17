@@ -28,12 +28,16 @@
     <string name="not_rooted">Sem root</string>
     <string name="proper_root">Rooteado</string>
     <string name="safetyNet_check_text">Pressione para checar o SafetyNet</string>
-    <string name="checking_safetyNet_status">Checando status do SafetyNet…</string>
+    <string name="checking_safetyNet_status">Verificando status do SafetyNet…</string>
+	<string name="safetyNet_check_success">SafetyNet verificado</string>
     <string name="safetyNet_connection_failed">Não é possível conectar-se à API do Google</string>
     <string name="safetyNet_connection_suspended">A conexão com API do Google foi suspensa</string>
     <string name="safetyNet_no_response">Não é possível verificar o SafetyNet, sem Internet?</string>
     <string name="safetyNet_fail">SafetyNet Falhou: CTS profile mismatch</string>
     <string name="safetyNet_pass">SafetyNet Passado</string>
+	<string name="safetyNet_network_loss">Conexão com a rede perdida</string>
+    <string name="safetyNet_service_disconnected">O serviço foi morto</string>
+    <string name="safetyNet_res_invalid">A resposta é inválida</string>
     <string name="root_info_warning">Funcionalidade muito limitada</string>
 
     <!--Install Fragment-->
@@ -126,6 +130,9 @@
     <string name="internal_storage">O zip foi salvo em:\n[Armazenamento interno]%1$s</string>
     <string name="zip_process_title">Processando</string>
     <string name="manual_boot_image">Por Favor, selecione manualmente a Boot Image</string>
+	<string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
+    <string name="manager_download_install">Pressione para baixar e instalar</string>
+    <string name="magisk_updates">Atualizações do Magisk</string>
 	
     <!--Settings Fragment -->
     <string name="settings_general_category">Geral</string>
@@ -157,7 +164,26 @@
     <string name="request_timeout">Tempo limite de solicitação</string>
     <string name="superuser_notification">Notificação do superusuário</string>
     <string name="request_timeout_summary">%1$s segundos</string>
+	<string name="settings_su_reauth_title">Re-autenticar após a atualização</string>
+    <string name="settings_su_reauth_summary">Re-autenticar permissões de superusuário após as atualizações de um aplicativo</string>
+	
+	<string name="multiuser_mode">Modo Multiusuário</string>
+    <string name="settings_owner_only">Apenas Proprietário do Dispositivo</string>
+    <string name="settings_owner_manage">Proprietário do dispositivo gerenciado</string>
+    <string name="settings_user_independent">Usuário Independente</string>
+    <string name="owner_only_summary">Somente o proprietário possui acesso de root</string>
+    <string name="owner_manage_summary">Somente o proprietário pode gerenciar o acesso root e receber paineis de solicitações</string>
+    <string name="user_indepenent_summary">Cada usuário tem suas próprias regras raiz separadas</string>
+    <string name="multiuser_hint_owner_request">Um pedido foi enviado ao proprietário do dispositivo. Mude para o proprietário e conceda a permissão</string>
 
+    <string name="mount_namespace_mode">Modo namespace de montagem</string>
+    <string name="settings_ns_global">Global namespace</string>
+    <string name="settings_ns_requester">Herdar namespace</string>
+    <string name="settings_ns_isolate">Isolar namespace</string>
+    <string name="global_summary">Todas as sessões raiz usam o namespace de montagem global</string>
+    <string name="requester_summary">As sessões de raiz herdarão o namespace do seu solicitante</string>
+    <string name="isolate_summary">Cada sessão raiz terá seu próprio namespace isolado</string>
+	
     <string name="settings_development_category">Desenvolvimento</string>
     <string name="settings_developer_logging_title">Ativar registro mais detalhado</string>
     <string name="settings_developer_logging_summary">Marque essa opção para habilitar um registro mais detalhado</string>
