@@ -8,8 +8,6 @@ public class MagiskHide extends ParallelTask<Object, Void, Void> {
 
     private boolean isList = false;
 
-    public MagiskHide() {}
-
     public MagiskHide(Activity context) {
         super(context);
     }

@@ -162,14 +162,14 @@ public class SettingsActivity extends Activity {
                             new AlertDialogBuilder(getActivity())
                                     .setTitle(R.string.no_magisksu_title)
                                     .setMessage(R.string.no_magisksu_msg)
-                                    .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide().enable())
+                                    .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide(getActivity()).enable())
                                     .setCancelable(false)
                                     .show();
                         } else {
-                            new MagiskHide().enable();
+                            new MagiskHide(getActivity()).enable();
                         }
                     } else {
-                        new MagiskHide().disable();
+                        new MagiskHide(getActivity()).disable();
                     }
                     break;
                 case "hosts":

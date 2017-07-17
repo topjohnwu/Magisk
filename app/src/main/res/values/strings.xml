@@ -133,6 +133,7 @@
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install</string>
     <string name="magisk_updates">Magisk Updates</string>
+    <string name="flashing">Flashing</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

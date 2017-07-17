@@ -44,19 +44,19 @@ public class Utils {
     private static final int APK_UPDATE_NOTIFICATION_ID = 2;
 
     public static boolean itemExist(Shell shell, String path) {
-        String command = "if [ -e " + path + " ]; then echo true; else echo false; fi";
+        String command = "[ -e " + path + " ] && echo true || echo false";
         List<String> ret = shell.su(command);
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static void createFile(Shell shell, String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
-        String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null; if [ -f \"" + path + "\" ]; then echo true; else echo false; fi";
+        String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null;";
         shell.su_raw(command);
     }
 
     public static void removeItem(Shell shell, String path) {
-        String command = "rm -rf " + path + " 2>/dev/null; if [ -e " + path + " ]; then echo false; else echo true; fi";
+        String command = "rm -rf " + path + " 2>/dev/null";
         shell.su_raw(command);
     }
 

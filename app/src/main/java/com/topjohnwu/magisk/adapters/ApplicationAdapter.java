@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
@@ -86,10 +87,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    new MagiskHide().add(info.packageName);
+                    new MagiskHide((Activity) holder.itemView.getContext()).add(info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    new MagiskHide().rm(info.packageName);
+                    new MagiskHide((Activity) holder.itemView.getContext()).rm(info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });

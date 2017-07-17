@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -14,13 +13,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
-import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.Shell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +84,9 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == FETCH_ZIP_CODE && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
-            final Uri uri = data.getData();
-            new FlashZip(getActivity(), uri).exec();
+            Intent intent = new Intent(getActivity(), FlashActivity.class);
+            intent.setData(data.getData()).putExtra("ACTION", "flash");
+            startActivity(intent);
         }
 
     }

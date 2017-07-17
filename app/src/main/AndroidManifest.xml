@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.topjohnwu.magisk"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,8 +21,7 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="true"/>
-
+            android:exported="true" />
         <activity
             android:name=".SplashActivity"
             android:configChanges="orientation|screenSize"
@@ -31,16 +29,22 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".AboutActivity"
-            android:theme="@style/AppTheme.Transparent"/>
+            android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".FlashActivity"
+            android:screenOrientation="nosensor"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.Transparent" />
+
         <activity
             android:name=".superuser.RequestActivity"
             android:excludeFromRecents="true"
@@ -54,29 +58,26 @@
             android:theme="@style/SuRequest" />
 
         <receiver android:name=".superuser.SuReceiver" />
-
         <receiver android:name=".receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".receivers.PackageReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-
         <receiver android:name=".receivers.ManagerUpdate" />
 
         <service android:name=".services.OnBootIntentService" />
-
         <service
             android:name=".services.UpdateCheckService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"

@@ -26,7 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.asyncs.ProcessMagiskZip;
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -144,7 +144,13 @@ public class MagiskFragment extends Fragment
 
                                     @Override
                                     public void onDownloadDone(Uri uri, Context context) {
-                                        new ProcessMagiskZip(getActivity(), uri, boot, enc, verity).exec();
+                                        if (Shell.rootAccess()) {
+                                            new SetInstallFlags(boot, enc, verity)
+                                                    .setCallBack(() -> startActivity(new Intent(context, FlashActivity.class).setData(uri)))
+                                                    .exec(context);
+                                        } else {
+                                            Utils.showUriSnack(getActivity(), uri);
+                                        }
                                     }
                                 },
                                 magiskManager.magiskLink,
@@ -158,6 +164,28 @@ public class MagiskFragment extends Fragment
                 })
                 .setNegativeButton(R.string.no_thanks, null)
                 .show();
+    }
+
+    private static class SetInstallFlags extends ParallelTask<Context, Void, Void> {
+
+        private String boot;
+        private boolean enc, verity;
+
+        SetInstallFlags(String boot, boolean enc, boolean verity) {
+            this.boot = boot;
+            this.enc = enc;
+            this.verity = verity;
+        }
+
+        @Override
+        protected Void doInBackground(Context... contexts) {
+            Shell.getRootShell(contexts[0]).su_raw("rm -f /dev/.magisk",
+                    (boot != null) ? "echo \"BOOTIMAGE=" + boot + "\" >> /dev/.magisk" : "",
+                    "echo \"KEEPFORCEENCRYPT=" + String.valueOf(enc) + "\" >> /dev/.magisk",
+                    "echo \"KEEPVERITY=" + String.valueOf(verity) + "\" >> /dev/.magisk"
+            );
+            return null;
+        }
     }
 
     @OnClick(R.id.uninstall_button)

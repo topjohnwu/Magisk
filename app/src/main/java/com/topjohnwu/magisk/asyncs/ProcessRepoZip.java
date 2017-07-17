@@ -2,9 +2,11 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
@@ -85,13 +87,12 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         progressDialog.dismiss();
         if (result) {
             if (Shell.rootAccess() && mInstall) {
-                new FlashZip(activity, mUri).exec();
+                magiskManager.startActivity(new Intent(magiskManager, FlashActivity.class).setData(mUri));
             } else {
                 Utils.showUriSnack(activity, mUri);
             }
-
         } else {
-            Toast.makeText(activity, R.string.process_error, Toast.LENGTH_LONG).show();
+            magiskManager.toast(R.string.process_error, Toast.LENGTH_LONG);
         }
     }
 }

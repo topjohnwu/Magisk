@@ -1,14 +1,12 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.net.Uri;
-import android.widget.Toast;
+import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
-import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -26,11 +24,12 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     private File mCachedFile, mScriptFile, mCheckFile;
 
     private String mFilename;
-    private ProgressDialog progress;
+    private AdaptiveList<String> mList;
 
-    public FlashZip(Activity context, Uri uri) {
+    public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
         super(context);
         mUri = uri;
+        mList = list;
 
         mCachedFile = new File(magiskManager.getCacheDir(), "install.zip");
         mScriptFile = new File(magiskManager.getCacheDir(), "/META-INF/com/google/android/update-binary");
@@ -40,97 +39,77 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
         mFilename = Utils.getNameFromUri(magiskManager, mUri);
     }
 
-    private void copyToCache() throws Throwable {
-        publishProgress(magiskManager.getString(R.string.copying_msg));
+    private void copyToCache() throws Exception {
+        mList.add(magiskManager.getString(R.string.copying_msg));
 
-        if (mCachedFile.exists() && !mCachedFile.delete()) {
-            Logger.error("FlashZip: Error while deleting already existing file");
-            throw new IOException();
-        }
+        mCachedFile.delete();
         try (
-                InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
-                OutputStream outputStream = new FileOutputStream(mCachedFile)
+            InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
+            OutputStream outputStream = new FileOutputStream(mCachedFile)
         ) {
             byte buffer[] = new byte[1024];
             int length;
             if (in == null) throw new FileNotFoundException();
             while ((length = in.read(buffer)) > 0)
                 outputStream.write(buffer, 0, length);
-
-            Logger.dev("FlashZip: File created successfully - " + mCachedFile.getPath());
         } catch (FileNotFoundException e) {
-            Logger.error("FlashZip: Invalid Uri");
+            mList.add("! Invalid Uri");
             throw e;
         } catch (IOException e) {
-            Logger.error("FlashZip: Error in creating file");
+            mList.add("! Cannot copy to cache");
             throw e;
         }
     }
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
-        List<String> ret;
-        ret = Utils.readFile(magiskManager.rootShell, mCheckFile.getPath());
+        List<String> ret = Utils.readFile(magiskManager.rootShell, mCheckFile.getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
-    }
-
-    private int cleanup(int ret) {
-        magiskManager.rootShell.su_raw(
-                "rm -rf " + mCachedFile.getParent() + "/*",
-                "rm -rf " + MagiskManager.TMP_FOLDER_PATH
-        );
-        return ret;
     }
 
     @Override
     protected void onPreExecute() {
-        progress = new ProgressDialog(activity);
-        progress.setTitle(R.string.zip_install_progress_title);
-        progress.show();
+        // UI updates must run in the UI thread
+        mList.setCallback(this::publishProgress);
     }
 
     @Override
     protected void onProgressUpdate(String... values) {
-        progress.setMessage(values[0]);
+        mList.updateView();
     }
 
     @Override
     protected Integer doInBackground(Void... voids) {
-        Logger.dev("FlashZip Running... " + mFilename);
-        List<String> ret;
         try {
             copyToCache();
-            if (!unzipAndCheck()) return cleanup(0);
-            publishProgress(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
-            ret = magiskManager.rootShell.su(
-                    "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile,
-                    "if [ $? -eq 0 ]; then echo true; else echo false; fi"
+            if (!unzipAndCheck()) return 0;
+            mList.add(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
+            magiskManager.rootShell.su(mList,
+                    "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile +
+                            " && echo 'Success!' || echo 'Failed!'"
             );
-            if (!Utils.isValidShellResponse(ret)) return -1;
-            Logger.dev("FlashZip: Console log:");
-            for (String line : ret) {
-                Logger.dev(line);
-            }
-            if (Boolean.parseBoolean(ret.get(ret.size() - 1)))
-                return cleanup(1);
-
-        } catch (Throwable e) {
+            if (TextUtils.equals(mList.get(mList.size() - 1), "Success!"))
+                return 1;
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return cleanup(-1);
+        return -1;
     }
 
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        progress.dismiss();
+        magiskManager.rootShell.su_raw(
+                "rm -rf " + mCachedFile.getParent() + "/*",
+                "rm -rf " + MagiskManager.TMP_FOLDER_PATH
+        );
         switch (result) {
             case -1:
-                Toast.makeText(magiskManager, magiskManager.getString(R.string.install_error), Toast.LENGTH_LONG).show();
+                mList.add(magiskManager.getString(R.string.install_error));
                 Utils.showUriSnack(activity, mUri);
                 break;
             case 0:
-                Toast.makeText(magiskManager, magiskManager.getString(R.string.invalid_zip), Toast.LENGTH_LONG).show();
+                mList.add(magiskManager.getString(R.string.invalid_zip));
                 break;
             case 1:
                 onSuccess();
@@ -140,14 +119,6 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     }
 
     protected void onSuccess() {
-        magiskManager.updateCheckDone.trigger();
         new LoadModules(activity).exec();
-
-        new AlertDialogBuilder(activity)
-                .setTitle(R.string.reboot_title)
-                .setMessage(R.string.reboot_msg)
-                .setPositiveButton(R.string.reboot, (dialogInterface, i) -> magiskManager.rootShell.su_raw("reboot"))
-                .setNegativeButton(R.string.no_thanks, null)
-                .show();
     }
 }
