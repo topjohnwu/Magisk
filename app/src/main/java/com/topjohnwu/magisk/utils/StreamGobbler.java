@@ -21,7 +21,7 @@ public class StreamGobbler extends Thread {
     /**
      * <p>StreamGobbler constructor</p>
      *
-     * <p>We use this class because shell STDOUT and STDERR should be read as quickly as
+     * <p>We use this class because sh STDOUT and STDERR should be read as quickly as
      * possible to prevent a deadlock from occurring, or Process.waitFor() never
      * returning (as the buffer is full, pausing the native process)</p>
      *
@@ -38,21 +38,16 @@ public class StreamGobbler extends Thread {
         writer = outputList;
     }
 
-    public StreamGobbler(InputStream inputStream, List<String> outputList, boolean root) {
-        this(inputStream, outputList);
-        isRoot = root;
-    }
-
     @Override
     public void run() {
         // keep reading the InputStream until it ends (or an error occurs)
         try {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (TextUtils.equals(line, "-root-done-"))
+                if (TextUtils.equals(line, "-shell-done-"))
                     return;
                 writer.add(line);
-                Logger.shell(isRoot, line);
+                Logger.shell(line);
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

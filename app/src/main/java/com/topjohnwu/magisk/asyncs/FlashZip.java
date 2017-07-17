@@ -63,7 +63,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
-        List<String> ret = Utils.readFile(magiskManager.rootShell, mCheckFile.getPath());
+        List<String> ret = Utils.readFile(magiskManager.shell, mCheckFile.getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
 
@@ -84,7 +84,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
             copyToCache();
             if (!unzipAndCheck()) return 0;
             mList.add(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
-            magiskManager.rootShell.su(mList,
+            magiskManager.shell.su(mList,
                     "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile +
                             " && echo 'Success!' || echo 'Failed!'"
             );
@@ -99,7 +99,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        magiskManager.rootShell.su_raw(
+        magiskManager.shell.su_raw(
                 "rm -rf " + mCachedFile.getParent() + "/*",
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );

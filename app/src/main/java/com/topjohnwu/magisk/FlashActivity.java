@@ -35,7 +35,7 @@ public class FlashActivity extends Activity {
 
     @OnClick(R.id.reboot)
     public void reboot() {
-        Shell.getRootShell(this).su_raw("reboot");
+        Shell.getShell(this).su_raw("reboot");
     }
 
     @Override

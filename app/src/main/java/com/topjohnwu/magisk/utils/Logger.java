@@ -37,13 +37,13 @@ public class Logger {
         dev(String.format(Locale.US, fmt, args));
     }
 
-    public static void shell(boolean root, String line) {
+    public static void shell(String line) {
         if (MagiskManager.shellLogging) {
-            Log.d(DEBUG_TAG, (root ? "MANAGERSU: " : "MANAGERSH: ") + line);
+            Log.d(DEBUG_TAG, "SHELL: " + line);
         }
     }
 
-    public static void shell(boolean root, String fmt, Object... args) {
-        shell(root, String.format(Locale.US, fmt, args));
+    public static void shell(String fmt, Object... args) {
+        shell(String.format(Locale.US, fmt, args));
     }
 }

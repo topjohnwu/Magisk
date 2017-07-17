@@ -149,9 +149,9 @@ public class SettingsActivity extends Activity {
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
                     if (enabled) {
-                        Utils.createFile(magiskManager.rootShell, MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.createFile(magiskManager.shell, MagiskManager.MAGISK_DISABLE_FILE);
                     } else {
-                        Utils.removeItem(magiskManager.rootShell, MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.removeItem(magiskManager.shell, MagiskManager.MAGISK_DISABLE_FILE);
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
@@ -175,11 +175,11 @@ public class SettingsActivity extends Activity {
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
-                        magiskManager.rootShell.su_raw(
+                        magiskManager.shell.su_raw(
                                 "cp -af /system/etc/hosts /magisk/.core/hosts",
                                 "mount -o bind /magisk/.core/hosts /system/etc/hosts");
                     } else {
-                        magiskManager.rootShell.su_raw(
+                        magiskManager.shell.su_raw(
                                 "umount -l /system/etc/hosts",
                                 "rm -f /magisk/.core/hosts");
                     }

@@ -15,7 +15,7 @@ public class MagiskHide extends ParallelTask<Object, Void, Void> {
     @Override
     protected Void doInBackground(Object... params) {
         String command = (String) params[0];
-        List<String> ret = magiskManager.rootShell.su("magiskhide --" + command);
+        List<String> ret = magiskManager.shell.su("magiskhide --" + command);
         if (isList) {
             magiskManager.magiskHideList = ret;
         }

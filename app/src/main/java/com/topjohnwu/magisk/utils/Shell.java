@@ -2,11 +2,12 @@ package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,145 +19,133 @@ public class Shell {
     // -1 = problematic/unknown issue; 0 = not rooted; 1 = properly rooted
     public static int rootStatus;
 
-    private final Process rootShell;
-    private final DataOutputStream rootSTDIN;
-    private final DataInputStream rootSTDOUT;
+    private final Process shellProcess;
+    private final DataOutputStream STDIN;
+    private final DataInputStream STDOUT;
 
     private boolean isValid;
 
     private Shell() {
-        Process process;
+        rootStatus = 1;
+        Process process = null;
+        DataOutputStream in = null;
+        DataInputStream out = null;
+
         try {
             process = Runtime.getRuntime().exec("su");
+            in = new DataOutputStream(process.getOutputStream());
+            out = new DataInputStream(process.getInputStream());
         } catch (IOException e) {
-            // No root
             rootStatus = 0;
-            rootShell = null;
-            rootSTDIN = null;
-            rootSTDOUT = null;
-            isValid = false;
-            return;
         }
 
-        rootStatus = 1;
-        isValid = true;
-        rootShell = process;
-        rootSTDIN = new DataOutputStream(rootShell.getOutputStream());
-        rootSTDOUT = new DataInputStream(rootShell.getInputStream());
-
-        su_raw("umask 022");
-        List<String> ret = su("echo -BOC-", "id");
-
-        if (ret.isEmpty()) {
-            // Something wrong with root, not allowed?
-            rootStatus = -1;
-            return;
-        }
-
-        for (String line : ret) {
-            if (line.contains("uid=")) {
-                // id command is working, let's see if we are actually root
-                rootStatus = line.contains("uid=0") ? 1 : -1;
-                return;
-            } else if (!line.contains("-BOC-")) {
-                rootStatus = -1;
-                return;
+        while (true) {
+            if (rootAccess()) {
+                try {
+                    in.write(("id\n").getBytes("UTF-8"));
+                    in.flush();
+                    String s = new BufferedReader(new InputStreamReader(out)).readLine();
+                    if (s.isEmpty() || !s.contains("uid=0")) {
+                        in.close();
+                        out.close();
+                        process.destroy();
+                        throw new IOException();
+                    }
+                } catch (IOException e) {
+                    rootStatus = -1;
+                    continue;
+                }
+                break;
+            } else {
+                // Try to gain non-root sh
+                try {
+                    process = Runtime.getRuntime().exec("sh");
+                    in = new DataOutputStream(process.getOutputStream());
+                    out = new DataInputStream(process.getInputStream());
+                } catch (IOException e) {
+                    // Nothing works....
+                    shellProcess = null;
+                    STDIN = null;
+                    STDOUT = null;
+                    isValid = false;
+                    return;
+                }
+                break;
             }
         }
+
+        isValid = true;
+        shellProcess = process;
+        STDIN = in;
+        STDOUT = out;
+        sh_raw("umask 022");
     }
 
-    public static Shell getRootShell() {
+    public static Shell getShell() {
         return new Shell();
     }
 
-    public static Shell getRootShell(Context context) {
-        return Utils.getMagiskManager(context).rootShell;
+    public static Shell getShell(Context context) {
+        return Utils.getMagiskManager(context).shell;
     }
 
     public static boolean rootAccess() {
         return rootStatus > 0;
     }
 
-    public static List<String> sh(String... commands) {
-        List<String> res = Collections.synchronizedList(new ArrayList<String>());
-
-        try {
-            Process process = Runtime.getRuntime().exec("sh");
-            DataOutputStream STDIN = new DataOutputStream(process.getOutputStream());
-            StreamGobbler STDOUT = new StreamGobbler(process.getInputStream(), res);
-
-            STDOUT.start();
-
-            try {
-                for (String write : commands) {
-                    STDIN.write((write + "\n").getBytes("UTF-8"));
-                    STDIN.flush();
-                    Logger.shell(false, write);
-                }
-                STDIN.write("exit\n".getBytes("UTF-8"));
-                STDIN.flush();
-            } catch (IOException e) {
-                if (!e.getMessage().contains("EPIPE")) {
-                    throw e;
-                }
-            }
-
-            process.waitFor();
-
-            try {
-                STDIN.close();
-            } catch (IOException e) {
-                // might be closed already
-            }
-            STDOUT.join();
-            process.destroy();
-
-        } catch (IOException | InterruptedException e) {
-            // shell probably not found
-            res = null;
-        }
-
-        return res;
-    }
-
-    public List<String> su(String... commands) {
-        if (!isValid) return null;
+    public List<String> sh(String... commands) {
         List<String> res = new ArrayList<>();
-        su(res, commands);
+        if (!isValid) return res;
+        sh(res, commands);
         return res;
     }
 
-    public void su_raw(String... commands) {
+    public void sh_raw(String... commands) {
         if (!isValid) return;
-        synchronized (rootShell) {
+        synchronized (shellProcess) {
             try {
                 for (String command : commands) {
-                    rootSTDIN.write((command + "\n").getBytes("UTF-8"));
-                    rootSTDIN.flush();
+                    STDIN.write((command + "\n").getBytes("UTF-8"));
+                    STDIN.flush();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                rootShell.destroy();
+                shellProcess.destroy();
                 isValid = false;
             }
         }
     }
 
-    public void su(List<String> output, String... commands) {
+    public void sh(List<String> output, String... commands) {
         if (!isValid) return;
         try {
-            rootShell.exitValue();
+            shellProcess.exitValue();
             isValid = false;
             return;  // The process is dead, return
         } catch (IllegalThreadStateException ignored) {
             // This should be the expected result
         }
-        synchronized (rootShell) {
-            StreamGobbler STDOUT = new StreamGobbler(rootSTDOUT, output, true);
-            STDOUT.start();
-            su_raw(commands);
-            su_raw("echo \'-root-done-\'");
-            try { STDOUT.join(); } catch (InterruptedException ignored) {}
+        synchronized (shellProcess) {
+            StreamGobbler out = new StreamGobbler(this.STDOUT, output);
+            out.start();
+            sh_raw(commands);
+            sh_raw("echo \'-shell-done-\'");
+            try { out.join(); } catch (InterruptedException ignored) {}
         }
+    }
+
+    public List<String> su(String... commands) {
+        if (!rootAccess()) return sh();
+        return sh(commands);
+    }
+
+    public void su_raw(String... commands) {
+        if (!rootAccess()) return;
+        sh_raw(commands);
+    }
+
+    public void su(List<String> output, String... commands) {
+        if (!rootAccess()) return;
+        sh(output, commands);
     }
 }

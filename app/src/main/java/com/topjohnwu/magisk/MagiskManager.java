@@ -38,7 +38,6 @@ public class MagiskManager extends Application {
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
 
     // Events
-    public final CallbackEvent<Void> blockDetectionDone = new CallbackEvent<>();
     public final CallbackEvent<Void> magiskHideDone = new CallbackEvent<>();
     public final CallbackEvent<Void> reloadMainActivity = new CallbackEvent<>();
     public final CallbackEvent<Void> moduleLoadDone = new CallbackEvent<>();
@@ -88,7 +87,7 @@ public class MagiskManager extends Application {
     // Global resources
     public SharedPreferences prefs;
     public SuDatabaseHelper suDB;
-    public Shell rootShell;
+    public Shell shell;
 
     private static Handler mHandler = new Handler();
 
@@ -97,7 +96,7 @@ public class MagiskManager extends Application {
         super.onCreate();
         new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        rootShell = Shell.getRootShell();
+        shell = Shell.getShell();
     }
 
     public void toast(String msg, int duration) {
@@ -121,11 +120,12 @@ public class MagiskManager extends Application {
         updateNotification = prefs.getBoolean("notification", true);
         initSU();
         updateMagiskInfo();
+        updateBlockInfo();
         // Initialize busybox
         File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
         if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
             busybox.getParentFile().mkdirs();
-            rootShell.su_raw(
+            shell.su_raw(
                     "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
                     "chmod -R 755 " + busybox.getParent(),
                     busybox + " --install -s " + busybox.getParent()
@@ -137,7 +137,7 @@ public class MagiskManager extends Application {
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
                 .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
-                .putBoolean("disable", Utils.itemExist(rootShell, MAGISK_DISABLE_FILE))
+                .putBoolean("disable", Utils.itemExist(shell, MAGISK_DISABLE_FILE))
                 .putBoolean("su_reauth", suReauth)
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
                 .putString("su_auto_response", String.valueOf(suResponseType))
@@ -148,7 +148,7 @@ public class MagiskManager extends Application {
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
-        rootShell.su_raw("PATH=$PATH:" + busybox.getParent());
+        shell.su_raw("PATH=$PATH:" + busybox.getParent());
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -170,7 +170,7 @@ public class MagiskManager extends Application {
     public void initSU() {
         initSUConfig();
 
-        List<String> ret = Shell.sh("su -v");
+        List<String> ret = shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);
             isSuClient = suVersion.toUpperCase().contains("MAGISK");
@@ -184,9 +184,9 @@ public class MagiskManager extends Application {
 
     public void updateMagiskInfo() {
         List<String> ret;
-        ret = Shell.sh("magisk -v");
+        ret = shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
-            ret = Shell.sh("getprop magisk.version");
+            ret = shell.sh("getprop magisk.version");
             if (Utils.isValidShellResponse(ret)) {
                 try {
                     magiskVersionString = ret.get(0);
@@ -195,24 +195,39 @@ public class MagiskManager extends Application {
             }
         } else {
             magiskVersionString = ret.get(0).split(":")[0];
-            ret = Shell.sh("magisk -V");
+            ret = shell.sh("magisk -V");
             try {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
         }
-        ret = Shell.sh("getprop " + DISABLE_INDICATION_PROP);
+        ret = shell.sh("getprop " + DISABLE_INDICATION_PROP);
         try {
             disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             disabled = false;
         }
-        ret = Shell.sh("getprop " + MAGISKHIDE_PROP);
+        ret = shell.sh("getprop " + MAGISKHIDE_PROP);
         try {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             magiskHide = true;
         }
-        
+    }
+
+    public void updateBlockInfo() {
+        List<String> res = shell.su(
+                "for BLOCK in boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",
+                "BOOTIMAGE=`ls /dev/block/by-name/$BLOCK || ls /dev/block/platform/*/by-name/$BLOCK || ls /dev/block/platform/*/*/by-name/$BLOCK` 2>/dev/null",
+                "[ ! -z \"$BOOTIMAGE\" ] && break",
+                "done",
+                "[ ! -z \"$BOOTIMAGE\" -a -L \"$BOOTIMAGE\" ] && BOOTIMAGE=`readlink $BOOTIMAGE`",
+                "echo \"$BOOTIMAGE\""
+        );
+        if (Utils.isValidShellResponse(res)) {
+            bootBlock = res.get(0);
+        } else {
+            blockList = shell.su("ls -d /dev/block/mmc* /dev/block/sd* 2>/dev/null");
+        }
     }
 
 }

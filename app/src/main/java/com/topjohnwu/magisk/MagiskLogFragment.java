@@ -142,7 +142,7 @@ public class MagiskLogFragment extends Fragment {
             mode = (int) params[0];
             switch (mode) {
                 case 0:
-                    List<String> logList = Utils.readFile(magiskManager.rootShell, MAGISK_LOG);
+                    List<String> logList = Utils.readFile(magiskManager.shell, MAGISK_LOG);
 
                     if (Utils.isValidShellResponse(logList)) {
                         StringBuilder llog = new StringBuilder(15 * 10 * 1024);
@@ -154,7 +154,7 @@ public class MagiskLogFragment extends Fragment {
                     return "";
 
                 case 1:
-                    magiskManager.rootShell.su_raw("echo > " + MAGISK_LOG);
+                    magiskManager.shell.su_raw("echo > " + MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
@@ -184,7 +184,7 @@ public class MagiskLogFragment extends Fragment {
                         return false;
                     }
 
-                    List<String> in = Utils.readFile(magiskManager.rootShell, MAGISK_LOG);
+                    List<String> in = Utils.readFile(magiskManager.shell, MAGISK_LOG);
 
                     if (Utils.isValidShellResponse(in)) {
                         try (FileWriter out = new FileWriter(targetFile)) {

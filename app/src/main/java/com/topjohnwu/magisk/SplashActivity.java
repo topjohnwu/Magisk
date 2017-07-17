@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.asyncs.GetBootBlocks;
 import com.topjohnwu.magisk.asyncs.LoadApps;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.LoadRepos;
@@ -25,12 +24,13 @@ public class SplashActivity extends Activity{
 
         super.onCreate(savedInstanceState);
 
-        // Init the info and configs and root shell
+        // Init the info and configs and root sh
         getApplicationContext().init();
 
         // Now fire all async tasks
-        new GetBootBlocks(this).exec();
-        new LoadModules(this).setCallBack(() -> new LoadRepos(this).exec()).exec();
+        new LoadModules(this)
+                .setCallBack(() -> new LoadRepos(this).exec())
+                .exec();
         new LoadApps(this).exec();
 
         if (Utils.checkNetworkStatus(this)) {

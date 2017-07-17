@@ -38,7 +38,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
-        Shell rootShell = Shell.getRootShell(context);
+        Shell rootShell = Shell.getShell(context);
         final Module module = mList.get(position);
 
         String version = module.getVersion();
