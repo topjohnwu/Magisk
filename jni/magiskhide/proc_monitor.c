@@ -91,6 +91,7 @@ static void hide_daemon(int pid) {
 
 	manage_selinux();
 	relink_sbin();
+	clean_magisk_props();
 
 	if (switch_mnt_ns(pid))
 		return;

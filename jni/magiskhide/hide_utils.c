@@ -58,6 +58,17 @@ void hide_sensitive_props() {
 	}
 }
 
+static void rm_magisk_prop(const char *name) {
+	if (strstr(name, "magisk")) {
+		deleteprop(name, 0);
+	}
+}
+
+void clean_magisk_props() {
+	LOGD("hide_utils: Cleaning magisk props\n");
+	getprop_all(rm_magisk_prop);
+}
+
 void relink_sbin() {
 	struct stat st;
 	if (stat("/sbin_orig", &st) == -1 && errno == ENOENT) {
