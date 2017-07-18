@@ -22,10 +22,10 @@ static void write_file(const int fd, const void *buf, const size_t size, const c
 static void report(const int mode, const char* filename) {
 	switch(mode) {
 		case 0:
-			printf("Decompressing to [%s]\n\n", filename);
+			fprintf(stderr, "Decompressing to [%s]\n\n", filename);
 			break;
 		default:
-			printf("Compressing to [%s]\n\n", filename);
+			fprintf(stderr, "Compressing to [%s]\n\n", filename);
 			break;
 	}
 }

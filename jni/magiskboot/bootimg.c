@@ -26,11 +26,11 @@ static void restore_buf(int fd, const void *buf, size_t size) {
 }
 
 static void print_info() {
-	printf("KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
-	printf("RAMDISK [%d] @ 0x%08x\n", hdr.ramdisk_size, hdr.ramdisk_addr);
-	printf("SECOND [%d] @ 0x%08x\n", hdr.second_size, hdr.second_addr);
-	printf("DTB [%d] @ 0x%08x\n", hdr.dt_size, hdr.tags_addr);
-	printf("PAGESIZE [%d]\n", hdr.page_size);
+	fprintf(stderr, "KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
+	fprintf(stderr, "RAMDISK [%d] @ 0x%08x\n", hdr.ramdisk_size, hdr.ramdisk_addr);
+	fprintf(stderr, "SECOND [%d] @ 0x%08x\n", hdr.second_size, hdr.second_addr);
+	fprintf(stderr, "DTB [%d] @ 0x%08x\n", hdr.dt_size, hdr.tags_addr);
+	fprintf(stderr, "PAGESIZE [%d]\n", hdr.page_size);
 	if (hdr.os_version != 0) {
 		int a,b,c,y,m = 0;
 		int os_version, os_patch_level;
@@ -40,38 +40,38 @@ static void print_info() {
 		a = (os_version >> 14) & 0x7f;
 		b = (os_version >> 7) & 0x7f;
 		c = os_version & 0x7f;
-		printf("OS_VERSION [%d.%d.%d]\n", a, b, c);
+		fprintf(stderr, "OS_VERSION [%d.%d.%d]\n", a, b, c);
 		
 		y = (os_patch_level >> 4) + 2000;
 		m = os_patch_level & 0xf;
-		printf("PATCH_LEVEL [%d-%02d]\n", y, m);
+		fprintf(stderr, "PATCH_LEVEL [%d-%02d]\n", y, m);
 	}
-	printf("NAME [%s]\n", hdr.name);
-	printf("CMDLINE [%s]\n", hdr.cmdline);
+	fprintf(stderr, "NAME [%s]\n", hdr.name);
+	fprintf(stderr, "CMDLINE [%s]\n", hdr.cmdline);
 
 	switch (ramdisk_type) {
 		case GZIP:
-			printf("COMPRESSION [%s]\n", "gzip");
+			fprintf(stderr, "COMPRESSION [%s]\n", "gzip");
 			break;
 		case XZ:
-			printf("COMPRESSION [%s]\n", "xz");
+			fprintf(stderr, "COMPRESSION [%s]\n", "xz");
 			break;
 		case LZMA:
-			printf("COMPRESSION [%s]\n", "lzma");
+			fprintf(stderr, "COMPRESSION [%s]\n", "lzma");
 			break;
 		case BZIP2:
-			printf("COMPRESSION [%s]\n", "bzip2");
+			fprintf(stderr, "COMPRESSION [%s]\n", "bzip2");
 			break;
 		case LZ4:
-			printf("COMPRESSION [%s]\n", "lz4");
+			fprintf(stderr, "COMPRESSION [%s]\n", "lz4");
 			break;
 		case LZ4_LEGACY:
-			printf("COMPRESSION [%s]\n", "lz4_legacy");
+			fprintf(stderr, "COMPRESSION [%s]\n", "lz4_legacy");
 			break;
 		default:
 			fprintf(stderr, "Unknown ramdisk format!\n");
 	}
-	printf("\n");
+	fprintf(stderr, "\n");
 }
 
 int parse_img(unsigned char *orig, size_t size) {
@@ -126,11 +126,11 @@ int parse_img(unsigned char *orig, size_t size) {
 
 			// Check MTK
 			if (check_type(kernel) == MTK) {
-				printf("MTK header found in kernel\n");
+				fprintf(stderr, "MTK header found in kernel\n");
 				mtk_kernel = 1;
 			}
 			if (ramdisk_type == MTK) {
-				printf("MTK header found in ramdisk\n");
+				fprintf(stderr, "MTK header found in ramdisk\n");
 				mtk_ramdisk = 1;
 				ramdisk_type = check_type(ramdisk + 512);
 			}
@@ -151,7 +151,7 @@ void unpack(const char* image) {
 	mmap_ro(image, &orig, &size);
 
 	// Parse image
-	printf("Parsing boot image: [%s]\n\n", image);
+	fprintf(stderr, "Parsing boot image: [%s]\n\n", image);
 	int ret = parse_img(orig, size);
 
 	// Dump kernel
@@ -199,10 +199,10 @@ void repack(const char* orig_image, const char* out_image) {
 	mmap_ro(orig_image, &orig, &size);
 
 	// Parse original image
-	printf("Parsing boot image: [%s]\n\n", orig_image);
+	fprintf(stderr, "Parsing boot image: [%s]\n\n", orig_image);
 	parse_img(orig, size);
 
-	printf("Repack to boot image: [%s]\n\n", out_image);
+	fprintf(stderr, "Repack to boot image: [%s]\n\n", out_image);
 
 	// Create new image
 	int fd = open_new(out_image);

@@ -83,7 +83,7 @@ int open_new(const char *filename) {
 }
 
 void cleanup() {
-	printf("Cleaning up...\n");
+	fprintf(stderr, "Cleaning up...\n");
 	char name[PATH_MAX];
 	unlink(KERNEL_FILE);
 	unlink(RAMDISK_FILE);

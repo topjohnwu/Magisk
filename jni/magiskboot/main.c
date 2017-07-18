@@ -58,7 +58,7 @@ static void usage(char *arg0) {
 }
 
 int main(int argc, char *argv[]) {
-	printf("MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
+	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
 
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
 		cleanup();
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
 		mmap_ro(argv[2], (unsigned char **) &buf, &size);
 		SHA1(sha1, buf, size);
 		for (int i = 0; i < 20; ++i)
-			printf("%02x", sha1[i]);
-		printf("\n");
+			fprintf(stderr, "%02x", sha1[i]);
+		fprintf(stderr, "\n");
 		munmap(buf, size);
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
 		unpack(argv[2]);

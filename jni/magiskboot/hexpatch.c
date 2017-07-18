@@ -20,7 +20,7 @@ void hexpatch(const char *image, const char *from, const char *to) {
 	hex2byte(to, patch);
 	for (size_t i = 0; i < filesize - patternsize; ++i) {
 		if (memcmp(file + i, pattern, patternsize) == 0) {
-			printf("Pattern %s found!\nPatching to %s\n", from, to);
+			fprintf(stderr, "Pattern %s found!\nPatching to %s\n", from, to);
 			memset(file + i, 0, patternsize);
 			memcpy(file + i, patch, patchsize);
 			i += patternsize - 1;
