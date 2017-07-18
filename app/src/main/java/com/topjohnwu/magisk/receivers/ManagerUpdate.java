@@ -18,7 +18,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                 context,
                 new DownloadReceiver() {
                     @Override
-                    public void onDownloadDone(Uri uri, Context context) {
+                    public void onDownloadDone(Uri uri) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                             install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

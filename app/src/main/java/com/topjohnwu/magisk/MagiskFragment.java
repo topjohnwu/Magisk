@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -136,7 +135,7 @@ public class MagiskFragment extends Fragment
                             private boolean verity = keepVerityChkbox.isChecked();
 
                             @Override
-                            public void onDownloadDone(Uri uri, Context context) {
+                            public void onDownloadDone(Uri uri) {
                                 if (Shell.rootAccess()) {
                                     magiskManager.shell.su_raw(
                                             "rm -f /dev/.magisk",
@@ -144,7 +143,7 @@ public class MagiskFragment extends Fragment
                                             "echo \"KEEPFORCEENCRYPT=" + String.valueOf(enc) + "\" >> /dev/.magisk",
                                             "echo \"KEEPVERITY=" + String.valueOf(verity) + "\" >> /dev/.magisk"
                                     );
-                                    startActivity(new Intent(context, FlashActivity.class).setData(uri));
+                                    startActivity(new Intent(getActivity(), FlashActivity.class).setData(uri));
                                 } else {
                                     Utils.showUriSnack(getActivity(), uri);
                                 }

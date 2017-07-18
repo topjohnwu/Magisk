@@ -16,96 +16,184 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.ValueSortedMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> {
+public class ReposAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int SECTION_TYPE = 0;
+    private static final int REPO_TYPE = 1;
 
     private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
-    private Context mContext;
+    private int[] sectionList;
+    private int size;
+    private ValueSortedMap<String, Repo> repoMap;
 
-    public ReposAdapter(List<Repo> update, List<Repo> installed, List<Repo> others) {
-        mUpdateRepos = update;
-        mInstalledRepos = installed;
-        mOthersRepos = others;
+    public ReposAdapter(ValueSortedMap<String, Repo> map) {
+        repoMap = map;
+        mUpdateRepos = new ArrayList<>();
+        mInstalledRepos = new ArrayList<>();
+        mOthersRepos = new ArrayList<>();
+        sectionList = new int[3];
+        size = 0;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
-        View v = LayoutInflater.from(mContext).inflate(R.layout.list_item_repo, parent, false);
-        return new ViewHolder(v);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        View v;
+        RecyclerView.ViewHolder holder = null;
+        switch (viewType) {
+            case SECTION_TYPE:
+                v = LayoutInflater.from(context).inflate(R.layout.section, parent, false);
+                holder = new SectionHolder(v);
+                break;
+            case REPO_TYPE:
+                v = LayoutInflater.from(context).inflate(R.layout.list_item_repo, parent, false);
+                holder = new RepoHolder(v);
+                break;
+        }
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        Repo repo = getItem(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Context context = holder.itemView.getContext();
+        switch (getItemViewType(position)) {
+            case SECTION_TYPE:
+                SectionHolder section = (SectionHolder) holder;
+                if (position == sectionList[0]) {
+                    section.sectionText.setText(context.getString(R.string.update_available));
+                } else if (position == sectionList[1]) {
+                    section.sectionText.setText(context.getString(R.string.installed));
+                } else {
+                    section.sectionText.setText(context.getString(R.string.not_installed));
+                }
+                break;
+            case REPO_TYPE:
+                RepoHolder repoHolder = (RepoHolder) holder;
+                Repo repo = getRepo(position);
+                repoHolder.title.setText(repo.getName());
+                repoHolder.versionName.setText(repo.getVersion());
+                String author = repo.getAuthor();
+                repoHolder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
+                repoHolder.description.setText(repo.getDescription());
 
-        holder.title.setText(repo.getName());
-        holder.versionName.setText(repo.getVersion());
-        String author = repo.getAuthor();
-        holder.author.setText(TextUtils.isEmpty(author) ? null : mContext.getString(R.string.author, author));
-        holder.description.setText(repo.getDescription());
+                repoHolder.infoLayout.setOnClickListener(v -> new MarkDownWindow(null, repo.getDetailUrl(), context));
 
-        holder.infoLayout.setOnClickListener(v -> new MarkDownWindow(null, repo.getDetailUrl(), mContext));
+                repoHolder.downloadImage.setOnClickListener(v -> {
+                    String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
+                    new AlertDialogBuilder(context)
+                            .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                            .setMessage(context.getString(R.string.repo_install_msg, filename))
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.install, (d, i) -> Utils.dlAndReceive(
+                                    context,
+                                    new DownloadReceiver() {
+                                        @Override
+                                        public void onDownloadDone(Uri uri) {
+                                            new ProcessRepoZip((Activity) context, uri, true).exec();
+                                        }
+                                    },
+                                    repo.getZipUrl(),
+                                    Utils.getLegalFilename(filename)))
+                            .setNeutralButton(R.string.download, (d, i) -> Utils.dlAndReceive(
+                                    context,
+                                    new DownloadReceiver() {
+                                        @Override
+                                        public void onDownloadDone(Uri uri) {
+                                            new ProcessRepoZip((Activity) context, uri, false).exec();
+                                        }
+                                    },
+                                    repo.getZipUrl(),
+                                    Utils.getLegalFilename(filename)))
+                            .setNegativeButton(R.string.no_thanks, null)
+                            .show();
+                });
+                break;
+        }
+    }
 
-        holder.downloadImage.setOnClickListener(v -> {
-            String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            new AlertDialogBuilder(mContext)
-                    .setTitle(mContext.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(mContext.getString(R.string.repo_install_msg, filename))
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.install, (d, i) -> Utils.dlAndReceive(
-                            mContext,
-                            new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Uri uri, Context context) {
-                                    new ProcessRepoZip((Activity) mContext, uri, true).exec();
-                                }
-                            },
-                            repo.getZipUrl(),
-                            Utils.getLegalFilename(filename)))
-                    .setNeutralButton(R.string.download, (d, i) -> Utils.dlAndReceive(
-                            mContext,
-                            new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Uri uri, Context context) {
-                                    new ProcessRepoZip((Activity) mContext, uri, false).exec();
-                                }
-                            },
-                            repo.getZipUrl(),
-                            Utils.getLegalFilename(filename)))
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
-        });
+    @Override
+    public int getItemViewType(int position) {
+        for (int i : sectionList) {
+            if (position == i)
+                return SECTION_TYPE;
+        }
+        return REPO_TYPE;
     }
 
     @Override
     public int getItemCount() {
-        return mUpdateRepos.size() + mInstalledRepos.size() + mOthersRepos.size();
+        return size;
     }
 
-    private Repo getItem(int position) {
-        if (position >= mUpdateRepos.size()) {
-            position -= mUpdateRepos.size();
-            if (position >= mInstalledRepos.size()) {
-                position -= mInstalledRepos.size();
-                return mOthersRepos.get(position);
-            } else {
-                return mInstalledRepos.get(position);
+    public void filter(ValueSortedMap<String, Module> moduleMap, String s) {
+        mUpdateRepos.clear();
+        mInstalledRepos.clear();
+        mOthersRepos.clear();
+        sectionList[0] = sectionList[1] = sectionList[2] = 0;
+        for (Repo repo : repoMap.values()) {
+            if (repo.getName().toLowerCase().contains(s.toLowerCase())
+                    || repo.getAuthor().toLowerCase().contains(s.toLowerCase())
+                    || repo.getDescription().toLowerCase().contains(s.toLowerCase())
+                    ) {
+                // Passed the filter
+                Module module = moduleMap.get(repo.getId());
+                if (module != null) {
+                    if (repo.getVersionCode() > module.getVersionCode()) {
+                        // Updates
+                        mUpdateRepos.add(repo);
+                    } else {
+                        mInstalledRepos.add(repo);
+                    }
+                } else {
+                    mOthersRepos.add(repo);
+                }
             }
-        } else {
-            return mUpdateRepos.get(position);
+        }
+
+        sectionList[0] = mUpdateRepos.isEmpty() ? -1 : 0;
+        size = mUpdateRepos.isEmpty() ? 0 : mUpdateRepos.size() + 1;
+        sectionList[1] = mInstalledRepos.isEmpty() ? -1 : size;
+        size += mInstalledRepos.isEmpty() ? 0 : mInstalledRepos.size() + 1;
+        sectionList[2] = mOthersRepos.isEmpty() ? -1 : size;
+        size += mOthersRepos.isEmpty() ? 0 : mOthersRepos.size() + 1;
+
+        notifyDataSetChanged();
+    }
+
+    private Repo getRepo(int position) {
+        if (!mUpdateRepos.isEmpty()) position -= 1;
+        if (position < mUpdateRepos.size()) return mUpdateRepos.get(position);
+        position -= mUpdateRepos.size();
+        if (!mInstalledRepos.isEmpty()) position -= 1;
+        if (position < mInstalledRepos.size()) return mInstalledRepos.get(position);
+        position -= mInstalledRepos.size();
+        if (!mOthersRepos.isEmpty()) position -= 1;
+        return mOthersRepos.get(position);
+    }
+
+    static class SectionHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.section_text) TextView sectionText;
+
+        SectionHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class RepoHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.title) TextView title;
         @BindView(R.id.version_name) TextView versionName;
@@ -114,7 +202,7 @@ public class ReposAdapter extends RecyclerView.Adapter<ReposAdapter.ViewHolder> 
         @BindView(R.id.info_layout) LinearLayout infoLayout;
         @BindView(R.id.download) ImageView downloadImage;
 
-        ViewHolder(View itemView) {
+        RepoHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
