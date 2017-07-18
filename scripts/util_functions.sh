@@ -133,12 +133,16 @@ recovery_actions() {
   # Add all possible library paths
   OLD_LD_PATH=$LD_LIBRARY_PATH
   $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
+  # Add /data/magisk to the system-path
+  OLD_PATH=$PATH
+  export PATH=/data/magisk:$PATH
 }
 
 recovery_cleanup() {
   mv /sbin_tmp /sbin
   # Clear LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=$OLD_LD_PATH
+  export PATH=$OLD_PATH
   ui_print "- Unmounting partitions"
   umount -l /system
   umount -l /vendor 2>/dev/null
