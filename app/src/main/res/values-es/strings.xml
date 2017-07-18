@@ -117,6 +117,7 @@
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Procesando</string>
+    <string name="flashing">Flasheando</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -127,8 +128,7 @@
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
 
-    <string name="settings_core_only_title">Magisk Modo Sólo Núcleo</string>
-    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y hosts fuera de la partición de sistema seguiran habilitados</string>
+    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y archivo hosts fuera de la partición de sistema seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Habilitar archivo hosts fuera de la partición de sistema</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partición de sistema</string>
@@ -147,16 +147,16 @@
     <string name="superuser_notification">Notificación de superusuario</string>
     <string name="request_timeout_summary">%1$s segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
-    <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada</string>
+    <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
 
     <string name="multiuser_mode">Modo MultiUsuario</string> 
-    <string name="settings_owner_only">Solo propietario del dispositivo</string>
-    <string name="settings_owner_manage">Administrador del dispositivo</string>
+    <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
+    <string name="settings_owner_manage">Administrador del Dispositivo</string>
     <string name="settings_user_independent">Usuario Independiente</string>
-    <string name="owner_only_summary">Sólo el propietario tiene acceso root</string>
-    <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes</string>
+    <string name="owner_only_summary">Sólo el administrador tiene acceso root</string>
+    <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
     <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
-    <string name="multiuser_hint_owner_request">Se ha enviado una solicitud al propietario del dispositivo. Por favor, cambie a la sesión del propietario y conceda el permiso</string>
+    <string name="multiuser_hint_owner_request">Se ha enviado una solicitud al administrador del dispositivo. Por favor, cambie a la cuenta del administrador y conceda el permiso</string>
     
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>
