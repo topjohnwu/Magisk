@@ -122,7 +122,7 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
     <string name="settings_dark_theme_summary">Habilita el tema oscuro</string>
-    <string name="settings_notification_title">Notificar Actualización/string>
+    <string name="settings_notification_title">Notificar Actualización</string>
     <string name="settings_notification_summary">Notificar cuando una nueva versión esté disponible</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
