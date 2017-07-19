@@ -65,7 +65,22 @@ cd $MAGISKBIN
 
 ui_print_wrap "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
-[ $? -ne 0 ] && abort_wrap "! Unable to unpack boot image"
+CHROMEOS=false
+case $? in
+  1 )
+    abort_wrap "! Unable to unpack boot image"
+    ;;
+  2 )
+    CHROMEOS=true
+    ;;
+  3 )
+    ui_print_wrap "! Sony ELF32 format detected"
+    abort_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
+    ;;
+  4 )
+    ui_print_wrap "! Sony ELF64 format detected"
+    abort_wrap "! Stock kernel cannot be patched, please use a custom kernel"
+esac
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
@@ -109,11 +124,11 @@ case $? in
 esac
 
 # Sign chromeos boot
-if [ -f chromeos ]; then
+if $CHROMEOS; then
   echo > empty
 
-  LD_LIBRARY_PATH=$SYSTEMLIB $CHROMEDIR/futility vbutil_kernel --pack stock_boot.img.signed \
-  --keyblock $CHROMEDIR/kernel.keyblock --signprivate $CHROMEDIR/kernel_data_key.vbprivk \
+  ./chromeos/futility vbutil_kernel --pack stock_boot.img.signed \
+  --keyblock ./chromeos/kernel.keyblock --signprivate ./chromeos/kernel_data_key.vbprivk \
   --version 1 --vmlinuz stock_boot.img --config empty --arch arm --bootloader empty --flags 0x1
 
   rm -f empty stock_boot.img
@@ -132,6 +147,7 @@ ui_print_wrap "- Removing Magisk files"
 rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
         /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
         /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
-        /data/busybox /data/magisk /data/custom_ramdisk_patch.sh 2>/dev/null
+        /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk* \
+        /data/app/com.topjohnwu.magisk* /data/user/*/com.topjohnwu.magisk 2>/dev/null
 
 $BOOTMODE && reboot
