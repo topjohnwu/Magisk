@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
+import android.content.Context;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.module.BaseModule;
@@ -11,12 +11,14 @@ import com.topjohnwu.magisk.utils.ValueSortedMap;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {
 
-    public LoadModules(Activity context) {
+    public LoadModules(Context context) {
         super(context);
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return null;
         Logger.dev("LoadModules: Loading modules");
 
         magiskManager.moduleMap = new ValueSortedMap<>();
@@ -35,6 +37,8 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return;
         magiskManager.moduleLoadDone.trigger();
         super.onPostExecute(v);
     }

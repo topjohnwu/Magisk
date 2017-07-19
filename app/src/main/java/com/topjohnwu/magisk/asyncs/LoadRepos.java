@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Repo;
@@ -41,11 +42,11 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
     private RepoDatabaseHelper repoDB;
     private SharedPreferences prefs;
 
-    public LoadRepos(Activity context) {
+    public LoadRepos(Context context) {
         super(context);
-        prefs = magiskManager.prefs;
+        prefs = getMagiskManager().prefs;
         String prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
-        repoDB = new RepoDatabaseHelper(magiskManager);
+        repoDB = new RepoDatabaseHelper(context);
         // Legacy data cleanup
         File old = new File(prefsPath, "RepoMap.xml");
         if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {
@@ -154,6 +155,8 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return null;
         Logger.dev("LoadRepos: Loading repos");
 
         cached = repoDB.getRepoMap(false);
@@ -183,6 +186,8 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return;
         magiskManager.repoLoadDone.trigger();
         super.onPostExecute(v);
     }

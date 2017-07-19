@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Modified by topjohnwu, based on Chainfire's libsuperuser
@@ -15,8 +15,7 @@ import java.util.List;
 public class StreamGobbler extends Thread {
 
     private BufferedReader reader = null;
-    private List<String> writer = null;
-    private boolean isRoot = false;
+    private Collection<String> writer = null;
 
     /**
      * <p>StreamGobbler constructor</p>
@@ -28,7 +27,7 @@ public class StreamGobbler extends Thread {
      * @param inputStream InputStream to read from
      * @param outputList  {@literal List<String>} to write to, or null
      */
-    public StreamGobbler(InputStream inputStream, List<String> outputList) {
+    public StreamGobbler(InputStream inputStream, Collection<String> outputList) {
         try {
             while (inputStream.available() != 0) {
                 inputStream.skip(inputStream.available());

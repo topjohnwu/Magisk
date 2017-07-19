@@ -1,17 +1,13 @@
 package com.topjohnwu.magisk;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,13 +24,12 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.Shell;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,7 +62,7 @@ public class MagiskLogFragment extends Fragment {
 
         txtLog.setTextIsSelectable(true);
 
-        new LogManager(getActivity()).read();
+        new LogManager().read();
 
         return view;
     }
@@ -81,7 +76,7 @@ public class MagiskLogFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        new LogManager(getActivity()).read();
+        new LogManager().read();
     }
 
     @Override
@@ -100,13 +95,13 @@ public class MagiskLogFragment extends Fragment {
         mClickedMenuItem = item;
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                new LogManager(getActivity()).read();
+                new LogManager().read();
                 return true;
             case R.id.menu_save:
-                new LogManager(getActivity()).save();
+                new LogManager().save();
                 return true;
             case R.id.menu_clear:
-                new LogManager(getActivity()).clear();
+                new LogManager().clear();
                 return true;
             default:
                 return true;
@@ -129,29 +124,19 @@ public class MagiskLogFragment extends Fragment {
 
     private class LogManager extends ParallelTask<Object, Void, Object> {
 
-        int mode;
-        File targetFile;
-
-        LogManager(Activity activity) {
-            super(activity);
-        }
+        private int mode;
+        private File targetFile;
 
         @SuppressLint("DefaultLocale")
         @Override
         protected Object doInBackground(Object... params) {
+            MagiskManager magiskManager = MagiskLogFragment.this.getApplication();
             mode = (int) params[0];
             switch (mode) {
                 case 0:
-                    List<String> logList = Utils.readFile(magiskManager.shell, MAGISK_LOG);
-
-                    if (Utils.isValidShellResponse(logList)) {
-                        StringBuilder llog = new StringBuilder(15 * 10 * 1024);
-                        for (String s : logList) {
-                            llog.append(s).append("\n");
-                        }
-                        return llog.toString();
-                    }
-                    return "";
+                    StringBuildingList logList = new StringBuildingList();
+                    magiskManager.shell.su(logList, "cat " + MAGISK_LOG);
+                    return logList.toString();
 
                 case 1:
                     magiskManager.shell.su_raw("echo > " + MAGISK_LOG);
@@ -159,17 +144,6 @@ public class MagiskLogFragment extends Fragment {
                     return "";
 
                 case 2:
-                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
-                        }
-                        return false;
-                    }
-
-                    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                        return false;
-                    }
-
                     Calendar now = Calendar.getInstance();
                     String filename = String.format(
                             "magisk_%s_%04d%02d%02d_%02d%02d%02d.log", "error",
@@ -184,19 +158,14 @@ public class MagiskLogFragment extends Fragment {
                         return false;
                     }
 
-                    List<String> in = Utils.readFile(magiskManager.shell, MAGISK_LOG);
-
-                    if (Utils.isValidShellResponse(in)) {
-                        try (FileWriter out = new FileWriter(targetFile)) {
-                            for (String line : in)
-                                out.write(line + "\n");
-                            return true;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return false;
-                        }
+                    try (FileWriter out = new FileWriter(targetFile)) {
+                        FileWritingList fileWritingList = new FileWritingList(out);
+                        magiskManager.shell.su(fileWritingList, "cat " + MAGISK_LOG);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return false;
                     }
-                    return false;
+                    return true;
             }
             return null;
         }
@@ -204,12 +173,10 @@ public class MagiskLogFragment extends Fragment {
         @Override
         protected void onPostExecute(Object o) {
             if (o == null) return;
-            boolean bool;
-            String llog;
             switch (mode) {
                 case 0:
                 case 1:
-                    llog = (String) o;
+                    String llog = (String) o;
                     progressBar.setVisibility(View.GONE);
                     if (TextUtils.isEmpty(llog))
                         txtLog.setText(R.string.log_is_empty);
@@ -219,26 +186,63 @@ public class MagiskLogFragment extends Fragment {
                     hsvLog.post(() -> hsvLog.scrollTo(0, 0));
                     break;
                 case 2:
-                    bool = (boolean) o;
+                    boolean bool = (boolean) o;
                     if (bool) {
-                        Toast.makeText(getActivity(), targetFile.toString(), Toast.LENGTH_LONG).show();
+                        MagiskLogFragment.this.getApplication().toast(targetFile.toString(), Toast.LENGTH_LONG);
                     } else {
-                        Toast.makeText(getActivity(), getString(R.string.logs_save_failed), Toast.LENGTH_LONG).show();
+                        MagiskLogFragment.this.getApplication().toast(R.string.logs_save_failed, Toast.LENGTH_LONG);
                     }
                     break;
             }
         }
 
-        public void read() {
+        void read() {
             exec(0);
         }
 
-        public void clear() {
+        void clear() {
             exec(1);
         }
 
-        public void save() {
+        void save() {
             exec(2);
+        }
+    }
+
+    private static class StringBuildingList extends Shell.AbstractList<String> {
+
+        StringBuilder builder;
+
+        StringBuildingList() {
+            builder = new StringBuilder();
+        }
+
+        @Override
+        public boolean add(String s) {
+            builder.append(s).append("\n");
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return builder.toString();
+        }
+    }
+
+    private static class FileWritingList extends Shell.AbstractList<String> {
+
+        private FileWriter writer;
+
+        FileWritingList(FileWriter out) {
+            writer = out;
+        }
+
+        @Override
+        public boolean add(String s) {
+            try {
+                writer.write(s + "\n");
+            } catch (IOException ignored) {}
+            return true;
         }
     }
 

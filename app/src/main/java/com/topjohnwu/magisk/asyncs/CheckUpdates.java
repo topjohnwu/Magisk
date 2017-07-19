@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.asyncs;
 import android.content.Context;
 
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -15,17 +16,19 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     private boolean showNotification = false;
 
-    public CheckUpdates(Context context, boolean b) {
-        this(context);
-        showNotification = b;
+    public CheckUpdates(Context context) {
+        super(context);
     }
 
-    public CheckUpdates(Context context) {
-        magiskManager = Utils.getMagiskManager(context);
+    public CheckUpdates(Context context, boolean b) {
+        super(context);
+        showNotification = b;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return null;
         String jsonStr = WebService.request(UPDATE_JSON, WebService.GET);
         try {
             JSONObject json = new JSONObject(jsonStr);
@@ -44,6 +47,8 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return;
         if (showNotification && magiskManager.updateNotification) {
             if (BuildConfig.VERSION_CODE < magiskManager.remoteManagerVersionCode) {
                 Utils.showManagerUpdate(magiskManager);

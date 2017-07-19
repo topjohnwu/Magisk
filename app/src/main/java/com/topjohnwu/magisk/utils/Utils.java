@@ -108,23 +108,6 @@ public class Utils {
                 .replace("#", "").replace("@", "").replace("*", "");
     }
 
-    public static String detectBootImage(Shell shell) {
-        String[] commands = {
-                "for PARTITION in kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",
-                "BOOTIMAGE=`readlink /dev/block/by-name/$PARTITION || " +
-                        "readlink /dev/block/platform/*/by-name/$PARTITION || " +
-                        "readlink /dev/block/platform/*/*/by-name/$PARTITION`",
-                "if [ ! -z \"$BOOTIMAGE\" ]; then break; fi",
-                "done",
-                "echo \"$BOOTIMAGE\""
-        };
-        List<String> ret = shell.su(commands);
-        if (isValidShellResponse(ret)) {
-            return ret.get(0);
-        }
-        return null;
-    }
-
     public static boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
         return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
     }

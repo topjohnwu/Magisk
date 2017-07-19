@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 
 import java.util.Collections;
@@ -12,12 +13,14 @@ import java.util.List;
 
 public class LoadApps extends ParallelTask<Void, Void, Void> {
 
-    public LoadApps(Activity context) {
+    public LoadApps(Context context) {
         super(context);
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return null;
         PackageManager pm = magiskManager.getPackageManager();
         List<ApplicationInfo> list = pm.getInstalledApplications(0);
         for (Iterator<ApplicationInfo> i = list.iterator(); i.hasNext(); ) {
@@ -34,6 +37,8 @@ public class LoadApps extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        new MagiskHide(activity).list();
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return;
+        new MagiskHide(magiskManager).list();
     }
 }

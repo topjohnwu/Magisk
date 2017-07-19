@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -116,7 +117,7 @@ public class Shell {
         }
     }
 
-    public void sh(List<String> output, String... commands) {
+    public void sh(Collection<String> output, String... commands) {
         if (!isValid) return;
         try {
             shellProcess.exitValue();
@@ -144,8 +145,24 @@ public class Shell {
         sh_raw(commands);
     }
 
-    public void su(List<String> output, String... commands) {
+    public void su(Collection<String> output, String... commands) {
         if (!rootAccess()) return;
         sh(output, commands);
+    }
+
+    public static abstract class AbstractList<E> extends java.util.AbstractList<E> {
+
+        @Override
+        public abstract boolean add(E e);
+
+        @Override
+        public E get(int i) {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
     }
 }

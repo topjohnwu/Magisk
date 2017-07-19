@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -26,44 +26,22 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     private String mFilename;
     private AdaptiveList<String> mList;
 
-    public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
+    public FlashZip(Context context, Uri uri, AdaptiveList<String> list) {
         super(context);
         mUri = uri;
         mList = list;
 
-        mCachedFile = new File(magiskManager.getCacheDir(), "install.zip");
-        mScriptFile = new File(magiskManager.getCacheDir(), "/META-INF/com/google/android/update-binary");
+        mCachedFile = new File(context.getCacheDir(), "install.zip");
+        mScriptFile = new File(context.getCacheDir(), "/META-INF/com/google/android/update-binary");
         mCheckFile = new File(mScriptFile.getParent(), "updater-script");
 
         // Try to get the filename ourselves
-        mFilename = Utils.getNameFromUri(magiskManager, mUri);
-    }
-
-    private void copyToCache() throws Exception {
-        mList.add(magiskManager.getString(R.string.copying_msg));
-
-        mCachedFile.delete();
-        try (
-            InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
-            OutputStream outputStream = new FileOutputStream(mCachedFile)
-        ) {
-            byte buffer[] = new byte[1024];
-            int length;
-            if (in == null) throw new FileNotFoundException();
-            while ((length = in.read(buffer)) > 0)
-                outputStream.write(buffer, 0, length);
-        } catch (FileNotFoundException e) {
-            mList.add("! Invalid Uri");
-            throw e;
-        } catch (IOException e) {
-            mList.add("! Cannot copy to cache");
-            throw e;
-        }
+        mFilename = Utils.getNameFromUri(context, mUri);
     }
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
-        List<String> ret = Utils.readFile(magiskManager.shell, mCheckFile.getPath());
+        List<String> ret = Utils.readFile(getShell(), mCheckFile.getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
 
@@ -80,8 +58,28 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
 
     @Override
     protected Integer doInBackground(Void... voids) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return -1;
         try {
-            copyToCache();
+            mList.add(magiskManager.getString(R.string.copying_msg));
+
+            mCachedFile.delete();
+            try (
+                InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
+                OutputStream outputStream = new FileOutputStream(mCachedFile)
+            ) {
+                if (in == null) throw new FileNotFoundException();
+                byte buffer[] = new byte[1024];
+                int length;
+                while ((length = in.read(buffer)) > 0)
+                    outputStream.write(buffer, 0, length);
+            } catch (FileNotFoundException e) {
+                mList.add("! Invalid Uri");
+                throw e;
+            } catch (IOException e) {
+                mList.add("! Cannot copy to cache");
+                throw e;
+            }
             if (!unzipAndCheck()) return 0;
             mList.add(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
             magiskManager.shell.su(mList,
@@ -99,6 +97,8 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
+        MagiskManager magiskManager = getMagiskManager();
+        if (magiskManager == null) return;
         magiskManager.shell.su_raw(
                 "rm -rf " + mCachedFile.getParent() + "/*",
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
@@ -106,19 +106,16 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
         switch (result) {
             case -1:
                 mList.add(magiskManager.getString(R.string.install_error));
-                Utils.showUriSnack(activity, mUri);
-                break;
+                Utils.showUriSnack(getActivity(), mUri);
+                return;
             case 0:
                 mList.add(magiskManager.getString(R.string.invalid_zip));
-                break;
+                return;
             case 1:
-                onSuccess();
+                // Success
                 break;
         }
+        new LoadModules(magiskManager).exec();
         super.onPostExecute(result);
-    }
-
-    protected void onSuccess() {
-        new LoadModules(activity).exec();
     }
 }

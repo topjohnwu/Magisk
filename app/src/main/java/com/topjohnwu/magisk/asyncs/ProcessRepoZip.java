@@ -32,6 +32,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
+        Activity activity = getActivity();
+        if (activity == null) return;
         progressDialog = ProgressDialog.show(activity,
                 activity.getString(R.string.zip_process_title),
                 activity.getString(R.string.zip_process_msg));
@@ -39,6 +41,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        Activity activity = getActivity();
+        if (activity == null) return null;
         try {
 
             // Create temp file
@@ -84,6 +88,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
+        Activity activity = getActivity();
+        if (activity == null) return;
         progressDialog.dismiss();
         if (result) {
             if (Shell.rootAccess() && mInstall) {
@@ -92,7 +98,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
                 Utils.showUriSnack(activity, mUri);
             }
         } else {
-            magiskManager.toast(R.string.process_error, Toast.LENGTH_LONG);
+            Utils.getMagiskManager(activity).toast(R.string.process_error, Toast.LENGTH_LONG);
         }
     }
 }
