@@ -61,12 +61,12 @@ public class Utils {
     }
 
     public static List<String> getModList(Shell shell, String path) {
-        String command = "find " + path + " -type d -maxdepth 1 ! -name \"*.core\" ! -name \"*lost+found\" ! -name \"*magisk\"";
+        String command = "ls -d " + path + "/* | grep -v lost+found";
         return shell.su(command);
     }
 
     public static List<String> readFile(Shell shell, String path) {
-        String command = "cat " + path;
+        String command = "cat " + path + " | sed '$a\\ ' | sed '$d'";
         return shell.su(command);
     }
 
