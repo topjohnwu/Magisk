@@ -32,6 +32,8 @@ public class MagiskManager extends Application {
     public static final String UNINSTALLER = "magisk_uninstaller.sh";
     public static final String UTIL_FUNCTIONS= "util_functions.sh";
     public static final String INTENT_SECTION = "section";
+    public static final String INTENT_VERSION = "version";
+    public static final String INTENT_LINK = "link";
     public static final String BUSYBOX_VERSION = "1.26.2";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";

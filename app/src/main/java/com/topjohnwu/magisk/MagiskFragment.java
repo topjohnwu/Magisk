@@ -2,7 +2,9 @@ package com.topjohnwu.magisk;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,7 +51,8 @@ import butterknife.Unbinder;
 public class MagiskFragment extends Fragment
         implements CallbackEvent.Listener<Void>, SwipeRefreshLayout.OnRefreshListener {
 
-    private static boolean noDialog = false;
+    public static final String SHOW_DIALOG = "dialog";
+
     private static int expandHeight = 0;
     private static boolean mExpanded = false;
 
@@ -126,31 +129,35 @@ public class MagiskFragment extends Fragment
                 .setMessage(getString(R.string.repo_install_msg, filename))
                 .setCancelable(true)
                 .setPositiveButton(Shell.rootAccess() ? R.string.install : R.string.download,
-                    (d, i) ->
-                    Utils.dlAndReceive(
-                        getActivity(),
-                        new DownloadReceiver() {
-                            private String boot = finalBootImage;
-                            private boolean enc = keepEncChkbox.isChecked();
-                            private boolean verity = keepVerityChkbox.isChecked();
+                    (d, i) -> {
+                        ((NotificationManager) getActivity()
+                                .getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
+                        Utils.dlAndReceive(
+                            getActivity(),
+                            new DownloadReceiver() {
+                                private String boot = finalBootImage;
+                                private boolean enc = keepEncChkbox.isChecked();
+                                private boolean verity = keepVerityChkbox.isChecked();
 
-                            @Override
-                            public void onDownloadDone(Uri uri) {
-                                if (Shell.rootAccess()) {
-                                    magiskManager.shell.su_raw(
-                                            "rm -f /dev/.magisk",
-                                            "echo \"BOOTIMAGE=" + boot + "\" >> /dev/.magisk",
-                                            "echo \"KEEPFORCEENCRYPT=" + String.valueOf(enc) + "\" >> /dev/.magisk",
-                                            "echo \"KEEPVERITY=" + String.valueOf(verity) + "\" >> /dev/.magisk"
-                                    );
-                                    startActivity(new Intent(getActivity(), FlashActivity.class).setData(uri));
-                                } else {
-                                    Utils.showUriSnack(getActivity(), uri);
+                                @Override
+                                public void onDownloadDone(Uri uri) {
+                                    if (Shell.rootAccess()) {
+                                        magiskManager.shell.su_raw(
+                                                "rm -f /dev/.magisk",
+                                                "echo \"BOOTIMAGE=" + boot + "\" >> /dev/.magisk",
+                                                "echo \"KEEPFORCEENCRYPT=" + String.valueOf(enc) + "\" >> /dev/.magisk",
+                                                "echo \"KEEPVERITY=" + String.valueOf(verity) + "\" >> /dev/.magisk"
+                                        );
+                                        startActivity(new Intent(getActivity(), FlashActivity.class).setData(uri));
+                                    } else {
+                                        Utils.showUriSnack(getActivity(), uri);
+                                    }
                                 }
-                            }
-                        },
-                        magiskManager.magiskLink,
-                        Utils.getLegalFilename(filename)))
+                            },
+                            magiskManager.magiskLink,
+                            Utils.getLegalFilename(filename));
+                    }
+                )
                 .setNeutralButton(R.string.release_notes, (d, i) -> {
                     if (magiskManager.releaseNoteLink != null) {
                         Intent openReleaseNoteLink = new Intent(Intent.ACTION_VIEW, Uri.parse(magiskManager.releaseNoteLink));
@@ -241,18 +248,10 @@ public class MagiskFragment extends Fragment
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        if (magiskManager.magiskVersionCode < 0 && Shell.rootAccess() && !noDialog) {
-            noDialog = true;
-            new AlertDialogBuilder(getActivity())
-                    .setTitle(R.string.no_magisk_title)
-                    .setMessage(R.string.no_magisk_msg)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.goto_install, (d, i) -> {})
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
-        }
-
         updateUI();
+
+        if (getArguments() != null && getArguments().getBoolean(SHOW_DIALOG))
+            install();
 
         return v;
     }
@@ -272,7 +271,6 @@ public class MagiskFragment extends Fragment
         magiskManager.remoteMagiskVersionString = null;
         magiskManager.remoteMagiskVersionCode = -1;
         collapse();
-        noDialog = false;
 
         // Trigger state check
         if (Utils.checkNetworkStatus(magiskManager)) {
@@ -410,6 +408,9 @@ public class MagiskFragment extends Fragment
 
         magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
+
+        if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode)
+            install();
     }
 
     private void updateSafetyNetUI() {

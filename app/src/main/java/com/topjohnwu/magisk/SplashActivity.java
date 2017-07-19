@@ -24,8 +24,14 @@ public class SplashActivity extends Activity{
 
         super.onCreate(savedInstanceState);
 
+        MagiskManager magiskManager = getApplicationContext();
+
         // Init the info and configs and root sh
-        getApplicationContext().init();
+        magiskManager.init();
+
+        // Get possible additional info from intent
+        magiskManager.remoteMagiskVersionString = getIntent().getStringExtra(MagiskManager.INTENT_VERSION);
+        magiskManager.magiskLink = getIntent().getStringExtra(MagiskManager.INTENT_LINK);
 
         // Now fire all async tasks
         new LoadModules(this)
