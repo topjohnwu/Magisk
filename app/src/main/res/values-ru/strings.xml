@@ -52,7 +52,9 @@
     <string name="uninstall_magisk_title">Удалить Magisk</string>
     <string name="uninstall_magisk_msg">Данное действие приведет к удалению всех модулей, MagiskSU, и может зашифровать данные, если они не зашифрованы.\nУверены, что желаете продолжить?</string>
     <string name="version_none">(Нет данных)</string>
-
+    <string name="reinstall">Переустановить</string>
+    <string name="update">Обновить</string>
+    
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет предоставленной информации)</string>
     <string name="no_modules_found">Модули не обнаружены</string>
