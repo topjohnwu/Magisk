@@ -33,11 +33,8 @@ public class SplashActivity extends Activity{
         magiskManager.remoteMagiskVersionString = getIntent().getStringExtra(MagiskManager.INTENT_VERSION);
         magiskManager.magiskLink = getIntent().getStringExtra(MagiskManager.INTENT_LINK);
 
-        // Now fire all async tasks
-        new LoadModules(this)
-                .setCallBack(() -> new LoadRepos(this).exec())
-                .exec();
-        new LoadApps(this).exec();
+
+        LoadModules loadModuleTask = new LoadModules(this);
 
         if (Utils.checkNetworkStatus(this)) {
             // Initialize the update check service, notify every 8 hours
@@ -51,7 +48,12 @@ public class SplashActivity extends Activity{
                 JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 scheduler.schedule(jobInfo);
             }
+            loadModuleTask.setCallBack(() -> new LoadRepos(this).exec());
         }
+
+        // Now fire all async tasks
+        loadModuleTask.exec();
+        new LoadApps(this).exec();
 
         Intent intent = new Intent(this, MainActivity.class);
         String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);

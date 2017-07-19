@@ -372,7 +372,11 @@ public class MagiskFragment extends Fragment
         if (!Shell.rootAccess()) {
             installText.setText(R.string.download);
         } else {
-            installText.setText(R.string.download_install);
+            if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
+                installText.setText(R.string.update);
+            } else {
+                installText.setText(R.string.reinstall);
+            }
 
             List<String> items = new ArrayList<>();
             if (magiskManager.bootBlock != null) {

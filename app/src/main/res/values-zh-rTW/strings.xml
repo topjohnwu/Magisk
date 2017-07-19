@@ -216,5 +216,8 @@
     <string name="settings_ns_global">全域 Namespace</string>
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
+    <string name="reinstall">重新安裝</string>
+    <string name="update">更新</string>
+    <string name="magisk_updates">Magisk 更新</string>
 
 </resources>

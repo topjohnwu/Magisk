@@ -55,6 +55,8 @@
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">This will remove all modules, MagiskSU, and potentially encrypt your data if not encrypted\nAre you sure to continue?</string>
     <string name="version_none">(None)</string>
+    <string name="reinstall">Re-Install</string>
+    <string name="update">Update</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
