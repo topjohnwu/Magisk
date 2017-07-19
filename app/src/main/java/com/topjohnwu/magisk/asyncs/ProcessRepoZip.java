@@ -42,9 +42,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         try {
 
             // Create temp file
-            File temp1 = new File(magiskManager.getCacheDir(), "1.zip");
-            File temp2 = new File(magiskManager.getCacheDir(), "2.zip");
-            magiskManager.getCacheDir().mkdirs();
+            File temp1 = new File(activity.getCacheDir(), "1.zip");
+            File temp2 = new File(activity.getCacheDir(), "2.zip");
+            activity.getCacheDir().mkdirs();
             temp1.createNewFile();
             temp2.createNewFile();
 
@@ -87,7 +87,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         progressDialog.dismiss();
         if (result) {
             if (Shell.rootAccess() && mInstall) {
-                magiskManager.startActivity(new Intent(magiskManager, FlashActivity.class).setData(mUri));
+                activity.startActivity(new Intent(activity, FlashActivity.class).setData(mUri));
             } else {
                 Utils.showUriSnack(activity, mUri);
             }

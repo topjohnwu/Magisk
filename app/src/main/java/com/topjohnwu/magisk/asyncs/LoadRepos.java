@@ -54,7 +54,7 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
             repoDB.clearRepo();
         }
         etags = new ArrayList<>(
-                Arrays.asList(magiskManager.prefs.getString(ETAG_KEY, "").split(",")));
+                Arrays.asList(prefs.getString(ETAG_KEY, "").split(",")));
     }
 
     private void loadJSON(String jsonString) throws Exception {

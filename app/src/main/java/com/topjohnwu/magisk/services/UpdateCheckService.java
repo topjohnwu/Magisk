@@ -4,24 +4,15 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
+import com.topjohnwu.magisk.utils.Utils;
 
 public class UpdateCheckService extends JobService {
+
     @Override
     public boolean onStartJob(JobParameters params) {
-        new CheckUpdates(this, true){
-            @Override
-            protected Void doInBackground(Void... voids) {
-                magiskManager.updateMagiskInfo();
-                magiskManager.updateNotification = magiskManager.prefs.getBoolean("notification", true);
-                return super.doInBackground(voids);
-            }
-
-            @Override
-            protected void onPostExecute(Void v) {
-                jobFinished(params, false);
-                super.onPostExecute(v);
-            }
-        }.exec();
+        Utils.getMagiskManager(this).updateMagiskInfo();
+        new CheckUpdates(this, true)
+                .setCallBack(() -> jobFinished(params, false)).exec();
         return true;
     }
 

@@ -117,7 +117,6 @@ public class MagiskManager extends Application {
             shellLogging = false;
         }
         magiskHide = prefs.getBoolean("magiskhide", true);
-        updateNotification = prefs.getBoolean("notification", true);
         initSU();
         updateMagiskInfo();
         updateBlockInfo();
@@ -183,6 +182,7 @@ public class MagiskManager extends Application {
     }
 
     public void updateMagiskInfo() {
+        updateNotification = prefs.getBoolean("notification", true);
         List<String> ret;
         ret = shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
