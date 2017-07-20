@@ -1,19 +1,23 @@
 package com.topjohnwu.magisk.utils;
 
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class CallbackEvent<Result> {
 
     public boolean isTriggered = false;
     private Result result;
-    private Set<Listener<Result>> listeners;
+    private List<WeakReference<Listener<Result>>> listeners;
 
     public void register(Listener<Result> l) {
         if (listeners == null) {
-            listeners = new HashSet<>();
+            listeners = new LinkedList<>();
         }
-        listeners.add(l);
+        listeners.add(new WeakReference<>(l));
     }
 
     public void unRegister() {
@@ -21,8 +25,11 @@ public class CallbackEvent<Result> {
     }
 
     public void unRegister(Listener<Result> l) {
-        if (listeners != null) {
-            listeners.remove(l);
+        for (Iterator<WeakReference<Listener<Result>>> i = listeners.iterator(); i.hasNext();) {
+            WeakReference<Listener<Result>> listener = i.next();
+            if (listener.get() == null || listener.get() == l) {
+                i.remove();
+            }
         }
     }
 
@@ -34,8 +41,9 @@ public class CallbackEvent<Result> {
         result = r;
         isTriggered = true;
         if (listeners != null) {
-            for (Listener<Result> listener : listeners) {
-                listener.onTrigger(this);
+            for (WeakReference<Listener<Result>> listener : listeners) {
+                if (listener.get() != null)
+                    listener.get().onTrigger(this);
             }
         }
     }
