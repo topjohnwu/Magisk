@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ValueSortedMap;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONArray;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class LoadRepos extends ParallelTask<Void, Void, Void> {
+public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     public static final String ETAG_KEY = "ETag";
 
@@ -38,11 +37,11 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
     private static final int LOAD_PREV = 2;
 
     private List<String> etags;
-    private ValueSortedMap<String, Repo> cached, fetched;
+    private List<String> cached;
     private RepoDatabaseHelper repoDB;
     private SharedPreferences prefs;
 
-    public LoadRepos(Context context) {
+    public UpdateRepos(Context context) {
         super(context);
         prefs = getMagiskManager().prefs;
         repoDB = getMagiskManager().repoDB;
@@ -68,25 +67,27 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
             String lastUpdate = jsonobject.getString("pushed_at");
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             Date updatedDate = format.parse(lastUpdate);
-            Repo repo = cached.get(id);
+            Repo repo = repoDB.getRepo(id);
             try {
+                Boolean updated;
                 if (repo == null) {
-                    Logger.dev("LoadRepos: Create new repo " + id);
+                    Logger.dev("UpdateRepos: Create new repo " + id);
                     repo = new Repo(name, updatedDate);
+                    updated = true;
                 } else {
                     // Popout from cached
                     cached.remove(id);
-                    repo.update(updatedDate);
+                    updated = repo.update(updatedDate);
                 }
-                if (repo.getId() != null) {
-                    fetched.put(id, repo);
+                if (updated) {
+                    repoDB.addRepo(repo);
                 }
             } catch (BaseModule.CacheModException ignored) {}
         }
     }
 
     private boolean loadPage(int page, String url, int mode) {
-        Logger.dev("LoadRepos: Loading page: " + (page + 1));
+        Logger.dev("UpdateRepos: Loading page: " + (page + 1));
         Map<String, String> header = new HashMap<>();
         if (mode == CHECK_ETAG && page < etags.size() && !TextUtils.isEmpty(etags.get(page))) {
             Logger.dev("ETAG: " + etags.get(page));
@@ -157,18 +158,16 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return null;
-        Logger.dev("LoadRepos: Loading repos");
+        Logger.dev("UpdateRepos: Loading repos");
 
-        cached = repoDB.getRepoMap(false);
-        fetched = new ValueSortedMap<>();
+        cached = repoDB.getRepoIDList();
 
         if (!loadPage(0, null, CHECK_ETAG)) {
-            magiskManager.repoMap = repoDB.getRepoMap();
-            Logger.dev("LoadRepos: No updates, use DB");
+            Logger.dev("UpdateRepos: No updates, use DB");
             return null;
         }
 
-        repoDB.addRepoMap(fetched);
+        // The leftover cached means they are removed from online repo
         repoDB.removeRepo(cached);
 
         // Update ETag
@@ -179,8 +178,7 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
         }
         prefs.edit().putString(ETAG_KEY, etagBuilder.toString()).apply();
 
-        magiskManager.repoMap = repoDB.getRepoMap();
-        Logger.dev("LoadRepos: Done");
+        Logger.dev("UpdateRepos: Done");
         return null;
     }
 

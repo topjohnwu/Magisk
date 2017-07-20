@@ -10,7 +10,7 @@ import android.text.TextUtils;
 
 import com.topjohnwu.magisk.asyncs.LoadApps;
 import com.topjohnwu.magisk.asyncs.LoadModules;
-import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Utils;
@@ -48,7 +48,7 @@ public class SplashActivity extends Activity{
                 JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
                 scheduler.schedule(jobInfo);
             }
-            loadModuleTask.setCallBack(() -> new LoadRepos(this).exec());
+            loadModuleTask.setCallBack(() -> new UpdateRepos(this).exec());
         }
 
         // Now fire all async tasks

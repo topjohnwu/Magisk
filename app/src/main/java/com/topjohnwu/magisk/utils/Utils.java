@@ -27,9 +27,8 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 
@@ -142,7 +141,7 @@ public class Utils {
 
     public static void clearRepoCache(Context context) {
         MagiskManager magiskManager = getMagiskManager(context);
-        magiskManager.prefs.edit().remove(LoadRepos.ETAG_KEY).apply();
+        magiskManager.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
         magiskManager.repoDB.clearRepo();
         magiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
     }

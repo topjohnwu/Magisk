@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Logger;
-import com.topjohnwu.magisk.utils.ValueSortedMap;
 
-import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
@@ -45,37 +45,39 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void addRepoMap(ValueSortedMap<String, Repo> map) {
-        Collection<Repo> list = map.values();
-        for (Repo repo : list) {
-            Logger.dev("Add to DB: " + repo.getId());
-            mDb.replace(TABLE_NAME, null, repo.getContentValues());
-        }
-    }
-
     public void clearRepo() {
         mDb.delete(TABLE_NAME, null, null);
     }
 
-    public void removeRepo(ValueSortedMap<String, Repo> map) {
-        Collection<Repo> list = map.values();
-        for (Repo repo : list) {
-            Logger.dev("Remove from DB: " + repo.getId());
-            mDb.delete(TABLE_NAME, "id=?", new String[] { repo.getId() });
+    public void removeRepo(List<String> list) {
+        for (String id : list) {
+            Logger.dev("Remove from DB: " + id);
+            mDb.delete(TABLE_NAME, "id=?", new String[] { id });
         }
     }
 
-    public ValueSortedMap<String, Repo> getRepoMap() {
-        return getRepoMap(true);
+    public void addRepo(Repo repo) {
+        mDb.replace(TABLE_NAME, null, repo.getContentValues());
     }
 
-    public ValueSortedMap<String, Repo> getRepoMap(boolean filtered) {
-        ValueSortedMap<String, Repo> ret = new ValueSortedMap<>();
-        Repo repo;
-        try (Cursor c = mDb.query(TABLE_NAME, null, "template>=?", new String[] { filtered ? String.valueOf(MIN_TEMPLATE_VER) : "0" }, null, null, null)) {
+    public Repo getRepo(String id) {
+        try (Cursor c = mDb.query(TABLE_NAME, null, "id=?", new String[] { id }, null, null, null)) {
+            if (c.moveToNext()) {
+                return new Repo(c);
+            }
+        }
+        return null;
+    }
+
+    public Cursor getRepoCursor() {
+        return mDb.query(TABLE_NAME, null, "template>=?", new String[] { String.valueOf(MIN_TEMPLATE_VER) }, null, null, "name COLLATE NOCASE");
+    }
+
+    public List<String> getRepoIDList() {
+        LinkedList<String> ret = new LinkedList<>();
+        try (Cursor c = mDb.query(TABLE_NAME, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
-                repo = new Repo(c);
-                ret.put(repo.getId(), repo);
+                ret.add(c.getString(c.getColumnIndex("id")));
             }
         }
         return ret;

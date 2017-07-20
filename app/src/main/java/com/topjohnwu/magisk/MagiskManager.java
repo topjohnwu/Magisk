@@ -15,15 +15,14 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ValueSortedMap;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class MagiskManager extends Application {
 
@@ -65,8 +64,7 @@ public class MagiskManager extends Application {
     public boolean disabled;
 
     // Data
-    public ValueSortedMap<String, Repo> repoMap;
-    public ValueSortedMap<String, Module> moduleMap;
+    public Map<String, Module> moduleMap;
     public List<String> blockList;
     public List<ApplicationInfo> appList;
     public List<String> magiskHideList;

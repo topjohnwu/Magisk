@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -16,14 +17,15 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.MarkDownWindow;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ValueSortedMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,10 +38,13 @@ public class ReposAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Repo> mUpdateRepos, mInstalledRepos, mOthersRepos;
     private int[] sectionList;
     private int size;
-    private ValueSortedMap<String, Repo> repoMap;
+    private Cursor repoCursor = null;
+    private Map<String, Module> moduleMap;
+    private RepoDatabaseHelper repoDB;
 
-    public ReposAdapter(ValueSortedMap<String, Repo> map) {
-        repoMap = map;
+    public ReposAdapter(RepoDatabaseHelper db, Map<String, Module> map) {
+        repoDB = db;
+        moduleMap = map;
         mUpdateRepos = new ArrayList<>();
         mInstalledRepos = new ArrayList<>();
         mOthersRepos = new ArrayList<>();
@@ -137,12 +142,20 @@ public class ReposAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return size;
     }
 
-    public void filter(ValueSortedMap<String, Module> moduleMap, String s) {
+    public void notifyDBChanged() {
+        if (repoCursor != null)
+            repoCursor.close();
+        repoCursor = repoDB.getRepoCursor();
+        filter("");
+    }
+
+    public void filter(String s) {
         mUpdateRepos.clear();
         mInstalledRepos.clear();
         mOthersRepos.clear();
         sectionList[0] = sectionList[1] = sectionList[2] = 0;
-        for (Repo repo : repoMap.values()) {
+        while (repoCursor.moveToNext()) {
+            Repo repo = new Repo(repoCursor);
             if (repo.getName().toLowerCase().contains(s.toLowerCase())
                     || repo.getAuthor().toLowerCase().contains(s.toLowerCase())
                     || repo.getDescription().toLowerCase().contains(s.toLowerCase())
@@ -161,6 +174,7 @@ public class ReposAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             }
         }
+        repoCursor.moveToFirst();
 
         sectionList[0] = mUpdateRepos.isEmpty() ? -1 : 0;
         size = mUpdateRepos.isEmpty() ? 0 : mUpdateRepos.size() + 1;

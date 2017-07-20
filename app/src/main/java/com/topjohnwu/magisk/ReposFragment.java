@@ -13,7 +13,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ReposAdapter;
-import com.topjohnwu.magisk.asyncs.LoadRepos;
+import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
@@ -43,15 +43,14 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        adapter = new ReposAdapter(getApplication().repoMap);
-
+        adapter = new ReposAdapter(getApplication().repoDB, getApplication().moduleMap);
         recyclerView.setAdapter(adapter);
 
         mSwipeRefreshLayout.setRefreshing(true);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new LoadRepos(getActivity()).exec();
+            new UpdateRepos(getActivity()).exec();
         });
 
         if (getApplication().repoLoadDone.isTriggered) {
@@ -64,15 +63,10 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
         Logger.dev("ReposFragment: UI refresh triggered");
-        if (getApplication().repoMap.isEmpty()) {
-            recyclerView.setVisibility(View.GONE);
-            emptyRv.setVisibility(View.VISIBLE);
-        } else {
-            adapter.filter(getApplication().moduleMap, "");
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyRv.setVisibility(View.GONE);
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
+        mSwipeRefreshLayout.setRefreshing(false);
+        adapter.notifyDBChanged();
+        recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+        emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -87,7 +81,7 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                adapter.filter(getApplication().moduleMap, newText);
+                adapter.filter(newText);
                 return false;
             }
         });

@@ -35,11 +35,13 @@ public class Repo extends BaseModule {
         Logger.dev("Repo: Fetching prop: " + getId());
     }
 
-    public void update(Date lastUpdate) throws CacheModException {
+    public boolean update(Date lastUpdate) throws CacheModException {
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();
+            return true;
         }
+        return false;
     }
 
     public ContentValues getContentValues() {
