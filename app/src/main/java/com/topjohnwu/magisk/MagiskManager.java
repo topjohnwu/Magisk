@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -66,8 +65,6 @@ public class MagiskManager extends Application {
     // Data
     public Map<String, Module> moduleMap;
     public List<String> blockList;
-    public List<ApplicationInfo> appList;
-    public List<String> magiskHideList;
 
     // Configurations
     public static boolean shellLogging;

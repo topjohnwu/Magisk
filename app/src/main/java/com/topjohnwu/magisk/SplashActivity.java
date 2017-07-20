@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.asyncs.LoadApps;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
@@ -53,7 +52,6 @@ public class SplashActivity extends Activity{
 
         // Now fire all async tasks
         loadModuleTask.exec();
-        new LoadApps(this).exec();
 
         Intent intent = new Intent(this, MainActivity.class);
         String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);

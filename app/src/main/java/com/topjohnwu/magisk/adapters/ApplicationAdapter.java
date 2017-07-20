@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
@@ -14,13 +14,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.MagiskHide;
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,20 +44,19 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     private List<ApplicationInfo> mOriginalList, mList;
     private List<String> mHideList;
-    private PackageManager packageManager;
+    private PackageManager pm;
     private ApplicationFilter filter;
+    private CallbackEvent<Void> magiskHideDone;
+    private Shell shell;
 
-    public ApplicationAdapter(PackageManager packageManager) {
+    public ApplicationAdapter(Context context) {
         mOriginalList = mList = Collections.emptyList();
         mHideList = Collections.emptyList();
-        this.packageManager = packageManager;
         filter = new ApplicationFilter();
-    }
-
-    public void setLists(List<ApplicationInfo> listApps, List<String> hideList) {
-        mOriginalList = mList = listApps;
-        mHideList = hideList;
-        notifyDataSetChanged();
+        pm = context.getPackageManager();
+        magiskHideDone = Utils.getMagiskManager(context).magiskHideDone;
+        shell = Utils.getMagiskManager(context).shell;
+        new LoadApps().exec();
     }
 
     @Override
@@ -67,8 +69,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     public void onBindViewHolder(final ViewHolder holder, int position) {
         ApplicationInfo info = mList.get(position);
 
-        holder.appIcon.setImageDrawable(info.loadIcon(packageManager));
-        holder.appName.setText(info.loadLabel(packageManager));
+        holder.appIcon.setImageDrawable(info.loadIcon(pm));
+        holder.appName.setText(info.loadLabel(pm));
         holder.appPackage.setText(info.packageName);
 
         // Remove all listeners
@@ -87,10 +89,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    new MagiskHide((Activity) holder.itemView.getContext()).add(info.packageName);
+                    Utils.addMagiskHide(shell, info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    new MagiskHide((Activity) holder.itemView.getContext()).rm(info.packageName);
+                    Utils.rmMagiskHide(shell, info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });
@@ -104,6 +106,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     public void filter(String constraint) {
         filter.filter(constraint);
+    }
+
+    public void refresh() {
+        new LoadApps().exec();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -130,7 +136,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 filteredApps = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : mOriginalList) {
-                    if (Utils.lowercaseContains(info.loadLabel(packageManager), filter)
+                    if (Utils.lowercaseContains(info.loadLabel(pm), filter)
                             || Utils.lowercaseContains(info.packageName, filter)) {
                         filteredApps.add(info);
                     }
@@ -148,6 +154,29 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         protected void publishResults(CharSequence constraint, FilterResults results) {
             mList = (List<ApplicationInfo>) results.values;
             notifyDataSetChanged();
+        }
+    }
+
+    private class LoadApps extends ParallelTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mOriginalList = pm.getInstalledApplications(0);
+            for (Iterator<ApplicationInfo> i = mOriginalList.iterator(); i.hasNext(); ) {
+                ApplicationInfo info = i.next();
+                if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled) {
+                    i.remove();
+                }
+            }
+            Collections.sort(mOriginalList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
+                    .compareTo(b.loadLabel(pm).toString().toLowerCase()));
+            mHideList = Utils.listMagiskHide(shell);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            magiskHideDone.trigger();
         }
     }
 }

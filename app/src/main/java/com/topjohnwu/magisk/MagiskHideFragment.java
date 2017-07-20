@@ -1,12 +1,10 @@
 package com.topjohnwu.magisk;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
-import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
@@ -46,13 +43,12 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        PackageManager packageManager = getActivity().getPackageManager();
+        lastFilter = "";
 
         mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(() -> new MagiskHide(getActivity()).list());
+        mSwipeRefreshLayout.setOnRefreshListener(() -> appAdapter.refresh());
 
-        appAdapter = new ApplicationAdapter(packageManager);
+        appAdapter = new ApplicationAdapter(getActivity());
         recyclerView.setAdapter(appAdapter);
 
         searchListener = new SearchView.OnQueryTextListener() {
@@ -70,10 +66,6 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
                 return false;
             }
         };
-
-        if (getApplication().magiskHideDone.isTriggered) {
-            onTrigger(getApplication().magiskHideDone);
-        }
 
         return view;
     }
@@ -107,10 +99,7 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
     @Override
     public void onTrigger(CallbackEvent<Void> event) {
         Logger.dev("MagiskHideFragment: UI refresh");
-        appAdapter.setLists(getApplication().appList, getApplication().magiskHideList);
         mSwipeRefreshLayout.setRefreshing(false);
-        if (!TextUtils.isEmpty(lastFilter)) {
-            appAdapter.filter(lastFilter);
-        }
+        appAdapter.filter(lastFilter);
     }
 }

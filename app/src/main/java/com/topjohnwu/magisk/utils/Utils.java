@@ -226,4 +226,24 @@ public class Utils {
                 (NotificationManager) magiskManager.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
+
+    public static void enableMagiskHide(Shell shell) {
+        shell.su_raw("magiskhide --enable");
+    }
+
+    public static void disableMagiskHide(Shell shell) {
+        shell.su_raw("magiskhide --disable");
+    }
+
+    public static List<String> listMagiskHide(Shell shell) {
+        return shell.su("magiskhide --ls");
+    }
+
+    public static void addMagiskHide(Shell shell, String pkg) {
+        shell.su_raw("magiskhide --add " + pkg);
+    }
+
+    public static void rmMagiskHide(Shell shell, String pkg) {
+        shell.su_raw("magiskhide --rm " + pkg);
+    }
 }

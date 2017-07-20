@@ -13,9 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.asyncs.MagiskHide;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
@@ -158,18 +156,9 @@ public class SettingsActivity extends Activity {
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        if (!magiskManager.isSuClient) {
-                            new AlertDialogBuilder(getActivity())
-                                    .setTitle(R.string.no_magisksu_title)
-                                    .setMessage(R.string.no_magisksu_msg)
-                                    .setPositiveButton(R.string.understand, (dialog, which) -> new MagiskHide(getActivity()).enable())
-                                    .setCancelable(false)
-                                    .show();
-                        } else {
-                            new MagiskHide(getActivity()).enable();
-                        }
+                        Utils.enableMagiskHide(magiskManager.shell);
                     } else {
-                        new MagiskHide(getActivity()).disable();
+                        Utils.disableMagiskHide(magiskManager.shell);
                     }
                     break;
                 case "hosts":
