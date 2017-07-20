@@ -55,9 +55,8 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.7.0'
     implementation 'com.thoughtbot:expandablerecyclerview:1.4'
     implementation 'us.feras.mdv:markdownview:1.1.0'
-    implementation 'com.madgag.spongycastle:core:1.54.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.54.0.0'
-    implementation 'com.madgag.spongycastle:pkix:1.54.0.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.57'
     implementation 'com.google.android.gms:play-services-safetynet:9.0.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
 }

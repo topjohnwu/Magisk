@@ -16,8 +16,8 @@
 #   public *;
 #}
 
-# SpongyCastle
--keep class org.spongycastle.** { *; }
+# BouncyCastle
+-keep class org.bouncycastle.** { *; }
 -dontwarn javax.naming.**
 
 -dontwarn android.content.**
