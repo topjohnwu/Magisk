@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
@@ -89,6 +90,7 @@ public class MagiskManager extends Application {
     // Global resources
     public SharedPreferences prefs;
     public SuDatabaseHelper suDB;
+    public RepoDatabaseHelper repoDB;
     public Shell shell;
 
     private static Handler mHandler = new Handler();
@@ -99,6 +101,8 @@ public class MagiskManager extends Application {
         new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         shell = Shell.getShell();
+        suDB = new SuDatabaseHelper(this);
+        repoDB = new RepoDatabaseHelper(this);
     }
 
     public void toast(String msg, int duration) {
@@ -161,7 +165,6 @@ public class MagiskManager extends Application {
     }
 
     public void initSUConfig() {
-        suDB = new SuDatabaseHelper(this);
         suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
         suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
         suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);

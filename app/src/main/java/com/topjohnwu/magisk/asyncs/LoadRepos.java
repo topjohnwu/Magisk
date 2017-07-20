@@ -45,8 +45,8 @@ public class LoadRepos extends ParallelTask<Void, Void, Void> {
     public LoadRepos(Context context) {
         super(context);
         prefs = getMagiskManager().prefs;
+        repoDB = getMagiskManager().repoDB;
         String prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
-        repoDB = new RepoDatabaseHelper(context);
         // Legacy data cleanup
         File old = new File(prefsPath, "RepoMap.xml");
         if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {

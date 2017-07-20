@@ -30,11 +30,13 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     private MagiskManager magiskManager;
     private PackageManager pm;
+    private SQLiteDatabase mDb;
 
     public SuDatabaseHelper(Context context) {
         super(context, "su.db", null, DATABASE_VER);
         magiskManager = Utils.getMagiskManager(context);
         pm = context.getPackageManager();
+        mDb = getWritableDatabase();
         cleanup();
     }
 
@@ -93,12 +95,11 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void cleanup() {
-        SQLiteDatabase db = getWritableDatabase();
         // Clear outdated policies
-        db.delete(POLICY_TABLE, "until > 0 AND until < ?",
+        mDb.delete(POLICY_TABLE, "until > 0 AND until < ?",
                 new String[] { String.valueOf(System.currentTimeMillis() / 1000) });
         // Clear outdated logs
-        db.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
+        mDb.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
                 System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
     }
 
@@ -107,25 +108,16 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deletePolicy(String pkg) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
-        db.close();
+        mDb.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
     }
 
     public void deletePolicy(int uid) {
-        SQLiteDatabase db = getWritableDatabase();
-        deletePolicy(db, uid);
-        db.close();
-    }
-
-    private void deletePolicy(SQLiteDatabase db, int uid) {
-        db.delete(POLICY_TABLE, "uid=?", new String[]{String.valueOf(uid)});
+        mDb.delete(POLICY_TABLE, "uid=?", new String[]{String.valueOf(uid)});
     }
 
     public Policy getPolicy(int uid) {
         Policy policy = null;
-        SQLiteDatabase db = getReadableDatabase();
-        try (Cursor c = db.query(POLICY_TABLE, null, "uid=?", new String[] { String.valueOf(uid) }, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, "uid=?", new String[] { String.valueOf(uid) }, null, null, null)) {
             if (c.moveToNext()) {
                 policy = new Policy(c, pm);
             }
@@ -133,14 +125,12 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             deletePolicy(uid);
             return null;
         }
-        db.close();
         return policy;
     }
 
     public Policy getPolicy(String pkg) {
         Policy policy = null;
-        SQLiteDatabase db = getReadableDatabase();
-        try (Cursor c = db.query(POLICY_TABLE, null, "package_name=?", new String[] { pkg }, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, "package_name=?", new String[] { pkg }, null, null, null)) {
             if (c.moveToNext()) {
                 policy = new Policy(c, pm);
             }
@@ -148,76 +138,64 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             deletePolicy(pkg);
             return null;
         }
-        db.close();
         return policy;
     }
 
     public void addPolicy(Policy policy) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.replace(POLICY_TABLE, null, policy.getContentValues());
-        db.close();
+        mDb.replace(POLICY_TABLE, null, policy.getContentValues());
     }
 
     public void updatePolicy(Policy policy) {
-        SQLiteDatabase db = getWritableDatabase();
-        updatePolicy(db, policy);
-        db.close();
-    }
-
-    private void updatePolicy(SQLiteDatabase db, Policy policy) {
-        db.update(POLICY_TABLE, policy.getContentValues(), "package_name=?",
+        mDb.update(POLICY_TABLE, policy.getContentValues(), "package_name=?",
                 new String[] { policy.packageName });
     }
 
     public List<Policy> getPolicyList(PackageManager pm) {
-        List<Policy> ret = new ArrayList<>();
-        SQLiteDatabase db = getWritableDatabase();
-        Policy policy;
-        try (Cursor c = db.query(POLICY_TABLE, null, null, null, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, null, null, null, null, null)) {
+            List<Policy> ret = new ArrayList<>(c.getCount());
             while (c.moveToNext()) {
                 try {
-                    policy = new Policy(c, pm);
+                    Policy policy = new Policy(c, pm);
                     // The application changed UID for some reason, check user config
                     if (policy.info.uid != policy.uid) {
                         if (magiskManager.suReauth) {
                             // Reauth required, remove from DB
-                            deletePolicy(db, policy.uid);
+                            deletePolicy(policy);
                             continue;
                         } else {
                             // No reauth, update to use the new UID
                             policy.uid = policy.info.uid;
-                            updatePolicy(db, policy);
+                            updatePolicy(policy);
                         }
                     }
                     ret.add(policy);
                 } catch (PackageManager.NameNotFoundException e) {
                     // The app no longer exist, remove from DB
-                    deletePolicy(db, c.getInt(c.getColumnIndex("uid")));
+                    deletePolicy(c.getInt(c.getColumnIndex("uid")));
                 }
             }
+            Collections.sort(ret);
+            return ret;
         }
-        db.close();
-        Collections.sort(ret);
-        return ret;
     }
 
     private List<SuLogEntry> getLogList(SQLiteDatabase db, String selection) {
-        List<SuLogEntry> ret = new ArrayList<>();
         try (Cursor c = db.query(LOG_TABLE, null, selection, null, null, null, "time DESC")) {
+            List<SuLogEntry> ret = new ArrayList<>(c.getCount());
             while (c.moveToNext()) {
                 ret.add(new SuLogEntry(c));
             }
+            return ret;
         }
-        db.close();
-        return ret;
     }
 
     private void migrateLegacyLogList(File oldDB, SQLiteDatabase newDB) {
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(oldDB.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
-        List<SuLogEntry> logs = getLogList(db, null);
+        SQLiteDatabase oldDb = SQLiteDatabase.openDatabase(oldDB.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
+        List<SuLogEntry> logs = getLogList(oldDb, null);
         for (SuLogEntry log : logs) {
             newDB.insert(LOG_TABLE, null, log.getContentValues());
         }
+        oldDb.close();
     }
 
     public List<SuLogEntry> getLogList() {
@@ -225,39 +203,31 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<SuLogEntry> getLogList(String selection) {
-        return getLogList(getReadableDatabase(), selection);
+        return getLogList(mDb, selection);
     }
 
     public void addLog(SuLogEntry log) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.insert(LOG_TABLE, null, log.getContentValues());
-        db.close();
+        mDb.insert(LOG_TABLE, null, log.getContentValues());
     }
 
     public void clearLogs() {
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(LOG_TABLE, null, null);
-        db.close();
+        mDb.delete(LOG_TABLE, null, null);
     }
 
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
         data.put("key", key);
         data.put("value", value);
-        SQLiteDatabase db = getWritableDatabase();
-        db.replace(SETTINGS_TABLE, null, data);
-        db.close();
+        mDb.replace(SETTINGS_TABLE, null, data);
     }
 
     public int getSettings(String key, int defaultValue) {
-        SQLiteDatabase db = getReadableDatabase();
         int value = defaultValue;
-        try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?", new String[] { key }, null, null, null)) {
-            while (c.moveToNext()) {
+        try (Cursor c = mDb.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+            if (c.moveToNext()) {
                 value = c.getInt(c.getColumnIndex("value"));
             }
         }
-        db.close();
         return value;
     }
 }

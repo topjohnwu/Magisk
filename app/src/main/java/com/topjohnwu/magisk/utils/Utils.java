@@ -140,11 +140,11 @@ public class Utils {
         }.requestTest();
     }
 
-    public static void clearRepoCache(Activity activity) {
-        MagiskManager magiskManager = getMagiskManager(activity);
+    public static void clearRepoCache(Context context) {
+        MagiskManager magiskManager = getMagiskManager(context);
         magiskManager.prefs.edit().remove(LoadRepos.ETAG_KEY).apply();
-        new RepoDatabaseHelper(activity).clearRepo();
-        Toast.makeText(activity, R.string.repo_cache_cleared, Toast.LENGTH_SHORT).show();
+        magiskManager.repoDB.clearRepo();
+        magiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
     }
 
     public static String getNameFromUri(Context context, Uri uri) {

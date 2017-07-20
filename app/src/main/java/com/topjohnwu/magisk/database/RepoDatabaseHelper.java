@@ -17,8 +17,11 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME = "repos";
     private static final int MIN_TEMPLATE_VER = 3;
 
+    private SQLiteDatabase mDb;
+
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
+        mDb = getWritableDatabase();
     }
 
     @Override
@@ -43,29 +46,23 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void addRepoMap(ValueSortedMap<String, Repo> map) {
-        SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
         for (Repo repo : list) {
             Logger.dev("Add to DB: " + repo.getId());
-            db.replace(TABLE_NAME, null, repo.getContentValues());
+            mDb.replace(TABLE_NAME, null, repo.getContentValues());
         }
-        db.close();
     }
 
     public void clearRepo() {
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, null, null);
-        db.close();
+        mDb.delete(TABLE_NAME, null, null);
     }
 
     public void removeRepo(ValueSortedMap<String, Repo> map) {
-        SQLiteDatabase db = getWritableDatabase();
         Collection<Repo> list = map.values();
         for (Repo repo : list) {
             Logger.dev("Remove from DB: " + repo.getId());
-            db.delete(TABLE_NAME, "id=?", new String[] { repo.getId() });
+            mDb.delete(TABLE_NAME, "id=?", new String[] { repo.getId() });
         }
-        db.close();
     }
 
     public ValueSortedMap<String, Repo> getRepoMap() {
@@ -74,20 +71,13 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public ValueSortedMap<String, Repo> getRepoMap(boolean filtered) {
         ValueSortedMap<String, Repo> ret = new ValueSortedMap<>();
-        SQLiteDatabase db = getReadableDatabase();
         Repo repo;
-        try (Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null)) {
+        try (Cursor c = mDb.query(TABLE_NAME, null, "template>=?", new String[] { filtered ? String.valueOf(MIN_TEMPLATE_VER) : "0" }, null, null, null)) {
             while (c.moveToNext()) {
                 repo = new Repo(c);
-                if (repo.getTemplateVersion() < MIN_TEMPLATE_VER && filtered) {
-                    Logger.dev("Outdated repo: " + repo.getId());
-                } else {
-                    // Logger.dev("Load from DB: " + repo.getId());
-                    ret.put(repo.getId(), repo);
-                }
+                ret.put(repo.getId(), repo);
             }
         }
-        db.close();
         return ret;
     }
 }
