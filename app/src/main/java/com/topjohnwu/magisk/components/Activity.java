@@ -1,14 +1,14 @@
 package com.topjohnwu.magisk.components;
 
 import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
-
-import java.util.Locale;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 
 public class Activity extends AppCompatActivity {
 
@@ -17,6 +17,22 @@ public class Activity extends AppCompatActivity {
         Configuration configuration = new Configuration();
         configuration.setLocale(MagiskManager.locale);
         applyOverrideConfiguration(configuration);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (this instanceof CallbackEvent.Listener) {
+            ((CallbackEvent.Listener) this).registerEvents();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (this instanceof CallbackEvent.Listener) {
+            ((CallbackEvent.Listener) this).unregisterEvents();
+        }
+        super.onDestroy();
     }
 
     @Override

@@ -49,7 +49,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
-        implements CallbackEvent.Listener<Void>, SwipeRefreshLayout.OnRefreshListener {
+        implements CallbackEvent.Listener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String SHOW_DIALOG = "dialog";
 
@@ -253,6 +253,8 @@ public class MagiskFragment extends Fragment
         if (getArguments() != null && getArguments().getBoolean(SHOW_DIALOG))
             install();
 
+        getActivity().setTitle(R.string.magisk);
+
         return v;
     }
 
@@ -281,7 +283,7 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onTrigger(CallbackEvent<Void> event) {
+    public void onTrigger(CallbackEvent event) {
         if (event == magiskManager.updateCheckDone) {
             updateCheckUI();
         } else if (event == magiskManager.safetyNetDone) {
@@ -290,23 +292,8 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Manual trigger if already done
-        if (magiskManager.updateCheckDone.isTriggered)
-            updateCheckUI();
-        if (magiskManager.safetyNetDone.isTriggered)
-            updateSafetyNetUI();
-        magiskManager.updateCheckDone.register(this);
-        magiskManager.safetyNetDone.register(this);
-        getActivity().setTitle(R.string.magisk);
-    }
-
-    @Override
-    public void onStop() {
-        magiskManager.updateCheckDone.unRegister(this);
-        magiskManager.safetyNetDone.unRegister(this);
-        super.onStop();
+    public CallbackEvent[] getRegisterEvents() {
+        return new CallbackEvent[] { magiskManager.updateCheckDone, magiskManager.safetyNetDone };
     }
 
     @Override

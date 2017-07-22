@@ -28,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends Activity
-        implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener<Void> {
+        implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener {
 
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
@@ -81,7 +81,6 @@ public class MainActivity extends Activity
             navigate(getIntent().getStringExtra(MagiskManager.INTENT_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
-        getApplicationContext().reloadMainActivity.register(this);
 
     }
 
@@ -89,12 +88,6 @@ public class MainActivity extends Activity
     protected void onResume() {
         super.onResume();
         checkHideSection();
-    }
-
-    @Override
-    protected void onDestroy() {
-        getApplicationContext().reloadMainActivity.unRegister(this);
-        super.onDestroy();
     }
 
     @Override
@@ -117,8 +110,13 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTrigger(CallbackEvent<Void> event) {
+    public void onTrigger(CallbackEvent event) {
         recreate();
+    }
+
+    @Override
+    public CallbackEvent[] getRegisterEvents() {
+        return new CallbackEvent[] { getApplicationContext().reloadMainActivity };
     }
 
     public void checkHideSection() {

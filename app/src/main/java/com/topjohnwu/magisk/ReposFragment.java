@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ReposFragment extends Fragment implements CallbackEvent.Listener<Void> {
+public class ReposFragment extends Fragment implements CallbackEvent.Listener {
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -53,20 +53,23 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
             new UpdateRepos(getActivity()).exec();
         });
 
-        if (getApplication().repoLoadDone.isTriggered) {
-            onTrigger(null);
-        }
+        getActivity().setTitle(R.string.downloads);
 
         return view;
     }
 
     @Override
-    public void onTrigger(CallbackEvent<Void> event) {
+    public void onTrigger(CallbackEvent event) {
         Logger.dev("ReposFragment: UI refresh triggered");
         mSwipeRefreshLayout.setRefreshing(false);
         adapter.notifyDBChanged();
         recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
         emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public CallbackEvent[] getRegisterEvents() {
+        return new CallbackEvent[] { getApplication().repoLoadDone };
     }
 
     @Override
@@ -85,19 +88,6 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener<Vo
                 return false;
             }
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getApplication().repoLoadDone.register(this);
-        getActivity().setTitle(R.string.downloads);
-    }
-
-    @Override
-    public void onStop() {
-        getApplication().repoLoadDone.unRegister(this);
-        super.onStop();
     }
 
     @Override

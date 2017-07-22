@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ModulesFragment extends Fragment implements CallbackEvent.Listener<Void> {
+public class ModulesFragment extends Fragment implements CallbackEvent.Listener {
 
     private static final int FETCH_ZIP_CODE = 2;
 
@@ -67,17 +67,20 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
             }
         });
 
-        if (getApplication().moduleLoadDone.isTriggered) {
-            updateUI();
-        }
+        getActivity().setTitle(R.string.modules);
 
         return view;
     }
 
     @Override
-    public void onTrigger(CallbackEvent<Void> event) {
+    public void onTrigger(CallbackEvent event) {
         Logger.dev("ModulesFragment: UI refresh triggered");
         updateUI();
+    }
+
+    @Override
+    public CallbackEvent[] getRegisterEvents() {
+        return new CallbackEvent[] { getApplication().moduleLoadDone };
     }
 
     @Override
@@ -88,20 +91,6 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener<
             intent.setData(data.getData()).putExtra("ACTION", "flash");
             startActivity(intent);
         }
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getApplication().moduleLoadDone.register(this);
-        getActivity().setTitle(R.string.modules);
-    }
-
-    @Override
-    public void onStop() {
-        getApplication().moduleLoadDone.unRegister(this);
-        super.onStop();
     }
 
     @Override

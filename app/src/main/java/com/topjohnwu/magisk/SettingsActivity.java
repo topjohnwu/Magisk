@@ -59,7 +59,7 @@ public class SettingsActivity extends Activity {
 
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener,
-            CallbackEvent.Listener<Void>{
+            CallbackEvent.Listener {
 
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
@@ -149,16 +149,14 @@ public class SettingsActivity extends Activity {
         public void onResume() {
             super.onResume();
             prefs.registerOnSharedPreferenceChangeListener(this);
-            magiskManager.localeDone.register(this);
-            if (magiskManager.localeDone.isTriggered)
-                onTrigger(null);
+            registerEvents();
         }
 
         @Override
         public void onPause() {
-            super.onPause();
             prefs.unregisterOnSharedPreferenceChangeListener(this);
-            magiskManager.localeDone.unRegister(this);
+            unregisterEvents();
+            super.onPause();
         }
 
         @Override
@@ -171,7 +169,7 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (magiskManager.isDarkTheme != enabled) {
                         magiskManager.isDarkTheme = enabled;
-                        magiskManager.reloadMainActivity.trigger();
+                        magiskManager.reloadMainActivity.trigger(false);
                         getActivity().recreate();
                     }
                     break;
@@ -233,7 +231,7 @@ public class SettingsActivity extends Activity {
                     break;
                 case "locale":
                     magiskManager.setLocale();
-                    magiskManager.reloadMainActivity.trigger();
+                    magiskManager.reloadMainActivity.trigger(false);
                     getActivity().recreate();
                     break;
             }
@@ -256,13 +254,18 @@ public class SettingsActivity extends Activity {
         }
 
         @Override
-        public void onTrigger(CallbackEvent<Void> event) {
+        public void onTrigger(CallbackEvent event) {
             ListPreference language = setLocalePreference(null);
             language.setOnPreferenceClickListener((pref) -> {
                 setLocalePreference((ListPreference) pref);
                 return false;
             });
             generalCatagory.addPreference(language);
+        }
+
+        @Override
+        public CallbackEvent[] getRegisterEvents() {
+            return new CallbackEvent[] { magiskManager.localeDone };
         }
     }
 

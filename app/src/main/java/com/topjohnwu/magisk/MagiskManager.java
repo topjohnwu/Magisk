@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.CallbackEvent;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -44,13 +43,13 @@ public class MagiskManager extends Application {
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
 
     // Events
-    public final CallbackEvent<Void> magiskHideDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> reloadMainActivity = new CallbackEvent<>();
-    public final CallbackEvent<Void> moduleLoadDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> updateCheckDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> safetyNetDone = new CallbackEvent<>();
-    public final CallbackEvent<Void> localeDone = new CallbackEvent<>();
+    public final CallbackEvent magiskHideDone = new CallbackEvent();
+    public final CallbackEvent reloadMainActivity = new CallbackEvent();
+    public final CallbackEvent moduleLoadDone = new CallbackEvent();
+    public final CallbackEvent repoLoadDone = new CallbackEvent();
+    public final CallbackEvent updateCheckDone = new CallbackEvent();
+    public final CallbackEvent safetyNetDone = new CallbackEvent();
+    public final CallbackEvent localeDone = new CallbackEvent();
 
     // Info
     public String magiskVersionString;

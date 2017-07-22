@@ -1,32 +1,29 @@
 package com.topjohnwu.magisk.utils;
 
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-public class CallbackEvent<Result> {
+public class CallbackEvent {
 
     public boolean isTriggered = false;
-    private Result result;
-    private List<WeakReference<Listener<Result>>> listeners;
+    private List<WeakReference<Listener>> listeners;
 
-    public void register(Listener<Result> l) {
+    public void register(Listener l) {
         if (listeners == null) {
             listeners = new LinkedList<>();
         }
         listeners.add(new WeakReference<>(l));
     }
 
-    public void unRegister() {
+    public void unregister() {
         listeners = null;
     }
 
-    public void unRegister(Listener<Result> l) {
-        for (Iterator<WeakReference<Listener<Result>>> i = listeners.iterator(); i.hasNext();) {
-            WeakReference<Listener<Result>> listener = i.next();
+    public void unregister(Listener l) {
+        for (Iterator<WeakReference<Listener>> i = listeners.iterator(); i.hasNext();) {
+            WeakReference<Listener> listener = i.next();
             if (listener.get() == null || listener.get() == l) {
                 i.remove();
             }
@@ -34,25 +31,38 @@ public class CallbackEvent<Result> {
     }
 
     public void trigger() {
-        trigger(null);
+        trigger(true);
     }
 
-    public void trigger(Result r) {
-        result = r;
-        isTriggered = true;
+    public void trigger(boolean b) {
+        isTriggered = b;
         if (listeners != null) {
-            for (WeakReference<Listener<Result>> listener : listeners) {
+            for (WeakReference<Listener> listener : listeners) {
                 if (listener.get() != null)
                     listener.get().onTrigger(this);
             }
         }
     }
 
-    public Result getResult() {
-        return result;
-    }
 
-    public interface Listener<R> {
-        void onTrigger(CallbackEvent<R> event);
+    public interface Listener {
+        default void registerEvents() {
+            for (CallbackEvent event : getRegisterEvents()) {
+                if (event.isTriggered) {
+                    onTrigger(event);
+                }
+                event.register(this);
+            }
+        }
+        default void unregisterEvents() {
+            for (CallbackEvent event : getRegisterEvents()) {
+                event.unregister(this);
+            }
+        }
+        default void onTrigger() {
+            onTrigger(null);
+        }
+        void onTrigger(CallbackEvent event);
+        CallbackEvent[] getRegisterEvents();
     }
 }

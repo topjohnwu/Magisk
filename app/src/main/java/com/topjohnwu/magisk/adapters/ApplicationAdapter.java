@@ -46,7 +46,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private List<String> mHideList;
     private PackageManager pm;
     private ApplicationFilter filter;
-    private CallbackEvent<Void> magiskHideDone;
+    private CallbackEvent magiskHideDone;
     private Shell shell;
 
     public ApplicationAdapter(Context context) {
@@ -176,7 +176,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected void onPostExecute(Void v) {
-            magiskHideDone.trigger();
+            magiskHideDone.trigger(false);
         }
     }
 }
