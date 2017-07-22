@@ -10,18 +10,23 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.OpenableColumns;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
@@ -33,7 +38,12 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 public class Utils {
 
@@ -245,5 +255,41 @@ public class Utils {
 
     public static void rmMagiskHide(Shell shell, String pkg) {
         shell.su_raw("magiskhide --rm " + pkg);
+    }
+
+    public static String getLocaleString(Context context, Locale locale, @StringRes int id) {
+        Configuration config = context.getResources().getConfiguration();
+        config.setLocale(locale);
+        Context localizedContext = context.createConfigurationContext(config);
+        return localizedContext.getString(id);
+    }
+
+    public static List<Locale> getAvailableLocale(Context context) {
+        List<Locale> locales = new ArrayList<>();
+        HashSet<String> set = new HashSet<>();
+        Locale locale;
+
+        // Add default locale
+        locales.add(Locale.ENGLISH);
+        set.add(getLocaleString(context, Locale.ENGLISH, R.string.download));
+
+        // Add some special locales
+        locales.add(Locale.TAIWAN);
+        set.add(getLocaleString(context, Locale.TAIWAN, R.string.download));
+        locale = new Locale("pt", "BR");
+        locales.add(locale);
+        set.add(getLocaleString(context, locale, R.string.download));
+
+        // Other locales
+        for (String s : context.getAssets().getLocales()) {
+            locale = Locale.forLanguageTag(s);
+            if (set.add(getLocaleString(context, locale, R.string.download))) {
+                locales.add(locale);
+            }
+        }
+
+        Collections.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
+
+        return locales;
     }
 }

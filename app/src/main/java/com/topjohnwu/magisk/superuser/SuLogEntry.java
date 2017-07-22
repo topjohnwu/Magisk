@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.topjohnwu.magisk.MagiskManager;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,11 +50,11 @@ public class SuLogEntry implements Parcelable {
     }
 
     public String getDateString() {
-        return DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
+        return DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
     }
 
     public String getTimeString() {
-        return new SimpleDateFormat("h:mm a", Locale.US).format(date);
+        return new SimpleDateFormat("h:mm a", MagiskManager.locale).format(date);
     }
 
 

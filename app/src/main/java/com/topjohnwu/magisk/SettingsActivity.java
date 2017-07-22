@@ -15,9 +15,12 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,13 +58,15 @@ public class SettingsActivity extends Activity {
     }
 
     public static class SettingsFragment extends PreferenceFragment
-            implements SharedPreferences.OnSharedPreferenceChangeListener {
+            implements SharedPreferences.OnSharedPreferenceChangeListener,
+            CallbackEvent.Listener<Void>{
 
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
 
         private ListPreference suAccess, autoRes, suNotification, requestTimeout, multiuserMode, namespaceMode;
         private MagiskManager magiskManager;
+        private PreferenceCategory generalCatagory;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,7 @@ public class SettingsActivity extends Activity {
             prefScreen = getPreferenceScreen();
             magiskManager = Utils.getMagiskManager(getActivity());
 
+            generalCatagory = (PreferenceCategory) findPreference("general");
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
             PreferenceCategory developer = (PreferenceCategory) findPreference("developer");
@@ -118,16 +124,41 @@ public class SettingsActivity extends Activity {
             }
         }
 
+        private ListPreference setLocalePreference(ListPreference lp) {
+            if (lp == null) {
+                lp = new ListPreference(getActivity());
+            }
+            CharSequence[] entries = new CharSequence[magiskManager.locales.size() + 1];
+            CharSequence[] entryValues = new CharSequence[magiskManager.locales.size() + 1];
+            entries[0] = getString(R.string.system_default);
+            entryValues[0] = "";
+            int i = 1;
+            for (Locale locale : magiskManager.locales) {
+                entries[i] = locale.getDisplayName(locale);
+                entryValues[i++] = locale.toLanguageTag();
+            }
+            lp.setEntries(entries);
+            lp.setEntryValues(entryValues);
+            lp.setTitle(R.string.language);
+            lp.setKey("locale");
+            lp.setSummary(MagiskManager.locale.getDisplayName(MagiskManager.locale));
+            return lp;
+        }
+
         @Override
         public void onResume() {
             super.onResume();
             prefs.registerOnSharedPreferenceChangeListener(this);
+            magiskManager.localeDone.register(this);
+            if (magiskManager.localeDone.isTriggered)
+                onTrigger(null);
         }
 
         @Override
         public void onPause() {
             super.onPause();
             prefs.unregisterOnSharedPreferenceChangeListener(this);
+            magiskManager.localeDone.unRegister(this);
         }
 
         @Override
@@ -200,6 +231,11 @@ public class SettingsActivity extends Activity {
                 case "shell_logging":
                     MagiskManager.shellLogging = prefs.getBoolean("shell_logging", false);
                     break;
+                case "locale":
+                    magiskManager.setLocale();
+                    magiskManager.reloadMainActivity.trigger();
+                    getActivity().recreate();
+                    break;
             }
             setSummary();
         }
@@ -217,6 +253,16 @@ public class SettingsActivity extends Activity {
                     .getStringArray(R.array.multiuser_summary)[magiskManager.multiuserMode]);
             namespaceMode.setSummary(getResources()
                     .getStringArray(R.array.namespace_summary)[magiskManager.suNamespaceMode]);
+        }
+
+        @Override
+        public void onTrigger(CallbackEvent<Void> event) {
+            ListPreference language = setLocalePreference(null);
+            language.setOnPreferenceClickListener((pref) -> {
+                setLocalePreference((ListPreference) pref);
+                return false;
+            });
+            generalCatagory.addPreference(language);
         }
     }
 

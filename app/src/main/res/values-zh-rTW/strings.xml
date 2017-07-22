@@ -219,5 +219,7 @@
     <string name="reinstall">重新安裝</string>
     <string name="update">更新</string>
     <string name="magisk_updates">Magisk 更新</string>
+    <string name="system_default">(系統預設)</string>
+    <string name="language">語言</string>
 
 </resources>

@@ -192,5 +192,6 @@
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">대상 UID:\u0020</string>
     <string name="command">명령:\u0020</string>
+    <string name="download">다운로드</string>
 
 </resources>

@@ -5,22 +5,27 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MagiskManager extends Application {
@@ -45,6 +50,7 @@ public class MagiskManager extends Application {
     public final CallbackEvent<Void> repoLoadDone = new CallbackEvent<>();
     public final CallbackEvent<Void> updateCheckDone = new CallbackEvent<>();
     public final CallbackEvent<Void> safetyNetDone = new CallbackEvent<>();
+    public final CallbackEvent<Void> localeDone = new CallbackEvent<>();
 
     // Info
     public String magiskVersionString;
@@ -65,10 +71,13 @@ public class MagiskManager extends Application {
     // Data
     public Map<String, Module> moduleMap;
     public List<String> blockList;
+    public List<Locale> locales;
 
     // Configurations
     public static boolean shellLogging;
     public static boolean devLogging;
+    public static Locale locale;
+    public static Locale defaultLocale;
 
     public boolean magiskHide;
     public boolean isDarkTheme;
@@ -90,6 +99,37 @@ public class MagiskManager extends Application {
 
     private static Handler mHandler = new Handler();
 
+    private static class LoadLocale extends ParallelTask<Void, Void, Void> {
+
+        LoadLocale(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getMagiskManager().locales = Utils.getAvailableLocale(getMagiskManager());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            getMagiskManager().localeDone.trigger();
+        }
+    }
+
+    public void setLocale() {
+        String localeTag = prefs.getString("locale", "");
+        if (localeTag.isEmpty()) {
+            locale = defaultLocale;
+        } else {
+            locale = Locale.forLanguageTag(localeTag);
+        }
+        Resources res = getBaseContext().getResources();
+        Configuration config = new Configuration(res.getConfiguration());
+        config.setLocale(locale);
+        res.updateConfiguration(config, res.getDisplayMetrics());
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -98,6 +138,9 @@ public class MagiskManager extends Application {
         shell = Shell.getShell();
         suDB = new SuDatabaseHelper(this);
         repoDB = new RepoDatabaseHelper(this);
+        defaultLocale = Locale.getDefault();
+        setLocale();
+        new LoadLocale(this).exec();
     }
 
     public void toast(String msg, int duration) {
@@ -117,7 +160,6 @@ public class MagiskManager extends Application {
             devLogging = false;
             shellLogging = false;
         }
-        magiskHide = prefs.getBoolean("magiskhide", true);
         initSU();
         updateMagiskInfo();
         updateBlockInfo();

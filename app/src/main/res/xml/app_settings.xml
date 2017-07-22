@@ -2,6 +2,7 @@
     android:layout_marginTop="?attr/actionBarSize"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
+        android:key="general"
         android:title="@string/settings_general_category">
 
         <SwitchPreference
