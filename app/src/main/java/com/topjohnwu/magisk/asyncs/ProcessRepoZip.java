@@ -65,13 +65,14 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
             ZipUtils.signZip(activity, temp1, temp2, true);
 
             // Write it back to the downloaded zip, temp2 -> Uri
-            FileInputStream in = new FileInputStream(temp2);
-            try (OutputStream target = activity.getContentResolver().openOutputStream(mUri)) {
+            try (OutputStream out = activity.getContentResolver().openOutputStream(mUri);
+                 FileInputStream in = new FileInputStream(temp2)
+            ) {
                 byte[] buffer = new byte[4096];
                 int length;
-                if (target == null) throw new FileNotFoundException();
+                if (out == null) throw new FileNotFoundException();
                 while ((length = in.read(buffer)) > 0)
-                    target.write(buffer, 0, length);
+                    out.write(buffer, 0, length);
             }
 
             // Delete the temp file

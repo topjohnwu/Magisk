@@ -32,7 +32,6 @@ public class SplashActivity extends Activity{
         magiskManager.remoteMagiskVersionString = getIntent().getStringExtra(MagiskManager.INTENT_VERSION);
         magiskManager.magiskLink = getIntent().getStringExtra(MagiskManager.INTENT_LINK);
 
-
         LoadModules loadModuleTask = new LoadModules(this);
 
         if (Utils.checkNetworkStatus(this)) {
@@ -44,10 +43,9 @@ public class SplashActivity extends Activity{
                         .setPersisted(true)
                         .setPeriodic(8 * 60 * 60 * 1000)
                         .build();
-                JobScheduler scheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                scheduler.schedule(jobInfo);
+                ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
             }
-            loadModuleTask.setCallBack(() -> new UpdateRepos(this).exec());
+            loadModuleTask.setCallBack(() -> new UpdateRepos(getApplication()).exec());
         }
 
         // Now fire all async tasks
