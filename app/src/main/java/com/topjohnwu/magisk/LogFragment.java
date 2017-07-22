@@ -29,6 +29,8 @@ public class LogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_log, container, false);
         unbinder = ButterKnife.bind(this, v);
 
+        ((MainActivity) getActivity()).toolbar.setElevation(0);
+
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 
         if (getApplication().isSuClient) {
