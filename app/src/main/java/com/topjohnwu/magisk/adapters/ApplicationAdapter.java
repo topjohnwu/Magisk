@@ -129,30 +129,23 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            List<ApplicationInfo> filteredApps;
             if (constraint == null || constraint.length() == 0) {
-                filteredApps = mOriginalList;
+                mList = mOriginalList;
             } else {
-                filteredApps = new ArrayList<>();
+                mList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : mOriginalList) {
                     if (Utils.lowercaseContains(info.loadLabel(pm), filter)
                             || Utils.lowercaseContains(info.packageName, filter)) {
-                        filteredApps.add(info);
+                        mList.add(info);
                     }
                 }
             }
-
-            FilterResults results = new FilterResults();
-            results.values = filteredApps;
-            results.count = filteredApps.size();
-            return results;
+            return null;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            mList = (List<ApplicationInfo>) results.values;
             notifyDataSetChanged();
         }
     }
