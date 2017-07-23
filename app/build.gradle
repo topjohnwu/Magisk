@@ -53,7 +53,6 @@ dependencies {
     implementation 'com.android.support:design:26.0.0-beta2'
     implementation 'com.android.support:support-v4:26.0.0-beta2'
     implementation 'com.jakewharton:butterknife:8.7.0'
-    implementation 'com.thoughtbot:expandablerecyclerview:1.4'
     implementation 'us.feras.mdv:markdownview:1.1.0'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.57'

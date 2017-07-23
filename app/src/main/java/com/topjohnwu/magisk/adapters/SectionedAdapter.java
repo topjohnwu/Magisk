@@ -48,6 +48,21 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
         return 0;
     }
 
+    protected int getSectionPosition(int section) {
+        return getItemPosition(section, -1);
+    }
+
+    protected int getItemPosition(int section, int position) {
+        int realPosition = 0;
+        // Previous sections
+        for (int i = 0; i < section; ++i) {
+            realPosition += getItemCount(i) + 1;
+        }
+        // Current section
+        realPosition += position + 1;
+        return realPosition;
+    }
+
     private PositionInfo getPositionInfo(int position) {
         int section = 0;
         while (true) {

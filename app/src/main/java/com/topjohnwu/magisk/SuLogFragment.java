@@ -13,9 +13,6 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.superuser.SuLogEntry;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +25,7 @@ public class SuLogFragment extends Fragment {
 
     private Unbinder unbinder;
     private MagiskManager magiskManager;
+    private SuLogAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +46,8 @@ public class SuLogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = ButterKnife.bind(this, v);
         magiskManager = getApplication();
+        adapter = new SuLogAdapter(magiskManager.suDB);
+        recyclerView.setAdapter(adapter);
 
         updateList();
 
@@ -55,13 +55,12 @@ public class SuLogFragment extends Fragment {
     }
 
     private void updateList() {
-        List<SuLogEntry> logs = magiskManager.suDB.getLogList();
+        adapter.notifyDBChanged();
 
-        if (logs.size() == 0) {
+        if (adapter.getSectionCount() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(new SuLogAdapter(logs).getAdapter());
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,147 +10,125 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
-import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
-import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
-import com.thoughtbot.expandablerecyclerview.viewholders.GroupViewHolder;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ExpandableViewHolder;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.SuLogEntry;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SuLogAdapter {
+public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, SuLogAdapter.LogViewHolder> {
 
-    private ExpandableAdapter adapter;
-    private Set<SuLogEntry> expandList = new HashSet<>();
+    private List<List<Integer>> logEntryList;
+    private Set<Integer> itemExpanded, sectionExpanded;
+    private SuDatabaseHelper suDB;
+    private Cursor suLogCursor = null;
 
-    public SuLogAdapter(List<SuLogEntry> list) {
+    public SuLogAdapter(SuDatabaseHelper db) {
+        suDB = db;
+        logEntryList = Collections.emptyList();
+        sectionExpanded = new HashSet<>();
+        itemExpanded = new HashSet<>();
+    }
 
-        // Separate the logs with date
-        Map<String, List<SuLogEntry>> logEntryMap = new LinkedHashMap<>();
-        List<SuLogEntry> group;
-        for (SuLogEntry log : list) {
-            String date = log.getDateString();
-            group = logEntryMap.get(date);
-            if (group == null) {
-                group = new ArrayList<>();
-                logEntryMap.put(date, group);
+    @Override
+    public int getSectionCount() {
+        return logEntryList.size();
+    }
+
+    @Override
+    public int getItemCount(int section) {
+        return sectionExpanded.contains(section) ? logEntryList.get(section).size() : 0;
+    }
+
+    @Override
+    public SectionHolder onCreateSectionViewHolder(ViewGroup parent) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_sulog_group, parent, false);
+        return new SectionHolder(v);
+    }
+
+    @Override
+    public LogViewHolder onCreateItemViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_sulog, parent, false);
+        return new LogViewHolder(v);
+    }
+
+    @Override
+    public void onBindSectionViewHolder(SectionHolder holder, int section) {
+        suLogCursor.moveToPosition(logEntryList.get(section).get(0));
+        SuLogEntry entry = new SuLogEntry(suLogCursor);
+        holder.arrow.setRotation(sectionExpanded.contains(section) ? 180 : 0);
+        holder.itemView.setOnClickListener(v -> {
+            RotateAnimation rotate;
+            if (sectionExpanded.contains(section)) {
+                holder.arrow.setRotation(0);
+                rotate = new RotateAnimation(180, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                sectionExpanded.remove(section);
+                notifyItemRangeRemoved(getItemPosition(section, 0), logEntryList.get(section).size());
+            } else {
+                rotate = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                sectionExpanded.add(section);
+                notifyItemRangeChanged(getItemPosition(section, 0), logEntryList.get(section).size());
             }
-            group.add(log);
-        }
-
-        // Then format them into expandable groups
-        List<LogGroup> logEntryGroups = new ArrayList<>();
-        for (Map.Entry<String, List<SuLogEntry>> entry : logEntryMap.entrySet()) {
-            logEntryGroups.add(new LogGroup(entry.getKey(), entry.getValue()));
-        }
-        adapter = new ExpandableAdapter(logEntryGroups);
-
+            rotate.setDuration(300);
+            rotate.setFillAfter(true);
+            holder.arrow.setAnimation(rotate);
+        });
+        holder.date.setText(entry.getDateString());
     }
 
-    public RecyclerView.Adapter getAdapter() {
-        return adapter;
-    }
-
-    private class ExpandableAdapter
-            extends ExpandableRecyclerViewAdapter<LogGroupViewHolder, LogViewHolder> {
-
-        ExpandableAdapter(List<? extends ExpandableGroup> groups) {
-            super(groups);
-            expandableList.expandedGroupIndexes[0] = true;
-        }
-
-        @Override
-        public LogGroupViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_sulog_group, parent, false);
-            return new LogGroupViewHolder(v);
-        }
-
-        @Override
-        public LogViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_sulog, parent, false);
-            return new LogViewHolder(v);
-        }
-
-        @Override
-        public void onBindChildViewHolder(LogViewHolder holder, int flatPosition, ExpandableGroup group, int childIndex) {
-            Context context = holder.itemView.getContext();
-            SuLogEntry logEntry = (SuLogEntry) group.getItems().get(childIndex);
-            holder.setExpanded(expandList.contains(logEntry));
-            holder.itemView.setOnClickListener(view -> {
-                if (holder.getExpanded()) {
-                    holder.collapse();
-                    expandList.remove(logEntry);
-                } else {
-                    holder.expand();
-                    expandList.add(logEntry);
-                }
-            });
-            holder.appName.setText(logEntry.appName);
-            holder.action.setText(context.getString(logEntry.action ? R.string.grant : R.string.deny));
-            holder.command.setText(logEntry.command);
-            holder.fromPid.setText(String.valueOf(logEntry.fromPid));
-            holder.toUid.setText(String.valueOf(logEntry.toUid));
-            holder.time.setText(logEntry.getTimeString());
-        }
-
-        @Override
-        public void onBindGroupViewHolder(LogGroupViewHolder holder, int flatPosition, ExpandableGroup group) {
-            holder.date.setText(group.getTitle());
-            if (isGroupExpanded(flatPosition)) {
+    @Override
+    public void onBindItemViewHolder(LogViewHolder holder, int section, int position) {
+        int sqlPosition = logEntryList.get(section).get(position);
+        suLogCursor.moveToPosition(sqlPosition);
+        SuLogEntry entry = new SuLogEntry(suLogCursor);
+        holder.setExpanded(itemExpanded.contains(sqlPosition));
+        holder.itemView.setOnClickListener(view -> {
+            if (holder.mExpanded) {
+                holder.collapse();
+                itemExpanded.remove(sqlPosition);
+            } else {
                 holder.expand();
+                itemExpanded.add(sqlPosition);
             }
-        }
+        });
+        holder.appName.setText(entry.appName);
+        holder.action.setText(entry.action ? R.string.grant : R.string.deny);
+        holder.command.setText(entry.command);
+        holder.fromPid.setText(String.valueOf(entry.fromPid));
+        holder.toUid.setText(String.valueOf(entry.toUid));
+        holder.time.setText(entry.getTimeString());
     }
 
-    private class LogGroup extends ExpandableGroup<SuLogEntry> {
-        LogGroup(String title, List<SuLogEntry> items) {
-            super(title, items);
-        }
+    public void notifyDBChanged() {
+        if (suLogCursor != null)
+            suLogCursor.close();
+        suLogCursor = suDB.getLogCursor();
+        logEntryList = suDB.getLogStructure();
+        itemExpanded.clear();
+        sectionExpanded.clear();
+        sectionExpanded.add(0);
+        notifyDataSetChanged();
     }
 
-    static class LogGroupViewHolder extends GroupViewHolder {
+    static class SectionHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.date) TextView date;
         @BindView(R.id.arrow) ImageView arrow;
 
-        public LogGroupViewHolder(View itemView) {
+        SectionHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
-
-        @Override
-        public void expand() {
-            RotateAnimation rotate =
-                    new RotateAnimation(360, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            rotate.setDuration(300);
-            rotate.setFillAfter(true);
-            arrow.setAnimation(rotate);
-        }
-
-        @Override
-        public void collapse() {
-            RotateAnimation rotate =
-                    new RotateAnimation(180, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-            rotate.setDuration(300);
-            rotate.setFillAfter(true);
-            arrow.setAnimation(rotate);
-        }
     }
 
-    // Wrapper class
-    static class LogViewHolder extends ChildViewHolder {
-
-        private InternalViewHolder expandableViewHolder;
+    static class LogViewHolder extends ExpandableViewHolder {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.action) TextView action;
@@ -162,36 +140,11 @@ public class SuLogAdapter {
         LogViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            expandableViewHolder = new InternalViewHolder(itemView);
         }
 
-        private class InternalViewHolder extends ExpandableViewHolder {
-
-            InternalViewHolder(View itemView) {
-                super(itemView);
-            }
-
-            @Override
-            public void setExpandLayout(View itemView) {
-                expandLayout = itemView.findViewById(R.id.expand_layout);
-            }
-        }
-
-        private boolean getExpanded() {
-            return expandableViewHolder.mExpanded;
-        }
-
-        private void setExpanded(boolean expanded) {
-            expandableViewHolder.setExpanded(expanded);
-        }
-
-        private void expand() {
-            expandableViewHolder.expand();
-        }
-
-        private void collapse() {
-            expandableViewHolder.collapse();
+        @Override
+        public void setExpandLayout(View itemView) {
+            expandLayout = itemView.findViewById(R.id.expand_layout);
         }
     }
-
 }

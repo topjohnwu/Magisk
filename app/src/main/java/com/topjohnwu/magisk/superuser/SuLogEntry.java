@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.superuser;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.topjohnwu.magisk.MagiskManager;
 
@@ -11,7 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class SuLogEntry implements Parcelable {
+public class SuLogEntry {
 
     public int fromUid, toUid, fromPid;
     public String packageName, appName, command;
@@ -54,46 +52,5 @@ public class SuLogEntry implements Parcelable {
 
     public String getTimeString() {
         return new SimpleDateFormat("h:mm a", MagiskManager.locale).format(date);
-    }
-
-
-    public static final Creator<SuLogEntry> CREATOR = new Creator<SuLogEntry>() {
-        @Override
-        public SuLogEntry createFromParcel(Parcel in) {
-            return new SuLogEntry(in);
-        }
-
-        @Override
-        public SuLogEntry[] newArray(int size) {
-            return new SuLogEntry[size];
-        }
-    };
-
-    protected SuLogEntry(Parcel in) {
-        fromUid = in.readInt();
-        toUid = in.readInt();
-        fromPid = in.readInt();
-        packageName = in.readString();
-        appName = in.readString();
-        command = in.readString();
-        action = in.readByte() != 0;
-        date = new Date(in.readLong());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(fromUid);
-        dest.writeInt(toUid);
-        dest.writeInt(fromPid);
-        dest.writeString(packageName);
-        dest.writeString(appName);
-        dest.writeString(command);
-        dest.writeByte((byte) (action ? 1 : 0));
-        dest.writeLong(date.getTime());
     }
 }

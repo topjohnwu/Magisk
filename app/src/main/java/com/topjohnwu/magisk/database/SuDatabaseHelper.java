@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.superuser.Policy;
@@ -13,8 +15,10 @@ import com.topjohnwu.magisk.superuser.SuLogEntry;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class SuDatabaseHelper extends SQLiteOpenHelper {
@@ -179,31 +183,42 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private List<SuLogEntry> getLogList(SQLiteDatabase db, String selection) {
-        try (Cursor c = db.query(LOG_TABLE, null, selection, null, null, null, "time DESC")) {
-            List<SuLogEntry> ret = new ArrayList<>(c.getCount());
+    public List<List<Integer>> getLogStructure() {
+        try (Cursor c = mDb.query(LOG_TABLE, new String[] { "time" }, null, null, null, null, "time DESC")) {
+            List<List<Integer>> ret = new ArrayList<>();
+            List<Integer> list = null;
+            String dateString = null, newString;
             while (c.moveToNext()) {
-                ret.add(new SuLogEntry(c));
+                Date date = new Date(c.getLong(c.getColumnIndex("time")) * 1000);
+                newString = DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
+                if (!TextUtils.equals(dateString, newString)) {
+                    dateString = newString;
+                    list = new ArrayList<>();
+                    ret.add(list);
+                }
+                list.add(c.getPosition());
             }
             return ret;
         }
     }
 
+    public Cursor getLogCursor() {
+        return getLogCursor(mDb);
+    }
+
+    public Cursor getLogCursor(SQLiteDatabase db) {
+        return db.query(LOG_TABLE, null, null, null, null, null, "time DESC");
+    }
+
     private void migrateLegacyLogList(File oldDB, SQLiteDatabase newDB) {
-        SQLiteDatabase oldDb = SQLiteDatabase.openDatabase(oldDB.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
-        List<SuLogEntry> logs = getLogList(oldDb, null);
-        for (SuLogEntry log : logs) {
-            newDB.insert(LOG_TABLE, null, log.getContentValues());
+        try (SQLiteDatabase oldDb = SQLiteDatabase.openDatabase(oldDB.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
+             Cursor c = getLogCursor(oldDb)) {
+            while (c.moveToNext()) {
+                ContentValues values = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(c, values);
+                newDB.insert(LOG_TABLE, null, values);
+            }
         }
-        oldDb.close();
-    }
-
-    public List<SuLogEntry> getLogList() {
-        return getLogList(null);
-    }
-
-    public List<SuLogEntry> getLogList(String selection) {
-        return getLogList(mDb, selection);
     }
 
     public void addLog(SuLogEntry log) {
