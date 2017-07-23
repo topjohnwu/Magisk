@@ -1,12 +1,9 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Öppna navigeringslåda</string>
     <string name="navigation_drawer_close">Stäng navigeringslåda</string>
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Moduler</string>
     <string name="downloads">Nerladdningar</string>
     <string name="superuser">Superuser</string>

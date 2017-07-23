@@ -38,7 +38,7 @@
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(No se puede detectar automáticamente)</string
+    <string name="cannot_auto_detect">(No se puede detectar automáticamente)</string>
     <string name="boot_image_title">Ubicación de la imagen boot</string>
     <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
