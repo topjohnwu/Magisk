@@ -14,6 +14,7 @@
 
     <!--Magisk Fragment-->
     <string name="magisk_version">Instalado Magisk v%1$s</string>
+     <string name="magisk_version_core_only">Instalado Magisk v%1$s (Core Only Mode)</string>
     <string name="magisk_version_error">Magisk no está instalado</string>
 
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
@@ -30,10 +31,14 @@
     <string name="safetyNet_no_response">No puede comprobar SafetyNet, ¿No tiene internet?</string>
     <string name="safetyNet_fail">SafetyNet: Error, no coincide el perfil CTS</string>
     <string name="safetyNet_pass">SafetyNet: Correcto</string>
+    <string name="safetyNet_network_loss">Conexión de red perdida</string>
+    <string name="safetyNet_service_disconnected">Se ha detenido el servicio</string>
+    <string name="safetyNet_res_invalid">La respuesta no es válida</string>
     <string name="root_info_warning">Funcionalidad enormemente limitada</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
+    <string name="cannot_auto_detect">(No se puede detectar automáticamente)</string
     <string name="boot_image_title">Ubicación de la imagen boot</string>
     <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
@@ -43,7 +48,12 @@
     <string name="install_magisk_title">Última versión de Magisk: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="reboot_countdown">Reiniciando en %1$d</string>
-
+    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
+    <string name="uninstall_magisk_msg">Esto eliminará todos los módulos, MagiskSU, y potencialmente puede cifrar sus datos si no está encriptada\nEstas seguro de continuar?</string>
+    <string name="version_none">(Ninguno)</string>
+    <string name="reinstall">Re-Instalar</string>
+    <string name="update">Actualización</string>
+    
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se han encontrado módulos</string>
@@ -117,6 +127,10 @@
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Procesando</string>
+    <string name="manual_boot_image">¡Selecciona manualmente una imagen de arranque!</string>
+    <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
+    <string name="manager_download_install">Pulse para descargar e instalar</string>
+    <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
 
     <!--Settings Activity -->
@@ -127,7 +141,9 @@
     <string name="settings_notification_summary">Notificar cuando una nueva versión esté disponible</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
-
+    <string name="language">Idioma</string>
+    <string name="system_default">(Idioma del sistema)</string>
+    
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y archivo hosts fuera de la partición de sistema seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Habilitar archivo hosts fuera de la partición de sistema</string>
