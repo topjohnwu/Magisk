@@ -50,6 +50,8 @@
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Αυτό θα αφαιρέσει όλες τις ενότητες, το MagiskSU και πιθανόν να κρυπτογραφύσει τα δεδομένα σας αν δεν είναι κρυπτογραφυμένα\nΕίστε σίγουρος/η ότι θέλετε να συνεχίσετε;</string>
     <string name="version_none">(Καμία)</string>
+    <string name="reinstall">Επανεγκατάσταση</string>
+    <string name="update">Ενημέρωση</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>
@@ -127,6 +129,8 @@
     <string name="manual_boot_image">Παρακαλώ επιλέξτε χειροκίνητα μια εικόνα boot!</string>
     <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για κατέβασμα και εγκατάσταση</string>
+    <string name="magisk_updates">Ενημερώσεις Magisk</string>
+    <string name="flashing">Γίνεται Flash</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Γενικά</string>
@@ -136,6 +140,8 @@
     <string name="settings_notification_summary">Εμφάνιση ειδοποιήσεων ενημέρωσης όταν είναι διαθέσιμη νέα έκδοση</string>
     <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
+    <string name="language">Γλώσσα</string>
+    <string name="system_default">(Προεπιλογή Συστήματος)</string>
 
     <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
     <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU, MagiskHide, και systemless hosts θα παραμείνουν ενεργά</string>
@@ -197,8 +203,8 @@
     <string name="twentymin">20 λεπτά</string>
     <string name="thirtymin">30 λεπτά</string>
     <string name="sixtymin">60 λεπτά</string>
-    <string name="su_allow_toast">Στο %1$s παραχορούνται δικαιώματα υπερχρήστη</string>
-    <string name="su_deny_toast">Στο %1$s απορρίπτονται τα δικαιώματα υπερχρήστη</string>
+    <string name="su_allow_toast">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
+    <string name="su_deny_toast">Δεν παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="no_apps_found">Δεν βρέθηκαν εφαρμογές</string>
     <string name="su_snack_grant">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_snack_deny">Δεν παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
