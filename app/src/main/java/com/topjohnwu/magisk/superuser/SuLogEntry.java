@@ -30,7 +30,7 @@ public class SuLogEntry {
         appName = c.getString(c.getColumnIndex("app_name"));
         command = c.getString(c.getColumnIndex("command"));
         action = c.getInt(c.getColumnIndex("action")) != 0;
-        date = new Date(c.getLong(c.getColumnIndex("time")) * 1000);
+        date = new Date(c.getLong(c.getColumnIndex("time")));
     }
 
     public ContentValues getContentValues() {
@@ -42,7 +42,7 @@ public class SuLogEntry {
         values.put("command", command);
         values.put("to_uid", toUid);
         values.put("action", action ? 1 : 0);
-        values.put("time", date.getTime() / 1000);
+        values.put("time", date.getTime());
         return values;
     }
 

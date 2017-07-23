@@ -27,7 +27,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     public static final String MULTIUSER_MODE = "multiuser_mode";
     public static final String MNT_NS = "mnt_ns";
 
-    private static final int DATABASE_VER = 2;
+    private static final int DATABASE_VER = 3;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
@@ -76,6 +76,10 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             }
             ++oldVersion;
         }
+        if (oldVersion == 2) {
+            db.execSQL("UPDATE " + LOG_TABLE + " SET time=time*1000");
+            ++oldVersion;
+        }
     }
 
     private void createTables(SQLiteDatabase db) {
@@ -104,7 +108,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(System.currentTimeMillis() / 1000) });
         // Clear outdated logs
         mDb.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
-                System.currentTimeMillis() / 1000 - magiskManager.suLogTimeout * 86400) });
+                System.currentTimeMillis() - magiskManager.suLogTimeout * 86400000) });
     }
 
     public void deletePolicy(Policy policy) {
@@ -189,7 +193,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             List<Integer> list = null;
             String dateString = null, newString;
             while (c.moveToNext()) {
-                Date date = new Date(c.getLong(c.getColumnIndex("time")) * 1000);
+                Date date = new Date(c.getLong(c.getColumnIndex("time")));
                 newString = DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
                 if (!TextUtils.equals(dateString, newString)) {
                     dateString = newString;
