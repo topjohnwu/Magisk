@@ -52,6 +52,8 @@
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
     <string name="version_none">（无）</string>
+    <string name="reinstall">重新安装</string>
+    <string name="update">更新</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>
@@ -129,6 +131,8 @@
     <string name="manual_boot_image">请手动选择 Boot 镜像位置！</string>
     <string name="manager_update_title">Magisk Manager 有更新！</string>
     <string name="manager_download_install">点击以下载并安装</string>
+    <string name="magisk_updates">Magisk 更新</string>
+    <string name="flashing">正在刷入</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -138,6 +142,8 @@
     <string name="settings_notification_summary">当有新版本可用时显示更新通知</string>
     <string name="settings_clear_cache_title">清除资源库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制刷新在线数据</string>
+    <string name="language">语言</string>
+    <string name="system_default">（系统默认）</string>
 
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
