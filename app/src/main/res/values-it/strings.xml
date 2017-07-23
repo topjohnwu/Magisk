@@ -4,7 +4,7 @@
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Apri drawer navigazione</string>
     <string name="navigation_drawer_close">Chiudi drawer navigazione</string>
-   <string name="modules">Moduli</string>
+    <string name="modules">Moduli</string>
     <string name="downloads">Download</string>
     <string name="superuser">Superuser</string>
     <string name="log">Registro eventi</string>
@@ -12,7 +12,7 @@
     <string name="status">Stato</string>
     <string name="install">Installa</string>
 
-     <!--Status Fragment-->
+    <!--Status Fragment-->
     <string name="magisk_version">Versione Magisk: v%1$s</string>
     <string name="magisk_version_core_only">Versione Magisk v%1$s (modo core)</string>
     <string name="magisk_version_error">Magisk non installato</string>
@@ -52,6 +52,8 @@
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Questo rimuoverà tutti i moduli, MagiskSU, e potenzialmente crittograferà i dati, se non crittografati/nVuoi continuare?</string>
     <string name="version_none">(nessuna)</string>
+    <string name="reinstall">Reinstalla</string>
+    <string name="update">Aggiorna</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(nessuna informazione)</string>
@@ -127,6 +129,10 @@
     <string name="internal_storage">Lo ZIP si trova in:\n[memoria interna]%1$s</string>
     <string name="zip_process_title">Elaborazione</string>
     <string name="manual_boot_image">Seleziona manualmente l\'immagine di boot!</string>
+    <string name="manager_update_title">Nuovo aggiornamento di Magisk Manager disponibile!</string>
+    <string name="manager_download_install">Premere per scaricare e installare</string>
+    <string name="magisk_updates">Aggiornamenti Magisk</string>
+    <string name="flashing">Flashando</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Generale</string>
