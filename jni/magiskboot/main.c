@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
 		mmap_ro(argv[2], (unsigned char **) &buf, &size);
 		SHA1(sha1, buf, size);
 		for (int i = 0; i < 20; ++i)
-			fprintf(stderr, "%02x", sha1[i]);
-		fprintf(stderr, "\n");
+			printf("%02x", sha1[i]);
+		printf("\n");
 		munmap(buf, size);
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
 		unpack(argv[2]);

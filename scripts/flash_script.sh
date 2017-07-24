@@ -3,7 +3,7 @@
 #
 # Magisk Flash Script
 # by topjohnwu
-# 
+#
 # This script will detect, construct the environment for Magisk
 # It will then call boot_patch.sh to patch the boot image
 #
@@ -87,7 +87,7 @@ find_boot_image
 ##########################################################################################
 
 ui_print "- Constructing environment"
-  
+
 is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
 # Copy required files
@@ -152,7 +152,7 @@ ui_print "- Found Boot Image: $BOOTIMAGE"
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
-  SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img | tail -n 1`
+  SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
   $MAGISKBIN/magiskboot --compress $STOCKDUMP

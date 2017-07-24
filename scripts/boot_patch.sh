@@ -3,11 +3,11 @@
 #
 # Magisk Boot Image Patcher
 # by topjohnwu
-# 
+#
 # This script should be placed in a directory with the following files:
-# 
+#
 # File name       type      Description
-# 
+#
 # boot_patch.sh   script    A script to patch boot. Expect path to boot image as parameter.
 #               (this file) The script will use binaries and files in its same directory
 #                           to complete the patching process
@@ -19,7 +19,7 @@
 #                           All magisk entrypoints are defined here
 # chromeos        folder    This folder should store all the utilities and keys to sign
 #               (optional)  a chromeos device, used in the tablet Pixel C
-# 
+#
 # If the script is not running as root, then the input boot image should be a stock image
 # or have a backup included in ramdisk internally, since we cannot access the stock boot
 # image placed under /data we've created when previously installing
@@ -147,7 +147,7 @@ case $? in
   0 )  # Stock boot
     ui_print_wrap "- Stock boot image detected!"
     ui_print_wrap "- Backing up stock boot image"
-    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" | tail -n 1`
+    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img
     dd if="$BOOTIMAGE" of=$STOCKDUMP
     ./magiskboot --compress $STOCKDUMP

@@ -3,17 +3,17 @@
 #
 # Magisk Uninstaller
 # by topjohnwu
-# 
+#
 # This script can be placed in /cache/magisk_uninstaller.sh
 # The Magisk main binary will pick up the script, and uninstall itself, following a reboot
 # This script can also be used in flashable zip with the uninstaller_loader.sh
-# 
+#
 # This script will try to do restoration with the following:
 # 1-1. Find and restore the original stock boot image dump (OTA proof)
 # 1-2. If 1-1 fails, restore ramdisk from the internal backup
 #      (ramdisk fully restored, not OTA friendly)
 # 1-3. If 1-2 fails, it will remove added files in ramdisk, however modified files
-#      are remained modified, because we have no backups. By doing so, Magisk will 
+#      are remained modified, because we have no backups. By doing so, Magisk will
 #      not be started at boot, but this isn't actually 100% cleaned up
 # 2. Remove all Magisk related files
 #    (The list is LARGE, most likely due to bad decision in early versions
@@ -84,7 +84,7 @@ esac
 
 # Update our previous backup to new format if exists
 if [ -f /data/stock_boot.img ]; then
-  SHA1=`./magiskboot --sha1 /data/stock_boot.img | tail -n 1`
+  SHA1=`./magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
   STOCKDUMP=/data/stock_boot_${SHA1}.img
   mv /data/stock_boot.img $STOCKDUMP
   ./magiskboot --compress $STOCKDUMP
