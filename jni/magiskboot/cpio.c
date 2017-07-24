@@ -470,6 +470,24 @@ static int cpio_restore(struct vector *v) {
 	return ret;
 }
 
+static void cpio_stocksha1(struct vector *v) {
+	cpio_file *f;
+	char sha1[41];
+	vec_for_each(v, f) {
+		if (strcmp(f->filename, "init.magisk.rc") == 0) {
+			for (char *pos = f->data; pos < f->data + f->filesize; pos = strchr(pos + 1, '\n') + 1) {
+				if (memcmp(pos, "# STOCKSHA1=", 12) == 0) {
+					pos += 12;
+					memcpy(sha1, pos, 40);
+					sha1[40] = '\0';
+					printf("%s\n", sha1);
+					return;
+				}
+			}
+		}
+	}
+}
+
 int cpio_commands(const char *command, int argc, char *argv[]) {
 	int recursive = 0, ret = 0;
 	command_t cmd;
@@ -480,6 +498,8 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		cmd = TEST;
 	} else if (strcmp(command, "restore") == 0) {
 		cmd = RESTORE;
+	} else if (strcmp(command, "stocksha1") == 0) {
+		cmd = STOCKSHA1;
 	} else if (argc == 1 && strcmp(command, "backup") == 0) {
 		cmd = BACKUP;
 	} else if (argc > 0 && strcmp(command, "rm") == 0) {
@@ -510,6 +530,9 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	case RESTORE:
 		ret = cpio_restore(&v);
 		break;
+	case STOCKSHA1:
+		cpio_stocksha1(&v);
+		return 0;
 	case BACKUP:
 		cpio_backup(argv[0], &v);
 	case RM:

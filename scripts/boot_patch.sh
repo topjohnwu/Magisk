@@ -106,7 +106,7 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 
 # Detect whether running as root
-[ `id -u` -eq 0 ] && ROOT=true || ROOT=false
+id | grep "uid=0" >/dev/null 2>&1 && ROOT=true || ROOT=false
 
 # Switch to the location of the script file
 [ -z $SOURCEDMODE ] && cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
@@ -156,12 +156,7 @@ case $? in
   1 )  # Magisk patched
     ui_print_wrap "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
-    if [ -z $SHA1 ]; then
-      ./magiskboot --cpio-extract ramdisk.cpio init.magisk.rc init.magisk.rc.old
-      SHA1=`grep_prop "# STOCKSHA1" init.magisk.rc.old`
-      rm -f init.magisk.rc.old
-    fi
-
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio`
     OK=false
     ./magiskboot --cpio-restore ramdisk.cpio
     if [ $? -eq 0 ]; then

@@ -1,10 +1,10 @@
 ##########################################################################################
-# 
+#
 # Magisk General Utility Functions
 # by topjohnwu
-# 
+#
 # Used in flash_script.sh, addon.d.sh, magisk module installers, and uninstaller
-# 
+#
 ##########################################################################################
 
 MAGISK_VERSION_STUB
@@ -30,7 +30,7 @@ get_outfd() {
 ui_print() {
   if $BOOTMODE; then
     echo "$1"
-  else 
+  else
     echo -n -e "ui_print $1\n" >> /proc/self/fd/$OUTFD
     echo -n -e "ui_print\n" >> /proc/self/fd/$OUTFD
   fi
@@ -128,10 +128,21 @@ api_level_arch_detect() {
 recovery_actions() {
   # TWRP bug fix
   mount -o bind /dev/urandom /dev/random
+  # Preserve environment varibles
+  OLD_PATH=$PATH
+  OLD_LD_PATH=$LD_LIBRARY_PATH
+  # Extract busybox from Magisk Manager
+  if [ -f $INSTALLER/common/magisk.apk ]; then
+    mkdir -p $TMPDIR/bin
+    [ $ARCH = "arm" -o $ARCH = "arm64" ] && BBPATH=lib/armeabi-v7a || BBPATH=lib/x86
+    unzip -p $INSTALLER/common/magisk.apk $BBPATH/libbusybox.so > $TMPDIR/bin/busybox 2>/dev/null
+    chmod 755 $TMPDIR/bin/busybox
+    $TMPDIR/bin/busybox --install -s $TMPDIR/bin
+    export PATH=$PATH:$TMPDIR/bin
+  fi
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Add all possible library paths
-  OLD_LD_PATH=$LD_LIBRARY_PATH
   $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
 }
 
@@ -139,6 +150,7 @@ recovery_cleanup() {
   mv /sbin_tmp /sbin
   # Clear LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=$OLD_LD_PATH
+  export PATH=$OLD_PATH
   ui_print "- Unmounting partitions"
   umount -l /system
   umount -l /vendor 2>/dev/null

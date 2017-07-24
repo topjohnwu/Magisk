@@ -183,6 +183,7 @@ if ! $BOOTMODE; then
   $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
   rmdir /magisk
   recovery_cleanup
+  rm -rf $TMPDIR
 fi
 
 ui_print "- Done"

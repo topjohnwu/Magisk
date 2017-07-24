@@ -55,7 +55,8 @@ typedef enum {
     TEST,
     PATCH,
     BACKUP,
-    RESTORE
+    RESTORE,
+    STOCKSHA1
 } command_t;
 
 extern char *SUP_LIST[];
