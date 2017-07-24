@@ -127,6 +127,7 @@ public class SettingsActivity extends Activity {
         private ListPreference setLocalePreference(ListPreference lp) {
             if (lp == null) {
                 lp = new ListPreference(getActivity());
+                generalCatagory.addPreference(lp);
             }
             CharSequence[] entries = new CharSequence[magiskManager.locales.size() + 1];
             CharSequence[] entryValues = new CharSequence[magiskManager.locales.size() + 1];
@@ -255,12 +256,11 @@ public class SettingsActivity extends Activity {
 
         @Override
         public void onTrigger(CallbackEvent event) {
-            ListPreference language = setLocalePreference(null);
+            ListPreference language = setLocalePreference((ListPreference) findPreference("locale"));
             language.setOnPreferenceClickListener((pref) -> {
                 setLocalePreference((ListPreference) pref);
                 return false;
             });
-            generalCatagory.addPreference(language);
         }
 
         @Override
