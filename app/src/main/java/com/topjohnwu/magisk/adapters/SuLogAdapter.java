@@ -74,7 +74,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
             } else {
                 rotate = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 sectionExpanded.add(section);
-                notifyItemRangeChanged(getItemPosition(section, 0), logEntryList.get(section).size());
+                notifyItemRangeInserted(getItemPosition(section, 0), logEntryList.get(section).size());
             }
             rotate.setDuration(300);
             rotate.setFillAfter(true);
