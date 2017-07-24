@@ -1,6 +1,7 @@
 # Triggers
 
 on post-fs
+    start logd
     start magisk_pfs
     wait /dev/.magisk.unblock 20
 
