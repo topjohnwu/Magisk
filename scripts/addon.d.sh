@@ -45,7 +45,10 @@ main() {
   # Check if system root is installed and remove
   remove_system_su
 
-  recovery_actions
+  if ! $isABDevice
+  then
+    recovery_actions
+  fi
 
   find_boot_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"

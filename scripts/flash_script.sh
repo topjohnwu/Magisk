@@ -205,6 +205,7 @@ then
   chmod 0750 /system/init.magisk.rc
   chown 0.0 /system/magisk /system/init.magisk.rc
   grep "import /init.magisk.rc" /system/init.rc >/dev/null || sed -i '1,/.*import.*/s/.*import.*/import \/init.magisk.rc\n&/' /system/init.rc
+  touch $MAGISKBIN/.late_logmon
 fi
 
 if [ -f stock_boot* ]; then

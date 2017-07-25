@@ -39,6 +39,22 @@ abort_wrap() {
   fi
 }
 
+clean_ab_sys() {
+  ui_print_wrap "- Cleaning /system"
+  rm -rf /system/magisk* /system/sbin_orig /system/sbin/magisk* /system/sbin/su /system/sbin/resetprop \
+         /system/sbin/sepolicy-inject /system/sbin/supolicy /system/init.magisk.rc 2>/dev/null
+  grep "import /init.magisk.rc" /system/init.rc >/dev/null && sed -i 's/import.*\/init.magisk.rc//' /system/init.rc
+}
+
+clean_files() {
+  ui_print_wrap "- Removing Magisk files"
+  rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
+          /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
+          /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
+          /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk*
+          /data/app/com.topjohnwu.magisk* /data/user/*/com.topjohnwu.magisk 2>/dev/null
+}
+
 if [ ! -d $MAGISKBIN -o ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
   ui_print_wrap "! Cannot find $MAGISKBIN"
   exit 1
@@ -98,6 +114,7 @@ fi
 ./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
+    if $isABDevice; then clean_ab_sys; clean_files; exit 0; fi
     ui_print_wrap "- Stock boot image detected!"
     ui_print_wrap "! Magisk is not installed!"
     exit
@@ -147,11 +164,10 @@ else
 fi
 rm -f stock_boot.img
 
-ui_print_wrap "- Removing Magisk files"
-rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
-        /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
-        /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
-        /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk* \
-        /data/app/com.topjohnwu.magisk* /data/user/*/com.topjohnwu.magisk 2>/dev/null
+clean_files
 
+if $isABDevice
+then
+  clean_ab_sys
+fi
 $BOOTMODE && reboot

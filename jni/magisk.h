@@ -36,6 +36,7 @@
 #define HIDELIST        COREDIR "/hidelist"
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
+#define LATELOGMON      "/data/magisk/.late_logmon"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
