@@ -111,9 +111,20 @@ static void hide_daemon(int pid) {
 	}
 
 	// First unmount dummy skeletons, /sbin links, cache mounts, and mirrors
+/* goodwin
 	vec_for_each(&mount_list, line) {
 		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
 			|| (strstr(line, cache_block) && (strstr(line, " /system") || strstr(line, " /vendor")))
+			|| strstr(line, MIRRDIR)) {
+			sscanf(line, "%*s %4096s", buffer);
+			lazy_unmount(buffer);
+		}
+		free(line);
+	}
+*/
+	vec_for_each(&mount_list, line) {
+		if (strstr(line, "tmpfs /sbin")
+			|| (strstr(line, cache_block) && strstr(line, " /system"))
 			|| strstr(line, MIRRDIR)) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);

@@ -70,39 +70,77 @@ void clean_magisk_props() {
 }
 
 void relink_sbin() {
-	struct stat st;
-	if (stat("/sbin_orig", &st) == -1 && errno == ENOENT) {
-		// Re-link all binaries and bind mount 
-		DIR *dir;
-		struct dirent *entry;
-		char from[PATH_MAX], to[PATH_MAX];
+    struct stat st;
+    DIR *dir;
+    struct dirent *entry;
+    char from[PATH_MAX], to[PATH_MAX];
 
-		LOGI("hide_utils: Re-linking /sbin\n");
+    if (stat("/sbin_orig", &st) == -1 && errno == ENOENT) {
+	// Re-link all binaries and bind mount 
+	LOGI("hide_utils: Re-linking /sbin (initial)\n");
 
-		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-		xrename("/sbin", "/sbin_orig");
-		xmkdir("/sbin", 0755);
-		xchmod("/sbin", 0755);
-		xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-		xmkdir("/dev/sbin_bind", 0755);
-		xchmod("/dev/sbin_bind", 0755);
-		dir = xopendir("/sbin_orig");
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 
-		while ((entry = xreaddir(dir))) {
-			if (strcmp(entry->d_name, "..") == 0)
-				continue;
-			snprintf(from, sizeof(from), "/sbin_orig/%s", entry->d_name);
-			if (entry->d_type == DT_LNK)
-				xreadlink(from, from, sizeof(from));
-			snprintf(to, sizeof(to), "/dev/sbin_bind/%s", entry->d_name);
-			symlink(from, to);
-			lsetfilecon(to, "u:object_r:rootfs:s0");
-		}
-		
-		closedir(dir);
+	clone_dir("/sbin", "/sbin_orig");
+	xchmod("/sbin_orig", 0755);
+	unlink("/sbin/magiskpolicy");
+	unlink("/sbin/sepolicy-inject");
+	unlink("/sbin/resetprop");
+	unlink("/sbin/su");
+	unlink("/sbin/supolicy");
 
-		xmount("/dev/sbin_bind", "/sbin", NULL, MS_BIND, NULL);
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	xmkdir("/dev/sbin_bind", 0755);
+	xchmod("/dev/sbin_bind", 0755);
+	dir = xopendir("/sbin_orig");
+
+	while ((entry = xreaddir(dir))) {
+	    if (strcmp(entry->d_name, "..") == 0)
+		continue;
+	    snprintf(from, sizeof(from), "/sbin_orig/%s", entry->d_name);
+	    if (entry->d_type == DT_LNK)
+		xreadlink(from, from, sizeof(from));
+	    snprintf(to, sizeof(to), "/dev/sbin_bind/%s", entry->d_name);
+	    symlink(from, to);
+	    lsetfilecon(to, "u:object_r:rootfs:s0");
 	}
+	
+	closedir(dir);
+
+	xmount("/dev/sbin_bind", "/sbin", NULL, MS_BIND, NULL);
+    }else
+    if (stat("/dev/sbin_bind", &st) == -1 && errno == ENOENT) {
+	// Re-link all binaries and bind mount 
+	LOGI("hide_utils: Re-linking /sbin\n");
+
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+
+	unlink("/sbin/magiskpolicy");
+	unlink("/sbin/sepolicy-inject");
+	unlink("/sbin/resetprop");
+	unlink("/sbin/su");
+	unlink("/sbin/supolicy");
+
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	xmkdir("/dev/sbin_bind", 0755);
+	xchmod("/dev/sbin_bind", 0755);
+	dir = xopendir("/sbin_orig");
+
+	while ((entry = xreaddir(dir))) {
+	    if (strcmp(entry->d_name, "..") == 0)
+		continue;
+	    snprintf(from, sizeof(from), "/sbin_orig/%s", entry->d_name);
+	    if (entry->d_type == DT_LNK)
+		xreadlink(from, from, sizeof(from));
+	    snprintf(to, sizeof(to), "/dev/sbin_bind/%s", entry->d_name);
+	    symlink(from, to);
+	    lsetfilecon(to, "u:object_r:rootfs:s0");
+	}
+	
+	closedir(dir);
+
+	xmount("/dev/sbin_bind", "/sbin", NULL, MS_BIND, NULL);
+    }
 }
 
 int add_list(char *proc) {

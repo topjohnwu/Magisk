@@ -148,7 +148,7 @@ def zip_main(args):
 	with zipfile.ZipFile('tmp_unsigned.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
 		# Compiled Binaries
 		for lib_dir, zip_dir in [('arm64-v8a', 'arm64'), ('armeabi-v7a', 'arm'), ('x86', 'x86'), ('x86_64', 'x64')]:
-			for binary in ['magisk', 'magiskboot']:
+			for binary in ['magisk', 'magiskboot', 'magiskpolicy', 'magisk_utils']:
 				source = os.path.join('libs', lib_dir, binary)
 				target = os.path.join(zip_dir, binary)
 				zip_with_msg(zipf, source, target)
@@ -185,6 +185,10 @@ def zip_main(args):
 		# init.magisk.rc
 		source = os.path.join('scripts', 'init.magisk.rc')
 		target = os.path.join('common', 'init.magisk.rc')
+		zip_with_msg(zipf, source, target)
+		# init.magisk.rc.pixel
+		source = os.path.join('scripts', 'init.magisk.rc.pixel')
+		target = os.path.join('common', 'init.magisk.rc.pixel')
 		zip_with_msg(zipf, source, target)
 		# boot_patch.sh
 		source = os.path.join('scripts', 'boot_patch.sh')

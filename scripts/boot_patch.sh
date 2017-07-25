@@ -62,12 +62,25 @@ basename_wrap() {
   echo ${1##*/}
 }
 
+ABdevice_check() {
+  SYSTEM=/system
+  ABDeviceCheck=$(cat /proc/cmdline | grep slot_suffix | wc -l)
+  if [ $ABDeviceCheck -gt 0 ];
+  then
+    isABDevice=true
+    SLOT=$(for i in `cat /proc/cmdline`; do echo $i | grep slot_suffix | awk -F "=" '{print $2}';done)
+    SYSTEM=$SYSTEM/system
+  else
+    isABDevice=false
+  fi
+}
+
 grep_prop() {
   REGEX="s/^$1=//p"
   shift
   FILES=$@
   if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
+    FILES="$SYSTEM/build.prop"
   fi
   cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
@@ -95,6 +108,10 @@ CWD=`pwd`
 cd "`dirname_wrap $1`"
 BOOTIMAGE="`pwd`/`basename_wrap $1`"
 cd "$CWD"
+
+isABDevice=false
+SYSTEM=/system
+ABdevice_check
 
 if [ -z "$BOOTIMAGE" ]; then
   ui_print_wrap "This script requires a boot image as a parameter"
@@ -205,7 +222,12 @@ ui_print_wrap "- Patching ramdisk"
 
 # sepolicy patches
 cpio_extract sepolicy sepolicy
-./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
+if $isABdevice
+then
+  ./magiskpolicy --load sepolicy --save sepolicy --minimal
+else
+  ./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
+fi
 cpio_add 644 sepolicy sepolicy
 rm -f sepolicy
 

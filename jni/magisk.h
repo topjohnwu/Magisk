@@ -36,6 +36,7 @@
 #define HIDELIST        COREDIR "/hidelist"
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
+#define LATELOGMON      "/data/magisk/.late_logmon"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
@@ -70,6 +71,14 @@ static inline void stub(const char *fmt, ...) {}
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #define PLOGE(fmt, args...) { LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno)); err_handler(); }
+
+#ifdef STATIC
+#define LOGD(...) stub(__VA_ARGS__)
+#define LOGI(...) stub(__VA_ARGS__)
+#define LOGW(...) stub(__VA_ARGS__)
+#define LOGE(...) stub(__VA_ARGS__)
+#define PLOGE(...) stub(__VA_ARGS__)
+#endif
 
 extern char *argv0;     /* For changing process name */
 

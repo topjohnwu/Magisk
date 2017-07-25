@@ -46,6 +46,28 @@ LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)
 
+include $(CLEAR_VARS)
+LOCAL_MODULE := magisk_utils
+LOCAL_LDFLAGS += -static
+
+LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH)/ \
+	$(LOCAL_PATH)/utils \
+	$(LOCAL_PATH)/daemon \
+	$(LOCAL_PATH)/external
+
+LOCAL_SRC_FILES := \
+	main_utils.c \
+	utils/misc.c \
+	utils/vector.c \
+	utils/xwrap.c \
+	utils/list.c \
+	utils/img.c
+
+LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DSTATIC -DPIXEL
+
+include $(BUILD_EXECUTABLE)
+
 # External shared libraries, build stub libraries for linking
 include jni/external/Android.mk
 
@@ -54,3 +76,5 @@ include jni/selinux/libsepol/Android.mk
 
 # Build magiskboot
 include jni/magiskboot/Android.mk
+
+include jni/magiskpolicy/Android.mk

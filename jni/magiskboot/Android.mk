@@ -3,6 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libz liblzma liblz4 libbz2
+LOCAL_LDFLAGS += -static
 LOCAL_C_INCLUDES := \
 	jni/utils \
 	jni/ndk-compression/zlib/ \

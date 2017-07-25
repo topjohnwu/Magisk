@@ -32,6 +32,10 @@ fi
 # Load utility functions
 . $INSTALLER/util_functions.sh
 
+isABDevice=false
+SYSTEM=/system
+ABdevice_check
+
 get_outfd
 
 ##########################################################################################
@@ -44,11 +48,15 @@ ui_print "************************"
 
 ui_print "- Mounting /system, /vendor, /cache, /data"
 mount -o ro /system 2>/dev/null
+if $isABDevice
+then
+  mount -o rw,remount /system 2>/dev/null
+fi
 mount -o ro /vendor 2>/dev/null
 mount /cache 2>/dev/null
 mount /data 2>/dev/null
 
-[ -f /system/build.prop ] || abort "! /system could not be mounted!"
+[ -f $SYSTEM/build.prop ] || abort "! /system could not be mounted!"
 
 api_level_arch_detect
 
@@ -71,7 +79,10 @@ if is_mounted /data; then
   cp -af $INSTALLER/util_functions.sh $MAGISKBIN
   chmod -R 755 $MAGISKBIN
   # Run the acttual uninstallation
-  recovery_actions
+  if ! $isABDevice
+  then
+    recovery_actions
+  fi
   . $INSTALLER/magisk_uninstaller.sh
   recovery_cleanup
 else

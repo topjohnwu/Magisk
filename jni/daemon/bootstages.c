@@ -478,6 +478,9 @@ void post_fs_data(int client) {
 	// Error handler
 	err_handler = unblock_boot_process;
 
+	if (access(LATELOGMON, F_OK) == 0)
+		monitor_logs();
+
 	// ack
 	write_int(client, 0);
 	close(client);
