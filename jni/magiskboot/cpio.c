@@ -62,7 +62,7 @@ static int cpio_compare(const void *a, const void *b) {
 
 // Parse cpio file to a vector of cpio_file
 static void parse_cpio(const char *filename, struct vector *v) {
-	printf("Loading cpio: [%s]\n\n", filename);
+	fprintf(stderr, "Loading cpio: [%s]\n\n", filename);
 	int fd = xopen(filename, O_RDONLY);
 	cpio_newc_header header;
 	cpio_file *f;
@@ -105,7 +105,7 @@ static void parse_cpio(const char *filename, struct vector *v) {
 }
 
 static void dump_cpio(const char *filename, struct vector *v) {
-	printf("\nDump cpio: [%s]\n\n", filename);
+	fprintf(stderr, "\nDump cpio: [%s]\n\n", filename);
 	int fd = open_new(filename);
 	unsigned inode = 300000;
 	char header[111];
@@ -158,7 +158,7 @@ static void cpio_rm(int recursive, const char *entry, struct vector *v) {
 		if ((recursive && strncmp(f->filename, entry, strlen(entry)) == 0)
 			|| (strcmp(f->filename, entry) == 0) ) {
 			if (!f->remove) {
-				printf("Remove [%s]\n", entry);
+				fprintf(stderr, "Remove [%s]\n", entry);
 				f->remove = 1;
 			}
 			if (!recursive) return;
@@ -173,7 +173,7 @@ static void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
 	f->filename = xmalloc(f->namesize);
 	memcpy(f->filename, entry, f->namesize);
 	cpio_vec_insert(v, f);
-	printf("Create directory [%s] (%04o)\n",entry, mode);
+	fprintf(stderr, "Create directory [%s] (%04o)\n",entry, mode);
 }
 
 static void cpio_add(mode_t mode, const char *entry, const char *filename, struct vector *v) {
@@ -189,7 +189,7 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, struc
 	xxread(fd, f->data, f->filesize);
 	close(fd);
 	cpio_vec_insert(v, f);
-	printf("Add entry [%s] (%04o)\n", entry, mode);
+	fprintf(stderr, "Add entry [%s] (%04o)\n", entry, mode);
 }
 
 static void cpio_test(struct vector *v) {
@@ -270,7 +270,7 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 					if (injected)
 						continue;
 					// Inject magisk script as import
-					printf("Inject new line [import /init.magisk.rc] in [init.rc]\n");
+					fprintf(stderr, "Inject new line [import /init.magisk.rc] in [init.rc]\n");
 					line = xcalloc(sizeof(*line), 1);
 					line->line = strdup("import /init.magisk.rc");
 					line->isNew = 1;
@@ -279,7 +279,7 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 					injected = 1;
 				} else if (strstr(line->line, "selinux.reload_policy")) {
 					// Remove this line
-					printf("Remove line [%s] in [init.rc]\n", line->line);
+					fprintf(stderr, "Remove line [%s] in [init.rc]\n", line->line);
 					f->filesize -= strlen(line->line) + 1;
 					__ = list_pop(&line->pos);
 					free(line);
@@ -296,14 +296,14 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 					for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
 						skip = check_verity_pattern(f->data + read);
 						if (skip > 0) {
-							printf("Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
+							fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
 							read += skip;
 						}
 						f->data[write] = f->data[read];
 					}
 					f->filesize = write;
 				} else if (strcmp(f->filename, "verity_key") == 0) {
-					printf("Remove [verity_key]\n");
+					fprintf(stderr, "Remove [verity_key]\n");
 					f->remove = 1;
 				}
 			}
@@ -313,7 +313,7 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 						for (int i = 0 ; ENCRYPT_LIST[i]; ++i) {
 							if (strncmp(f->data + read, ENCRYPT_LIST[i], strlen(ENCRYPT_LIST[i])) == 0) {
 								memcpy(f->data + write, "encryptable", 11);
-								printf("Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);
+								fprintf(stderr, "Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);
 								write += 11;
 								read += strlen(ENCRYPT_LIST[i]);
 								break;
@@ -332,7 +332,7 @@ static void cpio_extract(const char *entry, const char *filename, struct vector 
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
-			printf("Extracting [%s] to [%s]\n\n", entry, filename);
+			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
 			int fd = open_new(filename);
 			xwrite(fd, f->data, f->filesize);
 			fchmod(fd, f->mode);
@@ -390,14 +390,14 @@ static void cpio_backup(const char *orig, struct vector *v) {
 			// Something is missing in new ramdisk, backup!
 			++i;
 			doBak = 1;
-			printf("Backup missing entry: ");
+			fprintf(stderr, "Backup missing entry: ");
 		} else if (res == 0) {
 			++i; ++j;
 			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
 				continue;
 			// Not the same!
 			doBak = 1;
-			printf("Backup mismatch entry: ");
+			fprintf(stderr, "Backup mismatch entry: ");
 		} else {
 			// Someting new in ramdisk, record in rem
 			++j;
@@ -405,14 +405,14 @@ static void cpio_backup(const char *orig, struct vector *v) {
 			rem->data = xrealloc(rem->data, rem->filesize + n->namesize);
 			memcpy(rem->data + rem->filesize, n->filename, n->namesize);
 			rem->filesize += n->namesize;
-			printf("Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
+			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
 		}
 		if (doBak) {
 			m->namesize += 8;
 			m->filename = realloc(m->filename, m->namesize);
 			strcpy(buf, m->filename);
 			sprintf(m->filename, ".backup/%s", buf);
-			printf("[%s] -> [%s]\n", buf, m->filename);
+			fprintf(stderr, "[%s] -> [%s]\n", buf, m->filename);
 			vec_push_back(&bak, m);
 			// NULL the original entry, so it won't be freed
 			vec_entry(o)[i - 1] = NULL;
@@ -459,7 +459,7 @@ static int cpio_restore(struct vector *v) {
 			n->data = xmalloc(n->filesize);
 			memcpy(n->data, f->data, n->filesize);
 			n->remove = 0;
-			printf("Restoring [%s] -> [%s]\n", f->filename, n->filename);
+			fprintf(stderr, "Restoring [%s] -> [%s]\n", f->filename, n->filename);
 			cpio_vec_insert(v, n);
 		}
 	}

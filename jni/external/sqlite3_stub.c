@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "sqlite3.h"
 SQLITE_API const char *sqlite3_libversion(void) { return 0; }
 SQLITE_API const char *sqlite3_sourceid(void) { return 0; }

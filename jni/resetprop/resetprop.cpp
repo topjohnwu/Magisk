@@ -60,43 +60,31 @@
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "_system_properties.h"
-#include <sys/system_properties.h>
-
-#ifdef INDEP_BINARY
-
-int resetprop_main(int argc, char *argv[]);
-int main(int argc, char *argv[]) {
-    return resetprop_main(argc, argv);
-}
-#define PRINT_D(...)  if (verbose) printf(__VA_ARGS__)
-#define PRINT_E(...)  fprintf(stderr, __VA_ARGS__)
-
-#else
+#include "system_properties.h"
 #include "magisk.h"
+#include "resetprop.h"
 
 #define PRINT_D(...)  { LOGD(__VA_ARGS__); if (verbose) printf(__VA_ARGS__); }
 #define PRINT_E(...)  { LOGE(__VA_ARGS__); fprintf(stderr, __VA_ARGS__); }
-
-#endif
-
-#include "resetprop.h"
+#define PERSISTENT_PROPERTY_DIR  "/data/property"
 
 static int verbose = 0;
 
-static bool is_legal_property_name(const char* name, size_t namelen) {
+static bool is_legal_property_name(const char *name, size_t namelen) {
+
     if (namelen < 1) return false;
     if (name[0] == '.') return false;
     if (name[namelen - 1] == '.') return false;
 
-    /* Only allow alphanumeric, plus '.', '-', or '_' */
+    /* Only allow alphanumeric, plus '.', '-', '@', ':', or '_' */
     /* Don't allow ".." to appear in a property name */
     for (size_t i = 0; i < namelen; i++) {
         if (name[i] == '.') {
             // i=0 is guaranteed to never have a dot. See above.
-            if (name[i - 1] == '.') return false;
+            if (name[i-1] == '.') return false;
             continue;
         }
-        if (name[i] == '_' || name[i] == '-') continue;
+        if (name[i] == '_' || name[i] == '-' || name[i] == '@' || name[i] == ':') continue;
         if (name[i] >= 'a' && name[i] <= 'z') continue;
         if (name[i] >= 'A' && name[i] <= 'Z') continue;
         if (name[i] >= '0' && name[i] <= '9') continue;
@@ -117,6 +105,7 @@ static int usage(char* arg0) {
         "Options:\n"
         "   -v          verbose output\n"
         "   -n          don't trigger events when changing props\n"
+        "               if used with deleteprop determines whether remove persist prop file\n"
     , arg0, arg0, arg0, arg0);
     return 1;
 }
@@ -152,6 +141,22 @@ char *getprop(const char *name) {
     return strdup(value);
 }
 
+static void (*cb)(const char *);
+
+static void run_actual_cb(void* cookie, const char *name, const char *value, uint32_t serial) {
+    cb(name);
+}
+
+static void prop_foreach_cb(const prop_info* pi, void* cookie) {
+    __system_property_read_callback2(pi, run_actual_cb, NULL);
+}
+
+void getprop_all(void (*cbk)(const char *name)) {
+    if (init_resetprop()) return;
+    cb = cbk;
+    __system_property_foreach2(prop_foreach_cb, NULL);
+}
+
 int setprop(const char *name, const char *value) {
     return setprop2(name, value, 1);
 }
@@ -163,7 +168,7 @@ int setprop2(const char *name, const char *value, const int trigger) {
     prop_info *pi = (prop_info*) __system_property_find2(name);
     if (pi != NULL) {
         if (trigger) {
-            if (!strncmp(name, "ro.", 3)) deleteprop(name);
+            if (!strncmp(name, "ro.", 3)) deleteprop(name, trigger);
             ret = __system_property_set2(name, value);
         } else {
             ret = __system_property_update2(pi, value, strlen(value));
@@ -186,12 +191,17 @@ int setprop2(const char *name, const char *value, const int trigger) {
     return ret;
 }
 
-int deleteprop(const char *name) {
+int deleteprop(const char *name, const int trigger) {
     if (init_resetprop()) return -1;
     PRINT_D("resetprop: deleteprop [%s]\n", name);
     if (__system_property_del(name)) {
-        PRINT_E("resetprop: delete prop: [%s] error\n", name);
+        PRINT_D("resetprop: delete prop: [%s] error\n", name);
         return -1;
+    }
+    if (trigger && strstr(name, "persist.")) {
+        char buffer[PATH_MAX];
+        snprintf(buffer, sizeof(buffer), "%s/%s", PERSISTENT_PROPERTY_DIR, name);
+        unlink(buffer);
     }
     return 0;
 }
@@ -287,7 +297,7 @@ int resetprop_main(int argc, char *argv[]) {
     if (file) {
         return read_prop_file(filename, trigger);
     } else if (del) {
-        return deleteprop(name);
+        return deleteprop(name, trigger);
     } else {
         return setprop2(name, value, trigger);
     }

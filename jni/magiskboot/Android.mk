@@ -13,10 +13,8 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	main.c \
-	unpack.c \
-	repack.c \
+	bootimg.c \
 	hexpatch.c \
-	parseimg.c \
 	compress.c \
 	boot_utils.c \
 	cpio.c \

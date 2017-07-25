@@ -478,6 +478,9 @@ void post_fs_data(int client) {
 	// Error handler
 	err_handler = unblock_boot_process;
 
+	if (access(LATELOGMON, F_OK) == 0)
+		monitor_logs();
+
 	// ack
 	write_int(client, 0);
 	close(client);
@@ -489,6 +492,7 @@ void post_fs_data(int client) {
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 	char *const command[] = { "logcat", "-v", "brief", NULL };
 	debug_log_pid = run_command(0, &debug_log_fd, "/system/bin/logcat", command);
+	close(debug_log_fd);
 #endif
 
 	LOGI("** post-fs-data mode running\n");
@@ -556,7 +560,7 @@ void post_fs_data(int client) {
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
-		goto skip_modules;
+		goto core_only;
 
 	DIR *dir;
 	struct dirent *entry;
@@ -700,7 +704,7 @@ void post_fs_data(int client) {
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
 
-skip_modules:
+core_only:
 	// Systemless hosts
 	if (access(HOSTSFILE, F_OK) == 0) {
 		LOGI("* Enabling systemless hosts file support");
@@ -776,6 +780,5 @@ void late_start(int client) {
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
-	close(debug_log_fd);
 #endif
 }

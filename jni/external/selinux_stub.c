@@ -1,5 +1,3 @@
-#include <sys/types.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include "selinux/avc.h"
 #include "selinux/context.h"

@@ -232,8 +232,6 @@ int run_command(int err, int *fd, const char *path, char *const argv[]) {
 			if (xpipe2(pipefd, O_CLOEXEC) == -1)
 				return -1;
 			writeEnd = pipefd[1];
-			// Give the read end of the pipe
-			*fd = pipefd[0];
 		} else {
 			writeEnd = *fd;
 		}
@@ -241,7 +239,11 @@ int run_command(int err, int *fd, const char *path, char *const argv[]) {
 
 	int pid = fork();
 	if (pid != 0) {
-		close(writeEnd);
+		if (fd && *fd < 0) {
+			// Give the read end and close write end
+			*fd = pipefd[0];
+			close(pipefd[1]);
+		}
 		return pid;
 	}
 

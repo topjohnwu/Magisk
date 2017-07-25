@@ -91,6 +91,7 @@ static void hide_daemon(int pid) {
 
 	manage_selinux();
 	relink_sbin();
+	clean_magisk_props();
 
 	if (switch_mnt_ns(pid))
 		return;
@@ -180,7 +181,10 @@ void proc_monitor() {
 
 	while (1) {
 		// Clear previous logcat buffer
-		system("logcat -b events -c");
+		char *const restart[] = { "logcat", "-b", "events", "-c", NULL };
+		log_pid = run_command(0, NULL, "/system/bin/logcat", restart);
+		if (log_pid > 0)
+			waitpid(log_pid, NULL, 0);
 
 		// Monitor am_proc_start
 		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
@@ -269,6 +273,5 @@ void proc_monitor() {
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, NULL, 0);
 		close(log_fd);
-		log_pid = 0;
 	}
 }

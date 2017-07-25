@@ -82,57 +82,8 @@ int open_new(const char *filename) {
 	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 }
 
-void print_info() {
-	printf("KERNEL [%d] @ 0x%08x\n", hdr.kernel_size, hdr.kernel_addr);
-	printf("RAMDISK [%d] @ 0x%08x\n", hdr.ramdisk_size, hdr.ramdisk_addr);
-	printf("SECOND [%d] @ 0x%08x\n", hdr.second_size, hdr.second_addr);
-	printf("DTB [%d] @ 0x%08x\n", hdr.dt_size, hdr.tags_addr);
-	printf("PAGESIZE [%d]\n", hdr.page_size);
-	if (hdr.os_version != 0) {
-		int a,b,c,y,m = 0;
-		int os_version, os_patch_level;
-		os_version = hdr.os_version >> 11;
-		os_patch_level = hdr.os_version & 0x7ff;
-		
-		a = (os_version >> 14) & 0x7f;
-		b = (os_version >> 7) & 0x7f;
-		c = os_version & 0x7f;
-		printf("OS_VERSION [%d.%d.%d]\n", a, b, c);
-		
-		y = (os_patch_level >> 4) + 2000;
-		m = os_patch_level & 0xf;
-		printf("PATCH_LEVEL [%d-%02d]\n", y, m);
-	}
-	printf("NAME [%s]\n", hdr.name);
-	printf("CMDLINE [%s]\n", hdr.cmdline);
-
-	switch (ramdisk_type) {
-		case GZIP:
-			printf("COMPRESSION [%s]\n", "gzip");
-			break;
-		case XZ:
-			printf("COMPRESSION [%s]\n", "xz");
-			break;
-		case LZMA:
-			printf("COMPRESSION [%s]\n", "lzma");
-			break;
-		case BZIP2:
-			printf("COMPRESSION [%s]\n", "bzip2");
-			break;
-		case LZ4:
-			printf("COMPRESSION [%s]\n", "lz4");
-			break;
-		case LZ4_LEGACY:
-			printf("COMPRESSION [%s]\n", "lz4_legacy");
-			break;
-		default:
-			fprintf(stderr, "Unknown ramdisk format!\n");
-	}
-	printf("\n");
-}
-
 void cleanup() {
-	printf("Cleaning up...\n");
+	fprintf(stderr, "Cleaning up...\n");
 	char name[PATH_MAX];
 	unlink(KERNEL_FILE);
 	unlink(RAMDISK_FILE);

@@ -42,6 +42,9 @@ main() {
 
   api_level_arch_detect
 
+  # Check if system root is installed and remove
+  remove_system_su
+
   recovery_actions
 
   find_boot_image
