@@ -164,7 +164,7 @@
     <string name="request_timeout">Timeout richiesta</string>
     <string name="superuser_notification">Notifica Superuser</string>
     <string name="request_timeout_summary">%1$s secondi</string>
-    <string name="settings_su_reauth_title">Ri-autentifica dopo aggironamento</string>
+    <string name="settings_su_reauth_title">Ri-autentifica dopo aggiornamento</string>
     <string name="settings_su_reauth_summary">Ri-autentifica permessi superuser dopo aggiornamento applicazione</string>
 
     <string name="multiuser_mode">Modo multiutente</string>
