@@ -138,7 +138,9 @@
     <string name="settings_notification_summary">Een update melding weergeven wanneer een nieuwe versie beschikbaar is</string>
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
-
+    <string name="language">Taal</string>
+    <string name="system_default">(Systeem standaard)</string>
+    
     <string name="settings_core_only_title">Magisk basismodus</string>
     <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
