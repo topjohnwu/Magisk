@@ -101,13 +101,13 @@
     <string name="ok">OK</string>
     <string name="close">Close</string>
     <string name="repo_install_title">Install %1$s</string>
-    <string name="repo_install_msg">Do you want to install %1$s ?</string>
+    <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download_install">Download &amp; Install</string>
     <string name="download">Download</string>
     <string name="goto_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
-    <string name="invalid_zip">The zip is not a Magisk Module!!</string>
+    <string name="invalid_zip">This zip is not a Magisk Module!</string>
     <string name="reboot_title">Installation succeeded!</string>
     <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
