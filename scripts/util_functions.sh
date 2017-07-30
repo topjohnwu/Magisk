@@ -144,6 +144,9 @@ recovery_actions() {
   mv /sbin /sbin_tmp
   # Add all possible library paths
   $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
+  # Add /data/magisk to the system-path
+  OLD_PATH=$PATH
+  export PATH=/data/magisk:$PATH
 }
 
 recovery_cleanup() {
