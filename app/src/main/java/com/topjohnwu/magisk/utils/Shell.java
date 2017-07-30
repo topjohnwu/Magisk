@@ -106,6 +106,7 @@ public class Shell {
         synchronized (shellProcess) {
             try {
                 for (String command : commands) {
+                    Logger.shell(command);
                     STDIN.write((command + "\n").getBytes("UTF-8"));
                     STDIN.flush();
                 }
@@ -127,7 +128,7 @@ public class Shell {
             // This should be the expected result
         }
         synchronized (shellProcess) {
-            StreamGobbler out = new StreamGobbler(this.STDOUT, output);
+            StreamGobbler out = new StreamGobbler(STDOUT, output);
             out.start();
             sh_raw(commands);
             sh_raw("echo \'-shell-done-\'");

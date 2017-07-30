@@ -37,7 +37,7 @@ public class MagiskManager extends Application {
     public static final String INTENT_SECTION = "section";
     public static final String INTENT_VERSION = "version";
     public static final String INTENT_LINK = "link";
-    public static final String BUSYBOX_VERSION = "1.26.2";
+    public static final String BUSYBOX_VERSION = "1.27.1";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
@@ -165,6 +165,7 @@ public class MagiskManager extends Application {
         // Initialize busybox
         File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
         if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
+            shell.su("rm -rf " + busybox.getParentFile());
             busybox.getParentFile().mkdirs();
             shell.su_raw(
                     "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
@@ -189,7 +190,7 @@ public class MagiskManager extends Application {
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
         // Add busybox to PATH
-        shell.su_raw("PATH=$PATH:" + busybox.getParent());
+        shell.su_raw("PATH=" + busybox.getParent() + ":$PATH");
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
