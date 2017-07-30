@@ -8,6 +8,7 @@
 ##########################################################################################
 
 MAGISK_VERSION_STUB
+SCRIPT_VERSION=$MAGISK_VER_CODE
 
 get_outfd() {
   readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
@@ -36,31 +37,36 @@ ui_print() {
   fi
 }
 
+grep_prop() {
+  REGEX="s/^$1=//p"
+  shift
+  FILES=$@
+  [ -z "$FILES" ] && FILES='/system/build.prop'
+  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
+}
+
 getvar() {
   local VARNAME=$1
-  local VALUE=$(eval echo \$"$VARNAME");
-  for FILE in /dev/.magisk /data/.magisk /cache/.magisk /system/.magisk; do
-    if [ -z "$VALUE" ]; then
-      LINE=$(cat $FILE 2>/dev/null | grep "$VARNAME=")
-      if [ ! -z "$LINE" ]; then
-        VALUE=${LINE#*=}
-      fi
-    fi
+  local VALUE=`eval echo \$$VARNAME`
+  [ ! -z $VALUE ] && return
+  for DIR in /dev /data /cache /system; do
+    VALUE=`grep_prop $VARNAME $DIR/.magisk`
+    [ ! -z $VALUE ] && break;
   done
   eval $VARNAME=\$VALUE
 }
 
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
-    for BLOCK in boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do
-      BOOTIMAGE=`ls /dev/block/by-name/$BLOCK || ls /dev/block/platform/*/by-name/$BLOCK || ls /dev/block/platform/*/*/by-name/$BLOCK` 2>/dev/null
+    for BLOCK in boot_a kern-a android_boot kernel boot lnx; do
+      BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
   # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
     for FSTAB in /etc/*fstab*; do
-      BOOTIMAGE=`grep -E '\b/boot\b' $FSTAB | grep -v "#" | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+      BOOTIMAGE=`grep -v '#' $FSTAB | grep -E '\b/boot\b' | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
@@ -74,16 +80,6 @@ is_mounted() {
     cat /proc/mounts | grep $1 >/dev/null
   fi
   return $?
-}
-
-grep_prop() {
-  REGEX="s/^$1=//p"
-  shift
-  FILES=$@
-  if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
-  fi
-  cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
 
 remove_system_su() {
@@ -131,15 +127,11 @@ recovery_actions() {
   # Preserve environment varibles
   OLD_PATH=$PATH
   OLD_LD_PATH=$LD_LIBRARY_PATH
-  # Extract busybox from Magisk Manager
-  if [ -f $INSTALLER/common/magisk.apk ]; then
-    mkdir -p $TMPDIR/bin
-    [ $ARCH = "arm" -o $ARCH = "arm64" ] && BBPATH=lib/armeabi-v7a || BBPATH=lib/x86
-    unzip -p $INSTALLER/common/magisk.apk $BBPATH/libbusybox.so > $TMPDIR/bin/busybox 2>/dev/null
-    chmod 755 $TMPDIR/bin/busybox
-    $TMPDIR/bin/busybox --install -s $TMPDIR/bin
-    export PATH=$PATH:$TMPDIR/bin
-  fi
+  # Add busybox to PATH
+  mkdir -p $TMPDIR/bin
+  ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
+  $MAGISKBIN/busybox --install -s $TMPDIR/bin
+  export PATH=$TMPDIR/bin:$PATH
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Add all possible library paths
@@ -147,48 +139,39 @@ recovery_actions() {
 }
 
 recovery_cleanup() {
-  mv /sbin_tmp /sbin
-  # Clear LD_LIBRARY_PATH
+  mv /sbin_tmp /sbin 2>/dev/null
   export LD_LIBRARY_PATH=$OLD_LD_PATH
-  export PATH=$OLD_PATH
+  [ -z $OLD_PATH ] || export PATH=$OLD_PATH
   ui_print "- Unmounting partitions"
-  umount -l /system
+  umount -l /system 2>/dev/null
   umount -l /vendor 2>/dev/null
-  umount -l /dev/random
+  umount -l /dev/random 2>/dev/null
 }
 
 abort() {
   ui_print "$1"
-  mv /sbin_tmp /sbin 2>/dev/null
+  $BOOTMODE || recovery_cleanup
   exit 1
 }
 
 set_perm() {
   chown $2:$3 $1 || exit 1
   chmod $4 $1 || exit 1
-  if [ ! -z $5 ]; then
-    chcon $5 $1 2>/dev/null
-  else
-    chcon 'u:object_r:system_file:s0' $1 2>/dev/null
-  fi
+  [ -z $5 ] && chcon -h 'u:object_r:system_file:s0' $1 || chcon -h $5 $1
 }
 
 set_perm_recursive() {
   find $1 -type d 2>/dev/null | while read dir; do
     set_perm $dir $2 $3 $4 $6
   done
-  find $1 -type f 2>/dev/null | while read file; do
+  find $1 -type f -o -type l 2>/dev/null | while read file; do
     set_perm $file $2 $3 $5 $6
   done
 }
 
 mktouch() {
-  mkdir -p ${1%/*}
-  if [ -z "$2" ]; then
-    touch $1
-  else
-    echo $2 > $1
-  fi
+  mkdir -p ${1%/*} 2>/dev/null
+  [ -z $2 ] && touch $1 || echo $2 > $1
   chmod 644 $1
 }
 

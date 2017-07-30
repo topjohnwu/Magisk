@@ -89,10 +89,7 @@ def build_apk(args):
 		source = os.path.join('scripts', script)
 		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'assets', script)
 		print('cp: {} -> {}'.format(source, target))
-		with open(source, 'r') as file:
-			script_cont = file.read().replace('MAGISK_VERSION_STUB', '')
-		with open(target, 'w') as file:
-			file.write(script_cont)
+		shutil.copyfile(source, target)
 
 	print('')
 
@@ -191,22 +188,12 @@ def zip_main(args):
 		# Scripts
 		# flash_script.sh
 		source = os.path.join('scripts', 'flash_script.sh')
-		with open(source, 'r') as script:
-			# Add version info into flash script
-			update_binary = script.read().replace(
-				'MAGISK_VERSION_STUB', 'Magisk v{} Installer'.format(args.versionString))
-			target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
-			print('zip: ' + source + ' -> ' + target)
-			zipf.writestr(target, update_binary)
+		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
+		zip_with_msg(zipf, source, target)
 		# addon.d.sh
 		source = os.path.join('scripts', 'addon.d.sh')
-		with open(source, 'r') as script:
-			# Add version info addon.d.sh
-			addond = script.read().replace(
-				'MAGISK_VERSION_STUB', 'Magisk v{} addon.d'.format(args.versionString))
-			target = os.path.join('addon.d', '99-magisk.sh')
-			print('zip: ' + source + ' -> ' + target)
-			zipf.writestr(target, addond)
+		target = os.path.join('addon.d', '99-magisk.sh')
+		zip_with_msg(zipf, source, target)
 		# updater-script
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'updater-script')
 		print('zip: ' + target)
@@ -224,7 +211,7 @@ def zip_main(args):
 		with open(source, 'r') as script:
 			# Add version info util_functions.sh
 			util_func = script.read().replace(
-				'MAGISK_VERSION_STUB', 'SCRIPT_VERSION={}'.format(args.versionCode))
+				'MAGISK_VERSION_STUB', 'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(args.versionString, args.versionCode))
 			target = os.path.join('common', 'util_functions.sh')
 			print('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, util_func)

@@ -50,7 +50,7 @@ get_outfd
 ##########################################################################################
 
 ui_print "************************"
-ui_print "* MAGISK_VERSION_STUB"
+ui_print "* Magisk v$MAGISK_VER Installer"
 ui_print "************************"
 
 ui_print "- Mounting /system, /vendor, /cache, /data"
@@ -79,9 +79,6 @@ ui_print "- Device platform: $ARCH"
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
 
-find_boot_image
-[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-
 ##########################################################################################
 # Environment
 ##########################################################################################
@@ -95,6 +92,9 @@ rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
 cp -af $CHROMEDIR $MAGISKBIN
+# Extract busybox
+[ $ARCH = "arm" -o $ARCH = "arm64" ] && BBPATH=lib/armeabi-v7a || BBPATH=lib/x86
+unzip -p $INSTALLER/common/magisk.apk $BBPATH/libbusybox.so > $MAGISKBIN/busybox
 chmod -R 755 $MAGISKBIN
 
 # addon.d
@@ -148,6 +148,8 @@ rm -rf $COREDIR/magiskhide $COREDIR/bin
 # Unpack boot
 ##########################################################################################
 
+find_boot_image
+[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found Boot Image: $BOOTIMAGE"
 
 # Update our previous backup to new format if exists
@@ -183,8 +185,9 @@ if ! $BOOTMODE; then
   $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
   rmdir /magisk
   recovery_cleanup
-  rm -rf $TMPDIR
 fi
+
+# rm -rf $TMPDIR
 
 ui_print "- Done"
 exit 0

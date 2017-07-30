@@ -1,11 +1,11 @@
 #!/sbin/sh
 ##########################################################################################
-# 
+#
 # Magisk Survival Script for ROMs with addon.d support
 # by topjohnwu
-# 
+#
 # Inspired by 99-flashafterupdate.sh of osm0sis @ xda-developers
-# 
+#
 ##########################################################################################
 
 . /tmp/backuptool.functions
@@ -34,7 +34,7 @@ main() {
   [ -f /system/build.prop ] || abort "! /system could not be mounted!"
 
   ui_print "************************"
-  ui_print "* MAGISK_VERSION_STUB"
+  ui_print "* Magisk v$MAGISK_VER addon.d"
   ui_print "************************"
 
   api_level_arch_detect
@@ -91,7 +91,7 @@ case "$1" in
   post-restore)
     # Get the FD for ui_print
     OUTFD=`ps | grep -v grep | grep -oE "update(.*)" | cut -d" " -f3`
-    # Run the main function in a parallel subshell 
+    # Run the main function in a parallel subshell
     (main) &
   ;;
 esac
