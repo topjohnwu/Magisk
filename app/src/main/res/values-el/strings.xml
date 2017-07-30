@@ -96,7 +96,7 @@
     <string name="ok">OK</string>
     <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
-    <string name="repo_install_msg">Θέλετε να εγκαταστήσετε %1$s ;</string>
+    <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
     <string name="download_install">Λήψη &amp; Εγκατάσταση</string>
     <string name="download">Λήψη</string>
     <string name="goto_install">Μεταφορά στο τμήμα \"Εγκατάσταση\"</string>
