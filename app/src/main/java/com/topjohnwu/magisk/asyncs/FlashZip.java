@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -26,7 +27,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     private String mFilename;
     private AdaptiveList<String> mList;
 
-    public FlashZip(Context context, Uri uri, AdaptiveList<String> list) {
+    public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
         super(context);
         mUri = uri;
         mList = list;
@@ -100,22 +101,22 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return;
         magiskManager.shell.su_raw(
-                "rm -rf " + mCachedFile.getParent() + "/*",
+                "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );
         switch (result) {
             case -1:
                 mList.add(magiskManager.getString(R.string.install_error));
                 Utils.showUriSnack(getActivity(), mUri);
-                return;
+                break;
             case 0:
                 mList.add(magiskManager.getString(R.string.invalid_zip));
-                return;
+                break;
             case 1:
                 // Success
+                new LoadModules(magiskManager).exec();
                 break;
         }
-        new LoadModules(magiskManager).exec();
         super.onPostExecute(result);
     }
 }
