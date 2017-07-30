@@ -4,8 +4,6 @@
 #ifndef _SEPOLICY_H
 #define _SEPOLICY_H
 
-#define ALL NULL
-
 #include <getopt.h>
 #include <unistd.h>
 #include <stdlib.h>
