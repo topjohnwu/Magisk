@@ -4,7 +4,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libz liblzma liblz4 libbz2
 LOCAL_C_INCLUDES := \
-	jni/utils \
+	$(LOCAL_PATH) \
+	jni/include \
 	jni/ndk-compression/zlib/ \
 	jni/ndk-compression/xz/src/liblzma/api/ \
 	jni/ndk-compression/lz4/lib/ \

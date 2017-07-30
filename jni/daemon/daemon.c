@@ -96,7 +96,7 @@ static int setup_socket(struct sockaddr_un *sun) {
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
-	memcpy(sun->sun_path, REQUESTOR_DAEMON_PATH, REQUESTOR_DAEMON_PATH_LEN);
+	memcpy(sun->sun_path, REQUESTOR_DAEMON_PATH, sizeof(REQUESTOR_DAEMON_PATH) - 1);
 	return fd;
 }
 

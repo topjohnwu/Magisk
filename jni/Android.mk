@@ -6,10 +6,7 @@ LOCAL_STATIC_LIBRARIES := libsepol
 LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/utils \
-	$(LOCAL_PATH)/daemon \
-	$(LOCAL_PATH)/resetprop \
-	$(LOCAL_PATH)/magiskpolicy \
+	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/external \
 	$(LOCAL_PATH)/selinux/libsepol/include
 

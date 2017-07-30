@@ -10,13 +10,11 @@
 #include <pthread.h>
 #include <android/log.h>
 
-#define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
-
 #define str(a) #a
 #define xstr(a) str(a)
 
+#define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
 #define REQUESTOR_DAEMON_PATH     "\0MAGISK"
-#define REQUESTOR_DAEMON_PATH_LEN 7
 
 #define LOG_TAG    "Magisk"
 
