@@ -116,7 +116,7 @@ public class MainActivity extends Activity
 
     @Override
     public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplicationContext().reloadMainActivity };
+        return new CallbackEvent[] { getApplicationContext().reloadActivity };
     }
 
     public void checkHideSection() {

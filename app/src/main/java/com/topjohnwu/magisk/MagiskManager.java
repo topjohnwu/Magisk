@@ -44,7 +44,7 @@ public class MagiskManager extends Application {
 
     // Events
     public final CallbackEvent magiskHideDone = new CallbackEvent();
-    public final CallbackEvent reloadMainActivity = new CallbackEvent();
+    public final CallbackEvent reloadActivity = new CallbackEvent();
     public final CallbackEvent moduleLoadDone = new CallbackEvent();
     public final CallbackEvent repoLoadDone = new CallbackEvent();
     public final CallbackEvent updateCheckDone = new CallbackEvent();

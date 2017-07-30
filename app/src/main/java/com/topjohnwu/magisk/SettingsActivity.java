@@ -25,7 +25,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends Activity implements CallbackEvent.Listener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -55,6 +55,16 @@ public class SettingsActivity extends Activity {
             getFragmentManager().beginTransaction().add(R.id.container, new SettingsFragment()).commit();
         }
 
+    }
+
+    @Override
+    public void onTrigger(CallbackEvent event) {
+        recreate();
+    }
+
+    @Override
+    public CallbackEvent[] getRegisterEvents() {
+        return new CallbackEvent[] { getApplicationContext().reloadActivity };
     }
 
     public static class SettingsFragment extends PreferenceFragment
@@ -124,10 +134,10 @@ public class SettingsActivity extends Activity {
             }
         }
 
-        private ListPreference setLocalePreference(ListPreference lp) {
-            if (lp == null) {
+        private void setLocalePreference(ListPreference lp) {
+            boolean isNew = lp == null;
+            if (isNew) {
                 lp = new ListPreference(getActivity());
-                generalCatagory.addPreference(lp);
             }
             CharSequence[] entries = new CharSequence[magiskManager.locales.size() + 1];
             CharSequence[] entryValues = new CharSequence[magiskManager.locales.size() + 1];
@@ -143,7 +153,9 @@ public class SettingsActivity extends Activity {
             lp.setTitle(R.string.language);
             lp.setKey("locale");
             lp.setSummary(MagiskManager.locale.getDisplayName(MagiskManager.locale));
-            return lp;
+            if (isNew) {
+                generalCatagory.addPreference(lp);
+            }
         }
 
         @Override
@@ -170,8 +182,7 @@ public class SettingsActivity extends Activity {
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (magiskManager.isDarkTheme != enabled) {
                         magiskManager.isDarkTheme = enabled;
-                        magiskManager.reloadMainActivity.trigger(false);
-                        getActivity().recreate();
+                        magiskManager.reloadActivity.trigger(false);
                     }
                     break;
                 case "disable":
@@ -232,8 +243,7 @@ public class SettingsActivity extends Activity {
                     break;
                 case "locale":
                     magiskManager.setLocale();
-                    magiskManager.reloadMainActivity.trigger(false);
-                    getActivity().recreate();
+                    magiskManager.reloadActivity.trigger(false);
                     break;
             }
             setSummary();
@@ -256,11 +266,7 @@ public class SettingsActivity extends Activity {
 
         @Override
         public void onTrigger(CallbackEvent event) {
-            ListPreference language = setLocalePreference((ListPreference) findPreference("locale"));
-            language.setOnPreferenceClickListener((pref) -> {
-                setLocalePreference((ListPreference) pref);
-                return false;
-            });
+            setLocalePreference((ListPreference) findPreference("locale"));
         }
 
         @Override
