@@ -97,7 +97,7 @@
     <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
-    <string name="repo_install_msg">¿ Quieres instalar %1$s ?</string>
+    <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
     <string name="download_install">Descargar e instalar</string>
     <string name="download">Descargar</string>
     <string name="goto_install">Ir a la sección \"Instalar\"</string>
