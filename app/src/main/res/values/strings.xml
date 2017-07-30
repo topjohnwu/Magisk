@@ -16,29 +16,29 @@
     <string name="install">Install</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Installed Magisk v%1$s</string>
-    <string name="magisk_version_core_only">Installed Magisk v%1$s (Core Only Mode)</string>
-    <string name="magisk_version_error">Magisk not installed</string>
+    <string name="magisk_version">Magisk v%1$s Installed</string>
+    <string name="magisk_version_core_only">Magisk v%1$s Installed (Core Only Mode)</string>
+    <string name="magisk_version_error">Magisk is not installed</string>
 
     <string name="checking_for_updates">Checking for updates…</string>
-    <string name="magisk_update_available">Magisk v%1$s available!</string>
-    <string name="cannot_check_updates">Cannot check for updates, no Internet?</string>
-    <string name="up_to_date">Latest version of %1$s installed</string>
+    <string name="magisk_update_available">Magisk v%1$s is available!</string>
+    <string name="cannot_check_updates">Cannot check for updates, no internet?</string>
+    <string name="up_to_date">Latest version of %1$s is installed</string>
     <string name="root_error">Rooted but no root permission, not allowed?</string>
     <string name="not_rooted">Not rooted</string>
     <string name="proper_root">Properly rooted</string>
     <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
-    <string name="safetyNet_check_success">SafetyNet Check Success</string>
+    <string name="safetyNet_check_success">SafetyNet Check Was Successful</string>
     <string name="safetyNet_connection_failed">Cannot connect to Google API</string>
     <string name="safetyNet_connection_suspended">Connection to Google API was suspended</string>
-    <string name="safetyNet_no_response">Cannot check SafetyNet, no Internet?</string>
-    <string name="safetyNet_fail">SafetyNet Failed: CTS profile mismatch</string>
+    <string name="safetyNet_no_response">Cannot verify SafetyNet, no internet?</string>
+    <string name="safetyNet_fail">SafetyNet Invalid: CTS profile mismatch</string>
     <string name="safetyNet_pass">SafetyNet Passed</string>
-    <string name="safetyNet_network_loss">Network connection loss</string>
+    <string name="safetyNet_network_loss">Network connection unavailable</string>
     <string name="safetyNet_service_disconnected">Service has been killed</string>
     <string name="safetyNet_res_invalid">The response is invalid</string>
-    <string name="root_info_warning">Functionality greatly limited</string>
+    <string name="root_info_warning">Functionality is greatly limited</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -116,7 +116,7 @@
     <string name="zip_unzip_msg">Unzipping zip file …</string>
     <string name="zip_process_msg">Processing zip file …</string>
     <string name="zip_install_progress_msg">Installing %1$s …</string>
-    <string name="no_magisk_title">No Magisk Installed!</string>
+    <string name="no_magisk_title">Magisk Is Not Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="magisk_update_title">New Magisk Update Available!</string>
@@ -208,13 +208,13 @@
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">%1$s is granted Superuser rights</string>
-    <string name="su_deny_toast">%1$s is denied Superuser rights</string>
+    <string name="su_allow_toast">%1$s was granted Superuser rights</string>
+    <string name="su_deny_toast">%1$s was denied Superuser rights</string>
     <string name="no_apps_found">No apps found</string>
-    <string name="su_snack_grant">Superuser rights of %1$s is granted</string>
-    <string name="su_snack_deny">Superuser rights of %1$s is denied</string>
-    <string name="su_snack_notif_on">Notifications of %1$s is enabled</string>
-    <string name="su_snack_notif_off">Notifications of %1$s is disabled</string>
+    <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
+    <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
+    <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
+    <string name="su_snack_notif_off">Notifications of %1$s are disabled</string>
     <string name="su_snack_log_on">Logging of %1$s is enabled</string>
     <string name="su_snack_log_off">Logging of %1$s is disabled</string>
     <string name="su_snack_revoke">%1$s rights are revoked</string>
