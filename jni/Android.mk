@@ -39,6 +39,7 @@ LOCAL_SRC_FILES := \
 	su/su_socket.c
 
 LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
+LOCAL_CPPFLAGS := -std=c++11
 LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)
@@ -51,3 +52,10 @@ include jni/selinux/libsepol/Android.mk
 
 # Build magiskboot
 include jni/magiskboot/Android.mk
+
+# Build busybox (32-bit only)
+ifneq ($(TARGET_ARCH_ABI), x86_64)
+ifneq ($(TARGET_ARCH_ABI), arm64-v8a)
+include jni/busybox/Android.mk
+endif
+endif

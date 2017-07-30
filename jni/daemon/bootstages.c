@@ -25,7 +25,7 @@
 static char *buf, *buf2;
 static struct vector module_list;
 
-#ifdef DEBUG
+#ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
 #endif
 
@@ -69,7 +69,7 @@ static int merge_img(const char *source, const char *target) {
 		rename(source, target);
 		return 0;
 	}
-	
+
 	// resize target to worst case
 	int s_used, s_total, t_used, t_total, n_total;
 	get_img_size(source, &s_used, &s_total);
@@ -261,7 +261,7 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 		 * 1. File in module is a symlink
 		 * 2. Target file do not exist
 		 * 3. Target file is a symlink, but not /system/vendor
-		 */ 
+		 */
 		int clone = 0;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
 			clone = 1;
@@ -296,7 +296,7 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 			construct_tree(module, node);
 		}
 	}
-	
+
 	closedir(dir);
 
 cleanup:
@@ -484,7 +484,7 @@ void post_fs_data(int client) {
 	if (!check_data())
 		goto unblock;
 
-#ifdef DEBUG
+#ifdef MAGISK_DEBUG
 	// Start debug logs in new process
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 	char *const command[] = { "logcat", "-v", "brief", NULL };
@@ -751,7 +751,7 @@ void late_start(int client) {
 	if (access(MANAGERAPK, F_OK) == 0) {
 		while (1) {
 			sleep(5);
-			char *const command[] = { "sh", "-c", 
+			char *const command[] = { "sh", "-c",
 				"CLASSPATH=/system/framework/pm.jar "
 				"/system/bin/app_process /system/bin "
 				"com.android.commands.pm.Pm install -r " MANAGERAPK, NULL };
@@ -773,7 +773,7 @@ void late_start(int client) {
 	buf = buf2 = NULL;
 	vec_deep_destroy(&module_list);
 
-#ifdef DEBUG
+#ifdef MAGISK_DEBUG
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);

@@ -13,3 +13,6 @@
 [submodule "MagiskManager"]
 	path = MagiskManager
 	url = https://github.com/topjohnwu/MagiskManager.git
+[submodule "jni/busybox"]
+	path = jni/busybox
+	url = https://github.com/topjohnwu/ndk-busybox.git

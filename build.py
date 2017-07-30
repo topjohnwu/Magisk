@@ -58,7 +58,7 @@ def build_binary(args):
 	header('* Building Magisk binaries')
 
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
-	debug_flag = '' if args.release else '-DDEBUG'
+	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
 	proc = subprocess.run('{} APP_CFLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\" -j{}'.format(
 		ndk_build, args.versionString, args.versionCode, debug_flag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
@@ -113,8 +113,8 @@ def sign_adjust_zip(unsigned, output):
 	header('* Signing / Adjusting Zip')
 
 	# Unsigned->signed
-	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'signapk.jar'), 
-		os.path.join('ziptools', 'test.certificate.x509.pem'), 
+	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'signapk.jar'),
+		os.path.join('ziptools', 'test.certificate.x509.pem'),
 		os.path.join('ziptools', 'test.key.pk8'), unsigned, 'tmp_signed.zip'])
 	if proc.returncode != 0:
 		error('First sign flashable zip failed!')
@@ -131,8 +131,8 @@ def sign_adjust_zip(unsigned, output):
 		error('Adjust flashable zip failed!')
 
 	# Adjusted -> output
-	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'minsignapk.jar'), 
-		os.path.join('ziptools', 'test.certificate.x509.pem'), 
+	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'minsignapk.jar'),
+		os.path.join('ziptools', 'test.certificate.x509.pem'),
 		os.path.join('ziptools', 'test.key.pk8'), 'tmp_adjusted.zip', output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')

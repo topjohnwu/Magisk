@@ -58,7 +58,7 @@ static inline void do_nothing() {}
 // Dummy function to depress debug message
 static inline void stub(const char *fmt, ...) {}
 
-#ifdef DEBUG
+#ifdef MAGISK_DEBUG
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #else
 #define LOGD(...)  stub(__VA_ARGS__)
