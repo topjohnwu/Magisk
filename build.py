@@ -34,6 +34,7 @@ import multiprocessing
 import zipfile
 import datetime
 import errno
+import shutil
 
 def silentremove(file):
 	try:
@@ -45,7 +46,7 @@ def silentremove(file):
 def zip_with_msg(zipfile, source, target):
 	if not os.path.exists(source):
 		error('{} does not exist! Try build \'binary\' and \'apk\' before zipping!'.format(source))
-	print('zip: ' + source + ' -> ' + target)
+	print('zip: {} -> {}'.format(source, target))
 	zipfile.write(source, target)
 
 def build_all(args):
@@ -66,6 +67,34 @@ def build_binary(args):
 
 def build_apk(args):
 	header('* Building Magisk Manager')
+
+	for arch in ['armeabi-v7a', 'x86']:
+		source = os.path.join('libs', arch, 'busybox')
+		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'jniLibs', arch)
+		if not os.path.exists(source):
+			error('{} does not exist! Please build \'binary\' before building apk'.format(source))
+		if not os.path.exists(target):
+			os.makedirs(target)
+		target = os.path.join(target, 'libbusybox.so')
+		print('cp: {} -> {}'.format(source, target))
+		shutil.copyfile(source, target)
+
+	for key in ['public.certificate.x509.pem', 'private.key.pk8']:
+		source = os.path.join('ziptools', key)
+		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'assets', key)
+		print('cp: {} -> {}'.format(source, target))
+		shutil.copyfile(source, target)
+
+	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
+		source = os.path.join('scripts', script)
+		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'assets', script)
+		print('cp: {} -> {}'.format(source, target))
+		with open(source, 'r') as file:
+			script_cont = file.read().replace('MAGISK_VERSION_STUB', '')
+		with open(target, 'w') as file:
+			file.write(script_cont)
+
+	print('')
 
 	os.chdir('MagiskManager')
 	if args.release:
@@ -114,8 +143,8 @@ def sign_adjust_zip(unsigned, output):
 
 	# Unsigned->signed
 	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'signapk.jar'),
-		os.path.join('ziptools', 'test.certificate.x509.pem'),
-		os.path.join('ziptools', 'test.key.pk8'), unsigned, 'tmp_signed.zip'])
+		os.path.join('ziptools', 'public.certificate.x509.pem'),
+		os.path.join('ziptools', 'private.key.pk8'), unsigned, 'tmp_signed.zip'])
 	if proc.returncode != 0:
 		error('First sign flashable zip failed!')
 
@@ -132,8 +161,8 @@ def sign_adjust_zip(unsigned, output):
 
 	# Adjusted -> output
 	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'minsignapk.jar'),
-		os.path.join('ziptools', 'test.certificate.x509.pem'),
-		os.path.join('ziptools', 'test.key.pk8'), 'tmp_adjusted.zip', output])
+		os.path.join('ziptools', 'public.certificate.x509.pem'),
+		os.path.join('ziptools', 'private.key.pk8'), 'tmp_adjusted.zip', output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')
 
