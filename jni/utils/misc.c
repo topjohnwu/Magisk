@@ -133,7 +133,7 @@ void ps(void (*func)(int)) {
 				func(atoi(entry->d_name));
 		}
 	}
-	
+
 	closedir(dir);
 }
 
@@ -183,7 +183,7 @@ int create_links(const char *bin, const char *path) {
 
 #define DEV_BLOCK "/dev/block"
 
-void unlock_blocks() {	
+void unlock_blocks() {
 	char path[PATH_MAX];
 	DIR *dir;
 	struct dirent *entry;
@@ -280,7 +280,7 @@ int mkdir_p(const char *pathname, mode_t mode) {
 
 int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, NULL, MS_BIND, NULL);
-#ifdef DEBUG
+#ifdef MAGISK_DEBUG
 	LOGD("bind_mount: %s -> %s\n", from, to);
 #else
 	LOGI("bind_mount: %s\n", to);
