@@ -58,6 +58,12 @@ def build_all(args):
 def build_binary(args):
 	header('* Building Magisk binaries')
 
+	# Force update Android.mk footprint to trigger recompilation
+	with open(os.path.join('jni', 'Android.mk'), 'r') as makefile:
+		content = makefile.read()
+	with open(os.path.join('jni', 'Android.mk'), 'w') as makefile:
+		makefile.write(content)
+
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
 	proc = subprocess.run('{} APP_CFLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\" -j{}'.format(
