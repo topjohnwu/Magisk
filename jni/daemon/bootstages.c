@@ -161,7 +161,8 @@ void exec_module_script(const char* stage) {
 	char *module;
 	vec_for_each(&module_list, module) {
 		snprintf(buf, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
-		if (access(buf, F_OK) == -1)
+		snprintf(buf2, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
+		if (access(buf, F_OK) == -1 || access(buf2, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		char *const command[] = { "sh", buf, NULL };
@@ -551,10 +552,6 @@ void post_fs_data(int client) {
 		xmkdir(COREDIR "/props", 0755);
 	}
 
-	// Run common scripts
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
-
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		goto core_only;
@@ -702,6 +699,10 @@ void post_fs_data(int client) {
 	exec_module_script("post-fs-data");
 
 core_only:
+	// Run common scripts
+	LOGI("* Running post-fs-data.d scripts\n");
+	exec_common_script("post-fs-data");
+
 	// Systemless hosts
 	if (access(HOSTSFILE, F_OK) == 0) {
 		LOGI("* Enabling systemless hosts file support");
@@ -734,18 +735,17 @@ void late_start(int client) {
 	// Wait till the full patch is done
 	pthread_join(sepol_patch, NULL);
 
-	// Run scripts after full patch, most reliable way to run scripts
-	LOGI("* Running service.d scripts\n");
-	exec_common_script("service");
-
 	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0) {
-		setprop("ro.magisk.disable", "1");
-		return;
-	}
+	if (access(DISABLEFILE, F_OK) == 0)
+		goto core_only;
 
 	LOGI("* Running module service scripts\n");
 	exec_module_script("service");
+
+core_only:
+	// Run scripts after full patch, most reliable way to run scripts
+	LOGI("* Running service.d scripts\n");
+	exec_common_script("service");
 
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
