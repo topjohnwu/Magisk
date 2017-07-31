@@ -1,8 +1,13 @@
  <resources>
+    <!--Universal-->
+    <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="magisk" translatable="false">Magisk</string>
+	
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Gezinti çekmecesini aç</string>
-    <string name="navigation_drawer_close">Gezinti çekmecesini kapat</string>
-     <string name="modules">Modüller</string>
+    <string name="navigation_drawer_open">Gezinme çekmecesini aç</string>
+    <string name="navigation_drawer_close">Gezinme çekmecesini kapat</string>
+	<string name="magiskhide" translatable="false">Magisk Hide</string>
+    <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
     <string name="log">Günlük</string>
@@ -12,39 +17,46 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s yüklü</string>
-     <string name="magisk_version_error">Magisk yüklü değil</string>
+	<string name="magisk_version_core_only">Magisk v%1$s yüklü (Yalnızca Çekirdek Modu)</string>
+    <string name="magisk_version_error">Magisk yüklü değil</string>
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
-    <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet yok mu?</string>
+    <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet bağlantınız yok mu?</string>
     <string name="up_to_date">%1$s\'in son sürümü yüklü</string>
-    <string name="root_error">Rootlu ama root izni yok, izin verilmedi mi?</string>
-    <string name="not_rooted">Rootlu değil</string>
-    <string name="proper_root">Düzgünce rootlandı</string>
+    <string name="root_error">Kök erişimli ama kök erişimi izni yok, izin verilmedi mi?</string>
+    <string name="not_rooted">Kök erişimli değil</string>
+    <string name="proper_root">Uygun şekilde kök erişimi alındı</string>
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
-    <string name="safetyNet_connection_failed">"Google API'ye bağlanılamıyor"</string>
+	<string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
+    <string name="safetyNet_connection_failed">"Google API\'ye bağlanılamıyor"</string>
     <string name="safetyNet_connection_suspended">Google API bağlantısı askıya alındı</string>
-    <string name="safetyNet_no_response">SafetyNet kontrol edilemiyor, İnternet yok mu?</string>
+    <string name="safetyNet_no_response">SafetyNet kontrol edilemiyor, İnternet bağlantınız yok mu?</string>
     <string name="safetyNet_fail">SafetyNet başarısız: CTS profili uyumsuzluğu</string>
     <string name="safetyNet_pass">SafetyNet Geçti</string>
+	<string name="safetyNet_network_loss">Kötü ağ bağlantısı</string>
+	<string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
+	<string name="safetyNet_res_invalid">Yanıt geçersiz</string>
     <string name="root_info_warning">İşlevsellik çok sınırlıdır</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Otomatik) %1$s</string>
     <string name="cannot_auto_detect">(Otomatik algılanamıyor)</string>
-    <string name="boot_image_title">Boot İmajı Konumu</string>
+    <string name="boot_image_title">Önyükleme İmajı Konumu</string>
     <string name="detect_button">Algıla</string>
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
-    <string name="keep_dm_verity">"Dm-verity'yi koru"</string>
+    <string name="keep_dm_verity">"Dm-verity\'yi koru"</string>
     <string name="current_magisk_title">Yüklenmiş Magisk Sürümü: %1$s</string>
     <string name="install_magisk_title">Son Magisk Sürümü: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
-    <string name="uninstall_magisk_title">"Magisk'i kaldır"</string>
-    <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
+    <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
+    <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU\'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
     <string name="version_none">(Hiçbiri)</string>
+	<string name="reinstall">Yeniden Yükle</string>
+	<string name="update">Güncelle</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -55,7 +67,7 @@
     <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak</string>
     <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
     <string name="author">Yapımcı: %1$s</string>
-    <string name="fab_flash_zip">"Modül Zip'ini Yükle"</string>
+    <string name="fab_flash_zip">"Modül Zip\'ini Yükle"</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
@@ -63,7 +75,7 @@
     <string name="not_installed">Yüklenmemiş</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">"SD'ye kaydet"</string>
+    <string name="menuSaveToSd">"SD Kart\'a kaydet"</string>
     <string name="menuReload">Yenile</string>
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
@@ -73,13 +85,13 @@
     <!--About Activity-->
     <string name="about">Hakkında</string>
     <string name="app_developers">Ana geliştiriciler</string>
-    <string name="app_developers_">"<![CDATA[<a href="https://github.com/topjohnwu">topjohnwu</a> tarafından <a href="https://github.com/d8ahazard">Digitalhigh</a> ve <a href="https://github.com/dvdandroid">Dvdandroid</a>]]>'in katkılarıyla oluşturuldu"</string>
+    <string name="app_developers_">"<![CDATA[<a href="https://github.com/topjohnwu">topjohnwu</a> tarafından <a href="https://github.com/d8ahazard">Digitalhigh</a> ve <a href="https://github.com/dvdandroid">Dvdandroid</a>]]>\'in katkılarıyla oluşturuldu"</string>
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Fatih Fırıncı</string>
+    <string name="translators">Fatih Fırıncı - Mevlüt TOPÇU</string>
     <string name="app_version">Uygulama sürümü</string>
     <string name="app_source_code">Kaynak kodu</string>
-    <string name="donation">Bağış</string>
-    <string name="app_translators">Çevirmen</string>
+    <string name="donation">Bağış Yapın</string>
+    <string name="app_translators">Çevirmenler</string>
     <string name="support_thread">Destek konusu</string>
 
     <!--Toasts, Dialogs-->
@@ -105,7 +117,7 @@
     <string name="zip_process_msg">Zip dosyası işleniyor …</string>
     <string name="zip_install_progress_msg">%1$s yükleniyor …</string>
     <string name="no_magisk_title">Magisk Yüklü Değil!</string>
-    <string name="no_magisk_msg">"Magisk'i indirip yüklemek istiyor musunuz?"</string>
+    <string name="no_magisk_msg">"Magisk\'i indirip yüklemek istiyor musunuz?"</string>
     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
@@ -114,12 +126,16 @@
     <string name="safetyNet_hide_notice">Bu uygulama, SafetyNet kullanıyor\nZaten MagiskHide tarafından varsayılan olarak ele alındı</string>
     <string name="start_magiskhide">MagiskHide başlatılıyor …</string>
     <string name="no_magisksu_title">MagiskSU kullanılmıyor!</string>
-    <string name="no_magisksu_msg">"MagiskSU ile rootlu değilsiniz, MagiskHide'ın kendisini kullanmak yeterli olmayabilir!\nResmi olarak desteklenmez ve SafetyNet'i geçmek için ek araçlar (ör. suhide) gerekir."</string>
+    <string name="no_magisksu_msg">"MagiskSU ile kök erişimli değilsiniz, MagiskHide\'ın kendisini kullanmak yeterli olmayabilir!\nResmi olarak desteklenmez ve SafetyNet\'i geçmek için ek araçlar (ör. suhide) gerekir."</string>
     <string name="understand">Anladım</string>
     <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
     <string name="zip_process_title">İşleniyor</string>
     <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>
+	<string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
+	<string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
+	<string name="magisk_updates">Magisk Güncellemeleri</string>
+	<string name="flashing">Flaşlayın</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -129,10 +145,14 @@
     <string name="settings_notification_summary">Yeni sürüm kullanılabilir olduğunda güncelleme bildirimlerini göster</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
+	<string name="language">Dil</string>
+	<string name="system_default">(Sistem Varsayılanı)</string>
 
-     <string name="settings_magiskhide_summary">"Magisk'i çeşitli algılamalardan gizle"</string>
-    <string name="settings_busybox_title">"BusyBox'ı etkinleştir"</string>
-    <string name="settings_busybox_summary">"Magisk'in dahili busybox'ını xbin'e bağla"</string>
+    <string name="settings_core_only_title">Magisk Yalnızca Çekirdek Modu</string>
+	<string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>	
+	<string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
+    <string name="settings_busybox_title">"BusyBox\'ı etkinleştir"</string>
+    <string name="settings_busybox_summary">"Magisk\'in dahili busybox\'ını xbin\'e bağla"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
 
@@ -149,8 +169,27 @@
     <string name="request_timeout">İstek Zaman Aşımı</string>
     <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
     <string name="request_timeout_summary">%1$s saniye</string>
+	<string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulaması yapın</string>
+	<string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrulama</string>
 
-    <string name="settings_development_category">Uygulama Geliştirme</string>
+    <string name="multiuser_mode">Çok Kullanıcılı Modu</string>
+    <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>
+    <string name="settings_owner_manage">Cihaz Sahibi Tarafından Yönetilen</string>
+    <string name="settings_user_independent">Bağımsız Kullanıcı</string>
+    <string name="owner_only_summary">Yalnızca kök erişimi olan kullanıcı</string>
+    <string name="owner_manage_summary">Yalnızca cihaz sahibi kök erişimini yönetebilir ve izin isteklerini alabilir</string>
+    <string name="user_indepenent_summary">Her kullanıcının kendi ayrı kök erişimi kuralları vardır</string>
+    <string name="multiuser_hint_owner_request">Cihaz sahibine bir istek gönderilmiştir. Lütfen cihaz sahibi hesabına geçin ve izin verin</string>
+
+    <string name="mount_namespace_mode">Ad Alanı Modunu Doldur</string>
+    <string name="settings_ns_global">Global Ad Alanı</string>
+    <string name="settings_ns_requester">Inherit Ad Alanı</string>
+    <string name="settings_ns_isolate">Isolated Ad Alanı</string>
+    <string name="global_summary">Tüm kök oturumları genel bağlama ad alanını kullanır</string>
+    <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
+    <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
+	
+	<string name="settings_development_category">Uygulama Geliştirme</string>
     <string name="settings_developer_logging_title">Gelişmiş hata ayıklama günlüğünü etkinleştir</string>
     <string name="settings_developer_logging_summary">Ayrıntılı günlüğü etkinleştirmek için bunu işaretleyin</string>
     <string name="settings_shell_logging_title">Kabuk komut hata ayıklama günlüğünü etkinleştir</string>
