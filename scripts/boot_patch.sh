@@ -117,9 +117,8 @@ chmod +x ./*
 ##########################################################################################
 
 ui_print_wrap "- Unpacking boot image"
-./magiskboot --unpack "$BOOTIMAGE"
-
 CHROMEOS=false
+./magiskboot --unpack "$BOOTIMAGE"
 case $? in
   1 )
     abort_wrap "! Unable to unpack boot image"
