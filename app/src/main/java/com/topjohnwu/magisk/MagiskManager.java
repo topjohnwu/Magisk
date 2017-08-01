@@ -10,7 +10,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.ParallelTask;
@@ -37,10 +36,12 @@ public class MagiskManager extends Application {
     public static final String INTENT_SECTION = "section";
     public static final String INTENT_VERSION = "version";
     public static final String INTENT_LINK = "link";
-    public static final String BUSYBOX_VERSION = "1.27.1";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
+    public static final String BUSYBOX_VERSION = "1.27.1";
+    public static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-arm";
+    public static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-x86";
 
     // Events
     public final CallbackEvent magiskHideDone = new CallbackEvent();
@@ -162,17 +163,6 @@ public class MagiskManager extends Application {
         initSU();
         updateMagiskInfo();
         updateBlockInfo();
-        // Initialize busybox
-        File busybox = new File(getApplicationInfo().dataDir + "/busybox/busybox");
-        if (!busybox.exists() || !TextUtils.equals(prefs.getString("busybox_version", ""), BUSYBOX_VERSION)) {
-            shell.su("rm -rf " + busybox.getParentFile());
-            busybox.getParentFile().mkdirs();
-            shell.su_raw(
-                    "cp -f " + new File(getApplicationInfo().nativeLibraryDir, "libbusybox.so") + " " + busybox,
-                    "chmod -R 755 " + busybox.getParent(),
-                    busybox + " --install -s " + busybox.getParent()
-            );
-        }
         // Initialize prefs
         prefs.edit()
                 .putBoolean("dark_theme", isDarkTheme)
@@ -189,8 +179,9 @@ public class MagiskManager extends Application {
                 .putString("mnt_ns", String.valueOf(suNamespaceMode))
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .apply();
+
         // Add busybox to PATH
-        shell.su_raw("PATH=" + busybox.getParent() + ":$PATH");
+        shell.su_raw("PATH=" + getApplicationInfo().dataDir + "/busybox:$PATH");
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
