@@ -502,13 +502,6 @@ void post_fs_data(int client) {
 
 	LOGI("** post-fs-data mode running\n");
 
-	// uninstaller
-	if (access(UNINSTALLER, F_OK) == 0) {
-		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
-		system("(BOOTMODE=true sh " UNINSTALLER ") &");
-		return;
-	}
-
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
@@ -538,6 +531,17 @@ void post_fs_data(int client) {
 		goto unblock;
 	}
 
+	// Link busybox
+	link_busybox();
+
+	// uninstaller
+	if (access(UNINSTALLER, F_OK) == 0) {
+		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
+		bb_path();
+		system("(BOOTMODE=true sh " UNINSTALLER ") &");
+		return;
+	}
+
 	int new_img = 0;
 
 	if (access(MAINIMG, F_OK) == -1) {
@@ -558,9 +562,6 @@ void post_fs_data(int client) {
 		xmkdir(COREDIR "/service.d", 0755);
 		xmkdir(COREDIR "/props", 0755);
 	}
-
-	// Link busybox
-	link_busybox();
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)

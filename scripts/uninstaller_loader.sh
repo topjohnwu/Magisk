@@ -3,7 +3,7 @@
 #
 # Magisk Uninstaller (used in recovery)
 # by topjohnwu
-# 
+#
 # This script will load the real uninstaller in a flashable zip
 #
 ##########################################################################################
@@ -13,16 +13,15 @@
 ##########################################################################################
 
 BOOTMODE=false
-INSTALLER=/tmp/uninstall
+# This path should work in any cases
+TMPDIR=/dev/tmp
+
+INSTALLER=$TMPDIR/install
 # Default permissions
 umask 022
 
 OUTFD=$2
 ZIP=$3
-
-rm -rf $INSTALLER 2>/dev/null
-mkdir -p $INSTALLER
-unzip -o "$ZIP" -d $INSTALLER 2>/dev/null
 
 if [ ! -f $INSTALLER/util_functions.sh ]; then
   echo "! Failed: Unable to extract zip file!"
@@ -68,6 +67,7 @@ if is_mounted /data; then
   mkdir -p $MAGISKBIN
   cp -af $BINDIR/. $MAGISKBIN
   cp -af $CHROMEDIR $MAGISKBIN
+  cp -af $TMPDIR/bin/busybox $MAGISKBIN/busybox
   cp -af $INSTALLER/util_functions.sh $MAGISKBIN
   chmod -R 755 $MAGISKBIN
   # Run the acttual uninstallation

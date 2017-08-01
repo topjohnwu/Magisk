@@ -1,4 +1,4 @@
-#!/sbin/sh
+#MAGISK
 ##########################################################################################
 #
 # Magisk Flash Script
@@ -30,10 +30,6 @@ umask 022
 
 OUTFD=$2
 ZIP=$3
-
-rm -rf $TMPDIR 2>/dev/null
-mkdir -p $INSTALLER
-unzip -o "$ZIP" -d $INSTALLER 2>/dev/null
 
 if [ ! -d "$COMMONDIR" ]; then
   echo "! Unable to extract zip file!"
@@ -92,16 +88,14 @@ rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
 cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
 cp -af $CHROMEDIR $MAGISKBIN
-# Extract busybox
-[ $ARCH = "arm" -o $ARCH = "arm64" ] && BBPATH=lib/armeabi-v7a || BBPATH=lib/x86
-unzip -p $INSTALLER/common/magisk.apk $BBPATH/libbusybox.so > $MAGISKBIN/busybox
+cp -af $TMPDIR/bin/busybox $MAGISKBIN/busybox
 chmod -R 755 $MAGISKBIN
 
 # addon.d
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
-  cp $INSTALLER/addon.d/99-magisk.sh /system/addon.d/99-magisk.sh
+  cp -af $INSTALLER/addon.d/99-magisk.sh /system/addon.d/99-magisk.sh
   chmod 755 /system/addon.d/99-magisk.sh
 fi
 

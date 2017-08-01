@@ -127,11 +127,13 @@ recovery_actions() {
   # Preserve environment varibles
   OLD_PATH=$PATH
   OLD_LD_PATH=$LD_LIBRARY_PATH
-  # Add busybox to PATH
-  mkdir -p $TMPDIR/bin
-  ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
-  $MAGISKBIN/busybox --install -s $TMPDIR/bin
-  export PATH=$TMPDIR/bin:$PATH
+  if [ ! -d $TMPDIR/bin ]; then
+    # Add busybox to PATH
+    mkdir -p $TMPDIR/bin
+    ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
+    $MAGISKBIN/busybox --install -s $TMPDIR/bin
+    export PATH=$TMPDIR/bin:$PATH
+  fi
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Add all possible library paths

@@ -39,11 +39,6 @@ abort_wrap() {
   fi
 }
 
-if [ ! -d $MAGISKBIN -o ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
-  ui_print_wrap "! Cannot find $MAGISKBIN"
-  exit 1
-fi
-
 [ -z $BOOTMODE ] && BOOTMODE=false
 
 MAGISKBIN=/data/magisk
@@ -51,6 +46,11 @@ CHROMEDIR=$MAGISKBIN/chromeos
 
 # Default permissions
 umask 022
+
+if [ ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
+  ui_print_wrap "! Cannot find $MAGISKBIN"
+  exit 1
+fi
 
 # Load utility functions
 . $MAGISKBIN/util_functions.sh
