@@ -29,7 +29,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return null;
-        String jsonStr = WebService.request(UPDATE_JSON, WebService.GET);
+        String jsonStr = WebService.getString(UPDATE_JSON);
         try {
             JSONObject json = new JSONObject(jsonStr);
             JSONObject magisk = json.getJSONObject("magisk");

@@ -96,13 +96,13 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         if (url == null) {
             url = String.format(Locale.US, REPO_URL, page + 1);
         }
-        String jsonString = WebService.request(url, WebService.GET, header, true);
+        String jsonString = WebService.getString(url, header);
         if (TextUtils.isEmpty(jsonString)) {
             // At least check the pages we know
             return page + 1 < etags.size() && loadPage(page + 1, null, CHECK_ETAG);
         }
 
-        // The request succeed, parse the new stuffs
+        // The getString succeed, parse the new stuffs
         try {
             loadJSON(jsonString);
         } catch (Exception e) {

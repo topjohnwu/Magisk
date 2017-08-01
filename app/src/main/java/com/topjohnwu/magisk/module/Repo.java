@@ -29,7 +29,7 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws CacheModException {
-        String props = WebService.request(getManifestUrl(), WebService.GET);
+        String props = WebService.getString(getManifestUrl());
         String lines[] = props.split("\\n");
         parseProps(lines);
         Logger.dev("Repo: Fetching prop: " + getId());
