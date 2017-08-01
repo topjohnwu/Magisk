@@ -133,7 +133,14 @@ static void trim_img(const char *img) {
  * Scripts *
  ***********/
 
-void exec_common_script(const char* stage) {
+static void bb_path() {
+	char *path = strdup(getenv("PATH"));
+	snprintf(buf, PATH_MAX, "%s:%s", BBPATH, path);
+	setenv("PATH", buf, 1);
+	free(path);
+}
+
+static void exec_common_script(const char* stage) {
 	DIR *dir;
 	struct dirent *entry;
 	snprintf(buf, PATH_MAX, "%s/%s.d", COREDIR, stage);
@@ -148,7 +155,7 @@ void exec_common_script(const char* stage) {
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			char *const command[] = { "sh", buf2, NULL };
-			int pid = run_command(0, NULL, "/system/bin/sh", command);
+			int pid = run_command(0, NULL, bb_path, "/system/bin/sh", command);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -157,7 +164,7 @@ void exec_common_script(const char* stage) {
 	closedir(dir);
 }
 
-void exec_module_script(const char* stage) {
+static void exec_module_script(const char* stage) {
 	char *module;
 	vec_for_each(&module_list, module) {
 		snprintf(buf, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
@@ -166,7 +173,7 @@ void exec_module_script(const char* stage) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		char *const command[] = { "sh", buf, NULL };
-		int pid = run_command(0, NULL, "/system/bin/sh", command);
+		int pid = run_command(0, NULL, bb_path, "/system/bin/sh", command);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
@@ -489,7 +496,7 @@ void post_fs_data(int client) {
 	// Start debug logs in new process
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 	char *const command[] = { "logcat", "-v", "brief", NULL };
-	debug_log_pid = run_command(0, &debug_log_fd, "/system/bin/logcat", command);
+	debug_log_pid = run_command(0, &debug_log_fd, NULL, "/system/bin/logcat", command);
 	close(debug_log_fd);
 #endif
 
@@ -551,6 +558,9 @@ void post_fs_data(int client) {
 		xmkdir(COREDIR "/service.d", 0755);
 		xmkdir(COREDIR "/props", 0755);
 	}
+
+	// Link busybox
+	link_busybox();
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
@@ -722,6 +732,10 @@ unblock:
 	unblock_boot_process();
 }
 
+static void pm_setenv() {
+	setenv("CLASSPATH", "/system/framework/pm.jar", 1);
+}
+
 void late_start(int client) {
 	LOGI("** late_start service mode running\n");
 	// ack
@@ -751,18 +765,19 @@ core_only:
 	if (access(MANAGERAPK, F_OK) == 0) {
 		while (1) {
 			sleep(5);
-			char *const command[] = { "sh", "-c",
-				"CLASSPATH=/system/framework/pm.jar "
-				"/system/bin/app_process /system/bin "
-				"com.android.commands.pm.Pm install -r " MANAGERAPK, NULL };
+			char *const command[] = { "app_process",
+				"/system/bin", "com.android.commands.pm.Pm",
+				"install", "-r", MANAGERAPK, NULL };
 			int apk_res = -1, pid;
-			pid = run_command(1, &apk_res, "/system/bin/sh", command);
-			waitpid(pid, NULL, 0);
-			fdgets(buf, PATH_MAX, apk_res);
-			close(apk_res);
-			// Keep trying until pm is started
-			if (strstr(buf, "Error:") == NULL)
-				break;
+			pid = run_command(1, &apk_res, pm_setenv, "/system/bin/app_process", command);
+			if (pid != -1) {
+				waitpid(pid, NULL, 0);
+				fdgets(buf, PATH_MAX, apk_res);
+				close(apk_res);
+				// Keep trying until pm is started
+				if (strstr(buf, "Error:") == NULL)
+					break;
+			}
 		}
 		unlink(MANAGERAPK);
 	}

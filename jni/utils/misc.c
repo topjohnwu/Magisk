@@ -223,8 +223,9 @@ void setup_sighandlers(void (*handler)(int)) {
    fd == NULL -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
+  *cb         -> A callback function which runs after fork
 */
-int run_command(int err, int *fd, const char *path, char *const argv[]) {
+int run_command(int err, int *fd, void (*cb)(void), const char *path, char *const argv[]) {
 	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
@@ -246,6 +247,8 @@ int run_command(int err, int *fd, const char *path, char *const argv[]) {
 		}
 		return pid;
 	}
+
+	if (cb) cb();
 
 	if (fd) {
 		xdup2(writeEnd, STDOUT_FILENO);
@@ -405,4 +408,12 @@ int switch_mnt_ns(int pid) {
 	ret = setns(fd, 0);
 	close(fd);
 	return ret;
+}
+
+void link_busybox() {
+	mkdir_p(BBPATH, 0755);
+	char *const command[] = { "busybox", "--install", "-s", BBPATH, NULL};
+	int pid = run_command(0, NULL, NULL, BBBIN, command);
+	if (pid != -1)
+		waitpid(pid, NULL, 0);
 }

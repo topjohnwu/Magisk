@@ -27,12 +27,12 @@ static void *logger_thread(void *args) {
 	while (1) {
 		// Start logcat
 		char *const command[] = { "logcat", "-s", "Magisk", "-v", "thread", NULL };
-		log_pid = run_command(0, &log_fd, "/system/bin/logcat", command);
+		log_pid = run_command(0, &log_fd, NULL, "/system/bin/logcat", command);
 		if (log_pid > 0)
 			waitpid(log_pid, NULL, 0);
 		// For some reason it went here, clear buffer and restart
 		char *const restart[] = { "logcat", "-c", NULL };
-		log_pid = run_command(0, NULL, "/system/bin/logcat", restart);
+		log_pid = run_command(0, NULL, NULL, "/system/bin/logcat", restart);
 		if (log_pid > 0)
 			waitpid(log_pid, NULL, 0);
 	}

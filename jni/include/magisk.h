@@ -35,9 +35,11 @@
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
 #define MANAGERAPK      DATABIN "/magisk.apk"
+#define BBBIN           DATABIN "/busybox"
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define DUMMDIR         MAGISKTMP "/dummy"
+#define BBPATH          MAGISKTMP "/bin"
 #define CACHEMOUNT      "/cache/magisk_mount"
 
 #define SELINUX_PATH        "/sys/fs/selinux/"

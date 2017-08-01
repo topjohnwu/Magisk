@@ -82,7 +82,7 @@ void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
 void unlock_blocks();
 void setup_sighandlers(void (*handler)(int));
-int run_command(int err, int *fd, const char *path, char *const argv[]);
+int run_command(int err, int *fd, void (*cb)(void), const char *path, char *const argv[]);
 int mkdir_p(const char *pathname, mode_t mode);
 int bind_mount(const char *from, const char *to);
 int open_new(const char *filename);
@@ -93,6 +93,7 @@ void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
 void get_client_cred(int fd, struct ucred *cred);
 int switch_mnt_ns(int pid);
+void link_busybox();
 
 // img.c
 int create_img(const char *img, int size);

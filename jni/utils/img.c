@@ -15,7 +15,7 @@ static int e2fsck(const char *img) {
 	char buffer[128];
 	int pid, fd = -1;
 	char *const command[] = { "e2fsck", "-yf", (char *) img, NULL };
-	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
+	pid = run_command(1, &fd, NULL, "/system/bin/e2fsck", command);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
@@ -63,7 +63,7 @@ int create_img(const char *img, int size) {
 	char buffer[16];
 	snprintf(buffer, sizeof(buffer), "%dM", size);
 	char *const command[] = { "make_ext4fs", "-l", buffer, "-a", "/magisk", "-S", filename, (char *) img, NULL };
-	pid = run_command(0, NULL, "/system/bin/make_ext4fs", command);
+	pid = run_command(0, NULL, NULL, "/system/bin/make_ext4fs", command);
 	if (pid < 0)
 		return 1;
 	waitpid(pid, &status, 0);
@@ -77,7 +77,7 @@ int get_img_size(const char *img, int *used, int *total) {
 	char buffer[PATH_MAX];
 	int pid, fd = -1, status = 1;
 	char *const command[] = { "e2fsck", "-n", (char *) img, NULL };
-	pid = run_command(1, &fd, "/system/bin/e2fsck", command);
+	pid = run_command(1, &fd, NULL, "/system/bin/e2fsck", command);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd)) {
@@ -110,7 +110,7 @@ int resize_img(const char *img, int size) {
 	int pid, status, fd = -1;
 	snprintf(buffer, sizeof(buffer), "%dM", size);
 	char *const command[] = { "resize2fs", (char *) img, buffer, NULL };
-	pid = run_command(1, &fd, "/system/bin/resize2fs", command);
+	pid = run_command(1, &fd, NULL, "/system/bin/resize2fs", command);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
