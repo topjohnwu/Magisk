@@ -6,7 +6,6 @@
 app/release
 *.hprof
 app/.externalNativeBuild/
-libbusybox.so
 *.sh
 public.certificate.x509.pem
 private.key.pk8
