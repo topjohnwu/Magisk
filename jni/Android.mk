@@ -74,9 +74,18 @@ LOCAL_SRC_FILES := \
 LOCAL_CFLAGS := -DZLIB_CONST
 include $(BUILD_EXECUTABLE)
 
-# busybox (32-bit only)
+# 32-bit static binaries
 ifneq ($(TARGET_ARCH_ABI), x86_64)
 ifneq ($(TARGET_ARCH_ABI), arm64-v8a)
+# b64xz
+include $(CLEAR_VARS)
+LOCAL_MODULE := b64xz
+LOCAL_STATIC_LIBRARIES := liblzma
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/ndk-compression/xz/src/liblzma/api
+LOCAL_SRC_FILES := b64xz.c
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+# Busybox
 include jni/busybox/Android.mk
 endif
 endif

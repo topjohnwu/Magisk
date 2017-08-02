@@ -35,7 +35,7 @@ import zipfile
 import datetime
 import errno
 import shutil
-import gzip
+import lzma
 import base64
 
 def silentremove(file):
@@ -164,18 +164,24 @@ def sign_adjust_zip(unsigned, output):
 
 def gen_update_binary():
 	update_bin = []
-	bb = os.path.join('libs', 'armeabi-v7a', 'busybox')
-	if not os.path.exists(bb):
-		error('{} does not exist! Please build \'binary\' before zipping!'.format(bb))
-	with open(bb, 'rb') as busybox:
-		update_bin.append('#! /sbin/sh\nBB_ARM=')
-		update_bin.append(base64.b64encode(gzip.compress(busybox.read())).decode('ascii'))
-	bb = os.path.join('libs', 'x86', 'busybox')
-	if not os.path.exists(bb):
-		error('{} does not exist! Please build \'binary\' before zipping!'.format(bb))
-	with open(bb, 'rb') as busybox:
+	binary = os.path.join('libs', 'armeabi-v7a', 'b64xz')
+	if not os.path.exists(binary):
+		error('Please build \'binary\' before zipping!')
+	with open(binary, 'rb') as b64xz:
+		update_bin.append('#! /sbin/sh\nEX_ARM=')
+		update_bin.append(''.join("\\\\x{:02X}".format(c) for c in b64xz.read()))
+	binary = os.path.join('libs', 'x86', 'b64xz')
+	with open(binary, 'rb') as b64xz:
+		update_bin.append('\nEX_X86=')
+		update_bin.append(''.join("\\\\x{:02X}".format(c) for c in b64xz.read()))
+	binary = os.path.join('libs', 'armeabi-v7a', 'busybox')
+	with open(binary, 'rb') as busybox:
+		update_bin.append('\nBB_ARM=')
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read())).decode('ascii'))
+	binary = os.path.join('libs', 'x86', 'busybox')
+	with open(binary, 'rb') as busybox:
 		update_bin.append('\nBB_X86=')
-		update_bin.append(base64.b64encode(gzip.compress(busybox.read())).decode('ascii'))
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read())).decode('ascii'))
 		update_bin.append('\n')
 	with open(os.path.join('scripts', 'update_binary.sh'), 'r') as script:
 		update_bin.append(script.read())
