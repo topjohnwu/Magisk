@@ -134,10 +134,8 @@ static void trim_img(const char *img) {
  ***********/
 
 static void bb_path() {
-	char *path = strdup(getenv("PATH"));
-	snprintf(buf, PATH_MAX, "%s:%s", BBPATH, path);
+	snprintf(buf, PATH_MAX, "%s:%s", BBPATH, getenv("PATH"));
 	setenv("PATH", buf, 1);
-	free(path);
 }
 
 static void exec_common_script(const char* stage) {
@@ -167,12 +165,12 @@ static void exec_common_script(const char* stage) {
 static void exec_module_script(const char* stage) {
 	char *module;
 	vec_for_each(&module_list, module) {
-		snprintf(buf, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
-		snprintf(buf2, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
-		if (access(buf, F_OK) == -1 || access(buf2, F_OK) == 0)
+		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
+		snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
+		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		char *const command[] = { "sh", buf, NULL };
+		char *const command[] = { "sh", buf2, NULL };
 		int pid = run_command(0, NULL, bb_path, "/system/bin/sh", command);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
