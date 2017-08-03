@@ -16,8 +16,8 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private List<String> mHideList;
     private PackageManager pm;
     private ApplicationFilter filter;
-    private CallbackEvent magiskHideDone;
+    private Topic magiskHideDone;
     private Shell shell;
 
     public ApplicationAdapter(Context context) {
@@ -169,7 +169,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected void onPostExecute(Void v) {
-            magiskHideDone.trigger(false);
+            magiskHideDone.publish(false);
         }
     }
 }

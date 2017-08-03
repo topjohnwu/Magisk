@@ -13,13 +13,13 @@ import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MagiskHideFragment extends Fragment implements CallbackEvent.Listener {
+public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -84,13 +84,13 @@ public class MagiskHideFragment extends Fragment implements CallbackEvent.Listen
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
+    public void onTopicPublished(Topic topic) {
         mSwipeRefreshLayout.setRefreshing(false);
         appAdapter.filter(lastFilter);
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplication().magiskHideDone };
+    public Topic[] getSubscription() {
+        return new Topic[] { getApplication().magiskHideDone };
     }
 }

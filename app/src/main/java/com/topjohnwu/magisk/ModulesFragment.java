@@ -16,8 +16,8 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Topic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ModulesFragment extends Fragment implements CallbackEvent.Listener {
+public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
     private static final int FETCH_ZIP_CODE = 2;
 
@@ -73,14 +73,14 @@ public class ModulesFragment extends Fragment implements CallbackEvent.Listener 
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
+    public void onTopicPublished(Topic topic) {
         Logger.dev("ModulesFragment: UI refresh triggered");
         updateUI();
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplication().moduleLoadDone };
+    public Topic[] getSubscription() {
+        return new Topic[] { getApplication().moduleLoadDone };
     }
 
     @Override

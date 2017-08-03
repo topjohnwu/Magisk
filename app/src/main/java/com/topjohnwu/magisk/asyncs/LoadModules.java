@@ -39,7 +39,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
     protected void onPostExecute(Void v) {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return;
-        magiskManager.moduleLoadDone.trigger();
+        magiskManager.moduleLoadDone.publish();
         super.onPostExecute(v);
     }
 }

@@ -16,9 +16,9 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -43,14 +43,14 @@ public class MagiskManager extends Application {
     public static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-arm";
     public static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-x86";
 
-    // Events
-    public final CallbackEvent magiskHideDone = new CallbackEvent();
-    public final CallbackEvent reloadActivity = new CallbackEvent();
-    public final CallbackEvent moduleLoadDone = new CallbackEvent();
-    public final CallbackEvent repoLoadDone = new CallbackEvent();
-    public final CallbackEvent updateCheckDone = new CallbackEvent();
-    public final CallbackEvent safetyNetDone = new CallbackEvent();
-    public final CallbackEvent localeDone = new CallbackEvent();
+    // Topics
+    public final Topic magiskHideDone = new Topic();
+    public final Topic reloadActivity = new Topic();
+    public final Topic moduleLoadDone = new Topic();
+    public final Topic repoLoadDone = new Topic();
+    public final Topic updateCheckDone = new Topic();
+    public final Topic safetyNetDone = new Topic();
+    public final Topic localeDone = new Topic();
 
     // Info
     public String magiskVersionString;
@@ -113,7 +113,7 @@ public class MagiskManager extends Application {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            getMagiskManager().localeDone.trigger();
+            getMagiskManager().localeDone.publish();
         }
     }
 

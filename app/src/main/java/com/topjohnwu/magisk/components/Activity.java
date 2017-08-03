@@ -8,7 +8,7 @@ import android.view.WindowManager;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.CallbackEvent;
+import com.topjohnwu.magisk.utils.Topic;
 
 public class Activity extends AppCompatActivity {
 
@@ -22,15 +22,15 @@ public class Activity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (this instanceof CallbackEvent.Listener) {
-            ((CallbackEvent.Listener) this).registerEvents();
+        if (this instanceof Topic.Subscriber) {
+            ((Topic.Subscriber) this).subscribeTopics();
         }
     }
 
     @Override
     protected void onDestroy() {
-        if (this instanceof CallbackEvent.Listener) {
-            ((CallbackEvent.Listener) this).unregisterEvents();
+        if (this instanceof Topic.Subscriber) {
+            ((Topic.Subscriber) this).unsubscribeTopics();
         }
         super.onDestroy();
     }

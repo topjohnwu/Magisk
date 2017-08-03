@@ -15,14 +15,14 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ReposFragment extends Fragment implements CallbackEvent.Listener {
+public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -59,7 +59,7 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener {
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
+    public void onTopicPublished(Topic topic) {
         Logger.dev("ReposFragment: UI refresh triggered");
         mSwipeRefreshLayout.setRefreshing(false);
         adapter.notifyDBChanged();
@@ -68,8 +68,8 @@ public class ReposFragment extends Fragment implements CallbackEvent.Listener {
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplication().repoLoadDone };
+    public Topic[] getSubscription() {
+        return new Topic[] { getApplication().repoLoadDone };
     }
 
     @Override

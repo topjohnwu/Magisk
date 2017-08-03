@@ -15,9 +15,9 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Locale;
@@ -25,7 +25,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends Activity implements CallbackEvent.Listener {
+public class SettingsActivity extends Activity implements Topic.Subscriber {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
@@ -58,18 +58,18 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
+    public void onTopicPublished(Topic topic) {
         recreate();
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplicationContext().reloadActivity };
+    public Topic[] getSubscription() {
+        return new Topic[] { getApplicationContext().reloadActivity };
     }
 
     public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener,
-            CallbackEvent.Listener {
+            Topic.Subscriber {
 
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
@@ -162,13 +162,13 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
         public void onResume() {
             super.onResume();
             prefs.registerOnSharedPreferenceChangeListener(this);
-            registerEvents();
+            subscribeTopics();
         }
 
         @Override
         public void onPause() {
             prefs.unregisterOnSharedPreferenceChangeListener(this);
-            unregisterEvents();
+            unsubscribeTopics();
             super.onPause();
         }
 
@@ -182,7 +182,7 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
                     enabled = prefs.getBoolean("dark_theme", false);
                     if (magiskManager.isDarkTheme != enabled) {
                         magiskManager.isDarkTheme = enabled;
-                        magiskManager.reloadActivity.trigger(false);
+                        magiskManager.reloadActivity.publish(false);
                     }
                     break;
                 case "disable":
@@ -243,7 +243,7 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
                     break;
                 case "locale":
                     magiskManager.setLocale();
-                    magiskManager.reloadActivity.trigger(false);
+                    magiskManager.reloadActivity.publish(false);
                     break;
             }
             setSummary();
@@ -265,13 +265,13 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
         }
 
         @Override
-        public void onTrigger(CallbackEvent event) {
+        public void onTopicPublished(Topic topic) {
             setLocalePreference((ListPreference) findPreference("locale"));
         }
 
         @Override
-        public CallbackEvent[] getRegisterEvents() {
-            return new CallbackEvent[] { magiskManager.localeDone };
+        public Topic[] getSubscription() {
+            return new Topic[] { magiskManager.localeDone };
         }
     }
 

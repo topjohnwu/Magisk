@@ -56,7 +56,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                 Utils.showMagiskUpdate(magiskManager);
             }
         }
-        magiskManager.updateCheckDone.trigger();
+        magiskManager.updateCheckDone.publish();
         super.onPostExecute(v);
     }
 }

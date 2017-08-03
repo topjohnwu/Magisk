@@ -31,8 +31,8 @@ import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -49,7 +49,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
-        implements CallbackEvent.Listener, SwipeRefreshLayout.OnRefreshListener {
+        implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String SHOW_DIALOG = "dialog";
 
@@ -268,8 +268,8 @@ public class MagiskFragment extends Fragment
 
         safetyNetStatusText.setText(R.string.safetyNet_check_text);
 
-        magiskManager.safetyNetDone.isTriggered = false;
-        magiskManager.updateCheckDone.isTriggered = false;
+        magiskManager.safetyNetDone.hasPublished = false;
+        magiskManager.updateCheckDone.hasPublished = false;
         magiskManager.remoteMagiskVersionString = null;
         magiskManager.remoteMagiskVersionCode = -1;
         collapse();
@@ -283,17 +283,17 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
-        if (event == magiskManager.updateCheckDone) {
+    public void onTopicPublished(Topic topic) {
+        if (topic == magiskManager.updateCheckDone) {
             updateCheckUI();
-        } else if (event == magiskManager.safetyNetDone) {
+        } else if (topic == magiskManager.safetyNetDone) {
             updateSafetyNetUI();
         }
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { magiskManager.updateCheckDone, magiskManager.safetyNetDone };
+    public Topic[] getSubscription() {
+        return new Topic[] { magiskManager.updateCheckDone, magiskManager.safetyNetDone };
     }
 
     @Override

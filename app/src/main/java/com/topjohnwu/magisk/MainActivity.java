@@ -20,15 +20,15 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.CallbackEvent;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends Activity
-        implements NavigationView.OnNavigationItemSelectedListener, CallbackEvent.Listener {
+        implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
 
     private final Handler mDrawerHandler = new Handler();
     private SharedPreferences prefs;
@@ -110,13 +110,13 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTrigger(CallbackEvent event) {
+    public void onTopicPublished(Topic topic) {
         recreate();
     }
 
     @Override
-    public CallbackEvent[] getRegisterEvents() {
-        return new CallbackEvent[] { getApplicationContext().reloadActivity };
+    public Topic[] getSubscription() {
+        return new Topic[] { getApplicationContext().reloadActivity };
     }
 
     public void checkHideSection() {
