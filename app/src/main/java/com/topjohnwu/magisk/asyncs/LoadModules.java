@@ -23,10 +23,10 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
         magiskManager.moduleMap = new ValueSortedMap<>();
 
-        for (String path : Utils.getModList(magiskManager.shell, MagiskManager.MAGISK_PATH)) {
+        for (String path : Utils.getModList(getShell(), MagiskManager.MAGISK_PATH)) {
             Logger.dev("LoadModules: Adding modules from " + path);
             try {
-                Module module = new Module(magiskManager.shell, path);
+                Module module = new Module(getShell(), path);
                 magiskManager.moduleMap.put(module.getId(), module);
             } catch (BaseModule.CacheModException ignored) {}
         }

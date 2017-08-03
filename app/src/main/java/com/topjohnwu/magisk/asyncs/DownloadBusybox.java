@@ -2,11 +2,8 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.content.Context;
 import android.os.Build;
-import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Shell;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.io.File;
@@ -17,16 +14,14 @@ import java.io.InputStream;
 public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
     private File busybox;
-    private Shell shell;
 
     public DownloadBusybox(Context context, File bb) {
         busybox = bb;
-        shell = Utils.getMagiskManager(context).shell;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
-        shell.su("rm -rf " + busybox.getParentFile());
+        getShell().su("rm -rf " + busybox.getParentFile());
         busybox.getParentFile().mkdirs();
         try {
             FileOutputStream out  = new FileOutputStream(busybox);
@@ -44,7 +39,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
             }
             out.close();
             in.close();
-            shell.su_raw(
+            getShell().su_raw(
                     "chmod -R 755 " + busybox.getParent(),
                     busybox + " --install -s " + busybox.getParent()
             );

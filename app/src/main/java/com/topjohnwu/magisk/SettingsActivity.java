@@ -188,28 +188,28 @@ public class SettingsActivity extends Activity implements CallbackEvent.Listener
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
                     if (enabled) {
-                        Utils.createFile(magiskManager.shell, MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.createFile(Shell.getShell(magiskManager), MagiskManager.MAGISK_DISABLE_FILE);
                     } else {
-                        Utils.removeItem(magiskManager.shell, MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.removeItem(Shell.getShell(magiskManager), MagiskManager.MAGISK_DISABLE_FILE);
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        Utils.enableMagiskHide(magiskManager.shell);
+                        Utils.enableMagiskHide(Shell.getShell(magiskManager));
                     } else {
-                        Utils.disableMagiskHide(magiskManager.shell);
+                        Utils.disableMagiskHide(Shell.getShell(magiskManager));
                     }
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
-                        magiskManager.shell.su_raw(
+                        Shell.getShell(magiskManager).su_raw(
                                 "cp -af /system/etc/hosts /magisk/.core/hosts",
                                 "mount -o bind /magisk/.core/hosts /system/etc/hosts");
                     } else {
-                        magiskManager.shell.su_raw(
+                        Shell.getShell(magiskManager).su_raw(
                                 "umount -l /system/etc/hosts",
                                 "rm -f /magisk/.core/hosts");
                     }

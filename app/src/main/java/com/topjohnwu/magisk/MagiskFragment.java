@@ -142,7 +142,7 @@ public class MagiskFragment extends Fragment
                                 @Override
                                 public void onDownloadDone(Uri uri) {
                                     if (Shell.rootAccess()) {
-                                        magiskManager.shell.su_raw(
+                                        Shell.getShell(getActivity()).su_raw(
                                                 "rm -f /dev/.magisk",
                                                 "echo \"BOOTIMAGE=" + boot + "\" >> /dev/.magisk",
                                                 "echo \"KEEPFORCEENCRYPT=" + String.valueOf(enc) + "\" >> /dev/.magisk",
@@ -206,7 +206,7 @@ public class MagiskFragment extends Fragment
                             @Override
                             public void onFinish() {
                                 progress.setMessage(getString(R.string.reboot_countdown, 0));
-                                magiskManager.shell.su_raw(
+                                Shell.getShell(getActivity()).su_raw(
                                         "mv -f " + uninstaller + " /cache/" + MagiskManager.UNINSTALLER,
                                         "mv -f " + utils + " /data/magisk/" + MagiskManager.UTIL_FUNCTIONS,
                                         "reboot"

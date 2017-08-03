@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -83,7 +82,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
             }
             if (!unzipAndCheck()) return 0;
             mList.add(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
-            magiskManager.shell.su(mList,
+            getShell().su(mList,
                     "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile +
                             " && echo 'Success!' || echo 'Failed!'"
             );
@@ -100,7 +99,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     protected void onPostExecute(Integer result) {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return;
-        magiskManager.shell.su_raw(
+        getShell().su_raw(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );

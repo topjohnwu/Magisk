@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
 
+import com.topjohnwu.magisk.MagiskManager;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -87,7 +89,12 @@ public class Shell {
     }
 
     public static Shell getShell(Context context) {
-        return Utils.getMagiskManager(context).shell;
+        MagiskManager magiskManager = Utils.getMagiskManager(context);
+        if (!magiskManager.shell.isValid) {
+            // Get new shell if needed
+            magiskManager.shell = getShell();
+        }
+        return magiskManager.shell;
     }
 
     public static boolean rootAccess() {
@@ -102,12 +109,16 @@ public class Shell {
     }
 
     public void sh_raw(String... commands) {
+        sh_raw(false, commands);
+    }
+
+    public void sh_raw(boolean stdout, String... commands) {
         if (!isValid) return;
         synchronized (shellProcess) {
             try {
                 for (String command : commands) {
                     Logger.shell(command);
-                    STDIN.write((command + "\n").getBytes("UTF-8"));
+                    STDIN.write((command + (stdout ? "\n" : " >/dev/null\n")).getBytes("UTF-8"));
                     STDIN.flush();
                 }
             } catch (IOException e) {
@@ -130,8 +141,8 @@ public class Shell {
         synchronized (shellProcess) {
             StreamGobbler out = new StreamGobbler(STDOUT, output);
             out.start();
-            sh_raw(commands);
-            sh_raw("echo \'-shell-done-\'");
+            sh_raw(true, commands);
+            sh_raw(true, "echo \'-shell-done-\'");
             try { out.join(); } catch (InterruptedException ignored) {}
         }
     }

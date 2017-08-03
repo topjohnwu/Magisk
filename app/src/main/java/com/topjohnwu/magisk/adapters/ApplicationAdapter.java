@@ -55,7 +55,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         filter = new ApplicationFilter();
         pm = context.getPackageManager();
         magiskHideDone = Utils.getMagiskManager(context).magiskHideDone;
-        shell = Utils.getMagiskManager(context).shell;
+        shell = Shell.getShell(context);
         new LoadApps().exec();
     }
 

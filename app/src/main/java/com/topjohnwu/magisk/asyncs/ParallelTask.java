@@ -38,7 +38,7 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
 
     protected Shell getShell() {
         MagiskManager magiskManager = getMagiskManager();
-        return magiskManager == null ? null : getMagiskManager().shell;
+        return magiskManager == null ? null : Shell.getShell(magiskManager);
     }
 
     @SuppressWarnings("unchecked")
