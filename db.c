@@ -60,6 +60,8 @@ static int settings_callback(void *v, int argc, char **argv, char **azColName) {
 
 void database_check(struct su_context *ctx) {
 	sqlite3 *db = NULL;
+	int ret;
+	char query[512], *err = NULL;
 
 	// Set default values
 	ctx->info->root_access = ROOT_ACCESS_APPS_AND_ADB;
@@ -67,33 +69,57 @@ void database_check(struct su_context *ctx) {
 	ctx->info->mnt_ns = NAMESPACE_MODE_REQUESTER;
 	ctx->info->policy = QUERY;
 
+	// First query the from app data
 	// Check if file is readable
-	if (access(ctx->user.database_path, R_OK) == -1)
+	if (access(APP_DATA_PATH REQUESTOR_DATABASE_PATH, R_OK) == -1)
 		return;
 
 	// Open database
-	int ret = sqlite3_open_v2(ctx->user.database_path, &db, SQLITE_OPEN_READONLY, NULL);
+	ret = sqlite3_open_v2(APP_DATA_PATH REQUESTOR_DATABASE_PATH, &db, SQLITE_OPEN_READONLY, NULL);
 	if (ret) {
 		LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 		sqlite3_close(db);
 		return;
 	}
-	
-	char query[512], *err = NULL;
+
+	// Check multiuser mode settings
+	snprintf(query, sizeof(query), "SELECT key, value FROM settings WHERE key='%s'", MULTIUSER_MODE_ENTRY);
+	sqlite3_exec(db, query, settings_callback, ctx, &err);
+
+	err = NULL;
+
+	if (ctx->user.android_user_id != 0 && ctx->info->multiuser_mode == MULTIUSER_MODE_USER) {
+		sqlite3_close(db);
+		// Check if file is readable
+		if (access(ctx->user.database_path, R_OK) == -1)
+			return;
+
+		// Open database
+		ret = sqlite3_open_v2(ctx->user.database_path, &db, SQLITE_OPEN_READONLY, NULL);
+		if (ret) {
+			LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
+			sqlite3_close(db);
+			return;
+		}
+	}
 
 	// Query for policy
 	snprintf(query, sizeof(query), "SELECT policy, until FROM policies WHERE uid=%d", ctx->info->uid % 100000);
 	sqlite3_exec(db, query, policy_callback, ctx, &err);
-	if (err != NULL)
+	if (err != NULL) {
 		LOGE("sqlite3_exec: %s\n", err);
+		return;
+	}
 
 	err = NULL;
 
 	// Query for settings
-	snprintf(query, sizeof(query), "SELECT key, value FROM settings");
+	snprintf(query, sizeof(query), "SELECT key, value FROM settings WHERE key!='%s'", MULTIUSER_MODE_ENTRY);
 	sqlite3_exec(db, query, settings_callback, ctx, &err);
-	if (err != NULL)
+	if (err != NULL) {
 		LOGE("sqlite3_exec: %s\n", err);
+		return;
+	}
 
 	sqlite3_close(db);
 }

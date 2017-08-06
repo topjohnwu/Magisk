@@ -155,11 +155,9 @@ void su_daemon_receiver(int client) {
 
 	snprintf(su_ctx->user.database_path, PATH_MAX, "%s/%d/%s",
 		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR_DATABASE_PATH);
-	snprintf(su_ctx->user.base_path, PATH_MAX, "%s/%d/%s",
-		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR);
 
 	// verify if Magisk Manager is installed
-	xstat(su_ctx->user.base_path, &su_ctx->st);
+	xstat(APP_DATA_PATH REQUESTOR, &su_ctx->st);
 	// odd perms on superuser data dir
 	if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
 		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
@@ -342,7 +340,7 @@ void su_daemon_receiver(int client) {
 	su_daemon_main(argc, argv);
 }
 
-/* 
+/*
  * Connect daemon, send argc, argv, cwd, pts slave
  */
 int su_client_main(int argc, char *argv[]) {
