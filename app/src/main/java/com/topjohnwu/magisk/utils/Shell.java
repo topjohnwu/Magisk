@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 
@@ -48,7 +49,7 @@ public class Shell {
                     in.write(("id\n").getBytes("UTF-8"));
                     in.flush();
                     String s = new BufferedReader(new InputStreamReader(out)).readLine();
-                    if (s.isEmpty() || !s.contains("uid=0")) {
+                    if (TextUtils.isEmpty(s) || !s.contains("uid=0")) {
                         in.close();
                         out.close();
                         process.destroy();

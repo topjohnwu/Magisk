@@ -16,6 +16,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
     private File busybox;
 
     public DownloadBusybox(Context context, File bb) {
+        super(context);
         busybox = bb;
     }
 
