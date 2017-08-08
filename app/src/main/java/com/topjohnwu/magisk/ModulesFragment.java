@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class ModulesFragment extends Fragment implements Topic.Subscriber {
@@ -34,7 +34,12 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
-    @BindView(R.id.fab) FloatingActionButton fabio;
+    @OnClick(R.id.fab)
+    public void selectFile() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/zip");
+        startActivityForResult(intent, FETCH_ZIP_CODE);
+    }
 
     private List<Module> listModules = new ArrayList<>();
 
@@ -43,12 +48,6 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_modules, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        fabio.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("application/zip");
-            startActivityForResult(intent, FETCH_ZIP_CODE);
-        });
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
