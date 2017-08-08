@@ -15,9 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
-import com.topjohnwu.magisk.components.MarkDownWindow;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
@@ -97,7 +97,8 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
         holder.description.setText(repo.getDescription());
 
-        holder.infoLayout.setOnClickListener(v -> new MarkDownWindow(null, repo.getDetailUrl(), context));
+        holder.infoLayout.setOnClickListener(v ->
+                new MarkDownWindow((Activity) context, null, repo.getDetailUrl()).exec());
 
         holder.downloadImage.setOnClickListener(v -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
