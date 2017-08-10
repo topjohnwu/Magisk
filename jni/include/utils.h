@@ -96,10 +96,17 @@ int switch_mnt_ns(int pid);
 void link_busybox();
 
 // img.c
+
+#define round_size(a) ((((a) / 32) + 2) * 32)
+#define SOURCE_TMP "/dev/source"
+#define TARGET_TMP "/dev/target"
+
 int create_img(const char *img, int size);
 int get_img_size(const char *img, int *used, int *total);
 int resize_img(const char *img, int size);
 char *mount_image(const char *img, const char *target);
 void umount_image(const char *target, const char *device);
+int merge_img(const char *source, const char *target);
+void trim_img(const char *img);
 
 #endif

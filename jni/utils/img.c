@@ -146,3 +146,72 @@ void umount_image(const char *target, const char *device) {
 	ioctl(fd, LOOP_CLR_FD);
 	close(fd);
 }
+
+int merge_img(const char *source, const char *target) {
+	if (access(source, F_OK) == -1)
+		return 0;
+	if (access(target, F_OK) == -1) {
+		rename(source, target);
+		return 0;
+	}
+
+	char buffer[PATH_MAX];
+
+	// resize target to worst case
+	int s_used, s_total, t_used, t_total, n_total;
+	get_img_size(source, &s_used, &s_total);
+	get_img_size(target, &t_used, &t_total);
+	n_total = round_size(s_used + t_used);
+	if (n_total != t_total)
+		resize_img(target, n_total);
+
+	xmkdir(SOURCE_TMP, 0755);
+	xmkdir(TARGET_TMP, 0755);
+	char *s_loop, *t_loop;
+	s_loop = mount_image(source, SOURCE_TMP);
+	if (s_loop == NULL) return 1;
+	t_loop = mount_image(target, TARGET_TMP);
+	if (t_loop == NULL) return 1;
+
+	DIR *dir;
+	struct dirent *entry;
+	if (!(dir = opendir(SOURCE_TMP)))
+		return 1;
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_DIR) {
+			if (strcmp(entry->d_name, ".") == 0 ||
+				strcmp(entry->d_name, "..") == 0 ||
+				strcmp(entry->d_name, ".core") == 0 ||
+				strcmp(entry->d_name, "lost+found") == 0)
+				continue;
+			// Cleanup old module if exists
+			snprintf(buffer, sizeof(buffer), "%s/%s", TARGET_TMP, entry->d_name);
+			if (access(buffer, F_OK) == 0) {
+				LOGI("Upgrade module: %s\n", entry->d_name);
+				rm_rf(buffer);
+			} else {
+				LOGI("New module: %s\n", entry->d_name);
+			}
+		}
+	}
+	closedir(dir);
+	clone_dir(SOURCE_TMP, TARGET_TMP);
+
+	// Unmount all loop devices
+	umount_image(SOURCE_TMP, s_loop);
+	umount_image(TARGET_TMP, t_loop);
+	rmdir(SOURCE_TMP);
+	rmdir(TARGET_TMP);
+	free(s_loop);
+	free(t_loop);
+	unlink(source);
+	return 0;
+}
+
+void trim_img(const char *img) {
+	int used, total, new_size;
+	get_img_size(img, &used, &total);
+	new_size = round_size(used);
+	if (new_size != total)
+		resize_img(img, new_size);
+}
