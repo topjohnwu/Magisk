@@ -41,6 +41,10 @@ static int debug_log_pid, debug_log_fd;
 
 #define IS_VENDOR  0x10   /* special vendor placeholder */
 
+#define IS_DIR(n)  (n->type == DT_DIR)
+#define IS_LNK(n)  (n->type == DT_LNK)
+#define IS_REG(n)  (n->type == DT_REG)
+
 struct node_entry {
 	const char *module;    /* Only used when status & IS_MODULE */
 	char *name;
@@ -50,9 +54,65 @@ struct node_entry {
 	struct vector *children;
 };
 
-#define IS_DIR(n)  (n->type == DT_DIR)
-#define IS_LNK(n)  (n->type == DT_LNK)
-#define IS_REG(n)  (n->type == DT_REG)
+static void concat_path(struct node_entry *node) {
+	if (node->parent)
+		concat_path(node->parent);
+	int len = strlen(buf);
+	buf[len] = '/';
+	strcpy(buf + len + 1, node->name);
+}
+
+static char *get_full_path(struct node_entry *node) {
+	buf[0] = '\0';
+	concat_path(node);
+	return strdup(buf);
+}
+
+// Free the node
+static void destroy_node(struct node_entry *node) {
+	free(node->name);
+	vec_destroy(node->children);
+	free(node->children);
+	free(node);
+}
+
+// Free the node and all children recursively
+static void destroy_subtree(struct node_entry *node) {
+	// Never free parent, since it shall be freed by themselves
+	struct node_entry *e;
+	vec_for_each(node->children, e) {
+		destroy_subtree(e);
+	}
+	destroy_node(node);
+}
+
+// Return the child
+static struct node_entry *insert_child(struct node_entry *p, struct node_entry *c) {
+	c->parent = p;
+	if (p->children == NULL) {
+		p->children = xmalloc(sizeof(struct vector));
+		vec_init(p->children);
+	}
+	struct node_entry *e;
+	vec_for_each(p->children, e) {
+		if (strcmp(e->name, c->name) == 0) {
+			// Exist duplicate
+			if (c->status > e->status) {
+				// Precedence is higher, replace with new node
+				destroy_subtree(e);
+				vec_entry(p->children)[_] = c;
+				return c;
+			} else {
+				// Free the new entry, return old
+				destroy_node(c);
+				return e;
+			}
+		}
+	}
+	// New entry, push back
+	vec_push_back(p->children, c);
+	return c;
+}
 
 /***********
  * Scripts *
@@ -107,65 +167,6 @@ static void exec_module_script(const char* stage) {
  * Magic Mount *
  ***************/
 
-static char *get_full_path(struct node_entry *node) {
-	char buffer[PATH_MAX], temp[PATH_MAX];
-	// Concat the paths
-	struct node_entry *cur = node;
-	strcpy(buffer, node->name);
-	while (cur->parent) {
-		strcpy(temp, buffer);
-		snprintf(buffer, sizeof(buffer), "%s/%s", cur->parent->name, temp);
-		cur = cur->parent;
-	}
-	return strdup(buffer);
-}
-
-// Free the node
-static void destroy_node(struct node_entry *node) {
-	free(node->name);
-	vec_destroy(node->children);
-	free(node->children);
-	free(node);
-}
-
-// Free the node and all children recursively
-static void destroy_subtree(struct node_entry *node) {
-	// Never free parent, since it shall be freed by themselves
-	struct node_entry *e;
-	vec_for_each(node->children, e) {
-		destroy_subtree(e);
-	}
-	destroy_node(node);
-}
-
-// Return the child
-static struct node_entry *insert_child(struct node_entry *p, struct node_entry *c) {
-	c->parent = p;
-	if (p->children == NULL) {
-		p->children = xmalloc(sizeof(struct vector));
-		vec_init(p->children);
-	}
-	struct node_entry *e;
-	vec_for_each(p->children, e) {
-		if (strcmp(e->name, c->name) == 0) {
-			// Exist duplicate
-			if (c->status > e->status) {
-				// Precedence is higher, replace with new node
-				destroy_subtree(e);
-				vec_entry(p->children)[_] = c;
-				return c;
-			} else {
-				// Free the new entry, return old
-				destroy_node(c);
-				return e;
-			}
-		}
-	}
-	// New entry, push back
-	vec_push_back(p->children, c);
-	return c;
-}
-
 static void construct_tree(const char *module, struct node_entry *parent) {
 	DIR *dir;
 	struct dirent *entry;
@@ -196,7 +197,7 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 		int clone = 0;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
 			clone = 1;
-		} else if (strcmp(parent->name, "/system") != 0 || strcmp(node->name, "vendor") != 0) {
+		} else if (parent->parent != NULL || strcmp(node->name, "vendor") != 0) {
 			struct stat s;
 			xstat(buf, &s);
 			if (S_ISLNK(s.st_mode))
@@ -499,7 +500,7 @@ void post_fs_data(int client) {
 
 	// Create the system root entry
 	sys_root = xcalloc(sizeof(*sys_root), 1);
-	sys_root->name = strdup("/system");
+	sys_root->name = strdup("system");
 	sys_root->status = IS_INTER;
 
 	int has_modules = 0;
@@ -613,7 +614,7 @@ void post_fs_data(int client) {
 				child->name = ven_root->name;
 				child->status = IS_VENDOR;
 				vec_entry(sys_root->children)[_] = child;
-				ven_root->name = strdup("/vendor");
+				ven_root->name = strdup("vendor");
 				ven_root->parent = NULL;
 				break;
 			}
