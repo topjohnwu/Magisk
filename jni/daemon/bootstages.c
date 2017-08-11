@@ -39,8 +39,6 @@ static int debug_log_pid, debug_log_fd;
 #define IS_SKEL    0x04    /* mount from skeleton */
 #define IS_MODULE  0x08    /* mount from module */
 
-#define IS_VENDOR  0x10   /* special vendor placeholder */
-
 #define IS_DIR(n)  (n->type == DT_DIR)
 #define IS_LNK(n)  (n->type == DT_LNK)
 #define IS_REG(n)  (n->type == DT_REG)
@@ -273,7 +271,7 @@ static void clone_skeleton(struct node_entry *node) {
 			close(open_new(buf));
 		// Links will be handled later
 
-		if (child->status & IS_VENDOR) {
+		if (child->parent->parent == NULL && strcmp(child->name, "vendor") == 0) {
 			if (IS_LNK(child)) {
 				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
 				LOGI("cplink: %s -> %s\n", MIRRDIR "/system/vendor", "/system/vendor");
@@ -611,10 +609,10 @@ void post_fs_data(int client) {
 				child = xcalloc(sizeof(*child), 1);
 				child->type = seperate_vendor ? DT_LNK : DT_DIR;
 				child->parent = ven_root->parent;
-				child->name = ven_root->name;
-				child->status = IS_VENDOR;
+				child->name = strdup("vendor");
+				child->status = 0;
+				// Swap!
 				vec_entry(sys_root->children)[_] = child;
-				ven_root->name = strdup("vendor");
 				ven_root->parent = NULL;
 				break;
 			}
