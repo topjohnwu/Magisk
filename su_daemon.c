@@ -156,9 +156,8 @@ void su_daemon_receiver(int client) {
 	snprintf(su_ctx->user.database_path, PATH_MAX, "%s/%d/%s",
 		USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR_DATABASE_PATH);
 
-	// verify if Magisk Manager is installed
+	// Check main Magisk Manager
 	xstat(APP_DATA_PATH REQUESTOR, &su_ctx->st);
-	// odd perms on superuser data dir
 	if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
 		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
 		info->policy = DENY;
@@ -171,6 +170,17 @@ void su_daemon_receiver(int client) {
 	if (info->policy == QUERY) {
 		// Get data from database
 		database_check(su_ctx);
+
+		if (su_ctx->info->multiuser_mode == MULTIUSER_MODE_USER) {
+			snprintf(su_ctx->user.base_path, PATH_MAX, "%s/%d/%s",
+				USER_DATA_PATH, su_ctx->user.android_user_id, REQUESTOR);
+			// Check the user installed Magisk Manager
+			xstat(su_ctx->user.base_path, &su_ctx->st);
+			if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
+				LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
+				info->policy = DENY;
+			}
+		}
 
 		// Handle multiuser denies
 		if (su_ctx->user.android_user_id &&
