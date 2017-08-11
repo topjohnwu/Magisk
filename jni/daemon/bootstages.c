@@ -396,14 +396,17 @@ static void mount_mirrors() {
 		symlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 	}
+	mkdir_p(MIRRDIR "/bin", 0755);
+	bind_mount(DATABIN, MIRRDIR "/bin");
 }
 
 static void link_busybox() {
 	mkdir_p(BBPATH, 0755);
 	char *const command[] = { "busybox", "--install", "-s", BBPATH, NULL};
-	int pid = run_command(0, NULL, NULL, BBBIN, command);
+	int pid = run_command(0, NULL, NULL, MIRRDIR "/bin/busybox", command);
 	if (pid != -1)
 		waitpid(pid, NULL, 0);
+	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }
 
 /****************
