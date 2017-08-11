@@ -8,14 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.asyncs.DownloadBusybox;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Utils;
-
-import java.io.File;
 
 public class SplashActivity extends Activity{
 
@@ -49,12 +46,6 @@ public class SplashActivity extends Activity{
                 ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
             }
             loadModuleTask.setCallBack(() -> new UpdateRepos(getApplication()).exec());
-            File busybox = new File(magiskManager.getApplicationInfo().dataDir + "/busybox/busybox");
-            if (!busybox.exists() || !TextUtils.equals(
-                    magiskManager.prefs.getString("busybox_version", ""),
-                    MagiskManager.BUSYBOX_VERSION)) {
-                new DownloadBusybox(this, busybox).exec();
-            }
         }
 
         loadModuleTask.exec();

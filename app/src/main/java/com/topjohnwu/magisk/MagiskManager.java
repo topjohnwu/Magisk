@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.DownloadBusybox;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
@@ -40,8 +41,6 @@ public class MagiskManager extends Application {
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
     public static final String BUSYBOX_VERSION = "1.27.1";
-    public static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-arm";
-    public static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-x86";
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -144,7 +143,6 @@ public class MagiskManager extends Application {
         // Locale
         defaultLocale = Locale.getDefault();
         setLocale();
-        new LoadLocale(this).exec();
 
         isDarkTheme = prefs.getBoolean("dark_theme", false);
         if (BuildConfig.DEBUG) {
@@ -176,6 +174,8 @@ public class MagiskManager extends Application {
     }
 
     public void init() {
+        new LoadLocale(this).exec();
+        new DownloadBusybox(this).exec();
         getMagiskInfo();
         updateBlockInfo();
 
