@@ -409,11 +409,3 @@ int switch_mnt_ns(int pid) {
 	close(fd);
 	return ret;
 }
-
-void link_busybox() {
-	mkdir_p(BBPATH, 0755);
-	char *const command[] = { "busybox", "--install", "-s", BBPATH, NULL};
-	int pid = run_command(0, NULL, NULL, BBBIN, command);
-	if (pid != -1)
-		waitpid(pid, NULL, 0);
-}

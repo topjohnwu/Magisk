@@ -93,7 +93,6 @@ void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
 void get_client_cred(int fd, struct ucred *cred);
 int switch_mnt_ns(int pid);
-void link_busybox();
 
 // img.c
 

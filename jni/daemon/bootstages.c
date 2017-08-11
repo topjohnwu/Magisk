@@ -24,6 +24,7 @@
 
 static char *buf, *buf2;
 static struct vector module_list;
+static int seperate_vendor = 0;
 
 #ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
@@ -363,6 +364,48 @@ static void simple_mount(const char *path) {
 	closedir(dir);
 }
 
+/*****************
+ * Miscellaneous *
+ *****************/
+
+static void mount_mirrors() {
+	LOGI("* Mounting mirrors");
+	struct vector mounts;
+	vec_init(&mounts);
+	file_to_vector("/proc/mounts", &mounts);
+	char *line;
+	vec_for_each(&mounts, line) {
+		if (strstr(line, " /system ")) {
+			sscanf(line, "%s", buf);
+			xmkdir_p(MIRRDIR "/system", 0755);
+			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
+			LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
+			continue;
+		}
+		if (strstr(line, " /vendor ")) {
+			seperate_vendor = 1;
+			sscanf(line, "%s", buf);
+			xmkdir_p(MIRRDIR "/vendor", 0755);
+			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
+			LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+			continue;
+		}
+	}
+	vec_deep_destroy(&mounts);
+	if (!seperate_vendor) {
+		symlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+	}
+}
+
+static void link_busybox() {
+	mkdir_p(BBPATH, 0755);
+	char *const command[] = { "busybox", "--install", "-s", BBPATH, NULL};
+	int pid = run_command(0, NULL, NULL, BBBIN, command);
+	if (pid != -1)
+		waitpid(pid, NULL, 0);
+}
+
 /****************
  * Entry points *
  ****************/
@@ -454,6 +497,7 @@ void post_fs_data(int client) {
 	}
 
 	// Link busybox
+	mount_mirrors();
 	link_busybox();
 
 	// uninstaller
@@ -568,40 +612,6 @@ void post_fs_data(int client) {
 	free(magiskloop);
 
 	if (has_modules) {
-		// Mount mirrors
-		LOGI("* Mounting system/vendor mirrors");
-		int seperate_vendor = 0;
-		struct vector mounts;
-		vec_init(&mounts);
-		file_to_vector("/proc/mounts", &mounts);
-		char *line;
-		vec_for_each(&mounts, line) {
-			if (strstr(line, " /system ")) {
-				sscanf(line, "%s", buf);
-				snprintf(buf2, PATH_MAX, "%s/system", MIRRDIR);
-				xmkdir_p(buf2, 0755);
-				xmount(buf, buf2, "ext4", MS_RDONLY, NULL);
-				LOGI("mount: %s -> %s\n", buf, buf2);
-				continue;
-			}
-			if (strstr(line, " /vendor ")) {
-				seperate_vendor = 1;
-				sscanf(line, "%s", buf);
-				snprintf(buf2, PATH_MAX, "%s/vendor", MIRRDIR);
-				xmkdir_p(buf2, 0755);
-				xmount(buf, buf2, "ext4", MS_RDONLY, NULL);
-				LOGI("mount: %s -> %s\n", buf, buf2);
-				continue;
-			}
-		}
-		vec_deep_destroy(&mounts);
-		if (!seperate_vendor) {
-			snprintf(buf, PATH_MAX, "%s/system/vendor", MIRRDIR);
-			snprintf(buf2, PATH_MAX, "%s/vendor", MIRRDIR);
-			symlink(buf, buf2);
-			LOGI("link: %s -> %s\n", buf, buf2);
-		}
-
 		// Extract the vendor node out of system tree and swap with placeholder
 		vec_for_each(sys_root->children, child) {
 			if (strcmp(child->name, "vendor") == 0) {
