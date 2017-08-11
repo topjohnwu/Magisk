@@ -27,7 +27,6 @@ public class SuReceiver extends BroadcastReceiver {
         Policy policy;
 
         MagiskManager magiskManager = (MagiskManager) context.getApplicationContext();
-        magiskManager.initSUConfig();
 
         if (intent == null) return;
 

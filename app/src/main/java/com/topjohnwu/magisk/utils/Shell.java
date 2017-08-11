@@ -91,7 +91,7 @@ public class Shell {
 
     public static Shell getShell(Context context) {
         MagiskManager magiskManager = Utils.getMagiskManager(context);
-        if (!magiskManager.shell.isValid) {
+        if (magiskManager.shell == null || !magiskManager.shell.isValid) {
             // Get new shell if needed
             magiskManager.shell = getShell();
         }

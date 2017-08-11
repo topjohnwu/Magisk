@@ -260,6 +260,7 @@ public class MagiskFragment extends Fragment
 
     @Override
     public void onRefresh() {
+        magiskManager.getMagiskInfo();
         updateUI();
 
         magiskUpdateText.setText(R.string.checking_for_updates);
@@ -304,7 +305,6 @@ public class MagiskFragment extends Fragment
 
     private void updateUI() {
         ((MainActivity) getActivity()).checkHideSection();
-        magiskManager.updateMagiskInfo();
 
         final int ROOT = 0x1, NETWORK = 0x2, UPTODATE = 0x4;
         int status = 0;

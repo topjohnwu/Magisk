@@ -117,6 +117,16 @@ public class MagiskManager extends Application {
         }
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        suDB = new SuDatabaseHelper(this);
+        repoDB = new RepoDatabaseHelper(this);
+        loadConfig();
+    }
+
     public void setLocale() {
         String localeTag = prefs.getString("locale", "");
         if (localeTag.isEmpty()) {
@@ -130,17 +140,31 @@ public class MagiskManager extends Application {
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        shell = Shell.getShell();
-        suDB = new SuDatabaseHelper(this);
-        repoDB = new RepoDatabaseHelper(this);
+    private void loadConfig() {
+        // Locale
         defaultLocale = Locale.getDefault();
         setLocale();
         new LoadLocale(this).exec();
+
+        isDarkTheme = prefs.getBoolean("dark_theme", false);
+        if (BuildConfig.DEBUG) {
+            devLogging = prefs.getBoolean("developer_logging", false);
+            shellLogging = prefs.getBoolean("shell_logging", false);
+        } else {
+            devLogging = false;
+            shellLogging = false;
+        }
+
+        // su
+        suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+        suReauth = prefs.getBoolean("su_reauth", false);
+        suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, 3);
+        multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, 0);
+        suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, 1);
+
+        updateNotification = prefs.getBoolean("notification", true);
     }
 
     public void toast(String msg, int duration) {
@@ -152,18 +176,10 @@ public class MagiskManager extends Application {
     }
 
     public void init() {
-        isDarkTheme = prefs.getBoolean("dark_theme", false);
-        if (BuildConfig.DEBUG) {
-            devLogging = prefs.getBoolean("developer_logging", false);
-            shellLogging = prefs.getBoolean("shell_logging", false);
-        } else {
-            devLogging = false;
-            shellLogging = false;
-        }
-        initSU();
-        updateMagiskInfo();
+        getMagiskInfo();
         updateBlockInfo();
-        // Initialize prefs
+
+        // Write back default values
         prefs.edit()
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
@@ -192,31 +208,14 @@ public class MagiskManager extends Application {
 
     }
 
-    public void initSUConfig() {
-        suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
-        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
-        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
-        suReauth = prefs.getBoolean("su_reauth", false);
-    }
-
-    public void initSU() {
-        initSUConfig();
-
-        List<String> ret = shell.sh("su -v");
+    public void getMagiskInfo() {
+        Shell.getShell(this);
+        List<String> ret;
+        ret = shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);
             isSuClient = suVersion.toUpperCase().contains("MAGISK");
         }
-        if (isSuClient) {
-            suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, 3);
-            multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, 0);
-            suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, 1);
-        }
-    }
-
-    public void updateMagiskInfo() {
-        updateNotification = prefs.getBoolean("notification", true);
-        List<String> ret;
         ret = shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
             ret = shell.sh("getprop magisk.version");
@@ -247,11 +246,11 @@ public class MagiskManager extends Application {
         }
     }
 
-    public void updateBlockInfo() {
+    private void updateBlockInfo() {
         List<String> res = shell.su(
-                "for BLOCK in boot_a BOOT_A kern-a KERN-A android_boot ANDROID_BOOT kernel KERNEL boot BOOT lnx LNX; do",
-                "BOOTIMAGE=`ls /dev/block/by-name/$BLOCK || ls /dev/block/platform/*/by-name/$BLOCK || ls /dev/block/platform/*/*/by-name/$BLOCK` 2>/dev/null",
-                "[ ! -z \"$BOOTIMAGE\" ] && break",
+                "for BLOCK in boot_a kern-a android_boot kernel boot lnx; do",
+                "  BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null",
+                "  [ ! -z $BOOTIMAGE ] && break",
                 "done",
                 "[ ! -z \"$BOOTIMAGE\" -a -L \"$BOOTIMAGE\" ] && BOOTIMAGE=`readlink $BOOTIMAGE`",
                 "echo \"$BOOTIMAGE\""

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.topjohnwu.magisk.services.OnBootIntentService;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class BootReceiver extends BroadcastReceiver {
 
@@ -21,7 +20,6 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Utils.getMagiskManager(context).initSU();
             // There is currently no need to start an IntentService onBoot
             // startIntentService(context);
         }

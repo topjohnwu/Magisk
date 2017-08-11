@@ -12,7 +12,6 @@ public class PackageReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         MagiskManager magiskManager = Utils.getMagiskManager(context);
-        magiskManager.initSUConfig();
 
         String pkg = intent.getData().getEncodedSchemeSpecificPart();
         Policy policy = magiskManager.suDB.getPolicy(pkg);
