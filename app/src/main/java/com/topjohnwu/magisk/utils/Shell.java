@@ -29,6 +29,17 @@ public class Shell {
 
     private boolean isValid;
 
+    private void testRootShell(DataOutputStream in, DataInputStream out) throws IOException {
+        in.write(("id\n").getBytes("UTF-8"));
+        in.flush();
+        String s = new BufferedReader(new InputStreamReader(out)).readLine();
+        if (TextUtils.isEmpty(s) || !s.contains("uid=0")) {
+            in.close();
+            out.close();
+            throw new IOException();
+        }
+    }
+
     private Shell() {
         rootStatus = 1;
         Process process = null;
@@ -36,45 +47,36 @@ public class Shell {
         DataInputStream out = null;
 
         try {
-            process = Runtime.getRuntime().exec("su");
+            // Try getting global namespace
+            process = Runtime.getRuntime().exec("su --mount-master");
             in = new DataOutputStream(process.getOutputStream());
             out = new DataInputStream(process.getInputStream());
+            testRootShell(in, out);
         } catch (IOException e) {
-            rootStatus = 0;
+            // Feature not implemented, normal root shell
+            try {
+                process = Runtime.getRuntime().exec("su");
+                in = new DataOutputStream(process.getOutputStream());
+                out = new DataInputStream(process.getInputStream());
+                testRootShell(in, out);
+            } catch (IOException e1) {
+                rootStatus = 0;
+            }
         }
 
-        while (true) {
-            if (rootAccess()) {
-                try {
-                    in.write(("id\n").getBytes("UTF-8"));
-                    in.flush();
-                    String s = new BufferedReader(new InputStreamReader(out)).readLine();
-                    if (TextUtils.isEmpty(s) || !s.contains("uid=0")) {
-                        in.close();
-                        out.close();
-                        process.destroy();
-                        throw new IOException();
-                    }
-                } catch (IOException e) {
-                    rootStatus = -1;
-                    continue;
-                }
-                break;
-            } else {
-                // Try to gain non-root sh
-                try {
-                    process = Runtime.getRuntime().exec("sh");
-                    in = new DataOutputStream(process.getOutputStream());
-                    out = new DataInputStream(process.getInputStream());
-                } catch (IOException e) {
-                    // Nothing works....
-                    shellProcess = null;
-                    STDIN = null;
-                    STDOUT = null;
-                    isValid = false;
-                    return;
-                }
-                break;
+        if (!rootAccess()) {
+            // Try to gain non-root sh
+            try {
+                process = Runtime.getRuntime().exec("sh");
+                in = new DataOutputStream(process.getOutputStream());
+                out = new DataInputStream(process.getInputStream());
+            } catch (IOException e) {
+                // Nothing works....
+                shellProcess = null;
+                STDIN = null;
+                STDOUT = null;
+                isValid = false;
+                return;
             }
         }
 
