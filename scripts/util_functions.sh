@@ -121,6 +121,15 @@ api_level_arch_detect() {
   if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
 }
 
+boot_actions() {
+  if [ ! -d /dev/magisk/mirror/bin ]; then
+    mkdir -p /dev/magisk/mirror/bin
+    mount -o bind $MAGISKBIN /dev/magisk/mirror/bin
+  fi
+  MAGISKBIN=/dev/magisk/mirror/bin
+  $MAGISKBIN/magisk magiskpolicy --live "allow fsck * * *"
+}
+
 recovery_actions() {
   # TWRP bug fix
   mount -o bind /dev/urandom /dev/random

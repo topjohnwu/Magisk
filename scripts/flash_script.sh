@@ -83,6 +83,12 @@ ui_print "- Constructing environment"
 
 is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
+if $BOOTMODE; then
+  # Cleanup binary mirrors
+  umount -l /dev/magisk/mirror/bin 2>/dev/null
+  rm -rf /dev/magisk/mirror/bin 2>/dev/null
+fi
+
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
@@ -103,10 +109,7 @@ fi
 # Magisk Image
 ##########################################################################################
 
-$BOOTMODE || recovery_actions
-
-# Fix SuperSU.....
-$BOOTMODE && $MAGISKBIN/magisk magiskpolicy --live "allow fsck * * *"
+$BOOTMODE && boot_actions || recovery_actions
 
 if (is_mounted /data); then
   IMG=/data/magisk.img

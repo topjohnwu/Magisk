@@ -108,7 +108,7 @@ def build_apk(args):
 
 		proc = subprocess.run([
 			os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool, 'zipalign'),
-			'-v', '-p', '4', unsigned, aligned])
+			'-v', '-p', '4', unsigned, aligned], stdout=subprocess.DEVNULL)
 		if proc.returncode != 0:
 			error('Zipalign Magisk Manager failed!')
 
