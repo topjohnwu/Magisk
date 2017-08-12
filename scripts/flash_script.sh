@@ -184,7 +184,7 @@ if ! $BOOTMODE; then
   recovery_cleanup
 fi
 
-# rm -rf $TMPDIR
+rm -rf $TMPDIR
 
 ui_print "- Done"
 exit 0

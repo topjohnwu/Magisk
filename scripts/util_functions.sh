@@ -191,6 +191,10 @@ request_size_check() {
   reqSizeM=$((reqSizeM / 1024 + 1))
 }
 
+request_zip_size_check() {
+  reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int($1 / 1048567 + 1) }'`
+}
+
 image_size_check() {
   SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
   curUsedM=`echo "$SIZE" | cut -d" " -f1`
