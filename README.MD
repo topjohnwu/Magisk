@@ -4,9 +4,9 @@
 
 #### Building has been tested on 3 major platforms:
 
-***macOS 10.12.5***
-***Ubuntu 17.04 x64***
-***Windows 10 Creators Update x64***
+**macOS 10.12.5**  
+**Ubuntu 17.04 x64**  
+**Windows 10 Creators Update x64**
 
 #### Environment Requirements
 
