@@ -409,6 +409,64 @@ static void link_busybox() {
 	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }
 
+static int prepare_img() {
+	int new_img = 0;
+
+	if (access(MAINIMG, F_OK) == -1) {
+		if (create_img(MAINIMG, 64))
+			return 1;
+		new_img = 1;
+	}
+
+	LOGI("* Mounting " MAINIMG "\n");
+	// Mounting magisk image
+	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
+	if (magiskloop == NULL)
+		return 1;
+
+	vec_init(&module_list);
+
+	if (new_img) {
+		xmkdir(COREDIR, 0755);
+		xmkdir(COREDIR "/post-fs-data.d", 0755);
+		xmkdir(COREDIR "/service.d", 0755);
+		xmkdir(COREDIR "/props", 0755);
+	} else {
+		DIR *dir = xopendir(MOUNTPOINT);
+		struct dirent *entry;
+		while ((entry = xreaddir(dir))) {
+			if (entry->d_type == DT_DIR) {
+				if (strcmp(entry->d_name, ".") == 0 ||
+					strcmp(entry->d_name, "..") == 0 ||
+					strcmp(entry->d_name, ".core") == 0 ||
+					strcmp(entry->d_name, "lost+found") == 0)
+					continue;
+				snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
+				if (access(buf, F_OK) == 0) {
+					rm_rf(buf);
+					continue;
+				}
+				snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
+				if (access(buf, F_OK) == 0)
+					continue;
+				vec_push_back(&module_list, strdup(entry->d_name));
+			}
+		}
+
+		closedir(dir);
+
+		// Trim image
+		umount_image(MOUNTPOINT, magiskloop);
+		free(magiskloop);
+		trim_img(MAINIMG);
+
+		// Remount them back :)
+		magiskloop = mount_image(MAINIMG, MOUNTPOINT);
+		free(magiskloop);
+	}
+	return 0;
+}
+
 /****************
  * Entry points *
  ****************/
@@ -511,37 +569,25 @@ void post_fs_data(int client) {
 		return;
 	}
 
-	int new_img = 0;
-
-	if (access(MAINIMG, F_OK) == -1) {
-		if (create_img(MAINIMG, 64))
-			goto unblock;
-		new_img = 1;
-	}
-
-	LOGI("* Mounting " MAINIMG "\n");
-	// Mounting magisk image
-	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-	if (magiskloop == NULL)
+	// Trim, mount magisk.img, which will also travel through the modules
+	// After this, it will create the module list
+	if (prepare_img())
 		goto unblock;
 
-	if (new_img) {
-		xmkdir(COREDIR, 0755);
-		xmkdir(COREDIR "/post-fs-data.d", 0755);
-		xmkdir(COREDIR "/service.d", 0755);
-		xmkdir(COREDIR "/props", 0755);
-	}
+	// Run common scripts
+	LOGI("* Running post-fs-data.d scripts\n");
+	exec_common_script("post-fs-data");
 
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		goto core_only;
 
-	DIR *dir;
-	struct dirent *entry;
+	// Execute module scripts
+	LOGI("* Running module post-fs-data scripts\n");
+	exec_module_script("post-fs-data");
+
 	char *module;
 	struct node_entry *sys_root, *ven_root = NULL, *child;
-
-	dir = xopendir(MOUNTPOINT);
 
 	// Create the system root entry
 	sys_root = xcalloc(sizeof(*sys_root), 1);
@@ -550,69 +596,35 @@ void post_fs_data(int client) {
 
 	int has_modules = 0;
 
-	// Travel through each modules
-	vec_init(&module_list);
 	LOGI("* Loading modules\n");
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR) {
-			if (strcmp(entry->d_name, ".") == 0 ||
-				strcmp(entry->d_name, "..") == 0 ||
-				strcmp(entry->d_name, ".core") == 0 ||
-				strcmp(entry->d_name, "lost+found") == 0)
-				continue;
-			snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
-			// Check whether remove
-			snprintf(buf2, PATH_MAX, "%s/remove", buf);
-			if (access(buf2, F_OK) == 0) {
-				rm_rf(buf);
-				continue;
-			}
-			// Check whether disable
-			snprintf(buf2, PATH_MAX, "%s/disable", buf);
-			if (access(buf2, F_OK) == 0)
-				continue;
-			// Add the module to list
-			module = strdup(entry->d_name);
-			vec_push_back(&module_list, module);
-			// Read props
-			snprintf(buf2, PATH_MAX, "%s/system.prop", buf);
-			if (access(buf2, F_OK) == 0) {
-				LOGI("%s: loading [system.prop]\n", module);
-				read_prop_file(buf2, 0);
-			}
-			// Check whether enable auto_mount
-			snprintf(buf2, PATH_MAX, "%s/auto_mount", buf);
-			if (access(buf2, F_OK) == -1)
-				continue;
-			// Double check whether the system folder exists
-			snprintf(buf2, PATH_MAX, "%s/system", buf);
-			if (access(buf2, F_OK) == -1)
-				continue;
-
-			// Construct structure
-			has_modules = 1;
-			LOGI("%s: constructing magic mount structure\n", module);
-			// If /system/vendor exists in module, create a link outside
-			snprintf(buf2, PATH_MAX, "%s/system/vendor", buf);
-			if (access(buf2, F_OK) == 0) {
-				snprintf(buf, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, module);
-				unlink(buf);
-				symlink(buf2, buf);
-			}
-			construct_tree(module, sys_root);
+	vec_for_each(&module_list, module) {
+		// Read props
+		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
+		if (access(buf, F_OK) == 0) {
+			LOGI("%s: loading [system.prop]\n", module);
+			read_prop_file(buf, 0);
 		}
+		// Check whether enable auto_mount
+		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MOUNTPOINT, module);
+		if (access(buf, F_OK) == -1)
+			continue;
+		// Double check whether the system folder exists
+		snprintf(buf, PATH_MAX, "%s/%s/system", MOUNTPOINT, module);
+		if (access(buf, F_OK) == -1)
+			continue;
+
+		// Construct structure
+		has_modules = 1;
+		LOGI("%s: constructing magic mount structure\n", module);
+		// If /system/vendor exists in module, create a link outside
+		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MOUNTPOINT, module);
+		if (access(buf, F_OK) == 0) {
+			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, module);
+			unlink(buf2);
+			symlink(buf, buf2);
+		}
+		construct_tree(module, sys_root);
 	}
-
-	closedir(dir);
-
-	// Trim image
-	umount_image(MOUNTPOINT, magiskloop);
-	free(magiskloop);
-	trim_img(MAINIMG);
-
-	// Remount them back :)
-	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-	free(magiskloop);
 
 	if (has_modules) {
 		// Extract the vendor node out of system tree and swap with placeholder
@@ -640,15 +652,7 @@ void post_fs_data(int client) {
 	destroy_subtree(sys_root);
 	if (ven_root) destroy_subtree(ven_root);
 
-	// Execute module scripts
-	LOGI("* Running module post-fs-data scripts\n");
-	exec_module_script("post-fs-data");
-
 core_only:
-	// Run common scripts
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
-
 	// Systemless hosts
 	if (access(HOSTSFILE, F_OK) == 0) {
 		LOGI("* Enabling systemless hosts file support");
@@ -685,6 +689,10 @@ void late_start(int client) {
 	// Wait till the full patch is done
 	pthread_join(sepol_patch, NULL);
 
+	// Run scripts after full patch, most reliable way to run scripts
+	LOGI("* Running service.d scripts\n");
+	exec_common_script("service");
+
 	// Core only mode
 	if (access(DISABLEFILE, F_OK) == 0)
 		goto core_only;
@@ -693,10 +701,6 @@ void late_start(int client) {
 	exec_module_script("service");
 
 core_only:
-	// Run scripts after full patch, most reliable way to run scripts
-	LOGI("* Running service.d scripts\n");
-	exec_common_script("service");
-
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
 		while (1) {
