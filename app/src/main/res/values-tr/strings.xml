@@ -1,12 +1,8 @@
  <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
-	
     <!--Welcome Activity-->
     <string name="navigation_drawer_open">Gezinme çekmecesini aç</string>
     <string name="navigation_drawer_close">Gezinme çekmecesini kapat</string>
-	<string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
@@ -149,7 +145,7 @@
 	<string name="system_default">(Sistem Varsayılanı)</string>
 
     <string name="settings_core_only_title">Magisk Yalnızca Çekirdek Modu</string>
-	<string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>	
+	<string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
 	<string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_busybox_title">"BusyBox\'ı etkinleştir"</string>
     <string name="settings_busybox_summary">"Magisk\'in dahili busybox\'ını xbin\'e bağla"</string>
@@ -188,7 +184,7 @@
     <string name="global_summary">Tüm kök oturumları genel bağlama ad alanını kullanır</string>
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
-	
+
 	<string name="settings_development_category">Uygulama Geliştirme</string>
     <string name="settings_developer_logging_title">Gelişmiş hata ayıklama günlüğünü etkinleştir</string>
     <string name="settings_developer_logging_summary">Ayrıntılı günlüğü etkinleştirmek için bunu işaretleyin</string>
