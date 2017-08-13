@@ -1,3 +1,4 @@
+# Magisk Modules and Online Repo
 ## Magisk Module Format
 The Magisk module is a folder under `magisk`, which has a structure as described below:
 
@@ -48,8 +49,25 @@ Here are some files you would want to know:
 1. Directly zip your files, and the result zip file is a flashable zip for both Magisk Manager and custom recoveries
 1. Please check **Notes** for precautions
 
+## Submit Your Module to Magisk Modules Repo
+If you want to share your module with others, you can submit your modules to [Magisk Modules Repo](https://github.com/Magisk-Modules-Repo). In order to submit a module, you will need to know how to use some basic `git`.
+
+1. Create a module as stated [here](module.md), and test if it works properly
+1. Fork [this repo](https://github.com/topjohnwu/magisk-module-template) to your account
+1. Commit and push your changes to your forked repo
+1. Open an issue in [topjohnwu/Magisk_Repo_Central](https://github.com/topjohnwu/Magisk_Repo_Central/issues/new) with your repo link
+1. I will review your module, and once accepted, your repo should be cloned into [Magisk-Modules-Repo](https://github.com/Magisk-Modules-Repo), and you should receive an email to become the collaborator so you can edit the repo in the future.
+
+#### Once your module is live on the Modules Repo, the description of your repo should be the ID of your module. Please do NOT change the description, repeat, do NOT change the description.
+
 ## Notes
 - The Module Template depends on external scripts installed by Magisk, so it each version of template will has its own minimal Magisk version requirement.
 - **Windows users please aware!!** The line endings on all text files should be the **Unix format**. Please use advanced text editors like Sublime, Atom, Notepad++ etc., **NEVER** use Windows Notepad.
 - In `module.prop`, `version` can be an arbitrary string, so any fancy version name (e.g. ultra-beta-v1.1.1.1) is allowed. However, `versionCode` **MUST** be an integer. The value is used for version comparison.
 - Make sure your module ID **doesn't contain any spaces**.
+
+## For Repo Developers
+
+- Magisk Manager monitors all repo's `master` branch. Any changes to the branch `master` will be reflected to all users immediately. If you are working on an update for a module, please work on another branch, make sure it works, then finally merge the changes back to `master`.
+- Once you finished upgrading your repo, bump up at least the `versionCode` in `module.prop`, so Magisk Manager will know you module is updated!
+- The description of your repo should be the same as your module ID. If you changed your description, Magisk Manager will fail to identify your repo, and cannot relate installed module to the online repo together.
