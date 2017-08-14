@@ -13,7 +13,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version">Magisk v%1$s yüklü</string>
-	<string name="magisk_version_core_only">Magisk v%1$s yüklü (Yalnızca Çekirdek Modu)</string>
+    <string name="magisk_version_core_only">Magisk v%1$s yüklü (Yalnızca Çekirdek Modu)</string>
     <string name="magisk_version_error">Magisk yüklü değil</string>
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
@@ -25,15 +25,15 @@
     <string name="proper_root">Uygun şekilde kök erişimi alındı</string>
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
-	<string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
+    <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
     <string name="safetyNet_connection_failed">"Google API\'ye bağlanılamıyor"</string>
     <string name="safetyNet_connection_suspended">Google API bağlantısı askıya alındı</string>
-    <string name="safetyNet_no_response">SafetyNet kontrol edilemiyor, İnternet bağlantınız yok mu?</string>
-    <string name="safetyNet_fail">SafetyNet başarısız: CTS profili uyumsuzluğu</string>
+    <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
+    <string name="safetyNet_fail">SafetyNet Geçersiz: CTS profili uyumsuzluğu</string>
     <string name="safetyNet_pass">SafetyNet Geçti</string>
-	<string name="safetyNet_network_loss">Kötü ağ bağlantısı</string>
-	<string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
-	<string name="safetyNet_res_invalid">Yanıt geçersiz</string>
+    <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
+    <string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
+    <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
     <string name="root_info_warning">İşlevsellik çok sınırlıdır</string>
 
     <!--Install Fragment-->
@@ -51,8 +51,8 @@
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU\'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
     <string name="version_none">(Hiçbiri)</string>
-	<string name="reinstall">Yeniden Yükle</string>
-	<string name="update">Güncelle</string>
+    <string name="reinstall">Yeniden Yükle</string>
+    <string name="update">Güncelle</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -83,7 +83,7 @@
     <string name="app_developers">Ana geliştiriciler</string>
     <string name="app_developers_">"<![CDATA[<a href="https://github.com/topjohnwu">topjohnwu</a> tarafından <a href="https://github.com/d8ahazard">Digitalhigh</a> ve <a href="https://github.com/dvdandroid">Dvdandroid</a>]]>\'in katkılarıyla oluşturuldu"</string>
     <string name="app_changelog">Uygulama değişiklikleri</string>
-    <string name="translators">Fatih Fırıncı - Mevlüt TOPÇU</string>
+    <string name="translators">Fatih FIRINCI - Mevlüt TOPÇU</string>
     <string name="app_version">Uygulama sürümü</string>
     <string name="app_source_code">Kaynak kodu</string>
     <string name="donation">Bağış Yapın</string>
@@ -128,10 +128,10 @@
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
     <string name="zip_process_title">İşleniyor</string>
     <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>
-	<string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
-	<string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
-	<string name="magisk_updates">Magisk Güncellemeleri</string>
-	<string name="flashing">Flaşlayın</string>
+    <string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
+    <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
+    <string name="magisk_updates">Magisk Güncellemeleri</string>
+    <string name="flashing">Yükleyin</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -141,12 +141,12 @@
     <string name="settings_notification_summary">Yeni sürüm kullanılabilir olduğunda güncelleme bildirimlerini göster</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
-	<string name="language">Dil</string>
-	<string name="system_default">(Sistem Varsayılanı)</string>
+    <string name="language">Dil</string>
+    <string name="system_default">(Sistem Varsayılanı)</string>
 
     <string name="settings_core_only_title">Magisk Yalnızca Çekirdek Modu</string>
-	<string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
-	<string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
+    <string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
+    <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_busybox_title">"BusyBox\'ı etkinleştir"</string>
     <string name="settings_busybox_summary">"Magisk\'in dahili busybox\'ını xbin\'e bağla"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
@@ -165,8 +165,8 @@
     <string name="request_timeout">İstek Zaman Aşımı</string>
     <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
     <string name="request_timeout_summary">%1$s saniye</string>
-	<string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulaması yapın</string>
-	<string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrulama</string>
+    <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulaması yapın</string>
+    <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrulama</string>
 
     <string name="multiuser_mode">Çok Kullanıcılı Modu</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>
@@ -185,7 +185,7 @@
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
 
-	<string name="settings_development_category">Uygulama Geliştirme</string>
+    <string name="settings_development_category">Uygulama Geliştirme</string>
     <string name="settings_developer_logging_title">Gelişmiş hata ayıklama günlüğünü etkinleştir</string>
     <string name="settings_developer_logging_summary">Ayrıntılı günlüğü etkinleştirmek için bunu işaretleyin</string>
     <string name="settings_shell_logging_title">Kabuk komut hata ayıklama günlüğünü etkinleştir</string>
