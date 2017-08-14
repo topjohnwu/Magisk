@@ -112,15 +112,6 @@ Options:
                         (load from live policies if not specified)
   --save <outfile>      save policies to <outfile>
 
-magiskpolicy [--options...] [policystatements...]
-
-Options:
-  --live                directly load patched policy to device
-  --minimal             minimal patches, used for boot image patches
-  --load <infile>       load policies from <infile>
-                        (load from live policies if not specified)
-  --save <outfile>      save policies to <outfile>
-
 Policy statements should be enclosed by quotes in command-line;
 the whole statement should be treated as a single parameter.
 
