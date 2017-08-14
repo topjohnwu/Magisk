@@ -11,49 +11,60 @@ static int syntax_err = 0;
 static char err_msg[ARG_MAX];
 
 static void statements() {
-	fprintf(stderr, 
-		"\nSupported policy statements:\n"
+	fprintf(stderr,
+		"Policy statements should be enclosed by quotes in command-line;\n"
+		"the whole statement should be treated as a single parameter.\n"
 		"\n"
-		"\"allow #source-class #target-class permission-class #permission\"\n"
-		"\"deny #source-class #target-class permission-class #permission\"\n"
-		"\"auditallow #source-class #target-class permission-class #permission\"\n"
-		"\"auditdeny #source-class #target-class permission-class #permission\"\n"
+		"The statements has a format of \"<action> [args...]\"\n"
+		"Use '*' in args to represent every possible match.\n"
+		"Collections wrapped in curly brackets can also be used as args.\n"
+		"\n"
+		"Supported policy statements:\n"
+		"\n"
+		"Type 1:\n"
+		"\"<action> source-class target-class permission-class permission\"\n"
+		"Action: allow, deny, auditallow, auditdeny\n"
+		"\n"
+		"Type 2:\n"
+		"\"<action> source-class target-class permission-class ioctl range\"\n"
+		"Action: allowxperm, auditallowxperm, dontauditxperm\n"
+		"\n"
+		"Type 3:\n"
+		"\"<action> class\"\n"
+		"Action: create, permissive, enforcing\n"
+		"\n"
+		"Type 4:\n"
+		"\"attradd class attribute\"\n"
+		"\n"
+		"Type 5:\n"
 		"\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n"
-		"\"allowxperm #source-class #target-class #permission-class ioctl range\"\n"
-		"\"auditallowxperm #source-class #target-class #permission-class ioctl range\"\n"
-		"\"dontauditxperm #source-class #target-class #permission-class ioctl range\"\n"
-		"\"create #class\"\n"
-		"\"permissive #class\"\n"
-		"\"enforcing #class\"\n"
-		"\"attradd #class #attribute\"\n"
-		"\nsource-class and target-class can be attributes (patches the whole group)\n"
-		"All sections (except typetrans) can be replaced with \'*\' to patch every possible matches\n"
-		"Sections marked with \'#\' can be replaced with collections in curly brackets\n"
-		"e.g: allow { source1 source2 } { target1 target2 } permission-class { permission1 permission2 }\n"
+		"\n"
+		"Notes:\n"
+		"- typetrans does not support the all match '*' syntax\n"
+		"- permission-class cannot be collections\n"
+		"- source-class and target-class can also be attributes\n"
+		"\n"
+		"Example: allow { source1 source2 } { target1 target2 } permission-class *\n"
 		"Will be expanded to:\n"
-		"allow source1 target1 permission-class permission1\n"
-		"allow source1 target1 permission-class permission2\n"
-		"allow source1 target2 permission-class permission1\n"
-		"allow source1 target2 permission-class permission2\n"
-		"allow source2 target1 permission-class permission1\n"
-		"allow source2 target1 permission-class permission2\n"
-		"allow source2 target2 permission-class permission1\n"
-		"allow source2 target2 permission-class permission2\n"
+		"\n"
+		"allow source1 target1 permission-class { all-permissions }\n"
+		"allow source1 target2 permission-class { all-permissions }\n"
+		"allow source2 target1 permission-class { all-permissions }\n"
+		"allow source2 target2 permission-class { all-permissions }\n"
 		"\n"
 	);
 }
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & phh) - SEPolicy Modification Tool\n\n"
-		"%s [--options...] [policystatements...]\n\n"
+		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & phh) - sepolicy Modification Tool\n\n"
+		"Usage: %s [--options...] [policystatements...]\n\n"
 		"Options:\n"
-		"  --live: directly load patched policy to device\n"
-		// "  --magisk: complete (very large!) patches for Magisk and MagiskSU\n"
-		"  --minimal: minimal patches, used for boot image patches\n"
-		"  --load <infile>: load policies from <infile>\n"
-		"                   (load from current policies if not specified)\n"
-		"  --save <outfile>: save policies to <outfile>\n"
+		"  --live                directly load patched policy to device\n"
+		"  --minimal             minimal patches, used for boot image patches\n"
+		"  --load <infile>       load policies from <infile>\n"
+		"                        (load from live policies if not specified)\n"
+		"  --save <outfile>      save policies to <outfile>\n\n"
 		, arg0);
 	statements();
 	exit(1);
@@ -364,7 +375,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 				if (i + 1 >= argc) usage(argv[0]);
 				outfile = argv[i + 1];
 				i += 1;
-			} else 
+			} else
 				usage(argv[0]);
 		} else
 			vec_push_back(&rules, argv[i]);
