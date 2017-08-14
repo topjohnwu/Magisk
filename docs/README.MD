@@ -3,7 +3,7 @@
 
 - Magisk Details
     - [Introduction](#introduction)
-    - **(Important!)** [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/e1023fdfafb038956367fce582db1726f50a878f/docs/procedures.html)
+    - **(Important!)** [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/cc1809688299f1f8b5db494a234850852712c0c9/docs/procedures.html)
     - [Available Applets](applets.md)
         - [magisk](applets.md#magisk)
         - [su](applets.md#su)
