@@ -1,9 +1,15 @@
 # Magisk Documentations
-#### (Updated on 2017.8.15 for Magisk v13.5+)
 
-- Magisk Details
-    - [Introduction](#introduction)
-    - **(Important!)** [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/cc1809688299f1f8b5db494a234850852712c0c9/docs/procedures.html)
+## Document Changelog
+- 2017.8.15
+    - Initial version for Magisk v13.5+
+
+## Table of Content
+
+- [Introduction](#introduction)
+- Magisk Details  
+    - [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/cc1809688299f1f8b5db494a234850852712c0c9/docs/procedures.html)
+    - [Boot Stages](bootstages.md)
     - [Available Applets](applets.md)
         - [magisk](applets.md#magisk)
         - [su](applets.md#su)
@@ -17,9 +23,5 @@
     
 ## Introduction
 Magisk is a suite of open source tools for devices running Android version higher than 5.0 Lollipop (API 21). It provides an environment which covers most Android aftermarket customization like root, boot scripts, SELinux patches, and also acts as a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact, all of which accomplished by only patching the boot image, and adding some files into `/data`.
-
-## Document Changelog
-- 2017.8.15
-    - Initial version
 
 
