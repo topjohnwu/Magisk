@@ -1,10 +1,10 @@
 /* resetprop.cpp - Manipulate any system props
- * 
+ *
  * Copyright 2016 nkk71     <nkk71x@gmail.com>
  * Copyright 2016 topjohnwu <topjohnwu@gmail.com>
- * 
+ *
  * Info:
- * 
+ *
  * all changes are in
  *
  * bionic/libc/bionic/system_properties.cpp
@@ -26,23 +26,23 @@
  *
  * static prop_area* map_fd_ro(const int fd)
  *     we dont want this read only so change: 'PROT_READ' to 'PROT_READ | PROT_WRITE'
- * 
+ *
  *
  * Copy the code of prop_info *prop_area::find_property, and modify to delete props
  * const prop_info *prop_area::find_property_and_del(prop_bt *const trie, const char *name)
  * {
- *    ... 
+ *    ...
  *    ...  Do not alloc a new prop_bt here, remove all code involve alloc_if_needed
  *    ...
- * 
+ *
  *     if (prop_offset != 0) {
  *         atomic_store_explicit(&current->prop, 0, memory_order_release); // Add this line to nullify the prop entry
  *         return to_prop_info(&current->prop);
  *     } else {
- *     
+ *
  *    ....
  * }
- *      
+ *
  *
  * by patching just those functions directly, all other functions should be ok
  * as is.
@@ -98,14 +98,16 @@ static int usage(char* arg0) {
     fprintf(stderr,
         "resetprop v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & nkk71) - System Props Modification Tool\n\n"
         "Usage: %s [options] [args...]\n"
-        "%s <name> <value>:      Set property entry <name> with <value>\n"
-        "%s --file <prop file>:  Load props from <prop file>\n"
-        "%s --delete <name>:     Remove prop entry <name>\n"
         "\n"
         "Options:\n"
-        "   -v          verbose output\n"
-        "   -n          don't trigger events when changing props\n"
-        "               if used with deleteprop determines whether remove persist prop file\n"
+        "   -v      show verbose output\n"
+        "   -n      only modify property in memory\n"
+        "\n"
+        "%s  NAME VALUE        set property entry NAME with VALUE\n"
+        "%s  --file FILE       load props from FILE\n"
+        "%s  --delete NAME     remove prop entry NAME\n"
+        "\n"
+
     , arg0, arg0, arg0, arg0);
     return 1;
 }
@@ -164,7 +166,7 @@ int setprop(const char *name, const char *value) {
 int setprop2(const char *name, const char *value, const int trigger) {
     if (init_resetprop()) return -1;
     int ret;
-    
+
     prop_info *pi = (prop_info*) __system_property_find2(name);
     if (pi != NULL) {
         if (trigger) {
@@ -250,7 +252,7 @@ int read_prop_file(const char* filename, const int trigger) {
 int resetprop_main(int argc, char *argv[]) {
 
     int del = 0, file = 0, trigger = 1;
-    
+
     int exp_arg = 2;
     char *name, *value, *filename;
 

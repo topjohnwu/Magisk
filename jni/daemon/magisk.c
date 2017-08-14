@@ -25,34 +25,35 @@ static void usage() {
 		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
 		"\n"
 		"Usage: %s [applet [arguments]...]\n"
-		"   or: %s --install [SOURCE] <DIR> \n"
+		"   or: %s --install [SOURCE] DIR\n"
+		"       if SOURCE not provided, will link itself\n"
 		"   or: %s --list\n"
-		"   or: %s --createimg <PATH> <SIZE>\n"
+		"   or: %s --createimg IMG SIZE\n"
 		"       create ext4 image, SIZE is interpreted in MB\n"
-		"   or: %s --imgsize <PATH>\n"
-		"   or: %s --resizeimg <PATH> <SIZE>\n"
+		"   or: %s --imgsize IMG\n"
+		"   or: %s --resizeimg IMG SIZE\n"
 		"       SIZE is interpreted in MB\n"
-		"   or: %s --mountimg <IMG> <PATH>\n"
-		"       Prints out the loop device\n"
-		"   or: %s --umountimg <PATH> <LOOP>\n"
+		"   or: %s --mountimg IMG PATH\n"
+		"       mount IMG to PATH and prints the loop device\n"
+		"   or: %s --umountimg PATH LOOP\n"
 		"   or: %s --[boot stage]\n"
 		"       start boot stage service\n"
 		"   or: %s [options]\n"
 		"   or: applet [arguments]...\n"
 		"\n"
 		"Supported boot stages:\n"
-		"       post-fs, post-fs-data, service\n"
+		"   post-fs, post-fs-data, service\n"
 		"\n"
 		"Options:\n"
-		"       -c            print client version\n"
-		"       -v            print daemon version\n"
-		"       -V            print daemon version code\n"
+		"   -c          print client version\n"
+		"   -v          print daemon version\n"
+		"   -V          print daemon version code\n"
 		"\n"
 		"Supported applets:\n"
 	, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0);
 
 	for (int i = 0; applet[i]; ++i) {
-		fprintf(stderr, i ? ", %s" : "       %s", applet[i]);
+		fprintf(stderr, i ? ", %s" : "    %s", applet[i]);
 	}
 	fprintf(stderr, "\n");
 	exit(1);

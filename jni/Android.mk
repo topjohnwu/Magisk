@@ -16,16 +16,16 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/selinux/libsepol/include
 
 LOCAL_SRC_FILES := \
-	main.c \
+	daemon/magisk.c \
+	daemon/daemon.c \
+	daemon/socket_trans.c \
+	daemon/log_monitor.c \
+	daemon/bootstages.c \
 	utils/misc.c \
 	utils/vector.c \
 	utils/xwrap.c \
 	utils/list.c \
 	utils/img.c \
-	daemon/daemon.c \
-	daemon/socket_trans.c \
-	daemon/log_monitor.c \
-	daemon/bootstages.c \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \

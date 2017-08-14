@@ -29,13 +29,13 @@ void kill_proc(int pid) {
 static void usage(char *arg0) {
 	fprintf(stderr,
 		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Hide Magisk!\n\n"
-		"%s [--options [arguments...] ]\n\n"
+		"Usage: %s [--options [arguments...] ]\n\n"
 		"Options:\n"
-		"  --enable: Start the magiskhide daemon\n"
-		"  --disable: Stop the magiskhide daemon\n"
-		"  --add <process name>: Add <process name> to the list\n"
-		"  --rm <process name>: Remove <process name> from the list\n"
-		"  --ls: Print out the current hide list\n"
+		"  --enable          Start magiskhide\n"
+		"  --disable         Stop magiskhide\n"
+		"  --add PROCESS     Add PROCESS to the hide list\n"
+		"  --rm PROCESS      Remove PROCESS from the hide list\n"
+		"  --ls              Print out the current hide list\n"
 		, arg0);
 	exit(1);
 }
