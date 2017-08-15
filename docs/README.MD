@@ -7,18 +7,23 @@
 ## Table of Content
 
 - [Introduction](#introduction)
-- Magisk Details  
+- [Magisk Details](details.md)
     - [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/cc1809688299f1f8b5db494a234850852712c0c9/docs/procedures.html)
-    - [Boot Stages](bootstages.md)
-    - [Available Applets](applets.md)
-        - [magisk](applets.md#magisk)
-        - [su](applets.md#su)
-        - [resetprop](applets.md#resetprop)
-        - [magiskpolicy](applets.md#magiskpolicy)
-        - [magiskhide](applets.md#magiskhide)
+    - [Boot Stages](details.md#boot-stages)
+    - [Magic Mount Details](details.md#magic-mount-details)
+    - [Simple Mount Details](details.md#simple-mount-details)
+- [Available Applets](applets.md)
+    - [magisk](applets.md#magisk)
+    - [su](applets.md#su)
+    - [resetprop](applets.md#resetprop)
+    - [magiskpolicy](applets.md#magiskpolicy)
+    - [magiskhide](applets.md#magiskhide)
 - [Modules and Repos](module_repo.md)
     - [Modules and Templates](module_repo.md#magisk-module-format)
     - [Submit Modules to Repo](module_repo.md#submit-your-module-to-magisk-modules-repo)
+- [Tips and Tricks](tips.md)
+    - [Remove Files](tips.md#remove-files)
+    - [Remove Folders](tips.md#remove-folders)
 
     
 ## Introduction
