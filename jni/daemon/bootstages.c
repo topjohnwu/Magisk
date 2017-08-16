@@ -443,6 +443,7 @@ static int prepare_img() {
 					continue;
 				snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
 				if (access(buf, F_OK) == 0) {
+					snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
 					rm_rf(buf);
 					continue;
 				}
