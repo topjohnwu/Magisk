@@ -91,15 +91,14 @@ cpio_mkdir() {
 # Initialization
 ##########################################################################################
 
+[ -z $1 ] && abort_wrap "This script requires a boot image as a parameter"
+
 CWD=`pwd`
 cd "`dirname_wrap $1`"
 BOOTIMAGE="`pwd`/`basename_wrap $1`"
 cd "$CWD"
 
-if [ -z "$BOOTIMAGE" ]; then
-  ui_print_wrap "This script requires a boot image as a parameter"
-  exit 1
-fi
+[ -e "$BOOTIMAGE" ] || abort_wrap "$BOOTIMAGE does not exist!"
 
 # Presets
 [ -z $KEEPVERITY ] && KEEPVERITY=false
@@ -115,11 +114,11 @@ chmod +x ./*
 ##########################################################################################
 # Unpack
 ##########################################################################################
+CHROMEOS=false
 
 ui_print_wrap "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
 
-CHROMEOS=false
 case $? in
   1 )
     abort_wrap "! Unable to unpack boot image"
