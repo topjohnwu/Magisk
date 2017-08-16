@@ -10,7 +10,7 @@ If you are working on complicated projects, you shall need more control to the w
     - **This stage is BLOCKING. Boot process will NOT continue until everything is done, or 60 seconds has passed**
     - Happens after `/data` is ready (including the case when `/data` is encrypted)
     - Happens before Zygote and system servers are started (which means pretty much everything)
-    - Mirrors will be mounted. These mirrors play a critical part in **Magic Mount**
+    - Mirrors will be mounted. These mirrors play a critical role in **Magic Mount**
     - `/data/magisk.img` will be merged, trimmed, and mounted to `/magisk`
     - Magisk will run scripts under `/magisk/.core/post-fs-data.d`
     - Magisk will run scripts: `/magisk/$MODID/post-fs-data.sh` (placed in each module directory)
@@ -49,12 +49,12 @@ Directories containing a file named `.replace` will NOT be merged into the syste
 
 ### Notes
 - Sometimes, completely replacing a folder is inevitable. For example you want to replace `/system/priv-app/SystemUI` in your stock rom. In stock roms, system apps usually comes with pre-optimized files. If your replacement `SystemUI.apk` is deodexed (which is most likely the case), you would want to replace the whole `/system/priv-app/SystemUI` to make sure the folder only contains the modified `SystemUI.apk` and **NOT** merge with the pre-optimized files.
-- If you are using the [Magisk Module Template](https://github.com/topjohnwu/magisk-module-template), you can create a list of folders you want to directly replace in `config.sh`, the installation scripts will handle the creation of `.replace` files for you.
-- Adding non-existing target items is a relatively expensive operation. Magisk would need to do **MANY** under-the-hood tasks to achieve it. Replacing a whole folder is recommended if viable, it reduces the complexity of the generation of the mounting tree and could speed up the booting time
+- If you are using the [Magisk Module Template](https://github.com/topjohnwu/magisk-module-template), you can create a list of folders you want to replace in the file `config.sh`. The installation scripts will handle the creation of `.replace` files into the listed folders for you.
+- Adding non-existing target items is a relatively expensive operation. Magisk would need to do **MANY** under-the-hood tasks to achieve it. Replacing a whole folder is recommended if viable, it reduces the complexity of the construction of the mounting tree and could speed up the booting time
 
 ## Simple Mount Details
-Some files require to be mounted much earlier in the boot process, currently known are bootanimation and some libs (most users won't change them). You can simply just place your files into the corresponding path under `/cache/magisk_mount`. At boot time, Magisk will **clone all the attributes of the target file**, including selinux contexts, permission mode, owner/group to the file, and bind mount to the target. You don't need to worry about the metadatas for files placed under `/cache/magisk_mount`.
+Some files require to be mounted much earlier in the boot process, currently known are bootanimation and some libs (most users won't change them). You can simply place your modified files into the corresponding path under `/cache/magisk_mount`. At boot time, Magisk will **clone all the attributes from the target file**, which includes selinux context, permission mode, owner, group. It'll then bind mount the file to the target. This means you don't need to worry about the metadatas for files placed under `/cache/magisk_mount`: copy the file to the correct place, reboot then you're done!
 
-This mode does not feature the same complex Magic Mount implementation, it will only cover the case when a source leaf's target item exists in `/system`.
+This mode does not feature the same complex Magic Mount implementation, it will mount a source leaf to an existing target item under `/system`.
 
 For example, you want to replace `/system/media/bootanimation.zip`, copy your new boot animation zip to `/cache/magisk_mount/system/media/bootanimation.zip,` Magisk will mount your files in the next reboot.

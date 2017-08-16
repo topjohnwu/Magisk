@@ -2,7 +2,7 @@
 Magisk has a core binary which acts as a multi-call program with many applets. Here is an introduction to all available applets.
 
 ### magisk
-The magisk binary provides a lot of utility functions used in both Magisk installation and also module installation. It is also the entry point for `init` to invoke magisk's boot procedures.
+The magisk binary itself provides a lot of utility functions when called with the name `magisk`. They are used in both Magisk installation and module installation. The entry point for `init` to invoke magisk's boot procedures are also listed here.
 
 Command help message:
 
@@ -37,7 +37,7 @@ Supported applets:
 ```
 
 ### su
-The MagiskSU entrypoint. Call `su` to gain a root shell. **MagiskSU** has done several optimizations, check them out in the procedure diagram.
+The MagiskSU entrypoint. Call `su` to gain a root shell.
 
 Command help message:
 
@@ -60,16 +60,16 @@ Options:
                                 use if you need to publicly apply mounts
 ```
 
-Note: the `-Z --context` option still exists, but the option will do nothing since it's not needed anymore. It's still there because some apps requires specific context to work properly on legacy root implementations, and I don't want them to break.
+Note: even though the `-Z, --context` option is not listed above, it actually still exists. However MagiskSU will silently ignore the option since it's not needed anymore. It is still left over because some apps still request root shell with specific contexts as an option.
 
 ### resetprop
-An advanced system prop manipulation utility; using this tool, you can arbitrarily alter system props. Here's some background knowledge:
+An advanced system prop manipulation utility; you can arbitrarily alter system props using this tool. Here's some background knowledge:
 
-> System props are stored in a hybrid trie/binary tree data structure; it is originally designed to only support adding nodes, and no nodes will be removed. Props can be read by many processes (e.g. via the `getprop` command); however, only the `init` process can write to the data. `init` provides a `property_service` to accept property update requests, so all property changes are monitored and controlled by `init`. The restrictions of **read-only** props (props that starts with `ro.`), which they can only be set once and cannot be changed afterwards, is therefore implemented in `init`.
+> System props are stored in a hybrid trie/binary tree data structure in memory; it was originally designed to only support adding nodes, and no nodes should be removed. Props can be read by many processes (e.g. via the `getprop` command); however, only the `init` process have write access to the property data. `init` provides a `property_service` to accept property update requests, so all property changes are monitored and controlled by `init` Restrictions such as **read-only** props (props that starts with `ro.`), which can only be set once and cannot be changed afterwards, is therefore implemented in `init`.
 
-**resetprop** mimics what `init` is doing: directly accessing the data structure. This bypasses the whole `property_service` part, so we gain **arbitrary modification** power. Deleting properties, which was stated *"forbidden"* in the data structure is also implemented in resetprop through some tricks.
+**resetprop** acts just like `init`: directly access the data structure, bypassing the whole `property_service` part. Doing so, we gain **arbitrary modification** power, including altering read-only props and deleting properties. Delete properties, which was stated *"forbidden"* in the data structure, is implemented through some tricks in the data structure.
 
-One subtle thing to be aware of is that if we change props by directly modifying the data structure, `on property:foo=bar` triggers registered in `*.rc` scripts will not be triggered properly. This may be a good thing or a bad thing, depending on what result you want. I made the default behavior to match the original setprop command, which **will** trigger events, but still I provide a flag to disable it if you needed it.
+One subtle thing to be aware of is that if we change props by directly modifying the data structure, `on property:foo=bar` triggers registered in `*.rc` scripts will not be triggered properly. This may be a good thing or a bad thing, depending on what behavior you expect. I made the default behavior to match the original setprop command, which **WILL** trigger events, but of course I provide a flag (`-n`) to disable it if you need this special behavior.
 
 Command help message:
 
@@ -100,7 +100,7 @@ The built in patches are split to 3 parts: minimal, medium, and large. The full 
 
 What this all means is that **only late_start service mode is guaranteed to run in a fully patched environment**. If any script is not time critical, it is **highly recommended to run those scripts in late_start service mode**.
 
-Command help message (very helpful):
+Command help message:
 
 ```
 Usage: magiskpolicy [--options...] [policystatements...]
@@ -154,7 +154,7 @@ allow source2 target2 permission-class { all-permissions }
 ```
 
 ### magiskhide
-This is the command-line tool to control the state of MagiskHide.
+This is the CLI to control the state of MagiskHide.
 
 Command help message: 
 
