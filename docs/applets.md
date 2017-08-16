@@ -112,8 +112,9 @@ Options:
                         (load from live policies if not specified)
   --save <outfile>      save policies to <outfile>
 
-Policy statements should be enclosed by quotes in command-line;
-the whole statement should be treated as a single parameter.
+One policy statement should be treated as one parameter;
+this means a full policy statement should be enclosed in quotes;
+multiple policy statements can be provided in a single command
 
 The statements has a format of "<action> [args...]"
 Use '*' in args to represent every possible match.
