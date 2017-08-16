@@ -12,8 +12,9 @@ static char err_msg[ARG_MAX];
 
 static void statements() {
 	fprintf(stderr,
-		"Policy statements should be enclosed by quotes in command-line;\n"
-		"the whole statement should be treated as a single parameter.\n"
+		"One policy statement should be treated as one parameter;\n"
+		"this means a full policy statement should be enclosed in quotes;\n"
+		"multiple policy statements can be provided in a single command\n"
 		"\n"
 		"The statements has a format of \"<action> [args...]\"\n"
 		"Use '*' in args to represent every possible match.\n"
