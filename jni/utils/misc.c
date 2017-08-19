@@ -219,13 +219,22 @@ void setup_sighandlers(void (*handler)(int)) {
 	}
 }
 
+int run_command(char *const argv[]) {
+	int pid = run_command2(0, NULL, NULL, argv);
+	if (pid != -1)
+		waitpid(pid, NULL, 0);
+	else
+		return 1;
+	return 0;
+}
+
 /*
    fd == NULL -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
   *cb         -> A callback function which runs after fork
 */
-int run_command(int err, int *fd, void (*cb)(void), const char *path, char *const argv[]) {
+int run_command2(int err, int *fd, void (*cb)(void), char *const argv[]) {
 	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
@@ -255,7 +264,7 @@ int run_command(int err, int *fd, void (*cb)(void), const char *path, char *cons
 		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}
 
-	execv(path, argv);
+	execvp(argv[0], argv);
 	PLOGE("execv");
 	return -1;
 }
@@ -359,13 +368,12 @@ int clone_dir(const char *source, const char *target) {
 	return 0;
 }
 
-int rm_rf(const char *target) {
+void rm_rf(const char *target) {
 	if (access(target, F_OK) == -1)
-		return 0;
+		return;
 	// Use external rm command, saves a lot of headache and issues
-	char command[PATH_MAX];
-	snprintf(command, sizeof(command), "rm -rf %s", target);
-	return system(command);
+	char *const command[] = { "rm", "-rf", (char*) target, NULL };
+	run_command(command);
 }
 
 void clone_attr(const char *source, const char *target) {

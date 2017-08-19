@@ -117,7 +117,7 @@ static struct node_entry *insert_child(struct node_entry *p, struct node_entry *
  * Scripts *
  ***********/
 
-static void bb_path() {
+static void bb_setenv() {
 	snprintf(buf, PATH_MAX, "%s:%s", BBPATH, getenv("PATH"));
 	setenv("PATH", buf, 1);
 }
@@ -137,7 +137,7 @@ static void exec_common_script(const char* stage) {
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			char *const command[] = { "sh", buf2, NULL };
-			int pid = run_command(0, NULL, bb_path, "/system/bin/sh", command);
+			int pid = run_command2(0, NULL, bb_setenv, command);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -155,7 +155,7 @@ static void exec_module_script(const char* stage) {
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		char *const command[] = { "sh", buf2, NULL };
-		int pid = run_command(0, NULL, bb_path, "/system/bin/sh", command);
+		int pid = run_command2(0, NULL, bb_setenv, command);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
@@ -402,10 +402,8 @@ static void mount_mirrors() {
 
 static void link_busybox() {
 	mkdir_p(BBPATH, 0755);
-	char *const command[] = { "busybox", "--install", "-s", BBPATH, NULL};
-	int pid = run_command(0, NULL, NULL, MIRRDIR "/bin/busybox", command);
-	if (pid != -1)
-		waitpid(pid, NULL, 0);
+	char *const command[] = { MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL};
+	run_command(command);
 	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }
 
@@ -523,7 +521,7 @@ void post_fs_data(int client) {
 	// Start debug logs in new process
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 	char *const command[] = { "logcat", "-v", "brief", NULL };
-	debug_log_pid = run_command(0, &debug_log_fd, NULL, "/system/bin/logcat", command);
+	debug_log_pid = run_command2(0, &debug_log_fd, NULL, command);
 	close(debug_log_fd);
 #endif
 
@@ -565,7 +563,7 @@ void post_fs_data(int client) {
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
-		bb_path();
+		bb_setenv();
 		system("(BOOTMODE=true sh " UNINSTALLER ") &");
 		return;
 	}
@@ -710,7 +708,7 @@ core_only:
 				"/system/bin", "com.android.commands.pm.Pm",
 				"install", "-r", MANAGERAPK, NULL };
 			int apk_res = -1, pid;
-			pid = run_command(1, &apk_res, pm_setenv, "/system/bin/app_process", command);
+			pid = run_command2(1, &apk_res, pm_setenv, command);
 			if (pid != -1) {
 				waitpid(pid, NULL, 0);
 				fdgets(buf, PATH_MAX, apk_res);
