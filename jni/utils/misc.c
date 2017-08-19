@@ -369,14 +369,12 @@ int rm_rf(const char *target) {
 }
 
 void clone_attr(const char *source, const char *target) {
-	struct stat buf;
-	xstat(source, &buf);
-	chmod(target, buf.st_mode & 0777);
-	chown(target, buf.st_uid, buf.st_gid);
-	char *con;
-	lgetfilecon(source, &con);
-	lsetfilecon(target, con);
-	free(con);
+	int sourcefd, targetfd;
+	sourcefd = xopen(source, O_RDONLY);
+	targetfd = xopen(target, O_RDONLY);
+	fclone_attr(sourcefd, targetfd);
+	close(sourcefd);
+	close(targetfd);
 }
 
 void fclone_attr(const int sourcefd, const int targetfd) {
@@ -386,7 +384,7 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	fchown(targetfd, buf.st_uid, buf.st_gid);
 	char *con;
 	fgetfilecon(sourcefd, &con);
-	fsetfilecon(sourcefd, con);
+	fsetfilecon(targetfd, con);
 	free(con);
 }
 
