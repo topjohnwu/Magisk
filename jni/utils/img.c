@@ -14,8 +14,7 @@ static int e2fsck(const char *img) {
 	// Check and repair ext4 image
 	char buffer[128];
 	int pid, fd = -1;
-	char *const command[] = { "e2fsck", "-yf", (char *) img, NULL };
-	pid = run_command2(1, &fd, NULL, command);
+	pid = exec_command(1, &fd, NULL, "e2fsck", "-yf", img, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
@@ -56,19 +55,17 @@ int create_img(const char *img, int size) {
 	char file_contexts[] = "/magisk(/.*)? u:object_r:system_file:s0\n";
 	// If not root, attempt to create in current diretory
 	char *filename = getuid() == UID_ROOT ? "/dev/file_contexts_image" : "file_contexts_image";
-	int pid, status, fd = xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	int ret, fd = xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	xwrite(fd, file_contexts, sizeof(file_contexts));
 	close(fd);
 
 	char buffer[16];
 	snprintf(buffer, sizeof(buffer), "%dM", size);
-	char *const command[] = { "make_ext4fs", "-l", buffer, "-a", "/magisk", "-S", filename, (char *) img, NULL };
-	pid = run_command2(0, NULL, NULL, command);
-	if (pid < 0)
+	ret = exec_command_sync("make_ext4fs", "-l", buffer, "-a", "/magisk", "-S", filename, img, NULL);
+	if (ret < 0)
 		return 1;
-	waitpid(pid, &status, 0);
 	unlink(filename);
-	return WEXITSTATUS(status);
+	return ret;
 }
 
 int get_img_size(const char *img, int *used, int *total) {
@@ -76,8 +73,7 @@ int get_img_size(const char *img, int *used, int *total) {
 		return 1;
 	char buffer[PATH_MAX];
 	int pid, fd = -1, status = 1;
-	char *const command[] = { "e2fsck", "-n", (char *) img, NULL };
-	pid = run_command2(1, &fd, NULL, command);
+	pid = exec_command(1, &fd, NULL, "e2fsck", "-n", img, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd)) {
@@ -109,8 +105,7 @@ int resize_img(const char *img, int size) {
 	char buffer[128];
 	int pid, status, fd = -1;
 	snprintf(buffer, sizeof(buffer), "%dM", size);
-	char *const command[] = { "resize2fs", (char *) img, buffer, NULL };
-	pid = run_command2(1, &fd, NULL, command);
+	pid = exec_command(1, &fd, NULL, "resize2fs", img, buffer, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
@@ -188,14 +183,14 @@ int merge_img(const char *source, const char *target) {
 			snprintf(buffer, sizeof(buffer), "%s/%s", TARGET_TMP, entry->d_name);
 			if (access(buffer, F_OK) == 0) {
 				LOGI("Upgrade module: %s\n", entry->d_name);
-				rm_rf(buffer);
+				exec_command_sync(BBPATH "/rm", "-rf", buffer, NULL);
 			} else {
 				LOGI("New module: %s\n", entry->d_name);
 			}
 		}
 	}
 	closedir(dir);
-	clone_dir(SOURCE_TMP, TARGET_TMP);
+	cp_afc(SOURCE_TMP, TARGET_TMP);
 
 	// Unmount all loop devices
 	umount_image(SOURCE_TMP, s_loop);

@@ -181,13 +181,11 @@ void proc_monitor() {
 
 	while (1) {
 		// Clear previous logcat buffer
-		char *const restart[] = { "logcat", "-b", "events", "-c", NULL };
-		run_command(restart);
+		exec_command_sync("logcat", "-b", "events", "-c", NULL);
 
 		// Monitor am_proc_start
-		char *const command[] = { "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL };
 		log_fd = -1;
-		log_pid = run_command2(0, &log_fd, NULL, command);
+		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "events", "-v", "raw", "-s", "am_proc_start", NULL);
 
 		if (log_pid < 0) continue;
 		if (kill(log_pid, 0)) continue;

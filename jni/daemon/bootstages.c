@@ -136,8 +136,7 @@ static void exec_common_script(const char* stage) {
 			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			char *const command[] = { "sh", buf2, NULL };
-			int pid = run_command2(0, NULL, bb_setenv, command);
+			int pid = exec_command(0, NULL, bb_setenv, "sh", buf2, NULL);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -154,8 +153,7 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		char *const command[] = { "sh", buf2, NULL };
-		int pid = run_command2(0, NULL, bb_setenv, command);
+		int pid = exec_command(0, NULL, bb_setenv, "sh", buf2, NULL);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
@@ -402,8 +400,7 @@ static void mount_mirrors() {
 
 static void link_busybox() {
 	mkdir_p(BBPATH, 0755);
-	char *const command[] = { MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL};
-	run_command(command);
+	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
 	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }
 
@@ -442,7 +439,7 @@ static int prepare_img() {
 				snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
 				if (access(buf, F_OK) == 0) {
 					snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
-					rm_rf(buf);
+					exec_command_sync(BBPATH "/rm", "-rf", buf, NULL);
 					continue;
 				}
 				snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
@@ -520,8 +517,7 @@ void post_fs_data(int client) {
 #ifdef MAGISK_DEBUG
 	// Start debug logs in new process
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	char *const command[] = { "logcat", "-v", "brief", NULL };
-	debug_log_pid = run_command2(0, &debug_log_fd, NULL, command);
+	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "brief", NULL);
 	close(debug_log_fd);
 #endif
 
@@ -531,20 +527,25 @@ void post_fs_data(int client) {
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
-	// Cache support
-	if (access("/cache/data_bin", F_OK) == 0) {
-		rm_rf(DATABIN);
-		rename("/cache/data_bin", DATABIN);
+	// Magisk binaries
+	char *bin_path = NULL;
+	if (access("/cache/data_bin", F_OK) == 0)
+		bin_path = "/cache/data_bin";
+	else if (access("/data/local/tmp/magisk_inject", F_OK) == 0)
+		bin_path = "/data/local/tmp/magisk_inject";
+	if (bin_path) {
+		exec_command_sync("rm", "-rf", DATABIN, NULL);
+		exec_command_sync("cp", "-r", bin_path, DATABIN, NULL);
+		exec_command_sync("rm", "-rf", bin_path, NULL);
+		exec_command_sync("chmod", "-R", "755", bin_path, NULL);
 	}
 
-	// Magisk Manual Injector support
-	if (access("/data/local/tmp/magisk_inject", F_OK) == 0) {
-		rm_rf(DATABIN);
-		rename("/data/local/tmp/magisk_inject", DATABIN);
-	}
+	// Lazy.... use shell blob to match files
+	exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 
-	// Lazy.... use shell blob
-	system("mv /data/magisk/stock_boot* /data;");
+	// Link busybox
+	mount_mirrors();
+	link_busybox();
 
 	// Merge images
 	if (merge_img("/cache/magisk.img", MAINIMG)) {
@@ -556,15 +557,12 @@ void post_fs_data(int client) {
 		goto unblock;
 	}
 
-	// Link busybox
-	mount_mirrors();
-	link_busybox();
-
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
 		bb_setenv();
-		system("(BOOTMODE=true sh " UNINSTALLER ") &");
+		setenv("BOOTMODE", "true", 1);
+		exec_command(0, NULL, NULL, "sh", UNINSTALLER, NULL);
 		return;
 	}
 
@@ -704,11 +702,11 @@ core_only:
 	if (access(MANAGERAPK, F_OK) == 0) {
 		while (1) {
 			sleep(5);
-			char *const command[] = { "app_process",
-				"/system/bin", "com.android.commands.pm.Pm",
-				"install", "-r", MANAGERAPK, NULL };
 			int apk_res = -1, pid;
-			pid = run_command2(1, &apk_res, pm_setenv, command);
+			pid = exec_command(1, &apk_res, pm_setenv,
+				"app_process",
+				"/system/bin", "com.android.commands.pm.Pm",
+				"install", "-r", MANAGERAPK, NULL);
 			if (pid != -1) {
 				waitpid(pid, NULL, 0);
 				fdgets(buf, PATH_MAX, apk_res);

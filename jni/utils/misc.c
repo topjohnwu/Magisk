@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <dirent.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -97,7 +98,7 @@ int vector_to_file(const char *filename, struct vector *v) {
 }
 
 /* Check if the string only contains digits */
-int isNum(const char *s) {
+static int is_num(const char *s) {
 	int len = strlen(s);
 	for (int i = 0; i < len; ++i)
 		if (s[i] < '0' || s[i] > '9')
@@ -129,7 +130,7 @@ void ps(void (*func)(int)) {
 
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {
-			if (isNum(entry->d_name))
+			if (is_num(entry->d_name))
 				func(atoi(entry->d_name));
 		}
 	}
@@ -219,22 +220,13 @@ void setup_sighandlers(void (*handler)(int)) {
 	}
 }
 
-int run_command(char *const argv[]) {
-	int pid = run_command2(0, NULL, NULL, argv);
-	if (pid != -1)
-		waitpid(pid, NULL, 0);
-	else
-		return 1;
-	return 0;
-}
-
 /*
    fd == NULL -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
   *cb         -> A callback function which runs after fork
 */
-int run_command2(int err, int *fd, void (*cb)(void), char *const argv[]) {
+static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
 	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
@@ -257,6 +249,9 @@ int run_command2(int err, int *fd, void (*cb)(void), char *const argv[]) {
 		return pid;
 	}
 
+	// Don't affect the daemon if anything wrong happens
+	err_handler = do_nothing;
+
 	if (cb) cb();
 
 	if (fd) {
@@ -264,9 +259,37 @@ int run_command2(int err, int *fd, void (*cb)(void), char *const argv[]) {
 		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}
 
-	execvp(argv[0], argv);
-	PLOGE("execv");
+	// Collect va_list into vector
+	struct vector v;
+	vec_init(&v);
+	vec_push_back(&v, (void *) argv0);
+	for (void *arg = va_arg(argv, void*); arg; arg = va_arg(argv, void*))
+		vec_push_back(&v, arg);
+	vec_push_back(&v, NULL);
+
+	execvp(argv0, (char **) vec_entry(&v));
+	PLOGE("execvp");
 	return -1;
+}
+
+int exec_command_sync(char *const argv0, ...) {
+	va_list argv;
+	va_start(argv, argv0);
+	int pid, status;
+	pid = v_exec_command(0, NULL, NULL, argv0, argv);
+	va_end(argv);
+	if (pid < 0)
+		return pid;
+	waitpid(pid, &status, 0);
+	return WEXITSTATUS(status);
+}
+
+int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
+	va_list argv;
+	va_start(argv, argv0);
+	int pid = v_exec_command(err, fd, cb, argv0, argv);
+	va_end(argv);
+	return pid;
 }
 
 int mkdir_p(const char *pathname, mode_t mode) {
@@ -304,76 +327,55 @@ int open_new(const char *filename) {
 	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 }
 
-// file/link -> file/link only!!
 int cp_afc(const char *source, const char *target) {
 	struct stat buf;
 	xlstat(source, &buf);
-	unlink(target);
-	char *con;
-	if (S_ISREG(buf.st_mode)) {
-		int sfd, tfd;
-		sfd = xopen(source, O_RDONLY);
-		tfd = xopen(target, O_WRONLY | O_CREAT | O_TRUNC);
-		xsendfile(tfd, sfd, NULL, buf.st_size);
-		fclone_attr(sfd, tfd);
-		close(sfd);
-		close(tfd);
-	} else if (S_ISLNK(buf.st_mode)) {
-		char buffer[PATH_MAX];
-		xreadlink(source, buffer, sizeof(buffer));
-		xsymlink(buffer, target);
-		lchown(target, buf.st_uid, buf.st_gid);
-		lgetfilecon(source, &con);
-		lsetfilecon(target, con);
-		free(con);
-	} else {
-		return 1;
-	}
-	return 0;
-}
 
-int clone_dir(const char *source, const char *target) {
-	DIR *dir;
-	struct dirent *entry;
-	char *s_path, *t_path;
+	if (S_ISDIR(buf.st_mode)) {
+		DIR *dir;
+		struct dirent *entry;
+		char *s_path, *t_path;
 
-	if (!(dir = xopendir(source)))
-		return 1;
+		if (!(dir = xopendir(source)))
+			return 1;
 
-	s_path = xmalloc(PATH_MAX);
-	t_path = xmalloc(PATH_MAX);
+		s_path = xmalloc(PATH_MAX);
+		t_path = xmalloc(PATH_MAX);
 
-	mkdir_p(target, 0755);
-	clone_attr(source, target);
+		mkdir_p(target, 0755);
+		clone_attr(source, target);
 
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		snprintf(s_path, PATH_MAX, "%s/%s", source, entry->d_name);
-		snprintf(t_path, PATH_MAX, "%s/%s", target, entry->d_name);
-		switch (entry->d_type) {
-		case DT_DIR:
-			clone_dir(s_path, t_path);
-			break;
-		case DT_REG:
-		case DT_LNK:
+		while ((entry = xreaddir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			snprintf(s_path, PATH_MAX, "%s/%s", source, entry->d_name);
+			snprintf(t_path, PATH_MAX, "%s/%s", target, entry->d_name);
 			cp_afc(s_path, t_path);
-			break;
+		}
+		free(s_path);
+		free(t_path);
+
+		closedir(dir);
+	} else{
+		unlink(target);
+		if (S_ISREG(buf.st_mode)) {
+			int sfd, tfd;
+			sfd = xopen(source, O_RDONLY);
+			tfd = xopen(target, O_WRONLY | O_CREAT | O_TRUNC);
+			xsendfile(tfd, sfd, NULL, buf.st_size);
+			fclone_attr(sfd, tfd);
+			close(sfd);
+			close(tfd);
+		} else if (S_ISLNK(buf.st_mode)) {
+			char buffer[PATH_MAX];
+			xreadlink(source, buffer, sizeof(buffer));
+			xsymlink(buffer, target);
+			clone_attr(source, target);
+		} else {
+			return 1;
 		}
 	}
-	free(s_path);
-	free(t_path);
-
-	closedir(dir);
 	return 0;
-}
-
-void rm_rf(const char *target) {
-	if (access(target, F_OK) == -1)
-		return;
-	// Use external rm command, saves a lot of headache and issues
-	char *const command[] = { "rm", "-rf", (char*) target, NULL };
-	run_command(command);
 }
 
 void clone_attr(const char *source, const char *target) {
