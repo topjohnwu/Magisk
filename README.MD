@@ -4,33 +4,35 @@
 
 #### Building has been tested on 3 major platforms:
 
-**macOS 10.12.5**  
+**macOS 10.12**  
 **Ubuntu 17.04 x64**  
-**Windows 10 Creators Update x64**
+**Windows 10 x64**
 
 #### Environment Requirements
 
-1. Python 3 **(>= 3.5)**: `python3` (or in some cases `python`) should be accessible
-2. Java runtime: `java` should be accessible
-3. (Unix only) C compiler: `gcc` should be accessible
-4. Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder
-5. NDK: Install NDK using `sdkmanager`, or through Android SDK Manager
-6. Android build-tools: Should have build-tools version matching `MagiskManager/app/build.gradle` installed
+1. A 64-bit machine: `cmake` for Android is only available in 64-bit
+2. Python 3.5+: to run the build script
+3. Java Development Kit (JDK) 8: To compile Magisk Manager and sign zips
+4. C compiler (Unix only): To build `zipadjust`. Windows users can use the pre-built `zipadjust.exe`
+5. Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder
+6. Android NDK: Install NDK via `sdkmanager`, or via Android SDK Manager in Android Studio
 
 #### Instructions and Notes
 
-1. The python build script uses ANSI color codes to change the color of the terminal output. For Windows, this **only** works on Windows 10, as previous Windows console do not support them. If you insist to use an older Windows version, a quick Google search should provide many workarounds
-2. After installing the latest Python 3 on Windows (allow the installer to add Python to PATH, or you'll have to manually set the environment), instead of calling `python3` like most Unix environment, you should call `python` in shell (cmd or Powershell both OK). You can double check the version by `python --version`
-3. The build script will do several checks, it will refuse to run if the environment doesn't meet the requirements
-4. For further instructions, please check the built in help message by `python3 build.py -h`
-(Unix users can simply `./build.py -h`, Windows users, as mentioned, call `python` instead)
-5. Each action has its own help message, access them by commands like `python3 build.py all -h`
-6. To build Magisk for release (enabled through the `--release` flag, the script builds in debug mode by default), you will need to provide a Java keystore file, and place it in `release_signature.jks` to sign Magisk Manager APK for release builds. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually)
-7. To properly setup the Android SDK environment, the easiest way is to use Android Studio and open Magisk Manager. If gradle sync passed, your build-tools etc. should be set properly. You can also access SDK Manager GUI within Android Studio to download NDK. Don't forget to add Android Studio's SDK path into environment variable ANDROID_HOME.
+1. The easiest way to setup a working environment is to open Magisk Manager with Android Studio. The IDE will download required components and construct the environment for you. Don't forget to set `ANDROID_HOME` environment variable to the SDK path.
+2. Windows users: while installing Python 3 on Windows, allow the installer to add Python to `PATH`, or you'll have to add it manually afterwards. By default, the Python executable is setup as `python`, not `python3` like most Unix environment. If you have both Python 2 and Python 3 installed, you'll have to deal with the executable name and `PATH` yourself. To double check the Python version, call `python --version`.
+3. To run the script, on Windows call `python build.py [args...]`; on Unix call `python3 build.py [args...]`, or simply `./build.py [args...]`. To see the built-in help message, call the script with `-h` as an argument. The `-h` option also works for each supported actions to see the help message for the specific action.
+4. By default, the script will build binaries and Magisk Manager in debug mode, which will enable verbose debugging messages. If you want to build Magisk Manager in release mode (through the flag `--release`), you will need to place your Java Keystore file in `release_signature.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
+5. The python build script uses ANSI color codes to change the color of the terminal output. For Windows, this **only** works on Windows 10, as previous Windows console do not support them. If you use an older Windows version, a quick Google search should provide many workarounds.
+
 
 ## License
 
-Magisk, including all subprojects (git submodule) is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+```
+Magisk, including all subprojects (git submodule) is free software:
+you can redistribute it and/or modify it under the terms of the 
+GNU General Public License as published by the Free Software Foundation, 
+either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -39,14 +41,17 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
 
 ## Credits
 
 **MagiskManager** (`MagiskManager`)
+
 * Copyright 2016-2017, John Wu (@topjohnwu)
 * All contributors and translators
 
 **MagiskSU** (`jni/su`)
+
 * Copyright 2016-2017, John Wu (@topjohnwu)
 * Copyright 2015, Pierre-Hugues Husson (phh@phh.me)
 * Copyright 2013, Koushik Dutta (@koush)
@@ -54,30 +59,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 * Copyright 2008, Zinx Verituse (@zinxv)
 
 **MagiskPolicy** (`jni/magiskpolicy`)
+
 * Copyright 2016-2017, John Wu (@topjohnwu)
 * Copyright 2015, Pierre-Hugues Husson (phh@phh.me)
 * Copyright 2015, Joshua Brindle (@joshua_brindle)
 
 **MagiskHide** (`jni/magiskhide`)
+
 * Copyright 2016-2017, John Wu (@topjohnwu)
 * Copyright 2016, Pierre-Hugues Husson (phh@phh.me) (original hidesu)
 
 **resetprop** (`jni/resetprop`)
+
  * Copyright 2016-2017 John Wu (@topjohnwu)
  * Copyright 2016 nkk71 (nkk71x@gmail.com)
 
 **SELinux** (`jni/selinux`)
+
 * Makefile for NDK: Copyright 2016-2017, John Wu (@topjohnwu)
 * Maintained by many developers in SELinux project
 
 **ndk-compression** (`jni/ndk-compression`)
+
 * Makefile for NDK: Copyright 2017, John Wu (@topjohnwu)
 * Each library has its own copyright message in corresponding directories
 
 **ndk-busybox** (`jni/busybox`)
+
 * Makefile for NDK, generated by [ndk-busybox-kitchen](https://github.com/topjohnwu/ndk-busybox-kitchen): Copyright 2017, John Wu (@topjohnwu)
 * Patches for NDK: Many contributors along the way, all placed in [osm0sis/android-busybox-ndk](https://github.com/osm0sis/android-busybox-ndk)
 * The copyright message for busybox should be included in its own directory
 
 **Others Not Mentioned**
+
 * Copyright 2016-2017, John Wu (@topjohnwu)
