@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -65,6 +66,7 @@ public class ZipUtils {
     // File name in assets
     private static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
     private static final String PRIVATE_KEY_NAME = "private.key.pk8";
+    private static final String UNHIDE_NAME = "unhide.apk";
 
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
@@ -81,6 +83,45 @@ public class ZipUtils {
     }
 
     public native static void zipAdjust(String filenameIn, String filenameOut);
+
+    public static String generateUnhide(Context context, File output) {
+        File temp = new File(context.getCacheDir(), "temp.apk");
+        String pkg = "";
+        try {
+            JarInputStream source = new JarInputStream(context.getAssets().open(UNHIDE_NAME));
+            JarOutputStream dest = new JarOutputStream(new FileOutputStream(temp));
+            JarEntry entry;
+            int size;
+            byte buffer[] = new byte[4096];
+            while ((entry = source.getNextJarEntry()) != null) {
+                dest.putNextEntry(new JarEntry(entry.getName()));
+                if (TextUtils.equals(entry.getName(), "AndroidManifest.xml")) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    while((size = source.read(buffer)) != -1) {
+                        baos.write(buffer, 0, size);
+                    }
+                    byte xml[] = baos.toByteArray();
+                    pkg = Utils.genPackageName("com.", 20);
+                    for (int i = 0; i < 20; ++i) {
+                        xml[424 + i] = (byte) pkg.charAt(i);
+                    }
+                    dest.write(xml);
+                } else {
+                    while((size = source.read(buffer)) != -1) {
+                        dest.write(buffer, 0, size);
+                    }
+                }
+            }
+            source.close();
+            dest.close();
+            signZip(context, temp, output, false);
+            temp.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return pkg;
+        }
+        return pkg;
+    }
 
     public static void removeTopFolder(InputStream in, File output) throws IOException {
         try {
@@ -102,7 +143,7 @@ public class ZipUtils {
                     continue;
                 }
                 dest.putNextEntry(new JarEntry(path));
-                while((size = source.read(buffer, 0, 2048)) != -1) {
+                while((size = source.read(buffer)) != -1) {
                     dest.write(buffer, 0, size);
                 }
             }

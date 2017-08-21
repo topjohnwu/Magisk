@@ -53,10 +53,11 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:recyclerview-v7:26.0.0'
-    implementation 'com.android.support:cardview-v7:26.0.0'
-    implementation 'com.android.support:design:26.0.0'
-    implementation 'com.android.support:support-v4:26.0.0'
+    implementation project(':resource')
+    implementation 'com.android.support:recyclerview-v7:26.0.1'
+    implementation 'com.android.support:cardview-v7:26.0.1'
+    implementation 'com.android.support:design:26.0.1'
+    implementation 'com.android.support:support-v4:26.0.1'
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.atlassian.commonmark:commonmark:0.9.0'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.57'

@@ -53,6 +53,9 @@ public class MagiskFragment extends Fragment
 
     public static final String SHOW_DIALOG = "dialog";
 
+    private static final String UNINSTALLER = "magisk_uninstaller.sh";
+    private static final String UTIL_FUNCTIONS= "util_functions.sh";
+
     private static int expandHeight = 0;
     private static boolean mExpanded = false;
 
@@ -176,8 +179,8 @@ public class MagiskFragment extends Fragment
                 .setMessage(R.string.uninstall_magisk_msg)
                 .setPositiveButton(R.string.yes, (dialogInterface, i) -> {
                     try {
-                        InputStream in = magiskManager.getAssets().open(MagiskManager.UNINSTALLER);
-                        File uninstaller = new File(magiskManager.getCacheDir(), MagiskManager.UNINSTALLER);
+                        InputStream in = magiskManager.getAssets().open(UNINSTALLER);
+                        File uninstaller = new File(magiskManager.getCacheDir(), UNINSTALLER);
                         FileOutputStream out = new FileOutputStream(uninstaller);
                         byte[] bytes = new byte[1024];
                         int read;
@@ -186,8 +189,8 @@ public class MagiskFragment extends Fragment
                         }
                         in.close();
                         out.close();
-                        in = magiskManager.getAssets().open(MagiskManager.UTIL_FUNCTIONS);
-                        File utils = new File(magiskManager.getCacheDir(), MagiskManager.UTIL_FUNCTIONS);
+                        in = magiskManager.getAssets().open(UTIL_FUNCTIONS);
+                        File utils = new File(magiskManager.getCacheDir(), UTIL_FUNCTIONS);
                         out = new FileOutputStream(utils);
                         while ((read = in.read(bytes)) != -1) {
                             out.write(bytes, 0, read);
@@ -207,8 +210,8 @@ public class MagiskFragment extends Fragment
                             public void onFinish() {
                                 progress.setMessage(getString(R.string.reboot_countdown, 0));
                                 Shell.getShell(getActivity()).su_raw(
-                                        "mv -f " + uninstaller + " /cache/" + MagiskManager.UNINSTALLER,
-                                        "mv -f " + utils + " /data/magisk/" + MagiskManager.UTIL_FUNCTIONS,
+                                        "mv -f " + uninstaller + " /cache/" + UNINSTALLER,
+                                        "mv -f " + utils + " /data/magisk/" + UTIL_FUNCTIONS,
                                         "reboot"
                                 );
                             }

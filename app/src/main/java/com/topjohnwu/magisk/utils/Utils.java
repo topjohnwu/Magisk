@@ -35,6 +35,7 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -287,5 +288,26 @@ public class Utils {
         Collections.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
 
         return locales;
+    }
+
+    public static String genPackageName(String prefix, int length) {
+        StringBuilder builder = new StringBuilder(length);
+        builder.append(prefix);
+        length -= prefix.length();
+        SecureRandom random = new SecureRandom();
+        String base = "abcdefghijklmnopqrstuvwxyz";
+        String alpha = base + base.toUpperCase();
+        String full = alpha + "0123456789..........";
+        char next, prev = '\0';
+        for (int i = 0; i < length; ++i) {
+            if (prev == '.' || i == length - 1 || i == 0) {
+                next = alpha.charAt(random.nextInt(alpha.length()));
+            } else {
+                next = full.charAt(random.nextInt(full.length()));
+            }
+            builder.append(next);
+            prev = next;
+        }
+        return builder.toString();
     }
 }

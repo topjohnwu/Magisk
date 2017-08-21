@@ -9,3 +9,4 @@ app/.externalNativeBuild/
 *.sh
 public.certificate.x509.pem
 private.key.pk8
+*.apk

@@ -20,6 +20,11 @@
             android:title="@string/settings_clear_cache_title"
             android:summary="@string/settings_clear_cache_summary" />
 
+        <Preference
+            android:key="hide"
+            android:title="@string/settings_hide_manager_title"
+            android:summary="@string/settings_hide_manager_summary" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

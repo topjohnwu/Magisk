@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -13,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Logger;
@@ -98,6 +100,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             multiuserMode = (ListPreference) findPreference("multiuser_mode");
             namespaceMode = (ListPreference) findPreference("mnt_ns");
             SwitchPreference reauth = (SwitchPreference) findPreference("su_reauth");
+            Preference hideManager = findPreference("hide");
 
             setSummary();
 
@@ -105,6 +108,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (getActivity().getApplicationInfo().uid > 99999) {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
+                generalCatagory.removePreference(hideManager);
             }
 
             // Remove re-authentication option on Android O, it will not work
@@ -114,6 +118,11 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 Utils.clearRepoCache(getActivity());
+                return true;
+            });
+
+            hideManager.setOnPreferenceClickListener((pref) -> {
+                new HideManager(getActivity()).exec();
                 return true;
             });
 
