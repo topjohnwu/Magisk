@@ -85,14 +85,24 @@ def build_apk(args):
 		print('cp: {} -> {}'.format(source, target))
 		shutil.copyfile(source, target)
 
+	os.chdir('MagiskManager')
+
+	# Build unhide app and place in assets
+	proc = subprocess.run('{} unhide::assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+	if proc.returncode != 0:
+		error('Build Magisk Manager failed!')
+	source = os.path.join('unhide', 'build', 'outputs', 'apk', 'release', 'unhide-release-unsigned.apk')
+	target = os.path.join('app', 'src', 'main', 'assets', 'unhide.apk')
+	print('cp: {} -> {}'.format(source, target))
+	shutil.copyfile(source, target)
+
 	print('')
 
-	os.chdir('MagiskManager')
 	if args.release:
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
-		proc = subprocess.run('{} assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app::assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -122,7 +132,7 @@ def build_apk(args):
 		silentremove(unsigned)
 		silentremove(aligned)
 	else:
-		proc = subprocess.run('{} assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app::assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
