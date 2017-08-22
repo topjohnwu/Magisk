@@ -29,10 +29,10 @@
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
     <string name="safetyNet_connection_failed">无法连接至 Google API</string>
     <string name="safetyNet_connection_suspended">与 Google API 的连接已暂停</string>
-    <string name="safetyNet_no_response">无法检查 SafetyNet，没有网络连接？</string>
-    <string name="safetyNet_fail">SafetyNet 失败：CTS 配置文件不匹配</string>
+    <string name="safetyNet_no_response">无法验证 SafetyNet，没有网络连接？</string>
+    <string name="safetyNet_fail">SafetyNet 无效：CTS 配置文件不匹配</string>
     <string name="safetyNet_pass">SafetyNet 已通过</string>
-    <string name="safetyNet_network_loss">网络断线</string>
+    <string name="safetyNet_network_loss">网络连接不可用</string>
     <string name="safetyNet_service_disconnected">服务已被取消</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
     <string name="root_info_warning">功能严重受限</string>
@@ -98,7 +98,7 @@
     <string name="ok">确定</string>
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
-    <string name="repo_install_msg">你想要安装 %1$s 吗？</string>
+    <string name="repo_install_msg">你想要立即安装 %1$s 吗？</string>
     <string name="download_install">下载并安装</string>
     <string name="download">下载</string>
     <string name="goto_install">前往“安装”界面</string>
@@ -133,6 +133,8 @@
     <string name="manager_download_install">点击以下载并安装</string>
     <string name="magisk_updates">Magisk 更新</string>
     <string name="flashing">正在刷入</string>
+    <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -142,6 +144,8 @@
     <string name="settings_notification_summary">当有新版本可用时显示更新通知</string>
     <string name="settings_clear_cache_title">清除资源库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线资源库信息，强制刷新在线数据</string>
+    <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
+    <string name="settings_hide_manager_summary">临时隐藏 Magisk Manager。\n此功能将会安装一个名为“Unhide Magisk Manager（取消隐藏 Magisk Manager）”的新应用。</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
 
