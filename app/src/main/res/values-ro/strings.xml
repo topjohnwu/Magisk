@@ -22,7 +22,7 @@
     <string name="root_error">Root obţinut, dar fără permisiune root, nu este permis?</string>
     <string name="not_rooted">Nu este obţinut root</string>
     <string name="proper_root">Root obţinut corect</string>
-    <string name="safetyNet_check_text">Apăsați pentru a începe verificarea SafetyNet</string>
+    <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
     <string name="safetyNet_connection_failed">Nu se poate conecta la Google API</string>
     <string name="safetyNet_connection_suspended">Conexiunea la API-ul Google a fost suspendată</string>
@@ -46,6 +46,9 @@
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="uninstall_magisk_msg">Aceasta va elimina toate modulele, MagiskSU, şi potențial să cripteze datele, dacă nu sunt criptate\nContinuaţi?</string>
     <string name="version_none">(Niciuna)</string>
+    <string name="reinstall">Re-Instalare</string>
+    <string name="update">Actualizare</string>
+  
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
@@ -96,7 +99,7 @@
     <string name="goto_install">Accesaţi secţiunea \"Instalare\"</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
     <string name="install_error">Eroare de instalare!</string>
-    <string name="invalid_zip">Zip-ul nu este un modul Magisk!!</string>
+    <string name="invalid_zip">Zip-ul nu este un modul Magisk!</string>
     <string name="reboot_title">Instalarea a reușit!</string>
     <string name="reboot_msg">Reporniţi acum?</string>
     <string name="reboot">Repornire</string>
@@ -123,6 +126,10 @@
     <string name="manual_boot_image">Selectați manual o imagine de boot!</string>
     <string name="manager_update_title">O nouă actualizare pentru Magisk Manager este disponibilă!</string>
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
+    <string name="magisk_updates">Actualizări Magisk</string>
+    <string name="flashing">Flashing</string>
+    <string name="hide_manager_toast">Ascundere Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -132,6 +139,10 @@
     <string name="settings_notification_summary">Se afișează notificări de actualizare atunci când este disponibilă o nouă versiune</string>
     <string name="settings_clear_cache_title">Eliminare cache</string>
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
+    <string name="settings_hide_manager_title">Ascundeţi Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Ascundeţi temporar Magisk Manager.\nAceasta va instala o nouă aplicație numită \"Unhide Magisk Manager\"</string>
+    <string name="language">Limbă</string>
+    <string name="system_default">(Implicit)</string>
 
     <string name="settings_core_only_title">Mod de bază</string>
     <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide şi systemless hosts vor fi în continuare activate</string>
