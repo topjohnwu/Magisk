@@ -122,8 +122,17 @@ def build_apk(args):
 		if proc.returncode != 0:
 			error('Zipalign Magisk Manager failed!')
 
-		proc = subprocess.run('{} sign --ks {} --out {} {}'.format(
-			'java -jar {}'.format(os.path.join('../ziptools/apksigner.jar')),
+		# Find apksigner.jar
+		apksigner = ''
+		for root, dirs, files in os.walk(os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool)):
+			if 'apksigner.jar' in files:
+				apksigner = os.path.join(root, 'apksigner.jar')
+				break
+		if not apksigner:
+			error('Cannot find apksigner.jar in Android SDK build tools')
+
+		proc = subprocess.run('java -jar {} sign --ks {} --out {} {}'.format(
+			apksigner,
 			os.path.join('..', 'release_signature.jks'),
 			release, aligned), shell=True)
 		if proc.returncode != 0:
@@ -140,20 +149,33 @@ def build_apk(args):
 	os.chdir('..')
 
 def sign_adjust_zip(unsigned, output):
-	header('* Signing / Adjusting Zip')
 
-	# Unsigned->signed
-	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'signapk.jar'),
-		os.path.join('ziptools', 'public.certificate.x509.pem'),
-		os.path.join('ziptools', 'private.key.pk8'), unsigned, 'tmp_signed.zip'])
-	if proc.returncode != 0:
-		error('First sign flashable zip failed!')
+	zipsigner = os.path.join('ziptools', 'zipsigner', 'build', 'libs', 'zipsigner.jar')
 
 	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
+		header('* Building zipadjust')
 		# Compile zipadjust
-		proc = subprocess.run('gcc -o ziptools/zipadjust ziptools/src/*.c -lz', shell=True)
+		proc = subprocess.run('gcc -o ziptools/zipadjust ziptools/zipadjust_src/*.c -lz', shell=True)
 		if proc.returncode != 0:
 			error('Build zipadjust failed!')
+	if not os.path.exists(zipsigner):
+		header('* Building zipsigner.jar')
+		os.chdir(os.path.join('ziptools', 'zipsigner'))
+		proc = subprocess.run('{} shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
+		if proc.returncode != 0:
+			error('Build zipsigner.jar failed!')
+		os.chdir(os.path.join('..', '..'))
+
+	header('* Signing / Adjusting Zip')
+
+	publicKey = os.path.join('ziptools', 'public.certificate.x509.pem')
+	privateKey = os.path.join('ziptools', 'private.key.pk8')
+
+	# Unsigned->signed
+	proc = subprocess.run(['java', '-jar', zipsigner,
+		publicKey, privateKey, unsigned, 'tmp_signed.zip'])
+	if proc.returncode != 0:
+		error('First sign flashable zip failed!')
 
 	# Adjust zip
 	proc = subprocess.run([os.path.join('ziptools', 'zipadjust'), 'tmp_signed.zip', 'tmp_adjusted.zip'])
@@ -161,9 +183,8 @@ def sign_adjust_zip(unsigned, output):
 		error('Adjust flashable zip failed!')
 
 	# Adjusted -> output
-	proc = subprocess.run(['java', '-jar', os.path.join('ziptools', 'minsignapk.jar'),
-		os.path.join('ziptools', 'public.certificate.x509.pem'),
-		os.path.join('ziptools', 'private.key.pk8'), 'tmp_adjusted.zip', output])
+	proc = subprocess.run(['java', '-jar', zipsigner,
+		"-m", publicKey, privateKey, 'tmp_adjusted.zip', output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')
 

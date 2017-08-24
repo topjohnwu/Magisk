@@ -1,0 +1,4 @@
+rootProject.name = 'zipsigner'
+include 'apksigner'
+rootProject.name = 'zipsigner'
+
