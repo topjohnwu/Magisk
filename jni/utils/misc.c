@@ -239,6 +239,14 @@ static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0,
 		}
 	}
 
+	// Collect va_list into vector
+	struct vector v;
+	vec_init(&v);
+	vec_push_back(&v, strdup(argv0));
+	for (void *arg = va_arg(argv, void*); arg; arg = va_arg(argv, void*))
+		vec_push_back(&v, strdup(arg));
+	vec_push_back(&v, NULL);
+
 	int pid = fork();
 	if (pid != 0) {
 		if (fd && *fd < 0) {
@@ -246,11 +254,12 @@ static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0,
 			*fd = pipefd[0];
 			close(pipefd[1]);
 		}
+		vec_deep_destroy(&v);
 		return pid;
 	}
 
-	// Don't affect the daemon if anything wrong happens
-	err_handler = do_nothing;
+	// Don't return to the daemon if anything goes wrong
+	err_handler = exit_proc;
 
 	if (cb) cb();
 
@@ -258,14 +267,6 @@ static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0,
 		xdup2(writeEnd, STDOUT_FILENO);
 		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}
-
-	// Collect va_list into vector
-	struct vector v;
-	vec_init(&v);
-	vec_push_back(&v, (void *) argv0);
-	for (void *arg = va_arg(argv, void*); arg; arg = va_arg(argv, void*))
-		vec_push_back(&v, arg);
-	vec_push_back(&v, NULL);
 
 	execvp(argv0, (char **) vec_entry(&v));
 	PLOGE("execvp");
