@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
@@ -31,7 +32,8 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
             return false;
 
         // Generate a new unhide app with random package name
-        File unhideAPK = new File(magiskManager.getCacheDir(), "unhide.apk");
+        File unhideAPK = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", "unhide.apk");
+        unhideAPK.getParentFile().mkdirs();
         String pkg = ZipUtils.generateUnhide(magiskManager, unhideAPK);
 
         // Install the application
