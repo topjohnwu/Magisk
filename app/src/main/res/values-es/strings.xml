@@ -14,7 +14,7 @@
 
     <!--Magisk Fragment-->
     <string name="magisk_version">Instalado Magisk v%1$s</string>
-     <string name="magisk_version_core_only">Instalado Magisk v%1$s (Core Only Mode)</string>
+    <string name="magisk_version_core_only">Instalado Magisk v%1$s (Core Only Mode)</string>
     <string name="magisk_version_error">Magisk no está instalado</string>
 
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
@@ -26,6 +26,7 @@
     <string name="proper_root">Correctamente rooteado</string>
     <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
+    <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
     <string name="safetyNet_connection_failed">No puede conectar con la API de Google</string>
     <string name="safetyNet_connection_suspended">La conexión con la API de Google API fue suspendida</string>
     <string name="safetyNet_no_response">No puede comprobar SafetyNet, ¿No tiene internet?</string>
@@ -132,6 +133,8 @@
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
+    <string name="hide_manager_toast">Ocultando Magisk Manager...</string>
+    <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -141,6 +144,8 @@
     <string name="settings_notification_summary">Notificar cuando una nueva versión esté disponible</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
+    <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Ocultar temporalmente Magisk Manager.\nEsto instalará una nueva aplicación llamada \"Unhide Magisk Manager\"</string>  
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     
