@@ -221,5 +221,10 @@
     <string name="magisk_updates">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>
+    <string name="flashing">正在刷入</string>
+    <string name="hide_manager_toast">正在隱藏 Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
+    <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
+    <string name="settings_hide_manager_summary">暫時隱藏 Magisk Manager。\n這會新增一個新的 app 叫做 Unhide Magisk Manager</string>
 
 </resources>

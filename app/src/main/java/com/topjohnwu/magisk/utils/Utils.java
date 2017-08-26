@@ -266,21 +266,23 @@ public class Utils {
         HashSet<String> set = new HashSet<>();
         Locale locale;
 
+        int compareId = R.string.download_file_error;
+
         // Add default locale
         locales.add(Locale.ENGLISH);
-        set.add(getLocaleString(context, Locale.ENGLISH, R.string.download));
+        set.add(getLocaleString(context, Locale.ENGLISH, compareId));
 
         // Add some special locales
         locales.add(Locale.TAIWAN);
-        set.add(getLocaleString(context, Locale.TAIWAN, R.string.download));
+        set.add(getLocaleString(context, Locale.TAIWAN, compareId));
         locale = new Locale("pt", "BR");
         locales.add(locale);
-        set.add(getLocaleString(context, locale, R.string.download));
+        set.add(getLocaleString(context, locale, compareId));
 
         // Other locales
         for (String s : context.getAssets().getLocales()) {
             locale = Locale.forLanguageTag(s);
-            if (set.add(getLocaleString(context, locale, R.string.download))) {
+            if (set.add(getLocaleString(context, locale, compareId))) {
                 locales.add(locale);
             }
         }

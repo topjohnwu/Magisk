@@ -87,6 +87,7 @@ public class MagiskManager extends Application {
     public int suResponseType;
     public int suNotificationType;
     public int suNamespaceMode;
+    public String localeConfig;
 
     // Global resources
     public SharedPreferences prefs;
@@ -125,11 +126,11 @@ public class MagiskManager extends Application {
     }
 
     public void setLocale() {
-        String localeTag = prefs.getString("locale", "");
-        if (localeTag.isEmpty()) {
+        localeConfig = prefs.getString("locale", "");
+        if (localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {
-            locale = Locale.forLanguageTag(localeTag);
+            locale = Locale.forLanguageTag(localeConfig);
         }
         Resources res = getBaseContext().getResources();
         Configuration config = new Configuration(res.getConfiguration());
@@ -192,6 +193,7 @@ public class MagiskManager extends Application {
                 .putString("multiuser_mode", String.valueOf(multiuserMode))
                 .putString("mnt_ns", String.valueOf(suNamespaceMode))
                 .putString("busybox_version", BUSYBOX_VERSION)
+                .putString("locale", localeConfig)
                 .apply();
 
         // Add busybox to PATH
