@@ -379,12 +379,14 @@ int cp_afc(const char *source, const char *target) {
 }
 
 void clone_attr(const char *source, const char *target) {
-	int sourcefd, targetfd;
-	sourcefd = xopen(source, O_RDONLY);
-	targetfd = xopen(target, O_RDONLY);
-	fclone_attr(sourcefd, targetfd);
-	close(sourcefd);
-	close(targetfd);
+	struct stat buf;
+	lstat(target, &buf);
+	chmod(target, buf.st_mode & 0777);
+	chown(target, buf.st_uid, buf.st_gid);
+	char *con;
+	lgetfilecon(source, &con);
+	lsetfilecon(target, con);
+	free(con);
 }
 
 void fclone_attr(const int sourcefd, const int targetfd) {
