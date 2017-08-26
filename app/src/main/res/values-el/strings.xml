@@ -17,20 +17,20 @@
 
     <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
     <string name="magisk_update_available">Το Magisk v%1$s είναι διαθέσιμο!</string>
-    <string name="cannot_check_updates">Αδυναμία ελέγχου για ενημερώσεις, δεν έχει Internet;</string>
-    <string name="up_to_date">Τελευταία έκδοση του %1$s εγκατεστημένη</string>
+    <string name="cannot_check_updates">Αδυναμία ελέγχου για ενημερώσεις, δεν έχει internet;</string>
+    <string name="up_to_date">Η τελευταία έκδοση του %1$s είναι εγκατεστημένη</string>
     <string name="root_error">Υπάρχει root αλλά όχι άδεια για root, δεν επιτρέπεται;</string>
     <string name="not_rooted">Δεν υπάρχει root</string>
     <string name="proper_root">Rooted κανονικά</string>
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
-    <string name="safetyNet_check_success">Επιτυχημένος έλεγχος SafetyNet</string>
+    <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
     <string name="safetyNet_connection_failed">Αδυναμία σύνδεσης στο Google API</string>
     <string name="safetyNet_connection_suspended">Η σύνδεση στο Google API διακόπηκε</string>
-    <string name="safetyNet_no_response">Αδυναμία ελέγχου SafetyNet, δεν έχει Internet;</string>
-    <string name="safetyNet_fail">Αποτυχία SafetyNet: CTS profile mismatch</string>
+    <string name="safetyNet_no_response">Αδυναμία επαλήθευσης SafetyNet, δεν έχει internet;</string>
+    <string name="safetyNet_fail">Άκυρο SafetyNet: CTS profile mismatch</string>
     <string name="safetyNet_pass">Το SafetyNet Πέρασε</string>
-    <string name="safetyNet_network_loss">Χάθηκε η σύνδεση στο δίκτυο</string>
+    <string name="safetyNet_network_loss">Αδυναμία σύνδεσης στο δίκτυο</string>
     <string name="safetyNet_service_disconnected">Η υπηρεσία τερματίστηκε</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
     <string name="root_info_warning">Η λειτουργία είναι πολύ περιορισμένη</string>
@@ -131,6 +131,8 @@
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="magisk_updates">Ενημερώσεις Magisk</string>
     <string name="flashing">Γίνεται Flash</string>
+    <string name="hide_manager_toast">Κρύβοντας το Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Το κρύψιμο Magisk Manager απέτυχε…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Γενικά</string>
@@ -140,6 +142,8 @@
     <string name="settings_notification_summary">Εμφάνιση ειδοποιήσεων ενημέρωσης όταν είναι διαθέσιμη νέα έκδοση</string>
     <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
+    <string name="settings_hide_manager_title">Κρύψιμο Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Προσωρινό κρύψιμο του Magisk Manager.\nΑυτό θα εγκαταστήσει μια νέα εφαρμογή με το όνομα \"Unhide Magisk Manager\"</string>
     <string name="language">Γλώσσα</string>
     <string name="system_default">(Προεπιλογή Συστήματος)</string>
 
@@ -203,8 +207,8 @@
     <string name="twentymin">20 λεπτά</string>
     <string name="thirtymin">30 λεπτά</string>
     <string name="sixtymin">60 λεπτά</string>
-    <string name="su_allow_toast">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
-    <string name="su_deny_toast">Δεν παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
+    <string name="su_allow_toast">Παραχωρήθηκαν δικαιώματα υπερχρήστη στο %1$s</string>
+    <string name="su_deny_toast">Απορρίφθηκαν τα δικαιώματα υπερχρήστη του %1$s</string>
     <string name="no_apps_found">Δεν βρέθηκαν εφαρμογές</string>
     <string name="su_snack_grant">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_snack_deny">Δεν παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
