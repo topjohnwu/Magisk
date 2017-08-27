@@ -281,7 +281,7 @@ int create_domain(char *d) {
 	symtab_datum_t *src = hashtab_search(policydb->p_types.table, d);
 	if(src) {
 		fprintf(stderr, "Domain %s already exists\n", d);
-		return 1;
+		return 0;
 	}
 
 	type_datum_t *typedatum = (type_datum_t *) malloc(sizeof(type_datum_t));
@@ -349,7 +349,7 @@ int set_domain_state(char* s, int state) {
 			return 1;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -511,7 +511,7 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, int not) {
 			fprintf(stderr, "No class is specified, cannot add perm [%s] \n", p);
 			return 1;
 		}
-		
+
 		if (cls != NULL) {
 			perm = hashtab_search(cls->permissions.table, p);
 			if (perm == NULL && cls->comdatum != NULL) {

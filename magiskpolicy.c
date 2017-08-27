@@ -75,7 +75,7 @@ static void usage(char *arg0) {
 static int parse_pattern_1(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *class, *saveptr;
-	struct vector source, target, permission, *temp;
+	struct vector source, target, permission;
 	vec_init(&source);
 	vec_init(&target);
 	vec_init(&permission);
@@ -97,24 +97,25 @@ static int parse_pattern_1(int action, char* statement) {
 			}
 		} else {
 			if (tok[0] == '*') tok = ALL;
+			struct vector *vec;
 			switch (state) {
-				case 0:
-					temp = &source;
-					break;
-				case 1:
-					temp = &target;
-					break;
-				case 2:
-					temp = NULL;
-					class = tok;
-					break;
-				case 3:
-					temp = &permission;
-					break;
-				default:
-					return 1;
+			case 0:
+				vec = &source;
+				break;
+			case 1:
+				vec = &target;
+				break;
+			case 2:
+				vec = NULL;
+				class = tok;
+				break;
+			case 3:
+				vec = &permission;
+				break;
+			default:
+				return 1;
 			}
-			vec_push_back(temp, tok);
+			vec_push_back(vec, tok);
 		}
 		if (!in_bracket) ++state;
 		tok = strtok_r(NULL, " ", &saveptr);
@@ -122,27 +123,33 @@ static int parse_pattern_1(int action, char* statement) {
 	if (state != 4) return 1;
 	for(int i = 0; i < source.size; ++i)
 		for (int j = 0; j < target.size; ++j)
-			for (int k = 0; k < permission.size; ++k)
+			for (int k = 0; k < permission.size; ++k) {
+				int (*action_func)(char*, char*, char*, char*);
+				char *action_str;
 				switch (action) {
-					case 0:
-						if (sepol_allow(source.data[i], target.data[j], class, permission.data[k]))
-							fprintf(stderr, "Error in: allow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
-						break;
-					case 1:
-						if (sepol_deny(source.data[i], target.data[j], class, permission.data[k]))
-							fprintf(stderr, "Error in: deny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
-						break;
-					case 2:
-						if (sepol_auditallow(source.data[i], target.data[j], class, permission.data[k]))
-							fprintf(stderr, "Error in: auditallow %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
-						break;
-					case 3:
-						if (sepol_auditdeny(source.data[i], target.data[j], class, permission.data[k]))
-							fprintf(stderr, "Error in: auditdeny %s %s %s %s\n", source.data[i], target.data[j], class, permission.data[k]);
-						break;
-					default:
-						return 1;
+				case 0:
+					action_func = sepol_allow;
+					action_str = "allow";
+					break;
+				case 1:
+					action_func = sepol_deny;
+					action_str = "deny";
+					break;
+				case 2:
+					action_func = sepol_auditallow;
+					action_str = "auditallow";
+					break;
+				case 3:
+					action_func = sepol_auditdeny;
+					action_str = "auditdeny";
+					break;
+				default:
+					return 1;
 				}
+				if (action_func(source.data[i], target.data[j], class, permission.data[k]))
+					fprintf(stderr, "Error in: %s %s %s %s %s\n",
+						action_str, source.data[i], target.data[j], class, permission.data[k]);
+			}
 	vec_destroy(&source);
 	vec_destroy(&target);
 	vec_destroy(&permission);
@@ -153,7 +160,7 @@ static int parse_pattern_1(int action, char* statement) {
 static int parse_pattern_2(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *saveptr;
-	struct vector class, attribute, *temp;
+	struct vector class, attribute;
 	vec_init(&class);
 	vec_init(&attribute);
 	tok = strtok_r(statement, " ", &saveptr);
@@ -174,32 +181,39 @@ static int parse_pattern_2(int action, char* statement) {
 			}
 		} else {
 			if (tok[0] == '*') tok = ALL;
+			struct vector *vec;
 			switch (state) {
-				case 0:
-					temp = &class;
-					break;
-				case 1:
-					temp = &attribute;
-					break;
-				default:
-					return 1;
+			case 0:
+				vec = &class;
+				break;
+			case 1:
+				vec = &attribute;
+				break;
+			default:
+				return 1;
 			}
-			vec_push_back(temp, tok);
+			vec_push_back(vec, tok);
 		}
 		if (!in_bracket) ++state;
 		tok = strtok_r(NULL, " ", &saveptr);
 	}
 	if (state != 2) return 1;
 	for(int i = 0; i < class.size; ++i)
-		for (int j = 0; j < attribute.size; ++j)
+		for (int j = 0; j < attribute.size; ++j) {
+			int (*action_func)(char*, char*);
+			char *action_str;
 			switch (action) {
 				case 0:
-					if (sepol_attradd(class.data[i], attribute.data[j]))
-						fprintf(stderr, "Error in: attradd %s %s\n", class.data[i], attribute.data[j]);
+					action_func = sepol_attradd;
+					action_str = "attradd";
 					break;
 				default:
 					return 1;
 			}
+			if (action_func(class.data[i], attribute.data[j]))
+				fprintf(stderr, "Error in: %s %s %s\n",
+					action_str, class.data[i], attribute.data[j]);
+		}
 	vec_destroy(&class);
 	vec_destroy(&attribute);
 	return 0;
@@ -217,20 +231,24 @@ static int parse_pattern_3(int action, char* statement) {
 		tok = strtok_r(NULL, " {}", &saveptr);
 	}
 	for (int i = 0; i < classes.size; ++i) {
+		int (*action_func)(char*);
+		char *action_str;
 		switch (action) {
-			case 0:
-				if (sepol_create(classes.data[i]))
-					fprintf(stderr, "Domain %s already exists\n", classes.data[i]);
-				break;
-			case 1:
-				if (sepol_permissive(classes.data[i]))
-					fprintf(stderr, "Error in: permissive %s\n", classes.data[i]);
-				break;
-			case 2:
-				if (sepol_enforce(classes.data[i]))
-					fprintf(stderr, "Error in: enforce %s\n", classes.data[i]);
-				break;
+		case 0:
+			action_func = sepol_create;
+			action_str = "create";
+			break;
+		case 1:
+			action_func = sepol_permissive;
+			action_str = "permissive";
+			break;
+		case 2:
+			action_func = sepol_enforce;
+			action_str = "enforce";
+			break;
 		}
+		if (action_func(classes.data[i]))
+			fprintf(stderr, "Error in: %s %s\n", action_str, classes.data[i]);
 	}
 	vec_destroy(&classes);
 	return 0;
@@ -244,23 +262,23 @@ static int parse_pattern_4(int action, char* statement) {
 	tok = strtok_r(statement, " ", &saveptr);
 	while (tok != NULL) {
 		switch(state) {
-			case 0:
-				source = tok;
-				break;
-			case 1:
-				target = tok;
-				break;
-			case 2:
-				class = tok;
-				break;
-			case 3:
-				def = tok;
-				break;
-			case 4:
-				filename = tok;
-				break;
-			default:
-				return 1;
+		case 0:
+			source = tok;
+			break;
+		case 1:
+			target = tok;
+			break;
+		case 2:
+			class = tok;
+			break;
+		case 3:
+			def = tok;
+			break;
+		case 4:
+			filename = tok;
+			break;
+		default:
+			return 1;
 		}
 		tok = strtok_r(NULL, " ", &saveptr);
 		++state;
@@ -275,7 +293,7 @@ static int parse_pattern_4(int action, char* statement) {
 static int parse_pattern_5(int action, char* statement) {
 	int state = 0, in_bracket = 0;
 	char *tok, *range, *saveptr;
-	struct vector source, target, class, *temp;
+	struct vector source, target, class;
 	vec_init(&source);
 	vec_init(&target);
 	vec_init(&class);
@@ -297,28 +315,29 @@ static int parse_pattern_5(int action, char* statement) {
 			}
 		} else {
 			if (tok[0] == '*') tok = ALL;
+			struct vector *vec;
 			switch (state) {
-				case 0:
-					temp = &source;
-					break;
-				case 1:
-					temp = &target;
-					break;
-				case 2:
-					temp = &class;
-					break;
-				case 3:
-					// Should always be ioctl
-					temp = NULL;
-					break;
-				case 4:
-					temp = NULL;
-					range = tok;
-					break;
-				default:
-					return 1;
+			case 0:
+				vec = &source;
+				break;
+			case 1:
+				vec = &target;
+				break;
+			case 2:
+				vec = &class;
+				break;
+			case 3:
+				// Should always be ioctl
+				vec = NULL;
+				break;
+			case 4:
+				vec = NULL;
+				range = tok;
+				break;
+			default:
+				return 1;
 			}
-			vec_push_back(temp, tok);
+			vec_push_back(vec, tok);
 		}
 		if (!in_bracket) ++state;
 		tok = strtok_r(NULL, " ", &saveptr);
@@ -326,23 +345,29 @@ static int parse_pattern_5(int action, char* statement) {
 	if (state != 5) return 1;
 	for(int i = 0; i < source.size; ++i)
 		for (int j = 0; j < target.size; ++j)
-			for (int k = 0; k < class.size; ++k)
+			for (int k = 0; k < class.size; ++k) {
+				int (*action_func)(char*, char*, char*, char*);
+				char *action_str;
 				switch (action) {
-					case 0:
-						if (sepol_allowxperm(source.data[i], target.data[j], class.data[k], range))
-							fprintf(stderr, "Error in: allowxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
-						break;
-					case 1:
-						if (sepol_auditallowxperm(source.data[i], target.data[j], class.data[k], range))
-							fprintf(stderr, "Error in: auditallowxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
-						break;
-					case 2:
-						if (sepol_dontauditxperm(source.data[i], target.data[j], class.data[k], range))
-							fprintf(stderr, "Error in: dontauditxperm %s %s %s %s\n", source.data[i], target.data[j], class.data[k], range);
-						break;
-					default:
-						return 1;
+				case 0:
+					action_func = sepol_allowxperm;
+					action_str = "allowxperm";
+					break;
+				case 1:
+					action_func = sepol_auditallowxperm;
+					action_str = "auditallowxperm";
+					break;
+				case 2:
+					action_func = sepol_dontauditxperm;
+					action_str = "dontauditxperm";
+					break;
+				default:
+					return 1;
 				}
+				if (action_func(source.data[i], target.data[j], class.data[k], range))
+					fprintf(stderr, "Error in: %s %s %s %s %s\n",
+						action_str, source.data[i], target.data[j], class.data[k], range);
+			}
 	vec_destroy(&source);
 	vec_destroy(&target);
 	vec_destroy(&class);
@@ -387,7 +412,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		infile = SELINUX_POLICY;
 
 	if (load_policydb(infile)) {
-		fprintf(stderr, "Could not load policy\n");
+		fprintf(stderr, "Cannot load policy from %s\n", infile);
 		return 1;
 	}
 
@@ -445,14 +470,13 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	vec_destroy(&rules);
 
 	if (live)
-		if (dump_policydb(SELINUX_LOAD))
-			return 1;
+		outfile = SELINUX_LOAD;
 
-	if (outfile) {
-		unlink(outfile);
-		if (dump_policydb(outfile))
+	if (outfile)
+		if (dump_policydb(outfile)) {
+			fprintf(stderr, "Cannot dump policy to %s\n", outfile);
 			return 1;
-	}
+		}
 
 	destroy_policydb();
 	return 0;
