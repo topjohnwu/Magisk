@@ -130,16 +130,15 @@ public class MagiskLogFragment extends Fragment {
         @SuppressLint("DefaultLocale")
         @Override
         protected Object doInBackground(Object... params) {
-            MagiskManager magiskManager = MagiskLogFragment.this.getApplication();
             mode = (int) params[0];
             switch (mode) {
                 case 0:
                     StringBuildingList logList = new StringBuildingList();
-                    Shell.getShell(magiskManager).su(logList, "cat " + MAGISK_LOG);
+                    getShell().su(logList, "cat " + MAGISK_LOG);
                     return logList.toString();
 
                 case 1:
-                    Shell.getShell(magiskManager).su_raw("echo > " + MAGISK_LOG);
+                    getShell().su_raw("echo > " + MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
@@ -160,7 +159,7 @@ public class MagiskLogFragment extends Fragment {
 
                     try (FileWriter out = new FileWriter(targetFile)) {
                         FileWritingList fileWritingList = new FileWritingList(out);
-                        Shell.getShell(magiskManager).su(fileWritingList, "cat " + MAGISK_LOG);
+                        getShell().su(fileWritingList, "cat " + MAGISK_LOG);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return false;

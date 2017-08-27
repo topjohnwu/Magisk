@@ -69,7 +69,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         return new Topic[] { getApplicationContext().reloadActivity };
     }
 
-    public static class SettingsFragment extends PreferenceFragment
+    public class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener,
             Topic.Subscriber {
 
@@ -197,28 +197,28 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
                     if (enabled) {
-                        Utils.createFile(Shell.getShell(magiskManager), MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.createFile(getShell(), MagiskManager.MAGISK_DISABLE_FILE);
                     } else {
-                        Utils.removeItem(Shell.getShell(magiskManager), MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.removeItem(getShell(), MagiskManager.MAGISK_DISABLE_FILE);
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        Utils.enableMagiskHide(Shell.getShell(magiskManager));
+                        Utils.enableMagiskHide(getShell());
                     } else {
-                        Utils.disableMagiskHide(Shell.getShell(magiskManager));
+                        Utils.disableMagiskHide(getShell());
                     }
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
-                        Shell.getShell(magiskManager).su_raw(
+                        getShell().su_raw(
                                 "cp -af /system/etc/hosts /magisk/.core/hosts",
                                 "mount -o bind /magisk/.core/hosts /system/etc/hosts");
                     } else {
-                        Shell.getShell(magiskManager).su_raw(
+                        getShell().su_raw(
                                 "umount -l /system/etc/hosts",
                                 "rm -f /magisk/.core/hosts");
                     }
