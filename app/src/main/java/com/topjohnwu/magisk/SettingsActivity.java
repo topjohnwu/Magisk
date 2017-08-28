@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.Manifest;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -125,7 +126,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             });
 
             hideManager.setOnPreferenceClickListener((pref) -> {
-                new HideManager(getActivity()).exec();
+                Utils.runWithPermission(getActivity(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        () -> new HideManager(getActivity()).exec());
                 return true;
             });
 
