@@ -151,6 +151,9 @@
     <string name="settings_hide_manager_summary">Temporarily hide Magisk Manager.\nThis will install a new app called \"Unhide Magisk Manager\"</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
+    <string name="settings_update_channel_title">Update Channel</string>
+    <string name="settings_update_stable">Stable</string>
+    <string name="settings_update_beta">Beta</string>
 
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
     <string name="settings_core_only_summary">Enable only core features, all modules will not be loaded. MagiskSU, MagiskHide, and systemless hosts will still be enabled</string>

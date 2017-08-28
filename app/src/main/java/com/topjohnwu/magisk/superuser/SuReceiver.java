@@ -14,8 +14,9 @@ import java.util.Date;
 
 public class SuReceiver extends BroadcastReceiver {
 
-    private static final int NO_NOTIFICATION = 0;
-    private static final int TOAST = 1;
+    public static final int NO_NOTIFICATION = 0;
+    public static final int TOAST = 1;
+
     private static final int NOTIFY_NORMAL_LOG = 0;
     private static final int NOTIFY_USER_TOASTS = 1;
     private static final int NOTIFY_USER_TO_OWNER = 2;

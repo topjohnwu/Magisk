@@ -15,6 +15,12 @@
             android:title="@string/settings_notification_title"
             android:summary="@string/settings_notification_summary" />
 
+        <ListPreference
+            android:key="update_channel"
+            android:title="@string/settings_update_channel_title"
+            android:entries="@array/update_channel"
+            android:entryValues="@array/value_array" />
+
         <Preference
             android:key="clear"
             android:title="@string/settings_clear_cache_title"

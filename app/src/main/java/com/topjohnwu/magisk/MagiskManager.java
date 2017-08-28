@@ -12,11 +12,14 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.DownloadBusybox;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.superuser.SuReceiver;
+import com.topjohnwu.magisk.superuser.SuRequestActivity;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
@@ -88,6 +91,7 @@ public class MagiskManager extends Application {
     public int suNotificationType;
     public int suNamespaceMode;
     public String localeConfig;
+    public int updateChannel;
 
     // Global resources
     public SharedPreferences prefs;
@@ -154,14 +158,15 @@ public class MagiskManager extends Application {
 
         // su
         suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
-        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
-        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", SuRequestActivity.PROMPT);
+        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", SuReceiver.TOAST);
         suReauth = prefs.getBoolean("su_reauth", false);
-        suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, 3);
-        multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, 0);
-        suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, 1);
+        suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, SuDatabaseHelper.ROOT_ACCESS_APPS_AND_ADB);
+        multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, SuDatabaseHelper.MULTIUSER_MODE_OWNER_ONLY);
+        suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, SuDatabaseHelper.NAMESPACE_MODE_REQUESTER);
 
         updateNotification = prefs.getBoolean("notification", true);
+        updateChannel = Utils.getPrefsInt(prefs, "update_channel", CheckUpdates.STABLE_CHANNEL);
     }
 
     public void toast(String msg, int duration) {
@@ -192,6 +197,7 @@ public class MagiskManager extends Application {
                 .putString("su_access", String.valueOf(suAccessState))
                 .putString("multiuser_mode", String.valueOf(multiuserMode))
                 .putString("mnt_ns", String.valueOf(suNamespaceMode))
+                .putString("update_channel", String.valueOf(updateChannel))
                 .putString("busybox_version", BUSYBOX_VERSION)
                 .putString("locale", localeConfig)
                 .apply();

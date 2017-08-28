@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
@@ -76,7 +77,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
 
-        private ListPreference suAccess, autoRes, suNotification, requestTimeout, multiuserMode, namespaceMode;
+        private ListPreference updateChannel, suAccess, autoRes, suNotification,
+                requestTimeout, multiuserMode, namespaceMode;
         private MagiskManager magiskManager;
         private PreferenceCategory generalCatagory;
 
@@ -93,6 +95,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
             PreferenceCategory developer = (PreferenceCategory) findPreference("developer");
 
+            updateChannel = (ListPreference) findPreference("update_channel");
             suAccess = (ListPreference) findPreference("su_access");
             autoRes = (ListPreference) findPreference("su_auto_response");
             requestTimeout = (ListPreference) findPreference("su_request_timeout");
@@ -224,25 +227,25 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     }
                     break;
                 case "su_access":
-                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access", 3);
+                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access");
                     magiskManager.suDB.setSettings(SuDatabaseHelper.ROOT_ACCESS, magiskManager.suAccessState);
                     break;
                 case "multiuser_mode":
-                    magiskManager.multiuserMode = Utils.getPrefsInt(prefs, "multiuser_mode", 0);
+                    magiskManager.multiuserMode = Utils.getPrefsInt(prefs, "multiuser_mode");
                     magiskManager.suDB.setSettings(SuDatabaseHelper.MULTIUSER_MODE, magiskManager.multiuserMode);
                     break;
                 case "mnt_ns":
-                    magiskManager.suNamespaceMode = Utils.getPrefsInt(prefs, "mnt_ns", 1);
+                    magiskManager.suNamespaceMode = Utils.getPrefsInt(prefs, "mnt_ns");
                     magiskManager.suDB.setSettings(SuDatabaseHelper.MNT_NS, magiskManager.suNamespaceMode);
                     break;
                 case "su_request_timeout":
-                    magiskManager.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
+                    magiskManager.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout");
                     break;
                 case "su_auto_response":
-                    magiskManager.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", 0);
+                    magiskManager.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response");
                     break;
                 case "su_notification":
-                    magiskManager.suNotificationType = Utils.getPrefsInt(prefs, "su_notification", 1);
+                    magiskManager.suNotificationType = Utils.getPrefsInt(prefs, "su_notification");
                     break;
                 case "developer_logging":
                     MagiskManager.devLogging = prefs.getBoolean("developer_logging", false);
@@ -254,6 +257,10 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     magiskManager.setLocale();
                     magiskManager.reloadActivity.publish(false);
                     break;
+                case "update_channel":
+                    magiskManager.updateChannel = Utils.getPrefsInt(prefs, "update_channel");
+                    new CheckUpdates(magiskManager, true).exec();
+                    break;
             }
             setSummary();
         }
@@ -263,6 +270,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         private void setSummary() {
+            updateChannel.setSummary(getResources()
+                    .getStringArray(R.array.update_channel)[magiskManager.updateChannel]);
             suAccess.setSummary(getResources()
                     .getStringArray(R.array.su_access)[magiskManager.suAccessState]);
             autoRes.setSummary(getResources()

@@ -12,7 +12,11 @@ import org.json.JSONObject;
 
 public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
-    private static final String UPDATE_JSON = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/magisk_update.json";
+    public static final int STABLE_CHANNEL = 0;
+    public static final int BETA_CHANNEL = 1;
+
+    private static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
+    private static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
 
     private boolean showNotification = false;
 
@@ -29,7 +33,17 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return null;
-        String jsonStr = WebService.getString(UPDATE_JSON);
+        String jsonStr;
+        switch (magiskManager.updateChannel) {
+            case STABLE_CHANNEL:
+                jsonStr = WebService.getString(STABLE_URL);
+                break;
+            case BETA_CHANNEL:
+                jsonStr = WebService.getString(BETA_URL);
+                break;
+            default:
+                jsonStr = null;
+        }
         try {
             JSONObject json = new JSONObject(jsonStr);
             JSONObject magisk = json.getJSONObject("magisk");

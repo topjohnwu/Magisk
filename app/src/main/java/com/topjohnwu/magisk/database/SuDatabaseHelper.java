@@ -24,8 +24,20 @@ import java.util.List;
 public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ROOT_ACCESS = "root_access";
+    public static final int ROOT_ACCESS_DISABLED = 0;
+    public static final int ROOT_ACCESS_APPS_ONLY = 1;
+    public static final int ROOT_ACCESS_ADB_ONLY = 2;
+    public static final int ROOT_ACCESS_APPS_AND_ADB = 3;
+
     public static final String MULTIUSER_MODE = "multiuser_mode";
+    public static final int MULTIUSER_MODE_OWNER_ONLY = 0;
+    public static final int MULTIUSER_MODE_OWNER_MANAGED = 1;
+    public static final int MULTIUSER_MODE_USER = 2;
+
     public static final String MNT_NS = "mnt_ns";
+    public static final int NAMESPACE_MODE_GLOBAL = 0;
+    public static final int NAMESPACE_MODE_REQUESTER = 1;
+    public static final int NAMESPACE_MODE_ISOLATE = 2;
 
     private static final int DATABASE_VER = 3;
     private static final String POLICY_TABLE = "policies";

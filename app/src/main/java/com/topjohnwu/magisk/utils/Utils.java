@@ -132,6 +132,10 @@ public class Utils {
         return Integer.parseInt(prefs.getString(key, String.valueOf(def)));
     }
 
+    public static int getPrefsInt(SharedPreferences prefs, String key) {
+        return getPrefsInt(prefs, key, 0);
+    }
+
     public static MagiskManager getMagiskManager(Context context) {
         return (MagiskManager) context.getApplicationContext();
     }

@@ -30,10 +30,11 @@ import butterknife.ButterKnife;
 
 public class SuRequestActivity extends Activity {
 
+    public static final int PROMPT = 0;
+    public static final int AUTO_DENY = 1;
+    public static final int AUTO_ALLOW = 2;
+
     private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
-    private static final int PROMPT = 0;
-    private static final int AUTO_DENY = 1;
-    private static final int AUTO_ALLOW = 2;
 
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
