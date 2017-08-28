@@ -69,7 +69,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         return new Topic[] { getApplicationContext().reloadActivity };
     }
 
-    public class SettingsFragment extends PreferenceFragment
+    public static class SettingsFragment extends PreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener,
             Topic.Subscriber {
 
@@ -256,6 +256,10 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
             }
             setSummary();
+        }
+
+        private Shell getShell() {
+            return Shell.getShell(getActivity());
         }
 
         private void setSummary() {
