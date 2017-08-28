@@ -21,8 +21,8 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.app.NotificationCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -197,11 +197,10 @@ public class Utils {
     }
 
     public static void showMagiskUpdate(MagiskManager magiskManager) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(magiskManager.getString(R.string.magisk_update_title))
                 .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersionString))
-                .setChannelId(MagiskManager.NOTIFICATION_CHANNEL)
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, SplashActivity.class);
@@ -220,11 +219,10 @@ public class Utils {
     }
 
     public static void showManagerUpdate(MagiskManager magiskManager) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(magiskManager.getString(R.string.manager_update_title))
                 .setContentText(magiskManager.getString(R.string.manager_download_install))
-                .setChannelId(MagiskManager.NOTIFICATION_CHANNEL)
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, ManagerUpdate.class);
