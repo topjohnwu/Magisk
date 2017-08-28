@@ -34,8 +34,8 @@ public class Topic {
         publish(true);
     }
 
-    public void publish(boolean b) {
-        hasPublished = b;
+    public void publish(boolean record) {
+        hasPublished = record;
         if (subscribers != null) {
             for (WeakReference<Subscriber> subscriber : subscribers) {
                 if (subscriber.get() != null)

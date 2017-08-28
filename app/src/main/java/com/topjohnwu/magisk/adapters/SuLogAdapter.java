@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.ExpandableViewHolder;
+import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.superuser.SuLogEntry;
 
@@ -90,7 +90,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         SuLogEntry entry = new SuLogEntry(suLogCursor);
         holder.setExpanded(itemExpanded.contains(sqlPosition));
         holder.itemView.setOnClickListener(view -> {
-            if (holder.mExpanded) {
+            if (holder.isExpanded()) {
                 holder.collapse();
                 itemExpanded.remove(sqlPosition);
             } else {
@@ -128,7 +128,7 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         }
     }
 
-    static class LogViewHolder extends ExpandableViewHolder {
+    static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
         @BindView(R.id.app_name) TextView appName;
         @BindView(R.id.action) TextView action;
@@ -136,15 +136,20 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         @BindView(R.id.fromPid) TextView fromPid;
         @BindView(R.id.toUid) TextView toUid;
         @BindView(R.id.command) TextView command;
+        @BindView(R.id.expand_layout) ViewGroup expandLayout;
+
+        private Container container = new Container();
 
         LogViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            container.expandLayout = expandLayout;
+            setupExpandable();
         }
 
         @Override
-        public void setExpandLayout(View itemView) {
-            expandLayout = itemView.findViewById(R.id.expand_layout);
+        public Container getContainer() {
+            return container;
         }
     }
 }

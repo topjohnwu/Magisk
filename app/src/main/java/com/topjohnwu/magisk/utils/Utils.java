@@ -142,7 +142,7 @@ public class Utils {
             @Override
             public void handleResults(Result result) {
                 getMagiskManager(mActivity).SNCheckResult = result;
-                getMagiskManager(mActivity).safetyNetDone.publish();
+                getMagiskManager(mActivity).safetyNetDone.publish(false);
             }
         }.requestTest();
     }

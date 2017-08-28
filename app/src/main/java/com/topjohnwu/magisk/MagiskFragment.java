@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,7 +14,6 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -28,6 +25,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
@@ -49,15 +47,14 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
-        implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener {
+        implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener, ExpandableView {
 
     public static final String SHOW_DIALOG = "dialog";
 
     private static final String UNINSTALLER = "magisk_uninstaller.sh";
     private static final String UTIL_FUNCTIONS= "util_functions.sh";
 
-    private static int expandHeight = 0;
-    private static boolean mExpanded = false;
+    private Container expandableContainer = new Container();
 
     private MagiskManager magiskManager;
     private Unbinder unbinder;
@@ -231,23 +228,8 @@ public class MagiskFragment extends Fragment
         unbinder = ButterKnife.bind(this, v);
         magiskManager = getApplication();
 
-        expandLayout.getViewTreeObserver().addOnPreDrawListener(
-                new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                        if (expandHeight == 0) {
-                            final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                            final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                            expandLayout.measure(widthSpec, heightSpec);
-                            expandHeight = expandLayout.getMeasuredHeight();
-                        }
-
-                        expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                        setExpanded();
-                        return true;
-                    }
-
-                });
+        expandableContainer.expandLayout = expandLayout;
+        setupExpandable();
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -304,6 +286,11 @@ public class MagiskFragment extends Fragment
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public Container getContainer() {
+        return expandableContainer;
     }
 
     private void updateUI() {
@@ -439,57 +426,6 @@ public class MagiskFragment extends Fragment
             basicStatusIcon.setColorFilter(color);
             expand();
         }
-    }
-
-    private void setExpanded() {
-        ViewGroup.LayoutParams layoutParams = expandLayout.getLayoutParams();
-        layoutParams.height = mExpanded ? expandHeight : 0;
-        expandLayout.setLayoutParams(layoutParams);
-        expandLayout.setVisibility(mExpanded ? View.VISIBLE : View.GONE);
-    }
-
-    private void expand() {
-        if (mExpanded) return;
-        expandLayout.setVisibility(View.VISIBLE);
-        ValueAnimator mAnimator = slideAnimator(0, expandHeight);
-        mAnimator.start();
-        mExpanded = true;
-    }
-
-    private void collapse() {
-        if (!mExpanded) return;
-        int finalHeight = expandLayout.getHeight();
-        ValueAnimator mAnimator = slideAnimator(finalHeight, 0);
-        mAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                expandLayout.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationStart(Animator animator) {}
-
-            @Override
-            public void onAnimationCancel(Animator animator) {}
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {}
-        });
-        mAnimator.start();
-        mExpanded = false;
-    }
-
-    private ValueAnimator slideAnimator(int start, int end) {
-
-        ValueAnimator animator = ValueAnimator.ofInt(start, end);
-
-        animator.addUpdateListener(valueAnimator -> {
-            int value = (Integer) valueAnimator.getAnimatedValue();
-            ViewGroup.LayoutParams layoutParams = expandLayout.getLayoutParams();
-            layoutParams.height = value;
-            expandLayout.setLayoutParams(layoutParams);
-        });
-        return animator;
     }
 }
 

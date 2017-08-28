@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.AdaptiveList;
-import com.topjohnwu.magisk.utils.Shell;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
