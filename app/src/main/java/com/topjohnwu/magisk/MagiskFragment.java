@@ -122,6 +122,7 @@ public class MagiskFragment extends Fragment
                 }
             }
         }
+        ((NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
         final String finalBootImage = bootImage;
         String filename = "Magisk-v" + magiskManager.remoteMagiskVersionString + ".zip";
         new AlertDialogBuilder(getActivity())
@@ -129,9 +130,7 @@ public class MagiskFragment extends Fragment
                 .setMessage(getString(R.string.repo_install_msg, filename))
                 .setCancelable(true)
                 .setPositiveButton(Shell.rootAccess() ? R.string.install : R.string.download,
-                    (d, i) -> {
-                        ((NotificationManager) getActivity()
-                                .getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
+                    (d, i) ->
                         Utils.dlAndReceive(
                             getActivity(),
                             new DownloadReceiver() {
@@ -155,8 +154,7 @@ public class MagiskFragment extends Fragment
                                 }
                             },
                             magiskManager.magiskLink,
-                            Utils.getLegalFilename(filename));
-                    }
+                            Utils.getLegalFilename(filename))
                 )
                 .setNeutralButton(R.string.release_notes, (d, i) -> {
                     if (magiskManager.releaseNoteLink != null) {
@@ -226,19 +224,15 @@ public class MagiskFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
         unbinder = ButterKnife.bind(this, v);
+        getActivity().setTitle(R.string.magisk);
+
         magiskManager = getApplication();
 
         expandableContainer.expandLayout = expandLayout;
         setupExpandable();
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
-
         updateUI();
-
-        if (getArguments() != null && getArguments().getBoolean(SHOW_DIALOG))
-            install();
-
-        getActivity().setTitle(R.string.magisk);
 
         return v;
     }

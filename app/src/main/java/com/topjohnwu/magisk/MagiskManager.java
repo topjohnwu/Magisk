@@ -3,6 +3,9 @@ package com.topjohnwu.magisk;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -14,10 +17,13 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.DownloadBusybox;
+import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
+import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.superuser.SuReceiver;
 import com.topjohnwu.magisk.superuser.SuRequestActivity;
 import com.topjohnwu.magisk.utils.SafetyNetHelper;
@@ -42,6 +48,7 @@ public class MagiskManager extends Application {
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
     public static final String BUSYBOX_VERSION = "1.27.1";
+    public static final int UPDATE_SERVICE_ID = 1;
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -100,6 +107,7 @@ public class MagiskManager extends Application {
     public Shell shell;
 
     private static Handler mHandler = new Handler();
+    private boolean startup = false;
 
     private static class LoadLocale extends ParallelTask<Void, Void, Void> {
 
@@ -177,7 +185,12 @@ public class MagiskManager extends Application {
         mHandler.post(() -> Toast.makeText(this, resId, duration).show());
     }
 
-    public void init() {
+    public void startup() {
+        if (startup)
+            return;
+        startup = true;
+
+        shell = Shell.getShell();
         new LoadLocale(this).exec();
         new DownloadBusybox(this).exec();
         getMagiskInfo();
@@ -212,10 +225,24 @@ public class MagiskManager extends Application {
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
         }
 
+        LoadModules loadModuleTask = new LoadModules(this);
+        // Start update check job
+        if (Utils.checkNetworkStatus(this)) {
+            ComponentName service = new ComponentName(this, UpdateCheckService.class);
+            JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setPersisted(true)
+                    .setPeriodic(8 * 60 * 60 * 1000)
+                    .build();
+            ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
+            loadModuleTask.setCallBack(() -> new UpdateRepos(this).exec());
+        }
+        // Fire asynctasks
+        loadModuleTask.exec();
+
     }
 
     public void getMagiskInfo() {
-        Shell.getShell(this);
         List<String> ret;
         ret = shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {

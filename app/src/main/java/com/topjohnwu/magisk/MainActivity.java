@@ -38,6 +38,7 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        getApplicationContext().startup();
 
         prefs = getApplicationContext().prefs;
 
@@ -131,9 +132,6 @@ public class MainActivity extends Activity
                 case "magisk":
                     itemId = R.id.magisk;
                     break;
-                case "install":
-                    itemId = -1;
-                    break;
                 case "superuser":
                     itemId = R.id.superuser;
                     break;
@@ -165,13 +163,6 @@ public class MainActivity extends Activity
         mDrawerItem = itemId;
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
-            case -1:
-                Bundle args = new Bundle();
-                args.putBoolean(MagiskFragment.SHOW_DIALOG, true);
-                Fragment frag = new MagiskFragment();
-                frag.setArguments(args);
-                displayFragment(frag, "magisk", true);
-                break;
             case R.id.magisk:
                 displayFragment(new MagiskFragment(), "magisk", true);
                 break;

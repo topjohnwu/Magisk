@@ -201,9 +201,7 @@ public class Utils {
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(magiskManager, SplashActivity.class);
-        intent.putExtra(MagiskManager.INTENT_SECTION, "install");
-        intent.putExtra(MagiskManager.INTENT_VERSION, magiskManager.remoteMagiskVersionString);
-        intent.putExtra(MagiskManager.INTENT_LINK, magiskManager.magiskLink);
+        intent.putExtra(MagiskManager.INTENT_SECTION, "magisk");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(magiskManager);
         stackBuilder.addParentStack(SplashActivity.class);
         stackBuilder.addNextIntent(intent);
