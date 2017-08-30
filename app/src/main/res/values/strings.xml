@@ -138,6 +138,10 @@
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Hiding Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed…</string>
+    <string name="download_zip_only">Download Zip Only</string>
+    <string name="patch_boot_file">Patch Boot Image File</string>
+    <string name="direct_install">Direct Install (Recommend)</string>
+    <string name="select_method">Select Method</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

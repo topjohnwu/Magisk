@@ -87,7 +87,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
         if (requestCode == FETCH_ZIP_CODE && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
             Intent intent = new Intent(getActivity(), FlashActivity.class);
-            intent.setData(data.getData()).putExtra("ACTION", "flash");
+            intent.setData(data.getData()).putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_ZIP);
             startActivity(intent);
         }
     }

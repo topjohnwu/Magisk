@@ -94,12 +94,15 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         progressDialog.dismiss();
         if (result) {
             if (Shell.rootAccess() && mInstall) {
-                activity.startActivity(new Intent(activity, FlashActivity.class).setData(mUri));
+                Intent intent = new Intent(getActivity(), FlashActivity.class);
+                intent.setData(mUri).putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_ZIP);
+                activity.startActivity(intent);
             } else {
                 Utils.showUriSnack(activity, mUri);
             }
         } else {
             Utils.getMagiskManager(activity).toast(R.string.process_error, Toast.LENGTH_LONG);
         }
+        super.onPostExecute(result);
     }
 }

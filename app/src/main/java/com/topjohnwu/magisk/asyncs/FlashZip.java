@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-public class FlashZip extends ParallelTask<Void, String, Integer> {
+public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private Uri mUri;
     private File mCachedFile, mScriptFile, mCheckFile;
@@ -40,7 +40,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     }
 
     private boolean unzipAndCheck() throws Exception {
-        ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android");
+        ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", false);
         List<String> ret = Utils.readFile(getShell(), mCheckFile.getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
@@ -52,7 +52,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
     }
 
     @Override
-    protected void onProgressUpdate(String... values) {
+    protected void onProgressUpdate(Void... values) {
         mList.updateView();
     }
 
@@ -61,18 +61,18 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
         MagiskManager magiskManager = getMagiskManager();
         if (magiskManager == null) return -1;
         try {
-            mList.add(magiskManager.getString(R.string.copying_msg));
+            mList.add("- Copying zip to temp directory");
 
             mCachedFile.delete();
             try (
                 InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
-                OutputStream outputStream = new FileOutputStream(mCachedFile)
+                OutputStream out = new FileOutputStream(mCachedFile)
             ) {
                 if (in == null) throw new FileNotFoundException();
                 byte buffer[] = new byte[1024];
                 int length;
                 while ((length = in.read(buffer)) > 0)
-                    outputStream.write(buffer, 0, length);
+                    out.write(buffer, 0, length);
             } catch (FileNotFoundException e) {
                 mList.add("! Invalid Uri");
                 throw e;
@@ -81,7 +81,7 @@ public class FlashZip extends ParallelTask<Void, String, Integer> {
                 throw e;
             }
             if (!unzipAndCheck()) return 0;
-            mList.add(magiskManager.getString(R.string.zip_install_progress_msg, mFilename));
+            mList.add("- Installing " + mFilename);
             getShell().su(mList,
                     "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile +
                             " && echo 'Success!' || echo 'Failed!'"

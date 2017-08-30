@@ -139,6 +139,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
                 prefScreen.removePreference(suCategory);
+                generalCatagory.removePreference(hideManager);
             } else {
                 if (!magiskManager.isSuClient) {
                     prefScreen.removePreference(suCategory);

@@ -156,34 +156,38 @@ public class ZipUtils {
         }
     }
 
-    public static void unzip(File file, File folder, String path) throws Exception {
-        int count;
-        FileOutputStream out;
-        File dest;
-        InputStream is;
-        JarEntry entry;
+    public static void unzip(File zip, File folder, String path, boolean junkPath) throws Exception {
+        JarInputStream in = new JarInputStream(new FileInputStream(zip));
+        unzip(in, folder, path, junkPath);
+        in.close();
+    }
+
+    public static void unzip(InputStream zip, File folder, String path, boolean junkPath) throws Exception {
         byte data[] = new byte[4096];
-        try (JarFile zipfile = new JarFile(file)) {
-            Enumeration<JarEntry> e = zipfile.entries();
-            while(e.hasMoreElements()) {
-                entry = e.nextElement();
-                if (!entry.getName().contains(path) || entry.isDirectory()){
+        try {
+            JarInputStream zipfile = new JarInputStream(zip);
+            JarEntry entry;
+            while ((entry = zipfile.getNextJarEntry()) != null) {
+                if (!entry.getName().startsWith(path) || entry.isDirectory()){
                     // Ignore directories, only create files
                     continue;
                 }
-                Logger.dev("ZipUtils: Extracting: " + entry);
-                is = zipfile.getInputStream(entry);
-                dest = new File(folder, entry.getName());
-                if (dest.getParentFile().mkdirs()) {
-                    dest.createNewFile();
+                String name;
+                if (junkPath) {
+                    name = entry.getName().substring(entry.getName().lastIndexOf('/') + 1);
+                } else {
+                    name = entry.getName();
                 }
-                out = new FileOutputStream(dest);
-                while ((count = is.read(data)) != -1) {
+                Logger.dev("ZipUtils: Extracting: " + entry);
+                File dest = new File(folder, name);
+                dest.getParentFile().mkdirs();
+                FileOutputStream out = new FileOutputStream(dest);
+                int count;
+                while ((count = zipfile.read(data)) != -1) {
                     out.write(data, 0, count);
                 }
                 out.flush();
                 out.close();
-                is.close();
             }
         } catch(Exception e) {
             e.printStackTrace();
