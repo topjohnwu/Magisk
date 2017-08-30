@@ -26,6 +26,8 @@ static char *buf, *buf2;
 static struct vector module_list;
 static int seperate_vendor = 0;
 
+extern char **environ;
+
 #ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
 #endif
@@ -114,13 +116,33 @@ static struct node_entry *insert_child(struct node_entry *p, struct node_entry *
 }
 
 /***********
- * Scripts *
+ * setenvs *
  ***********/
 
-static void bb_setenv() {
-	snprintf(buf, PATH_MAX, "%s:%s", BBPATH, getenv("PATH"));
-	setenv("PATH", buf, 1);
+static void bb_setenv(struct vector *v) {
+	for (int i = 0; environ[i]; ++i) {
+		if (strncmp(environ[i], "PATH=", 5) == 0) {
+			snprintf(buf, PATH_MAX, "PATH=%s:%s", BBPATH, strchr(environ[i], '=') + 1);
+			vec_push_back(v, strdup(buf));
+		} else {
+			vec_push_back(v, strdup(environ[i]));
+		}
+	}
+	vec_push_back(v, NULL);
 }
+
+static void pm_setenv(struct vector *v) {
+	for (int i = 0; environ[i]; ++i) {
+		if (strncmp(environ[i], "CLASSPATH=", 10) != 0)
+			vec_push_back(v, strdup(environ[i]));
+	}
+	vec_push_back(v, strdup("CLASSPATH=/system/framework/pm.jar"));
+	vec_push_back(v, NULL);
+}
+
+/***********
+ * Scripts *
+ ***********/
 
 static void exec_common_script(const char* stage) {
 	DIR *dir;
@@ -560,9 +582,8 @@ void post_fs_data(int client) {
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
-		bb_setenv();
 		setenv("BOOTMODE", "true", 1);
-		exec_command(0, NULL, NULL, "sh", UNINSTALLER, NULL);
+		exec_command(0, NULL, bb_setenv, "sh", UNINSTALLER, NULL);
 		return;
 	}
 
@@ -667,10 +688,6 @@ core_only:
 
 unblock:
 	unblock_boot_process();
-}
-
-static void pm_setenv() {
-	setenv("CLASSPATH", "/system/framework/pm.jar", 1);
 }
 
 void late_start(int client) {

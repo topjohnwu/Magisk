@@ -226,7 +226,7 @@ void setup_sighandlers(void (*handler)(int)) {
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
   *cb         -> A callback function which runs after fork
 */
-static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
+static int v_exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char *argv0, va_list argv) {
 	int pipefd[2], writeEnd = -1;
 
 	if (fd) {
@@ -240,12 +240,24 @@ static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0,
 	}
 
 	// Collect va_list into vector
-	struct vector v;
-	vec_init(&v);
-	vec_push_back(&v, strdup(argv0));
+	struct vector args;
+	vec_init(&args);
+	vec_push_back(&args, strdup(argv0));
 	for (void *arg = va_arg(argv, void*); arg; arg = va_arg(argv, void*))
-		vec_push_back(&v, strdup(arg));
-	vec_push_back(&v, NULL);
+		vec_push_back(&args, strdup(arg));
+	vec_push_back(&args, NULL);
+
+	// Setup environment
+	char *const *envp;
+	struct vector env;
+	vec_init(&env);
+	if (setupenv) {
+		setupenv(&env);
+		envp = (char **) vec_entry(&env);
+	} else {
+		extern char **environ;
+		envp = environ;
+	}
 
 	int pid = fork();
 	if (pid != 0) {
@@ -254,22 +266,21 @@ static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0,
 			*fd = pipefd[0];
 			close(pipefd[1]);
 		}
-		vec_deep_destroy(&v);
+		vec_deep_destroy(&args);
+		vec_deep_destroy(&env);
 		return pid;
 	}
 
 	// Don't return to the daemon if anything goes wrong
 	err_handler = exit_proc;
 
-	if (cb) cb();
-
 	if (fd) {
 		xdup2(writeEnd, STDOUT_FILENO);
 		if (err) xdup2(writeEnd, STDERR_FILENO);
 	}
 
-	execvp(argv0, (char **) vec_entry(&v));
-	PLOGE("execvp");
+	execvpe(argv0, (char **) vec_entry(&args), envp);
+	PLOGE("execvpe");
 	return -1;
 }
 
@@ -285,10 +296,10 @@ int exec_command_sync(char *const argv0, ...) {
 	return WEXITSTATUS(status);
 }
 
-int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
+int exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char *argv0, ...) {
 	va_list argv;
 	va_start(argv, argv0);
-	int pid = v_exec_command(err, fd, cb, argv0, argv);
+	int pid = v_exec_command(err, fd, setupenv, argv0, argv);
 	va_end(argv);
 	return pid;
 }

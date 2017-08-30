@@ -81,7 +81,7 @@ void ps_filter_proc_name(const char *filter, void (*func)(int));
 int create_links(const char *bin, const char *path);
 void unlock_blocks();
 void setup_sighandlers(void (*handler)(int));
-int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...);
+int exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char *argv0, ...);
 int exec_command_sync(char *const argv0, ...);
 int mkdir_p(const char *pathname, mode_t mode);
 int bind_mount(const char *from, const char *to);
