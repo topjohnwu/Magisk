@@ -1,6 +1,12 @@
 # EX_ARM, EX_X86, BB_ARM, and BB_X86 should be generated in build.py
+dirname_wrap() {
+  case "$1" in
+    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
+    *) echo "." ;;
+  esac
+}
 [ "$1" = "indep" ] && INDEP=true || INDEP=false
-$INDEP && TMPDIR=/data/local/tmp || TMPDIR=/dev/tmp
+$INDEP && TMPDIR="`cd "\`dirname_wrap "${BASH_SOURCE:-$0}"\`" && pwd`" || TMPDIR=/dev/tmp
 INSTALLER=$TMPDIR/install; BBDIR=$TMPDIR/bin
 EXBIN=$BBDIR/b64xz; BBBIN=$BBDIR/busybox
 $INDEP || rm -rf $TMPDIR 2>/dev/null;
@@ -17,7 +23,7 @@ $BBBIN --install -s $TMPDIR/bin
 export PATH=$BBDIR:$PATH
 if $INDEP; then
   shift
-  exec sh $@
+  exec sh "$@"
 else
   mkdir -p $INSTALLER
   unzip -o "$3" -d $INSTALLER

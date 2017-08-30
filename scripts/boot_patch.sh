@@ -49,12 +49,15 @@ abort_wrap() {
 
 # Pure bash dirname implementation
 dirname_wrap() {
-  if echo $1 | grep "/" >/dev/null 2>&1; then
-    RES=${1%/*}
-    [ -z $RES ] && echo "/" || echo $RES
-  else
-    echo "."
-  fi
+  case "$1" in
+    */*)
+      dir=${1%/*}
+      [ -z $dir ] && echo "/" || echo $dir
+      ;;
+    *)
+      echo "."
+      ;;
+  esac
 }
 
 # Pure bash basename implementation
@@ -93,10 +96,8 @@ cpio_mkdir() {
 
 [ -z $1 ] && abort_wrap "This script requires a boot image as a parameter"
 
-CWD=`pwd`
 cd "`dirname_wrap $1`"
 BOOTIMAGE="`pwd`/`basename_wrap $1`"
-cd "$CWD"
 
 [ -e "$BOOTIMAGE" ] || abort_wrap "$BOOTIMAGE does not exist!"
 

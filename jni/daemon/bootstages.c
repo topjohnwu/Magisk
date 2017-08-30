@@ -553,17 +553,16 @@ void post_fs_data(int client) {
 	char *bin_path = NULL;
 	if (access("/cache/data_bin", F_OK) == 0)
 		bin_path = "/cache/data_bin";
-	else if (access("/data/local/tmp/magisk_inject", F_OK) == 0)
-		bin_path = "/data/local/tmp/magisk_inject";
+	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/data/com.topjohnwu.magisk/install";
 	if (bin_path) {
 		exec_command_sync("rm", "-rf", DATABIN, NULL);
 		exec_command_sync("cp", "-r", bin_path, DATABIN, NULL);
 		exec_command_sync("rm", "-rf", bin_path, NULL);
 		exec_command_sync("chmod", "-R", "755", bin_path, NULL);
+		// Lazy.... use shell blob to match files
+		exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 	}
-
-	// Lazy.... use shell blob to match files
-	exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 
 	// Link busybox
 	mount_mirrors();
