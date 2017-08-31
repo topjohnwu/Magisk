@@ -131,6 +131,8 @@
     <string name="manual_boot_image">Пожалуйста, выберите вручную boot-образ!</string>
     <string name="manager_update_title">Доступно новое обновление менеджера Magisk!</string>
     <string name="manager_download_install">Нажмите, чтобы скачать и установить</string>
+    <string name="hide_manager_toast">Скрытие Менеджера Magisk…</string>
+    <string name="hide_manager_fail_toast">Скрытие Менеджера Magisk неудачно…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
@@ -140,8 +142,13 @@
     <string name="settings_notification_summary">Показывать уведомления об обновлении, когда доступна новая версия</string>
     <string name="settings_clear_cache_title">Очистка кеша</string>
     <string name="settings_clear_cache_summary">Очистить сохранённую информацию о сетевых репозиториях, заставляя приложение принудительно обновляться через Интернете</string>
+    <string name="settings_hide_manager_title">Скрыть Менеджер Magisk</string>
+    <string name="settings_hide_manager_summary">Временно скрывает Менеджер Magisk.\nБудет установлено новое приложение, называется \"Unhide Magisk Manager\"</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
+    <string name="settings_update_channel_title">Источник обновления</string>
+    <string name="settings_update_stable">Стабильный релиз</string>
+    <string name="settings_update_beta">Релиз beta</string>
 
     <string name="settings_core_only_title">Режим Magisk Core</string>
     <string name="settings_core_only_summary">Включить возможности только уровня Core, все модули не будут загружены. MagiskSU, MagiskHide и внесистемные хосты останутся включенными</string>
