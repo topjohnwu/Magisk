@@ -135,6 +135,10 @@
     <string name="flashing">正在刷入</string>
     <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
+    <string name="download_zip_only">仅下载 Zip</string>
+    <string name="patch_boot_file">给 Boot 镜像文件打补丁</string>
+    <string name="direct_install">直接安装（推荐）</string>
+    <string name="select_method">选择方法</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -148,6 +152,9 @@
     <string name="settings_hide_manager_summary">临时隐藏 Magisk Manager。\n此功能将会安装一个名为“Unhide Magisk Manager（取消隐藏 Magisk Manager）”的新应用。</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
+    <string name="settings_update_channel_title">更新通道</string>
+    <string name="settings_update_stable">稳定版</string>
+    <string name="settings_update_beta">测试版</string>
 
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
