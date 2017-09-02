@@ -96,8 +96,10 @@ cpio_mkdir() {
 
 [ -z $1 ] && abort_wrap "This script requires a boot image as a parameter"
 
+cwd=`pwd`
 cd "`dirname_wrap $1`"
 BOOTIMAGE="`pwd`/`basename_wrap $1`"
+cd $cwd
 
 [ -e "$BOOTIMAGE" ] || abort_wrap "$BOOTIMAGE does not exist!"
 
@@ -110,7 +112,7 @@ id | grep "uid=0" >/dev/null 2>&1 && ROOT=true || ROOT=false
 
 # Switch to the location of the script file
 [ -z $SOURCEDMODE ] && cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
-chmod +x ./*
+chmod -R 755 .
 
 ##########################################################################################
 # Unpack
