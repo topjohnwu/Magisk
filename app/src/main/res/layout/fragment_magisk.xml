@@ -411,6 +411,7 @@
                         android:ems="10"
                         android:fontFamily="sans-serif"
                         android:gravity="center"
+                        android:text="@string/install"
                         android:textAllCaps="false"
                         android:textSize="20sp"
                         android:textStyle="bold" />

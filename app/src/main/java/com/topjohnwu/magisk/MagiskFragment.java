@@ -401,28 +401,18 @@ public class MagiskFragment extends Fragment
         rootStatusIcon.setImageResource(image);
         rootStatusIcon.setColorFilter(color);
 
-        if (!Shell.rootAccess()) {
-            installText.setText(R.string.install);
+        List<String> items = new ArrayList<>();
+        if (magiskManager.bootBlock != null) {
+            items.add(getString(R.string.auto_detect, magiskManager.bootBlock));
+            spinner.setEnabled(false);
         } else {
-            if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
-                installText.setText(R.string.update);
-            } else {
-                installText.setText(R.string.reinstall);
-            }
-
-            List<String> items = new ArrayList<>();
-            if (magiskManager.bootBlock != null) {
-                items.add(getString(R.string.auto_detect, magiskManager.bootBlock));
-                spinner.setEnabled(false);
-            } else {
-                items.add(getString(R.string.cannot_auto_detect));
-                items.addAll(magiskManager.blockList);
-            }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
-                    android.R.layout.simple_spinner_item, items);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
+            items.add(getString(R.string.cannot_auto_detect));
+            items.addAll(magiskManager.blockList);
         }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     private void updateCheckUI() {
@@ -436,6 +426,12 @@ public class MagiskFragment extends Fragment
             color = colorOK;
             image = R.drawable.ic_check_circle;
             magiskUpdateText.setText(getString(R.string.install_magisk_title, "v" + magiskManager.remoteMagiskVersionString));
+        }
+
+        if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
+            installText.setText(R.string.update);
+        } else {
+            installText.setText(R.string.install);
         }
 
         magiskUpdateIcon.setImageResource(image);
