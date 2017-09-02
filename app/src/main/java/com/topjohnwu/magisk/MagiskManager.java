@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class MagiskManager extends Application {
 
@@ -47,7 +48,7 @@ public class MagiskManager extends Application {
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
     public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
-    public static final String BUSYBOX_VERSION = "1.27.1";
+    public static final String BUSYBOXPATH = "/dev/magisk/bin";
     public static final int UPDATE_SERVICE_ID = 1;
 
     // Topics
@@ -107,7 +108,7 @@ public class MagiskManager extends Application {
     public Shell shell;
 
     private static Handler mHandler = new Handler();
-    private boolean startup = false;
+    private boolean started = false;
 
     private static class LoadLocale extends ParallelTask<Void, Void, Void> {
 
@@ -186,14 +187,26 @@ public class MagiskManager extends Application {
     }
 
     public void startup() {
-        if (startup)
+        if (started)
             return;
-        startup = true;
+        started = true;
 
-        shell = Shell.getShell();
-        new LoadLocale(this).exec();
-        new DownloadBusybox(this).exec();
+        boolean hasNetwork = Utils.checkNetworkStatus(this);
+
         getMagiskInfo();
+        new LoadLocale(this).exec();
+
+        // Force synchronous, make sure we have busybox to use
+        if (hasNetwork && Shell.rootAccess()
+                && !Utils.itemExist(shell, BUSYBOXPATH + "/busybox")) {
+            try {
+                new DownloadBusybox(this).exec().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        shell.su_raw("export PATH=" + BUSYBOXPATH + ":$PATH");
+
         updateBlockInfo();
 
         // Write back default values
@@ -211,12 +224,8 @@ public class MagiskManager extends Application {
                 .putString("multiuser_mode", String.valueOf(multiuserMode))
                 .putString("mnt_ns", String.valueOf(suNamespaceMode))
                 .putString("update_channel", String.valueOf(updateChannel))
-                .putString("busybox_version", BUSYBOX_VERSION)
                 .putString("locale", localeConfig)
                 .apply();
-
-        // Add busybox to PATH
-        shell.su_raw("PATH=" + getApplicationInfo().dataDir + "/busybox:$PATH");
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -227,7 +236,7 @@ public class MagiskManager extends Application {
 
         LoadModules loadModuleTask = new LoadModules(this);
         // Start update check job
-        if (Utils.checkNetworkStatus(this)) {
+        if (hasNetwork) {
             ComponentName service = new ComponentName(this, UpdateCheckService.class);
             JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -244,6 +253,7 @@ public class MagiskManager extends Application {
 
     public void getMagiskInfo() {
         List<String> ret;
+        Shell.getShell(this);
         ret = shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);

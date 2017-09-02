@@ -42,8 +42,9 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
     }
 
     @SuppressWarnings("unchecked")
-    public void exec(Params... params) {
+    public ParallelTask<Params, Progress, Result> exec(Params... params) {
         executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
+        return this;
     }
 
     @Override
