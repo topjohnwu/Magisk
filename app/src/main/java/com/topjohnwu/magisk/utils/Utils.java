@@ -185,14 +185,6 @@ public class Utils {
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    public static boolean checkBits(int bits, int... masks) {
-        for (int mask : masks) {
-            if ((bits & mask) == 0)
-                return false;
-        }
-        return true;
-    }
-
     public static void showMagiskUpdate(MagiskManager magiskManager) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)

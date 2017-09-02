@@ -351,17 +351,16 @@ public class MagiskFragment extends Fragment
     private void updateUI() {
         ((MainActivity) getActivity()).checkHideSection();
 
-        final int ROOT = 0x1, NETWORK = 0x2, UPTODATE = 0x4;
-        int status = 0;
-        status |= Shell.rootAccess() ? ROOT : 0;
-        status |= Utils.checkNetworkStatus(magiskManager) ? NETWORK : 0;
-        status |= magiskManager.magiskVersionCode >= 1300 ? UPTODATE : 0;
-        magiskUpdateCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
-        safetyNetCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
-        bootImageCard.setVisibility(Utils.checkBits(status, NETWORK, ROOT) ? View.VISIBLE : View.GONE);
-        installOptionCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
-        installButton.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
-        uninstallButton.setVisibility(Utils.checkBits(status, UPTODATE, ROOT) ? View.VISIBLE : View.GONE);
+        boolean hasNetwork = Utils.checkNetworkStatus(getActivity());
+        boolean hasRoot = Shell.rootAccess();
+        boolean isUpToDate = magiskManager.magiskVersionCode > 1300;
+
+        magiskUpdateCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        bootImageCard.setVisibility(hasNetwork && hasRoot ? View.VISIBLE : View.GONE);
+        installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        installButton.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
 
         int image, color;
 
