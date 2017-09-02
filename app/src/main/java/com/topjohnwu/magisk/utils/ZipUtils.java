@@ -157,7 +157,7 @@ public class ZipUtils {
     }
 
     public static void unzip(File zip, File folder, String path, boolean junkPath) throws Exception {
-        JarInputStream in = new JarInputStream(new FileInputStream(zip));
+        InputStream in = new FileInputStream(zip);
         unzip(in, folder, path, junkPath);
         in.close();
     }

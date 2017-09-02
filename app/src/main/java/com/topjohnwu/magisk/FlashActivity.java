@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.FlashZip;
-import com.topjohnwu.magisk.asyncs.PatchBootImage;
+import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Shell;
@@ -28,9 +28,13 @@ import butterknife.OnClick;
 public class FlashActivity extends Activity {
 
     public static final String SET_ACTION = "action";
-    public static final String SET_BOOT_URI = "boot_uri";
+    public static final String SET_BOOT = "boot";
+    public static final String SET_ENC = "enc";
+    public static final String SET_VERITY = "verity";
+
     public static final String FLASH_ZIP = "flash";
     public static final String PATCH_BOOT = "patch";
+    public static final String FLASH_MAGISK = "magisk";
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.flash_logs) RecyclerView flashLogs;
@@ -68,6 +72,9 @@ public class FlashActivity extends Activity {
         Intent intent = getIntent();
         Uri uri = intent.getData();
 
+        boolean keepEnc = intent.getBooleanExtra(SET_ENC, false);
+        boolean keepVerity = intent.getBooleanExtra(SET_VERITY, false);
+
         switch (getIntent().getStringExtra(SET_ACTION)) {
             case FLASH_ZIP:
                 new FlashZip(this, uri, rootShellOutput)
@@ -75,9 +82,29 @@ public class FlashActivity extends Activity {
                         .exec();
                 break;
             case PATCH_BOOT:
-                new PatchBootImage(this, uri, intent.getParcelableExtra(SET_BOOT_URI), rootShellOutput)
+                new InstallMagisk(this, rootShellOutput, uri, keepEnc, keepVerity, (Uri) intent.getParcelableExtra(SET_BOOT))
                         .setCallBack(() -> buttonPanel.setVisibility(View.VISIBLE))
                         .exec();
+                break;
+            case FLASH_MAGISK:
+                String boot = intent.getStringExtra(SET_BOOT);
+                if (getApplicationContext().remoteMagiskVersionCode < 1370) {
+                    // Use legacy installation method
+                    getShell().su_raw(
+                            "echo \"BOOTIMAGE=" + boot + "\" > /dev/.magisk",
+                            "echo \"KEEPFORCEENCRYPT=" + keepEnc + "\" >> /dev/.magisk",
+                            "echo \"KEEPVERITY=" + keepVerity + "\" >> /dev/.magisk"
+                    );
+                    new FlashZip(this, uri, rootShellOutput)
+                            .setCallBack(() -> buttonPanel.setVisibility(View.VISIBLE))
+                            .exec();
+                } else {
+                    // Use new installation method
+                    new InstallMagisk(this, rootShellOutput, uri, keepEnc, keepVerity, boot)
+                            .setCallBack(() -> buttonPanel.setVisibility(View.VISIBLE))
+                            .exec();
+                }
+                break;
         }
     }
 

@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
@@ -150,6 +151,10 @@ public class MagiskFragment extends Fragment
                                 DownloadReceiver receiver = null;
                                 switch (idx) {
                                     case 1:
+                                        if (magiskManager.remoteMagiskVersionCode < 1370) {
+                                            magiskManager.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
+                                            return;
+                                        }
                                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                         intent.setType("*/*");
                                         startActivityForResult(intent, SELECT_BOOT_IMG);
@@ -166,13 +171,12 @@ public class MagiskFragment extends Fragment
                                         receiver = new DownloadReceiver() {
                                             @Override
                                             public void onDownloadDone(Uri uri) {
-                                                getShell().su_raw(
-                                                        "echo \"BOOTIMAGE=" + boot + "\" > /dev/.magisk",
-                                                        "echo \"KEEPFORCEENCRYPT=" + keepEncChkbox.isChecked() + "\" >> /dev/.magisk",
-                                                        "echo \"KEEPVERITY=" + keepVerityChkbox.isChecked() + "\" >> /dev/.magisk"
-                                                );
                                                 Intent intent = new Intent(getActivity(), FlashActivity.class);
-                                                intent.setData(uri).putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_ZIP);
+                                                intent.setData(uri)
+                                                        .putExtra(FlashActivity.SET_BOOT, boot)
+                                                        .putExtra(FlashActivity.SET_ENC, keepEncChkbox.isChecked())
+                                                        .putExtra(FlashActivity.SET_VERITY, keepVerityChkbox.isChecked())
+                                                        .putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_MAGISK);
                                                 startActivity(intent);
                                             }
                                         };
@@ -304,10 +308,11 @@ public class MagiskFragment extends Fragment
                 new DownloadReceiver() {
                     @Override
                     public void onDownloadDone(Uri uri) {
-                        // Get the URI of the selected file
                         Intent intent = new Intent(getActivity(), FlashActivity.class);
                         intent.setData(uri)
-                                .putExtra(FlashActivity.SET_BOOT_URI, data.getData())
+                                .putExtra(FlashActivity.SET_BOOT, data.getData())
+                                .putExtra(FlashActivity.SET_ENC, keepEncChkbox.isChecked())
+                                .putExtra(FlashActivity.SET_VERITY, keepVerityChkbox.isChecked())
                                 .putExtra(FlashActivity.SET_ACTION, FlashActivity.PATCH_BOOT);
                         startActivity(intent);
                     }
@@ -350,11 +355,11 @@ public class MagiskFragment extends Fragment
         int status = 0;
         status |= Shell.rootAccess() ? ROOT : 0;
         status |= Utils.checkNetworkStatus(magiskManager) ? NETWORK : 0;
-        status |= magiskManager.magiskVersionCode >= 130 ? UPTODATE : 0;
+        status |= magiskManager.magiskVersionCode >= 1300 ? UPTODATE : 0;
         magiskUpdateCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
         safetyNetCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
         bootImageCard.setVisibility(Utils.checkBits(status, NETWORK, ROOT) ? View.VISIBLE : View.GONE);
-        installOptionCard.setVisibility(Utils.checkBits(status, NETWORK, ROOT) ? View.VISIBLE : View.GONE);
+        installOptionCard.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
         installButton.setVisibility(Utils.checkBits(status, NETWORK) ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(Utils.checkBits(status, UPTODATE, ROOT) ? View.VISIBLE : View.GONE);
 
