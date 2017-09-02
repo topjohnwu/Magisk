@@ -291,7 +291,7 @@ public class MagiskManager extends Application {
         if (Utils.isValidShellResponse(res)) {
             bootBlock = res.get(0);
         } else {
-            blockList = shell.su("ls -d /dev/block/mmc* /dev/block/sd* 2>/dev/null");
+            blockList = shell.su("find /dev/block -type b | grep -vE 'dm-0|ram|loop'");
         }
     }
 
