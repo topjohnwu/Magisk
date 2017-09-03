@@ -22,6 +22,8 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -126,7 +128,7 @@ public class ZipUtils {
     public static void removeTopFolder(InputStream in, File output) throws IOException {
         try {
             JarInputStream source = new JarInputStream(in);
-            JarOutputStream dest = new JarOutputStream(new FileOutputStream(output));
+            JarOutputStream dest = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
             JarEntry entry;
             String path;
             int size;
@@ -157,7 +159,7 @@ public class ZipUtils {
     }
 
     public static void unzip(File zip, File folder, String path, boolean junkPath) throws Exception {
-        InputStream in = new FileInputStream(zip);
+        InputStream in = new BufferedInputStream(new FileInputStream(zip));
         unzip(in, folder, path, junkPath);
         in.close();
     }
@@ -198,7 +200,7 @@ public class ZipUtils {
     public static void signZip(Context context, File input, File output, boolean minSign) {
         int alignment = 4;
         JarFile inputJar = null;
-        FileOutputStream outputFile = null;
+        BufferedOutputStream outputFile = null;
         int hashes = 0;
         try {
             X509Certificate publicKey = readPublicKey(context.getAssets().open(PUBLIC_KEY_NAME));
@@ -210,7 +212,7 @@ public class ZipUtils {
             long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
             PrivateKey privateKey = readPrivateKey(context.getAssets().open(PRIVATE_KEY_NAME));
 
-            outputFile = new FileOutputStream(output);
+            outputFile = new BufferedOutputStream(new FileOutputStream(output));
             if (minSign) {
                 ZipUtils.signWholeFile(input, publicKey, privateKey, outputFile);
             } else {

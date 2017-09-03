@@ -114,7 +114,6 @@
     <string name="copying_msg">Copying zip to temp directory</string>
     <string name="zip_install_progress_title">Installing</string>
     <string name="zip_unzip_msg">Unzipping zip file …</string>
-    <string name="zip_process_msg">Processing zip file …</string>
     <string name="zip_install_progress_msg">Installing %1$s …</string>
     <string name="no_magisk_title">Magisk Is Not Installed!</string>
     <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
@@ -130,7 +129,10 @@
     <string name="understand">I understand</string>
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
+    <string name="zip_download_title">Downloading</string>
+    <string name="zip_download_msg">Downloading zip file …</string>
     <string name="zip_process_title">Processing</string>
+    <string name="zip_process_msg">Processing zip file …</string>
     <string name="manual_boot_image">Please manually select a boot image!</string>
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install</string>

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -21,7 +20,6 @@ import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.Module;
 import com.topjohnwu.magisk.module.Repo;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
@@ -106,26 +104,13 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
-                    .setPositiveButton(R.string.install, (d, i) -> Utils.dlAndReceive(
-                            context,
-                            new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Uri uri) {
-                                    new ProcessRepoZip((Activity) context, uri, true).exec();
-                                }
-                            },
-                            repo.getZipUrl(),
-                            Utils.getLegalFilename(filename)))
-                    .setNeutralButton(R.string.download, (d, i) -> Utils.dlAndReceive(
-                            context,
-                            new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Uri uri) {
-                                    new ProcessRepoZip((Activity) context, uri, false).exec();
-                                }
-                            },
-                            repo.getZipUrl(),
-                            Utils.getLegalFilename(filename)))
+                    .setPositiveButton(R.string.install, (d, i) ->
+                        new ProcessRepoZip((Activity) context, repo.getZipUrl(),
+                                Utils.getLegalFilename(filename), true).exec()
+                    )
+                    .setNeutralButton(R.string.download, (d, i) ->
+                        new ProcessRepoZip((Activity) context, repo.getZipUrl(),
+                                Utils.getLegalFilename(filename), false).exec())
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });
