@@ -52,7 +52,7 @@
     <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU\'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
     <string name="version_none">(Hiçbiri)</string>
     <string name="reinstall">Yeniden Yükle</string>
-    <string name="update">Güncelle</string>
+    <string name="update">Güncelle %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>

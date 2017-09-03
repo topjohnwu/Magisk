@@ -217,7 +217,7 @@
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
     <string name="reinstall">重新安裝</string>
-    <string name="update">更新</string>
+    <string name="update">更新 %1$s</string>
     <string name="magisk_updates">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>

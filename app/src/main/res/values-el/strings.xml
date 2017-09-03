@@ -51,7 +51,7 @@
     <string name="uninstall_magisk_msg">Αυτό θα αφαιρέσει όλες τις ενότητες, το MagiskSU και πιθανόν να κρυπτογραφήσει τα δεδομένα σας αν δεν είναι κρυπτογραφυμένα\nΕίστε σίγουρος/η ότι θέλετε να συνεχίσετε;</string>
     <string name="version_none">(Καμία)</string>
     <string name="reinstall">Επανεγκατάσταση</string>
-    <string name="update">Ενημέρωση</string>
+    <string name="update">Ενημέρωση %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>

@@ -47,7 +47,7 @@
     <string name="uninstall_magisk_msg">Aceasta va elimina toate modulele, MagiskSU, şi potențial să cripteze datele, dacă nu sunt criptate\nContinuaţi?</string>
     <string name="version_none">(Niciuna)</string>
     <string name="reinstall">Re-Instalare</string>
-    <string name="update">Actualizare</string>
+    <string name="update">Actualizare %1$s</string>
   
 
     <!--Module Fragment-->

@@ -32,6 +32,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -112,6 +113,26 @@ public class MagiskFragment extends Fragment
     @OnClick(R.id.install_button)
     public void install() {
         shownDialog = true;
+
+        // Show Manager update first
+        if (magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+            new AlertDialogBuilder(getActivity())
+                    .setTitle(getString(R.string.repo_install_title, getString(R.string.app_name)))
+                    .setMessage(getString(R.string.repo_install_msg,
+                            Utils.getLegalFilename("MagiskManager-v" +
+                            magiskManager.remoteManagerVersionString + ".apk")))
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.install, (d, i) -> {
+                        Intent intent = new Intent(magiskManager, ManagerUpdate.class);
+                        intent.putExtra(MagiskManager.INTENT_LINK, magiskManager.managerLink);
+                        intent.putExtra(MagiskManager.INTENT_VERSION, magiskManager.remoteManagerVersionString);
+                        getActivity().sendBroadcast(intent);
+                    })
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .show();
+            return;
+        }
+
         String bootImage = null;
         if (Shell.rootAccess()) {
             if (magiskManager.bootBlock != null) {
@@ -427,10 +448,17 @@ public class MagiskFragment extends Fragment
             magiskUpdateText.setText(getString(R.string.install_magisk_title, "v" + magiskManager.remoteMagiskVersionString));
         }
 
-        if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
-            installText.setText(R.string.update);
+        if (magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+            installText.setText(getString(R.string.update, getString(R.string.app_name)));
+        } else if (magiskManager.magiskVersionCode > 0 && magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
+            installText.setText(getString(R.string.update, getString(R.string.magisk)));
         } else {
             installText.setText(R.string.install);
+        }
+
+        if (!shownDialog && (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode
+                || magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE)) {
+                install();
         }
 
         magiskUpdateIcon.setImageResource(image);
@@ -439,9 +467,6 @@ public class MagiskFragment extends Fragment
 
         magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
-
-        if (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode && !shownDialog)
-            install();
     }
 
     private void updateSafetyNetUI() {

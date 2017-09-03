@@ -50,10 +50,11 @@
 <string name="uninstall">Desinstalar</string>
 <string name="reboot_countdown">A reiniciar em %1$d</string>
 <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-<string name="uninstall_magisk_msg">Isso irá remover todos os módulos, MagiskSU, e Potencialmente encriptar seus dados se estiverem encriptados\nDeseja continuar?</string>
+<string name="uninstall_magisk_msg">Isso irá remover todos os módulos, MagiskSU, e Potencialmente encriptar seus dados se estiverem encriptados
+\nDeseja continuar?</string>
 <string name="version_none">(Nenhum)</string>
 <string name="reinstall">Reinstalar</string>
-<string name="update">Atualizar</string>
+<string name="update">Atualizar %1$s</string>
 
 <!--Module Fragment-->
 <string name="no_info_provided">(Nenhuma informação fornecida)</string>
@@ -119,13 +120,16 @@
 <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
 <string name="release_notes">Notas da atualização</string>
 <string name="repo_cache_cleared">Cache do repositório apagado</string>
-<string name="safetyNet_hide_notice">Esta aplicação usa SafetyNet\nJá manipulado pelo MagiskHide por padrão</string>
+<string name="safetyNet_hide_notice">Esta aplicação usa SafetyNet
+\nJá manipulado pelo MagiskHide por padrão</string>
 <string name="start_magiskhide">A iniciar MagiskHide …</string>
 <string name="no_magisksu_title">Não está a usar MagiskSU!</string>
-<string name="no_magisksu_msg">Não está root instalado com MagiskSU, Usar somente MagiskHide pode não ser suficiente!\nNão é oficialmente suportado, E precisaria de ferramentas adicionais (ex: suhide) para passar pelo SafetyNet.</string>
+<string name="no_magisksu_msg">Não está root instalado com MagiskSU, Usar somente MagiskHide pode não ser suficiente!
+\nNão é oficialmente suportado, E precisaria de ferramentas adicionais (ex: suhide) para passar pelo SafetyNet.</string>
 <string name="understand">Eu entendo</string>
 <string name="process_error">Erro no processo</string>
-<string name="internal_storage">O zip foi guardado em:\n[Armazenamento interno]%1$s</string>
+<string name="internal_storage">O zip foi guardado em:
+\n[Armazenamento interno]%1$s</string>
 <string name="zip_process_title">A processar</string>
 <string name="manual_boot_image">Por Favor, selecione manualmente a imagem de Arranque</string>
 <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
@@ -197,7 +201,8 @@
 <string name="deny">Negar</string>
 <string name="prompt">Perguntar</string>
 <string name="grant">Permitir</string>
-<string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se não tiver certeza!</string>
+<string name="su_warning">Concede acesso total ao seu dispositivo.
+\nNegue se não tiver certeza!</string>
 <string name="forever">Sempre</string>
 <string name="once">Uma vez</string>
 <string name="tenmin">10 minutos</string>

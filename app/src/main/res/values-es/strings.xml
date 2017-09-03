@@ -53,7 +53,7 @@
     <string name="uninstall_magisk_msg">Esto eliminará todos los módulos, MagiskSU, y potencialmente puede cifrar sus datos si no está encriptada\nEstas seguro de continuar?</string>
     <string name="version_none">(Ninguno)</string>
     <string name="reinstall">Re-Instalar</string>
-    <string name="update">Actualización</string>
+    <string name="update">Actualización %1$s</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>

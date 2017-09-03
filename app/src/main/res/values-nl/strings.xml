@@ -53,7 +53,7 @@
     <string name="uninstall_magisk_msg">Dit verwijdert alle modules, MagiskSU, en versleutelt mogelijk alle niet-versleutelde data\nZeker weten voortzetten?</string>
     <string name="version_none">(Geen)</string>
     <string name="reinstall">Herinstalleren</string>
-    <string name="update">Bijwerken</string>
+    <string name="update">Bijwerken %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Geen info verstrekt)</string>

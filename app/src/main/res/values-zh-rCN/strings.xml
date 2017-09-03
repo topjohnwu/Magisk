@@ -53,7 +53,7 @@
     <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
     <string name="version_none">（无）</string>
     <string name="reinstall">重新安装</string>
-    <string name="update">更新</string>
+    <string name="update">更新 %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供信息）</string>

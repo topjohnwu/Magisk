@@ -52,7 +52,7 @@
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
     <string name="version_none">(Немає даних)</string>
     <string name="reinstall">Перевстановити</string>
-    <string name="update">Оновити</string>
+    <string name="update">Оновити %1$s</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(Немає наданої інформації)</string>
