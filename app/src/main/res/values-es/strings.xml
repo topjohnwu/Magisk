@@ -81,7 +81,7 @@
 
     <!--About Activity-->
     <string name="about">Acerca de</string>
-    <string name="app_developers">Desarroladores principales</string>
+    <string name="app_developers">Desarrolladores principales</string>
     <string name="app_developers_"><![CDATA[Aplicación creada por <a href="https://github.com/topjohnwu">topjohnwu</a> en colaboración con <a href="https://github.com/d8ahazard">Digitalhigh</a> y <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Registro de cambios de la aplicación</string>
     <string name="translators">Gawenda, netizen, Deiki, Nosi>, dark-basic</string>
@@ -128,18 +128,23 @@
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Procesando</string>
-    <string name="manual_boot_image">¡Selecciona manualmente una imagen de arranque!</string>
+    <string name="manual_boot_image">¡Selecciona manualmente una imagen boot!</string>
     <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
     <string name="hide_manager_toast">Ocultando Magisk Manager...</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
-
+    <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
+    <string name="patch_boot_file">Parcheo de la imagen boot</string>
+    <string name="direct_install">Instalación Directa (Recomendado)</string>
+    <string name="select_method">Seleccionar Método</string>
+    <string name="no_boot_file_patch_support">La versión de Magisk no admite el parcheo de la imagen boot</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
-    <string name="settings_dark_theme_summary">Habilita el tema oscuro</string>
+    <string name="settings_dark_theme_summary">Habilitar el tema oscuro</string>
     <string name="settings_notification_title">Notificar Actualización</string>
     <string name="settings_notification_summary">Notificar cuando una nueva versión esté disponible</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
@@ -148,6 +153,12 @@
     <string name="settings_hide_manager_summary">Ocultar temporalmente Magisk Manager.\nEsto instalará una nueva aplicación llamada \"Unhide Magisk Manager\"</string>  
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
+    <string name="settings_update">Ajustes de Actualización</string>
+    <string name="settings_update_channel_title">Canal de Actualización</string>
+    <string name="settings_update_stable">Estable</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
+    <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
     
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y archivo hosts fuera de la partición de sistema seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
