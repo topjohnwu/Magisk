@@ -195,5 +195,18 @@
     <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
     <string name="settings_hide_manager_summary">暫時隱藏 Magisk Manager。\n這會新增一個新的 app 叫做 Unhide Magisk Manager</string>
+    <string name="settings_update_channel_title">更新頻道</string>
+    <string name="settings_update_stable">穩定版</string>
+    <string name="settings_update_beta">測試版</string>
+    <string name="download_zip_only">僅下載 Zip</string>
+    <string name="patch_boot_file">補丁 Boot 映像文件檔</string>
+    <string name="direct_install">直接安裝 (推薦)</string>
+    <string name="select_method">選擇安裝方法</string>
+    <string name="no_boot_file_patch_support">目標安裝版本不支援補丁 Boot 映像文件</string>
+    <string name="settings_update">更新設定</string>
+    <string name="settings_boot_format_title">已補丁 Boot 映像輸出格式</string>
+    <string name="zip_download_title">正在下載</string>
+    <string name="zip_download_msg">正在下載 Zip 文件 …</string>
+    <string name="settings_boot_format_summary">選擇已補丁 Boot 映像文件輸出格式\n若要透過 fastboot/download 模式刷入，請選擇 .img 格式；若要透過 ODIN 刷入，則選擇 .img.tar\n</string>
 
 </resources>
