@@ -1,42 +1,30 @@
  <resources>
     <!--Universal-->
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Gezinme çekmecesini aç</string>
-    <string name="navigation_drawer_close">Gezinme çekmecesini kapat</string>
-    <string name="modules">Modüller</string>
+     <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
     <string name="log">Günlük</string>
     <string name="settings">Ayarlar</string>
-    <string name="status">Durum</string>
-    <string name="install">Yükle</string>
+     <string name="install">Yükle</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s yüklü</string>
-    <string name="magisk_version_core_only">Magisk v%1$s yüklü (Yalnızca Çekirdek Modu)</string>
-    <string name="magisk_version_error">Magisk yüklü değil</string>
+     <string name="magisk_version_error">Magisk yüklü değil</string>
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
     <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet bağlantınız yok mu?</string>
-    <string name="up_to_date">%1$s\'in son sürümü yüklü</string>
-    <string name="root_error">Kök erişimli ama kök erişimi izni yok, izin verilmedi mi?</string>
+     <string name="root_error">Kök erişimli ama kök erişimi izni yok, izin verilmedi mi?</string>
     <string name="not_rooted">Kök erişimli değil</string>
-    <string name="proper_root">Uygun şekilde kök erişimi alındı</string>
-    <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
+     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
-    <string name="safetyNet_connection_failed">"Google API\'ye bağlanılamıyor"</string>
-    <string name="safetyNet_connection_suspended">Google API bağlantısı askıya alındı</string>
-    <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
-    <string name="safetyNet_fail">SafetyNet Geçersiz: CTS profili uyumsuzluğu</string>
-    <string name="safetyNet_pass">SafetyNet Geçti</string>
-    <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
+     <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
+     <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
     <string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
-    <string name="root_info_warning">İşlevsellik çok sınırlıdır</string>
 
-    <!--Install Fragment-->
+     <!--Install Fragment-->
     <string name="auto_detect">(Otomatik) %1$s</string>
     <string name="cannot_auto_detect">(Otomatik algılanamıyor)</string>
     <string name="boot_image_title">Önyükleme İmajı Konumu</string>
@@ -50,9 +38,7 @@
     <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU\'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
-    <string name="version_none">(Hiçbiri)</string>
-    <string name="reinstall">Yeniden Yükle</string>
-    <string name="update">Güncelle %1$s</string>
+     <string name="update">Güncelle %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -63,9 +49,8 @@
     <string name="disable_file_created">Modül sonraki yeniden başlatmada devre dışı bırakılacak</string>
     <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
     <string name="author">Yapımcı: %1$s</string>
-    <string name="fab_flash_zip">"Modül Zip\'ini Yükle"</string>
 
-    <!--Repo Fragment-->
+     <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
     <string name="installed">Yüklenmiş</string>
     <string name="not_installed">Yüklenmemiş</string>
@@ -98,33 +83,19 @@
     <string name="close">Kapat</string>
     <string name="repo_install_title">%1$s yükle</string>
     <string name="repo_install_msg">%1$s yüklensin mi?</string>
-    <string name="download_install">İndir &amp; Yükle</string>
-    <string name="download">İndir</string>
-    <string name="goto_install">\"Yükleme\" bölümüne git</string>
-    <string name="download_file_error">Dosya indirme hatası</string>
+     <string name="download">İndir</string>
+     <string name="download_file_error">Dosya indirme hatası</string>
     <string name="install_error">Yükleme hatası!</string>
     <string name="invalid_zip">Zip Magisk Modülü değil!!</string>
-    <string name="reboot_title">Yükleme başarılı!</string>
-    <string name="reboot_msg">Şimdi yeniden başlatmak istiyor musunuz?</string>
-    <string name="reboot">Yeniden başlat</string>
-    <string name="copying_msg">Zip geçici klasöre kopyalanıyor</string>
-    <string name="zip_install_progress_title">Yükleniyor</string>
-    <string name="zip_unzip_msg">Zip dosyası açılıyor …</string>
-    <string name="zip_process_msg">Zip dosyası işleniyor …</string>
-    <string name="zip_install_progress_msg">%1$s yükleniyor …</string>
-    <string name="no_magisk_title">Magisk Yüklü Değil!</string>
-    <string name="no_magisk_msg">"Magisk\'i indirip yüklemek istiyor musunuz?"</string>
-    <string name="downloading_toast">%1$s indiriliyor</string>
+     <string name="reboot">Yeniden başlat</string>
+     <string name="zip_process_msg">Zip dosyası işleniyor …</string>
+     <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
     <string name="safetyNet_hide_notice">Bu uygulama, SafetyNet kullanıyor\nZaten MagiskHide tarafından varsayılan olarak ele alındı</string>
-    <string name="start_magiskhide">MagiskHide başlatılıyor …</string>
-    <string name="no_magisksu_title">MagiskSU kullanılmıyor!</string>
-    <string name="no_magisksu_msg">"MagiskSU ile kök erişimli değilsiniz, MagiskHide\'ın kendisini kullanmak yeterli olmayabilir!\nResmi olarak desteklenmez ve SafetyNet\'i geçmek için ek araçlar (ör. suhide) gerekir."</string>
-    <string name="understand">Anladım</string>
-    <string name="process_error">İşlem hatası</string>
+     <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
     <string name="zip_process_title">İşleniyor</string>
     <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>
@@ -147,9 +118,7 @@
     <string name="settings_core_only_title">Magisk Yalnızca Çekirdek Modu</string>
     <string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
-    <string name="settings_busybox_title">"BusyBox\'ı etkinleştir"</string>
-    <string name="settings_busybox_summary">"Magisk\'in dahili busybox\'ını xbin\'e bağla"</string>
-    <string name="settings_hosts_title">Sistemsiz host</string>
+     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
 
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>

@@ -2,35 +2,24 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Mở thanh điều hướng</string>
-    <string name="navigation_drawer_close">Đóng thanh điều hướng</string>
     <string name="modules">Mô-đun</string>
     <string name="downloads">Tải xuống</string>
     <string name="superuser">Superuser</string>
     <string name="log">Nhật ký</string>
     <string name="settings">Thiết lập</string>
-    <string name="status">Trạng thái</string>
     <string name="install">Cài đặt</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Đã cài Magisk v%1$s</string>
     <string name="magisk_version_error">Magisk chưa được cài đặt</string>
 
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
     <string name="magisk_update_available">Magisk v%1$s available!</string>
     <string name="cannot_check_updates">Không thể kiểm tra cập nhật, không có Internet?</string>
-    <string name="up_to_date">Đã cài đặt phiên bản mới nhất của %1$s</string>
     <string name="root_error">Đã root nhưng không có quyền root, chưa được cho phép?</string>
     <string name="not_rooted">Chưa root</string>
-    <string name="proper_root">Đã root thành công</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
-    <string name="safetyNet_connection_failed">Không thể kết nối với API của Google</string>
-    <string name="safetyNet_connection_suspended">Kết nối với API của Google đã dừng</string>
     <string name="safetyNet_no_response">Không thể kiểm tra SafetyNet, không có Internet?</string>
-    <string name="safetyNet_fail">SafetyNet thất bại: cấu hình CTS không phù hợp</string>
-    <string name="safetyNet_pass">SafetyNet thành công</string>
-    <string name="root_info_warning">Tính năng bị hạn chế rất nhiều</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Tự động) %1$s</string>
@@ -46,7 +35,6 @@
     <string name="reboot_countdown">Khởi động lại trong %1$d</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Việc này sẽ xoá tất cả các mô-đun, MagiskSU và có khả năng sẽ mã hoá dữ liệu nếu chưa được mã hoá\nBạn chắc muốn tiếp tục?</string>
-    <string name="version_none">(Không có)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
@@ -57,7 +45,6 @@
     <string name="disable_file_created">Mô-đun sẽ bị vô hiệu ở lần khởi động lại kế tiếp</string>
     <string name="disable_file_removed">Mô-đun sẽ được kích hoạt ở lần khởi động lại kế tiếp</string>
     <string name="author">Tạo bởi %1$s</string>
-    <string name="fab_flash_zip">Cài file zip của Mô-đun</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Có cập nhật mới</string>
@@ -92,32 +79,18 @@
     <string name="close">Đóng</string>
     <string name="repo_install_title">Cài đặt %1$s</string>
     <string name="repo_install_msg">Bạn muốn cài đặt %1$s ?</string>
-    <string name="download_install">Tải xuống &amp; Cài đặt</string>
     <string name="download">Tải xuống</string>
-    <string name="goto_install">Mở phần \"Cài đặt\"</string>
     <string name="download_file_error">Lỗi tải tập tin</string>
     <string name="install_error">Lỗi cài đặt!</string>
     <string name="invalid_zip">Tập tin zip không phải mô-đun Magisk!!</string>
-    <string name="reboot_title">Cài đặt thành công!</string>
-    <string name="reboot_msg">Bạn muốn khởi động lại ngay chứ?</string>
     <string name="reboot">Khởi động lại</string>
-    <string name="copying_msg">Đang chép zip vào thư mục tạm</string>
-    <string name="zip_install_progress_title">Đang cài đặt</string>
-    <string name="zip_unzip_msg">Đang giải nén tập tin …</string>
     <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
-    <string name="zip_install_progress_msg">Đang cài đặt %1$s …</string>
-    <string name="no_magisk_title">Chưa cài Magisk!</string>
-    <string name="no_magisk_msg">Bạn muốn tải xuống và cài đặt Magisk chứ?</string>
     <string name="downloading_toast">Đang tải xuống %1$s</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Ghi chú phát hành</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
     <string name="safetyNet_hide_notice">Ứng dụng này dùng SafetyNet\nĐã được MagiskHide xử lý theo mặc định</string>
-    <string name="start_magiskhide">Đang khởi động MagiskHide …</string>
-    <string name="no_magisksu_title">Không dùng MagiskSU!</string>
-    <string name="no_magisksu_msg">Bạn không root với MagiskSU, sử dụng mỗi MagiskHide có thể sẽ không đủ hiệu quả!\nViệc này không được hỗ trợ chính thức và có thể bạn cần thêm công cụ khác (suhide chẳng hạn) để vượt Safety Net.</string>
-    <string name="understand">Tôi hiểu</string>
     <string name="process_error">Lỗi xử lý</string>
     <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
     <string name="zip_process_title">Đang xử lý</string>
@@ -133,8 +106,6 @@
     <string name="settings_clear_cache_summary">Xoá thông tin truy cập nhật về các kho mô-đun, buộc ứng dụng làm mới trực tuyến</string>
 
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
-    <string name="settings_busybox_title">Dùng BusyBox</string>
-    <string name="settings_busybox_summary">Gắn kết busy có sẵn của Magisk tới xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
 

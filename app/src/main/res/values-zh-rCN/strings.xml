@@ -2,40 +2,28 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="modules">模块</string>
     <string name="downloads">下载</string>
     <string name="superuser">超级用户</string>
     <string name="log">日志</string>
     <string name="settings">设置</string>
-    <string name="status">状态</string>
     <string name="install">安装</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">已安装 Magisk v%1$s</string>
-    <string name="magisk_version_core_only">已安装 Magisk v%1$s （仅核心功能）</string>
     <string name="magisk_version_error">未安装 Magisk</string>
 
     <string name="checking_for_updates">正在检查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="cannot_check_updates">无法检查更新，没有网络连接？</string>
-    <string name="up_to_date">已安装最新版本的 %1$s</string>
     <string name="root_error">已 ROOT 但没有 ROOT 权限，未授予权限？</string>
     <string name="not_rooted">未 ROOT</string>
-    <string name="proper_root">已正确 ROOT</string>
     <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
-    <string name="safetyNet_connection_failed">无法连接至 Google API</string>
-    <string name="safetyNet_connection_suspended">与 Google API 的连接已暂停</string>
     <string name="safetyNet_no_response">无法验证 SafetyNet，没有网络连接？</string>
-    <string name="safetyNet_fail">SafetyNet 无效：CTS 配置文件不匹配</string>
-    <string name="safetyNet_pass">SafetyNet 已通过</string>
     <string name="safetyNet_network_loss">网络连接不可用</string>
     <string name="safetyNet_service_disconnected">服务已被取消</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
-    <string name="root_info_warning">功能严重受限</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">（自动） %1$s</string>
@@ -51,8 +39,6 @@
     <string name="reboot_countdown">将在 %1$d 后重启</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
-    <string name="version_none">（无）</string>
-    <string name="reinstall">重新安装</string>
     <string name="update">更新 %1$s</string>
 
     <!--Module Fragment-->
@@ -64,7 +50,6 @@
     <string name="disable_file_created">模块将在下次重启后禁用</string>
     <string name="disable_file_removed">模块将在下次重启后启用</string>
     <string name="author">作者：%1$s</string>
-    <string name="fab_flash_zip">刷入模块 Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
@@ -99,32 +84,18 @@
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">你想要立即安装 %1$s 吗？</string>
-    <string name="download_install">下载并安装</string>
     <string name="download">下载</string>
-    <string name="goto_install">前往“安装”界面</string>
     <string name="download_file_error">下载文件时出错</string>
     <string name="install_error">安装出错！</string>
     <string name="invalid_zip">此 zip 文件不是 Magisk 模块！！</string>
-    <string name="reboot_title">安装成功！</string>
-    <string name="reboot_msg">你想要立即重启吗？</string>
     <string name="reboot">重启</string>
-    <string name="copying_msg">正在复制 zip 到临时目录</string>
-    <string name="zip_install_progress_title">正在安装</string>
-    <string name="zip_unzip_msg">正在解压 zip 文件 …</string>
     <string name="zip_process_msg">正在处理 zip 文件 …</string>
-    <string name="zip_install_progress_msg">正在安装 %1$s …</string>
-    <string name="no_magisk_title">未安装 Magisk！</string>
-    <string name="no_magisk_msg">你想要下载并安装 Magisk 吗？</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">资源库缓存已清除</string>
     <string name="safetyNet_hide_notice">此应用使用了 SafetyNet\n已默认由 MagiskHide 处理</string>
-    <string name="start_magiskhide">正在启动 MagiskHide …</string>
-    <string name="no_magisksu_title">未使用 MagiskSU！</string>
-    <string name="no_magisksu_msg">你未使用 MagiskSU 进行 ROOT，仅使用 MagiskHide 可能并不足够！\n官方并不支持，你需要额外的工具（如 suhide）才能通过 Safety Net。</string>
-    <string name="understand">我明白</string>
     <string name="process_error">处理失败</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储]%1$s</string>
     <string name="zip_process_title">正在处理</string>
@@ -159,8 +130,6 @@
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
-    <string name="settings_busybox_title">启用 BusyBox</string>
-    <string name="settings_busybox_summary">将 Magisk 内置的 Busybox 挂载到 xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
 

@@ -1,35 +1,23 @@
 <resources>
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Deschide sertarul de navigare</string>
-    <string name="navigation_drawer_close">Închide sertarul de navigare</string>
     <string name="modules">Module</string>
     <string name="downloads">Descărcări</string>
     <string name="superuser">Superuser</string>
     <string name="log">Jurnal</string>
     <string name="settings">Setări</string>
-    <string name="status">Stare</string>
     <string name="install">Instalare</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk instalat v%1$s</string>
-    <string name="magisk_version_core_only">Magisk instalat v%1$s (Mod de bază)</string>
     <string name="magisk_version_error">Magisk nu este instalat</string>
 
     <string name="checking_for_updates">Verificare actualizări…</string>
     <string name="magisk_update_available">Magisk v%1$s disponibil!</string>
     <string name="cannot_check_updates">Nu se pot verifica actualizările, nu este internet?</string>
-    <string name="up_to_date">Ultima versiune a %1$s este instalată</string>
     <string name="root_error">Root obţinut, dar fără permisiune root, nu este permis?</string>
     <string name="not_rooted">Nu este obţinut root</string>
-    <string name="proper_root">Root obţinut corect</string>
     <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
-    <string name="safetyNet_connection_failed">Nu se poate conecta la Google API</string>
-    <string name="safetyNet_connection_suspended">Conexiunea la API-ul Google a fost suspendată</string>
     <string name="safetyNet_no_response">Nu se poate verifica SafetyNet, nu este internet?</string>
-    <string name="safetyNet_fail">SafetyNet eșuat: nepotrivire profil CTS</string>
-    <string name="safetyNet_pass">SafetyNet a trecut</string>
-    <string name="root_info_warning">Funcționalitatea este foarte limitată</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -45,8 +33,6 @@
     <string name="reboot_countdown">Repornire în %1$d</string>
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="uninstall_magisk_msg">Aceasta va elimina toate modulele, MagiskSU, şi potențial să cripteze datele, dacă nu sunt criptate\nContinuaţi?</string>
-    <string name="version_none">(Niciuna)</string>
-    <string name="reinstall">Re-Instalare</string>
     <string name="update">Actualizare %1$s</string>
   
 
@@ -59,7 +45,6 @@
     <string name="disable_file_created">Modulul va fi dezactivat la următoarea repornire</string>
     <string name="disable_file_removed">Modulul va fi activat la următoarea repornire</string>
     <string name="author">Creat de %1$s</string>
-    <string name="fab_flash_zip">Modul Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
@@ -94,32 +79,18 @@
     <string name="close">Închide</string>
     <string name="repo_install_title">Instalare %1$s</string>
     <string name="repo_install_msg">Instalaţi %1$s?</string>
-    <string name="download_install">Descărcare şi instalare</string>
     <string name="download">Descărcare</string>
-    <string name="goto_install">Accesaţi secţiunea \"Instalare\"</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
     <string name="install_error">Eroare de instalare!</string>
     <string name="invalid_zip">Zip-ul nu este un modul Magisk!</string>
-    <string name="reboot_title">Instalarea a reușit!</string>
-    <string name="reboot_msg">Reporniţi acum?</string>
     <string name="reboot">Repornire</string>
-    <string name="copying_msg">Copierea zip-ului în dosarul temp</string>
-    <string name="zip_install_progress_title">Instalare</string>
-    <string name="zip_unzip_msg">Dezarhivarea fișierului zip…</string>
     <string name="zip_process_msg">Procesare fişierului zip…</string>
-    <string name="zip_install_progress_msg">Instalare %1$s…</string>
-    <string name="no_magisk_title">Magisk nu este instalat!</string>
-    <string name="no_magisk_msg">Doriți să descărcați și să instalați Magisk?</string>
     <string name="downloading_toast">Descărcare %1$s</string>
     <string name="magisk_update_title">O nouă actualizare Magisk este disponibilă!</string>
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>
     <string name="repo_cache_cleared">Arhive cache eliminate</string>
     <string name="safetyNet_hide_notice">Această aplicație utilizează SafetyNet\nDeja gestionat de MagiskHide în mod implicit</string>
-    <string name="start_magiskhide">Pornire MagiskHide…</string>
-    <string name="no_magisksu_title">Nu se utilizează MagiskSU!</string>
-    <string name="no_magisksu_msg">Nu aţi obţinut acces la root cu MagiskSU, utilizarea MagiskHide s-ar putea să nu fie suficientă!\nNu este susținută oficial și veți avea nevoie de instrumente suplimentare (de ex. suhide) pentru a trece Safety Net.</string>
-    <string name="understand">Înţeleg</string>
     <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
     <string name="zip_process_title">Procesare</string>
@@ -147,8 +118,6 @@
     <string name="settings_core_only_title">Mod de bază</string>
     <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide şi systemless hosts vor fi în continuare activate</string>
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
-    <string name="settings_busybox_title">Activare BusyBox</string>
-    <string name="settings_busybox_summary">Montare busybox Magisk în xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts suport pentru aplicațiile Adblock</string>
 

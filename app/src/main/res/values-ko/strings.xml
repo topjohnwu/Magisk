@@ -2,36 +2,24 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">내비게이션 서랍 열기</string>
-    <string name="navigation_drawer_close">내비게이션 서랍 닫기</string>
     <string name="modules">모듈</string>
     <string name="downloads">다운로드</string>
     <string name="superuser">슈퍼유저</string>
     <string name="log">로그</string>
     <string name="settings">설정</string>
-    <string name="status">상태</string>
     <string name="install">설치</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s 설치됨</string>
-    <string name="magisk_version_core_only">Magisk v%1$s 설치됨 (핵심 기능 모드)</string>
     <string name="magisk_version_error">Magisk가 설치되지 않음</string>
 
     <string name="checking_for_updates">업데이트 확인 중…</string>
     <string name="magisk_update_available">Magisk v%1$s 사용 가능!</string>
     <string name="cannot_check_updates">업데이트를 확인할 수 없음. 인터넷 연결을 확인하세요.</string>
-    <string name="up_to_date">최신 버전의 %1$s 설치됨</string>
     <string name="root_error">루팅은 되어 있으나 루트 권한을 얻을 수 없음. 루트 권한 허용 상태를 확인하세요.</string>
     <string name="not_rooted">루팅이 되어 있지 않음</string>
-    <string name="proper_root">정상적으로 루팅됨</string>
     <string name="safetyNet_check_text">SafetyNet 체크를 시작하려면 누르기</string>
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
-    <string name="safetyNet_connection_failed">Google API에 연결할 수 없음</string>
-    <string name="safetyNet_connection_suspended">Google API에 대한 연결이 일시 중지됨</string>
     <string name="safetyNet_no_response">SafetyNet 체크 실패. 인터넷 연결을 확인하세요.</string>
-    <string name="safetyNet_fail">SafetyNet 실패: CTS 프로필 불일치</string>
-    <string name="safetyNet_pass">SafetyNet 통과</string>
-    <string name="root_info_warning">기능이 크게 제한됨</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(자동) %1$s</string>
@@ -47,7 +35,6 @@
     <string name="reboot_countdown">%1$d초 안에 다시 시작됨</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
     <string name="uninstall_magisk_msg">모든 모듈과 MagiskSU를 제거합니다. 또한 데이터가 암호화되어 있지 않은 경우 암호화될 가능성이 있습니다.\n정말 계속하시겠습니까?</string>
-    <string name="version_none">(없음)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(제공된 정보 없음)</string>
@@ -58,7 +45,6 @@
     <string name="disable_file_created">모듈이 다음 다시 시작 시 비활성화됨</string>
     <string name="disable_file_removed">모듈이 다음 다시 시작 시 활성화됨</string>
     <string name="author">제작: %1$s</string>
-    <string name="fab_flash_zip">모듈 ZIp 파일 플래싱</string>
 
     <!--Repo Fragment-->
     <string name="update_available">업데이트 있음</string>
@@ -93,31 +79,17 @@
     <string name="close">닫기</string>
     <string name="repo_install_title">%1$s 설치</string>
     <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
-    <string name="download_install">다운로드 및 설치</string>
-    <string name="goto_install">\"설치\" 섹션으로 이동</string>
     <string name="download_file_error">파일 다운로드 오류</string>
     <string name="install_error">설치 오류!</string>
     <string name="invalid_zip">이 zip 파일은 Magisk 모듈이 아닙니다!!</string>
-    <string name="reboot_title">설치 성공!</string>
-    <string name="reboot_msg">지금 기기를 다시 시작하시겠습니까?</string>
     <string name="reboot">다시 시작</string>
-    <string name="copying_msg">임시 디렉터리에 zip 파일 복사 중</string>
-    <string name="zip_install_progress_title">설치 중</string>
-    <string name="zip_unzip_msg">zip 파일 압축 해제 중…</string>
     <string name="zip_process_msg">zip 파일 처리 중…</string>
-    <string name="zip_install_progress_msg">%1$s 설치 중…</string>
-    <string name="no_magisk_title">Magisk가 설치되어 있지 않습니다!</string>
-    <string name="no_magisk_msg">Magisk를 다운로드하고 설치하시겠습니까?</string>
     <string name="downloading_toast">%1$s 다운로드 중</string>
     <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
     <string name="settings_reboot_toast">기기를 다시 시작하면 설정이 적용됩니다.</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="repo_cache_cleared">저장소 캐시 비워짐</string>
     <string name="safetyNet_hide_notice">이 앱은 MagiskHide에서\n이미 기본적으로 관리하는 SafetyNet을 사용합니다.</string>
-    <string name="start_magiskhide">MagiskHide 시작 중…</string>
-    <string name="no_magisksu_title">MagiskSU를 사용하고 있지 않습니다!</string>
-    <string name="no_magisksu_msg">MagiskSU로 루팅이 되어있지 않아 MagiskHide 하나만으로는 충분하지 않을 수 있습니다!\n이는 공식적으로 지원되지 않으며, SafetyNet을 통과하려면 추가적인 도구(suhide 등)가 필요할 수 있습니다.</string>
-    <string name="understand">알겠습니다</string>
     <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
     <string name="zip_process_title">처리 중</string>
@@ -135,8 +107,6 @@
     <string name="settings_core_only_title">Magisk 핵심 기능 모드</string>
     <string name="settings_core_only_summary">핵심 기능만 사용합니다. 모든 모듈은 로드하지 않습니다. MagiskSU, MagiskHide 및 systemless hosts 는 계속 사용할 수 있습니다.</string>
     <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>
-    <string name="settings_busybox_title">BusyBox 사용</string>
-    <string name="settings_busybox_summary">xbin 디렉터리에 Magisk의 빌트인 busybox를 바인드합니다.</string>
     <string name="settings_hosts_title">systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
 

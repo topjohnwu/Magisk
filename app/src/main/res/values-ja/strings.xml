@@ -2,36 +2,24 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">ナビゲーションドロワーを開く</string>
-    <string name="navigation_drawer_close">ナビゲーションドロワーを閉じる</string>
     <string name="modules">モジュール</string>
     <string name="downloads">ダウンロード</string>
     <string name="superuser">スーパーユーザー</string>
     <string name="log">ログ</string>
     <string name="settings">設定</string>
-    <string name="status">ステータス</string>
     <string name="install">インストール</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s がインストール済</string>
-    <string name="magisk_version_core_only">Magisk v%1$s がインストール済（コアモード）</string>
     <string name="magisk_version_error">Magisk がインストールされていません</string>
 
     <string name="checking_for_updates">更新を確認中...</string>
     <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
     <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
-    <string name="up_to_date">最新の %1$s がインストール済です</string>
     <string name="root_error">Root化はされていますが権限がありません。拒否していませんか？</string>
     <string name="not_rooted">Root化されていません</string>
-    <string name="proper_root">正常にroot化済</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
-    <string name="safetyNet_connection_failed">Google APIに接続できませんでした</string>
-    <string name="safetyNet_connection_suspended">Google APIへの接続が中断されました</string>
     <string name="safetyNet_no_response">SafetyNetをチェックできませんでした。インターネットに接続されていますか？</string>
-    <string name="safetyNet_fail">SafetyNet Failed: CTSプロファイルが不一致</string>
-    <string name="safetyNet_pass">SafetyNet Passed</string>
-    <string name="root_info_warning">機能が大幅に制限されています</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
@@ -47,7 +35,6 @@
     <string name="reboot_countdown">%1$dで再起動します</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
     <string name="uninstall_magisk_msg">これにより、すべてのモジュールとMagiskSUを削除します。暗号化されていないデータが暗号化される可能性があります。\ n続行しますか？</string>
-    <string name="version_none">(なし)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>
@@ -58,7 +45,6 @@
     <string name="disable_file_created">次の再起動時にモジュールを無効にする</string>
     <string name="disable_file_removed">次の再起動時にモジュールを有効にする</string>
     <string name="author">作者: %1$s</string>
-    <string name="fab_flash_zip">モジュールのzipを焼く</string>
 
     <!--Repo Fragment-->
     <string name="update_available">利用可能な更新</string>
@@ -93,32 +79,18 @@
     <string name="close">閉じる</string>
     <string name="repo_install_title">%1$s をインストール</string>
     <string name="repo_install_msg">%1$s をインストールしますか？</string>
-    <string name="download_install">ダウンロード &amp; インストール</string>
     <string name="download">ダウンロード</string>
-    <string name="goto_install">インストール画面に移動する</string>
     <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
     <string name="install_error">インストールエラー！</string>
     <string name="invalid_zip">このzipはMagiskモジュールではありません</string>
-    <string name="reboot_title">インストールに成功しました！</string>
-    <string name="reboot_msg">今すぐ再起動しますか？</string>
     <string name="reboot">再起動</string>
-    <string name="copying_msg">一時ディレクトリへのzipをコピー中</string>
-    <string name="zip_install_progress_title">インストール中…</string>
-    <string name="zip_unzip_msg">zipファイルの解凍中…</string>
     <string name="zip_process_msg">zipファイルの処理中…</string>
-    <string name="zip_install_progress_msg">%1$s をインストール中…</string>
-    <string name="no_magisk_title">Magiskがインストールされていません！</string>
-    <string name="no_magisk_msg"> Magiskをダウンロードしてインストールしますか？</string>
     <string name="downloading_toast">%1$s をダウンロード中</string>
     <string name="magisk_update_title">新しいMagiskの更新が利用可能です！</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">リリースノート</string>
     <string name="repo_cache_cleared">リポジトリキャッシュを消去しました</string>
     <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用しています。\n既定ではMagiskHideで既に処理されています</string>
-    <string name="start_magiskhide">MagiskHideを開始中…</string>
-    <string name="no_magisksu_title">MagiskSUを使用していません！</string>
-    <string name="no_magisksu_msg">あなたのデバイスはMagiskSUにrootされていません。MagiskHideを使用するだけでは十分ではありません。\nそれは正式にサポートされておらず、あなたはSafetyNetを通過するために追加ツール（例えばsuhide）が必要です。</string>
-    <string name="understand">了解</string>
     <string name="process_error">プロセスエラー</string>
     <string name="internal_storage">zipは:\n[Internal Storage]%1$sに保存されます</string>
     <string name="zip_process_title">処理</string>
@@ -136,8 +108,6 @@
     <string name="settings_core_only_title">Magisk コアモード</string>
     <string name="settings_core_only_summary">コア機能のみを有効にすると、すべてのモジュールがロードされなくなります。 MagiskSU、MagiskHide、systemless hostsは引き続き有効になります。</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠す</string>
-    <string name="settings_busybox_title">BusyBoxを有効にする</string>
-    <string name="settings_busybox_summary">Magiskに搭載するBusyBoxをxbinにバインドする</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">AdblockのためのSystemless hostsサポート</string>
 

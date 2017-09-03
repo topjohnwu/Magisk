@@ -4,41 +4,29 @@
     <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Modules</string>
     <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Settings</string>
-    <string name="status">Status</string>
     <string name="install">Install</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s Installed</string>
-    <string name="magisk_version_core_only">Magisk v%1$s Installed (Core Only Mode)</string>
     <string name="magisk_version_error">Magisk is not installed</string>
 
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="magisk_update_available">Magisk v%1$s is available!</string>
     <string name="cannot_check_updates">Cannot check for updates, no internet?</string>
-    <string name="up_to_date">Latest version of %1$s is installed</string>
     <string name="root_error">Rooted but no root permission, not allowed?</string>
     <string name="not_rooted">Not rooted</string>
-    <string name="proper_root">Properly rooted</string>
     <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Was Successful</string>
-    <string name="safetyNet_connection_failed">Cannot connect to Google API</string>
-    <string name="safetyNet_connection_suspended">Connection to Google API was suspended</string>
     <string name="safetyNet_no_response">Cannot verify SafetyNet, no internet?</string>
-    <string name="safetyNet_fail">SafetyNet Invalid: CTS profile mismatch</string>
-    <string name="safetyNet_pass">SafetyNet Passed</string>
     <string name="safetyNet_network_loss">Network connection unavailable</string>
     <string name="safetyNet_service_disconnected">Service has been killed</string>
     <string name="safetyNet_res_invalid">The response is invalid</string>
-    <string name="root_info_warning">Functionality is greatly limited</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -54,8 +42,6 @@
     <string name="reboot_countdown">Rebooting in %1$d</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">This will remove all modules, MagiskSU, and potentially encrypt your data if not encrypted\nAre you sure to continue?</string>
-    <string name="version_none">(None)</string>
-    <string name="reinstall">Re-Install</string>
     <string name="update">Update %1$s</string>
 
     <!--Module Fragment-->
@@ -67,7 +53,6 @@
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
     <string name="author">Created by %1$s</string>
-    <string name="fab_flash_zip">Flash Module Zip</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Update Available</string>
@@ -102,31 +87,17 @@
     <string name="close">Close</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
-    <string name="download_install">Download &amp; Install</string>
     <string name="download">Download</string>
-    <string name="goto_install">Go to \"Install\" section</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="install_error">Installation error!</string>
     <string name="invalid_zip">This zip is not a Magisk Module!</string>
-    <string name="reboot_title">Installation succeeded!</string>
-    <string name="reboot_msg">Do you want to reboot now?</string>
     <string name="reboot">Reboot</string>
-    <string name="copying_msg">Copying zip to temp directory</string>
-    <string name="zip_install_progress_title">Installing</string>
-    <string name="zip_unzip_msg">Unzipping zip file …</string>
-    <string name="zip_install_progress_msg">Installing %1$s …</string>
-    <string name="no_magisk_title">Magisk Is Not Installed!</string>
-    <string name="no_magisk_msg">Do you want to download and install Magisk?</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="magisk_update_title">New Magisk Update Available!</string>
     <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
-    <string name="start_magiskhide">Starting MagiskHide …</string>
-    <string name="no_magisksu_title">Not using MagiskSU!</string>
-    <string name="no_magisksu_msg">You are not rooted with MagiskSU, using MagiskHide itself might not be enough!\nIt\'s not officially supported, and you would need additional tools (e.g suhide) to pass Safety Net.</string>
-    <string name="understand">I understand</string>
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Downloading</string>
@@ -168,8 +139,6 @@
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
     <string name="settings_core_only_summary">Enable only core features, all modules will not be loaded. MagiskSU, MagiskHide, and systemless hosts will still be enabled</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
-    <string name="settings_busybox_title">Enable BusyBox</string>
-    <string name="settings_busybox_summary">Bind mount Magisk\'s built-in busybox to xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
 

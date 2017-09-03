@@ -2,40 +2,28 @@
     <!--Universal-->
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Öppna navigeringslåda</string>
-    <string name="navigation_drawer_close">Stäng navigeringslåda</string>
     <string name="modules">Moduler</string>
     <string name="downloads">Nerladdningar</string>
     <string name="superuser">Superuser</string>
     <string name="log">Logg</string>
     <string name="settings">Inställningar</string>
-    <string name="status">Status</string>
     <string name="install">Install</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk v%1$s installerad</string>
-    <string name="magisk_version_core_only">Magisk v%1$s installerad (endast kärnläge)</string>
     <string name="magisk_version_error">Magisk är inte installerad</string>
 
     <string name="checking_for_updates">Söker efter uppdateringar…</string>
     <string name="magisk_update_available">Magisk v%1$s tillgänglig!</string>
     <string name="cannot_check_updates">Kan inte söka efter uppdateringar, inget internet?</string>
-    <string name="up_to_date">Senaste version av %1$s installerad</string>
     <string name="root_error">Rootad men inga root-rättigheter, inte tillåtet?</string>
     <string name="not_rooted">Inte rootad</string>
-    <string name="proper_root">Troligen rootad</string>
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
-    <string name="safetyNet_connection_failed">Kan inte ansluta till Google-API</string>
-    <string name="safetyNet_connection_suspended">Anslutningen till Google-API stängdes av</string>
     <string name="safetyNet_no_response">Kan inte kontrollera SafetyNet, inget internet?</string>
-    <string name="safetyNet_fail">SafetyNet misslyckades: CTS-profilen matchade inte</string>
-    <string name="safetyNet_pass">SafetyNet godkänd</string>
     <string name="safetyNet_network_loss">Tappade nätverksanslutningen</string>
     <string name="safetyNet_service_disconnected">Tjänsten har dödats</string>
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
-    <string name="root_info_warning">Funktionen är mycket begränsad</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -51,8 +39,6 @@
     <string name="reboot_countdown">Omstart om %1$d</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="uninstall_magisk_msg">Detta kommer att ta bort alla moduler, MagiskSU, och potentiellt kryptera din data om inte krypterad\nÄr det säker du vill fortsätta?</string>
-    <string name="version_none">(Inga)</string>
-    <string name="reinstall">Installera om</string>
     <string name="update">Uppdatera %1$s</string>
 
     <!--Module Fragment-->
@@ -64,7 +50,6 @@
     <string name="disable_file_created">Modulen kommer att inaktiveras vid nästa omstart</string>
     <string name="disable_file_removed">Modulen kommer att aktiveras vid nästa omstart</string>
     <string name="author">Skapad av %1$s</string>
-    <string name="fab_flash_zip">Flasha ZIP-modul</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Uppdatering tillgänglig</string>
@@ -99,32 +84,18 @@
     <string name="close">Stäng</string>
     <string name="repo_install_title">Installera %1$s</string>
     <string name="repo_install_msg">Vill du installera %1$s ?</string>
-    <string name="download_install">Ladda ner &amp; installera</string>
     <string name="download">Ladda ner</string>
-    <string name="goto_install">Gå till sektionen \"Installera\"</string>
     <string name="download_file_error">Fel vid nerladdning av fil</string>
     <string name="install_error">Installation error!</string>
     <string name="invalid_zip">ZIP-filen är inte en modul till Magisk!</string>
-    <string name="reboot_title">Installationen lyckades!</string>
-    <string name="reboot_msg">Vill du starta om nu?</string>
     <string name="reboot">Starta om</string>
-    <string name="copying_msg">Kopierar ZIP-filen till temp-katalogen</string>
-    <string name="zip_install_progress_title">Installerar</string>
-    <string name="zip_unzip_msg">Packar upp ZIP-filen …</string>
     <string name="zip_process_msg">Bearbetar ZIP-filen …</string>
-    <string name="zip_install_progress_msg">Installerar %1$s …</string>
-    <string name="no_magisk_title">Magisk är inte installerad!</string>
-    <string name="no_magisk_msg">Vill du ladda ner och installera Magisk?</string>
     <string name="downloading_toast">Laddar ner %1$s</string>
     <string name="magisk_update_title">En uppdatering av Magisk finns tillgänglig!</string>
     <string name="settings_reboot_toast">Starta om för att tillämpa inställningar</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo-cache rensad</string>
     <string name="safetyNet_hide_notice">Denna appen använder SafetyNet\nHanteras redan av MagiskHide som standard</string>
-    <string name="start_magiskhide">Startar MagiskHide …</string>
-    <string name="no_magisksu_title">Använder inte MagiskSU!</string>
-    <string name="no_magisksu_msg">Du är inte rootad med MagiskSU och att endast använda MagiskHide kanske inte räcker!\nDet stöds inte officiellt och du skulle behöva ytterligare verktyg (t.ex suhide) för att ta dig förbi Safety Net.</string>
-    <string name="understand">Jag förstår</string>
     <string name="process_error">Processfel</string>
     <string name="internal_storage">ZIP-filen är sparad i:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Arbetar</string>
@@ -145,8 +116,6 @@
     <string name="settings_core_only_title">Endast Magisk kärnläge</string>
     <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU, MagiskHide och systemless hosts kommer fortfarande att vara aktiverade</string>
     <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
-    <string name="settings_busybox_title">Aktivera BusyBox</string>
-    <string name="settings_busybox_summary">Bind mount Magisk\'s inbyggda busybox till xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts-stöd för Adblock-appar</string>
 

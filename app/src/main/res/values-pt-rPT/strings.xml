@@ -2,42 +2,30 @@
 <!--Universal-->
 
 <!--Welcome Activity-->
-<string name="navigation_drawer_open">Abrir gaveta de notificações</string>
-<string name="navigation_drawer_close">Fechar gaveta de notificações</string>
-<string name="modules">Módulos</string>
+    <string name="modules">Módulos</string>
 <string name="downloads">Transferir</string>
 <string name="superuser">Super-Utilizador</string>
 <string name="log">Registo</string>
 <string name="settings">Definições</string>
-<string name="status">Estado</string>
-<string name="install">Instalar</string>
+    <string name="install">Instalar</string>
 
 <!--Status Fragment-->
-<string name="magisk_version">Magisk v%1$s Instalado</string>
-<string name="magisk_version_core_only">Magisk v%1$s Instalado(Somente em modo Core)</string>
-<string name="magisk_version_error">Magisk não instalado</string>
+    <string name="magisk_version_error">Magisk não instalado</string>
 
 <string name="checking_for_updates">A procurar por atualizações…</string>
 <string name="magisk_update_available">Magisk v%1$s disponível!</string>
 <string name="cannot_check_updates">Não foi possível verificar atualizações, sem internet?</string>
-<string name="up_to_date">Última versão do %1$s instalado</string>
-<string name="root_error">Com root mas sem permissão de root, o acesso foi permitido?</string>
+    <string name="root_error">Com root mas sem permissão de root, o acesso foi permitido?</string>
 <string name="not_rooted">Sem root</string>
-<string name="proper_root">Root instalado corretamente</string>
-<string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
+    <string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
 <string name="checking_safetyNet_status">A verificar o estado do SafetyNet…</string>
 <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
-<string name="safetyNet_connection_failed">Não é possível ligar à API do Google</string>
-<string name="safetyNet_connection_suspended">A ligação com API do Google foi suspensa</string>
-<string name="safetyNet_no_response">Não é possível verificar o SafetyNet, sem Internet?</string>
-<string name="safetyNet_fail">SafetyNet Falhou: perfil CTS não corresponde</string>
-<string name="safetyNet_pass">SafetyNet Passado</string>
-<string name="safetyNet_network_loss">Perda de ligação</string>
+    <string name="safetyNet_no_response">Não é possível verificar o SafetyNet, sem Internet?</string>
+    <string name="safetyNet_network_loss">Perda de ligação</string>
 <string name="safetyNet_service_disconnected">Serviço foi interrompido</string>
 <string name="safetyNet_res_invalid">A resposta é inválida</string>
-<string name="root_info_warning">Funcionalidade muito limitada</string>
 
-<!--Install Fragment-->
+    <!--Install Fragment-->
 <string name="auto_detect">(Auto) %1$s</string>
 <string name="cannot_auto_detect">(Não foi auto detetado)</string>
 <string name="boot_image_title">Local da Imagem de Arranque</string>
@@ -52,9 +40,7 @@
 <string name="uninstall_magisk_title">Desinstalar Magisk</string>
 <string name="uninstall_magisk_msg">Isso irá remover todos os módulos, MagiskSU, e Potencialmente encriptar seus dados se estiverem encriptados
 \nDeseja continuar?</string>
-<string name="version_none">(Nenhum)</string>
-<string name="reinstall">Reinstalar</string>
-<string name="update">Atualizar %1$s</string>
+    <string name="update">Atualizar %1$s</string>
 
 <!--Module Fragment-->
 <string name="no_info_provided">(Nenhuma informação fornecida)</string>
@@ -65,9 +51,8 @@
 <string name="disable_file_created">Módulo será desativado depois de reiniciar</string>
 <string name="disable_file_removed">Módulo será ativado depois de reiniciar</string>
 <string name="author">Criado por %1$s</string>
-<string name="fab_flash_zip">Instalar Módulo Zip</string>
 
-<!--Repo Fragment-->
+    <!--Repo Fragment-->
 <string name="update_available">Atualização disponível</string>
 <string name="installed">Instalado</string>
 <string name="not_installed">Não Instalado</string>
@@ -99,35 +84,20 @@
 <string name="close">Fechar</string>
 <string name="repo_install_title">Instalar %1$s</string>
 <string name="repo_install_msg">Deseja instalar%1$s agora?</string>
-<string name="download_install">Transferir &amp; instalar</string>
-<string name="download">Transferir</string>
-<string name="goto_install">Ir para secção instalar</string>
-<string name="download_file_error">Erro ao transferir ficheiro</string>
+    <string name="download">Transferir</string>
+    <string name="download_file_error">Erro ao transferir ficheiro</string>
 <string name="install_error">Erro na instalação!</string>
 <string name="invalid_zip">Este zip não é um Módulo Magisk!!</string>
-<string name="reboot_title">Instalação bem-sucedida!</string>
-<string name="reboot_msg">Deseja reiniciar agora?</string>
-<string name="reboot">Reiniciar</string>
-<string name="copying_msg">A copiar zip para diretório temporário</string>
-<string name="zip_install_progress_title">A instalar</string>
-<string name="zip_unzip_msg">A descompactar ficheiro zip …</string>
-<string name="zip_process_msg">A processar ficheiro zip …</string>
-<string name="zip_install_progress_msg">A instalar %1$s …</string>
-<string name="no_magisk_title">Magisk Não Instalado!</string>
-<string name="no_magisk_msg">Deseja transferir e instalar o Magisk?</string>
-<string name="downloading_toast">A transferir %1$s</string>
+    <string name="reboot">Reiniciar</string>
+    <string name="zip_process_msg">A processar ficheiro zip …</string>
+    <string name="downloading_toast">A transferir %1$s</string>
 <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
 <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
 <string name="release_notes">Notas da atualização</string>
 <string name="repo_cache_cleared">Cache do repositório apagado</string>
 <string name="safetyNet_hide_notice">Esta aplicação usa SafetyNet
 \nJá manipulado pelo MagiskHide por padrão</string>
-<string name="start_magiskhide">A iniciar MagiskHide …</string>
-<string name="no_magisksu_title">Não está a usar MagiskSU!</string>
-<string name="no_magisksu_msg">Não está root instalado com MagiskSU, Usar somente MagiskHide pode não ser suficiente!
-\nNão é oficialmente suportado, E precisaria de ferramentas adicionais (ex: suhide) para passar pelo SafetyNet.</string>
-<string name="understand">Eu entendo</string>
-<string name="process_error">Erro no processo</string>
+    <string name="process_error">Erro no processo</string>
 <string name="internal_storage">O zip foi guardado em:
 \n[Armazenamento interno]%1$s</string>
 <string name="zip_process_title">A processar</string>
@@ -151,9 +121,7 @@
 <string name="settings_core_only_title">Magisk somente em Modo Core</string>
 <string name="settings_core_only_summary">Ativar somente funcionalidades principais, todos os módulos não serão carregados. MagiskSU, MagiskHide, e systemless hosts ainda estará ativado</string>
 <string name="settings_magiskhide_summary">Oculta Magisk de várias deteções</string>
-<string name="settings_busybox_title">Ativar BusyBox</string>
-<string name="settings_busybox_summary">Ativar systemless hosts</string>
-<string name="settings_hosts_title">Ativar systemless hosts</string>
+    <string name="settings_hosts_title">Ativar systemless hosts</string>
 <string name="settings_hosts_summary">Suporte de systemless para aplicações Adblock</string>
 
 <string name="settings_su_app_adb">Aplicações e ADB</string>

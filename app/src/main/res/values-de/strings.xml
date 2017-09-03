@@ -4,41 +4,29 @@
 
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Navigationsmenü öffnen</string>
-    <string name="navigation_drawer_close">Navigationsmenü schließen</string>
 
     <string name="modules">Module</string>
     <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
     <string name="log">Log</string>
     <string name="settings">Einstellungen</string>
-    <string name="status">Status</string>
     <string name="install">Installieren</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Magisk %1$s ist installiert</string>
-    <string name="magisk_version_core_only">Magisk %1$s ist installiert (nur Kernfunktionen)</string>
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
 
     <string name="checking_for_updates">Suche nach Updates…</string>
     <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
     <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
-    <string name="up_to_date">Die neueste Version von %1$s ist bereits installiert</string>
     <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>
     <string name="not_rooted">Nicht gerootet</string>
-    <string name="proper_root">Ordnungsgemäß gerootet</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
-    <string name="safetyNet_connection_failed">Verbindung zur Google-API fehlgeschlagen</string>
-    <string name="safetyNet_connection_suspended">Verbindung zur Google-API wurde ausgesetzt</string>	
     <string name="safetyNet_no_response">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
-    <string name="safetyNet_fail">SafetyNet nicht bestanden: \"CTS profile mismatch\"</string>
-    <string name="safetyNet_pass">SafetyNet bestanden</string>
     <string name="safetyNet_network_loss">Netzwerkverbindung verloren</string>
     <string name="safetyNet_service_disconnected">Der Dienst wurde beendet</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
-    <string name="root_info_warning">Funktionalität stark eingeschränkt</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">%1$s (autom.)</string>
@@ -54,7 +42,6 @@
     <string name="reboot_countdown">Neustart in %1$d</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Dies entfernt alle Module, MagiskSU und verschlüsselt unter Umständen deine Daten, falls nicht bereits verschlüsselt.\nMöchtest du wirklich fortfahren?</string>
-    <string name="version_none">(keine)</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>
@@ -65,7 +52,6 @@
     <string name="disable_file_created">Modul wird beim nächsten Neustart deaktiviert</string>
     <string name="disable_file_removed">Modul wird beim nächsten Neustart aktiviert</string>
     <string name="author">Erstellt von %1$s</string>
-    <string name="fab_flash_zip">Modul aus Zip-Datei flashen</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Update verfügbar</string>
@@ -100,32 +86,18 @@
     <string name="close">Schließen</string>
     <string name="repo_install_title">Installiere %1$s</string>
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
-    <string name="download_install">Herunterladen &amp; installieren</string>
     <string name="download">Herunterladen</string>
-    <string name="goto_install">Zu \"Installieren\" wechseln</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="install_error">Fehler bei der Installation!</string>
     <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!</string>
-    <string name="reboot_title">Installation erfolgreich!</string>
-    <string name="reboot_msg">Möchtest du jetzt neustarten?</string>
     <string name="reboot">Neustart</string>
-    <string name="copying_msg">Kopiere Zip ins temp-Verzeichnis</string>
-    <string name="zip_install_progress_title">Installiere</string>
-    <string name="zip_unzip_msg">Entpacke Zip-Datei…</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
-    <string name="zip_install_progress_msg">Installiere %1$s…</string>
-    <string name="no_magisk_title">Magisk ist nicht installiert!</string>
-    <string name="no_magisk_msg">Möchtest du Magisk herunterladen und installieren?</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
     <string name="release_notes">Änderungen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
     <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide gehandhabt</string>
-    <string name="start_magiskhide">Starte Magisk Hide…</string>
-    <string name="no_magisksu_title">Du benutzt nicht MagiskSU!</string>
-    <string name="no_magisksu_msg">Deine root-Lösung wird nicht offiziell unterstützt und Magisk Hide allein ist eventuell nicht ausreichend!\nEventuell benötigst du weitere Programme (z.B. \"suhide\"), um SafetyNet zu bestehen.</string>
-    <string name="understand">Ich verstehe</string>
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_process_title">Verarbeite</string>
@@ -145,8 +117,6 @@
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
-    <string name="settings_busybox_title">BusyBox aktivieren</string>
-    <string name="settings_busybox_summary">Magisk\'s integriertes BusyBox nach xbin mounten</string>
     <string name="settings_hosts_title">Systemlose hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
 

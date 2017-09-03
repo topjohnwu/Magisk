@@ -1,39 +1,27 @@
 <resources>
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Άνοιγμα συρταριού πλοήγησης</string>
-    <string name="navigation_drawer_close">Κλείσιμο συρταριού πλοήγησης</string>
     <string name="modules">Ενότητες</string>
     <string name="downloads">Λήψεις</string>
     <string name="superuser">Υπερχρήστης</string>
     <string name="log">Aρχείο Kαταγραφής</string>
     <string name="settings">Ρυθμίσεις</string>
-    <string name="status">Κατάσταση</string>
     <string name="install">Εγκατάσταση</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Εγκατεστημένο Magisk v%1$s</string>
-    <string name="magisk_version_core_only">Εγκατεστημένο Magisk v%1$s (Λειτουργία Πυρήνα Μόνο)</string>
     <string name="magisk_version_error">Το Magisk δεν είναι εγκατεστημένο</string>
 
     <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
     <string name="magisk_update_available">Το Magisk v%1$s είναι διαθέσιμο!</string>
     <string name="cannot_check_updates">Αδυναμία ελέγχου για ενημερώσεις, δεν έχει internet;</string>
-    <string name="up_to_date">Η τελευταία έκδοση του %1$s είναι εγκατεστημένη</string>
     <string name="root_error">Υπάρχει root αλλά όχι άδεια για root, δεν επιτρέπεται;</string>
     <string name="not_rooted">Δεν υπάρχει root</string>
-    <string name="proper_root">Rooted κανονικά</string>
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
-    <string name="safetyNet_connection_failed">Αδυναμία σύνδεσης στο Google API</string>
-    <string name="safetyNet_connection_suspended">Η σύνδεση στο Google API διακόπηκε</string>
     <string name="safetyNet_no_response">Αδυναμία επαλήθευσης SafetyNet, δεν έχει internet;</string>
-    <string name="safetyNet_fail">Άκυρο SafetyNet: CTS profile mismatch</string>
-    <string name="safetyNet_pass">Το SafetyNet Πέρασε</string>
     <string name="safetyNet_network_loss">Αδυναμία σύνδεσης στο δίκτυο</string>
     <string name="safetyNet_service_disconnected">Η υπηρεσία τερματίστηκε</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
-    <string name="root_info_warning">Η λειτουργία είναι πολύ περιορισμένη</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Αυτόματα) %1$s</string>
@@ -49,8 +37,6 @@
     <string name="reboot_countdown">Επανεκκίνηση σε %1$d</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Αυτό θα αφαιρέσει όλες τις ενότητες, το MagiskSU και πιθανόν να κρυπτογραφήσει τα δεδομένα σας αν δεν είναι κρυπτογραφυμένα\nΕίστε σίγουρος/η ότι θέλετε να συνεχίσετε;</string>
-    <string name="version_none">(Καμία)</string>
-    <string name="reinstall">Επανεγκατάσταση</string>
     <string name="update">Ενημέρωση %1$s</string>
 
     <!--Module Fragment-->
@@ -62,7 +48,6 @@
     <string name="disable_file_created">Η ενότητα θα απενεργοποιηθεί στην επόμενη επανεκκίνηση</string>
     <string name="disable_file_removed">Η ενότητα θα ενεργοποιηθεί στην επόμενη επανεκκίνηση</string>
     <string name="author">Δημιουργήθηκε από τον/την %1$s</string>
-    <string name="fab_flash_zip">Flash Zip Ενότητας</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Διαθέσιμη Ενημέρωση</string>
@@ -97,32 +82,18 @@
     <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
-    <string name="download_install">Λήψη &amp; Εγκατάσταση</string>
     <string name="download">Λήψη</string>
-    <string name="goto_install">Μεταφορά στο τμήμα \"Εγκατάσταση\"</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
     <string name="install_error">Σφάλμα εγκατάστασης!</string>
     <string name="invalid_zip">Αυτό το zip δεν είναι Ενότητα Magisk!!</string>
-    <string name="reboot_title">Η εγκατάσταση πέτυχε!</string>
-    <string name="reboot_msg">Θέλετε να κάνετε επανεκκίνηση τώρα;</string>
     <string name="reboot">Επανεκκίνηση</string>
-    <string name="copying_msg">Αντιγραφή zip στον προσωρινό κατάλογο</string>
-    <string name="zip_install_progress_title">Εγκατάσταση</string>
-    <string name="zip_unzip_msg">Αποσυμπίεση αρχείου zip …</string>
     <string name="zip_process_msg">Επεξεργασία αρχείου zip …</string>
-    <string name="zip_install_progress_msg">Εγκατάσταση %1$s …</string>
-    <string name="no_magisk_title">Το Magisk δεν είναι εγκατεστημένο!</string>
-    <string name="no_magisk_msg">Θέλετε να κατεβάσετε και να εγκαταστήσετε το Magisk;</string>
     <string name="downloading_toast">Κατέβασμα %1$s</string>
     <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>
     <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
     <string name="safetyNet_hide_notice">Αυτή η εφαρμογή χρησιμοποιεί SafetyNet\nΉδη διαχειρίζεται από το MagiskHide από προεπιλογή</string>
-    <string name="start_magiskhide">Εκκίνηση MagiskHide …</string>
-    <string name="no_magisksu_title">Δεν χρησιμοποιείται το MagiskSU!</string>
-    <string name="no_magisksu_msg">Δεν είστε rooted με το MagiskSU, η χρήση του MagiskHide μόνο μπορεί να μην είναι αρκετή!\nΔεν υποτηρίζεται επισήμως, και θα χρειαζόσασταν πρόσθετα εργαλεία (π.χ. suhide) για να περάσετε το Safety Net.</string>
-    <string name="understand">Καταλαβαίνω</string>
     <string name="process_error">Σφάλμα διαδικασίας</string>
     <string name="internal_storage">Το zip είναι αποθηκευμένο σε:\n[Εσωτερική μνήμη]%1$s</string>
     <string name="zip_process_title">Επεξεργασία</string>
@@ -160,8 +131,6 @@
     <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
     <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU, MagiskHide, και systemless hosts θα παραμείνουν ενεργά</string>
     <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
-    <string name="settings_busybox_title">Ενεργοποίηση BusyBox</string>
-    <string name="settings_busybox_summary">Υποχρεωτική προσάρτηση του ενσωματωμένου busybox του Magisk στο xbin</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Υποστήριξη Systemless hosts για εφαρμογές Adblock</string>
 
