@@ -55,6 +55,8 @@
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
     <string name="uninstall_magisk_msg">Spowoduje to usunięcie wszystkich modułów, MagiskSU i potencjalnie szyfrowanie danych jeśli nie były szyfrowane \ nCzy na pewno kontynuować?</string>
     <string name="version_none">(Brak)</string>
+	<string name="reinstall">Re-instalacja</string>
+    <string name="update">Aktualizacja %1$s</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
@@ -132,8 +134,17 @@
     <string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
-   
-   <!--Settings Activity -->
+    <string name="magisk_updates">Aktualizacja Magisk</string>
+    <string name="flashing">Flashowanie</string>
+    <string name="hide_manager_toast">Ukryj Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Błąd ukrycia Magisk Manager</string>
+    <string name="download_zip_only">Pobierz Tylko Zip</string>
+    <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
+    <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
+    <string name="select_method">Wybierz Metodę</string>
+    <string name="no_boot_file_patch_support">Wersja docelowa programu Magisk nie obsługuje ładowania pliku boot image</string>
+ 
+    <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
@@ -141,8 +152,18 @@
     <string name="settings_notification_summary">Pokaż powiadomienie o aktualizacji kiedy będzie dostępna nowa wersja</string>
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
-
-    <string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
+    <string name="settings_hide_manager_title">Ukryj Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Tymczasowo ukryj Magisk Manager.\nSpowoduje to zainstalowanie nowej aplikacji o nazwie \"Pokaż Magisk Manager\"</string>
+    <string name="language">Język</string>
+    <string name="system_default">(Domyślny Systemu)</string>
+    <string name="settings_update">Aktualizacja Ustawień</string>
+    <string name="settings_update_channel_title">Aktualizacja Kanału</string>
+    <string name="settings_update_stable">Stabilna</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_boot_format_title">Poprawiony format wyjścia rozruchowego</string>
+    <string name="settings_boot_format_summary">Wybierz format wyjściowy pliku boot image.\nWybierz .img do programu za pośrednictwem fastboot/download mode; wybierz .img.tar za pomocą ODINA.</string>
+    
+	<string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Hide Magisk dla wykrytych aplikacji</string>
     <string name="settings_busybox_title">Włącz BusyBox</string>
