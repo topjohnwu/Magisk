@@ -133,7 +133,11 @@
     <string name="flashing">Γίνεται Flash</string>
     <string name="hide_manager_toast">Κρύβοντας το Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Το κρύψιμο Magisk Manager απέτυχε…</string>
-
+    <string name="download_zip_only">Λήψη Zip Μόνο</string>
+    <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>
+    <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
+    <string name="select_method">Επιλογή Μεθόδου</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Γενικά</string>
     <string name="settings_dark_theme_title">Σκούρο θέμα</string>
@@ -146,6 +150,12 @@
     <string name="settings_hide_manager_summary">Προσωρινό κρύψιμο του Magisk Manager.\nΑυτό θα εγκαταστήσει μια νέα εφαρμογή με το όνομα \"Unhide Magisk Manager\"</string>
     <string name="language">Γλώσσα</string>
     <string name="system_default">(Προεπιλογή Συστήματος)</string>
+    <string name="settings_update">Ρυθμίσεις Ενημερώσεων</string>
+    <string name="settings_update_channel_title">Κανάλι Ενημερώσεων</string>
+    <string name="settings_update_stable">Σταθερή</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_boot_format_title">Μορφή Τροποποιημένης Εικόνας Boot</string>
+    <string name="settings_boot_format_summary">Επιλέξτε τη μορφή της εξαγόμενης εικόνας boot μετά το patch.\nΕπιλέξτε .img για flash μέσω λειτουργίας fastboot/download· επιλέξτε .img.tar για flash μέσω ODIN.</string>
 
     <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
     <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU, MagiskHide, και systemless hosts θα παραμείνουν ενεργά</string>
