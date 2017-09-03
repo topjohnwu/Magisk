@@ -91,11 +91,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 if (in == null) throw new FileNotFoundException();
                 BufferedInputStream buf = new BufferedInputStream(in);
                 buf.mark(Integer.MAX_VALUE);
-                ZipUtils.unzip(buf, install, arch, true);
+                ZipUtils.unzip(buf, install, arch + "/", true);
                 buf.reset();
-                ZipUtils.unzip(buf, install, "common", true);
+                ZipUtils.unzip(buf, install, "common/", true);
                 buf.reset();
-                ZipUtils.unzip(buf, install, "chromeos", false);
+                ZipUtils.unzip(buf, install, "chromeos/", false);
                 buf.reset();
                 ZipUtils.unzip(buf, install, "META-INF/com/google/android/update-binary", true);
             } catch (FileNotFoundException e) {

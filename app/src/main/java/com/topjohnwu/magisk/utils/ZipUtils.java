@@ -139,7 +139,7 @@ public class ZipUtils {
                     continue;
                 }
                 // Don't include placeholder
-                if (path.contains("system/placeholder")) {
+                if (path.equals("system/placeholder")) {
                     continue;
                 }
                 dest.putNextEntry(new JarEntry(path));
