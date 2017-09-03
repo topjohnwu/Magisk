@@ -136,6 +136,8 @@ public class MagiskManager extends Application {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         suDB = new SuDatabaseHelper(this);
         repoDB = new RepoDatabaseHelper(this);
+        defaultLocale = Locale.getDefault();
+        setLocale();
         loadConfig();
     }
 
@@ -153,10 +155,6 @@ public class MagiskManager extends Application {
     }
 
     public void loadConfig() {
-        // Locale
-        defaultLocale = Locale.getDefault();
-        setLocale();
-
         isDarkTheme = prefs.getBoolean("dark_theme", false);
         if (BuildConfig.DEBUG) {
             devLogging = prefs.getBoolean("developer_logging", false);
