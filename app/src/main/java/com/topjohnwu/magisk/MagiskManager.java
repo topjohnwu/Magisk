@@ -100,6 +100,7 @@ public class MagiskManager extends Application {
     public int suNamespaceMode;
     public String localeConfig;
     public int updateChannel;
+    public String bootFormat;
 
     // Global resources
     public SharedPreferences prefs;
@@ -176,6 +177,7 @@ public class MagiskManager extends Application {
 
         updateNotification = prefs.getBoolean("notification", true);
         updateChannel = Utils.getPrefsInt(prefs, "update_channel", CheckUpdates.STABLE_CHANNEL);
+        bootFormat = prefs.getString("boot_format", ".img");
     }
 
     public void toast(String msg, int duration) {
@@ -225,6 +227,7 @@ public class MagiskManager extends Application {
                 .putString("mnt_ns", String.valueOf(suNamespaceMode))
                 .putString("update_channel", String.valueOf(updateChannel))
                 .putString("locale", localeConfig)
+                .putString("boot_format", bootFormat)
                 .apply();
 
         // Create notification channel on Android O

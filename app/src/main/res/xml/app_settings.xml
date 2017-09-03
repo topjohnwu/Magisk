@@ -10,6 +10,22 @@
             android:title="@string/settings_dark_theme_title"
             android:summary="@string/settings_dark_theme_summary" />
 
+        <Preference
+            android:key="clear"
+            android:title="@string/settings_clear_cache_title"
+            android:summary="@string/settings_clear_cache_summary" />
+
+        <Preference
+            android:key="hide"
+            android:title="@string/settings_hide_manager_title"
+            android:summary="@string/settings_hide_manager_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="update"
+        android:title="@string/settings_update">
+
         <SwitchPreference
             android:key="notification"
             android:title="@string/settings_notification_title"
@@ -21,15 +37,12 @@
             android:entries="@array/update_channel"
             android:entryValues="@array/value_array" />
 
-        <Preference
-            android:key="clear"
-            android:title="@string/settings_clear_cache_title"
-            android:summary="@string/settings_clear_cache_summary" />
-
-        <Preference
-            android:key="hide"
-            android:title="@string/settings_hide_manager_title"
-            android:summary="@string/settings_hide_manager_summary" />
+        <ListPreference
+            android:key="boot_format"
+            android:title="@string/settings_boot_format_title"
+            android:entries="@array/boot_formats"
+            android:entryValues="@array/boot_formats"
+            android:summary="@string/settings_boot_format_summary"/>
 
     </PreferenceCategory>
 

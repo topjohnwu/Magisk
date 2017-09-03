@@ -8,10 +8,16 @@ import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.AdaptiveList;
+import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.TarEntry;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
+import org.kamranzafar.jtar.TarOutputStream;
+
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -135,7 +141,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             getShell().sh(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot + " 2>&1" +
+                            "update-binary indep boot_patch.sh " + boot +
                             " && echo 'Success!' || echo 'Failed!'"
             );
 
@@ -146,10 +152,36 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             mList.add("");
             switch (mode) {
                 case PATCH_MODE:
-                    // Move boot image
-                    File dest = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + "patched_boot.img");
+                    File dest = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/patched_boot" + mm.bootFormat);
                     dest.getParentFile().mkdirs();
-                    getShell().sh_raw("cp " + patched_boot + " " + dest);
+                    switch (mm.bootFormat) {
+                        case ".img":
+                            getShell().sh_raw("cp -f " + patched_boot + " " + dest);
+                            break;
+                        case ".img.tar":
+                            // Workaround root shell issues so we can access the file through Java
+                            if (Shell.rootAccess()) {
+                                // Get non-root UID
+                                int uid = mm.getApplicationInfo().uid;
+                                // Get app selabel
+                                String selabel = getShell().su("/system/bin/ls -dZ " + install + " | cut -d' ' -f1").get(0);
+                                getShell().su(
+                                        "chcon " + selabel + " " + patched_boot,
+                                        "chown " + uid + "." + uid + " " + patched_boot);
+                            }
+                            TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
+                            tar.putNextEntry(new TarEntry(patched_boot, "boot.img"));
+                            byte buffer[] = new byte[4096];
+                            BufferedInputStream in = new BufferedInputStream(new FileInputStream(patched_boot));
+                            int len;
+                            while ((len = in.read(buffer)) != -1) {
+                                tar.write(buffer, 0, len);
+                            }
+                            tar.flush();
+                            tar.close();
+                            in.close();
+                            break;
+                    }
                     mList.add("*********************************");
                     mList.add(" Patched Boot Image is placed in ");
                     mList.add(" " + dest + " ");

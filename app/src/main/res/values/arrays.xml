@@ -77,4 +77,9 @@
         <item>@string/settings_update_beta</item>
     </string-array>
 
+    <string-array name="boot_formats">
+        <item>.img</item>
+        <item>.img.tar</item>
+    </string-array>
+
 </resources>
