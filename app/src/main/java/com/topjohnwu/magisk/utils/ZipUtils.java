@@ -68,10 +68,13 @@ public class ZipUtils {
     // File name in assets
     private static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
     private static final String PRIVATE_KEY_NAME = "private.key.pk8";
-    private static final String UNHIDE_NAME = "unhide.apk";
+    private static final String UNHIDE_APK = "unhide.apk";
 
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
+
+    private static final String ANDROID_MANIFEST = "AndroidManifest.xml";
+    private static final byte[] UNHIDE_PKG_NAME = "com.topjohnwu.unhide\0".getBytes();
 
     private static Provider sBouncyCastleProvider;
     // bitmasks for which hash algorithms we need the manifest to include.
@@ -90,22 +93,42 @@ public class ZipUtils {
         File temp = new File(context.getCacheDir(), "temp.apk");
         String pkg = "";
         try {
-            JarInputStream source = new JarInputStream(context.getAssets().open(UNHIDE_NAME));
+            JarInputStream source = new JarInputStream(context.getAssets().open(UNHIDE_APK));
             JarOutputStream dest = new JarOutputStream(new FileOutputStream(temp));
             JarEntry entry;
             int size;
             byte buffer[] = new byte[4096];
             while ((entry = source.getNextJarEntry()) != null) {
                 dest.putNextEntry(new JarEntry(entry.getName()));
-                if (TextUtils.equals(entry.getName(), "AndroidManifest.xml")) {
+                if (TextUtils.equals(entry.getName(), ANDROID_MANIFEST)) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     while((size = source.read(buffer)) != -1) {
                         baos.write(buffer, 0, size);
                     }
+                    int offset = -1;
                     byte xml[] = baos.toByteArray();
-                    pkg = Utils.genPackageName("com.", 20);
-                    for (int i = 0; i < 20; ++i) {
-                        xml[424 + i] = (byte) pkg.charAt(i);
+
+                    // Linear search pattern offset
+                    for (int i = 0; i < xml.length - UNHIDE_PKG_NAME.length; ++i) {
+                        boolean match = true;
+                        for (int j = 0; j < UNHIDE_PKG_NAME.length; ++j) {
+                            if (xml[i + j] != UNHIDE_PKG_NAME[j]) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match) {
+                            offset = i;
+                            break;
+                        }
+                    }
+                    if (offset < 0)
+                        return "";
+
+                    // Patch binary XML with new package name
+                    pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
+                    for (int i = 0; i < pkg.length(); ++i) {
+                        xml[offset + i] = (byte) pkg.charAt(i);
                     }
                     dest.write(xml);
                 } else {
