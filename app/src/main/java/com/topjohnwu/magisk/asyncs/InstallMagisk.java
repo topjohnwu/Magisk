@@ -10,8 +10,10 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.TarEntry;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
+import org.kamranzafar.jtar.TarInputStream;
 import org.kamranzafar.jtar.TarOutputStream;
 
 import java.io.BufferedInputStream;
@@ -113,12 +115,27 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     // Copy boot image to local
                     try (
                             InputStream in = mm.getContentResolver().openInputStream(mBootImg);
-                            OutputStream out = new FileOutputStream(boot);
+                            OutputStream out = new FileOutputStream(boot)
                     ) {
+                        InputStream source;
                         if (in == null) throw new FileNotFoundException();
+
+                        if (Utils.getNameFromUri(mm, mBootImg).endsWith(".tar")) {
+                            // Extract boot.img from tar
+                            TarInputStream tar = new TarInputStream(new BufferedInputStream(in));
+                            org.kamranzafar.jtar.TarEntry entry;
+                            while ((entry = tar.getNextEntry()) != null) {
+                                if (entry.getName().equals("boot.img"))
+                                    break;
+                            }
+                            source = tar;
+                        } else {
+                            // Direct copy raw image
+                            source = in;
+                        }
                         byte buffer[] = new byte[1024];
                         int length;
-                        while ((length = in.read(buffer)) > 0)
+                        while ((length = source.read(buffer)) > 0)
                             out.write(buffer, 0, length);
                     } catch (FileNotFoundException e) {
                         mList.add("! Invalid Uri");
@@ -141,7 +158,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             getShell().sh(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot +
+                            "update-binary indep boot_patch.sh " + boot + " 2>&1" +
                             " && echo 'Success!' || echo 'Failed!'"
             );
 
