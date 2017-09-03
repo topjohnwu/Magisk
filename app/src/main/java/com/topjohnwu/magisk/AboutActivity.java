@@ -42,7 +42,7 @@ public class AboutActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getApplicationContext().isDarkTheme) {
+        if (getMagiskManager().isDarkTheme) {
             setTheme(R.style.AppTheme_Transparent_Dark);
         }
         setContentView(R.layout.activity_about);

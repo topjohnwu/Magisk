@@ -54,8 +54,7 @@ public class Activity extends AppCompatActivity {
         permissionGrantCallback = callback;
     }
 
-    @Override
-    public MagiskManager getApplicationContext() {
+    public MagiskManager getMagiskManager() {
         return (MagiskManager) super.getApplicationContext();
     }
 

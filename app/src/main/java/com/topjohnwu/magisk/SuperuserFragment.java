@@ -32,15 +32,15 @@ public class SuperuserFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         PackageManager pm = getActivity().getPackageManager();
-        MagiskManager magiskManager = getApplication();
+        MagiskManager mm = getApplication();
 
-        List<Policy> policyList = magiskManager.suDB.getPolicyList(pm);
+        List<Policy> policyList = mm.suDB.getPolicyList(pm);
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            recyclerView.setAdapter(new PolicyAdapter(policyList, magiskManager.suDB, pm));
+            recyclerView.setAdapter(new PolicyAdapter(policyList, mm.suDB, pm));
             emptyRv.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

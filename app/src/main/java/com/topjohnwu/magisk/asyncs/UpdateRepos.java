@@ -156,8 +156,6 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return null;
         Logger.dev("UpdateRepos: Loading repos");
 
         cached = repoDB.getRepoIDList();
@@ -184,9 +182,9 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return;
-        magiskManager.repoLoadDone.publish();
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return;
+        mm.repoLoadDone.publish();
         super.onPostExecute(v);
     }
 }

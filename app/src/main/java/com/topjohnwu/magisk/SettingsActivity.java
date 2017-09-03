@@ -36,7 +36,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getApplicationContext().isDarkTheme) {
+        if (getMagiskManager().isDarkTheme) {
             setTheme(R.style.AppTheme_Transparent_Dark);
         }
 
@@ -68,7 +68,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
     @Override
     public Topic[] getSubscription() {
-        return new Topic[] { getApplicationContext().reloadActivity };
+        return new Topic[] { getMagiskManager().reloadActivity };
     }
 
     public static class SettingsFragment extends PreferenceFragment
@@ -80,7 +80,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         private ListPreference updateChannel, suAccess, autoRes, suNotification,
                 requestTimeout, multiuserMode, namespaceMode;
-        private MagiskManager magiskManager;
+        private MagiskManager mm;
         private PreferenceCategory generalCatagory;
 
         @Override
@@ -89,7 +89,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             addPreferencesFromResource(R.xml.app_settings);
             prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
             prefScreen = getPreferenceScreen();
-            magiskManager = Utils.getMagiskManager(getActivity());
+            mm = Utils.getMagiskManager(getActivity());
 
             generalCatagory = (PreferenceCategory) findPreference("general");
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
@@ -141,10 +141,10 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 prefScreen.removePreference(suCategory);
                 generalCatagory.removePreference(hideManager);
             } else {
-                if (!magiskManager.isSuClient) {
+                if (!mm.isSuClient) {
                     prefScreen.removePreference(suCategory);
                 }
-                if (magiskManager.magiskVersionCode < 1300) {
+                if (mm.magiskVersionCode < 1300) {
                     prefScreen.removePreference(magiskCategory);
                 }
             }
@@ -155,12 +155,12 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (isNew) {
                 lp = new ListPreference(getActivity());
             }
-            CharSequence[] entries = new CharSequence[magiskManager.locales.size() + 1];
-            CharSequence[] entryValues = new CharSequence[magiskManager.locales.size() + 1];
+            CharSequence[] entries = new CharSequence[mm.locales.size() + 1];
+            CharSequence[] entryValues = new CharSequence[mm.locales.size() + 1];
             entries[0] = getString(R.string.system_default);
             entryValues[0] = "";
             int i = 1;
-            for (Locale locale : magiskManager.locales) {
+            for (Locale locale : mm.locales) {
                 entries[i] = locale.getDisplayName(locale);
                 entryValues[i++] = locale.toLanguageTag();
             }
@@ -196,9 +196,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             switch (key) {
                 case "dark_theme":
                     enabled = prefs.getBoolean("dark_theme", false);
-                    if (magiskManager.isDarkTheme != enabled) {
-                        magiskManager.isDarkTheme = enabled;
-                        magiskManager.reloadActivity.publish(false);
+                    if (mm.isDarkTheme != enabled) {
+                        mm.reloadActivity.publish(false);
                     }
                     break;
                 case "disable":
@@ -231,41 +230,24 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     }
                     break;
                 case "su_access":
-                    magiskManager.suAccessState = Utils.getPrefsInt(prefs, "su_access");
-                    magiskManager.suDB.setSettings(SuDatabaseHelper.ROOT_ACCESS, magiskManager.suAccessState);
+                    mm.suDB.setSettings(SuDatabaseHelper.ROOT_ACCESS, Utils.getPrefsInt(prefs, "su_access"));
                     break;
                 case "multiuser_mode":
-                    magiskManager.multiuserMode = Utils.getPrefsInt(prefs, "multiuser_mode");
-                    magiskManager.suDB.setSettings(SuDatabaseHelper.MULTIUSER_MODE, magiskManager.multiuserMode);
+                    mm.suDB.setSettings(SuDatabaseHelper.MULTIUSER_MODE, Utils.getPrefsInt(prefs, "multiuser_mode"));
                     break;
                 case "mnt_ns":
-                    magiskManager.suNamespaceMode = Utils.getPrefsInt(prefs, "mnt_ns");
-                    magiskManager.suDB.setSettings(SuDatabaseHelper.MNT_NS, magiskManager.suNamespaceMode);
-                    break;
-                case "su_request_timeout":
-                    magiskManager.suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout");
-                    break;
-                case "su_auto_response":
-                    magiskManager.suResponseType = Utils.getPrefsInt(prefs, "su_auto_response");
-                    break;
-                case "su_notification":
-                    magiskManager.suNotificationType = Utils.getPrefsInt(prefs, "su_notification");
-                    break;
-                case "developer_logging":
-                    MagiskManager.devLogging = prefs.getBoolean("developer_logging", false);
-                    break;
-                case "shell_logging":
-                    MagiskManager.shellLogging = prefs.getBoolean("shell_logging", false);
+                    mm.suDB.setSettings(SuDatabaseHelper.MNT_NS, Utils.getPrefsInt(prefs, "mnt_ns"));
                     break;
                 case "locale":
-                    magiskManager.setLocale();
-                    magiskManager.reloadActivity.publish(false);
+                    mm.setLocale();
+                    mm.reloadActivity.publish(false);
                     break;
                 case "update_channel":
-                    magiskManager.updateChannel = Utils.getPrefsInt(prefs, "update_channel");
-                    new CheckUpdates(magiskManager, true).exec();
+                    mm.updateChannel = Utils.getPrefsInt(prefs, "update_channel");
+                    new CheckUpdates(mm, true).exec();
                     break;
             }
+            mm.loadConfig();
             setSummary();
         }
 
@@ -275,19 +257,19 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         private void setSummary() {
             updateChannel.setSummary(getResources()
-                    .getStringArray(R.array.update_channel)[magiskManager.updateChannel]);
+                    .getStringArray(R.array.update_channel)[mm.updateChannel]);
             suAccess.setSummary(getResources()
-                    .getStringArray(R.array.su_access)[magiskManager.suAccessState]);
+                    .getStringArray(R.array.su_access)[mm.suAccessState]);
             autoRes.setSummary(getResources()
-                    .getStringArray(R.array.auto_response)[magiskManager.suResponseType]);
+                    .getStringArray(R.array.auto_response)[mm.suResponseType]);
             suNotification.setSummary(getResources()
-                    .getStringArray(R.array.su_notification)[magiskManager.suNotificationType]);
+                    .getStringArray(R.array.su_notification)[mm.suNotificationType]);
             requestTimeout.setSummary(
                     getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
             multiuserMode.setSummary(getResources()
-                    .getStringArray(R.array.multiuser_summary)[magiskManager.multiuserMode]);
+                    .getStringArray(R.array.multiuser_summary)[mm.multiuserMode]);
             namespaceMode.setSummary(getResources()
-                    .getStringArray(R.array.namespace_summary)[magiskManager.suNamespaceMode]);
+                    .getStringArray(R.array.namespace_summary)[mm.suNamespaceMode]);
         }
 
         @Override
@@ -297,7 +279,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         @Override
         public Topic[] getSubscription() {
-            return new Topic[] { magiskManager.localeDone };
+            return new Topic[] { mm.localeDone };
         }
     }
 

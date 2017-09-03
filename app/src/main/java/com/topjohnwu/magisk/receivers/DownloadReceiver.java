@@ -34,7 +34,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                         onDownloadDone(uri);
                         break;
                     default:
-                        Toast.makeText(context, R.string.download_file_error, Toast.LENGTH_LONG).show();
+                        Utils.getMagiskManager(context).toast(R.string.download_file_error, Toast.LENGTH_LONG);
                         break;
                 }
                 context.unregisterReceiver(this);

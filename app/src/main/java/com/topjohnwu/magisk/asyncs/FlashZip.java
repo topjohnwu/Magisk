@@ -58,14 +58,14 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     @Override
     protected Integer doInBackground(Void... voids) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return -1;
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return -1;
         try {
             mList.add("- Copying zip to temp directory");
 
             mCachedFile.delete();
             try (
-                InputStream in = magiskManager.getContentResolver().openInputStream(mUri);
+                InputStream in = mm.getContentResolver().openInputStream(mUri);
                 OutputStream out = new FileOutputStream(mCachedFile)
             ) {
                 if (in == null) throw new FileNotFoundException();
@@ -97,23 +97,23 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return;
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return;
         getShell().su_raw(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );
         switch (result) {
             case -1:
-                mList.add(magiskManager.getString(R.string.install_error));
+                mList.add(mm.getString(R.string.install_error));
                 Utils.showUriSnack(getActivity(), mUri);
                 break;
             case 0:
-                mList.add(magiskManager.getString(R.string.invalid_zip));
+                mList.add(mm.getString(R.string.invalid_zip));
                 break;
             case 1:
                 // Success
-                new LoadModules(magiskManager).exec();
+                new LoadModules(mm).exec();
                 break;
         }
         super.onPostExecute(result);

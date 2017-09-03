@@ -6,8 +6,6 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
 
-import butterknife.ButterKnife;
-
 public class SnackbarMaker {
 
     public static Snackbar make(Activity activity, CharSequence text, int duration) {
@@ -32,7 +30,7 @@ public class SnackbarMaker {
     }
 
     private static void setup(Snackbar snack) {
-        TextView text = ButterKnife.findById(snack.getView(), android.support.design.R.id.snackbar_text);
+        TextView text = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
         text.setMaxLines(Integer.MAX_VALUE);
     }
 

@@ -59,7 +59,7 @@ public class MagiskFragment extends Fragment
 
     private Container expandableContainer = new Container();
 
-    private MagiskManager magiskManager;
+    private MagiskManager mm;
     private Unbinder unbinder;
     private static boolean shownDialog = false;
 
@@ -115,17 +115,17 @@ public class MagiskFragment extends Fragment
         shownDialog = true;
 
         // Show Manager update first
-        if (magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+        if (mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
             new AlertDialogBuilder(getActivity())
                     .setTitle(getString(R.string.repo_install_title, getString(R.string.app_name)))
                     .setMessage(getString(R.string.repo_install_msg,
                             Utils.getLegalFilename("MagiskManager-v" +
-                            magiskManager.remoteManagerVersionString + ".apk")))
+                            mm.remoteManagerVersionString + ".apk")))
                     .setCancelable(true)
                     .setPositiveButton(R.string.install, (d, i) -> {
-                        Intent intent = new Intent(magiskManager, ManagerUpdate.class);
-                        intent.putExtra(MagiskManager.INTENT_LINK, magiskManager.managerLink);
-                        intent.putExtra(MagiskManager.INTENT_VERSION, magiskManager.remoteManagerVersionString);
+                        Intent intent = new Intent(mm, ManagerUpdate.class);
+                        intent.putExtra(MagiskManager.INTENT_LINK, mm.managerLink);
+                        intent.putExtra(MagiskManager.INTENT_VERSION, mm.remoteManagerVersionString);
                         getActivity().sendBroadcast(intent);
                     })
                     .setNegativeButton(R.string.no_thanks, null)
@@ -135,12 +135,12 @@ public class MagiskFragment extends Fragment
 
         String bootImage = null;
         if (Shell.rootAccess()) {
-            if (magiskManager.bootBlock != null) {
-                bootImage = magiskManager.bootBlock;
+            if (mm.bootBlock != null) {
+                bootImage = mm.bootBlock;
             } else {
                 int idx = spinner.getSelectedItemPosition();
                 if (idx > 0)  {
-                    bootImage = magiskManager.blockList.get(idx - 1);
+                    bootImage = mm.blockList.get(idx - 1);
                 } else {
                     SnackbarMaker.make(getActivity(),
                             R.string.manual_boot_image, Snackbar.LENGTH_LONG).show();
@@ -150,7 +150,7 @@ public class MagiskFragment extends Fragment
         }
         final String boot = bootImage;
         ((NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-        String filename = "Magisk-v" + magiskManager.remoteMagiskVersionString + ".zip";
+        String filename = "Magisk-v" + mm.remoteMagiskVersionString + ".zip";
         new AlertDialogBuilder(getActivity())
             .setTitle(getString(R.string.repo_install_title, getString(R.string.magisk)))
             .setMessage(getString(R.string.repo_install_msg, filename))
@@ -172,8 +172,8 @@ public class MagiskFragment extends Fragment
                                 DownloadReceiver receiver = null;
                                 switch (idx) {
                                     case 1:
-                                        if (magiskManager.remoteMagiskVersionCode < 1370) {
-                                            magiskManager.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
+                                        if (mm.remoteMagiskVersionCode < 1370) {
+                                            mm.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
                                             return;
                                         }
                                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -206,7 +206,7 @@ public class MagiskFragment extends Fragment
                                 Utils.dlAndReceive(
                                         getActivity(),
                                         receiver,
-                                        magiskManager.magiskLink,
+                                        mm.magiskLink,
                                         Utils.getLegalFilename(filename)
                                 );
                             }
@@ -214,10 +214,10 @@ public class MagiskFragment extends Fragment
                 }
             )
             .setNeutralButton(R.string.release_notes, (d, i) -> {
-                if (magiskManager.releaseNoteLink != null) {
-                    Intent openReleaseNoteLink = new Intent(Intent.ACTION_VIEW, Uri.parse(magiskManager.releaseNoteLink));
+                if (mm.releaseNoteLink != null) {
+                    Intent openReleaseNoteLink = new Intent(Intent.ACTION_VIEW, Uri.parse(mm.releaseNoteLink));
                     openReleaseNoteLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    magiskManager.startActivity(openReleaseNoteLink);
+                    mm.startActivity(openReleaseNoteLink);
                 }
             })
             .setNegativeButton(R.string.no_thanks, null)
@@ -231,8 +231,8 @@ public class MagiskFragment extends Fragment
                 .setMessage(R.string.uninstall_magisk_msg)
                 .setPositiveButton(R.string.yes, (d, i) -> {
                     try {
-                        InputStream in = magiskManager.getAssets().open(UNINSTALLER);
-                        File uninstaller = new File(magiskManager.getCacheDir(), UNINSTALLER);
+                        InputStream in = mm.getAssets().open(UNINSTALLER);
+                        File uninstaller = new File(mm.getCacheDir(), UNINSTALLER);
                         FileOutputStream out = new FileOutputStream(uninstaller);
                         byte[] bytes = new byte[1024];
                         int read;
@@ -241,8 +241,8 @@ public class MagiskFragment extends Fragment
                         }
                         in.close();
                         out.close();
-                        in = magiskManager.getAssets().open(UTIL_FUNCTIONS);
-                        File utils = new File(magiskManager.getCacheDir(), UTIL_FUNCTIONS);
+                        in = mm.getAssets().open(UTIL_FUNCTIONS);
+                        File utils = new File(mm.getCacheDir(), UTIL_FUNCTIONS);
                         out = new FileOutputStream(utils);
                         while ((read = in.read(bytes)) != -1) {
                             out.write(bytes, 0, read);
@@ -283,7 +283,7 @@ public class MagiskFragment extends Fragment
         unbinder = ButterKnife.bind(this, v);
         getActivity().setTitle(R.string.magisk);
 
-        magiskManager = getApplication();
+        mm = getApplication();
 
         expandableContainer.expandLayout = expandLayout;
         setupExpandable();
@@ -296,7 +296,7 @@ public class MagiskFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        magiskManager.getMagiskInfo();
+        mm.getMagiskInfo();
         updateUI();
 
         magiskUpdateText.setText(R.string.checking_for_updates);
@@ -305,16 +305,16 @@ public class MagiskFragment extends Fragment
 
         safetyNetStatusText.setText(R.string.safetyNet_check_text);
 
-        magiskManager.safetyNetDone.hasPublished = false;
-        magiskManager.updateCheckDone.hasPublished = false;
-        magiskManager.remoteMagiskVersionString = null;
-        magiskManager.remoteMagiskVersionCode = -1;
+        mm.safetyNetDone.hasPublished = false;
+        mm.updateCheckDone.hasPublished = false;
+        mm.remoteMagiskVersionString = null;
+        mm.remoteMagiskVersionCode = -1;
         collapse();
 
         shownDialog = false;
 
         // Trigger state check
-        if (Utils.checkNetworkStatus(magiskManager)) {
+        if (Utils.checkNetworkStatus(mm)) {
             new CheckUpdates(getActivity()).exec();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -338,24 +338,24 @@ public class MagiskFragment extends Fragment
                         startActivity(intent);
                     }
                 },
-                magiskManager.magiskLink,
-                Utils.getLegalFilename("Magisk-v" + magiskManager.remoteMagiskVersionString + ".zip")
+                mm.magiskLink,
+                Utils.getLegalFilename("Magisk-v" + mm.remoteMagiskVersionString + ".zip")
             );
         }
     }
 
     @Override
     public void onTopicPublished(Topic topic) {
-        if (topic == magiskManager.updateCheckDone) {
+        if (topic == mm.updateCheckDone) {
             updateCheckUI();
-        } else if (topic == magiskManager.safetyNetDone) {
+        } else if (topic == mm.safetyNetDone) {
             updateSafetyNetUI();
         }
     }
 
     @Override
     public Topic[] getSubscription() {
-        return new Topic[] { magiskManager.updateCheckDone, magiskManager.safetyNetDone };
+        return new Topic[] { mm.updateCheckDone, mm.safetyNetDone };
     }
 
     @Override
@@ -374,7 +374,7 @@ public class MagiskFragment extends Fragment
 
         boolean hasNetwork = Utils.checkNetworkStatus(getActivity());
         boolean hasRoot = Shell.rootAccess();
-        boolean isUpToDate = magiskManager.magiskVersionCode > 1300;
+        boolean isUpToDate = mm.magiskVersionCode > 1300;
 
         magiskUpdateCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
@@ -385,14 +385,14 @@ public class MagiskFragment extends Fragment
 
         int image, color;
 
-        if (magiskManager.magiskVersionCode < 0) {
+        if (mm.magiskVersionCode < 0) {
             color = colorBad;
             image = R.drawable.ic_cancel;
             magiskVersionText.setText(R.string.magisk_version_error);
         } else {
             color = colorOK;
             image = R.drawable.ic_check_circle;
-            magiskVersionText.setText(getString(R.string.current_magisk_title, "v" + magiskManager.magiskVersionString));
+            magiskVersionText.setText(getString(R.string.current_magisk_title, "v" + mm.magiskVersionString));
         }
 
         magiskStatusIcon.setImageResource(image);
@@ -405,10 +405,10 @@ public class MagiskFragment extends Fragment
                 rootStatusText.setText(R.string.not_rooted);
                 break;
             case 1:
-                if (magiskManager.suVersion != null) {
+                if (mm.suVersion != null) {
                     color = colorOK;
                     image = R.drawable.ic_check_circle;
-                    rootStatusText.setText(magiskManager.suVersion);
+                    rootStatusText.setText(mm.suVersion);
                     break;
                 }
             case -1:
@@ -422,12 +422,12 @@ public class MagiskFragment extends Fragment
         rootStatusIcon.setColorFilter(color);
 
         List<String> items = new ArrayList<>();
-        if (magiskManager.bootBlock != null) {
-            items.add(getString(R.string.auto_detect, magiskManager.bootBlock));
+        if (mm.bootBlock != null) {
+            items.add(getString(R.string.auto_detect, mm.bootBlock));
             spinner.setEnabled(false);
         } else {
             items.add(getString(R.string.cannot_auto_detect));
-            items.addAll(magiskManager.blockList);
+            items.addAll(mm.blockList);
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, items);
@@ -438,26 +438,26 @@ public class MagiskFragment extends Fragment
     private void updateCheckUI() {
         int image, color;
 
-        if (magiskManager.remoteMagiskVersionCode < 0) {
+        if (mm.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
             image = R.drawable.ic_help;
             magiskUpdateText.setText(R.string.cannot_check_updates);
         } else {
             color = colorOK;
             image = R.drawable.ic_check_circle;
-            magiskUpdateText.setText(getString(R.string.install_magisk_title, "v" + magiskManager.remoteMagiskVersionString));
+            magiskUpdateText.setText(getString(R.string.install_magisk_title, "v" + mm.remoteMagiskVersionString));
         }
 
-        if (magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+        if (mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
             installText.setText(getString(R.string.update, getString(R.string.app_name)));
-        } else if (magiskManager.magiskVersionCode > 0 && magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode) {
+        } else if (mm.magiskVersionCode > 0 && mm.remoteMagiskVersionCode > mm.magiskVersionCode) {
             installText.setText(getString(R.string.update, getString(R.string.magisk)));
         } else {
             installText.setText(R.string.install);
         }
 
-        if (!shownDialog && (magiskManager.remoteMagiskVersionCode > magiskManager.magiskVersionCode
-                || magiskManager.remoteManagerVersionCode > BuildConfig.VERSION_CODE)) {
+        if (!shownDialog && (mm.remoteMagiskVersionCode > mm.magiskVersionCode
+                || mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE)) {
                 install();
         }
 
@@ -473,30 +473,30 @@ public class MagiskFragment extends Fragment
         int image, color;
         safetyNetProgress.setVisibility(View.GONE);
         safetyNetRefreshIcon.setVisibility(View.VISIBLE);
-        if (magiskManager.SNCheckResult.failed) {
-            safetyNetStatusText.setText(magiskManager.SNCheckResult.errmsg);
+        if (mm.SNCheckResult.failed) {
+            safetyNetStatusText.setText(mm.SNCheckResult.errmsg);
             collapse();
         } else {
             safetyNetStatusText.setText(R.string.safetyNet_check_success);
-            if (magiskManager.SNCheckResult.ctsProfile) {
+            if (mm.SNCheckResult.ctsProfile) {
                 color = colorOK;
                 image = R.drawable.ic_check_circle;
             } else {
                 color = colorBad;
                 image = R.drawable.ic_cancel;
             }
-            ctsStatusText.setText("ctsProfile: " + magiskManager.SNCheckResult.ctsProfile);
+            ctsStatusText.setText("ctsProfile: " + mm.SNCheckResult.ctsProfile);
             ctsStatusIcon.setImageResource(image);
             ctsStatusIcon.setColorFilter(color);
 
-            if (magiskManager.SNCheckResult.basicIntegrity) {
+            if (mm.SNCheckResult.basicIntegrity) {
                 color = colorOK;
                 image = R.drawable.ic_check_circle;
             } else {
                 color = colorBad;
                 image = R.drawable.ic_cancel;
             }
-            basicStatusText.setText("basicIntegrity: " + magiskManager.SNCheckResult.basicIntegrity);
+            basicStatusText.setText("basicIntegrity: " + mm.SNCheckResult.basicIntegrity);
             basicStatusIcon.setImageResource(image);
             basicStatusIcon.setColorFilter(color);
             expand();

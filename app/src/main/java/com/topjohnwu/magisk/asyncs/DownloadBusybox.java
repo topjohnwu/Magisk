@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,13 +38,14 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
                     null
             );
             if (in == null) throw new IOException();
+            BufferedInputStream bis = new BufferedInputStream(in);
             byte[] buffer = new byte[4096];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
+            int len;
+            while ((len = bis.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
             }
             out.close();
-            in.close();
+            bis.close();
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -148,10 +148,10 @@ public class Utils {
     }
 
     public static void clearRepoCache(Context context) {
-        MagiskManager magiskManager = getMagiskManager(context);
-        magiskManager.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
-        magiskManager.repoDB.clearRepo();
-        magiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+        MagiskManager mm = getMagiskManager(context);
+        mm.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
+        mm.repoDB.clearRepo();
+        mm.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
     }
 
     public static String getNameFromUri(Context context, Uri uri) {
@@ -185,41 +185,41 @@ public class Utils {
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    public static void showMagiskUpdate(MagiskManager magiskManager) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager, MagiskManager.NOTIFICATION_CHANNEL);
+    public static void showMagiskUpdate(MagiskManager mm) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
-                .setContentTitle(magiskManager.getString(R.string.magisk_update_title))
-                .setContentText(magiskManager.getString(R.string.magisk_update_available, magiskManager.remoteMagiskVersionString))
+                .setContentTitle(mm.getString(R.string.magisk_update_title))
+                .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
-        Intent intent = new Intent(magiskManager, SplashActivity.class);
+        Intent intent = new Intent(mm, SplashActivity.class);
         intent.putExtra(MagiskManager.INTENT_SECTION, "magisk");
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(magiskManager);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mm);
         stackBuilder.addParentStack(SplashActivity.class);
         stackBuilder.addNextIntent(intent);
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(MAGISK_UPDATE_NOTIFICATION_ID,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =
-                (NotificationManager) magiskManager.getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
-    public static void showManagerUpdate(MagiskManager magiskManager) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(magiskManager, MagiskManager.NOTIFICATION_CHANNEL);
+    public static void showManagerUpdate(MagiskManager mm) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
-                .setContentTitle(magiskManager.getString(R.string.manager_update_title))
-                .setContentText(magiskManager.getString(R.string.manager_download_install))
+                .setContentTitle(mm.getString(R.string.manager_update_title))
+                .setContentText(mm.getString(R.string.manager_download_install))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
-        Intent intent = new Intent(magiskManager, ManagerUpdate.class);
-        intent.putExtra(MagiskManager.INTENT_LINK, magiskManager.managerLink);
-        intent.putExtra(MagiskManager.INTENT_VERSION, magiskManager.remoteManagerVersionString);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(magiskManager,
+        Intent intent = new Intent(mm, ManagerUpdate.class);
+        intent.putExtra(MagiskManager.INTENT_LINK, mm.managerLink);
+        intent.putExtra(MagiskManager.INTENT_VERSION, mm.remoteManagerVersionString);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =
-                (NotificationManager) magiskManager.getSystemService(Context.NOTIFICATION_SERVICE);
+                (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 

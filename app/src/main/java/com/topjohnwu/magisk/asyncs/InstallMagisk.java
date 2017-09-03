@@ -64,10 +64,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return false;
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return false;
 
-        File install = new File(magiskManager.getApplicationInfo().dataDir, "install");
+        File install = new File(mm.getApplicationInfo().dataDir, "install");
         getShell().sh_raw("rm -rf " + install);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
@@ -81,7 +81,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         try {
             // Unzip files
             mList.add("- Extracting files");
-            try (InputStream in = magiskManager.getContentResolver().openInputStream(mZip)) {
+            try (InputStream in = mm.getContentResolver().openInputStream(mZip)) {
                 if (in == null) throw new FileNotFoundException();
                 BufferedInputStream buf = new BufferedInputStream(in);
                 buf.mark(Integer.MAX_VALUE);
@@ -106,7 +106,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     boot = new File(install, "boot.img");
                     // Copy boot image to local
                     try (
-                            InputStream in = magiskManager.getContentResolver().openInputStream(mBootImg);
+                            InputStream in = mm.getContentResolver().openInputStream(mBootImg);
                             OutputStream out = new FileOutputStream(boot);
                     ) {
                         if (in == null) throw new FileNotFoundException();

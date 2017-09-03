@@ -59,7 +59,7 @@ public class SuRequestActivity extends Activity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         pm = getPackageManager();
-        magiskManager = getApplicationContext();
+        magiskManager = getMagiskManager();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");

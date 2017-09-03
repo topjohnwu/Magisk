@@ -11,7 +11,7 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getApplicationContext().startup();
+        getMagiskManager().startup();
 
         Intent intent = new Intent(this, MainActivity.class);
         String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);

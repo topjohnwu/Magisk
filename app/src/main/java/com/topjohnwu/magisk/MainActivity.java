@@ -38,11 +38,11 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        getApplicationContext().startup();
+        getMagiskManager().startup();
 
-        prefs = getApplicationContext().prefs;
+        prefs = getMagiskManager().prefs;
 
-        if (getApplicationContext().isDarkTheme) {
+        if (getMagiskManager().isDarkTheme) {
             setTheme(R.style.AppTheme_Dark);
         }
         super.onCreate(savedInstanceState);
@@ -108,21 +108,21 @@ public class MainActivity extends Activity
 
     @Override
     public Topic[] getSubscription() {
-        return new Topic[] { getApplicationContext().reloadActivity };
+        return new Topic[] { getMagiskManager().reloadActivity };
     }
 
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 1300
+                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 1300
                         && prefs.getBoolean("magiskhide", false));
         menu.findItem(R.id.modules).setVisible(
-                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
+                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus(this) &&
-                Shell.rootAccess() && getApplicationContext().magiskVersionCode >= 0);
+                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(
-                Shell.rootAccess() && getApplicationContext().isSuClient);
+                Shell.rootAccess() && getMagiskManager().isSuClient);
     }
 
     public void navigate(String item) {

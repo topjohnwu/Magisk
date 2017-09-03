@@ -24,11 +24,12 @@ public class WebService {
         InputStream in  = request(GET, url, header);
         if (in == null) return "";
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
+        int len;
         StringBuilder builder = new StringBuilder();
+        char buf[] = new char[4096];
         try {
-            while ((line = br.readLine()) != null) {
-                builder.append(line).append("\n");
+            while ((len = br.read(buf)) != -1) {
+                builder.append(buf, 0, len);
             }
             in.close();
         } catch (IOException e) {

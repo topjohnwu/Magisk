@@ -24,7 +24,7 @@ public class SuLogFragment extends Fragment {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
     private Unbinder unbinder;
-    private MagiskManager magiskManager;
+    private MagiskManager mm;
     private SuLogAdapter adapter;
 
     @Override
@@ -45,8 +45,8 @@ public class SuLogFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = ButterKnife.bind(this, v);
-        magiskManager = getApplication();
-        adapter = new SuLogAdapter(magiskManager.suDB);
+        mm = getApplication();
+        adapter = new SuLogAdapter(mm.suDB);
         recyclerView.setAdapter(adapter);
 
         updateList();
@@ -73,7 +73,7 @@ public class SuLogFragment extends Fragment {
                 updateList();
                 return true;
             case R.id.menu_clear:
-                magiskManager.suDB.clearLogs();
+                mm.suDB.clearLogs();
                 updateList();
                 return true;
             default:

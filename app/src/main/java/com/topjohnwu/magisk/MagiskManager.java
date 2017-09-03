@@ -151,7 +151,7 @@ public class MagiskManager extends Application {
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         // Locale
         defaultLocale = Locale.getDefault();
         setLocale();

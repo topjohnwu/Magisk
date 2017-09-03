@@ -27,7 +27,9 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         Node doc = parser.parse(md);
-        return renderer.render(doc);
+        return String.format(
+                "<link rel='stylesheet' type='text/css' href='file:///android_asset/%s.css'/> %s",
+                getMagiskManager().isDarkTheme ? "dark" : "light", renderer.render(doc));
     }
 
     @Override
@@ -36,11 +38,6 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
         alert.setTitle(mTitle);
 
         WebView wv = new WebView(getActivity());
-
-        html = String.format(
-                "<link rel='stylesheet' type='text/css' href='file:///android_asset/%s.css'/> %s",
-                getMagiskManager().isDarkTheme ? "dark" : "light", html);
-
         wv.loadDataWithBaseURL("fake://", html, "text/html", "UTF-8", null);
 
         alert.setView(wv);

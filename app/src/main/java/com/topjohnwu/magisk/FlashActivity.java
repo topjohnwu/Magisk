@@ -88,7 +88,7 @@ public class FlashActivity extends Activity {
                 break;
             case FLASH_MAGISK:
                 String boot = intent.getStringExtra(SET_BOOT);
-                if (getApplicationContext().remoteMagiskVersionCode < 1370) {
+                if (getMagiskManager().remoteMagiskVersionCode < 1370) {
                     // Use legacy installation method
                     getShell().su_raw(
                             "echo \"BOOTIMAGE=" + boot + "\" > /dev/.magisk",

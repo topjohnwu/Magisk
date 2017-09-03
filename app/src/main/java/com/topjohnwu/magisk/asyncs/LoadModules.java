@@ -17,17 +17,17 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return null;
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return null;
         Logger.dev("LoadModules: Loading modules");
 
-        magiskManager.moduleMap = new ValueSortedMap<>();
+        mm.moduleMap = new ValueSortedMap<>();
 
         for (String path : Utils.getModList(getShell(), MagiskManager.MAGISK_PATH)) {
             Logger.dev("LoadModules: Adding modules from " + path);
             try {
                 Module module = new Module(getShell(), path);
-                magiskManager.moduleMap.put(module.getId(), module);
+                mm.moduleMap.put(module.getId(), module);
             } catch (BaseModule.CacheModException ignored) {}
         }
 
@@ -37,9 +37,9 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return;
-        magiskManager.moduleLoadDone.publish();
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return;
+        mm.moduleLoadDone.publish();
         super.onPostExecute(v);
     }
 }

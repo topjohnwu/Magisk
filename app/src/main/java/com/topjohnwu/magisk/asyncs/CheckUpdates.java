@@ -31,10 +31,10 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return null;
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return null;
         String jsonStr;
-        switch (magiskManager.updateChannel) {
+        switch (mm.updateChannel) {
             case STABLE_CHANNEL:
                 jsonStr = WebService.getString(STABLE_URL);
                 break;
@@ -47,30 +47,30 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         try {
             JSONObject json = new JSONObject(jsonStr);
             JSONObject magisk = json.getJSONObject("magisk");
-            magiskManager.remoteMagiskVersionString = magisk.getString("version");
-            magiskManager.remoteMagiskVersionCode = magisk.getInt("versionCode");
-            magiskManager.magiskLink = magisk.getString("link");
-            magiskManager.releaseNoteLink = magisk.getString("note");
+            mm.remoteMagiskVersionString = magisk.getString("version");
+            mm.remoteMagiskVersionCode = magisk.getInt("versionCode");
+            mm.magiskLink = magisk.getString("link");
+            mm.releaseNoteLink = magisk.getString("note");
             JSONObject manager = json.getJSONObject("app");
-            magiskManager.remoteManagerVersionString = manager.getString("version");
-            magiskManager.remoteManagerVersionCode = manager.getInt("versionCode");
-            magiskManager.managerLink = manager.getString("link");
+            mm.remoteManagerVersionString = manager.getString("version");
+            mm.remoteManagerVersionCode = manager.getInt("versionCode");
+            mm.managerLink = manager.getString("link");
         } catch (JSONException ignored) {}
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager magiskManager = getMagiskManager();
-        if (magiskManager == null) return;
-        if (showNotification && magiskManager.updateNotification) {
-            if (BuildConfig.VERSION_CODE < magiskManager.remoteManagerVersionCode) {
-                Utils.showManagerUpdate(magiskManager);
-            } else if (magiskManager.magiskVersionCode < magiskManager.remoteMagiskVersionCode) {
-                Utils.showMagiskUpdate(magiskManager);
+        MagiskManager mm = getMagiskManager();
+        if (mm == null) return;
+        if (showNotification && mm.updateNotification) {
+            if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
+                Utils.showManagerUpdate(mm);
+            } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
+                Utils.showMagiskUpdate(mm);
             }
         }
-        magiskManager.updateCheckDone.publish();
+        mm.updateCheckDone.publish();
         super.onPostExecute(v);
     }
 }
