@@ -117,9 +117,12 @@
     <string name="settings_hide_manager_summary">Временно скрывает Менеджер Magisk.\nБудет установлено новое приложение, называется \"Unhide Magisk Manager\"</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
+    <string name="settings_update">Настройки обновления</string>
     <string name="settings_update_channel_title">Источник обновления</string>
     <string name="settings_update_stable">Стабильный релиз</string>
     <string name="settings_update_beta">Релиз beta</string>
+    <string name="settings_boot_format_title">Формат boot-образа</string>
+    <string name="settings_boot_format_summary">Выберите тип выходного формата патченого boot-образа.\n.img - для прошивки с помощью fastboot либо режима download\n.img.tar - для прошивки с помощью ODIN</string>
 
     <string name="settings_core_only_title">Режим Magisk Core</string>
     <string name="settings_core_only_summary">Включить возможности только уровня Core, все модули не будут загружены. MagiskSU, MagiskHide и внесистемные хосты останутся включенными</string>
