@@ -154,8 +154,16 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
             mList.add("- Use boot image: " + boot);
 
+            Shell shell;
+            if (mode == PATCH_MODE && Shell.rootAccess()) {
+                // Force non-root shell
+                shell = Shell.getShell("sh");
+             } else {
+                shell = getShell();
+            }
+
             // Patch boot image
-            getShell().sh(mList,
+            shell.sh(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
                             "update-binary indep boot_patch.sh " + boot + " 2>&1" +
@@ -176,16 +184,6 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             getShell().sh_raw("cp -f " + patched_boot + " " + dest);
                             break;
                         case ".img.tar":
-                            // Workaround root shell issues so we can access the file through Java
-                            if (Shell.rootAccess()) {
-                                // Get non-root UID
-                                int uid = mm.getApplicationInfo().uid;
-                                // Get app selabel
-                                String selabel = getShell().su("/system/bin/ls -dZ " + install + " | cut -d' ' -f1").get(0);
-                                getShell().su(
-                                        "chcon " + selabel + " " + patched_boot,
-                                        "chown " + uid + "." + uid + " " + patched_boot);
-                            }
                             TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
                             tar.putNextEntry(new TarEntry(patched_boot, "boot.img"));
                             byte buffer[] = new byte[4096];

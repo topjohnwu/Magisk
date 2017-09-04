@@ -87,8 +87,36 @@ public class Shell {
         sh_raw("umask 022");
     }
 
+    private Shell(String command) {
+        Process process;
+        DataOutputStream in;
+        DataInputStream out;
+
+        try {
+            process = Runtime.getRuntime().exec(command);
+            in = new DataOutputStream(process.getOutputStream());
+            out = new DataInputStream(process.getInputStream());
+        } catch (IOException e) {
+            // Nothing works....
+            shellProcess = null;
+            STDIN = null;
+            STDOUT = null;
+            isValid = false;
+            return;
+        }
+
+        isValid = true;
+        shellProcess = process;
+        STDIN = in;
+        STDOUT = out;
+    }
+
     public static Shell getShell() {
         return new Shell();
+    }
+
+    public static Shell getShell(String command) {
+        return new Shell(command);
     }
 
     public static Shell getShell(Context context) {
