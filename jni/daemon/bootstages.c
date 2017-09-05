@@ -589,7 +589,7 @@ void post_fs_data(int client) {
 	// Trim, mount magisk.img, which will also travel through the modules
 	// After this, it will create the module list
 	if (prepare_img())
-		goto unblock;
+		goto core_only; // Mounting fails, we can only do core only stuffs
 
 	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");

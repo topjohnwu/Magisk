@@ -19,7 +19,7 @@
 #include "daemon.h"
 
 static char *prop_key[] =
-	{ "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", 
+	{ "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit",
 	  "ro.debuggable", "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", NULL };
 
 static char *prop_value[] =
@@ -72,7 +72,7 @@ void clean_magisk_props() {
 void relink_sbin() {
 	struct stat st;
 	if (stat("/sbin_orig", &st) == -1 && errno == ENOENT) {
-		// Re-link all binaries and bind mount 
+		// Re-link all binaries and bind mount
 		DIR *dir;
 		struct dirent *entry;
 		char from[PATH_MAX], to[PATH_MAX];
@@ -98,7 +98,7 @@ void relink_sbin() {
 			symlink(from, to);
 			lsetfilecon(to, "u:object_r:rootfs:s0");
 		}
-		
+
 		closedir(dir);
 
 		xmount("/dev/sbin_bind", "/sbin", NULL, MS_BIND, NULL);
@@ -140,10 +140,7 @@ int add_list(char *proc) {
 	pthread_mutex_unlock(&hide_lock);
 
 	pthread_mutex_lock(&file_lock);
-	if (vector_to_file(HIDELIST, hide_list)) {
-		pthread_mutex_unlock(&file_lock);
-		return DAEMON_ERROR;
-	}
+	vector_to_file(HIDELIST, hide_list); // Do not complain if file not found
 	pthread_mutex_unlock(&file_lock);
 	return DAEMON_SUCCESS;
 }
@@ -184,8 +181,7 @@ int rm_list(char *proc) {
 
 		ret = DAEMON_SUCCESS;
 		pthread_mutex_lock(&file_lock);
-		if (vector_to_file(HIDELIST, hide_list))
-			ret = DAEMON_ERROR;
+		vector_to_file(HIDELIST, hide_list); // Do not complain if file not found
 		pthread_mutex_unlock(&file_lock);
 	} else {
 		ret = HIDE_ITEM_NOT_EXIST;
@@ -239,5 +235,20 @@ void rm_hide_list(int client) {
 	char *proc = read_string(client);
 	// ack
 	write_int(client, rm_list(proc));
+	close(client);
+}
+
+void ls_hide_list(int client) {
+	err_handler = do_nothing;
+	if (!hideEnabled) {
+		write_int(client, HIDE_NOT_ENABLED);
+		return;
+	}
+	write_int(client, DAEMON_SUCCESS);
+	write_int(client, vec_size(hide_list));
+	char *s;
+	vec_for_each(hide_list, s) {
+		write_string(client, s);
+	}
 	close(client);
 }

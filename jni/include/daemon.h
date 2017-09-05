@@ -15,6 +15,7 @@ typedef enum {
 	STOP_MAGISKHIDE,
 	ADD_HIDELIST,
 	RM_HIDELIST,
+	LS_HIDELIST,
 	SUPERUSER,
 	CHECK_VERSION,
 	CHECK_VERSION_CODE,
@@ -69,6 +70,7 @@ void launch_magiskhide(int client);
 void stop_magiskhide(int client);
 void add_hide_list(int client);
 void rm_hide_list(int client);
+void ls_hide_list(int client);
 
 /*************
  * Superuser *

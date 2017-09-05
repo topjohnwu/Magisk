@@ -40,6 +40,7 @@ static void *request_handler(void *args) {
 	case STOP_MAGISKHIDE:
 	case ADD_HIDELIST:
 	case RM_HIDELIST:
+	case LS_HIDELIST:
 	case POST_FS:
 	case POST_FS_DATA:
 	case LATE_START:
@@ -64,6 +65,9 @@ static void *request_handler(void *args) {
 		break;
 	case RM_HIDELIST:
 		rm_hide_list(client);
+		break;
+	case LS_HIDELIST:
+		ls_hide_list(client);
 		break;
 	case SUPERUSER:
 		su_daemon_receiver(client);

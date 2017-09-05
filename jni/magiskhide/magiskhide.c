@@ -123,15 +123,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "--rm") == 0 && argc > 2) {
 		req = RM_HIDELIST;
 	} else if (strcmp(argv[1], "--ls") == 0) {
-		FILE *fp = fopen(HIDELIST, "r");
-		if (fp == NULL)
-			return 1;
-		char buffer[512];
-		while (fgets(buffer, sizeof(buffer), fp)) {
-			printf("%s", buffer);
-		}
-		fclose(fp);
-		return 0;
+		req = LS_HIDELIST;
 	}
 	int fd = connect_daemon();
 	write_int(fd, req);
@@ -139,28 +131,38 @@ int magiskhide_main(int argc, char *argv[]) {
 		write_string(fd, argv[2]);
 	}
 	daemon_response code = read_int(fd);
-	close(fd);
 	switch (code) {
 	case DAEMON_ERROR:
 		fprintf(stderr, "Error occured in daemon...\n");
-		break;
+		return code;
 	case DAEMON_SUCCESS:
 		break;
 	case ROOT_REQUIRED:
 		fprintf(stderr, "Root is required for this operation\n");
-		break;
+		return code;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "Magisk hide is not enabled yet\n");
-		break;
+		return code;
 	case HIDE_IS_ENABLED:
 		fprintf(stderr, "Magisk hide is already enabled\n");
-		break;
+		return code;
 	case HIDE_ITEM_EXIST:
 		fprintf(stderr, "Process [%s] already exists in hide list\n", argv[2]);
-		break;
+		return code;
 	case HIDE_ITEM_NOT_EXIST:
 		fprintf(stderr, "Process [%s] does not exist in hide list\n", argv[2]);
-		break;
+		return code;
 	}
-	return code;
+
+	if (req == LS_HIDELIST) {
+		int argc = read_int(fd);
+		for (int i = 0; i < argc; ++i) {
+			char *s = read_string(fd);
+			printf("%s\n", s);
+			free(s);
+		}
+	}
+	close(fd);
+
+	return 0;
 }

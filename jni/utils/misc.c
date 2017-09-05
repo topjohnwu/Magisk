@@ -70,7 +70,7 @@ int file_to_vector(const char* filename, struct vector *v) {
 	size_t len = 0;
 	ssize_t read;
 
-	FILE *fp = fopen(filename, "r");
+	FILE *fp = xfopen(filename, "r");
 	if (fp == NULL)
 		return 1;
 
