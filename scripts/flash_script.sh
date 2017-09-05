@@ -92,9 +92,7 @@ fi
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
-cp -af $BINDIR/. $COMMONDIR/. $MAGISKBIN
-cp -af $CHROMEDIR $MAGISKBIN
-cp -af $TMPDIR/bin/busybox $MAGISKBIN/busybox
+cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $TMPDIR/bin/busybox $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
@@ -105,44 +103,10 @@ if [ -d /system/addon.d ]; then
   chmod 755 /system/addon.d/99-magisk.sh
 fi
 
-##########################################################################################
-# Magisk Image
-##########################################################################################
-
 $BOOTMODE && boot_actions || recovery_actions
 
-if (is_mounted /data); then
-  IMG=/data/magisk.img
-else
-  IMG=/cache/magisk.img
-  ui_print "- Data unavailable, use cache workaround"
-fi
-
-if [ -f $IMG ]; then
-  ui_print "- $IMG detected!"
-else
-  ui_print "- Creating $IMG"
-  $MAGISKBIN/magisk --createimg $IMG 64M
-fi
-
-if ! is_mounted /magisk; then
-  ui_print "- Mounting $IMG to /magisk"
-  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG /magisk`
-fi
-is_mounted /magisk || abort "! Magisk image mount failed..."
-
-# Core folders
-mkdir -p $COREDIR/props $COREDIR/post-fs-data.d $COREDIR/service.d 2>/dev/null
-
-chmod 755 $COREDIR/post-fs-data.d $COREDIR/service.d
-chown 0.0 $COREDIR/post-fs-data.d $COREDIR/service.d
-
-# Legacy cleanup
-mv $COREDIR/magiskhide/hidelist $COREDIR/hidelist 2>/dev/null
-rm -rf $COREDIR/magiskhide $COREDIR/bin
-
 ##########################################################################################
-# Unpack boot
+# Boot patching
 ##########################################################################################
 
 find_boot_image
@@ -163,10 +127,7 @@ cd $MAGISKBIN
 # Source the boot patcher
 . $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
 
-if [ -f stock_boot* ]; then
-  rm -f /data/stock_boot* 2>/dev/null
-  mv stock_boot* /data
-fi
+[ -f stock_boot* ] && rm -f /data/stock_boot* 2>/dev/null
 
 ui_print "- Flashing new boot image"
 if [ -L "$BOOTIMAGE" ]; then
@@ -178,12 +139,8 @@ rm -f new-boot.img
 
 cd /
 
-if ! $BOOTMODE; then
-  $MAGISKBIN/magisk --umountimg /magisk $MAGISKLOOP
-  rmdir /magisk
-  recovery_cleanup
-fi
-
+# Cleanups
+$BOOTMODE || recovery_cleanup
 rm -rf $TMPDIR
 
 ui_print "- Done"
