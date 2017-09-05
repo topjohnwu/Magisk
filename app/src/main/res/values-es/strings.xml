@@ -37,6 +37,7 @@
     <string name="install_magisk_title">Última versión de Magisk: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="reboot_countdown">Reiniciando en %1$d</string>
+    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, encriptará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Actualización %1$s</string>
     
@@ -110,6 +111,10 @@
     <string name="direct_install">Instalación Directa (Recomendado)</string>
     <string name="select_method">Seleccionar Método</string>
     <string name="no_boot_file_patch_support">La versión de Magisk no admite el parcheo de la imagen boot</string>
+    <string name="complete_uninstall">Desinstalación completa</string>
+    <string name="restore_stock_boot">Restaurar imagen boot Stock</string>
+    <string name="restore_done">¡Restauración Terminada!</string>
+    <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
