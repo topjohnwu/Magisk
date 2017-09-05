@@ -168,7 +168,7 @@ abort() {
 set_perm() {
   chown $2:$3 $1 || exit 1
   chmod $4 $1 || exit 1
-  [ -z $5 ] && chcon -h 'u:object_r:system_file:s0' $1 || chcon -h $5 $1
+  [ -z $5 ] && chcon 'u:object_r:system_file:s0' $1 || chcon $5 $1
 }
 
 set_perm_recursive() {
