@@ -157,7 +157,7 @@
     <string name="download">下載</string>
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
-    <string name="uninstall_magisk_msg">這將會刪除所有模組，MagiskSU，並有可能在目前資料未加密的情況下進行加密\n你確定要繼續嗎？</string>
+    <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
     <string name="manual_boot_image">請手動選取 boot 映像位置</string>
     <string name="cannot_auto_detect">(無法自動偵測)</string>
     <string name="settings_notification_summary">有更新的時候顯示通知</string>
@@ -208,5 +208,9 @@
     <string name="zip_download_title">正在下載</string>
     <string name="zip_download_msg">正在下載 Zip 文件 …</string>
     <string name="settings_boot_format_summary">選擇已補丁 Boot 映像文件輸出格式\n若要透過 fastboot/download 模式刷入，請選擇 .img 格式；若要透過 ODIN 刷入，則選擇 .img.tar\n</string>
+    <string name="complete_uninstall">完全解除安裝</string>
+    <string name="restore_stock_boot">還原原廠 boot 映像</string>
+    <string name="restore_done">還原完成！</string>
+    <string name="restore_fail">原廠 boot 映像備份不存在！</string>
 
 </resources>

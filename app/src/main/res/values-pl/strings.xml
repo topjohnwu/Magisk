@@ -41,7 +41,6 @@
     <string name="uninstall">Odinstaluj</string>
     <string name="reboot_countdown">Restartuj do %1$d</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
-    <string name="uninstall_magisk_msg">Spowoduje to usunięcie wszystkich modułów, MagiskSU i potencjalnie szyfrowanie danych jeśli nie były szyfrowane \ nCzy na pewno kontynuować?</string>
     <string name="update">Aktualizacja %1$s</string>
     
     <!--Module Fragment-->

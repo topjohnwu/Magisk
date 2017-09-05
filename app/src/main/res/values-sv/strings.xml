@@ -38,7 +38,6 @@
     <string name="uninstall">Avinstallera</string>
     <string name="reboot_countdown">Omstart om %1$d</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
-    <string name="uninstall_magisk_msg">Detta kommer att ta bort alla moduler, MagiskSU, och potentiellt kryptera din data om inte krypterad\nÄr det säker du vill fortsätta?</string>
     <string name="update">Uppdatera %1$s</string>
 
     <!--Module Fragment-->

@@ -37,7 +37,6 @@
     <string name="uninstall">Kaldır</string>
     <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
-    <string name="uninstall_magisk_msg">"Bu, tüm modülleri, MagiskSU\'yu kaldıracak ve şifrelenmemişse verilerinizi potansiyel olarak şifreleyecektir\nDevam etmek istediğinize emin misiniz?"</string>
      <string name="update">Güncelle %1$s</string>
 
     <!--Module Fragment-->

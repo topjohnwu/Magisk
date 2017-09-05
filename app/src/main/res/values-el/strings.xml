@@ -36,7 +36,6 @@
     <string name="uninstall">Απεγκατάσταση</string>
     <string name="reboot_countdown">Επανεκκίνηση σε %1$d</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
-    <string name="uninstall_magisk_msg">Αυτό θα αφαιρέσει όλες τις ενότητες, το MagiskSU και πιθανόν να κρυπτογραφήσει τα δεδομένα σας αν δεν είναι κρυπτογραφυμένα\nΕίστε σίγουρος/η ότι θέλετε να συνεχίσετε;</string>
     <string name="update">Ενημέρωση %1$s</string>
 
     <!--Module Fragment-->

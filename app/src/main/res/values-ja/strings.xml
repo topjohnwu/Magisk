@@ -34,7 +34,6 @@
     <string name="uninstall">アンインストール</string>
     <string name="reboot_countdown">%1$dで再起動します</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
-    <string name="uninstall_magisk_msg">これにより、すべてのモジュールとMagiskSUを削除します。暗号化されていないデータが暗号化される可能性があります。\ n続行しますか？</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(情報がありません)</string>

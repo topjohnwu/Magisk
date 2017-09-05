@@ -32,7 +32,6 @@
     <string name="uninstall">Dezinstalare</string>
     <string name="reboot_countdown">Repornire în %1$d</string>
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
-    <string name="uninstall_magisk_msg">Aceasta va elimina toate modulele, MagiskSU, şi potențial să cripteze datele, dacă nu sunt criptate\nContinuaţi?</string>
     <string name="update">Actualizare %1$s</string>
   
 

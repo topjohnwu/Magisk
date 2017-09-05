@@ -34,7 +34,6 @@
     <string name="uninstall">Odinstalovat</string>
     <string name="reboot_countdown">Restart za %1$d</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
-    <string name="uninstall_magisk_msg">Tímto odstraníte veškeré moduly, MagiskSU a potencionálně zašifrujete svá data pokud ještě nejsou\nOpravdu chcete pokračovat?</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Žádné info)</string>

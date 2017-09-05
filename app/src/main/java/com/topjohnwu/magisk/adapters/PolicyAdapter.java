@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -92,7 +93,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 dbHelper.updatePolicy(policy);
             }
         });
-        holder.delete.setOnClickListener(v -> new AlertDialogBuilder(v.getContext())
+        holder.delete.setOnClickListener(v -> new AlertDialogBuilder((Activity) v.getContext())
                 .setTitle(R.string.su_revoke_title)
                 .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
                 .setPositiveButton(R.string.yes, (dialog, which) -> {

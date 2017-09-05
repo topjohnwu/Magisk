@@ -100,7 +100,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         holder.downloadImage.setOnClickListener(v -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            new AlertDialogBuilder(context)
+            new AlertDialogBuilder((Activity) context)
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)

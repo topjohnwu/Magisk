@@ -38,7 +38,6 @@
     <string name="uninstall">Deïnstalleren</string>
     <string name="reboot_countdown">Herstarten in %1$d</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
-    <string name="uninstall_magisk_msg">Dit verwijdert alle modules, MagiskSU, en versleutelt mogelijk alle niet-versleutelde data\nZeker weten voortzetten?</string>
     <string name="update">Bijwerken %1$s</string>
 
     <!--Module Fragment-->

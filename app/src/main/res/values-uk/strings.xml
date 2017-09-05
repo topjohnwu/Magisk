@@ -37,7 +37,6 @@
     <string name="uninstall">Видалити</string>
     <string name="reboot_countdown">Перезавантаження через %1$d</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
-    <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
     <string name="update">Оновити %1$s</string>
     
     <!--Module Fragment-->

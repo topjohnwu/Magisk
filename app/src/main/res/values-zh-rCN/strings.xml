@@ -38,7 +38,6 @@
     <string name="uninstall">卸载</string>
     <string name="reboot_countdown">将在 %1$d 后重启</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
-    <string name="uninstall_magisk_msg">将会删除所有模块及 MagiskSU，并有可能在目前未加密的情况下加密你的数据\n你确定要继续吗？</string>
     <string name="update">更新 %1$s</string>
 
     <!--Module Fragment-->

@@ -34,7 +34,6 @@
     <string name="uninstall">제거</string>
     <string name="reboot_countdown">%1$d초 안에 다시 시작됨</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
-    <string name="uninstall_magisk_msg">모든 모듈과 MagiskSU를 제거합니다. 또한 데이터가 암호화되어 있지 않은 경우 암호화될 가능성이 있습니다.\n정말 계속하시겠습니까?</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(제공된 정보 없음)</string>

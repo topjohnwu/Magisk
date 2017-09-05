@@ -38,7 +38,6 @@
     <string name="uninstall">Desinstalar</string>
     <string name="reboot_countdown">Reiniciando en %1$d</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
-    <string name="uninstall_magisk_msg">Esto eliminará todos los módulos, MagiskSU, y potencialmente puede cifrar sus datos si no está encriptada\nEstas seguro de continuar?</string>
     <string name="update">Actualización %1$s</string>
     
     <!--Module Fragment-->

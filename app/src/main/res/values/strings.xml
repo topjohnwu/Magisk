@@ -41,7 +41,7 @@
     <string name="uninstall">Uninstall</string>
     <string name="reboot_countdown">Rebooting in %1$d</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">This will remove all modules, MagiskSU, and potentially encrypt your data if not encrypted\nAre you sure to continue?</string>
+    <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and potentially encrypt your data if your data is not currently encrypted</string>
     <string name="update">Update %1$s</string>
 
     <!--Module Fragment-->
@@ -116,6 +116,10 @@
     <string name="direct_install">Direct Install (Recommend)</string>
     <string name="select_method">Select Method</string>
     <string name="no_boot_file_patch_support">Target Magisk version doesn\'t support boot image file patching</string>
+    <string name="complete_uninstall">Complete Uninstall</string>
+    <string name="restore_stock_boot">Restore Stock Boot</string>
+    <string name="restore_done">Restoration done!</string>
+    <string name="restore_fail">Stock backup does not exist!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

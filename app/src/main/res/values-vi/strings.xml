@@ -34,7 +34,6 @@
     <string name="uninstall">Gỡ bỏ</string>
     <string name="reboot_countdown">Khởi động lại trong %1$d</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
-    <string name="uninstall_magisk_msg">Việc này sẽ xoá tất cả các mô-đun, MagiskSU và có khả năng sẽ mã hoá dữ liệu nếu chưa được mã hoá\nBạn chắc muốn tiếp tục?</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
