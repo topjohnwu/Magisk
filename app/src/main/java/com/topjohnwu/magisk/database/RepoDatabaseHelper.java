@@ -5,8 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.module.Repo;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,10 +20,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     private static final int MIN_TEMPLATE_VER = 3;
 
     private SQLiteDatabase mDb;
+    private MagiskManager mm;
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
         mDb = getWritableDatabase();
+        mm = Utils.getMagiskManager(context);
     }
 
     @Override
@@ -70,7 +74,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getRepoCursor() {
-        return mDb.query(TABLE_NAME, null, "template>=?", new String[] { String.valueOf(MIN_TEMPLATE_VER) }, null, null, "name COLLATE NOCASE");
+        return mDb.query(TABLE_NAME, null, "template>=? AND template<=?", new String[] { String.valueOf(MIN_TEMPLATE_VER), String.valueOf(mm.magiskVersionCode) }, null, null, "name COLLATE NOCASE");
     }
 
     public List<String> getRepoIDList() {

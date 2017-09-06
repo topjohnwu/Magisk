@@ -15,8 +15,8 @@ import java.io.InputStream;
 
 public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
-    private static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-arm";
-    private static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.1/busybox-x86";
+    private static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-arm";
+    private static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-x86";
 
     private File busybox;
 

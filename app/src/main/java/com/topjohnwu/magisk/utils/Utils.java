@@ -350,7 +350,7 @@ public class Utils {
                                 DownloadReceiver receiver = null;
                                 switch (idx) {
                                     case 1:
-                                        if (mm.remoteMagiskVersionCode < 1370) {
+                                        if (mm.remoteMagiskVersionCode < 1400) {
                                             mm.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
                                             return;
                                         }
