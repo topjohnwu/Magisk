@@ -354,6 +354,7 @@ public class Utils {
                                             mm.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
                                             return;
                                         }
+                                        mm.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                                         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                         intent.setType("*/*");
                                         fragment.startActivityForResult(intent, SELECT_BOOT_IMG,

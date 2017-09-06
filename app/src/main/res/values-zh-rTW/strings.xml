@@ -212,5 +212,6 @@
     <string name="restore_stock_boot">還原原廠 boot 映像</string>
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
+    <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
 
 </resources>

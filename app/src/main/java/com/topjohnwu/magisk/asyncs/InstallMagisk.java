@@ -166,7 +166,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             shell.sh(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot + " 2>&1" +
+                            "update-binary indep boot_patch.sh " + boot +
                             " && echo 'Success!' || echo 'Failed!'"
             );
 
@@ -213,8 +213,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
             // Finals
             getShell().sh_raw(
+                    "cd " + install,
                     "mv bin/busybox busybox",
-                    "rm -rf bin *.img update-binary");
+                    "rm -rf bin *.img update-binary",
+                    "cd /");
         } catch (Exception e) {
             e.printStackTrace();
             return false;

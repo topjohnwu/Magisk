@@ -116,6 +116,7 @@
     <string name="direct_install">Direct Install (Recommend)</string>
     <string name="select_method">Select Method</string>
     <string name="no_boot_file_patch_support">Target Magisk version doesn\'t support boot image file patching</string>
+    <string name="boot_file_patch_msg">Select stock boot image dump in .img or .img.tar format</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_stock_boot">Restore Stock Boot</string>
     <string name="restore_done">Restoration done!</string>
