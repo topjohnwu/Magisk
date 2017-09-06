@@ -99,7 +99,7 @@
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_download_title">Herunterladen</string>
-    <string name="zip_download_msg">Lade Zip-Datei herunter …</string>
+    <string name="zip_download_msg">Lade Zip-Datei herunter…</string>
     <string name="zip_process_title">Verarbeite</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
     <string name="manual_boot_image">Bitte Boot-Image auswählen!</string>
@@ -107,13 +107,13 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="magisk_updates">Magisk Updates</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Magisk Manager verstecken…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager verstecken fehlgeschlagen…</string>
+    <string name="hide_manager_toast">Verberge Magisk Manager…</string>
+    <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="download_zip_only">Zip-Datei nur herunterladen</string>
-    <string name="patch_boot_file">Bootimage-Datei patchen</string>
+    <string name="patch_boot_file">Boot-Image-Datei patchen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
     <string name="select_method">Methode auswählen</string>
-    <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Bootimages nicht</string>
+    <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Boot-Images nicht</string>
 	
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
@@ -123,16 +123,16 @@
     <string name="settings_notification_summary">Benachrichtigung, wenn eine neue Version verfügbar ist</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
-    <string name="settings_hide_manager_title">Verstecke Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Magisk Manager zeitweise verstecken.\nDies installiert eine neue App namens \"Unhide Magisk Manager\"</string>
+    <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
+    <string name="settings_hide_manager_summary">Magisk Manager temporär verbergen.\nDies installiert eine neue App namens \"Unhide Magisk Manager\"</string>
     <string name="language">Sprache</string>
-    <string name="system_default">(System Standard)</string>
-    <string name="settings_update">Update Einstellungen</string>
-    <string name="settings_update_channel_title">Update Kanal</string>
+    <string name="system_default">(Systemstandard)</string>
+    <string name="settings_update">Update-Einstellungen</string>
+    <string name="settings_update_channel_title">Update-Kanal</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_boot_format_title">Ausgabeformat des gepatchten Bootimages</string>
-    <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Bootimages.\nWähle .img um mit \"fastboot/download mode\" zu schreiben; wähle .img.tar zum Schreiben mit ODIN.</string>
+    <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
+    <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
 
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
