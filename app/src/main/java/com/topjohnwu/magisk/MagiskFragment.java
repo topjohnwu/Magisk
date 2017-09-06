@@ -212,7 +212,6 @@ public class MagiskFragment extends Fragment
         safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         bootImageCard.setVisibility(hasNetwork && hasRoot ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        installButton.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
 
         int image, color;
