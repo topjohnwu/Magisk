@@ -111,6 +111,7 @@
     <string name="direct_install">Instalación Directa (Recomendado)</string>
     <string name="select_method">Seleccionar Método</string>
     <string name="no_boot_file_patch_support">La versión de Magisk no admite el parcheo de la imagen boot</string>
+     <string name="boot_file_patch_msg">Seleccione el volcado de la imagen boot en formato .img o .img.tar</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_stock_boot">Restaurar imagen boot Stock</string>
     <string name="restore_done">¡Restauración Terminada!</string>
