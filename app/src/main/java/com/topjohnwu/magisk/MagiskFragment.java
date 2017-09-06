@@ -280,6 +280,7 @@ public class MagiskFragment extends Fragment
             magiskUpdateText.setText(getString(R.string.install_magisk_title, "v" + mm.remoteMagiskVersionString));
         }
 
+        installButton.setVisibility(View.VISIBLE);
         if (mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
             installText.setText(getString(R.string.update, getString(R.string.app_name)));
         } else if (mm.magiskVersionCode > 0 && mm.remoteMagiskVersionCode > mm.magiskVersionCode) {
