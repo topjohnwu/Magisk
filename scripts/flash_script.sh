@@ -113,14 +113,6 @@ find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found Boot Image: $BOOTIMAGE"
 
-# Update our previous backup to new format if exists
-if [ -f /data/stock_boot.img ]; then
-  SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
-  STOCKDUMP=/data/stock_boot_${SHA1}.img
-  mv /data/stock_boot.img $STOCKDUMP
-  $MAGISKBIN/magiskboot --compress $STOCKDUMP
-fi
-
 SOURCEDMODE=true
 cd $MAGISKBIN
 

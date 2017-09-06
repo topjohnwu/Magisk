@@ -21,34 +21,13 @@
 #
 ##########################################################################################
 
-# Call ui_print_wrap if exists, or else simply use echo
-# Useful when wrapped in flashable zip
-ui_print_wrap() {
-  type ui_print >/dev/null 2>&1 && ui_print "$1" || echo "$1"
-}
-
-# Call abort if exists, or else show error message and exit
-# Essential when wrapped in flashable zip
-abort_wrap() {
-  type abort >/dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    ui_print_wrap "$1"
-    exit 1
-  else
-    abort "$1"
-  fi
-}
-
 [ -z $BOOTMODE ] && BOOTMODE=false
 
 MAGISKBIN=/data/magisk
 CHROMEDIR=$MAGISKBIN/chromeos
 
-# Default permissions
-umask 022
-
 if [ ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
-  ui_print_wrap "! Cannot find $MAGISKBIN"
+  echo "! Cannot find $MAGISKBIN"
   exit 1
 fi
 
@@ -59,89 +38,75 @@ fi
 find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 
-ui_print_wrap "- Found Boot Image: $BOOTIMAGE"
+ui_print "- Found Boot Image: $BOOTIMAGE"
 
 cd $MAGISKBIN
 
-ui_print_wrap "- Unpacking boot image"
+ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
 CHROMEOS=false
 case $? in
   1 )
-    abort_wrap "! Unable to unpack boot image"
+    abort "! Unable to unpack boot image"
     ;;
   2 )
     CHROMEOS=true
     ;;
   3 )
-    ui_print_wrap "! Sony ELF32 format detected"
-    abort_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
+    ui_print "! Sony ELF32 format detected"
+    abort "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
   4 )
-    ui_print_wrap "! Sony ELF64 format detected"
-    abort_wrap "! Stock kernel cannot be patched, please use a custom kernel"
+    ui_print "! Sony ELF64 format detected"
+    abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
-# Update our previous backup to new format if exists
-if [ -f /data/stock_boot.img ]; then
-  SHA1=`./magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
-  STOCKDUMP=/data/stock_boot_${SHA1}.img
-  mv /data/stock_boot.img $STOCKDUMP
-  ./magiskboot --compress $STOCKDUMP
-fi
+migrate_boot_backup
 
 # Detect boot image state
 ./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
-    ui_print_wrap "- Stock boot image detected!"
-    ui_print_wrap "! Magisk is not installed!"
-    exit
+    ui_print "- Stock boot image detected!"
+    abort "! Magisk is not installed!"
     ;;
   1 )  # Magisk patched
-    ui_print_wrap "- Magisk patched image detected!"
+    ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio`
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
     [ ! -z $SHA1 ] && STOCKDUMP=/data/stock_boot_${SHA1}.img
     if [ -f ${STOCKDUMP}.gz ]; then
-      ui_print_wrap "- Boot image backup found!"
-      ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
+      ui_print "- Boot image backup found!"
+      ./magiskboot --decompress ${STOCKDUMP}.gz new-boot.img
     else
-      ui_print_wrap "! Boot image backup unavailable"
-      ui_print_wrap "- Restoring ramdisk with backup"
+      ui_print "! Boot image backup unavailable"
+      ui_print "- Restoring ramdisk with internal backup"
       ./magiskboot --cpio-restore ramdisk.cpio
-      ./magiskboot --repack $BOOTIMAGE stock_boot.img
+      ./magiskboot --repack $BOOTIMAGE new-boot.img
     fi
     ;;
   2 ) # Other patched
-    ui_print_wrap "! Boot image patched by other programs!"
-    abort_wrap "! Cannot uninstall with this uninstaller"
+    ui_print "! Boot image patched by other programs!"
+    abort "! Cannot uninstall"
     ;;
 esac
 
 # Sign chromeos boot
-if $CHROMEOS; then
-  echo > empty
+$CHROMEOS && sign_chromeos
 
-  ./chromeos/futility vbutil_kernel --pack stock_boot.img.signed \
-  --keyblock ./chromeos/kernel.keyblock --signprivate ./chromeos/kernel_data_key.vbprivk \
-  --version 1 --vmlinuz stock_boot.img --config empty --arch arm --bootloader empty --flags 0x1
-
-  rm -f empty stock_boot.img
-  mv stock_boot.img.signed stock_boot.img
-fi
-
-ui_print_wrap "- Flashing stock/reverted image"
+ui_print "- Flashing stock/reverted image"
 if [ -L "$BOOTIMAGE" ]; then
-  dd if=stock_boot.img of="$BOOTIMAGE" bs=4096
+  dd if=new-boot.img of="$BOOTIMAGE" bs=4096
 else
-  cat stock_boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
+  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
 fi
-rm -f stock_boot.img
+rm -f new-boot.img
 
-ui_print_wrap "- Removing Magisk files"
+cd /
+
+ui_print "- Removing Magisk files"
 rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
-        /cache/magisk /cache/magisk_merge /cache/magisk_mount  /cache/unblock /cache/magisk_uninstaller.sh \
+        /cache/magisk /cache/magisk_merge /cache/magisk_mount /cache/unblock /cache/magisk_uninstaller.sh \
         /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
         /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk* \
         /data/app/com.topjohnwu.magisk* /data/user/*/com.topjohnwu.magisk 2>/dev/null

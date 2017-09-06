@@ -30,7 +30,6 @@ fi
 
 # Load utility functions
 . $INSTALLER/util_functions.sh
-
 get_outfd
 
 ##########################################################################################
@@ -65,10 +64,7 @@ if is_mounted /data; then
   # Copy the binaries to /data/magisk, in case they do not exist
   rm -rf $MAGISKBIN 2>/dev/null
   mkdir -p $MAGISKBIN
-  cp -af $BINDIR/. $MAGISKBIN
-  cp -af $CHROMEDIR $MAGISKBIN
-  cp -af $TMPDIR/bin/busybox $MAGISKBIN/busybox
-  cp -af $INSTALLER/util_functions.sh $MAGISKBIN
+  cp -af $BINDIR/. $CHROMEDIR $TMPDIR/bin/busybox $INSTALLER/util_functions.sh $MAGISKBIN
   chmod -R 755 $MAGISKBIN
   # Run the acttual uninstallation
   recovery_actions

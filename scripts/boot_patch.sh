@@ -117,6 +117,9 @@ chmod -R 755 .
 ##########################################################################################
 # Unpack
 ##########################################################################################
+
+migrate_boot_backup
+
 CHROMEOS=false
 
 ui_print_wrap "- Unpacking boot image"
@@ -158,7 +161,7 @@ case $? in
   1 )  # Magisk patched
     ui_print_wrap "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio`
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
     OK=false
     ./magiskboot --cpio-restore ramdisk.cpio
     if [ $? -eq 0 ]; then
@@ -235,15 +238,6 @@ ui_print_wrap "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
 
 # Sign chromeos boot
-if $CHROMEOS; then
-  echo > empty
-
-  ./chromeos/futility vbutil_kernel --pack new-boot.img.signed \
-  --keyblock ./chromeos/kernel.keyblock --signprivate ./chromeos/kernel_data_key.vbprivk \
-  --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
-
-  rm -f empty new-boot.img
-  mv new-boot.img.signed new-boot.img
-fi
+$CHROMEOS && sign_chromeos
 
 ./magiskboot --cleanup
