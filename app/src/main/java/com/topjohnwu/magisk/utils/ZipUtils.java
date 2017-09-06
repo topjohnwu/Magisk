@@ -127,9 +127,7 @@ public class ZipUtils {
 
                     // Patch binary XML with new package name
                     pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
-                    for (int i = 0; i < pkg.length(); ++i) {
-                        xml[offset + i] = (byte) pkg.charAt(i);
-                    }
+                    System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
                     dest.write(xml);
                 } else {
                     while((size = source.read(buffer)) != -1) {
