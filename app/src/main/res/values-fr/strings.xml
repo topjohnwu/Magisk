@@ -12,11 +12,15 @@
     <string name="checking_for_updates">Vérification de mises à jour…</string>
     <string name="magisk_update_available">Magisk v%1$s disponible !</string>
     <string name="cannot_check_updates">Impossible de vérifier les mises à jour, pas d\'Internet ?</string>
-    <string name="root_error">Rooté mais aucune permission root, non acceptée ?</string>
+    <string name="root_error">Rooté mais aucune permission root, non autorisée ?</string>
     <string name="not_rooted">Non rooté</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_no_response">Impossible de contrôler SafetyNet, pas d\'Internet?</string>
+	<string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
+	<string name="safetyNet_network_loss">Connexion réseau indisponible unavailable</string>
+	<string name="safetyNet_service_disconnected">Le service a été tué</string>
+	<string name="safetyNet_res_invalid">La réponse est invalide</string>
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
     <string name="cannot_auto_detect">(Auto détection impossible)</string>
@@ -30,12 +34,14 @@
     <string name="uninstall">Désinstaller</string>
     <string name="reboot_countdown">Redémarrage dans %1$d</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
+	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si ce n'est actuellement pas le cas</string>
+	<string name="update">Mise à jour %1$s</string>
     <!--Module Fragment-->
     <string name="no_info_provided">(Aucune information transmise)</string>
     <string name="no_modules_found">Aucun module trouvé</string>
     <string name="update_file_created">Le module va être mis à jour au prochain redémarrage</string>
     <string name="remove_file_created">Le module va être supprimé au prochain redémarrage</string>
-    <string name="remove_file_deleted">Le modufle ne va pas être supprimé au prochain redémarrage</string>
+    <string name="remove_file_deleted">Le module ne va pas être supprimé au prochain redémarrage</string>
     <string name="disable_file_created">Le module va être désactivé au prochain redémarrage</string>
     <string name="disable_file_removed">Le module va être activé au prochain redémarrage</string>
     <string name="author">Créé par %1$s</string>
@@ -53,7 +59,7 @@
     <!--About Activity-->
     <string name="about">À propos</string>
     <string name="app_developers">Principaux développeurs</string>
-    <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_developers_"><![CDATA[Appli créée par <a href="https://github.com/topjohnwu">topjohnwu</a> en collaboration avec <a href="https://github.com/d8ahazard">Digitalhigh</a> et <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Modifications de l\'application</string>
     <string name="translators" />
     <string name="app_version">Version de l\'application</string>
@@ -85,6 +91,23 @@
     <string name="internal_storage">Le zip est stocké dans :\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Exécution</string>
     <string name="manual_boot_image">Veuillez sélectionner l\'image boot manuellement !</string>
+	<string name="zip_download_title">Téléchargement</string>
+	<string name="zip_download_msg">Téléchargement du fichier zip...</string>
+	<string name="manager_update_title">Nouvelle mise à jour Magisk Manager disponible !</string>
+	<string name="manager_download_install">Appuyez pour télécharger et installer</string>
+	<string name="magisk_updates">Mises à jour Magisk</string>
+	<string name="flashing">Flash en-cours</string>
+	<string name="hide_manager_toast">Masquage de Magisk Manager…</string>
+	<string name="hide_manager_fail_toast">Échec du masquage de Magisk Manager...</string>
+	<string name="download_zip_only">Télécharger uniquement le zip</string>
+	<string name="patch_boot_file">Patcher le fichier image Boot</string>
+	<string name="direct_install">Installation directe (recommandée)</string>
+	<string name="select_method">Choisir une méthode</string>
+	<string name="no_boot_file_patch_support">La version cible de Magisk ne supporte pas la modification du fichier image Boot</string>
+	<string name="complete_uninstall">Désinstaller complètement</string>
+	<string name="restore_stock_boot">Restaurer le Boot stock</string>
+	<string name="restore_done">Restauration effectuée !</string>
+	<string name="restore_fail">Pas de sauvegarde stock disponible !</string>
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
@@ -116,6 +139,33 @@
     <string name="settings_developer_logging_summary">Cocher ceci pour activer la journalisation "verbose" (tout)</string>
     <string name="settings_shell_logging_title">Activer la journalisation de débogage de commande shell</string>
     <string name="settings_shell_logging_summary">Cocher ceci pour activer la journalisation de toutes les commandes shell et leurs données de sortie</string>
+	<string name="settings_hide_manager_title">Masquer Magisk Manager</string>
+	<string name="settings_hide_manager_summary">Masquer temporellement Magisk Manager.\nCeci installera une nouvelle appli appelée \"Démasquer Magisk Manager\"</string>
+	<string name="language">Langue</string>
+	<string name="system_default">(Selon système)</string>
+	<string name="settings_update">Paramètres de mises à jour</string>
+	<string name="settings_update_channel_title">Canal de mise à jour</string>
+	<string name="settings_update_stable">Stable</string>
+	<string name="settings_update_beta">Beta</string>
+	<string name="settings_boot_format_title">Format de sortie du boot patché</string>
+	<string name="settings_boot_format_summary">Sélectionner le format de \'image boot patchée finale.\nChoisir .img pour flasher via fastboot/mode download ; chosiir .img.tar pour flasher via ODIN.</string>
+	<string name="settings_su_reauth_title">Ré-authentifier après mise à jour</string>
+	<string name="settings_su_reauth_summary">Ré-authentifier les permissions superuser après les mises à jour d\'une application</string>
+	<string name="multiuser_mode">Mode multi-utilisateurs</string>
+	<string name="settings_owner_only">Appareil du propriétaire uniquement</string>
+	<string name="settings_owner_manage">Appareil du propriétaire géré</string>
+	<string name="settings_user_independent">Utilisateur indépendant</string>
+	<string name="owner_only_summary">Seul le propriétaire a l\'accès root</string>
+	<string name="owner_manage_summary">Seul le propriétaire peut gérer les accès root et recevoir des demandes de permissions</string>
+	<string name="user_indepenent_summary">Chaque utilisateur dispose de ses propres règles root</string>
+	<string name="multiuser_hint_owner_request">Une requête a été envoyée au propriétaire de l\'appareil. Veuillez basculer sur le profil du propriétaire et accorder la permission</string>
+	<string name="mount_namespace_mode">Monter le mode espace de noms</string>
+	<string name="settings_ns_global">Espace de noms global</string>
+	<string name="settings_ns_requester">Hériter de l\'espace de noms</string>
+	<string name="settings_ns_isolate">Espace de noms isolé</string>
+	<string name="global_summary">Toutes les sessions root utilisent l\'espace de noms global monté</string>
+	<string name="requester_summary">Les sessions root hériteront des espaces de noms du demandeur</string>
+	<string name="isolate_summary">Chaque session root aura son propre espace de noms isolé</string>
     <!--Superuser-->
     <string name="su_request_title">Requête Superuser</string>
     <string name="deny_with_str">Refuser%1$s</string>
