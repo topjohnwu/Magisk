@@ -16,8 +16,8 @@ echo -ne $EX_ARM > $EXBIN
 if $EXBIN --test 2>/dev/null; then
   echo $BB_ARM | $EXBIN > $BBBIN
 else
-  echo -ne $EX_x86 > $EXBIN
-  echo $BB_x86 | $EXBIN > $BBBIN
+  echo -ne $EX_X86 > $EXBIN
+  echo $BB_X86 | $EXBIN > $BBBIN
 fi
 $BBBIN --install -s $TMPDIR/bin
 export PATH=$BBDIR:$PATH
