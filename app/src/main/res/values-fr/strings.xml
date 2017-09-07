@@ -140,7 +140,7 @@
     <string name="settings_shell_logging_title">Activer la journalisation de débogage de commande shell</string>
     <string name="settings_shell_logging_summary">Cocher ceci pour activer la journalisation de toutes les commandes shell et leurs données de sortie</string>
 	<string name="settings_hide_manager_title">Masquer Magisk Manager</string>
-	<string name="settings_hide_manager_summary">Masquer temporellement Magisk Manager.\nCeci installera une nouvelle appli appelée \"Démasquer Magisk Manager\"</string>
+	<string name="settings_hide_manager_summary">Masquer temporairement Magisk Manager.\nCeci installera une nouvelle appli appelée \"Unhide Magisk Manager\"</string>
 	<string name="language">Langue</string>
 	<string name="system_default">(Selon système)</string>
 	<string name="settings_update">Paramètres de mises à jour</string>
