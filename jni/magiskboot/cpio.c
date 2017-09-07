@@ -28,32 +28,16 @@ static void cpio_free(cpio_file *f) {
 }
 
 static void cpio_vec_insert(struct vector *v, cpio_file *n) {
-	cpio_file *f, *t;
-	int shift = 0;
-	// Insert in alphabet order
+	cpio_file *f;
 	vec_for_each(v, f) {
-		if (shift) {
-			vec_entry(v)[_] = t;
-			t = f;
-			continue;
-		}
-		t = f;
 		if (strcmp(f->filename, n->filename) == 0) {
 			// Replace, then all is done
 			cpio_free(f);
-			vec_entry(v)[_] = n;
+			vec_cur(v) = n;
 			return;
-		} else if (strcmp(f->filename, n->filename) > 0) {
-			// Insert, then start shifting
-			vec_entry(v)[_] = n;
-			t = f;
-			shift = 1;
 		}
 	}
-	if (shift)
-		vec_push_back(v, t);
-	else
-		vec_push_back(v, n);
+	vec_push_back(v, n);
 }
 
 static int cpio_compare(const void *a, const void *b) {
@@ -66,7 +50,7 @@ static void parse_cpio(const char *filename, struct vector *v) {
 	int fd = xopen(filename, O_RDONLY);
 	cpio_newc_header header;
 	cpio_file *f;
-	while(read(fd, &header, 110) == 110) {
+	while(xxread(fd, &header, 110) != -1) {
 		f = xcalloc(sizeof(*f), 1);
 		// f->ino = x8u(header.ino);
 		f->mode = x8u(header.mode);
@@ -81,7 +65,7 @@ static void parse_cpio(const char *filename, struct vector *v) {
 		// f->rdevminor = x8u(header.rdevminor);
 		f->namesize = x8u(header.namesize);
 		// f->check = x8u(header.check);
-		f->filename = malloc(f->namesize);
+		f->filename = xmalloc(f->namesize);
 		xxread(fd, f->filename, f->namesize);
 		file_align(fd, 4, 0);
 		if (strcmp(f->filename, ".") == 0 || strcmp(f->filename, "..") == 0) {
@@ -100,8 +84,6 @@ static void parse_cpio(const char *filename, struct vector *v) {
 		vec_push_back(v, f);
 	}
 	close(fd);
-	// Sort by name
-	vec_sort(v, cpio_compare);
 }
 
 static void dump_cpio(const char *filename, struct vector *v) {
@@ -109,6 +91,8 @@ static void dump_cpio(const char *filename, struct vector *v) {
 	int fd = open_new(filename);
 	unsigned inode = 300000;
 	char header[111];
+	// Sort by name
+	vec_sort(v, cpio_compare);
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (f->remove) continue;
@@ -170,8 +154,7 @@ static void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
 	cpio_file *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFDIR | mode;
 	f->namesize = strlen(entry) + 1;
-	f->filename = xmalloc(f->namesize);
-	memcpy(f->filename, entry, f->namesize);
+	f->filename = strdup(entry);
 	cpio_vec_insert(v, f);
 	fprintf(stderr, "Create directory [%s] (%04o)\n",entry, mode);
 }
@@ -181,11 +164,10 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, struc
 	cpio_file *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFREG | mode;
 	f->namesize = strlen(entry) + 1;
-	f->filename = xmalloc(f->namesize);
-	memcpy(f->filename, entry, f->namesize);
+	f->filename = strdup(entry);
 	f->filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	f->data = malloc(f->filesize);
+	f->data = xmalloc(f->filesize);
 	xxread(fd, f->data, f->filesize);
 	close(fd);
 	cpio_vec_insert(v, f);
@@ -362,6 +344,10 @@ static void cpio_backup(const char *orig, struct vector *v) {
 	cpio_rm(1, ".backup", o);
 	cpio_rm(1, ".backup", v);
 
+	// Sort both vectors before comparing
+	vec_sort(v, cpio_compare);
+	vec_sort(o, cpio_compare);
+
 	// Init the directory and rmlist
 	dir->filename = strdup(".backup");
 	dir->namesize = strlen(dir->filename) + 1;
@@ -431,9 +417,6 @@ static void cpio_backup(const char *orig, struct vector *v) {
 			dir->remove = 1;
 	}
 
-	// Sort
-	vec_sort(v, cpio_compare);
-
 	// Cleanup
 	cpio_vec_destroy(o);
 }
@@ -454,10 +437,9 @@ static int cpio_restore(struct vector *v) {
 			n = xcalloc(sizeof(*n), 1);
 			memcpy(n, f, sizeof(*f));
 			n->namesize -= 8;
-			n->filename = xmalloc(n->namesize);
-			memcpy(n->filename, f->filename + 8, n->namesize);
-			n->data = xmalloc(n->filesize);
-			memcpy(n->data, f->data, n->filesize);
+			n->filename = strdup(f->filename + 8);
+			n->data = f->data;
+			f->data = NULL;
 			n->remove = 0;
 			fprintf(stderr, "Restoring [%s] -> [%s]\n", f->filename, n->filename);
 			cpio_vec_insert(v, n);

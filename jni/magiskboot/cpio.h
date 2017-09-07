@@ -47,4 +47,17 @@ typedef struct cpio_newc_header {
 	char check[8];
 } cpio_newc_header;
 
+typedef enum {
+    NONE,
+    RM,
+    MKDIR,
+    ADD,
+    EXTRACT,
+    TEST,
+    PATCH,
+    BACKUP,
+    RESTORE,
+    STOCKSHA1
+} command_t;
+
 #endif

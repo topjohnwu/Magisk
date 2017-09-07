@@ -101,7 +101,7 @@ static struct node_entry *insert_child(struct node_entry *p, struct node_entry *
 			if (c->status > e->status) {
 				// Precedence is higher, replace with new node
 				destroy_subtree(e);
-				vec_entry(p->children)[_] = c;
+				vec_cur(p->children) = c;
 				return c;
 			} else {
 				// Free the new entry, return old
@@ -654,7 +654,7 @@ void post_fs_data(int client) {
 				child->name = strdup("vendor");
 				child->status = 0;
 				// Swap!
-				vec_entry(sys_root->children)[_] = child;
+				vec_cur(sys_root->children) = child;
 				ven_root->parent = NULL;
 				break;
 			}

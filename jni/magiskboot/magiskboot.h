@@ -46,19 +46,6 @@ typedef enum {
     MTK
 } file_t;
 
-typedef enum {
-    NONE,
-    RM,
-    MKDIR,
-    ADD,
-    EXTRACT,
-    TEST,
-    PATCH,
-    BACKUP,
-    RESTORE,
-    STOCKSHA1
-} command_t;
-
 extern char *SUP_LIST[];
 extern char *SUP_EXT_LIST[];
 extern file_t SUP_TYPE_LIST[];

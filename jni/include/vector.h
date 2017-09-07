@@ -32,4 +32,6 @@ struct vector *vec_dup(struct vector *v);
 	e = v ? (v)->data[(v)->size - 1] : NULL; \
 	for (size_t _ = (v)->size; v && _ > 0; --_, e = (v)->data[_ - 1])
 
+#define vec_cur(v) vec_entry(v)[_]
+
 #endif
