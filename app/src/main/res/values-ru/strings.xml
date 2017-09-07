@@ -28,7 +28,7 @@
     <!--Install Fragment-->
     <string name="auto_detect">(Авто) %1$s</string>
     <string name="cannot_auto_detect">(Автоопределение невозможно)</string>
-    <string name="boot_image_title">Распоожение boot-образа</string>
+    <string name="boot_image_title">Расположение boot-образа</string>
     <string name="detect_button">Определить</string>
     <string name="advanced_settings_title">Расширенные настройки</string>
     <string name="keep_force_encryption">Оставить принуд. шифрование</string>
@@ -38,6 +38,7 @@
     <string name="uninstall">Удалить</string>
     <string name="reboot_countdown">Перезагрузка через %1$d</string>
     <string name="uninstall_magisk_title">Удалить Magisk</string>
+    <string name="uninstall_magisk_msg">Все модули были отключены либо удалены. Root-доступ будет удален, данные зашифруются, если до сих пор не были зашифрованы</string>
     <string name="update">Обновить %1$s</string>
     
     <!--Module Fragment-->
@@ -88,7 +89,6 @@
     <string name="install_error">Ошибка во время установки!</string>
     <string name="invalid_zip">В архив отсутствует модуль Magisk!</string>
     <string name="reboot">Перезагрузка</string>
-    <string name="zip_process_msg">Обработка архива …</string>
     <string name="downloading_toast">Скачивание %1$s</string>
     <string name="magisk_update_title">Доступно новое обновление Magisk!</string>
     <string name="settings_reboot_toast">Для применения настроек выполните перезагрузку</string>
@@ -98,11 +98,24 @@
     <string name="process_error">Ошибка обработки</string>
     <string name="internal_storage">Архив расположен:\n[Внутреннее Хранилище]%1$s</string>
     <string name="zip_process_title">Обработка</string>
+    <string name="zip_process_msg">Обработка архива…</string>
     <string name="manual_boot_image">Пожалуйста, выберите вручную boot-образ!</string>
     <string name="manager_update_title">Доступно новое обновление менеджера Magisk!</string>
     <string name="manager_download_install">Нажмите, чтобы скачать и установить</string>
+    <string name="magisk_updates">Обновления Magisk</string>
+    <string name="flashing">Прошивка…</string>
     <string name="hide_manager_toast">Скрытие Менеджера Magisk…</string>
     <string name="hide_manager_fail_toast">Скрытие Менеджера Magisk неудачно…</string>
+    <string name="download_zip_only">Загрузка только архива</string>
+    <string name="patch_boot_file">Пропатчить boot-образ</string>
+    <string name="direct_install">Непосредственная установка (рекомендуется)</string>
+    <string name="select_method">Выбрать способ</string>
+    <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образа</string>
+    <string name="boot_file_patch_msg">Выберите оригинальный дамп boot-образа, .img либо .img.tar формата</string>
+    <string name="complete_uninstall">Удаление завершено</string>
+    <string name="restore_stock_boot">Восстановить оригинальный boot-образ</string>
+    <string name="restore_done">Восстановление завершено!</string>
+    <string name="restore_fail">Резервная копия отсутствует!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
