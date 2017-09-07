@@ -1,30 +1,30 @@
- <resources>
+<resources>
     <!--Universal-->
     <!--Welcome Activity-->
-     <string name="modules">Modüller</string>
+    <string name="modules">Modüller</string>
     <string name="downloads">İndir</string>
     <string name="superuser">Yetkili kullanıcı</string>
     <string name="log">Günlük</string>
     <string name="settings">Ayarlar</string>
-     <string name="install">Yükle</string>
+    <string name="install">Yükle</string>
 
     <!--Status Fragment-->
-     <string name="magisk_version_error">Magisk yüklü değil</string>
+    <string name="magisk_version_error">Magisk yüklü değil</string>
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
     <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet bağlantınız yok mu?</string>
-     <string name="root_error">Kök erişimli ama kök erişimi izni yok, izin verilmedi mi?</string>
+    <string name="root_error">Kök erişimli ama kök erişimi izni yok, izin verilmedi mi?</string>
     <string name="not_rooted">Kök erişimli değil</string>
-     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
+    <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
-     <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
-     <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
+    <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
+    <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
     <string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
 
-     <!--Install Fragment-->
+    <!--Install Fragment-->
     <string name="auto_detect">(Otomatik) %1$s</string>
     <string name="cannot_auto_detect">(Otomatik algılanamıyor)</string>
     <string name="boot_image_title">Önyükleme İmajı Konumu</string>
@@ -37,7 +37,8 @@
     <string name="uninstall">Kaldır</string>
     <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
-     <string name="update">Güncelle %1$s</string>
+    <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verilerinizi şifrelenecek</string>
+    <string name="update">Güncelle %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
@@ -49,7 +50,7 @@
     <string name="disable_file_removed">Modül sonraki yeniden başlatmada etkinleştirilecek</string>
     <string name="author">Yapımcı: %1$s</string>
 
-     <!--Repo Fragment-->
+    <!--Repo Fragment-->
     <string name="update_available">Güncelleme Mevcut</string>
     <string name="installed">Yüklenmiş</string>
     <string name="not_installed">Yüklenmemiş</string>
@@ -82,27 +83,41 @@
     <string name="close">Kapat</string>
     <string name="repo_install_title">%1$s yükle</string>
     <string name="repo_install_msg">%1$s yüklensin mi?</string>
-     <string name="download">İndir</string>
-     <string name="download_file_error">Dosya indirme hatası</string>
+    <string name="download">İndir</string>
+    <string name="download_file_error">Dosya indirme hatası</string>
     <string name="install_error">Yükleme hatası!</string>
     <string name="invalid_zip">Zip Magisk Modülü değil!!</string>
-     <string name="reboot">Yeniden başlat</string>
-     <string name="zip_process_msg">Zip dosyası işleniyor …</string>
-     <string name="downloading_toast">%1$s indiriliyor</string>
+    <string name="reboot">Yeniden başlat</string>
+    <string name="downloading_toast">%1$s indiriliyor</string>
     <string name="magisk_update_title">Yeni Magisk Güncellemesi Mevcut!</string>
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
     <string name="safetyNet_hide_notice">Bu uygulama, SafetyNet kullanıyor\nZaten MagiskHide tarafından varsayılan olarak ele alındı</string>
-     <string name="process_error">İşlem hatası</string>
+    <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
+    <string name="zip_download_title">İndiriliyor</string>
+    <string name="zip_download_msg">Zip dosyası indiriliyor …</string>
     <string name="zip_process_title">İşleniyor</string>
+    <string name="zip_process_msg">Zip dosyası işleniyor …</string>
     <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>
     <string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
     <string name="magisk_updates">Magisk Güncellemeleri</string>
     <string name="flashing">Yükleyin</string>
-
+    <string name="hide_manager_toast">Magisk Manager\'ı Gizle…</string>
+    <string name="hide_manager_fail_toast">Hide Magisk Manager\'ı Gizleme başarısız oldu…</string>
+    <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>
+    <string name="patch_boot_file">Önyükleme İmaj Dosyasını Yamala</string>
+    <string name="direct_install">Doğrudan Yükleme (Önerilen)</string>
+    <string name="select_method">Yöntem Seçin</string>
+    <string name="no_boot_file_patch_support">Hedef Magisk sürümü önyükleme imaj dosyasını yamalamayı desteklemez</string>
+    <string name="boot_file_patch_msg">.img veya .img.tar formatında stok önyükleme imajını seçin</string>
+    <string name="complete_uninstall">Tamamen Kaldır</string>
+    <string name="restore_stock_boot">Stok Önyükleme Dosyasını Geri Yükle</string>
+    <string name="restore_done">Yenileme tamamlandı!</string>
+    <string name="restore_fail">Stok önyükleme yedeği yok!</string>
+ 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
@@ -111,13 +126,21 @@
     <string name="settings_notification_summary">Yeni sürüm kullanılabilir olduğunda güncelleme bildirimlerini göster</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
+    <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
+    <string name="settings_hide_manager_summary">Magisk Manager\'ı geçici olarak gizle.\nBu, \"Unhide Magisk Manager\" adlı yeni bir uygulama yükleyecektir.</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
+    <string name="settings_update">Güncelleme Ayarları</string>
+    <string name="settings_update_channel_title">Güncelleme Kanalı</string>
+    <string name="settings_update_stable">Kararlı</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_boot_format_title">Yamalı Önyükleme Formatı</string>
+    <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/indirme modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
 
     <string name="settings_core_only_title">Magisk Yalnızca Çekirdek Modu</string>
     <string name="settings_core_only_summary">Yalnızca temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
-     <string name="settings_hosts_title">Sistemsiz host</string>
+    <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>
 
     <string name="settings_su_app_adb">Uygulamalar ve ADB</string>
