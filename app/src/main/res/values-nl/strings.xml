@@ -38,6 +38,7 @@
     <string name="uninstall">Deïnstalleren</string>
     <string name="reboot_countdown">Herstarten in %1$d</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
+    <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd. Root wordt verwijderd, en je data wordt mogelijk versleuteld als deze dat momenteel niet is</string>
     <string name="update">Bijwerken %1$s</string>
 
     <!--Module Fragment-->
@@ -88,7 +89,6 @@
     <string name="install_error">Installatiefout!</string>
     <string name="invalid_zip">De zip is geen Magisk module!</string>
     <string name="reboot">Herstarten</string>
-    <string name="zip_process_msg">Zip-bestand verwerken…</string>
     <string name="downloading_toast">%1$s downloaden</string>
     <string name="magisk_update_title">Nieuwe Magisk update beschikbaar!</string>
     <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
@@ -97,8 +97,27 @@
     <string name="safetyNet_hide_notice">Deze app gebruikt SafetyNet\nReeds afgehandeld door standaard MagiskHide</string>
     <string name="process_error">Verwerkingsfout</string>
     <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
+    <string name="zip_download_title">Downloaden</string>
+    <string name="zip_download_msg">Zip-bestand downloaden…</string>
     <string name="zip_process_title">Verwerken</string>
+    <string name="zip_process_msg">Zip-bestand verwerken…</string>
     <string name="manual_boot_image">Gelieve handmatig een boot image te selecteren!</string>
+    <string name="manager_update_title">Nieuwe Magisk Manager update beschikbaar!</string>
+    <string name="manager_download_install">Tik om te downloaden en installeren</string>
+    <string name="magisk_updates">Magisk updates</string>
+    <string name="flashing">Flashen</string>
+    <string name="hide_manager_toast">Magisk Manager verbergen…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
+    <string name="download_zip_only">Alleen zip downloaden</string>
+    <string name="patch_boot_file">Boot image-bestand patchen</string>
+    <string name="direct_install">Direct installeren (aangeraden)</string>
+    <string name="select_method">Methode kiezen</string>
+    <string name="no_boot_file_patch_support">Magisk versie ondersteund geen boot image-bestand patchen</string>
+    <string name="boot_file_patch_msg">Kies originele boot image-dump in .img- of .img.tar-formaat</string>
+    <string name="complete_uninstall">Compleet deïnstalleren</string>
+    <string name="restore_stock_boot">Originele boot herstellen</string>
+    <string name="restore_done">Herstel voltooid!</string>
+    <string name="restore_fail">Originele back-up bestaat niet!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
@@ -108,8 +127,16 @@
     <string name="settings_notification_summary">Een update melding weergeven wanneer een nieuwe versie beschikbaar is</string>
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
+    <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
+    <string name="settings_hide_manager_summary">Magisk Manager tijdelijk verbergen.\nDit installeert een nieuwe app genaamd \"Unhide Magisk Manager\"</string>
     <string name="language">Taal</string>
     <string name="system_default">(Systeem standaard)</string>
+    <string name="settings_update">Instellingen bijwerken</string>
+    <string name="settings_update_channel_title">Update-kanaal</string>
+    <string name="settings_update_stable">Stabiel</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
+    <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
     
     <string name="settings_core_only_title">Magisk basismodus</string>
     <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
