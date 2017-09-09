@@ -24,6 +24,7 @@ static void usage(char *arg0) {
 		"    -rm [-r] <entry>\n      Remove entry from <incpio>, flag -r to remove recursively\n"
 		"    -mkdir <mode> <entry>\n      Create directory as an <entry>\n"
 		"    -add <mode> <entry> <infile>\n      Add <infile> as an <entry>; replaces <entry> if already exists\n"
+		"    -mv <from-entry> <to-entry>\n      Move <from-entry> to <to-entry>\n"
 		"    -extract <entry> <outfile>\n      Extract <entry> to <outfile>\n"
 		"    -test \n      Return value: 0/not patched 1/Magisk 2/Other (e.g. phh, SuperSU)\n"
 		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n      Patch cpio for Magisk. KEEP**** are true/false values\n"

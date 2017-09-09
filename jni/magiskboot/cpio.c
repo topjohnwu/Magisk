@@ -40,7 +40,7 @@ static void cpio_vec_insert(struct vector *v, cpio_file *n) {
 	vec_push_back(v, n);
 }
 
-static int cpio_compare(const void *a, const void *b) {
+static int cpio_cmp(const void *a, const void *b) {
 	return strcmp((*(cpio_file **) a)->filename, (*(cpio_file **) b)->filename);
 }
 
@@ -92,7 +92,7 @@ static void dump_cpio(const char *filename, struct vector *v) {
 	unsigned inode = 300000;
 	char header[111];
 	// Sort by name
-	vec_sort(v, cpio_compare);
+	vec_sort(v, cpio_cmp);
 	cpio_file *f;
 	vec_for_each(v, f) {
 		if (f->remove) continue;
@@ -139,13 +139,15 @@ static void cpio_vec_destroy(struct vector *v) {
 static void cpio_rm(int recursive, const char *entry, struct vector *v) {
 	cpio_file *f;
 	vec_for_each(v, f) {
-		if ((recursive && strncmp(f->filename, entry, strlen(entry)) == 0)
-			|| (strcmp(f->filename, entry) == 0) ) {
-			if (!f->remove) {
-				fprintf(stderr, "Remove [%s]\n", entry);
-				f->remove = 1;
+		if (strncmp(f->filename, entry, strlen(entry)) == 0) {
+			char next = f->filename[strlen(entry)];
+			if ((recursive && next == '/') || next == '\0') {
+				if (!f->remove) {
+					fprintf(stderr, "Remove [%s]\n", f->filename);
+					f->remove = 1;
+				}
+				if (!recursive) return;
 			}
-			if (!recursive) return;
 		}
 	}
 }
@@ -345,8 +347,8 @@ static void cpio_backup(const char *orig, struct vector *v) {
 	cpio_rm(1, ".backup", v);
 
 	// Sort both vectors before comparing
-	vec_sort(v, cpio_compare);
-	vec_sort(o, cpio_compare);
+	vec_sort(v, cpio_cmp);
+	vec_sort(o, cpio_cmp);
 
 	// Init the directory and rmlist
 	dir->filename = strdup(".backup");
@@ -470,6 +472,27 @@ static void cpio_stocksha1(struct vector *v) {
 	}
 }
 
+static void cpio_mv(struct vector *v, const char *from, const char *to) {
+	struct cpio_file *f, *t;
+	vec_for_each(v, f) {
+		if (strcmp(f->filename, from) == 0) {
+			fprintf(stderr, "Move [%s] -> [%s]\n", from, to);
+			vec_for_each(v, t) {
+				if (strcmp(t->filename, to) == 0) {
+					t->remove = 1;
+					break;
+				}
+			}
+			free(f->filename);
+			f->namesize = strlen(to) + 1;
+			f->filename = strdup(to);
+			return;
+		}
+	}
+	fprintf(stderr, "Cannot find entry %s\n", from);
+	exit(1);
+}
+
 int cpio_commands(const char *command, int argc, char *argv[]) {
 	int recursive = 0, ret = 0;
 	command_t cmd;
@@ -491,6 +514,8 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 			++argv;
 			--argc;
 		}
+	} else if (argc == 2 && strcmp(command, "mv") == 0) {
+		cmd = MV;
 	} else if (argc == 2 && strcmp(command, "patch") == 0) {
 		cmd = PATCH;
 	} else if (argc == 2 && strcmp(command, "extract") == 0) {
@@ -531,6 +556,9 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		break;
 	case ADD:
 		cpio_add(strtoul(argv[0], NULL, 8), argv[1], argv[2], &v);
+		break;
+	case MV:
+		cpio_mv(&v, argv[0], argv[1]);
 		break;
 	case NONE:
 		return 1;

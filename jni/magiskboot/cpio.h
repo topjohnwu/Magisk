@@ -52,6 +52,7 @@ typedef enum {
     RM,
     MKDIR,
     ADD,
+    MV,
     EXTRACT,
     TEST,
     PATCH,
