@@ -98,6 +98,8 @@
     <string name="safetyNet_hide_notice">Esta aplicación usa SafetyNet\nYa manejado por defecto por MagiskHide</string>
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
+    <string name="zip_download_title">Descargando</string>
+    <string name="zip_download_msg">Descargando el archivo zip …</string>
     <string name="zip_process_title">Procesando</string>
     <string name="manual_boot_image">¡Selecciona manualmente una imagen boot!</string>
     <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
