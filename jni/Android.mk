@@ -13,7 +13,8 @@ LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/include \
 	$(LOCAL_PATH)/external \
-	$(LOCAL_PATH)/selinux/libsepol/include
+	$(LOCAL_PATH)/selinux/libsepol/include \
+	$(LOCAL_PATH)/selinux/libsepol/cil/include
 
 LOCAL_SRC_FILES := \
 	daemon/magisk.c \
@@ -32,6 +33,7 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
+	magiskpolicy/secilc.c \
 	magiskpolicy/api.c \
 	resetprop/resetprop.cpp \
 	resetprop/system_properties.cpp \

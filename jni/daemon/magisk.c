@@ -11,10 +11,10 @@
 char *argv0;
 
 char *applet[] =
-	{ "su", "resetprop", "magiskpolicy", "supolicy", "sepolicy-inject", "magiskhide", NULL };
+	{ "su", "resetprop", "magisksecilc", "magiskpolicy", "supolicy", "sepolicy-inject", "magiskhide", NULL };
 
 int (*applet_main[]) (int, char *[]) =
-	{ su_client_main, resetprop_main, magiskpolicy_main, magiskpolicy_main, magiskpolicy_main, magiskhide_main, NULL };
+	{ su_client_main, resetprop_main, secilc_main, magiskpolicy_main, magiskpolicy_main, magiskpolicy_main, magiskhide_main, NULL };
 
 // Global error hander function
 // Should be changed each thread/process

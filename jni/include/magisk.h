@@ -79,6 +79,7 @@ extern int (*applet_main[]) (int, char *[]);
 int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
+int secilc_main(int argc, char *argv[]);
 
 #ifdef __cplusplus
 extern "C" {
