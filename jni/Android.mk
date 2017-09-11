@@ -74,6 +74,15 @@ LOCAL_SRC_FILES := \
 LOCAL_CFLAGS := -DZLIB_CONST
 include $(BUILD_EXECUTABLE)
 
+# magiskinit
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskinit
+LOCAL_SRC_FILES := magiskinit.c
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+endif
+
 # 32-bit static binaries
 ifneq ($(TARGET_ARCH_ABI), x86_64)
 ifneq ($(TARGET_ARCH_ABI), arm64-v8a)
