@@ -89,6 +89,9 @@ if $BOOTMODE; then
   rm -rf /dev/magisk/mirror/bin 2>/dev/null
 fi
 
+# Save our stock boot image dump before removing it
+[ -f $MAGISKBIN/stock_boot* ] && mv $MAGISKBIN/stock_boot* /data
+
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
 mkdir -p $MAGISKBIN
@@ -119,7 +122,10 @@ cd $MAGISKBIN
 # Source the boot patcher
 . $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
 
-[ -f stock_boot* ] && rm -f /data/stock_boot* 2>/dev/null
+if [ -f stock_boot* ]; then
+  rm -f /data/stock_boot* 2>/dev/null
+  mv stock_boot* /data
+fi
 
 ui_print "- Flashing new boot image"
 if [ -L "$BOOTIMAGE" ]; then
