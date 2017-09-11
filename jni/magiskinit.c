@@ -66,6 +66,45 @@ static void clone_dir(int src, int dest) {
 	}
 }
 
+static void mv_dir(int src, int dest) {
+	struct dirent *entry;
+	DIR *dir;
+	int newsrc, newdest;
+	struct stat st;
+	char buf[PATH_MAX];
+	ssize_t size;
+
+	dir = fdopendir(src);
+	while ((entry = readdir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		fstatat(src, entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+		switch (entry->d_type) {
+		case DT_DIR:
+			mkdirat(dest, entry->d_name, st.st_mode & 0777);
+			fchownat(dest, entry->d_name, st.st_uid, st.st_gid, 0);
+			newsrc = openat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newdest = openat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
+			mv_dir(newsrc, newdest);
+			close(newsrc);
+			close(newdest);
+			break;
+		case DT_REG:
+			renameat(src, entry->d_name, dest, entry->d_name);
+			fchmodat(dest, entry->d_name, st.st_mode & 0777, 0);
+			fchownat(dest, entry->d_name, st.st_uid, st.st_gid, 0);
+			break;
+		case DT_LNK:
+			size = readlinkat(src, entry->d_name, buf, sizeof(buf));
+			buf[size] = '\0';
+			symlinkat(buf, dest, entry->d_name);
+			fchownat(dest, entry->d_name, st.st_uid, st.st_gid, AT_SYMLINK_NOFOLLOW);
+			break;
+		}
+		unlinkat(src, entry->d_name, AT_REMOVEDIR);
+	}
+}
+
 static void rm_rf(int path) {
 	struct dirent *entry;
 	int newfd;
@@ -76,6 +115,9 @@ static void rm_rf(int path) {
 			continue;
 		switch (entry->d_type) {
 		case DT_DIR:
+			// Preserve overlay
+			if (strcmp(entry->d_name, "overlay") == 0)
+				continue;
 			newfd = openat(path, entry->d_name, O_RDONLY | O_CLOEXEC);
 			rm_rf(newfd);
 			close(newfd);
@@ -185,13 +227,17 @@ int main(int argc, char *argv[]) {
 		mkdir("/system_root", 0755);
 		mount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
-
 		clone_dir(system_root, root);
-
 		mount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+
+		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
+		if (overlay > 0)
+			mv_dir(overlay, root);
 
 		close(root);
 		close(system_root);
+		close(overlay);
+		rmdir("/overlay");
 	} else {
 		// Recovery mode
 		// Revert original init binary
