@@ -37,6 +37,36 @@ ui_print() {
   fi
 }
 
+mount_partitions() {
+  # Check A/B slot
+  SLOT=`getprop ro.boot.slot_suffix`
+  [ -z $SLOT ] || ui_print "- A/B partition detected, current slot: $SLOT"
+  ui_print "- Mounting /system, /vendor"
+  is_mounted /system || [ -f /system/build.prop ] || mount -o ro /system 2>/dev/null
+  if ! is_mounted /system && ! [ -f /system/build.prop ]; then
+    SYSTEMBLOCK=`find /dev/block -iname system$SLOT | head -n 1`
+    mount -t ext4 -o ro $SYSTEMBLOCK /system
+  fi
+  is_mounted /system || [ -f /system/build.prop ] || abort "! Cannot mount /system"
+  cat /proc/mounts | grep /dev/root >/dev/null && SKIP_INITRAMFS=true || SKIP_INITRAMFS=false
+  if [ -f /system/init.rc ]; then
+    SKIP_INITRAMFS=true
+    mkdir /system_root 2>/dev/null
+    mount --move /system /system_root
+    mount -o bind /system_root/system /system
+  fi
+  $SKIP_INITRAMFS && ui_print "- Device skip_initramfs detected"
+  if [ -L /system/vendor ]; then
+    # Seperate /vendor partition
+    is_mounted /vendor || mount -o ro /vendor 2>/dev/null
+    if ! is_mounted /vendor; then
+      VENDORBLOCK=`find /dev/block -iname vendor$SLOT | head -n 1`
+      mount -t ext4 -o ro $VENDORBLOCK /vendor
+    fi
+    is_mounted /vendor || abort "! Cannot mount /vendor"
+  fi
+}
+
 grep_prop() {
   REGEX="s/^$1=//p"
   shift
@@ -58,10 +88,14 @@ getvar() {
 
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
-    for BLOCK in boot_a kern-a android_boot kernel boot lnx; do
-      BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
-      [ ! -z $BOOTIMAGE ] && break
-    done
+    if [ ! -z $SLOT ]; then
+      BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
+    else
+      for BLOCK in boot_a kern-a android_boot kernel boot lnx; do
+        BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
+        [ ! -z $BOOTIMAGE ] && break
+      done
+    fi
   fi
   # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
@@ -180,6 +214,7 @@ recovery_cleanup() {
   export LD_LIBRARY_PATH=$OLD_LD_PATH
   [ -z $OLD_PATH ] || export PATH=$OLD_PATH
   ui_print "- Unmounting partitions"
+  umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
   umount -l /vendor 2>/dev/null
   umount -l /dev/random 2>/dev/null

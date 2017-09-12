@@ -238,6 +238,9 @@ def zip_main(args):
 				source = os.path.join('libs', lib_dir, binary)
 				target = os.path.join(zip_dir, binary)
 				zip_with_msg(zipf, source, target)
+		source = os.path.join('libs', 'arm64-v8a', 'magiskinit')
+		target = os.path.join('arm64', 'magiskinit')
+		zip_with_msg(zipf, source, target)
 
 		# APK
 		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk',

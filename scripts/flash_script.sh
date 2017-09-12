@@ -49,13 +49,8 @@ ui_print "************************"
 ui_print "* Magisk v$MAGISK_VER Installer"
 ui_print "************************"
 
-ui_print "- Mounting /system, /vendor, /cache, /data"
-mount -o ro /system 2>/dev/null
-mount -o ro /vendor 2>/dev/null
-mount /cache 2>/dev/null
-mount /data 2>/dev/null
-
-[ -f /system/build.prop ] || abort "! /system could not be mounted!"
+is_mounted /data || mount /data
+mount_partitions
 
 # read override variables
 getvar KEEPVERITY

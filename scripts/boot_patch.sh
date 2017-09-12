@@ -200,23 +200,54 @@ esac
 
 ui_print_wrap "- Patching ramdisk"
 
-# Add magisk entrypoint
-./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
-
-# sepolicy patches
-cpio_extract sepolicy sepolicy
-./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
-cpio_add 644 sepolicy sepolicy
-rm -f sepolicy
-
-# Add new items
 if [ ! -z $SHA1 ]; then
   cp init.magisk.rc init.magisk.rc.bak
   echo "# STOCKSHA1=$SHA1" >> init.magisk.rc
 fi
-cpio_add 750 init.magisk.rc init.magisk.rc
+
+if $SKIP_INITRAMFS; then
+  # First check precompiled ones
+  [ -f /system_root/sepolicy ] && cp /system_root/sepolicy sepolicy
+  if [ ! -f sepolicy -a -f /vendor/etc/selinux/precompiled_sepolicy ]; then
+    # Check SHA256
+    SYSTEMSHA256=`find /system/etc/selinux -name '*.sha256' -exec cat {} \; 2>/dev/null`
+    VENDORSHA256=`find /vendor/etc/selinux -name '*.sha256' -exec cat {} \; 2>/dev/null`
+    [ "$SYSTEMSHA256" = "$VENDORSHA256" ] && cp /vendor/etc/selinux/precompiled_sepolicy sepolicy
+  fi
+  if [ ! -f sepolicy ]; then
+    ui_print_wrap "- Compiling split cil policies"
+    # Compile the split policies
+    POLICY_VER=`cat /sys/fs/selinux/policyvers`
+    PLAT_CIL=/system/etc/selinux/plat_sepolicy.cil
+    NONPLAT_CIL=`find /vendor/etc/selinux -name '*.cil' 2>/dev/null`
+    VENDOR_PLAT_VER=`cat /vendor/etc/selinux/plat_sepolicy_vers.txt`
+    MAPPING_CIL=/system/etc/selinux/mapping/${VENDOR_PLAT_VER}.cil
+    ./magisk magisksecilc -M true -c $POLICY_VER -o sepolicy -f /dev/null $PLAT_CIL $NONPLAT_CIL $MAPPING_CIL
+  fi
+  [ -f sepolicy ] || abort_wrap "! Cannot get sepolicy"
+
+  # TODO: Patch dm-verity
+
+  cpio_add 750 init ./magiskinit
+  cpio_mkdir 000 overlay
+  cpio_add 750 overlay/init.magisk.rc init.magisk.rc
+  cpio_mkdir 750 overlay/sbin
+  cpio_add 755 overlay/sbin/magisk magisk
+else
+  ./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
+
+  cpio_extract sepolicy sepolicy
+
+  cpio_add 750 init.magisk.rc init.magisk.rc
+  cpio_add 755 sbin/magisk magisk
+fi
+
 mv init.magisk.rc.bak init.magisk.rc 2>/dev/null
-cpio_add 755 sbin/magisk magisk
+
+# sepolicy patches
+./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
+$SKIP_INITRAMFS && cpio_add 644 overlay/sepolicy sepolicy || cpio_add 644 sepolicy sepolicy
+rm -f sepolicy
 
 # Create ramdisk backups
 ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
@@ -233,6 +264,11 @@ rm -f ramdisk.cpio.orig
 ./magiskboot --hexpatch kernel \
 49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
+
+# skip_initramfs -> want_initramfs
+./magiskboot --hexpatch kernel \
+736B69705F696E697472616D6673 \
+77616E745F696E697472616D6673
 
 ui_print_wrap "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
