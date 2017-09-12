@@ -151,7 +151,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 	LZ4F_compressionContext_t cctx;
 	LZ4F_frameInfo_t info;
 
-	size_t outCapacity, avail_in, ret = 0, pos = 0, total = 0;
+	size_t blockSize, outCapacity, avail_in, ret = 0, pos = 0, total = 0;
 	size_t have, read;
 	void *out = NULL;
 
@@ -171,10 +171,11 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 		LOGE(1, "Context creation error: %s\n", LZ4F_getErrorName(ret));
 
 	// Allocate out buffer
+	blockSize = 1 << 22;
 	switch(mode) {
 		case 0:
 			// Read header
-			read = CHUNK;
+			read = blockSize;
 			ret = LZ4F_getFrameInfo(dctx, &info, buf, &read);
 			if (LZ4F_isError(ret))
 				LOGE(1, "LZ4F_getFrameInfo error: %s\n", LZ4F_getErrorName(ret));
@@ -190,7 +191,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			pos += read;
 			break;
 		case 1:
-			outCapacity = LZ4F_compressBound(CHUNK, NULL) + LZ4_HEADER_SIZE + LZ4_FOOTER_SIZE;
+			outCapacity = LZ4F_compressFrameBound(blockSize, NULL);
 			break;
 	}
 
@@ -198,23 +199,31 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 
 	// Write header
 	if (mode == 1) {
-		have = ret = LZ4F_compressBegin(cctx, out, size, NULL);
+		LZ4F_preferences_t prefs;
+		memset(&prefs, 0, sizeof(prefs));
+		prefs.autoFlush = 1;
+		prefs.compressionLevel = 9;
+		prefs.frameInfo.blockMode = 1;
+		prefs.frameInfo.blockSizeID = 7;
+		prefs.frameInfo.contentChecksumFlag = 1;
+		have = ret = LZ4F_compressBegin(cctx, out, size, &prefs);
 		if (LZ4F_isError(ret))
 			LOGE(1, "Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
 		total += xwrite(fd, out, have);
 	}
 
 	do {
-		if (pos + CHUNK >= size) {
+		if (pos + blockSize >= size) {
 			avail_in = size - pos;
 		} else {
-			avail_in = CHUNK;
+			avail_in = blockSize;
 		}
 
 		do {
 			switch(mode) {
 				case 0:
-					have = outCapacity, read = avail_in;
+					have = outCapacity;
+					read = avail_in;
 					ret = LZ4F_decompress(dctx, out, &have, buf + pos, &read, NULL);
 					break;
 				case 1:
@@ -513,16 +522,16 @@ void comp_file(const char *method, const char *from, const char *to) {
 	void *file;
 	size_t size;
 	mmap_ro(from, &file, &size);
-	if (!to) {
+	if (!to)
 		snprintf(dest, sizeof(dest), "%s.%s", from, ext);
-		to = dest;
-	}
-	fprintf(stderr, "Compressing to [%s]\n\n", to);
-	int fd = open_new(to);
+	else
+		strcpy(dest, to);
+	fprintf(stderr, "Compressing to [%s]\n\n", dest);
+	int fd = open_new(dest);
 	comp(type, fd, file, size);
 	close(fd);
 	munmap(file, size);
-	if (to == from)
+	if (!to)
 		unlink(from);
 }
 
