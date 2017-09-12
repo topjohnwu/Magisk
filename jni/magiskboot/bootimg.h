@@ -2,20 +2,21 @@
 **
 ** Copyright 2007, The Android Open Source Project
 **
-** Licensed under the Apache License, Version 2.0 (the "License"); 
-** you may not use this file except in compliance with the License. 
-** You may obtain a copy of the License at 
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at
 **
-**     http://www.apache.org/licenses/LICENSE-2.0 
+**     http://www.apache.org/licenses/LICENSE-2.0
 **
-** Unless required by applicable law or agreed to in writing, software 
-** distributed under the License is distributed on an "AS IS" BASIS, 
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-** See the License for the specific language governing permissions and 
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
 ** limitations under the License.
 */
 
 #include <stdint.h>
+#include "magic.h"
 
 #ifndef _BOOT_IMAGE_H_
 #define _BOOT_IMAGE_H_
@@ -64,12 +65,12 @@ struct boot_img_hdr
 } __attribute__((packed));
 
 /*
-** +-----------------+ 
+** +-----------------+
 ** | boot header     | 1 page
 ** +-----------------+
-** | kernel          | n pages  
+** | kernel          | n pages
 ** +-----------------+
-** | ramdisk         | m pages  
+** | ramdisk         | m pages
 ** +-----------------+
 ** | second stage    | o pages
 ** +-----------------+
@@ -98,5 +99,22 @@ typedef struct mtk_hdr {
    uint32_t size;       /* Size of the content */
    uint8_t name[32];    /* The type of the header */
 } mtk_hdr;
+
+// Flags
+#define MTK_KERNEL    0x1
+#define MTK_RAMDISK   0x2
+#define APPEND_DTB    0x4
+
+typedef struct boot_img {
+    boot_img_hdr hdr;
+    void *kernel;
+    void *ramdisk;
+    void *second;
+    void *dtb;
+    void *extra;
+    int flags;
+    file_t kernel_type, ramdisk_type;
+    mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
+} boot_img;
 
 #endif

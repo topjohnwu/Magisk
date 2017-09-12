@@ -35,7 +35,7 @@ extern file_t SUP_TYPE_LIST[];
 void unpack(const char *image);
 void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
-int parse_img(void *orig, size_t size);
+int parse_img(void *orig, size_t size, boot_img *boot);
 int cpio_commands(const char *command, int argc, char *argv[]);
 void comp_file(const char *method, const char *from, const char *to);
 void decomp_file(char *from, const char *to);
