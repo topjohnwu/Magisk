@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mount.h>
+#include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 
@@ -21,6 +22,22 @@ struct device {
 	char partname[32];
 	char path[64];
 };
+
+static void mmap_ro(const char *filename, void **buf, size_t *size) {
+	int fd = open(filename, O_RDONLY);
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = mmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0);
+	close(fd);
+}
+
+static void mmap_rw(const char *filename, void **buf, size_t *size) {
+	int fd = open(filename, O_RDWR);
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	close(fd);
+}
 
 static void clone_dir(int src, int dest) {
 	struct dirent *entry;
@@ -206,6 +223,32 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
+static void patch_ramdisk() {
+	void *addr;
+	size_t size;
+	mmap_rw("/init", &addr, &size);
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(addr + i, "/system/etc/selinux/plat_sepolicy.cil", 37) == 0) {
+			memcpy(addr + i, "/system/etc/selinux/plat_sepolicy.xxx", 37);
+			break;
+		}
+	}
+	munmap(addr, size);
+	mmap_ro("/init.rc", &addr, &size);
+	int fd = open("/init.rc.patch", O_WRONLY | O_CREAT | O_CLOEXEC, 0750);
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(addr + i, "import", 6) == 0) {
+			write(fd, addr, i);
+			write(fd, "import /init.magisk.rc\n", 23);
+			write(fd, addr + i, size -i);
+			close(fd);
+			break;
+		}
+	}
+	munmap(addr, size);
+	rename("/init.rc.patch", "/init.rc");
+}
+
 int main(int argc, char *argv[]) {
 	umask(0);
 
@@ -233,6 +276,8 @@ int main(int argc, char *argv[]) {
 		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 		if (overlay > 0)
 			mv_dir(overlay, root);
+
+		patch_ramdisk();
 
 		close(root);
 		close(system_root);
