@@ -1,3 +1,14 @@
+/* magiskinit.c - Workaround for skip_initramfs devices
+ *
+ * This code has to be compiled statically to work properly.
+ *
+ * Magiskinit will mount sysfs, parse through uevent files to make the system block device,
+ * then it'll mount the system partition and clone rootfs except files under /system.
+ * Folders placed in "overlay" will then be overlayed to the root.
+ * Lastly before giving control back to the real init, it'll patch the root files to load Magisk.
+ */
+
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -287,7 +298,7 @@ int main(int argc, char *argv[]) {
 		// Recovery mode
 		// Revert original init binary
 		unlink("/init");
-		rename("/init_orig", "/init");
+		rename("/.backup/init", "/init");
 	}
 
 	execv("/init", argv);
