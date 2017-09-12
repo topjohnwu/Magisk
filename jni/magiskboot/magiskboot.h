@@ -37,18 +37,18 @@ void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
 int parse_img(void *orig, size_t size);
 int cpio_commands(const char *command, int argc, char *argv[]);
+void comp_file(const char *method, const char *from, const char *to);
+void decomp_file(char *from, const char *to);
 void cleanup();
 
 // Compressions
-void gzip(int mode, const char* filename, const void *buf, size_t size);
-void lzma(int mode, const char* filename, const void *buf, size_t size);
-void lz4(int mode, const char* filename, const void *buf, size_t size);
-void bzip2(int mode, const char* filename, const void *buf, size_t size);
-void lz4_legacy(int mode, const char* filename, const void *buf, size_t size);
-int comp(file_t type, const char *to, const void *from, size_t size);
-void comp_file(const char *method, const char *from, const char *to);
-int decomp(file_t type, const char *to, const void *from, size_t size);
-void decomp_file(char *from, const char *to);
+size_t gzip(int mode, int fd, const void *buf, size_t size);
+size_t lzma(int mode, int fd, const void *buf, size_t size);
+size_t lz4(int mode, int fd, const void *buf, size_t size);
+size_t bzip2(int mode, int fd, const void *buf, size_t size);
+size_t lz4_legacy(int mode, int fd, const void *buf, size_t size);
+long long comp(file_t type, int to, const void *from, size_t size);
+long long decomp(file_t type, int to, const void *from, size_t size);
 
 // Utils
 void mmap_ro(const char *filename, void **buf, size_t *size);
