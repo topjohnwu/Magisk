@@ -177,21 +177,28 @@ static void cpio_add(mode_t mode, const char *entry, const char *filename, struc
 }
 
 static void cpio_test(struct vector *v) {
-	#define MAGISK_PATCH  0x1
-	#define OTHER_PATCH 0x2
-	int ret = 0;
+	#define STOCK_BOOT      0x0
+	#define MAGISK_PATCH    0x1
+	#define OTHER_PATCH     0x2
+	int ret = STOCK_BOOT;
 	cpio_file *f;
-	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "init.supersu.rc", NULL };
+	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
+	const char *MAGISK_LIST[] = { "init.magisk.rc", "overlay/init.magisk.rc", NULL };
 	vec_for_each(v, f) {
 		for (int i = 0; OTHER_LIST[i]; ++i) {
-			if (strcmp(f->filename, OTHER_LIST[i]) == 0)
+			if (strcmp(f->filename, OTHER_LIST[i]) == 0) {
 				ret |= OTHER_PATCH;
+				// Already find other files, abort
+				exit(OTHER_PATCH);
+			}
 		}
-		if (strcmp(f->filename, "init.magisk.rc") == 0)
-			ret |= MAGISK_PATCH;
+		for (int i = 0; MAGISK_LIST[i]; ++i) {
+			if (strcmp(f->filename, MAGISK_LIST[i]) == 0)
+				ret = MAGISK_PATCH;
+		}
 	}
 	cpio_vec_destroy(v);
-	exit((ret & OTHER_PATCH) ? OTHER_PATCH : (ret & MAGISK_PATCH));
+	exit(ret);
 }
 
 static int check_verity_pattern(const char *s) {

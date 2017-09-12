@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 2 && strcmp(argv[1], "--sha1") == 0) {
 		char sha1[21], *buf;
 		size_t size;
-		mmap_ro(argv[2], (unsigned char **) &buf, &size);
+		mmap_ro(argv[2], (void **) &buf, &size);
 		SHA1(sha1, buf, size);
 		for (int i = 0; i < 20; ++i)
 			printf("%02x", sha1[i]);

@@ -31,7 +31,7 @@ static void report(const int mode, const char* filename) {
 }
 
 // Mode: 0 = decode; 1 = encode
-void gzip(int mode, const char* filename, const unsigned char* buf, size_t size) {
+void gzip(int mode, const char* filename, const void *buf, size_t size) {
 	size_t ret = 0, flush, have, pos = 0;
 	z_stream strm;
 	unsigned char out[CHUNK];
@@ -102,7 +102,7 @@ void gzip(int mode, const char* filename, const unsigned char* buf, size_t size)
 
 
 // Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
-void lzma(int mode, const char* filename, const unsigned char* buf, size_t size) {
+void lzma(int mode, const char* filename, const void *buf, size_t size) {
 	size_t have, pos = 0;
 	lzma_ret ret = 0;
 	lzma_stream strm = LZMA_STREAM_INIT;
@@ -167,14 +167,14 @@ void lzma(int mode, const char* filename, const unsigned char* buf, size_t size)
 }
 
 // Mode: 0 = decode; 1 = encode
-void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) {
+void lz4(int mode, const char* filename, const void *buf, size_t size) {
 	LZ4F_decompressionContext_t dctx;
 	LZ4F_compressionContext_t cctx;
 	LZ4F_frameInfo_t info;
 
 	size_t outCapacity, avail_in, ret = 0, pos = 0;
 	size_t have, read;
-	unsigned char *out = NULL;
+	void *out = NULL;
 
 	report(mode, filename);
 	int fd = open_new(filename);
@@ -190,7 +190,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 		default:
 			LOGE(1, "Unsupported lz4 mode!\n");
 	}
-	
+
 	if (LZ4F_isError(ret))
 		LOGE(1, "Context creation error: %s\n", LZ4F_getErrorName(ret));
 
@@ -277,7 +277,7 @@ void lz4(int mode, const char* filename, const unsigned char* buf, size_t size) 
 }
 
 // Mode: 0 = decode; 1 = encode
-void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size) {
+void bzip2(int mode, const char* filename, const void* buf, size_t size) {
 	size_t ret = 0, action, have, pos = 0;
 	bz_stream strm;
 	char out[CHUNK];
@@ -345,7 +345,7 @@ void bzip2(int mode, const char* filename, const unsigned char* buf, size_t size
 }
 
 // Mode: 0 = decode; 1 = encode
-void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t size) {
+void lz4_legacy(int mode, const char* filename, const void* buf, size_t size) {
 	size_t pos = 0;
 	int have;
 	char *out;
@@ -372,12 +372,13 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 	}
 
 	do {
+		const char *buff = buf;
 		switch(mode) {
 			case 0:
-				block_size = buf[pos];
-				block_size += (buf[pos + 1]<<8);
-				block_size += (buf[pos + 2]<<16);
-				block_size += ((unsigned)buf[pos + 3])<<24;
+				block_size = buff[pos];
+				block_size += (buff[pos + 1]<<8);
+				block_size += (buff[pos + 2]<<16);
+				block_size += ((unsigned)buff[pos + 3])<<24;
 				pos += 4;
 				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
 					LOGE(1, "lz4_legacy block size too large!\n");
@@ -395,10 +396,10 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 				if (have == 0)
 					LOGE(1, "lz4_legacy compression error\n");
 				pos += insize;
-				block_size_le[0] = (unsigned char)have;
-				block_size_le[1] = (unsigned char)(have >> 8);
-				block_size_le[2] = (unsigned char)(have >> 16);
-				block_size_le[3] = (unsigned char)(have >> 24);
+				block_size_le[0] = have & 0xff;
+				block_size_le[1] = (have >> 8) & 0xff;
+				block_size_le[2] = (have >> 16) & 0xff;
+				block_size_le[3] = (have >> 24) & 0xff;
 				write_file(fd, block_size_le, 4, filename);
 				break;
 		}
@@ -410,7 +411,7 @@ void lz4_legacy(int mode, const char* filename, const unsigned char* buf, size_t
 	close(fd);
 }
 
-int decomp(file_t type, const char *to, const unsigned char *from, size_t size) {
+int decomp(file_t type, const char *to, const void *from, size_t size) {
 	switch (type) {
 		case GZIP:
 			gzip(0, to, from, size);
@@ -438,7 +439,7 @@ int decomp(file_t type, const char *to, const unsigned char *from, size_t size) 
 }
 
 // Output will be to.ext
-int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
+int comp(file_t type, const char *to, const void *from, size_t size) {
 	char name[PATH_MAX];
 	const char *ext = strrchr(to, '.');
 	if (ext == NULL) ext = to;
@@ -483,7 +484,7 @@ int comp(file_t type, const char *to, const unsigned char *from, size_t size) {
 
 void decomp_file(char *from, const char *to) {
 	int ok = 1;
-	unsigned char *file;
+	void *file;
 	size_t size;
 	mmap_ro(from, &file, &size);
 	file_t type = check_type(file);
@@ -556,7 +557,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 		fprintf(stderr, "\n");
 		exit(1);
 	}
-	unsigned char *file;
+	void *file;
 	size_t size;
 	mmap_ro(from, &file, &size);
 	if (!to)

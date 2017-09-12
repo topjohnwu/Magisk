@@ -1,12 +1,12 @@
 #include "bootimg.h"
 #include "magiskboot.h"
 
-static unsigned char *kernel, *ramdisk, *second, *dtb, *extra;
+static void *kernel, *ramdisk, *second, *dtb, *extra;
 static boot_img_hdr hdr;
 static int mtk_kernel = 0, mtk_ramdisk = 0;
 static file_t ramdisk_type;
 
-static void dump(unsigned char *buf, size_t size, const char *filename) {
+static void dump(void *buf, size_t size, const char *filename) {
 	int fd = open_new(filename);
 	xwrite(fd, buf, size);
 	close(fd);
@@ -36,12 +36,12 @@ static void print_info() {
 		int os_version, os_patch_level;
 		os_version = hdr.os_version >> 11;
 		os_patch_level = hdr.os_version & 0x7ff;
-		
+
 		a = (os_version >> 14) & 0x7f;
 		b = (os_version >> 7) & 0x7f;
 		c = os_version & 0x7f;
 		fprintf(stderr, "OS_VERSION [%d.%d.%d]\n", a, b, c);
-		
+
 		y = (os_patch_level >> 4) + 2000;
 		m = os_patch_level & 0xf;
 		fprintf(stderr, "PATCH_LEVEL [%d-%02d]\n", y, m);
@@ -49,33 +49,15 @@ static void print_info() {
 	fprintf(stderr, "NAME [%s]\n", hdr.name);
 	fprintf(stderr, "CMDLINE [%s]\n", hdr.cmdline);
 
-	switch (ramdisk_type) {
-		case GZIP:
-			fprintf(stderr, "COMPRESSION [%s]\n", "gzip");
-			break;
-		case XZ:
-			fprintf(stderr, "COMPRESSION [%s]\n", "xz");
-			break;
-		case LZMA:
-			fprintf(stderr, "COMPRESSION [%s]\n", "lzma");
-			break;
-		case BZIP2:
-			fprintf(stderr, "COMPRESSION [%s]\n", "bzip2");
-			break;
-		case LZ4:
-			fprintf(stderr, "COMPRESSION [%s]\n", "lz4");
-			break;
-		case LZ4_LEGACY:
-			fprintf(stderr, "COMPRESSION [%s]\n", "lz4_legacy");
-			break;
-		default:
-			fprintf(stderr, "Unknown ramdisk format!\n");
-	}
+	char cmp[16];
+
+	get_type_name(ramdisk_type, cmp);
+	fprintf(stderr, "RAMDISK_COMP [%s]\n", cmp);
 	fprintf(stderr, "\n");
 }
 
-int parse_img(unsigned char *orig, size_t size) {
-	unsigned char *base, *end;
+int parse_img(void *orig, size_t size) {
+	void *base, *end;
 	size_t pos = 0;
 	int ret = 0;
 	for(base = orig, end = orig + size; base < end; base += 256, size -= 256) {
@@ -147,7 +129,7 @@ int parse_img(unsigned char *orig, size_t size) {
 
 void unpack(const char* image) {
 	size_t size;
-	unsigned char *orig;
+	void *orig;
 	mmap_ro(image, &orig, &size);
 
 	// Parse image
@@ -168,8 +150,8 @@ void unpack(const char* image) {
 	}
 	if (decomp(ramdisk_type, RAMDISK_FILE, ramdisk, hdr.ramdisk_size)) {
 		// Dump the compressed ramdisk
-		dump(ramdisk, hdr.ramdisk_size, RAMDISK_FILE ".unsupport");
-		LOGE(1, "Unsupported ramdisk format! Dumped to %s\n", RAMDISK_FILE ".unsupport");
+		dump(ramdisk, hdr.ramdisk_size, RAMDISK_FILE ".raw");
+		LOGE(1, "Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
 	}
 
 	if (hdr.second_size) {
@@ -188,7 +170,7 @@ void unpack(const char* image) {
 
 void repack(const char* orig_image, const char* out_image) {
 	size_t size;
-	unsigned char *orig;
+	void *orig;
 	char name[PATH_MAX];
 
 	// There are possible two MTK headers
@@ -241,7 +223,7 @@ void repack(const char* orig_image, const char* out_image) {
 		}
 
 		size_t cpio_size;
-		unsigned char *cpio;
+		void *cpio;
 		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
 
 		if (comp(ramdisk_type, RAMDISK_FILE, cpio, cpio_size))
@@ -278,8 +260,8 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Check extra info, currently only for LG Bump and Samsung SEANDROIDENFORCE
 	if (extra) {
-		if (memcmp(extra, "SEANDROIDENFORCE", 16) == 0 || 
-			memcmp(extra, "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79", 16) == 0 ) {
+		if (memcmp(extra, "SEANDROIDENFORCE", 16) == 0 ||
+			memcmp(extra, LG_BUMP_MAGIC, 16) == 0 ) {
 			restore_buf(fd, extra, 16);
 		}
 	}

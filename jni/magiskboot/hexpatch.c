@@ -12,7 +12,7 @@ static void hex2byte(const char *hex, unsigned char *str) {
 void hexpatch(const char *image, const char *from, const char *to) {
 	int patternsize = strlen(from) / 2, patchsize = strlen(to) / 2;
 	size_t filesize;
-	unsigned char *file, *pattern, *patch;
+	void *file, *pattern, *patch;
 	mmap_rw(image, &file, &filesize);
 	pattern = xmalloc(patternsize);
 	patch = xmalloc(patchsize);
