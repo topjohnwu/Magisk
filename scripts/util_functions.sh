@@ -3,7 +3,7 @@
 # Magisk General Utility Functions
 # by topjohnwu
 #
-# Used in flash_script.sh, addon.d.sh, magisk module installers, and uninstaller
+# Used everywhere in Magisk
 #
 ##########################################################################################
 
@@ -48,7 +48,7 @@ mount_partitions() {
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
   is_mounted /system || [ -f /system/build.prop ] || abort "! Cannot mount /system"
-  cat /proc/mounts | grep /dev/root >/dev/null && SKIP_INITRAMFS=true || SKIP_INITRAMFS=false
+  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SKIP_INITRAMFS=true || SKIP_INITRAMFS=false
   if [ -f /system/init.rc ]; then
     SKIP_INITRAMFS=true
     mkdir /system_root 2>/dev/null
@@ -121,6 +121,7 @@ migrate_boot_backup() {
     mv /data/stock_boot.img $STOCKDUMP
     ./magiskboot --compress $STOCKDUMP
   fi
+  [ -f /data/magisk/stock_boot* ] && mv /data/magisk/stock_boot* /data
 }
 
 sign_chromeos() {
