@@ -28,12 +28,14 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
     private ProgressDialog progressDialog;
     private boolean mInstall;
-    private String mLink, mFile;
+    private String mLink;
+    private File mFile;
 
     public ProcessRepoZip(Activity context, String link, String filename, boolean install) {
         super(context);
         mLink = link;
-        mFile = Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename;
+        mFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", filename);
+        mFile.getParentFile().mkdirs();
         mInstall = install;
     }
 
@@ -108,7 +110,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         Activity activity = getActivity();
         if (activity == null) return;
         progressDialog.dismiss();
-        Uri uri = Uri.fromFile(new File(mFile));
+        Uri uri = Uri.fromFile(mFile);
         if (result) {
             if (Shell.rootAccess() && mInstall) {
                 Intent intent = new Intent(getActivity(), FlashActivity.class);
