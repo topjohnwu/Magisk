@@ -314,7 +314,11 @@ static void clone_skeleton(struct node_entry *node) {
 		if (IS_LNK(child)) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
-			LOGI("cplink: %s -> %s\n", buf2, buf);
+			#ifdef MAGISK_DEBUG
+				LOGD("cplink: %s -> %s\n",buf2, buf);
+			#else
+				LOGI("cplink: %s\n", buf);
+			#endif
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
 			bind_mount(buf2, buf);
@@ -394,12 +398,26 @@ static void mount_mirrors() {
 	vec_init(&mounts);
 	file_to_vector("/proc/mounts", &mounts);
 	char *line;
+	int skip_initramfs = 0;
+	// Check whether skip_initramfs device
 	vec_for_each(&mounts, line) {
-		if (strstr(line, " /system ")) {
+		if (strstr(line, " /system_root ")) {
+			xmkdir_p(MIRRDIR "/system", 0755);
+			bind_mount("/system_root/system", MIRRDIR "/system");
+			skip_initramfs = 1;
+			break;
+		}
+	}
+	vec_for_each(&mounts, line) {
+		if (!skip_initramfs && strstr(line, " /system ")) {
 			sscanf(line, "%s", buf);
 			xmkdir_p(MIRRDIR "/system", 0755);
 			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
-			LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
+			#ifdef MAGISK_DEBUG
+				LOGD("mount: %s -> %s\n", buf, MIRRDIR "/system");
+			#else
+				LOGI("mount: %s\n", MIRRDIR "/system");
+			#endif
 			continue;
 		}
 		if (strstr(line, " /vendor ")) {
@@ -407,14 +425,22 @@ static void mount_mirrors() {
 			sscanf(line, "%s", buf);
 			xmkdir_p(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
-			LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+			#ifdef MAGISK_DEBUG
+				LOGD("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+			#else
+				LOGI("mount: %s\n", MIRRDIR "/vendor");
+			#endif
 			continue;
 		}
 	}
 	vec_deep_destroy(&mounts);
 	if (!seperate_vendor) {
 		symlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-		LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		#ifdef MAGISK_DEBUG
+			LOGD("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		#else
+			LOGI("link: %s\n", MIRRDIR "/vendor");
+		#endif
 	}
 	mkdir_p(MIRRDIR "/bin", 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
@@ -503,9 +529,6 @@ void post_fs(int client) {
 	// Error handler
 	err_handler = unblock_boot_process;
 
-	// Start log monitor
-	monitor_logs();
-
 	LOGI("** post-fs mode running\n");
 	// ack
 	write_int(client, 0);
@@ -535,6 +558,9 @@ void post_fs_data(int client) {
 	close(client);
 	if (!check_data())
 		goto unblock;
+
+	// Start log monitor
+	monitor_logs();
 
 #ifdef MAGISK_DEBUG
 	// Start debug logs in new process
@@ -569,10 +595,6 @@ void post_fs_data(int client) {
 	link_busybox();
 
 	// Merge images
-	if (merge_img("/cache/magisk.img", MAINIMG)) {
-		LOGE("Image merge %s -> %s failed!\n", "/cache/magisk.img", MAINIMG);
-		goto unblock;
-	}
 	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
 		LOGE("Image merge %s -> %s failed!\n", "/data/magisk_merge.img", MAINIMG);
 		goto unblock;

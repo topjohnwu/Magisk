@@ -134,7 +134,7 @@ void start_daemon(int client) {
 	close(client);
 	xsetsid();
 	setcon("u:r:su:s0");
-	umask(022);
+	umask(0);
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDIN_FILENO);
 	xdup2(fd, STDOUT_FILENO);
@@ -171,7 +171,6 @@ void start_daemon(int client) {
 	create_links(NULL, "/sbin");
 	xchmod("/sbin", 0755);
 	xmkdir("/magisk", 0755);
-	xchmod("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	// Loop forever to listen for requests

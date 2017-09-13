@@ -196,8 +196,7 @@ void unlock_blocks() {
 	while((entry = readdir(dir))) {
 		if (entry->d_type == DT_BLK &&
 			strstr(entry->d_name, "ram") == NULL &&
-			strstr(entry->d_name, "loop") == NULL &&
-			strstr(entry->d_name, "dm-0") == NULL) {
+			strstr(entry->d_name, "loop") == NULL) {
 			snprintf(path, sizeof(path), "%s/%s", DEV_BLOCK, entry->d_name);
 			if ((fd = xopen(path, O_RDONLY)) < 0)
 				continue;

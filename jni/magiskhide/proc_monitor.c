@@ -21,7 +21,7 @@
 
 static int zygote_num;
 static char init_ns[32], zygote_ns[2][32], cache_block[256];
-static int log_pid, log_fd, target_pid;
+static int log_pid, log_fd, target_pid, has_cache = 1;
 static char *buffer;
 
 // Workaround for the lack of pthread_cancel
@@ -101,20 +101,30 @@ static void hide_daemon(int pid) {
 	file_to_vector(buffer, &mount_list);
 
 	// Find the cache block name if not found yet
-	if (cache_block[0] == '\0') {
+	if (has_cache && cache_block[0] == '\0') {
 		vec_for_each(&mount_list, line) {
 			if (strstr(line, " /cache ")) {
 				sscanf(line, "%256s", cache_block);
 				break;
 			}
 		}
+		if (strlen(cache_block) == 0)
+			has_cache = 0;
 	}
 
-	// First unmount dummy skeletons, /sbin links, cache mounts, and mirrors
+	// Unmout cache mounts
+	if (has_cache) {
+		vec_for_each(&mount_list, line) {
+			if (strstr(line, cache_block) && (strstr(line, " /system/") || strstr(line, " /vendor/"))) {
+				sscanf(line, "%*s %4096s", buffer);
+				lazy_unmount(buffer);
+			}
+		}
+	}
+
+	// Unmount dummy skeletons, /sbin links, and mirrors
 	vec_for_each(&mount_list, line) {
-		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")
-			|| (strstr(line, cache_block) && (strstr(line, " /system") || strstr(line, " /vendor")))
-			|| strstr(line, MIRRDIR)) {
+		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin") || strstr(line, MIRRDIR)) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
