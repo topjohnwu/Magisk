@@ -32,6 +32,10 @@ import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -196,18 +200,46 @@ public class MagiskManager extends Application {
         getMagiskInfo();
         new LoadLocale(this).exec();
 
-        // Force synchronous, make sure we have busybox to use
-        if (hasNetwork && Shell.rootAccess()
-                && !Utils.itemExist(shell, BUSYBOXPATH + "/busybox")) {
-            try {
-                new DownloadBusybox(this).exec().get();
-            } catch (InterruptedException | ExecutionException e) {
+        // Root actions
+        if (Shell.rootAccess()) {
+            if (hasNetwork && !Utils.itemExist(shell, BUSYBOXPATH + "/busybox")) {
+                try {
+                    // Force synchronous, make sure we have busybox to use
+                    new DownloadBusybox(this).exec().get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            File utils = new File(getFilesDir(), Utils.UTIL_FUNCTIONS);
+
+            try (InputStream in  = getAssets().open(Utils.UTIL_FUNCTIONS);
+                 OutputStream out = new FileOutputStream(utils)
+            ) {
+                int read;
+                byte[] bytes = new byte[4096];
+                while ((read = in.read(bytes)) != -1) {
+                    out.write(bytes, 0, read);
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        shell.su_raw("export PATH=" + BUSYBOXPATH + ":$PATH");
 
-        updateBlockInfo();
+            shell.su_raw(
+                    "export PATH=" + BUSYBOXPATH + ":$PATH",
+                    ". " + utils,
+                    "mount_partitions",
+                    "find_boot_image",
+                    "migrate_boot_backup"
+            );
+
+            List<String> res = shell.su("echo \"$BOOTIMAGE\"");
+            if (Utils.isValidShellResponse(res)) {
+                bootBlock = res.get(0);
+            } else {
+                blockList = shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
+            }
+        }
 
         // Write back default values
         prefs.edit()
@@ -289,21 +321,4 @@ public class MagiskManager extends Application {
             magiskHide = true;
         }
     }
-
-    private void updateBlockInfo() {
-        List<String> res = shell.su(
-                "for BLOCK in boot_a kern-a android_boot kernel boot lnx; do",
-                "  BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null",
-                "  [ ! -z $BOOTIMAGE ] && break",
-                "done",
-                "[ ! -z \"$BOOTIMAGE\" -a -L \"$BOOTIMAGE\" ] && BOOTIMAGE=`readlink $BOOTIMAGE`",
-                "echo \"$BOOTIMAGE\""
-        );
-        if (Utils.isValidShellResponse(res)) {
-            bootBlock = res.get(0);
-        } else {
-            blockList = shell.su("find /dev/block -type b | grep -vE 'dm-0|ram|loop'");
-        }
-    }
-
 }
