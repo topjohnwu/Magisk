@@ -92,14 +92,16 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 				boot->extra = base + pos;
 			}
 
-			// Linear search in kernel for DTB
-			for (int i = 0; i < boot->hdr.kernel_size; ++i) {
-				if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
-					boot->flags |= APPEND_DTB;
-					boot->dtb = boot->kernel + i;
-					boot->hdr.dt_size = boot->hdr.kernel_size - i;
-					boot->hdr.kernel_size = i;
-					fprintf(stderr, "APPEND_DTB [%d]\n", boot->hdr.dt_size);
+			// Search for dtb in kernel if not found
+			if (boot->hdr.dt_size == 0) {
+				for (int i = 0; i < boot->hdr.kernel_size; ++i) {
+					if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
+						boot->flags |= APPEND_DTB;
+						boot->dtb = boot->kernel + i;
+						boot->hdr.dt_size = boot->hdr.kernel_size - i;
+						boot->hdr.kernel_size = i;
+						fprintf(stderr, "APPEND_DTB [%d]\n", boot->hdr.dt_size);
+					}
 				}
 			}
 
