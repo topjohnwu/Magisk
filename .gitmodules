@@ -1,11 +1,11 @@
 [submodule "jni/selinux"]
-	path = jni/selinux
+	path = jni/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
 [submodule "jni/su"]
 	path = jni/su
 	url = https://github.com/topjohnwu/MagiskSU.git
 [submodule "jni/ndk-compression"]
-	path = jni/ndk-compression
+	path = jni/external/ndk-compression
 	url = https://github.com/topjohnwu/ndk-compression.git
 [submodule "jni/magiskpolicy"]
 	path = jni/magiskpolicy
@@ -14,5 +14,5 @@
 	path = MagiskManager
 	url = https://github.com/topjohnwu/MagiskManager.git
 [submodule "jni/busybox"]
-	path = jni/busybox
+	path = jni/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git

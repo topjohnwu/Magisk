@@ -1,5 +1,16 @@
 LOCAL_PATH := $(call my-dir)
 
+# Some handy paths
+JNI_ROOT := jni
+SELINUX_PATH := jni/external/selinux
+COMPRESS_LIB := jni/external/ndk-compression
+LIBSELINUX := $(SELINUX_PATH)/libselinux/include
+LIBSEPOL := $(SELINUX_PATH)/libsepol/include $(SELINUX_PATH)/libsepol/cil/include
+LIBZ := $(COMPRESS_LIB)/zlib
+LIBLZMA := $(COMPRESS_LIB)/xz/src/liblzma/api
+LIBLZ4 := $(COMPRESS_LIB)/lz4/lib
+LIBBZ2 := $(COMPRESS_LIB)/bzip2
+
 ########################
 # Binaries
 ########################
@@ -11,10 +22,10 @@ LOCAL_STATIC_LIBRARIES := libsepol
 LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/include \
-	$(LOCAL_PATH)/external \
-	$(LOCAL_PATH)/selinux/libsepol/include \
-	$(LOCAL_PATH)/selinux/libsepol/cil/include
+	jni/include \
+	jni/external \
+	$(LIBSELINUX) \
+	$(LIBSEPOL)
 
 LOCAL_SRC_FILES := \
 	daemon/magisk.c \
@@ -55,12 +66,12 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libz liblzma liblz4 libbz2
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/magiskboot \
-	$(LOCAL_PATH)/include \
-	$(LOCAL_PATH)/ndk-compression/zlib \
-	$(LOCAL_PATH)/ndk-compression/xz/src/liblzma/api \
-	$(LOCAL_PATH)/ndk-compression/lz4/lib \
-	$(LOCAL_PATH)/ndk-compression/bzip2
+	jni/magiskboot \
+	jni/include \
+	$(LIBZ) \
+	$(LIBLZMA) \
+	$(LIBLZ4) \
+	$(LIBBZ2)
 
 LOCAL_SRC_FILES := \
 	magiskboot/main.c \
@@ -92,27 +103,16 @@ ifneq ($(TARGET_ARCH_ABI), arm64-v8a)
 include $(CLEAR_VARS)
 LOCAL_MODULE := b64xz
 LOCAL_STATIC_LIBRARIES := liblzma
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/ndk-compression/xz/src/liblzma/api
+LOCAL_C_INCLUDES := $(LIBLZMA)
 LOCAL_SRC_FILES := b64xz.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 # Busybox
-include jni/busybox/Android.mk
+include jni/external/busybox/Android.mk
 endif
 endif
 
 ########################
-# Libraries
+# Externals
 ########################
-
-# External shared libraries, include stub libselinux and libsqlite
 include jni/external/Android.mk
-
-# libsepol, static library
-include jni/selinux/libsepol/Android.mk
-
-# Compression libraries for magiskboot
-include jni/ndk-compression/zlib/Android.mk
-include jni/ndk-compression/xz/src/liblzma/Android.mk
-include jni/ndk-compression/lz4/lib/Android.mk
-include jni/ndk-compression/bzip2/Android.mk

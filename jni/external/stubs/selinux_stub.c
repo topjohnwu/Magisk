@@ -1,10 +1,11 @@
 #include <stdbool.h>
-#include "selinux/avc.h"
-#include "selinux/context.h"
-#include "selinux/get_context_list.h"
-#include "selinux/get_default_type.h"
-#include "selinux/restorecon.h"
-#include "selinux/selinux.h"
+#include <selinux/avc.h>
+#include <selinux/context.h>
+#include <selinux/get_context_list.h>
+#include <selinux/get_default_type.h>
+#include <selinux/label.h>
+#include <selinux/restorecon.h>
+#include <selinux/selinux.h>
 int is_selinux_enabled(void) { return 0; }
 int is_selinux_mls_enabled(void) { return 0; }
 void freecon(char * con) { }
@@ -225,7 +226,7 @@ int selinux_raw_to_trans_context(const char * raw,
 int selinux_raw_context_to_color(const char * raw,
 					char **color_str) { return 0; }
 int getseuserbyname(const char *linuxuser, char **seuser, char **level) { return 0; }
-int getseuser(const char *username, const char *service, 
+int getseuser(const char *username, const char *service,
 			char **r_seuser, char **r_level) { return 0; }
 int selinux_file_context_cmp(const char * a,
 				const char * b) { return 0; }
