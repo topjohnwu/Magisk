@@ -16,7 +16,7 @@
 */
 
 #include <stdint.h>
-#include "magic.h"
+#include "types.h"
 
 #ifndef _BOOT_IMAGE_H_
 #define _BOOT_IMAGE_H_

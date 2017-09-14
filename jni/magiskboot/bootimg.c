@@ -1,5 +1,11 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include "bootimg.h"
 #include "magiskboot.h"
+#include "utils.h"
+#include "logging.h"
 
 static void dump(void *buf, size_t size, const char *filename) {
 	int fd = open_new(filename);
@@ -139,7 +145,7 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 			continue;
 		}
 	}
-	LOGE(1, "No boot image magic found!\n");
+	LOGE("No boot image magic found!\n");
 }
 
 void unpack(const char* image) {
@@ -165,7 +171,7 @@ void unpack(const char* image) {
 	// Dump ramdisk
 	if (boot.ramdisk_type == UNKNOWN) {
 		dump(boot.ramdisk, boot.hdr.ramdisk_size, RAMDISK_FILE ".raw");
-		LOGE(1, "Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
+		LOGE("Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
 	} else {
 		fd = open_new(RAMDISK_FILE);
 		decomp(boot.ramdisk_type, fd, boot.ramdisk, boot.hdr.ramdisk_size);
@@ -253,7 +259,7 @@ void repack(const char* orig_image, const char* out_image) {
 			}
 		}
 		if (!found)
-			LOGE(1, "No ramdisk exists!\n");
+			LOGE("No ramdisk exists!\n");
 		boot.hdr.ramdisk_size = restore(name, fd);
 	}
 	file_align(fd, boot.hdr.page_size, 1);

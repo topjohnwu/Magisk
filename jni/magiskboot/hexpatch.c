@@ -1,4 +1,10 @@
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <sys/mman.h>
+
 #include "magiskboot.h"
+#include "utils.h"
 
 static void hex2byte(const char *hex, unsigned char *str) {
 	char high, low;

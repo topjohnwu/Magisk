@@ -1,3 +1,6 @@
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include <zlib.h>
 #include <lzma.h>
 #include <lz4.h>
@@ -5,6 +8,8 @@
 #include <bzlib.h>
 
 #include "magiskboot.h"
+#include "logging.h"
+#include "utils.h"
 
 #define windowBits 15
 #define ZLIB_GZIP 16
@@ -33,11 +38,11 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 			ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
 			break;
 		default:
-			LOGE(1, "Unsupported gzip mode!\n");
+			LOGE("Unsupported gzip mode!\n");
 	}
 
 	if (ret != Z_OK)
-		LOGE(1, "Unable to init zlib stream\n");
+		LOGE("Unable to init zlib stream\n");
 
 	do {
 		strm.next_in = buf + pos;
@@ -62,7 +67,7 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 					break;
 			}
 			if (ret == Z_STREAM_ERROR)
-				LOGE(1, "Error when running gzip\n");
+				LOGE("Error when running gzip\n");
 
 			have = CHUNK - strm.avail_out;
 			total += xwrite(fd, out, have);
@@ -110,12 +115,12 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 			ret = lzma_alone_encoder(&strm, &opt);
 			break;
 		default:
-			LOGE(1, "Unsupported lzma mode!\n");
+			LOGE("Unsupported lzma mode!\n");
 	}
 
 
 	if (ret != LZMA_OK)
-		LOGE(1, "Unable to init lzma stream\n");
+		LOGE("Unable to init lzma stream\n");
 
 	do {
 		strm.next_in = buf + pos;
@@ -137,7 +142,7 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 		} while (strm.avail_out == 0 && ret == LZMA_OK);
 
 		if (ret != LZMA_OK && ret != LZMA_STREAM_END)
-			LOGE(1, "LZMA error %d!\n", ret);
+			LOGE("LZMA error %d!\n", ret);
 
 	} while (pos < size);
 
@@ -164,11 +169,11 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			ret = LZ4F_createCompressionContext(&cctx, LZ4F_VERSION);
 			break;
 		default:
-			LOGE(1, "Unsupported lz4 mode!\n");
+			LOGE("Unsupported lz4 mode!\n");
 	}
 
 	if (LZ4F_isError(ret))
-		LOGE(1, "Context creation error: %s\n", LZ4F_getErrorName(ret));
+		LOGE("Context creation error: %s\n", LZ4F_getErrorName(ret));
 
 	// Allocate out buffer
 	blockSize = 1 << 22;
@@ -178,7 +183,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			read = blockSize;
 			ret = LZ4F_getFrameInfo(dctx, &info, buf, &read);
 			if (LZ4F_isError(ret))
-				LOGE(1, "LZ4F_getFrameInfo error: %s\n", LZ4F_getErrorName(ret));
+				LOGE("LZ4F_getFrameInfo error: %s\n", LZ4F_getErrorName(ret));
 			switch (info.blockSizeID) {
 				case LZ4F_default:
 				case LZ4F_max64KB:  outCapacity = 1 << 16; break;
@@ -186,7 +191,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 				case LZ4F_max1MB:   outCapacity = 1 << 20; break;
 				case LZ4F_max4MB:   outCapacity = 1 << 22; break;
 				default:
-					LOGE(1, "Impossible unless more block sizes are allowed\n");
+					LOGE("Impossible unless more block sizes are allowed\n");
 			}
 			pos += read;
 			break;
@@ -208,7 +213,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 		prefs.frameInfo.contentChecksumFlag = 1;
 		have = ret = LZ4F_compressBegin(cctx, out, size, &prefs);
 		if (LZ4F_isError(ret))
-			LOGE(1, "Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
+			LOGE("Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
 		total += xwrite(fd, out, have);
 	}
 
@@ -232,7 +237,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 					break;
 			}
 			if (LZ4F_isError(ret))
-				LOGE(1, "LZ4 coding error: %s\n", LZ4F_getErrorName(ret));
+				LOGE("LZ4 coding error: %s\n", LZ4F_getErrorName(ret));
 
 			total += xwrite(fd, out, have);
 			// Update status
@@ -249,7 +254,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 		case 1:
 			have = ret = LZ4F_compressEnd(cctx, out, outCapacity, NULL);
 			if (LZ4F_isError(ret))
-				LOGE(1, "Failed to end compression: error %s\n", LZ4F_getErrorName(ret));
+				LOGE("Failed to end compression: error %s\n", LZ4F_getErrorName(ret));
 
 			total += xwrite(fd, out, have);
 
@@ -279,11 +284,11 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 			ret = BZ2_bzCompressInit(&strm, 9, 0, 0);
 			break;
 		default:
-			LOGE(1, "Unsupported bzip2 mode!\n");
+			LOGE("Unsupported bzip2 mode!\n");
 	}
 
 	if (ret != BZ_OK)
-		LOGE(1, "Unable to init bzlib stream\n");
+		LOGE("Unable to init bzlib stream\n");
 
 	do {
 		strm.next_in = (char *) buf + pos;
@@ -346,7 +351,7 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 			total += xwrite(fd, "\x02\x21\x4c\x18", 4);
 			break;
 		default:
-			LOGE(1, "Unsupported lz4_legacy mode!\n");
+			LOGE("Unsupported lz4_legacy mode!\n");
 	}
 
 	do {
@@ -359,10 +364,10 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 				block_size += ((unsigned)buff[pos + 3])<<24;
 				pos += 4;
 				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
-					LOGE(1, "lz4_legacy block size too large!\n");
+					LOGE("lz4_legacy block size too large!\n");
 				have = LZ4_decompress_safe((const char*) (buf + pos), out, block_size, LZ4_LEGACY_BLOCKSIZE);
 				if (have < 0)
-					LOGE(1, "Cannot decode lz4_legacy block\n");
+					LOGE("Cannot decode lz4_legacy block\n");
 				pos += block_size;
 				break;
 			case 1:
@@ -372,7 +377,7 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 					insize = LZ4_LEGACY_BLOCKSIZE;
 				have = LZ4_compress_default((const char*) (buf + pos), out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
 				if (have == 0)
-					LOGE(1, "lz4_legacy compression error\n");
+					LOGE("lz4_legacy compression error\n");
 				pos += insize;
 				block_size_le[0] = have & 0xff;
 				block_size_le[1] = (have >> 8) & 0xff;
@@ -443,7 +448,7 @@ void decomp_file(char *from, const char *to) {
 	char *ext;
 	ext = strrchr(from, '.');
 	if (ext == NULL)
-		LOGE(1, "Bad filename extention\n");
+		LOGE("Bad filename extention\n");
 
 	// File type and extension should match
 	switch (type) {
@@ -469,7 +474,7 @@ void decomp_file(char *from, const char *to) {
 				ok = 0;
 			break;
 		default:
-			LOGE(1, "Provided file \'%s\' is not a supported archive format\n", from);
+			LOGE("Provided file \'%s\' is not a supported archive format\n", from);
 	}
 	if (ok) {
 		// If all match, strip out the suffix
@@ -486,7 +491,7 @@ void decomp_file(char *from, const char *to) {
 			unlink(from);
 		}
 	} else {
-		LOGE(1, "Bad filename extention \'%s\'\n", ext);
+		LOGE("Bad filename extention \'%s\'\n", ext);
 	}
 	munmap(file, size);
 }

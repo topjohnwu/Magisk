@@ -1,5 +1,5 @@
-#ifndef _MAGIC_H_
-#define _MAGIC_H_
+#ifndef _TYPES_H_
+#define _TYPES_H_
 
 typedef enum {
     UNKNOWN,
@@ -30,5 +30,12 @@ typedef enum {
 #define MTK_MAGIC       "\x88\x16\x88\x58"
 #define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
+
+extern char *SUP_LIST[];
+extern char *SUP_EXT_LIST[];
+extern file_t SUP_TYPE_LIST[];
+
+file_t check_type(const void *buf);
+void get_type_name(file_t type, char *name);
 
 #endif

@@ -41,7 +41,7 @@ static inline void stub(const char *fmt, ...) {}
 
 #include <stdio.h>
 
-#define LOGE(err, ...) { fprintf(stderr, __VA_ARGS__); exit(err); }
+#define LOGE(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
 #define PLOGE(fmt, args...) { fprintf(stderr, fmt " failed with %d: %s\n\n", ##args, errno, strerror(errno)); exit(1); }
 
 #endif // IS_DAEMON

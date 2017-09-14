@@ -80,6 +80,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/boot_utils.c \
 	magiskboot/cpio.c \
 	magiskboot/sha1.c \
+	magiskboot/types.c \
 	utils/xwrap.c \
 	utils/vector.c \
 	utils/list.c

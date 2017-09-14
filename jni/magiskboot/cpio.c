@@ -1,7 +1,10 @@
+#include <stdio.h>
+#include <unistd.h>
+
 #include "magiskboot.h"
 #include "cpio.h"
-#include "vector.h"
-#include "list.h"
+#include "logging.h"
+#include "utils.h"
 
 static uint32_t x8u(char *hex) {
   uint32_t val, inpos = 8, outpos;
@@ -14,7 +17,7 @@ static uint32_t x8u(char *hex) {
   // Because scanf gratuitously treats %*X differently than printf does.
   sprintf(pattern, "%%%dx%%n", inpos);
   sscanf(hex, pattern, &val, &outpos);
-  if (inpos != outpos) LOGE(1, "bad cpio header\n");
+  if (inpos != outpos) LOGE("bad cpio header\n");
 
   return val;
 }
@@ -332,7 +335,7 @@ static void cpio_extract(const char *entry, const char *filename, struct vector 
 			exit(0);
 		}
 	}
-	LOGE(1, "Cannot find the file entry [%s]\n", entry);
+	LOGE("Cannot find the file entry [%s]\n", entry);
 }
 
 static void cpio_backup(const char *orig, struct vector *v) {

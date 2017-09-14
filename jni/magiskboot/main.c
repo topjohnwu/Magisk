@@ -1,4 +1,11 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
 #include "magiskboot.h"
+#include "sha1.h"
 
 /********************
   Patch Boot Image
@@ -6,55 +13,69 @@
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-		"%s --unpack <bootimg>\n"
-		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb) into the\n  current directory\n"
+		"Usage: %s <action> [args...]\n"
 		"\n"
-		"%s --repack <origbootimg> [outbootimg]\n"
+		"Supported actions:\n"
+		" --unpack <bootimg>\n"
+		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb) into the\n"
+		"  current directory\n"
+		"\n"
+		" --repack <origbootimg> [outbootimg]\n"
 		"  Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
 		"  to [outbootimg], or new-boot.img if not specified.\n"
 		"  It will compress ramdisk.cpio with the same method used in <origbootimg>\n"
 		"  if exists, or attempt to find ramdisk.cpio.[ext], and repack\n"
 		"  directly with the compressed ramdisk file\n"
 		"\n"
-		"%s --hexpatch <file> <hexpattern1> <hexpattern2>\n"
+		" --hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"  Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
 		"\n"
-		"%s --cpio-<cmd> <incpio> [flags...] [params...]\n"
-		"  Do cpio related cmds to <incpio> (modifications are done directly)\n  Supported commands and params:\n"
-		"    -rm [-r] <entry>\n      Remove entry from <incpio>, flag -r to remove recursively\n"
-		"    -mkdir <mode> <entry>\n      Create directory as an <entry>\n"
-		"    -add <mode> <entry> <infile>\n      Add <infile> as an <entry>; replaces <entry> if already exists\n"
-		"    -mv <from-entry> <to-entry>\n      Move <from-entry> to <to-entry>\n"
-		"    -extract <entry> <outfile>\n      Extract <entry> to <outfile>\n"
-		"    -test \n      Return value: 0/not patched 1/Magisk 2/Other (e.g. phh, SuperSU)\n"
-		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n      Patch cpio for Magisk. KEEP**** are true/false values\n"
-		"    -backup <origcpio>\n      Create ramdisk backups into <incpio> from <origcpio>\n"
-		"    -restore\n      Restore ramdisk from ramdisk backup within <incpio>\n"
-		"    -stocksha1\n      Get stock boot SHA1 recorded within <incpio>\n"
+		" --cpio-<cmd> <incpio> [flags...] [args...]\n"
+		"  Do cpio related cmds to <incpio> (modifications are done directly)\n"
+		"  Supported commands:\n"
+		"    -rm [-r] <entry>\n"
+		"      Remove entry from <incpio>, flag -r to remove recursively\n"
+		"    -mkdir <mode> <entry>\n"
+		"      Create directory as an <entry>\n"
+		"    -add <mode> <entry> <infile>\n"
+		"      Add <infile> as an <entry>; replaces <entry> if already exists\n"
+		"    -mv <from-entry> <to-entry>\n"
+		"      Move <from-entry> to <to-entry>\n"
+		"    -extract <entry> <outfile>\n"
+		"      Extract <entry> to <outfile>\n"
+		"    -test \n"
+		"      Return value: 0/stock 1/Magisk 2/other (e.g. phh, SuperSU)\n"
+		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n"
+		"      Patch cpio for Magisk. KEEP**** are true/false values\n"
+		"    -backup <origcpio>\n"
+		"      Create ramdisk backups into <incpio> from <origcpio>\n"
+		"    -restore\n"
+		"      Restore ramdisk from ramdisk backup within <incpio>\n"
+		"    -stocksha1\n"
+		"      Get stock boot SHA1 recorded within <incpio>\n"
 		"\n"
-		"%s --compress[=method] <infile> [outfile]\n"
-		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n  Supported methods: "
-	, arg0, arg0, arg0, arg0, arg0);
-	for (int i = 0; SUP_LIST[i]; ++i)
-		fprintf(stderr, "%s ", SUP_LIST[i]);
-	fprintf(stderr,
-		"\n"
-		"\n"
-		"%s --decompress <infile> [outfile]\n"
-		"  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: "
+		" --compress[=method] <infile> [outfile]\n"
+		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n"
+		"  Supported methods: "
 	, arg0);
 	for (int i = 0; SUP_LIST[i]; ++i)
 		fprintf(stderr, "%s ", SUP_LIST[i]);
 	fprintf(stderr,
 		"\n"
 		"\n"
-		"%s --sha1 <file>\n"
+		" --decompress <infile> [outfile]\n"
+		"  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: ");
+	for (int i = 0; SUP_LIST[i]; ++i)
+		fprintf(stderr, "%s ", SUP_LIST[i]);
+	fprintf(stderr,
+		"\n"
+		"\n"
+		" --sha1 <file>\n"
 		"  Print the SHA1 checksum for <file>\n"
 		"\n"
-		"%s --cleanup\n"
+		" --cleanup\n"
 		"  Cleanup the current working directory\n"
-		"\n"
-	, arg0, arg0);
+		"\n");
 
 	exit(1);
 }
@@ -63,7 +84,17 @@ int main(int argc, char *argv[]) {
 	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
 
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
-		cleanup();
+		fprintf(stderr, "Cleaning up...\n\n");
+		char name[PATH_MAX];
+		unlink(KERNEL_FILE);
+		unlink(RAMDISK_FILE);
+		unlink(RAMDISK_FILE ".raw");
+		unlink(SECOND_FILE);
+		unlink(DTB_FILE);
+		for (int i = 0; SUP_EXT_LIST[i]; ++i) {
+			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
+			unlink(name);
+		}
 	} else if (argc > 2 && strcmp(argv[1], "--sha1") == 0) {
 		char sha1[21], *buf;
 		size_t size;
