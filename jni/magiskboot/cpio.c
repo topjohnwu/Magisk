@@ -19,7 +19,7 @@ static uint32_t x8u(char *hex) {
   return val;
 }
 
-static void cpio_free(cpio_file *f) {
+static void cpio_free(cpio_entry *f) {
 	if (f) {
 		free(f->filename);
 		free(f->data);
@@ -27,8 +27,8 @@ static void cpio_free(cpio_file *f) {
 	}
 }
 
-static void cpio_vec_insert(struct vector *v, cpio_file *n) {
-	cpio_file *f;
+static void cpio_vec_insert(struct vector *v, cpio_entry *n) {
+	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, n->filename) == 0) {
 			// Replace, then all is done
@@ -41,15 +41,15 @@ static void cpio_vec_insert(struct vector *v, cpio_file *n) {
 }
 
 static int cpio_cmp(const void *a, const void *b) {
-	return strcmp((*(cpio_file **) a)->filename, (*(cpio_file **) b)->filename);
+	return strcmp((*(cpio_entry **) a)->filename, (*(cpio_entry **) b)->filename);
 }
 
-// Parse cpio file to a vector of cpio_file
+// Parse cpio file to a vector of cpio_entry
 static void parse_cpio(const char *filename, struct vector *v) {
 	fprintf(stderr, "Loading cpio: [%s]\n\n", filename);
 	int fd = xopen(filename, O_RDONLY);
 	cpio_newc_header header;
-	cpio_file *f;
+	cpio_entry *f;
 	while(xxread(fd, &header, 110) != -1) {
 		f = xcalloc(sizeof(*f), 1);
 		// f->ino = x8u(header.ino);
@@ -93,7 +93,7 @@ static void dump_cpio(const char *filename, struct vector *v) {
 	char header[111];
 	// Sort by name
 	vec_sort(v, cpio_cmp);
-	cpio_file *f;
+	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (f->remove) continue;
 		sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
@@ -128,8 +128,8 @@ static void dump_cpio(const char *filename, struct vector *v) {
 }
 
 static void cpio_vec_destroy(struct vector *v) {
-	// Free each cpio_file
-	cpio_file *f;
+	// Free each cpio_entry
+	cpio_entry *f;
 	vec_for_each(v, f) {
 		cpio_free(f);
 	}
@@ -137,7 +137,7 @@ static void cpio_vec_destroy(struct vector *v) {
 }
 
 static void cpio_rm(int recursive, const char *entry, struct vector *v) {
-	cpio_file *f;
+	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (strncmp(f->filename, entry, strlen(entry)) == 0) {
 			char next = f->filename[strlen(entry)];
@@ -153,7 +153,7 @@ static void cpio_rm(int recursive, const char *entry, struct vector *v) {
 }
 
 static void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
-	cpio_file *f = xcalloc(sizeof(*f), 1);
+	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFDIR | mode;
 	f->namesize = strlen(entry) + 1;
 	f->filename = strdup(entry);
@@ -163,7 +163,7 @@ static void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
 
 static void cpio_add(mode_t mode, const char *entry, const char *filename, struct vector *v) {
 	int fd = xopen(filename, O_RDONLY);
-	cpio_file *f = xcalloc(sizeof(*f), 1);
+	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFREG | mode;
 	f->namesize = strlen(entry) + 1;
 	f->filename = strdup(entry);
@@ -181,7 +181,7 @@ static void cpio_test(struct vector *v) {
 	#define MAGISK_PATCH    0x1
 	#define OTHER_PATCH     0x2
 	int ret = STOCK_BOOT;
-	cpio_file *f;
+	cpio_entry *f;
 	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
 	const char *MAGISK_LIST[] = { "init.magisk.rc", "overlay/init.magisk.rc", NULL };
 	vec_for_each(v, f) {
@@ -247,7 +247,7 @@ static void free_newline(line_list *line) {
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	struct list_head *head;
 	line_list *line;
-	cpio_file *f;
+	cpio_entry *f;
 	int skip, injected = 0;
 	size_t read, write;
 	const char *ENCRYPT_LIST[] = { "forceencrypt", "forcefdeorfbe", "fileencryptioninline", NULL };
@@ -320,7 +320,7 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 }
 
 static void cpio_extract(const char *entry, const char *filename, struct vector *v) {
-	cpio_file *f;
+	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
 			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
@@ -337,7 +337,7 @@ static void cpio_extract(const char *entry, const char *filename, struct vector 
 
 static void cpio_backup(const char *orig, struct vector *v) {
 	struct vector o_body, *o = &o_body, bak;
-	cpio_file *m, *n, *dir, *rem;
+	cpio_entry *m, *n, *dir, *rem;
 	char buf[PATH_MAX];
 	int res, doBak;
 
@@ -431,7 +431,7 @@ static void cpio_backup(const char *orig, struct vector *v) {
 }
 
 static int cpio_restore(struct vector *v) {
-	cpio_file *f, *n;
+	cpio_entry *f, *n;
 	int ret = 1;
 	vec_for_each(v, f) {
 		if (strstr(f->filename, ".backup") != NULL) {
@@ -462,7 +462,7 @@ static int cpio_restore(struct vector *v) {
 }
 
 static void cpio_stocksha1(struct vector *v) {
-	cpio_file *f;
+	cpio_entry *f;
 	char sha1[41];
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, "init.magisk.rc") == 0) {
@@ -480,7 +480,7 @@ static void cpio_stocksha1(struct vector *v) {
 }
 
 static void cpio_mv(struct vector *v, const char *from, const char *to) {
-	struct cpio_file *f, *t;
+	struct cpio_entry *f, *t;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, from) == 0) {
 			fprintf(stderr, "Move [%s] -> [%s]\n", from, to);

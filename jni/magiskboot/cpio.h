@@ -5,7 +5,7 @@
 
 #include "list.h"
 
-typedef struct cpio_file {
+typedef struct cpio_entry {
 	// uint32_t ino;
 	uint32_t mode;
 	uint32_t uid;
@@ -22,7 +22,7 @@ typedef struct cpio_file {
 	char *filename;
 	char *data;
 	int remove;
-} cpio_file;
+} cpio_entry;
 
 typedef struct line_list {
     char *line;
