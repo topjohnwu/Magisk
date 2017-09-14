@@ -1,19 +1,13 @@
 <resources>
 
     <!--Welcome Activity-->
-    <string name="navigation_drawer_open">Відкрити меню навігації</string>
-    <string name="navigation_drawer_close">Закрити меню навігації</string>
     <string name="modules">Модулі</string>
     <string name="downloads">Завантаження</string>
     <string name="superuser">Суперкористувач</string>
     <string name="log">Логи</string>
     <string name="settings">Налаштування</string>
-    <string name="status">Стан</string>
-    <string name="install">Встановлення</string>
 
     <!--Status Fragment-->
-    <string name="magisk_version">Встановлено Magisk v%1$s</string>
-    <string name="magisk_version_core_only">Встановлено Magisk v%1$s (Базовий режим)</string>
     <string name="install">Встановлення</string>
 
     <!--Status Fragment-->
@@ -22,31 +16,11 @@
     <string name="checking_for_updates">Перевірка оновлень…</string>
     <string name="magisk_update_available">Доступно Magisk v%1$s!</string>
     <string name="cannot_check_updates">Неможливо перевірити наявність оновлень</string>
-    <string name="up_to_date">Встановлено останню версію %1$s</string>
     <string name="root_error">Root присутній, але немає дозволу</string>
     <string name="not_rooted">Root відсутній</string>
-    <string name="proper_root">Коректний root-доступ</string>
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Перевірку SafetyNet завершено</string>
-    <string name="safetyNet_connection_failed">Неможливо підключитися до Google API</string>
-    <string name="safetyNet_connection_suspended">Підключення до Google API було перервано</string>
-    <string name="safetyNet_no_response">Неможливо виконати перевірку SafetyNet</string>
-    <string name="safetyNet_fail">Перевірку SafetyNet не пройдено: невідповідність профілю CTS</string>
-    <string name="safetyNet_pass">Перевірку SafetyNet пройдено</string>
-    <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
-    <string name="safetyNet_service_disconnected">Службу зупинено</string>
-    <string name="safetyNet_res_invalid">Невірна відповідь</string>
-    <string name="root_info_warning">Функціональність значно обмежена</string>
-
-    <!--Install Fragment-->
-    <string name="auto_detect">(авто) %1$s</string>
-    <string name="cannot_auto_detect">(автовизначення неможливе)</string>
-    <string name="root_error">Root присутній, але немає дозволу</string>
-    <string name="not_rooted">Root відсутній</string>
-    <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
-    <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
-    <string name="safetyNet_check_success">Перевірку SafetyNet пройдено</string>
     <string name="safetyNet_no_response">Неможливо виконати перевірку SafetyNet</string>
     <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
     <string name="safetyNet_service_disconnected">Службу зупинено</string>
@@ -66,14 +40,7 @@
     <string name="reboot_countdown">Перезавантаження через %1$d</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
-    <string name="version_none">(немає даних)</string>
-    <string name="reinstall">Перевстановити</string>
-    <string name="update">Оновити</string>
-    
-    <!--Module Fragment-->
-    <string name="no_info_provided">(немає наданої інформації)</string>
-    <string name="update">Оновити %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Немає наданої інформації)</string>
     <string name="no_modules_found">Модулів не знайдено</string>
@@ -83,7 +50,7 @@
     <string name="disable_file_created">Модуль вимкнеться при перезавантаженні</string>
     <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні</string>
     <string name="author">Автор: %1$s</string>
-    <string name="fab_flash_zip">Прошити архів з модулем</string>
+    <string name="update">Оновити %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
@@ -118,22 +85,6 @@
     <string name="close">Закрити</string>
     <string name="repo_install_title">Встановити %1$s</string>
     <string name="repo_install_msg">Бажаєте встановити %1$s ?</string>
-    <string name="download_install">Завантажити і встановити</string>
-    <string name="download">Завантажити</string>
-    <string name="goto_install">Перейти в розділ \"Встановлення\"</string>
-    <string name="download_file_error">Помилка завантаження файлу</string>
-    <string name="install_error">Помилка під час встановлення</string>
-    <string name="invalid_zip">В архіві відсутній модуль Magisk!</string>
-    <string name="reboot_title">Успішно встановлено!</string>
-    <string name="reboot_msg">Бажаєте перезавантажити зараз?</string>
-    <string name="reboot">Перезавантаження</string>
-    <string name="copying_msg">Копіювання архіву в тимчасову папку</string>
-    <string name="zip_install_progress_title">Встановлення</string>
-    <string name="zip_unzip_msg">Розпакування архіву …</string>
-    <string name="zip_process_msg">Опрацювання архіву …</string>
-    <string name="zip_install_progress_msg">Встановлення %1$s …</string>
-    <string name="no_magisk_title">Magisk не встановлено!</string>
-    <string name="no_magisk_msg">Бажаєте завантажити і встановити Magisk?</string>
     <string name="download">Завантажити</string>
     <string name="download_file_error">Помилка завантаження файлу</string>
     <string name="install_error">Помилка під час встановлення</string>
@@ -146,16 +97,8 @@
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
     <string name="safetyNet_hide_notice">Ця програма використовує SafetyNet.\nВже опрацьовано MagiskHide за замовчуванням</string>
-    <string name="start_magiskhide">Запуск MagiskHide …</string>
-    <string name="no_magisksu_title">Не використовувати MagiskSU!</string>
-    <string name="no_magisksu_msg">Ви отримали root-доступ не через MagiskSU. Використання MagiskHide може бути недостатньо для приховування root, тому можуть знадобитися додаткові інструменти (наприклад, suhide) для успішного проходження перевірки SafetyNet</string>
-    <string name="understand">Розумію</string>
-    <string name="process_error">Помилка опрацювання</string>
-    <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
     <string name="zip_download_title">Завантаження</string>
     <string name="zip_download_msg">Завантаження zip файлу …</string>
-    <string name="zip_process_title">Опрацювання</string>
-    <string name="zip_process_msg">Опрацювання архіву …</string>
     <string name="process_error">Помилка опрацювання</string>
     <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
     <string name="zip_process_title">Опрацювання</string>
@@ -195,14 +138,10 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
-    <string name="language">Мова</string>
-    <string name="system_default">Стандартна (системна)</string>
 
     <string name="settings_core_only_title">Режим ядра Magisk</string>
     <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, MagiskHide і позасистемні хости залишуться увімкненими</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних перевірок</string>
-    <string name="settings_busybox_title">Увімкнути BusyBox</string>
-    <string name="settings_busybox_summary">Монтування вбудованого в Magisk busybox до xbin</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами</string>
 
