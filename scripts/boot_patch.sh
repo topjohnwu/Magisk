@@ -226,8 +226,6 @@ if $SKIP_INITRAMFS; then
   fi
   [ -f sepolicy ] || abort_wrap "! Cannot get sepolicy"
 
-  # TODO: Patch dm-verity
-
   cpio_add 750 init ./magiskinit
   cpio_mkdir 000 overlay
   cpio_add 750 overlay/init.magisk.rc init.magisk.rc
@@ -251,6 +249,10 @@ rm -f sepolicy
 
 # Create ramdisk backups
 ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
+
+if ! $KEEPVERITY && [ -f dtb ]; then
+  ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
+fi
 
 rm -f ramdisk.cpio.orig
 

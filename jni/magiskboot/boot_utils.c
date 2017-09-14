@@ -86,7 +86,7 @@ int check_verity_pattern(const char *s) {
 	if (strncmp(s + pos, "verify", 6) != 0) return -1;
 	pos += 6;
 	if (s[pos] == '=') {
-		while (s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
+		while (s[pos] != '\0' && s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
 	}
 	return pos;
 }

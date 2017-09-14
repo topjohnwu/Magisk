@@ -54,6 +54,9 @@ static void usage(char *arg0) {
 		"    -stocksha1\n"
 		"      Get stock boot SHA1 recorded within <incpio>\n"
 		"\n"
+		" --dtb-patch <dtb>\n"
+		"  Search for fstab in <dtb> and remove verity checks\n"
+		"\n"
 		" --compress[=method] <infile> [outfile]\n"
 		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n"
 		"  Supported methods: "
@@ -110,6 +113,8 @@ int main(int argc, char *argv[]) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
 		decomp_file(argv[2], argc > 3 ? argv[3] : NULL);
+	} else if (argc > 2 && strcmp(argv[1], "--dtb-patch") == 0) {
+		dtb_patch(argv[2]);
 	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {
 		char *method;
 		method = strchr(argv[1], '=');
