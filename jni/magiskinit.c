@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
@@ -34,21 +35,9 @@ struct device {
 	char path[64];
 };
 
-static void mmap_ro(const char *filename, void **buf, size_t *size) {
-	int fd = open(filename, O_RDONLY);
-	*size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	*buf = mmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0);
-	close(fd);
-}
-
-static void mmap_rw(const char *filename, void **buf, size_t *size) {
-	int fd = open(filename, O_RDWR);
-	*size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	*buf = mmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	close(fd);
-}
+extern void mmap_ro(const char *filename, void **buf, size_t *size);
+extern void mmap_rw(const char *filename, void **buf, size_t *size);
+extern void *patch_init_rc(char *data, uint32_t *size);
 
 static void clone_dir(int src, int dest) {
 	struct dirent *entry;
@@ -245,19 +234,14 @@ static void patch_ramdisk() {
 		}
 	}
 	munmap(addr, size);
-	mmap_ro("/init.rc", &addr, &size);
-	int fd = open("/init.rc.patch", O_WRONLY | O_CREAT | O_CLOEXEC, 0750);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(addr + i, "import", 6) == 0) {
-			write(fd, addr, i);
-			write(fd, "import /init.magisk.rc\n", 23);
-			write(fd, addr + i, size -i);
-			close(fd);
-			break;
-		}
-	}
+	mmap_rw("/init.rc", &addr, &size);
+	uint32_t new_size = size;
+	void *init_rc = patch_init_rc(addr, &new_size);
 	munmap(addr, size);
-	rename("/init.rc.patch", "/init.rc");
+	int fd = open("/init.rc", O_WRONLY | O_TRUNC | O_CLOEXEC);
+	write(fd, init_rc, new_size);
+	close(fd);
+	free(init_rc);
 }
 
 int main(int argc, char *argv[]) {

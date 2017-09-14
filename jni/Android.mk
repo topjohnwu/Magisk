@@ -94,7 +94,11 @@ include $(BUILD_EXECUTABLE)
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_SRC_FILES := magiskinit.c
+LOCAL_C_INCLUDES := jni/include
+LOCAL_SRC_FILES := \
+	magiskinit.c \
+	magiskboot/boot_utils.c \
+	utils/xwrap.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 endif
