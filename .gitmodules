@@ -16,3 +16,6 @@
 [submodule "jni/busybox"]
 	path = jni/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
+[submodule "jni/external/dtc"]
+	path = jni/external/dtc
+	url = https://github.com/dgibson/dtc
