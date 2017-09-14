@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "list.h"
-
 typedef struct cpio_entry {
 	// uint32_t ino;
 	uint32_t mode;
@@ -23,12 +21,6 @@ typedef struct cpio_entry {
 	char *data;
 	int remove;
 } cpio_entry;
-
-typedef struct line_list {
-    char *line;
-    int isNew;
-    struct list_head pos;
-} line_list;
 
 typedef struct cpio_newc_header {
 	char magic[6];

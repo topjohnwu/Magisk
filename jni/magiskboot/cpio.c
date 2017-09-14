@@ -204,98 +204,24 @@ static void cpio_test(struct vector *v) {
 	exit(ret);
 }
 
-static int check_verity_pattern(const char *s) {
-	int pos = 0;
-	if (s[0] == ',') ++pos;
-	if (strncmp(s + pos, "verify", 6) != 0) return -1;
-	pos += 6;
-	if (s[pos] == '=') {
-		while (s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
-	}
-	return pos;
-}
-
-static struct list_head *block_to_list(char *data) {
-	struct list_head *head = xmalloc(sizeof(*head));
-	line_list *line;
-	init_list_head(head);
-	char *tok;
-	tok = strsep(&data, "\n");
-	while (tok) {
-		line = xcalloc(sizeof(*line), 1);
-		line->line = tok;
-		list_insert_end(head, &line->pos);
-		tok = strsep(&data, "\n");
-	}
-	return head;
-}
-
-static char *list_to_block(struct list_head *head, uint32_t filesize) {
-	line_list *line;
-	char *data = xmalloc(filesize);
-	uint32_t off = 0;
-	list_for_each(line, head, line_list, pos) {
-		strcpy(data + off, line->line);
-		off += strlen(line->line);
-		data[off++] = '\n';
-	}
-	return data;
-}
-
-static void free_newline(line_list *line) {
-	if (line->isNew)
-		free(line->line);
-}
-
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
-	struct list_head *head;
-	line_list *line;
 	cpio_entry *f;
-	int skip, injected = 0;
-	size_t read, write;
-	const char *ENCRYPT_LIST[] = { "forceencrypt", "forcefdeorfbe", "fileencryptioninline", NULL };
+	int skip;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, "init.rc") == 0) {
-			head = block_to_list(f->data);
-			list_for_each(line, head, line_list, pos) {
-				if (strstr(line->line, "import")) {
-					if (strstr(line->line, "init.magisk.rc"))
-						injected = 1;
-					if (injected)
-						continue;
-					// Inject magisk script as import
-					fprintf(stderr, "Inject new line [import /init.magisk.rc] in [init.rc]\n");
-					line = xcalloc(sizeof(*line), 1);
-					line->line = strdup("import /init.magisk.rc");
-					line->isNew = 1;
-					f->filesize += 23;
-					list_insert(__->prev, &line->pos);
-					injected = 1;
-				} else if (strstr(line->line, "selinux.reload_policy")) {
-					// Remove this line
-					fprintf(stderr, "Remove line [%s] in [init.rc]\n", line->line);
-					f->filesize -= strlen(line->line) + 1;
-					__ = list_pop(&line->pos);
-					free(line);
-				}
-			}
-			char *temp = list_to_block(head, f->filesize);
+			void *new_data = patch_init_rc(f->data, &f->filesize);
 			free(f->data);
-			f->data = temp;
-			list_destory(head, list_head, pos, free_newline);
-			free(head);
+			f->data = new_data;
 		} else {
 			if (!keepverity) {
 				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-					for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
-						skip = check_verity_pattern(f->data + read);
-						if (skip > 0) {
-							fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
-							read += skip;
+					for (int i = 0; i < f->filesize; ++i) {
+						if ((skip = check_verity_pattern(f->data + i)) > 0) {
+							fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + i, f->filename);
+							memcpy(f->data + i, f->data + i + skip, f->filesize - i - skip);
+							f->filesize -= skip;
 						}
-						f->data[write] = f->data[read];
 					}
-					f->filesize = write;
 				} else if (strcmp(f->filename, "verity_key") == 0) {
 					fprintf(stderr, "Remove [verity_key]\n");
 					f->remove = 1;
@@ -303,19 +229,15 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 			}
 			if (!keepforceencrypt) {
 				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-					for (read = 0, write = 0; read < f->filesize; ++read, ++write) {
-						for (int i = 0 ; ENCRYPT_LIST[i]; ++i) {
-							if (strncmp(f->data + read, ENCRYPT_LIST[i], strlen(ENCRYPT_LIST[i])) == 0) {
-								memcpy(f->data + write, "encryptable", 11);
-								fprintf(stderr, "Replace [%s] with [%s] in [%s]\n", ENCRYPT_LIST[i], "encryptable", f->filename);
-								write += 11;
-								read += strlen(ENCRYPT_LIST[i]);
-								break;
-							}
+					for (int i = 0; i < f->filesize; ++i) {
+						if ((skip = check_encryption_pattern(f->data + i)) > 0) {
+							fprintf(stderr, "Replace pattern [%.*s] with [encryptable] in [%s]\n", skip, f->data + i, f->filename);
+							memcpy(f->data + i, "encryptable", 11);
+							// assert(skip > 11)!
+							memcpy(f->data + i + 11, f->data + i + skip, f->filesize - i - skip);
+							f->filesize = f->filesize - skip + 11;
 						}
-						f->data[write] = f->data[read];
 					}
-					f->filesize = write;
 				}
 			}
 		}

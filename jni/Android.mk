@@ -82,8 +82,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/sha1.c \
 	magiskboot/types.c \
 	utils/xwrap.c \
-	utils/vector.c \
-	utils/list.c
+	utils/vector.c
 LOCAL_CFLAGS := -DZLIB_CONST
 include $(BUILD_EXECUTABLE)
 
