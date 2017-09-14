@@ -21,7 +21,7 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 
-#include "magisk.h"
+#include "logging.h"
 #include "utils.h"
 
 FILE *xfopen(const char *pathname, const char *mode) {

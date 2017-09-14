@@ -14,7 +14,7 @@
 
 #include "bootimg.h"
 #include "sha1.h"
-#include "magisk.h"
+#include "logging.h"
 #include "utils.h"
 #include "magic.h"
 

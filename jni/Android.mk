@@ -56,7 +56,7 @@ LOCAL_SRC_FILES := \
 	su/su_daemon.c \
 	su/su_socket.c
 
-LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch
+LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DIS_DAEMON
 LOCAL_CPPFLAGS := -std=c++11
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
@@ -66,7 +66,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := libz liblzma liblz4 libbz2
 LOCAL_C_INCLUDES := \
-	jni/magiskboot \
 	jni/include \
 	$(LIBZ) \
 	$(LIBLZMA) \

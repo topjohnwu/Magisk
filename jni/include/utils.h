@@ -78,7 +78,6 @@ int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
 void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
-int create_links(const char *bin, const char *path);
 void unlock_blocks();
 void setup_sighandlers(void (*handler)(int));
 int exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char *argv0, ...);

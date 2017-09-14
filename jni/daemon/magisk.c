@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "utils.h"
 #include "magisk.h"
@@ -15,6 +16,21 @@ char *applet[] =
 
 int (*applet_main[]) (int, char *[]) =
 	{ su_client_main, resetprop_main, secilc_main, magiskpolicy_main, magiskpolicy_main, magiskpolicy_main, magiskhide_main, NULL };
+
+int create_links(const char *bin, const char *path) {
+	char self[PATH_MAX], linkpath[PATH_MAX];
+	if (bin == NULL) {
+		xreadlink("/proc/self/exe", self, sizeof(self));
+		bin = self;
+	}
+	int ret = 0;
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(linkpath, sizeof(linkpath), "%s/%s", path, applet[i]);
+		unlink(linkpath);
+		ret |= symlink(bin, linkpath);
+	}
+	return ret;
+}
 
 // Global error hander function
 // Should be changed each thread/process
