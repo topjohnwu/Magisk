@@ -34,9 +34,6 @@
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 
-#define APP_DATA_PATH "/data/data/"
-#define USER_DATA_PATH "/data/user"
-
 // If --rename-manifest-package is used in AAPT, this
 // must be changed to correspond to the new APK package name
 // See the two Android.mk files for more details.
@@ -45,10 +42,6 @@
 // with classes in another package.
 #define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
 #define REQUESTOR_CACHE_PATH "/dev/" REQUESTOR
-// there's no guarantee that the db or files are actually created named as such by
-// SQLiteOpenHelper, etc. Though that is the behavior as of current.
-// it is up to the Android application to symlink as appropriate.
-#define REQUESTOR_DATABASE_PATH REQUESTOR "/databases/su.db"
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -85,31 +78,23 @@ struct su_request {
     int argc;
 };
 
-struct su_user_info {
-    // the user in android userspace (multiuser)
-    // that invoked this action.
-    unsigned android_user_id;
-    // path to superuser directory. this is populated according
-    // to the multiuser mode.
-    // this is used to check uid/gid for protecting socket.
-    // this is used instead of database, as it is more likely
-    // to exist. db will not exist if su has never launched.
+struct su_path {
     char base_path[PATH_MAX];
-    // path to su database. this is populated according
-    // to the multiuser mode.
-    char database_path[PATH_MAX];
+    char base_db[PATH_MAX];
+    char multiuser_path[PATH_MAX];
+    char multiuser_db[PATH_MAX];
+    char sock_path[PATH_MAX];
 };
 
 struct su_context {
     struct su_info *info;
     struct su_request to;
-    struct su_user_info user;
+    struct su_path path;
     pid_t pid;
     int notify;
     mode_t umask;
     char *cwd;
     struct stat st;
-    char sock_path[PATH_MAX];
 };
 
 extern struct su_context *su_ctx;

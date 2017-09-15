@@ -52,9 +52,9 @@ static int setup_user(struct su_context *ctx, char* user) {
 	case MULTIUSER_MODE_OWNER_ONLY:   /* Should already be denied if not owner */
 	case MULTIUSER_MODE_OWNER_MANAGED:
 		sprintf(user, "%d", 0);
-		return ctx->user.android_user_id;
+		return ctx->info->uid / 100000;
 	case MULTIUSER_MODE_USER:
-		sprintf(user, "%d", ctx->user.android_user_id);
+		sprintf(user, "%d", ctx->info->uid / 100000);
 		break;
 	}
 	return 0;
@@ -135,7 +135,7 @@ void app_send_request(struct su_context *ctx) {
 		user,
 		"--es",
 		"socket",
-		ctx->sock_path,
+		ctx->path.sock_path,
 		"--ez",
 		"timeout",
 		notify ? "false" : "true",

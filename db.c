@@ -69,13 +69,8 @@ void database_check(struct su_context *ctx) {
 	ctx->info->mnt_ns = NAMESPACE_MODE_REQUESTER;
 	ctx->info->policy = QUERY;
 
-	// First query the from app data
-	// Check if file is readable
-	if (access(APP_DATA_PATH REQUESTOR_DATABASE_PATH, R_OK) == -1)
-		return;
-
 	// Open database
-	ret = sqlite3_open_v2(APP_DATA_PATH REQUESTOR_DATABASE_PATH, &db, SQLITE_OPEN_READONLY, NULL);
+	ret = sqlite3_open_v2(ctx->path.base_db, &db, SQLITE_OPEN_READONLY, NULL);
 	if (ret) {
 		LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 		sqlite3_close(db);
@@ -88,14 +83,11 @@ void database_check(struct su_context *ctx) {
 
 	err = NULL;
 
-	if (ctx->user.android_user_id != 0 && ctx->info->multiuser_mode == MULTIUSER_MODE_USER) {
+	if (ctx->info->uid / 100000 != 0 && ctx->info->multiuser_mode == MULTIUSER_MODE_USER) {
 		sqlite3_close(db);
-		// Check if file is readable
-		if (access(ctx->user.database_path, R_OK) == -1)
-			return;
 
 		// Open database
-		ret = sqlite3_open_v2(ctx->user.database_path, &db, SQLITE_OPEN_READONLY, NULL);
+		ret = sqlite3_open_v2(ctx->path.multiuser_db, &db, SQLITE_OPEN_READONLY, NULL);
 		if (ret) {
 			LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 			sqlite3_close(db);
