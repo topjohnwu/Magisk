@@ -5,7 +5,8 @@
  * Magiskinit will mount sysfs, parse through uevent files to make the system block device,
  * then it'll mount the system partition and clone rootfs except files under /system.
  * Folders placed in "overlay" will then be overlayed to the root.
- * Lastly before giving control back to the real init, it'll patch the root files to load Magisk.
+ * Lastly, before giving control back to the real init, it'll patch the root files,
+ * extract (or compile if needed) sepolicy and patch it to load Magisk.
  */
 
 
@@ -22,6 +23,10 @@
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 
+#include <cil/cil.h>
+
+#include "magiskpolicy.h"
+
 struct cmdline {
 	int skip_initramfs;
 	char slot[3];
@@ -34,6 +39,8 @@ struct device {
 	char partname[32];
 	char path[64];
 };
+
+extern policydb_t *policydb;
 
 extern void mmap_ro(const char *filename, void **buf, size_t *size);
 extern void mmap_rw(const char *filename, void **buf, size_t *size);
@@ -244,6 +251,107 @@ static void patch_ramdisk() {
 	free(init_rc);
 }
 
+static int strend(const char *s1, const char *s2) {
+	int l1 = strlen(s1);
+	int l2 = strlen(s2);
+	return strcmp(s1 + l1 - l2, s2);
+}
+
+static void patch_sepolicy() {
+	DIR *dir;
+	struct dirent *entry;
+	char *sepolicy = NULL, path[128];
+	if (access("/system_root/sepolicy", R_OK) == 0)
+		sepolicy = "/system_root/sepolicy";
+	if (sepolicy == NULL && access("/vendor/etc/selinux/precompiled_sepolicy", R_OK) == 0) {
+		void *sys_sha = NULL, *ven_sha = NULL;
+		size_t sys_size = 0, ven_size = 0;
+		dir = opendir("/vendor/etc/selinux");
+		while ((entry = readdir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			if (strend(entry->d_name, ".sha256") == 0) {
+				snprintf(path, sizeof(path), "/vendor/etc/selinux/%s", entry->d_name);
+				mmap_ro(path, &ven_sha, &ven_size);
+				break;
+			}
+		}
+		closedir(dir);
+		dir = opendir("/system/etc/selinux");
+		while ((entry = readdir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			if (strend(entry->d_name, ".sha256") == 0) {
+				snprintf(path, sizeof(path), "/system/etc/selinux/%s", entry->d_name);
+				mmap_ro(path, &sys_sha, &sys_size);
+				break;
+			}
+		}
+		closedir(dir);
+		if (sys_size == ven_size && memcmp(sys_sha, ven_sha, sys_size) == 0)
+			sepolicy = "/vendor/etc/selinux/precompiled_sepolicy";
+		munmap(sys_sha, sys_size);
+		munmap(ven_sha, ven_size);
+	}
+
+	if (sepolicy) {
+		load_policydb(sepolicy);
+	} else {
+		// Compile cil
+		struct cil_db *db = NULL;
+		sepol_policydb_t *pdb = NULL;
+		void *addr;
+		size_t size;
+
+		cil_db_init(&db);
+		cil_set_mls(db, 1);
+		cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
+		cil_set_policy_version(db, POLICYDB_VERSION_XPERMS_IOCTL);
+		cil_set_attrs_expand_generated(db, 0);
+
+		mmap_ro("/system/etc/selinux/plat_sepolicy.cil", &addr, &size);
+		cil_add_file(db, "/system/etc/selinux/plat_sepolicy.cil", addr, size);
+		munmap(addr, size);
+
+		dir = opendir("/system/etc/selinux/mapping");
+		while ((entry = readdir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			if (strend(entry->d_name, ".cil") == 0) {
+				snprintf(path, sizeof(path), "/system/etc/selinux/mapping/%s", entry->d_name);
+				mmap_ro(path, &addr, &size);
+				cil_add_file(db, path, addr, size);
+				munmap(addr, size);
+			}
+		}
+		closedir(dir);
+
+		dir = opendir("/vendor/etc/selinux");
+		while ((entry = readdir(dir))) {
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
+			if (strend(entry->d_name, ".cil") == 0) {
+				snprintf(path, sizeof(path), "/vendor/etc/selinux/%s", entry->d_name);
+				mmap_ro(path, &addr, &size);
+				cil_add_file(db, path, addr, size);
+				munmap(addr, size);
+			}
+		}
+		closedir(dir);
+
+		cil_compile(db);
+		cil_build_policydb(db, &pdb);
+		cil_db_destroy(&db);
+
+		policydb = &pdb->p;
+	}
+
+	// Magisk patches
+	sepol_min_rules();
+	dump_policydb("/sepolicy");
+	destroy_policydb();
+}
+
 int main(int argc, char *argv[]) {
 	umask(0);
 
@@ -272,12 +380,18 @@ int main(int argc, char *argv[]) {
 		if (overlay > 0)
 			mv_dir(overlay, root);
 
+		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
+		setup_block(&dev, partname);
+		mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+
 		patch_ramdisk();
+		patch_sepolicy();
 
 		close(root);
 		close(system_root);
 		close(overlay);
 		rmdir("/overlay");
+		umount("/vendor");
 	} else {
 		// Recovery mode
 		// Revert original init binary

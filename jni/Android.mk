@@ -46,7 +46,6 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
-	magiskpolicy/secilc.c \
 	magiskpolicy/api.c \
 	resetprop/resetprop.cpp \
 	resetprop/system_properties.cpp \
@@ -93,11 +92,15 @@ include $(BUILD_EXECUTABLE)
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_C_INCLUDES := jni/include
+LOCAL_STATIC_LIBRARIES := libsepol
+LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
 LOCAL_SRC_FILES := \
 	magiskinit.c \
 	magiskboot/boot_utils.c \
-	utils/xwrap.c
+	utils/xwrap.c \
+	magiskpolicy/rules.c \
+	magiskpolicy/sepolicy.c \
+	magiskpolicy/api.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 endif
