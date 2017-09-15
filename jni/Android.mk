@@ -53,7 +53,6 @@ LOCAL_SRC_FILES := \
 	su/su.c \
 	su/activity.c \
 	su/db.c \
-	su/misc.c \
 	su/pts.c \
 	su/su_daemon.c \
 	su/su_socket.c

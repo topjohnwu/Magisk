@@ -581,6 +581,8 @@ void post_fs_data(int client) {
 		bin_path = "/cache/data_bin";
 	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
 		bin_path = "/data/data/com.topjohnwu.magisk/install";
+	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
 	if (bin_path) {
 		exec_command_sync("rm", "-rf", DATABIN, NULL);
 		exec_command_sync("cp", "-r", bin_path, DATABIN, NULL);
