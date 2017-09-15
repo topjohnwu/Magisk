@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,7 +15,6 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.support.annotation.StringRes;
@@ -508,26 +506,15 @@ public class Utils {
                     }
                     in.close();
                     out.close();
-                    ProgressDialog progress = new ProgressDialog(fragment.getActivity());
-                    progress.setTitle(R.string.reboot);
-                    progress.show();
-                    new CountDownTimer(5000, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            progress.setMessage(mm.getString(R.string.reboot_countdown,
-                                    millisUntilFinished / 1000));
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            progress.setMessage(mm.getString(R.string.reboot_countdown, 0));
-                            Shell.getShell(mm).su_raw(
-                                    "mv -f " + uninstaller + " /cache/" + UNINSTALLER,
-                                    "mv -f " + utils + " /data/magisk/" + UTIL_FUNCTIONS,
-                                    "reboot"
-                            );
-                        }
-                    }.start();
+                    Shell.getShell(mm).su(
+                            "cat " + uninstaller + " > /cache/" + UNINSTALLER,
+                            "cat " + utils + " > /data/magisk/" + UTIL_FUNCTIONS
+                    );
+                    mm.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
+                    Shell.getShell(mm).su_raw(
+                            "sleep 5",
+                            "pm uninstall " + mm.getApplicationInfo().packageName
+                    );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

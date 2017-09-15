@@ -122,6 +122,7 @@
     <string name="restore_stock_boot">Restore Stock Boot</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
+    <string name="uninstall_toast">Uninstalling Magisk Manager in 5 seconds, please manually reboot afterwards</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
