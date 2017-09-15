@@ -39,18 +39,19 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     public static final int NAMESPACE_MODE_REQUESTER = 1;
     public static final int NAMESPACE_MODE_ISOLATE = 2;
 
+    public static final String DB_NAME = "su.db";
     private static final int DATABASE_VER = 3;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
 
-    private MagiskManager magiskManager;
+    private MagiskManager mm;
     private PackageManager pm;
     private SQLiteDatabase mDb;
 
     public SuDatabaseHelper(Context context) {
-        super(context, "su.db", null, DATABASE_VER);
-        magiskManager = Utils.getMagiskManager(context);
+        super(context, DB_NAME, null, DATABASE_VER);
+        mm = Utils.getMagiskManager(context);
         pm = context.getPackageManager();
         mDb = getWritableDatabase();
         cleanup();
@@ -81,10 +82,10 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                     "FROM " + POLICY_TABLE + "_old");
             db.execSQL("DROP TABLE " + POLICY_TABLE + "_old");
 
-            File oldDB = magiskManager.getDatabasePath("sulog.db");
+            File oldDB = mm.getDatabasePath("sulog.db");
             if (oldDB.exists()) {
                 migrateLegacyLogList(oldDB, db);
-                magiskManager.deleteDatabase("sulog.db");
+                mm.deleteDatabase("sulog.db");
             }
             ++oldVersion;
         }
@@ -120,7 +121,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(System.currentTimeMillis() / 1000) });
         // Clear outdated logs
         mDb.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
-                System.currentTimeMillis() - magiskManager.suLogTimeout * 86400000) });
+                System.currentTimeMillis() - mm.suLogTimeout * 86400000) });
     }
 
     public void deletePolicy(Policy policy) {
@@ -178,7 +179,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                     Policy policy = new Policy(c, pm);
                     // The application changed UID for some reason, check user config
                     if (policy.info.uid != policy.uid) {
-                        if (magiskManager.suReauth) {
+                        if (mm.suReauth) {
                             // Reauth required, remove from DB
                             deletePolicy(policy);
                             continue;

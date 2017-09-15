@@ -17,7 +17,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        android:directBootAware="true"
+        tools:ignore="UnusedAttribute">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize"

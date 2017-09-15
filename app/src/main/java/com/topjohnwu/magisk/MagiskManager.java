@@ -136,9 +136,17 @@ public class MagiskManager extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        new File(getApplicationInfo().dataDir).mkdirs();  /* Create the app data directory */
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        suDB = new SuDatabaseHelper(this);
+
+        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists()
+                || Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            // Don't migrate yet, wait and check Magisk version
+            suDB = new SuDatabaseHelper(this);
+        } else {
+            // Place the suDB in DE memory
+            suDB = new SuDatabaseHelper(createDeviceProtectedStorageContext());
+        }
+
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
@@ -198,6 +206,17 @@ public class MagiskManager extends Application {
         boolean hasNetwork = Utils.checkNetworkStatus(this);
 
         getMagiskInfo();
+
+        // Check if we need to migrate suDB
+        if (magiskVersionCode >= 1410
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && getDatabasePath(SuDatabaseHelper.DB_NAME).exists()) {
+            suDB.close();
+            Context de = createDeviceProtectedStorageContext();
+            de.moveDatabaseFrom(this, SuDatabaseHelper.DB_NAME);
+            suDB = new SuDatabaseHelper(de);
+        }
+
         new LoadLocale(this).exec();
 
         // Root actions
