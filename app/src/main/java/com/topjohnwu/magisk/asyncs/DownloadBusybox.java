@@ -51,7 +51,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
             e.printStackTrace();
         }
         if (busybox.exists()) {
-            getShell().su_raw(
+            getShell().su(
                     "rm -rf " + MagiskManager.BUSYBOXPATH,
                     "mkdir -p " + MagiskManager.BUSYBOXPATH,
                     "cp " + busybox + " " + MagiskManager.BUSYBOXPATH,
