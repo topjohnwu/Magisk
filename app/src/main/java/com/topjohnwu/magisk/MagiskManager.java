@@ -229,6 +229,7 @@ public class MagiskManager extends Application {
                     "export PATH=" + BUSYBOXPATH + ":$PATH",
                     ". " + utils,
                     "mount_partitions",
+                    "BOOTIMAGE=",
                     "find_boot_image",
                     "migrate_boot_backup"
             );
