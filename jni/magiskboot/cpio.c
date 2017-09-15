@@ -390,7 +390,8 @@ static void cpio_stocksha1(struct vector *v) {
 	cpio_entry *f;
 	char sha1[41];
 	vec_for_each(v, f) {
-		if (strcmp(f->filename, "init.magisk.rc") == 0) {
+		if (strcmp(f->filename, "init.magisk.rc") == 0
+			|| strcmp(f->filename, "overlay/init.magisk.rc") == 0) {
 			for (char *pos = f->data; pos < f->data + f->filesize; pos = strchr(pos + 1, '\n') + 1) {
 				if (memcmp(pos, "# STOCKSHA1=", 12) == 0) {
 					pos += 12;
