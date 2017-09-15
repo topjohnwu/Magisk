@@ -31,8 +31,16 @@ if [ ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
   exit 1
 fi
 
-# Load utility functions
-. $MAGISKBIN/util_functions.sh
+if $BOOTMODE; then
+  # Load utility functions
+  . $MAGISKBIN/util_functions.sh
+  boot_actions
+  mount_partitions
+else
+  recovery_actions
+fi
+
+cd $MAGISKBIN
 
 # Find the boot image
 find_boot_image
@@ -40,7 +48,7 @@ find_boot_image
 
 ui_print "- Found Boot Image: $BOOTIMAGE"
 
-cd $MAGISKBIN
+migrate_boot_backup
 
 ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
@@ -61,9 +69,8 @@ case $? in
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
-migrate_boot_backup
-
 # Detect boot image state
+ui_print "- Checking ramdisk status"
 ./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
@@ -109,6 +116,6 @@ rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.d
         /cache/magisk /cache/magisk_merge /cache/magisk_mount /cache/unblock /cache/magisk_uninstaller.sh \
         /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
         /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk* \
-        /data/app/com.topjohnwu.magisk* /data/user/*/com.topjohnwu.magisk 2>/dev/null
+        /data/app/com.topjohnwu.magisk* /data/user*/*/com.topjohnwu.magisk 2>/dev/null
 
-$BOOTMODE && reboot
+$BOOTMODE && reboot || recovery_cleanup

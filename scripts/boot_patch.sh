@@ -29,24 +29,6 @@
 # Functions
 ##########################################################################################
 
-# Call ui_print_wrap if exists, or else simply use echo
-# Useful when wrapped in flashable zip
-ui_print_wrap() {
-  type ui_print >/dev/null 2>&1 && ui_print "$1" || echo "$1"
-}
-
-# Call abort if exists, or else show error message and exit
-# Essential when wrapped in flashable zip
-abort_wrap() {
-  type abort >/dev/null 2>&1
-  if [ $? -ne 0 ]; then
-    ui_print_wrap "$1"
-    exit 1
-  else
-    abort "$1"
-  fi
-}
-
 # Pure bash dirname implementation
 dirname_wrap() {
   case "$1" in
@@ -63,16 +45,6 @@ dirname_wrap() {
 # Pure bash basename implementation
 basename_wrap() {
   echo ${1##*/}
-}
-
-grep_prop() {
-  REGEX="s/^$1=//p"
-  shift
-  FILES=$@
-  if [ -z "$FILES" ]; then
-    FILES='/system/build.prop'
-  fi
-  cat $FILES 2>/dev/null | sed -n "$REGEX" | head -n 1
 }
 
 # --cpio-add <incpio> <mode> <entry> <infile>
@@ -94,14 +66,9 @@ cpio_mkdir() {
 # Initialization
 ##########################################################################################
 
-[ -z $1 ] && abort_wrap "This script requires a boot image as a parameter"
+BOOTIMAGE="$1"
 
-cwd=`pwd`
-cd "`dirname_wrap $1`"
-BOOTIMAGE="`pwd`/`basename_wrap $1`"
-cd $cwd
-
-[ -e "$BOOTIMAGE" ] || abort_wrap "$BOOTIMAGE does not exist!"
+[ -e "$BOOTIMAGE" ] || (echo "$BOOTIMAGE does not exist!" && exit 1)
 
 # Presets
 [ -z $KEEPVERITY ] && KEEPVERITY=false
@@ -129,23 +96,23 @@ migrate_boot_backup
 
 CHROMEOS=false
 
-ui_print_wrap "- Unpacking boot image"
+ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
 
 case $? in
   1 )
-    abort_wrap "! Unable to unpack boot image"
+    abort "! Unable to unpack boot image"
     ;;
   2 )
     CHROMEOS=true
     ;;
   3 )
-    ui_print_wrap "! Sony ELF32 format detected"
-    abort_wrap "! Please use BootBridge from @AdrianDC to flash Magisk"
+    ui_print "! Sony ELF32 format detected"
+    abort "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
   4 )
-    ui_print_wrap "! Sony ELF64 format detected"
-    abort_wrap "! Stock kernel cannot be patched, please use a custom kernel"
+    ui_print "! Sony ELF64 format detected"
+    abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
 ##########################################################################################
@@ -153,12 +120,12 @@ esac
 ##########################################################################################
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
-ui_print_wrap "- Checking ramdisk status"
+ui_print "- Checking ramdisk status"
 ./magiskboot --cpio-test ramdisk.cpio
 case $? in
   0 )  # Stock boot
-    ui_print_wrap "- Stock boot image detected!"
-    ui_print_wrap "- Backing up stock boot image"
+    ui_print "- Stock boot image detected!"
+    ui_print "- Backing up stock boot image"
     SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img
     dd if="$BOOTIMAGE" of=$STOCKDUMP
@@ -166,22 +133,22 @@ case $? in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
-    ui_print_wrap "- Magisk patched image detected!"
+    ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
     OK=false
     ./magiskboot --cpio-restore ramdisk.cpio
     if [ $? -eq 0 ]; then
-      ui_print_wrap "- Ramdisk restored from internal backup"
+      ui_print "- Ramdisk restored from internal backup"
       OK=true
     else
       # Restore failed
-      ui_print_wrap "! Cannot restore from internal backup"
+      ui_print "! Cannot restore from internal backup"
       # If we are root and SHA1 known, we try to find the stock backup
       if $ROOT && [ ! -z $SHA1 ]; then
         STOCKDUMP=/data/stock_boot_${SHA1}.img
         if [ -f ${STOCKDUMP}.gz ]; then
-          ui_print_wrap "- Stock boot image backup found"
+          ui_print "- Stock boot image backup found"
           ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
           ./magiskboot --unpack stock_boot.img
           rm -f stock_boot.img
@@ -190,14 +157,14 @@ case $? in
       fi
     fi
     if ! $OK; then
-      ui_print_wrap "! Ramdisk restoration incomplete"
-      ui_print_wrap "! Will still try to continue installation"
+      ui_print "! Ramdisk restoration incomplete"
+      ui_print "! Will still try to continue installation"
     fi
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 ) # Other patched
-    ui_print_wrap "! Boot image patched by other programs!"
-    abort_wrap "! Please restore stock boot image"
+    ui_print "! Boot image patched by other programs!"
+    abort "! Please restore stock boot image"
     ;;
 esac
 
@@ -205,7 +172,7 @@ esac
 # Ramdisk patches
 ##########################################################################################
 
-ui_print_wrap "- Patching ramdisk"
+ui_print "- Patching ramdisk"
 
 if [ ! -z $SHA1 ]; then
   cp init.magisk.rc init.magisk.rc.bak
@@ -257,8 +224,8 @@ A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 736B69705F696E697472616D6673 \
 77616E745F696E697472616D6673
 
-ui_print_wrap "- Repacking boot image"
-./magiskboot --repack "$BOOTIMAGE" || abort_wrap "! Unable to repack boot image!"
+ui_print "- Repacking boot image"
+./magiskboot --repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos

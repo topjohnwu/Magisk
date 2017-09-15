@@ -31,7 +31,7 @@ umask 022
 OUTFD=$2
 ZIP=$3
 
-if [ ! -d "$COMMONDIR" ]; then
+if [ ! -f $COMMONDIR/util_functions.sh ]; then
   echo "! Unable to extract zip file!"
   exit 1
 fi

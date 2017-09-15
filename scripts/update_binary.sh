@@ -6,7 +6,7 @@ dirname_wrap() {
   esac
 }
 [ "$1" = "indep" ] && INDEP=true || INDEP=false
-$INDEP && TMPDIR="`cd "\`dirname_wrap "${BASH_SOURCE:-$0}"\`" && pwd`" || TMPDIR=/dev/tmp
+$INDEP && TMPDIR="`dirname_wrap "${BASH_SOURCE:-$0}"`" || TMPDIR=/dev/tmp
 INSTALLER=$TMPDIR/install; BBDIR=$TMPDIR/bin
 EXBIN=$BBDIR/b64xz; BBBIN=$BBDIR/busybox
 $INDEP || rm -rf $TMPDIR 2>/dev/null;

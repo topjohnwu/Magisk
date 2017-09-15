@@ -24,7 +24,7 @@ OUTFD=$2
 ZIP=$3
 
 if [ ! -f $INSTALLER/util_functions.sh ]; then
-  echo "! Failed: Unable to extract zip file!"
+  echo "! Unable to extract zip file!"
   exit 1
 fi
 
@@ -40,13 +40,8 @@ ui_print "************************"
 ui_print "   Magisk Uninstaller   "
 ui_print "************************"
 
-ui_print "- Mounting /system, /vendor, /cache, /data"
-mount -o ro /system 2>/dev/null
-mount -o ro /vendor 2>/dev/null
-mount /cache 2>/dev/null
-mount /data 2>/dev/null
-
-[ -f /system/build.prop ] || abort "! /system could not be mounted!"
+is_mounted /data || mount /data
+mount_partitions
 
 api_level_arch_detect
 
@@ -61,15 +56,15 @@ BINDIR=$INSTALLER/$ARCH
 MAGISKBIN=/data/magisk
 
 if is_mounted /data; then
+  # Save our stock boot image dump before removing it
+  [ -f $MAGISKBIN/stock_boot* ] && mv $MAGISKBIN/stock_boot* /data
   # Copy the binaries to /data/magisk, in case they do not exist
   rm -rf $MAGISKBIN 2>/dev/null
   mkdir -p $MAGISKBIN
   cp -af $BINDIR/. $CHROMEDIR $TMPDIR/bin/busybox $INSTALLER/util_functions.sh $MAGISKBIN
   chmod -R 755 $MAGISKBIN
   # Run the acttual uninstallation
-  recovery_actions
   . $INSTALLER/magisk_uninstaller.sh
-  recovery_cleanup
 else
   ui_print "! Data unavailable"
   ui_print "! Placing uninstall script to /cache"
