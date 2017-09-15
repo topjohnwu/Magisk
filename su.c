@@ -86,6 +86,22 @@ static void populate_environment(const struct su_context *ctx) {
 	}
 }
 
+void set_identity(unsigned uid) {
+	/*
+	 * Set effective uid back to root, otherwise setres[ug]id will fail
+	 * if uid isn't root.
+	 */
+	if (seteuid(0)) {
+		PLOGE("seteuid (root)");
+	}
+	if (setresgid(uid, uid, uid)) {
+		PLOGE("setresgid (%u)", uid);
+	}
+	if (setresuid(uid, uid, uid)) {
+		PLOGE("setresuid (%u)", uid);
+	}
+}
+
 static __attribute__ ((noreturn)) void allow() {
 	char *arg0;
 
@@ -114,7 +130,7 @@ static __attribute__ ((noreturn)) void allow() {
 	set_identity(su_ctx->to.uid);
 
 	setexeccon("u:r:su:s0");
-	
+
 	su_ctx->to.argv[--su_ctx->to.argc] = arg0;
 	execvp(binary, su_ctx->to.argv + su_ctx->to.argc);
 	fprintf(stderr, "Cannot execute %s: %s\n", binary, strerror(errno));

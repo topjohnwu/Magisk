@@ -24,6 +24,14 @@
 
 #define AM_PATH "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
 
+static char *get_command(const struct su_request *to) {
+	if (to->command)
+		return to->command;
+	if (to->shell)
+		return to->shell;
+	return DEFAULT_SHELL;
+}
+
 static void silent_run(char* const args[]) {
 	set_identity(0);
 	if (fork())

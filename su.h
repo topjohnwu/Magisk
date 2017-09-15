@@ -119,6 +119,7 @@ extern int pipefd[2];
 
 int su_daemon_main(int argc, char **argv);
 __attribute__ ((noreturn)) void exit2(int status);
+void set_identity(unsigned uid);
 
 // su_client.c
 
@@ -135,11 +136,5 @@ void app_send_request(struct su_context *ctx);
 // db.c
 
 void database_check(struct su_context *ctx);
-
-// misc.c
-
-void set_identity(unsigned uid);
-char *get_command(const struct su_request *to);
-int fork_zero_fucks();
 
 #endif
