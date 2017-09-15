@@ -258,7 +258,8 @@ public class MagiskFragment extends Fragment
             spinner.setEnabled(false);
         } else {
             items.add(getString(R.string.cannot_auto_detect));
-            items.addAll(mm.blockList);
+            if (mm.blockList != null)
+                items.addAll(mm.blockList);
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_spinner_item, items);
