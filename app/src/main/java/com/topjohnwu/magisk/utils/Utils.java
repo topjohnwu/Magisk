@@ -446,7 +446,7 @@ public class Utils {
                                 default:
                             }
                             Utils.dlAndReceive(
-                                    mm,
+                                    fragment.getActivity(),
                                     receiver,
                                     mm.magiskLink,
                                     filename
