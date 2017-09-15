@@ -110,8 +110,15 @@ cd $cwd
 # Detect whether running as root
 id | grep "uid=0" >/dev/null 2>&1 && ROOT=true || ROOT=false
 
-# Switch to the location of the script file
-[ -z $SOURCEDMODE ] && cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
+if [ -z $SOURCEDMODE ]; then
+  # Switch to the location of the script file
+  cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
+  # Load utility functions
+  . ./util_functions.sh
+  # Detect current status
+  mount_partitions
+fi
+
 chmod -R 755 .
 
 ##########################################################################################
