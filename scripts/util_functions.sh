@@ -91,7 +91,7 @@ find_boot_image() {
     if [ ! -z $SLOT ]; then
       BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
     else
-      for BLOCK in boot_a kern-a android_boot kernel boot lnx; do
+      for BLOCK in bootimg boot_a kern-a android_boot kernel boot lnx; do
         BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
         [ ! -z $BOOTIMAGE ] && break
       done
