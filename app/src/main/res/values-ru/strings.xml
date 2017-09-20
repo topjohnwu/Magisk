@@ -97,6 +97,8 @@
     <string name="safetyNet_hide_notice">Данное приложение использует SafetyNet.\nУже обработано MagiskHide по умолчанию</string>
     <string name="process_error">Ошибка обработки</string>
     <string name="internal_storage">Архив расположен:\n[Внутреннее Хранилище]%1$s</string>
+    <string name="zip_download_title">Загрузка</string>
+    <string name="zip_download_msg">Загрузка архива…</string>
     <string name="zip_process_title">Обработка</string>
     <string name="zip_process_msg">Обработка архива…</string>
     <string name="manual_boot_image">Пожалуйста, выберите вручную boot-образ!</string>
@@ -109,6 +111,7 @@
     <string name="download_zip_only">Загрузка только архива</string>
     <string name="patch_boot_file">Пропатчить boot-образ</string>
     <string name="direct_install">Непосредственная установка (рекомендуется)</string>
+    <string name="install_second_slot">Установить во Второй Слот (после OTA)</string>
     <string name="select_method">Выбрать способ</string>
     <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образа</string>
     <string name="boot_file_patch_msg">Выберите оригинальный дамп boot-образа, .img либо .img.tar формата</string>
@@ -116,6 +119,7 @@
     <string name="restore_stock_boot">Восстановить оригинальный boot-образ</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
+    <string name="uninstall_toast">Удаление менеджера Magisk в течении 5 секунд, затем, пожалуйста, вручную выполните перезагрузку</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
