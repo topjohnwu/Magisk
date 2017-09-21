@@ -41,6 +41,7 @@
     <string name="uninstall">Odinstaluj</string>
     <string name="reboot_countdown">Restartuj do %1$d</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
+	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte.Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Aktualizacja %1$s</string>
     
     <!--Module Fragment-->
@@ -91,7 +92,6 @@
     <string name="install_error">Błąd instalacji!</string>
     <string name="invalid_zip">Ten zip nie jest Modułem Magisk!!</string>
     <string name="reboot">Restart</string>
-    <string name="zip_process_msg">Przetwarzanie pliku zip …</string>
     <string name="downloading_toast">Pobieranie %1$s</string>
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
@@ -100,8 +100,11 @@
     <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJest już domyślnie obsługiwana przez MagiskHide</string>
     <string name="process_error">Błąd procesu</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
-    <string name="zip_process_title">Przetwarzanie</string>
-    <string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
+    <string name="zip_download_title">Pobieranie</string>
+    <string name="zip_download_msg">Pobieranie pliku zip …</string>
+	<string name="zip_process_title">Przetwarzanie</string>
+	<string name="zip_process_msg">Przetwarzanie pliku zip …</string>
+	<string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
     <string name="magisk_updates">Aktualizacja Magisk</string>
@@ -111,9 +114,16 @@
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
+	<string name="install_second_slot">Zainstaluj na Drugim Slocie (Po OTA)</string>
     <string name="select_method">Wybierz Metodę</string>
     <string name="no_boot_file_patch_support">Wersja docelowa programu Magisk nie obsługuje ładowania pliku boot image</string>
- 
+    <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
+    <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
+    <string name="restore_stock_boot">Przywróć Stockowy Boot</string>
+    <string name="restore_done">Przywracanie zakonczone!</string>
+    <string name="restore_fail">Stock backup nie istnieje!</string>
+    <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>
+   
     <!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
