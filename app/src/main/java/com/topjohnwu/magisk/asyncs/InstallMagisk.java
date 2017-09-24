@@ -75,14 +75,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         MagiskManager mm = getMagiskManager();
         if (mm == null) return false;
 
-        File install;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // Need to be stored in device encrypted storage for FBE
-            install = new File(mm.createDeviceProtectedStorageContext().getFilesDir().getParent(),
-                    "install");
-        } else {
-            install = new File(mm.getApplicationInfo().dataDir, "install");
-        }
+        File install = new File(Utils.getEncContext(mm).getFilesDir().getParent(), "install");
         getShell().sh_raw("rm -rf " + install);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);

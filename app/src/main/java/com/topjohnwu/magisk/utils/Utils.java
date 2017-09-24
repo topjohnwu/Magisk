@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,6 +16,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.support.annotation.StringRes;
@@ -526,5 +528,18 @@ public class Utils {
             })
             .setNegativeButton(R.string.no_thanks, null)
             .show();
+    }
+
+    public static boolean useFDE(Context context) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && context.getSystemService(DevicePolicyManager.class).getStorageEncryptionStatus()
+                == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER;
+    }
+
+    public static Context getEncContext(Context context) {
+        if (useFDE(context))
+            return context.createDeviceProtectedStorageContext();
+        else
+            return context;
     }
 }

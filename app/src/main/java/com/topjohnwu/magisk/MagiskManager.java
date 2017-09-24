@@ -138,13 +138,11 @@ public class MagiskManager extends Application {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists()
-                || Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists()) {
             // Don't migrate yet, wait and check Magisk version
             suDB = new SuDatabaseHelper(this);
         } else {
-            // Place the suDB in DE memory
-            suDB = new SuDatabaseHelper(createDeviceProtectedStorageContext());
+            suDB = new SuDatabaseHelper(Utils.getEncContext(this));
         }
 
         repoDB = new RepoDatabaseHelper(this);
@@ -208,13 +206,13 @@ public class MagiskManager extends Application {
         getMagiskInfo();
 
         // Check if we need to migrate suDB
-        if (magiskVersionCode >= 1410
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                && getDatabasePath(SuDatabaseHelper.DB_NAME).exists()) {
-            suDB.close();
-            Context de = createDeviceProtectedStorageContext();
-            de.moveDatabaseFrom(this, SuDatabaseHelper.DB_NAME);
-            suDB = new SuDatabaseHelper(de);
+        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists() && Utils.useFDE(this)) {
+            if (magiskVersionCode >= 1410) {
+                suDB.close();
+                Context de = createDeviceProtectedStorageContext();
+                de.moveDatabaseFrom(this, SuDatabaseHelper.DB_NAME);
+                suDB = new SuDatabaseHelper(de);
+            }
         }
 
         new LoadLocale(this).exec();
@@ -284,7 +282,7 @@ public class MagiskManager extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
                     getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
 
         LoadModules loadModuleTask = new LoadModules(this);
