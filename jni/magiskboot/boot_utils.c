@@ -92,7 +92,7 @@ int check_verity_pattern(const char *s) {
 }
 
 int check_encryption_pattern(const char *s) {
-	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", "fileencryptioninline", "fileencryption", NULL };
+	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", NULL };
 	for (int i = 0 ; encrypt_list[i]; ++i) {
 		int len = strlen(encrypt_list[i]);
 		if (strncmp(s, encrypt_list[i], len) == 0)
