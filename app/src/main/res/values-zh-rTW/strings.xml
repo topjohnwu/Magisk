@@ -213,5 +213,7 @@
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
     <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
+    <string name="install_second_slot">安裝到第二分區 (安裝完OTA後)</string>
+    <string name="uninstall_toast">將在 5 秒內解除安裝 Magisk Manager，接下來請手動重新啟動</string>
 
 </resources>
