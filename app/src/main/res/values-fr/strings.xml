@@ -24,7 +24,7 @@
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
     <string name="cannot_auto_detect">(Auto détection impossible)</string>
-    <string name="boot_image_title">Emplacement de l\'Image Boot</string>
+    <string name="boot_image_title">Emplacement de l\'image Boot</string>
     <string name="detect_button">Détection</string>
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
@@ -55,7 +55,7 @@
     <string name="menuClearLog">Effacer le journal maintenant</string>
     <string name="logs_cleared">Journal effacé avec succès</string>
     <string name="log_is_empty">Journal vide</string>
-    <string name="logs_save_failed">Impossible d\'écrire le journal sur la SD card:</string>
+    <string name="logs_save_failed">Impossible d\'écrire le journal sur la carte SD:</string>
     <!--About Activity-->
     <string name="about">À propos</string>
     <string name="app_developers">Principaux développeurs</string>
@@ -134,7 +134,7 @@
     <string name="request_timeout">Délai de requête</string>
     <string name="superuser_notification">Notification Superuser</string>
     <string name="request_timeout_summary">%1$s secondes</string>
-    <string name="settings_development_category">Dévellopement de l\'application</string>
+    <string name="settings_development_category">Développement de l\'application</string>
     <string name="settings_developer_logging_title">Activer le journal de débogage avancé</string>
     <string name="settings_developer_logging_summary">Cocher ceci pour activer la journalisation "verbose" (tout)</string>
     <string name="settings_shell_logging_title">Activer la journalisation de débogage de commande shell</string>
@@ -148,7 +148,7 @@
 	<string name="settings_update_stable">Stable</string>
 	<string name="settings_update_beta">Beta</string>
 	<string name="settings_boot_format_title">Format de sortie du boot patché</string>
-	<string name="settings_boot_format_summary">Sélectionner le format de \'image boot patchée finale.\nChoisir .img pour flasher via fastboot/mode download ; chosiir .img.tar pour flasher via ODIN.</string>
+	<string name="settings_boot_format_summary">Sélectionner le format de l\'image boot patchée finale.\nChoisir .img pour flasher via fastboot/mode download ; choisir .img.tar pour flasher via ODIN.</string>
 	<string name="settings_su_reauth_title">Ré-authentifier après mise à jour</string>
 	<string name="settings_su_reauth_summary">Ré-authentifier les permissions superuser après les mises à jour d\'une application</string>
 	<string name="multiuser_mode">Mode multi-utilisateurs</string>
