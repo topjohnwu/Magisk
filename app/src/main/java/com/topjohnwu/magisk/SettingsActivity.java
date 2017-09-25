@@ -221,12 +221,12 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
                         getShell().su_raw(
-                                "cp -af /system/etc/hosts /magisk/.core/hosts",
-                                "mount -o bind /magisk/.core/hosts /system/etc/hosts");
+                                "cp -af /system/etc/hosts " + MagiskManager.MAGISK_HOST_FILE,
+                                "mount -o bind " + MagiskManager.MAGISK_HOST_FILE + " /system/etc/hosts");
                     } else {
                         getShell().su_raw(
                                 "umount -l /system/etc/hosts",
-                                "rm -f /magisk/.core/hosts");
+                                "rm -f " + MagiskManager.MAGISK_HOST_FILE);
                     }
                     break;
                 case "su_access":

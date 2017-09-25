@@ -44,6 +44,7 @@ import java.util.concurrent.ExecutionException;
 public class MagiskManager extends Application {
 
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
+    public static final String MAGISK_HOST_FILE = "/magisk/.core/hosts";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_PATH = "/magisk";
     public static final String INTENT_SECTION = "section";
@@ -264,7 +265,7 @@ public class MagiskManager extends Application {
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
-                .putBoolean("hosts", new File("/magisk/.core/hosts").exists())
+                .putBoolean("hosts", Utils.itemExist(shell, MAGISK_HOST_FILE))
                 .putBoolean("disable", Utils.itemExist(shell, MAGISK_DISABLE_FILE))
                 .putBoolean("su_reauth", suReauth)
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
