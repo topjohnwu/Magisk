@@ -206,7 +206,7 @@ static void cpio_test(struct vector *v) {
 
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	cpio_entry *f;
-	int skip;
+	int skip, write;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, "init.rc") == 0) {
 			void *new_data = patch_init_rc(f->data, &f->filesize);
@@ -215,13 +215,15 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 		} else {
 			if (!keepverity) {
 				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-					for (int i = 0; i < f->filesize; ++i) {
-						if ((skip = check_verity_pattern(f->data + i)) > 0) {
-							fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + i, f->filename);
-							memcpy(f->data + i, f->data + i + skip, f->filesize - i - skip);
-							f->filesize -= skip;
+					write = 0;
+					for (int read = 0; read < f->filesize; ++write, ++read) {
+						if ((skip = check_verity_pattern(f->data + read)) > 0) {
+							fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
+							read += skip;
 						}
+						f->data[write] = f->data[read];
 					}
+					f->filesize = write;
 				} else if (strcmp(f->filename, "verity_key") == 0) {
 					fprintf(stderr, "Remove [verity_key]\n");
 					f->remove = 1;
@@ -229,15 +231,18 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 			}
 			if (!keepforceencrypt) {
 				if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-					for (int i = 0; i < f->filesize; ++i) {
-						if ((skip = check_encryption_pattern(f->data + i)) > 0) {
-							fprintf(stderr, "Replace pattern [%.*s] with [encryptable] in [%s]\n", skip, f->data + i, f->filename);
-							memcpy(f->data + i, "encryptable", 11);
+					write = 0;
+					for (int read = 0; read < f->filesize; ++write, ++read) {
+						if ((skip = check_encryption_pattern(f->data + read)) > 0) {
 							// assert(skip > 11)!
-							memcpy(f->data + i + 11, f->data + i + skip, f->filesize - i - skip);
-							f->filesize = f->filesize - skip + 11;
+							fprintf(stderr, "Replace pattern [%.*s] with [encryptable] in [%s]\n", skip, f->data + read, f->filename);
+							memcpy(f->data + write, "encryptable", 11);
+							write += 11;
+							read += skip;
 						}
+						f->data[write] = f->data[read];
 					}
+					f->filesize = write;
 				}
 			}
 		}
