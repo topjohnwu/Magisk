@@ -196,16 +196,12 @@ int setprop2(const char *name, const char *value, const int trigger) {
 int deleteprop(const char *name, const int trigger) {
     if (init_resetprop()) return -1;
     PRINT_D("resetprop: deleteprop [%s]\n", name);
-    if (__system_property_del(name)) {
-        PRINT_D("resetprop: delete prop: [%s] error\n", name);
-        return -1;
-    }
     if (trigger && strstr(name, "persist.")) {
         char buffer[PATH_MAX];
         snprintf(buffer, sizeof(buffer), "%s/%s", PERSISTENT_PROPERTY_DIR, name);
         unlink(buffer);
     }
-    return 0;
+    return __system_property_del(name);
 }
 
 int read_prop_file(const char* filename, const int trigger) {
