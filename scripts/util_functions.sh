@@ -86,12 +86,20 @@ getvar() {
   eval $VARNAME=\$VALUE
 }
 
+resolve_link() {
+  RESOLVED="$1"
+  while RESOLVE=`readlink $RESOLVED`; do
+    RESOLVED=$RESOLVE
+  done
+  echo $RESOLVED
+}
+
 find_boot_image() {
   if [ -z "$BOOTIMAGE" ]; then
     if [ ! -z $SLOT ]; then
       BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
     else
-      for BLOCK in boot_a kern-a android_boot kernel boot lnx; do
+      for BLOCK in boot_a kern-a android_boot kernel boot lnx bootimg; do
         BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
         [ ! -z $BOOTIMAGE ] && break
       done
@@ -100,11 +108,11 @@ find_boot_image() {
   # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
     for FSTAB in /etc/*fstab*; do
-      BOOTIMAGE=`grep -v '#' $FSTAB | grep -E '\b/boot\b' | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
+      BOOTIMAGE=`grep -v '#' $FSTAB | grep -E '/boot[^a-zA-Z]' | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
-  [ -L "$BOOTIMAGE" ] && BOOTIMAGE=`readlink $BOOTIMAGE`
+  BOOTIMAGE=`resolve_link $BOOTIMAGE`
 }
 
 migrate_boot_backup() {
@@ -121,7 +129,24 @@ migrate_boot_backup() {
     mv /data/stock_boot.img $STOCKDUMP
     ./magiskboot --compress $STOCKDUMP
   fi
-  [ -f /data/magisk/stock_boot* ] && mv /data/magisk/stock_boot* /data
+  mv /data/magisk/stock_boot* /data 2>/dev/null
+}
+
+flash_boot_image() {
+  case "$1" in
+    *.gz) COMMAND="gzip -d < \"$1\"";;
+    *)    COMMAND="cat \"$1\"";;
+  esac
+  case "$2" in
+    /dev/block/*)
+      ui_print "- Flashing new boot image"
+      eval $COMMAND | cat - /dev/zero | dd of="$2" bs=4096 >/dev/null 2>&1
+      ;;
+    *)
+      ui_print "- Storing new boot image"
+      eval $COMMAND | dd of="$2" bs=4096 >/dev/null 2>&1
+      ;;
+  esac
 }
 
 sign_chromeos() {

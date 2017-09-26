@@ -49,7 +49,7 @@ ui_print "************************"
 ui_print "* Magisk v$MAGISK_VER Installer"
 ui_print "************************"
 
-is_mounted /data || mount /data
+is_mounted /data || mount /data || is_mounted /cache || mount /cache || abort "! Unable to mount partitions"
 mount_partitions
 
 # read override variables
@@ -85,7 +85,7 @@ if $BOOTMODE; then
 fi
 
 # Save our stock boot image dump before removing it
-[ -f $MAGISKBIN/stock_boot* ] && mv $MAGISKBIN/stock_boot* /data
+mv /data/magisk/stock_boot* /data 2>/dev/null
 
 # Copy required files
 rm -rf $MAGISKBIN 2>/dev/null
@@ -122,16 +122,10 @@ if [ -f stock_boot* ]; then
   mv stock_boot* /data
 fi
 
-ui_print "- Flashing new boot image"
-if [ -L "$BOOTIMAGE" ]; then
-  dd if=new-boot.img of="$BOOTIMAGE" bs=4096
-else
-  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
-fi
+flash_boot_image new-boot.img "$BOOTIMAGE"
 rm -f new-boot.img
 
 cd /
-
 # Cleanups
 $BOOTMODE || recovery_cleanup
 rm -rf $TMPDIR

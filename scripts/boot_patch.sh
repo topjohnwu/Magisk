@@ -180,7 +180,7 @@ if [ ! -z $SHA1 ]; then
 fi
 
 if $SKIP_INITRAMFS; then
-  cpio_add 750 init ./magiskinit
+  cpio_add 750 init magiskinit
   cpio_mkdir 000 overlay
   cpio_add 750 overlay/init.magisk.rc init.magisk.rc
   cpio_mkdir 750 overlay/sbin
@@ -220,7 +220,7 @@ rm -f ramdisk.cpio.orig
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 # skip_initramfs -> want_initramfs
-./magiskboot --hexpatch kernel \
+$SKIP_INITRAMFS && ./magiskboot --hexpatch kernel \
 736B69705F696E697472616D6673 \
 77616E745F696E697472616D6673
 
