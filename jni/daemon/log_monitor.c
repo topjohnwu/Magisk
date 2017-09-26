@@ -26,7 +26,7 @@ static void *logger_thread(void *args) {
 
 	while (1) {
 		// Start logcat
-		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-s", "Magisk", "-v", "thread", NULL);
+		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-v", "thread", "Magisk:I", "*:S", NULL);
 		if (log_pid > 0)
 			waitpid(log_pid, NULL, 0);
 		// For some reason it went here, clear buffer and restart

@@ -315,7 +315,7 @@ static void clone_skeleton(struct node_entry *node) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
 			#ifdef MAGISK_DEBUG
-				LOGD("cplink: %s -> %s\n",buf2, buf);
+				LOGI("cplink: %s -> %s\n",buf2, buf);
 			#else
 				LOGI("cplink: %s\n", buf);
 			#endif
@@ -414,7 +414,7 @@ static void mount_mirrors() {
 			xmkdir_p(MIRRDIR "/system", 0755);
 			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
-				LOGD("mount: %s -> %s\n", buf, MIRRDIR "/system");
+				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/system");
 			#endif
@@ -426,7 +426,7 @@ static void mount_mirrors() {
 			xmkdir_p(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
-				LOGD("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/vendor");
 			#endif
@@ -437,7 +437,7 @@ static void mount_mirrors() {
 	if (!seperate_vendor) {
 		symlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#ifdef MAGISK_DEBUG
-			LOGD("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+			LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#else
 			LOGI("link: %s\n", MIRRDIR "/vendor");
 		#endif
@@ -563,10 +563,10 @@ void post_fs_data(int client) {
 	monitor_logs();
 
 #ifdef MAGISK_DEBUG
-	// Start debug logs in new process
+	// Log everything initially
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "brief", NULL);
-	close(debug_log_fd);
+	xwrite(debug_log_fd, "Boot logs:\n", 11);
+	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "thread", NULL);
 #endif
 
 	LOGI("** post-fs-data mode running\n");
@@ -769,5 +769,8 @@ core_only:
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
+	// Then start to log Magisk verbosely
+	xwrite(debug_log_fd, "\nVerbose logs:\n", 15);
+	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "thread", "-s", "Magisk", NULL);
 #endif
 }

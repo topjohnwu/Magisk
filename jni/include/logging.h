@@ -23,13 +23,10 @@ static inline void exit_proc() { exit(1); }
 static inline void exit_thread() { pthread_exit(NULL); }
 static inline void do_nothing() {}
 
-// Dummy function to depress debug message
-static inline void stub(const char *fmt, ...) {}
-
 #ifdef MAGISK_DEBUG
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #else
-#define LOGD(...)  stub(__VA_ARGS__)
+#define LOGD(...)  {}
 #endif
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGW(...)  __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
