@@ -25,7 +25,7 @@ public class RestoreStockBoot extends ParallelTask<Void, Void, Boolean> {
         String stock_boot = "/data/stock_boot_" + ret.get(0).substring(ret.get(0).indexOf('=') + 1) + ".img.gz";
         if (!Utils.itemExist(getShell(), stock_boot))
             return false;
-        getShell().su_raw("gzip -d < " + stock_boot + " | cat - /dev/zero | dd of=" + mBoot + " bs=4096");
+        getShell().su_raw("flash_boot_image " + stock_boot + " " + mBoot);
         return true;
     }
 

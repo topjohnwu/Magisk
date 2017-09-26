@@ -10,6 +10,8 @@ import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,27 +23,19 @@ import java.util.List;
 public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private Uri mUri;
-    private File mCachedFile, mScriptFile, mCheckFile;
-
-    private String mFilename;
+    private File mCachedFile;
     private AdaptiveList<String> mList;
 
     public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
         super(context);
         mUri = uri;
         mList = list;
-
         mCachedFile = new File(context.getCacheDir(), "install.zip");
-        mScriptFile = new File(context.getCacheDir(), "/META-INF/com/google/android/update-binary");
-        mCheckFile = new File(mScriptFile.getParent(), "updater-script");
-
-        // Try to get the filename ourselves
-        mFilename = Utils.getNameFromUri(context, mUri);
     }
 
     private boolean unzipAndCheck() throws Exception {
-        ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", false);
-        List<String> ret = Utils.readFile(getShell(), mCheckFile.getPath());
+        ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
+        List<String> ret = Utils.readFile(getShell(), new File(mCachedFile.getParentFile(), "updater-script").getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
 
@@ -66,12 +60,13 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             mCachedFile.delete();
             try (
                 InputStream in = mm.getContentResolver().openInputStream(mUri);
-                OutputStream out = new FileOutputStream(mCachedFile)
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(mCachedFile))
             ) {
                 if (in == null) throw new FileNotFoundException();
-                byte buffer[] = new byte[1024];
+                InputStream buf= new BufferedInputStream(in);
+                byte buffer[] = new byte[4096];
                 int length;
-                while ((length = in.read(buffer)) > 0)
+                while ((length = buf.read(buffer)) > 0)
                     out.write(buffer, 0, length);
             } catch (FileNotFoundException e) {
                 mList.add("! Invalid Uri");
@@ -81,9 +76,10 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
                 throw e;
             }
             if (!unzipAndCheck()) return 0;
-            mList.add("- Installing " + mFilename);
+            mList.add("- Installing " + Utils.getNameFromUri(mm, mUri));
             getShell().su(mList,
-                    "BOOTMODE=true sh " + mScriptFile + " dummy 1 " + mCachedFile +
+                    "cd " + mCachedFile.getParent(),
+                    "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile +
                             " && echo 'Success!' || echo 'Failed!'"
             );
             if (TextUtils.equals(mList.get(mList.size() - 1), "Success!"))

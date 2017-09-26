@@ -114,8 +114,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     boot = new File(install, "boot.img");
                     // Copy boot image to local
                     try (
-                            InputStream in = mm.getContentResolver().openInputStream(mBootImg);
-                            OutputStream out = new FileOutputStream(boot)
+                        InputStream in = mm.getContentResolver().openInputStream(mBootImg);
+                        OutputStream out = new FileOutputStream(boot)
                     ) {
                         InputStream source;
                         if (in == null) throw new FileNotFoundException();
@@ -131,7 +131,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             source = tar;
                         } else {
                             // Direct copy raw image
-                            source = in;
+                            source = new BufferedInputStream(in);
                         }
                         byte buffer[] = new byte[1024];
                         int length;
@@ -204,8 +204,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     break;
                 case DIRECT_MODE:
                     // Direct flash boot image
-                    getShell().su_raw("cat " + patched_boot + " /dev/zero | dd of=" + mBootLocation + " bs=4096");
-                    mList.add("Flashing patched boot to " + mBootLocation);
+                    getShell().su(mList, "flash_boot_image " + patched_boot + " " + mBootLocation);
                     break;
                 default:
                     return false;
