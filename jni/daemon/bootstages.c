@@ -276,14 +276,13 @@ static void clone_skeleton(struct node_entry *node) {
 	}
 	closedir(dir);
 
-	snprintf(buf, PATH_MAX, "%s%s", DUMMDIR, full_path);
-	mkdir_p(buf, 0755);
-	clone_attr(full_path, buf);
-	if (node->status & IS_SKEL)
-		bind_mount(buf, full_path);
+	if (node->status & IS_SKEL) {
+		LOGI("tmpfs: %s\n", full_path);
+		mount("tmpfs", full_path, "tmpfs", 0, NULL);
+	}
 
 	vec_for_each(node->children, child) {
-		snprintf(buf, PATH_MAX, "%s%s/%s", DUMMDIR, full_path, child->name);
+		snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
 
 		// Create the dummy file/directory
 		if (IS_DIR(child))
@@ -303,7 +302,7 @@ static void clone_skeleton(struct node_entry *node) {
 			// Mount from module file to dummy file
 			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
 		} else if (child->status & (IS_SKEL | IS_INTER)) {
-			// It's a intermediate folder, recursive clone
+			// It's an intermediate folder, recursive clone
 			clone_skeleton(child);
 			continue;
 		} else if (child->status & IS_DUMMY) {

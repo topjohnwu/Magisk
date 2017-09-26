@@ -31,7 +31,6 @@
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKTMP       "/dev/magisk"
 #define MIRRDIR         MAGISKTMP "/mirror"
-#define DUMMDIR         MAGISKTMP "/dummy"
 #define BBPATH          MAGISKTMP "/bin"
 #define CACHEMOUNT      "/cache/magisk_mount"
 

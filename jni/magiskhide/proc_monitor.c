@@ -137,9 +137,9 @@ static void hide_daemon(int pid) {
 	vec_init(&mount_list);
 	file_to_vector(buffer, &mount_list);
 
-	// Unmount any loop mounts and dummy mounts
+	// Unmount any loop mounts
 	vec_for_each(&mount_list, line) {
-		if (strstr(line, "/dev/block/loop") || strstr(line, DUMMDIR)) {
+		if (strstr(line, "/dev/block/loop")) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
