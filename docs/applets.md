@@ -8,32 +8,27 @@ Command help message:
 
 ```
 Usage: magisk [applet [arguments]...]
-   or: magisk --install [SOURCE] DIR
-       if SOURCE not provided, will link itself
-   or: magisk --list
-   or: magisk --createimg IMG SIZE
-       create ext4 image, SIZE is interpreted in MB
-   or: magisk --imgsize IMG
-   or: magisk --resizeimg IMG SIZE
-       SIZE is interpreted in MB
-   or: magisk --mountimg IMG PATH
-       mount IMG to PATH and prints the loop device
-   or: magisk --umountimg PATH LOOP
-   or: magisk --[boot stage]
-       start boot stage service
-   or: magisk [options]
-   or: applet [arguments]...
+   or: magisk [options]...
+
+Options:
+   -c                        print current binary version
+   -v                        print running daemon version
+   -V                        print running daemon version code
+   --list                    list all availible applets
+   --install [SOURCE] DIR    symlink all applets to DIR. SOURCE is optional
+   --createimg IMG SIZE      create ext4 image. SIZE is interpreted in MB
+   --imgsize IMG             report ext4 image used/total size
+   --resizeimg IMG SIZE      resize ext4 image. SIZE is interpreted in MB
+   --mountimg IMG PATH       mount IMG to PATH and prints the loop device
+   --umountimg PATH LOOP     unmount PATH and delete LOOP device
+   --[boot stage]            start boot stage service
+   --unlock-blocks           set BLKROSET flag to OFF for all block devices
 
 Supported boot stages:
    post-fs, post-fs-data, service
 
-Options:
-   -c          print client version
-   -v          print daemon version
-   -V          print daemon version code
-
 Supported applets:
-    su, resetprop, magiskpolicy, supolicy, sepolicy-inject, magiskhide
+    su, resetprop, magiskpolicy, supolicy, magiskhide
 ```
 
 ### su
@@ -86,7 +81,7 @@ resetprop  --delete NAME     remove prop entry NAME
 ```
 
 ### magiskpolicy
-(This tool is aliased to `supolicy` and `sepolicy-injection` for legacy reasons)
+(This tool is aliased to `supolicy` for compatibility)
 
 A tool to patch `sepolicy`. **magiskpolicy** also comes with built-in rules to unleash restrictions to make Magisk work properly. `sepolicy` is a compiled binary containing SELinux rules; we directly patch rules in the binary format since we don't have access to the SELinux policy source (`*.te`) files.
 

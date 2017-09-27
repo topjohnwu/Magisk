@@ -61,7 +61,7 @@ If you want to share your module with others, you can submit your modules to [Ma
 
 #### Once your module is live on the Modules Repo, the description of your repo should be the ID of your module. Please do NOT change the description, repeat, do NOT change the description.
 
-![repo_description.png](repo_description.png)
+![repo_description.png](images/repo_description.png)
 
 ## Notes
 - The Module Template depends on external scripts, be aware of the minimal required Magisk version of the template.

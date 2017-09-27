@@ -1,7 +1,7 @@
 # Magisk Documentations
-(Updated on 2017.8.16) ([Changelog](changelog.md))
+(Updated on 2017.9.28) ([Changelog](changelog.md))
 
-## Table of Content
+## Table of Contents
 
 - [Introduction](#introduction)
 - [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/cc1809688299f1f8b5db494a234850852712c0c9/docs/procedures.html)
@@ -19,6 +19,7 @@
     - [Modules and Templates](module_repo.md#magisk-module-format)
     - [Submit Modules to Repo](module_repo.md#submit-your-module-to-magisk-modules-repo)
 - [Tips and Tricks](tips.md)
+    - [OTA Installation Tips](tips.md#ota-installation-tips)
     - [Remove Files](tips.md#remove-files)
     - [Remove Folders](tips.md#remove-folders)
 
