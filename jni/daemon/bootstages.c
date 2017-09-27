@@ -452,12 +452,9 @@ static void link_busybox() {
 }
 
 static int prepare_img() {
-	int new_img = 0;
-
 	if (access(MAINIMG, F_OK) == -1) {
 		if (create_img(MAINIMG, 64))
 			return 1;
-		new_img = 1;
 	}
 
 	LOGI("* Mounting " MAINIMG "\n");
@@ -468,45 +465,44 @@ static int prepare_img() {
 
 	vec_init(&module_list);
 
-	if (new_img) {
-		xmkdir(COREDIR, 0755);
-		xmkdir(COREDIR "/post-fs-data.d", 0755);
-		xmkdir(COREDIR "/service.d", 0755);
-		xmkdir(COREDIR "/props", 0755);
-	} else {
-		DIR *dir = xopendir(MOUNTPOINT);
-		struct dirent *entry;
-		while ((entry = xreaddir(dir))) {
-			if (entry->d_type == DT_DIR) {
-				if (strcmp(entry->d_name, ".") == 0 ||
-					strcmp(entry->d_name, "..") == 0 ||
-					strcmp(entry->d_name, ".core") == 0 ||
-					strcmp(entry->d_name, "lost+found") == 0)
-					continue;
-				snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
-				if (access(buf, F_OK) == 0) {
-					snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
-					exec_command_sync(BBPATH "/rm", "-rf", buf, NULL);
-					continue;
-				}
-				snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
-				if (access(buf, F_OK) == 0)
-					continue;
-				vec_push_back(&module_list, strdup(entry->d_name));
+	xmkdir(COREDIR, 0755);
+	xmkdir(COREDIR "/post-fs-data.d", 0755);
+	xmkdir(COREDIR "/service.d", 0755);
+	xmkdir(COREDIR "/props", 0755);
+
+	DIR *dir = xopendir(MOUNTPOINT);
+	struct dirent *entry;
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_DIR) {
+			if (strcmp(entry->d_name, ".") == 0 ||
+				strcmp(entry->d_name, "..") == 0 ||
+				strcmp(entry->d_name, ".core") == 0 ||
+				strcmp(entry->d_name, "lost+found") == 0)
+				continue;
+			snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
+			if (access(buf, F_OK) == 0) {
+				snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
+				exec_command_sync(BBPATH "/rm", "-rf", buf, NULL);
+				continue;
 			}
+			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
+			if (access(buf, F_OK) == 0)
+				continue;
+			vec_push_back(&module_list, strdup(entry->d_name));
 		}
-
-		closedir(dir);
-
-		// Trim image
-		umount_image(MOUNTPOINT, magiskloop);
-		free(magiskloop);
-		trim_img(MAINIMG);
-
-		// Remount them back :)
-		magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-		free(magiskloop);
 	}
+
+	closedir(dir);
+
+	// Trim image
+	umount_image(MOUNTPOINT, magiskloop);
+	free(magiskloop);
+	trim_img(MAINIMG);
+
+	// Remount them back :)
+	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
+	free(magiskloop);
+
 	return 0;
 }
 
