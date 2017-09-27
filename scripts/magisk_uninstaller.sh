@@ -36,8 +36,6 @@ if $BOOTMODE; then
   . $MAGISKBIN/util_functions.sh
   boot_actions
   mount_partitions
-else
-  recovery_actions
 fi
 
 cd $MAGISKBIN
@@ -81,15 +79,17 @@ case $? in
     ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
-    [ ! -z $SHA1 ] && STOCKDUMP=/data/stock_boot_${SHA1}.img
-    if [ -f ${STOCKDUMP}.gz ]; then
+    [ ! -z $SHA1 ] && STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
+    if [ -f "$STOCKBOOT" ]; then
       ui_print "- Boot image backup found!"
-      ./magiskboot --decompress ${STOCKDUMP}.gz new-boot.img
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
       ./magiskboot --cpio-restore ramdisk.cpio
-      ./magiskboot --repack $BOOTIMAGE new-boot.img
+      ./magiskboot --repack $BOOTIMAGE
+      # Sign chromeos boot
+      $CHROMEOS && sign_chromeos
+      STOCKBOOT=new-boot.img
     fi
     ;;
   2 ) # Other patched
@@ -98,24 +98,13 @@ case $? in
     ;;
 esac
 
-# Sign chromeos boot
-$CHROMEOS && sign_chromeos
-
-ui_print "- Flashing stock/reverted image"
-if [ -L "$BOOTIMAGE" ]; then
-  dd if=new-boot.img of="$BOOTIMAGE" bs=4096
-else
-  cat new-boot.img /dev/zero | dd of="$BOOTIMAGE" bs=4096 >/dev/null 2>&1
-fi
-rm -f new-boot.img
+flash_boot_image $STOCKBOOT "$BOOTIMAGE"
 
 cd /
 
 ui_print "- Removing Magisk files"
-rm -rf  /cache/magisk.log /cache/last_magisk.log /cache/magiskhide.log /cache/.disable_magisk \
-        /cache/magisk /cache/magisk_merge /cache/magisk_mount /cache/unblock /cache/magisk_uninstaller.sh \
-        /data/Magisk.apk /data/magisk.apk /data/magisk.img /data/magisk_merge.img /data/magisk_debug.log \
-        /data/busybox /data/magisk /data/custom_ramdisk_patch.sh /data/property/*magisk* \
+rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
+        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh  \
         /data/app/com.topjohnwu.magisk* /data/user*/*/com.topjohnwu.magisk 2>/dev/null
 
-$BOOTMODE && reboot || recovery_cleanup
+$BOOTMODE && reboot

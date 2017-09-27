@@ -40,7 +40,8 @@ ui_print "************************"
 ui_print "   Magisk Uninstaller   "
 ui_print "************************"
 
-is_mounted /data || mount /data
+is_mounted /data || mount /data || abort "! Unable to mount partitions"
+is_mounted /cache || mount /cache 2>/dev/null
 mount_partitions
 
 api_level_arch_detect
@@ -56,21 +57,22 @@ BINDIR=$INSTALLER/$ARCH
 MAGISKBIN=/data/magisk
 
 if is_mounted /data; then
+  recovery_actions
   # Save our stock boot image dump before removing it
-  [ -f $MAGISKBIN/stock_boot* ] && mv $MAGISKBIN/stock_boot* /data
+  mv $MAGISKBIN/stock_boot* /data 2>/dev/null
   # Copy the binaries to /data/magisk, in case they do not exist
   rm -rf $MAGISKBIN 2>/dev/null
   mkdir -p $MAGISKBIN
   cp -af $BINDIR/. $CHROMEDIR $TMPDIR/bin/busybox $INSTALLER/util_functions.sh $MAGISKBIN
   chmod -R 755 $MAGISKBIN
-  # Run the acttual uninstallation
+  # Run the actual uninstallation
   . $INSTALLER/magisk_uninstaller.sh
+  recovery_cleanup
 else
   ui_print "! Data unavailable"
   ui_print "! Placing uninstall script to /cache"
   ui_print "! The device might reboot multiple times"
   cp -af $INSTALLER/magisk_uninstaller.sh /cache/magisk_uninstaller.sh
-  umount /system
   ui_print "- Rebooting....."
   sleep 5
   reboot
