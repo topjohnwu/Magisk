@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,6 +131,19 @@ public class Shell {
 
     public static boolean rootAccess() {
         return rootStatus > 0;
+    }
+
+    public void loadInputStream(InputStream in) {
+        try {
+            int read;
+            byte[] bytes = new byte[4096];
+            while ((read = in.read(bytes)) != -1) {
+                STDIN.write(bytes, 0, read);
+            }
+            STDIN.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<String> sh(String... commands) {

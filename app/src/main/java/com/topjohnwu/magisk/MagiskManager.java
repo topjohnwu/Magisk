@@ -31,11 +31,8 @@ import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -229,23 +226,14 @@ public class MagiskManager extends Application {
                 }
             }
 
-            File utils = new File(getFilesDir(), Utils.UTIL_FUNCTIONS);
-
-            try (InputStream in  = getAssets().open(Utils.UTIL_FUNCTIONS);
-                 OutputStream out = new FileOutputStream(utils)
-            ) {
-                int read;
-                byte[] bytes = new byte[4096];
-                while ((read = in.read(bytes)) != -1) {
-                    out.write(bytes, 0, read);
-                }
+            try (InputStream in  = getAssets().open(Utils.UTIL_FUNCTIONS)) {
+                shell.loadInputStream(in);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             shell.su_raw(
                     "export PATH=" + BUSYBOXPATH + ":$PATH",
-                    ". " + utils,
                     "mount_partitions",
                     "BOOTIMAGE=",
                     "find_boot_image",
