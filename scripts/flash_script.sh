@@ -101,7 +101,7 @@ if [ -d /system/addon.d ]; then
   chmod 755 /system/addon.d/99-magisk.sh
 fi
 
-$BOOTMODE && boot_actions || recovery_actions
+$BOOTMODE || recovery_actions
 
 ##########################################################################################
 # Boot patching

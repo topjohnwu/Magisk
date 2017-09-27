@@ -41,37 +41,31 @@ static void usage() {
 		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
 		"\n"
 		"Usage: %s [applet [arguments]...]\n"
-		"   or: %s --install [SOURCE] DIR\n"
-		"       if SOURCE not provided, will link itself\n"
-		"   or: %s --list\n"
-		"   or: %s --createimg IMG SIZE\n"
-		"       create ext4 image, SIZE is interpreted in MB\n"
-		"   or: %s --imgsize IMG\n"
-		"   or: %s --resizeimg IMG SIZE\n"
-		"       SIZE is interpreted in MB\n"
-		"   or: %s --mountimg IMG PATH\n"
-		"       mount IMG to PATH and prints the loop device\n"
-		"   or: %s --umountimg PATH LOOP\n"
-		"   or: %s --[boot stage]\n"
-		"       start boot stage service\n"
-		"   or: %s [options]\n"
-		"   or: applet [arguments]...\n"
+		"   or: %s [options]...\n"
+		"\n"
+		"Options:\n"
+		"   -c                        print current binary version\n"
+		"   -v                        print running daemon version\n"
+		"   -V                        print running daemon version code\n"
+		"   --list                    list all availible applets\n"
+        "   --install [SOURCE] DIR    symlink all applets to DIR. SOURCE is optional\n"
+		"   --createimg IMG SIZE      create ext4 image. SIZE is interpreted in MB\n"
+		"   --imgsize IMG             report ext4 image used/total size\n"
+		"   --resizeimg IMG SIZE      resize ext4 image. SIZE is interpreted in MB\n"
+		"   --mountimg IMG PATH       mount IMG to PATH and prints the loop device\n"
+		"   --umountimg PATH LOOP     unmount PATH and delete LOOP device\n"
+		"   --[boot stage]            start boot stage service\n"
+		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
 		"\n"
 		"Supported boot stages:\n"
 		"   post-fs, post-fs-data, service\n"
 		"\n"
-		"Options:\n"
-		"   -c          print client version\n"
-		"   -v          print daemon version\n"
-		"   -V          print daemon version code\n"
-		"\n"
 		"Supported applets:\n"
-	, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0, argv0);
+	, argv0, argv0);
 
-	for (int i = 0; applet[i]; ++i) {
+	for (int i = 0; applet[i]; ++i)
 		fprintf(stderr, i ? ", %s" : "    %s", applet[i]);
-	}
-	fprintf(stderr, "\n");
+	fprintf(stderr, "\n\n");
 	exit(1);
 }
 
@@ -148,6 +142,9 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[1], "--umountimg") == 0) {
 			if (argc < 4) usage();
 			umount_image(argv[2], argv[3]);
+			return 0;
+		} else if (strcmp(argv[1], "--unlock-blocks") == 0) {
+			unlock_blocks();
 			return 0;
 		} else if (strcmp(argv[1], "--post-fs") == 0) {
 			int fd = connect_daemon();

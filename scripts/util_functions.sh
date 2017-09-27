@@ -10,6 +10,9 @@
 MAGISK_VERSION_STUB
 SCRIPT_VERSION=$MAGISK_VER_CODE
 
+# Default location, will override if needed
+MAGISKBIN=/data/magisk
+
 get_outfd() {
   readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
   if [ "$?" -eq "0" ]; then
@@ -118,21 +121,23 @@ find_boot_image() {
 migrate_boot_backup() {
   # Update the broken boot backup
   if [ -f /data/stock_boot_.img.gz ]; then
-    ./magiskboot --decompress /data/stock_boot_.img.gz
+    $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz
     mv /data/stock_boot_.img /data/stock_boot.img
   fi
   # Update our previous backup to new format if exists
   if [ -f /data/stock_boot.img ]; then
     ui_print "- Migrating boot image backup"
-    SHA1=`./magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
+    SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
     STOCKDUMP=/data/stock_boot_${SHA1}.img
     mv /data/stock_boot.img $STOCKDUMP
-    ./magiskboot --compress $STOCKDUMP
+    $MAGISKBIN/magiskboot --compress $STOCKDUMP
   fi
   mv /data/magisk/stock_boot* /data 2>/dev/null
 }
 
 flash_boot_image() {
+  # Make sure all blocks are writable
+  $MAGISKBIN/magisk --unlock-blocks
   case "$1" in
     *.gz) COMMAND="gzip -d < \"$1\"";;
     *)    COMMAND="cat \"$1\"";;
