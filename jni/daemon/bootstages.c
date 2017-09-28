@@ -277,8 +277,16 @@ static void clone_skeleton(struct node_entry *node) {
 	closedir(dir);
 
 	if (node->status & IS_SKEL) {
+		struct stat s;
+		char *con;
+		xstat(full_path, &s);
+		getfilecon(full_path, &con);
 		LOGI("tmpfs: %s\n", full_path);
 		mount("tmpfs", full_path, "tmpfs", 0, NULL);
+		chmod(full_path, s.st_mode & 0777);
+		chown(full_path, s.st_uid, s.st_gid);
+		setfilecon(full_path, con);
+		free(con);
 	}
 
 	vec_for_each(node->children, child) {
