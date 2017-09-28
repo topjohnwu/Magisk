@@ -42,16 +42,14 @@ struct boot_img_hdr
     uint32_t second_size;  /* size in bytes */
     uint32_t second_addr;  /* physical load addr */
 
-    uint32_t tags_addr;    /* physical addr for kernel tags */
-    uint32_t page_size;    /* flash page size we assume */
+    /* only for Maarvell PXA boards */
     uint32_t dt_size;      /* device tree in bytes */
 
-    /* operating system version and security patch level; for
-     * version "A.B.C" and patch level "Y-M-D":
-     * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
-     * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
-     * os_version = ver << 11 | lvl */
-    uint32_t os_version;
+    uint32_t unknown;      /* 0x02000000, 0x02800000 or 0x03000000 */
+    uint32_t tags_addr;    /* physical addr for kernel tags */
+    uint32_t page_size;    /* flash page size we assume */
+    uint32_t dummy[2];     /* this is because id[8] is placed higher */
+    /* all PXA boards doesn't have name, cmdline and extra_cmdline */
 
     uint8_t name[BOOT_NAME_SIZE]; /* asciiz product name */
 
