@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.container;
 
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
@@ -25,7 +26,19 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         templateVersion = c.getInt(c.getColumnIndex("template"));
     }
 
-    protected void parseProps(List<String> props) throws CacheModException { parseProps(props.toArray(new String[props.size()])); }
+    public ContentValues getContentValues() {
+        ContentValues values = new ContentValues();
+        values.put("id", mId);
+        values.put("name", mName);
+        values.put("version", mVersion);
+        values.put("versionCode", mVersionCode);
+        values.put("author", mAuthor);
+        values.put("description", mDescription);
+        values.put("template", templateVersion);
+        return values;
+    }
+
+    protected void parseProps(List<String> props) throws CacheModException { parseProps(props.toArray(new String[0])); }
 
     protected void parseProps(String[] props) throws CacheModException {
         for (String line : props) {

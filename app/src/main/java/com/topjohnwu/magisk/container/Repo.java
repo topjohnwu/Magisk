@@ -45,16 +45,9 @@ public class Repo extends BaseModule {
     }
 
     public ContentValues getContentValues() {
-        ContentValues values = new ContentValues();
-        values.put("id", getId());
-        values.put("name", getName());
-        values.put("version", getVersion());
-        values.put("versionCode", getVersionCode());
-        values.put("author", getAuthor());
-        values.put("description", getDescription());
+        ContentValues values = super.getContentValues();
         values.put("repo_name", repoName);
         values.put("last_update", mLastUpdate.getTime());
-        values.put("template", getTemplateVersion());
         return values;
     }
 
