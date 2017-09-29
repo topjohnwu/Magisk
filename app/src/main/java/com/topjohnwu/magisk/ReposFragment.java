@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
@@ -29,7 +28,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private ReposAdapter adapter;
+    public static ReposAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,13 +42,11 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        adapter = new ReposAdapter(getApplication().repoDB, getApplication().moduleMap);
-        recyclerView.setAdapter(adapter);
-
         mSwipeRefreshLayout.setRefreshing(true);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            recyclerView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyRv.setVisibility(View.GONE);
             new UpdateRepos(getActivity()).exec();
         });
 
@@ -59,10 +56,21 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
+    public void onResume() {
+        adapter = new ReposAdapter(getApplication().repoDB, getApplication().moduleMap);
+        recyclerView.setAdapter(adapter);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        adapter = null;
+    }
+
+    @Override
     public void onTopicPublished(Topic topic) {
-        Logger.dev("ReposFragment: UI refresh triggered");
         mSwipeRefreshLayout.setRefreshing(false);
-        adapter.notifyDBChanged();
         recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
         emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }

@@ -44,6 +44,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         repoDB = db;
         moduleMap = map;
         repoPairs = new ArrayList<>();
+        notifyDBChanged();
     }
 
 

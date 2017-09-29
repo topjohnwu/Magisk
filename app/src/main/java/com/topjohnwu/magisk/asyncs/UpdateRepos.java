@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.module.BaseModule;
 import com.topjohnwu.magisk.module.Repo;
@@ -45,6 +46,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         super(context);
         prefs = getMagiskManager().prefs;
         repoDB = getMagiskManager().repoDB;
+        getMagiskManager().repoLoadDone.hasPublished = false;
         String prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
         // Legacy data cleanup
         File old = new File(prefsPath, "RepoMap.xml");
@@ -81,6 +83,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                 }
                 if (updated) {
                     repoDB.addRepo(repo);
+                    publishProgress();
                 }
             } catch (BaseModule.CacheModException ignored) {}
         }
@@ -152,6 +155,12 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         }
 
         return true;
+    }
+
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        if (ReposFragment.adapter != null)
+            ReposFragment.adapter.notifyDBChanged();
     }
 
     @Override
