@@ -16,9 +16,9 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Shell;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -63,6 +63,7 @@ public class FlashActivity extends Activity {
             ab.setTitle(R.string.flashing);
         }
         setFloating();
+        setFinishOnTouchOutside(false);
         if (!Shell.rootAccess())
             reboot.setVisibility(View.GONE);
 
@@ -146,6 +147,37 @@ public class FlashActivity extends Activity {
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    public static class AdaptiveList<E> extends ArrayList<E> {
+
+        private Runnable callback;
+        private RecyclerView mView;
+
+        public AdaptiveList(RecyclerView v) {
+            mView = v;
+        }
+
+        public void updateView() {
+            mView.getAdapter().notifyDataSetChanged();
+            mView.scrollToPosition(mView.getAdapter().getItemCount() - 1);
+        }
+
+        public void setCallback(Runnable cb) {
+            callback = cb;
+        }
+
+        public boolean add(E e) {
+            boolean ret = super.add(e);
+            if (ret) {
+                if (callback == null) {
+                    updateView();
+                } else {
+                    callback.run();
+                }
+            }
+            return ret;
         }
     }
 }

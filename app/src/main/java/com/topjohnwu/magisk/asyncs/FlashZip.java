@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.AdaptiveList;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -24,9 +24,9 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private Uri mUri;
     private File mCachedFile;
-    private AdaptiveList<String> mList;
+    private FlashActivity.AdaptiveList<String> mList;
 
-    public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
+    public FlashZip(Activity context, Uri uri, FlashActivity.AdaptiveList<String> list) {
         super(context);
         mUri = uri;
         mList = list;
