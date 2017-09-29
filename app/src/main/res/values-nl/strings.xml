@@ -111,6 +111,7 @@
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>
     <string name="direct_install">Direct installeren (aangeraden)</string>
+    <string name="install_second_slot">Op tweede positie installeren (na OTA)</string>
     <string name="select_method">Methode kiezen</string>
     <string name="no_boot_file_patch_support">Magisk versie ondersteund geen boot image-bestand patchen</string>
     <string name="boot_file_patch_msg">Kies originele boot image-dump in .img- of .img.tar-formaat</string>
@@ -118,6 +119,7 @@
     <string name="restore_stock_boot">Originele boot herstellen</string>
     <string name="restore_done">Herstel voltooid!</string>
     <string name="restore_fail">Originele back-up bestaat niet!</string>
+    <string name="uninstall_toast">Magisk Manager wordt over 5 seconden verwijderd, hierna handmatig herstarten aub</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
