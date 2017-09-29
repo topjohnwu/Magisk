@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.module;
+package com.topjohnwu.magisk.container;
 
 
 import android.database.Cursor;

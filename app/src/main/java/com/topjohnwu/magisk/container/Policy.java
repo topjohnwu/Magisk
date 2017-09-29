@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.superuser;
+package com.topjohnwu.magisk.container;
 
 import android.content.ContentValues;
 import android.content.pm.ApplicationInfo;

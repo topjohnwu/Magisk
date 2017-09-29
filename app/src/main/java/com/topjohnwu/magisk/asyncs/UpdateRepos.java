@@ -7,8 +7,8 @@ import android.text.TextUtils;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.module.BaseModule;
-import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.container.BaseModule;
+import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.WebService;
 

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk.container;
 
 import org.kamranzafar.jtar.TarHeader;
 

@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.container.Policy;
 
 import java.io.DataInputStream;
 import java.io.IOException;

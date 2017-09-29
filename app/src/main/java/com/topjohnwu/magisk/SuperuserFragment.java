@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.superuser.Policy;
+import com.topjohnwu.magisk.container.Policy;
 
 import java.util.List;
 

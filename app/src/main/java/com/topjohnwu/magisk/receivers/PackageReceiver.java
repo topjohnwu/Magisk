@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.superuser.Policy;
+import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class PackageReceiver extends BroadcastReceiver {

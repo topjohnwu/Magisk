@@ -22,7 +22,7 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.module.Module;
+import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.superuser.SuReceiver;
 import com.topjohnwu.magisk.superuser.SuRequestActivity;

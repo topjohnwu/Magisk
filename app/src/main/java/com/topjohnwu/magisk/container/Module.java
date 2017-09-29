@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.module;
+package com.topjohnwu.magisk.container;
 
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;

@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.superuser.Policy;
-import com.topjohnwu.magisk.superuser.SuLogEntry;
+import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;

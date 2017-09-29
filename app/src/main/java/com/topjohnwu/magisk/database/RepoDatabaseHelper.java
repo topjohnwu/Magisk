@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.module.Repo;
+import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
