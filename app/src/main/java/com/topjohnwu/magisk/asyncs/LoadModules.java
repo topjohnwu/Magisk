@@ -25,10 +25,8 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
         for (String path : Utils.getModList(getShell(), MagiskManager.MAGISK_PATH)) {
             Logger.dev("LoadModules: Adding modules from " + path);
-            try {
-                Module module = new Module(getShell(), path);
-                mm.moduleMap.put(module.getId(), module);
-            } catch (BaseModule.CacheModException ignored) {}
+            Module module = new Module(getShell(), path);
+            mm.moduleMap.put(module.getId(), module);
         }
 
         Logger.dev("LoadModules: Data load done");

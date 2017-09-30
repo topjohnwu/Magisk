@@ -38,9 +38,9 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         return values;
     }
 
-    protected void parseProps(List<String> props) throws CacheModException { parseProps(props.toArray(new String[0])); }
+    protected void parseProps(List<String> props) { parseProps(props.toArray(new String[0])); }
 
-    protected void parseProps(String[] props) throws CacheModException {
+    protected void parseProps(String[] props) {
         for (String line : props) {
             String[] prop = line.split("=", 2);
             if (prop.length != 2)
@@ -75,9 +75,6 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                     try {
                         templateVersion = Integer.parseInt(prop[1]);
                     } catch (NumberFormatException ignored) {}
-                case "cacheModule":
-                    if (Boolean.parseBoolean(prop[1]))
-                        throw new CacheModException(mId);
                     break;
                 default:
                     break;
@@ -119,12 +116,6 @@ public abstract class BaseModule implements Comparable<BaseModule> {
 
     public int getTemplateVersion() {
         return templateVersion;
-    }
-
-    public static class CacheModException extends Exception {
-        public CacheModException(String id) {
-            Logger.error("Cache mods are no longer supported! id: " + id);
-        }
     }
 
     @Override

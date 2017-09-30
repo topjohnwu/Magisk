@@ -9,7 +9,7 @@ public class Module extends BaseModule {
     private String mRemoveFile, mDisableFile, mUpdateFile;
     private boolean mEnable, mRemove, mUpdated;
 
-    public Module(Shell shell, String path) throws CacheModException {
+    public Module(Shell shell, String path) {
 
         parseProps(Utils.readFile(shell, path + "/module.prop"));
 
@@ -25,8 +25,6 @@ public class Module extends BaseModule {
         if (getName() == null) {
             setName(getId());
         }
-
-        Logger.dev("Creating Module, id: " + getId());
 
         mEnable = !Utils.itemExist(shell, mDisableFile);
         mRemove = Utils.itemExist(shell, mRemoveFile);

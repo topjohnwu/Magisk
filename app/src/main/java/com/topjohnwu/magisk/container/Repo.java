@@ -16,7 +16,7 @@ public class Repo extends BaseModule {
     private String repoName;
     private Date mLastUpdate;
 
-    public Repo(String name, Date lastUpdate) throws CacheModException {
+    public Repo(String name, Date lastUpdate) {
         mLastUpdate = lastUpdate;
         repoName = name;
         update();
@@ -28,14 +28,13 @@ public class Repo extends BaseModule {
         mLastUpdate = new Date(c.getLong(c.getColumnIndex("last_update")));
     }
 
-    public void update() throws CacheModException {
+    public void update() {
         String props = WebService.getString(getManifestUrl());
         String lines[] = props.split("\\n");
         parseProps(lines);
-        Logger.dev("Repo: Fetching prop: " + getId());
     }
 
-    public boolean update(Date lastUpdate) throws CacheModException {
+    public boolean update(Date lastUpdate) {
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();

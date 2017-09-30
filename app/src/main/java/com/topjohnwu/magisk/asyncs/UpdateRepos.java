@@ -68,21 +68,19 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             Date updatedDate = format.parse(lastUpdate);
             Repo repo = repoDB.getRepo(id);
-            try {
-                Boolean updated;
-                if (repo == null) {
-                    repo = new Repo(name, updatedDate);
-                    updated = true;
-                } else {
-                    // Popout from cached
-                    cached.remove(id);
-                    updated = repo.update(updatedDate);
-                }
-                if (updated) {
-                    repoDB.addRepo(repo);
-                    publishProgress();
-                }
-            } catch (BaseModule.CacheModException ignored) {}
+            Boolean updated;
+            if (repo == null) {
+                repo = new Repo(name, updatedDate);
+                updated = true;
+            } else {
+                // Popout from cached
+                cached.remove(id);
+                updated = repo.update(updatedDate);
+            }
+            if (updated) {
+                repoDB.addRepo(repo);
+                publishProgress();
+            }
         }
     }
 
