@@ -11,7 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.HttpURLConnection;
 
 public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
@@ -31,22 +31,21 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
         Utils.removeItem(getShell(), context.getApplicationInfo().dataDir + "/busybox");
         try {
             FileOutputStream out  = new FileOutputStream(busybox);
-            InputStream in = WebService.request(WebService.GET,
+            HttpURLConnection conn = WebService.request(
                     Build.SUPPORTED_32_BIT_ABIS[0].contains("x86") ?
                             BUSYBOX_X86 :
                             BUSYBOX_ARM,
                     null
             );
-            if (in == null) throw new IOException();
-            BufferedInputStream bis = new BufferedInputStream(in);
+            if (conn == null) throw new IOException();
+            BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
             byte[] buffer = new byte[4096];
             int len;
             while ((len = bis.read(buffer)) != -1) {
                 out.write(buffer, 0, len);
             }
             out.close();
-            bis.close();
-
+            conn.disconnect();
         } catch (IOException e) {
             e.printStackTrace();
         }

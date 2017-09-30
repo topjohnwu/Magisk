@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 
 public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
 
@@ -60,9 +61,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
         try {
 
             // Request zip from Internet
-            InputStream in = WebService.request(WebService.GET, mLink, null);
-            if (in == null) return false;
-            in = new BufferedInputStream(in);
+            HttpURLConnection conn = WebService.request(mLink, null);
+            if (conn == null) return false;
+            InputStream in = new BufferedInputStream(conn.getInputStream());
 
             // Temp files
             File temp1 = new File(activity.getCacheDir(), "1.zip");
@@ -72,6 +73,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
             // First remove top folder in Github source zip, Web -> temp1
             ZipUtils.removeTopFolder(in, temp1);
 
+            conn.disconnect();
             publishProgress();
 
             // Then sign the zip for the first time, temp1 -> temp2
