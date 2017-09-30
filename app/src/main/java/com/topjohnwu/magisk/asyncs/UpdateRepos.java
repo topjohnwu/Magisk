@@ -2,20 +2,19 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.container.BaseModule;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,9 +26,9 @@ import java.util.Map;
 
 public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
-    public static final String ETAG_KEY = "ETag";
-
     private static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
+
+    public static final String ETAG_KEY = "ETag";
     private static final String IF_NONE_MATCH = "If-None-Match";
     private static final String LINK_KEY = "Link";
 
@@ -37,8 +36,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private static final int LOAD_NEXT = 1;
     private static final int LOAD_PREV = 2;
 
-    private List<String> etags;
-    private List<String> cached;
+    private List<String> cached, etags, newEtags = new ArrayList<>();
     private RepoDatabaseHelper repoDB;
     private SharedPreferences prefs;
 
@@ -47,20 +45,20 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         prefs = getMagiskManager().prefs;
         repoDB = getMagiskManager().repoDB;
         getMagiskManager().repoLoadDone.hasPublished = false;
-        String prefsPath = context.getApplicationInfo().dataDir + "/shared_prefs";
         // Legacy data cleanup
-        File old = new File(prefsPath, "RepoMap.xml");
-        if (old.exists() || !prefs.getString("repomap", "empty").equals("empty")) {
+        File old = new File(context.getApplicationInfo().dataDir + "/shared_prefs", "RepoMap.xml");
+        if (old.exists() || prefs.getString("repomap", null) != null) {
             old.delete();
             prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
             repoDB.clearRepo();
         }
-        etags = new ArrayList<>(
-                Arrays.asList(prefs.getString(ETAG_KEY, "").split(",")));
     }
 
     private void loadJSON(String jsonString) throws Exception {
         JSONArray jsonArray = new JSONArray(jsonString);
+
+        // Empty page, throw error
+        if (jsonArray.length() == 0) throw new Exception();
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonobject = jsonArray.getJSONObject(i);
@@ -73,7 +71,6 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             try {
                 Boolean updated;
                 if (repo == null) {
-                    Logger.dev("UpdateRepos: Create new repo " + id);
                     repo = new Repo(name, updatedDate);
                     updated = true;
                 } else {
@@ -89,71 +86,46 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         }
     }
 
-    private boolean loadPage(int page, String url, int mode) {
-        Logger.dev("UpdateRepos: Loading page: " + (page + 1));
+    private boolean loadPage(int page, int mode) {
         Map<String, String> header = new HashMap<>();
-        if (mode == CHECK_ETAG && page < etags.size() && !TextUtils.isEmpty(etags.get(page))) {
-            Logger.dev("ETAG: " + etags.get(page));
-            header.put(IF_NONE_MATCH, etags.get(page));
+        String etag = "";
+        if (mode == CHECK_ETAG && page < etags.size()) {
+            etag = etags.get(page);
         }
-        if (url == null) {
-            url = String.format(Locale.US, REPO_URL, page + 1);
-        }
-        String jsonString = WebService.getString(url, header);
-        if (TextUtils.isEmpty(jsonString)) {
-            // At least check the pages we know
-            return page + 1 < etags.size() && loadPage(page + 1, null, CHECK_ETAG);
-        }
+        header.put(IF_NONE_MATCH, etag);
+        String url = String.format(Locale.US, REPO_URL, page + 1);
+        HttpURLConnection conn = WebService.request(url, header);
 
-        // The getString succeed, parse the new stuffs
         try {
-            loadJSON(jsonString);
+            if (conn == null) throw new Exception();
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+                newEtags.add(etag);
+                return page + 1 < etags.size() && loadPage(page + 1, CHECK_ETAG);
+            }
+            loadJSON(WebService.getString(conn));
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            // Don't continue
+            return true;
         }
 
-        // Update the ETAG
-        String newEtag = header.get(ETAG_KEY);
-        newEtag = newEtag.substring(newEtag.indexOf('\"'), newEtag.lastIndexOf('\"') + 1);
-        Logger.dev("New ETAG: " + newEtag);
-        if (page < etags.size()) {
-            etags.set(page, newEtag);
-        } else {
-            etags.add(newEtag);
-        }
+        // Update ETAG
+        etag = header.get(ETAG_KEY);
+        etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
+        newEtags.add(etag);
 
         String links = header.get(LINK_KEY);
         if (links != null) {
-            if (mode == CHECK_ETAG || mode == LOAD_NEXT) {
-                // Try to check next page URL
-                url = null;
-                for (String s : links.split(", ")) {
-                    if (s.contains("next")) {
-                        url = s.substring(s.indexOf("<") + 1, s.indexOf(">; "));
-                        break;
-                    }
-                }
-                if (url != null) {
-                    loadPage(page + 1, url, LOAD_NEXT);
-                }
-            }
-
-            if (mode == CHECK_ETAG || mode == LOAD_PREV) {
-                // Try to check prev page URL
-                url = null;
-                for (String s : links.split(", ")) {
-                    if (s.contains("prev")) {
-                        url = s.substring(s.indexOf("<") + 1, s.indexOf(">; "));
-                        break;
-                    }
-                }
-                if (url != null) {
-                    loadPage(page - 1, url, LOAD_PREV);
+            for (String s : links.split(", ")) {
+                if (mode != LOAD_PREV && s.contains("next")) {
+                    // Force load all next pages
+                    loadPage(page + 1, LOAD_NEXT);
+                } else if (mode != LOAD_NEXT && s.contains("prev")) {
+                    // Back propagation
+                    loadPage(page - 1, LOAD_PREV);
                 }
             }
         }
-
         return true;
     }
 
@@ -165,12 +137,11 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        Logger.dev("UpdateRepos: Loading repos");
-
+        etags = new ArrayList<>(Arrays.asList(prefs.getString(ETAG_KEY, "").split(",")));
         cached = repoDB.getRepoIDList();
 
-        if (!loadPage(0, null, CHECK_ETAG)) {
-            Logger.dev("UpdateRepos: No updates, use DB");
+        if (!loadPage(0, CHECK_ETAG)) {
+            // Nothing changed
             return null;
         }
 
@@ -179,13 +150,11 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
         // Update ETag
         StringBuilder etagBuilder = new StringBuilder();
-        for (int i = 0; i < etags.size(); ++i) {
+        for (int i = 0; i < newEtags.size(); ++i) {
             if (i != 0) etagBuilder.append(",");
-            etagBuilder.append(etags.get(i));
+            etagBuilder.append(newEtags.get(i));
         }
         prefs.edit().putString(ETAG_KEY, etagBuilder.toString()).apply();
-
-        Logger.dev("UpdateRepos: Done");
         return null;
     }
 
