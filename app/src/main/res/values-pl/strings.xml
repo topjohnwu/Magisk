@@ -101,7 +101,7 @@
     <string name="process_error">Błąd procesu</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     <string name="zip_download_title">Pobieranie</string>
-    <string name="zip_download_msg">Pobieranie pliku zip …</string>
+    <string name="zip_download_msg">Pobieranie pliku zip (%1$d%%) …</string>
 	<string name="zip_process_title">Przetwarzanie</string>
 	<string name="zip_process_msg">Przetwarzanie pliku zip …</string>
 	<string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>

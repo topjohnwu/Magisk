@@ -92,7 +92,7 @@
     <string name="zip_process_title">Exécution</string>
     <string name="manual_boot_image">Veuillez sélectionner l\'image boot manuellement !</string>
 	<string name="zip_download_title">Téléchargement</string>
-	<string name="zip_download_msg">Téléchargement du fichier zip...</string>
+	<string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%) ...</string>
 	<string name="manager_update_title">Nouvelle mise à jour Magisk Manager disponible !</string>
 	<string name="manager_download_install">Appuyez pour télécharger et installer</string>
 	<string name="magisk_updates">Mises à jour Magisk</string>

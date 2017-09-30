@@ -98,7 +98,7 @@
     <string name="process_error">Verwerkingsfout</string>
     <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
     <string name="zip_download_title">Downloaden</string>
-    <string name="zip_download_msg">Zip-bestand downloaden…</string>
+    <string name="zip_download_msg">Zip-bestand downloaden (%1$d%%) …</string>
     <string name="zip_process_title">Verwerken</string>
     <string name="zip_process_msg">Zip-bestand verwerken…</string>
     <string name="manual_boot_image">Gelieve handmatig een boot image te selecteren!</string>

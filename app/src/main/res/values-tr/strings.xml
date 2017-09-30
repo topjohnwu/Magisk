@@ -97,7 +97,7 @@
     <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
     <string name="zip_download_title">İndiriliyor</string>
-    <string name="zip_download_msg">Zip dosyası indiriliyor …</string>
+    <string name="zip_download_msg">Zip dosyası indiriliyor (%1$d%%) …</string>
     <string name="zip_process_title">İşleniyor</string>
     <string name="zip_process_msg">Zip dosyası işleniyor …</string>
     <string name="manual_boot_image">Lütfen elle bir boot imajı seçin!</string>

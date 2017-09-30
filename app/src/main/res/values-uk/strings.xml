@@ -98,7 +98,7 @@
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
     <string name="safetyNet_hide_notice">Ця програма використовує SafetyNet.\nВже опрацьовано MagiskHide за замовчуванням</string>
     <string name="zip_download_title">Завантаження</string>
-    <string name="zip_download_msg">Завантаження zip файлу …</string>
+    <string name="zip_download_msg">Завантаження zip файлу (%1$d%%) …</string>
     <string name="process_error">Помилка опрацювання</string>
     <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
     <string name="zip_process_title">Опрацювання</string>

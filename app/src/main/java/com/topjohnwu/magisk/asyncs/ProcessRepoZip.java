@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.FlashActivity;
@@ -21,16 +22,21 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
-public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
+public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     private ProgressDialog progressDialog;
     private boolean mInstall;
     private String mLink;
     private File mFile;
+    private int progress = 0, total;
+
+    private static final int UPDATE_DL_PROG = 0;
+    private static final int SHOW_PROCESSING = 1;
 
     public ProcessRepoZip(Activity context, String link, String filename, boolean install) {
         super(context);
@@ -43,15 +49,23 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected void onPreExecute() {
         Activity activity = getActivity();
-        progressDialog = ProgressDialog.show(activity,
-                activity.getString(R.string.zip_download_title),
-                activity.getString(R.string.zip_download_msg));
+        progressDialog = ProgressDialog.show(activity, activity.getString(R.string.zip_download_title), activity.getString(R.string.zip_download_msg, 0));
     }
 
     @Override
-    protected void onProgressUpdate(Void... values) {
-        progressDialog.setTitle(R.string.zip_process_title);
-        progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
+    protected void onProgressUpdate(Object... values) {
+        int mode = (int) values[0];
+        switch (mode) {
+            case UPDATE_DL_PROG:
+                int add = (int) values[1];
+                progress += add;
+                progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, 100 * progress / total));
+                break;
+            case SHOW_PROCESSING:
+                progressDialog.setTitle(R.string.zip_process_title);
+                progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
+                break;
+        }
     }
 
     @Override
@@ -63,7 +77,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
             // Request zip from Internet
             HttpURLConnection conn = WebService.request(mLink, null);
             if (conn == null) return false;
-            InputStream in = new BufferedInputStream(conn.getInputStream());
+            total = conn.getContentLength();
+            InputStream in = new ProgressUpdateInputStream(conn.getInputStream());
 
             // Temp files
             File temp1 = new File(activity.getCacheDir(), "1.zip");
@@ -74,7 +89,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
             ZipUtils.removeTopFolder(in, temp1);
 
             conn.disconnect();
-            publishProgress();
+            publishProgress(SHOW_PROCESSING);
 
             // Then sign the zip for the first time, temp1 -> temp2
             ZipUtils.signZip(activity, temp1, temp2, false);
@@ -128,8 +143,33 @@ public class ProcessRepoZip extends ParallelTask<Void, Void, Boolean> {
     }
 
     @Override
-    public ParallelTask<Void, Void, Boolean> exec(Void... voids) {
+    public ParallelTask<Void, Object, Boolean> exec(Void... voids) {
         Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> super.exec(voids));
         return this;
+    }
+
+    private class ProgressUpdateInputStream extends BufferedInputStream {
+
+        ProgressUpdateInputStream(@NonNull InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public synchronized int read() throws IOException {
+            publishProgress(UPDATE_DL_PROG, 1);
+            return super.read();
+        }
+
+        @Override
+        public int read(@NonNull byte[] b) throws IOException {
+            return read(b, 0, b.length);
+        }
+
+        @Override
+        public synchronized int read(@NonNull byte[] b, int off, int len) throws IOException {
+            int read = super.read(b, off, len);
+            publishProgress(UPDATE_DL_PROG, read);
+            return read;
+        }
     }
 }

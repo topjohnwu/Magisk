@@ -99,7 +99,7 @@
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_download_title">Herunterladen</string>
-    <string name="zip_download_msg">Lade Zip-Datei herunter…</string>
+    <string name="zip_download_msg">Lade Zip-Datei herunter (%1$d%%) …</string>
     <string name="zip_process_title">Verarbeite</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
     <string name="manual_boot_image">Bitte Boot-Image auswählen!</string>

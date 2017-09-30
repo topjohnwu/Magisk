@@ -101,7 +101,7 @@
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Downloading</string>
-    <string name="zip_download_msg">Downloading zip file …</string>
+    <string name="zip_download_msg">Downloading zip file (%1$d%%) …</string>
     <string name="zip_process_title">Processing</string>
     <string name="zip_process_msg">Processing zip file …</string>
     <string name="manual_boot_image">Please manually select a boot image!</string>

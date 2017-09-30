@@ -98,7 +98,7 @@
     <string name="process_error">Ошибка обработки</string>
     <string name="internal_storage">Архив расположен:\n[Внутреннее Хранилище]%1$s</string>
     <string name="zip_download_title">Загрузка</string>
-    <string name="zip_download_msg">Загрузка архива…</string>
+    <string name="zip_download_msg">Загрузка архива (%1$d%%) …</string>
     <string name="zip_process_title">Обработка</string>
     <string name="zip_process_msg">Обработка архива…</string>
     <string name="manual_boot_image">Пожалуйста, выберите вручную boot-образ!</string>

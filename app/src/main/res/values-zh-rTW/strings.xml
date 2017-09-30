@@ -206,7 +206,7 @@
     <string name="settings_update">更新設定</string>
     <string name="settings_boot_format_title">已補丁 Boot 映像輸出格式</string>
     <string name="zip_download_title">正在下載</string>
-    <string name="zip_download_msg">正在下載 Zip 文件 …</string>
+    <string name="zip_download_msg">正在下載 Zip 文件 (%1$d%%) …</string>
     <string name="settings_boot_format_summary">選擇已補丁 Boot 映像文件輸出格式\n若要透過 fastboot/download 模式刷入，請選擇 .img 格式；若要透過 ODIN 刷入，則選擇 .img.tar\n</string>
     <string name="complete_uninstall">完全解除安裝</string>
     <string name="restore_stock_boot">還原原廠 boot 映像</string>
