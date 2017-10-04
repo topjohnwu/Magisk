@@ -16,10 +16,9 @@
 #   public *;
 #}
 
+# Keep all names, we are open source anyway :)
+-keepnames class ** { *; }
+
 # BouncyCastle
--keep class org.bouncycastle.** { *; }
+-keep class org.bouncycastle.jcajce.provider.** { *; }
 -dontwarn javax.naming.**
-
--dontwarn android.content.**
--dontwarn android.animation.**
-
