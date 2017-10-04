@@ -70,13 +70,9 @@ public class ZipUtils {
     // File name in assets
     private static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
     private static final String PRIVATE_KEY_NAME = "private.key.pk8";
-    private static final String UNHIDE_APK = "unhide.apk";
 
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
-
-    private static final String ANDROID_MANIFEST = "AndroidManifest.xml";
-    private static final byte[] UNHIDE_PKG_NAME = "com.topjohnwu.unhide\0".getBytes();
 
     private static Provider sBouncyCastleProvider;
     // bitmasks for which hash algorithms we need the manifest to include.
@@ -90,78 +86,6 @@ public class ZipUtils {
     }
 
     public native static void zipAdjust(String filenameIn, String filenameOut);
-
-    public static String generateUnhide(Context context, File output) {
-        try {
-            String pkg;
-            JarMap apk = new JarMap(context.getAssets().open(UNHIDE_APK));
-            JarEntry je = new JarEntry(ANDROID_MANIFEST);
-            byte xml[] = apk.getRawData(je);
-            int offset = -1;
-
-            // Linear search pattern offset
-            for (int i = 0; i < xml.length - UNHIDE_PKG_NAME.length; ++i) {
-                boolean match = true;
-                for (int j = 0; j < UNHIDE_PKG_NAME.length; ++j) {
-                    if (xml[i + j] != UNHIDE_PKG_NAME[j]) {
-                        match = false;
-                        break;
-                    }
-                }
-                if (match) {
-                    offset = i;
-                    break;
-                }
-            }
-            if (offset < 0)
-                return "";
-
-            // Patch binary XML with new package name
-            pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
-            System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
-            apk.getOutputStream(je).write(xml);
-
-            // Sign the APK
-            signZip(context, apk, output, false);
-
-            return pkg;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    public static void removeTopFolder(InputStream in, File output) throws IOException {
-        try {
-            JarInputStream source = new JarInputStream(in);
-            JarOutputStream dest = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
-            JarEntry entry;
-            String path;
-            int size;
-            byte buffer[] = new byte[4096];
-            while ((entry = source.getNextJarEntry()) != null) {
-                // Remove the top directory from the path
-                path = entry.getName().substring(entry.getName().indexOf("/") + 1);
-                // If it's the top folder, ignore it
-                if (path.isEmpty()) {
-                    continue;
-                }
-                // Don't include placeholder
-                if (path.equals("system/placeholder")) {
-                    continue;
-                }
-                dest.putNextEntry(new JarEntry(path));
-                while((size = source.read(buffer)) != -1) {
-                    dest.write(buffer, 0, size);
-                }
-            }
-            source.close();
-            dest.close();
-            in.close();
-        } catch (IOException e) {
-            throw e;
-        }
-    }
 
     public static void unzip(File zip, File folder, String path, boolean junkPath) throws Exception {
         InputStream in = new BufferedInputStream(new FileInputStream(zip));
@@ -201,63 +125,46 @@ public class ZipUtils {
         }
     }
 
-    public static void signZip(Context context, InputStream is, File output, boolean minSign) {
-        try {
-            signZip(context, new JarMap(is, false), output, minSign);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void signZip(Context context, InputStream is, File output, boolean minSign) throws Exception {
+        signZip(context, new JarMap(is, false), output, minSign);
     }
 
-    public static void signZip(Context context, File input, File output, boolean minSign) {
-        try {
-            signZip(context, new JarMap(new FileInputStream(input), false), output, minSign);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void signZip(Context context, File input, File output, boolean minSign) throws Exception {
+        signZip(context, new JarMap(new FileInputStream(input), false), output, minSign);
     }
 
-    public static void signZip(Context context, JarMap input, File output, boolean minSign) {
+    public static void signZip(Context context, JarMap input, File output, boolean minSign) throws Exception {
         int alignment = 4;
         BufferedOutputStream outputFile = null;
         int hashes = 0;
-        try {
-            X509Certificate publicKey = readPublicKey(context.getAssets().open(PUBLIC_KEY_NAME));
-            hashes |= getDigestAlgorithm(publicKey);
+        X509Certificate publicKey = readPublicKey(context.getAssets().open(PUBLIC_KEY_NAME));
+        hashes |= getDigestAlgorithm(publicKey);
 
-            // Set the ZIP file timestamp to the starting valid time
-            // of the 0th certificate plus one hour (to match what
-            // we've historically done).
-            long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
-            PrivateKey privateKey = readPrivateKey(context.getAssets().open(PRIVATE_KEY_NAME));
+        // Set the ZIP file timestamp to the starting valid time
+        // of the 0th certificate plus one hour (to match what
+        // we've historically done).
+        long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
+        PrivateKey privateKey = readPrivateKey(context.getAssets().open(PRIVATE_KEY_NAME));
 
-            outputFile = new BufferedOutputStream(new FileOutputStream(output));
-            if (minSign) {
-                ZipUtils.signWholeFile(input.getInputStream(), publicKey, privateKey, outputFile);
-            } else {
-                JarOutputStream outputJar = new JarOutputStream(outputFile);
-                // For signing .apks, use the maximum compression to make
-                // them as small as possible (since they live forever on
-                // the system partition).  For OTA packages, use the
-                // default compression level, which is much much faster
-                // and produces output that is only a tiny bit larger
-                // (~0.1% on full OTA packages I tested).
-                outputJar.setLevel(9);
-                Manifest manifest = addDigestsToManifest(input, hashes);
-                copyFiles(manifest, input, outputJar, timestamp, alignment);
-                signFile(manifest, input, publicKey, privateKey, outputJar);
-                outputJar.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (input != null) input.close();
-                if (outputFile != null) outputFile.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        outputFile = new BufferedOutputStream(new FileOutputStream(output));
+        if (minSign) {
+            ZipUtils.signWholeFile(input.getInputStream(), publicKey, privateKey, outputFile);
+        } else {
+            JarOutputStream outputJar = new JarOutputStream(outputFile);
+            // For signing .apks, use the maximum compression to make
+            // them as small as possible (since they live forever on
+            // the system partition).  For OTA packages, use the
+            // default compression level, which is much much faster
+            // and produces output that is only a tiny bit larger
+            // (~0.1% on full OTA packages I tested).
+            outputJar.setLevel(9);
+            Manifest manifest = addDigestsToManifest(input, hashes);
+            copyFiles(manifest, input, outputJar, timestamp, alignment);
+            signFile(manifest, input, publicKey, privateKey, outputJar);
+            outputJar.close();
         }
+        input.close();
+        outputFile.close();
     }
 
 

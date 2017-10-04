@@ -7,14 +7,20 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.container.JarMap;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
 import java.io.File;
 import java.util.List;
+import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
+
+    private static final String UNHIDE_APK = "unhide.apk";
+    private static final String ANDROID_MANIFEST = "AndroidManifest.xml";
+    private static final byte[] UNHIDE_PKG_NAME = "com.topjohnwu.unhide\0".getBytes();
 
     public HideManager(Context context) {
         super(context);
@@ -34,7 +40,42 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         // Generate a new unhide app with random package name
         File unhideAPK = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", "unhide.apk");
         unhideAPK.getParentFile().mkdirs();
-        String pkg = ZipUtils.generateUnhide(mm, unhideAPK);
+        String pkg;
+
+        try {
+            JarMap asset = new JarMap(mm.getAssets().open(UNHIDE_APK));
+            JarEntry je = new JarEntry(ANDROID_MANIFEST);
+            byte xml[] = asset.getRawData(je);
+            int offset = -1;
+
+            // Linear search pattern offset
+            for (int i = 0; i < xml.length - UNHIDE_PKG_NAME.length; ++i) {
+                boolean match = true;
+                for (int j = 0; j < UNHIDE_PKG_NAME.length; ++j) {
+                    if (xml[i + j] != UNHIDE_PKG_NAME[j]) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    offset = i;
+                    break;
+                }
+            }
+            if (offset < 0)
+                return false;
+
+            // Patch binary XML with new package name
+            pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
+            System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
+            asset.getOutputStream(je).write(xml);
+
+            // Sign the APK
+            ZipUtils.signZip(mm, asset, unhideAPK, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
 
         // Install the application
         List<String> ret = getShell().su("pm install " + unhideAPK + ">/dev/null && echo true || echo false");

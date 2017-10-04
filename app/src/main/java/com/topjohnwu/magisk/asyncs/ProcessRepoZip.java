@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -26,6 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 
 public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
@@ -44,6 +46,34 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         mFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", filename);
         mFile.getParentFile().mkdirs();
         mInstall = install;
+    }
+
+    private void removeTopFolder(InputStream in, File output) throws IOException {
+        JarInputStream source = new JarInputStream(in);
+        JarOutputStream dest = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
+        JarEntry entry;
+        String path;
+        int size;
+        byte buffer[] = new byte[4096];
+        while ((entry = source.getNextJarEntry()) != null) {
+            // Remove the top directory from the path
+            path = entry.getName().substring(entry.getName().indexOf("/") + 1);
+            // If it's the top folder, ignore it
+            if (path.isEmpty()) {
+                continue;
+            }
+            // Don't include placeholder
+            if (path.equals("system/placeholder")) {
+                continue;
+            }
+            dest.putNextEntry(new JarEntry(path));
+            while((size = source.read(buffer)) != -1) {
+                dest.write(buffer, 0, size);
+            }
+        }
+        source.close();
+        dest.close();
+        in.close();
     }
 
     @Override
@@ -86,7 +116,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             temp1.getParentFile().mkdir();
 
             // First remove top folder in Github source zip, Web -> temp1
-            ZipUtils.removeTopFolder(in, temp1);
+            removeTopFolder(in, temp1);
 
             conn.disconnect();
             publishProgress(SHOW_PROCESSING);
@@ -116,7 +146,6 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
             return true;
         } catch (Exception e) {
-            Logger.error("ProcessRepoZip: Error!");
             e.printStackTrace();
             return false;
         }
@@ -144,7 +173,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     @Override
     public ParallelTask<Void, Object, Boolean> exec(Void... voids) {
-        Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> super.exec(voids));
+        Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                () -> super.exec(voids));
         return this;
     }
 
