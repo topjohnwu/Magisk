@@ -1,7 +1,9 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
-import android.text.TextUtils;
+
+import com.topjohnwu.magisk.container.ByteArrayStream;
+import com.topjohnwu.magisk.container.JarMap;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -90,60 +92,43 @@ public class ZipUtils {
     public native static void zipAdjust(String filenameIn, String filenameOut);
 
     public static String generateUnhide(Context context, File output) {
-        File temp = new File(context.getCacheDir(), "temp.apk");
-        String pkg = "";
         try {
-            JarInputStream source = new JarInputStream(context.getAssets().open(UNHIDE_APK));
-            JarOutputStream dest = new JarOutputStream(new FileOutputStream(temp));
-            JarEntry entry;
-            int size;
-            byte buffer[] = new byte[4096];
-            while ((entry = source.getNextJarEntry()) != null) {
-                dest.putNextEntry(new JarEntry(entry.getName()));
-                if (TextUtils.equals(entry.getName(), ANDROID_MANIFEST)) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    while((size = source.read(buffer)) != -1) {
-                        baos.write(buffer, 0, size);
-                    }
-                    int offset = -1;
-                    byte xml[] = baos.toByteArray();
+            String pkg;
+            JarMap apk = new JarMap(context.getAssets().open(UNHIDE_APK));
+            JarEntry je = new JarEntry(ANDROID_MANIFEST);
+            byte xml[] = apk.getRawData(je);
+            int offset = -1;
 
-                    // Linear search pattern offset
-                    for (int i = 0; i < xml.length - UNHIDE_PKG_NAME.length; ++i) {
-                        boolean match = true;
-                        for (int j = 0; j < UNHIDE_PKG_NAME.length; ++j) {
-                            if (xml[i + j] != UNHIDE_PKG_NAME[j]) {
-                                match = false;
-                                break;
-                            }
-                        }
-                        if (match) {
-                            offset = i;
-                            break;
-                        }
-                    }
-                    if (offset < 0)
-                        return "";
-
-                    // Patch binary XML with new package name
-                    pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
-                    System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
-                    dest.write(xml);
-                } else {
-                    while((size = source.read(buffer)) != -1) {
-                        dest.write(buffer, 0, size);
+            // Linear search pattern offset
+            for (int i = 0; i < xml.length - UNHIDE_PKG_NAME.length; ++i) {
+                boolean match = true;
+                for (int j = 0; j < UNHIDE_PKG_NAME.length; ++j) {
+                    if (xml[i + j] != UNHIDE_PKG_NAME[j]) {
+                        match = false;
+                        break;
                     }
                 }
+                if (match) {
+                    offset = i;
+                    break;
+                }
             }
-            source.close();
-            dest.close();
-            signZip(context, temp, output, false);
-            temp.delete();
+            if (offset < 0)
+                return "";
+
+            // Patch binary XML with new package name
+            pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
+            System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
+            apk.getOutputStream(je).write(xml);
+
+            // Sign the APK
+            signZip(context, apk, output, false);
+
+            return pkg;
         } catch (IOException e) {
             e.printStackTrace();
-            return pkg;
+            return "";
         }
-        return pkg;
     }
 
     public static void removeTopFolder(InputStream in, File output) throws IOException {
@@ -174,7 +159,6 @@ public class ZipUtils {
             dest.close();
             in.close();
         } catch (IOException e) {
-            Logger.dev("ZipUtils: removeTopFolder IO error!");
             throw e;
         }
     }
@@ -201,7 +185,6 @@ public class ZipUtils {
                 } else {
                     name = entry.getName();
                 }
-                Logger.dev("ZipUtils: Extracting: " + entry);
                 File dest = new File(folder, name);
                 dest.getParentFile().mkdirs();
                 FileOutputStream out = new FileOutputStream(dest);
@@ -218,9 +201,24 @@ public class ZipUtils {
         }
     }
 
+    public static void signZip(Context context, InputStream is, File output, boolean minSign) {
+        try {
+            signZip(context, new JarMap(is, false), output, minSign);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void signZip(Context context, File input, File output, boolean minSign) {
+        try {
+            signZip(context, new JarMap(new FileInputStream(input), false), output, minSign);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void signZip(Context context, JarMap input, File output, boolean minSign) {
         int alignment = 4;
-        JarFile inputJar = null;
         BufferedOutputStream outputFile = null;
         int hashes = 0;
         try {
@@ -235,9 +233,8 @@ public class ZipUtils {
 
             outputFile = new BufferedOutputStream(new FileOutputStream(output));
             if (minSign) {
-                ZipUtils.signWholeFile(input, publicKey, privateKey, outputFile);
+                ZipUtils.signWholeFile(input.getInputStream(), publicKey, privateKey, outputFile);
             } else {
-                inputJar = new JarFile(input, false);  // Don't verify.
                 JarOutputStream outputJar = new JarOutputStream(outputFile);
                 // For signing .apks, use the maximum compression to make
                 // them as small as possible (since they live forever on
@@ -246,16 +243,16 @@ public class ZipUtils {
                 // and produces output that is only a tiny bit larger
                 // (~0.1% on full OTA packages I tested).
                 outputJar.setLevel(9);
-                Manifest manifest = addDigestsToManifest(inputJar, hashes);
-                copyFiles(manifest, inputJar, outputJar, timestamp, alignment);
-                signFile(manifest, inputJar, publicKey, privateKey, outputJar);
+                Manifest manifest = addDigestsToManifest(input, hashes);
+                copyFiles(manifest, input, outputJar, timestamp, alignment);
+                signFile(manifest, input, publicKey, privateKey, outputJar);
                 outputJar.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if (inputJar != null) inputJar.close();
+                if (input != null) input.close();
                 if (outputFile != null) outputFile.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -335,7 +332,7 @@ public class ZipUtils {
      * Add the hash(es) of every file to the manifest, creating it if
      * necessary.
      */
-    private static Manifest addDigestsToManifest(JarFile jar, int hashes)
+    private static Manifest addDigestsToManifest(JarMap jar, int hashes)
             throws IOException, GeneralSecurityException {
         Manifest input = jar.getManifest();
         Manifest output = new Manifest();
@@ -490,12 +487,12 @@ public class ZipUtils {
      * reduce variation in the output file and make incremental OTAs
      * more efficient.
      */
-    private static void copyFiles(Manifest manifest, JarFile in, JarOutputStream out,
+    private static void copyFiles(Manifest manifest, JarMap in, JarOutputStream out,
                                   long timestamp, int alignment) throws IOException {
         byte[] buffer = new byte[4096];
         int num;
         Map<String, Attributes> entries = manifest.getEntries();
-        ArrayList<String> names = new ArrayList<String>(entries.keySet());
+        ArrayList<String> names = new ArrayList<>(entries.keySet());
         Collections.sort(names);
         boolean firstEntry = true;
         long offset = 0L;
@@ -564,15 +561,15 @@ public class ZipUtils {
     // Used for signWholeFile
     private static class CMSProcessableFile implements CMSTypedData {
 
-        private File file;
+        private InputStream is;
         private ASN1ObjectIdentifier type;
-        private byte[] buffer;
-        int bufferSize = 0;
+        ByteArrayStream bos;
 
-        CMSProcessableFile(File file) {
-            this.file = file;
+        CMSProcessableFile(InputStream is) {
+            this.is = is;
             type = new ASN1ObjectIdentifier(CMSObjectIdentifiers.data.getId());
-            buffer = new byte[4096];
+            bos = new ByteArrayStream();
+            bos.readFrom(is);
         }
 
         @Override
@@ -582,30 +579,20 @@ public class ZipUtils {
 
         @Override
         public void write(OutputStream out) throws IOException, CMSException {
-            FileInputStream input = new FileInputStream(file);
-            long len = file.length() - 2;
-            while ((bufferSize = input.read(buffer)) > 0) {
-                if (len <= bufferSize) {
-                    out.write(buffer, 0, (int) len);
-                    break;
-                } else {
-                    out.write(buffer, 0, bufferSize);
-                }
-                len -= bufferSize;
-            }
+            bos.writeTo(out, 0, bos.size() - 2);
         }
 
         @Override
         public Object getContent() {
-            return file;
+            return is;
         }
 
         byte[] getTail() {
-            return Arrays.copyOfRange(buffer, 0, bufferSize);
+            return Arrays.copyOfRange(bos.getBuf(), bos.size() - 22, bos.size());
         }
     }
 
-    private static void signWholeFile(File input, X509Certificate publicKey,
+    private static void signWholeFile(InputStream input, X509Certificate publicKey,
                                       PrivateKey privateKey, OutputStream outputStream)
             throws Exception {
         ByteArrayOutputStream temp = new ByteArrayOutputStream();
@@ -666,7 +653,7 @@ public class ZipUtils {
         outputStream.write((total_size >> 8) & 0xff);
         temp.writeTo(outputStream);
     }
-    private static void signFile(Manifest manifest, JarFile inputJar,
+    private static void signFile(Manifest manifest, JarMap inputJar,
                                  X509Certificate publicKey, PrivateKey privateKey,
                                  JarOutputStream outputJar)
             throws Exception {
