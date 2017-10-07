@@ -96,8 +96,6 @@ public class MagiskFragment extends Fragment
     @OnClick(R.id.safetyNet_title)
     void safetyNet() {
         Runnable task = () -> {
-            mm.snet_version = CheckSafetyNet.SNET_VER;
-            mm.prefs.edit().putInt("snet_version", CheckSafetyNet.SNET_VER).apply();
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetRefreshIcon.setVisibility(View.GONE);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);

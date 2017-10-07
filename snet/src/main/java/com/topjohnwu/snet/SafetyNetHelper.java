@@ -43,7 +43,7 @@ public class SafetyNetHelper
     }
 
     // Entry point to start test
-    public void requestTest() {
+    public void attest() {
         // Connect Google Service
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(mActivity);
         try {
@@ -92,7 +92,7 @@ public class SafetyNetHelper
                         responseCode |= decoded.getBoolean("ctsProfileMatch") ? CTS_PASS : 0;
                         responseCode |= decoded.getBoolean("basicIntegrity") ? BASIC_PASS : 0;
                     } catch (JSONException e) {
-                        responseCode |= RESPONSE_ERR;
+                        cb.onResponse(RESPONSE_ERR);
                         return;
                     }
                     // Disconnect

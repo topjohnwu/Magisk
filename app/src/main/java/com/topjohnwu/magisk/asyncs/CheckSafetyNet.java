@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.asyncs;
 import android.support.v4.app.FragmentActivity;
 
 import com.topjohnwu.jarsigner.ByteArrayStream;
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.io.BufferedOutputStream;
@@ -32,9 +33,12 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
     @Override
     protected void onPreExecute() {
-        if (getMagiskManager().snet_version < CheckSafetyNet.SNET_VER) {
+        MagiskManager mm = getMagiskManager();
+        if (mm.snet_version != CheckSafetyNet.SNET_VER) {
             getShell().sh("rm -rf " + dexPath.getParent());
         }
+        mm.snet_version = CheckSafetyNet.SNET_VER;
+        mm.prefs.edit().putInt("snet_version", CheckSafetyNet.SNET_VER).apply();
     }
 
     @Override
@@ -71,7 +75,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                                 getMagiskManager().safetyNetDone.publish(false, args[0]);
                                 return null;
                             }));
-            helperClazz.getMethod("requestTest").invoke(helper);
+            helperClazz.getMethod("attest").invoke(helper);
         } catch (Exception e) {
             e.printStackTrace();
             getMagiskManager().safetyNetDone.publish(false, -1);
