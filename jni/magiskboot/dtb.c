@@ -5,16 +5,14 @@
 #include "magiskboot.h"
 #include "utils.h"
 
-/* Left here for debugging */
-
-// static void print_subnode(const void *fdt, int parent, int depth) {
-// 	int node;
-// 	fdt_for_each_subnode(node, fdt, parent) {
-// 		for (int i = 0; i < depth; ++i) printf("  ");
-// 		printf("%d: %s\n", node, fdt_get_name(fdt, node, NULL));
-// 		print_subnode(fdt, node, depth + 1);
-// 	}
-// }
+static void print_subnode(const void *fdt, int parent, int depth) {
+	int node;
+	fdt_for_each_subnode(node, fdt, parent) {
+		for (int i = 0; i < depth; ++i) printf("  ");
+		printf("%d: %s\n", node, fdt_get_name(fdt, node, NULL));
+		print_subnode(fdt, node, depth + 1);
+	}
+}
 
 static int find_fstab(const void *fdt, int parent) {
 	int node, fstab;
@@ -26,6 +24,25 @@ static int find_fstab(const void *fdt, int parent) {
 			return fstab;
 	}
 	return -1;
+}
+
+void dtb_print(const char *file) {
+	size_t size ;
+	void *dtb, *fdt;
+	fprintf(stderr, "Loading dtbs from [%s]\n", file);
+	mmap_ro(file, &dtb, &size);
+	// Loop through all the dtbs
+	int dtb_num = 0;
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
+			fdt = dtb + i;
+			fprintf(stderr, "\nPrinting dtb.%04d\n\n", dtb_num++);
+			print_subnode(fdt, 0, 0);
+		}
+	}
+	fprintf(stderr, "\n");
+	munmap(dtb, size);
+	exit(0);
 }
 
 void dtb_patch(const char *file) {

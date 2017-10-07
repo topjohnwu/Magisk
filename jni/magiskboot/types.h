@@ -18,6 +18,8 @@ typedef enum {
     DTB
 } file_t;
 
+#define COMPRESSED(type)  (type >= GZIP && type <= LZ4_LEGACY)
+
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define ELF32_MAGIC     "\x7f""ELF\x01"
 #define ELF64_MAGIC     "\x7f""ELF\x02"

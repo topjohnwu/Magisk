@@ -8,7 +8,7 @@ void mmap_ro(const char *filename, void **buf, size_t *size) {
 	int fd = xopen(filename, O_RDONLY);
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	*buf = xmmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0);
+	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0) : NULL;
 	close(fd);
 }
 
@@ -16,7 +16,7 @@ void mmap_rw(const char *filename, void **buf, size_t *size) {
 	int fd = xopen(filename, O_RDWR);
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	*buf = xmmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0) : NULL;
 	close(fd);
 }
 

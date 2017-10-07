@@ -66,17 +66,6 @@ cpio_mkdir() {
 # Initialization
 ##########################################################################################
 
-BOOTIMAGE="$1"
-
-[ -e "$BOOTIMAGE" ] || (echo "$BOOTIMAGE does not exist!" && exit 1)
-
-# Presets
-[ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
-
-# Detect whether running as root
-id | grep "uid=0" >/dev/null 2>&1 && ROOT=true || ROOT=false
-
 if [ -z $SOURCEDMODE ]; then
   # Switch to the location of the script file
   cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
@@ -85,6 +74,14 @@ if [ -z $SOURCEDMODE ]; then
   # Detect current status
   mount_partitions
 fi
+
+BOOTIMAGE="$1"
+
+[ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
+
+# Presets
+[ -z $KEEPVERITY ] && KEEPVERITY=false
+[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 
 chmod -R 755 .
 
@@ -104,6 +101,7 @@ case $? in
     abort "! Unable to unpack boot image"
     ;;
   2 )
+    ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
   3 )
@@ -145,7 +143,7 @@ case $? in
       # Restore failed
       ui_print "! Cannot restore from internal backup"
       # If we are root and SHA1 known, we try to find the stock backup
-      if $ROOT && [ ! -z $SHA1 ]; then
+      if [ ! -z $SHA1 ]; then
         STOCKDUMP=/data/stock_boot_${SHA1}.img
         if [ -f ${STOCKDUMP}.gz ]; then
           ui_print "- Stock boot image backup found"

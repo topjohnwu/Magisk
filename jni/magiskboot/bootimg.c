@@ -30,7 +30,7 @@ static void print_hdr(const boot_img_hdr *hdr) {
 	fprintf(stderr, "KERNEL [%d] @ 0x%08x\n", hdr->kernel_size, hdr->kernel_addr);
 	fprintf(stderr, "RAMDISK [%d] @ 0x%08x\n", hdr->ramdisk_size, hdr->ramdisk_addr);
 	fprintf(stderr, "SECOND [%d] @ 0x%08x\n", hdr->second_size, hdr->second_addr);
-	fprintf(stderr, "DTB [%d] @ 0x%08x\n", hdr->dt_size, hdr->tags_addr);
+	fprintf(stderr, "EXTRA [%d] @ 0x%08x\n", hdr->extra_size, hdr->tags_addr);
 	fprintf(stderr, "PAGESIZE [%d]\n", hdr->page_size);
 	if (hdr->os_version != 0) {
 		int a,b,c,y,m = 0;
@@ -88,26 +88,24 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
-			if (boot->hdr.dt_size) {
-				boot->dtb = base + pos;
-				pos += boot->hdr.dt_size;
+			if (boot->hdr.extra_size) {
+				boot->extra = base + pos;
+				pos += boot->hdr.extra_size;
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
 			if (pos < size) {
-				boot->extra = base + pos;
+				boot->tail = base + pos;
+				boot->tail_size = end - base - pos;
 			}
 
-			// Search for dtb in kernel if not found
-			if (boot->hdr.dt_size == 0) {
-				for (int i = 0; i < boot->hdr.kernel_size; ++i) {
-					if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
-						boot->flags |= APPEND_DTB;
-						boot->dtb = boot->kernel + i;
-						boot->hdr.dt_size = boot->hdr.kernel_size - i;
-						boot->hdr.kernel_size = i;
-						fprintf(stderr, "APPEND_DTB [%d]\n", boot->hdr.dt_size);
-					}
+			// Search for dtb in kernel
+			for (int i = 0; i < boot->hdr.kernel_size; ++i) {
+				if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
+					boot->dtb = boot->kernel + i;
+					boot->dt_size = boot->hdr.kernel_size - i;
+					boot->hdr.kernel_size = i;
+					fprintf(stderr, "DTB [%d]\n", boot->dt_size);
 				}
 			}
 
@@ -146,6 +144,7 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 		}
 	}
 	LOGE("No boot image magic found!\n");
+	return 1;
 }
 
 void unpack(const char* image) {
@@ -160,22 +159,27 @@ void unpack(const char* image) {
 	int ret = parse_img(orig, size, &boot);
 
 	// Dump kernel
-	if (boot.kernel_type == UNKNOWN) {
-		dump(boot.kernel, boot.hdr.kernel_size, KERNEL_FILE);
-	} else {
+	if (COMPRESSED(boot.kernel_type)) {
 		fd = open_new(KERNEL_FILE);
 		decomp(boot.kernel_type, fd, boot.kernel, boot.hdr.kernel_size);
 		close(fd);
+	} else {
+		dump(boot.kernel, boot.hdr.kernel_size, KERNEL_FILE);
+	}
+
+	if (boot.dt_size) {
+		// Dump dtb
+		dump(boot.dtb, boot.dt_size, DTB_FILE);
 	}
 
 	// Dump ramdisk
-	if (boot.ramdisk_type == UNKNOWN) {
-		dump(boot.ramdisk, boot.hdr.ramdisk_size, RAMDISK_FILE ".raw");
-		LOGE("Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
-	} else {
+	if (COMPRESSED(boot.ramdisk_type)) {
 		fd = open_new(RAMDISK_FILE);
 		decomp(boot.ramdisk_type, fd, boot.ramdisk, boot.hdr.ramdisk_size);
 		close(fd);
+	} else {
+		dump(boot.ramdisk, boot.hdr.ramdisk_size, RAMDISK_FILE ".raw");
+		LOGE("Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
 	}
 
 	if (boot.hdr.second_size) {
@@ -183,9 +187,9 @@ void unpack(const char* image) {
 		dump(boot.second, boot.hdr.second_size, SECOND_FILE);
 	}
 
-	if (boot.hdr.dt_size) {
-		// Dump dtb
-		dump(boot.dtb, boot.hdr.dt_size, DTB_FILE);
+	if (boot.hdr.extra_size) {
+		// Dump extra
+		dump(boot.extra, boot.hdr.extra_size, EXTRA_FILE);
 	}
 
 	munmap(orig, size);
@@ -220,18 +224,18 @@ void repack(const char* orig_image, const char* out_image) {
 		mtk_kernel_off = lseek(fd, 0, SEEK_CUR);
 		write_zero(fd, 512);
 	}
-	if (boot.kernel_type == UNKNOWN) {
-		boot.hdr.kernel_size = restore(KERNEL_FILE, fd);
-	} else {
+	if (COMPRESSED(boot.kernel_type)) {
 		size_t raw_size;
 		void *kernel_raw;
 		mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
 		boot.hdr.kernel_size = comp(boot.kernel_type, fd, kernel_raw, raw_size);
 		munmap(kernel_raw, raw_size);
+	} else {
+		boot.hdr.kernel_size = restore(KERNEL_FILE, fd);
 	}
-	if (boot.flags & APPEND_DTB) {
+	// Restore dtb
+	if (boot.dt_size && access(DTB_FILE, R_OK) == 0) {
 		boot.hdr.kernel_size += restore(DTB_FILE, fd);
-		boot.hdr.dt_size = 0;
 	}
 	file_align(fd, boot.hdr.page_size, 1);
 
@@ -270,18 +274,17 @@ void repack(const char* orig_image, const char* out_image) {
 		file_align(fd, boot.hdr.page_size, 1);
 	}
 
-	// Restore dtb
-	if (boot.hdr.dt_size && access(DTB_FILE, R_OK) == 0) {
-		printf("Here\n");
-		boot.hdr.dt_size = restore(DTB_FILE, fd);
+	// Restore extra
+	if (boot.hdr.extra_size && access(EXTRA_FILE, R_OK) == 0) {
+		boot.hdr.extra_size = restore(EXTRA_FILE, fd);
 		file_align(fd, boot.hdr.page_size, 1);
 	}
 
-	// Check extra info, currently only for LG Bump and Samsung SEANDROIDENFORCE
-	if (boot.extra) {
-		if (memcmp(boot.extra, "SEANDROIDENFORCE", 16) == 0 ||
-			memcmp(boot.extra, LG_BUMP_MAGIC, 16) == 0 ) {
-			restore_buf(fd, boot.extra, 16);
+	// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
+	if (boot.tail_size >= 16) {
+		if (memcmp(boot.tail, "SEANDROIDENFORCE", 16) == 0 ||
+			memcmp(boot.tail, LG_BUMP_MAGIC, 16) == 0 ) {
+			restore_buf(fd, boot.tail, 16);
 		}
 	}
 

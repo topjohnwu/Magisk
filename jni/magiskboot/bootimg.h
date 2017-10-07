@@ -44,7 +44,7 @@ struct boot_img_hdr
 
     uint32_t tags_addr;    /* physical addr for kernel tags */
     uint32_t page_size;    /* flash page size we assume */
-    uint32_t dt_size;      /* device tree in bytes */
+    uint32_t extra_size;   /* extra blob size in bytes */
 
     /* operating system version and security patch level; for
      * version "A.B.C" and patch level "Y-M-D":
@@ -74,13 +74,13 @@ struct boot_img_hdr
 ** +-----------------+
 ** | second stage    | o pages
 ** +-----------------+
-** | device tree     | p pages
+** | extra blobs     | p pages
 ** +-----------------+
 **
 ** n = (kernel_size + page_size - 1) / page_size
 ** m = (ramdisk_size + page_size - 1) / page_size
 ** o = (second_size + page_size - 1) / page_size
-** p = (dt_size + page_size - 1) / page_size
+** p = (extra_size + page_size - 1) / page_size
 **
 ** 0. all entities are page_size aligned in flash
 ** 1. kernel and ramdisk are required (size != 0)
@@ -103,16 +103,18 @@ typedef struct mtk_hdr {
 // Flags
 #define MTK_KERNEL    0x1
 #define MTK_RAMDISK   0x2
-#define APPEND_DTB    0x4
 
 typedef struct boot_img {
     boot_img_hdr hdr;
     void *kernel;
+    void *dtb;
+    uint32_t dt_size;
     void *ramdisk;
     void *second;
-    void *dtb;
     void *extra;
-    int flags;
+    void *tail;
+    uint32_t tail_size;
+    uint32_t flags;
     file_t kernel_type, ramdisk_type;
     mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
 } boot_img;
