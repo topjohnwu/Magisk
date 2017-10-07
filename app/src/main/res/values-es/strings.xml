@@ -20,6 +20,7 @@
     <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
+    <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_no_response">No puede comprobar SafetyNet, ¿No tiene internet?</string>
     <string name="safetyNet_network_loss">Conexión de red perdida</string>
     <string name="safetyNet_service_disconnected">Se ha detenido el servicio</string>
@@ -120,6 +121,9 @@
     <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="uninstall_toast">Desinstalación de Magisk Manager en 5 segundos, por favor después reinicie manualmente </string>
+    <string name="proprietary_title">Descargar Código Propietario</string>
+    <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para los cheques de SafetyNet?</string>
+ 
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
