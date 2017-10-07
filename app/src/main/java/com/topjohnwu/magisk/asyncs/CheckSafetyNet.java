@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.support.v4.app.FragmentActivity;
 
-import com.topjohnwu.magisk.container.ByteArrayStream;
+import com.topjohnwu.jarsigner.ByteArrayStream;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.io.BufferedOutputStream;

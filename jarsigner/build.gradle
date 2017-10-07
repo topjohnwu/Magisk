@@ -1,0 +1,37 @@
+apply plugin: 'java-library'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.topjohnwu.jarsigner.CommandLine'
+    }
+}
+
+shadowJar {
+    classifier = 'fat'
+    version = null
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.57'
+}

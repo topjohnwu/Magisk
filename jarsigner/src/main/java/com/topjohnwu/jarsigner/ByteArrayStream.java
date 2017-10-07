@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.container;
+package com.topjohnwu.jarsigner;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
