@@ -51,6 +51,10 @@ def zip_with_msg(zipfile, source, target):
 	print('zip: {} -> {}'.format(source, target))
 	zipfile.write(source, target)
 
+def cp(source, target):
+	print('cp: {} -> {}'.format(source, target))
+	shutil.copyfile(source, target)
+
 def build_all(args):
 	build_binary(args)
 	build_apk(args)
@@ -75,26 +79,23 @@ def build_apk(args):
 
 	for key in ['public.certificate.x509.pem', 'private.key.pk8']:
 		source = os.path.join('ziptools', key)
-		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'assets', key)
-		print('cp: {} -> {}'.format(source, target))
-		shutil.copyfile(source, target)
+		target = os.path.join('java', 'app', 'src', 'main', 'assets', key)
+		cp(source, target)
 
 	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
 		source = os.path.join('scripts', script)
-		target = os.path.join('MagiskManager', 'app', 'src', 'main', 'assets', script)
-		print('cp: {} -> {}'.format(source, target))
-		shutil.copyfile(source, target)
+		target = os.path.join('java', 'app', 'src', 'main', 'assets', script)
+		cp(source, target)
 
-	os.chdir('MagiskManager')
+	os.chdir('java')
 
 	# Build unhide app and place in assets
-	proc = subprocess.run('{} unhide::assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+	proc = subprocess.run('{} unhide:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk Manager failed!')
 	source = os.path.join('unhide', 'build', 'outputs', 'apk', 'release', 'unhide-release-unsigned.apk')
 	target = os.path.join('app', 'src', 'main', 'assets', 'unhide.apk')
-	print('cp: {} -> {}'.format(source, target))
-	shutil.copyfile(source, target)
+	cp(source, target)
 
 	print('')
 
@@ -102,7 +103,7 @@ def build_apk(args):
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
-		proc = subprocess.run('{} app::assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -141,16 +142,26 @@ def build_apk(args):
 		silentremove(unsigned)
 		silentremove(aligned)
 	else:
-		proc = subprocess.run('{} app::assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
 	# Return to upper directory
 	os.chdir('..')
 
-def sign_adjust_zip(unsigned, output):
+def build_snet(args):
+	os.chdir('java')
+	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+	if proc.returncode != 0:
+		error('Build snet extention failed!')
+	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
+	target = os.path.join('..', 'snet.apk')
+	print('')
+	cp(source, target)
+	os.chdir('..')
 
-	zipsigner = os.path.join('ziptools', 'zipsigner', 'build', 'libs', 'zipsigner.jar')
+def sign_adjust_zip(unsigned, output):
+	jarsigner = os.path.join('java', 'jarsigner', 'build', 'libs', 'jarsigner-fat.jar')
 
 	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
 		header('* Building zipadjust')
@@ -158,13 +169,13 @@ def sign_adjust_zip(unsigned, output):
 		proc = subprocess.run('gcc -o ziptools/zipadjust ziptools/zipadjust_src/*.c -lz', shell=True)
 		if proc.returncode != 0:
 			error('Build zipadjust failed!')
-	if not os.path.exists(zipsigner):
-		header('* Building zipsigner.jar')
-		os.chdir(os.path.join('ziptools', 'zipsigner'))
-		proc = subprocess.run('{} shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
+	if not os.path.exists(jarsigner):
+		header('* Building jarsigner-fat.jar')
+		os.chdir('java')
+		proc = subprocess.run('{} jarsigner:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
-			error('Build zipsigner.jar failed!')
-		os.chdir(os.path.join('..', '..'))
+			error('Build jarsigner-fat.jar failed!')
+		os.chdir('..')
 
 	header('* Signing / Adjusting Zip')
 
@@ -172,7 +183,7 @@ def sign_adjust_zip(unsigned, output):
 	privateKey = os.path.join('ziptools', 'private.key.pk8')
 
 	# Unsigned->signed
-	proc = subprocess.run(['java', '-jar', zipsigner,
+	proc = subprocess.run(['java', '-jar', jarsigner,
 		publicKey, privateKey, unsigned, 'tmp_signed.zip'])
 	if proc.returncode != 0:
 		error('First sign flashable zip failed!')
@@ -183,7 +194,7 @@ def sign_adjust_zip(unsigned, output):
 		error('Adjust flashable zip failed!')
 
 	# Adjusted -> output
-	proc = subprocess.run(['java', '-jar', zipsigner,
+	proc = subprocess.run(['java', '-jar', jarsigner,
 		"-m", publicKey, privateKey, 'tmp_adjusted.zip', output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')
@@ -243,7 +254,7 @@ def zip_main(args):
 		zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join('MagiskManager', 'app', 'build', 'outputs', 'apk',
+		source = os.path.join('java', 'app', 'build', 'outputs', 'apk',
 			'release' if args.release else 'debug', 'app-release.apk' if args.release else 'app-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
@@ -328,20 +339,20 @@ def zip_uninstaller(args):
 
 def cleanup(args):
 	if len(args.target) == 0:
-		args.target = ['binary', 'apk', 'zip']
+		args.target = ['binary', 'java', 'zip']
 
 	if 'binary' in args.target:
-		header('* Cleaning Magisk binaries')
+		header('* Cleaning binaries')
 		subprocess.run(os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build') + ' clean', shell=True)
 
-	if 'apk' in args.target:
-		header('* Cleaning Magisk Manager')
-		os.chdir('MagiskManager')
+	if 'java' in args.target:
+		header('* Cleaning java')
+		os.chdir('java')
 		subprocess.run('{} clean'.format(os.path.join('.', 'gradlew')), shell=True)
 		os.chdir('..')
 
 	if 'zip' in args.target:
-		header('* Cleaning created zip files')
+		header('* Cleaning zip files')
 		for f in os.listdir('.'):
 			if '.zip' in f:
 				print('rm {}'.format(f))
@@ -364,6 +375,9 @@ binary_parser.set_defaults(func=build_binary)
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
 apk_parser.set_defaults(func=build_apk)
 
+snet_parser = subparsers.add_parser('snet', help='build snet extention for Magisk Manager')
+snet_parser.set_defaults(func=build_snet)
+
 zip_parser = subparsers.add_parser('zip', help='zip and sign Magisk into a flashable zip')
 zip_parser.add_argument('versionString')
 zip_parser.add_argument('versionCode', type=int)
@@ -372,7 +386,7 @@ zip_parser.set_defaults(func=zip_main)
 uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
 uninstaller_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='clean [target...] targets: binary apk zip')
+clean_parser = subparsers.add_parser('clean', help='clean [target...] targets: binary java zip')
 clean_parser.add_argument('target', nargs='*')
 clean_parser.set_defaults(func=cleanup)
 

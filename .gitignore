@@ -2,6 +2,7 @@ obj/
 libs/
 *.zip
 *.jks
+*.apk
 
-# Copied binaries
+# Built binaries
 ziptools/zipadjust

@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Credits
 
-**MagiskManager** (`MagiskManager`)
+**MagiskManager** (`java`)
 
 * Copyright 2016-2017, John Wu (@topjohnwu)
 * All contributors and translators

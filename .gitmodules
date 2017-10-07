@@ -11,7 +11,7 @@
 	path = jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
 [submodule "MagiskManager"]
-	path = MagiskManager
+	path = java
 	url = https://github.com/topjohnwu/MagiskManager.git
 [submodule "jni/busybox"]
 	path = jni/external/busybox
