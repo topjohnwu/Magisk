@@ -5,8 +5,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import com.topjohnwu.magisk.utils.Logger;
-
 import java.util.List;
 
 public abstract class BaseModule implements Comparable<BaseModule> {

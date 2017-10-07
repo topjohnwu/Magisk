@@ -72,7 +72,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onTopicPublished(Topic topic, Object result) {
         Logger.dev("ModulesFragment: UI refresh triggered");
         updateUI();
     }

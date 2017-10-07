@@ -69,7 +69,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onTopicPublished(Topic topic, Object result) {
         mSwipeRefreshLayout.setRefreshing(false);
         recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
         emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);

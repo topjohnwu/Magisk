@@ -62,7 +62,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onTopicPublished(Topic topic, Object result) {
         recreate();
     }
 
@@ -273,7 +273,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         @Override
-        public void onTopicPublished(Topic topic) {
+        public void onTopicPublished(Topic topic, Object result) {
             setLocalePreference((ListPreference) findPreference("locale"));
         }
 

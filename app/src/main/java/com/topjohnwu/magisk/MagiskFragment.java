@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -19,7 +20,9 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -38,6 +41,13 @@ import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
         implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener, ExpandableView {
+
+    public static final int CAUSE_SERVICE_DISCONNECTED = 0x00001;
+    public static final int CAUSE_NETWORK_LOST = 0x00010;
+    public static final int RESPONSE_ERR = 0x00100;
+
+    public static final int BASIC_PASS = 0x01000;
+    public static final int CTS_PASS = 0x10000;
 
     private Container expandableContainer = new Container();
 
@@ -85,11 +95,28 @@ public class MagiskFragment extends Fragment
 
     @OnClick(R.id.safetyNet_title)
     void safetyNet() {
-        safetyNetProgress.setVisibility(View.VISIBLE);
-        safetyNetRefreshIcon.setVisibility(View.GONE);
-        safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-        Utils.checkSafetyNet(getActivity());
-        collapse();
+        Runnable task = () -> {
+            mm.snet_version = CheckSafetyNet.SNET_VER;
+            mm.prefs.edit().putInt("snet_version", CheckSafetyNet.SNET_VER).apply();
+            safetyNetProgress.setVisibility(View.VISIBLE);
+            safetyNetRefreshIcon.setVisibility(View.GONE);
+            safetyNetStatusText.setText(R.string.checking_safetyNet_status);
+            new CheckSafetyNet(getActivity()).exec();
+            collapse();
+        };
+        if (mm.snet_version < 0) {
+            // Show dialog
+            new AlertDialogBuilder(getActivity())
+                    .setTitle(R.string.proprietary_title)
+                    .setMessage(R.string.proprietary_notice)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.yes, (d, i) -> task.run())
+                    .setNegativeButton(R.string.no_thanks, null)
+                    .show();
+        } else {
+            task.run();
+        }
+
     }
 
     @OnClick(R.id.install_button)
@@ -158,11 +185,11 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onTopicPublished(Topic topic, Object result) {
         if (topic == mm.updateCheckDone) {
             updateCheckUI();
         } else if (topic == mm.safetyNetDone) {
-            updateSafetyNetUI();
+            updateSafetyNetUI((int) result);
         }
     }
 
@@ -302,37 +329,41 @@ public class MagiskFragment extends Fragment
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    private void updateSafetyNetUI() {
-        int image, color;
+    private void updateSafetyNetUI(int response) {
         safetyNetProgress.setVisibility(View.GONE);
         safetyNetRefreshIcon.setVisibility(View.VISIBLE);
-        if (mm.SNCheckResult.failed) {
-            safetyNetStatusText.setText(mm.SNCheckResult.errmsg);
-            collapse();
-        } else {
+        if (response < 0) {
+            safetyNetStatusText.setText(R.string.safetyNet_api_error);
+        } else if ((response & 0x111) == 0) {
             safetyNetStatusText.setText(R.string.safetyNet_check_success);
-            if (mm.SNCheckResult.ctsProfile) {
-                color = colorOK;
-                image = R.drawable.ic_check_circle;
-            } else {
-                color = colorBad;
-                image = R.drawable.ic_cancel;
-            }
-            ctsStatusText.setText("ctsProfile: " + mm.SNCheckResult.ctsProfile);
-            ctsStatusIcon.setImageResource(image);
-            ctsStatusIcon.setColorFilter(color);
 
-            if (mm.SNCheckResult.basicIntegrity) {
-                color = colorOK;
-                image = R.drawable.ic_check_circle;
-            } else {
-                color = colorBad;
-                image = R.drawable.ic_cancel;
-            }
-            basicStatusText.setText("basicIntegrity: " + mm.SNCheckResult.basicIntegrity);
-            basicStatusIcon.setImageResource(image);
-            basicStatusIcon.setColorFilter(color);
+            boolean b;
+            b = (response & CTS_PASS) != 0;
+            ctsStatusText.setText("ctsProfile: " + b);
+            ctsStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
+            ctsStatusIcon.setColorFilter(b ? colorOK : colorBad);
+
+            b = (response & BASIC_PASS) != 0;
+            basicStatusText.setText("basicIntegrity: " + b);
+            basicStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
+            basicStatusIcon.setColorFilter(b ? colorOK : colorBad);
+
             expand();
+        } else {
+            @StringRes int resid;
+            switch (response) {
+                case CAUSE_SERVICE_DISCONNECTED:
+                    resid = R.string.safetyNet_network_loss;
+                    break;
+                case CAUSE_NETWORK_LOST:
+                    resid = R.string.safetyNet_service_disconnected;
+                    break;
+                case RESPONSE_ERR:
+                default:
+                    resid = R.string.safetyNet_res_invalid;
+                    break;
+            }
+            safetyNetStatusText.setText(resid);
         }
     }
 }

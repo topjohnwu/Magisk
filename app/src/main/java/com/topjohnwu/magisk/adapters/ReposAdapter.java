@@ -17,9 +17,9 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;

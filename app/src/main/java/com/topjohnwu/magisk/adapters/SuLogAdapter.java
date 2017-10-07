@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ExpandableView;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 
 import java.util.Collections;
 import java.util.HashSet;

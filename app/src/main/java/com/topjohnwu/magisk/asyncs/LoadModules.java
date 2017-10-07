@@ -3,11 +3,10 @@ package com.topjohnwu.magisk.asyncs;
 import android.content.Context;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.container.BaseModule;
 import com.topjohnwu.magisk.container.Module;
+import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.container.ValueSortedMap;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {
 

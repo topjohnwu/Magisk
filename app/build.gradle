@@ -63,6 +63,5 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.57'
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.57'
     implementation 'org.kamranzafar:jtar:2.3'
-    implementation 'com.google.android.gms:play-services-safetynet:9.0.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

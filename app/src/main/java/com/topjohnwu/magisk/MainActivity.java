@@ -102,7 +102,7 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onTopicPublished(Topic topic, Object result) {
         recreate();
     }
 

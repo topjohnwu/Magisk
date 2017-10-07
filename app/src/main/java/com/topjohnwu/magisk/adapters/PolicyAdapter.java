@@ -15,8 +15,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 
 import java.util.HashSet;
 import java.util.List;

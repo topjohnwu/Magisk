@@ -8,8 +8,8 @@ import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.AdaptiveList;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.container.TarEntry;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 

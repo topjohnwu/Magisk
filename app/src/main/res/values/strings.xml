@@ -22,7 +22,8 @@
     <string name="not_rooted">Not rooted</string>
     <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
-    <string name="safetyNet_check_success">SafetyNet Check Was Successful</string>
+    <string name="safetyNet_check_success">SafetyNet Check Success</string>
+    <string name="safetyNet_api_error">SafetyNet API Error</string>
     <string name="safetyNet_no_response">Cannot verify SafetyNet, no internet?</string>
     <string name="safetyNet_network_loss">Network connection unavailable</string>
     <string name="safetyNet_service_disconnected">Service has been killed</string>
@@ -123,6 +124,8 @@
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="uninstall_toast">Uninstalling Magisk Manager in 5 seconds, please manually reboot afterwards</string>
+    <string name="proprietary_title">Download Proprietary Code</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS so doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

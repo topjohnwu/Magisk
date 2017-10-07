@@ -1,1 +1,1 @@
-include ':app', ':unhide', ':resource'
+include ':app', ':unhide', ':resource', ':snet'

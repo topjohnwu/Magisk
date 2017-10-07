@@ -1,0 +1,81 @@
+package com.topjohnwu.magisk.asyncs;
+
+import android.support.v4.app.FragmentActivity;
+
+import com.topjohnwu.magisk.container.ByteArrayStream;
+import com.topjohnwu.magisk.utils.WebService;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Proxy;
+import java.net.HttpURLConnection;
+
+import dalvik.system.DexClassLoader;
+
+public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
+
+    public static final int SNET_VER = 1;
+
+    // Test URL, will switch to proper URL
+    private static final String SNET_URL = "https://www.dropbox.com/s/i5vvbl5eenmag5q/snet-release-unsigned.apk?dl=1";
+    private static final String PKG = "com.topjohnwu.snet";
+
+    private File dexPath;
+    private DexClassLoader loader;
+
+    public CheckSafetyNet(FragmentActivity activity) {
+        super(activity);
+        dexPath = new File(activity.getCacheDir().getParent() + "/snet", "snet.apk");
+    }
+
+    @Override
+    protected void onPreExecute() {
+        if (getMagiskManager().snet_version < CheckSafetyNet.SNET_VER) {
+            getShell().sh("rm -rf " + dexPath.getParent());
+        }
+    }
+
+    @Override
+    protected Exception doInBackground(Void... voids) {
+        try {
+            if (!dexPath.exists()) {
+                HttpURLConnection conn = WebService.request(SNET_URL, null);
+                ByteArrayStream bas = new ByteArrayStream();
+                bas.readFrom(conn.getInputStream());
+                conn.disconnect();
+                dexPath.getParentFile().mkdir();
+                try (OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath))) {
+                    bas.writeTo(out);
+                    out.flush();
+                }
+            }
+            loader = new DexClassLoader(dexPath.toString(), dexPath.getParent(),
+                    null, ClassLoader.getSystemClassLoader());
+        } catch (Exception e) {
+            return e;
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Exception err) {
+        try {
+            if (err != null) throw err;
+            Class<?> helperClazz = loader.loadClass(PKG + ".SafetyNetHelper");
+            Class<?> callbackClazz = loader.loadClass(PKG + ".SafetyNetCallback");
+            Object helper = helperClazz.getConstructors()[0].newInstance(
+                    getActivity(), Proxy.newProxyInstance(
+                            loader, new Class[] { callbackClazz }, (proxy, method, args) -> {
+                                getMagiskManager().safetyNetDone.publish(false, args[0]);
+                                return null;
+                            }));
+            helperClazz.getMethod("requestTest").invoke(helper);
+        } catch (Exception e) {
+            e.printStackTrace();
+            getMagiskManager().safetyNetDone.publish(false, -1);
+        }
+        super.onPostExecute(err);
+    }
+}

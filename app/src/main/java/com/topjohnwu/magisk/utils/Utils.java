@@ -22,7 +22,6 @@ import android.provider.OpenableColumns;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
@@ -148,16 +147,6 @@ public class Utils {
 
     public static MagiskManager getMagiskManager(Context context) {
         return (MagiskManager) context.getApplicationContext();
-    }
-
-    public static void checkSafetyNet(FragmentActivity activity) {
-        new SafetyNetHelper(activity) {
-            @Override
-            public void handleResults(Result result) {
-                getMagiskManager(mActivity).SNCheckResult = result;
-                getMagiskManager(mActivity).safetyNetDone.publish(false);
-            }
-        }.requestTest();
     }
 
     public static void clearRepoCache(Context context) {

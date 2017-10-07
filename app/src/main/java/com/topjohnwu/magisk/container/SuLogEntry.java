@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.container.Policy;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

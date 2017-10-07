@@ -31,15 +31,19 @@ public class Topic {
     }
 
     public void publish() {
-        publish(true);
+        publish(true, null);
     }
 
     public void publish(boolean record) {
+        publish(record, null);
+    }
+
+    public void publish(boolean record, Object result) {
         hasPublished = record;
         if (subscribers != null) {
             for (WeakReference<Subscriber> subscriber : subscribers) {
                 if (subscriber.get() != null)
-                    subscriber.get().onTopicPublished(this);
+                    subscriber.get().onTopicPublished(this, result);
             }
         }
     }
@@ -60,9 +64,12 @@ public class Topic {
             }
         }
         default void onTopicPublished() {
-            onTopicPublished(null);
+            onTopicPublished(null, null);
         }
-        void onTopicPublished(Topic topic);
+        default void onTopicPublished(Topic topic) {
+            onTopicPublished(topic, null);
+        }
+        void onTopicPublished(Topic topic, Object result);
         Topic[] getSubscription();
     }
 }

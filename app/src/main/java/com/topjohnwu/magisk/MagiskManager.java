@@ -20,13 +20,12 @@ import com.topjohnwu.magisk.asyncs.DownloadBusybox;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
+import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.superuser.SuReceiver;
 import com.topjohnwu.magisk.superuser.SuRequestActivity;
-import com.topjohnwu.magisk.utils.SafetyNetHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -72,7 +71,6 @@ public class MagiskManager extends Application {
     public String remoteManagerVersionString;
     public int remoteManagerVersionCode = -1;
     public String managerLink;
-    public SafetyNetHelper.Result SNCheckResult;
     public String bootBlock = null;
     public boolean isSuClient = false;
     public String suVersion = null;
@@ -103,6 +101,7 @@ public class MagiskManager extends Application {
     public String localeConfig;
     public int updateChannel;
     public String bootFormat;
+    public int snet_version;
 
     // Global resources
     public SharedPreferences prefs;
@@ -184,6 +183,7 @@ public class MagiskManager extends Application {
         updateNotification = prefs.getBoolean("notification", true);
         updateChannel = Utils.getPrefsInt(prefs, "update_channel", CheckUpdates.STABLE_CHANNEL);
         bootFormat = prefs.getString("boot_format", ".img");
+        snet_version = prefs.getInt("snet_version", -1);
     }
 
     public void toast(String msg, int duration) {
