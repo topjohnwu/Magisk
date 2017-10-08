@@ -399,7 +399,45 @@ static void simple_mount(const char *path) {
  * Miscellaneous *
  *****************/
 
-static void mount_mirrors() {
+// A one time setup
+void daemon_init() {
+	LOGI("* Creating /sbin overlay");
+	DIR *dir;
+	struct dirent *entry;
+	int root, sbin;
+	char target[PATH_MAX], linkpath[PATH_MAX];
+	// Setup links under /sbin
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	xmkdir("/root", 0755);
+	xchmod("/root", 0755);
+	root = xopen("/root", O_RDONLY | O_CLOEXEC);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	dir = fdopendir(sbin);
+	while((entry = readdir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		linkat(sbin, entry->d_name, root, entry->d_name, 0);
+		if (strcmp(entry->d_name, "magisk") == 0)
+			unlinkat(sbin, entry->d_name, 0);
+	}
+	close(sbin);
+	mount("tmpfs", "/sbin", "tmpfs", 0, NULL);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	fchmod(sbin, 0755);
+	fsetfilecon(sbin, "u:object_r:rootfs:s0");
+	dir = fdopendir(root);
+	while((entry = readdir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		snprintf(target, sizeof(target), "/root/%s", entry->d_name);
+		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", entry->d_name);
+		symlink(target, linkpath);
+	}
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", applet[i]);
+		symlink("/root/magisk", linkpath);
+	}
+	xmkdir("/magisk", 0755);
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+
 	LOGI("* Mounting mirrors");
 	struct vector mounts;
 	vec_init(&mounts);
@@ -451,9 +489,8 @@ static void mount_mirrors() {
 	}
 	mkdir_p(MIRRDIR "/bin", 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
-}
 
-static void link_busybox() {
+	LOGI("* Setting up internal busybox");
 	mkdir_p(BBPATH, 0755);
 	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
 	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
@@ -595,9 +632,8 @@ void post_fs_data(int client) {
 		exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 	}
 
-	// Link busybox
-	mount_mirrors();
-	link_busybox();
+	// Initialize
+	daemon_init();
 
 	// Merge images
 	if (merge_img("/data/magisk_merge.img", MAINIMG)) {

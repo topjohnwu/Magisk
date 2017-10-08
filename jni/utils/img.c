@@ -51,20 +51,13 @@ static char *loopsetup(const char *img) {
 int create_img(const char *img, int size) {
 	unlink(img);
 	LOGI("Create %s with size %dM\n", img, size);
-	// Create a temp file with the file contexts
-	char file_contexts[] = "/magisk(/.*)? u:object_r:system_file:s0\n";
-	// If not root, attempt to create in current diretory
-	char *filename = getuid() == UID_ROOT ? "/dev/file_contexts_image" : "file_contexts_image";
-	int ret, fd = xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	xwrite(fd, file_contexts, sizeof(file_contexts));
-	close(fd);
+	int ret;
 
 	char buffer[16];
 	snprintf(buffer, sizeof(buffer), "%dM", size);
-	ret = exec_command_sync("make_ext4fs", "-l", buffer, "-a", "/magisk", "-S", filename, img, NULL);
+	ret = exec_command_sync("make_ext4fs", "-l", buffer, img, NULL);
 	if (ret < 0)
 		return 1;
-	unlink(filename);
 	return ret;
 }
 

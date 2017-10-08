@@ -167,32 +167,25 @@ void ps_filter_proc_name(const char *pattern, void (*func)(int)) {
 	ps(proc_name_filter);
 }
 
-#define DEV_BLOCK "/dev/block"
-
 void unlock_blocks() {
-	char path[PATH_MAX];
 	DIR *dir;
 	struct dirent *entry;
-	int fd, OFF = 0;
+	int fd, dev, OFF = 0;
 
-	if (!(dir = xopendir(DEV_BLOCK)))
+	if ((dev = xopen("/dev/block", O_RDONLY | O_CLOEXEC)) < 0)
 		return;
+	dir = fdopendir(dev);
 
 	while((entry = readdir(dir))) {
-		if (entry->d_type == DT_BLK &&
-			strstr(entry->d_name, "ram") == NULL &&
-			strstr(entry->d_name, "loop") == NULL) {
-			snprintf(path, sizeof(path), "%s/%s", DEV_BLOCK, entry->d_name);
-			if ((fd = xopen(path, O_RDONLY)) < 0)
+		if (entry->d_type == DT_BLK) {
+			if ((fd = openat(dev, entry->d_name, O_RDONLY)) < 0)
 				continue;
-
 			if (ioctl(fd, BLKROSET, &OFF) == -1)
-				PLOGE("unlock %s", path);
+				PLOGE("unlock %s", entry->d_name);
 			close(fd);
 		}
 	}
-
-	closedir(dir);
+	close(dev);
 }
 
 void setup_sighandlers(void (*handler)(int)) {

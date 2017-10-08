@@ -12,7 +12,6 @@ void proc_monitor();
 // Utility functions
 void manage_selinux();
 void hide_sensitive_props();
-void relink_sbin();
 void clean_magisk_props();
 
 // List managements

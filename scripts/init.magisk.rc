@@ -2,19 +2,23 @@
 
 on post-fs
     start logd
+    start magisk_daemon
+    wait /dev/.magisk.unblock 1
     start magisk_pfs
-    wait /dev/.magisk.unblock 20
+    wait /dev/.magisk.unblock 5
 
 on post-fs-data
     rm /dev/.magisk.unblock
     load_persist_props
     start magisk_pfsd
-    wait /dev/.magisk.unblock 60
-
-on property:magisk.restart_pfsd=1
-    trigger post-fs-data
+    wait /dev/.magisk.unblock 10
 
 # Services
+
+# Self recoverable service
+service magisk_daemon /sbin/magisk --daemon
+    user root
+    seclabel u:r:su:s0
 
 # launch post-fs script
 service magisk_pfs /sbin/magisk --post-fs

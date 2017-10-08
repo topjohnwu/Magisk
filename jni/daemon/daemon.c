@@ -114,25 +114,7 @@ static void *large_sepol_patch(void *args) {
 	return NULL;
 }
 
-void start_daemon(int client) {
-	// Launch the daemon, create new session, set proper context
-	if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
-		fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
-		PLOGE("start daemon");
-	}
-
-	switch (fork()) {
-	case -1:
-		PLOGE("fork");
-	case 0:
-		break;
-	default:
-		return;
-	}
-
-	// First close the client, it's useless for us
-	close(client);
-	xsetsid();
+void start_daemon() {
 	setcon("u:r:su:s0");
 	umask(0);
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
@@ -166,13 +148,6 @@ void start_daemon(int client) {
 	// Unlock all blocks for rw
 	unlock_blocks();
 
-	// Setup links under /sbin
-	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-	create_links(NULL, "/sbin");
-	xchmod("/sbin", 0755);
-	xmkdir("/magisk", 0755);
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-
 	// Loop forever to listen for requests
 	while(1) {
 		int *client = xmalloc(sizeof(int));
@@ -189,11 +164,26 @@ int connect_daemon() {
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
 	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
-		/* If we cannot access the daemon, we start the daemon
-		 * since there is no clear entry point when the daemon should be started
-		 */
-		LOGD("client: connect fail, try launching new daemon process\n");
-		start_daemon(fd);
+		// If we cannot access the daemon, we start a daemon in the child process if possible
+
+		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
+			fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
+			PLOGE("start daemon");
+		}
+
+		switch (fork()) {
+		case -1:
+			PLOGE("fork");
+		case 0:
+			LOGD("client: connect fail, try launching new daemon process\n");
+			close(fd);
+			xsetsid();
+			start_daemon();
+			break;
+		default:
+			break;
+		}
+
 		do {
 			// Wait for 10ms
 			usleep(10);
