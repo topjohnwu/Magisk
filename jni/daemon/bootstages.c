@@ -28,10 +28,6 @@ static int seperate_vendor = 0;
 
 extern char **environ;
 
-#ifdef MAGISK_DEBUG
-static int debug_log_pid, debug_log_fd;
-#endif
-
 /******************
  * Node structure *
  ******************/
@@ -599,15 +595,8 @@ void post_fs_data(int client) {
 	if (!check_data())
 		goto unblock;
 
-	// Start log monitor
-	monitor_logs();
-
-#ifdef MAGISK_DEBUG
-	// Log everything initially
-	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	xwrite(debug_log_fd, "Boot logs:\n", 11);
-	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "thread", NULL);
-#endif
+	// Start the debug log
+	start_debug_full_log();
 
 	LOGI("** post-fs-data mode running\n");
 
@@ -804,12 +793,5 @@ core_only:
 	buf = buf2 = NULL;
 	vec_deep_destroy(&module_list);
 
-#ifdef MAGISK_DEBUG
-	// Stop recording the boot logcat after every boot task is done
-	kill(debug_log_pid, SIGTERM);
-	waitpid(debug_log_pid, NULL, 0);
-	// Then start to log Magisk verbosely
-	xwrite(debug_log_fd, "\nVerbose logs:\n", 15);
-	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "thread", "-s", "Magisk", NULL);
-#endif
+	stop_debug_full_log();
 }

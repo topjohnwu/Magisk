@@ -408,3 +408,14 @@ int switch_mnt_ns(int pid) {
 	close(fd);
 	return ret;
 }
+
+int fork_dont_care() {
+	int pid = fork();
+	if (pid) {
+		waitpid(pid, NULL, 0);
+		return pid;
+	} else if ((pid = fork())) {
+		exit(0);
+	}
+	return 0;
+}

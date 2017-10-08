@@ -50,10 +50,6 @@ void write_int(int fd, int val);
 char* read_string(int fd);
 void write_string(int fd, const char* val);
 
-// log_monitor.c
-
-void monitor_logs();
-
 /***************
  * Boot Stages *
  ***************/

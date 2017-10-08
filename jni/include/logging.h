@@ -34,6 +34,17 @@ static inline void do_nothing() {}
 
 #define PLOGE(fmt, args...) { LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno)); err_handler(); }
 
+enum {
+	HIDE_EVENT,
+	LOG_EVENT,
+	DEBUG_EVENT
+};
+extern int logcat_events[];
+
+void monitor_logs();
+void start_debug_full_log();
+void stop_debug_full_log();
+
 #else // IS_DAEMON
 
 #include <stdio.h>

@@ -123,6 +123,9 @@ void start_daemon() {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
+	// Start the log monitor
+	monitor_logs();
+
 	// Patch selinux with medium patch before we do anything
 	load_policydb(SELINUX_POLICY);
 	sepol_med_rules();
