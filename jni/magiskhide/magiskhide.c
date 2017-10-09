@@ -55,7 +55,7 @@ void launch_magiskhide(int client) {
 	hideEnabled = 1;
 	LOGI("* Starting MagiskHide\n");
 
-	deleteprop(MAGISKHIDE_PROP, 1);
+	deleteprop2(MAGISKHIDE_PROP, 1);
 
 	hide_sensitive_props();
 
@@ -102,7 +102,7 @@ void stop_magiskhide(int client) {
 	hideEnabled = 0;
 	setprop(MAGISKHIDE_PROP, "0");
 	// Remove without actually removing persist props
-	deleteprop(MAGISKHIDE_PROP, 0);
+	deleteprop2(MAGISKHIDE_PROP, 0);
 	pthread_kill(proc_monitor_thread, SIGUSR1);
 
 	write_int(client, DAEMON_SUCCESS);

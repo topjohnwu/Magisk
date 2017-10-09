@@ -58,9 +58,9 @@ void hide_sensitive_props() {
 	}
 }
 
-static void rm_magisk_prop(const char *name) {
+static void rm_magisk_prop(const char *name, const char *value) {
 	if (strstr(name, "magisk")) {
-		deleteprop(name, 0);
+		deleteprop2(name, 0);
 	}
 }
 
