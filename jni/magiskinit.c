@@ -197,8 +197,6 @@ static void parse_device(struct device *dev, char *uevent) {
 
 static int setup_block(struct device *dev, const char *partname) {
 	char buffer[1024], path[128];
-	mkdir("/sys", 0755);
-	mount("sysfs", "/sys", "sysfs", 0, NULL);
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
 	if (dir == NULL)
@@ -266,7 +264,8 @@ static void patch_sepolicy() {
 	if (sepolicy == NULL && access("/vendor/etc/selinux/precompiled_sepolicy", R_OK) == 0) {
 		void *sys_sha = NULL, *ven_sha = NULL;
 		size_t sys_size = 0, ven_size = 0;
-		dir = opendir("/vendor/etc/selinux");
+		if ((dir = opendir("/vendor/etc/selinux")) == NULL)
+			goto check_done;
 		while ((entry = readdir(dir))) {
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 				continue;
@@ -277,7 +276,8 @@ static void patch_sepolicy() {
 			}
 		}
 		closedir(dir);
-		dir = opendir("/system/etc/selinux");
+		if ((dir = opendir("/system/etc/selinux")) == NULL)
+			goto check_done;
 		while ((entry = readdir(dir))) {
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 				continue;
@@ -293,6 +293,8 @@ static void patch_sepolicy() {
 		munmap(sys_sha, sys_size);
 		munmap(ven_sha, ven_size);
 	}
+
+check_done:
 
 	if (sepolicy) {
 		load_policydb(sepolicy);
@@ -364,6 +366,9 @@ int main(int argc, char *argv[]) {
 		int root = open("/", O_RDONLY | O_CLOEXEC);
 		rm_rf(root);
 
+		mkdir("/sys", 0755);
+		mount("sysfs", "/sys", "sysfs", 0, NULL);
+
 		char partname[32];
 		snprintf(partname, sizeof(partname), "system%s", cmd.slot);
 
@@ -381,8 +386,10 @@ int main(int argc, char *argv[]) {
 			mv_dir(overlay, root);
 
 		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
-		setup_block(&dev, partname);
-		mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+
+		// We need to mount independent vendor partition
+		if (setup_block(&dev, partname) == 0)
+			mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 
 		patch_ramdisk();
 		patch_sepolicy();
