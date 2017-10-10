@@ -44,6 +44,7 @@ extern int logcat_events[];
 void monitor_logs();
 void start_debug_full_log();
 void stop_debug_full_log();
+void start_debug_log();
 
 #else // IS_DAEMON
 

@@ -551,11 +551,6 @@ static int prepare_img() {
  * Entry points *
  ****************/
 
-static void *start_magisk_hide(void *args) {
-	launch_magiskhide(-1);
-	return NULL;
-}
-
 static void unblock_boot_process() {
 	close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
 	pthread_exit(NULL);
@@ -728,14 +723,8 @@ core_only:
 		bind_mount(HOSTSFILE, "/system/etc/hosts");
 	}
 
-	// Enable magiskhide by default, only disable when set explicitly
-	char *hide_prop = getprop(MAGISKHIDE_PROP);
-	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
-		pthread_t thread;
-		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
-		pthread_detach(thread);
-	}
-	free(hide_prop);
+	auto_start_magiskhide();
+
 
 unblock:
 	unblock_boot_process();

@@ -15,8 +15,7 @@
 #include "utils.h"
 
 int logcat_events[] = { -1, -1, -1 };
-
-static int is_restart = 0;
+extern int is_restart;
 
 #ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
@@ -120,19 +119,9 @@ static void *debug_magisk_log_thread(void *args) {
 void monitor_logs() {
 	pthread_t thread;
 
-	is_restart = check_data();
-
 	// Start log file dumper before monitor
 	xpthread_create(&thread, NULL, magisk_log_thread, NULL);
 	pthread_detach(thread);
-
-#ifdef MAGISK_DEBUG
-	if (is_restart) {
-		// Restart debug logs
-		xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
-		pthread_detach(thread);
-	}
-#endif
 
 	// Start logcat monitor
 	xpthread_create(&thread, NULL, logger_thread, NULL);
@@ -154,6 +143,16 @@ void stop_debug_full_log() {
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
+	pthread_t thread;
+	// Start debug thread
+	xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
+	pthread_detach(thread);
+	start_debug_log();
+#endif
+}
+
+void start_debug_log() {
+#ifdef MAGISK_DEBUG
 	pthread_t thread;
 	// Start debug thread
 	xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);

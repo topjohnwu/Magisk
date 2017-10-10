@@ -21,8 +21,10 @@
 #include "utils.h"
 #include "daemon.h"
 #include "magiskpolicy.h"
+#include "resetprop.h"
 
 pthread_t sepol_patch;
+int is_restart = 0;
 
 static void *request_handler(void *args) {
 	// Setup the default error handler for threads
@@ -114,6 +116,21 @@ static void *large_sepol_patch(void *args) {
 	return NULL;
 }
 
+static void *start_magisk_hide(void *args) {
+	launch_magiskhide(-1);
+	return NULL;
+}
+
+void auto_start_magiskhide() {
+	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
+	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
+		pthread_t thread;
+		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
+		pthread_detach(thread);
+	}
+	free(hide_prop);
+}
+
 void start_daemon() {
 	setcon("u:r:su:s0");
 	umask(0);
@@ -123,8 +140,16 @@ void start_daemon() {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
+	if ((is_restart = check_data())) {
+		// Restart many stuffs
+		auto_start_magiskhide();
+		start_debug_log();
+	}
+
 	// Start the log monitor
 	monitor_logs();
+
+	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Patch selinux with medium patch before we do anything
 	load_policydb(SELINUX_POLICY);
@@ -145,8 +170,6 @@ void start_daemon() {
 	// The root daemon should not do anything if an error occurs
 	// It should stay intact under any circumstances
 	err_handler = do_nothing;
-
-	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Unlock all blocks for rw
 	unlock_blocks();

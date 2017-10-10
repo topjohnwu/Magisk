@@ -124,6 +124,8 @@ int magiskhide_main(int argc, char *argv[]) {
 		req = RM_HIDELIST;
 	} else if (strcmp(argv[1], "--ls") == 0) {
 		req = LS_HIDELIST;
+	} else {
+		usage(argv[0]);
 	}
 	int fd = connect_daemon();
 	write_int(fd, req);
