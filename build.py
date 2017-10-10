@@ -210,15 +210,15 @@ def gen_update_binary():
 	if not os.path.exists(binary):
 		error('Please build \'binary\' before zipping!')
 	with open(binary, 'rb') as b64xz:
-		update_bin.append('#! /sbin/sh\nEX_ARM=')
-		update_bin.append(''.join("\\\\x{:02X}".format(c) for c in b64xz.read()))
+		update_bin.append('#! /sbin/sh\nEX_ARM=\'')
+		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
 	binary = os.path.join('libs', 'x86', 'b64xz')
 	with open(binary, 'rb') as b64xz:
-		update_bin.append('\nEX_X86=')
-		update_bin.append(''.join("\\\\x{:02X}".format(c) for c in b64xz.read()))
+		update_bin.append('\'\nEX_X86=\'')
+		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
 	binary = os.path.join('libs', 'armeabi-v7a', 'busybox')
 	with open(binary, 'rb') as busybox:
-		update_bin.append('\nBB_ARM=')
+		update_bin.append('\'\nBB_ARM=')
 		update_bin.append(base64.b64encode(lzma.compress(busybox.read())).decode('ascii'))
 	binary = os.path.join('libs', 'x86', 'busybox')
 	with open(binary, 'rb') as busybox:
