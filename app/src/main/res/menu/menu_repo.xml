@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/repo_search"
+        android:title=""
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always"/>
 </menu>

@@ -56,9 +56,9 @@
                 android:ellipsize="marquee"
                 android:gravity="center_vertical"
                 android:marqueeRepeatLimit="marquee_forever"
-                android:maxLines="1"
                 android:paddingEnd="3dp"
-                android:paddingStart="3dp"/>
+                android:paddingStart="3dp"
+                android:singleLine="true"/>
         </LinearLayout>
 
         <LinearLayout

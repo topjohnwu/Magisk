@@ -34,7 +34,7 @@
     <string name="uninstall">Désinstaller</string>
     <string name="reboot_countdown">Redémarrage dans %1$d</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
-	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si ce n'est actuellement pas le cas</string>
+	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si ce n\'est actuellement pas le cas</string>
 	<string name="update">Mise à jour %1$s</string>
     <!--Module Fragment-->
     <string name="no_info_provided">(Aucune information transmise)</string>
