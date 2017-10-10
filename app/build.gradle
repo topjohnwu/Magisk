@@ -60,7 +60,7 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
-    implementation 'com.atlassian.commonmark:commonmark:0.9.0'
+    implementation 'com.atlassian.commonmark:commonmark:0.10.0'
     implementation 'org.kamranzafar:jtar:2.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }
