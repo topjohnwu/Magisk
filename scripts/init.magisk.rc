@@ -3,13 +3,14 @@
 on post-fs
     start logd
     start magisk_daemon
-    wait /dev/.magisk.unblock 1
-    start magisk_pfs
     wait /dev/.magisk.unblock 5
+    rm /dev/.magisk.unblock
+    start magisk_pfs
+    wait /dev/.magisk.unblock 10
 
 on post-fs-data
-    rm /dev/.magisk.unblock
     load_persist_props
+    rm /dev/.magisk.unblock
     start magisk_pfsd
     wait /dev/.magisk.unblock 10
 

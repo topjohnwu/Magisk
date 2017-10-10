@@ -29,10 +29,8 @@ static void *logger_thread(void *args) {
 	char line[4096];
 
 	while (1) {
-		// Clear buffer
-		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 		// Start logcat
-		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "events", "-b", "default", "-s", "am_proc_start", "Magisk", NULL);
+		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "all" , "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
 		while (fdgets(line, sizeof(line), log_fd)) {
 			for (int i = 0; i < (sizeof(logcat_events) / sizeof(int)); ++i) {
 				if (logcat_events[i] > 0) {
@@ -43,6 +41,8 @@ static void *logger_thread(void *args) {
 			if (kill(log_pid, 0))
 				break;
 		}
+		// Clear buffer if restart required
+		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 	}
 
 	// Should never be here, but well...
@@ -133,7 +133,7 @@ void start_debug_full_log() {
 #ifdef MAGISK_DEBUG
 	// Log everything initially
 	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", NULL);
+	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "threadtime", NULL);
 	close(debug_log_fd);
 #endif
 }

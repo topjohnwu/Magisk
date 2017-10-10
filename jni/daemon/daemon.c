@@ -140,8 +140,9 @@ void start_daemon() {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
-	if ((is_restart = check_data())) {
-		// Restart many stuffs
+	if ((is_restart = access(UNBLOCKFILE, F_OK) == 0)) {
+		// Restart stuffs if the daemon is restarted
+		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 		auto_start_magiskhide();
 		start_debug_log();
 	}
@@ -173,6 +174,9 @@ void start_daemon() {
 
 	// Unlock all blocks for rw
 	unlock_blocks();
+
+	// Notifiy init the daemon is started
+	close(open(UNBLOCKFILE, O_RDONLY));
 
 	// Loop forever to listen for requests
 	while(1) {
