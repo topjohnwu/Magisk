@@ -6,19 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <dirent.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <pwd.h>
 #include <signal.h>
-#include <errno.h>
 #include <sched.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <selinux/selinux.h>
 
 #include "logging.h"
 #include "utils.h"
@@ -281,27 +276,6 @@ int exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char 
 	return pid;
 }
 
-int mkdir_p(const char *pathname, mode_t mode) {
-	char *path = strdup(pathname), *p;
-	errno = 0;
-	for (p = path + 1; *p; ++p) {
-		if (*p == '/') {
-			*p = '\0';
-			if (mkdir(path, mode) == -1) {
-				if (errno != EEXIST)
-					return -1;
-			}
-			*p = '/';
-		}
-	}
-	if (mkdir(path, mode) == -1) {
-		if (errno != EEXIST)
-			return -1;
-	}
-	free(path);
-	return 0;
-}
-
 int bind_mount(const char *from, const char *to) {
 	int ret = xmount(from, to, NULL, MS_BIND, NULL);
 #ifdef MAGISK_DEBUG
@@ -314,79 +288,6 @@ int bind_mount(const char *from, const char *to) {
 
 int open_new(const char *filename) {
 	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-}
-
-int cp_afc(const char *source, const char *target) {
-	struct stat buf;
-	xlstat(source, &buf);
-
-	if (S_ISDIR(buf.st_mode)) {
-		DIR *dir;
-		struct dirent *entry;
-		char *s_path, *t_path;
-
-		if (!(dir = xopendir(source)))
-			return 1;
-
-		s_path = xmalloc(PATH_MAX);
-		t_path = xmalloc(PATH_MAX);
-
-		mkdir_p(target, 0755);
-		clone_attr(source, target);
-
-		while ((entry = xreaddir(dir))) {
-			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-				continue;
-			snprintf(s_path, PATH_MAX, "%s/%s", source, entry->d_name);
-			snprintf(t_path, PATH_MAX, "%s/%s", target, entry->d_name);
-			cp_afc(s_path, t_path);
-		}
-		free(s_path);
-		free(t_path);
-
-		closedir(dir);
-	} else{
-		unlink(target);
-		if (S_ISREG(buf.st_mode)) {
-			int sfd, tfd;
-			sfd = xopen(source, O_RDONLY);
-			tfd = xopen(target, O_WRONLY | O_CREAT | O_TRUNC);
-			xsendfile(tfd, sfd, NULL, buf.st_size);
-			fclone_attr(sfd, tfd);
-			close(sfd);
-			close(tfd);
-		} else if (S_ISLNK(buf.st_mode)) {
-			char buffer[PATH_MAX];
-			xreadlink(source, buffer, sizeof(buffer));
-			xsymlink(buffer, target);
-			clone_attr(source, target);
-		} else {
-			return 1;
-		}
-	}
-	return 0;
-}
-
-void clone_attr(const char *source, const char *target) {
-	struct stat buf;
-	lstat(target, &buf);
-	chmod(target, buf.st_mode & 0777);
-	chown(target, buf.st_uid, buf.st_gid);
-	char *con;
-	lgetfilecon(source, &con);
-	lsetfilecon(target, con);
-	free(con);
-}
-
-void fclone_attr(const int sourcefd, const int targetfd) {
-	struct stat buf;
-	fstat(sourcefd, &buf);
-	fchmod(targetfd, buf.st_mode & 0777);
-	fchown(targetfd, buf.st_uid, buf.st_gid);
-	char *con;
-	fgetfilecon(sourcefd, &con);
-	fsetfilecon(targetfd, con);
-	free(con);
 }
 
 void get_client_cred(int fd, struct ucred *cred) {

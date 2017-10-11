@@ -523,7 +523,7 @@ static int prepare_img() {
 			snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
 			if (access(buf, F_OK) == 0) {
 				snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
-				exec_command_sync(BBPATH "/rm", "-rf", buf, NULL);
+				rm_rf(buf);
 				continue;
 			}
 			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
@@ -608,10 +608,9 @@ void post_fs_data(int client) {
 	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
 		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
 	if (bin_path) {
-		exec_command_sync("rm", "-rf", DATABIN, NULL);
-		exec_command_sync("cp", "-r", bin_path, DATABIN, NULL);
-		exec_command_sync("rm", "-rf", bin_path, NULL);
-		exec_command_sync("chmod", "-R", "755", bin_path, NULL);
+		rm_rf(DATABIN);
+		cp_afc(bin_path, DATABIN);
+		rm_rf(bin_path);
 		// Lazy.... use shell blob to match files
 		exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 	}

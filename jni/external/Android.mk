@@ -14,6 +14,14 @@ LOCAL_C_INCLUDES := $(LIBSELINUX)
 LOCAL_SRC_FILES := stubs/selinux_stub.c
 include $(BUILD_SHARED_LIBRARY)
 
+# libselinux_static.a (stub)
+include $(CLEAR_VARS)
+LOCAL_MODULE:= libselinux_static
+LOCAL_C_INCLUDES := $(LIBSELINUX)
+LOCAL_SRC_FILES := stubs/selinux_stub.c
+include $(BUILD_STATIC_LIBRARY)
+
+
 # libfdt
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libfdt

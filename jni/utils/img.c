@@ -176,7 +176,7 @@ int merge_img(const char *source, const char *target) {
 			snprintf(buffer, sizeof(buffer), "%s/%s", TARGET_TMP, entry->d_name);
 			if (access(buffer, F_OK) == 0) {
 				LOGI("Upgrade module: %s\n", entry->d_name);
-				exec_command_sync(BBPATH "/rm", "-rf", buffer, NULL);
+				rm_rf(buffer);
 			} else {
 				LOGI("New module: %s\n", entry->d_name);
 			}

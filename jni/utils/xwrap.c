@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <errno.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>

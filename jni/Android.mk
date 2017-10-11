@@ -40,6 +40,7 @@ LOCAL_SRC_FILES := \
 	utils/xwrap.c \
 	utils/list.c \
 	utils/img.c \
+	utils/file.c \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
@@ -92,11 +93,12 @@ include $(BUILD_EXECUTABLE)
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_STATIC_LIBRARIES := libsepol
-LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
+LOCAL_STATIC_LIBRARIES := libsepol libselinux_static
+LOCAL_C_INCLUDES := jni/include $(LIBSEPOL) $(LIBSELINUX)
 LOCAL_SRC_FILES := \
 	magiskinit.c \
 	magiskboot/boot_utils.c \
+	utils/file.c \
 	utils/xwrap.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
