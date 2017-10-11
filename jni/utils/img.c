@@ -2,6 +2,7 @@
  */
 
 #include <unistd.h>
+#include <libgen.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
@@ -96,7 +97,7 @@ int resize_img(const char *img, int size) {
 	if (e2fsck(img))
 		return 1;
 	char buffer[128];
-	int pid, status, fd = -1;
+	int pid, fd = -1, used, total;
 	snprintf(buffer, sizeof(buffer), "%dM", size);
 	pid = exec_command(1, &fd, NULL, "resize2fs", img, buffer, NULL);
 	if (pid < 0)
@@ -104,8 +105,32 @@ int resize_img(const char *img, int size) {
 	while (fdgets(buffer, sizeof(buffer), fd))
 		LOGD("magisk_img: %s", buffer);
 	close(fd);
-	waitpid(pid, &status, 0);
-	return WEXITSTATUS(status);
+	waitpid(pid, NULL, 0);
+
+	// Double check our image size
+	get_img_size(img, &used, &total);
+	if (total != size) {
+		// Sammy crap occurs or resize2fs failed, lets create a new image!
+		char *dir = dirname(img);
+		snprintf(buffer, sizeof(buffer), "%s/tmp.img", dir);
+		create_img(buffer, size);
+		char *s_loop, *t_loop;
+		s_loop = mount_image(img, SOURCE_TMP);
+		if (s_loop == NULL) return 1;
+		t_loop = mount_image(buffer, TARGET_TMP);
+		if (t_loop == NULL) return 1;
+
+		cp_afc(SOURCE_TMP, TARGET_TMP);
+		umount_image(SOURCE_TMP, s_loop);
+		umount_image(TARGET_TMP, t_loop);
+		rmdir(SOURCE_TMP);
+		rmdir(TARGET_TMP);
+		free(s_loop);
+		free(t_loop);
+		rename(buffer, img);
+	}
+
+	return 0;
 }
 
 char *mount_image(const char *img, const char *target) {
@@ -150,7 +175,7 @@ int merge_img(const char *source, const char *target) {
 	get_img_size(source, &s_used, &s_total);
 	get_img_size(target, &t_used, &t_total);
 	n_total = round_size(s_used + t_used);
-	if (n_total != t_total)
+	if (n_total > t_total)
 		resize_img(target, n_total);
 
 	xmkdir(SOURCE_TMP, 0755);
