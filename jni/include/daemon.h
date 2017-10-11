@@ -59,6 +59,7 @@ void write_string(int fd, const char* val);
 void post_fs(int client);
 void post_fs_data(int client);
 void late_start(int client);
+void fix_filecon();
 
 /**************
  * MagiskHide *

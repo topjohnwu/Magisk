@@ -396,7 +396,7 @@ static void simple_mount(const char *path) {
  *****************/
 
 // A one time setup
-void daemon_init() {
+static void daemon_init() {
 	LOGI("* Creating /sbin overlay");
 	DIR *dir;
 	struct dirent *entry;
@@ -493,6 +493,12 @@ void daemon_init() {
 }
 
 static int prepare_img() {
+	// First merge images
+	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
+		LOGE("Image merge %s -> %s failed!\n", "/data/magisk_merge.img", MAINIMG);
+		return 1;
+	}
+
 	if (access(MAINIMG, F_OK) == -1) {
 		if (create_img(MAINIMG, 64))
 			return 1;
@@ -544,7 +550,18 @@ static int prepare_img() {
 	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
 	free(magiskloop);
 
+	// Fix file seliux contexts
+	fix_filecon();
 	return 0;
+}
+
+void fix_filecon() {
+	int dirfd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
+	restorecon(dirfd, 0);
+	close(dirfd);
+	dirfd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);
+	restorecon(dirfd, 1);
+	close(dirfd);
 }
 
 /****************
@@ -618,12 +635,6 @@ void post_fs_data(int client) {
 	// Initialize
 	daemon_init();
 
-	// Merge images
-	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
-		LOGE("Image merge %s -> %s failed!\n", "/data/magisk_merge.img", MAINIMG);
-		goto unblock;
-	}
-
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
@@ -632,7 +643,7 @@ void post_fs_data(int client) {
 		return;
 	}
 
-	// Trim, mount magisk.img, which will also travel through the modules
+	// Merge, trim, mount magisk.img, which will also travel through the modules
 	// After this, it will create the module list
 	if (prepare_img())
 		goto core_only; // Mounting fails, we can only do core only stuffs

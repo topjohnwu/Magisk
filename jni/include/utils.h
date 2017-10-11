@@ -110,6 +110,7 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
+void restorecon(int dirfd, int force);
 
 // img.c
 

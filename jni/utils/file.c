@@ -270,3 +270,35 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	fgetattr(sourcefd, &a);
 	fsetattr(targetfd, &a);
 }
+
+#define UNLABEL_CON "u:object_r:unlabeled:s0"
+#define SYSTEM_CON  "u:object_r:system_file:s0"
+
+void restorecon(int dirfd, int force) {
+	struct dirent *entry;
+	DIR *dir;
+	int fd;
+	char *con;
+
+	fgetfilecon(dirfd, &con);
+	if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+		fsetfilecon(dirfd, SYSTEM_CON);
+	freecon(con);
+
+	dir = fdopendir(dirfd);
+	while ((entry = readdir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		if (entry->d_type == DT_DIR) {
+			fd = openat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			restorecon(fd, force);
+		} else {
+			fd = openat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
+			fgetfilecon(fd, &con);
+			if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+				fsetfilecon(fd, SYSTEM_CON);
+			freecon(con);
+		}
+		close(fd);
+	}
+}
