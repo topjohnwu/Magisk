@@ -110,8 +110,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
             // Disable dangerous settings in user mode if selected owner manage
             if (getActivity().getApplicationInfo().uid > 99999) {
-                prefScreen.removePreference(magiskCategory);
-                prefScreen.removePreference(suCategory);
+                suCategory.removePreference(multiuserMode);
                 generalCatagory.removePreference(hideManager);
             }
 
