@@ -307,9 +307,6 @@ int su_daemon_main(int argc, char **argv) {
 		optind++;
 	}
 
-	// Setup done, now every error leads to deny
-	err_handler = deny;
-
 	// Handle namespaces
 	switch (su_ctx->info->mnt_ns) {
 	case NAMESPACE_MODE_GLOBAL:
