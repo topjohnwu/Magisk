@@ -5,6 +5,7 @@
 #include <lzma.h>
 #include <lz4.h>
 #include <lz4frame.h>
+#include <lz4hc.h>
 #include <bzlib.h>
 
 #include "magiskboot.h"
@@ -37,8 +38,6 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 		case 1:
 			ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
 			break;
-		default:
-			LOGE("Unsupported gzip mode!\n");
 	}
 
 	if (ret != Z_OK)
@@ -98,7 +97,7 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	unsigned char out[BUFSIZ];
 
 	// Initialize preset
-	lzma_lzma_preset(&opt, LZMA_PRESET_DEFAULT);
+	lzma_lzma_preset(&opt, 9);
 	lzma_filter filters[] = {
 		{ .id = LZMA_FILTER_LZMA2, .options = &opt },
 		{ .id = LZMA_VLI_UNKNOWN, .options = NULL },
@@ -114,8 +113,6 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 		case 2:
 			ret = lzma_alone_encoder(&strm, &opt);
 			break;
-		default:
-			LOGE("Unsupported lzma mode!\n");
 	}
 
 
@@ -168,8 +165,6 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 		case 1:
 			ret = LZ4F_createCompressionContext(&cctx, LZ4F_VERSION);
 			break;
-		default:
-			LOGE("Unsupported lz4 mode!\n");
 	}
 
 	if (LZ4F_isError(ret))
@@ -283,8 +278,6 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 		case 1:
 			ret = BZ2_bzCompressInit(&strm, 9, 0, 0);
 			break;
-		default:
-			LOGE("Unsupported bzip2 mode!\n");
 	}
 
 	if (ret != BZ_OK)
@@ -333,11 +326,10 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 
 // Mode: 0 = decode; 1 = encode
 size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
-	size_t pos = 0, total = 0;
+	size_t pos = 0;
 	int have;
 	char *out;
-	unsigned block_size, insize;
-	unsigned char block_size_le[4];
+	unsigned block_size, insize, total = 0;
 
 	switch(mode) {
 		case 0:
@@ -350,22 +342,17 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 			// Write magic
 			total += xwrite(fd, "\x02\x21\x4c\x18", 4);
 			break;
-		default:
-			LOGE("Unsupported lz4_legacy mode!\n");
 	}
 
 	do {
-		const char *buff = buf;
 		switch(mode) {
 			case 0:
-				block_size = buff[pos];
-				block_size += (buff[pos + 1]<<8);
-				block_size += (buff[pos + 2]<<16);
-				block_size += ((unsigned)buff[pos + 3])<<24;
+				// Read block size
+				block_size = *(unsigned *)(buf + pos);
 				pos += 4;
 				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
-					LOGE("lz4_legacy block size too large!\n");
-				have = LZ4_decompress_safe((const char*) (buf + pos), out, block_size, LZ4_LEGACY_BLOCKSIZE);
+					goto done;
+				have = LZ4_decompress_safe(buf + pos, out, block_size, LZ4_LEGACY_BLOCKSIZE);
 				if (have < 0)
 					LOGE("Cannot decode lz4_legacy block\n");
 				pos += block_size;
@@ -375,21 +362,24 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 					insize = size - pos;
 				else
 					insize = LZ4_LEGACY_BLOCKSIZE;
-				have = LZ4_compress_default((const char*) (buf + pos), out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
+				have = LZ4_compress_HC(buf + pos, out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE), 9);
 				if (have == 0)
 					LOGE("lz4_legacy compression error\n");
 				pos += insize;
-				block_size_le[0] = have & 0xff;
-				block_size_le[1] = (have >> 8) & 0xff;
-				block_size_le[2] = (have >> 16) & 0xff;
-				block_size_le[3] = (have >> 24) & 0xff;
-				total += xwrite(fd, block_size_le, 4);
+				// Write block size
+				total += xwrite(fd, &have, sizeof(have));
 				break;
 		}
 		// Write main data
 		total += xwrite(fd, out, have);
 	} while(pos < size);
 
+done:
+	if (mode == 1) {
+		// Append original size to output
+		unsigned uncomp = size;
+		xwrite(fd, &uncomp, sizeof(uncomp));
+	}
 	free(out);
 	return total;
 }
