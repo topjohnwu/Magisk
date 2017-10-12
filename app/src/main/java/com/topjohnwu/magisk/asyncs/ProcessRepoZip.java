@@ -35,7 +35,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     private boolean mInstall;
     private String mLink;
     private File mFile;
-    private int progress = 0, total;
+    private int progress = 0, total = -1;
 
     private static final int UPDATE_DL_PROG = 0;
     private static final int SHOW_PROCESSING = 1;
@@ -105,9 +105,17 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         try {
 
             // Request zip from Internet
-            HttpURLConnection conn = WebService.request(mLink, null);
-            if (conn == null) return false;
-            total = conn.getContentLength();
+            HttpURLConnection conn;
+            do {
+                conn = WebService.request(mLink, null);
+                if (conn == null) return null;
+                total = conn.getContentLength();
+                if (total < 0)
+                    conn.disconnect();
+                else
+                    break;
+            } while (true);
+
             InputStream in = new ProgressUpdateInputStream(conn.getInputStream());
 
             // Temp files
