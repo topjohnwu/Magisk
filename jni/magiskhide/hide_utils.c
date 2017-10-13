@@ -187,7 +187,6 @@ int destroy_list() {
 }
 
 void add_hide_list(int client) {
-	err_handler = do_nothing;
 	char *proc = read_string(client);
 	// ack
 	write_int(client, add_list(proc));
@@ -195,7 +194,6 @@ void add_hide_list(int client) {
 }
 
 void rm_hide_list(int client) {
-	err_handler = do_nothing;
 	char *proc = read_string(client);
 	// ack
 	write_int(client, rm_list(proc));
@@ -203,7 +201,6 @@ void rm_hide_list(int client) {
 }
 
 void ls_hide_list(int client) {
-	err_handler = do_nothing;
 	if (!hideEnabled) {
 		write_int(client, HIDE_NOT_ENABLED);
 		return;

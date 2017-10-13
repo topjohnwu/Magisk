@@ -27,9 +27,6 @@ pthread_t sepol_patch;
 int is_restart = 0;
 
 static void *request_handler(void *args) {
-	// Setup the default error handler for threads
-	err_handler = exit_thread;
-
 	int client = *((int *) args);
 	free(args);
 	client_request req = read_int(client);
@@ -168,9 +165,6 @@ void start_daemon() {
 
 	// Change process name
 	strcpy(argv0, "magisk_daemon");
-	// The root daemon should not do anything if an error occurs
-	// It should stay intact under any circumstances
-	err_handler = do_nothing;
 
 	// Unlock all blocks for rw
 	unlock_blocks();

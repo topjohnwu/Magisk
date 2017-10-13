@@ -24,7 +24,6 @@ static int zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
 
 // Workaround for the lack of pthread_cancel
 static void quit_pthread(int sig) {
-	err_handler = do_nothing;
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
 	hideEnabled = 0;
@@ -37,11 +36,6 @@ static void quit_pthread(int sig) {
 	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
-}
-
-static void proc_monitor_err() {
-	LOGE("proc_monitor: error occured, stopping magiskhide services\n");
-	quit_pthread(SIGUSR1);
 }
 
 static int read_namespace(const int pid, char* target, const size_t size) {
@@ -69,14 +63,8 @@ static void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmount Failed (%s)\n", mountpoint);
 }
 
-static void hide_daemon_err() {
-	LOGE("hide_daemon: error occured\n");
-}
-
 static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
-	// When an error occurs, report its failure
-	err_handler = hide_daemon_err;
 
 	char *line, buffer[PATH_MAX];
 	struct vector mount_list;
@@ -152,15 +140,12 @@ void proc_monitor() {
 	act.sa_handler = quit_pthread;
 	sigaction(SIGUSR1, &act, NULL);
 
-	// The error handler should stop magiskhide services
-	err_handler = proc_monitor_err;
-
 	cache_block[0] = '\0';
 
 	// Get the mount namespace of init
 	if (read_namespace(1, init_ns, 32)) {
 		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
-		proc_monitor_err();
+		quit_pthread(SIGUSR1);
 	}
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 

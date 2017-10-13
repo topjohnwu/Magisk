@@ -574,9 +574,6 @@ static void unblock_boot_process() {
 }
 
 void post_fs(int client) {
-	// Error handler
-	err_handler = unblock_boot_process;
-
 	LOGI("** post-fs mode running\n");
 	// ack
 	write_int(client, 0);
@@ -598,9 +595,6 @@ unblock:
 }
 
 void post_fs_data(int client) {
-	// Error handler
-	err_handler = unblock_boot_process;
-
 	// ack
 	write_int(client, 0);
 	close(client);

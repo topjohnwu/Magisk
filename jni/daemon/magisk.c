@@ -32,10 +32,6 @@ int create_links(const char *bin, const char *path) {
 	return ret;
 }
 
-// Global error hander function
-// Should be changed each thread/process
-__thread void (*err_handler)(void);
-
 static void usage() {
 	fprintf(stderr,
 		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
@@ -72,8 +68,6 @@ static void usage() {
 
 int main(int argc, char *argv[]) {
 	argv0 = argv[0];
-	// Exit the whole app if error occurs by default
-	err_handler = exit_proc;
 	char * arg = strrchr(argv[0], '/');
 	if (arg) ++arg;
 	else arg = argv[0];

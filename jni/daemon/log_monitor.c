@@ -22,9 +22,6 @@ static int debug_log_pid, debug_log_fd;
 #endif
 
 static void *logger_thread(void *args) {
-	// Setup error handler
-	err_handler = exit_thread;
-
 	int log_fd = -1, log_pid;
 	char line[4096];
 
@@ -50,9 +47,6 @@ static void *logger_thread(void *args) {
 }
 
 static void *magisk_log_thread(void *args) {
-	// Setup error handler
-	err_handler = exit_thread;
-
 	int have_data = 0;
 
 	// Temp buffer for logs before we have data access
@@ -95,9 +89,6 @@ static void *magisk_log_thread(void *args) {
 }
 
 static void *debug_magisk_log_thread(void *args) {
-	// Setup error handler
-	err_handler = exit_thread;
-
 	FILE *log = xfopen(DEBUG_LOG, "a");
 	setbuf(log, NULL);
 	int pipefd[2];

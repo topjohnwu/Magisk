@@ -243,9 +243,6 @@ static int v_exec_command(int err, int *fd, void (*setupenv)(struct vector*), co
 		return pid;
 	}
 
-	// Don't return to the daemon if anything goes wrong
-	err_handler = exit_proc;
-
 	if (fd) {
 		xdup2(writeEnd, STDOUT_FILENO);
 		if (err) xdup2(writeEnd, STDERR_FILENO);

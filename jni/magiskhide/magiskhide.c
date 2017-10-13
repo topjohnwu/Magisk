@@ -41,9 +41,6 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
-	// We manually handle crashes
-	err_handler = do_nothing;
-
 	if (hideEnabled) {
 		if (client > 0) {
 			write_int(client, HIDE_IS_ENABLED);
