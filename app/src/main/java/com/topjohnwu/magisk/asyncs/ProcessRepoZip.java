@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.container.InputStreamWrapper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -116,7 +117,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                     break;
             } while (true);
 
-            InputStream in = new ProgressUpdateInputStream(conn.getInputStream());
+            InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
 
             // Temp files
             File temp1 = new File(activity.getCacheDir(), "1.zip");
@@ -186,9 +187,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         return this;
     }
 
-    private class ProgressUpdateInputStream extends BufferedInputStream {
+    private class ProgressInputStream extends InputStreamWrapper {
 
-        ProgressUpdateInputStream(@NonNull InputStream in) {
+        ProgressInputStream(InputStream in) {
             super(in);
         }
 
