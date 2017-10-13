@@ -21,7 +21,6 @@
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Перевірку SafetyNet завершено</string>
-    <string name="safetyNet_no_response">Неможливо виконати перевірку SafetyNet</string>
     <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
     <string name="safetyNet_service_disconnected">Службу зупинено</string>
     <string name="safetyNet_res_invalid">Невірна відповідь</string>
@@ -37,7 +36,6 @@
     <string name="current_magisk_title">Поточна версія Magisk: %1$s</string>
     <string name="install_magisk_title">Найновіша версія Magisk: %1$s</string>
     <string name="uninstall">Видалити</string>
-    <string name="reboot_countdown">Перезавантаження через %1$d</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
 
@@ -177,12 +175,6 @@
     <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен</string>
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен</string>
-
-    <string name="settings_development_category">Розробники</string>
-    <string name="settings_developer_logging_title">Розширені логи</string>
-    <string name="settings_developer_logging_summary">Увімкнути детальне ведення логів налагодження</string>
-    <string name="settings_shell_logging_title">Логи команд оболонки</string>
-    <string name="settings_shell_logging_summary">Увімкнути детальний запис всіх команд оболонки і їх виведення</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>

@@ -19,7 +19,6 @@
     <string name="not_rooted">Nemáte root</string>
     <string name="safetyNet_check_text">Kliknutím zahájíte SafetyNet kontrolu</string>
     <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
-    <string name="safetyNet_no_response">Nelze zkontrolovat SafetyNet. Jste připojeni k Internetu?</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -32,7 +31,6 @@
     <string name="current_magisk_title">Nainstalovaná verze Magisk: %1$s</string>
     <string name="install_magisk_title">Poslední verze Magisk: %1$s</string>
     <string name="uninstall">Odinstalovat</string>
-    <string name="reboot_countdown">Restart za %1$d</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
 
     <!--Module Fragment-->
@@ -121,12 +119,6 @@
     <string name="request_timeout">Časový limit Požadavku</string>
     <string name="superuser_notification">Oznámení Superuser</string>
     <string name="request_timeout_summary">%1$s sekund</string>
-
-    <string name="settings_development_category">Vývoj aplikace</string>
-    <string name="settings_developer_logging_title">Povolit pokročilé ladění logování</string>
-    <string name="settings_developer_logging_summary">Zkuste zapnout toto pro rozsáhlejší logování</string>
-    <string name="settings_shell_logging_title">Povolit logování pro příkazy shellu</string>
-    <string name="settings_shell_logging_summary">Logování všech příkazů shellu a jejich výstup</string>
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek Superuser</string>

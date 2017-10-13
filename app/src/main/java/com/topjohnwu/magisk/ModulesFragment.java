@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -77,7 +76,6 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
     @Override
     public void onTopicPublished(Topic topic, Object result) {
-        Logger.dev("ModulesFragment: UI refresh triggered");
         updateUI();
     }
 

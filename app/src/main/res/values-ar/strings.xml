@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
     <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
-    <string name="safetyNet_no_response">لا يمكن التحقق من SafetyNet، لا يوجد إنترنت؟</string>
     <string name="safetyNet_network_loss">فقدان الاتصال بالشبكة</string>
     <string name="safetyNet_service_disconnected">تم إنهاء الخدمة</string>
     <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>
@@ -36,7 +35,6 @@
     <string name="current_magisk_title">نسخة Magisk المثبته: %1$s</string>
     <string name="install_magisk_title">آخر نسخة Magisk: %1$s</string>
     <string name="uninstall">إلغاء التثبيت</string>
-    <string name="reboot_countdown">إعادة التشغيل في %1$d</string>
     <string name="uninstall_magisk_title">إلغاء تثبيت Magisk</string>
 
     <!--Module Fragment-->
@@ -136,12 +134,6 @@
     <string name="owner_manage_summary">يمكن للمالك فقط إدارة صلاحيات الروت وتلقي مطالبات الطلب</string>
     <string name="user_indepenent_summary">كل مستخدم لديه قواعد روت منفصلة خاصة به</string>
     <string name="multiuser_hint_owner_request">تم إرسال طلب إلى مالك الجهاز. يرجى التبديل إلى المالك ومنح الإذن</string>
-
-    <string name="settings_development_category">تطوير التطبيق</string>
-    <string name="settings_developer_logging_title">تمكين تصحيح السجلات المتقدمة</string>
-    <string name="settings_developer_logging_summary">حدد هذا الخيار لتمكين سجل مطول أكثر.</string>
-    <string name="settings_shell_logging_title">تمكين سجل تصحيح الأوامر الدفعية</string>
-    <string name="settings_shell_logging_summary">حدد هذا الخيار لتمكين سجل جميع الأوامر الدفعية والمخرجات</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser طلبات</string>

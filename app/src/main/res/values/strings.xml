@@ -24,7 +24,6 @@
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
-    <string name="safetyNet_no_response">Cannot verify SafetyNet, no internet?</string>
     <string name="safetyNet_network_loss">Network connection unavailable</string>
     <string name="safetyNet_service_disconnected">Service has been killed</string>
     <string name="safetyNet_res_invalid">The response is invalid</string>
@@ -40,7 +39,6 @@
     <string name="current_magisk_title">Installed Magisk Version: %1$s</string>
     <string name="install_magisk_title">Latest Magisk Version: %1$s</string>
     <string name="uninstall">Uninstall</string>
-    <string name="reboot_countdown">Rebooting in %1$d</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and potentially encrypt your data if your data is not currently encrypted</string>
     <string name="update">Update %1$s</string>
@@ -184,12 +182,6 @@
     <string name="global_summary">All root sessions use the global mount namespace</string>
     <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
-
-    <string name="settings_development_category">App Development</string>
-    <string name="settings_developer_logging_title">Enable advanced debug logging</string>
-    <string name="settings_developer_logging_summary">Check this to enable verbose logging</string>
-    <string name="settings_shell_logging_title">Enable shell command debug logging</string>
-    <string name="settings_shell_logging_summary">Check this to enable logging all shell commands and its output</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>

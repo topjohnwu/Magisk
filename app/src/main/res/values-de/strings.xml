@@ -23,7 +23,6 @@
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
-    <string name="safetyNet_no_response">SafetyNet-Status konnte nicht geprüft werden. Ist eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_network_loss">Netzwerkverbindung verloren</string>
     <string name="safetyNet_service_disconnected">Der Dienst wurde beendet</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
@@ -39,7 +38,6 @@
     <string name="current_magisk_title">Installierte Magisk-Version: %1$s</string>
     <string name="install_magisk_title">Neueste Magisk-Version: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
-    <string name="reboot_countdown">Neustart in %1$d</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
 
     <!--Module Fragment-->
@@ -172,12 +170,6 @@
     <string name="global_summary">Alle root-Sitzungen benutzen den global angelegten Namensraum</string>
     <string name="requester_summary">Root-Sitzungen erben den Namensraum des Abfragenden</string>
     <string name="isolate_summary">Jede root-Sitzung hat ihren isolierten Namensraum</string>
-	
-    <string name="settings_development_category">Entwickler</string>
-    <string name="settings_developer_logging_title">Erweiterte Fehlerprotokolle</string>
-    <string name="settings_developer_logging_summary">Für ausführliches Logging aktivieren</string>
-    <string name="settings_shell_logging_title">Fehlerprotokolle für Shell-Befehle</string>
-    <string name="settings_shell_logging_summary">Logging aller Shell-Befehle sowie deren Ausgabe</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>

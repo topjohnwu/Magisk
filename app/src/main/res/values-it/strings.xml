@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">Tocca per avviare controllo SafetyNet</string>
     <string name="checking_safetyNet_status">Controllo stato SafetyNet</string>
     <string name="safetyNet_check_success">Controllo SafetyNet OK</string>
-    <string name="safetyNet_no_response">Impossibile controllare SafetyNet. Nessuna connessione internet?</string>
     <string name="safetyNet_network_loss">persa conenssioen di rete</string>
     <string name="safetyNet_service_disconnected">Ils ervizio è stato terminato</string>
     <string name="safetyNet_res_invalid">La risposta non è valida</string>
@@ -36,7 +35,6 @@
     <string name="current_magisk_title">Versione Magisk installata: %1$s</string>
     <string name="install_magisk_title">Versione Magisk aggiornata: %1$s</string>
     <string name="uninstall">Disinstalla</string>
-    <string name="reboot_countdown">Riavvio tra %1$d</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="update">Aggiorna %1$s</string>
 
@@ -143,12 +141,6 @@
     <string name="owner_manage_summary">Solo il propietario può gestire accesso root e ricevere richieste</string>
     <string name="user_indepenent_summary">Ogni utente ha le sue regole di root separate</string>
     <string name="multiuser_hint_owner_request">Una richiestà è stata inviata al propietario dipositivo. Accedi come propietario dispositivo e concedi i permessi.</string>
-
-    <string name="settings_development_category">Sviluppo app</string>
-    <string name="settings_developer_logging_title">Abilita registro eventi avanzato debug</string>
-    <string name="settings_developer_logging_summary">Spunta questo per abilitare il registro eventi dettagliato</string>
-    <string name="settings_shell_logging_title">Abilita registro eventi debug comandi shell</string>
-    <string name="settings_shell_logging_summary">Spunta questo per abilitare il registro eventi dettagliato dei comandi shell e dei relativi risultati</string>
 
     <!--Superuser-->
     <string name="su_request_title">Richiesta Superuser</string>

@@ -19,7 +19,6 @@
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
-    <string name="safetyNet_no_response">SafetyNet doğrulanamıyor, İnternet bağlantınız yok mu?</string>
     <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
     <string name="safetyNet_service_disconnected">Servis sonlandırıldı</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
@@ -35,7 +34,6 @@
     <string name="current_magisk_title">Yüklenmiş Magisk Sürümü: %1$s</string>
     <string name="install_magisk_title">Son Magisk Sürümü: %1$s</string>
     <string name="uninstall">Kaldır</string>
-    <string name="reboot_countdown">%1$d saniye içinde yeniden başlatılacak</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verilerinizi şifrelenecek</string>
     <string name="update">Güncelle %1$s</string>
@@ -175,12 +173,6 @@
     <string name="global_summary">Tüm kök oturumları genel bağlama ad alanını kullanır</string>
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
-
-    <string name="settings_development_category">Uygulama Geliştirme</string>
-    <string name="settings_developer_logging_title">Gelişmiş hata ayıklama günlüğünü etkinleştir</string>
-    <string name="settings_developer_logging_summary">Ayrıntılı günlüğü etkinleştirmek için bunu işaretleyin</string>
-    <string name="settings_shell_logging_title">Kabuk komut hata ayıklama günlüğünü etkinleştir</string>
-    <string name="settings_shell_logging_summary">Tüm kabuk komutlarını ve çıktısını günlüğe kaydetmeyi etkinleştirmek için bunu işaretleyin</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>

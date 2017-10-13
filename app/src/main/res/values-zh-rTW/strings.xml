@@ -19,7 +19,6 @@
     <string name="not_rooted">未 ROOT</string>
     <string name="safetyNet_check_text">點擊啟動 SafetyNet 檢查</string>
     <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
-    <string name="safetyNet_no_response">無法檢查 SafetyNet，沒有網絡連線？</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
@@ -31,7 +30,6 @@
     <string name="current_magisk_title">已安裝 Magisk 版本：%1$s</string>
     <string name="install_magisk_title">最新的 Magisk 版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
-    <string name="reboot_countdown">將在 %1$d 後重啟</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">（未提供資訊）</string>
@@ -111,12 +109,6 @@
     <string name="request_timeout">請求逾時</string>
     <string name="superuser_notification">超級用戶通知</string>
     <string name="request_timeout_summary">%1$s 秒</string>
-
-    <string name="settings_development_category">開發</string>
-    <string name="settings_developer_logging_title">啟用進階日誌記錄</string>
-    <string name="settings_developer_logging_summary">勾選此項以啟用更加詳細的日誌記錄。</string>
-    <string name="settings_shell_logging_title">啟用 shell 命令日誌記錄</string>
-    <string name="settings_shell_logging_summary">勾選此項以啟用對所有 shell 命令及輸出進行日誌記錄</string>
 
     <!--Superuser-->
     <string name="su_request_title">超級用戶請求</string>

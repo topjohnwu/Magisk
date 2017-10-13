@@ -19,7 +19,6 @@
     <string name="not_rooted">Root化されていません</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
-    <string name="safetyNet_no_response">SafetyNetをチェックできませんでした。インターネットに接続されていますか？</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(自動) %1$s</string>
@@ -32,7 +31,6 @@
     <string name="current_magisk_title">インストール済のMagisk: %1$s</string>
     <string name="install_magisk_title">最新のMagisk: %1$s</string>
     <string name="uninstall">アンインストール</string>
-    <string name="reboot_countdown">%1$dで再起動します</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
 
     <!--Module Fragment-->
@@ -123,12 +121,6 @@
     <string name="request_timeout">リクエストタイムアウト</string>
     <string name="superuser_notification">スーパーユーザー通知</string>
     <string name="request_timeout_summary">%1$s秒</string>
-
-    <string name="settings_development_category">アプリケーション開発</string>
-    <string name="settings_developer_logging_title">高度なデバッグログを有効にする</string>
-    <string name="settings_developer_logging_summary">詳細なログを有効にするにはここをチェック</string>
-    <string name="settings_shell_logging_title">シェルコマンドのデバッグログを有効にする</string>
-    <string name="settings_shell_logging_summary">すべてのシェルコマンドとその出力をログに記録します</string>
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザーリクエスト</string>

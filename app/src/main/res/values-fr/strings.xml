@@ -16,8 +16,7 @@
     <string name="not_rooted">Non rooté</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
-    <string name="safetyNet_no_response">Impossible de contrôler SafetyNet, pas d\'Internet?</string>
-	<string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
+    <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
 	<string name="safetyNet_network_loss">Connexion réseau indisponible unavailable</string>
 	<string name="safetyNet_service_disconnected">Le service a été tué</string>
 	<string name="safetyNet_res_invalid">La réponse est invalide</string>
@@ -32,7 +31,6 @@
     <string name="current_magisk_title">Version Magisk Installée : %1$s</string>
     <string name="install_magisk_title">Dernière Version Magisk : %1$s</string>
     <string name="uninstall">Désinstaller</string>
-    <string name="reboot_countdown">Redémarrage dans %1$d</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
 	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si ce n\'est actuellement pas le cas</string>
 	<string name="update">Mise à jour %1$s</string>
@@ -134,12 +132,7 @@
     <string name="request_timeout">Délai de requête</string>
     <string name="superuser_notification">Notification Superuser</string>
     <string name="request_timeout_summary">%1$s secondes</string>
-    <string name="settings_development_category">Développement de l\'application</string>
-    <string name="settings_developer_logging_title">Activer le journal de débogage avancé</string>
-    <string name="settings_developer_logging_summary">Cocher ceci pour activer la journalisation "verbose" (tout)</string>
-    <string name="settings_shell_logging_title">Activer la journalisation de débogage de commande shell</string>
-    <string name="settings_shell_logging_summary">Cocher ceci pour activer la journalisation de toutes les commandes shell et leurs données de sortie</string>
-	<string name="settings_hide_manager_title">Masquer Magisk Manager</string>
+    <string name="settings_hide_manager_title">Masquer Magisk Manager</string>
 	<string name="settings_hide_manager_summary">Masquer temporairement Magisk Manager.\nCeci installera une nouvelle appli appelée \"Unhide Magisk Manager\"</string>
 	<string name="language">Langue</string>
 	<string name="system_default">(Selon système)</string>

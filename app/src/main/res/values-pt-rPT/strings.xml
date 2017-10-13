@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
 <string name="checking_safetyNet_status">A verificar o estado do SafetyNet…</string>
 <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
-    <string name="safetyNet_no_response">Não é possível verificar o SafetyNet, sem Internet?</string>
     <string name="safetyNet_network_loss">Perda de ligação</string>
 <string name="safetyNet_service_disconnected">Serviço foi interrompido</string>
 <string name="safetyNet_res_invalid">A resposta é inválida</string>
@@ -36,8 +35,7 @@
 <string name="current_magisk_title">Versão instalada do Magisk: %1$s</string>
 <string name="install_magisk_title">Última versão do Magisk: %1$s</string>
 <string name="uninstall">Desinstalar</string>
-<string name="reboot_countdown">A reiniciar em %1$d</string>
-<string name="uninstall_magisk_title">Desinstalar Magisk</string>
+    <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Atualizar %1$s</string>
 
 <!--Module Fragment-->
@@ -155,13 +153,7 @@
 <string name="requester_summary">As sessões de root herdarão a identificação do seu solicitante</string>
 <string name="isolate_summary">Cada sessão root terá sua própria identificação isolada</string>
 
-<string name="settings_development_category">Desenvolvimento</string>
-<string name="settings_developer_logging_title">Ativar registo mais detalhado</string>
-<string name="settings_developer_logging_summary">Marque essa opção para permitir um registo mais detalhado</string>
-<string name="settings_shell_logging_title">Ativar registo da linha de comandos</string>
-<string name="settings_shell_logging_summary">Marque esta opção para permitir o registo de todos os comandos</string>
-
-<!--Superuser-->
+    <!--Superuser-->
 <string name="su_request_title">Pedido de Super-Utilizador</string>
 <string name="deny_with_str">Negar%1$s</string>
 <string name="deny">Negar</string>

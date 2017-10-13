@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
-    <string name="safetyNet_no_response">Невозможно выполнить проверку SafetyNet</string>
     <string name="safetyNet_network_loss">Подключение к интернету прервано</string>
     <string name="safetyNet_service_disconnected">Служба была остановлена</string>
     <string name="safetyNet_res_invalid">Некорректный ответ</string>
@@ -36,7 +35,6 @@
     <string name="current_magisk_title">Текущая версия Magisk: %1$s</string>
     <string name="install_magisk_title">Последняя версия Magisk: %1$s</string>
     <string name="uninstall">Удалить</string>
-    <string name="reboot_countdown">Перезагрузка через %1$d</string>
     <string name="uninstall_magisk_title">Удалить Magisk</string>
     <string name="uninstall_magisk_msg">Все модули были отключены либо удалены. Root-доступ будет удален, данные зашифруются, если до сих пор не были зашифрованы</string>
     <string name="update">Обновить %1$s</string>
@@ -178,12 +176,6 @@
     <string name="global_summary">Все сеансы Суперпользователя используют глобальное пространство имён</string>
     <string name="requester_summary">Сессии Суперпользователя наследуют пространство имен запрашивающего</string>
     <string name="isolate_summary">Каждая сессия Суперпользователя будет иметь собственное изолированное пространство имен</string>
-
-    <string name="settings_development_category">Разработка</string>
-    <string name="settings_developer_logging_title">Расширенная история</string>
-    <string name="settings_developer_logging_summary">Включить подробнейшее ведение истории отладки</string>
-    <string name="settings_shell_logging_title">История команд оболочки</string>
-    <string name="settings_shell_logging_summary">Включить подробную запись всех команд оболочки и их вывод</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав Суперпользователя</string>

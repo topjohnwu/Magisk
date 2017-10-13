@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
-    <string name="safetyNet_no_response">Kan inte kontrollera SafetyNet, inget internet?</string>
     <string name="safetyNet_network_loss">Tappade nätverksanslutningen</string>
     <string name="safetyNet_service_disconnected">Tjänsten har dödats</string>
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
@@ -36,7 +35,6 @@
     <string name="current_magisk_title">Installerad Magisk: %1$s</string>
     <string name="install_magisk_title">Senaste Magisk: %1$s</string>
     <string name="uninstall">Avinstallera</string>
-    <string name="reboot_countdown">Omstart om %1$d</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="update">Uppdatera %1$s</string>
 
@@ -150,12 +148,6 @@
     <string name="global_summary">Alla root-sessioner använder den globala monteringsnamnrymden</string>
     <string name="requester_summary">Root-sessioner kommer att ärva den sökandes namnrymd</string>
     <string name="isolate_summary">Varje root-session kommer att ha sin egen isolerade namnrymd</string>
-
-    <string name="settings_development_category">Apputveckling</string>
-    <string name="settings_developer_logging_title">Aktivera avancerad debug-loggning</string>
-    <string name="settings_developer_logging_summary">Markera för att aktivera detaljerad loggning</string>
-    <string name="settings_shell_logging_title">Aktivera felsökningsloggning av shell-kommandon</string>
-    <string name="settings_shell_logging_summary">Markera för att aktivera loggning av alla shell-kommandon och dess utmatning</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-förfrågan</string>

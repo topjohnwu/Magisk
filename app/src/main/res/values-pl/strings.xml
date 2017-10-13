@@ -23,7 +23,6 @@
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>
-    <string name="safetyNet_no_response">Nie można sprawdzić SafetyNet bez internetu</string>
     <string name="safetyNet_network_loss">Brak połączenia z internetem</string>
     <string name="safetyNet_service_disconnected">Usługa została zamknięta</string>
     <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
@@ -39,7 +38,6 @@
     <string name="current_magisk_title">Zainstalowana Wersja Magisk: %1$s</string>
     <string name="install_magisk_title">Ostatnia Wersja Magisk: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
-    <string name="reboot_countdown">Restartuj do %1$d</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte.Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Aktualizacja %1$s</string>
@@ -181,13 +179,7 @@
     <string name="global_summary">Wszystkie sesje root za pomocą globalnej przestrzeni montowań nazw</string>
     <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
-	
-    <string name="settings_development_category">Dla Developerów</string>
-    <string name="settings_developer_logging_title">Włącz zaawansowane logowanie debugowania</string>
-    <string name="settings_developer_logging_summary">Zaznacz, aby umożliwić pełne rejestrowanie</string>
-    <string name="settings_shell_logging_title">Włącz rejestrowanie poleceń powłoki debugowania</string>
-    <string name="settings_shell_logging_summary">Włącz, aby rejestrować wszystkie polecenia powłoki i wyjścia</string>
-   
+
     <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>

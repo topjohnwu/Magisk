@@ -17,7 +17,6 @@
     <string name="not_rooted">Nu este obţinut root</string>
     <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
-    <string name="safetyNet_no_response">Nu se poate verifica SafetyNet, nu este internet?</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Auto) %1$s</string>
@@ -30,7 +29,6 @@
     <string name="current_magisk_title">Versiune Magisk instalată: %1$s</string>
     <string name="install_magisk_title">Ultima versiune Magisk: %1$s</string>
     <string name="uninstall">Dezinstalare</string>
-    <string name="reboot_countdown">Repornire în %1$d</string>
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="update">Actualizare %1$s</string>
   
@@ -152,12 +150,6 @@
     <string name="global_summary">Toate sesiunile de root utilizează spațiul de nume global</string>
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
-
-    <string name="settings_development_category">Dezvoltare aplicaţie</string>
-    <string name="settings_developer_logging_title">Activați logarea avansată de depanare</string>
-    <string name="settings_developer_logging_summary">Bifați această opțiune pentru a activa înregistrarea detaliată</string>
-    <string name="settings_shell_logging_title">Activați logarea comenzilor shell</string>
-    <string name="settings_shell_logging_summary">Bifați această opțiune pentru a permite logarea tuturor comenzilor shell și ieșirea acestora</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare Superuser</string>

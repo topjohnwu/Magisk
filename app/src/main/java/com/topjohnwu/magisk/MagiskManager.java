@@ -82,8 +82,6 @@ public class MagiskManager extends Application {
     public List<Locale> locales;
 
     // Configurations
-    public static boolean shellLogging;
-    public static boolean devLogging;
     public static Locale locale;
     public static Locale defaultLocale;
 
@@ -163,13 +161,6 @@ public class MagiskManager extends Application {
 
     public void loadConfig() {
         isDarkTheme = prefs.getBoolean("dark_theme", false);
-        if (BuildConfig.DEBUG) {
-            devLogging = prefs.getBoolean("developer_logging", false);
-            shellLogging = prefs.getBoolean("shell_logging", false);
-        } else {
-            devLogging = false;
-            shellLogging = false;
-        }
 
         // su
         suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);

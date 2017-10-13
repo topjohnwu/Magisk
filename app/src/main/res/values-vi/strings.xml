@@ -19,7 +19,6 @@
     <string name="not_rooted">Chưa root</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
-    <string name="safetyNet_no_response">Không thể kiểm tra SafetyNet, không có Internet?</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(Tự động) %1$s</string>
@@ -32,7 +31,6 @@
     <string name="current_magisk_title">Đã cài đặt Magisk phiên bản: %1$s</string>
     <string name="install_magisk_title">Phiên bản Magisk mới nhất: %1$s</string>
     <string name="uninstall">Gỡ bỏ</string>
-    <string name="reboot_countdown">Khởi động lại trong %1$d</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
 
     <!--Module Fragment-->
@@ -121,12 +119,6 @@
     <string name="request_timeout">Thời gian chờ yêu cầu</string>
     <string name="superuser_notification">Thông báo Superuser</string>
     <string name="request_timeout_summary">%1$s giây</string>
-
-    <string name="settings_development_category">Phát triển ứng dụng</string>
-    <string name="settings_developer_logging_title">Kích hoạt ghi nhận gỡ rối nâng cao</string>
-    <string name="settings_developer_logging_summary">Chọn để kích hoạt ghi nhận chi tiết</string>
-    <string name="settings_shell_logging_title">Kích hoạt ghi nhận gỡ rối lệnh shell</string>
-    <string name="settings_shell_logging_summary">Chọn để kích hoạt ghi nhận tất cả các lệnh shell và kết quả xuất ra</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yêu cầu Superuser</string>

@@ -18,7 +18,6 @@
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
-    <string name="safetyNet_no_response">Αδυναμία επαλήθευσης SafetyNet, δεν έχει internet;</string>
     <string name="safetyNet_network_loss">Αδυναμία σύνδεσης στο δίκτυο</string>
     <string name="safetyNet_service_disconnected">Η υπηρεσία τερματίστηκε</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
@@ -34,7 +33,6 @@
     <string name="current_magisk_title">Εγκατεστημένη έκδοση Magisk: %1$s</string>
     <string name="install_magisk_title">Τελευταία έκδοση Magisk: %1$s</string>
     <string name="uninstall">Απεγκατάσταση</string>
-    <string name="reboot_countdown">Επανεκκίνηση σε %1$d</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="update">Ενημέρωση %1$s</string>
 
@@ -165,12 +163,6 @@
     <string name="global_summary">Όλες οι συνεδρίες root χρησιμοποιούν τον καθολικό χώρο oνομάτων προσάρτησης</string>
     <string name="requester_summary">Οι συνεδρίες root θα κληρονομούν το χώρο ονομάτων του αιτούντα τους</string>
     <string name="isolate_summary">Κάθε συνεδρία root θα έχει το δικό της απομονωμένο χώρο ονομάτων</string>
-
-    <string name="settings_development_category">Ανάπτυξη Εφαρμογής</string>
-    <string name="settings_developer_logging_title">Ενεργοποίηση προηγμένης καταγραφής ελέγχου σφαλμάτων</string>
-    <string name="settings_developer_logging_summary">Επιλέξτε αυτό για να ενεργοποιήσετε τη verbose καταγραφή</string>
-    <string name="settings_shell_logging_title">Ενεργοποίηση καταγραφής ελέγχου σφαλμάτων εντολών κελύφους</string>
-    <string name="settings_shell_logging_summary">Επιλέξτε αυτό για να ενεργοποιήσετε την καταγραφή όλων των εντολών κελύφους και την έξοδο τους</string>
 
     <!--Superuser-->
     <string name="su_request_title">Αίτημα υπερχρήστη</string>

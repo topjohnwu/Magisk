@@ -19,7 +19,6 @@
     <string name="not_rooted">루팅이 되어 있지 않음</string>
     <string name="safetyNet_check_text">SafetyNet 체크를 시작하려면 누르기</string>
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
-    <string name="safetyNet_no_response">SafetyNet 체크 실패. 인터넷 연결을 확인하세요.</string>
 
     <!--Install Fragment-->
     <string name="auto_detect">(자동) %1$s</string>
@@ -32,7 +31,6 @@
     <string name="current_magisk_title">설치된 Magisk 버전: %1$s</string>
     <string name="install_magisk_title">최신 Magisk 버전: %1$s</string>
     <string name="uninstall">제거</string>
-    <string name="reboot_countdown">%1$d초 안에 다시 시작됨</string>
     <string name="uninstall_magisk_title">Magisk 제거</string>
 
     <!--Module Fragment-->
@@ -122,12 +120,6 @@
     <string name="request_timeout">요청 시간 제한</string>
     <string name="superuser_notification">슈퍼유저 알림</string>
     <string name="request_timeout_summary">%1$s초</string>
-
-    <string name="settings_development_category">앱 개발</string>
-    <string name="settings_developer_logging_title">고급 디버그 로깅 사용</string>
-    <string name="settings_developer_logging_summary">더 자세한 로그를 보려면 체크하세요.</string>
-    <string name="settings_shell_logging_title">셸 커맨드 디버그 로깅 사용</string>
-    <string name="settings_shell_logging_summary">모든 셸 커맨드와 그 출력을 로그에 기록하려면 체크하세요.</string>
 
     <!--Superuser-->
     <string name="su_request_title">슈퍼유저 요청</string>

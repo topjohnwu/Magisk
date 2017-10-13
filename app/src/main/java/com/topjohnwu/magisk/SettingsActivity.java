@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -94,7 +93,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             generalCatagory = (PreferenceCategory) findPreference("general");
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
-            PreferenceCategory developer = (PreferenceCategory) findPreference("developer");
 
             updateChannel = (ListPreference) findPreference("update_channel");
             suAccess = (ListPreference) findPreference("su_access");
@@ -130,10 +128,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                         () -> new HideManager(getActivity()).exec());
                 return true;
             });
-
-            if (!BuildConfig.DEBUG) {
-                prefScreen.removePreference(developer);
-            }
 
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
@@ -189,7 +183,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            Logger.dev("Settings: Prefs change " + key);
             boolean enabled;
 
             switch (key) {

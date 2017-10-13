@@ -20,7 +20,6 @@
     <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
-    <string name="safetyNet_no_response">无法验证 SafetyNet，没有网络连接？</string>
     <string name="safetyNet_network_loss">网络连接不可用</string>
     <string name="safetyNet_service_disconnected">服务已被取消</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
@@ -36,7 +35,6 @@
     <string name="current_magisk_title">已安装 Magisk 版本：%1$s</string>
     <string name="install_magisk_title">最新的 Magisk 版本：%1$s</string>
     <string name="uninstall">卸载</string>
-    <string name="reboot_countdown">将在 %1$d 后重启</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="update">更新 %1$s</string>
 
@@ -164,12 +162,6 @@
     <string name="global_summary">所有的 ROOT 会话使用全局挂载命名空间</string>
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
-
-    <string name="settings_development_category">开发</string>
-    <string name="settings_developer_logging_title">启用高级日志记录</string>
-    <string name="settings_developer_logging_summary">勾选此项以启用更加详细的日志记录。</string>
-    <string name="settings_shell_logging_title">启用 shell 命令日志记录</string>
-    <string name="settings_shell_logging_summary">勾选此项以启用对所有 shell 命令及输出进行日志记录</string>
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
