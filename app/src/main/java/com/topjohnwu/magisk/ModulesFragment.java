@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +38,11 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     @BindView(R.id.empty_rv) TextView emptyRv;
     @OnClick(R.id.fab)
     public void selectFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("application/zip");
-        startActivityForResult(intent, FETCH_ZIP_CODE);
+        Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("application/zip");
+            startActivityForResult(intent, FETCH_ZIP_CODE);
+        });
     }
 
     private List<Module> listModules = new ArrayList<>();

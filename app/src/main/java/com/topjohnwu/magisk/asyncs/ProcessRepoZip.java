@@ -45,7 +45,6 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         super(context);
         mLink = link;
         mFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", filename);
-        mFile.getParentFile().mkdirs();
         mInstall = install;
     }
 
@@ -80,6 +79,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     @Override
     protected void onPreExecute() {
         Activity activity = getActivity();
+        mFile.getParentFile().mkdirs();
         progressDialog = ProgressDialog.show(activity, activity.getString(R.string.zip_download_title), activity.getString(R.string.zip_download_msg, 0));
     }
 
