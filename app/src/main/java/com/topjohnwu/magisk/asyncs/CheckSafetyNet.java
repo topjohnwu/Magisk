@@ -17,10 +17,9 @@ import dalvik.system.DexClassLoader;
 
 public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
-    public static final int SNET_VER = 1;
+    public static final int SNET_VER = 2;
 
-    // Test URL, will switch to proper URL
-    private static final String SNET_URL = "https://www.dropbox.com/s/i5vvbl5eenmag5q/snet-release-unsigned.apk?dl=1";
+    private static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/releases/download/v5.4.0/snet.apk";
     private static final String PKG = "com.topjohnwu.snet";
 
     private File dexPath;
