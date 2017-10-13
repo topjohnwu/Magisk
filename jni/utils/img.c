@@ -164,7 +164,7 @@ int merge_img(const char *source, const char *target) {
 	if (access(source, F_OK) == -1)
 		return 0;
 	if (access(target, F_OK) == -1) {
-		rename(source, target);
+		xrename(source, target);
 		return 0;
 	}
 
@@ -188,7 +188,7 @@ int merge_img(const char *source, const char *target) {
 
 	DIR *dir;
 	struct dirent *entry;
-	if (!(dir = opendir(SOURCE_TMP)))
+	if (!(dir = xopendir(SOURCE_TMP)))
 		return 1;
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_DIR) {

@@ -145,7 +145,7 @@ static void exec_common_script(const char* stage) {
 	struct dirent *entry;
 	snprintf(buf, PATH_MAX, "%s/%s.d", COREDIR, stage);
 
-	if (!(dir = opendir(buf)))
+	if (!(dir = xopendir(buf)))
 		return;
 
 	while ((entry = xreaddir(dir))) {
@@ -190,7 +190,7 @@ static void construct_tree(const char *module, struct node_entry *parent) {
 	char *parent_path = get_full_path(parent);
 	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, parent_path);
 
-	if (!(dir = opendir(buf)))
+	if (!(dir = xopendir(buf)))
 		goto cleanup;
 
 	while ((entry = xreaddir(dir))) {
@@ -258,7 +258,7 @@ static void clone_skeleton(struct node_entry *node) {
 	// Clone the structure
 	char *full_path = get_full_path(node);
 	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path);
-	if (!(dir = opendir(buf)))
+	if (!(dir = xopendir(buf)))
 		goto cleanup;
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -278,7 +278,7 @@ static void clone_skeleton(struct node_entry *node) {
 		xstat(full_path, &s);
 		getfilecon(full_path, &con);
 		LOGI("tmpfs: %s\n", full_path);
-		mount("tmpfs", full_path, "tmpfs", 0, NULL);
+		xmount("tmpfs", full_path, "tmpfs", 0, NULL);
 		chmod(full_path, s.st_mode & 0777);
 		chown(full_path, s.st_uid, s.st_gid);
 		setfilecon(full_path, con);
@@ -405,11 +405,11 @@ static void daemon_init() {
 	// Setup links under /sbin
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	xmkdir("/root", 0755);
-	xchmod("/root", 0755);
+	chmod("/root", 0755);
 	root = xopen("/root", O_RDONLY | O_CLOEXEC);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	dir = fdopendir(sbin);
-	while((entry = readdir(dir))) {
+	dir = xfdopendir(sbin);
+	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
 		linkat(sbin, entry->d_name, root, entry->d_name, 0);
 		if (strcmp(entry->d_name, "magisk") == 0)
@@ -420,16 +420,16 @@ static void daemon_init() {
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	fchmod(sbin, 0755);
 	fsetfilecon(sbin, "u:object_r:rootfs:s0");
-	dir = fdopendir(root);
-	while((entry = readdir(dir))) {
+	dir = xfdopendir(root);
+	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
 		snprintf(target, sizeof(target), "/root/%s", entry->d_name);
 		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", entry->d_name);
-		symlink(target, linkpath);
+		xsymlink(target, linkpath);
 	}
 	for (int i = 0; applet[i]; ++i) {
 		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", applet[i]);
-		symlink("/root/magisk", linkpath);
+		xsymlink("/root/magisk", linkpath);
 	}
 	xmkdir("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
@@ -476,20 +476,20 @@ static void daemon_init() {
 	}
 	vec_deep_destroy(&mounts);
 	if (!seperate_vendor) {
-		symlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#ifdef MAGISK_DEBUG
 			LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#else
 			LOGI("link: %s\n", MIRRDIR "/vendor");
 		#endif
 	}
-	mkdir_p(MIRRDIR "/bin", 0755);
+	xmkdir_p(MIRRDIR "/bin", 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
 
 	LOGI("* Setting up internal busybox");
-	mkdir_p(BBPATH, 0755);
+	xmkdir_p(BBPATH, 0755);
 	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
-	symlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }
 
 static int prepare_img() {
@@ -569,7 +569,7 @@ void fix_filecon() {
  ****************/
 
 static void unblock_boot_process() {
-	close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
+	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT));
 	pthread_exit(NULL);
 }
 
@@ -689,7 +689,7 @@ void post_fs_data(int client) {
 		if (access(buf, F_OK) == 0) {
 			snprintf(buf2, PATH_MAX, "%s/%s/vendor", MOUNTPOINT, module);
 			unlink(buf2);
-			symlink(buf, buf2);
+			xsymlink(buf, buf2);
 		}
 		construct_tree(module, sys_root);
 	}
@@ -728,7 +728,6 @@ core_only:
 	}
 
 	auto_start_magiskhide();
-
 
 unblock:
 	unblock_boot_process();

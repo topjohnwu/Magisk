@@ -1,8 +1,8 @@
 /* xwrap.c - wrappers around existing library functions.
  *
- * Functions with the x prefix are wrappers that either succeed or kill the
- * program with an error message, but never return failure. They usually have
- * the same arguments and return value as the function they wrap.
+ * Functions with the x prefix are wrappers that either succeed or log the
+ * error message. They usually have the same arguments and return value
+ * as the function they wrap.
  *
  */
 
@@ -57,6 +57,14 @@ int xopen3(const char *pathname, int flags, mode_t mode) {
 	return fd;
 }
 
+int xopenat(int dirfd, const char *pathname, int flags) {
+	int fd = openat(dirfd, pathname, flags);
+	if (fd < 0) {
+		PLOGE("openat: %s", pathname);
+	}
+	return fd;
+}
+
 ssize_t xwrite(int fd, const void *buf, size_t count) {
 	int ret = write(fd, buf, count);
 	if (count != ret) {
@@ -103,6 +111,14 @@ DIR *xopendir(const char *name) {
 	DIR *d = opendir(name);
 	if (d == NULL) {
 		PLOGE("opendir: %s", name);
+	}
+	return d;
+}
+
+DIR *xfdopendir(int fd) {
+	DIR *d = fdopendir(fd);
+	if (d == NULL) {
+		PLOGE("fdopendir");
 	}
 	return d;
 }
@@ -251,7 +267,16 @@ ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
 		PLOGE("readlink %s", pathname);
 	} else {
 		buf[ret] = '\0';
-		++ret;
+	}
+	return ret;
+}
+
+ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
+	ssize_t ret = readlinkat(dirfd, pathname, buf, bufsiz);
+	if (ret == -1) {
+		PLOGE("readlinkat %s", pathname);
+	} else {
+		buf[ret] = '\0';
 	}
 	return ret;
 }
@@ -290,14 +315,6 @@ int xumount2(const char *target, int flags) {
 	return ret;
 }
 
-int xchmod(const char *pathname, mode_t mode) {
-	int ret = chmod(pathname, mode);
-	if (ret == -1) {
-		PLOGE("chmod %s %u", pathname, mode);
-	}
-	return ret;
-}
-
 int xrename(const char *oldpath, const char *newpath) {
 	int ret = rename(oldpath, newpath);
 	if (ret == -1) {
@@ -310,6 +327,22 @@ int xmkdir(const char *pathname, mode_t mode) {
 	int ret = mkdir(pathname, mode);
 	if (ret == -1 && errno != EEXIST) {
 		PLOGE("mkdir %s %u", pathname, mode);
+	}
+	return ret;
+}
+
+int xmkdir_p(const char *pathname, mode_t mode) {
+	int ret = mkdir_p(pathname, mode);
+	if (ret == -1) {
+		PLOGE("mkdir_p %s", pathname);
+	}
+	return ret;
+}
+
+int xmkdirat(int dirfd, const char *pathname, mode_t mode) {
+	int ret = mkdirat(dirfd, pathname, mode);
+	if (ret == -1 && errno != EEXIST) {
+		PLOGE("mkdirat %s %u", pathname, mode);
 	}
 	return ret;
 }
@@ -331,10 +364,10 @@ ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
 	return ret;
 }
 
-int xmkdir_p(const char *pathname, mode_t mode) {
-	int ret = mkdir_p(pathname, mode);
+pid_t xfork() {
+	int ret = fork();
 	if (ret == -1) {
-		PLOGE("mkdir_p %s", pathname);
+		PLOGE("fork");
 	}
 	return ret;
 }

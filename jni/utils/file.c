@@ -50,16 +50,16 @@ void rm_rf(const char *path) {
 void frm_rf(int dirfd) {
 	struct dirent *entry;
 	int newfd;
-	DIR *dir = fdopendir(dirfd);
+	DIR *dir = xfdopendir(dirfd);
 
-	while ((entry = readdir(dir))) {
+	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (is_excl(entry->d_name))
 			continue;
 		switch (entry->d_type) {
 		case DT_DIR:
-			newfd = openat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 			frm_rf(newfd);
 			close(newfd);
 			unlinkat(dirfd, entry->d_name, AT_REMOVEDIR);
@@ -88,7 +88,7 @@ void mv_f(const char *source, const char *destination) {
 		close(dest);
 	} else{
 		getattr(source, &a);
-		rename(source, destination);
+		xrename(source, destination);
 		setattr(destination, &a);
 	}
 	rmdir(source);
@@ -101,8 +101,8 @@ void mv_dir(int src, int dest) {
 	int newsrc, newdest;
 	struct file_attr a;
 
-	dir = fdopendir(src);
-	while ((entry = readdir(dir))) {
+	dir = xfdopendir(src);
+	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (is_excl(entry->d_name))
@@ -110,9 +110,9 @@ void mv_dir(int src, int dest) {
 		getattrat(src, entry->d_name, &a);
 		switch (entry->d_type) {
 		case DT_DIR:
-			mkdirat(dest, entry->d_name, a.st.st_mode & 0777);
-			newsrc = openat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
-			newdest = openat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
+			xmkdirat(dest, entry->d_name, a.st.st_mode & 0777);
+			newsrc = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newdest = xopenat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
 			fsetattr(newdest, &a);
 			mv_dir(newsrc, newdest);
 			close(newsrc);
@@ -164,11 +164,10 @@ void clone_dir(int src, int dest) {
 	DIR *dir;
 	int srcfd, destfd, newsrc, newdest;
 	char buf[PATH_MAX];
-	ssize_t size;
 	struct file_attr a;
 
-	dir = fdopendir(src);
-	while ((entry = readdir(dir))) {
+	dir = xfdopendir(src);
+	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (is_excl(entry->d_name))
@@ -176,25 +175,24 @@ void clone_dir(int src, int dest) {
 		getattrat(src, entry->d_name, &a);
 		switch (entry->d_type) {
 		case DT_DIR:
-			mkdirat(dest, entry->d_name, a.st.st_mode & 0777);
+			xmkdirat(dest, entry->d_name, a.st.st_mode & 0777);
 			setattrat(dest, entry->d_name, &a);
-			newsrc = openat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
-			newdest = openat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newsrc = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newdest = xopenat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
 			clone_dir(newsrc, newdest);
 			close(newsrc);
 			close(newdest);
 			break;
 		case DT_REG:
-			destfd = openat(dest, entry->d_name, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, a.st.st_mode & 0777);
-			srcfd = openat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
-			sendfile(destfd, srcfd, 0, a.st.st_size);
+			destfd = xopenat(dest, entry->d_name, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC);
+			srcfd = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
+			xsendfile(destfd, srcfd, 0, a.st.st_size);
 			fsetattr(destfd, &a);
 			close(destfd);
 			close(srcfd);
 			break;
 		case DT_LNK:
-			size = readlinkat(src, entry->d_name, buf, sizeof(buf));
-			buf[size] = '\0';
+			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
 			symlinkat(buf, dest, entry->d_name);
 			setattrat(dest, entry->d_name, &a);
 			break;
@@ -285,15 +283,15 @@ void restorecon(int dirfd, int force) {
 		fsetfilecon(dirfd, SYSTEM_CON);
 	freecon(con);
 
-	dir = fdopendir(dirfd);
-	while ((entry = readdir(dir))) {
+	dir = xfdopendir(dirfd);
+	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (entry->d_type == DT_DIR) {
-			fd = openat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 			restorecon(fd, force);
 		} else {
-			fd = openat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
+			fd = xopenat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
 			fgetfilecon(fd, &con);
 			if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
 				fsetfilecon(fd, SYSTEM_CON);

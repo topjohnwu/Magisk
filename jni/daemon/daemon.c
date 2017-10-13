@@ -155,7 +155,7 @@ void start_daemon() {
 	dump_policydb(SELINUX_LOAD);
 
 	// Continue the larger patch in another thread, we will join later
-	pthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
+	xpthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun);
@@ -170,7 +170,7 @@ void start_daemon() {
 	unlock_blocks();
 
 	// Notifiy init the daemon is started
-	close(open(UNBLOCKFILE, O_RDONLY));
+	close(xopen(UNBLOCKFILE, O_RDONLY));
 
 	// Loop forever to listen for requests
 	while(1) {
@@ -187,25 +187,19 @@ void start_daemon() {
 int connect_daemon() {
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
-	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
+	if (xconnect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
 		// If we cannot access the daemon, we start a daemon in the child process if possible
 
 		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
-			fprintf(stderr, "Starting daemon requires root: %s\n", strerror(errno));
-			PLOGE("start daemon");
+			fprintf(stderr, "No daemon is currently running!\n");
+			exit(1);
 		}
 
-		switch (fork()) {
-		case -1:
-			PLOGE("fork");
-		case 0:
+		if (xfork() == 0) {
 			LOGD("client: connect fail, try launching new daemon process\n");
 			close(fd);
 			xsetsid();
 			start_daemon();
-			break;
-		default:
-			break;
 		}
 
 		do {

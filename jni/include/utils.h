@@ -24,12 +24,14 @@ FILE *xfdopen(int fd, const char *mode);
 #define xopen(...) GET_MACRO(__VA_ARGS__, xopen3, xopen2)(__VA_ARGS__)
 int xopen2(const char *pathname, int flags);
 int xopen3(const char *pathname, int flags, mode_t mode);
+int xopenat(int dirfd, const char *pathname, int flags);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
 int xpipe2(int pipefd[2], int flags);
 int xsetns(int fd, int nstype);
 DIR *xopendir(const char *name);
+DIR *xfdopendir(int fd);
 struct dirent *xreaddir(DIR *dirp);
 pid_t xsetsid();
 int xsocket(int domain, int type, int protocol);
@@ -49,19 +51,21 @@ int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
+ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz);
 int xsymlink(const char *target, const char *linkpath);
 int xmount(const char *source, const char *target,
 	const char *filesystemtype, unsigned long mountflags,
 	const void *data);
 int xumount(const char *target);
 int xumount2(const char *target, int flags);
-int xchmod(const char *pathname, mode_t mode);
 int xrename(const char *oldpath, const char *newpath);
 int xmkdir(const char *pathname, mode_t mode);
+int xmkdir_p(const char *pathname, mode_t mode);
+int xmkdirat(int dirfd, const char *pathname, mode_t mode);
 void *xmmap(void *addr, size_t length, int prot, int flags,
 	int fd, off_t offset);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
-int xmkdir_p(const char *pathname, mode_t mode);
+pid_t xfork();
 
 // misc.c
 

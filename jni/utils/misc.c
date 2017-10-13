@@ -140,12 +140,12 @@ static void proc_name_filter(int pid) {
 	char buf[64];
 	int fd;
 	snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-	if ((fd = open(buf, O_RDONLY)) == -1)
+	if (access(buf, R_OK) == -1 || (fd = xopen(buf, O_RDONLY)) == -1)
 		return;
 	if (fdgets(buf, sizeof(buf), fd) == 0) {
 		snprintf(buf, sizeof(buf), "/proc/%d/comm", pid);
 		close(fd);
-		if ((fd = open(buf, O_RDONLY)) == -1)
+		if (access(buf, R_OK) == -1 || (fd = xopen(buf, O_RDONLY)) == -1)
 			return;
 		fdgets(buf, sizeof(buf), fd);
 	}
@@ -169,7 +169,7 @@ void unlock_blocks() {
 
 	if ((dev = xopen("/dev/block", O_RDONLY | O_CLOEXEC)) < 0)
 		return;
-	dir = fdopendir(dev);
+	dir = xfdopendir(dev);
 
 	while((entry = readdir(dir))) {
 		if (entry->d_type == DT_BLK) {
@@ -231,7 +231,7 @@ static int v_exec_command(int err, int *fd, void (*setupenv)(struct vector*), co
 		envp = environ;
 	}
 
-	int pid = fork();
+	int pid = xfork();
 	if (pid != 0) {
 		if (fd && *fd < 0) {
 			// Give the read end and close write end
@@ -308,11 +308,11 @@ int switch_mnt_ns(int pid) {
 }
 
 int fork_dont_care() {
-	int pid = fork();
+	int pid = xfork();
 	if (pid) {
 		waitpid(pid, NULL, 0);
 		return pid;
-	} else if ((pid = fork())) {
+	} else if ((pid = xfork())) {
 		exit(0);
 	}
 	return 0;
