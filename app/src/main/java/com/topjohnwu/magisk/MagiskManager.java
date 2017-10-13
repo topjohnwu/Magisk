@@ -284,7 +284,7 @@ public class MagiskManager extends Application {
                     .setPeriodic(8 * 60 * 60 * 1000)
                     .build();
             ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
-            loadModuleTask.setCallBack(() -> new UpdateRepos(this).exec());
+            loadModuleTask.setCallBack(() -> new UpdateRepos(this, false).exec());
         }
         // Fire asynctasks
         loadModuleTask.exec();

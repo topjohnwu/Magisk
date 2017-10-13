@@ -9,13 +9,15 @@ import java.util.Date;
 
 public class Repo extends BaseModule {
 
+    public static final int MIN_TEMPLATE_VER = 4;
+
     private static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
     private static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
 
     private String repoName;
     private Date mLastUpdate;
 
-    public Repo(String name, Date lastUpdate) {
+    public Repo(String name, Date lastUpdate) throws IllegalRepoException {
         mLastUpdate = lastUpdate;
         repoName = name;
         update();
@@ -27,13 +29,27 @@ public class Repo extends BaseModule {
         mLastUpdate = new Date(c.getLong(c.getColumnIndex("last_update")));
     }
 
-    public void update() {
+    public void update() throws IllegalRepoException {
         String props = WebService.getString(getManifestUrl());
         String lines[] = props.split("\\n");
-        parseProps(lines);
+        try {
+            parseProps(lines);
+        } catch (NumberFormatException e) {
+            throw new IllegalRepoException("Repo [" + repoName + "] parse error: " + e.getMessage());
+        }
+
+        if (getId() == null) {
+            throw new IllegalRepoException("Repo [" + repoName + "] does not contain id");
+        }
+        if (getVersionCode() < 0) {
+            throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
+        }
+        if (getTemplateVersion() < MIN_TEMPLATE_VER) {
+            throw new IllegalRepoException("Repo [" + repoName + "] is outdated");
+        }
     }
 
-    public boolean update(Date lastUpdate) {
+    public boolean update(Date lastUpdate) throws IllegalRepoException {
         if (lastUpdate.after(mLastUpdate)) {
             mLastUpdate = lastUpdate;
             update();
@@ -47,6 +63,10 @@ public class Repo extends BaseModule {
         values.put("repo_name", repoName);
         values.put("last_update", mLastUpdate.getTime());
         return values;
+    }
+
+    public String getRepoName() {
+        return repoName;
     }
 
     public String getZipUrl() {
@@ -63,5 +83,11 @@ public class Repo extends BaseModule {
 
     public Date getLastUpdate() {
         return mLastUpdate;
+    }
+
+    public class IllegalRepoException extends Exception {
+        IllegalRepoException(String message) {
+            super(message);
+        }
     }
 }

@@ -2,11 +2,13 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONArray;
@@ -38,8 +40,11 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private List<String> cached, etags, newEtags = new ArrayList<>();
     private RepoDatabaseHelper repoDB;
     private SharedPreferences prefs;
+    private boolean forceUpdate;
 
-    public UpdateRepos(Context context) {
+    private int tasks = 0;
+
+    public UpdateRepos(Context context, boolean force) {
         super(context);
         prefs = getMagiskManager().prefs;
         repoDB = getMagiskManager().repoDB;
@@ -51,6 +56,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
             repoDB.clearRepo();
         }
+        forceUpdate = force;
     }
 
     private void loadJSON(String jsonString) throws Exception {
@@ -66,20 +72,37 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             String lastUpdate = jsonobject.getString("pushed_at");
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             Date updatedDate = format.parse(lastUpdate);
-            Repo repo = repoDB.getRepo(id);
-            Boolean updated;
-            if (repo == null) {
-                repo = new Repo(name, updatedDate);
-                updated = true;
-            } else {
-                // Popout from cached
-                cached.remove(id);
-                updated = repo.update(updatedDate);
-            }
-            if (updated) {
-                repoDB.addRepo(repo);
-                publishProgress();
-            }
+            ++tasks;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                Repo repo = repoDB.getRepo(id);
+                Boolean updated;
+                try {
+                    if (repo == null) {
+                        repo = new Repo(name, updatedDate);
+                        updated = true;
+                    } else {
+                        // Popout from cached
+                        cached.remove(id);
+                        if (forceUpdate) {
+                            repo.update();
+                            updated = true;
+                        } else {
+                            updated = repo.update(updatedDate);
+                        }
+                    }
+                    if (updated) {
+                        repoDB.addRepo(repo);
+                        publishProgress();
+                    }
+                    if (!id.equals(repo.getId())) {
+                        Logger.error("Repo [" + name + "] id=[" + repo.getId() + "] has illegal repo id");
+                    }
+                } catch (Repo.IllegalRepoException e) {
+                    Logger.error(e.getMessage());
+                    repoDB.removeRepo(id);
+                }
+                --tasks;
+            });
         }
     }
 
@@ -126,6 +149,17 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         return true;
     }
 
+    private Void waitTasks() {
+        while (tasks > 0) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void onProgressUpdate(Void... values) {
         if (ReposFragment.adapter != null)
@@ -138,9 +172,29 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         cached = repoDB.getRepoIDList();
 
         if (!loadPage(0, CHECK_ETAG)) {
-            // Nothing changed
-            return null;
+            // Nothing changed online
+            if (forceUpdate) {
+                for (String id : cached) {
+                    if (id == null) continue;
+                    ++tasks;
+                    AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                        Repo repo = repoDB.getRepo(id);
+                        try {
+                            repo.update();
+                            repoDB.addRepo(repo);
+                        } catch (Repo.IllegalRepoException e) {
+                            Logger.error(e.getMessage());
+                            repoDB.removeRepo(repo);
+                        }
+                        --tasks;
+                    });
+                }
+            }
+            return waitTasks();
         }
+
+        // Wait till all tasks are done
+        waitTasks();
 
         // The leftover cached means they are removed from online repo
         repoDB.removeRepo(cached);

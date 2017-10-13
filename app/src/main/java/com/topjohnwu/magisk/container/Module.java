@@ -10,7 +10,9 @@ public class Module extends BaseModule {
 
     public Module(Shell shell, String path) {
 
-        parseProps(Utils.readFile(shell, path + "/module.prop"));
+        try {
+            parseProps(Utils.readFile(shell, path + "/module.prop"));
+        } catch (NumberFormatException ignored) {}
 
         mRemoveFile = path + "/remove";
         mDisableFile = path + "/disable";

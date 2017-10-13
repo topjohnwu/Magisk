@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.LinkedList;
@@ -17,7 +16,6 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VER = 2;
     private static final String TABLE_NAME = "repos";
-    private static final int MIN_TEMPLATE_VER = 3;
 
     private SQLiteDatabase mDb;
     private MagiskManager mm;
@@ -26,6 +24,10 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         super(context, "repo.db", null, DATABASE_VER);
         mDb = getWritableDatabase();
         mm = Utils.getMagiskManager(context);
+
+        // Clear bad repos
+        mDb.delete(TABLE_NAME, "template<?",
+                new String[] { String.valueOf(Repo.MIN_TEMPLATE_VER) });
     }
 
     @Override
@@ -53,9 +55,18 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         mDb.delete(TABLE_NAME, null, null);
     }
 
+
+    public void removeRepo(String id) {
+        mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+    }
+
+    public void removeRepo(Repo repo) {
+        mDb.delete(TABLE_NAME, "repo_name=?", new String[] { repo.getRepoName() });
+    }
+
     public void removeRepo(List<String> list) {
         for (String id : list) {
-            Logger.dev("Remove from DB: " + id);
+            if (id == null) continue;
             mDb.delete(TABLE_NAME, "id=?", new String[] { id });
         }
     }
@@ -74,7 +85,9 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getRepoCursor() {
-        return mDb.query(TABLE_NAME, null, "template>=? AND template<=?", new String[] { String.valueOf(MIN_TEMPLATE_VER), String.valueOf(mm.magiskVersionCode) }, null, null, "name COLLATE NOCASE");
+        return mDb.query(TABLE_NAME, null, "template<=?",
+                new String[] { String.valueOf(mm.magiskVersionCode) },
+                null, null, "name COLLATE NOCASE");
     }
 
     public List<String> getRepoIDList() {

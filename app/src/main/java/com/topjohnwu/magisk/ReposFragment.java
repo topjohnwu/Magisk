@@ -47,7 +47,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.VISIBLE);
             emptyRv.setVisibility(View.GONE);
-            new UpdateRepos(getActivity()).exec();
+            new UpdateRepos(getActivity(), true).exec();
         });
 
         getActivity().setTitle(R.string.downloads);

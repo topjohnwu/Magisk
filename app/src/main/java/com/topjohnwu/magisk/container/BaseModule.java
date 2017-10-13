@@ -9,8 +9,8 @@ import java.util.List;
 
 public abstract class BaseModule implements Comparable<BaseModule> {
 
-    private String mId, mName, mVersion, mAuthor, mDescription;
-    private int mVersionCode = 0, templateVersion = 0;
+    private String mId = null, mName, mVersion, mAuthor, mDescription;
+    private int mVersionCode = -1, templateVersion = -1;
 
     protected BaseModule() {}
 
@@ -38,7 +38,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
 
     protected void parseProps(List<String> props) { parseProps(props.toArray(new String[0])); }
 
-    protected void parseProps(String[] props) {
+    protected void parseProps(String[] props) throws NumberFormatException {
         for (String line : props) {
             String[] prop = line.split("=", 2);
             if (prop.length != 2)
@@ -59,9 +59,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                     mVersion = prop[1];
                     break;
                 case "versionCode":
-                    try {
-                        mVersionCode = Integer.parseInt(prop[1]);
-                    } catch (NumberFormatException ignored) {}
+                    mVersionCode = Integer.parseInt(prop[1]);
                     break;
                 case "author":
                     mAuthor = prop[1];
@@ -70,9 +68,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                     mDescription = prop[1];
                     break;
                 case "template":
-                    try {
-                        templateVersion = Integer.parseInt(prop[1]);
-                    } catch (NumberFormatException ignored) {}
+                    templateVersion = Integer.parseInt(prop[1]);
                     break;
                 default:
                     break;
