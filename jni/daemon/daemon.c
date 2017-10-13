@@ -170,7 +170,7 @@ void start_daemon() {
 	unlock_blocks();
 
 	// Notifiy init the daemon is started
-	close(xopen(UNBLOCKFILE, O_RDONLY));
+	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT));
 
 	// Loop forever to listen for requests
 	while(1) {
