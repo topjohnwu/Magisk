@@ -137,6 +137,18 @@ void start_daemon() {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
+	// Patch selinux with medium patch before we do anything
+	load_policydb(SELINUX_POLICY);
+	sepol_med_rules();
+	dump_policydb(SELINUX_LOAD);
+
+	struct sockaddr_un sun;
+	fd = setup_socket(&sun);
+
+	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun)) == -1)
+		exit(1);
+	xlisten(fd, 10);
+
 	if ((is_restart = access(UNBLOCKFILE, F_OK) == 0)) {
 		// Restart stuffs if the daemon is restarted
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
@@ -147,21 +159,10 @@ void start_daemon() {
 	// Start the log monitor
 	monitor_logs();
 
-	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
-
-	// Patch selinux with medium patch before we do anything
-	load_policydb(SELINUX_POLICY);
-	sepol_med_rules();
-	dump_policydb(SELINUX_LOAD);
-
 	// Continue the larger patch in another thread, we will join later
 	xpthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
-	struct sockaddr_un sun;
-	fd = setup_socket(&sun);
-
-	xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
-	xlisten(fd, 10);
+	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Change process name
 	strcpy(argv0, "magisk_daemon");
