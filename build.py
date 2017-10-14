@@ -350,6 +350,7 @@ def cleanup(args):
 		os.chdir('java')
 		subprocess.run('{} clean'.format(os.path.join('.', 'gradlew')), shell=True)
 		os.chdir('..')
+		silentremove('snet.apk')
 
 	if 'zip' in args.target:
 		header('* Cleaning zip files')
