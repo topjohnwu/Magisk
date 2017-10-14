@@ -20,6 +20,7 @@
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
+    <string name="safetyNet_api_error">Ошибка в  API SafetyNet</string>
     <string name="safetyNet_network_loss">Подключение к интернету прервано</string>
     <string name="safetyNet_service_disconnected">Служба была остановлена</string>
     <string name="safetyNet_res_invalid">Некорректный ответ</string>
@@ -118,6 +119,8 @@
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="uninstall_toast">Удаление менеджера Magisk в течении 5 секунд, затем, пожалуйста, вручную выполните перезагрузку</string>
+    <string name="proprietary_title">Загрузка собственного кода</string>
+    <string name="proprietary_notice">Менеджер Magisk является свободно распространяемым приложением, поэтому он не содержит собственный код API SafetyNet от Google.\n\nРазрешите ли Вы менеджеру Magisk загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
