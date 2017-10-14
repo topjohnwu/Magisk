@@ -5,7 +5,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/sendfile.h>
+
+#ifndef NO_SELINUX
 #include <selinux/selinux.h>
+#endif
 
 #include "utils.h"
 
@@ -16,6 +19,13 @@ static int is_excl(const char *name) {
 		if (strcmp(name, excl_list[i]) == 0)
 			return 1;
 	}
+	return 0;
+}
+
+int fd_getpath(int fd, char *path, size_t size) {
+	snprintf(path, size, "/proc/self/fd/%d", fd);
+	if (xreadlink(path, path, size) == -1)
+		return -1;
 	return 0;
 }
 
@@ -201,16 +211,22 @@ void clone_dir(int src, int dest) {
 }
 
 int getattr(const char *path, struct file_attr *a) {
-	int fd = open(path, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-	if (fd < 0)
+	if (xlstat(path, &a->st) == -1)
 		return -1;
-	int ret = fgetattr(fd, a);
-	close(fd);
-	return ret;
+	char *con = "";
+#ifndef NO_SELINUX
+	if (lgetfilecon(path, &con) == -1)
+		return -1;
+	strcpy(a->con, con);
+	freecon(con);
+#else
+	a->con[0] = '\0';
+#endif
+	return 0;
 }
 
 int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
-	int fd = openat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
+	int fd = xopenat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
 	if (fd < 0)
 		return -1;
 	int ret = fgetattr(fd, a);
@@ -219,27 +235,32 @@ int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fgetattr(int fd, struct file_attr *a) {
-	if (fstat(fd, &a->st) < 0)
+#ifndef NO_SELINUX
+	char path[PATH_MAX];
+	fd_getpath(fd, path, sizeof(path));
+	return getattr(path, a);
+#else
+	if (fstat(fd, &a->st) == -1)
 		return -1;
-	char *con = "";
-	if (fgetfilecon(fd, &con) < 0)
-		return -1;
-	strcpy(a->con, con);
-	freecon(con);
+	a->con[0] = '\0';
 	return 0;
+#endif
 }
 
 int setattr(const char *path, struct file_attr *a) {
-	int fd = open(path, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-	if (fd < 0)
+	if (chmod(path, a->st.st_mode & 0777) < 0)
 		return -1;
-	int ret = fsetattr(fd, a);
-	close(fd);
-	return ret;
+	if (chown(path, a->st.st_uid, a->st.st_gid) < 0)
+		return -1;
+#ifndef NO_SELINUX
+	if (strlen(a->con) && lsetfilecon(path, a->con) < 0)
+		return -1;
+#endif
+	return 0;
 }
 
 int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
-	int fd = openat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
+	int fd = xopenat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
 	if (fd < 0)
 		return -1;
 	int ret = fsetattr(fd, a);
@@ -248,13 +269,17 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fsetattr(int fd, struct file_attr *a) {
+#ifndef NO_SELINUX
+	char path[PATH_MAX];
+	fd_getpath(fd, path, sizeof(path));
+	return setattr(path, a);
+#else
 	if (fchmod(fd, a->st.st_mode & 0777) < 0)
 		return -1;
 	if (fchown(fd, a->st.st_uid, a->st.st_gid) < 0)
 		return -1;
-	if (strlen(a->con) && fsetfilecon(fd, a->con) < 0)
-		return -1;
 	return 0;
+#endif
 }
 
 void clone_attr(const char *source, const char *target) {
@@ -269,6 +294,8 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	fsetattr(targetfd, &a);
 }
 
+#ifndef NO_SELINUX
+
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
 
@@ -276,11 +303,12 @@ void restorecon(int dirfd, int force) {
 	struct dirent *entry;
 	DIR *dir;
 	int fd;
-	char *con;
+	char path[PATH_MAX], *con;
 
-	fgetfilecon(dirfd, &con);
+	fd_getpath(dirfd, path, sizeof(path));
+	lgetfilecon(path, &con);
 	if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
-		fsetfilecon(dirfd, SYSTEM_CON);
+		lsetfilecon(path, SYSTEM_CON);
 	freecon(con);
 
 	dir = xfdopendir(dirfd);
@@ -292,11 +320,14 @@ void restorecon(int dirfd, int force) {
 			restorecon(fd, force);
 		} else {
 			fd = xopenat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-			fgetfilecon(fd, &con);
+			fd_getpath(fd, path, sizeof(path));
+			lgetfilecon(path, &con);
 			if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
-				fsetfilecon(fd, SYSTEM_CON);
+				lsetfilecon(path, SYSTEM_CON);
 			freecon(con);
 		}
 		close(fd);
 	}
 }
+
+#endif   // NO_SELINUX

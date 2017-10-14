@@ -163,6 +163,7 @@ void umount_image(const char *target, const char *device) {
 int merge_img(const char *source, const char *target) {
 	if (access(source, F_OK) == -1)
 		return 0;
+	LOGI("* Merging %s  -> %s\n", source, target);
 	if (access(target, F_OK) == -1) {
 		xrename(source, target);
 		return 0;

@@ -99,6 +99,7 @@ struct file_attr {
 	char con[128];
 };
 
+int fd_getpath(int fd, char *path, size_t size);
 int mkdir_p(const char *pathname, mode_t mode);
 void rm_rf(const char *path);
 void frm_rf(int dirfd);

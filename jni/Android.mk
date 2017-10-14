@@ -93,8 +93,8 @@ include $(BUILD_EXECUTABLE)
 ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_STATIC_LIBRARIES := libsepol libselinux_static
-LOCAL_C_INCLUDES := jni/include $(LIBSEPOL) $(LIBSELINUX)
+LOCAL_STATIC_LIBRARIES := libsepol
+LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
 LOCAL_SRC_FILES := \
 	magiskinit.c \
 	magiskboot/boot_utils.c \
@@ -103,6 +103,7 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
 	magiskpolicy/api.c
+LOCAL_CFLAGS := -DNO_SELINUX
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 endif
