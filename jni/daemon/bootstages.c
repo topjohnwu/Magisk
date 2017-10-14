@@ -401,7 +401,6 @@ static void daemon_init() {
 	DIR *dir;
 	struct dirent *entry;
 	int root, sbin;
-	char target[PATH_MAX], linkpath[PATH_MAX];
 	// Setup links under /sbin
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 	xmkdir("/root", 0755);
@@ -423,13 +422,13 @@ static void daemon_init() {
 	dir = xfdopendir(root);
 	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-		snprintf(target, sizeof(target), "/root/%s", entry->d_name);
-		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", entry->d_name);
-		xsymlink(target, linkpath);
+		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		snprintf(buf2, PATH_MAX, "/sbin/%s", entry->d_name);
+		xsymlink(buf, buf2);
 	}
 	for (int i = 0; applet[i]; ++i) {
-		snprintf(linkpath, sizeof(linkpath), "/sbin/%s", applet[i]);
-		xsymlink("/root/magisk", linkpath);
+		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
+		xsymlink("/root/magisk", buf2);
 	}
 	xmkdir("/magisk", 0755);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
@@ -459,9 +458,7 @@ static void daemon_init() {
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/system");
 			#endif
-			continue;
-		}
-		if (strstr(line, " /vendor ")) {
+		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
 			sscanf(line, "%s", buf);
 			xmkdir_p(MIRRDIR "/vendor", 0755);
@@ -471,10 +468,10 @@ static void daemon_init() {
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/vendor");
 			#endif
-			continue;
 		}
+		free(line);
 	}
-	vec_deep_destroy(&mounts);
+	vec_destroy(&mounts);
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#ifdef MAGISK_DEBUG
@@ -495,7 +492,7 @@ static void daemon_init() {
 static int prepare_img() {
 	// First merge images
 	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
-		LOGE("Image merge %s -> %s failed!\n", "/data/magisk_merge.img", MAINIMG);
+		LOGE("Image merge /data/magisk_merge.img -> " MAINIMG " failed!\n");
 		return 1;
 	}
 
@@ -550,7 +547,7 @@ static int prepare_img() {
 	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
 	free(magiskloop);
 
-	// Fix file seliux contexts
+	// Fix file selinux contexts
 	fix_filecon();
 	return 0;
 }
