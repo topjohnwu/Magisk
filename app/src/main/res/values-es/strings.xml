@@ -120,7 +120,7 @@
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="uninstall_toast">Desinstalación de Magisk Manager en 5 segundos, por favor después reinicie manualmente </string>
     <string name="proprietary_title">Descargar Código Propietario</string>
-    <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para los cheques de SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
  
     
     <!--Settings Activity -->
