@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.components.AlertDialogBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +58,7 @@ public class AboutActivity extends Activity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
 
-        appVersionInfo.setSummary(BuildConfig.VERSION_NAME);
+        appVersionInfo.setSummary(String.format(Locale.US, "%s (%d)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
 
         String changes = null;
         try (InputStream is = getAssets().open("changelog.html")) {

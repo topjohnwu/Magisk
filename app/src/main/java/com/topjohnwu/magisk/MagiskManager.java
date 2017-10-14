@@ -312,7 +312,11 @@ public class MagiskManager extends Application {
         } catch (NumberFormatException e) {
             disabled = false;
         }
-        ret = shell.sh("getprop " + MAGISKHIDE_PROP);
+        if (magiskVersionCode > 1435) {
+            ret = shell.su("resetprop -p " + MAGISKHIDE_PROP);
+        } else {
+            ret = shell.sh("getprop " + MAGISKHIDE_PROP);
+        }
         try {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
