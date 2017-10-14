@@ -25,6 +25,8 @@ static void *logger_thread(void *args) {
 	int log_fd = -1, log_pid;
 	char line[4096];
 
+	LOGD("log_monitor: logger start");
+
 	while (1) {
 		// Start logcat
 		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "all" , "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
@@ -61,6 +63,8 @@ static void *magisk_log_thread(void *args) {
 	// Register our listener
 	logcat_events[LOG_EVENT] = pipefd[1];
 
+	LOGD("log_monitor: magisk log dumper start");
+
 	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
 		char *ss;
 		if ((ss = strstr(line, " Magisk")) && (ss[-1] != 'D') && (ss[-1] != 'V')) {
@@ -78,7 +82,7 @@ static void *magisk_log_thread(void *args) {
 					}
 					vec_destroy(&logs);
 				} else {
-					vec_push_back(&logs, line);
+					vec_push_back(&logs, strdup(line));
 				}
 			}
 			if (have_data)
@@ -94,6 +98,8 @@ static void *debug_magisk_log_thread(void *args) {
 	int pipefd[2];
 	if (xpipe2(pipefd, O_CLOEXEC) == -1)
 		return NULL;
+
+	LOGD("log_monitor: debug log dumper start");
 
 	// Register our listener
 	logcat_events[DEBUG_EVENT] = pipefd[1];
