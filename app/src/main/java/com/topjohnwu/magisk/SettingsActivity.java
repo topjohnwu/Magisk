@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
+import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Shell;
@@ -118,7 +119,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             }
 
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                Utils.clearRepoCache(getActivity());
+                mm.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
+                mm.repoDB.clearRepo();
+                mm.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
                 return true;
             });
 
@@ -204,9 +207,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        Utils.enableMagiskHide();
+                        Shell.su_raw("magiskhide --enable");
                     } else {
-                        Utils.disableMagiskHide();
+                        Shell.su_raw("magiskhide --disable");
                     }
                     break;
                 case "hosts":

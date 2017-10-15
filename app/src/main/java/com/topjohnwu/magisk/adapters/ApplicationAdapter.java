@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -56,6 +58,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         new LoadApps().exec();
     }
 
+    private boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
+        return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
@@ -86,10 +92,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    Utils.addMagiskHide(info.packageName);
+                    Shell.su_raw("magiskhide --add " + info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    Utils.rmMagiskHide(info.packageName);
+                    Shell.su_raw("magiskhide --rm " + info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });
@@ -132,8 +138,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 mList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : mOriginalList) {
-                    if (Utils.lowercaseContains(info.loadLabel(pm), filter)
-                            || Utils.lowercaseContains(info.packageName, filter)) {
+                    if (lowercaseContains(info.loadLabel(pm), filter)
+                            || lowercaseContains(info.packageName, filter)) {
                         mList.add(info);
                     }
                 }
@@ -160,7 +166,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             }
             Collections.sort(mOriginalList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                     .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            mHideList = Utils.listMagiskHide();
+            mHideList = Shell.su("magiskhide --ls");
             return null;
         }
 

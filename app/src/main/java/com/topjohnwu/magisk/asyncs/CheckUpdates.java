@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONException;
@@ -65,9 +65,9 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         if (mm == null) return;
         if (showNotification && mm.updateNotification) {
             if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
-                Utils.showManagerUpdateNotification(mm);
+                ShowUI.showManagerUpdateNotification(mm);
             } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
-                Utils.showMagiskUpdateNotification(mm);
+                ShowUI.showMagiskUpdateNotification(mm);
             }
         }
         mm.updateCheckDone.publish();

@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.jar.JarEntry;
 
@@ -25,6 +26,27 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     public HideManager(Context context) {
         super(context);
+    }
+
+    private String genPackageName(String prefix, int length) {
+        StringBuilder builder = new StringBuilder(length);
+        builder.append(prefix);
+        length -= prefix.length();
+        SecureRandom random = new SecureRandom();
+        String base = "abcdefghijklmnopqrstuvwxyz";
+        String alpha = base + base.toUpperCase();
+        String full = alpha + "0123456789..........";
+        char next, prev = '\0';
+        for (int i = 0; i < length; ++i) {
+            if (prev == '.' || i == length - 1 || i == 0) {
+                next = alpha.charAt(random.nextInt(alpha.length()));
+            } else {
+                next = full.charAt(random.nextInt(full.length()));
+            }
+            builder.append(next);
+            prev = next;
+        }
+        return builder.toString();
     }
 
     @Override
@@ -67,7 +89,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
                 return false;
 
             // Patch binary XML with new package name
-            pkg = Utils.genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
+            pkg = genPackageName("com.", UNHIDE_PKG_NAME.length - 1);
             System.arraycopy(pkg.getBytes(), 0, xml, offset, pkg.length());
             asset.getOutputStream(je).write(xml);
 

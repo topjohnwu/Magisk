@@ -27,6 +27,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -123,18 +124,18 @@ public class MagiskFragment extends Fragment
 
         // Show Manager update first
         if (mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-            Utils.showManagerInstallDialog(getActivity());
+            ShowUI.showManagerInstallDialog(getActivity());
             return;
         }
 
         ((NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-        Utils.showMagiskInstallDialog(this,
+        ShowUI.showMagiskInstallDialog(this,
                 keepEncChkbox.isChecked(), keepVerityChkbox.isChecked());
     }
 
     @OnClick(R.id.uninstall_button)
     void uninstall() {
-        Utils.showUninstallDialog(this);
+        ShowUI.showUninstallDialog(this);
     }
 
     @Nullable
