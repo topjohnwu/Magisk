@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.topjohnwu.jarsigner.ByteArrayStream;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.io.BufferedOutputStream;
@@ -34,7 +35,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     protected void onPreExecute() {
         MagiskManager mm = getMagiskManager();
         if (mm.snet_version != CheckSafetyNet.SNET_VER) {
-            getShell().sh("rm -rf " + dexPath.getParent());
+            Shell.sh("rm -rf " + dexPath.getParent());
         }
         mm.snet_version = CheckSafetyNet.SNET_VER;
         mm.prefs.edit().putInt("snet_version", CheckSafetyNet.SNET_VER).apply();

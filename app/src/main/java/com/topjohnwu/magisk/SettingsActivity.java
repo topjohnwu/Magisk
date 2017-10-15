@@ -195,28 +195,28 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case "disable":
                     enabled = prefs.getBoolean("disable", false);
                     if (enabled) {
-                        Utils.createFile(getShell(), MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.createFile(MagiskManager.MAGISK_DISABLE_FILE);
                     } else {
-                        Utils.removeItem(getShell(), MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.removeItem(MagiskManager.MAGISK_DISABLE_FILE);
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case "magiskhide":
                     enabled = prefs.getBoolean("magiskhide", false);
                     if (enabled) {
-                        Utils.enableMagiskHide(getShell());
+                        Utils.enableMagiskHide();
                     } else {
-                        Utils.disableMagiskHide(getShell());
+                        Utils.disableMagiskHide();
                     }
                     break;
                 case "hosts":
                     enabled = prefs.getBoolean("hosts", false);
                     if (enabled) {
-                        getShell().su_raw(
+                        Shell.su_raw(
                                 "cp -af /system/etc/hosts " + MagiskManager.MAGISK_HOST_FILE,
                                 "mount -o bind " + MagiskManager.MAGISK_HOST_FILE + " /system/etc/hosts");
                     } else {
-                        getShell().su_raw(
+                        Shell.su_raw(
                                 "umount -l /system/etc/hosts",
                                 "rm -f " + MagiskManager.MAGISK_HOST_FILE);
                     }
@@ -241,10 +241,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             }
             mm.loadConfig();
             setSummary();
-        }
-
-        private Shell getShell() {
-            return Shell.getShell(getActivity());
         }
 
         private void setSummary() {

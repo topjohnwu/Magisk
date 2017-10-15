@@ -62,31 +62,31 @@ public class Utils {
     private static final int MAGISK_UPDATE_NOTIFICATION_ID = 1;
     private static final int APK_UPDATE_NOTIFICATION_ID = 2;
 
-    public static boolean itemExist(Shell shell, String path) {
+    public static boolean itemExist(String path) {
         String command = "[ -e " + path + " ] && echo true || echo false";
-        List<String> ret = shell.su(command);
+        List<String> ret = Shell.su(command);
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
-    public static void createFile(Shell shell, String path) {
+    public static void createFile(String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
         String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null;";
-        shell.su_raw(command);
+        Shell.su_raw(command);
     }
 
-    public static void removeItem(Shell shell, String path) {
+    public static void removeItem(String path) {
         String command = "rm -rf " + path + " 2>/dev/null";
-        shell.su_raw(command);
+        Shell.su_raw(command);
     }
 
-    public static List<String> getModList(Shell shell, String path) {
+    public static List<String> getModList(String path) {
         String command = "ls -d " + path + "/* | grep -v lost+found";
-        return shell.su(command);
+        return Shell.su(command);
     }
 
-    public static List<String> readFile(Shell shell, String path) {
+    public static List<String> readFile(String path) {
         String command = "cat " + path + " | sed '$a\\ ' | sed '$d'";
-        return shell.su(command);
+        return Shell.su(command);
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
@@ -225,24 +225,24 @@ public class Utils {
         notificationManager.notify(APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
-    public static void enableMagiskHide(Shell shell) {
-        shell.su_raw("magiskhide --enable");
+    public static void enableMagiskHide() {
+        Shell.su_raw("magiskhide --enable");
     }
 
-    public static void disableMagiskHide(Shell shell) {
-        shell.su_raw("magiskhide --disable");
+    public static void disableMagiskHide() {
+        Shell.su_raw("magiskhide --disable");
     }
 
-    public static List<String> listMagiskHide(Shell shell) {
-        return shell.su("magiskhide --ls");
+    public static List<String> listMagiskHide() {
+        return Shell.su("magiskhide --ls");
     }
 
-    public static void addMagiskHide(Shell shell, String pkg) {
-        shell.su_raw("magiskhide --add " + pkg);
+    public static void addMagiskHide(String pkg) {
+        Shell.su_raw("magiskhide --add " + pkg);
     }
 
-    public static void rmMagiskHide(Shell shell, String pkg) {
-        shell.su_raw("magiskhide --rm " + pkg);
+    public static void rmMagiskHide(String pkg) {
+        Shell.su_raw("magiskhide --rm " + pkg);
     }
 
     public static String getLocaleString(Context context, Locale locale, @StringRes int id) {
@@ -331,7 +331,7 @@ public class Utils {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                List<String> res = Shell.getShell(mm).su("echo $SLOT");
+                List<String> res = Shell.su("echo $SLOT");
                 if (isValidShellResponse(res)) {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
@@ -409,14 +409,14 @@ public class Utils {
                                     if (slot[1] == 'a') slot[1] = 'b';
                                     else slot[1] = 'a';
                                     // Then find the boot image again
-                                    List<String> ret = Shell.getShell(mm).su(
+                                    List<String> ret = Shell.su(
                                             "BOOTIMAGE=",
                                             "SLOT=" + String.valueOf(slot),
                                             "find_boot_image",
                                             "echo \"$BOOTIMAGE\""
                                     );
                                     boot = isValidShellResponse(ret) ? ret.get(ret.size() - 1) : null;
-                                    Shell.getShell(mm).su_raw("mount_partitions");
+                                    Shell.su_raw("mount_partitions");
                                     if (boot == null)
                                         return;
                                     receiver = new DownloadReceiver() {
@@ -497,12 +497,12 @@ public class Utils {
                     }
                     in.close();
                     out.close();
-                    Shell.getShell(mm).su(
+                    Shell.su(
                             "cat " + uninstaller + " > /cache/" + UNINSTALLER,
                             "cat " + utils + " > /data/magisk/" + UTIL_FUNCTIONS
                     );
                     mm.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
-                    Shell.getShell(mm).su_raw(
+                    Shell.su_raw(
                             "sleep 5",
                             "pm uninstall " + mm.getApplicationInfo().packageName
                     );

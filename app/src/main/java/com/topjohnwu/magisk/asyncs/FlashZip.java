@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.AdaptiveList;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -35,7 +36,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
-        List<String> ret = Utils.readFile(getShell(), new File(mCachedFile.getParentFile(), "updater-script").getPath());
+        List<String> ret = Utils.readFile(new File(mCachedFile.getParentFile(), "updater-script").getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
     }
 
@@ -77,7 +78,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             }
             if (!unzipAndCheck()) return 0;
             mList.add("- Installing " + Utils.getNameFromUri(mm, mUri));
-            getShell().su(mList,
+            Shell.su(mList,
                     "cd " + mCachedFile.getParent(),
                     "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile +
                             " && echo 'Success!' || echo 'Failed!'"
@@ -95,7 +96,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     protected void onPostExecute(Integer result) {
         MagiskManager mm = getMagiskManager();
         if (mm == null) return;
-        getShell().su_raw(
+        Shell.su_raw(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
         );

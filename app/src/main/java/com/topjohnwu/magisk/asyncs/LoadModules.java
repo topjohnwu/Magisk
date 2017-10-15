@@ -19,8 +19,8 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
         if (mm == null) return null;
         mm.moduleMap = new ValueSortedMap<>();
 
-        for (String path : Utils.getModList(getShell(), MagiskManager.MAGISK_PATH)) {
-            Module module = new Module(getShell(), path);
+        for (String path : Utils.getModList(MagiskManager.MAGISK_PATH)) {
+            Module module = new Module(path);
             mm.moduleMap.put(module.getId(), module);
         }
 

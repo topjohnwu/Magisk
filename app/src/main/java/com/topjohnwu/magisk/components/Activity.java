@@ -10,7 +10,6 @@ import android.view.WindowManager;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 
 public class Activity extends AppCompatActivity {
@@ -56,10 +55,6 @@ public class Activity extends AppCompatActivity {
 
     public MagiskManager getMagiskManager() {
         return (MagiskManager) super.getApplicationContext();
-    }
-
-    public Shell getShell() {
-        return Shell.getShell(this);
     }
 
     protected void setFloating() {

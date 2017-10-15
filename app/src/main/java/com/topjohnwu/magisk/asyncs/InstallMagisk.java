@@ -76,7 +76,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         if (mm == null) return false;
 
         File install = new File(Utils.getEncContext(mm).getFilesDir().getParent(), "install");
-        getShell().sh_raw("rm -rf " + install);
+        Shell.sh_raw("rm -rf " + install);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
@@ -157,13 +157,16 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             Shell shell;
             if (mode == PATCH_MODE && Shell.rootAccess()) {
                 // Force non-root shell
-                shell = Shell.getShell("sh");
+                shell = new Shell("sh");
              } else {
-                shell = getShell();
+                shell = Shell.getShell();
             }
 
+            if (shell == null)
+                return false;
+
             // Patch boot image
-            shell.sh(mList,
+            shell.run(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
                             "update-binary indep boot_patch.sh " + boot +
@@ -181,7 +184,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     dest.getParentFile().mkdirs();
                     switch (mm.bootFormat) {
                         case ".img":
-                            getShell().sh_raw("cp -f " + patched_boot + " " + dest);
+                            shell.run_raw(false, "cp -f " + patched_boot + " " + dest);
                             break;
                         case ".img.tar":
                             TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
@@ -204,14 +207,14 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     break;
                 case DIRECT_MODE:
                     // Direct flash boot image
-                    getShell().su(mList, "flash_boot_image " + patched_boot + " " + mBootLocation);
+                    Shell.su(mList, "flash_boot_image " + patched_boot + " " + mBootLocation);
                     break;
                 default:
                     return false;
             }
 
             // Finals
-            getShell().sh_raw(
+            shell.run_raw(false,
                     "cd " + install,
                     "mv bin/busybox busybox",
                     "rm -rf bin *.img update-binary",

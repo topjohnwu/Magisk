@@ -38,7 +38,6 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Context context = holder.itemView.getContext();
-        Shell rootShell = Shell.getShell(context);
         final Module module = mList.get(position);
 
         String version = module.getVersion();
@@ -56,10 +55,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
             int snack;
             if (isChecked) {
-                module.removeDisableFile(rootShell);
+                module.removeDisableFile();
                 snack = R.string.disable_file_removed;
             } else {
-                module.createDisableFile(rootShell);
+                module.createDisableFile();
                 snack = R.string.disable_file_created;
             }
             SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();
@@ -69,10 +68,10 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
             boolean removed = module.willBeRemoved();
             int snack;
             if (removed) {
-                module.deleteRemoveFile(rootShell);
+                module.deleteRemoveFile();
                 snack = R.string.remove_file_deleted;
             } else {
-                module.createRemoveFile(rootShell);
+                module.createRemoveFile();
                 snack = R.string.remove_file_created;
             }
             SnackbarMaker.make(holder.itemView, snack, Snackbar.LENGTH_SHORT).show();

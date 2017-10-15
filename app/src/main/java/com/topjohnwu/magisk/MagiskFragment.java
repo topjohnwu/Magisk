@@ -254,7 +254,7 @@ public class MagiskFragment extends Fragment
         magiskStatusIcon.setImageResource(image);
         magiskStatusIcon.setColorFilter(color);
 
-        switch (Shell.rootStatus) {
+        switch (Shell.status) {
             case 0:
                 color = colorBad;
                 image = R.drawable.ic_cancel;

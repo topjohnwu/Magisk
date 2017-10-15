@@ -208,7 +208,7 @@ public class MagiskManager extends Application {
 
         // Root actions
         if (Shell.rootAccess()) {
-            if (hasNetwork && !Utils.itemExist(shell, BUSYBOXPATH + "/busybox")) {
+            if (hasNetwork && !Utils.itemExist(BUSYBOXPATH + "/busybox")) {
                 try {
                     // Force synchronous, make sure we have busybox to use
                     new DownloadBusybox(this).exec().get();
@@ -223,7 +223,7 @@ public class MagiskManager extends Application {
                 e.printStackTrace();
             }
 
-            shell.su_raw(
+            Shell.su_raw(
                     "export PATH=" + BUSYBOXPATH + ":$PATH",
                     "mount_partitions",
                     "BOOTIMAGE=",
@@ -231,11 +231,11 @@ public class MagiskManager extends Application {
                     "migrate_boot_backup"
             );
 
-            List<String> res = shell.su("echo \"$BOOTIMAGE\"");
+            List<String> res = Shell.su("echo \"$BOOTIMAGE\"");
             if (Utils.isValidShellResponse(res)) {
                 bootBlock = res.get(0);
             } else {
-                blockList = shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
+                blockList = Shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
             }
         }
 
@@ -244,8 +244,8 @@ public class MagiskManager extends Application {
                 .putBoolean("dark_theme", isDarkTheme)
                 .putBoolean("magiskhide", magiskHide)
                 .putBoolean("notification", updateNotification)
-                .putBoolean("hosts", Utils.itemExist(shell, MAGISK_HOST_FILE))
-                .putBoolean("disable", Utils.itemExist(shell, MAGISK_DISABLE_FILE))
+                .putBoolean("hosts", Utils.itemExist(MAGISK_HOST_FILE))
+                .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
                 .putBoolean("su_reauth", suReauth)
                 .putString("su_request_timeout", String.valueOf(suRequestTimeout))
                 .putString("su_auto_response", String.valueOf(suResponseType))
@@ -284,15 +284,15 @@ public class MagiskManager extends Application {
 
     public void getMagiskInfo() {
         List<String> ret;
-        Shell.getShell(this);
-        ret = shell.sh("su -v");
+        Shell.registerShell(this);
+        ret = Shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);
             isSuClient = suVersion.toUpperCase().contains("MAGISK");
         }
-        ret = shell.sh("magisk -v");
+        ret = Shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
-            ret = shell.sh("getprop magisk.version");
+            ret = Shell.sh("getprop magisk.version");
             if (Utils.isValidShellResponse(ret)) {
                 try {
                     magiskVersionString = ret.get(0);
@@ -301,21 +301,21 @@ public class MagiskManager extends Application {
             }
         } else {
             magiskVersionString = ret.get(0).split(":")[0];
-            ret = shell.sh("magisk -V");
+            ret = Shell.sh("magisk -V");
             try {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
         }
-        ret = shell.sh("getprop " + DISABLE_INDICATION_PROP);
+        ret = Shell.sh("getprop " + DISABLE_INDICATION_PROP);
         try {
             disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             disabled = false;
         }
         if (magiskVersionCode > 1435) {
-            ret = shell.su("resetprop -p " + MAGISKHIDE_PROP);
+            ret = Shell.su("resetprop -p " + MAGISKHIDE_PROP);
         } else {
-            ret = shell.sh("getprop " + MAGISKHIDE_PROP);
+            ret = Shell.sh("getprop " + MAGISKHIDE_PROP);
         }
         try {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;

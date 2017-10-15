@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.container;
 
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class Module extends BaseModule {
@@ -8,10 +7,10 @@ public class Module extends BaseModule {
     private String mRemoveFile, mDisableFile, mUpdateFile;
     private boolean mEnable, mRemove, mUpdated;
 
-    public Module(Shell shell, String path) {
+    public Module(String path) {
 
         try {
-            parseProps(Utils.readFile(shell, path + "/module.prop"));
+            parseProps(Utils.readFile(path + "/module.prop"));
         } catch (NumberFormatException ignored) {}
 
         mRemoveFile = path + "/remove";
@@ -27,33 +26,33 @@ public class Module extends BaseModule {
             setName(getId());
         }
 
-        mEnable = !Utils.itemExist(shell, mDisableFile);
-        mRemove = Utils.itemExist(shell, mRemoveFile);
-        mUpdated = Utils.itemExist(shell, mUpdateFile);
+        mEnable = !Utils.itemExist(mDisableFile);
+        mRemove = Utils.itemExist(mRemoveFile);
+        mUpdated = Utils.itemExist(mUpdateFile);
     }
 
-    public void createDisableFile(Shell shell) {
+    public void createDisableFile() {
         mEnable = false;
-        Utils.createFile(shell, mDisableFile);
+        Utils.createFile(mDisableFile);
     }
 
-    public void removeDisableFile(Shell shell) {
+    public void removeDisableFile() {
         mEnable = true;
-        Utils.removeItem(shell, mDisableFile);
+        Utils.removeItem(mDisableFile);
     }
 
     public boolean isEnabled() {
         return mEnable;
     }
 
-    public void createRemoveFile(Shell shell) {
+    public void createRemoveFile() {
         mRemove = true;
-        Utils.createFile(shell, mRemoveFile);
+        Utils.createFile(mRemoveFile);
     }
 
-    public void deleteRemoveFile(Shell shell) {
+    public void deleteRemoveFile() {
         mRemove = false;
-        Utils.removeItem(shell, mRemoveFile);
+        Utils.removeItem(mRemoveFile);
     }
 
     public boolean willBeRemoved() {

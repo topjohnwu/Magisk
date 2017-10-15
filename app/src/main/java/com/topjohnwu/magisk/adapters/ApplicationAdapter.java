@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -47,7 +46,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private PackageManager pm;
     private ApplicationFilter filter;
     private Topic magiskHideDone;
-    private Shell shell;
 
     public ApplicationAdapter(Context context) {
         mOriginalList = mList = Collections.emptyList();
@@ -55,7 +53,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         filter = new ApplicationFilter();
         pm = context.getPackageManager();
         magiskHideDone = Utils.getMagiskManager(context).magiskHideDone;
-        shell = Shell.getShell(context);
         new LoadApps().exec();
     }
 
@@ -89,10 +86,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    Utils.addMagiskHide(shell, info.packageName);
+                    Utils.addMagiskHide(info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    Utils.rmMagiskHide(shell, info.packageName);
+                    Utils.rmMagiskHide(info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });
@@ -163,7 +160,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             }
             Collections.sort(mOriginalList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                     .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            mHideList = Utils.listMagiskHide(shell);
+            mHideList = Utils.listMagiskHide();
             return null;
         }
 

@@ -117,11 +117,11 @@ public class MagiskLogFragment extends Fragment {
             switch (mode) {
                 case 0:
                     StringBuildingList logList = new StringBuildingList();
-                    getShell().su(logList, "cat " + MAGISK_LOG);
+                    Shell.su(logList, "cat " + MAGISK_LOG);
                     return logList.toString();
 
                 case 1:
-                    getShell().su_raw("echo -n > " + MAGISK_LOG);
+                    Shell.su_raw("echo -n > " + MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
@@ -142,7 +142,7 @@ public class MagiskLogFragment extends Fragment {
 
                     try (FileWriter out = new FileWriter(targetFile)) {
                         FileWritingList fileWritingList = new FileWritingList(out);
-                        getShell().su(fileWritingList, "cat " + MAGISK_LOG);
+                        Shell.su(fileWritingList, "cat " + MAGISK_LOG);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return false;

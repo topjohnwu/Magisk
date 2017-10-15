@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -28,7 +29,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         Context context = getMagiskManager();
-        Utils.removeItem(getShell(), context.getApplicationInfo().dataDir + "/busybox");
+        Utils.removeItem(context.getApplicationInfo().dataDir + "/busybox");
         try {
             FileOutputStream out  = new FileOutputStream(busybox);
             HttpURLConnection conn = WebService.request(
@@ -50,7 +51,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
             e.printStackTrace();
         }
         if (busybox.exists()) {
-            getShell().su(
+            Shell.su(
                     "rm -rf " + MagiskManager.BUSYBOXPATH,
                     "mkdir -p " + MagiskManager.BUSYBOXPATH,
                     "cp " + busybox + " " + MagiskManager.BUSYBOXPATH,

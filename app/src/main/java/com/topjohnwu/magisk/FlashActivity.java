@@ -48,7 +48,7 @@ public class FlashActivity extends Activity {
 
     @OnClick(R.id.reboot)
     public void reboot() {
-        getShell().su_raw("reboot");
+        Shell.su_raw("reboot");
     }
 
     @Override
@@ -91,7 +91,7 @@ public class FlashActivity extends Activity {
                 String boot = intent.getStringExtra(SET_BOOT);
                 if (getMagiskManager().remoteMagiskVersionCode < 1370) {
                     // Use legacy installation method
-                    getShell().su_raw(
+                    Shell.su_raw(
                             "echo \"BOOTIMAGE=" + boot + "\" > /dev/.magisk",
                             "echo \"KEEPFORCEENCRYPT=" + keepEnc + "\" >> /dev/.magisk",
                             "echo \"KEEPVERITY=" + keepVerity + "\" >> /dev/.magisk"

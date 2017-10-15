@@ -9,6 +9,7 @@ import com.topjohnwu.jarsigner.JarMap;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 
@@ -78,7 +79,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         }
 
         // Install the application
-        List<String> ret = getShell().su("pm install " + unhideAPK + ">/dev/null && echo true || echo false");
+        List<String> ret = Shell.su("pm install " + unhideAPK + ">/dev/null && echo true || echo false");
         unhideAPK.delete();
         if (!Utils.isValidShellResponse(ret) || !Boolean.parseBoolean(ret.get(0)))
             return false;
@@ -98,7 +99,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         }
 
         // Hide myself!
-        getShell().su_raw("pm hide " + mm.getPackageName());
+        Shell.su_raw("pm hide " + mm.getPackageName());
         return true;
     }
 
