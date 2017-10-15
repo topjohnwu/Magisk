@@ -53,8 +53,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     @Override
     protected Integer doInBackground(Void... voids) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return -1;
+        MagiskManager mm = MagiskManager.get();
         try {
             mList.add("- Copying zip to temp directory");
 
@@ -94,8 +93,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return;
+        MagiskManager mm = MagiskManager.get();
         Shell.su_raw(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + MagiskManager.TMP_FOLDER_PATH
@@ -110,7 +108,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
                 break;
             case 1:
                 // Success
-                new LoadModules(mm).exec();
+                new LoadModules().exec();
                 break;
         }
         super.onPostExecute(result);

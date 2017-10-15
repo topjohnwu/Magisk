@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.content.Context;
-
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
@@ -11,10 +9,6 @@ import java.util.List;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {
 
-    public LoadModules(Context context) {
-        super(context);
-    }
-
     private List<String> getModList() {
         String command = "ls -d " + MagiskManager.MAGISK_PATH + "/* | grep -v lost+found";
         return Shell.su(command);
@@ -22,8 +16,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return null;
+        MagiskManager mm = MagiskManager.get();
         mm.moduleMap = new ValueSortedMap<>();
 
         for (String path : getModList()) {
@@ -36,9 +29,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return;
-        mm.moduleLoadDone.publish();
+        MagiskManager.get().moduleLoadDone.publish();
         super.onPostExecute(v);
     }
 }

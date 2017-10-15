@@ -170,9 +170,9 @@ public class MagiskLogFragment extends Fragment {
                 case 2:
                     boolean bool = (boolean) o;
                     if (bool) {
-                        getMagiskManager().toast(targetFile.toString(), Toast.LENGTH_LONG);
+                        MagiskManager.toast(targetFile.toString(), Toast.LENGTH_LONG);
                     } else {
-                        getMagiskManager().toast(R.string.logs_save_failed, Toast.LENGTH_LONG);
+                        MagiskManager.toast(R.string.logs_save_failed, Toast.LENGTH_LONG);
                     }
                     break;
             }

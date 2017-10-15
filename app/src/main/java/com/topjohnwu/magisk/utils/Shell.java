@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,8 +18,6 @@ import java.util.List;
  */
 
 public class Shell {
-
-    private static WeakReference<MagiskManager> weakMm;
 
     // -1 = no shell; 0 = non root shell; 1 = root shell
     public static int status;
@@ -47,12 +43,8 @@ public class Shell {
         STDOUT = process.getInputStream();
     }
 
-    public static void registerShell(Context context) {
-        weakMm = new WeakReference<>(Utils.getMagiskManager(context));
-    }
-
     public static Shell getShell() {
-        MagiskManager mm = weakMm.get();
+        MagiskManager mm = MagiskManager.get();
         boolean needNewShell = mm.shell == null;
 
         if (!needNewShell) {

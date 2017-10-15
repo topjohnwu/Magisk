@@ -121,14 +121,14 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 mm.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
                 mm.repoDB.clearRepo();
-                mm.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+                MagiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
                 return true;
             });
 
             hideManager.setOnPreferenceClickListener((pref) -> {
                 Utils.runWithPermission(getActivity(),
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        () -> new HideManager(getActivity()).exec());
+                        () -> new HideManager().exec());
                 return true;
             });
 
@@ -239,7 +239,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
                 case "update_channel":
                     mm.updateChannel = Utils.getPrefsInt(prefs, "update_channel");
-                    new CheckUpdates(mm, true).exec();
+                    new CheckUpdates(true).exec();
                     break;
             }
             mm.loadConfig();

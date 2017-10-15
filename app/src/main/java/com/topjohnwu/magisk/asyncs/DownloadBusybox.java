@@ -21,14 +21,10 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
     private File busybox;
 
-    public DownloadBusybox(Context context) {
-        super(context);
-        busybox = new File(context.getCacheDir(), "busybox");
-    }
-
     @Override
     protected Void doInBackground(Void... voids) {
-        Context context = getMagiskManager();
+        Context context = MagiskManager.get();
+        busybox = new File(context.getCacheDir(), "busybox");
         Utils.removeItem(context.getApplicationInfo().dataDir + "/busybox");
         try {
             FileOutputStream out  = new FileOutputStream(busybox);

@@ -143,41 +143,43 @@ public class Utils {
                 .setAction(R.string.ok, (v)->{}).show();
     }
 
-    public static boolean checkNetworkStatus(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean checkNetworkStatus() {
+        ConnectivityManager manager = (ConnectivityManager)
+                MagiskManager.get().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }
 
-    public static String getLocaleString(Context context, Locale locale, @StringRes int id) {
+    public static String getLocaleString(Locale locale, @StringRes int id) {
+        Context context = MagiskManager.get();
         Configuration config = context.getResources().getConfiguration();
         config.setLocale(locale);
         Context localizedContext = context.createConfigurationContext(config);
         return localizedContext.getString(id);
     }
 
-    public static List<Locale> getAvailableLocale(Context context) {
+    public static List<Locale> getAvailableLocale() {
         List<Locale> locales = new ArrayList<>();
         HashSet<String> set = new HashSet<>();
         Locale locale;
 
-        int compareId = R.string.download_file_error;
+        @StringRes int compareId = R.string.download_file_error;
 
         // Add default locale
         locales.add(Locale.ENGLISH);
-        set.add(getLocaleString(context, Locale.ENGLISH, compareId));
+        set.add(getLocaleString(Locale.ENGLISH, compareId));
 
         // Add some special locales
         locales.add(Locale.TAIWAN);
-        set.add(getLocaleString(context, Locale.TAIWAN, compareId));
+        set.add(getLocaleString(Locale.TAIWAN, compareId));
         locale = new Locale("pt", "BR");
         locales.add(locale);
-        set.add(getLocaleString(context, locale, compareId));
+        set.add(getLocaleString(locale, compareId));
 
         // Other locales
-        for (String s : context.getAssets().getLocales()) {
+        for (String s : MagiskManager.get().getAssets().getLocales()) {
             locale = Locale.forLanguageTag(s);
-            if (set.add(getLocaleString(context, locale, compareId))) {
+            if (set.add(getLocaleString(locale, compareId))) {
                 locales.add(locale);
             }
         }
@@ -206,7 +208,8 @@ public class Utils {
                 == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER;
     }
 
-    public static Context getEncContext(Context context) {
+    public static Context getEncContext() {
+        Context context = MagiskManager.get();
         if (useFDE(context))
             return context.createDeviceProtectedStorageContext();
         else

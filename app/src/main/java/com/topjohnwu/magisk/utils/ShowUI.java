@@ -34,7 +34,8 @@ public class ShowUI {
     private static final int MAGISK_UPDATE_NOTIFICATION_ID = 1;
     private static final int APK_UPDATE_NOTIFICATION_ID = 2;
 
-    public static void showMagiskUpdateNotification(MagiskManager mm) {
+    public static void showMagiskUpdateNotification() {
+        MagiskManager mm = MagiskManager.get();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(mm.getString(R.string.magisk_update_title))
@@ -54,7 +55,8 @@ public class ShowUI {
         notificationManager.notify(MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
-    public static void showManagerUpdateNotification(MagiskManager mm) {
+    public static void showManagerUpdateNotification() {
+        MagiskManager mm = MagiskManager.get();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(mm.getString(R.string.manager_update_title))
@@ -73,7 +75,7 @@ public class ShowUI {
     }
 
     public static void showMagiskInstallDialog(MagiskFragment fragment, boolean enc, boolean verity) {
-        MagiskManager mm = Utils.getMagiskManager(fragment.getActivity());
+        MagiskManager mm = Utils.getMagiskManager(fragment.getContext());
         String filename = Utils.getLegalFilename("Magisk-v" + mm.remoteMagiskVersionString + ".zip");
         new AlertDialogBuilder(fragment.getActivity())
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)))
@@ -101,10 +103,10 @@ public class ShowUI {
                             switch (idx) {
                                 case 1:
                                     if (mm.remoteMagiskVersionCode < 1400) {
-                                        mm.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
+                                        MagiskManager.toast(R.string.no_boot_file_patch_support, Toast.LENGTH_LONG);
                                         return;
                                     }
-                                    mm.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
+                                    MagiskManager.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                     intent.setType("*/*");
                                     fragment.startActivityForResult(intent, SELECT_BOOT_IMG,
@@ -256,7 +258,7 @@ public class ShowUI {
                             "cat " + uninstaller + " > /cache/" + UNINSTALLER,
                             "cat " + utils + " > /data/magisk/" + Utils.UTIL_FUNCTIONS
                     );
-                    mm.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
+                    MagiskManager.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
                     Shell.su_raw(
                             "sleep 5",
                             "pm uninstall " + mm.getApplicationInfo().packageName
@@ -268,7 +270,7 @@ public class ShowUI {
             .setNeutralButton(R.string.restore_stock_boot, (d, i) -> {
                 String boot = fragment.getSelectedBootImage();
                 if (boot == null) return;
-                new RestoreStockBoot(mm, boot).exec();
+                new RestoreStockBoot(boot).exec();
             })
             .setNegativeButton(R.string.no_thanks, null)
             .show();

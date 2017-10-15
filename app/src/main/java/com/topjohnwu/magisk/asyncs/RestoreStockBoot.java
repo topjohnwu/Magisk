@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.content.Context;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -13,8 +13,7 @@ public class RestoreStockBoot extends ParallelTask<Void, Void, Boolean> {
 
     private String mBoot;
 
-    public RestoreStockBoot(Context context, String boot) {
-        super(context);
+    public RestoreStockBoot(String boot) {
         mBoot = boot;
     }
 
@@ -33,9 +32,9 @@ public class RestoreStockBoot extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         if (result) {
-            getMagiskManager().toast(R.string.restore_done, Toast.LENGTH_SHORT);
+            MagiskManager.toast(R.string.restore_done, Toast.LENGTH_SHORT);
         } else {
-            getMagiskManager().toast(R.string.restore_fail, Toast.LENGTH_LONG);
+            MagiskManager.toast(R.string.restore_fail, Toast.LENGTH_LONG);
         }
     }
 }

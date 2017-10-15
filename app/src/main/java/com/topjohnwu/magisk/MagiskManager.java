@@ -32,12 +32,16 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class MagiskManager extends Application {
+
+    // Global weak reference to self
+    private static WeakReference<MagiskManager> weakSelf;
 
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String MAGISK_HOST_FILE = "/magisk/.core/hosts";
@@ -110,21 +114,17 @@ public class MagiskManager extends Application {
     private static Handler mHandler = new Handler();
     private boolean started = false;
 
-    private static class LoadLocale extends ParallelTask<Void, Void, Void> {
-
-        LoadLocale(Context context) {
-            super(context);
-        }
+    private class LoadLocale extends ParallelTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            getMagiskManager().locales = Utils.getAvailableLocale(getMagiskManager());
+            locales = Utils.getAvailableLocale();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            getMagiskManager().localeDone.publish();
+            localeDone.publish();
         }
     }
 
@@ -137,13 +137,18 @@ public class MagiskManager extends Application {
             // Don't migrate yet, wait and check Magisk version
             suDB = new SuDatabaseHelper(this);
         } else {
-            suDB = new SuDatabaseHelper(Utils.getEncContext(this));
+            suDB = new SuDatabaseHelper(Utils.getEncContext());
         }
 
+        weakSelf = new WeakReference<>(this);
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
         loadConfig();
+    }
+
+    public static MagiskManager get() {
+        return weakSelf.get();
     }
 
     public void setLocale() {
@@ -177,12 +182,12 @@ public class MagiskManager extends Application {
         snet_version = prefs.getInt("snet_version", -1);
     }
 
-    public void toast(String msg, int duration) {
-        mHandler.post(() -> Toast.makeText(this, msg, duration).show());
+    public static void toast(String msg, int duration) {
+        mHandler.post(() -> Toast.makeText(weakSelf.get(), msg, duration).show());
     }
 
-    public void toast(int resId, int duration) {
-        mHandler.post(() -> Toast.makeText(this, resId, duration).show());
+    public static void toast(int resId, int duration) {
+        mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
     }
 
     public void startup() {
@@ -190,7 +195,7 @@ public class MagiskManager extends Application {
             return;
         started = true;
 
-        boolean hasNetwork = Utils.checkNetworkStatus(this);
+        boolean hasNetwork = Utils.checkNetworkStatus();
 
         getMagiskInfo();
 
@@ -204,14 +209,14 @@ public class MagiskManager extends Application {
             }
         }
 
-        new LoadLocale(this).exec();
+        new LoadLocale().exec();
 
         // Root actions
         if (Shell.rootAccess()) {
             if (hasNetwork && !Utils.itemExist(BUSYBOXPATH + "/busybox")) {
                 try {
                     // Force synchronous, make sure we have busybox to use
-                    new DownloadBusybox(this).exec().get();
+                    new DownloadBusybox().exec().get();
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -265,7 +270,7 @@ public class MagiskManager extends Application {
             getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
 
-        LoadModules loadModuleTask = new LoadModules(this);
+        LoadModules loadModuleTask = new LoadModules();
         // Start update check job
         if (hasNetwork) {
             ComponentName service = new ComponentName(this, UpdateCheckService.class);
@@ -275,7 +280,7 @@ public class MagiskManager extends Application {
                     .setPeriodic(8 * 60 * 60 * 1000)
                     .build();
             ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
-            loadModuleTask.setCallBack(() -> new UpdateRepos(this, false).exec());
+            loadModuleTask.setCallBack(() -> new UpdateRepos(false).exec());
         }
         // Fire asynctasks
         loadModuleTask.exec();
@@ -284,7 +289,6 @@ public class MagiskManager extends Application {
 
     public void getMagiskInfo() {
         List<String> ret;
-        Shell.registerShell(this);
         ret = Shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
             suVersion = ret.get(0);

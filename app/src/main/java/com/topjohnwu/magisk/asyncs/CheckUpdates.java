@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.content.Context;
-
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.ShowUI;
@@ -18,21 +16,19 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     private static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
     private static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
 
-    private boolean showNotification = false;
+    private boolean showNotification;
 
-    public CheckUpdates(Context context) {
-        super(context);
+    public CheckUpdates() {
+        this(false);
     }
 
-    public CheckUpdates(Context context, boolean b) {
-        super(context);
+    public CheckUpdates(boolean b) {
         showNotification = b;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return null;
+        MagiskManager mm = MagiskManager.get();
         String jsonStr;
         switch (mm.updateChannel) {
             case STABLE_CHANNEL:
@@ -61,13 +57,12 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return;
+        MagiskManager mm = MagiskManager.get();
         if (showNotification && mm.updateNotification) {
             if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
-                ShowUI.showManagerUpdateNotification(mm);
+                ShowUI.showManagerUpdateNotification();
             } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
-                ShowUI.showMagiskUpdateNotification(mm);
+                ShowUI.showMagiskUpdateNotification();
             }
         }
         mm.updateCheckDone.publish();

@@ -118,7 +118,7 @@ public class MainActivity extends Activity
                         && prefs.getBoolean("magiskhide", false));
         menu.findItem(R.id.modules).setVisible(
                 Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus(this) &&
+        menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
                 Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(

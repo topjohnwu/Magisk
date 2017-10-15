@@ -54,7 +54,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new LoadModules(getActivity()).exec();
+            new LoadModules().exec();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

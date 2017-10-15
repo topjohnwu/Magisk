@@ -176,8 +176,8 @@ public class MagiskFragment extends Fragment
         shownDialog = false;
 
         // Trigger state check
-        if (Utils.checkNetworkStatus(mm)) {
-            new CheckUpdates(getActivity()).exec();
+        if (Utils.checkNetworkStatus()) {
+            new CheckUpdates().exec();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
         }
@@ -230,7 +230,7 @@ public class MagiskFragment extends Fragment
     private void updateUI() {
         ((MainActivity) getActivity()).checkHideSection();
 
-        boolean hasNetwork = Utils.checkNetworkStatus(getActivity());
+        boolean hasNetwork = Utils.checkNetworkStatus();
         boolean hasRoot = Shell.rootAccess();
         boolean isUpToDate = mm.magiskVersionCode > 1300;
 

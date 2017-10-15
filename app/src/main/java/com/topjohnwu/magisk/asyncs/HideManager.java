@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.widget.Toast;
@@ -23,10 +22,6 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
     private static final String UNHIDE_APK = "unhide.apk";
     private static final String ANDROID_MANIFEST = "AndroidManifest.xml";
     private static final byte[] UNHIDE_PKG_NAME = "com.topjohnwu.unhide\0".getBytes();
-
-    public HideManager(Context context) {
-        super(context);
-    }
 
     private String genPackageName(String prefix, int length) {
         StringBuilder builder = new StringBuilder(length);
@@ -51,14 +46,12 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        getMagiskManager().toast(R.string.hide_manager_toast, Toast.LENGTH_SHORT);
+        MagiskManager.toast(R.string.hide_manager_toast, Toast.LENGTH_SHORT);
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null)
-            return false;
+        MagiskManager mm = MagiskManager.get();
 
         // Generate a new unhide app with random package name
         File unhideAPK = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", "unhide.apk");
@@ -127,11 +120,8 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean b) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null)
-            return;
         if (!b) {
-            mm.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
+            MagiskManager.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         }
         super.onPostExecute(b);
     }

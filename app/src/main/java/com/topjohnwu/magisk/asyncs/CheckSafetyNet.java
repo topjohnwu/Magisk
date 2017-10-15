@@ -33,7 +33,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
     @Override
     protected void onPreExecute() {
-        MagiskManager mm = getMagiskManager();
+        MagiskManager mm = MagiskManager.get();
         if (mm.snet_version != CheckSafetyNet.SNET_VER) {
             Shell.sh("rm -rf " + dexPath.getParent());
         }
@@ -72,13 +72,13 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
             Object helper = helperClazz.getConstructors()[0].newInstance(
                     getActivity(), Proxy.newProxyInstance(
                             loader, new Class[] { callbackClazz }, (proxy, method, args) -> {
-                                getMagiskManager().safetyNetDone.publish(false, args[0]);
+                                MagiskManager.get().safetyNetDone.publish(false, args[0]);
                                 return null;
                             }));
             helperClazz.getMethod("attest").invoke(helper);
         } catch (Exception e) {
             e.printStackTrace();
-            getMagiskManager().safetyNetDone.publish(false, -1);
+            MagiskManager.get().safetyNetDone.publish(false, -1);
         }
         super.onPostExecute(err);
     }

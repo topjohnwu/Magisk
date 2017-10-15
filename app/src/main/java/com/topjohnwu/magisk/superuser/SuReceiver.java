@@ -37,7 +37,7 @@ public class SuReceiver extends BroadcastReceiver {
         if (mode < 0) return;
 
         if (mode == NOTIFY_USER_TO_OWNER) {
-            magiskManager.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
+            MagiskManager.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
             return;
         }
 

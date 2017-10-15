@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
@@ -44,13 +43,13 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     private int tasks = 0;
 
-    public UpdateRepos(Context context, boolean force) {
-        super(context);
-        prefs = getMagiskManager().prefs;
-        repoDB = getMagiskManager().repoDB;
-        getMagiskManager().repoLoadDone.hasPublished = false;
+    public UpdateRepos(boolean force) {
+        MagiskManager mm = MagiskManager.get();
+        prefs = mm.prefs;
+        repoDB = mm.repoDB;
+        mm.repoLoadDone.hasPublished = false;
         // Legacy data cleanup
-        File old = new File(context.getApplicationInfo().dataDir + "/shared_prefs", "RepoMap.xml");
+        File old = new File(mm.getApplicationInfo().dataDir + "/shared_prefs", "RepoMap.xml");
         if (old.exists() || prefs.getString("repomap", null) != null) {
             old.delete();
             prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
@@ -211,9 +210,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = getMagiskManager();
-        if (mm == null) return;
-        mm.repoLoadDone.publish();
+        MagiskManager.get().repoLoadDone.publish();
         super.onPostExecute(v);
     }
 }

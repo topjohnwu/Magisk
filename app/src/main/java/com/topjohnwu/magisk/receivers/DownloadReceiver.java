@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -34,7 +35,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                         onDownloadDone(uri);
                         break;
                     default:
-                        Utils.getMagiskManager(context).toast(R.string.download_file_error, Toast.LENGTH_LONG);
+                        MagiskManager.toast(R.string.download_file_error, Toast.LENGTH_LONG);
                         break;
                 }
                 context.unregisterReceiver(this);
