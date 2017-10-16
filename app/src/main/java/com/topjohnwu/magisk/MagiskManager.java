@@ -114,6 +114,10 @@ public class MagiskManager extends Application {
     private static Handler mHandler = new Handler();
     private boolean started = false;
 
+    public MagiskManager() {
+        weakSelf = new WeakReference<>(this);
+    }
+
     private class LoadLocale extends ParallelTask<Void, Void, Void> {
 
         @Override
@@ -140,7 +144,6 @@ public class MagiskManager extends Application {
             suDB = new SuDatabaseHelper(Utils.getEncContext());
         }
 
-        weakSelf = new WeakReference<>(this);
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
