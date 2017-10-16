@@ -3,27 +3,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@android:color/black"
     tools:context="com.topjohnwu.magisk.FlashActivity">
 
     <include layout="@layout/toolbar"/>
 
-    <HorizontalScrollView
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/flash_logs"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager">
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        </android.support.v7.widget.RecyclerView>
+            <TextView
+                android:id="@+id/txtLog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:padding="8dp"
+                android:textColor="@android:color/white"
+                android:textSize="10sp" />
 
-    </HorizontalScrollView>
+        </HorizontalScrollView>
+
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/button_panel"

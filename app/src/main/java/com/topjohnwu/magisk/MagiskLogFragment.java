@@ -117,7 +117,7 @@ public class MagiskLogFragment extends Fragment {
             switch (mode) {
                 case 0:
                     StringBuildingList logList = new StringBuildingList();
-                    Shell.su(logList, "cat " + MAGISK_LOG);
+                    Shell.su(logList, "cat " + MAGISK_LOG + " | tail -n 1000");
                     return logList.toString();
 
                 case 1:
@@ -164,8 +164,8 @@ public class MagiskLogFragment extends Fragment {
                         txtLog.setText(R.string.log_is_empty);
                     else
                         txtLog.setText(llog);
-                    svLog.post(() -> svLog.scrollTo(0, txtLog.getHeight()));
-                    hsvLog.post(() -> hsvLog.scrollTo(0, 0));
+                    svLog.postDelayed(() -> svLog.fullScroll(ScrollView.FOCUS_DOWN), 100);
+                    hsvLog.postDelayed(() -> hsvLog.fullScroll(ScrollView.FOCUS_LEFT), 100);
                     break;
                 case 2:
                     boolean bool = (boolean) o;
