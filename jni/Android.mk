@@ -2,16 +2,14 @@ LOCAL_PATH := $(call my-dir)
 
 # Some handy paths
 JNI_ROOT := jni
-SELINUX_PATH := jni/external/selinux
-COMPRESS_LIB := jni/external/ndk-compression
-DTC_PATH := jni/external/dtc
-LIBSELINUX := $(SELINUX_PATH)/libselinux/include
-LIBSEPOL := $(SELINUX_PATH)/libsepol/include $(SELINUX_PATH)/libsepol/cil/include
-LIBZ := $(COMPRESS_LIB)/zlib
-LIBLZMA := $(COMPRESS_LIB)/xz/src/liblzma/api
-LIBLZ4 := $(COMPRESS_LIB)/lz4/lib
-LIBBZ2 := $(COMPRESS_LIB)/bzip2
-LIBFDT := $(DTC_PATH)/libfdt
+EXT_PATH := jni/external
+SE_PATH := $(EXT_PATH)/selinux
+LIBSELINUX := $(SE_PATH)/libselinux/include
+LIBSEPOL := $(SE_PATH)/libsepol/include $(SE_PATH)/libsepol/cil/include
+LIBLZMA := $(EXT_PATH)/xz/src/liblzma/api
+LIBLZ4 := $(EXT_PATH)/lz4/lib
+LIBBZ2 := $(EXT_PATH)/bzip2
+LIBFDT := $(EXT_PATH)/dtc/libfdt
 
 ########################
 # Binaries
@@ -65,10 +63,9 @@ include $(BUILD_EXECUTABLE)
 # magiskboot
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
-LOCAL_STATIC_LIBRARIES := libz liblzma liblz4 libbz2 libfdt
+LOCAL_STATIC_LIBRARIES := liblzma liblz4 libbz2 libfdt
 LOCAL_C_INCLUDES := \
 	jni/include \
-	$(LIBZ) \
 	$(LIBLZMA) \
 	$(LIBLZ4) \
 	$(LIBBZ2) \
@@ -86,7 +83,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/dtb.c \
 	utils/xwrap.c \
 	utils/vector.c
-LOCAL_CFLAGS := -DZLIB_CONST
+LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
 
 # magiskinit

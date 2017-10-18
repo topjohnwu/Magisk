@@ -44,7 +44,7 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 		LOGE("Unable to init zlib stream\n");
 
 	do {
-		strm.next_in = buf + pos;
+		strm.next_in = (void *) buf + pos;
 		if (pos + CHUNK >= size) {
 			strm.avail_in = size - pos;
 			flush = Z_FINISH;

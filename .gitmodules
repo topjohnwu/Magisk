@@ -4,9 +4,6 @@
 [submodule "jni/su"]
 	path = jni/su
 	url = https://github.com/topjohnwu/MagiskSU.git
-[submodule "jni/ndk-compression"]
-	path = jni/external/ndk-compression
-	url = https://github.com/topjohnwu/ndk-compression.git
 [submodule "jni/magiskpolicy"]
 	path = jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
@@ -19,3 +16,12 @@
 [submodule "jni/external/dtc"]
 	path = jni/external/dtc
 	url = https://github.com/dgibson/dtc
+[submodule "jni/external/lz4"]
+	path = jni/external/lz4
+	url = https://github.com/lz4/lz4.git
+[submodule "jni/external/bzip2"]
+	path = jni/external/bzip2
+	url = https://github.com/nemequ/bzip2.git
+[submodule "jni/external/xz"]
+	path = jni/external/xz
+	url = https://github.com/xz-mirror/xz.git
