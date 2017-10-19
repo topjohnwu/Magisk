@@ -3,9 +3,6 @@ package com.topjohnwu.magisk.asyncs;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Utils;
-
 import java.lang.ref.WeakReference;
 
 public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {

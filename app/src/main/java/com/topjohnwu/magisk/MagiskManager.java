@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -55,6 +56,7 @@ public class MagiskManager extends Application {
     public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
     public static final String BUSYBOXPATH = "/dev/magisk/bin";
     public static final int UPDATE_SERVICE_ID = 1;
+    public static final int UPDATE_SERVICE_VER = 1;
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -79,6 +81,8 @@ public class MagiskManager extends Application {
     public boolean isSuClient = false;
     public String suVersion = null;
     public boolean disabled;
+    public int snet_version;
+    public int updateServiceVersion;
 
     // Data
     public Map<String, Module> moduleMap;
@@ -103,7 +107,6 @@ public class MagiskManager extends Application {
     public String localeConfig;
     public int updateChannel;
     public String bootFormat;
-    public int snet_version;
 
     // Global resources
     public SharedPreferences prefs;
@@ -118,30 +121,16 @@ public class MagiskManager extends Application {
         weakSelf = new WeakReference<>(this);
     }
 
-    private class LoadLocale extends ParallelTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            locales = Utils.getAvailableLocale();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            localeDone.publish();
-        }
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists()) {
+        if (Utils.getDatabasePath(this, SuDatabaseHelper.DB_NAME).exists()) {
             // Don't migrate yet, wait and check Magisk version
             suDB = new SuDatabaseHelper(this);
         } else {
-            suDB = new SuDatabaseHelper(Utils.getEncContext());
+            suDB = new SuDatabaseHelper();
         }
 
         repoDB = new RepoDatabaseHelper(this);
@@ -183,6 +172,7 @@ public class MagiskManager extends Application {
         updateChannel = Utils.getPrefsInt(prefs, "update_channel", CheckUpdates.STABLE_CHANNEL);
         bootFormat = prefs.getString("boot_format", ".img");
         snet_version = prefs.getInt("snet_version", -1);
+        updateServiceVersion = prefs.getInt("update_service_version", -1);
     }
 
     public static void toast(String msg, int duration) {
@@ -193,44 +183,64 @@ public class MagiskManager extends Application {
         mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void startup() {
         if (started)
             return;
         started = true;
 
-        boolean hasNetwork = Utils.checkNetworkStatus();
+        // Dynamic detect all locales
+        new ParallelTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                locales = Utils.getAvailableLocale();
+                return null;
+            }
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                localeDone.publish();
+            }
+        }.exec();
+
+        // Create notification channel on Android O
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
+                    getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
+            getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        }
 
         getMagiskInfo();
 
-        // Check if we need to migrate suDB
-        if (getDatabasePath(SuDatabaseHelper.DB_NAME).exists() && Utils.useFDE(this)) {
-            if (magiskVersionCode >= 1410) {
-                suDB.close();
-                Context de = createDeviceProtectedStorageContext();
-                de.moveDatabaseFrom(this, SuDatabaseHelper.DB_NAME);
-                suDB = new SuDatabaseHelper(de);
-            }
-        }
-
-        new LoadLocale().exec();
-
-        // Root actions
-        if (Shell.rootAccess()) {
-            if (hasNetwork && !Utils.itemExist(BUSYBOXPATH + "/busybox")) {
-                try {
-                    // Force synchronous, make sure we have busybox to use
-                    new DownloadBusybox().exec().get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-
+        // Magisk working as expected
+        if (Shell.rootAccess() && magiskVersionCode > 0) {
+            // Load utility shell scripts
             try (InputStream in  = getAssets().open(Utils.UTIL_FUNCTIONS)) {
                 shell.loadInputStream(in);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            LoadModules loadModuleTask = new LoadModules();
+
+            if (Utils.checkNetworkStatus()) {
+                // Make sure we have busybox
+                if (!Utils.itemExist(BUSYBOXPATH + "/busybox")) {
+                    try {
+                        // Force synchronous, make sure we have busybox to use
+                        new DownloadBusybox().exec().get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Fire update check
+                new CheckUpdates().exec();
+
+                // Add repo update check
+                loadModuleTask.setCallBack(() -> new UpdateRepos(false).exec());
+            }
+
+            // Root shell initialization
             Shell.su_raw(
                     "export PATH=" + BUSYBOXPATH + ":$PATH",
                     "mount_partitions",
@@ -238,13 +248,30 @@ public class MagiskManager extends Application {
                     "find_boot_image",
                     "migrate_boot_backup"
             );
-
-            List<String> res = Shell.su("echo \"$BOOTIMAGE\"");
-            if (Utils.isValidShellResponse(res)) {
-                bootBlock = res.get(0);
+            List<String> ret = Shell.su("echo \"$BOOTIMAGE\"");
+            if (Utils.isValidShellResponse(ret)) {
+                bootBlock = ret.get(0);
             } else {
                 blockList = Shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
             }
+
+            // Setup suDB
+            SuDatabaseHelper.setupSuDB();
+
+            // Add update checking service
+            if (UPDATE_SERVICE_VER > updateServiceVersion) {
+                ComponentName service = new ComponentName(this, UpdateCheckService.class);
+                JobInfo info = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
+                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                        .setPersisted(true)
+                        .setPeriodic(8 * 60 * 60 * 1000)
+                        .build();
+                ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(info);
+                updateServiceVersion = UPDATE_SERVICE_VER;
+            }
+
+            // Fire asynctasks
+            loadModuleTask.exec();
         }
 
         // Write back default values
@@ -264,30 +291,8 @@ public class MagiskManager extends Application {
                 .putString("update_channel", String.valueOf(updateChannel))
                 .putString("locale", localeConfig)
                 .putString("boot_format", bootFormat)
+                .putInt("update_service_version", updateServiceVersion)
                 .apply();
-
-        // Create notification channel on Android O
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
-                    getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
-        }
-
-        LoadModules loadModuleTask = new LoadModules();
-        // Start update check job
-        if (hasNetwork) {
-            ComponentName service = new ComponentName(this, UpdateCheckService.class);
-            JobInfo jobInfo = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setPersisted(true)
-                    .setPeriodic(8 * 60 * 60 * 1000)
-                    .build();
-            ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
-            loadModuleTask.setCallBack(() -> new UpdateRepos(false).exec());
-        }
-        // Fire asynctasks
-        loadModuleTask.exec();
-
     }
 
     public void getMagiskInfo() {

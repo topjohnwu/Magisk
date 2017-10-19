@@ -74,7 +74,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
 
-        File install = new File(Utils.getEncContext().getFilesDir().getParent(), "install");
+        File install = new File(
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
+                        mm.createDeviceProtectedStorageContext() :
+                        mm).getFilesDir().getParent()
+                , "install");
         Shell.sh_raw("rm -rf " + install);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
