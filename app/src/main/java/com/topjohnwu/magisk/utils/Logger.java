@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.utils;
 
 import android.util.Log;
 
-import com.topjohnwu.magisk.MagiskManager;
-
 import java.util.Locale;
 
 public class Logger {
@@ -27,13 +25,13 @@ public class Logger {
         error(String.format(Locale.US, fmt, args));
     }
 
-    public static void shell(String line) {
+    public static void shell(boolean in, String line) {
         if (SHELL_LOGGING) {
-            Log.d(DEBUG_TAG, "SHELL: " + line);
+            Log.d(DEBUG_TAG, (in ? "SHELLIN : " : "SHELLOUT: ") + line);
         }
     }
 
-    public static void shell(String fmt, Object... args) {
-        shell(String.format(Locale.US, fmt, args));
+    public static void shell(boolean in, String fmt, Object... args) {
+        shell(in, String.format(Locale.US, fmt, args));
     }
 }

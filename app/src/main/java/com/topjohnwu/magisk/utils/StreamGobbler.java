@@ -46,7 +46,7 @@ public class StreamGobbler extends Thread {
                 if (TextUtils.equals(line, "-shell-done-"))
                     return;
                 writer.add(line);
-                Logger.shell(line);
+                Logger.shell(false, line);
             }
         } catch (IOException e) {
             // reader probably closed, expected exit condition

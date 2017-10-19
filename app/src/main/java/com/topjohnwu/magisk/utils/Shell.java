@@ -19,8 +19,8 @@ import java.util.List;
 
 public class Shell {
 
-    // -1 = no shell; 0 = non root shell; 1 = root shell
-    public static int status;
+    // -2 = not initialized; -1 = no shell; 0 = non root shell; 1 = root shell
+    public static int status = -2;
 
     private final Process process;
     private final OutputStream STDIN;
@@ -84,16 +84,25 @@ public class Shell {
     }
 
     public static boolean rootAccess() {
+        if (status == -2) getShell();
         return status > 0;
     }
 
     public void run(Collection<String> output, String... commands) {
         synchronized (process) {
-            StreamGobbler out = new StreamGobbler(STDOUT, output);
-            out.start();
-            run_raw(true, commands);
-            run_raw(true, "echo \'-shell-done-\'");
-            try { out.join(); } catch (InterruptedException ignored) {}
+            try {
+                StreamGobbler out = new StreamGobbler(STDOUT, output);
+                out.start();
+                run_raw(true, commands);
+                STDIN.write("echo \'-shell-done-\'\n".getBytes("UTF-8"));
+                STDIN.flush();
+                try {
+                    out.join();
+                } catch (InterruptedException ignored) {}
+            } catch (IOException e) {
+                e.printStackTrace();
+                process.destroy();
+            }
         }
     }
 
@@ -101,7 +110,7 @@ public class Shell {
         synchronized (process) {
             try {
                 for (String command : commands) {
-                    Logger.shell(command);
+                    Logger.shell(true, command);
                     STDIN.write((command + (stdout ? "\n" : " >/dev/null\n")).getBytes("UTF-8"));
                     STDIN.flush();
                 }
@@ -113,15 +122,17 @@ public class Shell {
     }
 
     public void loadInputStream(InputStream in) {
-        try {
-            int read;
-            byte[] bytes = new byte[4096];
-            while ((read = in.read(bytes)) != -1) {
-                STDIN.write(bytes, 0, read);
+        synchronized (process) {
+            try {
+                int read;
+                byte[] bytes = new byte[4096];
+                while ((read = in.read(bytes)) != -1) {
+                    STDIN.write(bytes, 0, read);
+                }
+                STDIN.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            STDIN.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
