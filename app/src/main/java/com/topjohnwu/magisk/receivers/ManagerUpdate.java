@@ -24,7 +24,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                             install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             Uri content = FileProvider.getUriForFile(context,
-                                    "com.topjohnwu.magisk.provider", new File(uri.getPath()));
+                                    context.getPackageName() + ".provider", new File(uri.getPath()));
                             install.setData(content);
                             context.startActivity(install);
                         } else {

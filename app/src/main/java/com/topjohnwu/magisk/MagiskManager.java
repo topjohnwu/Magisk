@@ -9,6 +9,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -44,6 +45,7 @@ public class MagiskManager extends Application {
     // Global weak reference to self
     private static WeakReference<MagiskManager> weakSelf;
 
+    public static final String ORIG_PKG_NAME = "com.topjohnwu.magisk";
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String MAGISK_HOST_FILE = "/magisk/.core/hosts";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
@@ -68,6 +70,7 @@ public class MagiskManager extends Application {
     public final Topic localeDone = new Topic();
 
     // Info
+    public int userId;
     public String magiskVersionString;
     public int magiskVersionCode = -1;
     public String remoteMagiskVersionString;
@@ -125,12 +128,22 @@ public class MagiskManager extends Application {
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        userId = getApplicationInfo().uid / 100000;
 
         if (Utils.getDatabasePath(this, SuDatabaseHelper.DB_NAME).exists()) {
             // Don't migrate yet, wait and check Magisk version
             suDB = new SuDatabaseHelper(this);
         } else {
             suDB = new SuDatabaseHelper();
+        }
+
+        // If detect original package, self destruct!
+        if (!getPackageName().equals(ORIG_PKG_NAME)) {
+            try {
+                getPackageManager().getApplicationInfo(ORIG_PKG_NAME, 0);
+                Shell.su(String.format(Locale.US, "pm uninstall --user %d %s", userId, getPackageName()));
+                return;
+            } catch (PackageManager.NameNotFoundException ignored) { /* Expected*/ }
         }
 
         repoDB = new RepoDatabaseHelper(this);
@@ -257,6 +270,14 @@ public class MagiskManager extends Application {
 
             // Setup suDB
             SuDatabaseHelper.setupSuDB();
+
+            // Check alternative Magisk Manager
+            String pkg;
+            if (getPackageName().equals(ORIG_PKG_NAME) &&
+                    (pkg = suDB.getStrings(SuDatabaseHelper.REQUESTER, null)) != null) {
+                Shell.su_raw("pm uninstall " + pkg);
+                suDB.setStrings(SuDatabaseHelper.REQUESTER, null);
+            }
 
             // Add update checking service
             if (UPDATE_SERVICE_VER > updateServiceVersion) {

@@ -131,7 +131,6 @@
     <string name="settings_clear_cache_title">Очистка кеша</string>
     <string name="settings_clear_cache_summary">Очистить сохранённую информацию о сетевых репозиториях, заставляя приложение принудительно обновляться через Интернете</string>
     <string name="settings_hide_manager_title">Скрыть Менеджер Magisk</string>
-    <string name="settings_hide_manager_summary">Временно скрывает Менеджер Magisk.\nБудет установлено новое приложение, называется \"Unhide Magisk Manager\"</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
     <string name="settings_update">Настройки обновления</string>

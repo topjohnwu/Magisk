@@ -128,7 +128,6 @@
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
-    <string name="settings_hide_manager_summary">Magisk Manager tijdelijk verbergen.\nDit installeert een nieuwe app genaamd \"Unhide Magisk Manager\"</string>
     <string name="language">Taal</string>
     <string name="system_default">(Systeem standaard)</string>
     <string name="settings_update">Instellingen bijwerken</string>

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "26.0.2"
 
     defaultConfig {
-        applicationId "com.topjohnwu.sn"
+        applicationId "com.topjohnwu.snet"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1

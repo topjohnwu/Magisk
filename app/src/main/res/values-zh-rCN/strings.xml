@@ -130,7 +130,6 @@
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
-    <string name="settings_hide_manager_summary">暂时隐藏 Magisk Manager。\n这将会安装一个应用“Unhide Magisk Manager”用以恢复显示。</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
     <string name="settings_update">更新设定</string>

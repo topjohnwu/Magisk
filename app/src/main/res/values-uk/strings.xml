@@ -127,7 +127,6 @@
     <string name="settings_clear_cache_title">Очищення кешу</string>
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії, змушуючи програму примусово оновлюватися через Інтернет</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Тимчасово приховати Magisk Manager.\nЦя дія встановить новий додаток \"Unhide Magisk Manager\"</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
     <string name="settings_update">Оновити налаштування</string>

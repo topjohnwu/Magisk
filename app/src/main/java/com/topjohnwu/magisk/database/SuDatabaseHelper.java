@@ -41,11 +41,14 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     public static final int NAMESPACE_MODE_REQUESTER = 1;
     public static final int NAMESPACE_MODE_ISOLATE = 2;
 
+    public static final String REQUESTER = "requester";
+
     public static final String DB_NAME = "su.db";
-    private static final int DATABASE_VER = 3;
+    private static final int DATABASE_VER = 4;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
+    private static final String STRINGS_TABLE = "strings";
 
     private static String GLOBAL_DB;
 
@@ -130,7 +133,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion == 0) {
             createTables(db);
-            oldVersion = 2;
+            oldVersion = 3;
         }
         if (oldVersion == 1) {
             // We're dropping column app_name, rename and re-construct table
@@ -155,6 +158,12 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion == 2) {
             db.execSQL("UPDATE " + LOG_TABLE + " SET time=time*1000");
+            ++oldVersion;
+        }
+        if (oldVersion == 3) {
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS " + STRINGS_TABLE + " " +
+                    "(key TEXT, value TEXT, PRIMARY KEY(key))");
             ++oldVersion;
         }
 
@@ -331,6 +340,27 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         try (Cursor c = mDb.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
             if (c.moveToNext()) {
                 value = c.getInt(c.getColumnIndex("value"));
+            }
+        }
+        return value;
+    }
+
+    public void setStrings(String key, String value) {
+        if (value == null) {
+            mDb.delete(STRINGS_TABLE, "key=?", new String[] { key });
+        } else {
+            ContentValues data = new ContentValues();
+            data.put("key", key);
+            data.put("value", value);
+            mDb.replace(STRINGS_TABLE, null, data);
+        }
+    }
+
+    public String getStrings(String key, String defaultValue) {
+        String value = defaultValue;
+        try (Cursor c = mDb.query(STRINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+            if (c.moveToNext()) {
+                value = c.getString(c.getColumnIndex("value"));
             }
         }
         return value;

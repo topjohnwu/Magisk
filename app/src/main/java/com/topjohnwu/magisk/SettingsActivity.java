@@ -108,7 +108,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             setSummary();
 
             // Disable dangerous settings in user mode if selected owner manage
-            if (getActivity().getApplicationInfo().uid > 99999) {
+            if (mm.userId > 0) {
                 suCategory.removePreference(multiuserMode);
                 generalCatagory.removePreference(hideManager);
             }
@@ -125,12 +125,16 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 return true;
             });
 
-            hideManager.setOnPreferenceClickListener((pref) -> {
-                Utils.runWithPermission(getActivity(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        () -> new HideManager().exec());
-                return true;
-            });
+            if (mm.getPackageName().equals(MagiskManager.ORIG_PKG_NAME)) {
+                hideManager.setOnPreferenceClickListener((pref) -> {
+                    Utils.runWithPermission(getActivity(),
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            () -> new HideManager().exec());
+                    return true;
+                });
+            } else {
+                generalCatagory.removePreference(hideManager);
+            }
 
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);

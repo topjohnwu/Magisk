@@ -134,7 +134,6 @@
     <string name="settings_clear_cache_title">Limpar Repo Cache</string>
     <string name="settings_clear_cache_summary">Limpe as informações armazenadas em cache para repos. online, forçando o aplicativo a atualizar online</string>
 	<string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Oculta temporariamente o Magisk Manager.\nIsso irá instalar um novo aplicativo chamado \"Unhide Magisk Manager\"</string>
     <string name="language">Linguagem</string>
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update">Atualizar Configurações</string>

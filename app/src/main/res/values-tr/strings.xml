@@ -125,7 +125,6 @@
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
     <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
-    <string name="settings_hide_manager_summary">Magisk Manager\'ı geçici olarak gizle.\nBu, \"Unhide Magisk Manager\" adlı yeni bir uygulama yükleyecektir.</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>

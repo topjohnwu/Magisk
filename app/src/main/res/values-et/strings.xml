@@ -135,8 +135,6 @@
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda võrgus olevate hoidlate vahemälus olev teave, sunnib rakendust võrgust värskendama</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Peida ajutiselt Magisk Manager.\n
- See installib uue rakenduse nimega \"Unhide Magisk Manager"</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_update">Uuenda seadeid</string>

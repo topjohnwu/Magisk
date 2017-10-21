@@ -132,13 +132,13 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             publishProgress(SHOW_PROCESSING);
 
             // Then sign the zip for the first time, temp1 -> temp2
-            ZipUtils.signZip(activity, temp1, temp2, false);
+            ZipUtils.signZip(temp1, temp2, false);
 
             // Adjust the zip to prevent unzip issues, temp2 -> temp1
             ZipUtils.zipAdjust(temp2.getPath(), temp1.getPath());
 
             // Finally, sign the whole zip file again, temp1 -> temp2
-            ZipUtils.signZip(activity, temp1, temp2, true);
+            ZipUtils.signZip(temp1, temp2, true);
 
             // Write it to the target zip, temp2 -> file
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(mFile));

@@ -122,7 +122,6 @@
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
-    <string name="settings_hide_manager_summary">Magisk Manager temporär verbergen.\nDies installiert eine neue App namens \"Unhide Magisk Manager\"</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
     <string name="settings_update">Update-Einstellungen</string>

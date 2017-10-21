@@ -108,7 +108,6 @@
     <string name="settings_clear_cache_title">Eliminare cache</string>
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
     <string name="settings_hide_manager_title">Ascundeţi Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Ascundeţi temporar Magisk Manager.\nAceasta va instala o nouă aplicație numită \"Unhide Magisk Manager\"</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicit)</string>
 
