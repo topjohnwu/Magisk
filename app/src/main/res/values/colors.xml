@@ -17,4 +17,8 @@
 
     <color name="su_request_background">#e0e0e0</color>
 
+
+<!-- Flashing colors -->
+    <color name="flashing_background_color">@android:color/black</color>
+    <color name="button_panel_background_color">@android:color/darker_gray</color>
 </resources>

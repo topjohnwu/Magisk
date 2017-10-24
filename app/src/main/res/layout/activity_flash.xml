@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/black"
+    android:background="@color/flashing_background_color"
     tools:context="com.topjohnwu.magisk.FlashActivity">
 
     <include layout="@layout/toolbar"/>
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@android:color/darker_gray"
+        android:background="@color/button_panel_background_color"
         android:orientation="horizontal"
         android:visibility="gone">
 
