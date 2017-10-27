@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
@@ -17,7 +16,8 @@
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
-	<string name="safetyNet_network_loss">Connexion réseau indisponible unavailable</string>
+    <string name="safetyNet_api_error">Erreur d\'API SafetyNet</string>
+    <string name="safetyNet_network_loss">Connexion réseau indisponible</string>
 	<string name="safetyNet_service_disconnected">Le service a été tué</string>
 	<string name="safetyNet_res_invalid">La réponse est invalide</string>
     <!--Install Fragment-->
@@ -28,11 +28,11 @@
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
     <string name="keep_dm_verity">Garder dm-verity</string>
-    <string name="current_magisk_title">Version Magisk Installée : %1$s</string>
-    <string name="install_magisk_title">Dernière Version Magisk : %1$s</string>
+    <string name="current_magisk_title">Version Magisk installée : %1$s</string>
+    <string name="install_magisk_title">Dernière version Magisk : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
-	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si ce n\'est actuellement pas le cas</string>
+	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si elles ne le sont pas actuellement</string>
 	<string name="update">Mise à jour %1$s</string>
     <!--Module Fragment-->
     <string name="no_info_provided">(Aucune information transmise)</string>
@@ -59,12 +59,12 @@
     <string name="app_developers">Principaux développeurs</string>
     <string name="app_developers_"><![CDATA[Appli créée par <a href="https://github.com/topjohnwu">topjohnwu</a> en collaboration avec <a href="https://github.com/d8ahazard">Digitalhigh</a> et <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Modifications de l\'application</string>
-    <string name="translators" />
+    <string name="translators">Primokorn, Naboleo, tonymanou</string>
     <string name="app_version">Version de l\'application</string>
     <string name="app_source_code">Code source</string>
     <string name="donation">Dons</string>
     <string name="app_translators">Traducteurs de l\'application</string>
-    <string name="support_thread">Sujet pour support</string>
+    <string name="support_thread">Fil de discussion pour support</string>
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Cette fonctionnalité ne marchera pas sans la permission d\'écriture sur le stockage externe.</string>
     <string name="no_thanks">Non merci</string>
@@ -72,11 +72,11 @@
     <string name="ok">OK</string>
     <string name="close">Fermer</string>
     <string name="repo_install_title">Installer %1$s</string>
-    <string name="repo_install_msg">Voulez-vous installer %1$s ?</string>
+    <string name="repo_install_msg">Voulez-vous installer %1$s maintenant ?</string>
     <string name="download">Télécharger</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
     <string name="install_error">Échec de l\'installation !</string>
-    <string name="invalid_zip">Ce zip n\'est pas un Module Magisk !!</string>
+    <string name="invalid_zip">Ce zip n\'est pas un module Magisk !</string>
     <string name="reboot">Redémarrer</string>
     <string name="zip_process_msg">Exécution du fichier zip…</string>
     <string name="downloading_toast">Téléchargement %1$s</string>
@@ -85,27 +85,32 @@
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache du dépôt effacé</string>
     <string name="safetyNet_hide_notice">Cette application utilise SafetyNet\nDéjà pris en charge par MagiskHide par défaut</string>
-    <string name="process_error">Erreur d\'exécution</string>
-    <string name="internal_storage">Le zip est stocké dans :\n[Internal Storage]%1$s</string>
-    <string name="zip_process_title">Exécution</string>
+    <string name="process_error">Erreur de traitement</string>
+    <string name="internal_storage">Le zip est stocké dans :\n[Stockage interne]%1$s</string>
+    <string name="zip_process_title">Traitement</string>
     <string name="manual_boot_image">Veuillez sélectionner l\'image boot manuellement !</string>
 	<string name="zip_download_title">Téléchargement</string>
-	<string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%) ...</string>
-	<string name="manager_update_title">Nouvelle mise à jour Magisk Manager disponible !</string>
+	<string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%)…</string>
+	<string name="manager_update_title">Nouvelle mise à jour de Magisk Manager disponible !</string>
 	<string name="manager_download_install">Appuyez pour télécharger et installer</string>
 	<string name="magisk_updates">Mises à jour Magisk</string>
-	<string name="flashing">Flash en-cours</string>
+	<string name="flashing">Flashage en cours</string>
 	<string name="hide_manager_toast">Masquage de Magisk Manager…</string>
-	<string name="hide_manager_fail_toast">Échec du masquage de Magisk Manager...</string>
+	<string name="hide_manager_fail_toast">Échec du masquage de Magisk Manager…</string>
 	<string name="download_zip_only">Télécharger uniquement le zip</string>
 	<string name="patch_boot_file">Patcher le fichier image Boot</string>
 	<string name="direct_install">Installation directe (recommandée)</string>
+    <string name="install_second_slot">Intaller sur le second slot (après une OTA)</string>
 	<string name="select_method">Choisir une méthode</string>
 	<string name="no_boot_file_patch_support">La version cible de Magisk ne supporte pas la modification du fichier image Boot</string>
+    <string name="boot_file_patch_msg">Sélectionnez l\'image Boot stock au format .img ou .img.tar</string>
 	<string name="complete_uninstall">Désinstaller complètement</string>
 	<string name="restore_stock_boot">Restaurer le Boot stock</string>
 	<string name="restore_done">Restauration effectuée !</string>
 	<string name="restore_fail">Pas de sauvegarde stock disponible !</string>
+    <string name="uninstall_toast">Désinstallation de Magisk Manager dans 5 secondes, n\'oubliez pas de redémarrer par la suite</string>
+    <string name="proprietary_title">Télécharger le code propriétaire</string>
+    <string name="proprietary_notice">Magisk Manager est un logiciel FOSS et ne contient donc pas le code propriétaire de l\'API SafetyNet de Google. Autorisez-vous Magisk Manager à télécharger une extension (qui contient GoogleApiClient) afin de tester SafetyNet ?</string>
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
@@ -113,7 +118,7 @@
     <string name="settings_notification_title">Notification de mise à jour</string>
     <string name="settings_notification_summary">Afficher des notifications de mises à jour quand une nouvelle version est disponible</string>
     <string name="settings_clear_cache_title">Effacer le cache du dépôt</string>
-    <string name="settings_clear_cache_summary">Effacer les informations en cache des dépôts en ligne, pour forcer une actualisation de l\'application</string>
+    <string name="settings_clear_cache_summary">Effacer les informations en cache des dépôts distants, pour forcer une actualisation de l\'application</string>
     <string name="settings_core_only_title">Mode Magisk Core uniquement</string>
     <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide et les hosts systemless restent activés</string>
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
@@ -187,6 +192,6 @@
     <string name="none">Aucun</string>
     <!--Superuser logs-->
     <string name="pid">PID :\u0020</string>
-    <string name="target_uid">Cible UID:\u0020</string>
+    <string name="target_uid">UID cible :\\u0020</string>
     <string name="command">Commande :\u0020</string>
 </resources>
