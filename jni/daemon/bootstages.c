@@ -415,7 +415,7 @@ static void daemon_init() {
 			unlinkat(sbin, entry->d_name, 0);
 	}
 	close(sbin);
-	mount("tmpfs", "/sbin", "tmpfs", 0, NULL);
+	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	fchmod(sbin, 0755);
 	fsetfilecon(sbin, "u:object_r:rootfs:s0");
@@ -430,7 +430,9 @@ static void daemon_init() {
 		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
 		xsymlink("/root/magisk", buf2);
 	}
-	xmkdir("/magisk", 0755);
+	xsymlink(MOUNTPOINT, FAKEPOINT);
+	close(root);
+	close(sbin);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	LOGI("* Mounting mirrors");

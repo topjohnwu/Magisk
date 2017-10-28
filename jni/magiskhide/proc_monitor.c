@@ -125,11 +125,17 @@ static void hide_daemon(int pid) {
 		free(line);
 	}
 
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	unlink(FAKEPOINT);
+
 exit:
 	// Send resume signal
 	kill(pid, SIGCONT);
 	// Free up memory
 	vec_destroy(&mount_list);
+	// Wait a while and link it back
+	sleep(10);
+	xsymlink(MOUNTPOINT, FAKEPOINT);
 	_exit(0);
 }
 
