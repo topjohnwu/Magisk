@@ -106,6 +106,7 @@
     <string name="magisk_updates">Обновления Magisk</string>
     <string name="flashing">Прошивка…</string>
     <string name="hide_manager_toast">Скрытие Менеджера Magisk…</string>
+    <string name="hide_manager_toast2">Может занять некоторое время…</string>
     <string name="hide_manager_fail_toast">Скрытие Менеджера Magisk неудачно…</string>
     <string name="download_zip_only">Загрузка только архива</string>
     <string name="patch_boot_file">Пропатчить boot-образ</string>
@@ -129,8 +130,9 @@
     <string name="settings_notification_title">Уведомление об обновлении</string>
     <string name="settings_notification_summary">Показывать уведомления об обновлении, когда доступна новая версия</string>
     <string name="settings_clear_cache_title">Очистка кеша</string>
-    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о сетевых репозиториях, заставляя приложение принудительно обновляться через Интернете</string>
+    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о сетевых репозиториях, заставляя приложение принудительно обновляться через Интернет</string>
     <string name="settings_hide_manager_title">Скрыть Менеджер Magisk</string>
+    <string name="settings_hide_manager_summary">Пересобрать менеджер Magisk с случайным именем пакета</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
     <string name="settings_update">Настройки обновления</string>
