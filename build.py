@@ -89,16 +89,6 @@ def build_apk(args):
 
 	os.chdir('java')
 
-	# Build unhide app and place in assets
-	proc = subprocess.run('{} unhide:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
-	if proc.returncode != 0:
-		error('Build Magisk Manager failed!')
-	source = os.path.join('unhide', 'build', 'outputs', 'apk', 'release', 'unhide-release-unsigned.apk')
-	target = os.path.join('app', 'src', 'main', 'assets', 'unhide.apk')
-	cp(source, target)
-
-	print('')
-
 	if args.release:
 		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')

@@ -53,6 +53,7 @@ static void usage() {
 		"   --[init service]          start init service\n"
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
 		"   --restorecon              fix selinux context on Magisk files and folders\n"
+		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
 		"\n"
 		"Supported init services:\n"
 		"   daemon post-fs, post-fs-data, service\n"
@@ -143,6 +144,10 @@ int main(int argc, char *argv[]) {
 			return 0;
 		} else if (strcmp(argv[1], "--restorecon") == 0) {
 			fix_filecon();
+			return 0;
+		} else if (strcmp(argv[1], "--clone-attr") == 0) {
+			if (argc < 4) usage();
+			clone_attr(argv[2], argv[3]);
 			return 0;
 		} else if (strcmp(argv[1], "--daemon") == 0) {
 			// Start daemon, this process won't return
