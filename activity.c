@@ -18,9 +18,8 @@
 #include "su.h"
 
 /* intent actions */
-#define ACTION_REQUEST "start", "-n", REQUESTOR "/" REQUESTOR_PREFIX ".RequestActivity"
-#define ACTION_NOTIFY "start", "-n", REQUESTOR "/" REQUESTOR_PREFIX ".NotifyActivity"
-#define ACTION_RESULT "broadcast", "-n", REQUESTOR "/" REQUESTOR_PREFIX ".SuReceiver"
+#define ACTION_REQUEST "%s/" REQUESTOR_PREFIX ".RequestActivity"
+#define ACTION_RESULT  "%s/" REQUESTOR_PREFIX ".SuReceiver"
 
 #define AM_PATH "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
 
@@ -73,30 +72,20 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	char user[16];
 	int notify = setup_user(ctx, user);
 
+	char activity[128];
+	sprintf(activity, ACTION_RESULT, ctx->path.pkg_name);
+
 	// Send notice to manager, enable logging
 	char *result_command[] = {
-		AM_PATH,
-		ACTION_RESULT,
-		"--user",
-		user,
-		"--ei",
-		"mode",
-		"0",
-		"--ei",
-		"from.uid",
-		fromUid,
-		"--ei",
-		"to.uid",
-		toUid,
-		"--ei",
-		"pid",
-		pid,
-		"--es",
-		"command",
-		get_command(&ctx->to),
-		"--es",
-		"action",
-		policy == ALLOW ? "allow" : "deny",
+		AM_PATH, "broadcast", "-n",
+		activity,
+		"--user", user,
+		"--ei", "mode", "0",
+		"--ei", "from.uid", fromUid,
+		"--ei", "to.uid", toUid,
+		"--ei", "pid", pid,
+		"--es", "command", get_command(&ctx->to),
+		"--es", "action", policy == ALLOW ? "allow" : "deny",
 		NULL
 	};
 	silent_run(result_command);
@@ -105,19 +94,12 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	if (notify) {
 		sprintf(user, "%d", notify);
 		char *notify_command[] = {
-			AM_PATH,
-			ACTION_RESULT,
-			"--user",
-			user,
-			"--ei",
-			"mode",
-			"1",
-			"--ei",
-			"from.uid",
-			fromUid,
-			"--es",
-			"action",
-			policy == ALLOW ? "allow" : "deny",
+			AM_PATH, "broadcast", "-n",
+			activity,
+			"--user", user,
+			"--ei", "mode", "1",
+			"--ei", "from.uid", fromUid,
+			"--es", "action", policy == ALLOW ? "allow" : "deny",
 			NULL
 		};
 		silent_run(notify_command);
@@ -128,17 +110,15 @@ void app_send_request(struct su_context *ctx) {
 	char user[16];
 	int notify = setup_user(ctx, user);
 
+	char activity[128];
+	sprintf(activity, ACTION_REQUEST, ctx->path.pkg_name);
+
 	char *request_command[] = {
-		AM_PATH,
-		ACTION_REQUEST,
-		"--user",
-		user,
-		"--es",
-		"socket",
-		ctx->path.sock_path,
-		"--ez",
-		"timeout",
-		notify ? "false" : "true",
+		AM_PATH, "start", "-n",
+		activity,
+		"--user", user,
+		"--es", "socket", ctx->path.sock_path,
+		"--ez", "timeout", notify ? "false" : "true",
 		NULL
 	};
 	silent_run(request_command);
@@ -146,14 +126,12 @@ void app_send_request(struct su_context *ctx) {
 	// Send notice to user to tell them root is managed by owner
 	if (notify) {
 		sprintf(user, "%d", notify);
+		sprintf(activity, ACTION_RESULT, ctx->path.pkg_name);
 		char *notify_command[] = {
-			AM_PATH,
-			ACTION_RESULT,
-			"--user",
-			user,
-			"--ei",
-			"mode",
-			"2",
+			AM_PATH, "broadcast", "-n",
+			activity,
+			"--user", user,
+			"--ei", "mode", "2",
 			NULL
 		};
 		silent_run(notify_command);

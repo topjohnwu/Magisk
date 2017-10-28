@@ -162,9 +162,9 @@ static void cleanup_signal(int sig) {
 __attribute__ ((noreturn)) void exit2(int status) {
 	// Handle the pipe, or the daemon will get stuck
 	if (su_ctx->info->policy == QUERY) {
-		xwrite(pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
-		close(pipefd[0]);
-		close(pipefd[1]);
+		xwrite(su_ctx->pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+		close(su_ctx->pipefd[0]);
+		close(su_ctx->pipefd[1]);
 	}
 	exit(status);
 }
@@ -352,19 +352,6 @@ int su_daemon_main(int argc, char **argv) {
 
 	// New request or no db exist, notify user for response
 	if (su_ctx->info->policy == QUERY) {
-		mkdir(REQUESTOR_CACHE_PATH, 0770);
-		if (chown(REQUESTOR_CACHE_PATH, su_ctx->st.st_uid, su_ctx->st.st_gid))
-			PLOGE("chown (%s, %u, %u)", REQUESTOR_CACHE_PATH, su_ctx->st.st_uid, su_ctx->st.st_gid);
-
-		if (setgroups(0, NULL))
-			PLOGE("setgroups");
-
-		if (setegid(su_ctx->st.st_gid))
-			PLOGE("setegid (%u)", su_ctx->st.st_gid);
-
-		if (seteuid(su_ctx->st.st_uid))
-			PLOGE("seteuid (%u)", su_ctx->st.st_uid);
-
 		socket_serv_fd = socket_create_temp(su_ctx->path.sock_path, sizeof(su_ctx->path.sock_path));
 		setup_sighandlers(cleanup_signal);
 
@@ -387,9 +374,9 @@ int su_daemon_main(int argc, char **argv) {
 			su_ctx->info->policy = DENY;
 
 		// Report the policy to main daemon
-		xwrite(pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
-		close(pipefd[0]);
-		close(pipefd[1]);
+		xwrite(su_ctx->pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+		close(su_ctx->pipefd[0]);
+		close(su_ctx->pipefd[1]);
 	}
 
 	if (su_ctx->info->policy == ALLOW)

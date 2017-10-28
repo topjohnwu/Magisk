@@ -31,17 +31,14 @@
 #define NAMESPACE_MODE_REQUESTER  1
 #define NAMESPACE_MODE_ISOLATE    2
 
+// DB entry for requester
+#define REQUESTER_ENTRY           "requester"
+
 // DO NOT CHANGE LINE BELOW, java package name will always be the same
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
-
-// If --rename-manifest-package is used in AAPT, this
-// must be changed to correspond to the new APK package name
-// See the two Android.mk files for more details.
-#define REQUESTOR JAVA_PACKAGE_NAME
 // This is used if wrapping the fragment classes and activities
 // with classes in another package.
 #define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
-#define REQUESTOR_CACHE_PATH "/dev/" REQUESTOR
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -80,9 +77,8 @@ struct su_request {
 
 struct su_path {
     char base_path[PATH_MAX];
-    char base_db[PATH_MAX];
     char multiuser_path[PATH_MAX];
-    char multiuser_db[PATH_MAX];
+    char pkg_name[PATH_MAX];
     char sock_path[PATH_MAX];
 };
 
@@ -95,10 +91,10 @@ struct su_context {
     mode_t umask;
     char *cwd;
     struct stat st;
+    int pipefd[2];
 };
 
 extern struct su_context *su_ctx;
-extern int pipefd[2];
 
 // su.c
 

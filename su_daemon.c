@@ -90,28 +90,6 @@ static void *collector(void *args) {
 	}
 }
 
-#define BASE_FMT  "/data/user%s/%d/" REQUESTOR
-#define DB_FMT    BASE_FMT "/databases/su.db"
-#define CAT_PATH(dest, fmt, ...) snprintf(dest, sizeof(dest), fmt, __VA_ARGS__)
-
-static void populate_paths(struct su_context *ctx) {
-	CAT_PATH(ctx->path.base_path, BASE_FMT, "_de", 0);
-	if (access(ctx->path.base_path, R_OK) == -1)
-		CAT_PATH(ctx->path.base_path, BASE_FMT, "", 0);
-
-	CAT_PATH(ctx->path.base_db, DB_FMT, "_de", 0);
-	if (access(ctx->path.base_db, R_OK) == -1)
-		CAT_PATH(ctx->path.base_db, DB_FMT, "", 0);
-
-	CAT_PATH(ctx->path.multiuser_path, BASE_FMT, "_de", ctx->info->uid / 100000);
-	if (access(ctx->path.multiuser_path, R_OK) == -1)
-		CAT_PATH(ctx->path.multiuser_path, BASE_FMT, "", ctx->info->uid / 100000);
-
-	CAT_PATH(ctx->path.multiuser_db, DB_FMT, "_de", ctx->info->uid / 100000);
-	if (access(ctx->path.multiuser_db, R_OK) == -1)
-		CAT_PATH(ctx->path.multiuser_db, DB_FMT, "", ctx->info->uid / 100000);
-}
-
 void su_daemon_receiver(int client) {
 	LOGD("su: request from client: %d\n", client);
 
@@ -170,16 +148,6 @@ void su_daemon_receiver(int client) {
 		.umask = 022,
 		.notify = new_request,
 	};
-	su_ctx = &ctx;
-
-	populate_paths(su_ctx);
-
-	// Check main Magisk Manager
-	xstat(su_ctx->path.base_path, &su_ctx->st);
-	if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
-		LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
-		info->policy = DENY;
-	}
 
 	// Lock before the policy is determined
 	LOCK_UID();
@@ -187,41 +155,38 @@ void su_daemon_receiver(int client) {
 	// Not cached, do the checks
 	if (info->policy == QUERY) {
 		// Get data from database
-		database_check(su_ctx);
-
-		if (su_ctx->info->multiuser_mode == MULTIUSER_MODE_USER) {
-			// Check the user installed Magisk Manager
-			xstat(su_ctx->path.multiuser_path, &su_ctx->st);
-			if (su_ctx->st.st_gid != su_ctx->st.st_uid) {
-				LOGE("Bad uid/gid %d/%d for Superuser Requestor application", su_ctx->st.st_uid, su_ctx->st.st_gid);
-				info->policy = DENY;
-			}
-		}
+		database_check(&ctx);
 
 		// Handle multiuser denies
-		if (su_ctx->info->uid / 100000 &&
-			su_ctx->info->multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
+		if (info->uid / 100000 &&
+			info->multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
 			info->policy = DENY;
-			su_ctx->notify = 0;
+			ctx.notify = 0;
 		}
 
-		// always allow if this is Magisk Manager
-		if (info->policy == QUERY && (info->uid % 100000) == (su_ctx->st.st_uid % 100000)) {
-			info->policy = ALLOW;
-			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
-			su_ctx->notify = 0;
+		// Check requester
+		if (info->policy == QUERY) {
+			if (ctx.st.st_gid != ctx.st.st_uid) {
+				LOGE("Bad uid/gid %d/%d for Superuser Requestor", ctx.st.st_uid, ctx.st.st_gid);
+				info->policy = DENY;
+				ctx.notify = 0;
+			} else if ((info->uid % 100000) == (ctx.st.st_uid % 100000)) {
+				info->policy = ALLOW;
+				info->root_access = ROOT_ACCESS_APPS_AND_ADB;
+				ctx.notify = 0;
+			}
 		}
 
 		// always allow if it's root
 		if (info->uid == UID_ROOT) {
 			info->policy = ALLOW;
 			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
-			su_ctx->notify = 0;
+			ctx.notify = 0;
 		}
 
 		// If still not determined, open a pipe and wait for results
 		if (info->policy == QUERY)
-			xpipe2(pipefd, O_CLOEXEC);
+			xpipe2(ctx.pipefd, O_CLOEXEC);
 	}
 
 	// Fork a new process, the child process will need to setsid,
@@ -235,9 +200,9 @@ void su_daemon_receiver(int client) {
 	if (child) {
 		// Wait for results
 		if (info->policy == QUERY) {
-			xxread(pipefd[0], &info->policy, sizeof(info->policy));
-			close(pipefd[0]);
-			close(pipefd[1]);
+			xxread(ctx.pipefd[0], &info->policy, sizeof(info->policy));
+			close(ctx.pipefd[0]);
+			close(ctx.pipefd[1]);
 		}
 
 		// The policy is determined, unlock
@@ -308,8 +273,8 @@ void su_daemon_receiver(int client) {
 	}
 
 	// Get cwd
-	su_ctx->cwd = read_string(client);
-	LOGD("su: cwd=[%s]\n", su_ctx->cwd);
+	ctx.cwd = read_string(client);
+	LOGD("su: cwd=[%s]\n", ctx.cwd);
 
 	// Get pts_slave
 	char *pts_slave = read_string(client);
@@ -330,7 +295,7 @@ void su_daemon_receiver(int client) {
 		xstat(pts_slave, &stbuf);
 
 		//If caller is not root, ensure the owner of pts_slave is the caller
-		if(stbuf.st_uid != credential.uid && credential.uid != 0) {
+		if(stbuf.st_uid != info->uid && info->uid != 0) {
 			LOGE("su: Wrong permission of pts_slave");
 			exit2(1);
 		}
@@ -363,6 +328,8 @@ void su_daemon_receiver(int client) {
 
 	close(ptsfd);
 
+	// Give main the reference
+	su_ctx = &ctx;
 	su_daemon_main(argc, argv);
 }
 

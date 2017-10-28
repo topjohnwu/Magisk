@@ -29,21 +29,22 @@ int socket_create_temp(char *path, size_t len) {
 
     memset(&sun, 0, sizeof(sun));
     sun.sun_family = AF_LOCAL;
-    snprintf(path, len, "%s/.socket%d", REQUESTOR_CACHE_PATH, (int) syscall(SYS_gettid));
-    snprintf(sun.sun_path, sizeof(sun.sun_path), "%s", path);
+    snprintf(path, len, "/dev/.socket%d", (int) syscall(SYS_gettid));
+    strcpy(sun.sun_path, path);
 
     /*
      * Delete the socket to protect from situations when
      * something bad occured previously and the kernel reused pid from that process.
      * Small probability, isn't it.
      */
-    unlink(sun.sun_path);
+    unlink(path);
 
     xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
     xlisten(fd, 1);
 
-    // Set context to su_device, so apps can access it
-    setfilecon(sun.sun_path, "u:object_r:su_device:s0");
+    // Set attributes so requester can access it
+    setfilecon(path, "u:object_r:su_device:s0");
+    chown(path, su_ctx->st.st_uid, su_ctx->st.st_gid);
 
     return fd;
 }
