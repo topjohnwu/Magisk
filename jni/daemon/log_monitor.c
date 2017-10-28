@@ -140,10 +140,7 @@ void stop_debug_full_log() {
 	// Stop recording the boot logcat after every boot task is done
 	kill(debug_log_pid, SIGTERM);
 	waitpid(debug_log_pid, NULL, 0);
-	pthread_t thread;
 	// Start debug thread
-	xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
-	pthread_detach(thread);
 	start_debug_log();
 #endif
 }

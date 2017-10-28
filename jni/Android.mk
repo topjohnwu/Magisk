@@ -1,7 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
 # Some handy paths
-JNI_ROOT := jni
 EXT_PATH := jni/external
 SE_PATH := $(EXT_PATH)/selinux
 LIBSELINUX := $(SE_PATH)/libselinux/include

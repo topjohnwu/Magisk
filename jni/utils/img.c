@@ -137,9 +137,9 @@ char *mount_image(const char *img, const char *target) {
 	if (access(img, F_OK) == -1)
 		return NULL;
 	if (access(target, F_OK) == -1) {
-		if (xmkdir(target, 0755) == -1) {
+		if (xmkdir_p(target, 0755) == -1) {
 			xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-			xmkdir(target, 0755);
+			xmkdir_p(target, 0755);
 			xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 		}
 	}
