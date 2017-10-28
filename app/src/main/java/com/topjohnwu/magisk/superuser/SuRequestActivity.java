@@ -48,7 +48,7 @@ public class SuRequestActivity extends Activity {
     private String socketPath;
     private LocalSocket socket;
     private PackageManager pm;
-    private MagiskManager magiskManager;
+    private MagiskManager mm;
 
     private boolean hasTimeout;
     private Policy policy;
@@ -60,7 +60,7 @@ public class SuRequestActivity extends Activity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         pm = getPackageManager();
-        magiskManager = getMagiskManager();
+        mm = getMagiskManager();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
@@ -85,7 +85,7 @@ public class SuRequestActivity extends Activity {
     }
 
     private void showRequest() {
-        switch (magiskManager.suResponseType) {
+        switch (mm.suResponseType) {
             case AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
@@ -114,7 +114,7 @@ public class SuRequestActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
 
-        timer = new CountDownTimer(magiskManager.suRequestTimeout * 1000, 1000) {
+        timer = new CountDownTimer(mm.suRequestTimeout * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
@@ -176,7 +176,7 @@ public class SuRequestActivity extends Activity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            magiskManager.suDB.addPolicy(policy);
+            mm.suDB.addPolicy(policy);
         }
         handleAction();
     }
@@ -216,7 +216,7 @@ public class SuRequestActivity extends Activity {
                 }
 
                 int uid = payload.getAsInteger("uid");
-                policy = magiskManager.suDB.getPolicy(uid);
+                policy = mm.suDB.getPolicy(uid);
                 if (policy == null) {
                     policy = new Policy(uid, pm);
                 }

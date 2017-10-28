@@ -44,7 +44,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     public static final String REQUESTER = "requester";
 
     public static final String DB_NAME = "su.db";
-    private static final int DATABASE_VER = 4;
+    private static final int DATABASE_VER = 5;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
@@ -166,11 +166,24 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                     "(key TEXT, value TEXT, PRIMARY KEY(key))");
             ++oldVersion;
         }
+        if (oldVersion == 4) {
+            db.execSQL("UPDATE " + POLICY_TABLE + " SET uid=uid%100000");
+            ++oldVersion;
+        }
 
         if (!Utils.itemExist(GLOBAL_DB)) {
             // Hard link our DB globally
             Shell.su_raw("ln " + getDbFile() + " " + GLOBAL_DB);
         }
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Remove everything, we do not support downgrade
+        db.delete(POLICY_TABLE, null, null);
+        db.delete(LOG_TABLE, null, null);
+        db.delete(SETTINGS_TABLE, null, null);
+        db.delete(STRINGS_TABLE, null, null);
     }
 
     public File getDbFile() {
@@ -220,7 +233,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public Policy getPolicy(int uid) {
         Policy policy = null;
-        try (Cursor c = mDb.query(POLICY_TABLE, null, "uid=?", new String[] { String.valueOf(uid) }, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, "uid=?", new String[] { String.valueOf(uid % 100000) }, null, null, null)) {
             if (c.moveToNext()) {
                 policy = new Policy(c, pm);
             }
@@ -259,18 +272,6 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 try {
                     Policy policy = new Policy(c, pm);
-                    // The application changed UID for some reason, check user config
-                    if (policy.info.uid != policy.uid) {
-                        if (MagiskManager.get().suReauth) {
-                            // Reauth required, remove from DB
-                            deletePolicy(policy);
-                            continue;
-                        } else {
-                            // No reauth, update to use the new UID
-                            policy.uid = policy.info.uid;
-                            updatePolicy(policy);
-                        }
-                    }
                     ret.add(policy);
                 } catch (PackageManager.NameNotFoundException e) {
                     // The app no longer exist, remove from DB

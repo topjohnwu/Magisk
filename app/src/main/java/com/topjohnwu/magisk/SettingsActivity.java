@@ -110,7 +110,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             // Disable dangerous settings in user mode if selected owner manage
             if (mm.userId > 0) {
                 suCategory.removePreference(multiuserMode);
-                generalCatagory.removePreference(hideManager);
             }
 
             // Remove re-authentication option on Android O, it will not work
