@@ -43,12 +43,13 @@ import butterknife.Unbinder;
 public class MagiskFragment extends Fragment
         implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener, ExpandableView {
 
-    public static final int CAUSE_SERVICE_DISCONNECTED = 0x00001;
-    public static final int CAUSE_NETWORK_LOST = 0x00010;
-    public static final int RESPONSE_ERR = 0x00100;
+    public static final int CAUSE_SERVICE_DISCONNECTED = 0x01;
+    public static final int CAUSE_NETWORK_LOST = 0x02;
+    public static final int RESPONSE_ERR = 0x04;
+    public static final int CONNECTION_FAIL = 0x08;
 
-    public static final int BASIC_PASS = 0x01000;
-    public static final int CTS_PASS = 0x10000;
+    public static final int BASIC_PASS = 0x10;
+    public static final int CTS_PASS = 0x20;
 
     private Container expandableContainer = new Container();
 
@@ -331,9 +332,7 @@ public class MagiskFragment extends Fragment
     private void updateSafetyNetUI(int response) {
         safetyNetProgress.setVisibility(View.GONE);
         safetyNetRefreshIcon.setVisibility(View.VISIBLE);
-        if (response < 0) {
-            safetyNetStatusText.setText(R.string.safetyNet_api_error);
-        } else if ((response & 0x111) == 0) {
+        if ((response & 0x0F) == 0) {
             safetyNetStatusText.setText(R.string.safetyNet_check_success);
 
             boolean b;
@@ -358,8 +357,11 @@ public class MagiskFragment extends Fragment
                     resid = R.string.safetyNet_service_disconnected;
                     break;
                 case RESPONSE_ERR:
-                default:
                     resid = R.string.safetyNet_res_invalid;
+                    break;
+                case CONNECTION_FAIL:
+                default:
+                    resid = R.string.safetyNet_api_error;
                     break;
             }
             safetyNetStatusText.setText(resid);

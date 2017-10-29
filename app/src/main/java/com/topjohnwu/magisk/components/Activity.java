@@ -1,8 +1,11 @@
 package com.topjohnwu.magisk.components;
 
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +17,9 @@ import com.topjohnwu.magisk.utils.Topic;
 
 public class Activity extends AppCompatActivity {
 
-    private Runnable permissionGrantCallback;
+    private Runnable permissionGrantCallback = null;
+    private AssetManager mAssetManager = null;
+    private Resources mResources = null;
 
     public Activity() {
         super();
@@ -49,6 +54,16 @@ public class Activity extends AppCompatActivity {
         permissionGrantCallback = null;
     }
 
+    @Override
+    public AssetManager getAssets() {
+        return mAssetManager == null ? super.getAssets() : mAssetManager;
+    }
+
+    @Override
+    public Resources getResources() {
+        return mResources == null ? super.getResources() : mResources;
+    }
+
     public void setPermissionGrantCallback(Runnable callback) {
         permissionGrantCallback = callback;
     }
@@ -69,6 +84,27 @@ public class Activity extends AppCompatActivity {
             getWindow().setAttributes(params);
             setFinishOnTouchOutside(true);
         }
+    }
+
+    @Keep
+    public void swapResources(String dexPath) {
+        try {
+            AssetManager asset = AssetManager.class.newInstance();
+            AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, dexPath);
+            mAssetManager = asset;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        Resources res = super.getResources();
+        mResources = new Resources(mAssetManager, res.getDisplayMetrics(), res.getConfiguration());
+        mResources.newTheme().setTo(super.getTheme());
+    }
+
+    @Keep
+    public void restoreResources() {
+        mAssetManager = null;
+        mResources = null;
     }
 
 }

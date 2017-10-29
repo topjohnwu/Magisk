@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.topjohnwu.jarsigner.ByteArrayStream;
 import com.topjohnwu.magisk.MagiskManager;
@@ -18,15 +18,15 @@ import dalvik.system.DexClassLoader;
 
 public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
-    public static final int SNET_VER = 2;
+    public static final int SNET_VER = 3;
 
-    private static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/releases/download/v5.4.0/snet.apk";
+    private static final String SNET_URL = "https://www.dropbox.com/s/jg2yhcrn3l9fckc/snet.apk?dl=1";
     private static final String PKG = "com.topjohnwu.snet";
 
     private File dexPath;
     private DexClassLoader loader;
 
-    public CheckSafetyNet(FragmentActivity activity) {
+    public CheckSafetyNet(Activity activity) {
         super(activity);
         dexPath = new File(activity.getCacheDir().getParent() + "/snet", "snet.apk");
     }
@@ -65,20 +65,21 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
     @Override
     protected void onPostExecute(Exception err) {
+        MagiskManager mm = MagiskManager.get();
         try {
             if (err != null) throw err;
             Class<?> helperClazz = loader.loadClass(PKG + ".SafetyNetHelper");
             Class<?> callbackClazz = loader.loadClass(PKG + ".SafetyNetCallback");
             Object helper = helperClazz.getConstructors()[0].newInstance(
-                    getActivity(), Proxy.newProxyInstance(
+                    getActivity(), dexPath.getPath(), Proxy.newProxyInstance(
                             loader, new Class[] { callbackClazz }, (proxy, method, args) -> {
-                                MagiskManager.get().safetyNetDone.publish(false, args[0]);
+                                mm.safetyNetDone.publish(false, args[0]);
                                 return null;
                             }));
             helperClazz.getMethod("attest").invoke(helper);
         } catch (Exception e) {
             e.printStackTrace();
-            MagiskManager.get().safetyNetDone.publish(false, -1);
+            mm.safetyNetDone.publish(false, -1);
         }
         super.onPostExecute(err);
     }

@@ -1,12 +1,13 @@
 package com.topjohnwu.snet;
 
-import android.content.Context;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -16,49 +17,40 @@ import com.google.android.gms.safetynet.SafetyNetApi;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.security.SecureRandom;
 
 public class SafetyNetHelper
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public static final int CONNECTION_FAIL = -1;
+    public static final int CAUSE_SERVICE_DISCONNECTED = 0x01;
+    public static final int CAUSE_NETWORK_LOST = 0x02;
+    public static final int RESPONSE_ERR = 0x04;
+    public static final int CONNECTION_FAIL = 0x08;
 
-    public static final int CAUSE_SERVICE_DISCONNECTED = 0x00001;
-    public static final int CAUSE_NETWORK_LOST = 0x00010;
-    public static final int RESPONSE_ERR = 0x00100;
-
-    public static final int BASIC_PASS = 0x01000;
-    public static final int CTS_PASS = 0x10000;
+    public static final int BASIC_PASS = 0x10;
+    public static final int CTS_PASS = 0x20;
 
     private GoogleApiClient mGoogleApiClient;
-    private Context mActivity;
+    private Activity mActivity;
     private int responseCode;
     private SafetyNetCallback cb;
+    private String dexPath;
 
-    public SafetyNetHelper(Context context, SafetyNetCallback cb) {
-        mActivity = context;
+    public SafetyNetHelper(Activity activity, String dexPath, SafetyNetCallback cb) {
+        mActivity = activity;
         this.cb = cb;
+        this.dexPath = dexPath;
         responseCode = 0;
     }
 
     // Entry point to start test
     public void attest() {
         // Connect Google Service
-        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(mActivity);
-        try {
-            // Use reflection to workaround FragmentActivity crap
-            Class<?> clazz = Class.forName("com.google.android.gms.common.api.GoogleApiClient$Builder");
-            for (Method m : clazz.getMethods()) {
-                if (m.getName().equals("enableAutoManage")) {
-                    m.invoke(builder, mActivity, this);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mGoogleApiClient = builder.addApi(SafetyNet.API).addConnectionCallbacks(this).build();
+        mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
+                .addApi(SafetyNet.API)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
+                .build();
         mGoogleApiClient.connect();
     }
 
@@ -68,7 +60,16 @@ public class SafetyNetHelper
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
+        Class<? extends Activity> clazz = mActivity.getClass();
+        try {
+            // Use external resources
+            clazz.getMethod("swapResources", String.class).invoke(mActivity, dexPath);
+            GoogleApiAvailability.getInstance().getErrorDialog(mActivity, result.getErrorCode(), 0).show();
+            clazz.getMethod("restoreResources").invoke(mActivity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         cb.onResponse(CONNECTION_FAIL);
     }
 
@@ -92,22 +93,10 @@ public class SafetyNetHelper
                         responseCode |= decoded.getBoolean("ctsProfileMatch") ? CTS_PASS : 0;
                         responseCode |= decoded.getBoolean("basicIntegrity") ? BASIC_PASS : 0;
                     } catch (JSONException e) {
-                        cb.onResponse(RESPONSE_ERR);
-                        return;
+                        responseCode = RESPONSE_ERR;
                     }
+
                     // Disconnect
-                    try {
-                        // Use reflection to workaround FragmentActivity crap
-                        Class<?> clazz = Class.forName("com.google.android.gms.common.api.GoogleApiClient");
-                        for (Method m : clazz.getMethods()) {
-                            if (m.getName().equals("stopAutoManage")) {
-                                m.invoke(mGoogleApiClient, mActivity, this);
-                                break;
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                     mGoogleApiClient.disconnect();
 
                     // Return results
