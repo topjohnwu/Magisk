@@ -1,10 +1,7 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="magisk" translatable="false">Magisk</string>
 
     <!--Welcome Activity-->
-    <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="modules">Moduli</string>
     <string name="downloads">Preuzimanja</string>
     <string name="superuser">Superuser</string>
