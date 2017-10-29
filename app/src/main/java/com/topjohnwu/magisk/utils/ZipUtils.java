@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.utils;
 
 import android.content.res.AssetManager;
 
-import com.topjohnwu.jarsigner.JarMap;
-import com.topjohnwu.jarsigner.SignAPK;
+import com.topjohnwu.crypto.JarMap;
+import com.topjohnwu.crypto.SignAPK;
 import com.topjohnwu.magisk.MagiskManager;
 
 import java.io.BufferedInputStream;
@@ -16,8 +16,8 @@ import java.util.jar.JarInputStream;
 
 public class ZipUtils {
     // File name in assets
-    private static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
-    private static final String PRIVATE_KEY_NAME = "private.key.pk8";
+    static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
+    static final String PRIVATE_KEY_NAME = "private.key.pk8";
 
     static {
         System.loadLibrary("zipadjust");

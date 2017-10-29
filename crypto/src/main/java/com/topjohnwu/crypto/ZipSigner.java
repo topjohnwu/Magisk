@@ -1,4 +1,4 @@
-package com.topjohnwu.jarsigner;
+package com.topjohnwu.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.Security;
 
-public class CommandLine {
+public class ZipSigner {
     public static void main(String[] args) {
         boolean minSign = false;
         int argStart = 0;

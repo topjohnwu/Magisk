@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 
 public class Activity extends AppCompatActivity {
 
@@ -88,14 +89,9 @@ public class Activity extends AppCompatActivity {
 
     @Keep
     public void swapResources(String dexPath) {
-        try {
-            AssetManager asset = AssetManager.class.newInstance();
-            AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, dexPath);
-            mAssetManager = asset;
-        } catch (Exception e) {
-            e.printStackTrace();
+        mAssetManager = Utils.getAssets(dexPath);
+        if (mAssetManager == null)
             return;
-        }
         Resources res = super.getResources();
         mResources = new Resources(mAssetManager, res.getDisplayMetrics(), res.getConfiguration());
         mResources.newTheme().setTo(super.getTheme());

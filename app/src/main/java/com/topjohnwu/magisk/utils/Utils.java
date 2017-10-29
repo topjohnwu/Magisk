@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -202,5 +203,16 @@ public class Utils {
 
     public static File getDatabasePath(Context context, String dbName) {
         return new File(context.getFilesDir().getParent() + "/databases", dbName);
+    }
+
+    public static AssetManager getAssets(String apk) {
+        try {
+            AssetManager asset = AssetManager.class.newInstance();
+            AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, apk);
+            return asset;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

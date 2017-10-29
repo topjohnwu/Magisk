@@ -1,4 +1,4 @@
-package com.topjohnwu.jarsigner;
+package com.topjohnwu.crypto;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

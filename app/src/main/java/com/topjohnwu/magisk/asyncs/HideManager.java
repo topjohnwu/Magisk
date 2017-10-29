@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.asyncs;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.topjohnwu.jarsigner.JarMap;
+import com.topjohnwu.crypto.JarMap;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;

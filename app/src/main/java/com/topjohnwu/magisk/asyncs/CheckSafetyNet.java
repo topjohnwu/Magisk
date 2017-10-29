@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.jarsigner.ByteArrayStream;
+import com.topjohnwu.crypto.ByteArrayStream;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.WebService;

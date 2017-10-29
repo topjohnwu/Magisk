@@ -3,8 +3,9 @@ package com.topjohnwu.magisk.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 
 public class OnBootIntentService extends IntentService {
@@ -19,7 +20,8 @@ public class OnBootIntentService extends IntentService {
     public void onCreate() {
         super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            NotificationCompat.Builder builder =
+                    new NotificationCompat.Builder(this, MagiskManager.NOTIFICATION_CHANNEL);
             builder.setSmallIcon(R.drawable.ic_magisk)
                     .setContentTitle("onBoot")
                     .setContentText("Running onBoot operations...");

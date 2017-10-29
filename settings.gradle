@@ -1,1 +1,1 @@
-include ':app', ':snet', ':jarsigner'
+include ':app', ':snet', ':crypto'

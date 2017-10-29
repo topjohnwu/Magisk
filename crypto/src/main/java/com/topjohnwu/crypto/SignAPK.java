@@ -1,10 +1,9 @@
-package com.topjohnwu.jarsigner;
+package com.topjohnwu.crypto;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROutputStream;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -20,7 +19,6 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,15 +29,12 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.security.DigestOutputStream;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,8 +64,8 @@ public class SignAPK {
     private static final int USE_SHA256 = 2;
 
     static {
-        SignAPK.sBouncyCastleProvider = new BouncyCastleProvider();
-        Security.insertProviderAt(SignAPK.sBouncyCastleProvider, 1);
+        sBouncyCastleProvider = new BouncyCastleProvider();
+        Security.insertProviderAt(sBouncyCastleProvider, 1);
     }
 
     public static void signZip(InputStream publicIn, InputStream privateIn,
@@ -78,14 +73,14 @@ public class SignAPK {
         int alignment = 4;
         BufferedOutputStream outputFile;
         int hashes = 0;
-        X509Certificate publicKey = readPublicKey(publicIn);
+        X509Certificate publicKey = CryptoUtils.readPublicKey(publicIn);
         hashes |= getDigestAlgorithm(publicKey);
 
         // Set the ZIP file timestamp to the starting valid time
         // of the 0th certificate plus one hour (to match what
         // we've historically done).
         long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
-        PrivateKey privateKey = readPrivateKey(privateIn);
+        PrivateKey privateKey = CryptoUtils.readPrivateKey(privateIn);
 
         outputFile = new BufferedOutputStream(new FileOutputStream(output));
         if (minSign) {
@@ -144,37 +139,7 @@ public class SignAPK {
     private static Pattern stripPattern =
             Pattern.compile("^(META-INF/((.*)[.](SF|RSA|DSA|EC)|com/android/otacert))|(" +
                     Pattern.quote(JarFile.MANIFEST_NAME) + ")$");
-    private static X509Certificate readPublicKey(InputStream input)
-            throws IOException, GeneralSecurityException {
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            return (X509Certificate) cf.generateCertificate(input);
-        } finally {
-            input.close();
-        }
-    }
 
-    /** Read a PKCS#8 format private key. */
-    private static PrivateKey readPrivateKey(InputStream input)
-            throws IOException, GeneralSecurityException {
-        try {
-            byte[] buffer = new byte[4096];
-            int size = input.read(buffer);
-            byte[] bytes = Arrays.copyOf(buffer, size);
-            /* Check to see if this is in an EncryptedPrivateKeyInfo structure. */
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(bytes);
-            /*
-             * Now it's in a PKCS#8 PrivateKeyInfo structure. Read its Algorithm
-             * OID and use that to construct a KeyFactory.
-             */
-            ASN1InputStream bIn = new ASN1InputStream(new ByteArrayInputStream(spec.getEncoded()));
-            PrivateKeyInfo pki = PrivateKeyInfo.getInstance(bIn.readObject());
-            String algOid = pki.getPrivateKeyAlgorithm().getAlgorithm().getId();
-            return KeyFactory.getInstance(algOid).generatePrivate(spec);
-        } finally {
-            input.close();
-        }
-    }
     /**
      * Add the hash(es) of every file to the manifest, creating it if
      * necessary.
