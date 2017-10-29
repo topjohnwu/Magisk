@@ -151,7 +151,8 @@ def build_snet(args):
 	os.chdir('..')
 
 def sign_adjust_zip(unsigned, output):
-	jarsigner = os.path.join('java', 'jarsigner', 'build', 'libs', 'jarsigner-fat.jar')
+	signer_name = 'zipsigner-1.0.jar'
+	jarsigner = os.path.join('java', 'crypto', 'build', 'libs', signer_name)
 
 	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
 		header('* Building zipadjust')
@@ -160,11 +161,11 @@ def sign_adjust_zip(unsigned, output):
 		if proc.returncode != 0:
 			error('Build zipadjust failed!')
 	if not os.path.exists(jarsigner):
-		header('* Building jarsigner-fat.jar')
+		header('* Building ' + signer_name)
 		os.chdir('java')
-		proc = subprocess.run('{} jarsigner:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} crypto:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
-			error('Build jarsigner-fat.jar failed!')
+			error('Build {} failed!'.format(signer_name))
 		os.chdir('..')
 
 	header('* Signing / Adjusting Zip')
