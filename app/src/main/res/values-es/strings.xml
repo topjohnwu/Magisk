@@ -106,6 +106,7 @@
     <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
     <string name="hide_manager_toast">Ocultando Magisk Manager...</string>
+    <string name="hide_manager_toast2">Esto podría tomar un tiempo...</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
     <string name="patch_boot_file">Parcheo de la imagen boot</string>
@@ -132,6 +133,7 @@
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Re-empaquetar Magisk Manager con un nombre de paquete al azar</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_update">Ajustes de Actualización</string>
