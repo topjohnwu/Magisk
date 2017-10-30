@@ -36,57 +36,55 @@ public class SignBoot {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static void doSignature(String target, String imagePath, String outPath,
-                                   InputStream keyIn, InputStream certIn) throws Exception {
-        doSignature(target, new FileInputStream(imagePath),
-                new FileOutputStream(outPath), keyIn, certIn);
-    }
-
-    public static void doSignature(String target, InputStream imgIn, OutputStream imgOut,
-                                   InputStream keyIn, InputStream certIn) throws Exception {
-        ByteArrayStream bas = new ByteArrayStream();
-        bas.readFrom(imgIn);
-        byte[] image = bas.toByteArray();
-        bas.close();
-        imgIn.close();
-        int signableSize = getSignableImageSize(image);
-        if (signableSize < image.length) {
-            System.err.println("NOTE: truncating input from " +
-                    image.length + " to " + signableSize + " bytes");
-            image = Arrays.copyOf(image, signableSize);
-        } else if (signableSize > image.length) {
-            throw new IllegalArgumentException("Invalid image: too short, expected " +
-                    signableSize + " bytes");
-        }
-        BootSignature bootsig = new BootSignature(target, image.length);
-        X509Certificate cert = CryptoUtils.readPublicKey(certIn);
-        bootsig.setCertificate(cert);
-        PrivateKey key = CryptoUtils.readPrivateKey(keyIn);
-        bootsig.setSignature(bootsig.sign(image, key),
-                CryptoUtils.getSignatureAlgorithmIdentifier(key));
-        byte[] encoded_bootsig = bootsig.getEncoded();
-        imgOut.write(image);
-        imgOut.write(encoded_bootsig);
-        imgOut.flush();
-        imgOut.close();
-    }
-
-    public static boolean verifySignature(String imagePath, InputStream certPath) throws Exception {
-        ByteArrayStream bas = new ByteArrayStream();
-        bas.readFrom(new FileInputStream(imagePath));
-        byte[] image = bas.toByteArray();
-        bas.close();
-        int signableSize = getSignableImageSize(image);
-        if (signableSize >= image.length) {
-            System.err.println("Invalid image: not signed");
+    public static boolean doSignature(String target, InputStream imgIn, OutputStream imgOut,
+                                   InputStream keyIn, InputStream certIn) {
+        try {
+            ByteArrayStream bas = new ByteArrayStream();
+            bas.readFrom(imgIn);
+            byte[] image = bas.toByteArray();
+            bas.close();
+            int signableSize = getSignableImageSize(image);
+            if (signableSize < image.length) {
+                System.err.println("NOTE: truncating input from " +
+                        image.length + " to " + signableSize + " bytes");
+                image = Arrays.copyOf(image, signableSize);
+            } else if (signableSize > image.length) {
+                throw new IllegalArgumentException("Invalid image: too short, expected " +
+                        signableSize + " bytes");
+            }
+            BootSignature bootsig = new BootSignature(target, image.length);
+            X509Certificate cert = CryptoUtils.readPublicKey(certIn);
+            bootsig.setCertificate(cert);
+            PrivateKey key = CryptoUtils.readPrivateKey(keyIn);
+            bootsig.setSignature(bootsig.sign(image, key),
+                    CryptoUtils.getSignatureAlgorithmIdentifier(key));
+            byte[] encoded_bootsig = bootsig.getEncoded();
+            imgOut.write(image);
+            imgOut.write(encoded_bootsig);
+            imgOut.flush();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
             return false;
         }
-        byte[] signature = Arrays.copyOfRange(image, signableSize, image.length);
-        BootSignature bootsig = new BootSignature(signature);
-        if (certPath != null) {
-            bootsig.setCertificate(CryptoUtils.readPublicKey(certPath));
-        }
+    }
+
+    public static boolean verifySignature(InputStream imgIn, InputStream certPath) {
         try {
+            ByteArrayStream bas = new ByteArrayStream();
+            bas.readFrom(imgIn);
+            byte[] image = bas.toByteArray();
+            bas.close();
+            int signableSize = getSignableImageSize(image);
+            if (signableSize >= image.length) {
+                System.err.println("Invalid image: not signed");
+                return false;
+            }
+            byte[] signature = Arrays.copyOfRange(image, signableSize, image.length);
+            BootSignature bootsig = new BootSignature(signature);
+            if (certPath != null) {
+                bootsig.setCertificate(CryptoUtils.readPublicKey(certPath));
+            }
             if (bootsig.verify(Arrays.copyOf(image, signableSize))) {
                 System.err.println("Signature is VALID");
                 return true;
@@ -94,7 +92,8 @@ public class SignBoot {
                 System.err.println("Signature is INVALID");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
+            System.err.println("Invalid image: not signed");
         }
         return false;
     }
