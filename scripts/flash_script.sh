@@ -22,6 +22,7 @@ TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/install
 COMMONDIR=$INSTALLER/common
+APK=$COMMONDIR/magisk.apk
 CHROMEDIR=$INSTALLER/chromeos
 COREDIR=/magisk/.core
 
@@ -109,7 +110,10 @@ $BOOTMODE || recovery_actions
 
 find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-ui_print "- Found Boot Image: $BOOTIMAGE"
+ui_print "- Found boot image: $BOOTIMAGE"
+
+eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
+$BOOTSIGNED && ui_print "- Signed boot image detected"
 
 SOURCEDMODE=true
 cd $MAGISKBIN

@@ -13,6 +13,9 @@ SCRIPT_VERSION=$MAGISK_VER_CODE
 # Default location, will override if needed
 MAGISKBIN=/data/magisk
 
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
+BOOTSIGNED=false
+
 get_outfd() {
   readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
   if [ "$?" -eq "0" ]; then
@@ -137,14 +140,15 @@ flash_boot_image() {
     *.gz) COMMAND="gzip -d < \"$1\"";;
     *)    COMMAND="cat \"$1\"";;
   esac
+  $BOOTSIGNED && SIGNCOM="$BOOTSIGNER -sign" || SIGNCOM="cat -"
   case "$2" in
     /dev/block/*)
       ui_print "- Flashing new boot image"
-      eval $COMMAND | cat - /dev/zero | dd of="$2" bs=4096 >/dev/null 2>&1
+      eval $COMMAND | eval $SIGNCOM | cat - /dev/zero | dd of="$2" bs=4096 >/dev/null 2>&1
       ;;
     *)
       ui_print "- Storing new boot image"
-      eval $COMMAND | dd of="$2" bs=4096 >/dev/null 2>&1
+      eval $COMMAND | eval $SIGNCOM | dd of="$2" bs=4096 >/dev/null 2>&1
       ;;
   esac
 }
