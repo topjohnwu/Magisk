@@ -43,13 +43,12 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         return builder.toString();
     }
 
-    private boolean findAndPatch(byte xml[], String from, String to) {
+    private int findOffset(byte buf[], byte pattern[]) {
         int offset = -1;
-        byte target[] = (from + '\0').getBytes();
-        for (int i = 0; i < xml.length - target.length; ++i) {
+        for (int i = 0; i < buf.length - pattern.length; ++i) {
             boolean match = true;
-            for (int j = 0; j < target.length; ++j) {
-                if (xml[i + j] != target[j]) {
+            for (int j = 0; j < pattern.length; ++j) {
+                if (buf[i + j] != pattern[j]) {
                     match = false;
                     break;
                 }
@@ -59,9 +58,32 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
                 break;
             }
         }
+        return offset;
+    }
+
+    /* It seems that AAPT sometimes generate another type of string format */
+    private boolean fallbackPatch(byte xml[], String from, String to) {
+
+        byte[] target = new byte[from.length() * 2 + 2];
+        for (int i = 0; i < from.length(); ++i) {
+            target[i * 2] = (byte) from.charAt(i);
+        }
+        int offset = findOffset(xml, target);
         if (offset < 0)
             return false;
+        byte[] dest = new byte[target.length - 2];
+        for (int i = 0; i < to.length(); ++i) {
+            dest[i * 2] = (byte) to.charAt(i);
+        }
+        System.arraycopy(dest, 0, xml, offset, dest.length);
+        return true;
+    }
 
+    private boolean findAndPatch(byte xml[], String from, String to) {
+        byte target[] = (from + '\0').getBytes();
+        int offset = findOffset(xml, target);
+        if (offset < 0)
+            return fallbackPatch(xml, from, to);
         System.arraycopy(to.getBytes(), 0, xml, offset, to.length());
         return true;
     }
