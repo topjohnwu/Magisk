@@ -90,12 +90,15 @@
     <string name="zip_download_title">正在下载</string>
     <string name="zip_download_msg">正在下载 Zip 文件（%1$d%%）…</string>
     <string name="zip_process_title">正在处理</string>
-    <string name="zip_process_msg">正在处理 zip 文件 …</string>
+    <string name="zip_process_msg">正在处理 zip 文件…</string>
     <string name="manager_update_title">Magisk Manager 有更新！</string>
     <string name="manager_download_install">点击以下载并安装</string>
+    <string name="dtbo_patched_title">已修补 DTBO!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="magisk_updates">Magisk 更新</string>
     <string name="flashing">正在刷入</string>
     <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
+    <string name="hide_manager_toast2">这可能需要一点时间…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
     <string name="download_zip_only">仅下载 Zip</string>
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
@@ -121,6 +124,7 @@
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
+    <string name="settings_hide_manager_summary">用随机包名重新安装 Magisk Manager</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
     <string name="settings_update">更新设定</string>
