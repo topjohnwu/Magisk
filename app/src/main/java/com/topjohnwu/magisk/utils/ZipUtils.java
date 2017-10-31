@@ -16,8 +16,8 @@ import java.util.jar.JarInputStream;
 
 public class ZipUtils {
     // File name in assets
-    static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
-    static final String PRIVATE_KEY_NAME = "private.key.pk8";
+    public static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
+    public static final String PRIVATE_KEY_NAME = "private.key.pk8";
 
     static {
         System.loadLibrary("zipadjust");
@@ -32,7 +32,6 @@ public class ZipUtils {
     }
 
     public static void unzip(InputStream zip, File folder, String path, boolean junkPath) throws Exception {
-        byte data[] = new byte[4096];
         try {
             JarInputStream zipfile = new JarInputStream(zip);
             JarEntry entry;
@@ -49,13 +48,9 @@ public class ZipUtils {
                 }
                 File dest = new File(folder, name);
                 dest.getParentFile().mkdirs();
-                FileOutputStream out = new FileOutputStream(dest);
-                int count;
-                while ((count = zipfile.read(data)) != -1) {
-                    out.write(data, 0, count);
+                try (FileOutputStream out = new FileOutputStream(dest)) {
+                    Utils.inToOut(zipfile, out);
                 }
-                out.flush();
-                out.close();
             }
         } catch(Exception e) {
             e.printStackTrace();

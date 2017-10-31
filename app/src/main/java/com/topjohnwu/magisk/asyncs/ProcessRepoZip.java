@@ -54,8 +54,6 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         JarOutputStream dest = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
         JarEntry entry;
         String path;
-        int size;
-        byte buffer[] = new byte[4096];
         while ((entry = source.getNextJarEntry()) != null) {
             // Remove the top directory from the path
             path = entry.getName().substring(entry.getName().indexOf("/") + 1);
@@ -68,9 +66,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                 continue;
             }
             dest.putNextEntry(new JarEntry(path));
-            while((size = source.read(buffer)) != -1) {
-                dest.write(buffer, 0, size);
-            }
+            Utils.inToOut(source, dest);
         }
         source.close();
         dest.close();

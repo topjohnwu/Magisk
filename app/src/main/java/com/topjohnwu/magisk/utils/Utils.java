@@ -28,6 +28,9 @@ import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -214,5 +217,14 @@ public class Utils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static void inToOut(InputStream in, OutputStream out) throws IOException {
+        int read;
+        byte buffer[] = new byte[4096];
+        while ((read = in.read(buffer)) > 0) {
+            out.write(buffer, 0, read);
+        }
+        out.flush();
     }
 }

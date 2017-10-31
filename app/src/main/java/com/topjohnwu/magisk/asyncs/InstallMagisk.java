@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import com.topjohnwu.crypto.SignBoot;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.AdaptiveList;
 import com.topjohnwu.magisk.container.TarEntry;
@@ -103,6 +105,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 ZipUtils.unzip(buf, install, "chromeos/", false);
                 buf.reset();
                 ZipUtils.unzip(buf, install, "META-INF/com/google/android/update-binary", true);
+                buf.close();
             } catch (FileNotFoundException e) {
                 mList.add("! Invalid Uri");
                 throw e;
@@ -111,10 +114,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 throw e;
             }
 
-            File boot;
+            File boot = new File(install, "boot.img");
             switch (mode) {
                 case PATCH_MODE:
-                    boot = new File(install, "boot.img");
                     // Copy boot image to local
                     try (
                         InputStream in = mm.getContentResolver().openInputStream(mBootImg);
@@ -136,10 +138,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             // Direct copy raw image
                             source = new BufferedInputStream(in);
                         }
-                        byte buffer[] = new byte[1024];
-                        int length;
-                        while ((length = source.read(buffer)) > 0)
-                            out.write(buffer, 0, length);
+                        Utils.inToOut(source, out);
                     } catch (FileNotFoundException e) {
                         mList.add("! Invalid Uri");
                         throw e;
@@ -147,26 +146,41 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         mList.add("! Copy failed");
                         throw e;
                     }
+                    mList.add("- Use boot image: " + boot);
                     break;
                 case DIRECT_MODE:
-                    boot = new File(mBootLocation);
+                    try (OutputStream out = new FileOutputStream(boot)) {
+                        Process process = Runtime.getRuntime().exec(new String[] { "su", "-c", "cat " + mBootLocation });
+                        Utils.inToOut(process.getInputStream(), out);
+                        process.waitFor();
+                        process.destroy();
+                    } catch (Exception e) {
+                        mList.add("! Dump boot image failed");
+                        throw e;
+                    }
+                    mList.add("- Use boot image: " + mBootLocation);
                     break;
                 default:
                     return false;
             }
 
-            mList.add("- Use boot image: " + boot);
-
-            Shell shell;
-            if (mode == PATCH_MODE && Shell.rootAccess()) {
-                // Force non-root shell
-                shell = new Shell("sh");
-             } else {
-                shell = Shell.getShell();
+            boolean isSigned;
+            try (InputStream in = new FileInputStream(boot)) {
+                isSigned = SignBoot.verifySignature(in, null);
+                if (isSigned) {
+                    mList.add("- Signed boot image detected");
+                }
+            } catch (Exception e) {
+                mList.add("! Unable to check signature");
+                throw e;
             }
 
-            if (shell == null)
-                return false;
+            // Force non-root shell
+            Shell shell;
+            if (Shell.rootAccess())
+                shell = new Shell("sh");
+            else
+                shell = Shell.getShell();
 
             // Patch boot image
             shell.run(mList,
@@ -180,6 +194,22 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 return false;
 
             File patched_boot = new File(install, "new-boot.img");
+
+            if (isSigned) {
+                mList.add("- Signing boot image");
+                File signed = new File(install, "signed.img");
+                AssetManager assets = mm.getAssets();
+                try (
+                    InputStream in = new FileInputStream(patched_boot);
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(signed));
+                    InputStream keyIn = assets.open(ZipUtils.PRIVATE_KEY_NAME);
+                    InputStream certIn = assets.open(ZipUtils.PUBLIC_KEY_NAME)
+                ) {
+                    SignBoot.doSignature("/boot", in, out, keyIn, certIn);
+                }
+                shell.run_raw(false, "mv -f " + signed + " " + patched_boot);
+            }
+
             mList.add("");
             switch (mode) {
                 case PATCH_MODE:
@@ -190,17 +220,13 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             shell.run_raw(false, "cp -f " + patched_boot + " " + dest);
                             break;
                         case ".img.tar":
-                            TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
-                            tar.putNextEntry(new TarEntry(patched_boot, "boot.img"));
-                            byte buffer[] = new byte[4096];
-                            BufferedInputStream in = new BufferedInputStream(new FileInputStream(patched_boot));
-                            int len;
-                            while ((len = in.read(buffer)) != -1) {
-                                tar.write(buffer, 0, len);
+                            try (
+                                TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
+                                InputStream in = new FileInputStream(patched_boot)
+                            ) {
+                                tar.putNextEntry(new TarEntry(patched_boot, "boot.img"));
+                                Utils.inToOut(in, tar);
                             }
-                            tar.flush();
-                            tar.close();
-                            in.close();
                             break;
                     }
                     mList.add("*********************************");

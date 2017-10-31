@@ -19,15 +19,13 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
     private static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-arm";
     private static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-x86";
 
-    private File busybox;
-
     @Override
     protected Void doInBackground(Void... voids) {
         Context context = MagiskManager.get();
-        busybox = new File(context.getCacheDir(), "busybox");
+        File busybox = new File(context.getCacheDir(), "busybox");
         Utils.removeItem(context.getApplicationInfo().dataDir + "/busybox");
-        try {
-            FileOutputStream out  = new FileOutputStream(busybox);
+        try (FileOutputStream out  = new FileOutputStream(busybox)) {
+
             HttpURLConnection conn = WebService.request(
                     Build.SUPPORTED_32_BIT_ABIS[0].contains("x86") ?
                             BUSYBOX_X86 :
@@ -36,12 +34,7 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
             );
             if (conn == null) throw new IOException();
             BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
-            byte[] buffer = new byte[4096];
-            int len;
-            while ((len = bis.read(buffer)) != -1) {
-                out.write(buffer, 0, len);
-            }
-            out.close();
+            Utils.inToOut(bis, out);
             conn.disconnect();
         } catch (IOException e) {
             e.printStackTrace();

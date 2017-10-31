@@ -64,10 +64,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             ) {
                 if (in == null) throw new FileNotFoundException();
                 InputStream buf= new BufferedInputStream(in);
-                byte buffer[] = new byte[4096];
-                int length;
-                while ((length = buf.read(buffer)) > 0)
-                    out.write(buffer, 0, length);
+                Utils.inToOut(buf, out);
             } catch (FileNotFoundException e) {
                 mList.add("! Invalid Uri");
                 throw e;
