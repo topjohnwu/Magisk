@@ -65,7 +65,6 @@ static void parse_cmdline(struct cmdline *cmd) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
 			cmd->skip_initramfs = 1;
-			break;
 		}
 		tok = strtok(NULL, " ");
 	}
