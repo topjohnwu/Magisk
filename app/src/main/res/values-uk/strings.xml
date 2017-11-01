@@ -6,8 +6,6 @@
     <string name="superuser">Суперкористувач</string>
     <string name="log">Логи</string>
     <string name="settings">Налаштування</string>
-
-    <!--Status Fragment-->
     <string name="install">Встановлення</string>
 
     <!--Status Fragment-->
@@ -21,6 +19,7 @@
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Перевірку SafetyNet завершено</string>
+    <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
     <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
     <string name="safetyNet_service_disconnected">Службу зупинено</string>
     <string name="safetyNet_res_invalid">Невірна відповідь</string>
@@ -28,7 +27,7 @@
     <!--Install Fragment-->
     <string name="auto_detect">(Авто) %1$s</string>
     <string name="cannot_auto_detect">(Автовизначення неможливе)</string>
-    <string name="boot_image_title">Розташування boot-образу</string>
+    <string name="boot_image_title">Розташування boot образу</string>
     <string name="detect_button">Визначити</string>
     <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
@@ -38,6 +37,7 @@
     <string name="uninstall">Видалити</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>
+    <string name="update">Оновити %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Немає наданої інформації)</string>
@@ -48,7 +48,6 @@
     <string name="disable_file_created">Модуль вимкнеться при перезавантаженні</string>
     <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні</string>
     <string name="author">Автор: %1$s</string>
-    <string name="update">Оновити %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
@@ -88,36 +87,41 @@
     <string name="install_error">Помилка під час встановлення</string>
     <string name="invalid_zip">В архіві відсутній модуль Magisk!</string>
     <string name="reboot">Перезавантаження</string>
-    <string name="zip_process_msg">Опрацювання архіву …</string>
     <string name="downloading_toast">Завантаження %1$s</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
     <string name="safetyNet_hide_notice">Ця програма використовує SafetyNet.\nВже опрацьовано MagiskHide за замовчуванням</string>
-    <string name="zip_download_title">Завантаження</string>
-    <string name="zip_download_msg">Завантаження zip файлу (%1$d%%) …</string>
     <string name="process_error">Помилка опрацювання</string>
     <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
+    <string name="zip_download_title">Завантаження</string>
+    <string name="zip_download_msg">Завантаження zip файлу (%1$d%%) …</string>
     <string name="zip_process_title">Опрацювання</string>
+    <string name="zip_process_msg">Опрацювання архіву …</string>
     <string name="manual_boot_image">Будь ласка, виберіть boot-образ!</string>
     <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
     <string name="magisk_updates">Оновлення Magisk</string>
     <string name="flashing">Прошивання</string>
     <string name="hide_manager_toast">Приховування Magisk Manager…</string>
+    <string name="hide_manager_toast2">Це може зайняти деякий час…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
     <string name="download_zip_only">Тільки завантажити</string>
     <string name="patch_boot_file">Пропатчити boot образ</string>
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
+    <string name="install_second_slot">Встановити в Другий Слот (після OTA)</string>
     <string name="select_method">Виберіть спосіб</string>
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
-    <string name="boot_file_patch_msg">Виберіть дамп заводського boot образу в форматі .img чи .img.tar</string>
+    <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
-    <string name="restore_stock_boot">Відновити заводський образ</string>
+    <string name="restore_stock_boot">Відновити оригінальний образ</string>
     <string name="restore_done">Відновлення завершено!</string>
-    <string name="restore_fail">Немає резервної копії заводського boot образу</string>
-  
+    <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
+    <string name="uninstall_toast">Видалення Менеджера Magisk протягом 5 секунд, потім, будь ласка, вручну перезавантажте</string>
+    <string name="proprietary_title">Завантажити пропрієтарний код</string>
+    <string name="proprietary_notice">Менеджер Magisk - це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Менеджеру Magisk завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>
     <string name="settings_dark_theme_title">Темна тема</string>
@@ -127,6 +131,7 @@
     <string name="settings_clear_cache_title">Очищення кешу</string>
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії, змушуючи програму примусово оновлюватися через Інтернет</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Перезібрати Менеджер Magisk з випадковим іменем пакету</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
     <string name="settings_update">Оновити налаштування</string>
@@ -135,7 +140,6 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
-
     <string name="settings_core_only_title">Режим ядра Magisk</string>
     <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, MagiskHide і позасистемні хости залишуться увімкненими</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних перевірок</string>
