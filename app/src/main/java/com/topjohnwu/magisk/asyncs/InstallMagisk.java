@@ -117,6 +117,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             File boot = new File(install, "boot.img");
             switch (mode) {
                 case PATCH_MODE:
+                    mList.add("- Use boot image: " + boot);
                     // Copy boot image to local
                     try (
                         InputStream in = mm.getContentResolver().openInputStream(mBootImg);
@@ -146,19 +147,15 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         mList.add("! Copy failed");
                         throw e;
                     }
-                    mList.add("- Use boot image: " + boot);
                     break;
                 case DIRECT_MODE:
-                    try (OutputStream out = new FileOutputStream(boot)) {
-                        Process process = Runtime.getRuntime().exec(new String[] { "su", "-c", "cat " + mBootLocation });
-                        Utils.inToOut(process.getInputStream(), out);
-                        process.waitFor();
-                        process.destroy();
-                    } catch (Exception e) {
-                        mList.add("! Dump boot image failed");
-                        throw e;
-                    }
                     mList.add("- Use boot image: " + mBootLocation);
+                    if (boot.createNewFile()) {
+                        Shell.su("cat " + mBootLocation + " > " + boot);
+                    } else {
+                        mList.add("! Dump boot image failed");
+                        return false;
+                    }
                     break;
                 default:
                     return false;
