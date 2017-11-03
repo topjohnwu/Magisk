@@ -163,6 +163,14 @@ void sepol_min_rules() {
 	sepol_attradd("su", "mlstrustedsubject");
 	sepol_attradd("su_device", "mlstrustedobject");
 
+	// Let pre-init do stuffs
+	sepol_allow("kernel", "kernel", "security", "load_policy");
+	sepol_allow("kernel", "device", "dir", "write");
+	sepol_allow("kernel", "device", "dir", "add_name");
+	sepol_allow("kernel", "device", "file", "create");
+	sepol_allow("kernel", "device", "file", "open");
+	sepol_allow("kernel", "device", "file", "read");
+
 	// Let init run stuffs in su context
 	sepol_allow("kernel", "su", "fd", "use");
 	sepol_allow("init", "su", "process", ALL);
