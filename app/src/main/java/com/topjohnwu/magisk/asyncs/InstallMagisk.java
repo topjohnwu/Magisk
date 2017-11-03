@@ -183,18 +183,23 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             shell.run(mList,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot +
-                            " && echo 'Success!' || echo 'Failed!'"
+                            "update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'"
             );
 
-            if (!TextUtils.equals(mList.get(mList.size() - 1), "Success!"))
+            if (TextUtils.equals(mList.get(mList.size() - 1), "Failed!"))
                 return false;
 
-            File patched_boot = new File(install, "new-boot.img");
+            shell.run(mList,
+                    "mv -f new-boot.img ../ 2>/dev/null",
+                    "mv bin/busybox busybox 2>/dev/null",
+                    "rm -rf bin *.img update-binary 2>/dev/null",
+                    "cd /");
+
+            File patched_boot = new File(install.getParent(), "new-boot.img");
 
             if (isSigned) {
                 mList.add("- Signing boot image");
-                File signed = new File(install, "signed.img");
+                File signed = new File(install.getParent(), "signed.img");
                 AssetManager assets = mm.getAssets();
                 try (
                     InputStream in = new FileInputStream(patched_boot);
@@ -207,7 +212,6 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 shell.run_raw(false, "mv -f " + signed + " " + patched_boot);
             }
 
-            mList.add("");
             switch (mode) {
                 case PATCH_MODE:
                     File dest = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/patched_boot" + mm.bootFormat);
@@ -226,6 +230,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             }
                             break;
                     }
+                    mList.add("");
                     mList.add("*********************************");
                     mList.add(" Patched Boot Image is placed in ");
                     mList.add(" " + dest + " ");
@@ -233,18 +238,18 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     break;
                 case DIRECT_MODE:
                     // Direct flash boot image
-                    Shell.su(mList, "flash_boot_image " + patched_boot + " " + mBootLocation);
+                    Shell.su(mList,
+                            "rm -rf /data/magisk/*",
+                            "mv -f " + install + "/* /data/magisk",
+                            "rm -rf " + install,
+                            "flash_boot_image " + patched_boot + " " + mBootLocation,
+                            "rm -rf " + patched_boot);
                     break;
                 default:
                     return false;
             }
 
-            // Finals
-            shell.run_raw(false,
-                    "cd " + install,
-                    "mv bin/busybox busybox",
-                    "rm -rf bin *.img update-binary",
-                    "cd /");
+            mList.add("- All done!");
         } catch (Exception e) {
             e.printStackTrace();
             return false;
