@@ -130,10 +130,8 @@ public class SplashActivity extends Activity {
         mm.hasInit = true;
 
         Intent intent = new Intent(this, MainActivity.class);
-        String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
-        if (section != null) {
-            intent.putExtra(Const.Key.OPEN_SECTION, section);
-        }
+        intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION));
+        intent.putExtra(Const.Key.INTENT_PERM, getIntent().getStringExtra(Const.Key.INTENT_PERM));
         startActivity(intent);
         finish();
     }

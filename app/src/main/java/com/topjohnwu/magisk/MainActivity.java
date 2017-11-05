@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -50,6 +51,11 @@ public class MainActivity extends Activity
             }
             startActivity(intent);
             finish();
+        }
+
+        String perm = getIntent().getStringExtra(Const.Key.INTENT_PERM);
+        if (perm != null) {
+            ActivityCompat.requestPermissions(this, new String[] { perm }, 0);
         }
 
         prefs = mm.prefs;

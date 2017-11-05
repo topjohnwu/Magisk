@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -216,10 +217,12 @@ public class ShowUI {
                             mm.remoteManagerVersionString + ".apk")))
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
-                Intent intent = new Intent(mm, ManagerUpdate.class);
-                intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
-                intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
-                mm.sendBroadcast(intent);
+                Utils.runWithPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
+                    Intent intent = new Intent(mm, ManagerUpdate.class);
+                    intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
+                    intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
+                    mm.sendBroadcast(intent);
+                });
             })
             .setNegativeButton(R.string.no_thanks, null)
             .show();

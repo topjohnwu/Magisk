@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
@@ -193,11 +195,17 @@ public class Utils {
     public static void runWithPermission(Context context, String permission, Runnable callback) {
         if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
             // Passed in context should be an activity if not granted, need to show dialog!
-            if (!(context instanceof com.topjohnwu.magisk.components.Activity))
-                return;
-            com.topjohnwu.magisk.components.Activity activity = (com.topjohnwu.magisk.components.Activity) context;
-            activity.setPermissionGrantCallback(callback);
-            ActivityCompat.requestPermissions(activity, new String[] { permission }, 0);
+            Utils.getMagiskManager(context).setPermissionGrantCallback(callback);
+            if (!(context instanceof com.topjohnwu.magisk.components.Activity)) {
+                // Start activity to show dialog
+                Intent intent = new Intent(context, SplashActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(Const.Key.INTENT_PERM, permission);
+                context.startActivity(intent);
+            } else {
+                ActivityCompat.requestPermissions((Activity) context, new String[] { permission }, 0);
+            }
+
         } else {
             callback.run();
         }

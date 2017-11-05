@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.utils.Utils;
 
 public class Activity extends AppCompatActivity {
 
-    private Runnable permissionGrantCallback = null;
     private AssetManager mAssetManager = null;
     private Resources mResources = null;
 
@@ -47,12 +46,13 @@ public class Activity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        MagiskManager mm = getMagiskManager();
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (permissionGrantCallback != null) {
-                permissionGrantCallback.run();
+            if (mm.permissionGrantCallback != null) {
+                mm.permissionGrantCallback.run();
             }
         }
-        permissionGrantCallback = null;
+        mm.permissionGrantCallback = null;
     }
 
     @Override
@@ -63,10 +63,6 @@ public class Activity extends AppCompatActivity {
     @Override
     public Resources getResources() {
         return mResources == null ? super.getResources() : mResources;
-    }
-
-    public void setPermissionGrantCallback(Runnable callback) {
-        permissionGrantCallback = callback;
     }
 
     public MagiskManager getMagiskManager() {

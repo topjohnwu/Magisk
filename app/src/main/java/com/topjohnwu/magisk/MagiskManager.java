@@ -84,6 +84,7 @@ public class MagiskManager extends Application {
     public SuDatabaseHelper suDB;
     public RepoDatabaseHelper repoDB;
     public Shell shell;
+    public Runnable permissionGrantCallback = null;
 
     private static Handler mHandler = new Handler();
 
@@ -202,5 +203,9 @@ public class MagiskManager extends Application {
         } catch (NumberFormatException e) {
             magiskHide = true;
         }
+    }
+
+    public void setPermissionGrantCallback(Runnable callback) {
+        permissionGrantCallback = callback;
     }
 }
