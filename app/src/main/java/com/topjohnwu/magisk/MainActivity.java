@@ -39,11 +39,22 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        getMagiskManager().startup();
 
-        prefs = getMagiskManager().prefs;
+        MagiskManager mm = getMagiskManager();
 
-        if (getMagiskManager().isDarkTheme) {
+        if (!mm.hasInit) {
+            Intent intent = new Intent(this, SplashActivity.class);
+            String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
+            if (section != null) {
+                intent.putExtra(Const.Key.OPEN_SECTION, section);
+            }
+            startActivity(intent);
+            finish();
+        }
+
+        prefs = mm.prefs;
+
+        if (mm.isDarkTheme) {
             setTheme(R.style.AppTheme_Dark);
         }
         super.onCreate(savedInstanceState);
@@ -74,7 +85,6 @@ public class MainActivity extends Activity
             navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
-
     }
 
     @Override

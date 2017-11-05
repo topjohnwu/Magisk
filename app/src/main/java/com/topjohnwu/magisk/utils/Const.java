@@ -56,8 +56,6 @@ public class Const {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
         public static final String SNET_URL = "https://www.dropbox.com/s/jg2yhcrn3l9fckc/snet.apk?dl=1";
-        public static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-arm";
-        public static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-x86";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";

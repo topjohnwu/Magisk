@@ -159,7 +159,7 @@ public class MagiskFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        mm.getMagiskInfo();
+        mm.loadMagiskInfo();
         updateUI();
 
         magiskUpdateText.setText(R.string.checking_for_updates);

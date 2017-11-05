@@ -10,7 +10,7 @@ public class UpdateCheckService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Utils.getMagiskManager(this).getMagiskInfo();
+        Utils.getMagiskManager(this).loadMagiskInfo();
         new CheckUpdates(true)
                 .setCallBack(() -> jobFinished(params, false)).exec();
         return true;

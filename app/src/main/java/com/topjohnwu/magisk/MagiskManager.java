@@ -1,43 +1,26 @@
 package com.topjohnwu.magisk;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.asyncs.DownloadBusybox;
-import com.topjohnwu.magisk.asyncs.LoadModules;
-import com.topjohnwu.magisk.asyncs.ParallelTask;
-import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
-import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class MagiskManager extends Application {
 
@@ -54,6 +37,7 @@ public class MagiskManager extends Application {
     public final Topic localeDone = new Topic();
 
     // Info
+    public boolean hasInit = false;
     public int userId;
     public String magiskVersionString;
     public int magiskVersionCode = -1;
@@ -102,7 +86,6 @@ public class MagiskManager extends Application {
     public Shell shell;
 
     private static Handler mHandler = new Handler();
-    private boolean started = false;
 
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
@@ -180,127 +163,7 @@ public class MagiskManager extends Application {
         mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
     }
 
-    @SuppressLint("StaticFieldLeak")
-    public void startup() {
-        if (started)
-            return;
-        started = true;
-
-        // Dynamic detect all locales
-        new ParallelTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                locales = Utils.getAvailableLocale();
-                return null;
-            }
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                localeDone.publish();
-            }
-        }.exec();
-
-        // Create notification channel on Android O
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(Const.ID.NOTIFICATION_CHANNEL,
-                    getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
-        }
-
-        getMagiskInfo();
-
-        // Magisk working as expected
-        if (Shell.rootAccess() && magiskVersionCode > 0) {
-            // Load utility shell scripts
-            try (InputStream in  = getAssets().open(Const.UTIL_FUNCTIONS)) {
-                shell.loadInputStream(in);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            LoadModules loadModuleTask = new LoadModules();
-
-            if (Utils.checkNetworkStatus()) {
-                // Make sure we have busybox
-                if (!Utils.itemExist(Const.BUSYBOXPATH + "/busybox")) {
-                    try {
-                        // Force synchronous, make sure we have busybox to use
-                        new DownloadBusybox().exec().get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Fire update check
-                new CheckUpdates().exec();
-
-                // Add repo update check
-                loadModuleTask.setCallBack(() -> new UpdateRepos(false).exec());
-            }
-
-            // Root shell initialization
-            Shell.su_raw(
-                    "export PATH=" + Const.BUSYBOXPATH + ":$PATH",
-                    "mount_partitions",
-                    "BOOTIMAGE=",
-                    "find_boot_image",
-                    "migrate_boot_backup"
-            );
-            List<String> ret = Shell.su("echo \"$BOOTIMAGE\"");
-            if (Utils.isValidShellResponse(ret)) {
-                bootBlock = ret.get(0);
-            } else {
-                blockList = Shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
-            }
-
-            // Setup suDB
-            SuDatabaseHelper.setupSuDB();
-
-            // Check alternative Magisk Manager
-            String pkg;
-            if (getPackageName().equals(Const.ORIG_PKG_NAME) &&
-                    (pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null)) != null) {
-                Shell.su_raw("pm uninstall " + pkg);
-                suDB.setStrings(Const.Key.SU_REQUESTER, null);
-            }
-
-            // Add update checking service
-            if (Const.Value.UPDATE_SERVICE_VER > updateServiceVersion) {
-                ComponentName service = new ComponentName(this, UpdateCheckService.class);
-                JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
-                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                        .setPersisted(true)
-                        .setPeriodic(8 * 60 * 60 * 1000)
-                        .build();
-                ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(info);
-                updateServiceVersion = Const.Value.UPDATE_SERVICE_VER;
-            }
-
-            // Fire asynctasks
-            loadModuleTask.exec();
-        }
-
-        // Write back default values
-        prefs.edit()
-                .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
-                .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
-                .putBoolean(Const.Key.UPDATE_NOTIFICATION, updateNotification)
-                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE))
-                .putBoolean(Const.Key.DISABLE, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
-                .putBoolean(Const.Key.SU_REAUTH, suReauth)
-                .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
-                .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
-                .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
-                .putString(Const.Key.ROOT_ACCESS, String.valueOf(suAccessState))
-                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
-                .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
-                .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
-                .putString(Const.Key.LOCALE, localeConfig)
-                .putString(Const.Key.BOOT_FORMAT, bootFormat)
-                .putInt(Const.Key.UPDATE_SERVICE_VER, updateServiceVersion)
-                .apply();
-    }
-
-    public void getMagiskInfo() {
+    public void loadMagiskInfo() {
         List<String> ret;
         ret = Shell.sh("su -v");
         if (Utils.isValidShellResponse(ret)) {
