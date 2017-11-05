@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 
+#include "logging.h"
 #include "bootimg.h"
 
 #define KERNEL_FILE     "kernel"
@@ -11,9 +12,6 @@
 #define EXTRA_FILE      "extra"
 #define DTB_FILE        "dtb"
 #define NEW_BOOT        "new-boot.img"
-
-#define str(a) #a
-#define xstr(a) str(a)
 
 // Main entries
 void unpack(const char *image);
@@ -36,13 +34,10 @@ long long comp(file_t type, int to, const void *from, size_t size);
 long long decomp(file_t type, int to, const void *from, size_t size);
 
 // Utils
-extern void mmap_ro(const char *filename, void **buf, size_t *size);
-extern void mmap_rw(const char *filename, void **buf, size_t *size);
 extern void write_zero(int fd, size_t size);
 extern void mem_align(size_t *pos, size_t align);
 extern void file_align(int fd, size_t align, int out);
 extern int open_new(const char *filename);
-extern void *patch_init_rc(char *data, uint32_t *size);
 extern int check_verity_pattern(const char *s);
 extern int check_encryption_pattern(const char *s);
 

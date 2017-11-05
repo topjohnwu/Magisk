@@ -6,9 +6,6 @@
 
 #include "logging.h"
 
-#define str(a) #a
-#define xstr(a) str(a)
-
 #define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
 #define REQUESTOR_DAEMON_PATH     "\0MAGISK"
 
@@ -20,6 +17,7 @@
 #define LASTLOG         "/cache/last_magisk.log"
 #define DEBUG_LOG       "/data/magisk_debug.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
+#define PATCHDONE       "/dev/.magisk.patch.done"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"
 #define CACHEMOUNT      "/cache/magisk_mount"

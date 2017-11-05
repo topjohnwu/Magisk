@@ -103,16 +103,6 @@ static int setup_socket(struct sockaddr_un *sun) {
 	return fd;
 }
 
-static void *large_sepol_patch(void *args) {
-	LOGD("sepol: Starting large patch thread\n");
-	// Patch su to everything
-	sepol_allow("su", ALL, ALL, ALL);
-	dump_policydb(SELINUX_LOAD);
-	LOGD("sepol: Large patch done\n");
-	destroy_policydb();
-	return NULL;
-}
-
 static void *start_magisk_hide(void *args) {
 	launch_magiskhide(-1);
 	return NULL;
@@ -137,11 +127,6 @@ void start_daemon() {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
-	// Patch selinux with medium patch before we do anything
-	load_policydb(SELINUX_POLICY);
-	sepol_med_rules();
-	dump_policydb(SELINUX_LOAD);
-
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun);
 
@@ -158,9 +143,6 @@ void start_daemon() {
 
 	// Start the log monitor
 	monitor_logs();
-
-	// Continue the larger patch in another thread, we will join later
-	xpthread_create(&sepol_patch, NULL, large_sepol_patch, NULL);
 
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 

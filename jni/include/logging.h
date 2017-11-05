@@ -8,6 +8,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#define str(a) #a
+#define xstr(a) str(a)
+
 #ifdef IS_DAEMON
 
 #include <pthread.h>

@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/sendfile.h>
+#include <sys/mman.h>
 
 #ifndef NO_SELINUX
 #include <selinux/selinux.h>
@@ -52,6 +53,8 @@ int mkdir_p(const char *pathname, mode_t mode) {
 
 void rm_rf(const char *path) {
 	int fd = xopen(path, O_RDONLY | O_CLOEXEC);
+	if (fd < 0)
+		return;
 	frm_rf(fd);
 	close(fd);
 	rmdir(path);
@@ -292,6 +295,22 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	struct file_attr a;
 	fgetattr(sourcefd, &a);
 	fsetattr(targetfd, &a);
+}
+
+void mmap_ro(const char *filename, void **buf, size_t *size) {
+	int fd = xopen(filename, O_RDONLY);
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0) : NULL;
+	close(fd);
+}
+
+void mmap_rw(const char *filename, void **buf, size_t *size) {
+	int fd = xopen(filename, O_RDWR);
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0) : NULL;
+	close(fd);
 }
 
 #ifndef NO_SELINUX

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "utils.h"
 #include "magisk.h"
@@ -12,10 +13,10 @@
 char *argv0;
 
 char *applet[] =
-	{ "su", "resetprop", "magiskpolicy", "supolicy", "magiskhide", NULL };
+	{ "su", "resetprop", "magiskhide", NULL };
 
 int (*applet_main[]) (int, char *[]) =
-	{ su_client_main, resetprop_main, magiskpolicy_main, magiskpolicy_main, magiskhide_main, NULL };
+	{ su_client_main, resetprop_main, magiskhide_main, NULL };
 
 int create_links(const char *bin, const char *path) {
 	char self[PATH_MAX], linkpath[PATH_MAX];
@@ -56,7 +57,7 @@ static void usage() {
 		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
 		"\n"
 		"Supported init services:\n"
-		"   daemon post-fs, post-fs-data, service\n"
+		"   daemon, post-fs, post-fs-data, service\n"
 		"\n"
 		"Supported applets:\n"
 	, argv0, argv0);
@@ -69,10 +70,7 @@ static void usage() {
 
 int main(int argc, char *argv[]) {
 	argv0 = argv[0];
-	char * arg = strrchr(argv[0], '/');
-	if (arg) ++arg;
-	else arg = argv[0];
-	if (strcmp(arg, "magisk") == 0) {
+	if (strcmp(basename(argv[0]), "magisk") == 0) {
 		if (argc < 2) usage();
 		if (strcmp(argv[1], "-c") == 0) {
 			printf("%s\n", MAGISK_VER_STR);
@@ -168,16 +166,15 @@ int main(int argc, char *argv[]) {
 			// It's calling applets
 			--argc;
 			++argv;
-			arg = argv[0];
 		}
 	}
 
 	// Applets
 	for (int i = 0; applet[i]; ++i) {
-		if (strcmp(arg, applet[i]) == 0)
+		if (strcmp(basename(argv[0]), applet[i]) == 0)
 			return (*applet_main[i])(argc, argv);
 	}
 
-	fprintf(stderr, "%s: applet not found\n", arg);
+	fprintf(stderr, "%s: applet not found\n", basename(argv[0]));
 	return 1;
 }

@@ -79,18 +79,12 @@ ui_print "- Constructing environment"
 
 is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
 
-if $BOOTMODE; then
-  # Cleanup binary mirrors
-  umount -l /dev/magisk/mirror/bin 2>/dev/null
-  rm -rf /dev/magisk/mirror/bin 2>/dev/null
-fi
-
 # Save our stock boot image dump before removing it
 mv /data/magisk/stock_boot* /data 2>/dev/null
 
 # Copy required files
-rm -rf $MAGISKBIN 2>/dev/null
-mkdir -p $MAGISKBIN
+rm -rf $MAGISKBIN/* 2>/dev/null
+mkdir -p $MAGISKBIN 2>/dev/null
 cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $TMPDIR/bin/busybox $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 

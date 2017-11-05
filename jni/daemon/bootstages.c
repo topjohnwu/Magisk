@@ -568,7 +568,7 @@ void fix_filecon() {
  ****************/
 
 static void unblock_boot_process() {
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT));
+	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
 	pthread_exit(NULL);
 }
 
@@ -743,7 +743,8 @@ void late_start(int client) {
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
-	pthread_join(sepol_patch, NULL);
+	while (access(PATCHDONE, F_OK) == -1)
+		usleep(500); /* Wait 0.5ms */
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");

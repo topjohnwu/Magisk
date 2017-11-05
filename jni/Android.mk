@@ -14,17 +14,17 @@ LIBFDT := $(EXT_PATH)/dtc/libfdt
 # Binaries
 ########################
 
+ifdef PRECOMPILE
+
 # magisk main binary
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libsepol
 LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/external \
-	$(LIBSELINUX) \
-	$(LIBSEPOL)
+	$(LIBSELINUX)
 
 LOCAL_SRC_FILES := \
 	daemon/magisk.c \
@@ -41,10 +41,6 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
-	magiskpolicy/magiskpolicy.c \
-	magiskpolicy/rules.c \
-	magiskpolicy/sepolicy.c \
-	magiskpolicy/api.c \
 	resetprop/resetprop.cpp \
 	resetprop/system_properties.cpp \
 	su/su.c \
@@ -57,6 +53,37 @@ LOCAL_SRC_FILES := \
 LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DIS_DAEMON
 LOCAL_CPPFLAGS := -std=c++11
 LOCAL_LDLIBS := -llog
+include $(BUILD_EXECUTABLE)
+
+# magiskinit
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskinit
+LOCAL_STATIC_LIBRARIES := libsepol
+LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
+LOCAL_SRC_FILES := \
+	init/magiskinit.c \
+	utils/vector.c \
+	utils/file.c \
+	utils/xwrap.c \
+	magiskpolicy/api.c \
+	magiskpolicy/magiskpolicy.c \
+	magiskpolicy/rules.c \
+	magiskpolicy/sepolicy.c
+
+LOCAL_CFLAGS := -DNO_SELINUX
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+# precompile
+else
+
+# monogisk
+include $(CLEAR_VARS)
+LOCAL_MODULE := monogisk
+LOCAL_STATIC_LIBRARIES := liblzma
+LOCAL_C_INCLUDES := jni/include out/$(TARGET_ARCH_ABI) $(LIBLZMA)
+LOCAL_SRC_FILES := init/monogisk.c
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 # magiskboot
@@ -81,28 +108,12 @@ LOCAL_SRC_FILES := \
 	magiskboot/types.c \
 	magiskboot/dtb.c \
 	utils/xwrap.c \
+	utils/file.c \
 	utils/vector.c
+
+LOCAL_CFLAGS := -DNO_SELINUX
 LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
-
-# magiskinit
-ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
-include $(CLEAR_VARS)
-LOCAL_MODULE := magiskinit
-LOCAL_STATIC_LIBRARIES := libsepol
-LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
-LOCAL_SRC_FILES := \
-	magiskinit.c \
-	magiskboot/boot_utils.c \
-	utils/file.c \
-	utils/xwrap.c \
-	magiskpolicy/rules.c \
-	magiskpolicy/sepolicy.c \
-	magiskpolicy/api.c
-LOCAL_CFLAGS := -DNO_SELINUX
-LOCAL_LDFLAGS := -static
-include $(BUILD_EXECUTABLE)
-endif
 
 # 32-bit static binaries
 ifneq ($(TARGET_ARCH_ABI), x86_64)
@@ -118,6 +129,9 @@ include $(BUILD_EXECUTABLE)
 # Busybox
 include jni/external/busybox/Android.mk
 endif
+endif
+
+# Precompile
 endif
 
 ########################

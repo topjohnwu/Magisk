@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 
 #include "magiskboot.h"
+#include "utils.h"
 #include "sha1.h"
 
 /********************
@@ -47,8 +48,9 @@ static void usage(char *arg0) {
 		"      Return value: 0/stock 1/Magisk 2/other (e.g. phh, SuperSU)\n"
 		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n"
 		"      Patch cpio for Magisk. KEEP**** are true/false values\n"
-		"    -backup <origcpio>\n"
+		"    -backup <origcpio> [SHA1]\n"
 		"      Create ramdisk backups into <incpio> from <origcpio>\n"
+		"      SHA1 of stock boot image is optional\n"
 		"    -restore\n"
 		"      Restore ramdisk from ramdisk backup within <incpio>\n"
 		"    -stocksha1\n"

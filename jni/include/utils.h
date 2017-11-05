@@ -116,6 +116,8 @@ int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
 void restorecon(int dirfd, int force);
+void mmap_ro(const char *filename, void **buf, size_t *size);
+void mmap_rw(const char *filename, void **buf, size_t *size);
 
 // img.c
 

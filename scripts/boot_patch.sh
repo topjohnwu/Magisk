@@ -11,18 +11,15 @@
 # boot_patch.sh   script    A script to patch boot. Expect path to boot image as parameter.
 #               (this file) The script will use binaries and files in its same directory
 #                           to complete the patching process
-# magisk          binary    The main binary for all Magisk operations.
-#                           It is also used to patch the sepolicy in the ramdisk.
+# monogisk        binary    The monolithic binary to replace /init
 # magiskboot      binary    A tool to unpack boot image, decompress ramdisk, extract ramdisk
 #                           , and patch the ramdisk for Magisk support
-# init.magisk.rc  script    A new line will be added to init.rc to import this script.
-#                           All magisk entrypoints are defined here
 # chromeos        folder    This folder should store all the utilities and keys to sign
 #               (optional)  a chromeos device, used in the tablet Pixel C
 #
 # If the script is not running as root, then the input boot image should be a stock image
 # or have a backup included in ramdisk internally, since we cannot access the stock boot
-# image placed under /data we've created when previously installing
+# image placed under /data we've created when previously installed
 #
 ##########################################################################################
 ##########################################################################################
@@ -47,21 +44,6 @@ basename_wrap() {
   echo ${1##*/}
 }
 
-# --cpio-add <incpio> <mode> <entry> <infile>
-cpio_add() {
-  ./magiskboot --cpio-add ramdisk.cpio $1 $2 $3
-}
-
-# --cpio-extract <incpio> <entry> <outfile>
-cpio_extract() {
-  ./magiskboot --cpio-extract ramdisk.cpio $1 $2
-}
-
-# --cpio-mkdir <incpio> <mode> <entry>
-cpio_mkdir() {
-  ./magiskboot --cpio-mkdir ramdisk.cpio $1 $2
-}
-
 ##########################################################################################
 # Initialization
 ##########################################################################################
@@ -84,6 +66,9 @@ BOOTIMAGE="$1"
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 
 chmod -R 755 .
+
+# Extract magisk if doesn't exist
+[ -e magisk ] || ./monogisk -x magisk magisk
 
 ##########################################################################################
 # Unpack
@@ -172,33 +157,11 @@ esac
 
 ui_print "- Patching ramdisk"
 
-if [ ! -z $SHA1 ]; then
-  cp init.magisk.rc init.magisk.rc.bak
-  echo "# STOCKSHA1=$SHA1" >> init.magisk.rc
-fi
-
-if $SKIP_INITRAMFS; then
-  cpio_add 750 init magiskinit
-  cpio_mkdir 000 overlay
-  cpio_add 750 overlay/init.magisk.rc init.magisk.rc
-  cpio_mkdir 750 overlay/sbin
-  cpio_add 755 overlay/sbin/magisk magisk
-else
-  ./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
-
-  cpio_extract sepolicy sepolicy
-  ./magisk magiskpolicy --load sepolicy --save sepolicy --minimal
-  cpio_add 644 sepolicy sepolicy
-  rm -f sepolicy
-
-  cpio_add 750 init.magisk.rc init.magisk.rc
-  cpio_add 755 sbin/magisk magisk
-fi
-
-mv init.magisk.rc.bak init.magisk.rc 2>/dev/null
+./magiskboot --cpio-add ramdisk.cpio 750 init monogisk
+./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
 
 # Create ramdisk backups
-./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig
+./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $SHA1
 
 if ! $KEEPVERITY && [ -f dtb ]; then
   ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
@@ -218,7 +181,7 @@ rm -f ramdisk.cpio.orig
 A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
 # skip_initramfs -> want_initramfs
-$SKIP_INITRAMFS && ./magiskboot --hexpatch kernel \
+./magiskboot --hexpatch kernel \
 736B69705F696E697472616D6673 \
 77616E745F696E697472616D6673
 
