@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -70,7 +71,7 @@ public class MainActivity extends Activity
         toggle.syncState();
 
         if (savedInstanceState == null)
-            navigate(getIntent().getStringExtra(MagiskManager.INTENT_SECTION));
+            navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -115,7 +116,7 @@ public class MainActivity extends Activity
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
                 Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 1300
-                        && prefs.getBoolean("magiskhide", false));
+                        && prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(
                 Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
@@ -141,7 +142,7 @@ public class MainActivity extends Activity
                 case "downloads":
                     itemId = R.id.downloads;
                     break;
-                case "magiskhide":
+                case Const.Key.MAGISKHIDE:
                     itemId = R.id.magiskhide;
                     break;
                 case "log":
@@ -176,7 +177,7 @@ public class MainActivity extends Activity
                 displayFragment(new ReposFragment(), "downloads", true);
                 break;
             case R.id.magiskhide:
-                displayFragment(new MagiskHideFragment(), "magiskhide", true);
+                displayFragment(new MagiskHideFragment(), Const.Key.MAGISKHIDE, true);
                 break;
             case R.id.log:
                 displayFragment(new LogFragment(), "log", false);

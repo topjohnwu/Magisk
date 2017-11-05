@@ -15,9 +15,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 public class ZipUtils {
-    // File name in assets
-    public static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
-    public static final String PRIVATE_KEY_NAME = "private.key.pk8";
 
     static {
         System.loadLibrary("zipadjust");
@@ -69,7 +66,7 @@ public class ZipUtils {
     public static void signZip(JarMap input, File output, boolean minSign) throws Exception {
         AssetManager assets = MagiskManager.get().getAssets();
         SignAPK.signZip(
-                assets.open(PUBLIC_KEY_NAME), assets.open(PRIVATE_KEY_NAME),
+                assets.open(Const.PUBLIC_KEY_NAME), assets.open(Const.PRIVATE_KEY_NAME),
                 input, output, minSign);
     }
 }

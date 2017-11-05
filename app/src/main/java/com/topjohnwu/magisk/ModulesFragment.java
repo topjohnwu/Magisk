@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -29,8 +30,6 @@ import butterknife.Unbinder;
 
 public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
-    private static final int FETCH_ZIP_CODE = 2;
-
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -40,7 +39,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
         Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
-            startActivityForResult(intent, FETCH_ZIP_CODE);
+            startActivityForResult(intent, Const.ID.FETCH_ZIP);
         });
     }
 
@@ -86,10 +85,10 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FETCH_ZIP_CODE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
             Intent intent = new Intent(getActivity(), FlashActivity.class);
-            intent.setData(data.getData()).putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_ZIP);
+            intent.setData(data.getData()).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
             startActivity(intent);
         }
     }

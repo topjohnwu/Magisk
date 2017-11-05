@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.utils.Const;
 
 public class SplashActivity extends Activity {
 
@@ -14,9 +15,9 @@ public class SplashActivity extends Activity {
         getMagiskManager().startup();
 
         Intent intent = new Intent(this, MainActivity.class);
-        String section = getIntent().getStringExtra(MagiskManager.INTENT_SECTION);
+        String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
         if (section != null) {
-            intent.putExtra(MagiskManager.INTENT_SECTION, section);
+            intent.putExtra(Const.Key.OPEN_SECTION, section);
         }
         startActivity(intent);
         finish();

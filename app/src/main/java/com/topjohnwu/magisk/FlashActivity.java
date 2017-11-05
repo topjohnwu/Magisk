@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.container.AdaptiveList;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 
 import butterknife.BindView;
@@ -23,15 +24,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class FlashActivity extends Activity {
-
-    public static final String SET_ACTION = "action";
-    public static final String SET_BOOT = "boot";
-    public static final String SET_ENC = "enc";
-    public static final String SET_VERITY = "verity";
-
-    public static final String FLASH_ZIP = "flash";
-    public static final String PATCH_BOOT = "patch";
-    public static final String FLASH_MAGISK = "magisk";
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.txtLog) TextView flashLogs;
@@ -75,22 +67,22 @@ public class FlashActivity extends Activity {
         Intent intent = getIntent();
         Uri uri = intent.getData();
 
-        boolean keepEnc = intent.getBooleanExtra(SET_ENC, false);
-        boolean keepVerity = intent.getBooleanExtra(SET_VERITY, false);
+        boolean keepEnc = intent.getBooleanExtra(Const.Key.FLASH_SET_ENC, false);
+        boolean keepVerity = intent.getBooleanExtra(Const.Key.FLASH_SET_VERITY, false);
 
-        switch (getIntent().getStringExtra(SET_ACTION)) {
-            case FLASH_ZIP:
+        switch (getIntent().getStringExtra(Const.Key.FLASH_ACTION)) {
+            case Const.Value.FLASH_ZIP:
                 new FlashZip(this, uri, rootShellOutput)
                         .setCallBack(() -> buttonPanel.setVisibility(View.VISIBLE))
                         .exec();
                 break;
-            case PATCH_BOOT:
-                new InstallMagisk(this, rootShellOutput, uri, keepEnc, keepVerity, (Uri) intent.getParcelableExtra(SET_BOOT))
+            case Const.Value.PATCH_BOOT:
+                new InstallMagisk(this, rootShellOutput, uri, keepEnc, keepVerity, (Uri) intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT))
                         .setCallBack(() -> buttonPanel.setVisibility(View.VISIBLE))
                         .exec();
                 break;
-            case FLASH_MAGISK:
-                String boot = intent.getStringExtra(SET_BOOT);
+            case Const.Value.FLASH_MAGISK:
+                String boot = intent.getStringExtra(Const.Key.FLASH_SET_BOOT);
                 if (getMagiskManager().remoteMagiskVersionCode < 1370) {
                     // Use legacy installation method
                     Shell.su_raw(

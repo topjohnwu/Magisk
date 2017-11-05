@@ -26,8 +26,7 @@ import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
-import com.topjohnwu.magisk.superuser.SuReceiver;
-import com.topjohnwu.magisk.superuser.SuRequestActivity;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -44,21 +43,6 @@ public class MagiskManager extends Application {
 
     // Global weak reference to self
     private static WeakReference<MagiskManager> weakSelf;
-
-    public static final String ORIG_PKG_NAME = "com.topjohnwu.magisk";
-    public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
-    public static final String MAGISK_HOST_FILE = "/magisk/.core/hosts";
-    public static final String TMP_FOLDER_PATH = "/dev/tmp";
-    public static final String MAGISK_PATH = "/magisk";
-    public static final String INTENT_SECTION = "section";
-    public static final String INTENT_VERSION = "version";
-    public static final String INTENT_LINK = "link";
-    public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
-    public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
-    public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
-    public static final String BUSYBOXPATH = "/dev/magisk/bin";
-    public static final int UPDATE_SERVICE_ID = 1;
-    public static final int UPDATE_SERVICE_VER = 1;
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -138,9 +122,9 @@ public class MagiskManager extends Application {
         }
 
         // If detect original package, self destruct!
-        if (!getPackageName().equals(ORIG_PKG_NAME)) {
+        if (!getPackageName().equals(Const.ORIG_PKG_NAME)) {
             try {
-                getPackageManager().getApplicationInfo(ORIG_PKG_NAME, 0);
+                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
                 Shell.su(String.format(Locale.US, "pm uninstall --user %d %s", userId, getPackageName()));
                 return;
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected*/ }
@@ -157,7 +141,7 @@ public class MagiskManager extends Application {
     }
 
     public void setLocale() {
-        localeConfig = prefs.getString("locale", "");
+        localeConfig = prefs.getString(Const.Key.LOCALE, "");
         if (localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {
@@ -170,22 +154,22 @@ public class MagiskManager extends Application {
     }
 
     public void loadConfig() {
-        isDarkTheme = prefs.getBoolean("dark_theme", false);
+        isDarkTheme = prefs.getBoolean(Const.Key.DARK_THEME, false);
 
         // su
-        suRequestTimeout = Utils.getPrefsInt(prefs, "su_request_timeout", 10);
-        suResponseType = Utils.getPrefsInt(prefs, "su_auto_response", SuRequestActivity.PROMPT);
-        suNotificationType = Utils.getPrefsInt(prefs, "su_notification", SuReceiver.TOAST);
-        suReauth = prefs.getBoolean("su_reauth", false);
-        suAccessState = suDB.getSettings(SuDatabaseHelper.ROOT_ACCESS, SuDatabaseHelper.ROOT_ACCESS_APPS_AND_ADB);
-        multiuserMode = suDB.getSettings(SuDatabaseHelper.MULTIUSER_MODE, SuDatabaseHelper.MULTIUSER_MODE_OWNER_ONLY);
-        suNamespaceMode = suDB.getSettings(SuDatabaseHelper.MNT_NS, SuDatabaseHelper.NAMESPACE_MODE_REQUESTER);
+        suRequestTimeout = Utils.getPrefsInt(prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
+        suResponseType = Utils.getPrefsInt(prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
+        suNotificationType = Utils.getPrefsInt(prefs, Const.Key.SU_NOTIFICATION, Const.Value.NOTIFICATION_TOAST);
+        suReauth = prefs.getBoolean(Const.Key.SU_REAUTH, false);
+        suAccessState = suDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
+        multiuserMode = suDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
+        suNamespaceMode = suDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
 
-        updateNotification = prefs.getBoolean("notification", true);
-        updateChannel = Utils.getPrefsInt(prefs, "update_channel", CheckUpdates.STABLE_CHANNEL);
-        bootFormat = prefs.getString("boot_format", ".img");
-        snet_version = prefs.getInt("snet_version", -1);
-        updateServiceVersion = prefs.getInt("update_service_version", -1);
+        updateNotification = prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true);
+        updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
+        bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
+        snet_version = prefs.getInt(Const.Key.SNET_VER, -1);
+        updateServiceVersion = prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1);
     }
 
     public static void toast(String msg, int duration) {
@@ -217,7 +201,7 @@ public class MagiskManager extends Application {
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL,
+            NotificationChannel channel = new NotificationChannel(Const.ID.NOTIFICATION_CHANNEL,
                     getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
             getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
@@ -227,7 +211,7 @@ public class MagiskManager extends Application {
         // Magisk working as expected
         if (Shell.rootAccess() && magiskVersionCode > 0) {
             // Load utility shell scripts
-            try (InputStream in  = getAssets().open(Utils.UTIL_FUNCTIONS)) {
+            try (InputStream in  = getAssets().open(Const.UTIL_FUNCTIONS)) {
                 shell.loadInputStream(in);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -237,7 +221,7 @@ public class MagiskManager extends Application {
 
             if (Utils.checkNetworkStatus()) {
                 // Make sure we have busybox
-                if (!Utils.itemExist(BUSYBOXPATH + "/busybox")) {
+                if (!Utils.itemExist(Const.BUSYBOXPATH + "/busybox")) {
                     try {
                         // Force synchronous, make sure we have busybox to use
                         new DownloadBusybox().exec().get();
@@ -255,7 +239,7 @@ public class MagiskManager extends Application {
 
             // Root shell initialization
             Shell.su_raw(
-                    "export PATH=" + BUSYBOXPATH + ":$PATH",
+                    "export PATH=" + Const.BUSYBOXPATH + ":$PATH",
                     "mount_partitions",
                     "BOOTIMAGE=",
                     "find_boot_image",
@@ -273,22 +257,22 @@ public class MagiskManager extends Application {
 
             // Check alternative Magisk Manager
             String pkg;
-            if (getPackageName().equals(ORIG_PKG_NAME) &&
-                    (pkg = suDB.getStrings(SuDatabaseHelper.REQUESTER, null)) != null) {
+            if (getPackageName().equals(Const.ORIG_PKG_NAME) &&
+                    (pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null)) != null) {
                 Shell.su_raw("pm uninstall " + pkg);
-                suDB.setStrings(SuDatabaseHelper.REQUESTER, null);
+                suDB.setStrings(Const.Key.SU_REQUESTER, null);
             }
 
             // Add update checking service
-            if (UPDATE_SERVICE_VER > updateServiceVersion) {
+            if (Const.Value.UPDATE_SERVICE_VER > updateServiceVersion) {
                 ComponentName service = new ComponentName(this, UpdateCheckService.class);
-                JobInfo info = new JobInfo.Builder(UPDATE_SERVICE_ID, service)
+                JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                         .setPersisted(true)
                         .setPeriodic(8 * 60 * 60 * 1000)
                         .build();
                 ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(info);
-                updateServiceVersion = UPDATE_SERVICE_VER;
+                updateServiceVersion = Const.Value.UPDATE_SERVICE_VER;
             }
 
             // Fire asynctasks
@@ -297,22 +281,22 @@ public class MagiskManager extends Application {
 
         // Write back default values
         prefs.edit()
-                .putBoolean("dark_theme", isDarkTheme)
-                .putBoolean("magiskhide", magiskHide)
-                .putBoolean("notification", updateNotification)
-                .putBoolean("hosts", Utils.itemExist(MAGISK_HOST_FILE))
-                .putBoolean("disable", Utils.itemExist(MAGISK_DISABLE_FILE))
-                .putBoolean("su_reauth", suReauth)
-                .putString("su_request_timeout", String.valueOf(suRequestTimeout))
-                .putString("su_auto_response", String.valueOf(suResponseType))
-                .putString("su_notification", String.valueOf(suNotificationType))
-                .putString("su_access", String.valueOf(suAccessState))
-                .putString("multiuser_mode", String.valueOf(multiuserMode))
-                .putString("mnt_ns", String.valueOf(suNamespaceMode))
-                .putString("update_channel", String.valueOf(updateChannel))
-                .putString("locale", localeConfig)
-                .putString("boot_format", bootFormat)
-                .putInt("update_service_version", updateServiceVersion)
+                .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
+                .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
+                .putBoolean(Const.Key.UPDATE_NOTIFICATION, updateNotification)
+                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE))
+                .putBoolean(Const.Key.DISABLE, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
+                .putBoolean(Const.Key.SU_REAUTH, suReauth)
+                .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
+                .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
+                .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
+                .putString(Const.Key.ROOT_ACCESS, String.valueOf(suAccessState))
+                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
+                .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
+                .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
+                .putString(Const.Key.LOCALE, localeConfig)
+                .putString(Const.Key.BOOT_FORMAT, bootFormat)
+                .putInt(Const.Key.UPDATE_SERVICE_VER, updateServiceVersion)
                 .apply();
     }
 
@@ -339,16 +323,16 @@ public class MagiskManager extends Application {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
         }
-        ret = Shell.sh("getprop " + DISABLE_INDICATION_PROP);
+        ret = Shell.sh("getprop " + Const.DISABLE_INDICATION_PROP);
         try {
             disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             disabled = false;
         }
         if (magiskVersionCode > 1435) {
-            ret = Shell.su("resetprop -p " + MAGISKHIDE_PROP);
+            ret = Shell.su("resetprop -p " + Const.MAGISKHIDE_PROP);
         } else {
-            ret = Shell.sh("getprop " + MAGISKHIDE_PROP);
+            ret = Shell.sh("getprop " + Const.MAGISKHIDE_PROP);
         }
         try {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;

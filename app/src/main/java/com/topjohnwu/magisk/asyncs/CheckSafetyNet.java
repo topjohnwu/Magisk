@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.topjohnwu.crypto.ByteArrayStream;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -18,11 +19,6 @@ import dalvik.system.DexClassLoader;
 
 public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
-    public static final int SNET_VER = 3;
-
-    private static final String SNET_URL = "https://www.dropbox.com/s/jg2yhcrn3l9fckc/snet.apk?dl=1";
-    private static final String PKG = "com.topjohnwu.snet";
-
     private File dexPath;
     private DexClassLoader loader;
 
@@ -34,18 +30,18 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     @Override
     protected void onPreExecute() {
         MagiskManager mm = MagiskManager.get();
-        if (mm.snet_version != CheckSafetyNet.SNET_VER) {
+        if (mm.snet_version != Const.Value.SNET_VER) {
             Shell.sh("rm -rf " + dexPath.getParent());
         }
-        mm.snet_version = CheckSafetyNet.SNET_VER;
-        mm.prefs.edit().putInt("snet_version", CheckSafetyNet.SNET_VER).apply();
+        mm.snet_version = Const.Value.SNET_VER;
+        mm.prefs.edit().putInt(Const.Key.SNET_VER, Const.Value.SNET_VER).apply();
     }
 
     @Override
     protected Exception doInBackground(Void... voids) {
         try {
             if (!dexPath.exists()) {
-                HttpURLConnection conn = WebService.request(SNET_URL, null);
+                HttpURLConnection conn = WebService.request(Const.Url.SNET_URL, null);
                 ByteArrayStream bas = new ByteArrayStream();
                 bas.readFrom(conn.getInputStream());
                 conn.disconnect();
@@ -68,8 +64,8 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         MagiskManager mm = MagiskManager.get();
         try {
             if (err != null) throw err;
-            Class<?> helperClazz = loader.loadClass(PKG + ".SafetyNetHelper");
-            Class<?> callbackClazz = loader.loadClass(PKG + ".SafetyNetCallback");
+            Class<?> helperClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetHelper");
+            Class<?> callbackClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetCallback");
             Object helper = helperClazz.getConstructors()[0].newInstance(
                     getActivity(), dexPath.getPath(), Proxy.newProxyInstance(
                             loader, new Class[] { callbackClazz }, (proxy, method, args) -> {

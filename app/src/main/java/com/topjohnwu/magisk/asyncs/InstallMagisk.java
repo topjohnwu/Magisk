@@ -11,6 +11,7 @@ import com.topjohnwu.crypto.SignBoot;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.AdaptiveList;
 import com.topjohnwu.magisk.container.TarEntry;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -202,10 +203,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 File signed = new File(install.getParent(), "signed.img");
                 AssetManager assets = mm.getAssets();
                 try (
-                    InputStream in = new FileInputStream(patched_boot);
-                    OutputStream out = new BufferedOutputStream(new FileOutputStream(signed));
-                    InputStream keyIn = assets.open(ZipUtils.PRIVATE_KEY_NAME);
-                    InputStream certIn = assets.open(ZipUtils.PUBLIC_KEY_NAME)
+                        InputStream in = new FileInputStream(patched_boot);
+                        OutputStream out = new BufferedOutputStream(new FileOutputStream(signed));
+                        InputStream keyIn = assets.open(Const.PRIVATE_KEY_NAME);
+                        InputStream certIn = assets.open(Const.PUBLIC_KEY_NAME)
                 ) {
                     SignBoot.doSignature("/boot", in, out, keyIn, certIn);
                 }

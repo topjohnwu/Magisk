@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -25,12 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class UpdateRepos extends ParallelTask<Void, Void, Void> {
-
-    private static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
-
-    public static final String ETAG_KEY = "ETag";
-    private static final String IF_NONE_MATCH = "If-None-Match";
-    private static final String LINK_KEY = "Link";
 
     private static final int CHECK_ETAG = 0;
     private static final int LOAD_NEXT = 1;
@@ -52,7 +47,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         File old = new File(mm.getApplicationInfo().dataDir + "/shared_prefs", "RepoMap.xml");
         if (old.exists() || prefs.getString("repomap", null) != null) {
             old.delete();
-            prefs.edit().remove("version").remove("repomap").remove(ETAG_KEY).apply();
+            prefs.edit().remove("version").remove("repomap").remove(Const.Key.ETAG_KEY).apply();
             repoDB.clearRepo();
         }
         forceUpdate = force;
@@ -111,8 +106,8 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         if (mode == CHECK_ETAG && page < etags.size()) {
             etag = etags.get(page);
         }
-        header.put(IF_NONE_MATCH, etag);
-        String url = String.format(Locale.US, REPO_URL, page + 1);
+        header.put(Const.Key.IF_NONE_MATCH, etag);
+        String url = String.format(Locale.US, Const.Url.REPO_URL, page + 1);
         HttpURLConnection conn = WebService.request(url, header);
 
         try {
@@ -129,11 +124,11 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         }
 
         // Update ETAG
-        etag = header.get(ETAG_KEY);
+        etag = header.get(Const.Key.ETAG_KEY);
         etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
         newEtags.add(etag);
 
-        String links = header.get(LINK_KEY);
+        String links = header.get(Const.Key.LINK_KEY);
         if (links != null) {
             for (String s : links.split(", ")) {
                 if (mode != LOAD_PREV && s.contains("next")) {
@@ -167,7 +162,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        etags = new ArrayList<>(Arrays.asList(prefs.getString(ETAG_KEY, "").split(",")));
+        etags = new ArrayList<>(Arrays.asList(prefs.getString(Const.Key.ETAG_KEY, "").split(",")));
         cached = repoDB.getRepoIDList();
 
         if (!loadPage(0, CHECK_ETAG)) {
@@ -204,7 +199,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             if (i != 0) etagBuilder.append(",");
             etagBuilder.append(newEtags.get(i));
         }
-        prefs.edit().putString(ETAG_KEY, etagBuilder.toString()).apply();
+        prefs.edit().putString(Const.Key.ETAG_KEY, etagBuilder.toString()).apply();
         return null;
     }
 

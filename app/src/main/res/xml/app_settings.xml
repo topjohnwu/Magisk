@@ -72,7 +72,7 @@
         android:title="@string/superuser">
 
         <ListPreference
-            android:key="su_access"
+            android:key="root_access"
             android:title="@string/superuser_access"
             android:entries="@array/su_access"
             android:entryValues="@array/value_array" />

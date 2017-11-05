@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -35,8 +35,8 @@ public class ManagerUpdate extends BroadcastReceiver {
                         }
                     }
                 },
-                intent.getStringExtra(MagiskManager.INTENT_LINK),
+                intent.getStringExtra(Const.Key.INTENT_SET_LINK),
                 Utils.getLegalFilename("MagiskManager-v" +
-                        intent.getStringExtra(MagiskManager.INTENT_VERSION) + ".apk"));
+                        intent.getStringExtra(Const.Key.INTENT_SET_VERSION) + ".apk"));
     }
 }

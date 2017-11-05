@@ -17,12 +17,12 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -31,17 +31,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
-
-    public static final List<String> BLACKLIST =  Arrays.asList(
-            "android",
-            "com.topjohnwu.magisk",
-            "com.google.android.gms"
-    );
-
-    private static final List<String> SNLIST =  Arrays.asList(
-            "com.google.android.apps.walletnfcrel",
-            "com.nianticlabs.pokemongo"
-    );
 
     private List<ApplicationInfo> mOriginalList, mList;
     private List<String> mHideList;
@@ -80,7 +69,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.itemView.setOnClickListener(null);
         holder.checkBox.setOnCheckedChangeListener(null);
 
-        if (SNLIST.contains(info.packageName)) {
+        if (Const.SN_DEFAULTLIST.contains(info.packageName)) {
             holder.checkBox.setChecked(true);
             holder.checkBox.setEnabled(false);
             holder.itemView.setOnClickListener(v ->
@@ -160,7 +149,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             mOriginalList = pm.getInstalledApplications(0);
             for (Iterator<ApplicationInfo> i = mOriginalList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
-                if (ApplicationAdapter.BLACKLIST.contains(info.packageName) || !info.enabled) {
+                if (Const.SN_BLACKLIST.contains(info.packageName) || !info.enabled) {
                     i.remove();
                 }
             }

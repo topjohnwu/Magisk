@@ -6,11 +6,10 @@ import java.util.Locale;
 
 public class Logger {
 
-    public static final String DEBUG_TAG = "MagiskManager";
     private static final boolean SHELL_LOGGING = false;
 
     public static void debug(String line) {
-        Log.d(DEBUG_TAG, "DEBUG: " + line);
+        Log.d(Const.DEBUG_TAG, "DEBUG: " + line);
     }
 
     public static void debug(String fmt, Object... args) {
@@ -18,7 +17,7 @@ public class Logger {
     }
 
     public static void error(String line) {
-        Log.e(DEBUG_TAG, "ERROR: " + line);
+        Log.e(Const.DEBUG_TAG, "ERROR: " + line);
     }
 
     public static void error(String fmt, Object... args) {
@@ -27,7 +26,7 @@ public class Logger {
 
     public static void shell(boolean in, String line) {
         if (SHELL_LOGGING) {
-            Log.d(DEBUG_TAG, (in ? "SHELLIN : " : "SHELLOUT: ") + line);
+            Log.d(Const.DEBUG_TAG, (in ? "SHELLIN : " : "SHELLOUT: ") + line);
         }
     }
 

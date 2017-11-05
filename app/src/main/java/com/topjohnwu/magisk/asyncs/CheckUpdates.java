@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -9,12 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CheckUpdates extends ParallelTask<Void, Void, Void> {
-
-    public static final int STABLE_CHANNEL = 0;
-    public static final int BETA_CHANNEL = 1;
-
-    private static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
-    private static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
 
     private boolean showNotification;
 
@@ -31,11 +26,11 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         MagiskManager mm = MagiskManager.get();
         String jsonStr;
         switch (mm.updateChannel) {
-            case STABLE_CHANNEL:
-                jsonStr = WebService.getString(STABLE_URL);
+            case Const.Value.STABLE_CHANNEL:
+                jsonStr = WebService.getString(Const.Url.STABLE_URL);
                 break;
-            case BETA_CHANNEL:
-                jsonStr = WebService.getString(BETA_URL);
+            case Const.Value.BETA_CHANNEL:
+                jsonStr = WebService.getString(Const.Url.BETA_URL);
                 break;
             default:
                 jsonStr = null;

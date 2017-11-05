@@ -11,17 +11,12 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Date;
 
 public class SuReceiver extends BroadcastReceiver {
-
-    public static final int NO_NOTIFICATION = 0;
-    public static final int TOAST = 1;
-
-    private static final int NOTIFY_NORMAL_LOG = 0;
-    private static final int NOTIFY_USER_TOASTS = 1;
-    private static final int NOTIFY_USER_TO_OWNER = 2;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -29,14 +24,14 @@ public class SuReceiver extends BroadcastReceiver {
         String command, action;
         Policy policy;
 
-        MagiskManager magiskManager = (MagiskManager) context.getApplicationContext();
+        MagiskManager mm = Utils.getMagiskManager(context);
 
         if (intent == null) return;
 
         mode = intent.getIntExtra("mode", -1);
         if (mode < 0) return;
 
-        if (mode == NOTIFY_USER_TO_OWNER) {
+        if (mode == Const.Value.NOTIFY_USER_TO_OWNER) {
             MagiskManager.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
             return;
         }
@@ -48,7 +43,7 @@ public class SuReceiver extends BroadcastReceiver {
         action = intent.getStringExtra("action");
         if (action == null) return;
 
-        policy = magiskManager.suDB.getPolicy(fromUid);
+        policy = mm.suDB.getPolicy(fromUid);
         if (policy == null) {
             try {
                 policy = new Policy(fromUid, context.getPackageManager());
@@ -74,11 +69,11 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
         }
 
-        if (policy.notification && magiskManager.suNotificationType == TOAST) {
-            magiskManager.toast(message, Toast.LENGTH_SHORT);
+        if (policy.notification && mm.suNotificationType == Const.Value.NOTIFICATION_TOAST) {
+            MagiskManager.toast(message, Toast.LENGTH_SHORT);
         }
 
-        if (mode == NOTIFY_NORMAL_LOG && policy.logging) {
+        if (mode == Const.Value.NOTIFY_NORMAL_LOG && policy.logging) {
             toUid = intent.getIntExtra("to.uid", -1);
             if (toUid < 0) return;
             pid = intent.getIntExtra("pid", -1);
@@ -89,7 +84,7 @@ public class SuReceiver extends BroadcastReceiver {
             log.fromPid = pid;
             log.command = command;
             log.date = new Date();
-            magiskManager.suDB.addLog(log);
+            mm.suDB.addLog(log);
         }
     }
 }

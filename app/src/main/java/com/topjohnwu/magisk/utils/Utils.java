@@ -39,7 +39,6 @@ import java.util.Locale;
 
 public class Utils {
 
-    public static final String UTIL_FUNCTIONS= "util_functions.sh";
     public static boolean isDownloading = false;
 
     public static boolean itemExist(String path) {

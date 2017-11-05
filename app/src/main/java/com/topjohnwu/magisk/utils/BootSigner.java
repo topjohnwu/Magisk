@@ -31,8 +31,8 @@ public class BootSigner {
             } else {
                 /* Use internal test keys */
                 JarFile apk = new JarFile(System.getProperty("java.class.path"));
-                JarEntry keyEntry = apk.getJarEntry("assets/" + ZipUtils.PRIVATE_KEY_NAME);
-                JarEntry sigEntry = apk.getJarEntry("assets/" + ZipUtils.PUBLIC_KEY_NAME);
+                JarEntry keyEntry = apk.getJarEntry("assets/" + Const.PRIVATE_KEY_NAME);
+                JarEntry sigEntry = apk.getJarEntry("assets/" + Const.PUBLIC_KEY_NAME);
 
                 keyIn = apk.getInputStream(keyEntry);
                 certIn = apk.getInputStream(sigEntry);

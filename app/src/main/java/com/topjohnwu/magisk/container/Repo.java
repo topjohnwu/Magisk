@@ -3,16 +3,12 @@ package com.topjohnwu.magisk.container;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.util.Date;
 
 public class Repo extends BaseModule {
-
-    public static final int MIN_TEMPLATE_VER = 4;
-
-    private static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
-    private static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
 
     private String repoName;
     private Date mLastUpdate;
@@ -44,7 +40,7 @@ public class Repo extends BaseModule {
         if (getVersionCode() < 0) {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
         }
-        if (getTemplateVersion() < MIN_TEMPLATE_VER) {
+        if (getTemplateVersion() < Const.Value.MIN_TEMPLATE_VER) {
             throw new IllegalRepoException("Repo [" + repoName + "] is outdated");
         }
     }
@@ -70,15 +66,15 @@ public class Repo extends BaseModule {
     }
 
     public String getZipUrl() {
-        return String.format(ZIP_URL, repoName);
+        return String.format(Const.Url.ZIP_URL, repoName);
     }
 
     public String getManifestUrl() {
-        return String.format(FILE_URL, repoName, "module.prop");
+        return String.format(Const.Url.FILE_URL, repoName, "module.prop");
     }
 
     public String getDetailUrl() {
-        return String.format(FILE_URL, repoName, "README.md");
+        return String.format(Const.Url.FILE_URL, repoName, "README.md");
     }
 
     public Date getLastUpdate() {

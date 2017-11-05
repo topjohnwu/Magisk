@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -16,9 +17,6 @@ import java.net.HttpURLConnection;
 
 public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
-    private static final String BUSYBOX_ARM = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-arm";
-    private static final String BUSYBOX_X86 = "https://github.com/topjohnwu/ndk-busybox/releases/download/1.27.2/busybox-x86";
-
     @Override
     protected Void doInBackground(Void... voids) {
         Context context = MagiskManager.get();
@@ -28,8 +26,8 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
 
             HttpURLConnection conn = WebService.request(
                     Build.SUPPORTED_32_BIT_ABIS[0].contains("x86") ?
-                            BUSYBOX_X86 :
-                            BUSYBOX_ARM,
+                            Const.Url.BUSYBOX_X86 :
+                            Const.Url.BUSYBOX_ARM,
                     null
             );
             if (conn == null) throw new IOException();
@@ -41,11 +39,11 @@ public class DownloadBusybox extends ParallelTask<Void, Void, Void> {
         }
         if (busybox.exists()) {
             Shell.su(
-                    "rm -rf " + MagiskManager.BUSYBOXPATH,
-                    "mkdir -p " + MagiskManager.BUSYBOXPATH,
-                    "cp " + busybox + " " + MagiskManager.BUSYBOXPATH,
-                    "chmod -R 755 " + MagiskManager.BUSYBOXPATH,
-                    MagiskManager.BUSYBOXPATH + "/busybox --install -s " + MagiskManager.BUSYBOXPATH
+                    "rm -rf " + Const.BUSYBOXPATH,
+                    "mkdir -p " + Const.BUSYBOXPATH,
+                    "cp " + busybox + " " + Const.BUSYBOXPATH,
+                    "chmod -R 755 " + Const.BUSYBOXPATH,
+                    Const.BUSYBOXPATH + "/busybox --install -s " + Const.BUSYBOXPATH
             );
             busybox.delete();
         }

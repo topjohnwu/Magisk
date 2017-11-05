@@ -6,7 +6,7 @@ import android.widget.Toast;
 import com.topjohnwu.crypto.JarMap;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -19,8 +19,6 @@ import java.util.Locale;
 import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
-
-    private static final String ANDROID_MANIFEST = "AndroidManifest.xml";
 
     private String genPackageName(String prefix, int length) {
         StringBuilder builder = new StringBuilder(length);
@@ -101,17 +99,17 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         // Generate a new unhide app with random package name
         File repack = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", "repack.apk");
         repack.getParentFile().mkdirs();
-        String pkg = genPackageName("com.", MagiskManager.ORIG_PKG_NAME.length());
+        String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
 
         try {
             // Read whole APK into memory
             JarMap apk = new JarMap(new FileInputStream(mm.getPackageCodePath()));
-            JarEntry je = new JarEntry(ANDROID_MANIFEST);
+            JarEntry je = new JarEntry(Const.ANDROID_MANIFEST);
             byte xml[] = apk.getRawData(je);
 
-            if (!findAndPatch(xml, MagiskManager.ORIG_PKG_NAME, pkg))
+            if (!findAndPatch(xml, Const.ORIG_PKG_NAME, pkg))
                 return false;
-            if (!findAndPatch(xml, MagiskManager.ORIG_PKG_NAME + ".provider", pkg + ".provider"))
+            if (!findAndPatch(xml, Const.ORIG_PKG_NAME + ".provider", pkg + ".provider"))
                 return false;
 
             // Write in changes
@@ -133,7 +131,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         if (!Utils.isValidShellResponse(ret) || !Boolean.parseBoolean(ret.get(0)))
             return false;
 
-        mm.suDB.setStrings(SuDatabaseHelper.REQUESTER, pkg);
+        mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
         Shell.su_raw(String.format(Locale.US, "pm uninstall --user %d %s", mm.userId, mm.getPackageName()));
 
         return true;

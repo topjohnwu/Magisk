@@ -17,9 +17,8 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
-import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -94,16 +93,23 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             generalCatagory = (PreferenceCategory) findPreference("general");
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
-
-            updateChannel = (ListPreference) findPreference("update_channel");
-            suAccess = (ListPreference) findPreference("su_access");
-            autoRes = (ListPreference) findPreference("su_auto_response");
-            requestTimeout = (ListPreference) findPreference("su_request_timeout");
-            suNotification = (ListPreference) findPreference("su_notification");
-            multiuserMode = (ListPreference) findPreference("multiuser_mode");
-            namespaceMode = (ListPreference) findPreference("mnt_ns");
-            SwitchPreference reauth = (SwitchPreference) findPreference("su_reauth");
             Preference hideManager = findPreference("hide");
+            findPreference("clear").setOnPreferenceClickListener((pref) -> {
+                mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+                mm.repoDB.clearRepo();
+                MagiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+                return true;
+            });
+
+            updateChannel = (ListPreference) findPreference(Const.Key.UPDATE_CHANNEL);
+            suAccess = (ListPreference) findPreference(Const.Key.ROOT_ACCESS);
+            autoRes = (ListPreference) findPreference(Const.Key.SU_AUTO_RESPONSE);
+            requestTimeout = (ListPreference) findPreference(Const.Key.SU_REQUEST_TIMEOUT);
+            suNotification = (ListPreference) findPreference(Const.Key.SU_NOTIFICATION);
+            multiuserMode = (ListPreference) findPreference(Const.Key.SU_MULTIUSER_MODE);
+            namespaceMode = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
+            SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
+
 
             setSummary();
 
@@ -117,14 +123,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 suCategory.removePreference(reauth);
             }
 
-            findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                mm.prefs.edit().remove(UpdateRepos.ETAG_KEY).apply();
-                mm.repoDB.clearRepo();
-                MagiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
-                return true;
-            });
-
-            if (mm.getPackageName().equals(MagiskManager.ORIG_PKG_NAME)) {
+            if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                 hideManager.setOnPreferenceClickListener((pref) -> {
                     Utils.runWithPermission(getActivity(),
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -166,7 +165,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             lp.setEntries(entries);
             lp.setEntryValues(entryValues);
             lp.setTitle(R.string.language);
-            lp.setKey("locale");
+            lp.setKey(Const.Key.LOCALE);
             lp.setSummary(MagiskManager.locale.getDisplayName(MagiskManager.locale));
             if (isNew) {
                 generalCatagory.addPreference(lp);
@@ -192,56 +191,56 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             boolean enabled;
 
             switch (key) {
-                case "dark_theme":
-                    enabled = prefs.getBoolean("dark_theme", false);
+                case Const.Key.DARK_THEME:
+                    enabled = prefs.getBoolean(Const.Key.DARK_THEME, false);
                     if (mm.isDarkTheme != enabled) {
                         mm.reloadActivity.publish(false);
                     }
                     break;
-                case "disable":
-                    enabled = prefs.getBoolean("disable", false);
+                case Const.Key.DISABLE:
+                    enabled = prefs.getBoolean(Const.Key.DISABLE, false);
                     if (enabled) {
-                        Utils.createFile(MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.createFile(Const.MAGISK_DISABLE_FILE);
                     } else {
-                        Utils.removeItem(MagiskManager.MAGISK_DISABLE_FILE);
+                        Utils.removeItem(Const.MAGISK_DISABLE_FILE);
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
-                case "magiskhide":
-                    enabled = prefs.getBoolean("magiskhide", false);
+                case Const.Key.MAGISKHIDE:
+                    enabled = prefs.getBoolean(Const.Key.MAGISKHIDE, false);
                     if (enabled) {
                         Shell.su_raw("magiskhide --enable");
                     } else {
                         Shell.su_raw("magiskhide --disable");
                     }
                     break;
-                case "hosts":
-                    enabled = prefs.getBoolean("hosts", false);
+                case Const.Key.HOSTS:
+                    enabled = prefs.getBoolean(Const.Key.HOSTS, false);
                     if (enabled) {
                         Shell.su_raw(
-                                "cp -af /system/etc/hosts " + MagiskManager.MAGISK_HOST_FILE,
-                                "mount -o bind " + MagiskManager.MAGISK_HOST_FILE + " /system/etc/hosts");
+                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
+                                "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts");
                     } else {
                         Shell.su_raw(
                                 "umount -l /system/etc/hosts",
-                                "rm -f " + MagiskManager.MAGISK_HOST_FILE);
+                                "rm -f " + Const.MAGISK_HOST_FILE);
                     }
                     break;
-                case "su_access":
-                    mm.suDB.setSettings(SuDatabaseHelper.ROOT_ACCESS, Utils.getPrefsInt(prefs, "su_access"));
+                case Const.Key.ROOT_ACCESS:
+                    mm.suDB.setSettings(Const.Key.ROOT_ACCESS, Utils.getPrefsInt(prefs, Const.Key.ROOT_ACCESS));
                     break;
-                case "multiuser_mode":
-                    mm.suDB.setSettings(SuDatabaseHelper.MULTIUSER_MODE, Utils.getPrefsInt(prefs, "multiuser_mode"));
+                case Const.Key.SU_MULTIUSER_MODE:
+                    mm.suDB.setSettings(Const.Key.SU_MULTIUSER_MODE, Utils.getPrefsInt(prefs, Const.Key.SU_MULTIUSER_MODE));
                     break;
-                case "mnt_ns":
-                    mm.suDB.setSettings(SuDatabaseHelper.MNT_NS, Utils.getPrefsInt(prefs, "mnt_ns"));
+                case Const.Key.SU_MNT_NS:
+                    mm.suDB.setSettings(Const.Key.SU_MNT_NS, Utils.getPrefsInt(prefs, Const.Key.SU_MNT_NS));
                     break;
-                case "locale":
+                case Const.Key.LOCALE:
                     mm.setLocale();
                     mm.reloadActivity.publish(false);
                     break;
-                case "update_channel":
-                    mm.updateChannel = Utils.getPrefsInt(prefs, "update_channel");
+                case Const.Key.UPDATE_CHANNEL:
+                    mm.updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL);
                     new CheckUpdates(true).exec();
                     break;
             }
@@ -259,7 +258,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             suNotification.setSummary(getResources()
                     .getStringArray(R.array.su_notification)[mm.suNotificationType]);
             requestTimeout.setSummary(
-                    getString(R.string.request_timeout_summary, prefs.getString("su_request_timeout", "10")));
+                    getString(R.string.request_timeout_summary, prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
             multiuserMode.setSummary(getResources()
                     .getStringArray(R.array.multiuser_summary)[mm.multiuserMode]);
             namespaceMode.setSummary(getResources()
@@ -268,7 +267,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         @Override
         public void onTopicPublished(Topic topic, Object result) {
-            setLocalePreference((ListPreference) findPreference("locale"));
+            setLocalePreference((ListPreference) findPreference(Const.Key.LOCALE));
         }
 
         @Override

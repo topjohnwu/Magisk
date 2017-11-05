@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.utils.Const;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,10 +27,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AboutActivity extends Activity {
-
-    private static final String DONATION_URL = "https://www.paypal.me/topjohnwu";
-    private static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
-    private static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.app_version_info) AboutCardRow appVersionInfo;
@@ -120,13 +117,13 @@ public class AboutActivity extends Activity {
         }
 
         appSourceCode.removeSummary();
-        appSourceCode.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_CODE_URL))));
+        appSourceCode.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.SOURCE_CODE_URL))));
 
         supportThread.removeSummary();
-        supportThread.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(XDA_THREAD))));
+        supportThread.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.XDA_THREAD))));
 
         donation.removeSummary();
-        donation.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(DONATION_URL))));
+        donation.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.DONATION_URL))));
 
         setFloating();
     }

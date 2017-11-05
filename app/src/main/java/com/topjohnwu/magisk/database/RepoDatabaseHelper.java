@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Repo;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
         // Clear bad repos
         mDb.delete(TABLE_NAME, "template<?",
-                new String[] { String.valueOf(Repo.MIN_TEMPLATE_VER) });
+                new String[] { String.valueOf(Const.Value.MIN_TEMPLATE_VER) });
     }
 
     @Override

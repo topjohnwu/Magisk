@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.container.Policy;
+import com.topjohnwu.magisk.utils.Const;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -30,12 +31,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SuRequestActivity extends Activity {
-
-    public static final int PROMPT = 0;
-    public static final int AUTO_DENY = 1;
-    public static final int AUTO_ALLOW = 2;
-
-    private static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
 
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
@@ -86,13 +81,13 @@ public class SuRequestActivity extends Activity {
 
     private void showRequest() {
         switch (mm.suResponseType) {
-            case AUTO_DENY:
+            case Const.Value.SU_AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
-            case AUTO_ALLOW:
+            case Const.Value.SU_AUTO_ALLOW:
                 handleAction(Policy.ALLOW, 0);
                 return;
-            case PROMPT:
+            case Const.Value.SU_PROMPT:
             default:
         }
 
@@ -169,7 +164,7 @@ public class SuRequestActivity extends Activity {
     }
 
     void handleAction(int action) {
-        handleAction(action, timeoutList[timeout.getSelectedItemPosition()]);
+        handleAction(action, Const.Value.timeoutList[timeout.getSelectedItemPosition()]);
     }
 
     void handleAction(int action, int time) {

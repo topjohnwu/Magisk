@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.AdaptiveList;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -93,7 +94,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
         MagiskManager mm = MagiskManager.get();
         Shell.su_raw(
                 "rm -rf " + mCachedFile.getParent(),
-                "rm -rf " + MagiskManager.TMP_FOLDER_PATH
+                "rm -rf " + Const.TMP_FOLDER_PATH
         );
         switch (result) {
             case -1:

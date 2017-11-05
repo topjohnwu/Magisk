@@ -29,49 +29,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShowUI {
-    private static final int SELECT_BOOT_IMG = 3;
-    private static final String UNINSTALLER = "magisk_uninstaller.sh";
-    private static final int MAGISK_UPDATE_NOTIFICATION_ID = 1;
-    private static final int APK_UPDATE_NOTIFICATION_ID = 2;
 
     public static void showMagiskUpdateNotification() {
         MagiskManager mm = MagiskManager.get();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(mm.getString(R.string.magisk_update_title))
                 .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(mm, SplashActivity.class);
-        intent.putExtra(MagiskManager.INTENT_SECTION, "magisk");
+        intent.putExtra(Const.Key.OPEN_SECTION, "magisk");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mm);
         stackBuilder.addParentStack(SplashActivity.class);
         stackBuilder.addNextIntent(intent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(MAGISK_UPDATE_NOTIFICATION_ID,
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
+        notificationManager.notify(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
     public static void showManagerUpdateNotification() {
         MagiskManager mm = MagiskManager.get();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, MagiskManager.NOTIFICATION_CHANNEL);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk)
                 .setContentTitle(mm.getString(R.string.manager_update_title))
                 .setContentText(mm.getString(R.string.manager_download_install))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true);
         Intent intent = new Intent(mm, ManagerUpdate.class);
-        intent.putExtra(MagiskManager.INTENT_LINK, mm.managerLink);
-        intent.putExtra(MagiskManager.INTENT_VERSION, mm.remoteManagerVersionString);
+        intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
+        intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
-                APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(APK_UPDATE_NOTIFICATION_ID, builder.build());
+        notificationManager.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
     public static void showMagiskInstallDialog(MagiskFragment fragment, boolean enc, boolean verity) {
@@ -109,9 +105,9 @@ public class ShowUI {
                                     MagiskManager.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                     intent.setType("*/*");
-                                    fragment.startActivityForResult(intent, SELECT_BOOT_IMG,
+                                    fragment.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                                         (requestCode, resultCode, data) -> {
-                                            if (requestCode == SELECT_BOOT_IMG
+                                            if (requestCode == Const.ID.SELECT_BOOT
                                                     && resultCode == Activity.RESULT_OK && data != null) {
                                                 Utils.dlAndReceive(
                                                     fragment.getActivity(),
@@ -121,10 +117,10 @@ public class ShowUI {
                                                             Intent intent = new Intent(mm, FlashActivity.class);
                                                             intent.setData(uri)
                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                                .putExtra(FlashActivity.SET_BOOT, data.getData())
-                                                                .putExtra(FlashActivity.SET_ENC, enc)
-                                                                .putExtra(FlashActivity.SET_VERITY, verity)
-                                                                .putExtra(FlashActivity.SET_ACTION, FlashActivity.PATCH_BOOT);
+                                                                .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                                                .putExtra(Const.Key.FLASH_SET_ENC, enc)
+                                                                .putExtra(Const.Key.FLASH_SET_VERITY, verity)
+                                                                .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
                                                             mm.startActivity(intent);
                                                         }
                                                     },
@@ -152,10 +148,10 @@ public class ShowUI {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                .putExtra(FlashActivity.SET_BOOT, boot)
-                                                .putExtra(FlashActivity.SET_ENC, enc)
-                                                .putExtra(FlashActivity.SET_VERITY, verity)
-                                                .putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_MAGISK);
+                                                .putExtra(Const.Key.FLASH_SET_BOOT, boot)
+                                                .putExtra(Const.Key.FLASH_SET_ENC, enc)
+                                                .putExtra(Const.Key.FLASH_SET_VERITY, verity)
+                                                .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                                             mm.startActivity(intent);
                                         }
                                     };
@@ -182,10 +178,10 @@ public class ShowUI {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                    .putExtra(FlashActivity.SET_BOOT, boot)
-                                                    .putExtra(FlashActivity.SET_ENC, enc)
-                                                    .putExtra(FlashActivity.SET_VERITY, verity)
-                                                    .putExtra(FlashActivity.SET_ACTION, FlashActivity.FLASH_MAGISK);
+                                                    .putExtra(Const.Key.FLASH_SET_BOOT, boot)
+                                                    .putExtra(Const.Key.FLASH_SET_ENC, enc)
+                                                    .putExtra(Const.Key.FLASH_SET_VERITY, verity)
+                                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                                             mm.startActivity(intent);
                                         }
                                     };
@@ -221,8 +217,8 @@ public class ShowUI {
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
                 Intent intent = new Intent(mm, ManagerUpdate.class);
-                intent.putExtra(MagiskManager.INTENT_LINK, mm.managerLink);
-                intent.putExtra(MagiskManager.INTENT_VERSION, mm.remoteManagerVersionString);
+                intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
+                intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
                 mm.sendBroadcast(intent);
             })
             .setNegativeButton(R.string.no_thanks, null)
@@ -236,8 +232,8 @@ public class ShowUI {
             .setMessage(R.string.uninstall_magisk_msg)
             .setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 try {
-                    InputStream in = mm.getAssets().open(UNINSTALLER);
-                    File uninstaller = new File(mm.getCacheDir(), UNINSTALLER);
+                    InputStream in = mm.getAssets().open(Const.UNINSTALLER);
+                    File uninstaller = new File(mm.getCacheDir(), Const.UNINSTALLER);
                     FileOutputStream out = new FileOutputStream(uninstaller);
                     byte[] bytes = new byte[1024];
                     int read;
@@ -246,8 +242,8 @@ public class ShowUI {
                     }
                     in.close();
                     out.close();
-                    in = mm.getAssets().open(Utils.UTIL_FUNCTIONS);
-                    File utils = new File(mm.getCacheDir(), Utils.UTIL_FUNCTIONS);
+                    in = mm.getAssets().open(Const.UTIL_FUNCTIONS);
+                    File utils = new File(mm.getCacheDir(), Const.UTIL_FUNCTIONS);
                     out = new FileOutputStream(utils);
                     while ((read = in.read(bytes)) != -1) {
                         out.write(bytes, 0, read);
@@ -255,8 +251,8 @@ public class ShowUI {
                     in.close();
                     out.close();
                     Shell.su(
-                            "cat " + uninstaller + " > /cache/" + UNINSTALLER,
-                            "cat " + utils + " > /data/magisk/" + Utils.UTIL_FUNCTIONS
+                            "cat " + uninstaller + " > /cache/" + Const.UNINSTALLER,
+                            "cat " + utils + " > /data/magisk/" + Const.UTIL_FUNCTIONS
                     );
                     MagiskManager.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
                     Shell.su_raw(
