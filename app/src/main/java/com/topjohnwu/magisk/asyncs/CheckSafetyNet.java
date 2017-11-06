@@ -2,15 +2,17 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.crypto.ByteArrayStream;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Proxy;
 import java.net.HttpURLConnection;
@@ -42,14 +44,13 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         try {
             if (!dexPath.exists()) {
                 HttpURLConnection conn = WebService.request(Const.Url.SNET_URL, null);
-                ByteArrayStream bas = new ByteArrayStream();
-                bas.readFrom(conn.getInputStream());
-                conn.disconnect();
                 dexPath.getParentFile().mkdir();
-                try (OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath))) {
-                    bas.writeTo(out);
-                    out.flush();
+                try (
+                        OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath));
+                        InputStream in = new BufferedInputStream(conn.getInputStream())) {
+                    Utils.inToOut(in, out);
                 }
+                conn.disconnect();
             }
             loader = new DexClassLoader(dexPath.toString(), dexPath.getParent(),
                     null, ClassLoader.getSystemClassLoader());
