@@ -35,6 +35,9 @@
 #include "utils.h"
 #include "magiskpolicy.h"
 
+// #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
+#define VLOG(fmt, ...)
+
 struct cmdline {
 	int skip_initramfs;
 	char slot[3];
@@ -66,6 +69,9 @@ static void parse_cmdline(struct cmdline *cmd) {
 	while (tok != NULL) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
+		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
+			cmd->slot[0] = '_';
+			sscanf(tok, "androidboot.slot=%s", cmd->slot + 1);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
 			cmd->skip_initramfs = 1;
 		}
@@ -74,6 +80,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 }
 
 static void parse_device(struct device *dev, char *uevent) {
+	dev->partname[0] = '\0';
 	char *tok;
 	tok = strtok(uevent, "\n");
 	while (tok != NULL) {
@@ -88,6 +95,7 @@ static void parse_device(struct device *dev, char *uevent) {
 		}
 		tok = strtok(NULL, "\n");
 	}
+	VLOG("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
 }
 
 static int setup_block(struct device *dev, const char *partname) {
@@ -292,6 +300,8 @@ int main(int argc, char *argv[]) {
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
+
+	VLOG("cmdline: skip_initramfs=[%d] slot_suffix=[%s]\n", cmd.skip_initramfs, cmd.slot);
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
 
