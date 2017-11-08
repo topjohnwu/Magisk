@@ -41,7 +41,8 @@ ui_print() {
 mount_partitions() {
   # Check A/B slot
   SLOT=`getprop ro.boot.slot_suffix`
-  [ -z $SLOT ] || ui_print "- A/B partition detected, current slot: $SLOT"
+  [ -z $SLOT ] && SLOT=_`getprop ro.boot.slot`
+  [ $SLOT = "_" ] || ui_print "- A/B partition detected, current slot: $SLOT"
   ui_print "- Mounting /system, /vendor"
   is_mounted /system || [ -f /system/build.prop ] || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
