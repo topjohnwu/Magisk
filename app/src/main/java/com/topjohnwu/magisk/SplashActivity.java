@@ -112,7 +112,7 @@ public class SplashActivity extends Activity {
                 .putBoolean(Const.Key.DARK_THEME, mm.isDarkTheme)
                 .putBoolean(Const.Key.MAGISKHIDE, mm.magiskHide)
                 .putBoolean(Const.Key.UPDATE_NOTIFICATION, mm.updateNotification)
-                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE))
+                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
                 .putBoolean(Const.Key.DISABLE, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
                 .putBoolean(Const.Key.SU_REAUTH, mm.suReauth)
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(mm.suRequestTimeout))

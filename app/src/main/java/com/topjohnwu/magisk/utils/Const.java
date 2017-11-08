@@ -20,11 +20,21 @@ public class Const {
 
     // Paths
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
-    public static final String MAGISK_HOST_FILE = "/magisk/.core/hosts";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
-    public static final String MAGISK_PATH = "/magisk";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final String BUSYBOXPATH = "/dev/magisk/bin";
+
+    public static String MAGISK_PATH() {
+        if (Utils.itemExist("/dev/magisk/img")) {
+            return "/dev/magisk/img";
+        } else {
+            return "/magisk";
+        }
+    }
+
+    public static String MAGISK_HOST_FILE() {
+        return MAGISK_PATH() + "/.core/hosts";
+    }
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> SN_BLACKLIST =  Arrays.asList(

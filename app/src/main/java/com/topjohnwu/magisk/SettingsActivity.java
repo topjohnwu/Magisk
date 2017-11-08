@@ -218,12 +218,12 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     enabled = prefs.getBoolean(Const.Key.HOSTS, false);
                     if (enabled) {
                         Shell.su_raw(
-                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
-                                "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts");
+                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE(),
+                                "mount -o bind " + Const.MAGISK_HOST_FILE() + " /system/etc/hosts");
                     } else {
                         Shell.su_raw(
                                 "umount -l /system/etc/hosts",
-                                "rm -f " + Const.MAGISK_HOST_FILE);
+                                "rm -f " + Const.MAGISK_HOST_FILE());
                     }
                     break;
                 case Const.Key.ROOT_ACCESS:
