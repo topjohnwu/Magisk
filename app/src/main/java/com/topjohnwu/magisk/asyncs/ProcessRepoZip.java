@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
@@ -39,15 +40,14 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     private String mLink;
     private File mFile;
     private int progress = 0, total = -1;
-
-    private static final int UPDATE_DL_PROG = 0;
-    private static final int SHOW_PROCESSING = 1;
+    private Handler mHandler;
 
     public ProcessRepoZip(Activity context, String link, String filename, boolean install) {
         super(context);
         mLink = link;
         mFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", filename);
         mInstall = install;
+        mHandler = new Handler();
     }
 
     private void removeTopFolder(InputStream in, File output) throws IOException {
@@ -82,27 +82,10 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(Object... values) {
-        int mode = (int) values[0];
-        switch (mode) {
-            case UPDATE_DL_PROG:
-                int add = (int) values[1];
-                progress += add;
-                progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, 100 * progress / total));
-                break;
-            case SHOW_PROCESSING:
-                progressDialog.setTitle(R.string.zip_process_title);
-                progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
-                break;
-        }
-    }
-
-    @Override
     protected Boolean doInBackground(Void... params) {
         Activity activity = getActivity();
         if (activity == null) return null;
         try {
-
             // Request zip from Internet
             HttpURLConnection conn;
             do {
@@ -126,7 +109,10 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             removeTopFolder(in, temp1);
 
             conn.disconnect();
-            publishProgress(SHOW_PROCESSING);
+            mHandler.post(() -> {
+                progressDialog.setTitle(R.string.zip_process_title);
+                progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
+            });
 
             // Then sign the zip for the first time, temp1 -> temp2
             ZipUtils.signZip(temp1, temp2, false);
@@ -138,8 +124,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             ZipUtils.signZip(temp1, temp2, true);
 
             // Write it to the target zip, temp2 -> file
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(mFile));
-                 InputStream source = new BufferedInputStream(new FileInputStream(temp2))
+            try (
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(mFile));
+                InputStream source = new BufferedInputStream(new FileInputStream(temp2))
             ) {
                 byte[] buffer = new byte[4096];
                 int length;
@@ -191,10 +178,18 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             super(in);
         }
 
+        private void updateDlProgress(int step) {
+            progress += step;
+            progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, 100 * progress / total));
+        }
+
         @Override
         public synchronized int read() throws IOException {
-            publishProgress(UPDATE_DL_PROG, 1);
-            return super.read();
+            int b = super.read();
+            if (b > 0) {
+                mHandler.post(() -> updateDlProgress(1));
+            }
+            return b;
         }
 
         @Override
@@ -205,7 +200,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         @Override
         public synchronized int read(@NonNull byte[] b, int off, int len) throws IOException {
             int read = super.read(b, off, len);
-            publishProgress(UPDATE_DL_PROG, read);
+            if (read > 0) {
+                mHandler.post(() -> updateDlProgress(read));
+            }
             return read;
         }
     }

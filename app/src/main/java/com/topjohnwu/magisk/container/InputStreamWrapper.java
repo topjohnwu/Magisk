@@ -39,7 +39,7 @@ public class InputStreamWrapper extends InputStream {
 
     @Override
     public int read(@NonNull byte[] b) throws IOException {
-        return read(b, 0, b.length);
+        return in.read(b);
     }
 
     @Override
@@ -55,5 +55,20 @@ public class InputStreamWrapper extends InputStream {
     @Override
     public long skip(long n) throws IOException {
         return in.skip(n);
+    }
+
+    @Override
+    public int hashCode() {
+        return in.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return in.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return in.toString();
     }
 }
