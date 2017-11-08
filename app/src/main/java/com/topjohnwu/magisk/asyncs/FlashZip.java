@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.container.AdaptiveList;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -26,9 +25,9 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private Uri mUri;
     private File mCachedFile;
-    private AdaptiveList<String> mList;
+    private List<String> mList;
 
-    public FlashZip(Activity context, Uri uri, AdaptiveList<String> list) {
+    public FlashZip(Activity context, Uri uri, List<String> list) {
         super(context);
         mUri = uri;
         mList = list;
@@ -39,17 +38,6 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
         List<String> ret = Utils.readFile(new File(mCachedFile.getParentFile(), "updater-script").getPath());
         return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
-    }
-
-    @Override
-    protected void onPreExecute() {
-        // UI updates must run in the UI thread
-        mList.setCallback(this::publishProgress);
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        mList.updateView();
     }
 
     @Override

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.container.AdaptiveList;
+import com.topjohnwu.magisk.container.CallbackList;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 
@@ -46,9 +46,9 @@ public class FlashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
         ButterKnife.bind(this);
-        AdaptiveList<String> rootShellOutput = new AdaptiveList<String>() {
+        CallbackList<String> rootShellOutput = new CallbackList<String>() {
             @Override
-            public synchronized void updateView() {
+            public synchronized void onAddElement() {
                 flashLogs.setText(TextUtils.join("\n", this));
                 sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
             }

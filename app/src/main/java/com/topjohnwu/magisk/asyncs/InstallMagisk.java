@@ -9,7 +9,6 @@ import android.text.TextUtils;
 
 import com.topjohnwu.crypto.SignBoot;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.container.AdaptiveList;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
@@ -37,12 +36,12 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private static final int DIRECT_MODE = 1;
 
     private Uri mBootImg, mZip;
-    private AdaptiveList<String> mList;
+    private List<String> mList;
     private String mBootLocation;
     private boolean mKeepEnc, mKeepVerity;
     private int mode;
 
-    private InstallMagisk(Activity context, AdaptiveList<String> list, Uri zip, boolean enc, boolean verity) {
+    private InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity) {
         super(context);
         mList = list;
         mZip = zip;
@@ -50,27 +49,16 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         mKeepVerity = verity;
     }
 
-    public InstallMagisk(Activity context, AdaptiveList<String> list, Uri zip, boolean enc, boolean verity, Uri boot) {
+    public InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity, Uri boot) {
         this(context, list, zip, enc, verity);
         mBootImg = boot;
         mode = PATCH_MODE;
     }
 
-    public InstallMagisk(Activity context, AdaptiveList<String> list, Uri zip, boolean enc, boolean verity, String boot) {
+    public InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity, String boot) {
         this(context, list, zip, enc, verity);
         mBootLocation = boot;
         mode = DIRECT_MODE;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        // UI updates must run in the UI thread
-        mList.setCallback(this::publishProgress);
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        mList.updateView();
     }
 
     @Override
