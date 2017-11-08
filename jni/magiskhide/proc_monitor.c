@@ -20,10 +20,10 @@
 #include "magiskhide.h"
 
 static char init_ns[32], zygote_ns[2][32], cache_block[256];
-static int zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
+static int hide_queue = 0, zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
 
 // Workaround for the lack of pthread_cancel
-static void quit_pthread(int sig) {
+static void term_thread(int sig) {
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
 	hideEnabled = 0;
@@ -36,6 +36,15 @@ static void quit_pthread(int sig) {
 	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
+}
+
+static void hide_done(int sig) {
+	--hide_queue;
+	if (hide_queue == 0) {
+		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+		xsymlink(MOUNTPOINT, FAKEPOINT);
+		xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	}
 }
 
 static int read_namespace(const int pid, char* target, const size_t size) {
@@ -63,7 +72,7 @@ static void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmount Failed (%s)\n", mountpoint);
 }
 
-static void hide_daemon(int pid) {
+static void hide_daemon(int pid, int ppid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 
 	char *line, buffer[PATH_MAX];
@@ -135,7 +144,7 @@ exit:
 	vec_destroy(&mount_list);
 	// Wait a while and link it back
 	sleep(10);
-	xsymlink(MOUNTPOINT, FAKEPOINT);
+	kill(ppid, HIDE_DONE);
 	_exit(0);
 }
 
@@ -143,15 +152,17 @@ void proc_monitor() {
 	// Register the cancel signal
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
-	act.sa_handler = quit_pthread;
-	sigaction(SIGUSR1, &act, NULL);
+	act.sa_handler = term_thread;
+	sigaction(TERM_THREAD, &act, NULL);
+	act.sa_handler = hide_done;
+	sigaction(HIDE_DONE, &act, NULL);
 
 	cache_block[0] = '\0';
 
 	// Get the mount namespace of init
 	if (read_namespace(1, init_ns, 32)) {
 		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
-		quit_pthread(SIGUSR1);
+		term_thread(TERM_THREAD);
 	}
 	LOGI("proc_monitor: init ns=%s\n", init_ns);
 
@@ -227,8 +238,10 @@ void proc_monitor() {
 					 * The setns system call do not support multithread processes
 					 * We have to fork a new process, setns, then do the unmounts
 					 */
+					++hide_queue;
+					int selfpid = getpid();
 					if (fork_dont_care() == 0)
-						hide_daemon(pid);
+						hide_daemon(pid, selfpid);
 
 					break;
 				}

@@ -100,7 +100,7 @@ void stop_magiskhide(int client) {
 	setprop(MAGISKHIDE_PROP, "0");
 	// Remove without actually removing persist props
 	deleteprop2(MAGISKHIDE_PROP, 0);
-	pthread_kill(proc_monitor_thread, SIGUSR1);
+	pthread_kill(proc_monitor_thread, TERM_THREAD);
 
 	write_int(client, DAEMON_SUCCESS);
 	close(client);
