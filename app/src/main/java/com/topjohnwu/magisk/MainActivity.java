@@ -138,8 +138,7 @@ public class MainActivity extends Activity
         menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
                 Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.superuser).setVisible(
-                Shell.rootAccess() && getMagiskManager().isSuClient);
+        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess());
     }
 
     public void navigate(String item) {

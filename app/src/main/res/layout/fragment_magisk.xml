@@ -21,7 +21,6 @@
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
-                android:id="@+id/magisk_update_card"
                 style="?attr/cardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -32,65 +31,52 @@
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/magisk_update_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="15dp"
-                        android:layout_toStartOf="@+id/magisk_update_status"
-                        android:src="@drawable/ic_refresh"
-                        android:visibility="gone" />
-
-                    <ProgressBar
-                        android:id="@+id/magisk_update_progress"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_centerVertical="true"
-                        android:layout_margin="15dp"
-                        android:layout_toStartOf="@+id/magisk_update_status" />
-
-                    <TextView
-                        android:id="@+id/magisk_update_status"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="center"
-                        android:minWidth="225dp"
-                        android:padding="6dp"
-                        android:text="@string/checking_for_updates"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                style="?attr/cardStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="4dp"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation" >
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:id="@+id/magisk_update"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="15dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/magisk_update_icon"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/magisk_update_status"
+                            android:visibility="gone" />
+
+                        <ProgressBar
+                            android:id="@+id/magisk_update_progress"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/magisk_update_status" />
+
+                        <TextView
+                            android:id="@+id/magisk_update_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:minWidth="225dp"
+                            android:padding="6dp"
+                            android:text="@string/checking_for_updates"
+                            android:textStyle="bold" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="15dp"
+                        android:layout_marginTop="5dp"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -98,8 +84,6 @@
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginStart="15dp"
                             android:layout_toStartOf="@+id/magisk_version" />
 
                         <TextView
@@ -113,35 +97,6 @@
                             android:padding="6dp"
                             android:textStyle="bold" />
 
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginTop="5dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:id="@+id/root_status_icon"
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_toStartOf="@+id/root_status" />
-
-                        <TextView
-                            android:id="@+id/root_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:layout_centerVertical="true"
-                            android:gravity="center"
-                            android:minWidth="225dp"
-                            android:padding="6dp"
-                            android:textStyle="bold" />
 
                     </RelativeLayout>
 

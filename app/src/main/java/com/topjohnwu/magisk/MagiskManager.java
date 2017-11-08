@@ -49,8 +49,6 @@ public class MagiskManager extends Application {
     public int remoteManagerVersionCode = -1;
     public String managerLink;
     public String bootBlock = null;
-    public boolean isSuClient = false;
-    public String suVersion = null;
     public boolean disabled;
     public int snet_version;
     public int updateServiceVersion;
@@ -166,11 +164,6 @@ public class MagiskManager extends Application {
 
     public void loadMagiskInfo() {
         List<String> ret;
-        ret = Shell.sh("su -v");
-        if (Utils.isValidShellResponse(ret)) {
-            suVersion = ret.get(0);
-            isSuClient = suVersion.toUpperCase().contains("MAGISK");
-        }
         ret = Shell.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
             ret = Shell.sh("getprop magisk.version");

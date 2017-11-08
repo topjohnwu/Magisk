@@ -17,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -59,15 +60,12 @@ public class MagiskFragment extends Fragment
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.magisk_update_card) CardView magiskUpdateCard;
+    @BindView(R.id.magisk_update) RelativeLayout magiskUpdate;
     @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
     @BindView(R.id.magisk_update_status) TextView magiskUpdateText;
     @BindView(R.id.magisk_update_progress) ProgressBar magiskUpdateProgress;
-
     @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
     @BindView(R.id.magisk_version) TextView magiskVersionText;
-    @BindView(R.id.root_status_icon) ImageView rootStatusIcon;
-    @BindView(R.id.root_status) TextView rootStatusText;
 
     @BindView(R.id.safetyNet_card) CardView safetyNetCard;
     @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
@@ -235,7 +233,7 @@ public class MagiskFragment extends Fragment
         boolean hasRoot = Shell.rootAccess();
         boolean isUpToDate = mm.magiskVersionCode > 1300;
 
-        magiskUpdateCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         bootImageCard.setVisibility(hasNetwork && hasRoot ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
@@ -255,29 +253,6 @@ public class MagiskFragment extends Fragment
 
         magiskStatusIcon.setImageResource(image);
         magiskStatusIcon.setColorFilter(color);
-
-        switch (Shell.status) {
-            case 0:
-                color = colorBad;
-                image = R.drawable.ic_cancel;
-                rootStatusText.setText(R.string.not_rooted);
-                break;
-            case 1:
-                if (mm.suVersion != null) {
-                    color = colorOK;
-                    image = R.drawable.ic_check_circle;
-                    rootStatusText.setText(mm.suVersion);
-                    break;
-                }
-            case -1:
-            default:
-                color = colorNeutral;
-                image = R.drawable.ic_help;
-                rootStatusText.setText(R.string.root_error);
-        }
-
-        rootStatusIcon.setImageResource(image);
-        rootStatusIcon.setColorFilter(color);
 
         List<String> items = new ArrayList<>();
         if (mm.bootBlock != null) {
