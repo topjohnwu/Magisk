@@ -42,9 +42,6 @@ typedef enum {
 void start_daemon();
 int connect_daemon();
 void auto_start_magiskhide();
-
-// socket_trans.c
-
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);

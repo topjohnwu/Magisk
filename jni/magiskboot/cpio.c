@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "magiskboot.h"
 #include "cpio.h"
@@ -91,7 +92,7 @@ static void parse_cpio(const char *filename, struct vector *v) {
 
 static void dump_cpio(const char *filename, struct vector *v) {
 	fprintf(stderr, "\nDump cpio: [%s]\n\n", filename);
-	int fd = open_new(filename);
+	int fd = creat(filename, 0644);
 	unsigned inode = 300000;
 	char header[111];
 	// Sort by name
@@ -204,6 +205,27 @@ static void cpio_test(struct vector *v) {
 	exit(ret);
 }
 
+int check_verity_pattern(const char *s) {
+	int pos = 0;
+	if (s[0] == ',') ++pos;
+	if (strncmp(s + pos, "verify", 6) != 0) return -1;
+	pos += 6;
+	if (s[pos] == '=') {
+		while (s[pos] != '\0' && s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
+	}
+	return pos;
+}
+
+int check_encryption_pattern(const char *s) {
+	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", NULL };
+	for (int i = 0 ; encrypt_list[i]; ++i) {
+		int len = strlen(encrypt_list[i]);
+		if (strncmp(s, encrypt_list[i], len) == 0)
+			return len;
+	}
+	return -1;
+}
+
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	cpio_entry *f;
 	int skip, write;
@@ -248,7 +270,7 @@ static void cpio_extract(const char *entry, const char *filename, struct vector 
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
 			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
-			int fd = open_new(filename);
+			int fd = creat(filename, 0644);
 			xwrite(fd, f->data, f->filesize);
 			fchmod(fd, f->mode);
 			fchown(fd, f->uid, f->gid);

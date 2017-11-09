@@ -292,7 +292,7 @@ static void clone_skeleton(struct node_entry *node) {
 		if (IS_DIR(child))
 			xmkdir(buf, 0755);
 		else if (IS_REG(child))
-			close(open_new(buf));
+			close(creat(buf, 0644));
 		// Links will be handled later
 
 		if (child->parent->parent == NULL && strcmp(child->name, "vendor") == 0) {

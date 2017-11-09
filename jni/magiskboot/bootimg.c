@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 
 #include "bootimg.h"
@@ -8,7 +9,7 @@
 #include "logging.h"
 
 static void dump(void *buf, size_t size, const char *filename) {
-	int fd = open_new(filename);
+	int fd = creat(filename, 0644);
 	xwrite(fd, buf, size);
 	close(fd);
 }
@@ -160,7 +161,7 @@ void unpack(const char* image) {
 
 	// Dump kernel
 	if (COMPRESSED(boot.kernel_type)) {
-		fd = open_new(KERNEL_FILE);
+		fd = creat(KERNEL_FILE, 0644);
 		decomp(boot.kernel_type, fd, boot.kernel, boot.hdr.kernel_size);
 		close(fd);
 	} else {
@@ -174,7 +175,7 @@ void unpack(const char* image) {
 
 	// Dump ramdisk
 	if (COMPRESSED(boot.ramdisk_type)) {
-		fd = open_new(RAMDISK_FILE);
+		fd = creat(RAMDISK_FILE, 0644);
 		decomp(boot.ramdisk_type, fd, boot.ramdisk, boot.hdr.ramdisk_size);
 		close(fd);
 	} else {
@@ -214,7 +215,7 @@ void repack(const char* orig_image, const char* out_image) {
 	fprintf(stderr, "Repack to boot image: [%s]\n\n", out_image);
 
 	// Create new image
-	int fd = open_new(out_image);
+	int fd = creat(out_image, 0644);
 
 	// Skip a page for header
 	write_zero(fd, boot.hdr.page_size);

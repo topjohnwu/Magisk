@@ -33,12 +33,4 @@ size_t lz4_legacy(int mode, int fd, const void *buf, size_t size);
 long long comp(file_t type, int to, const void *from, size_t size);
 long long decomp(file_t type, int to, const void *from, size_t size);
 
-// Utils
-extern void write_zero(int fd, size_t size);
-extern void mem_align(size_t *pos, size_t align);
-extern void file_align(int fd, size_t align, int out);
-extern int open_new(const char *filename);
-extern int check_verity_pattern(const char *s);
-extern int check_encryption_pattern(const char *s);
-
 #endif

@@ -29,7 +29,6 @@ LOCAL_C_INCLUDES := \
 LOCAL_SRC_FILES := \
 	core/magisk.c \
 	core/daemon.c \
-	core/socket_trans.c \
 	core/log_monitor.c \
 	core/bootstages.c \
 	utils/misc.c \
@@ -98,7 +97,6 @@ LOCAL_SRC_FILES := \
 	magiskboot/bootimg.c \
 	magiskboot/hexpatch.c \
 	magiskboot/compress.c \
-	magiskboot/boot_utils.c \
 	magiskboot/cpio.c \
 	magiskboot/sha1.c \
 	magiskboot/types.c \

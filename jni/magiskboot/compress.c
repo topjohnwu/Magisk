@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/mman.h>
 
 #include <zlib.h>
@@ -472,7 +473,7 @@ void decomp_file(char *from, const char *to) {
 			*ext = '\0';
 			to = from;
 		}
-		int fd = open_new(to);
+		int fd = creat(to, 0644);
 		fprintf(stderr, "Decompressing to [%s]\n\n", to);
 		decomp(type, fd, file, size);
 		close(fd);
@@ -522,7 +523,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 	else
 		strcpy(dest, to);
 	fprintf(stderr, "Compressing to [%s]\n\n", dest);
-	int fd = open_new(dest);
+	int fd = creat(dest, 0644);
 	comp(type, fd, file, size);
 	close(fd);
 	munmap(file, size);

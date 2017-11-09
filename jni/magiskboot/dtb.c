@@ -5,6 +5,8 @@
 #include "magiskboot.h"
 #include "utils.h"
 
+extern int check_verity_pattern(const char *s);
+
 static void print_subnode(const void *fdt, int parent, int depth) {
 	int node;
 	fdt_for_each_subnode(node, fdt, parent) {

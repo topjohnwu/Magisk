@@ -283,10 +283,6 @@ int bind_mount(const char *from, const char *to) {
 	return ret;
 }
 
-int open_new(const char *filename) {
-	return xopen(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-}
-
 void get_client_cred(int fd, struct ucred *cred) {
 	socklen_t ucred_length = sizeof(*cred);
 	if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length))

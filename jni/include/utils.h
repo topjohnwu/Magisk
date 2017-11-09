@@ -85,7 +85,6 @@ void setup_sighandlers(void (*handler)(int));
 int exec_command(int err, int *fd, void (*setupenv)(struct vector*), const char *argv0, ...);
 int exec_command_sync(char *const argv0, ...);
 int bind_mount(const char *from, const char *to);
-int open_new(const char *filename);
 void get_client_cred(int fd, struct ucred *cred);
 int switch_mnt_ns(int pid);
 int fork_dont_care();
@@ -118,6 +117,9 @@ void clone_attr(const char *source, const char *target);
 void restorecon(int dirfd, int force);
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void mmap_rw(const char *filename, void **buf, size_t *size);
+void write_zero(int fd, size_t size);
+void mem_align(size_t *pos, size_t align);
+void file_align(int fd, size_t align, int out);
 
 // img.c
 
