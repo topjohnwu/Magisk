@@ -27,11 +27,11 @@ LOCAL_C_INCLUDES := \
 	$(LIBSELINUX)
 
 LOCAL_SRC_FILES := \
-	daemon/magisk.c \
-	daemon/daemon.c \
-	daemon/socket_trans.c \
-	daemon/log_monitor.c \
-	daemon/bootstages.c \
+	core/magisk.c \
+	core/daemon.c \
+	core/socket_trans.c \
+	core/log_monitor.c \
+	core/bootstages.c \
 	utils/misc.c \
 	utils/vector.c \
 	utils/xwrap.c \
@@ -55,13 +55,21 @@ LOCAL_CPPFLAGS := -std=c++11
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
 
+# precompile
+else
+
 # magiskinit
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_STATIC_LIBRARIES := libsepol
-LOCAL_C_INCLUDES := jni/include $(LIBSEPOL)
+LOCAL_STATIC_LIBRARIES := libsepol liblzma
+LOCAL_C_INCLUDES := \
+	jni/include \
+	out/$(TARGET_ARCH_ABI) \
+	$(LIBSEPOL) \
+	$(LIBLZMA)
+
 LOCAL_SRC_FILES := \
-	init/magiskinit.c \
+	core/magiskinit.c \
 	utils/vector.c \
 	utils/file.c \
 	utils/xwrap.c \
@@ -71,18 +79,6 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/sepolicy.c
 
 LOCAL_CFLAGS := -DNO_SELINUX
-LOCAL_LDFLAGS := -static
-include $(BUILD_EXECUTABLE)
-
-# precompile
-else
-
-# monogisk
-include $(CLEAR_VARS)
-LOCAL_MODULE := monogisk
-LOCAL_STATIC_LIBRARIES := liblzma
-LOCAL_C_INCLUDES := jni/include out/$(TARGET_ARCH_ABI) $(LIBLZMA)
-LOCAL_SRC_FILES := init/monogisk.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 

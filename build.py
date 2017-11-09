@@ -94,12 +94,12 @@ def build_binary(args):
 		mkdir_p(os.path.join('out', arch))
 		with open(os.path.join('out', arch, 'dump.h'), 'w') as dump:
 			dump.write('#include "stdlib.h"\n')
-			for binary in ['magisk', 'magiskinit']:
-				mv(os.path.join('libs', arch, binary), os.path.join('out', arch, binary))
-				with open(os.path.join('out', arch, binary), 'rb') as bin:
-					dump.write('const uint8_t {}_dump[] = "'.format(binary))
-					dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
-					dump.write('";\n')
+			mv(os.path.join('libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
+			with open(os.path.join('out', arch, 'magisk'), 'rb') as bin:
+				dump.write('const uint8_t magisk_dump[] = "')
+				dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
+				dump.write('";\n')
+
 	print('')
 
 	proc = subprocess.run('{} {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
@@ -108,7 +108,7 @@ def build_binary(args):
 
 	print('')
 	for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
-		for binary in ['monogisk', 'magiskboot', 'b64xz', 'busybox']:
+		for binary in ['magiskinit', 'magiskboot', 'b64xz', 'busybox']:
 			try:
 				mv(os.path.join('libs', arch, binary), os.path.join('out', arch, binary))
 			except:
@@ -243,7 +243,7 @@ def zip_main(args):
 
 		# Binaries
 		for lib_dir, zip_dir in [('arm64-v8a', 'arm64'), ('armeabi-v7a', 'arm'), ('x86', 'x86'), ('x86_64', 'x64')]:
-			for binary in ['monogisk', 'magiskboot']:
+			for binary in ['magiskinit', 'magiskboot']:
 				source = os.path.join('out', lib_dir, binary)
 				target = os.path.join(zip_dir, binary)
 				zip_with_msg(zipf, source, target)

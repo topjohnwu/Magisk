@@ -68,7 +68,7 @@ BOOTIMAGE="$1"
 chmod -R 755 .
 
 # Extract magisk if doesn't exist
-[ -e magisk ] || ./monogisk -x magisk magisk
+[ -e magisk ] || ./magiskinit -x magisk magisk
 
 ##########################################################################################
 # Unpack
@@ -157,7 +157,7 @@ esac
 
 ui_print "- Patching ramdisk"
 
-./magiskboot --cpio-add ramdisk.cpio 750 init monogisk
+./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
 ./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
 
 # Create ramdisk backups

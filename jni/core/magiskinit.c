@@ -2,14 +2,20 @@
  *
  * This code has to be compiled statically to work properly.
  *
- * This binary will be extracted from monogisk, and dos all pre-init operations to setup
- * a Magisk environment. The tool modifies rootfs on the fly, providing fundamental support
- * such as init, init.rc, and sepolicy patching. Magiskinit is also responsible to construct
- * a proper rootfs on skip_initramfs devices.
+ * To unify Magisk support for both legacy "normal" devices and new skip_initramfs devices,
+ * magisk binary compilation is split into two parts - first part only compiles "magisk".
+ * The python build script will load the magisk main binary and compress with lzma2, dumping
+ * the results into "dump.h". The "magisk" binary is embedded into this binary, and will
+ * get extracted to the overlay folder along with init.magisk.rc.
+ *
+ * This tool does all pre-init operations to setup a Magisk environment, which pathces rootfs
+ * on the fly, providing fundamental support such as init, init.rc, and sepolicy patching.
+ *
+ * Magiskinit is also responsible for constructing a proper rootfs on skip_initramfs devices.
  * On skip_initramfs devices, it will parse kernel cmdline, mount sysfs, parse through
  * uevent files to make the system (or vendor if available) block device node, then copy
- * rootfs files from system. The "overlay" folder is constructed by monogisk,
- * which contains additional files extracted from the tool. These files will be moved to /.
+ * rootfs files from system.
+ *
  * This tool will be replaced with the real init to continue the boot process, but hardlinks are
  * preserved as it also provides CLI for sepolicy patching (magiskpolicy)
  */
@@ -29,11 +35,14 @@
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 
+#include <lzma.h>
 #include <cil/cil.h>
 
 #include "magisk.h"
 #include "utils.h"
 #include "magiskpolicy.h"
+#include "magiskrc.h"
+#include "dump.h"
 
 // #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
 #define VLOG(fmt, ...)
@@ -290,6 +299,46 @@ static void patch_sepolicy() {
 	dump_policydb("/sepolicy");
 }
 
+#define BUFSIZE (1 << 20)
+
+static int unxz(const void *buf, size_t size, int fd) {
+	lzma_stream strm = LZMA_STREAM_INIT;
+	if (lzma_auto_decoder(&strm, UINT64_MAX, 0) != LZMA_OK)
+		return 1;
+	lzma_ret ret = 0;
+	void *out = malloc(BUFSIZE);
+	strm.next_in = buf;
+	strm.avail_in = size;
+	do {
+		strm.next_out = out;
+		strm.avail_out = BUFSIZE;
+		ret = lzma_code(&strm, LZMA_RUN);
+		write(fd, out, BUFSIZE - strm.avail_out);
+	} while (strm.avail_out == 0 && ret == LZMA_OK);
+
+	free(out);
+	lzma_end(&strm);
+
+	if (ret != LZMA_OK && ret != LZMA_STREAM_END)
+		return 1;
+	return 0;
+}
+
+static int dump_magisk(const char *path, mode_t mode) {
+	unlink(path);
+	int fd = creat(path, mode);
+	int ret = unxz(magisk_dump, sizeof(magisk_dump), fd);
+	close(fd);
+	return ret;
+}
+
+static int dump_magiskrc(const char *path, mode_t mode) {
+	int fd = creat(path, mode);
+	write(fd, magiskrc, sizeof(magiskrc));
+	close(fd);
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
 	if (strcmp(basename(argv[0]), "magiskpolicy") == 0 || strcmp(basename(argv[0]), "supolicy") == 0)
 		return magiskpolicy_main(argc, argv);
@@ -297,6 +346,23 @@ int main(int argc, char *argv[]) {
 		return magiskpolicy_main(argc - 1, argv + 1);
 
 	umask(0);
+
+	if (argc > 1) {
+		if (strcmp(argv[2], "magisk") == 0)
+			return dump_magisk(argv[3], 0755);
+		else if (strcmp(argv[2], "magiskrc") == 0)
+			return dump_magiskrc(argv[3], 0755);
+	}
+
+	// Extract and link files
+	mkdir("/overlay", 0000);
+	dump_magiskrc("/overlay/init.magisk.rc", 0750);
+	mkdir("/overlay/sbin", 0755);
+	dump_magisk("/overlay/sbin/magisk", 0755);
+	mkdir("/overlay/root", 0755);
+	link("/init", "/overlay/root/magiskinit");
+	symlink("/root/magiskinit", "/overlay/root/magiskpolicy");
+	symlink("/root/magiskinit", "/overlay/root/supolicy");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
