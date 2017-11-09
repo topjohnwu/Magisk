@@ -44,8 +44,8 @@ static void usage(char *arg0) {
 		"      Move <from-entry> to <to-entry>\n"
 		"    -extract <entry> <outfile>\n"
 		"      Extract <entry> to <outfile>\n"
-		"    -test \n"
-		"      Return value: 0/stock 1/Magisk 2/other (e.g. phh, SuperSU)\n"
+		"    -test\n"
+		"      Return value: 0/stock 1/Magisk 2/other (phh, SuperSU, Xposed)\n"
 		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n"
 		"      Patch cpio for Magisk. KEEP**** are true/false values\n"
 		"    -backup <origcpio> [SHA1]\n"
@@ -56,11 +56,13 @@ static void usage(char *arg0) {
 		"    -stocksha1\n"
 		"      Get stock boot SHA1 recorded within <incpio>\n"
 		"\n"
-		" --dtb-print <dtb>\n"
-		"  Print all nodes in <dtb>, for debugging\n"
-		"\n"
-		" --dtb-patch <dtb>\n"
-		"  Search for fstab in <dtb> and remove verity checks\n"
+		" --dtb-<cmd> <dtb>\n"
+		"  Do dtb related cmds to <dtb> (modifications are done directly)\n"
+		"  Supported commands:\n"
+		"    -dump\n"
+		"      Dump all contents from dtb for debugging\n"
+		"    -patch\n"
+		"      Search for fstab and remove verity/avb\n"
 		"\n"
 		" --compress[=method] <infile> [outfile]\n"
 		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n"
@@ -119,8 +121,8 @@ int main(int argc, char *argv[]) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
 		decomp_file(argv[2], argc > 3 ? argv[3] : NULL);
-	} else if (argc > 2 && strcmp(argv[1], "--dtb-print") == 0) {
-		dtb_print(argv[2]);
+	} else if (argc > 2 && strcmp(argv[1], "--dtb-dump") == 0) {
+		dtb_dump(argv[2]);
 	} else if (argc > 2 && strcmp(argv[1], "--dtb-patch") == 0) {
 		dtb_patch(argv[2]);
 	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {

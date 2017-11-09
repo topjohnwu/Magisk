@@ -21,7 +21,7 @@ int parse_img(void *orig, size_t size, boot_img *boot);
 int cpio_commands(const char *command, int argc, char *argv[]);
 void comp_file(const char *method, const char *from, const char *to);
 void decomp_file(char *from, const char *to);
-void dtb_print(const char *file);
+void dtb_dump(const char *file);
 void dtb_patch(const char *file);
 
 // Compressions

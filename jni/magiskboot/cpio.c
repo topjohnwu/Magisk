@@ -208,8 +208,13 @@ static void cpio_test(struct vector *v) {
 int check_verity_pattern(const char *s) {
 	int pos = 0;
 	if (s[0] == ',') ++pos;
-	if (strncmp(s + pos, "verify", 6) != 0) return -1;
-	pos += 6;
+	if (strncmp(s + pos, "verify", 6) == 0)
+		pos += 6;
+	else if (strncmp(s + pos, "avb", 3) == 0)
+		pos += 3;
+	else
+		return -1;
+
 	if (s[pos] == '=') {
 		while (s[pos] != '\0' && s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
 	}

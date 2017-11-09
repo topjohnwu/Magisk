@@ -7,11 +7,24 @@
 
 extern int check_verity_pattern(const char *s);
 
+static void print_props(const void *fdt, int node, int depth) {
+	int prop;
+	fdt_for_each_property_offset(prop, fdt, node) {
+		for (int i = 0; i < depth; ++i) printf("    ");
+		printf("  ");
+		int size;
+		const char *name;
+		const char *value = fdt_getprop_by_offset(fdt, prop, &name, &size);
+		printf("[%s]: [%s]\n", name, value);
+	}
+}
+
 static void print_subnode(const void *fdt, int parent, int depth) {
 	int node;
 	fdt_for_each_subnode(node, fdt, parent) {
-		for (int i = 0; i < depth; ++i) printf("  ");
-		printf("%d: %s\n", node, fdt_get_name(fdt, node, NULL));
+		for (int i = 0; i < depth; ++i) printf("    ");
+		printf("#%d: %s\n", node, fdt_get_name(fdt, node, NULL));
+		print_props(fdt, node, depth);
 		print_subnode(fdt, node, depth + 1);
 	}
 }
@@ -28,7 +41,7 @@ static int find_fstab(const void *fdt, int parent) {
 	return -1;
 }
 
-void dtb_print(const char *file) {
+void dtb_dump(const char *file) {
 	size_t size ;
 	void *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
@@ -38,7 +51,7 @@ void dtb_print(const char *file) {
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
-			fprintf(stderr, "\nPrinting dtb.%04d\n\n", dtb_num++);
+			fprintf(stderr, "Dumping dtb.%04d\n\n", dtb_num++);
 			print_subnode(fdt, 0, 0);
 		}
 	}
