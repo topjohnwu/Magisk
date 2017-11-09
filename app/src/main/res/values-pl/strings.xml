@@ -23,7 +23,8 @@
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>
-    <string name="safetyNet_network_loss">Brak połączenia z internetem</string>
+    <string name="safetyNet_api_error">Bład SafetyNet API</string>
+	<string name="safetyNet_network_loss">Brak połączenia z internetem</string>
     <string name="safetyNet_service_disconnected">Usługa została zamknięta</string>
     <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
 
@@ -108,7 +109,8 @@
     <string name="magisk_updates">Aktualizacja Magisk</string>
     <string name="flashing">Flashowanie</string>
     <string name="hide_manager_toast">Ukryj Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Błąd ukrycia Magisk Manager</string>
+    <string name="hide_manager_toast2">To może chwilę potrwać…</string>
+	<string name="hide_manager_fail_toast">Błąd Menadżera Hide Magisk</string>
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
@@ -118,11 +120,13 @@
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_stock_boot">Przywróć Stockowy Boot</string>
-    <string name="restore_done">Przywracanie zakonczone!</string>
+    <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Stock backup nie istnieje!</string>
     <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>
-   
-    <!--Settings Activity -->
+    <string name="proprietary_title">Pobierz Własny Kod</string>
+    <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzeń SafetyNet?</string>
+    
+	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
@@ -137,8 +141,8 @@
     <string name="settings_update_channel_title">Aktualizacja Kanału</string>
     <string name="settings_update_stable">Stabilna</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_boot_format_title">Poprawiony format wyjścia rozruchowego</string>
-    <string name="settings_boot_format_summary">Wybierz format wyjściowy pliku boot image.\nWybierz .img do programu za pośrednictwem fastboot/download mode; wybierz .img.tar za pomocą ODINA.</string>
+    <string name="settings_boot_format_title">Poprawny format wyjścia rozruchowego</string>
+    <string name="settings_boot_format_summary">Wybierz format pliku boot image.\nWybierz .img dla wgrywania poprzez Fastboot/Download Mode; wybierz .img.tar dla ODINA.</string>
     
 	<string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
@@ -171,7 +175,7 @@
     <string name="user_indepenent_summary">Każdy użytkownik ma swoje własne odrębne ustawienia dostępu</string>
     <string name="multiuser_hint_owner_request">Żądanie zostało wysłane do właściciela urządzenia. Proszę przejść do właściciela i udzielić pozwolenia</string>
 
-    <string name="mount_namespace_mode">Montuj Tryb Nazw</string>
+    <string name="mount_namespace_mode">Montuj Tryb Odstępu Nazw</string>
     <string name="settings_ns_global">Globalna Nazwa</string>
     <string name="settings_ns_requester">Dziedziczenie Nazw</string>
     <string name="settings_ns_isolate">Izolacja Nazw</string>
