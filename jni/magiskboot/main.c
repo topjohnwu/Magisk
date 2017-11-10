@@ -124,10 +124,6 @@ int main(int argc, char *argv[]) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
 		decomp_file(argv[2], argc > 3 ? argv[3] : NULL);
-	} else if (argc > 2 && strcmp(argv[1], "--dtb-dump") == 0) {
-		dtb_dump(argv[2]);
-	} else if (argc > 2 && strcmp(argv[1], "--dtb-patch") == 0) {
-		dtb_patch(argv[2]);
 	} else if (argc > 2 && strncmp(argv[1], "--compress", 10) == 0) {
 		char *method;
 		method = strchr(argv[1], '=');
@@ -137,11 +133,15 @@ int main(int argc, char *argv[]) {
 	} else if (argc > 4 && strcmp(argv[1], "--hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
 	} else if (argc > 2 && strncmp(argv[1], "--cpio", 6) == 0) {
-		char *command;
-		command = strchr(argv[1] + 2, '-');
-		if (command == NULL) usage(argv[0]);
-		else ++command;
-		if (cpio_commands(command, argc - 2, argv + 2)) usage(argv[0]);
+		char *cmd = argv[1] + 6;
+		if (*cmd == '\0') usage(argv[0]);
+		else ++cmd;
+		if (cpio_commands(cmd, argc - 2, argv + 2)) usage(argv[0]);
+	} else if (argc > 2 && strncmp(argv[1], "--dtb", 5) == 0) {
+		char *cmd = argv[1] + 5;
+		if (*cmd == '\0') usage(argv[0]);
+		else ++cmd;
+		if (dtb_commands(cmd, argc - 2, argv + 2)) usage(argv[0]);
 	} else {
 		usage(argv[0]);
 	}

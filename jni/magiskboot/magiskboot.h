@@ -18,11 +18,10 @@ void unpack(const char *image);
 void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
 int parse_img(void *orig, size_t size, boot_img *boot);
-int cpio_commands(const char *command, int argc, char *argv[]);
+int cpio_commands(const char *cmd, int argc, char *argv[]);
 void comp_file(const char *method, const char *from, const char *to);
 void decomp_file(char *from, const char *to);
-void dtb_dump(const char *file);
-void dtb_patch(const char *file);
+int dtb_commands(const char *cmd, int argc, char *argv[]);
 
 // Compressions
 size_t gzip(int mode, int fd, const void *buf, size_t size);

@@ -41,7 +41,7 @@ static int find_fstab(const void *fdt, int parent) {
 	return -1;
 }
 
-void dtb_dump(const char *file) {
+static void dtb_dump(const char *file) {
 	size_t size ;
 	void *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
@@ -60,13 +60,16 @@ void dtb_dump(const char *file) {
 	exit(0);
 }
 
-void dtb_patch(const char *file) {
+static void dtb_patch(const char *file, int patch) {
 	size_t size ;
 	void *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n\n", file);
-	mmap_rw(file, &dtb, &size);
+	if (patch)
+		mmap_rw(file, &dtb, &size);
+	else
+		mmap_ro(file, &dtb, &size);
 	// Loop through all the dtbs
-	int dtb_num = 0, patched = 0;
+	int dtb_num = 0, found = 0;
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
@@ -80,10 +83,15 @@ void dtb_patch(const char *file) {
 					char *value = (char *) fdt_getprop(fdt, block, "fsmgr_flags", &value_size);
 					for (int i = 0; i < value_size; ++i) {
 						if ((skip = check_verity_pattern(value + i)) > 0) {
-							fprintf(stderr, "Remove pattern [%.*s] in [fsmgr_flags]\n", skip, value + i);
-							memcpy(value + i, value + i + skip, value_size - i - skip);
-							memset(value + value_size - skip, '\0', skip);
-							patched = 1;
+							if (patch) {
+								fprintf(stderr, "Remove pattern [%.*s] in [fsmgr_flags]\n", skip, value + i);
+								memcpy(value + i, value + i + skip, value_size - i - skip);
+								memset(value + value_size - skip, '\0', skip);
+							} else {
+								fprintf(stderr, "Found pattern [%.*s] in [fsmgr_flags]\n", skip, value + i);
+								i += skip - 1;
+							}
+							found = 1;
 						}
 					}
 				}
@@ -92,7 +100,18 @@ void dtb_patch(const char *file) {
 	}
 	fprintf(stderr, "\n");
 	munmap(dtb, size);
-	exit(!patched);
+	exit(!found);
+}
+
+int dtb_commands(const char *cmd, int argc, char *argv[]) {
+	if (argc == 0) return 1;
+	if (strcmp(cmd, "dump") == 0)
+		dtb_dump(argv[0]);
+	else if (strcmp(cmd, "patch") == 0)
+		dtb_patch(argv[0], 1);
+	else if (strcmp(cmd, "test") == 0)
+		dtb_patch(argv[0], 0);
+	return 0;
 }
 
 
