@@ -110,9 +110,8 @@ case $? in
     ui_print "- Stock boot image detected!"
     ui_print "- Backing up stock boot image"
     SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
-    STOCKDUMP=stock_boot_${SHA1}.img
-    dd if="$BOOTIMAGE" of=$STOCKDUMP
-    ./magiskboot --compress $STOCKDUMP
+    STOCKDUMP=stock_boot_${SHA1}.img.gz
+    ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
@@ -129,10 +128,10 @@ case $? in
       ui_print "! Cannot restore from internal backup"
       # If we are root and SHA1 known, we try to find the stock backup
       if [ ! -z $SHA1 ]; then
-        STOCKDUMP=/data/stock_boot_${SHA1}.img
-        if [ -f ${STOCKDUMP}.gz ]; then
+        STOCKDUMP=/data/stock_boot_${SHA1}.img.gz
+        if [ -f $STOCKDUMP ]; then
           ui_print "- Stock boot image backup found"
-          ./magiskboot --decompress ${STOCKDUMP}.gz stock_boot.img
+          ./magiskboot --decompress $STOCKDUMP stock_boot.img
           ./magiskboot --unpack stock_boot.img
           rm -f stock_boot.img
           OK=true
@@ -163,17 +162,15 @@ ui_print "- Patching ramdisk"
 # Create ramdisk backups
 ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $SHA1
 
-if ! $KEEPVERITY && [ -f dtb ]; then
-  ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
-fi
-
 rm -f ramdisk.cpio.orig
 
 ##########################################################################################
-# Repack and flash
+# Binary patches
 ##########################################################################################
 
-# Hexpatches
+if ! $KEEPVERITY && [ -f dtb ]; then
+  ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
+fi
 
 # Remove Samsung RKP in stock kernel
 ./magiskboot --hexpatch kernel \
@@ -184,6 +181,10 @@ A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 ./magiskboot --hexpatch kernel \
 736B69705F696E697472616D6673 \
 77616E745F696E697472616D6673
+
+##########################################################################################
+# Repack and flash
+##########################################################################################
 
 ui_print "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"

@@ -43,7 +43,7 @@ main() {
 
   find_boot_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-  ui_print "- Found Boot Image: $BOOTIMAGE"
+  ui_print "- Found boot image: $BOOTIMAGE"
 
   SOURCEDMODE=true
   cd $MAGISKBIN
@@ -51,13 +51,20 @@ main() {
   # Source the boot patcher
   . $MAGISKBIN/boot_patch.sh "$BOOTIMAGE"
 
+  flash_boot_image new-boot.img "$BOOTIMAGE"
+  rm -f new-boot.img
+
   if [ -f stock_boot* ]; then
     rm -f /data/stock_boot* 2>/dev/null
-    mv stock_boot* /data
+    is_mounted /data && mv stock_boot* /data
   fi
 
-  flash_boot_image new-boot.img $BOOTIMAGE
-  rm -f new-boot.img
+  patch_dtbo_image
+
+  if [ -f stock_dtbo* ]; then
+    rm -f /data/stock_dtbo* 2>/dev/null
+    is_mounted /data && mv stock_dtbo* /data
+  fi
 
   cd /
   recovery_cleanup

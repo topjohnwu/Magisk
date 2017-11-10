@@ -41,8 +41,11 @@ ui_print() {
 mount_partitions() {
   # Check A/B slot
   SLOT=`getprop ro.boot.slot_suffix`
-  [ -z $SLOT ] && SLOT=_`getprop ro.boot.slot`
-  [ $SLOT = "_" ] || ui_print "- A/B partition detected, current slot: $SLOT"
+  if [ -z $SLOT ]; then
+    SLOT=_`getprop ro.boot.slot`
+    [ $SLOT = "_" ] && SLOT=
+  fi
+  [ -z $SLOT ] || ui_print "- A/B partition detected, current slot: $SLOT"
   ui_print "- Mounting /system, /vendor"
   is_mounted /system || [ -f /system/build.prop ] || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
@@ -136,22 +139,58 @@ migrate_boot_backup() {
 
 flash_boot_image() {
   # Make sure all blocks are writable
-  $MAGISKBIN/magisk --unlock-blocks
+  $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
-    *.gz) COMMAND="gzip -d < \"$1\"";;
-    *)    COMMAND="cat \"$1\"";;
+    *.gz) COMMAND="gzip -d < '$1'";;
+    *)    COMMAND="cat '$1'";;
   esac
   $BOOTSIGNED && SIGNCOM="$BOOTSIGNER -sign" || SIGNCOM="cat -"
   case "$2" in
     /dev/block/*)
       ui_print "- Flashing new boot image"
-      eval $COMMAND | eval $SIGNCOM | cat - /dev/zero | dd of="$2" bs=4096 >/dev/null 2>&1
+      eval $COMMAND | eval $SIGNCOM | cat - /dev/zero 2>/dev/null | dd of="$2" bs=4096 2>/dev/null
       ;;
     *)
       ui_print "- Storing new boot image"
-      eval $COMMAND | eval $SIGNCOM | dd of="$2" bs=4096 >/dev/null 2>&1
+      eval $COMMAND | eval $SIGNCOM | dd of="$2" bs=4096 2>/dev/null
       ;;
   esac
+}
+
+find_dtbo_image() {
+  DTBOIMAGE=`find /dev/block -iname dtbo$SLOT | head -n 1` 2>/dev/null
+  [ ! -z $DTBOIMAGE ] && DTBOIMAGE=`resolve_link $DTBOIMAGE`
+}
+
+patch_dtbo_image() {
+  find_dtbo_image
+  if [ ! -z $DTBOIMAGE ]; then
+    ui_print "- Found dtbo image: $DTBOIMAGE"
+    if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
+      ui_print "- Backing up stock dtbo image"
+      $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
+      ui_print "- Patching fstab in dtbo to remove avb-verity"
+      $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
+    fi
+  fi
+}
+
+restore_imgs() {
+  STOCKBOOT=/data/stock_boot_${1}.img.gz
+  STOCKDTBO=/data/stock_dtbo.img.gz
+  find_dtbo_image
+  if [ ! -z "$DTBOIMAGE" -a -f "$STOCKDTBO" ]; then
+    ui_print "- Restoring stock dtbo image"
+    gzip -d < $STOCKDTBO | dd of=$DTBOIMAGE
+  fi
+  BOOTSIGNED=false
+  find_boot_image
+  if [ ! -z "$BOOTIMAGE" -a -f "$STOCKBOOT" ]; then
+    ui_print "- Restoring stock boot image"
+    flash_boot_image $STOCKBOOT "$BOOTIMAGE"
+    return 0
+  fi
+  return 1
 }
 
 sign_chromeos() {
