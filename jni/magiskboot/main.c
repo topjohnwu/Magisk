@@ -18,8 +18,8 @@ static void usage(char *arg0) {
 		"\n"
 		"Supported actions:\n"
 		" --unpack <bootimg>\n"
-		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb) into the\n"
-		"  current directory\n"
+		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb), (extra) into\n"
+		"  the current directory\n"
 		"\n"
 		" --repack <origbootimg> [outbootimg]\n"
 		"  Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
@@ -66,6 +66,7 @@ static void usage(char *arg0) {
 		"\n"
 		" --compress[=method] <infile> [outfile]\n"
 		"  Compress <infile> with [method] (default: gzip), optionally to [outfile]\n"
+		"  <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
 		"  Supported methods: "
 	, arg0);
 	for (int i = 0; SUP_LIST[i]; ++i)
@@ -74,7 +75,9 @@ static void usage(char *arg0) {
 		"\n"
 		"\n"
 		" --decompress <infile> [outfile]\n"
-		"  Detect method and decompress <infile>, optionally to [outfile]\n  Supported methods: ");
+		"  Detect method and decompress <infile>, optionally to [outfile]\n"
+		"  <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
+		"  Supported methods: ");
 	for (int i = 0; SUP_LIST[i]; ++i)
 		fprintf(stderr, "%s ", SUP_LIST[i]);
 	fprintf(stderr,

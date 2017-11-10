@@ -351,6 +351,25 @@ void mmap_rw(const char *filename, void **buf, size_t *size) {
 	close(fd);
 }
 
+void full_read(int fd, void **buf, size_t *size) {
+	size_t cap = 1 << 20;
+	uint8_t tmp[1 << 20];
+	*buf = xmalloc(cap);
+	ssize_t read;
+	*size = 0;
+	while (1) {
+		read = xread(fd, tmp, sizeof(tmp));
+		if (read <= 0)
+			break;
+		if (*size + read > cap) {
+			cap *= 2;
+			*buf = realloc(*buf, cap);
+		}
+		memcpy(*buf + *size, tmp, read);
+		*size += read;
+	}
+}
+
 void write_zero(int fd, size_t size) {
 	size_t pos = lseek(fd, 0, SEEK_CUR);
 	ftruncate(fd, pos + size);

@@ -87,7 +87,6 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 	return total;
 }
 
-
 // Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
 size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	size_t have, pos = 0, total = 0;
@@ -405,7 +404,6 @@ long long decomp(file_t type, int to, const void *from, size_t size) {
 	}
 }
 
-// Output will be to.ext
 long long comp(file_t type, int to, const void *from, size_t size) {
 	switch (type) {
 		case GZIP:
@@ -431,60 +429,68 @@ long long comp(file_t type, int to, const void *from, size_t size) {
  */
 
 void decomp_file(char *from, const char *to) {
-	int ok = 1;
+	int strip = 1;
 	void *file;
-	size_t size;
-	mmap_ro(from, &file, &size);
+	size_t size = 0;
+	if (strcmp(from, "-") == 0)
+		full_read(STDIN_FILENO, &file, &size);
+	else
+		mmap_ro(from, &file, &size);
 	file_t type = check_type(file);
 	char *ext;
 	ext = strrchr(from, '.');
-	if (ext == NULL)
-		LOGE("Bad filename extention\n");
-
-	// File type and extension should match
-	switch (type) {
+	if (to == NULL)
+		to = from;
+	if (ext != NULL) {
+		// Strip out a matched file extension
+		switch (type) {
 		case GZIP:
 			if (strcmp(ext, ".gz") != 0)
-				ok = 0;
+				strip = 0;
 			break;
 		case XZ:
 			if (strcmp(ext, ".xz") != 0)
-				ok = 0;
+				strip = 0;
 			break;
 		case LZMA:
 			if (strcmp(ext, ".lzma") != 0)
-				ok = 0;
+				strip = 0;
 			break;
 		case BZIP2:
 			if (strcmp(ext, ".bz2") != 0)
-				ok = 0;
+				strip = 0;
 			break;
 		case LZ4_LEGACY:
 		case LZ4:
 			if (strcmp(ext, ".lz4") != 0)
-				ok = 0;
+				strip = 0;
 			break;
 		default:
 			LOGE("Provided file \'%s\' is not a supported archive format\n", from);
-	}
-	if (ok) {
-		// If all match, strip out the suffix
-		if (!to) {
+		}
+		if (strip)
 			*ext = '\0';
-			to = from;
-		}
-		int fd = creat(to, 0644);
-		fprintf(stderr, "Decompressing to [%s]\n\n", to);
-		decomp(type, fd, file, size);
-		close(fd);
-		if (to == from) {
-			*ext = '.';
-			unlink(from);
-		}
-	} else {
-		LOGE("Bad filename extention \'%s\'\n", ext);
 	}
-	munmap(file, size);
+
+	int fd;
+
+	if (strcmp(to, "-") == 0) {
+		fd = STDOUT_FILENO;
+	} else {
+		fd = creat(to, 0644);
+		fprintf(stderr, "Decompressing to [%s]\n\n", to);
+	}
+
+	decomp(type, fd, file, size);
+	close(fd);
+	if (to == from && ext != NULL) {
+		*ext = '.';
+		unlink(from);
+	}
+	if (strcmp(from, "-") == 0)
+		free(file);
+	else
+		munmap(file, size);
 }
 
 void comp_file(const char *method, const char *from, const char *to) {
@@ -517,17 +523,31 @@ void comp_file(const char *method, const char *from, const char *to) {
 	}
 	void *file;
 	size_t size;
-	mmap_ro(from, &file, &size);
-	if (!to)
-		snprintf(dest, sizeof(dest), "%s.%s", from, ext);
+	if (strcmp(from, "-") == 0)
+		full_read(STDIN_FILENO, &file, &size);
 	else
+		mmap_ro(from, &file, &size);
+	if (to == NULL) {
+		if (strcmp(from, "-") == 0)
+			strcpy(dest, "-");
+		else
+			snprintf(dest, sizeof(dest), "%s.%s", from, ext);
+	} else
 		strcpy(dest, to);
-	fprintf(stderr, "Compressing to [%s]\n\n", dest);
-	int fd = creat(dest, 0644);
+	int fd;
+	if (strcmp(dest, "-") == 0) {
+		fd = STDOUT_FILENO;
+	} else {
+		fd = creat(dest, 0644);
+		fprintf(stderr, "Compressing to [%s]\n\n", dest);
+	}
 	comp(type, fd, file, size);
 	close(fd);
-	munmap(file, size);
-	if (!to)
+	if (strcmp(from, "-") == 0)
+		free(file);
+	else
+		munmap(file, size);
+	if (to == NULL)
 		unlink(from);
 }
 

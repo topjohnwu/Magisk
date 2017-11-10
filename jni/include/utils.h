@@ -117,6 +117,7 @@ void clone_attr(const char *source, const char *target);
 void restorecon(int dirfd, int force);
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void mmap_rw(const char *filename, void **buf, size_t *size);
+void full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 void mem_align(size_t *pos, size_t align);
 void file_align(int fd, size_t align, int out);
