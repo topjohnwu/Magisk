@@ -20,6 +20,7 @@
     <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
     <string name="safetyNet_check_success">SafetyNet controle succesvol</string>
+    <string name="safetyNet_api_error">SafetyNet API fout</string>
     <string name="safetyNet_network_loss">Netwerkverbinding verloren</string>
     <string name="safetyNet_service_disconnected">Service is beëindigd</string>
     <string name="safetyNet_res_invalid">Reactie is ongeldig</string>
@@ -106,6 +107,7 @@
     <string name="flashing">Flashen</string>
     <string name="hide_manager_toast">Magisk Manager verbergen…</string>
     <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
+    <string name="hide_manager_toast2">Dit kan even duren…</string>
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>
     <string name="direct_install">Direct installeren (aangeraden)</string>
@@ -118,6 +120,8 @@
     <string name="restore_done">Herstel voltooid!</string>
     <string name="restore_fail">Originele back-up bestaat niet!</string>
     <string name="uninstall_toast">Magisk Manager wordt over 5 seconden verwijderd, hierna handmatig herstarten aub</string>
+    <string name="proprietary_title">Google\'s code downloaden</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS, dus bevat geen SafetyNet API code van Google.\n\nSta je Magisk Manager toe om een extensie te downloaden (bevat GoogleApiClient) voor SafetyNet controles?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
@@ -128,6 +132,7 @@
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
+    <string name="settings_hide_manager_summary">Magisk Manager opnieuw inpakken met een willekeurige pakketnaam</string>
     <string name="language">Taal</string>
     <string name="system_default">(Systeem standaard)</string>
     <string name="settings_update">Instellingen bijwerken</string>
@@ -136,7 +141,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
     <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
-    
     <string name="settings_core_only_title">Magisk basismodus</string>
     <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
