@@ -4,22 +4,21 @@
 
 #### Building has been tested on 3 major platforms: macOS, Ubuntu, Windows 10
 
-#### Environment Requirements
+### Environment Requirements
 
 1. A 64-bit machine: `cmake` for Android is only available in 64-bit
-2. Python 3.5+: to run the build script
-3. Java Development Kit (JDK) 8: To compile Magisk Manager and sign zips
-4. C compiler (Unix only): To build `zipadjust`. Windows users can use the pre-built `zipadjust.exe`
-5. Latest Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder
-6. Latest Android NDK: Install NDK via `sdkmanager`, or via Android SDK Manager in Android Studio
+2. Python 3.5+: run `build.py` script
+3. Java Development Kit (JDK) 8: Compile Magisk Manager and sign zips
+4. Latest Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder
+5. Latest Android NDK: Install NDK via `sdkmanager`, or via Android SDK Manager in Android Studio
+6. (Windows Only) Colorama: Install Colorama with `pip install colorama`, used for ANSI color codes
+7. (Unix only) C compiler: Build `zipadjust`. Windows users can use the pre-built `zipadjust.exe`
 
-#### Instructions and Notes
+### Instructions and Notes
 
 1. The easiest way to setup a working environment is to open Magisk Manager with Android Studio. The IDE will download required components and construct the environment for you. Don't forget to set `ANDROID_HOME` environment variable to the SDK path.
-2. Windows users: while installing Python 3 on Windows, allow the installer to add Python to `PATH`, or you'll have to add it manually afterwards. By default, the Python executable is setup as `python`, not `python3` like most Unix environment. If you have both Python 2 and Python 3 installed, you'll have to deal with the executable name and `PATH` yourself. To double check the Python version, call `python --version`.
-3. To run the script, on Windows call `python build.py [args...]`; on Unix call `python3 build.py [args...]`, or simply `./build.py [args...]`. To see the built-in help message, call the script with `-h` as an argument. The `-h` option also works for each supported actions to see the help message for the specific action.
-4. By default, the script will build binaries and Magisk Manager in debug mode, which will enable verbose debugging messages. If you want to build Magisk Manager in release mode (through the flag `--release`), you will need to place your Java Keystore file in `release_signature.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
-5. The python build script uses ANSI color codes to change the color of the terminal output. For Windows, this **only** works on Windows 10, as previous Windows console do not support them. If you use an older Windows version, a quick Google search should provide many workarounds.
+2. Run the script with `-h` as an argument to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
+3. By default, the script will build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (through the flag `--release`), you will need to place your Java Keystore file at `release_signature.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
 
 
 ## License

@@ -3,6 +3,10 @@ import sys
 import os
 import subprocess
 
+if os.name == 'nt':
+	from colorama import init
+	init()
+
 def error(str):
 	print('\n' + '\033[41m' + str + '\033[0m' + '\n')
 	sys.exit(1)
@@ -85,7 +89,7 @@ def build_binary(args):
 
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 	# Prebuild
-	proc = subprocess.run('PRECOMPILE=true {} {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
+	proc = subprocess.run('{} PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
 
