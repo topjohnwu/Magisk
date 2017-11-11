@@ -13,18 +13,11 @@
 #include "logging.h"
 #include "utils.h"
 
-#define windowBits 15
-#define ZLIB_GZIP 16
-#define memLevel 8
 #define CHUNK 0x40000
-
-#define LZ4_HEADER_SIZE 19
-#define LZ4_FOOTER_SIZE 4
-#define LZ4_LEGACY_BLOCKSIZE  0x800000
 
 // Mode: 0 = decode; 1 = encode
 size_t gzip(int mode, int fd, const void *buf, size_t size) {
-	size_t ret = 0, flush, have, pos = 0, total = 0;
+	size_t ret = 0, have, total = 0;
 	z_stream strm;
 	unsigned char out[CHUNK];
 
@@ -34,47 +27,35 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 
 	switch(mode) {
 		case 0:
-			ret = inflateInit2(&strm, windowBits | ZLIB_GZIP);
+			ret = inflateInit2(&strm, 15 | 16);
 			break;
 		case 1:
-			ret = deflateInit2(&strm, 9, Z_DEFLATED, windowBits | ZLIB_GZIP, memLevel, Z_DEFAULT_STRATEGY);
+			ret = deflateInit2(&strm, 9, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
 			break;
 	}
 
 	if (ret != Z_OK)
 		LOGE("Unable to init zlib stream\n");
 
+	strm.next_in = (void *) buf;
+	strm.avail_in = size;
+
 	do {
-		strm.next_in = (void *) buf + pos;
-		if (pos + CHUNK >= size) {
-			strm.avail_in = size - pos;
-			flush = Z_FINISH;
-		} else {
-			strm.avail_in = CHUNK;
-			flush = Z_NO_FLUSH;
+		strm.avail_out = CHUNK;
+		strm.next_out = out;
+		switch(mode) {
+			case 0:
+				ret = inflate(&strm, Z_FINISH);
+				break;
+			case 1:
+				ret = deflate(&strm, Z_FINISH);
+				break;
 		}
-		pos += strm.avail_in;
-
-		do {
-			strm.avail_out = CHUNK;
-			strm.next_out = out;
-			switch(mode) {
-				case 0:
-					ret = inflate(&strm, flush);
-					break;
-				case 1:
-					ret = deflate(&strm, flush);
-					break;
-			}
-			if (ret == Z_STREAM_ERROR)
-				LOGE("Error when running gzip\n");
-
-			have = CHUNK - strm.avail_out;
-			total += xwrite(fd, out, have);
-
-		} while (strm.avail_out == 0);
-
-	} while(pos < size);
+		if (ret == Z_STREAM_ERROR)
+			LOGE("Error when running gzip\n");
+		have = CHUNK - strm.avail_out;
+		total += xwrite(fd, out, have);
+	} while (strm.avail_out == 0);
 
 	switch(mode) {
 		case 0:
@@ -89,12 +70,11 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 
 // Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
 size_t lzma(int mode, int fd, const void *buf, size_t size) {
-	size_t have, pos = 0, total = 0;
+	size_t have, total = 0;
 	lzma_ret ret = 0;
 	lzma_stream strm = LZMA_STREAM_INIT;
 	lzma_options_lzma opt;
-	lzma_action action;
-	unsigned char out[BUFSIZ];
+	unsigned char out[CHUNK];
 
 	// Initialize preset
 	lzma_lzma_preset(&opt, 9);
@@ -119,29 +99,18 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	if (ret != LZMA_OK)
 		LOGE("Unable to init lzma stream\n");
 
+	strm.next_in = buf;
+	strm.avail_in = size;
+
 	do {
-		strm.next_in = buf + pos;
-		if (pos + BUFSIZ >= size) {
-			strm.avail_in = size - pos;
-			action = LZMA_FINISH;
-		} else {
-			strm.avail_in = BUFSIZ;
-			action = LZMA_RUN;
-		}
-		pos += strm.avail_in;
-
-		do {
-			strm.avail_out = BUFSIZ;
-			strm.next_out = out;
-			ret = lzma_code(&strm, action);
-			have = BUFSIZ - strm.avail_out;
-			total += xwrite(fd, out, have);
-		} while (strm.avail_out == 0 && ret == LZMA_OK);
-
+		strm.avail_out = CHUNK;
+		strm.next_out = out;
+		ret = lzma_code(&strm, LZMA_FINISH);
 		if (ret != LZMA_OK && ret != LZMA_STREAM_END)
 			LOGE("LZMA error %d!\n", ret);
-
-	} while (pos < size);
+		have = CHUNK - strm.avail_out;
+		total += xwrite(fd, out, have);
+	} while (strm.avail_out == 0);
 
 	lzma_end(&strm);
 	return total;
@@ -263,7 +232,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 
 // Mode: 0 = decode; 1 = encode
 size_t bzip2(int mode, int fd, const void* buf, size_t size) {
-	size_t ret = 0, action, have, pos = 0, total = 0;
+	size_t ret = 0, have, total = 0;
 	bz_stream strm;
 	char out[CHUNK];
 
@@ -283,35 +252,23 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 	if (ret != BZ_OK)
 		LOGE("Unable to init bzlib stream\n");
 
+	strm.next_in = (void *) buf;
+	strm.avail_in = size;
+
 	do {
-		strm.next_in = (char *) buf + pos;
-		if (pos + CHUNK >= size) {
-			strm.avail_in = size - pos;
-			action = BZ_FINISH;
-		} else {
-			strm.avail_in = CHUNK;
-			action = BZ_RUN;
+		strm.avail_out = CHUNK;
+		strm.next_out = out;
+		switch(mode) {
+			case 0:
+				ret = BZ2_bzDecompress(&strm);
+				break;
+			case 1:
+				ret = BZ2_bzCompress(&strm, BZ_FINISH);
+				break;
 		}
-		pos += strm.avail_in;
-
-		do {
-			strm.avail_out = CHUNK;
-			strm.next_out = out;
-			switch(mode) {
-				case 0:
-					ret = BZ2_bzDecompress(&strm);
-					break;
-				case 1:
-					ret = BZ2_bzCompress(&strm, action);
-					break;
-			}
-
-			have = CHUNK - strm.avail_out;
-			total += xwrite(fd, out, have);
-
-		} while (strm.avail_out == 0);
-
-	} while(pos < size);
+		have = CHUNK - strm.avail_out;
+		total += xwrite(fd, out, have);
+	} while (strm.avail_out == 0);
 
 	switch(mode) {
 		case 0:
@@ -323,6 +280,8 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 	}
 	return total;
 }
+
+#define LZ4_LEGACY_BLOCKSIZE  0x800000
 
 // Mode: 0 = decode; 1 = encode
 size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
