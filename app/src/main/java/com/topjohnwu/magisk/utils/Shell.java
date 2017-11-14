@@ -78,6 +78,22 @@ public class Shell {
                     }
                 }
             }
+            if (rootAccess()) {
+                // Load utility shell scripts
+                try (InputStream in  = mm.getAssets().open(Const.UTIL_FUNCTIONS)) {
+                    mm.shell.loadInputStream(in);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // Root shell initialization
+                mm.shell.run_raw(false,
+                        "export PATH=" + Const.BUSYBOXPATH + ":$PATH",
+                        "mount_partitions",
+                        "find_boot_image",
+                        "migrate_boot_backup"
+                );
+            }
         }
 
         return mm.shell;

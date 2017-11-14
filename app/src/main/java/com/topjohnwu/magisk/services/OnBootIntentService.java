@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.magisk.utils.Utils;
 
 public class OnBootIntentService extends IntentService {
 
@@ -29,6 +32,17 @@ public class OnBootIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Currently nothing to do
+        /* Pixel 2 (XL) devices will need to patch dtbo.img.
+         * However, that is not possible if Magisk is installed by
+         * patching boot image with Magisk Manager and fastboot flash
+         * the boot image, since at that time we do not have root.
+         * Check for dtbo status every boot time, and prompt user
+         * to reboot if dtbo wasn't patched and patched by Magisk Manager.
+         * */
+        MagiskManager mm = Utils.getMagiskManager(this);
+        mm.loadMagiskInfo();
+        if (Shell.rootAccess()) {
+            Utils.patchDTBO();
+        }
     }
 }

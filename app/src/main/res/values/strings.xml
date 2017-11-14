@@ -106,6 +106,8 @@
     <string name="manual_boot_image">Please manually select a boot image!</string>
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install</string>
+    <string name="dtbo_patched_title">DTBO was patched!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img, please reboot</string>
     <string name="magisk_updates">Magisk Updates</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Hiding Magisk Manager…</string>

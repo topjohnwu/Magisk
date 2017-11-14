@@ -234,4 +234,13 @@ public class Utils {
         }
         out.flush();
     }
+
+    public static void patchDTBO() {
+        if (MagiskManager.get().magiskVersionCode >= 1446) {
+            List<String> ret = Shell.su("patch_dtbo_image && echo true || echo false");
+            if (Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
+                ShowUI.dtboPatchedNotification();
+            }
+        }
+    }
 }

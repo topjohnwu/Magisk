@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
@@ -20,6 +21,7 @@ public class Activity extends AppCompatActivity {
 
     private AssetManager mAssetManager = null;
     private Resources mResources = null;
+    private ActivityResultListener activityResultListener;
 
     public Activity() {
         super();
@@ -83,6 +85,18 @@ public class Activity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (activityResultListener != null)
+            activityResultListener.onActivityResult(requestCode, resultCode, data);
+        activityResultListener = null;
+    }
+
+    public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
+        activityResultListener = listener;
+        super.startActivityForResult(intent, requestCode);
+    }
+
     @Keep
     public void swapResources(String dexPath) {
         mAssetManager = Utils.getAssets(dexPath);
@@ -97,6 +111,10 @@ public class Activity extends AppCompatActivity {
     public void restoreResources() {
         mAssetManager = null;
         mResources = null;
+    }
+
+    public interface ActivityResultListener {
+        void onActivityResult(int requestCode, int resultCode, Intent data);
     }
 
 }

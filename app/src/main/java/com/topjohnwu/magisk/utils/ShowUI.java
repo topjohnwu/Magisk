@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.MagiskFragment;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -21,6 +20,7 @@ import com.topjohnwu.magisk.asyncs.RestoreStockBoot;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
+import com.topjohnwu.magisk.receivers.RebootReceiver;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,14 +31,9 @@ import java.util.List;
 
 public class ShowUI {
 
-    public static void showMagiskUpdateNotification() {
+    public static void magiskUpdateNotification() {
         MagiskManager mm = MagiskManager.get();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
-        builder.setSmallIcon(R.drawable.ic_magisk)
-                .setContentTitle(mm.getString(R.string.magisk_update_title))
-                .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
-                .setVibrate(new long[]{0, 100, 100, 100})
-                .setAutoCancel(true);
+
         Intent intent = new Intent(mm, SplashActivity.class);
         intent.putExtra(Const.Key.OPEN_SECTION, "magisk");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mm);
@@ -46,35 +41,65 @@ public class ShowUI {
         stackBuilder.addNextIntent(intent);
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
+        builder.setSmallIcon(R.drawable.ic_magisk)
+                .setContentTitle(mm.getString(R.string.magisk_update_title))
+                .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
+                .setVibrate(new long[]{0, 100, 100, 100})
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
         NotificationManager notificationManager =
                 (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
-    public static void showManagerUpdateNotification() {
+    public static void managerUpdateNotification() {
         MagiskManager mm = MagiskManager.get();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
-        builder.setSmallIcon(R.drawable.ic_magisk)
-                .setContentTitle(mm.getString(R.string.manager_update_title))
-                .setContentText(mm.getString(R.string.manager_download_install))
-                .setVibrate(new long[]{0, 100, 100, 100})
-                .setAutoCancel(true);
+
         Intent intent = new Intent(mm, ManagerUpdate.class);
         intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
+        builder.setSmallIcon(R.drawable.ic_magisk)
+                .setContentTitle(mm.getString(R.string.manager_update_title))
+                .setContentText(mm.getString(R.string.manager_download_install))
+                .setVibrate(new long[]{0, 100, 100, 100})
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
+
         NotificationManager notificationManager =
                 (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build());
     }
 
-    public static void showMagiskInstallDialog(MagiskFragment fragment, boolean enc, boolean verity) {
-        MagiskManager mm = Utils.getMagiskManager(fragment.getContext());
+    public static void dtboPatchedNotification() {
+        MagiskManager mm = MagiskManager.get();
+
+        Intent intent = new Intent(mm, RebootReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
+                Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
+        builder.setSmallIcon(R.drawable.ic_magisk)
+                .setContentTitle(mm.getString(R.string.dtbo_patched_title))
+                .setContentText(mm.getString(R.string.dtbo_patched_reboot))
+                .setVibrate(new long[]{0, 100, 100, 100})
+                .addAction(R.drawable.ic_refresh, mm.getString(R.string.reboot), pendingIntent);
+
+        NotificationManager notificationManager =
+                (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
+    }
+
+    public static void magiskInstallDialog(Activity activity, boolean enc, boolean verity) {
+        MagiskManager mm = Utils.getMagiskManager(activity);
         String filename = Utils.getLegalFilename("Magisk-v" + mm.remoteMagiskVersionString + ".zip");
-        new AlertDialogBuilder(fragment.getActivity())
+        new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)))
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
             .setCancelable(true)
@@ -90,7 +115,7 @@ public class ShowUI {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
                 char[] slot = Utils.isValidShellResponse(res) ? res.get(0).toCharArray() : null;
-                new AlertDialog.Builder(fragment.getActivity())
+                new AlertDialog.Builder(activity)
                     .setTitle(R.string.select_method)
                     .setItems(
                         options.toArray(new String [0]),
@@ -106,12 +131,13 @@ public class ShowUI {
                                     MagiskManager.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                                     intent.setType("*/*");
-                                    fragment.startActivityForResult(intent, Const.ID.SELECT_BOOT,
+                                    ((com.topjohnwu.magisk.components.Activity) activity)
+                                        .startActivityForResult(intent, Const.ID.SELECT_BOOT,
                                         (requestCode, resultCode, data) -> {
                                             if (requestCode == Const.ID.SELECT_BOOT
                                                     && resultCode == Activity.RESULT_OK && data != null) {
                                                 Utils.dlAndReceive(
-                                                    fragment.getActivity(),
+                                                    activity,
                                                     new DownloadReceiver() {
                                                         @Override
                                                         public void onDownloadDone(Uri uri) {
@@ -135,12 +161,12 @@ public class ShowUI {
                                     receiver = new DownloadReceiver() {
                                         @Override
                                         public void onDownloadDone(Uri uri) {
-                                            Utils.showUriSnack(fragment.getActivity(), uri);
+                                            Utils.showUriSnack(activity, uri);
                                         }
                                     };
                                     break;
                                 case 2:
-                                    boot = fragment.getSelectedBootImage();
+                                    boot = mm.bootBlock;
                                     if (boot == null)
                                         return;
                                     receiver = new DownloadReceiver() {
@@ -148,12 +174,11 @@ public class ShowUI {
                                         public void onDownloadDone(Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
-                                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                 .putExtra(Const.Key.FLASH_SET_BOOT, boot)
                                                 .putExtra(Const.Key.FLASH_SET_ENC, enc)
                                                 .putExtra(Const.Key.FLASH_SET_VERITY, verity)
                                                 .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
-                                            mm.startActivity(intent);
+                                            activity.startActivity(intent);
                                         }
                                     };
                                     break;
@@ -164,7 +189,6 @@ public class ShowUI {
                                     else slot[1] = 'a';
                                     // Then find the boot image again
                                     List<String> ret = Shell.su(
-                                            "BOOTIMAGE=",
                                             "SLOT=" + String.valueOf(slot),
                                             "find_boot_image",
                                             "echo \"$BOOTIMAGE\""
@@ -178,18 +202,17 @@ public class ShowUI {
                                         public void onDownloadDone(Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
-                                                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                     .putExtra(Const.Key.FLASH_SET_BOOT, boot)
                                                     .putExtra(Const.Key.FLASH_SET_ENC, enc)
                                                     .putExtra(Const.Key.FLASH_SET_VERITY, verity)
                                                     .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
-                                            mm.startActivity(intent);
+                                            activity.startActivity(intent);
                                         }
                                     };
                                 default:
                             }
                             Utils.dlAndReceive(
-                                    fragment.getActivity(),
+                                    activity,
                                     receiver,
                                     mm.magiskLink,
                                     filename
@@ -208,7 +231,7 @@ public class ShowUI {
             .show();
     }
 
-    public static void showManagerInstallDialog(Activity activity) {
+    public static void managerInstallDialog(Activity activity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
         new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.app_name)))
@@ -228,9 +251,9 @@ public class ShowUI {
             .show();
     }
 
-    public static void showUninstallDialog(MagiskFragment fragment) {
-        MagiskManager mm = Utils.getMagiskManager(fragment.getActivity());
-        new AlertDialogBuilder(fragment.getActivity())
+    public static void uninstallDialog(Activity activity) {
+        MagiskManager mm = Utils.getMagiskManager(activity);
+        new AlertDialogBuilder(activity)
             .setTitle(R.string.uninstall_magisk_title)
             .setMessage(R.string.uninstall_magisk_msg)
             .setPositiveButton(R.string.complete_uninstall, (d, i) -> {
@@ -267,9 +290,7 @@ public class ShowUI {
                 }
             })
             .setNeutralButton(R.string.restore_stock_boot, (d, i) -> {
-                String boot = fragment.getSelectedBootImage();
-                if (boot == null) return;
-                new RestoreStockBoot(boot).exec();
+                new RestoreStockBoot().exec();
             })
             .setNegativeButton(R.string.no_thanks, null)
             .show();

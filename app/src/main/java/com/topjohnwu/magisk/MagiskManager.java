@@ -55,7 +55,6 @@ public class MagiskManager extends Application {
 
     // Data
     public Map<String, Module> moduleMap;
-    public List<String> blockList;
     public List<Locale> locales;
 
     // Configurations

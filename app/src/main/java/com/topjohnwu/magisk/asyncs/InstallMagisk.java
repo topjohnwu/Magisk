@@ -226,13 +226,15 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     mList.add("*********************************");
                     break;
                 case DIRECT_MODE:
-                    // Direct flash boot image
+                    // Direct flash boot image and patch dtbo if possible
                     Shell.su(mList,
                             "rm -rf /data/magisk/*",
+                            "mkdir -p /data/magisk 2>/dev/null",
                             "mv -f " + install + "/* /data/magisk",
                             "rm -rf " + install,
                             "flash_boot_image " + patched_boot + " " + mBootLocation,
-                            "rm -rf " + patched_boot);
+                            "rm -rf " + patched_boot,
+                            "patch_dtbo_image");
                     break;
                 default:
                     return false;

@@ -73,6 +73,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.ManagerUpdate" />
+        <receiver android:name=".receivers.RebootReceiver" />
 
         <service android:name=".services.OnBootIntentService" />
         <service

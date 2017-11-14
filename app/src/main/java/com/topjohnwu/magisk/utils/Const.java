@@ -59,13 +59,14 @@ public class Const {
         public static final int MAGISK_UPDATE_NOTIFICATION_ID = 4;
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
         public static final int ONBOOT_NOTIFICATION_ID = 6;
-        public static final String NOTIFICATION_CHANNEL = "magisk_update_notice";
+        public static final int DTBO_NOTIFICATION_ID = 7;
+        public static final String NOTIFICATION_CHANNEL = "magisk_notification";
     }
 
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
-        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
-        public static final String SNET_URL = "https://www.dropbox.com/s/jg2yhcrn3l9fckc/snet.apk?dl=1";
+        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
+        public static final String SNET_URL = "https://www.dropbox.com/s/vbq6y8pzfn4rq60/snet.apk?dl=1";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";

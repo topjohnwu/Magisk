@@ -55,9 +55,9 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         MagiskManager mm = MagiskManager.get();
         if (showNotification && mm.updateNotification) {
             if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
-                ShowUI.showManagerUpdateNotification();
+                ShowUI.managerUpdateNotification();
             } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
-                ShowUI.showMagiskUpdateNotification();
+                ShowUI.magiskUpdateNotification();
             }
         }
         mm.updateCheckDone.publish();

@@ -21,8 +21,6 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 public class SplashActivity extends Activity {
@@ -57,27 +55,10 @@ public class SplashActivity extends Activity {
 
         // Magisk working as expected
         if (Shell.rootAccess() && mm.magiskVersionCode > 0) {
-            // Load utility shell scripts
-            try (InputStream in  = getAssets().open(Const.UTIL_FUNCTIONS)) {
-                Shell.getShell().loadInputStream(in);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // Root shell initialization
-            Shell.su_raw(
-                    "export PATH=" + Const.BUSYBOXPATH + ":$PATH",
-                    "mount_partitions",
-                    "BOOTIMAGE=",
-                    "find_boot_image",
-                    "migrate_boot_backup"
-            );
 
             List<String> ret = Shell.su("echo \"$BOOTIMAGE\"");
             if (Utils.isValidShellResponse(ret)) {
                 mm.bootBlock = ret.get(0);
-            } else {
-                mm.blockList = Shell.su("find /dev/block -type b | grep -vE 'dm|ram|loop'");
             }
 
             // Setup suDB
@@ -105,6 +86,9 @@ public class SplashActivity extends Activity {
 
             // Fire asynctasks
             loadModuleTask.exec();
+
+            // Check dtbo status
+            Utils.patchDTBO();
         }
 
         // Write back default values
