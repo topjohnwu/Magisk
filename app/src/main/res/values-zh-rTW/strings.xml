@@ -27,8 +27,8 @@
     <string name="advanced_settings_title">高級設置</string>
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保留 dm-verity</string>
-    <string name="current_magisk_title">已安裝 Magisk 版本：%1$s</string>
-    <string name="install_magisk_title">最新的 Magisk 版本：%1$s</string>
+    <string name="current_magisk_title">已安裝版本：%1$s</string>
+    <string name="install_magisk_title">最新的版本：%1$s</string>
     <string name="uninstall">解除安裝</string>
 
     <!--Module Fragment-->

@@ -33,8 +33,8 @@
     <string name="advanced_settings_title">Napredne postavke</string>
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
     <string name="keep_dm_verity">Zadrži dm-istinitost</string>
-    <string name="current_magisk_title">Instalirana inačica Magisk: %1$s</string>
-    <string name="install_magisk_title">Najnovija Magisk inačica: %1$s</string>
+    <string name="current_magisk_title">Instalirana inačica: %1$s</string>
+    <string name="install_magisk_title">Najnovija inačica: %1$s</string>
     <string name="uninstall">Deinstaliraj</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati vaše podatke, ukoliko vaši podaci trenutačno nisu šifrirani</string>

@@ -35,8 +35,8 @@
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
-    <string name="current_magisk_title">Zainstalowana Wersja Magisk: %1$s</string>
-    <string name="install_magisk_title">Ostatnia Wersja Magisk: %1$s</string>
+    <string name="current_magisk_title">Zainstalowana Wersja: %1$s</string>
+    <string name="install_magisk_title">Ostatnia Wersja: %1$s</string>
     <string name="uninstall">Odinstaluj</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte.Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>

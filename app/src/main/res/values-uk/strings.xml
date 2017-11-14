@@ -32,8 +32,8 @@
     <string name="advanced_settings_title">Розширені налаштування</string>
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
     <string name="keep_dm_verity">Залишити dm-verity</string>
-    <string name="current_magisk_title">Поточна версія Magisk: %1$s</string>
-    <string name="install_magisk_title">Найновіша версія Magisk: %1$s</string>
+    <string name="current_magisk_title">Поточна версія: %1$s</string>
+    <string name="install_magisk_title">Найновіша версія: %1$s</string>
     <string name="uninstall">Видалити</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до видалення всіх модулів, MagiskSU, і може зашифрувати дані, якщо вони не зашифровані.\nВпевнені, що бажаєте продовжити?</string>

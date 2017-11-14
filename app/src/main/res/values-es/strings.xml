@@ -33,8 +33,8 @@
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener dm-verity</string>
-    <string name="current_magisk_title">Versión de Magisk instalada: %1$s</string>
-    <string name="install_magisk_title">Última versión de Magisk: %1$s</string>
+    <string name="current_magisk_title">Versión instalada: %1$s</string>
+    <string name="install_magisk_title">Última versión: %1$s</string>
     <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, encriptará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>

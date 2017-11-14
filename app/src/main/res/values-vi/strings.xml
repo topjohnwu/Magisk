@@ -28,8 +28,8 @@
     <string name="advanced_settings_title">Thiết lập nâng cao</string>
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ dm-verity</string>
-    <string name="current_magisk_title">Đã cài đặt Magisk phiên bản: %1$s</string>
-    <string name="install_magisk_title">Phiên bản Magisk mới nhất: %1$s</string>
+    <string name="current_magisk_title">Đã cài đặt phiên bản: %1$s</string>
+    <string name="install_magisk_title">Phiên bản mới nhất: %1$s</string>
     <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
 

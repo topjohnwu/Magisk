@@ -33,8 +33,8 @@
     <string name="advanced_settings_title">Расширенные настройки</string>
     <string name="keep_force_encryption">Оставить принуд. шифрование</string>
     <string name="keep_dm_verity">Оставить dm-verity</string>
-    <string name="current_magisk_title">Текущая версия Magisk: %1$s</string>
-    <string name="install_magisk_title">Последняя версия Magisk: %1$s</string>
+    <string name="current_magisk_title">Текущая версия: %1$s</string>
+    <string name="install_magisk_title">Последняя версия: %1$s</string>
     <string name="uninstall">Удалить</string>
     <string name="uninstall_magisk_title">Удалить Magisk</string>
     <string name="uninstall_magisk_msg">Все модули были отключены либо удалены. Root-доступ будет удален, данные зашифруются, если до сих пор не были зашифрованы</string>

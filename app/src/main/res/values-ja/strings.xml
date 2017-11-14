@@ -28,8 +28,8 @@
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を維持する</string>
     <string name="keep_dm_verity">dm-verityを維持する</string>
-    <string name="current_magisk_title">インストール済のMagisk: %1$s</string>
-    <string name="install_magisk_title">最新のMagisk: %1$s</string>
+    <string name="current_magisk_title">インストール済: %1$s</string>
+    <string name="install_magisk_title">最新: %1$s</string>
     <string name="uninstall">アンインストール</string>
     <string name="uninstall_magisk_title">Magiskをアンインストールします</string>
 

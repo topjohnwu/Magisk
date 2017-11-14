@@ -31,8 +31,8 @@
     <string name="advanced_settings_title">Gelişmiş Ayarlar</string>
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
     <string name="keep_dm_verity">"Dm-verity\'yi koru"</string>
-    <string name="current_magisk_title">Yüklenmiş Magisk Sürümü: %1$s</string>
-    <string name="install_magisk_title">Son Magisk Sürümü: %1$s</string>
+    <string name="current_magisk_title">Yüklenmiş Sürümü: %1$s</string>
+    <string name="install_magisk_title">Son Sürümü: %1$s</string>
     <string name="uninstall">Kaldır</string>
     <string name="uninstall_magisk_title">"Magisk\'i kaldır"</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacak ve verileriniz şu anda şifrelenmemişse potansiyel olarak verilerinizi şifrelenecek</string>

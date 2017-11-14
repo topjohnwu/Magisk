@@ -26,8 +26,8 @@
     <string name="advanced_settings_title">Setări avansate</string>
     <string name="keep_force_encryption">Păstrare criptare forţată</string>
     <string name="keep_dm_verity">Păstrare dm-verity</string>
-    <string name="current_magisk_title">Versiune Magisk instalată: %1$s</string>
-    <string name="install_magisk_title">Ultima versiune Magisk: %1$s</string>
+    <string name="current_magisk_title">Versiune instalată: %1$s</string>
+    <string name="install_magisk_title">Ultima versiune: %1$s</string>
     <string name="uninstall">Dezinstalare</string>
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="update">Actualizare %1$s</string>

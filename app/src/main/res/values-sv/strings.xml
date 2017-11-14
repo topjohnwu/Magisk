@@ -32,8 +32,8 @@
     <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll dm-verity</string>
-    <string name="current_magisk_title">Installerad Magisk: %1$s</string>
-    <string name="install_magisk_title">Senaste Magisk: %1$s</string>
+    <string name="current_magisk_title">Installerad: %1$s</string>
+    <string name="install_magisk_title">Senaste: %1$s</string>
     <string name="uninstall">Avinstallera</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="update">Uppdatera %1$s</string>

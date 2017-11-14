@@ -35,8 +35,8 @@
     <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
-    <string name="current_magisk_title">Installierte Magisk-Version: %1$s</string>
-    <string name="install_magisk_title">Neueste Magisk-Version: %1$s</string>
+    <string name="current_magisk_title">Installierte Version: %1$s</string>
+    <string name="install_magisk_title">Neueste Version: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
 

@@ -33,8 +33,8 @@
     <string name="advanced_settings_title">Täpsemad seaded</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita dm-verity</string>
-    <string name="current_magisk_title">Installitud Magisk\'i versioon: %1$s</string>
-    <string name="install_magisk_title">Viimane Magisk\'i versioon: %1$s</string>
+    <string name="current_magisk_title">Installitud versioon: %1$s</string>
+    <string name="install_magisk_title">Viimane versioon: %1$s</string>
     <string name="uninstall">Eemalda</string>
     <string name="uninstall_magisk_title">Eemalda Magisk</string>
     <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse. Juurkasutaja eemaldatakse ning potensiaalselt krüptitakse su andmed, kui need ei ole hetkel krüpteeritud</string>

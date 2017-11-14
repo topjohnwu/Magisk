@@ -32,8 +32,8 @@
     <string name="advanced_settings_title">Geavanceerde instellingen</string>
     <string name="keep_force_encryption">Behoud afgedwongen versleuteling</string>
     <string name="keep_dm_verity">Behoud dm-verity</string>
-    <string name="current_magisk_title">Geïnstalleerde Magisk versie: %1$s</string>
-    <string name="install_magisk_title">Recentste Magisk versie: %1$s</string>
+    <string name="current_magisk_title">Geïnstalleerde versie: %1$s</string>
+    <string name="install_magisk_title">Recentste versie: %1$s</string>
     <string name="uninstall">Deïnstalleren</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd. Root wordt verwijderd, en je data wordt mogelijk versleuteld als deze dat momenteel niet is</string>

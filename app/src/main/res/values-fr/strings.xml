@@ -28,8 +28,8 @@
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
     <string name="keep_dm_verity">Garder dm-verity</string>
-    <string name="current_magisk_title">Version Magisk installée : %1$s</string>
-    <string name="install_magisk_title">Dernière version Magisk : %1$s</string>
+    <string name="current_magisk_title">Version installée : %1$s</string>
+    <string name="install_magisk_title">Dernière Magisk : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
 	<string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si elles ne le sont pas actuellement</string>
