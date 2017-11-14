@@ -149,6 +149,13 @@ exit:
 }
 
 void proc_monitor() {
+	// Unblock user signals
+	sigset_t block_set;
+	sigemptyset(&block_set);
+	sigaddset(&block_set, TERM_THREAD);
+	sigaddset(&block_set, HIDE_DONE);
+	pthread_sigmask(SIG_UNBLOCK, &block_set, NULL);
+
 	// Register the cancel signal
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
@@ -188,7 +195,12 @@ void proc_monitor() {
 	xpipe2(pipefd, O_CLOEXEC);
 	logcat_events[HIDE_EVENT] = pipefd[1];
 
-	for (char *log, *line; xxread(pipefd[0], &log, sizeof(log)) > 0; free(log)) {
+	for (char *log, *line; 1; free(log)) {
+		if (read(pipefd[0], &log, sizeof(log)) != sizeof(log)) {
+			/* It might be interrupted */
+			log = NULL;
+			continue;
+		}
 		char *ss;
 		if ((ss = strstr(log, "am_proc_start")) && (ss = strchr(ss, '['))) {
 			int pid, ret, comma = 0;

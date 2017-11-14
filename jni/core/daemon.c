@@ -10,6 +10,7 @@
 #include <string.h>
 #include <errno.h>
 #include <pthread.h>
+#include <signal.h>
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -126,6 +127,13 @@ void start_daemon() {
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
+
+	// Block user signals
+	sigset_t block_set;
+	sigemptyset(&block_set);
+	sigaddset(&block_set, SIGUSR1);
+	sigaddset(&block_set, SIGUSR2);
+	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
 
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun);
