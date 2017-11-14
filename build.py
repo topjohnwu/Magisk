@@ -41,6 +41,7 @@ import errno
 import shutil
 import lzma
 import base64
+import tempfile
 
 def mv(source, target):
 	print('mv: {} -> {}'.format(source, target))
@@ -234,7 +235,9 @@ def gen_update_binary():
 def zip_main(args):
 	header('* Packing Flashable Zip')
 
-	with zipfile.ZipFile('tmp_unsigned.zip', 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
+	unsigned = tempfile.mkstemp()[1]
+
+	with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
 		# META-INF
 		# update-binary
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
@@ -284,12 +287,14 @@ def zip_main(args):
 		# End of zipping
 
 	output = os.path.join('out', 'Magisk-v{}.zip'.format(args.versionString))
-	sign_adjust_zip('tmp_unsigned.zip', output)
+	sign_adjust_zip(unsigned, output)
 
 def zip_uninstaller(args):
 	header('* Packing Uninstaller Zip')
 
-	with zipfile.ZipFile('tmp_unsigned.zip', 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
+	unsigned = tempfile.mkstemp()[1]
+
+	with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
 		# META-INF
 		# update-binary
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
@@ -329,7 +334,7 @@ def zip_uninstaller(args):
 		# End of zipping
 
 	output = os.path.join('out', 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')))
-	sign_adjust_zip('tmp_unsigned.zip', output)
+	sign_adjust_zip(unsigned, output)
 
 def sign_adjust_zip(unsigned, output):
 	signer_name = 'zipsigner-1.0.jar'
@@ -354,27 +359,31 @@ def sign_adjust_zip(unsigned, output):
 	publicKey = os.path.join('ziptools', 'public.certificate.x509.pem')
 	privateKey = os.path.join('ziptools', 'private.key.pk8')
 
+	signed = tempfile.mkstemp()[1]
+
 	# Unsigned->signed
 	proc = subprocess.run(['java', '-jar', jarsigner,
-		publicKey, privateKey, unsigned, 'tmp_signed.zip'])
+		publicKey, privateKey, unsigned, signed])
 	if proc.returncode != 0:
 		error('First sign flashable zip failed!')
 
+	adjusted = tempfile.mkstemp()[1]
+
 	# Adjust zip
-	proc = subprocess.run([os.path.join('ziptools', 'zipadjust'), 'tmp_signed.zip', 'tmp_adjusted.zip'])
+	proc = subprocess.run([os.path.join('ziptools', 'zipadjust'), signed, adjusted])
 	if proc.returncode != 0:
 		error('Adjust flashable zip failed!')
 
 	# Adjusted -> output
 	proc = subprocess.run(['java', '-jar', jarsigner,
-		"-m", publicKey, privateKey, 'tmp_adjusted.zip', output])
+		"-m", publicKey, privateKey, adjusted, output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')
 
 	# Cleanup
 	rm(unsigned)
-	rm('tmp_signed.zip')
-	rm('tmp_adjusted.zip')
+	rm(signed)
+	rm(adjusted)
 
 def cleanup(args):
 	if len(args.target) == 0:
