@@ -621,9 +621,10 @@ void post_fs_data(int client) {
 		rm_rf(DATABIN);
 		cp_afc(bin_path, DATABIN);
 		rm_rf(bin_path);
-		// Lazy.... use shell blob to match files
-		exec_command_sync("sh", "-c", "mv /data/magisk/stock_boot* /data", NULL);
 	}
+
+	// Lazy.... use shell blob to match files
+	exec_command_sync("sh", "-c", "mv -f /data/magisk/stock_*.img.gz /data", NULL);
 
 	// Initialize
 	daemon_init();

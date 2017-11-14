@@ -102,7 +102,7 @@ $BOOTMODE || recovery_actions
 # Boot patching
 ##########################################################################################
 
-find_boot_image
+[ -z $BOOTIMAGE ] && find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found boot image: $BOOTIMAGE"
 

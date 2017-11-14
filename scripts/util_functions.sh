@@ -100,15 +100,14 @@ resolve_link() {
 }
 
 find_boot_image() {
-  if [ -z "$BOOTIMAGE" ]; then
-    if [ ! -z $SLOT ]; then
-      BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
-    else
-      for BLOCK in boot_a kern-a android_boot kernel boot lnx bootimg; do
-        BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
-        [ ! -z $BOOTIMAGE ] && break
-      done
-    fi
+  BOOTIMAGE=
+  if [ ! -z $SLOT ]; then
+    BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
+  else
+    for BLOCK in boot_a kern-a android_boot kernel boot lnx bootimg; do
+      BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
+      [ ! -z $BOOTIMAGE ] && break
+    done
   fi
   # Recovery fallback
   if [ -z "$BOOTIMAGE" ]; then
@@ -123,8 +122,7 @@ find_boot_image() {
 migrate_boot_backup() {
   # Update the broken boot backup
   if [ -f /data/stock_boot_.img.gz ]; then
-    $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz
-    mv /data/stock_boot_.img /data/stock_boot.img
+    $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz /data/stock_boot.img
   fi
   # Update our previous backup to new format if exists
   if [ -f /data/stock_boot.img ]; then
@@ -171,13 +169,18 @@ patch_dtbo_image() {
       $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
       ui_print "- Patching fstab in dtbo to remove avb-verity"
       $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
+      return 0
     fi
   fi
+  return 1
 }
 
 restore_imgs() {
   STOCKBOOT=/data/stock_boot_${1}.img.gz
   STOCKDTBO=/data/stock_dtbo.img.gz
+
+  # Make sure all blocks are writable
+  $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   find_dtbo_image
   if [ ! -z "$DTBOIMAGE" -a -f "$STOCKDTBO" ]; then
     ui_print "- Restoring stock dtbo image"
@@ -187,7 +190,7 @@ restore_imgs() {
   find_boot_image
   if [ ! -z "$BOOTIMAGE" -a -f "$STOCKBOOT" ]; then
     ui_print "- Restoring stock boot image"
-    flash_boot_image $STOCKBOOT "$BOOTIMAGE"
+    gzip -d < $STOCKBOOT | cat - /dev/zero 2>/dev/null | dd of="$BOOTIMAGE" bs=4096 2>/dev/null
     return 0
   fi
   return 1
