@@ -10,6 +10,7 @@
 #include <pwd.h>
 #include <signal.h>
 #include <sched.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
