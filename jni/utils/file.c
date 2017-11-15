@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/sendfile.h>
 #include <sys/mman.h>
 
