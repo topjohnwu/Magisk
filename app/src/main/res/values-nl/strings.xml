@@ -186,7 +186,7 @@
     <string name="deny">Weigeren</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Toestaan</string>
-    <string name="su_warning">Verleent volledige toegang aan je apparaat.\nWeigeren als je het niet zeker weet!</string>
+    <string name="su_warning">Verleent volledige toegang tot je apparaat.\nWeigeren als je het niet zeker weet!</string>
     <string name="forever">Altijd</string>
     <string name="once">Eénmalig</string>
     <string name="tenmin">10 min</string>
