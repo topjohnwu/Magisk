@@ -128,7 +128,7 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 				memcpy(&boot->mtk_ramdisk_hdr, boot->ramdisk, sizeof(mtk_hdr));
 				boot->ramdisk += 512;
 				boot->hdr.ramdisk_size -= 512;
-				boot->ramdisk_type = check_type(boot->ramdisk + 512);
+				boot->ramdisk_type = check_type(boot->ramdisk);
 			}
 
 			char fmt[16];
