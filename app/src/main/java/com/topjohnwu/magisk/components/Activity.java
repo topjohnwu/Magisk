@@ -92,6 +92,11 @@ public class Activity extends AppCompatActivity {
         activityResultListener = null;
     }
 
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode, this::onActivityResult);
+    }
+
     public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
         activityResultListener = listener;
         super.startActivityForResult(intent, requestCode);
