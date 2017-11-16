@@ -209,5 +209,9 @@
     <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
     <string name="proprietary_title">下載非開源程式</string>
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
+    <string name="dtbo_patched_title">DTBO 已被打上補丁！</string>
+    <string name="dtbo_patched_reboot">Magisk Manager 已為 dtbo.img 打上補丁，請立即重新啟動</string>
+    <string name="hide_manager_toast2">這可能會花上一段時間…</string>
+    <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名稱重新打包，以達成隱藏效果</string>
 
 </resources>
