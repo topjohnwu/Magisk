@@ -283,33 +283,36 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="4dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:visibility="gone"
                 app:cardCornerRadius="@dimen/card_corner_radius"
                 app:cardElevation="@dimen/card_elevation">
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="25dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/imageView"
                         android:layout_width="50dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="0"
-                        app:srcCompat="@mipmap/ic_launcher" />
+                        app:srcCompat="@mipmap/ic_launcher_round" />
 
                     <TextView
                         android:id="@+id/install_text"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
                         android:ems="10"
                         android:fontFamily="sans-serif"
                         android:gravity="center"
@@ -318,15 +321,7 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <FrameLayout
-                        android:layout_width="50dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_weight="0">
-
-                    </FrameLayout>
-
-                </LinearLayout>
+                </RelativeLayout>
 
             </android.support.v7.widget.CardView>
 
@@ -343,7 +338,8 @@
                 android:clickable="true"
                 android:foreground="?android:attr/selectableItemBackground"
                 app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                app:cardElevation="@dimen/card_elevation"
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="match_parent"
