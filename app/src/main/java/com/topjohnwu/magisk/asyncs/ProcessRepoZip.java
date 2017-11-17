@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
@@ -45,7 +44,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     public ProcessRepoZip(Activity context, String link, String filename, boolean install) {
         super(context);
         mLink = link;
-        mFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", filename);
+        mFile = new File(Const.EXTERNAL_PATH, filename);
         mInstall = install;
         mHandler = new Handler();
     }

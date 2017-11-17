@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
@@ -30,6 +29,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -109,7 +109,6 @@ public class MagiskLogFragment extends Fragment {
             super(MagiskLogFragment.this.getActivity());
         }
 
-        @SuppressLint("DefaultLocale")
         @Override
         protected Object doInBackground(Object... params) {
             mode = (int) params[0];
@@ -126,13 +125,13 @@ public class MagiskLogFragment extends Fragment {
 
                 case 2:
                     Calendar now = Calendar.getInstance();
-                    String filename = String.format(
-                            "magisk_%s_%04d%02d%02d_%02d%02d%02d.log", "error",
+                    String filename = String.format(Locale.US,
+                            "magisk_log_%04d%02d%02d_%02d:%02d:%02d.log",
                             now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
                             now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                             now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-                    targetFile = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
+                    targetFile = new File(Const.EXTERNAL_PATH + "/logs", filename);
 
                     if ((!targetFile.getParentFile().exists() && !targetFile.getParentFile().mkdirs())
                             || (targetFile.exists() && !targetFile.delete())) {

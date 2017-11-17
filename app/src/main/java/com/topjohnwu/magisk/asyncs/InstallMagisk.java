@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.text.TextUtils;
 
 import com.topjohnwu.crypto.SignBoot;
@@ -203,7 +202,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
             switch (mode) {
                 case PATCH_MODE:
-                    File dest = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/patched_boot" + mm.bootFormat);
+                    File dest = new File(Const.EXTERNAL_PATH, patched_boot + mm.bootFormat);
                     dest.getParentFile().mkdirs();
                     switch (mm.bootFormat) {
                         case ".img":

@@ -14,7 +14,6 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -70,7 +69,7 @@ public class Utils {
             return;
 
         runWithPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
-            File file = new File(Environment.getExternalStorageDirectory() + "/MagiskManager/" + filename);
+            File file = new File(Const.EXTERNAL_PATH, filename);
 
             if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs())
                     || (file.exists() && !file.delete())) {

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 

@@ -1,5 +1,8 @@
 package com.topjohnwu.magisk.utils;
 
+import android.os.Environment;
+
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class Const {
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final String BUSYBOXPATH = "/dev/magisk/bin";
+    public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
 
     public static String MAGISK_PATH() {
         if (Utils.itemExist("/dev/magisk/img")) {

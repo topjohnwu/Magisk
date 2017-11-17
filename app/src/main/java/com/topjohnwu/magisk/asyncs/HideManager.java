@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.os.Environment;
 import android.widget.Toast;
 
 import com.topjohnwu.crypto.JarMap;
@@ -97,7 +96,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         MagiskManager mm = MagiskManager.get();
 
         // Generate a new unhide app with random package name
-        File repack = new File(Environment.getExternalStorageDirectory() + "/MagiskManager", "repack.apk");
+        File repack = new File(Const.EXTERNAL_PATH, "repack.apk");
         repack.getParentFile().mkdirs();
         String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
 
