@@ -5,7 +5,7 @@
     <item
         android:id="@+id/menu_save"
         android:icon="@drawable/ic_save"
-        android:title="@string/menuSaveToSd"
+        android:title="@string/menuSaveLog"
         app:showAsAction="ifRoom"/>
 
     <item

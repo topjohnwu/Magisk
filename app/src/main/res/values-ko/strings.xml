@@ -49,7 +49,7 @@
     <string name="not_installed">설치되지 않음</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">SD 카드에 저장</string>
+    <string name="menuSaveLog">저장 로그</string>
     <string name="menuReload">다시 불러오기</string>
     <string name="menuClearLog">지금 로그 비우기</string>
     <string name="logs_cleared">로그가 성공적으로 비워짐</string>

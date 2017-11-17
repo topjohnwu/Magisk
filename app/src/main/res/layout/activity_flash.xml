@@ -51,6 +51,14 @@
             android:text="@string/close" />
 
         <Button
+            android:id="@+id/save_logs"
+            style="?android:borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/menuSaveLog" />
+
+        <Button
             android:id="@+id/reboot"
             style="?android:borderlessButtonStyle"
             android:layout_width="0dp"

@@ -3,9 +3,10 @@ package com.topjohnwu.magisk.asyncs;
 import android.app.Activity;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.view.View;
 
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -25,12 +26,13 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private Uri mUri;
     private File mCachedFile;
-    private List<String> mList;
+    private List<String> console, logs;
 
-    public FlashZip(Activity context, Uri uri, List<String> list) {
+    public FlashZip(Activity context, Uri uri, List<String> console, List<String> logs) {
         super(context);
         mUri = uri;
-        mList = list;
+        this.console = console;
+        this.logs = logs;
         mCachedFile = new File(context.getCacheDir(), "install.zip");
     }
 
@@ -44,7 +46,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     protected Integer doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
         try {
-            mList.add("- Copying zip to temp directory");
+            console.add("- Copying zip to temp directory");
 
             mCachedFile.delete();
             try (
@@ -55,48 +57,52 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
                 InputStream buf= new BufferedInputStream(in);
                 Utils.inToOut(buf, out);
             } catch (FileNotFoundException e) {
-                mList.add("! Invalid Uri");
+                console.add("! Invalid Uri");
                 throw e;
             } catch (IOException e) {
-                mList.add("! Cannot copy to cache");
+                console.add("! Cannot copy to cache");
                 throw e;
             }
             if (!unzipAndCheck()) return 0;
-            mList.add("- Installing " + Utils.getNameFromUri(mm, mUri));
-            Shell.su(mList,
+            console.add("- Installing " + Utils.getNameFromUri(mm, mUri));
+            Shell.getShell().run(console, logs,
                     "cd " + mCachedFile.getParent(),
-                    "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile +
-                            " && echo 'Success!' || echo 'Failed!'"
+                    "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile + " || echo 'Failed!'"
             );
-            if (TextUtils.equals(mList.get(mList.size() - 1), "Success!"))
-                return 1;
+
+            if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
+                return -1;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return -1;
         }
-        return -1;
+        console.add("- All done!");
+        return 1;
     }
 
     // -1 = error, manual install; 0 = invalid zip; 1 = success
     @Override
     protected void onPostExecute(Integer result) {
-        MagiskManager mm = MagiskManager.get();
+        FlashActivity activity = (FlashActivity) getActivity();
         Shell.su_raw(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + Const.TMP_FOLDER_PATH
         );
         switch (result) {
             case -1:
-                mList.add(mm.getString(R.string.install_error));
+                console.add("! Installation failed");
                 Utils.showUriSnack(getActivity(), mUri);
                 break;
             case 0:
-                mList.add(mm.getString(R.string.invalid_zip));
+                console.add("! This zip is not a Magisk Module!");
                 break;
             case 1:
                 // Success
                 new LoadModules().exec();
                 break;
         }
-        super.onPostExecute(result);
+        activity.reboot.setVisibility(result > 0 ? View.VISIBLE : View.GONE);
+        activity.buttonPanel.setVisibility(View.VISIBLE);
     }
 }

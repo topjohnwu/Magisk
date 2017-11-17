@@ -49,7 +49,7 @@
     <string name="not_installed">Chưa được cài đặt</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Lưu vào thẻ nhớ</string>
+    <string name="menuSaveLog">Lưu nhật ký</string>
     <string name="menuReload">Tải lại</string>
     <string name="menuClearLog">Xoá nhật ký ngay</string>
     <string name="logs_cleared">Đã xoá nhật ký thành công</string>

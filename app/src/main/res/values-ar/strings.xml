@@ -53,7 +53,6 @@
     <string name="not_installed">غير مثبت</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">حفظ إلى بطاقة ذاكرة SD</string>
     <string name="menuReload">إعادة تحميل</string>
     <string name="menuClearLog">حذف السجل الآن</string>
     <string name="logs_cleared">تم حذف السجل بنجاح</string>

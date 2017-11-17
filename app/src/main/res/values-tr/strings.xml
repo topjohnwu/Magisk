@@ -54,7 +54,7 @@
     <string name="not_installed">Yüklenmemiş</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">"SD Kart\'a kaydet"</string>
+    <string name="menuSaveLog">Günlüğü kaydet</string>
     <string name="menuReload">Yenile</string>
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>

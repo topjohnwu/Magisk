@@ -52,7 +52,7 @@
     <string name="not_installed">Μη εγκατεστημένη</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Αποθήκευση σε SD</string>
+    <string name="menuSaveLog">"Αποθήκευση καταγραφής "</string>
     <string name="menuReload">Επαναφόρτωση</string>
     <string name="menuClearLog">Εκκαθάριση αρχείου καταγραφής τώρα</string>
     <string name="logs_cleared">Το αρχείο καταγραφής εκκαθαρίστηκε επιτυχώς</string>

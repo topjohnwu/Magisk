@@ -56,7 +56,7 @@
     <string name="not_installed">Nije instalirano</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Spremi na SD karticu</string>
+    <string name="menuSaveLog">"Spremi zapisnik "</string>
     <string name="menuReload">Ponovno učitaj</string>
     <string name="menuClearLog">Očisti zapisnik sada</string>
     <string name="logs_cleared">Zapisnik je uspješno izbrisan</string>

@@ -5,8 +5,10 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.topjohnwu.crypto.SignBoot;
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
@@ -35,27 +37,28 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private static final int DIRECT_MODE = 1;
 
     private Uri mBootImg, mZip;
-    private List<String> mList;
+    private List<String> console, logs;
     private String mBootLocation;
     private boolean mKeepEnc, mKeepVerity;
     private int mode;
 
-    private InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity) {
+    private InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity) {
         super(context);
-        mList = list;
+        this.console = console;
+        this.logs = logs;
         mZip = zip;
         mKeepEnc = enc;
         mKeepVerity = verity;
     }
 
-    public InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity, Uri boot) {
-        this(context, list, zip, enc, verity);
+    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity, Uri boot) {
+        this(context, console, logs, zip, enc, verity);
         mBootImg = boot;
         mode = PATCH_MODE;
     }
 
-    public InstallMagisk(Activity context, List<String> list, Uri zip, boolean enc, boolean verity, String boot) {
-        this(context, list, zip, enc, verity);
+    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity, String boot) {
+        this(context, console, logs, zip, enc, verity);
         mBootLocation = boot;
         mode = DIRECT_MODE;
     }
@@ -77,11 +80,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         else if (abis.contains("arm64-v8a")) arch = "arm64";
         else if (abis.contains("x86")) arch = "x86";
         else arch = "arm";
-        mList.add("- Device platform: " + arch);
+        console.add("- Device platform: " + arch);
 
         try {
             // Unzip files
-            mList.add("- Extracting files");
+            console.add("- Extracting files");
             try (InputStream in = mm.getContentResolver().openInputStream(mZip)) {
                 if (in == null) throw new FileNotFoundException();
                 BufferedInputStream buf = new BufferedInputStream(in);
@@ -95,17 +98,17 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 ZipUtils.unzip(buf, install, "META-INF/com/google/android/update-binary", true);
                 buf.close();
             } catch (FileNotFoundException e) {
-                mList.add("! Invalid Uri");
+                console.add("! Invalid Uri");
                 throw e;
             } catch (Exception e) {
-                mList.add("! Cannot unzip zip");
+                console.add("! Cannot unzip zip");
                 throw e;
             }
 
             File boot = new File(install, "boot.img");
             switch (mode) {
                 case PATCH_MODE:
-                    mList.add("- Use boot image: " + boot);
+                    console.add("- Use boot image: " + boot);
                     // Copy boot image to local
                     try (
                         InputStream in = mm.getContentResolver().openInputStream(mBootImg);
@@ -129,19 +132,19 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         }
                         Utils.inToOut(source, out);
                     } catch (FileNotFoundException e) {
-                        mList.add("! Invalid Uri");
+                        console.add("! Invalid Uri");
                         throw e;
                     } catch (IOException e) {
-                        mList.add("! Copy failed");
+                        console.add("! Copy failed");
                         throw e;
                     }
                     break;
                 case DIRECT_MODE:
-                    mList.add("- Use boot image: " + mBootLocation);
+                    console.add("- Use boot image: " + mBootLocation);
                     if (boot.createNewFile()) {
                         Shell.su("cat " + mBootLocation + " > " + boot);
                     } else {
-                        mList.add("! Dump boot image failed");
+                        console.add("! Dump boot image failed");
                         return false;
                     }
                     break;
@@ -153,10 +156,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             try (InputStream in = new FileInputStream(boot)) {
                 isSigned = SignBoot.verifySignature(in, null);
                 if (isSigned) {
-                    mList.add("- Signed boot image detected");
+                    console.add("- Signed boot image detected");
                 }
             } catch (Exception e) {
-                mList.add("! Unable to check signature");
+                console.add("! Unable to check signature");
                 throw e;
             }
 
@@ -168,12 +171,12 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 shell = Shell.getShell();
 
             // Patch boot image
-            shell.run(mList, null,
+            shell.run(console, logs,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
                             "update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'");
 
-            if (TextUtils.equals(mList.get(mList.size() - 1), "Failed!"))
+            if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;
 
             shell.run(null, null,
@@ -185,7 +188,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             File patched_boot = new File(install.getParent(), "new-boot.img");
 
             if (isSigned) {
-                mList.add("- Signing boot image");
+                console.add("- Signing boot image");
                 File signed = new File(install.getParent(), "signed.img");
                 AssetManager assets = mm.getAssets();
                 try (
@@ -217,15 +220,15 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             }
                             break;
                     }
-                    mList.add("");
-                    mList.add("*********************************");
-                    mList.add(" Patched Boot Image is placed in ");
-                    mList.add(" " + dest + " ");
-                    mList.add("*********************************");
+                    console.add("");
+                    console.add("*********************************");
+                    console.add(" Patched Boot Image is placed in ");
+                    console.add(" " + dest + " ");
+                    console.add("*********************************");
                     break;
                 case DIRECT_MODE:
                     // Direct flash boot image and patch dtbo if possible
-                    Shell.su(mList,
+                    Shell.getShell().run(console, logs,
                             "rm -rf /data/magisk/*",
                             "mkdir -p /data/magisk 2>/dev/null",
                             "mv -f " + install + "/* /data/magisk",
@@ -238,7 +241,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     return false;
             }
 
-            mList.add("- All done!");
+            console.add("- All done!");
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -248,6 +251,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        super.onPostExecute(result);
+        FlashActivity activity = (FlashActivity) getActivity();
+        if (!result) {
+            console.add("! Installation failed");
+            activity.reboot.setVisibility(View.GONE);
+        }
+        activity.buttonPanel.setVisibility(View.VISIBLE);
     }
 }

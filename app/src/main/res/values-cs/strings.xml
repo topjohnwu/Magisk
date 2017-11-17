@@ -49,7 +49,7 @@
     <string name="not_installed">Nenainstalováno</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Uložit na SD</string>
+    <string name="menuSaveLog">Uložit log</string>
     <string name="menuReload">Aktualizovat</string>
     <string name="menuClearLog">Smazat Log</string>
     <string name="logs_cleared">Log byl smazán</string>

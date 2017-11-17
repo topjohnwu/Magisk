@@ -56,7 +56,7 @@
     <string name="not_installed">No Instalado</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Guardar en la SD</string>
+    <string name="menuSaveLog">Guardar registro</string>
     <string name="menuReload">Recargar</string>
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>

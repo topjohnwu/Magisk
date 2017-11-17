@@ -49,7 +49,7 @@
     <string name="not_installed">未インストール</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">SDカードに保存</string>
+    <string name="menuSaveLog">ログ保存</string>
     <string name="menuReload">リロード</string>
     <string name="menuClearLog">ログを消去する</string>
     <string name="logs_cleared">ログは正常にクリアされました</string>

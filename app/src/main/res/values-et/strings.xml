@@ -56,7 +56,7 @@
     <string name="not_installed">Pole installitud</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Salvesta SD-kaardile</string>
+    <string name="menuSaveLog">Salvesta logi</string>
     <string name="menuReload">Laadi uuesti</string>
     <string name="menuClearLog">Tühjenda logi nüüd</string>
     <string name="logs_cleared">Logi edukalt tühjendatud</string>

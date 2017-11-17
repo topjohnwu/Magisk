@@ -49,7 +49,7 @@
     <string name="not_installed">Nu este instalat</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Salvare pe cardul SD</string>
+    <string name="menuSaveLog">Salvare jurnal</string>
     <string name="menuReload">Reîncărcare</string>
     <string name="menuClearLog">Șterge jurnal acum</string>
     <string name="logs_cleared">Jurnal şters</string>

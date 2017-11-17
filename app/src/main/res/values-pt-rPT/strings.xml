@@ -55,7 +55,7 @@
 <string name="not_installed">Não Instalado</string>
 
 <!--Log Fragment-->
-<string name="menuSaveToSd">Gravar no SD</string>
+<string name="menuSaveLog">Gravar registo</string>
 <string name="menuReload">Recarregar</string>
 <string name="menuClearLog">Limpar registo agora</string>
 <string name="logs_cleared">Registo limpo com sucesso</string>
@@ -91,9 +91,11 @@
 <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
 <string name="release_notes">Notas da atualização</string>
 <string name="repo_cache_cleared">Cache do repositório apagado</string>
-<string name="safetyNet_hide_notice">Esta aplicação usa SafetyNet\nJá manipulado pelo MagiskHide por padrão</string>
+<string name="safetyNet_hide_notice">Esta aplicação usa SafetyNet
+\nJá manipulado pelo MagiskHide por padrão</string>
 <string name="process_error">Erro no processo</string>
-<string name="internal_storage">O zip foi guardado em:\n[Armazenamento interno]%1$s</string>
+<string name="internal_storage">O zip foi guardado em:
+\n[Armazenamento interno]%1$s</string>
 <string name="zip_download_msg">A transferir ficheiro zip (%1$d%%) …</string>
 <string name="zip_process_title">A processar</string>
 <string name="zip_process_msg">A processar ficheiro zip …</string>
@@ -170,7 +172,8 @@
 <string name="deny">Negar</string>
 <string name="prompt">Perguntar</string>
 <string name="grant">Permitir</string>
-<string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se não tiver certeza!</string>
+<string name="su_warning">Concede acesso total ao seu dispositivo.
+\nNegue se não tiver certeza!</string>
 <string name="forever">Sempre</string>
 <string name="once">Uma vez</string>
 <string name="tenmin">10 minutos</string>

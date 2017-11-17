@@ -55,7 +55,7 @@
     <string name="not_installed">未安装</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">保存到内置存储</string>
+    <string name="menuSaveLog">保存日志</string>
     <string name="menuReload">刷新</string>
     <string name="menuClearLog">清除日志</string>
     <string name="logs_cleared">日志已成功清除</string>

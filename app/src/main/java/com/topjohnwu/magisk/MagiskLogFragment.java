@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;

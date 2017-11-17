@@ -55,7 +55,7 @@
     <string name="not_installed">Не встановлено</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Зберегти на карту пам\'яті</string>
+    <string name="menuSaveLog">Зберегти логи</string>
     <string name="menuReload">Оновити</string>
     <string name="menuClearLog">Очистити логи</string>
     <string name="logs_cleared">Логи очищено</string>

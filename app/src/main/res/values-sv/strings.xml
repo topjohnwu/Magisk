@@ -54,7 +54,7 @@
     <string name="not_installed">Inte installerad</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Spara till SD-kort</string>
+    <string name="menuSaveLog">Spara loggen</string>
     <string name="menuReload">Uppdatera</string>
     <string name="menuClearLog">Rensa loggen</string>
     <string name="logs_cleared">Loggen rensad</string>

@@ -56,7 +56,7 @@
     <string name="not_installed">Nicht installiert</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Log auf SD-Karte speichern</string>
+    <string name="menuSaveLog">Log auf speichern</string>
     <string name="menuReload">Log erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
     <string name="logs_cleared">Log gelöscht</string>

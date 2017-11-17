@@ -12,11 +12,11 @@ public abstract class CallbackList<E> extends ArrayList<E> {
         handler = new Handler();
     }
 
-    public abstract void onAddElement();
+    public abstract void onAddElement(E e);
 
     public synchronized boolean add(E e) {
         boolean ret = super.add(e);
-        handler.post(this::onAddElement);
+        handler.post(() -> onAddElement(e));
         return ret;
     }
 }

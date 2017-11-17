@@ -48,7 +48,7 @@
     <string name="installed">Installé</string>
     <string name="not_installed">Non installé</string>
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Enregistrer sur SD</string>
+    <string name="menuSaveLog">Enregistrer journal</string>
     <string name="menuReload">Actualiser</string>
     <string name="menuClearLog">Effacer le journal maintenant</string>
     <string name="logs_cleared">Journal effacé avec succès</string>

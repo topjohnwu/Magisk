@@ -59,7 +59,7 @@
     <string name="not_installed">Nie zainstalowany</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Zapisz na SD</string>
+    <string name="menuSaveLog">Zapisz log</string>
     <string name="menuReload">Załaduj ponownie</string>
     <string name="menuClearLog">Wyczyść Log</string>
     <string name="logs_cleared">Log wyczyszczony</string>

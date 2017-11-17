@@ -56,7 +56,7 @@
     <string name="not_installed">Не установлен</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveToSd">Сохранить на карту памяти</string>
+    <string name="menuSaveLog">"Сохранить историю "</string>
     <string name="menuReload">Обновить</string>
     <string name="menuClearLog">Очистить историю сейчас</string>
     <string name="logs_cleared">История успешно очищена</string>
