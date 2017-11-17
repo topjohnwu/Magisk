@@ -114,49 +114,54 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 0) {
-            createTables(db);
-            oldVersion = 3;
-        }
-        if (oldVersion == 1) {
-            // We're dropping column app_name, rename and re-construct table
-            db.execSQL("ALTER TABLE " + POLICY_TABLE + " RENAME TO " + POLICY_TABLE + "_old");
-
-            // Create the new tables
-            createTables(db);
-
-            // Migrate old data to new tables
-            db.execSQL(
-                    "INSERT INTO " + POLICY_TABLE + " SELECT " +
-                    "uid, package_name, policy, until, logging, notification " +
-                    "FROM " + POLICY_TABLE + "_old");
-            db.execSQL("DROP TABLE " + POLICY_TABLE + "_old");
-
-            File oldDB = Utils.getDatabasePath(MagiskManager.get(), "sulog.db");
-            if (oldDB.exists()) {
-                migrateLegacyLogList(oldDB, db);
-                MagiskManager.get().deleteDatabase("sulog.db");
+        try {
+            if (oldVersion == 0) {
+                createTables(db);
+                oldVersion = 3;
             }
-            ++oldVersion;
-        }
-        if (oldVersion == 2) {
-            db.execSQL("UPDATE " + LOG_TABLE + " SET time=time*1000");
-            ++oldVersion;
-        }
-        if (oldVersion == 3) {
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " + STRINGS_TABLE + " " +
-                    "(key TEXT, value TEXT, PRIMARY KEY(key))");
-            ++oldVersion;
-        }
-        if (oldVersion == 4) {
-            db.execSQL("UPDATE " + POLICY_TABLE + " SET uid=uid%100000");
-            ++oldVersion;
-        }
+            if (oldVersion == 1) {
+                // We're dropping column app_name, rename and re-construct table
+                db.execSQL("ALTER TABLE " + POLICY_TABLE + " RENAME TO " + POLICY_TABLE + "_old");
 
-        if (!Utils.itemExist(GLOBAL_DB)) {
-            // Hard link our DB globally
-            Shell.su_raw("ln " + getDbFile() + " " + GLOBAL_DB);
+                // Create the new tables
+                createTables(db);
+
+                // Migrate old data to new tables
+                db.execSQL(
+                        "INSERT INTO " + POLICY_TABLE + " SELECT " +
+                                "uid, package_name, policy, until, logging, notification " +
+                                "FROM " + POLICY_TABLE + "_old");
+                db.execSQL("DROP TABLE " + POLICY_TABLE + "_old");
+
+                File oldDB = Utils.getDatabasePath(MagiskManager.get(), "sulog.db");
+                if (oldDB.exists()) {
+                    migrateLegacyLogList(oldDB, db);
+                    MagiskManager.get().deleteDatabase("sulog.db");
+                }
+                ++oldVersion;
+            }
+            if (oldVersion == 2) {
+                db.execSQL("UPDATE " + LOG_TABLE + " SET time=time*1000");
+                ++oldVersion;
+            }
+            if (oldVersion == 3) {
+                db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS " + STRINGS_TABLE + " " +
+                                "(key TEXT, value TEXT, PRIMARY KEY(key))");
+                ++oldVersion;
+            }
+            if (oldVersion == 4) {
+                db.execSQL("UPDATE " + POLICY_TABLE + " SET uid=uid%100000");
+                ++oldVersion;
+            }
+
+            if (!Utils.itemExist(GLOBAL_DB)) {
+                // Hard link our DB globally
+                Shell.su_raw("ln " + getDbFile() + " " + GLOBAL_DB);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            onDowngrade(db, DATABASE_VER, 0);
         }
     }
 

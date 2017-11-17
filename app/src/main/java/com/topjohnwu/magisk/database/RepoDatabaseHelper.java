@@ -38,15 +38,21 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 3) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
-                    "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
-                    "author TEXT, description TEXT, repo_name TEXT, last_update INT, " +
-                    "PRIMARY KEY(id))");
-            mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
-            oldVersion = 3;
+        try {
+            if (oldVersion < 3) {
+                db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+                db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
+                                "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
+                                "author TEXT, description TEXT, repo_name TEXT, last_update INT, " +
+                                "PRIMARY KEY(id))");
+                mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+                oldVersion = 3;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Reset database
+            onDowngrade(db, DATABASE_VER, 0);
         }
     }
 
