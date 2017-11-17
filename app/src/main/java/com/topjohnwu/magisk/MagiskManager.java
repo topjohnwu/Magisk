@@ -49,7 +49,6 @@ public class MagiskManager extends Application {
     public int remoteManagerVersionCode = -1;
     public String managerLink;
     public String bootBlock = null;
-    public boolean disabled;
     public int snet_version;
     public int updateServiceVersion;
 
@@ -65,6 +64,7 @@ public class MagiskManager extends Application {
     public boolean isDarkTheme;
     public boolean updateNotification;
     public boolean suReauth;
+    public boolean coreOnly;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -146,6 +146,7 @@ public class MagiskManager extends Application {
         multiuserMode = suDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         suNamespaceMode = suDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
 
+        coreOnly = prefs.getBoolean(Const.Key.DISABLE, false);
         updateNotification = prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true);
         updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
@@ -178,12 +179,6 @@ public class MagiskManager extends Application {
             try {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
-        }
-        ret = Shell.sh("getprop " + Const.DISABLE_INDICATION_PROP);
-        try {
-            disabled = Utils.isValidShellResponse(ret) && Integer.parseInt(ret.get(0)) != 0;
-        } catch (NumberFormatException e) {
-            disabled = false;
         }
         if (magiskVersionCode > 1435) {
             ret = Shell.su("resetprop -p " + Const.MAGISKHIDE_PROP);

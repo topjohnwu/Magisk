@@ -129,14 +129,16 @@ public class MainActivity extends Activity
     }
 
     public void checkHideSection() {
+        MagiskManager mm = getMagiskManager();
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 1300
+                Shell.rootAccess() && mm.magiskVersionCode >= 1300
                         && prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(
-                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
+                Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
-                Shell.rootAccess() && getMagiskManager().magiskVersionCode >= 0);
+                Shell.rootAccess() && mm.magiskVersionCode >= 0);
+        menu.setGroupVisible(R.id.second_group, !mm.coreOnly);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess());
     }
@@ -157,7 +159,7 @@ public class MainActivity extends Activity
                 case "downloads":
                     itemId = R.id.downloads;
                     break;
-                case Const.Key.MAGISKHIDE:
+                case "magiskhide":
                     itemId = R.id.magiskhide;
                     break;
                 case "log":
