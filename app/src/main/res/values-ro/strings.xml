@@ -13,16 +13,10 @@
     <string name="checking_for_updates">Verificare actualizări…</string>
     <string name="magisk_update_available">Magisk v%1$s disponibil!</string>
     <string name="cannot_check_updates">Nu se pot verifica actualizările, nu este internet?</string>
-    <string name="root_error">Root obţinut, dar fără permisiune root, nu este permis?</string>
-    <string name="not_rooted">Nu este obţinut root</string>
     <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Nu se poate detecta automat)</string>
-    <string name="boot_image_title">Locaţie imagine Boot</string>
-    <string name="detect_button">Detectare</string>
     <string name="advanced_settings_title">Setări avansate</string>
     <string name="keep_force_encryption">Păstrare criptare forţată</string>
     <string name="keep_dm_verity">Păstrare dm-verity</string>
@@ -78,8 +72,6 @@
     <string name="repo_install_msg">Instalaţi %1$s?</string>
     <string name="download">Descărcare</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
-    <string name="install_error">Eroare de instalare!</string>
-    <string name="invalid_zip">Zip-ul nu este un modul Magisk!</string>
     <string name="reboot">Repornire</string>
     <string name="zip_process_msg">Procesare fişierului zip…</string>
     <string name="downloading_toast">Descărcare %1$s</string>
@@ -91,7 +83,6 @@
     <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
     <string name="zip_process_title">Procesare</string>
-    <string name="manual_boot_image">Selectați manual o imagine de boot!</string>
     <string name="manager_update_title">O nouă actualizare pentru Magisk Manager este disponibilă!</string>
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
     <string name="magisk_updates">Actualizări Magisk</string>

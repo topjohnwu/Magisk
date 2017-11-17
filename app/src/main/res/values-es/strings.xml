@@ -15,8 +15,6 @@
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
     <string name="cannot_check_updates">No se pueden comprobar actualizaciones ¿No tiene internet?</string>
-    <string name="root_error">Rooteado pero sin permiso root, ¿No lo permitiste?</string>
-    <string name="not_rooted">No rooteado</string>
     <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
@@ -26,10 +24,6 @@
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(No se puede detectar automáticamente)</string>
-    <string name="boot_image_title">Ubicación de la imagen boot</string>
-    <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Ajustes avanzados</string>
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener dm-verity</string>
@@ -85,8 +79,6 @@
     <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
     <string name="download">Descargar</string>
     <string name="download_file_error">Error descargando archivo</string>
-    <string name="install_error">¡Error en la instalación!</string>
-    <string name="invalid_zip">¡El zip no es un módulo Magisk!</string>
     <string name="reboot">Reiniciar</string>
     <string name="zip_process_msg">Procesando archivo zip …</string>
     <string name="downloading_toast">Descargando %1$s</string>
@@ -100,7 +92,6 @@
     <string name="zip_download_title">Descargando</string>
     <string name="zip_download_msg">Descargando el archivo zip (%1$d%%) …</string>
     <string name="zip_process_title">Procesando</string>
-    <string name="manual_boot_image">¡Selecciona manualmente una imagen boot!</string>
     <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="dtbo_patched_title">DTBO fue parchado!</string>

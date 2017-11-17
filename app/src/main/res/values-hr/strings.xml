@@ -15,8 +15,6 @@
     <string name="checking_for_updates">Provjera ažuriranja...</string>
     <string name="magisk_update_available">Dostupna je Maigsk inačica v%1$s!</string>
     <string name="cannot_check_updates">Nije moguće provjeriti ažuriranja, nema interneta?</string>
-    <string name="root_error">Rootan, ali bez root dopuštenja, nije dozvoljeno?</string>
-    <string name="not_rooted">Nije rootan</string>
     <string name="safetyNet_check_text">Dodirni za SafetyNet provjeru</string>
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
     <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>
@@ -26,10 +24,6 @@
     <string name="safetyNet_res_invalid">Odgovor je nevažeći</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Automatski) %1$s</string>
-    <string name="cannot_auto_detect">(Ne može se automatski otkriti)</string>
-    <string name="boot_image_title">Lokacija datoteke za podizanje sustava</string>
-    <string name="detect_button">Otkrij</string>
     <string name="advanced_settings_title">Napredne postavke</string>
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
     <string name="keep_dm_verity">Zadrži dm-istinitost</string>
@@ -85,8 +79,6 @@
     <string name="repo_install_msg">Da li želiš instalirati %1$s sada?</string>
     <string name="download">Preuzmi</string>
     <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
-    <string name="install_error">Pogreška u instalaciji!</string>
-    <string name="invalid_zip">Ovaj zip nije Magisk modul!</string>
     <string name="reboot">Ponovno podizanje sustava</string>
     <string name="downloading_toast">Preuzimanje %1$s</string>
     <string name="magisk_update_title">Dostupno je novo Magisk ažuriranje!</string>
@@ -100,7 +92,6 @@
     <string name="zip_download_msg">Preuzimanje zip datoteke (%1$d%%) …</string>
     <string name="zip_process_title">Obrada</string>
     <string name="zip_process_msg">Obrada zip datoteke …</string>
-    <string name="manual_boot_image">Ručno odaberite datoteku za podizanje sustava!</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
     <string name="manager_download_install">Pritisnite za preuzimanje i instalaciju</string>
     <string name="magisk_updates">Magisk ažuriranja</string>

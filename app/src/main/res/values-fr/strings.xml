@@ -11,8 +11,6 @@
     <string name="checking_for_updates">Vérification de mises à jour…</string>
     <string name="magisk_update_available">Magisk v%1$s disponible !</string>
     <string name="cannot_check_updates">Impossible de vérifier les mises à jour, pas d\'Internet ?</string>
-    <string name="root_error">Rooté mais aucune permission root, non autorisée ?</string>
-    <string name="not_rooted">Non rooté</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
@@ -21,10 +19,6 @@
 	<string name="safetyNet_service_disconnected">Le service a été tué</string>
 	<string name="safetyNet_res_invalid">La réponse est invalide</string>
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Auto détection impossible)</string>
-    <string name="boot_image_title">Emplacement de l\'image Boot</string>
-    <string name="detect_button">Détection</string>
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
     <string name="keep_dm_verity">Garder dm-verity</string>
@@ -75,8 +69,6 @@
     <string name="repo_install_msg">Voulez-vous installer %1$s maintenant ?</string>
     <string name="download">Télécharger</string>
     <string name="download_file_error">Erreur de téléchargement du fichier</string>
-    <string name="install_error">Échec de l\'installation !</string>
-    <string name="invalid_zip">Ce zip n\'est pas un module Magisk !</string>
     <string name="reboot">Redémarrer</string>
     <string name="zip_process_msg">Exécution du fichier zip…</string>
     <string name="downloading_toast">Téléchargement %1$s</string>
@@ -88,8 +80,7 @@
     <string name="process_error">Erreur de traitement</string>
     <string name="internal_storage">Le zip est stocké dans :\n[Stockage interne]%1$s</string>
     <string name="zip_process_title">Traitement</string>
-    <string name="manual_boot_image">Veuillez sélectionner l\'image boot manuellement !</string>
-	<string name="zip_download_title">Téléchargement</string>
+    <string name="zip_download_title">Téléchargement</string>
 	<string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%)…</string>
 	<string name="manager_update_title">Nouvelle mise à jour de Magisk Manager disponible !</string>
 	<string name="manager_download_install">Appuyez pour télécharger et installer</string>

@@ -15,16 +15,10 @@
     <string name="checking_for_updates">更新を確認中...</string>
     <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
     <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
-    <string name="root_error">Root化はされていますが権限がありません。拒否していませんか？</string>
-    <string name="not_rooted">Root化されていません</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(自動) %1$s</string>
-    <string name="cannot_auto_detect">(自動検出に失敗)</string>
-    <string name="boot_image_title">Bootイメージの位置</string>
-    <string name="detect_button">検出</string>
     <string name="advanced_settings_title">高度な設定</string>
     <string name="keep_force_encryption">強制的な暗号化を維持する</string>
     <string name="keep_dm_verity">dm-verityを維持する</string>
@@ -78,8 +72,6 @@
     <string name="repo_install_msg">%1$s をインストールしますか？</string>
     <string name="download">ダウンロード</string>
     <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
-    <string name="install_error">インストールエラー！</string>
-    <string name="invalid_zip">このzipはMagiskモジュールではありません</string>
     <string name="reboot">再起動</string>
     <string name="zip_process_msg">zipファイルの処理中…</string>
     <string name="downloading_toast">%1$s をダウンロード中</string>
@@ -91,7 +83,6 @@
     <string name="process_error">プロセスエラー</string>
     <string name="internal_storage">zipは:\n[Internal Storage]%1$sに保存されます</string>
     <string name="zip_process_title">処理</string>
-    <string name="manual_boot_image">ブートイメージを手動で選択してください！</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>

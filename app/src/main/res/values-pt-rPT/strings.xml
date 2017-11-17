@@ -15,9 +15,7 @@
 <string name="checking_for_updates">A procurar por atualizações…</string>
 <string name="magisk_update_available">Magisk v%1$s disponível!</string>
 <string name="cannot_check_updates">Não foi possível verificar atualizações, sem internet?</string>
-<string name="root_error">Com root mas sem permissão de root, o acesso foi permitido?</string>
-<string name="not_rooted">Sem root</string>
-<string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
+    <string name="safetyNet_check_text">Pressione para verificar SafetyNet</string>
 <string name="checking_safetyNet_status">A verificar o estado do SafetyNet…</string>
 <string name="safetyNet_check_success">SafetyNet verificado com sucesso</string>
 <string name="safetyNet_api_error">Erro na API SafetyNet</string>
@@ -26,11 +24,7 @@
 <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
 <!--Install Fragment-->
-<string name="auto_detect">(Auto) %1$s</string>
-<string name="cannot_auto_detect">(Não foi auto detetado)</string>
-<string name="boot_image_title">Local da Imagem de Arranque</string>
-<string name="detect_button">Detetar</string>
-<string name="advanced_settings_title">Definições avançadas</string>
+    <string name="advanced_settings_title">Definições avançadas</string>
 <string name="keep_force_encryption">Manter encriptação forçada</string>
 <string name="keep_dm_verity">Manter dm-verity</string>
 <string name="current_magisk_title">Versão instalada: %1$s</string>
@@ -83,9 +77,7 @@
 <string name="repo_install_msg">Deseja instalar%1$s agora?</string>
 <string name="download">Transferir</string>
 <string name="download_file_error">Erro ao transferir ficheiro</string>
-<string name="install_error">Erro na instalação!</string>
-<string name="invalid_zip">Este zip não é um Módulo Magisk!!</string>
-<string name="reboot">Reiniciar</string>
+    <string name="reboot">Reiniciar</string>
 <string name="downloading_toast">A transferir %1$s</string>
 <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
 <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
@@ -99,8 +91,7 @@
 <string name="zip_download_msg">A transferir ficheiro zip (%1$d%%) …</string>
 <string name="zip_process_title">A processar</string>
 <string name="zip_process_msg">A processar ficheiro zip …</string>
-<string name="manual_boot_image">Por Favor, selecione manualmente a imagem de Arranque</string>
-<string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
+    <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
 <string name="manager_download_install">Pressione para transferir e instalar</string>
 <string name="magisk_updates">Atualizações do Magisk</string>
 <string name="flashing">A instalar</string>

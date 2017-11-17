@@ -15,16 +15,10 @@
     <string name="checking_for_updates">Kontrola aktualizací…</string>
     <string name="magisk_update_available">Magisk v%1$s je dostupný!</string>
     <string name="cannot_check_updates">Nelze zkontrolovat aktualizace. Jste připojeni k Internetu?</string>
-    <string name="root_error">Zařízení s rootem ale chybí root povolení, máte jej zpřístupněno?</string>
-    <string name="not_rooted">Nemáte root</string>
     <string name="safetyNet_check_text">Kliknutím zahájíte SafetyNet kontrolu</string>
     <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Nelze zjistit automaticky)</string>
-    <string name="boot_image_title">Umístění Boot Image</string>
-    <string name="detect_button">Zjistit</string>
     <string name="advanced_settings_title">Pokročilá Nastavení</string>
     <string name="keep_force_encryption">Udržet "force encryption"</string>
     <string name="keep_dm_verity">Udržet dm-verity</string>
@@ -78,8 +72,6 @@
     <string name="repo_install_msg">Chcete nainstalovat %1$s ?</string>
     <string name="download">Stáhnout</string>
     <string name="download_file_error">Chyba při Stahování souboru</string>
-    <string name="install_error">Chyba při Instalaci!</string>
-    <string name="invalid_zip">Soubor zip není Magisk Modul!!</string>
     <string name="reboot">Restart</string>
     <string name="zip_process_msg">Zpracování zip souboru …</string>
     <string name="downloading_toast">Stahování %1$s</string>
@@ -91,7 +83,6 @@
     <string name="process_error">Chyba při Zpracování</string>
     <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
     <string name="zip_process_title">Zpracování</string>
-    <string name="manual_boot_image">Ručně vyberte boot image!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Obecné</string>

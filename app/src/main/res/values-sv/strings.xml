@@ -15,8 +15,6 @@
     <string name="checking_for_updates">Söker efter uppdateringar…</string>
     <string name="magisk_update_available">Magisk v%1$s tillgänglig!</string>
     <string name="cannot_check_updates">Kan inte söka efter uppdateringar, inget internet?</string>
-    <string name="root_error">Rootad men inga root-rättigheter, inte tillåtet?</string>
-    <string name="not_rooted">Inte rootad</string>
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
@@ -25,10 +23,6 @@
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Det går inte att auto-detektera)</string>
-    <string name="boot_image_title">Boot-image plats</string>
-    <string name="detect_button">Detektera</string>
     <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
     <string name="keep_dm_verity">Behåll dm-verity</string>
@@ -83,8 +77,6 @@
     <string name="repo_install_msg">Vill du installera %1$s ?</string>
     <string name="download">Ladda ner</string>
     <string name="download_file_error">Fel vid nerladdning av fil</string>
-    <string name="install_error">Installation error!</string>
-    <string name="invalid_zip">ZIP-filen är inte en modul till Magisk!</string>
     <string name="reboot">Starta om</string>
     <string name="zip_process_msg">Bearbetar ZIP-filen …</string>
     <string name="downloading_toast">Laddar ner %1$s</string>
@@ -96,7 +88,6 @@
     <string name="process_error">Processfel</string>
     <string name="internal_storage">ZIP-filen är sparad i:\n[Internal Storage]%1$s</string>
     <string name="zip_process_title">Arbetar</string>
-    <string name="manual_boot_image">Välj manuellt en boot-image!</string>
     <string name="manager_update_title">En uppdatering av Magisk maneger finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
     <string name="magisk_updates">Magiska uppdateringar</string>

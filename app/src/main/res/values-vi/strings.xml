@@ -15,16 +15,10 @@
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
     <string name="magisk_update_available">Magisk v%1$s available!</string>
     <string name="cannot_check_updates">Không thể kiểm tra cập nhật, không có Internet?</string>
-    <string name="root_error">Đã root nhưng không có quyền root, chưa được cho phép?</string>
-    <string name="not_rooted">Chưa root</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Tự động) %1$s</string>
-    <string name="cannot_auto_detect">(Không thể tự phát hiện)</string>
-    <string name="boot_image_title">Vị trí ảnh khởi động</string>
-    <string name="detect_button">Tìm</string>
     <string name="advanced_settings_title">Thiết lập nâng cao</string>
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ dm-verity</string>
@@ -78,8 +72,6 @@
     <string name="repo_install_msg">Bạn muốn cài đặt %1$s ?</string>
     <string name="download">Tải xuống</string>
     <string name="download_file_error">Lỗi tải tập tin</string>
-    <string name="install_error">Lỗi cài đặt!</string>
-    <string name="invalid_zip">Tập tin zip không phải mô-đun Magisk!!</string>
     <string name="reboot">Khởi động lại</string>
     <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
     <string name="downloading_toast">Đang tải xuống %1$s</string>
@@ -91,7 +83,6 @@
     <string name="process_error">Lỗi xử lý</string>
     <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
     <string name="zip_process_title">Đang xử lý</string>
-    <string name="manual_boot_image">Hãy tự chọn một ảnh khởi động!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Chung</string>

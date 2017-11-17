@@ -15,15 +15,10 @@
     <string name="checking_for_updates">正在檢查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="cannot_check_updates">無法檢查更新，沒有網絡連線？</string>
-    <string name="root_error">已 ROOT 但沒有 ROOT 權限，未授予權限？</string>
-    <string name="not_rooted">未 ROOT</string>
     <string name="safetyNet_check_text">點擊啟動 SafetyNet 檢查</string>
     <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(自動) %1$s</string>
-    <string name="boot_image_title">Boot 映像位置</string>
-    <string name="detect_button">偵測</string>
     <string name="advanced_settings_title">高級設置</string>
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保留 dm-verity</string>
@@ -73,8 +68,6 @@
     <string name="repo_install_title">安裝 %1$s</string>
     <string name="repo_install_msg">你想要安裝 %1$s 嗎？</string>
     <string name="download_file_error">下載文件時出錯</string>
-    <string name="install_error">安裝出錯！</string>
-    <string name="invalid_zip">此 zip 文件不是 Magisk 模組！！</string>
     <string name="reboot">重啟</string>
     <string name="zip_process_msg">正在處理 zip 文件 …</string>
     <string name="downloading_toast">正在下載 %1$s</string>
@@ -150,8 +143,6 @@
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
-    <string name="manual_boot_image">請手動選取 boot 映像位置</string>
-    <string name="cannot_auto_detect">(無法自動偵測)</string>
     <string name="settings_notification_summary">有更新的時候顯示通知</string>
     <string name="settings_notification_title">更新通知</string>
     <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide 和 systemless hosts 仍會持續運作</string>

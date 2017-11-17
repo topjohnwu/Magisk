@@ -18,8 +18,6 @@
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="magisk_update_available">Magisk v%1$s dostępny!</string>
     <string name="cannot_check_updates">Nie można sprawdzić dostępności aktualizacji, brak internetu</string>
-    <string name="root_error">Root dostępny, ale dostęp nie przyznany</string>
-    <string name="not_rooted">Brak Roota</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>
@@ -29,10 +27,6 @@
     <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Nie można automatycznie wykryć)</string>
-    <string name="boot_image_title">Lokalizacja Boot Image</string>
-    <string name="detect_button">Wykryj</string>
     <string name="advanced_settings_title">Zaawansowane Ustawienia</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
@@ -88,8 +82,6 @@
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download">Pobierz</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
-    <string name="install_error">Błąd instalacji!</string>
-    <string name="invalid_zip">Ten zip nie jest Modułem Magisk!!</string>
     <string name="reboot">Restart</string>
     <string name="downloading_toast">Pobieranie %1$s</string>
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
@@ -103,7 +95,6 @@
     <string name="zip_download_msg">Pobieranie pliku zip (%1$d%%) …</string>
 	<string name="zip_process_title">Przetwarzanie</string>
 	<string name="zip_process_msg">Przetwarzanie pliku zip …</string>
-	<string name="manual_boot_image">Proszę ręcznie wybrać boot image!</string>
     <string name="manager_update_title">Nowa Wersja Magisk Manager Jest Dostępna!</string>
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
     <string name="magisk_updates">Aktualizacja Magisk</string>

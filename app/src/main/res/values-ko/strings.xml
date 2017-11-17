@@ -15,16 +15,10 @@
     <string name="checking_for_updates">업데이트 확인 중…</string>
     <string name="magisk_update_available">Magisk v%1$s 사용 가능!</string>
     <string name="cannot_check_updates">업데이트를 확인할 수 없음. 인터넷 연결을 확인하세요.</string>
-    <string name="root_error">루팅은 되어 있으나 루트 권한을 얻을 수 없음. 루트 권한 허용 상태를 확인하세요.</string>
-    <string name="not_rooted">루팅이 되어 있지 않음</string>
     <string name="safetyNet_check_text">SafetyNet 체크를 시작하려면 누르기</string>
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(자동) %1$s</string>
-    <string name="cannot_auto_detect">(자동 감지 실패)</string>
-    <string name="boot_image_title">부트 이미지 위치</string>
-    <string name="detect_button">감지</string>
     <string name="advanced_settings_title">고급 설정</string>
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">dm-verity 유지</string>
@@ -77,8 +71,6 @@
     <string name="repo_install_title">%1$s 설치</string>
     <string name="repo_install_msg">정말 %1$s을(를) 설치하시겠습니까?</string>
     <string name="download_file_error">파일 다운로드 오류</string>
-    <string name="install_error">설치 오류!</string>
-    <string name="invalid_zip">이 zip 파일은 Magisk 모듈이 아닙니다!!</string>
     <string name="reboot">다시 시작</string>
     <string name="zip_process_msg">zip 파일 처리 중…</string>
     <string name="downloading_toast">%1$s 다운로드 중</string>
@@ -90,7 +82,6 @@
     <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
     <string name="zip_process_title">처리 중</string>
-    <string name="manual_boot_image">부트 이미지를 직접 선택해 주세요!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">일반</string>

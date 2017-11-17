@@ -15,8 +15,6 @@
     <string name="checking_for_updates">Kontrollin uuendusi...</string>
     <string name="magisk_update_available">Magisk v%1$s on saadaval!</string>
     <string name="cannot_check_updates">Ei saanud uuendusi kontrollida, internet puudub?</string>
-    <string name="root_error">Juurkasutaja on olemas, aga ilma õigusteta, pole lubatud?</string>
-    <string name="not_rooted">Pole juurkasutaja õigusi</string>
     <string name="safetyNet_check_text">Koputa, et alustada SafetyNet\'i kontrolli</string>
     <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut...</string>
     <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>
@@ -26,10 +24,6 @@
     <string name="safetyNet_res_invalid">Vastus on sobimatu</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Automaatne) %1$s</string>
-    <string name="cannot_auto_detect">(Ei saanud automaatselt tuvastada)</string>
-    <string name="boot_image_title">Käivituspildi asukoht</string>
-    <string name="detect_button">Tuvasta</string>
     <string name="advanced_settings_title">Täpsemad seaded</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita dm-verity</string>
@@ -85,8 +79,6 @@
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
     <string name="download">Allalaadimine</string>
     <string name="download_file_error">Faili allalaadimisel esines viga</string>
-    <string name="install_error">Installimise viga!</string>
-    <string name="invalid_zip">See ZIP ei ole Magisk\'i moodul!</string>
     <string name="reboot">Taaskäivita</string>
     <string name="downloading_toast">Laadin %1$s alla</string>
     <string name="magisk_update_title">Saadaval uus Magisk\'i uuendus!</string>
@@ -102,7 +94,6 @@
     <string name="zip_download_msg">Laadin ZIP-faili alla (%1$d%%)...</string>
     <string name="zip_process_title">Töötlen</string>
     <string name="zip_process_msg">Töötlen ZIP-faili...</string>
-    <string name="manual_boot_image">Palun vali käivituspilt käsitsi!</string>
     <string name="manager_update_title">Saadaval uus Magisk Manager uuendus!</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
     <string name="magisk_updates">Magisk\'i uuendused</string>

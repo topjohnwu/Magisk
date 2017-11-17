@@ -15,8 +15,6 @@
     <string name="checking_for_updates">البحث عن تحديثات…</string>
     <string name="magisk_update_available">Magisk v%1$s متاح!</string>
     <string name="cannot_check_updates">لا يمكن التحقق من التحديثات، لا يوجد إنترنت؟</string>
-    <string name="root_error">مروت لكن لا يوجد إذن الروت، غير مسموح به؟</string>
-    <string name="not_rooted">غير مروت</string>
     <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
     <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
@@ -25,10 +23,6 @@
     <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(تلقائي) %1$s</string>
-    <string name="cannot_auto_detect">(لا يمكن الكشف التلقائي)</string>
-    <string name="boot_image_title">موقع ملف الإقلاع</string>
-    <string name="detect_button">تحقق</string>
     <string name="advanced_settings_title">إعدادات متقدمة</string>
     <string name="keep_force_encryption">الحفاظ علي قوه التشفير</string>
     <string name="keep_dm_verity">إبقاء dm-verity</string>
@@ -81,8 +75,6 @@
     <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
     <string name="download">التنزيل</string>
     <string name="download_file_error">خطأ تنزيل الملف</string>
-    <string name="install_error">خطأ في التثبيت!</string>
-    <string name="invalid_zip">الملف المضغوط ليس إضافة Magisk!!</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="zip_process_msg">معالجة الملف المضغوط …</string>
     <string name="downloading_toast">جاري التنزيل %1$s</string>
@@ -94,7 +86,6 @@
     <string name="process_error">خطأ في العملية</string>
     <string name="internal_storage">يتم تخزين الملف المضغوط في:\n[التخزين الداخلي]%1$s</string>
     <string name="zip_process_title">معالجة</string>
-    <string name="manual_boot_image">يرجى تحديد ملف الإقلاع يدوياً!</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">عام</string>

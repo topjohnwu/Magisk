@@ -18,8 +18,6 @@
 	<string name="checking_for_updates">Checando por atualizações…</string>
     <string name="magisk_update_available">Magisk v%1$s disponível!</string>
     <string name="cannot_check_updates">Não é possível verificar se há atualizações</string>
-    <string name="root_error">Rooteado mas sem permissão de root, o acesso foi permitido?</string>
-    <string name="not_rooted">Sem root</string>
     <string name="safetyNet_check_text">Pressione para checar o SafetyNet</string>
     <string name="checking_safetyNet_status">Verificando status do SafetyNet…</string>
 	<string name="safetyNet_check_success">SafetyNet verificado</string>
@@ -29,10 +27,6 @@
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
     <!--Install Fragment-->
-	<string name="auto_detect">(Auto) %1$s</string>
-	<string name="cannot_auto_detect">(Não foi auto detectado)</string>
-    <string name="boot_image_title">Local da Boot Image</string>
-    <string name="detect_button">Detectar</string>
     <string name="advanced_settings_title">Configurações avançadas</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
@@ -88,8 +82,6 @@
     <string name="repo_install_msg">Você deseja instalar%1$s ?</string>
     <string name="download">Baixar</string>
     <string name="download_file_error">Erro ao baixar o arquivo</string>
-    <string name="install_error">Erro na instalação!</string>
-    <string name="invalid_zip">O zip não é um Módulo Magisk!!</string>
     <string name="reboot">Reiniciar</string>
     <string name="downloading_toast">Baixando %1$s</string>
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
@@ -103,8 +95,7 @@
     <string name="zip_download_msg">Baixando o arquivo zip (%1$d%%) …</string>
     <string name="zip_process_title">Processando</string>
 	<string name="zip_process_msg">Processando arquivo zip …</string>
-    <string name="manual_boot_image">Por Favor, selecione manualmente a Boot Image</string>
-	<string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
+    <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
     <string name="manager_download_install">Pressione para baixar e instalar</string>
     <string name="magisk_updates">Atualizações do Magisk</string>
     <string name="flashing">Flasheando</string>

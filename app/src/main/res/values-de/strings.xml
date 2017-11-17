@@ -18,8 +18,6 @@
     <string name="checking_for_updates">Suche nach Updates…</string>
     <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
     <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
-    <string name="root_error">Gerootet, aber keine root-Rechte. Wurde der root-Zugriff verweigert?</string>
-    <string name="not_rooted">Nicht gerootet</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
@@ -28,10 +26,6 @@
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">%1$s (autom.)</string>
-    <string name="cannot_auto_detect">(Erkennung nicht möglich)</string>
-    <string name="boot_image_title">Boot-Image-Pfad</string>
-    <string name="detect_button">Automatisch</string>
     <string name="advanced_settings_title">Erweiterte Optionen</string>
     <string name="keep_force_encryption">\"force encryption\" beibehalten</string>
     <string name="keep_dm_verity">\"dm-verity\"-Test beibehalten</string>
@@ -85,8 +79,6 @@
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
-    <string name="install_error">Fehler bei der Installation!</string>
-    <string name="invalid_zip">Die Zip-Datei ist kein Magisk-Modul!</string>
     <string name="reboot">Neustart</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
@@ -100,7 +92,6 @@
     <string name="zip_download_msg">Lade Zip-Datei herunter (%1$d%%) …</string>
     <string name="zip_process_title">Verarbeite</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
-    <string name="manual_boot_image">Bitte Boot-Image auswählen!</string>
     <string name="manager_update_title">Update für Magisk Manager verfügbar!</string>
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="magisk_updates">Magisk Updates</string>

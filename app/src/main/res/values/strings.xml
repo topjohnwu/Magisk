@@ -18,8 +18,6 @@
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="magisk_update_available">Magisk v%1$s is available!</string>
     <string name="cannot_check_updates">Cannot check for updates, no internet?</string>
-    <string name="root_error">Rooted but no root permission, not allowed?</string>
-    <string name="not_rooted">Not rooted</string>
     <string name="safetyNet_check_text">Tap to start SafetyNet check</string>
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
@@ -29,10 +27,6 @@
     <string name="safetyNet_res_invalid">The response is invalid</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Auto) %1$s</string>
-    <string name="cannot_auto_detect">(Cannot auto detect)</string>
-    <string name="boot_image_title">Boot Image Location</string>
-    <string name="detect_button">Detect</string>
     <string name="advanced_settings_title">Advanced Settings</string>
     <string name="keep_force_encryption">Keep force encryption</string>
     <string name="keep_dm_verity">Keep dm-verity</string>
@@ -88,8 +82,6 @@
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download">Download</string>
     <string name="download_file_error">Error downloading file</string>
-    <string name="install_error">Installation error!</string>
-    <string name="invalid_zip">This zip is not a Magisk Module!</string>
     <string name="reboot">Reboot</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="magisk_update_title">New Magisk Update Available!</string>
@@ -103,7 +95,6 @@
     <string name="zip_download_msg">Downloading zip file (%1$d%%) …</string>
     <string name="zip_process_title">Processing</string>
     <string name="zip_process_msg">Processing zip file …</string>
-    <string name="manual_boot_image">Please manually select a boot image!</string>
     <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install</string>
     <string name="dtbo_patched_title">DTBO was patched!</string>

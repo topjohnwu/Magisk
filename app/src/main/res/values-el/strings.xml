@@ -13,8 +13,6 @@
     <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
     <string name="magisk_update_available">Το Magisk v%1$s είναι διαθέσιμο!</string>
     <string name="cannot_check_updates">Αδυναμία ελέγχου για ενημερώσεις, δεν έχει internet;</string>
-    <string name="root_error">Υπάρχει root αλλά όχι άδεια για root, δεν επιτρέπεται;</string>
-    <string name="not_rooted">Δεν υπάρχει root</string>
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
@@ -23,10 +21,6 @@
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Αυτόματα) %1$s</string>
-    <string name="cannot_auto_detect">(Αδυναμία αυτόματης εύρεσης)</string>
-    <string name="boot_image_title">Τοποθεσία Εικόνας Boot</string>
-    <string name="detect_button">Εύρεση</string>
     <string name="advanced_settings_title">Προηγμένες ρυθμίσεις</string>
     <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση dm-verity</string>
@@ -81,8 +75,6 @@
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
     <string name="download">Λήψη</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
-    <string name="install_error">Σφάλμα εγκατάστασης!</string>
-    <string name="invalid_zip">Αυτό το zip δεν είναι Ενότητα Magisk!!</string>
     <string name="reboot">Επανεκκίνηση</string>
     <string name="zip_process_msg">Επεξεργασία αρχείου zip …</string>
     <string name="downloading_toast">Κατέβασμα %1$s</string>
@@ -94,7 +86,6 @@
     <string name="process_error">Σφάλμα διαδικασίας</string>
     <string name="internal_storage">Το zip είναι αποθηκευμένο σε:\n[Εσωτερική μνήμη]%1$s</string>
     <string name="zip_process_title">Επεξεργασία</string>
-    <string name="manual_boot_image">Παρακαλώ επιλέξτε χειροκίνητα μια εικόνα boot!</string>
     <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="magisk_updates">Ενημερώσεις Magisk</string>

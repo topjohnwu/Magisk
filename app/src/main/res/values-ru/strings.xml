@@ -15,8 +15,6 @@
     <string name="checking_for_updates">Проверка обновлений…</string>
     <string name="magisk_update_available">Доступен Magisk v%1$s!</string>
     <string name="cannot_check_updates">Невозможно проверить наличие обновлений</string>
-    <string name="root_error">Root присутствует, но отсутствует разрешение</string>
-    <string name="not_rooted">Root отсутствует</string>
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
@@ -26,10 +24,6 @@
     <string name="safetyNet_res_invalid">Некорректный ответ</string>
 
     <!--Install Fragment-->
-    <string name="auto_detect">(Авто) %1$s</string>
-    <string name="cannot_auto_detect">(Автоопределение невозможно)</string>
-    <string name="boot_image_title">Расположение boot-образа</string>
-    <string name="detect_button">Определить</string>
     <string name="advanced_settings_title">Расширенные настройки</string>
     <string name="keep_force_encryption">Оставить принуд. шифрование</string>
     <string name="keep_dm_verity">Оставить dm-verity</string>
@@ -85,8 +79,6 @@
     <string name="repo_install_msg">Желаете установить %1$s ?</string>
     <string name="download">Скачать</string>
     <string name="download_file_error">Ошибка скачивания файла</string>
-    <string name="install_error">Ошибка во время установки!</string>
-    <string name="invalid_zip">В архив отсутствует модуль Magisk!</string>
     <string name="reboot">Перезагрузка</string>
     <string name="downloading_toast">Скачивание %1$s</string>
     <string name="magisk_update_title">Доступно новое обновление Magisk!</string>
@@ -100,7 +92,6 @@
     <string name="zip_download_msg">Загрузка архива (%1$d%%) …</string>
     <string name="zip_process_title">Обработка</string>
     <string name="zip_process_msg">Обработка архива…</string>
-    <string name="manual_boot_image">Пожалуйста, выберите вручную boot-образ!</string>
     <string name="manager_update_title">Доступно новое обновление менеджера Magisk!</string>
     <string name="manager_download_install">Нажмите, чтобы скачать и установить</string>
     <string name="magisk_updates">Обновления Magisk</string>
