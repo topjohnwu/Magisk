@@ -40,7 +40,7 @@ public class Repo extends BaseModule {
         if (getVersionCode() < 0) {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
         }
-        if (getTemplateVersion() < Const.Value.MIN_TEMPLATE_VER) {
+        if (getMinMagiskVersion() < Const.Value.MIN_MODULE_VER) {
             throw new IllegalRepoException("Repo [" + repoName + "] is outdated");
         }
     }
@@ -54,6 +54,7 @@ public class Repo extends BaseModule {
         return false;
     }
 
+    @Override
     public ContentValues getContentValues() {
         ContentValues values = super.getContentValues();
         values.put("repo_name", repoName);

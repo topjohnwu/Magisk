@@ -10,7 +10,7 @@ import java.util.List;
 public abstract class BaseModule implements Comparable<BaseModule> {
 
     private String mId = null, mName, mVersion, mAuthor, mDescription;
-    private int mVersionCode = -1, templateVersion = -1;
+    private int mVersionCode = -1, minMagiskVersion = -1;
 
     protected BaseModule() {}
 
@@ -21,7 +21,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         mVersionCode = c.getInt(c.getColumnIndex("versionCode"));
         mAuthor = c.getString(c.getColumnIndex("author"));
         mDescription = c.getString(c.getColumnIndex("description"));
-        templateVersion = c.getInt(c.getColumnIndex("template"));
+        minMagiskVersion = c.getInt(c.getColumnIndex("minMagisk"));
     }
 
     public ContentValues getContentValues() {
@@ -32,7 +32,7 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         values.put("versionCode", mVersionCode);
         values.put("author", mAuthor);
         values.put("description", mDescription);
-        values.put("template", templateVersion);
+        values.put("minMagisk", minMagiskVersion);
         return values;
     }
 
@@ -67,8 +67,9 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                 case "description":
                     mDescription = prop[1];
                     break;
+                case "minMagisk":
                 case "template":
-                    templateVersion = Integer.parseInt(prop[1]);
+                    minMagiskVersion = Integer.parseInt(prop[1]);
                     break;
                 default:
                     break;
@@ -108,8 +109,8 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         return mVersionCode;
     }
 
-    public int getTemplateVersion() {
-        return templateVersion;
+    public int getMinMagiskVersion() {
+        return minMagiskVersion;
     }
 
     @Override

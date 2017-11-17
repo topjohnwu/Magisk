@@ -9,7 +9,6 @@ public class Const {
     public static final String ORIG_PKG_NAME = "com.topjohnwu.magisk";
     public static final String SNET_PKG = "com.topjohnwu.snet";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
-    public static final String DISABLE_INDICATION_PROP = "ro.magisk.disable";
 
     // APK content
     public static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
@@ -142,6 +141,6 @@ public class Const {
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
         public static final int UPDATE_SERVICE_VER = 1;
         public static final int SNET_VER = 3;
-        public static final int MIN_TEMPLATE_VER = 4;
+        public static final int MIN_MODULE_VER = 1400;
     }
 }

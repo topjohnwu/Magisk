@@ -15,7 +15,7 @@ import java.util.List;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VER = 2;
+    private static final int DATABASE_VER = 3;
     private static final String TABLE_NAME = "repos";
 
     private SQLiteDatabase mDb;
@@ -23,12 +23,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
-        mDb = getWritableDatabase();
         mm = Utils.getMagiskManager(context);
+        mDb = getWritableDatabase();
 
         // Clear bad repos
-        mDb.delete(TABLE_NAME, "template<?",
-                new String[] { String.valueOf(Const.Value.MIN_TEMPLATE_VER) });
+        mDb.delete(TABLE_NAME, "minMagisk<?",
+                new String[] { String.valueOf(Const.Value.MIN_MODULE_VER) });
     }
 
     @Override
@@ -38,18 +38,21 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion == 0) {
+        if (oldVersion < 3) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
             db.execSQL(
                     "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " " +
-                    "(id TEXT, name TEXT, version TEXT, versionCode INT, " +
+                    "(id TEXT, name TEXT, version TEXT, versionCode INT, minMagisk INT, " +
                     "author TEXT, description TEXT, repo_name TEXT, last_update INT, " +
                     "PRIMARY KEY(id))");
-            oldVersion++;
+            mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+            oldVersion = 3;
         }
-        if (oldVersion == 1) {
-            db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD template INT");
-            oldVersion++;
-        }
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        onUpgrade(db, 0, DATABASE_VER);
     }
 
     public void clearRepo() {
@@ -86,7 +89,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getRepoCursor() {
-        return mDb.query(TABLE_NAME, null, "template<=?",
+        return mDb.query(TABLE_NAME, null, "minMagisk<=?",
                 new String[] { String.valueOf(mm.magiskVersionCode) },
                 null, null, "name COLLATE NOCASE");
     }

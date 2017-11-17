@@ -163,10 +163,11 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Remove everything, we do not support downgrade
-        db.delete(POLICY_TABLE, null, null);
-        db.delete(LOG_TABLE, null, null);
-        db.delete(SETTINGS_TABLE, null, null);
-        db.delete(STRINGS_TABLE, null, null);
+        db.execSQL("DROP TABLE IF EXISTS " + POLICY_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + LOG_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + SETTINGS_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + STRINGS_TABLE);
+        onUpgrade(db, 0, DATABASE_VER);
     }
 
     public File getDbFile() {
