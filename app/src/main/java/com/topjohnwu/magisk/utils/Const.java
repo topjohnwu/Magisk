@@ -24,7 +24,7 @@ public class Const {
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
-    public static final String BUSYBOXPATH = "/dev/magisk/bin";
+    public static final String BUSYBOX_PATH = "/dev/magisk/bin";
     public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
 
     public static String MAGISK_PATH() {

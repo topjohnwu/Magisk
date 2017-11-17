@@ -168,19 +168,18 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 shell = Shell.getShell();
 
             // Patch boot image
-            shell.run(mList,
+            shell.run(mList, null,
                     "cd " + install,
                     "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'"
-            );
+                            "update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'");
 
             if (TextUtils.equals(mList.get(mList.size() - 1), "Failed!"))
                 return false;
 
-            shell.run(mList,
-                    "mv -f new-boot.img ../ 2>/dev/null",
-                    "mv bin/busybox busybox 2>/dev/null",
-                    "rm -rf bin *.img update-binary 2>/dev/null",
+            shell.run(null, null,
+                    "mv -f new-boot.img ../",
+                    "mv bin/busybox busybox",
+                    "rm -rf bin *.img update-binary",
                     "cd /");
 
             File patched_boot = new File(install.getParent(), "new-boot.img");
@@ -197,7 +196,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 ) {
                     SignBoot.doSignature("/boot", in, out, keyIn, certIn);
                 }
-                shell.run_raw(false, "mv -f " + signed + " " + patched_boot);
+                shell.run_raw(false, false, "mv -f " + signed + " " + patched_boot);
             }
 
             switch (mode) {
@@ -206,7 +205,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     dest.getParentFile().mkdirs();
                     switch (mm.bootFormat) {
                         case ".img":
-                            shell.run_raw(false, "cp -f " + patched_boot + " " + dest);
+                            shell.run_raw(false, false, "cp -f " + patched_boot + " " + dest);
                             break;
                         case ".img.tar":
                             try (

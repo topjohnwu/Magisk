@@ -25,6 +25,7 @@ public class Shell {
     private final Process process;
     private final OutputStream STDIN;
     private final InputStream STDOUT;
+    private final InputStream STDERR;
 
     private static void testRootShell(Shell shell) throws IOException {
         shell.STDIN.write(("id\n").getBytes("UTF-8"));
@@ -41,6 +42,7 @@ public class Shell {
         process = Runtime.getRuntime().exec(command);
         STDIN = process.getOutputStream();
         STDOUT = process.getInputStream();
+        STDERR = process.getErrorStream();
     }
 
     public static Shell getShell() {
@@ -87,12 +89,11 @@ public class Shell {
                 }
 
                 // Root shell initialization
-                mm.shell.run_raw(false,
-                        "export PATH=" + Const.BUSYBOXPATH + ":$PATH",
+                mm.shell.run_raw(false, false,
+                        "export PATH=" + Const.BUSYBOX_PATH + ":$PATH",
                         "mount_partitions",
                         "find_boot_image",
-                        "migrate_boot_backup"
-                );
+                        "migrate_boot_backup");
             }
         }
 
@@ -104,16 +105,20 @@ public class Shell {
         return status > 0;
     }
 
-    public void run(Collection<String> output, String... commands) {
+    public void run(Collection<String> output, Collection<String> error, String... commands) {
+        StreamGobbler out, err;
         synchronized (process) {
             try {
-                StreamGobbler out = new StreamGobbler(STDOUT, output);
+                out = new StreamGobbler(STDOUT, output);
+                err = new StreamGobbler(STDERR, error);
                 out.start();
-                run_raw(true, commands);
-                STDIN.write("echo \'-shell-done-\'\n".getBytes("UTF-8"));
+                err.start();
+                run_raw(output != null, error != null, commands);
+                STDIN.write("echo \'-shell-done-\'\necho \'-shell-done-\' >&2\n".getBytes("UTF-8"));
                 STDIN.flush();
                 try {
                     out.join();
+                    err.join();
                 } catch (InterruptedException ignored) {}
             } catch (IOException e) {
                 e.printStackTrace();
@@ -122,12 +127,15 @@ public class Shell {
         }
     }
 
-    public void run_raw(boolean stdout, String... commands) {
+    public void run_raw(boolean stdout, boolean stderr, String... commands) {
+        String suffix = "\n";
+        if (!stderr) suffix = " 2>/dev/null" + suffix;
+        if (!stdout) suffix = " >/dev/null" + suffix;
         synchronized (process) {
             try {
                 for (String command : commands) {
                     Logger.shell(true, command);
-                    STDIN.write((command + (stdout ? "\n" : " >/dev/null\n")).getBytes("UTF-8"));
+                    STDIN.write((command + suffix).getBytes("UTF-8"));
                     STDIN.flush();
                 }
             } catch (IOException e) {
@@ -140,12 +148,7 @@ public class Shell {
     public void loadInputStream(InputStream in) {
         synchronized (process) {
             try {
-                int read;
-                byte[] bytes = new byte[4096];
-                while ((read = in.read(bytes)) != -1) {
-                    STDIN.write(bytes, 0, read);
-                }
-                STDIN.flush();
+                Utils.inToOut(in, STDIN);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -162,14 +165,14 @@ public class Shell {
         Shell shell = getShell();
         if (shell == null)
             return;
-        shell.run(output, commands);
+        shell.run(output, null, commands);
     }
 
     public static void sh_raw(String... commands) {
         Shell shell = getShell();
         if (shell == null)
             return;
-        shell.run_raw(false, commands);
+        shell.run_raw(false, false, commands);
     }
 
     public static List<String> su(String... commands) {

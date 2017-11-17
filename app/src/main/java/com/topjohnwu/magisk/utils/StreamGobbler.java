@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Modified by topjohnwu, based on Chainfire's libsuperuser
@@ -14,8 +15,8 @@ import java.util.Collection;
 
 public class StreamGobbler extends Thread {
 
-    private BufferedReader reader = null;
-    private Collection<String> writer = null;
+    private BufferedReader reader;
+    private Collection<String> writer;
 
     /**
      * <p>StreamGobbler constructor</p>
@@ -24,17 +25,17 @@ public class StreamGobbler extends Thread {
      * possible to prevent a deadlock from occurring, or Process.waitFor() never
      * returning (as the buffer is full, pausing the native process)</p>
      *
-     * @param inputStream InputStream to read from
-     * @param outputList  {@literal List<String>} to write to, or null
+     * @param in InputStream to read from
+     * @param out  {@literal List<String>} to write to, or null
      */
-    public StreamGobbler(InputStream inputStream, Collection<String> outputList) {
+    public StreamGobbler(InputStream in, Collection<String> out) {
         try {
-            while (inputStream.available() != 0) {
-                inputStream.skip(inputStream.available());
+            while (in.available() != 0) {
+                in.skip(in.available());
             }
         } catch (IOException ignored) {}
-        reader = new BufferedReader(new InputStreamReader(inputStream));
-        writer = outputList;
+        reader = new BufferedReader(new InputStreamReader(in));
+        writer = out == null ? null : Collections.synchronizedCollection(out);
     }
 
     @Override
@@ -45,7 +46,7 @@ public class StreamGobbler extends Thread {
             while ((line = reader.readLine()) != null) {
                 if (TextUtils.equals(line, "-shell-done-"))
                     return;
-                writer.add(line);
+                if (writer != null) writer.add(line);
                 Logger.shell(false, line);
             }
         } catch (IOException e) {
