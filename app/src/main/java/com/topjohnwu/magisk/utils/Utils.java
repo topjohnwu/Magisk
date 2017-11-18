@@ -225,13 +225,15 @@ public class Utils {
         }
     }
 
-    public static void inToOut(InputStream in, OutputStream out) throws IOException {
-        int read;
+    public static int inToOut(InputStream in, OutputStream out) throws IOException {
+        int read, total = 0;
         byte buffer[] = new byte[4096];
         while ((read = in.read(buffer)) > 0) {
             out.write(buffer, 0, read);
+            total += read;
         }
         out.flush();
+        return total;
     }
 
     public static void patchDTBO() {

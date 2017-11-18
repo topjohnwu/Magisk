@@ -49,28 +49,28 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         mHandler = new Handler();
     }
 
-    private void removeTopFolder(InputStream in, File output) throws IOException {
-        JarInputStream source = new JarInputStream(in);
-        JarOutputStream dest = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
+    private void removeTopFolder(File input, File output) throws IOException {
         JarEntry entry;
-        String path;
-        while ((entry = source.getNextJarEntry()) != null) {
-            // Remove the top directory from the path
-            path = entry.getName().substring(entry.getName().indexOf("/") + 1);
-            // If it's the top folder, ignore it
-            if (path.isEmpty()) {
-                continue;
+        try (
+            JarInputStream in = new JarInputStream(new BufferedInputStream(new FileInputStream(input)));
+            JarOutputStream out = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)))
+        ) {
+            String path;
+            while ((entry = in.getNextJarEntry()) != null) {
+                // Remove the top directory from the path
+                path = entry.getName().substring(entry.getName().indexOf("/") + 1);
+                // If it's the top folder, ignore it
+                if (path.isEmpty()) {
+                    continue;
+                }
+                // Don't include placeholder
+                if (path.equals("system/placeholder")) {
+                    continue;
+                }
+                out.putNextEntry(new JarEntry(path));
+                Utils.inToOut(in, out);
             }
-            // Don't include placeholder
-            if (path.equals("system/placeholder")) {
-                continue;
-            }
-            dest.putNextEntry(new JarEntry(path));
-            Utils.inToOut(source, dest);
         }
-        source.close();
-        dest.close();
-        in.close();
     }
 
     @Override
@@ -97,41 +97,37 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                     break;
             } while (true);
 
-            InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
-
             // Temp files
             File temp1 = new File(activity.getCacheDir(), "1.zip");
             File temp2 = new File(temp1.getParentFile(), "2.zip");
             temp1.getParentFile().mkdir();
 
-            // First remove top folder in Github source zip, Web -> temp1
-            removeTopFolder(in, temp1);
-
+            // First download the zip, Web -> temp1
+            try (
+                InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))
+            ) {
+                Utils.inToOut(in, out);
+                in.close();
+            }
             conn.disconnect();
+
             mHandler.post(() -> {
                 progressDialog.setTitle(R.string.zip_process_title);
                 progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
             });
 
-            // Then sign the zip for the first time, temp1 -> temp2
-            ZipUtils.signZip(temp1, temp2, false);
+            // First remove top folder in Github source zip, temp1 -> temp2
+            removeTopFolder(temp1, temp2);
 
-            // Adjust the zip to prevent unzip issues, temp2 -> temp1
-            ZipUtils.zipAdjust(temp2.getPath(), temp1.getPath());
+            // Then sign the zip for the first time, temp2 -> temp1
+            ZipUtils.signZip(temp2, temp1, false);
 
-            // Finally, sign the whole zip file again, temp1 -> temp2
-            ZipUtils.signZip(temp1, temp2, true);
+            // Adjust the zip to prevent unzip issues, temp1 -> temp2
+            ZipUtils.zipAdjust(temp1.getPath(), temp2.getPath());
 
-            // Write it to the target zip, temp2 -> file
-            try (
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(mFile));
-                InputStream source = new BufferedInputStream(new FileInputStream(temp2))
-            ) {
-                byte[] buffer = new byte[4096];
-                int length;
-                while ((length = source.read(buffer)) > 0)
-                    out.write(buffer, 0, length);
-            }
+            // Finally, sign the whole zip file again, temp2 -> target
+            ZipUtils.signZip(temp2, mFile, true);
 
             // Delete temp files
             temp1.delete();
@@ -149,8 +145,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         Activity activity = getActivity();
         if (activity == null) return;
         progressDialog.dismiss();
-        Uri uri = Uri.fromFile(mFile);
         if (result) {
+            Uri uri = Uri.fromFile(mFile);
             if (Shell.rootAccess() && mInstall) {
                 Intent intent = new Intent(activity, FlashActivity.class);
                 intent.setData(uri).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
