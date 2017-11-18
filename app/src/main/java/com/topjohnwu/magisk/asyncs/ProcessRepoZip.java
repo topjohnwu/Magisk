@@ -179,7 +179,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
         private void updateDlProgress(int step) {
             progress += step;
-            progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, 100 * progress / total));
+            progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, (int) (100 * (double) progress / total + 0.5)));
         }
 
         @Override
