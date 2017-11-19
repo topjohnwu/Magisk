@@ -132,6 +132,8 @@
     <string name="settings_update_channel_title">Canal de Actualización</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Personalizado</string>
+    <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
     <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
     <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
     
