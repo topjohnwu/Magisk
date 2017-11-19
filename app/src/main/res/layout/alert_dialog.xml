@@ -9,26 +9,19 @@
         android:id="@+id/message_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="12dip"
+        android:paddingEnd="20dip"
+        android:paddingStart="20dip"
+        android:paddingTop="12dip">
 
-        <ScrollView
+        <TextView
+            android:id="@+id/message"
+            style="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:overScrollMode="ifContentScrolls"
-            android:paddingBottom="12dip"
-            android:paddingEnd="20dip"
-            android:paddingStart="20dip"
-            android:paddingTop="12dip">
-
-            <TextView
-                android:id="@+id/message"
-                style="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip" />
-
-        </ScrollView>
+            android:padding="5dip" />
 
     </LinearLayout>
 

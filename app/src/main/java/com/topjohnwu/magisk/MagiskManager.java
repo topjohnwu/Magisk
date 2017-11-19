@@ -75,6 +75,7 @@ public class MagiskManager extends Application {
     public String localeConfig;
     public int updateChannel;
     public String bootFormat;
+    public String customChannelUrl;
 
     // Global resources
     public SharedPreferences prefs;
@@ -152,6 +153,7 @@ public class MagiskManager extends Application {
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
         snet_version = prefs.getInt(Const.Key.SNET_VER, -1);
         updateServiceVersion = prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1);
+        customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
     }
 
     public static void toast(String msg, int duration) {

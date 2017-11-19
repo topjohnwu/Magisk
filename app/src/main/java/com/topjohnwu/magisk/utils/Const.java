@@ -68,7 +68,7 @@ public class Const {
 
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
-        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
+        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
         public static final String SNET_URL = "https://www.dropbox.com/s/vbq6y8pzfn4rq60/snet.apk?dl=1";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
@@ -104,6 +104,7 @@ public class Const {
         // others
         public static final String UPDATE_NOTIFICATION = "notification";
         public static final String UPDATE_CHANNEL = "update_channel";
+        public static final String CUSTOM_CHANNEL = "custom_channel";
         public static final String BOOT_FORMAT = "boot_format";
         public static final String SNET_VER = "snet_version";
         public static final String UPDATE_SERVICE_VER = "update_service_version";
@@ -121,6 +122,7 @@ public class Const {
     public static class Value {
         public static final int STABLE_CHANNEL = 0;
         public static final int BETA_CHANNEL = 1;
+        public static final int CUSTOM_CHANNEL = 2;
         public static final int ROOT_ACCESS_DISABLED = 0;
         public static final int ROOT_ACCESS_APPS_ONLY = 1;
         public static final int ROOT_ACCESS_ADB_ONLY = 2;

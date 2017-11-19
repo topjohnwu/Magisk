@@ -24,7 +24,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
-        String jsonStr;
+        String jsonStr = "";
         switch (mm.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
                 jsonStr = WebService.getString(Const.Url.STABLE_URL);
@@ -32,8 +32,9 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             case Const.Value.BETA_CHANNEL:
                 jsonStr = WebService.getString(Const.Url.BETA_URL);
                 break;
-            default:
-                jsonStr = null;
+            case Const.Value.CUSTOM_CHANNEL:
+                jsonStr = WebService.getString(mm.customChannelUrl);
+                break;
         }
         try {
             JSONObject json = new JSONObject(jsonStr);

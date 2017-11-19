@@ -8,16 +8,19 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
@@ -71,8 +74,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     }
 
     public static class SettingsFragment extends PreferenceFragment
-            implements SharedPreferences.OnSharedPreferenceChangeListener,
-            Topic.Subscriber {
+            implements SharedPreferences.OnSharedPreferenceChangeListener, Topic.Subscriber {
 
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
@@ -86,16 +88,16 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.app_settings);
-            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            prefScreen = getPreferenceScreen();
             mm = Utils.getMagiskManager(getActivity());
+            prefs = mm.prefs;
+            prefScreen = getPreferenceScreen();
 
             generalCatagory = (PreferenceCategory) findPreference("general");
             PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
             PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
             Preference hideManager = findPreference("hide");
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+                prefs.edit().remove(Const.Key.ETAG_KEY).apply();
                 mm.repoDB.clearRepo();
                 MagiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
                 return true;
@@ -110,6 +112,32 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             namespaceMode = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
             SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
 
+            updateChannel.setOnPreferenceChangeListener((pref, o) -> {
+                mm.updateChannel = Integer.parseInt((String) o);
+                if (mm.updateChannel == Const.Value.CUSTOM_CHANNEL) {
+                    LinearLayout layout = new LinearLayout(getActivity());
+                    EditText url = new EditText(getActivity());
+                    url.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                    url.setText(mm.customChannelUrl);
+                    layout.setOrientation(LinearLayout.VERTICAL);
+                    layout.addView(url);
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) url.getLayoutParams();
+                    params.setMargins(Utils.dpInPx(15), 0, Utils.dpInPx(15), 0);
+                    new AlertDialogBuilder(getActivity())
+                        .setTitle(R.string.settings_update_custom)
+                        .setMessage(R.string.settings_update_custom_msg)
+                        .setView(layout)
+                        .setPositiveButton(R.string.ok, (d, i) -> {
+                            prefs.edit().putString(Const.Key.CUSTOM_CHANNEL, url.getText().toString()).apply();
+                        })
+                        .setNegativeButton(R.string.close, (d, i) -> {
+                            mm.updateChannel = Const.Value.STABLE_CHANNEL;
+                            prefs.edit().putString(Const.Key.UPDATE_CHANNEL, String.valueOf(Const.Value.STABLE_CHANNEL)).apply();
+                        })
+                        .show();
+                }
+                return true;
+            });
 
             setSummary();
 
@@ -235,8 +263,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     mm.reloadActivity.publish(false);
                     break;
                 case Const.Key.UPDATE_CHANNEL:
-                    mm.updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL);
-                    new CheckUpdates(true).exec();
+                    new CheckUpdates().exec();
                     break;
             }
             mm.loadConfig();

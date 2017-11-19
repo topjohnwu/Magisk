@@ -135,6 +135,8 @@
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Custom</string>
+    <string name="settings_update_custom_msg">Insert a custom URL</string>
     <string name="settings_boot_format_title">Patched Boot Output Format</string>
     <string name="settings_boot_format_summary">Select the format of the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
     <string name="settings_core_only_title">Magisk Core Only Mode</string>

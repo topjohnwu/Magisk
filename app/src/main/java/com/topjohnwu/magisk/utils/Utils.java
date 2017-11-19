@@ -244,4 +244,10 @@ public class Utils {
             }
         }
     }
+
+    public static int dpInPx(int dp) {
+        Context context = MagiskManager.get();
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * scale + 0.5);
+    }
 }
