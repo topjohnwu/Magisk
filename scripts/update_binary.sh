@@ -11,7 +11,7 @@ INSTALLER=$TMPDIR/install; BBDIR=$TMPDIR/bin
 EXBIN=$BBDIR/b64xz; BBBIN=$BBDIR/busybox
 $INDEP || rm -rf $TMPDIR 2>/dev/null;
 mkdir -p $BBDIR 2>/dev/null
-touch $EXBIN $BBBIN; chmod 755 $EXBIN $BBBIN
+touch $EXBIN; touch $BBBIN; chmod 755 $EXBIN $BBBIN
 echo -ne $EX_ARM > $EXBIN
 if $EXBIN --test 2>/dev/null; then
   echo $BB_ARM | $EXBIN > $BBBIN
