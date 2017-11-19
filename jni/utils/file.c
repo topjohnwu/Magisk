@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/sendfile.h>
 #include <sys/mman.h>
+#include <linux/fs.h>
 
 #ifndef NO_SELINUX
 #include <selinux/selinux.h>
@@ -337,20 +338,24 @@ void restorecon(int dirfd, int force) {
 
 #endif   // NO_SELINUX
 
-void mmap_ro(const char *filename, void **buf, size_t *size) {
-	int fd = xopen(filename, O_RDONLY);
-	*size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ, MAP_SHARED, fd, 0) : NULL;
+static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
+	struct stat st;
+	stat(filename, &st);
+	int fd = xopen(filename, rw ? O_RDWR : O_RDONLY);
+	if (S_ISBLK(st.st_mode))
+		ioctl(fd, BLKGETSIZE64, size);
+	else
+		*size = st.st_size;
+	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : NULL;
 	close(fd);
 }
 
+void mmap_ro(const char *filename, void **buf, size_t *size) {
+	_mmap(0, filename, buf, size);
+}
+
 void mmap_rw(const char *filename, void **buf, size_t *size) {
-	int fd = xopen(filename, O_RDWR);
-	*size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0) : NULL;
-	close(fd);
+	_mmap(1, filename, buf, size);
 }
 
 void full_read(int fd, void **buf, size_t *size) {
