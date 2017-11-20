@@ -146,7 +146,7 @@ public class Const {
         public static final String FLASH_MAGISK = "magisk";
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
         public static final int UPDATE_SERVICE_VER = 1;
-        public static final int SNET_VER = 3;
+        public static final int SNET_VER = 4;
         public static final int MIN_MODULE_VER = 1400;
     }
 }

@@ -26,5 +26,5 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.gms:play-services-safetynet:11.4.2'
+    implementation 'com.google.android.gms:play-services-safetynet:11.6.0'
 }
