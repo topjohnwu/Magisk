@@ -14,7 +14,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk is not installed</string>
-
     <string name="checking_for_updates">Checking for updates…</string>
     <string name="magisk_update_available">Magisk v%1$s is available!</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
@@ -118,6 +117,7 @@
     <string name="uninstall_toast">Uninstalling Magisk Manager in 5 seconds, please manually reboot afterwards</string>
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS so doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="su_db_corrupt">SU database is corrupted, will recreate new db</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

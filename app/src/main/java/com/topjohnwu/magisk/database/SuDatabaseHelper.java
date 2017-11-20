@@ -9,8 +9,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.utils.Shell;
@@ -171,6 +173,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        MagiskManager.toast(R.string.su_db_corrupt, Toast.LENGTH_LONG);
         // Remove everything, we do not support downgrade
         db.execSQL("DROP TABLE IF EXISTS " + POLICY_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + LOG_TABLE);
