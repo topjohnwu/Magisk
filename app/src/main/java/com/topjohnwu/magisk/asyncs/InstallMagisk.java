@@ -204,21 +204,22 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
             switch (mode) {
                 case PATCH_MODE:
-                    File dest = new File(Const.EXTERNAL_PATH, patched_boot + mm.bootFormat);
+                    File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + mm.bootFormat);
                     dest.getParentFile().mkdirs();
+                    OutputStream out;
                     switch (mm.bootFormat) {
-                        case ".img":
-                            shell.run_raw(false, false, "cp -f " + patched_boot + " " + dest);
-                            break;
                         case ".img.tar":
-                            try (
-                                TarOutputStream tar = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
-                                InputStream in = new FileInputStream(patched_boot)
-                            ) {
-                                tar.putNextEntry(new TarEntry(patched_boot, "boot.img"));
-                                Utils.inToOut(in, tar);
-                            }
+                            out = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
+                            ((TarOutputStream) out).putNextEntry(new TarEntry(patched_boot, "boot.img"));
                             break;
+                        default:
+                        case ".img":
+                            out = new BufferedOutputStream(new FileOutputStream(dest));
+                            break;
+                    }
+                    try (InputStream in = new BufferedInputStream(new FileInputStream(patched_boot))) {
+                        Utils.inToOut(in, out);
+                        out.close();
                     }
                     console.add("");
                     console.add("*********************************");
@@ -234,12 +235,13 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             "mv -f " + install + "/* /data/magisk",
                             "rm -rf " + install,
                             "flash_boot_image " + patched_boot + " " + mBootLocation,
-                            "rm -rf " + patched_boot,
                             "patch_dtbo_image");
                     break;
                 default:
                     return false;
             }
+
+            patched_boot.delete();
 
             console.add("- All done!");
         } catch (Exception e) {
