@@ -85,12 +85,16 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         // Check if we are linked globally
         List<String> ret = Shell.sh("ls -l " + suDbFile);
         if (Utils.isValidShellResponse(ret)) {
-            int links = Integer.parseInt(ret.get(0).trim().split("\\s+")[1]);
-            if (links < 2) {
-                mm.suDB.close();
-                suDbFile.delete();
-                new File(suDbFile + "-journal").delete();
-                mm.suDB = new SuDatabaseHelper();
+            try {
+                int links = Integer.parseInt(ret.get(0).trim().split("\\s+")[1]);
+                if (links < 2) {
+                    mm.suDB.close();
+                    suDbFile.delete();
+                    new File(suDbFile + "-journal").delete();
+                    mm.suDB = new SuDatabaseHelper();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

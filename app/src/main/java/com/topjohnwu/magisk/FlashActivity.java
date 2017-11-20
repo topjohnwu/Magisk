@@ -49,7 +49,7 @@ public class FlashActivity extends Activity {
 
     @OnClick(R.id.reboot)
     void reboot() {
-        Shell.su_raw("reboot");
+        Shell.su_raw("/system/bin/reboot");
     }
 
     @OnClick(R.id.save_logs)

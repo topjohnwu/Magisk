@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Đang kiểm tra cập nhật…</string>
     <string name="magisk_update_available">Magisk v%1$s available!</string>
-    <string name="cannot_check_updates">Không thể kiểm tra cập nhật, không có Internet?</string>
     <string name="safetyNet_check_text">Chạm để bắt đầu kiểm tra SafetyNet</string>
     <string name="checking_safetyNet_status">Đang kiểm tra trạng thái SafetyNet…</string>
 

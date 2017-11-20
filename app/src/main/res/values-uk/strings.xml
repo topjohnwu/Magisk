@@ -13,7 +13,6 @@
 
     <string name="checking_for_updates">Перевірка оновлень…</string>
     <string name="magisk_update_available">Доступно Magisk v%1$s!</string>
-    <string name="cannot_check_updates">Неможливо перевірити наявність оновлень</string>
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Перевірку SafetyNet завершено</string>

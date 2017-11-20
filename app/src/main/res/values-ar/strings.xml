@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">البحث عن تحديثات…</string>
     <string name="magisk_update_available">Magisk v%1$s متاح!</string>
-    <string name="cannot_check_updates">لا يمكن التحقق من التحديثات، لا يوجد إنترنت؟</string>
     <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
     <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="safetyNet_check_success">نجح فحص SafetyNet</string>

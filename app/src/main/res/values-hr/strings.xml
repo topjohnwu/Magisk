@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Provjera ažuriranja...</string>
     <string name="magisk_update_available">Dostupna je Maigsk inačica v%1$s!</string>
-    <string name="cannot_check_updates">Nije moguće provjeriti ažuriranja, nema interneta?</string>
     <string name="safetyNet_check_text">Dodirni za SafetyNet provjeru</string>
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
     <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>

@@ -14,7 +14,6 @@
 	
     <string name="checking_for_updates">Controllo aggiornamenti…</string>
     <string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
-    <string name="cannot_check_updates">Impossibile controllare gli aggiornamenti</string>
     <string name="safetyNet_check_text">Tocca per controllare SafetyNet</string>
     <string name="checking_safetyNet_status">Controllo stato di SafetyNet</string>
     <string name="safetyNet_check_success">Controllo di SafetyNet OK</string>

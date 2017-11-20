@@ -10,7 +10,6 @@
     <string name="magisk_version_error">Magisk non installé</string>
     <string name="checking_for_updates">Vérification de mises à jour…</string>
     <string name="magisk_update_available">Magisk v%1$s disponible !</string>
-    <string name="cannot_check_updates">Impossible de vérifier les mises à jour, pas d\'Internet ?</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>

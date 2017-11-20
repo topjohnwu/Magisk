@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">更新を確認中...</string>
     <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
-    <string name="cannot_check_updates">更新を確認できませんでした。インターネットに接続されていますか？</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
     <string name="checking_safetyNet_status">SafetyNet Statusをチェック中…</string>
 

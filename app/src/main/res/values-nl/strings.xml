@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Controleren op updates…</string>
     <string name="magisk_update_available">Magisk v%1$s beschikbaar!</string>
-    <string name="cannot_check_updates">Kan niet controleren op updates. Geen internet?</string>
     <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
     <string name="safetyNet_check_success">SafetyNet controle succesvol</string>

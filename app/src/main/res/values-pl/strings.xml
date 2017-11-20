@@ -17,7 +17,6 @@
 
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="magisk_update_available">Magisk v%1$s dostępny!</string>
-    <string name="cannot_check_updates">Nie można sprawdzić dostępności aktualizacji, brak internetu</string>
     <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>

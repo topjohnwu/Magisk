@@ -12,7 +12,6 @@
 
     <string name="checking_for_updates">Verificare actualizări…</string>
     <string name="magisk_update_available">Magisk v%1$s disponibil!</string>
-    <string name="cannot_check_updates">Nu se pot verifica actualizările, nu este internet?</string>
     <string name="safetyNet_check_text">Verificare SafetyNet</string>
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
 

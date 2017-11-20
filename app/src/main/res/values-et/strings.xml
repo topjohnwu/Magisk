@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Kontrollin uuendusi...</string>
     <string name="magisk_update_available">Magisk v%1$s on saadaval!</string>
-    <string name="cannot_check_updates">Ei saanud uuendusi kontrollida, internet puudub?</string>
     <string name="safetyNet_check_text">Koputa, et alustada SafetyNet\'i kontrolli</string>
     <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut...</string>
     <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>

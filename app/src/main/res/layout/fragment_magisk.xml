@@ -309,7 +309,7 @@
 
                     <TextView
                         android:id="@+id/install_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="180dp"
                         android:layout_height="match_parent"
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"

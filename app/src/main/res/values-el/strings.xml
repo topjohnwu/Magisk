@@ -12,7 +12,6 @@
 
     <string name="checking_for_updates">Έλεγχος για ενημερώσεις…</string>
     <string name="magisk_update_available">Το Magisk v%1$s είναι διαθέσιμο!</string>
-    <string name="cannot_check_updates">Αδυναμία ελέγχου για ενημερώσεις, δεν έχει internet;</string>
     <string name="safetyNet_check_text">Πατήστε για έλεγχο του SafetyNet</string>
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>

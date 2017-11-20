@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Kontrola aktualizací…</string>
     <string name="magisk_update_available">Magisk v%1$s je dostupný!</string>
-    <string name="cannot_check_updates">Nelze zkontrolovat aktualizace. Jste připojeni k Internetu?</string>
     <string name="safetyNet_check_text">Kliknutím zahájíte SafetyNet kontrolu</string>
     <string name="checking_safetyNet_status">Kontrola stavu SafetyNet…</string>
 

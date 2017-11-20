@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">업데이트 확인 중…</string>
     <string name="magisk_update_available">Magisk v%1$s 사용 가능!</string>
-    <string name="cannot_check_updates">업데이트를 확인할 수 없음. 인터넷 연결을 확인하세요.</string>
     <string name="safetyNet_check_text">SafetyNet 체크를 시작하려면 누르기</string>
     <string name="checking_safetyNet_status">SafetyNet 상태 확인 중…</string>
 

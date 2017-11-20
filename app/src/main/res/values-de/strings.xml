@@ -17,7 +17,6 @@
 
     <string name="checking_for_updates">Suche nach Updates…</string>
     <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
-    <string name="cannot_check_updates">Updatesuche fehlgeschlagen.\nIst eine Internetverbindung verfügbar?</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>

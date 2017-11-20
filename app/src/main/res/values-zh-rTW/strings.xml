@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">正在檢查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
-    <string name="cannot_check_updates">無法檢查更新，沒有網絡連線？</string>
     <string name="safetyNet_check_text">點擊啟動 SafetyNet 檢查</string>
     <string name="checking_safetyNet_status">正在檢查 SafetyNet 狀態…</string>
 
@@ -204,5 +203,8 @@
     <string name="dtbo_patched_reboot">Magisk Manager 已為 dtbo.img 打上補丁，請立即重新啟動</string>
     <string name="hide_manager_toast2">這可能會花上一段時間…</string>
     <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名稱重新打包，以達成隱藏效果</string>
+    <string name="invalid_update_channel">不合法的更新頻道</string>
+    <string name="settings_update_custom">自訂</string>
+    <string name="settings_update_custom_msg">請輸入自訂網址</string>
 
 </resources>

@@ -14,7 +14,6 @@
 
     <string name="checking_for_updates">Söker efter uppdateringar…</string>
     <string name="magisk_update_available">Magisk v%1$s tillgänglig!</string>
-    <string name="cannot_check_updates">Kan inte söka efter uppdateringar, inget internet?</string>
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>

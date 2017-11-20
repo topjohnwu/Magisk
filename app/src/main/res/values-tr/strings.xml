@@ -13,7 +13,6 @@
 
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
-    <string name="cannot_check_updates">Güncelleştirmeler denetlenemiyor, İnternet bağlantınız yok mu?</string>
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
