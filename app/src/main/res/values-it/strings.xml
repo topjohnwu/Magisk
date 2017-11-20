@@ -14,6 +14,7 @@
 	
     <string name="checking_for_updates">Controllo aggiornamenti…</string>
     <string name="magisk_update_available">È disponibile Magisk v%1$s!</string>
+    <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
     <string name="safetyNet_check_text">Tocca per controllare SafetyNet</string>
     <string name="checking_safetyNet_status">Controllo stato di SafetyNet</string>
     <string name="safetyNet_check_success">Controllo di SafetyNet OK</string>
@@ -49,7 +50,7 @@
     <string name="not_installed">Non installato</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveLog">Salva registro</string>
+    <string name="menuSaveLog">Salva registro eventi</string>
     <string name="menuReload">Ricarica</string>
     <string name="menuClearLog">Pulisci registro eventi</string>
     <string name="logs_cleared">Registro eventi creato correttamente</string>
@@ -114,6 +115,7 @@
     <string name="uninstall_toast">Disinstallazione di Magisk Manager in 5 secondi, riavvia manualmente per completare</string>
     <string name="proprietary_title">Scarica codice proprietario</string>
     <string name="proprietary_notice">Magisk Manager è FOSS, quindi non contiene il codice proprietario delle API Google SafetyNet.\n\nVuoi permettere il download di un\'estensione (che contiene GoogleApiClient) per controllare lo stato di SafetyNet?</string>
+    <string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Generale</string>
@@ -131,6 +133,8 @@
     <string name="settings_update_channel_title">Canale di aggiornamento</string>
     <string name="settings_update_stable">Stabile</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Personalizzato</string>
++   <string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
     <string name="settings_boot_format_title">Formato dell\'immagine di boot aggiornata</string>    
     <string name="settings_boot_format_summary">Seleziona il formato nel quale l\'immagine di boot verrà salvata. .\nSeleziona .img per il flash in fastboot/download mode; Seleziona .img.tar per il flash con Odin.</string>													   
     <string name="settings_core_only_title">Modalità Magisk Core</string>							
@@ -152,8 +156,8 @@
     <string name="request_timeout">Timeout richiesta</string>
     <string name="superuser_notification">Notifica Superuser</string>
     <string name="request_timeout_summary">%1$s secondi</string>
-    <string name="settings_su_reauth_title">Ri-autentifica dopo un aggiornamento</string>
-    <string name="settings_su_reauth_summary">Ri-autentifica permessi Superuser dopo aggiornamento applicazione</string>
+    <string name="settings_su_reauth_title">Ri-autentica dopo un aggiornamento</string>
+    <string name="settings_su_reauth_summary">Ri-autentica permessi Superuser dopo aggiornamento applicazione</string>
     
     <string name="multiuser_mode">Modalità multiutente</string>    
     <string name="settings_owner_only">Solo proprietario del dispositivo</string>
