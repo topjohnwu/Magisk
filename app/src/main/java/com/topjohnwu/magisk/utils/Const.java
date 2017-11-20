@@ -69,7 +69,7 @@ public class Const {
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
-        public static final String SNET_URL = "https://www.dropbox.com/s/vbq6y8pzfn4rq60/snet.apk?dl=1";
+        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/c0e60c41f26744a86d90dfbd368a73c847db6b70/snet.apk";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
