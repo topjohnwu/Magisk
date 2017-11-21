@@ -14,6 +14,7 @@
 
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
+    <string name="invalid_update_channel">Canal de actualización inválido</string>
     <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
@@ -114,7 +115,7 @@
     <string name="uninstall_toast">Desinstalación de Magisk Manager en 5 segundos, por favor después reinicie manualmente </string>
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
- 
+    <string name="su_db_corrupt">La base de datos SU está dañada, se creará nueva base de datos</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
