@@ -13,6 +13,7 @@
     <string name="magisk_version_error">未安装 Magisk</string>
     <string name="checking_for_updates">正在检查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
+    <string name="invalid_update_channel">无效的更新通道</string>
     <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
@@ -60,7 +61,7 @@
     <string name="app_developers">主要开发者</string>
     <string name="app_developers_"><![CDATA[此应用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 与 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作开发。]]></string>
     <string name="app_changelog">应用更新日志</string>
-    <string name="translators">gh2923</string>
+    <string name="translators">gh2923, vvb2060</string>
     <string name="app_version">应用版本</string>
     <string name="app_source_code">源代码</string>
     <string name="donation">捐赠</string>
@@ -113,6 +114,7 @@
     <string name="uninstall_toast">将在 5 秒内卸载 Magisk Manager，接下来请手动重新启动</string>
     <string name="proprietary_title">下载专有代码</string>
     <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n你允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
+    <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -130,9 +132,10 @@
     <string name="settings_update_channel_title">更新通道</string>
     <string name="settings_update_stable">稳定版</string>
     <string name="settings_update_beta">测试版</string>
+    <string name="settings_update_custom">自定义</string>
+    <string name="settings_update_custom_msg">请输入自定义网址</string>
     <string name="settings_boot_format_title">已修补的 Boot 镜像输出格式</string>
     <string name="settings_boot_format_summary">选择已修补的 Boot 镜像文件输出格式\n若要通过 fastboot/download 模式刷入，请选择 .img 格式；若要通过 Odin 刷入，则选择 .img.tar\n</string>
-
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
