@@ -148,7 +148,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 suCategory.removePreference(reauth);
             }
 
-            if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
+            if (mm.getPackageName().equals(Const.ORIG_PKG_NAME) && mm.magiskVersionCode >= 1440) {
                 hideManager.setOnPreferenceClickListener((pref) -> {
                     Utils.runWithPermission(getActivity(),
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
