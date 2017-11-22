@@ -25,10 +25,10 @@
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Impostazioni avanzate</string>
-    <string name="keep_force_encryption">Mantieni la crittografia forzata</string>
+    <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni dm-verity</string>
-    <string name="current_magisk_title">Versione di installata: %1$s</string>
-    <string name="install_magisk_title">Ultima versione di: %1$s</string>
+    <string name="current_magisk_title">Versione installata: %1$s</string>
+    <string name="install_magisk_title">Ultima versione disponibile: %1$s</string>
     <string name="uninstall">Disinstalla</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e se il dispositivo non è crittografato è possibile che vengano crittografati tutti i dati</string>													  
@@ -136,7 +136,7 @@
     <string name="settings_update_custom">Personalizzato</string>
 +   <string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
     <string name="settings_boot_format_title">Formato dell\'immagine di boot aggiornata</string>    
-    <string name="settings_boot_format_summary">Seleziona il formato nel quale l\'immagine di boot verrà salvata. .\nSeleziona .img per il flash in fastboot/download mode; Seleziona .img.tar per il flash con Odin.</string>													   
+    <string name="settings_boot_format_summary">Seleziona il formato nel quale l\'immagine di boot verrà salvata.\nSeleziona .img per il flash in fastboot/download mode; Seleziona .img.tar per il flash con Odin.</string>													   
     <string name="settings_core_only_title">Modalità Magisk Core</string>							
     <string name="settings_core_only_summary">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU, MagiskHide e host systemless rimarranno abilitati</string>
     <string name="settings_magiskhide_summary">Nasconde Magisk da numerose rilevazioni</string>			
@@ -157,7 +157,7 @@
     <string name="superuser_notification">Notifica Superuser</string>
     <string name="request_timeout_summary">%1$s secondi</string>
     <string name="settings_su_reauth_title">Ri-autentica dopo un aggiornamento</string>
-    <string name="settings_su_reauth_summary">Ri-autentica permessi Superuser dopo aggiornamento applicazione</string>
+    <string name="settings_su_reauth_summary">Ri-autentica i permessi Superuser dopo un aggiornamento dell\'app</string>
     
     <string name="multiuser_mode">Modalità multiutente</string>    
     <string name="settings_owner_only">Solo proprietario del dispositivo</string>
