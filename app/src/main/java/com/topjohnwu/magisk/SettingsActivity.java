@@ -130,10 +130,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                         .setPositiveButton(R.string.ok, (d, i) -> {
                             prefs.edit().putString(Const.Key.CUSTOM_CHANNEL, url.getText().toString()).apply();
                         })
-                        .setNegativeButton(R.string.close, (d, i) -> {
-                            mm.updateChannel = Const.Value.STABLE_CHANNEL;
-                            prefs.edit().putString(Const.Key.UPDATE_CHANNEL, String.valueOf(Const.Value.STABLE_CHANNEL)).apply();
-                        })
+                        .setNegativeButton(R.string.close, null)
                         .show();
                 }
                 return true;

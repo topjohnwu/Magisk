@@ -24,11 +24,20 @@ public class Const {
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
-    public static final String BUSYBOX_PATH = "/dev/magisk/bin";
     public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
 
+    public static String BUSYBOX_PATH() {
+        if (Utils.itemExist("/sbin/.core/busybox/busybox")) {
+            return "/sbin/.core/busybox";
+        } else {
+            return "/dev/magisk/bin";
+        }
+    }
+
     public static String MAGISK_PATH() {
-        if (Utils.itemExist("/dev/magisk/img")) {
+        if (Utils.itemExist("/sbin/.core/img")) {
+            return "/sbin/.core/img";
+        } else if (Utils.itemExist("/dev/magisk/img")) {
             return "/dev/magisk/img";
         } else {
             return "/magisk";
