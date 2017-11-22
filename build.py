@@ -78,6 +78,7 @@ def build_all(args):
 	build_apk(args)
 	zip_main(args)
 	zip_uninstaller(args)
+	build_snet(args)
 
 def build_binary(args):
 	header('* Building Magisk binaries')

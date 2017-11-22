@@ -110,9 +110,9 @@ static void hide_daemon(int pid, int ppid) {
 		}
 	}
 
-	// Unmount dummy skeletons, /sbin links, and mirrors
+	// Unmount dummy skeletons, /sbin links
 	vec_for_each(&mount_list, line) {
-		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin") || strstr(line, MIRRDIR)) {
+		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
@@ -133,9 +133,6 @@ static void hide_daemon(int pid, int ppid) {
 		}
 		free(line);
 	}
-
-	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-	unlink(FAKEPOINT);
 
 exit:
 	// Send resume signal
@@ -250,6 +247,10 @@ void proc_monitor() {
 					 * The setns system call do not support multithread processes
 					 * We have to fork a new process, setns, then do the unmounts
 					 */
+					xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+					unlink(FAKEPOINT);
+					unlink(MAGISKRC);
+					xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 					++hide_queue;
 					int selfpid = getpid();
 					if (fork_dont_care() == 0)

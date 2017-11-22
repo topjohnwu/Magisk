@@ -257,11 +257,11 @@ api_level_arch_detect() {
 }
 
 boot_actions() {
-  if [ ! -d /dev/magisk/mirror/bin ]; then
-    mkdir -p /dev/magisk/mirror/bin
-    mount -o bind $MAGISKBIN /dev/magisk/mirror/bin
+  if [ ! -d /sbin/.core/mirror/bin ]; then
+    mkdir -p /sbin/.core/mirror/bin
+    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
   fi
-  MAGISKBIN=/dev/magisk/mirror/bin
+  MAGISKBIN=/sbin/.core/mirror/bin
 }
 
 recovery_actions() {

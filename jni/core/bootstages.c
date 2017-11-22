@@ -558,9 +558,6 @@ void fix_filecon() {
 	int dirfd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
 	restorecon(dirfd, 0);
 	close(dirfd);
-	dirfd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);
-	restorecon(dirfd, 1);
-	close(dirfd);
 }
 
 /****************

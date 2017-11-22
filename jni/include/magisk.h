@@ -21,9 +21,9 @@
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"
 #define CACHEMOUNT      "/cache/magisk_mount"
-#define MAGISKTMP       "/dev/magisk"
+#define MAGISKTMP       "/sbin/.core"
 #define MIRRDIR         MAGISKTMP "/mirror"
-#define BBPATH          MAGISKTMP "/bin"
+#define BBPATH          MAGISKTMP "/busybox"
 #define MOUNTPOINT      MAGISKTMP "/img"
 #define FAKEPOINT       "/magisk"
 #define COREDIR         MOUNTPOINT "/.core"
@@ -31,7 +31,8 @@
 #define HIDELIST        COREDIR "/hidelist"
 #define MAINIMG         "/data/magisk.img"
 #define DATABIN         "/data/magisk"
-#define MANAGERAPK      DATABIN "/magisk.apk"
+#define MANAGERAPK      MIRRDIR "/bin/magisk.apk"
+#define MAGISKRC        "/init.magisk.rc"
 
 
 #define SELINUX_PATH        "/sys/fs/selinux/"
