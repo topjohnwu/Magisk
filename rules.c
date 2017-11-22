@@ -165,11 +165,9 @@ void sepol_min_rules() {
 
 	// Let pre-init do stuffs
 	sepol_allow("kernel", "kernel", "security", "load_policy");
-	sepol_allow("kernel", "device", "dir", "write");
-	sepol_allow("kernel", "device", "dir", "add_name");
-	sepol_allow("kernel", "device", "file", "create");
-	sepol_allow("kernel", "device", "file", "open");
-	sepol_allow("kernel", "device", "file", "read");
+	sepol_allow("kernel", "kernel", "capability", "dac_override");
+	sepol_allow("kernel", "device", "dir", ALL);
+	sepol_allow("kernel", "device", "file", ALL);
 
 	// Let init run stuffs in su context
 	sepol_allow("kernel", "su", "fd", "use");
@@ -233,7 +231,7 @@ void sepol_min_rules() {
 	sepol_allow("su", "kernel", "process", "setsched");
 	sepol_allow("su", "labeledfs", "filesystem", "mount");
 	sepol_allow("su", "labeledfs", "filesystem", "unmount");
-	sepol_allow("kernel", "system_data_file", "file", "read");
+	sepol_allow("kernel", ALL, "file", "read");
 
 	// For changing attributes
 	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
@@ -243,8 +241,10 @@ void sepol_min_rules() {
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
 
 	// xperms
-	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
 		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm("domain", "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+	}
 }
 
 void sepol_med_rules() {
