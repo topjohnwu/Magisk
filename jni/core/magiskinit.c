@@ -425,9 +425,9 @@ int main(int argc, char *argv[]) {
 		// Fork a new process for full patch
 		setsid();
 		sepol_allow("su", ALL, ALL, ALL);
-		while (access(SELINUX_LOAD, W_OK) == -1) {
+		while (access(PATCHSTART, W_OK) == -1)
 			usleep(500); /* Wait 0.5ms */
-		}
+		unlink(PATCHSTART);
 		dump_policydb(SELINUX_LOAD);
 		close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
 		destroy_policydb();

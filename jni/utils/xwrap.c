@@ -159,7 +159,7 @@ int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
 int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
 	int ret = connect(sockfd, addr, addrlen);
 	if (ret == -1) {
-		PLOGE("bind");
+		PLOGE("connect");
 	}
 	return ret;
 }

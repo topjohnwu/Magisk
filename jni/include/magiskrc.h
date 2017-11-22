@@ -16,6 +16,7 @@ const char magiskrc[] =
 "   rm /dev/.magisk.unblock\n"
 "   start magisk_pfsd\n"
 "   wait /dev/.magisk.unblock 10\n"
+"   rm /dev/.magisk.unblock\n"
 "\n"
 
 // Services

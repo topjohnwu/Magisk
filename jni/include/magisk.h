@@ -17,6 +17,7 @@
 #define LASTLOG         "/cache/last_magisk.log"
 #define DEBUG_LOG       "/data/magisk_debug.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
+#define PATCHSTART      "/dev/.magisk.patch.start"
 #define PATCHDONE       "/dev/.magisk.patch.done"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"

@@ -575,6 +575,9 @@ void post_fs(int client) {
 	write_int(client, 0);
 	close(client);
 
+	// Allow magiskinit to full patch
+	close(creat(PATCHSTART, 0));
+
 	// Uninstall or core only mode
 	if (access(UNINSTALLER, F_OK) == 0 || access(DISABLEFILE, F_OK) == 0)
 		goto unblock;
@@ -743,6 +746,7 @@ void late_start(int client) {
 	// Wait till the full patch is done
 	while (access(PATCHDONE, F_OK) == -1)
 		usleep(500); /* Wait 0.5ms */
+	unlink(PATCHDONE);
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");

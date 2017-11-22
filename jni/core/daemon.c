@@ -120,6 +120,7 @@ void auto_start_magiskhide() {
 }
 
 void start_daemon() {
+	setsid();
 	setcon("u:r:su:s0");
 	umask(0);
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
@@ -138,11 +139,10 @@ void start_daemon() {
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun);
 
-	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun)) == -1)
-		exit(1);
+	xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
 	xlisten(fd, 10);
 
-	if ((is_restart = access(UNBLOCKFILE, F_OK) == 0)) {
+	if ((is_restart = access(MAGISKTMP, F_OK) == 0)) {
 		// Restart stuffs if the daemon is restarted
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 		auto_start_magiskhide();
@@ -189,7 +189,6 @@ int connect_daemon() {
 		if (xfork() == 0) {
 			LOGD("client: connect fail, try launching new daemon process\n");
 			close(fd);
-			xsetsid();
 			start_daemon();
 		}
 
