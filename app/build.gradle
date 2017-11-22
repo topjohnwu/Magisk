@@ -8,8 +8,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 58
-        versionName "5.4.1"
+        versionCode 63
+        versionName "5.4.2"
         ndk {
             moduleName 'zipadjust'
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
@@ -55,10 +55,10 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':crypto')
-    implementation 'com.android.support:recyclerview-v7:27.0.0'
-    implementation 'com.android.support:cardview-v7:27.0.0'
-    implementation 'com.android.support:design:27.0.0'
-    implementation 'com.android.support:support-v4:27.0.0'
+    implementation 'com.android.support:recyclerview-v7:27.0.1'
+    implementation 'com.android.support:cardview-v7:27.0.1'
+    implementation 'com.android.support:design:27.0.1'
+    implementation 'com.android.support:support-v4:27.0.1'
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.atlassian.commonmark:commonmark:0.10.0'
     implementation 'org.kamranzafar:jtar:2.3'
