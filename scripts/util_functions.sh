@@ -209,11 +209,8 @@ sign_chromeos() {
 }
 
 is_mounted() {
-  if [ ! -z "$2" ]; then
-    cat /proc/mounts | grep $1 | grep $2, >/dev/null
-  else
-    cat /proc/mounts | grep $1 >/dev/null
-  fi
+  TARGET="`resolve_link $1`"
+  cat /proc/mounts | grep " $TARGET " >/dev/null
   return $?
 }
 
