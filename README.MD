@@ -10,15 +10,15 @@
 2. Python 3.5+: run `build.py` script
 3. Java Development Kit (JDK) 8: Compile Magisk Manager and sign zips
 4. Latest Android SDK: `ANDROID_HOME` environment variable should point to the Android SDK folder
-5. Latest Android NDK: Install NDK via `sdkmanager`, or via Android SDK Manager in Android Studio
+5. Android NDK: Install NDK along with SDK (`$ANDROID_HOME/ndk-bundle`), or specify custom path `ANDROID_NDK`
 6. (Windows Only) Colorama: Install Colorama with `pip install colorama`, used for ANSI color codes
 7. (Unix only) C compiler: Build `zipadjust`. Windows users can use the pre-built `zipadjust.exe`
 
 ### Instructions and Notes
-
-1. The easiest way to setup a working environment is to open Magisk Manager with Android Studio. The IDE will download required components and construct the environment for you. Don't forget to set `ANDROID_HOME` environment variable to the SDK path.
-2. Run the script with `-h` as an argument to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
-3. By default, the script will build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (through the flag `--release`), you will need to place your Java Keystore file at `release_signature.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
+1. Magisk can be built with the latest NDK (r16 as of writing), however official released binaries will be built with NDK r10e due to ELF incompatibilities with the binaries built from newer NDKs.
+2. The easiest way to setup a working environment is to open Magisk Manager with Android Studio. The IDE will download required components and construct the environment for you. Don't forget to set `ANDROID_HOME` environment variable to the SDK path.
+3. Run the script with `-h` as an argument to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
+4. By default, the script will build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (through the flag `--release`), you will need to place your Java Keystore file at `release_signature.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
 
 
 ## License

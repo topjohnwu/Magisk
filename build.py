@@ -87,9 +87,13 @@ def build_binary(args):
 	os.utime(os.path.join('jni', 'Android.mk'))
 
 	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
-	cflag = 'APP_CFLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
+	cflag = 'MAGISK_FLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
 
-	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
+	if 'ANDROID_NDK' in os.environ:
+		ndk_build = os.path.join(os.environ['ANDROID_NDK'], 'ndk-build')
+	else:
+		ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
+
 	# Prebuild
 	proc = subprocess.run('{} PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:

@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 

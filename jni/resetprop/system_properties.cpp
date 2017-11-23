@@ -30,11 +30,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <stdio.h>
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
 #include <new>
@@ -48,6 +50,9 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/un.h>
+
+#undef XATTR_CREATE
+#undef XATTR_REPLACE
 #include <sys/xattr.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
@@ -1319,7 +1324,7 @@ int __system_property_get2(const char* name, char* value) {
 static constexpr uint32_t kProtocolVersion1 = 1;
 static constexpr uint32_t kProtocolVersion2 = 2;  // current
 
-static atomic_uint_least32_t g_propservice_protocol_version = 0;
+static uint32_t g_propservice_protocol_version = 0;
 
 static void detect_protocol_version() {
   char value[PROP_VALUE_MAX];
@@ -1486,7 +1491,7 @@ int __system_property_add2(const char* name, unsigned int namelen, const char* v
 uint32_t __system_property_serial2(const prop_info* pi) {
   uint32_t serial = load_const_atomic(&pi->serial, memory_order_acquire);
   while (SERIAL_DIRTY(serial)) {
-    __futex_wait(const_cast<_Atomic(uint_least32_t)*>(&pi->serial), serial, nullptr);
+    __futex_wait(const_cast<atomic_uint_least32_t*>(&pi->serial), serial, nullptr);
     serial = load_const_atomic(&pi->serial, memory_order_acquire);
   }
   return serial;

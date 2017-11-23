@@ -49,8 +49,7 @@ LOCAL_SRC_FILES := \
 	su/su_daemon.c \
 	su/su_socket.c
 
-LOCAL_CFLAGS := -Wno-implicit-exception-spec-mismatch -DIS_DAEMON
-LOCAL_CPPFLAGS := -std=c++11
+LOCAL_CFLAGS := -DIS_DAEMON
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
 

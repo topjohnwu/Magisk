@@ -43,7 +43,7 @@ typedef struct prop_info prop_info;
 /*
  * Sets system property `key` to `value`, creating the system property if it doesn't already exist.
  */
-int __system_property_set2(const char* key, const char* value) __INTRODUCED_IN(12);
+int __system_property_set2(const char* key, const char* value);
 
 /*
  * Returns a `prop_info` corresponding system property `name`, or nullptr if it doesn't exist.
@@ -58,7 +58,7 @@ const prop_info* __system_property_find2(const char* name);
  */
 void __system_property_read_callback2(const prop_info *pi,
     void (*callback)(void* cookie, const char *name, const char *value, uint32_t serial),
-    void* cookie) __INTRODUCED_IN(26);
+    void* cookie);
 
 /*
  * Passes a `prop_info` for each system property to the provided
@@ -66,8 +66,7 @@ void __system_property_read_callback2(const prop_info *pi,
  *
  * This method is for inspecting and debugging the property system, and not generally useful.
  */
-int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie), void* cookie)
-  __INTRODUCED_IN(19);
+int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
 
 /*
  * Waits for the specific system property identified by `pi` to be updated
@@ -85,8 +84,7 @@ struct timespec;
 bool __system_property_wait2(const prop_info* pi,
                             uint32_t old_serial,
                             uint32_t* new_serial_ptr,
-                            const struct timespec* relative_timeout)
-    __INTRODUCED_IN(26);
+                            const struct timespec* relative_timeout);
 
 /* Deprecated. In Android O and above, there's no limit on property name length. */
 #define PROP_NAME_MAX   32
