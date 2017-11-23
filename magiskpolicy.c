@@ -3,9 +3,9 @@
  * Includes all the parsing logic for the policy statements
  */
 
-#include "magisk.h"
 #include "magiskpolicy.h"
 #include "sepolicy.h"
+#include "magisk.h"
 
 static int syntax_err = 0;
 static char err_msg[ARG_MAX];
@@ -148,7 +148,7 @@ static int parse_pattern_1(int action, char* statement) {
 				}
 				if (action_func(source.data[i], target.data[j], class, permission.data[k]))
 					fprintf(stderr, "Error in: %s %s %s %s %s\n",
-						action_str, source.data[i], target.data[j], class, permission.data[k]);
+						action_str, (char *) source.data[i], (char *) target.data[j], class, (char *) permission.data[k]);
 			}
 	vec_destroy(&source);
 	vec_destroy(&target);
@@ -212,7 +212,7 @@ static int parse_pattern_2(int action, char* statement) {
 			}
 			if (action_func(class.data[i], attribute.data[j]))
 				fprintf(stderr, "Error in: %s %s %s\n",
-					action_str, class.data[i], attribute.data[j]);
+					action_str, (char *) class.data[i], (char *) attribute.data[j]);
 		}
 	vec_destroy(&class);
 	vec_destroy(&attribute);
@@ -248,7 +248,7 @@ static int parse_pattern_3(int action, char* statement) {
 			break;
 		}
 		if (action_func(classes.data[i]))
-			fprintf(stderr, "Error in: %s %s\n", action_str, classes.data[i]);
+			fprintf(stderr, "Error in: %s %s\n", action_str, (char *) classes.data[i]);
 	}
 	vec_destroy(&classes);
 	return 0;
@@ -366,7 +366,7 @@ static int parse_pattern_5(int action, char* statement) {
 				}
 				if (action_func(source.data[i], target.data[j], class.data[k], range))
 					fprintf(stderr, "Error in: %s %s %s %s %s\n",
-						action_str, source.data[i], target.data[j], class.data[k], range);
+						action_str, (char *) source.data[i], (char *) target.data[j], (char *) class.data[k], range);
 			}
 	vec_destroy(&source);
 	vec_destroy(&target);
