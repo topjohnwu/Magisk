@@ -22,7 +22,8 @@ public class ManagerUpdate extends BroadcastReceiver {
                     public void onDownloadDone(Uri uri) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                            install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             Uri content = FileProvider.getUriForFile(context,
                                     context.getPackageName() + ".provider", new File(uri.getPath()));
                             install.setData(content);
@@ -30,7 +31,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                         } else {
                             Intent install = new Intent(Intent.ACTION_VIEW);
                             install.setDataAndType(uri, "application/vnd.android.package-archive");
-                            install.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(install);
                         }
                     }
