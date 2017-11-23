@@ -1,10 +1,7 @@
 <resources>
     <!--Universal-->
-    <string name="app_name" translatable="false">Магиск Менаџер</string>
-    <string name="magisk" translatable="false">Магиск</string>
 
     <!--Welcome Activity-->
-    <string name="magiskhide" translatable="false">Магиск Скривање</string>
     <string name="modules">Модули</string>
     <string name="downloads">Преузимања</string>
     <string name="superuser">Супер-корисник</string>
