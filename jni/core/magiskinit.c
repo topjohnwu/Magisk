@@ -63,18 +63,19 @@ struct device {
 extern policydb_t *policydb;
 
 static void parse_cmdline(struct cmdline *cmd) {
+	// cleanup
+	cmd->skip_initramfs = 0;
+	cmd->slot[0] = '\0';
+
 	char *tok;
-	char buffer[4096];
+	char cmdline[4096];
 	mkdir("/proc", 0555);
 	mount("proc", "/proc", "proc", 0, NULL);
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
-	ssize_t size = read(fd, buffer, sizeof(buffer));
-	buffer[size] = '\0';
+	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 	umount("/proc");
-	tok = strtok(buffer, " ");
-	cmd->skip_initramfs = 0;
-	cmd->slot[0] = '\0';
+	tok = strtok(cmdline, " ");
 	while (tok != NULL) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
@@ -340,14 +341,14 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 }
 
 int main(int argc, char *argv[]) {
+	umask(0);
+
 	if (strcmp(basename(argv[0]), "magiskpolicy") == 0 || strcmp(basename(argv[0]), "supolicy") == 0)
 		return magiskpolicy_main(argc, argv);
 	if (argc > 1 && (strcmp(argv[1], "magiskpolicy") == 0 || strcmp(argv[1], "supolicy") == 0))
 		return magiskpolicy_main(argc - 1, argv + 1);
 
-	umask(0);
-
-	if (argc > 1) {
+	if (argc > 1 && strcmp(argv[1], "-x") == 0) {
 		if (strcmp(argv[2], "magisk") == 0)
 			return dump_magisk(argv[3], 0755);
 		else if (strcmp(argv[2], "magiskrc") == 0)
@@ -412,14 +413,15 @@ int main(int argc, char *argv[]) {
 	int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 	mv_dir(overlay, root);
 
+	// Clean up
+	rmdir("/overlay");
+	close(overlay);
+	close(root);
+
 	patch_ramdisk();
 	patch_sepolicy();
 
-	// Clean up
-	rmdir("/overlay");
 	umount("/vendor");
-	close(overlay);
-	close(root);
 
 	if (fork() == 0) {
 		// Fork a new process for full patch
@@ -431,10 +433,9 @@ int main(int argc, char *argv[]) {
 		dump_policydb(SELINUX_LOAD);
 		close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
 		destroy_policydb();
-	} else {
-		// Finally, give control back!
-		execv("/init", argv);
+		return 0;
 	}
 
-	return 0;
+	// Finally, give control back!
+	execv("/init", argv);
 }
