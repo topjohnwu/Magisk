@@ -12,7 +12,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <selinux/selinux.h>
-#include <syscall.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -29,7 +28,7 @@ int socket_create_temp(char *path, size_t len) {
 
     memset(&sun, 0, sizeof(sun));
     sun.sun_family = AF_LOCAL;
-    snprintf(path, len, "/dev/.socket%d", (int) syscall(SYS_gettid));
+    snprintf(path, len, "/dev/.socket%d", getpid());
     strcpy(sun.sun_path, path);
 
     /*
