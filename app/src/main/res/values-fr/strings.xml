@@ -10,13 +10,14 @@
     <string name="magisk_version_error">Magisk non installé</string>
     <string name="checking_for_updates">Vérification de mises à jour…</string>
     <string name="magisk_update_available">Magisk v%1$s disponible !</string>
+    <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="safetyNet_check_text">Appuyer pour lancer le contrôle SafetyNet</string>
     <string name="checking_safetyNet_status">Vérification de l\'état de SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
     <string name="safetyNet_api_error">Erreur d\'API SafetyNet</string>
     <string name="safetyNet_network_loss">Connexion réseau indisponible</string>
-	<string name="safetyNet_service_disconnected">Le service a été tué</string>
-	<string name="safetyNet_res_invalid">La réponse est invalide</string>
+    <string name="safetyNet_service_disconnected">Le service a été tué</string>
+    <string name="safetyNet_res_invalid">La réponse est invalide</string>
     <!--Install Fragment-->
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
@@ -83,9 +84,12 @@
 	<string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%)…</string>
 	<string name="manager_update_title">Nouvelle mise à jour de Magisk Manager disponible !</string>
 	<string name="manager_download_install">Appuyez pour télécharger et installer</string>
+    <string name="dtbo_patched_title">DTBO a été patché !</string>
+    <string name="dtbo_patched_reboot">Magisk Manager a patché dtbo.img, veuillez redémarrer</string>
 	<string name="magisk_updates">Mises à jour Magisk</string>
 	<string name="flashing">Flashage en cours</string>
 	<string name="hide_manager_toast">Masquage de Magisk Manager…</string>
+	<string name="hide_manager_toast2">Cela peut prendre du temps…</string>
 	<string name="hide_manager_fail_toast">Échec du masquage de Magisk Manager…</string>
 	<string name="download_zip_only">Télécharger uniquement le zip</string>
 	<string name="patch_boot_file">Patcher le fichier image Boot</string>
@@ -101,6 +105,7 @@
     <string name="uninstall_toast">Désinstallation de Magisk Manager dans 5 secondes, n\'oubliez pas de redémarrer par la suite</string>
     <string name="proprietary_title">Télécharger le code propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est un logiciel FOSS et ne contient donc pas le code propriétaire de l\'API SafetyNet de Google. Autorisez-vous Magisk Manager à télécharger une extension (qui contient GoogleApiClient) afin de tester SafetyNet ?</string>
+    <string name="su_db_corrupt">La base de données SU est corrompue, création d\'une nouvelle base de données prévue</string>
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
@@ -128,12 +133,15 @@
     <string name="superuser_notification">Notification Superuser</string>
     <string name="request_timeout_summary">%1$s secondes</string>
     <string name="settings_hide_manager_title">Masquer Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Reconstruire Magisk Manager avec un nom de paquet aléatoire</string>
     <string name="language">Langue</string>
 	<string name="system_default">(Selon système)</string>
 	<string name="settings_update">Paramètres de mises à jour</string>
 	<string name="settings_update_channel_title">Canal de mise à jour</string>
 	<string name="settings_update_stable">Stable</string>
 	<string name="settings_update_beta">Beta</string>
+	<string name="settings_update_custom">Personnaliser</string>
+	<string name="settings_update_custom_msg">Insérer une URL personnalisée</string>
 	<string name="settings_boot_format_title">Format de sortie du boot patché</string>
 	<string name="settings_boot_format_summary">Sélectionner le format de l\'image boot patchée finale.\nChoisir .img pour flasher via fastboot/mode download ; choisir .img.tar pour flasher via ODIN.</string>
 	<string name="settings_su_reauth_title">Ré-authentifier après mise à jour</string>
