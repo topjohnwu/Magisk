@@ -5,63 +5,63 @@
     <string name="modules">Модули</string>
     <string name="downloads">Загрузки</string>
     <string name="superuser">Суперпользователь</string>
-    <string name="log">История</string>
+    <string name="log">Журнал</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не установлен</string>
-
     <string name="checking_for_updates">Проверка обновлений…</string>
     <string name="magisk_update_available">Доступен Magisk v%1$s!</string>
+    <string name="invalid_update_channel">Неверный канал обновлений</string>
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
-    <string name="safetyNet_api_error">Ошибка в  API SafetyNet</string>
-    <string name="safetyNet_network_loss">Подключение к интернету прервано</string>
+    <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
+    <string name="safetyNet_network_loss">Нет подключения к сети</string>
     <string name="safetyNet_service_disconnected">Служба была остановлена</string>
-    <string name="safetyNet_res_invalid">Некорректный ответ</string>
+    <string name="safetyNet_res_invalid">Неверный ответ</string>
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Расширенные настройки</string>
-    <string name="keep_force_encryption">Оставить принуд. шифрование</string>
+    <string name="keep_force_encryption">Оставить шифрование</string>
     <string name="keep_dm_verity">Оставить dm-verity</string>
-    <string name="current_magisk_title">Текущая версия: %1$s</string>
+    <string name="current_magisk_title">Установлена версия: %1$s</string>
     <string name="install_magisk_title">Последняя версия: %1$s</string>
-    <string name="uninstall">Удалить</string>
-    <string name="uninstall_magisk_title">Удалить Magisk</string>
-    <string name="uninstall_magisk_msg">Все модули были отключены либо удалены. Root-доступ будет удален, данные зашифруются, если до сих пор не были зашифрованы</string>
+    <string name="uninstall">Удаление</string>
+    <string name="uninstall_magisk_title">Удаление Magisk</string>
+    <string name="uninstall_magisk_msg">Все модули будут отключены/удалены. Root-права будут удалены. Данные будут зашифрованы.</string>
     <string name="update">Обновить %1$s</string>
     
     <!--Module Fragment-->
-    <string name="no_info_provided">(Нет предоставленной информации)</string>
+    <string name="no_info_provided">(Нет информации)</string>
     <string name="no_modules_found">Модули не обнаружены</string>
-    <string name="update_file_created">Модуль будет обновлен при перезагрузке</string>
-    <string name="remove_file_created">Модуль будет удалён при перезагрузке</string>
-    <string name="remove_file_deleted">Модуль не будет удалён при перезагрузке</string>
-    <string name="disable_file_created">Модуль будет отключен при перезагрузке</string>
-    <string name="disable_file_removed">Модуль будет включен при перезагрузке</string>
-    <string name="author">Автор: %1$s</string>
+    <string name="update_file_created">Модуль будет обновлен после перезагрузки</string>
+    <string name="remove_file_created">Модуль будет удален после перезагрузки</string>
+    <string name="remove_file_deleted">Модуль не будет удален после перезагрузки</string>
+    <string name="disable_file_created">Модуль будет отключен после перезагрузки</string>
+    <string name="disable_file_removed">Модуль будет активирован после перезагрузки</string>
+    <string name="author">Разработчик: %1$s</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступно обновление</string>
-    <string name="installed">Установлен</string>
-    <string name="not_installed">Не установлен</string>
+    <string name="installed">Установлены</string>
+    <string name="not_installed">Не установлены</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveLog">"Сохранить историю "</string>
+    <string name="menuSaveLog">Сохранить логи</string>
     <string name="menuReload">Обновить</string>
-    <string name="menuClearLog">Очистить историю сейчас</string>
+    <string name="menuClearLog">Очистить логи</string>
     <string name="logs_cleared">История успешно очищена</string>
-    <string name="log_is_empty">История пуста</string>
-    <string name="logs_save_failed">Не удалось записать файл истории на карту памяти:</string>
+    <string name="log_is_empty">Журнал пуст</string>
+    <string name="logs_save_failed">Не удалось сохранить лог-файл в SD Card:</string>
 
     <!--About Activity-->
     <string name="about">О приложении</string>
-    <string name="app_developers">Главные разработчики</string>
-    <string name="app_developers_"><![CDATA[Приложение создано <a href="https://github.com/topjohnwu">topjohnwu</a> совместно с <a href="https://github.com/d8ahazard">Digitalhigh</a> и <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_developers">Разработчики</string>
+    <string name="app_developers_"><![CDATA[Приложение создано <a href="https://github.com/topjohnwu">topjohnwu</a>, совместно с <a href="https://github.com/d8ahazard">Digitalhigh</a> и <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Список изменений</string>
-    <string name="translators" />
+    <string name="translators">Displax</string>
     <string name="app_version">Версия</string>
     <string name="app_source_code">Исходный код</string>
     <string name="donation">Поддержать проект</string>
@@ -70,83 +70,87 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Данная функция не будет работать без разрешения на запись во внешнее хранилище</string>
-    <string name="no_thanks">Нет, спасибо</string>
+    <string name="no_thanks">Нет</string>
     <string name="yes">Да</string>
     <string name="ok">OK</string>
     <string name="close">Закрыть</string>
-    <string name="repo_install_title">Установить %1$s</string>
-    <string name="repo_install_msg">Желаете установить %1$s ?</string>
+    <string name="repo_install_title">Установка %1$s</string>
+    <string name="repo_install_msg">Установить %1$s ?</string>
     <string name="download">Скачать</string>
-    <string name="download_file_error">Ошибка скачивания файла</string>
+    <string name="download_file_error">Ошибка загрузки файла</string>
     <string name="reboot">Перезагрузка</string>
-    <string name="downloading_toast">Скачивание %1$s</string>
-    <string name="magisk_update_title">Доступно новое обновление Magisk!</string>
-    <string name="settings_reboot_toast">Для применения настроек выполните перезагрузку</string>
-    <string name="release_notes">Особенности версии</string>
-    <string name="repo_cache_cleared">Кеш репозитория очищен</string>
-    <string name="safetyNet_hide_notice">Данное приложение использует SafetyNet.\nУже обработано MagiskHide по умолчанию</string>
+    <string name="downloading_toast">Загрузка %1$s</string>
+    <string name="magisk_update_title">Доступно обновление Magisk!</string>
+    <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
+    <string name="release_notes">О версии</string>
+    <string name="repo_cache_cleared">Кэш репозитория очищен</string>
+    <string name="safetyNet_hide_notice">Приложение использует SafetyNet.\nПо умолчанию обработано MagiskHide.</string>
     <string name="process_error">Ошибка обработки</string>
-    <string name="internal_storage">Архив расположен:\n[Внутреннее Хранилище]%1$s</string>
+    <string name="internal_storage">Расположение архива:\n[Внутреннее Хранилище]%1$s</string>
     <string name="zip_download_title">Загрузка</string>
     <string name="zip_download_msg">Загрузка архива (%1$d%%) …</string>
     <string name="zip_process_title">Обработка</string>
     <string name="zip_process_msg">Обработка архива…</string>
-    <string name="manager_update_title">Доступно новое обновление менеджера Magisk!</string>
-    <string name="manager_download_install">Нажмите, чтобы скачать и установить</string>
+    <string name="manager_update_title">Доступно обновление Magisk Manager!</string>
+    <string name="manager_download_install">Нажмите для установки</string>
+    <string name="dtbo_patched_title">DTBO пропатчен!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузитесь.</string>
     <string name="magisk_updates">Обновления Magisk</string>
     <string name="flashing">Прошивка…</string>
-    <string name="hide_manager_toast">Скрытие Менеджера Magisk…</string>
+    <string name="hide_manager_toast">Скрытие Magisk Manager…</string>
     <string name="hide_manager_toast2">Может занять некоторое время…</string>
-    <string name="hide_manager_fail_toast">Скрытие Менеджера Magisk неудачно…</string>
-    <string name="download_zip_only">Загрузка только архива</string>
-    <string name="patch_boot_file">Пропатчить boot-образ</string>
-    <string name="direct_install">Непосредственная установка (рекомендуется)</string>
-    <string name="install_second_slot">Установить во Второй Слот (после OTA)</string>
-    <string name="select_method">Выбрать способ</string>
-    <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образа</string>
-    <string name="boot_file_patch_msg">Выберите оригинальный дамп boot-образа, .img либо .img.tar формата</string>
-    <string name="complete_uninstall">Удаление завершено</string>
-    <string name="restore_stock_boot">Восстановить оригинальный boot-образ</string>
+    <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно!</string>
+    <string name="download_zip_only">Только загрузка архива</string>
+    <string name="patch_boot_file">Пропатчить образ ядра</string>
+    <string name="direct_install">Прямая установка (рекомендуется)</string>
+    <string name="install_second_slot">Установка во Второй Слот (после OTA)</string>
+    <string name="select_method">Выбор способа</string>
+    <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
+    <string name="boot_file_patch_msg">Выберите файл ядра (boot), .img либо .img.tar формата</string>
+    <string name="complete_uninstall">Удалить</string>
+    <string name="restore_stock_boot">Восстановить исходное ядро</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
-    <string name="uninstall_toast">Удаление менеджера Magisk в течении 5 секунд, затем, пожалуйста, вручную выполните перезагрузку</string>
+    <string name="uninstall_toast">Удаление Magisk Manager в течении 5 секунд. Выполните перезагрузку.</string>
     <string name="proprietary_title">Загрузка собственного кода</string>
-    <string name="proprietary_notice">Менеджер Magisk является свободно распространяемым приложением, поэтому он не содержит собственный код API SafetyNet от Google.\n\nРазрешите ли Вы менеджеру Magisk загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
+    <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
-    <string name="settings_dark_theme_title">Тёмная тема</string>
-    <string name="settings_dark_theme_summary">Включить тёмное оформление</string>
+    <string name="settings_dark_theme_title">Темная тема</string>
+    <string name="settings_dark_theme_summary">Включить темное оформление</string>
     <string name="settings_notification_title">Уведомление об обновлении</string>
-    <string name="settings_notification_summary">Показывать уведомления об обновлении, когда доступна новая версия</string>
-    <string name="settings_clear_cache_title">Очистка кеша</string>
-    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о сетевых репозиториях, заставляя приложение принудительно обновляться через Интернет</string>
-    <string name="settings_hide_manager_title">Скрыть Менеджер Magisk</string>
-    <string name="settings_hide_manager_summary">Пересобрать менеджер Magisk с случайным именем пакета</string>
+    <string name="settings_notification_summary">Показывать уведомления о выходе новой версии</string>
+    <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
+    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозиториях. Список будет обновлен принудительно.</string>
+    <string name="settings_hide_manager_title">Скрыть Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
     <string name="settings_update">Настройки обновления</string>
     <string name="settings_update_channel_title">Источник обновления</string>
     <string name="settings_update_stable">Стабильный релиз</string>
-    <string name="settings_update_beta">Релиз beta</string>
-    <string name="settings_boot_format_title">Формат boot-образа</string>
-    <string name="settings_boot_format_summary">Выберите тип выходного формата патченого boot-образа.\n.img - для прошивки с помощью fastboot либо режима download\n.img.tar - для прошивки с помощью ODIN</string>
-
+    <string name="settings_update_beta">Beta релиз</string>
+    <string name="settings_update_custom">Неофициальная сборка</string>
+    <string name="settings_update_custom_msg">Вставьте ссылку</string>
+    <string name="settings_boot_format_title">Формат образа ядра</string>
+    <string name="settings_boot_format_summary">Выберите формат патченого образа ядра.\n.img - для прошивки через fastboot/download режим.\n.img.tar - для прошивки через ODIN.</string>
     <string name="settings_core_only_title">Режим Magisk Core</string>
-    <string name="settings_core_only_summary">Включить возможности только уровня Core, все модули не будут загружены. MagiskSU, MagiskHide и внесистемные хосты останутся включенными</string>
+    <string name="settings_core_only_summary">Включает возможности только Core уровня, модули не будут загружены. MagiskSU, MagiskHide и внесистемные хосты останутся активными.</string>
     <string name="settings_magiskhide_summary">Скрыть Magisk от различных проверок</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений блокировки рекламы</string>
 
     <string name="settings_su_app_adb">Приложения и ADB</string>
-    <string name="settings_su_app">Приложения</string>
-    <string name="settings_su_adb">ADB</string>
+    <string name="settings_su_app">Только приложения</string>
+    <string name="settings_su_adb">Только ADB</string>
     <string name="settings_su_disable">Отключен</string>
     <string name="settings_su_request_10">10 секунд</string>
     <string name="settings_su_request_20">20 секунд</string>
     <string name="settings_su_request_30">30 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
-    <string name="superuser_access">Доступ суперпользователя</string>
+    <string name="superuser_access">Уровень доступа</string>
     <string name="auto_response">Автоответ</string>
     <string name="request_timeout">Период запроса</string>
     <string name="superuser_notification">Уведомление суперпользователя</string>
