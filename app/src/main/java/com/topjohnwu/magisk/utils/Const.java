@@ -78,7 +78,7 @@ public class Const {
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
-        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/c0e60c41f26744a86d90dfbd368a73c847db6b70/snet.apk";
+        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/43745edac091dd8b5ba5f6076006677d1d6c5899/snet.apk";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
@@ -155,7 +155,7 @@ public class Const {
         public static final String FLASH_MAGISK = "magisk";
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
         public static final int UPDATE_SERVICE_VER = 1;
-        public static final int SNET_VER = 4;
+        public static final int SNET_VER = 5;
         public static final int MIN_MODULE_VER = 1400;
     }
 }
