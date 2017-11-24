@@ -11,9 +11,10 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk pole installitud</string>
-
+    
     <string name="checking_for_updates">Kontrollin uuendusi...</string>
     <string name="magisk_update_available">Magisk v%1$s on saadaval!</string>
+    <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
     <string name="safetyNet_check_text">Koputa, et alustada SafetyNet\'i kontrolli</string>
     <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut...</string>
     <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>
@@ -31,7 +32,7 @@
     <string name="uninstall">Eemalda</string>
     <string name="uninstall_magisk_title">Eemalda Magisk</string>
     <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse. Juurkasutaja eemaldatakse ning potensiaalselt krüptitakse su andmed, kui need ei ole hetkel krüpteeritud</string>
-    <string name="update">Uuenda %1$s</string>
+    <string name="update">Uuenda %1$s\'i</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Info puudub)</string>
@@ -59,7 +60,7 @@
     <!--About Activity-->
     <string name="about">Teave</string>
     <string name="app_developers">Põhilised arendajad</string>
-    <string name="app_developers_"><![CDATA[Rakendus on loodud <a href="https://github.com/topjohnwu">topjohnwu</a> poolt, koostöös <a href="https://github.com/d8ahazard">Digitalhigh</a> ja <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
+    <string name="app_developers_"><![CDATA[Rakendus on loodud <a href="https://github.com/topjohnwu">topjohnwu</a> poolt, kaasa aitasid <a href="https://github.com/d8ahazard">Digitalhigh</a> ja <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Rakenduse muutuste logi</string>
     <string name="translators" />
     <string name="app_version">Rakenduse versioon</string>
@@ -80,24 +81,25 @@
     <string name="download_file_error">Faili allalaadimisel esines viga</string>
     <string name="reboot">Taaskäivita</string>
     <string name="downloading_toast">Laadin %1$s alla</string>
-    <string name="magisk_update_title">Saadaval uus Magisk\'i uuendus!</string>
+    <string name="magisk_update_title">Magisk\'ile on uuendus saadaval!</string>
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks</string>
     <string name="release_notes">Väljalaskemärkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
-    <string name="safetyNet_hide_notice">See rakendus kasutab SafetyNet\'i\n
-    Juba vaikimisi hallatud MagiskHide poolt</string>
+    <string name="safetyNet_hide_notice">See rakendus kasutab SafetyNet\'i\nJuba vaikimisi hallatud MagiskHide poolt</string>
     <string name="process_error">Protsessi viga</string>
-    <string name="internal_storage">ZIP on salvestatud:\n
-    [Sisemälu]%1$s</string>
+    <string name="internal_storage">ZIP on salvestatud:\n[Sisemälu]%1$s</string>
     <string name="zip_download_title">Laadin alla</string>
     <string name="zip_download_msg">Laadin ZIP-faili alla (%1$d%%)...</string>
     <string name="zip_process_title">Töötlen</string>
     <string name="zip_process_msg">Töötlen ZIP-faili...</string>
-    <string name="manager_update_title">Saadaval uus Magisk Manager uuendus!</string>
+    <string name="manager_update_title">Magisk Manager\'ile on uuendus saadaval!</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
+    <string name="dtbo_patched_title">DTBO sai paigatud!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string> 
     <string name="magisk_updates">Magisk\'i uuendused</string>
     <string name="flashing">Välgutamine</string>
     <string name="hide_manager_toast">Peidan Magisk Manager\'i...</string>
+    <string name="hide_manager_toast2">See võib aega võtta...</string> 
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus...</string>
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>
@@ -112,10 +114,9 @@
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="uninstall_toast">Eemaldan Magisk Manager\'i 5 sekundi pärast, palun tee peale seda käsitsi taaskäivitus</string>
     <string name="proprietary_title">Laadi alla suletud koodi</string>
-    <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, seega ei sisalda Google\'i suletud  SafetyNet\'i API koodi.\n
-    \n
-   Kas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (mis sisaldab GoogleApiClient\'i)?</string>
-
+    <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, seega ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n\nKas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClient\'i)?</string>
+    <string name="su_db_corrupt">Superkasutaja andmebaas on korrumpteerunud, loon uue andmebaasi</string> 
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>
     <string name="settings_dark_theme_title">Tume teema</string>
@@ -125,15 +126,17 @@
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda võrgus olevate hoidlate vahemälus olev teave, sunnib rakendust võrgust värskendama</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Taaspaki Magisk Manager juhusliku nimega</string> 
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_update">Uuenda seadeid</string>
-    <string name="settings_update_channel_title">Uuenduskanal</string>
+    <string name="settings_update_channel_title">Uuenduste kanal</string>
     <string name="settings_update_stable">Stabiilne</string>
     <string name="settings_update_beta">Beeta</string>
+    <string name="settings_update_custom">Kohandatud</string> 			
+	<string name="settings_update_custom_msg">Sisesta kohandatud URL</string> 
     <string name="settings_boot_format_title">Paigatud käivitusväljundi vorming</string>
-    <string name="settings_boot_format_summary">Vali väljutatava paigatud käivituspildi vorming.\n
- Vali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
+    <string name="settings_boot_format_summary">Vali väljutatava paigatud käivituspildi vorming.\nVali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
 
     <string name="settings_core_only_title">Magisk\'i ainult tuuma režiim</string>
     <string name="settings_core_only_summary">Luba ainult põhifunktsioonid, kõiki mooduleid ei laadita. MagiskSU, MagiskHide ja süsteemivaba hosts siiski lubatakse</string>
@@ -180,8 +183,7 @@
     <string name="deny">Keela</string>
     <string name="prompt">Küsi</string>
     <string name="grant">Luba</string>
-    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\n
-   Keela, kui pole kindel!</string>
+    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\nKeela, kui sa pole kindel!</string>
     <string name="forever">Igavesti</string>
     <string name="once">Üks kord</string>
     <string name="tenmin">10 min</string>
