@@ -19,8 +19,9 @@ import com.topjohnwu.magisk.utils.Utils;
 
 public class Activity extends AppCompatActivity {
 
-    private AssetManager mAssetManager = null;
-    private Resources mResources = null;
+    private AssetManager swappedAssetManager = null;
+    private Resources swappedResources = null;
+    private Resources.Theme swappedTheme = null;
     private ActivityResultListener activityResultListener;
 
     public Activity() {
@@ -58,13 +59,18 @@ public class Activity extends AppCompatActivity {
     }
 
     @Override
+    public Resources.Theme getTheme() {
+        return swappedTheme == null ? super.getTheme() : swappedTheme;
+    }
+
+    @Override
     public AssetManager getAssets() {
-        return mAssetManager == null ? super.getAssets() : mAssetManager;
+        return swappedAssetManager == null ? super.getAssets() : swappedAssetManager;
     }
 
     @Override
     public Resources getResources() {
-        return mResources == null ? super.getResources() : mResources;
+        return swappedResources == null ? super.getResources() : swappedResources;
     }
 
     public MagiskManager getMagiskManager() {
@@ -92,30 +98,27 @@ public class Activity extends AppCompatActivity {
         activityResultListener = null;
     }
 
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        startActivityForResult(intent, requestCode, this::onActivityResult);
-    }
-
     public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
         activityResultListener = listener;
         super.startActivityForResult(intent, requestCode);
     }
 
     @Keep
-    public void swapResources(String dexPath) {
-        mAssetManager = Utils.getAssets(dexPath);
-        if (mAssetManager == null)
+    public void swapResources(String dexPath, int resId) {
+        swappedAssetManager = Utils.getAssets(dexPath);
+        if (swappedAssetManager == null)
             return;
         Resources res = super.getResources();
-        mResources = new Resources(mAssetManager, res.getDisplayMetrics(), res.getConfiguration());
-        mResources.newTheme().setTo(super.getTheme());
+        swappedResources = new Resources(swappedAssetManager, res.getDisplayMetrics(), res.getConfiguration());
+        swappedTheme = swappedResources.newTheme();
+        swappedTheme.applyStyle(resId, true);
     }
 
     @Keep
     public void restoreResources() {
-        mAssetManager = null;
-        mResources = null;
+        swappedAssetManager = null;
+        swappedResources = null;
+        swappedTheme = null;
     }
 
     public interface ActivityResultListener {

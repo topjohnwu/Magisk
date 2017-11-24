@@ -1,6 +1,7 @@
 package com.topjohnwu.snet;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import com.google.android.gms.safetynet.SafetyNetApi;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.security.SecureRandom;
 
 public class SafetyNetHelper
@@ -35,12 +37,22 @@ public class SafetyNetHelper
     private int responseCode;
     private SafetyNetCallback cb;
     private String dexPath;
+    private boolean isDarkTheme;
 
     public SafetyNetHelper(Activity activity, String dexPath, SafetyNetCallback cb) {
         mActivity = activity;
         this.cb = cb;
         this.dexPath = dexPath;
         responseCode = 0;
+
+        // Get theme
+        try {
+            Context context = activity.getApplicationContext();
+            Field theme = context.getClass().getField("isDarkTheme");
+            isDarkTheme = (boolean) theme.get(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Entry point to start test
@@ -64,8 +76,13 @@ public class SafetyNetHelper
         Class<? extends Activity> clazz = mActivity.getClass();
         try {
             // Use external resources
-            clazz.getMethod("swapResources", String.class).invoke(mActivity, dexPath);
-            GoogleApiAvailability.getInstance().getErrorDialog(mActivity, result.getErrorCode(), 0).show();
+            clazz.getMethod("swapResources", String.class, int.class).invoke(mActivity, dexPath,
+                    isDarkTheme ? android.R.style.Theme_Material : android.R.style.Theme_Material_Light);
+            try {
+                GoogleApiAvailability.getInstance().getErrorDialog(mActivity, result.getErrorCode(), 0).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             clazz.getMethod("restoreResources").invoke(mActivity);
         } catch (Exception e) {
             e.printStackTrace();
