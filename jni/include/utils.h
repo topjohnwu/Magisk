@@ -89,6 +89,7 @@ int bind_mount(const char *from, const char *to);
 void get_client_cred(int fd, struct ucred *cred);
 int switch_mnt_ns(int pid);
 int fork_dont_care();
+void wait_till_exists(const char *target);
 
 // file.c
 

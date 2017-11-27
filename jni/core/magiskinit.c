@@ -340,6 +340,17 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 	return 0;
 }
 
+static void magisk_init_daemon() {
+	// Fork a new process for full patch
+	setsid();
+	sepol_allow("su", ALL, ALL, ALL);
+	wait_till_exists("/dev/.coldboot_done");
+	dump_policydb(SELINUX_LOAD);
+	close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
+	destroy_policydb();
+	exit(0);
+}
+
 int main(int argc, char *argv[]) {
 	umask(0);
 
@@ -423,18 +434,8 @@ int main(int argc, char *argv[]) {
 
 	umount("/vendor");
 
-	if (fork() == 0) {
-		// Fork a new process for full patch
-		setsid();
-		sepol_allow("su", ALL, ALL, ALL);
-		while (access(PATCHSTART, W_OK) == -1)
-			usleep(500); /* Wait 0.5ms */
-		unlink(PATCHSTART);
-		dump_policydb(SELINUX_LOAD);
-		close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
-		destroy_policydb();
-		return 0;
-	}
+	if (fork() == 0)
+		magisk_init_daemon();
 
 	// Finally, give control back!
 	execv("/init", argv);

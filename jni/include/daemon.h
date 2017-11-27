@@ -5,6 +5,7 @@
 #define _DAEMON_H_
 
 #include <pthread.h>
+#include <sys/un.h>
 
 extern pthread_t sepol_patch;
 extern int is_restart;
@@ -42,6 +43,10 @@ typedef enum {
 void start_daemon();
 int connect_daemon();
 void auto_start_magiskhide();
+
+// socket.c
+
+int setup_socket(struct sockaddr_un *sun);
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);

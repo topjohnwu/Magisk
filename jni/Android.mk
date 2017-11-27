@@ -31,6 +31,7 @@ LOCAL_SRC_FILES := \
 	core/daemon.c \
 	core/log_monitor.c \
 	core/bootstages.c \
+	core/socket.c \
 	utils/misc.c \
 	utils/vector.c \
 	utils/xwrap.c \

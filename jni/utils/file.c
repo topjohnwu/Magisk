@@ -6,8 +6,10 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <libgen.h>
 #include <sys/sendfile.h>
 #include <sys/mman.h>
+#include <sys/inotify.h>
 #include <linux/fs.h>
 
 #ifndef NO_SELINUX
@@ -214,6 +216,23 @@ void clone_dir(int src, int dest) {
 			break;
 		}
 	}
+}
+
+void wait_till_exists(const char *target) {
+	if (access(target, F_OK) == 0)
+		return;
+	int fd = inotify_init();
+	char *dir = dirname(target);
+	char crap[PATH_MAX];
+	inotify_add_watch(fd, dir, IN_CREATE);
+	while (1) {
+		struct inotify_event event;
+		read(fd, &event, sizeof(event));
+		read(fd, crap, event.len);
+		if (access(target, F_OK) == 0)
+			break;
+	}
+	close(fd);
 }
 
 int getattr(const char *path, struct file_attr *a) {
