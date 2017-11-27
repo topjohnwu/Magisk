@@ -15,7 +15,7 @@
 #include "utils.h"
 
 int logcat_events[] = { -1, -1, -1 };
-extern int is_restart;
+extern int is_daemon_init;
 
 #ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
@@ -71,7 +71,7 @@ static void *magisk_log_thread(void *args) {
 			if (!have_data) {
 				if ((have_data = check_data())) {
 					// Dump buffered logs to file
-					if (!is_restart)
+					if (!is_daemon_init)
 						rename(LOGFILE, LASTLOG);
 					log = xfopen(LOGFILE, "a");
 					setbuf(log, NULL);

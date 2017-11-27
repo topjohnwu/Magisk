@@ -38,7 +38,6 @@
 #include <lzma.h>
 #include <cil/cil.h>
 
-
 #include "dump.h"
 #include "magiskrc.h"
 #include "utils.h"
@@ -48,6 +47,8 @@
 
 // #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
 #define VLOG(fmt, ...)
+
+int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
 
 struct cmdline {
 	int skip_initramfs;
@@ -383,10 +384,10 @@ static void magisk_init_daemon() {
 int main(int argc, char *argv[]) {
 	umask(0);
 
-	if (strcmp(basename(argv[0]), "magiskpolicy") == 0 || strcmp(basename(argv[0]), "supolicy") == 0)
-		return magiskpolicy_main(argc, argv);
-	if (argc > 1 && (strcmp(argv[1], "magiskpolicy") == 0 || strcmp(argv[1], "supolicy") == 0))
-		return magiskpolicy_main(argc - 1, argv + 1);
+	for (int i = 0; init_applet[i]; ++i) {
+		if (strcmp(basename(argv[0]), init_applet[i]) == 0)
+			return (*init_applet_main[i])(argc, argv);
+	}
 
 	if (argc > 1 && strcmp(argv[1], "-x") == 0) {
 		if (strcmp(argv[2], "magisk") == 0)
@@ -402,8 +403,6 @@ int main(int argc, char *argv[]) {
 	dump_magisk("/overlay/sbin/magisk", 0755);
 	mkdir("/overlay/root", 0755);
 	link("/init", "/overlay/root/magiskinit");
-	symlink("/root/magiskinit", "/overlay/root/magiskpolicy");
-	symlink("/root/magiskinit", "/overlay/root/supolicy");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);

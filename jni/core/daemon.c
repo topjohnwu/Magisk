@@ -13,6 +13,7 @@
 #include <signal.h>
 #include <sys/un.h>
 #include <sys/types.h>
+#include <sys/mount.h>
 #include <selinux/selinux.h>
 
 #include "magisk.h"
@@ -22,7 +23,7 @@
 #include "resetprop.h"
 
 pthread_t sepol_patch;
-int is_restart = 0;
+int is_daemon_init = 0, seperate_vendor = 0;
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);
@@ -108,6 +109,107 @@ void auto_start_magiskhide() {
 	free(hide_prop);
 }
 
+ void daemon_init() {
+	is_daemon_init = 1;
+	LOGI("* Creating /sbin overlay");
+	DIR *dir;
+	struct dirent *entry;
+	int root, sbin;
+	char buf[PATH_MAX], buf2[PATH_MAX];
+
+	// Setup links under /sbin
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	xmkdir("/root", 0755);
+	chmod("/root", 0755);
+	root = xopen("/root", O_RDONLY | O_CLOEXEC);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	dir = xfdopendir(sbin);
+	while((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		linkat(sbin, entry->d_name, root, entry->d_name, 0);
+		if (strcmp(entry->d_name, "magisk") == 0)
+			unlinkat(sbin, entry->d_name, 0);
+	}
+	close(sbin);
+	xsymlink(MOUNTPOINT, FAKEPOINT);
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+
+	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
+	chmod("/sbin", 0755);
+	setfilecon("/sbin", "u:object_r:rootfs:s0");
+	dir = xfdopendir(root);
+	while((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		snprintf(buf2, PATH_MAX, "/sbin/%s", entry->d_name);
+		xsymlink(buf, buf2);
+	}
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
+		xsymlink("/root/magisk", buf2);
+	}
+	for (int i = 0; init_applet[i]; ++i) {
+		snprintf(buf2, PATH_MAX, "/sbin/%s", init_applet[i]);
+		xsymlink("/root/magiskinit", buf2);
+	}
+	close(root);
+
+	LOGI("* Mounting mirrors");
+	struct vector mounts;
+	vec_init(&mounts);
+	file_to_vector("/proc/mounts", &mounts);
+	char *line;
+	int skip_initramfs = 0;
+	// Check whether skip_initramfs device
+	vec_for_each(&mounts, line) {
+		if (strstr(line, " /system_root ")) {
+			xmkdir_p(MIRRDIR "/system", 0755);
+			bind_mount("/system_root/system", MIRRDIR "/system");
+			skip_initramfs = 1;
+			break;
+		}
+	}
+	vec_for_each(&mounts, line) {
+		if (!skip_initramfs && strstr(line, " /system ")) {
+			sscanf(line, "%s", buf);
+			xmkdir_p(MIRRDIR "/system", 0755);
+			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
+			#ifdef MAGISK_DEBUG
+				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
+			#else
+				LOGI("mount: %s\n", MIRRDIR "/system");
+			#endif
+		} else if (strstr(line, " /vendor ")) {
+			seperate_vendor = 1;
+			sscanf(line, "%s", buf);
+			xmkdir_p(MIRRDIR "/vendor", 0755);
+			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
+			#ifdef MAGISK_DEBUG
+				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+			#else
+				LOGI("mount: %s\n", MIRRDIR "/vendor");
+			#endif
+		}
+		free(line);
+	}
+	vec_destroy(&mounts);
+	if (!seperate_vendor) {
+		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		#ifdef MAGISK_DEBUG
+			LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+		#else
+			LOGI("link: %s\n", MIRRDIR "/vendor");
+		#endif
+	}
+	xmkdir_p(MIRRDIR "/bin", 0755);
+	bind_mount(DATABIN, MIRRDIR "/bin");
+
+	LOGI("* Setting up internal busybox");
+	xmkdir_p(BBPATH, 0755);
+	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
+	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+}
+
 void start_daemon() {
 	setsid();
 	setcon("u:r:su:s0");
@@ -132,11 +234,13 @@ void start_daemon() {
 		exit(1);
 	xlisten(fd, 10);
 
-	if ((is_restart = access(MAGISKTMP, F_OK) == 0)) {
+	if ((is_daemon_init = access(MAGISKTMP, F_OK) == 0)) {
 		// Restart stuffs if the daemon is restarted
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 		auto_start_magiskhide();
 		start_debug_log();
+	} else if (check_data()) {
+		daemon_init();
 	}
 
 	// Start the log monitor

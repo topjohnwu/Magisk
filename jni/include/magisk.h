@@ -44,8 +44,10 @@
 
 extern char *argv0;     /* For changing process name */
 
-extern char *applet[];
-extern int (*applet_main[]) (int, char *[]);
+#define applet          ((char *[]) { "su", "resetprop", "magiskhide", NULL })
+#define init_applet     ((char *[]) { "magiskpolicy", "supolicy", NULL })
+
+extern int (*applet_main[]) (int, char *[]), (*init_applet_main[]) (int, char *[]);
 
 int create_links(const char *bin, const char *path);
 

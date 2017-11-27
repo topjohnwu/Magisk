@@ -8,7 +8,7 @@
 #include <sys/un.h>
 
 extern pthread_t sepol_patch;
-extern int is_restart;
+extern int is_daemon_init, seperate_vendor;
 
 // Commands require connecting to daemon
 typedef enum {
@@ -43,6 +43,7 @@ typedef enum {
 void start_daemon();
 int connect_daemon();
 void auto_start_magiskhide();
+void daemon_init();
 
 // socket.c
 

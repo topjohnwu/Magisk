@@ -24,7 +24,6 @@
 
 static char *buf, *buf2;
 static struct vector module_list;
-static int seperate_vendor = 0;
 
 extern char **environ;
 
@@ -395,102 +394,6 @@ static void simple_mount(const char *path) {
  * Miscellaneous *
  *****************/
 
-// A one time setup
-static void daemon_init() {
-	LOGI("* Creating /sbin overlay");
-	DIR *dir;
-	struct dirent *entry;
-	int root, sbin;
-	// Setup links under /sbin
-	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-	xmkdir("/root", 0755);
-	chmod("/root", 0755);
-	root = xopen("/root", O_RDONLY | O_CLOEXEC);
-	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	dir = xfdopendir(sbin);
-	while((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-		linkat(sbin, entry->d_name, root, entry->d_name, 0);
-		if (strcmp(entry->d_name, "magisk") == 0)
-			unlinkat(sbin, entry->d_name, 0);
-	}
-	close(sbin);
-	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
-	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	fchmod(sbin, 0755);
-	fsetfilecon(sbin, "u:object_r:rootfs:s0");
-	dir = xfdopendir(root);
-	while((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
-		snprintf(buf2, PATH_MAX, "/sbin/%s", entry->d_name);
-		xsymlink(buf, buf2);
-	}
-	for (int i = 0; applet[i]; ++i) {
-		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
-		xsymlink("/root/magisk", buf2);
-	}
-	xsymlink(MOUNTPOINT, FAKEPOINT);
-	close(root);
-	close(sbin);
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-
-	LOGI("* Mounting mirrors");
-	struct vector mounts;
-	vec_init(&mounts);
-	file_to_vector("/proc/mounts", &mounts);
-	char *line;
-	int skip_initramfs = 0;
-	// Check whether skip_initramfs device
-	vec_for_each(&mounts, line) {
-		if (strstr(line, " /system_root ")) {
-			xmkdir_p(MIRRDIR "/system", 0755);
-			bind_mount("/system_root/system", MIRRDIR "/system");
-			skip_initramfs = 1;
-			break;
-		}
-	}
-	vec_for_each(&mounts, line) {
-		if (!skip_initramfs && strstr(line, " /system ")) {
-			sscanf(line, "%s", buf);
-			xmkdir_p(MIRRDIR "/system", 0755);
-			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
-			#ifdef MAGISK_DEBUG
-				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
-			#else
-				LOGI("mount: %s\n", MIRRDIR "/system");
-			#endif
-		} else if (strstr(line, " /vendor ")) {
-			seperate_vendor = 1;
-			sscanf(line, "%s", buf);
-			xmkdir_p(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
-			#ifdef MAGISK_DEBUG
-				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
-			#else
-				LOGI("mount: %s\n", MIRRDIR "/vendor");
-			#endif
-		}
-		free(line);
-	}
-	vec_destroy(&mounts);
-	if (!seperate_vendor) {
-		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-		#ifdef MAGISK_DEBUG
-			LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-		#else
-			LOGI("link: %s\n", MIRRDIR "/vendor");
-		#endif
-	}
-	xmkdir_p(MIRRDIR "/bin", 0755);
-	bind_mount(DATABIN, MIRRDIR "/bin");
-
-	LOGI("* Setting up internal busybox");
-	xmkdir_p(BBPATH, 0755);
-	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
-	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
-}
-
 static int prepare_img() {
 	// First merge images
 	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
@@ -624,7 +527,8 @@ void post_fs_data(int client) {
 	exec_command_sync("sh", "-c", "mv -f /data/magisk/stock_*.img.gz /data", NULL);
 
 	// Initialize
-	daemon_init();
+	if (!is_daemon_init)
+		daemon_init();
 
 	// uninstaller
 	if (access(UNINSTALLER, F_OK) == 0) {
