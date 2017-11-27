@@ -163,11 +163,12 @@ void sepol_min_rules() {
 	sepol_attradd("su", "mlstrustedsubject");
 	sepol_attradd("su_device", "mlstrustedobject");
 
-	// Let pre-init do stuffs
-	sepol_allow("kernel", "kernel", "security", "load_policy");
-	sepol_allow("kernel", "kernel", "capability", "dac_override");
+	// Let magiskinit daemon monitor and transit to su
 	sepol_allow("kernel", "device", "dir", ALL);
 	sepol_allow("kernel", "device", "file", ALL);
+	sepol_allow("kernel", "su", "unix_stream_socket", "connectto");
+	sepol_allow("kernel", "kernel", "process", "setcurrent");
+	sepol_allow("kernel", "su", "process", "dyntransition");
 
 	// Let init run stuffs in su context
 	sepol_allow("kernel", "su", "fd", "use");
