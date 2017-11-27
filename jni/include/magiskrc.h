@@ -4,9 +4,6 @@ const char magiskrc[] =
 
 "on post-fs\n"
 "   start logd\n"
-"   start magisk_daemon\n"
-"   wait /dev/.magisk.unblock 5\n"
-"   rm /dev/.magisk.unblock\n"
 "   start magisk_pfs\n"
 "   wait /dev/.magisk.unblock 10\n"
 "\n"
@@ -19,11 +16,16 @@ const char magiskrc[] =
 "   rm /dev/.magisk.unblock\n"
 "\n"
 
+"on property:magisk.daemon=1\n"
+"   start magisk_daemon\n"
+"\n"
+
 // Services
 
 "service magisk_daemon /sbin/magisk --daemon\n"
 "   user root\n"
 "   seclabel u:r:su:s0\n"
+"   oneshot\n"
 "\n"
 
 "service magisk_pfs /sbin/magisk --post-fs\n"

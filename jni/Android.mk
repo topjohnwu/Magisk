@@ -69,6 +69,8 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	core/magiskinit.c \
+	core/socket.c \
+	utils/misc.c \
 	utils/vector.c \
 	utils/file.c \
 	utils/xwrap.c \

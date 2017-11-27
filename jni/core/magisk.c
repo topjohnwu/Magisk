@@ -148,8 +148,9 @@ int main(int argc, char *argv[]) {
 			clone_attr(argv[2], argv[3]);
 			return 0;
 		} else if (strcmp(argv[1], "--daemon") == 0) {
-			// Start daemon, this process won't return
-			start_daemon();
+			if (xfork() == 0)
+				start_daemon();
+			return 0;
 		} else if (strcmp(argv[1], "--post-fs") == 0) {
 			int fd = connect_daemon();
 			write_int(fd, POST_FS);

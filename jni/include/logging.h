@@ -45,6 +45,7 @@ void start_debug_log();
 
 #include <stdio.h>
 
+#define LOGI(...)
 #define LOGE(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
 #define PLOGE(fmt, args...) { fprintf(stderr, fmt " failed with %d: %s\n\n", ##args, errno, strerror(errno)); exit(1); }
 

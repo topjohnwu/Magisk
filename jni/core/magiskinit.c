@@ -38,11 +38,13 @@
 #include <lzma.h>
 #include <cil/cil.h>
 
-#include "magisk.h"
+
+#include "dump.h"
+#include "magiskrc.h"
 #include "utils.h"
 #include "magiskpolicy.h"
-#include "magiskrc.h"
-#include "dump.h"
+#include "daemon.h"
+#include "magisk.h"
 
 // #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
 #define VLOG(fmt, ...)
@@ -341,13 +343,40 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 }
 
 static void magisk_init_daemon() {
-	// Fork a new process for full patch
 	setsid();
 	sepol_allow("su", ALL, ALL, ALL);
+
+	// Wait till init cold boot done
 	wait_till_exists("/dev/.coldboot_done");
+
+	// Transit our context to su (mimic setcon)
+	int fd, crap;
+	fd = open("/proc/self/attr/current", O_WRONLY);
+	write(fd, "u:r:su:s0", 9);
+	close(fd);
+
+	// Dump full patch to kernel
 	dump_policydb(SELINUX_LOAD);
 	close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
 	destroy_policydb();
+
+	// Keep Magisk daemon always alive
+	struct sockaddr_un sun;
+	fd = setup_socket(&sun);
+	while (1) {
+		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
+			usleep(10000); /* Wait 10 ms after each try */
+
+		/* Should hold forever */
+		read(fd, &crap, sizeof(crap));
+
+		/* If things went here, it means the other side of the socket is closed
+		 * We restart the daemon again */
+		if (fork_dont_care() == 0) {
+			execv("/sbin/magisk", (char *[]) { "resetprop", "magisk.daemon", "1", NULL } );
+			exit(1);
+		}
+	}
 	exit(0);
 }
 
@@ -434,8 +463,10 @@ int main(int argc, char *argv[]) {
 
 	umount("/vendor");
 
-	if (fork() == 0)
+	if (fork_dont_care() == 0) {
+		strcpy(argv[0], "magiskinit");
 		magisk_init_daemon();
+	}
 
 	// Finally, give control back!
 	execv("/init", argv);

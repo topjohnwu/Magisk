@@ -128,7 +128,8 @@ void start_daemon() {
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun);
 
-	xbind(fd, (struct sockaddr*) &sun, sizeof(sun));
+	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun)))
+		exit(1);
 	xlisten(fd, 10);
 
 	if ((is_restart = access(MAGISKTMP, F_OK) == 0)) {
@@ -149,9 +150,6 @@ void start_daemon() {
 	// Unlock all blocks for rw
 	unlock_blocks();
 
-	// Notifiy init the daemon is started
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT));
-
 	// Loop forever to listen for requests
 	while(1) {
 		int *client = xmalloc(sizeof(int));
@@ -167,7 +165,7 @@ void start_daemon() {
 int connect_daemon() {
 	struct sockaddr_un sun;
 	int fd = setup_socket(&sun);
-	if (xconnect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
+	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
 		// If we cannot access the daemon, we start a daemon in the child process if possible
 
 		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
@@ -181,10 +179,8 @@ int connect_daemon() {
 			start_daemon();
 		}
 
-		do {
-			// Wait for 10ms
-			usleep(10);
-		} while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)));
+		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
+			usleep(10000);
 	}
 	return fd;
 }
