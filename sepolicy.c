@@ -255,7 +255,7 @@ int dump_policydb(const char *filename) {
 		return 1;
 	}
 
-	fd = open(filename, O_RDWR | O_CREAT, 0644);
+	fd = creat(filename, 0644);
 	if (fd < 0) {
 		fprintf(stderr, "Can't open '%s':  %s\n",
 		        filename, strerror(errno));

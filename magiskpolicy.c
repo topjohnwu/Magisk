@@ -58,14 +58,15 @@ static void statements() {
 
 static void usage(char *arg0) {
 	fprintf(stderr,
-		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu & phh) - sepolicy Modification Tool\n\n"
+		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
 		"Usage: %s [--options...] [policystatements...]\n\n"
 		"Options:\n"
-		"  --live                directly load patched policy to device\n"
-		"  --minimal             minimal patches, used for boot image patches\n"
-		"  --load <infile>       load policies from <infile>\n"
-		"                        (load from live policies if not specified)\n"
-		"  --save <outfile>      save policies to <outfile>\n\n"
+		"  --live            directly apply patched policy live\n"
+		"  --magisk          built-in rules for a Magisk selinux environment\n"
+		"  --load FILE       load policies from <infile>\n"
+		"  --save FILE       save policies to <outfile>\n\n"
+		"If no input file is specified, it will load from current policies\n"
+		"If neither --live nor --save is specified, nothing will happen\n\n"
 		, arg0);
 	statements();
 	exit(1);
@@ -381,7 +382,7 @@ static void syntax_error_msg() {
 
 int magiskpolicy_main(int argc, char *argv[]) {
 	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
-	int live = 0, minimal = 0;
+	int live = 0, magisk = 0;
 	struct vector rules;
 
 	vec_init(&rules);
@@ -391,8 +392,8 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
 			if (strcmp(argv[i], "--live") == 0)
 				live = 1;
-			else if (strcmp(argv[i], "--minimal") == 0)
-				minimal = 1;
+			else if (strcmp(argv[i], "--magisk") == 0)
+				magisk = 1;
 			else if (strcmp(argv[i], "--load") == 0) {
 				if (i + 1 >= argc) usage(argv[0]);
 				infile = argv[i + 1];
@@ -403,8 +404,9 @@ int magiskpolicy_main(int argc, char *argv[]) {
 				i += 1;
 			} else
 				usage(argv[0]);
-		} else
+		} else {
 			vec_push_back(&rules, argv[i]);
+		}
 	}
 
 	// Use current policy if not specified
@@ -416,8 +418,8 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	if (minimal)
-		sepol_min_rules();
+	if (magisk)
+		sepol_magisk_rules();
 
 	for (int i = 0; i < rules.size; ++i) {
 		// Since strtok will modify the origin string, copy the policy for error messages
@@ -472,11 +474,10 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	if (live)
 		outfile = SELINUX_LOAD;
 
-	if (outfile)
-		if (dump_policydb(outfile)) {
-			fprintf(stderr, "Cannot dump policy to %s\n", outfile);
-			return 1;
-		}
+	if (outfile && dump_policydb(outfile)) {
+		fprintf(stderr, "Cannot dump policy to %s\n", outfile);
+		return 1;
+	}
 
 	destroy_policydb();
 	return 0;
