@@ -14,12 +14,13 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
-
-    <string name="checking_for_updates">Suche nach Updates…</string>
+    <string name="checking_for_updates">Suche nach Aktualisierungen…</string>
     <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
+    <string name="invalid_update_channel">Nicht valider Aktualisierungskanal</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
+    <string name="safetyNet_api_error">SafetyNet API Fehler</string>
     <string name="safetyNet_network_loss">Netzwerkverbindung verloren</string>
     <string name="safetyNet_service_disconnected">Der Dienst wurde beendet</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
@@ -32,6 +33,8 @@
     <string name="install_magisk_title">Neueste Version: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
+    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt und wenn die Daten nicht verschlüsselt sind, werden sie möglicherweise verschlüsselt.</string>
+    <string name="update">Aktualisierung %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nichts angegeben)</string>
@@ -44,7 +47,7 @@
     <string name="author">Erstellt von %1$s</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Update verfügbar</string>
+    <string name="update_available">Aktualisierung verfügbar</string>
     <string name="installed">Installiert</string>
     <string name="not_installed">Nicht installiert</string>
 
@@ -80,47 +83,62 @@
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="reboot">Neustart</string>
     <string name="downloading_toast">Herunterladen von %1$s</string>
-    <string name="magisk_update_title">Neues Magisk-Update verfügbar!</string>
+    <string name="magisk_update_title">Neue Magisk-Aktualisierung verfügbar!</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
     <string name="release_notes">Änderungen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
-    <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide gehandhabt</string>
+    <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide verwaltet wird</string>
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_download_title">Herunterladen</string>
     <string name="zip_download_msg">Lade Zip-Datei herunter (%1$d%%) …</string>
     <string name="zip_process_title">Verarbeite</string>
     <string name="zip_process_msg">Verarbeite Zip-Datei…</string>
-    <string name="manager_update_title">Update für Magisk Manager verfügbar!</string>
+    <string name="manager_update_title">Aktualisierung für Magisk Manager verfügbar!</string>
     <string name="manager_download_install">Herunterladen und installieren</string>
-    <string name="magisk_updates">Magisk Updates</string>
+    <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte Neustart durchführen</string>
+    <string name="magisk_updates">Magisk Aktualisierungen</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Verberge Magisk Manager…</string>
+    <string name="hide_manager_toast2">Dies könnte einige Zeit in Anspruch nehmen…</string>
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="download_zip_only">Zip-Datei nur herunterladen</string>
     <string name="patch_boot_file">Boot-Image-Datei patchen</string>
     <string name="direct_install">Direkt installieren (empfohlen)</string>
+    <string name="install_second_slot">Installiere auf zweiten Slot (Nach OTA)</string>
     <string name="select_method">Methode auswählen</string>
     <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Boot-Images nicht</string>
+    <string name="boot_file_patch_msg">Selektiere das originale Boot image dump im Format .img oder .img.tar</string>
+    <string name="complete_uninstall">Komplette Deinstallation</string>
+    <string name="restore_stock_boot">Stelle originalen Boot wieder her</string>
+    <string name="restore_done">Wiederherstellung durchgeführt!</string>
+    <string name="restore_fail">Kein Original Backup vorhanden!</string>
+    <string name="uninstall_toast">Deinstalliere Magisk Manager in 5 Sekunden, bitte im Anschluss manuell neustarten</string>
+    <string name="proprietary_title">Lade proprietären Code herunter</string>
+    <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
+    <string name="su_db_corrupt">Datenbank für SU ist fehlerhaft, es wird eine neue erstellt</string>
 	
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
     <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
-    <string name="settings_notification_title">Update-Benachrichtigung</string>
+    <string name="settings_notification_title">Aktualisierungs-Benachrichtigung</string>
     <string name="settings_notification_summary">Benachrichtigung, wenn eine neue Version verfügbar ist</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
-    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Aktualisierung</string>
+    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Online-Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
+    <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
-    <string name="settings_update">Update-Einstellungen</string>
-    <string name="settings_update_channel_title">Update-Kanal</string>
+    <string name="settings_update">Aktualisierungs-Einstellungen</string>
+    <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Benutzerdefiniert</string>
+    <string name="settings_update_custom_msg">Gebe eine benutzerdefinierte URL ein</string>
     <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
     <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
-
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
@@ -140,25 +158,25 @@
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
     <string name="request_timeout_summary">%1$s Sekunden</string>
-    <string name="settings_su_reauth_title">Nach Updates erneut authentifizieren</string>
-    <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Updates erneut abfragen</string>
+    <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
+    <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
     <string name="settings_owner_manage">Durch Gerätebesitzer verwaltet</string>
-    <string name="settings_user_independent">User Independent</string>
-    <string name="owner_only_summary">Nur der Besitzer hat root-Zugriff</string>
-    <string name="owner_manage_summary">Nur der Besitzer verwaltet den root-Zugriff und erhält Zugriffs-Anfragen</string>
-    <string name="user_indepenent_summary">Jeder Nutzer hat seine eingenen root-Regeln</string>
+    <string name="settings_user_independent">Benutzerunabhängig</string>
+    <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
+    <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffs-Anfragen</string>
+    <string name="user_indepenent_summary">Jeder Nutzer hat seine eingenen Root-Regeln</string>
     <string name="multiuser_hint_owner_request">Eine Anfrage wurde an den Gerätebesitzer gesendet. Bitte wechsle zum Bersitzerkonto und gewähre die Rechte</string>
 
     <string name="mount_namespace_mode">Namensraum-Modus</string>
     <string name="settings_ns_global">Globaler Namensraum</string>
     <string name="settings_ns_requester">Geerbter Namensraum</string>
     <string name="settings_ns_isolate">Isolierter Namensraum</string>
-    <string name="global_summary">Alle root-Sitzungen benutzen den global angelegten Namensraum</string>
+    <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namensraum</string>
     <string name="requester_summary">Root-Sitzungen erben den Namensraum des Abfragenden</string>
-    <string name="isolate_summary">Jede root-Sitzung hat ihren isolierten Namensraum</string>
+    <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namensraum</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
