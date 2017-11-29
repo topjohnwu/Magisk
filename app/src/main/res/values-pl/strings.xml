@@ -14,10 +14,10 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie jest zainstalowany</string>
-
     <string name="checking_for_updates">Sprawdzanie aktualizacji…</string>
     <string name="magisk_update_available">Magisk v%1$s dostępny!</string>
-    <string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
+    <string name="invalid_update_channel">Nieprawidłowy Kanał Aktualizacji</string>
+	<string name="safetyNet_check_text">Dotknij aby sprawdzić SafetyNet</string>
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">Sprawdzanie SafetyNet z Powodzeniem</string>
     <string name="safetyNet_api_error">Bład SafetyNet API</string>
@@ -117,7 +117,8 @@
     <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>
     <string name="proprietary_title">Pobierz Własny Kod</string>
     <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzeń SafetyNet?</string>
-    
+    <string name="su_db_corrupt">Baza danych SU jest uszkodzona, odtworzy nową bazę danych</string>
+	
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
@@ -134,7 +135,9 @@
     <string name="settings_update_channel_title">Aktualizacja Kanału</string>
     <string name="settings_update_stable">Stabilna</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_boot_format_title">Poprawny format wyjścia rozruchowego</string>
+    <string name="settings_update_custom">Własna</string>
+	<string name="settings_update_custom_msg">Wstaw własny URL</string>
+	<string name="settings_boot_format_title">Poprawny format wyjścia rozruchowego</string>
     <string name="settings_boot_format_summary">Wybierz format pliku boot image.\nWybierz .img dla wgrywania poprzez Fastboot/Download Mode; wybierz .img.tar dla ODINA.</string>
     <string name="settings_core_only_title">Tylko Tryb Rdzeni Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
