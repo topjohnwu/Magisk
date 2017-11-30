@@ -19,7 +19,6 @@
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
-#include "magiskpolicy.h"
 #include "resetprop.h"
 
 pthread_t sepol_patch;

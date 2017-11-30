@@ -299,7 +299,7 @@ static void patch_sepolicy() {
 		compile_cil();
 	}
 
-	sepol_med_rules();
+	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
 }
 
@@ -345,6 +345,8 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 
 static void magisk_init_daemon() {
 	setsid();
+
+	// Full patch
 	sepol_allow("su", ALL, ALL, ALL);
 
 	// Wait till init cold boot done
@@ -358,7 +360,7 @@ static void magisk_init_daemon() {
 
 	// Dump full patch to kernel
 	dump_policydb(SELINUX_LOAD);
-	close(open(PATCHDONE, O_RDONLY | O_CREAT, 0));
+	close(creat(PATCHDONE, 0));
 	destroy_policydb();
 
 	// Keep Magisk daemon always alive

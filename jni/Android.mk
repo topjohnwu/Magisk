@@ -63,6 +63,7 @@ LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := libsepol liblzma
 LOCAL_C_INCLUDES := \
 	jni/include \
+	jni/magiskpolicy \
 	out/$(TARGET_ARCH_ABI) \
 	$(LIBSEPOL) \
 	$(LIBLZMA)
