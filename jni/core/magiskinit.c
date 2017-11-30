@@ -177,8 +177,8 @@ static void patch_ramdisk() {
 	size_t size;
 	mmap_rw("/init", &addr, &size);
 	for (int i = 0; i < size; ++i) {
-		if (memcmp(addr + i, "/system/etc/selinux/plat_sepolicy.cil", 37) == 0) {
-			memcpy(addr + i, "/system/etc/selinux/plat_sepolicy.xxx", 37);
+		if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
+			memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
 			break;
 		}
 	}
@@ -218,29 +218,31 @@ static int compile_cil() {
 	cil_set_attrs_expand_generated(db, 0);
 
 	// plat
-	mmap_ro("/system/etc/selinux/plat_sepolicy.cil", &addr, &size);
-	cil_add_file(db, "/system/etc/selinux/plat_sepolicy.cil", addr, size);
+	mmap_ro(SPLIT_PLAT_CIL, &addr, &size);
+	VLOG("cil_add[%s]\n", SPLIT_PLAT_CIL);
+	cil_add_file(db, SPLIT_PLAT_CIL, addr, size);
 	munmap(addr, size);
 
 	// mapping
 	char plat[10];
-	int fd = open("/vendor/etc/selinux/plat_sepolicy_vers.txt", O_RDONLY | O_CLOEXEC);
-	if (fd > 0) {
-		plat[read(fd, plat, sizeof(plat)) - 1] = '\0';
-		snprintf(path, sizeof(path), "/system/etc/selinux/mapping/%s.cil", plat);
-		mmap_ro(path, &addr, &size);
-		cil_add_file(db, path, addr, size);
-		munmap(addr, size);
-		close(fd);
-	}
+	int fd = open(SPLIT_NONPLAT_VER, O_RDONLY | O_CLOEXEC);
+	plat[read(fd, plat, sizeof(plat)) - 1] = '\0';
+	snprintf(path, sizeof(path), SPLIT_PLAT_MAPPING, plat);
+	mmap_ro(path, &addr, &size);
+	VLOG("cil_add[%s]\n", path);
+	cil_add_file(db, path, addr, size);
+	munmap(addr, size);
+	close(fd);
 
-	dir = opendir("/vendor/etc/selinux");
+	// nonplat
+	dir = opendir(NONPLAT_POLICY_DIR);
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (strend(entry->d_name, ".cil") == 0) {
-			snprintf(path, sizeof(path), "/vendor/etc/selinux/%s", entry->d_name);
+			snprintf(path, sizeof(path), NONPLAT_POLICY_DIR "%s", entry->d_name);
 			mmap_ro(path, &addr, &size);
+			VLOG("cil_add[%s]\n", path);
 			cil_add_file(db, path, addr, size);
 			munmap(addr, size);
 		}
@@ -262,42 +264,45 @@ static int verify_precompiled() {
 	int fd;
 	char sys_sha[70], ven_sha[70];
 
-	dir = opendir("/vendor/etc/selinux");
+	// init the strings with different value
+	sys_sha[0] = 0;
+	ven_sha[0] = 1;
+
+	dir = opendir(NONPLAT_POLICY_DIR);
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (strend(entry->d_name, ".sha256") == 0) {
 			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			ven_sha[read(fd, ven_sha, sizeof(ven_sha))] = '\0';
+			ven_sha[read(fd, ven_sha, sizeof(ven_sha)) - 1] = '\0';
 			close(fd);
 			break;
 		}
 	}
 	closedir(dir);
-	dir = opendir("/system/etc/selinux");
+	dir = opendir(PLAT_POLICY_DIR);
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (strend(entry->d_name, ".sha256") == 0) {
 			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			sys_sha[read(fd, sys_sha, sizeof(sys_sha))] = '\0';
+			sys_sha[read(fd, sys_sha, sizeof(sys_sha)) - 1] = '\0';
 			close(fd);
 			break;
 		}
 	}
 	closedir(dir);
-	return strcmp(sys_sha, ven_sha);
+	VLOG("sys_sha[%s]\nven_sha[%s]\n", sys_sha, ven_sha);
+	return strcmp(sys_sha, ven_sha) == 0;
 }
 
 static void patch_sepolicy() {
-	if (access("/sepolicy", R_OK) == 0) {
+	if (access("/sepolicy", R_OK) == 0)
 		load_policydb("/sepolicy");
-	} else if (access("/vendor/etc/selinux/precompiled_sepolicy", R_OK) == 0
-		&& verify_precompiled() == 0) {
-		load_policydb("/vendor/etc/selinux/precompiled_sepolicy");
-	} else if (access("/system/etc/selinux/plat_sepolicy.cil", R_OK) == 0) {
+	else if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled())
+		load_policydb(SPLIT_PRECOMPILE);
+	else if (access(SPLIT_PLAT_CIL, R_OK) == 0)
 		compile_cil();
-	}
 
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");

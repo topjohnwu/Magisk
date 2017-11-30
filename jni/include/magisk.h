@@ -35,10 +35,19 @@
 #define MAGISKRC        "/init.magisk.rc"
 
 
+// selinuxfs paths
 #define SELINUX_PATH        "/sys/fs/selinux/"
 #define SELINUX_ENFORCE     SELINUX_PATH "enforce"
 #define SELINUX_POLICY      SELINUX_PATH "policy"
 #define SELINUX_LOAD        SELINUX_PATH "load"
+
+// split policy paths
+#define PLAT_POLICY_DIR     "/system/etc/selinux/"
+#define NONPLAT_POLICY_DIR  "/vendor/etc/selinux/"
+#define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
+#define SPLIT_PLAT_MAPPING  PLAT_POLICY_DIR "mapping/%s.cil"
+#define SPLIT_PRECOMPILE    NONPLAT_POLICY_DIR "precompiled_sepolicy"
+#define SPLIT_NONPLAT_VER   NONPLAT_POLICY_DIR "plat_sepolicy_vers.txt"
 
 #define MAGISKHIDE_PROP     "persist.magisk.hide"
 
