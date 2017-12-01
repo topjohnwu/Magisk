@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.container.InputStreamWrapper;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
@@ -24,6 +23,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -167,7 +167,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         return this;
     }
 
-    private class ProgressInputStream extends InputStreamWrapper {
+    private class ProgressInputStream extends FilterInputStream {
 
         ProgressInputStream(InputStream in) {
             super(in);
