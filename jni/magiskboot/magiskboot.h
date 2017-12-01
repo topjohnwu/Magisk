@@ -32,4 +32,18 @@ size_t lz4_legacy(int mode, int fd, const void *buf, size_t size);
 long long comp(file_t type, int to, const void *from, size_t size);
 long long decomp(file_t type, int to, const void *from, size_t size);
 
+typedef enum {
+    NONE,
+    RM,
+    MKDIR,
+    ADD,
+    MV,
+    EXTRACT,
+    TEST,
+    PATCH,
+    BACKUP,
+    RESTORE,
+    STOCKSHA1
+} command_t;
+
 #endif

@@ -100,12 +100,13 @@ LOCAL_SRC_FILES := \
 	magiskboot/bootimg.c \
 	magiskboot/hexpatch.c \
 	magiskboot/compress.c \
-	magiskboot/cpio.c \
 	magiskboot/sha1.c \
 	magiskboot/types.c \
 	magiskboot/dtb.c \
+	magiskboot/ramdisk.c \
 	utils/xwrap.c \
 	utils/file.c \
+	utils/cpio.c \
 	utils/vector.c
 
 LOCAL_CFLAGS := -DNO_SELINUX
