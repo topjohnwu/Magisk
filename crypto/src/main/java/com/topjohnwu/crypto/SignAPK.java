@@ -21,12 +21,14 @@ import org.bouncycastle.util.encoders.Base64;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
 import java.security.DigestOutputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -36,7 +38,6 @@ import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -84,7 +85,7 @@ public class SignAPK {
 
         outputFile = new BufferedOutputStream(new FileOutputStream(output));
         if (minSign) {
-            signWholeFile(input.getInputStream(), publicKey, privateKey, outputFile);
+            signWholeFile(input.getFile(), publicKey, privateKey, outputFile);
         } else {
             JarOutputStream outputJar = new JarOutputStream(outputFile);
             // For signing .apks, use the maximum compression to make
@@ -373,15 +374,12 @@ public class SignAPK {
     // Used for signWholeFile
     private static class CMSProcessableFile implements CMSTypedData {
 
-        private InputStream is;
         private ASN1ObjectIdentifier type;
-        ByteArrayStream bos;
+        private RandomAccessFile file;
 
-        CMSProcessableFile(InputStream is) {
-            this.is = is;
+        CMSProcessableFile(File file) throws FileNotFoundException {
+            this.file = new RandomAccessFile(file, "r");
             type = new ASN1ObjectIdentifier(CMSObjectIdentifiers.data.getId());
-            bos = new ByteArrayStream();
-            bos.readFrom(is);
         }
 
         @Override
@@ -391,20 +389,30 @@ public class SignAPK {
 
         @Override
         public void write(OutputStream out) throws IOException, CMSException {
-            bos.writeTo(out, 0, bos.size() - 2);
+            file.seek(0);
+            int read;
+            byte buffer[] = new byte[4096];
+            int len = (int) file.length() - 2;
+            while ((read = file.read(buffer, 0, len < buffer.length ? len : buffer.length)) > 0) {
+                out.write(buffer, 0, read);
+                len -= read;
+            }
         }
 
         @Override
         public Object getContent() {
-            return is;
+            return file;
         }
 
-        byte[] getTail() {
-            return Arrays.copyOfRange(bos.getBuf(), bos.size() - 22, bos.size());
+        byte[] getTail() throws IOException {
+            byte tail[] = new byte[22];
+            file.seek(file.length() - 22);
+            file.readFully(tail);
+            return tail;
         }
     }
 
-    private static void signWholeFile(InputStream input, X509Certificate publicKey,
+    private static void signWholeFile(File input, X509Certificate publicKey,
                                       PrivateKey privateKey, OutputStream outputStream)
             throws Exception {
         ByteArrayOutputStream temp = new ByteArrayOutputStream();
