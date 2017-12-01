@@ -50,7 +50,7 @@ LOCAL_SRC_FILES := \
 	su/su_daemon.c \
 	su/su_socket.c
 
-LOCAL_CFLAGS := -DIS_DAEMON
+LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
 
@@ -80,7 +80,6 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c
 
-LOCAL_CFLAGS := -DNO_SELINUX
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
@@ -109,7 +108,7 @@ LOCAL_SRC_FILES := \
 	utils/cpio.c \
 	utils/vector.c
 
-LOCAL_CFLAGS := -DNO_SELINUX
+LOCAL_CFLAGS := -DXWRAP_EXIT
 LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
 

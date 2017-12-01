@@ -11,7 +11,23 @@
 #define str(a) #a
 #define xstr(a) str(a)
 
+/**************
+ * No logging *
+ **************/
+
+#define LOGI(...)
+#define LOGE(...)
+#define PLOGE(...)
+
+/******************
+ * Daemon logging *
+ ******************/
+
 #ifdef IS_DAEMON
+
+#undef LOGI
+#undef LOGE
+#undef PLOGE
 
 #include <pthread.h>
 #include <android/log.h>
@@ -41,7 +57,17 @@ void start_debug_full_log();
 void stop_debug_full_log();
 void start_debug_log();
 
-#else // IS_DAEMON
+#endif
+
+/********************
+ * Tools Log & Exit *
+ ********************/
+
+#ifdef XWRAP_EXIT
+
+#undef LOGI
+#undef LOGE
+#undef PLOGE
 
 #include <stdio.h>
 
@@ -49,6 +75,7 @@ void start_debug_log();
 #define LOGE(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
 #define PLOGE(fmt, args...) { fprintf(stderr, fmt " failed with %d: %s\n\n", ##args, errno, strerror(errno)); exit(1); }
 
-#endif // IS_DAEMON
+#endif
+
 
 #endif // _LOGGING_H_

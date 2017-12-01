@@ -12,7 +12,7 @@
 #include <sys/inotify.h>
 #include <linux/fs.h>
 
-#ifndef NO_SELINUX
+#ifdef SELINUX
 #include <selinux/selinux.h>
 #endif
 
@@ -238,8 +238,8 @@ void wait_till_exists(const char *target) {
 int getattr(const char *path, struct file_attr *a) {
 	if (xlstat(path, &a->st) == -1)
 		return -1;
+#ifdef SELINUX
 	char *con = "";
-#ifndef NO_SELINUX
 	if (lgetfilecon(path, &con) == -1)
 		return -1;
 	strcpy(a->con, con);
@@ -277,7 +277,7 @@ int setattr(const char *path, struct file_attr *a) {
 		return -1;
 	if (chown(path, a->st.st_uid, a->st.st_gid) < 0)
 		return -1;
-#ifndef NO_SELINUX
+#ifdef SELINUX
 	if (strlen(a->con) && lsetfilecon(path, a->con) < 0)
 		return -1;
 #endif
@@ -294,7 +294,7 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fsetattr(int fd, struct file_attr *a) {
-#ifndef NO_SELINUX
+#ifdef SELINUX
 	char path[PATH_MAX];
 	fd_getpath(fd, path, sizeof(path));
 	return setattr(path, a);
@@ -319,7 +319,7 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	fsetattr(targetfd, &a);
 }
 
-#ifndef NO_SELINUX
+#ifdef SELINUX
 
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
@@ -355,7 +355,7 @@ void restorecon(int dirfd, int force) {
 	}
 }
 
-#endif   // NO_SELINUX
+#endif   // SELINUX
 
 static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
 	struct stat st;
