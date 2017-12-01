@@ -42,6 +42,10 @@ public class SplashActivity extends Activity {
         }
 
         mm.loadMagiskInfo();
+        if (Utils.itemExist(Const.MANAGER_CONFIGS)) {
+            Utils.loadPrefs();
+        }
+
         LoadModules loadModuleTask = new LoadModules();
 
         if (Utils.checkNetworkStatus()) {
@@ -63,14 +67,6 @@ public class SplashActivity extends Activity {
 
             // Setup suDB
             SuDatabaseHelper.setupSuDB();
-
-            // Check alternative Magisk Manager
-            String pkg;
-            if (getPackageName().equals(Const.ORIG_PKG_NAME) &&
-                    (pkg = mm.suDB.getStrings(Const.Key.SU_REQUESTER, null)) != null) {
-                Shell.su_raw("pm uninstall " + pkg);
-                mm.suDB.setStrings(Const.Key.SU_REQUESTER, null);
-            }
 
             // Add update checking service
             if (Const.Value.UPDATE_SERVICE_VER > mm.updateServiceVersion) {

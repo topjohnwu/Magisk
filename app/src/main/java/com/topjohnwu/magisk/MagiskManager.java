@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.app.Application;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -103,13 +104,21 @@ public class MagiskManager extends Application {
             suDB = new SuDatabaseHelper();
         }
 
-        // If detect original package, self destruct!
+        // Handle duplicate package
         if (!getPackageName().equals(Const.ORIG_PKG_NAME)) {
             try {
                 getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
-                Shell.su(String.format(Locale.US, "pm uninstall --user %d %s", userId, getPackageName()));
+                Intent intent = getPackageManager().getLaunchIntentForPackage(Const.ORIG_PKG_NAME);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 return;
-            } catch (PackageManager.NameNotFoundException ignored) { /* Expected*/ }
+            } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
+        } else {
+            String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null);
+            if (pkg != null) {
+                Shell.su_raw("pm uninstall " + pkg);
+                suDB.setStrings(Const.Key.SU_REQUESTER, null);
+            }
         }
 
         repoDB = new RepoDatabaseHelper(this);

@@ -131,7 +131,8 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
             return false;
 
         mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
-        Shell.su_raw(String.format(Locale.US, "pm uninstall --user %d %s", mm.userId, mm.getPackageName()));
+        Utils.dumpPrefs();
+        Shell.su_raw("pm uninstall " + Const.ORIG_PKG_NAME);
 
         return true;
     }

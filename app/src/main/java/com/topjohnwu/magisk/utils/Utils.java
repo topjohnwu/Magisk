@@ -22,6 +22,8 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -37,6 +39,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Utils {
 
@@ -249,5 +252,37 @@ public class Utils {
         Context context = MagiskManager.get();
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5);
+    }
+
+    public static void dumpPrefs() {
+        Map<String, ?> prefMap = MagiskManager.get().prefs.getAll();
+        Gson gson = new Gson();
+        String json = gson.toJson(prefMap, new TypeToken<Map<String, ?>>(){}.getType());
+        Shell.su("echo '" + json + "' > " + Const.MANAGER_CONFIGS);
+    }
+
+    public static void loadPrefs() {
+        List<String> ret = Utils.readFile(Const.MANAGER_CONFIGS);
+        if (isValidShellResponse(ret)) {
+            removeItem(Const.MANAGER_CONFIGS);
+            SharedPreferences.Editor editor = MagiskManager.get().prefs.edit();
+            String json = ret.get(0);
+            Gson gson = new Gson();
+            Map<String, ?> prefMap = gson.fromJson(json, new TypeToken<Map<String, ?>>(){}.getType());
+            editor.clear();
+            for (Map.Entry<String, ?> entry : prefMap.entrySet()) {
+                Object value = entry.getValue();
+                if (value instanceof String) {
+                    editor.putString(entry.getKey(), (String) value);
+                } else if (value instanceof Boolean) {
+                    editor.putBoolean(entry.getKey(), (boolean) value);
+                } else if (value instanceof Integer) {
+                    editor.putInt(entry.getKey(), (int) value);
+                }
+            }
+            editor.remove(Const.Key.ETAG_KEY);
+            editor.apply();
+            MagiskManager.get().loadConfig();
+        }
     }
 }

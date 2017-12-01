@@ -240,6 +240,7 @@ public class ShowUI {
                             mm.remoteManagerVersionString + ".apk")))
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
+                Utils.dumpPrefs();
                 Utils.runWithPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
                     Intent intent = new Intent(mm, ManagerUpdate.class);
                     intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
