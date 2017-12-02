@@ -118,6 +118,7 @@ public class Const {
         public static final String BOOT_FORMAT = "boot_format";
         public static final String SNET_VER = "snet_version";
         public static final String UPDATE_SERVICE_VER = "update_service_version";
+        public static final String APP_VER = "app_version";
         public static final String MAGISKHIDE = "magiskhide";
         public static final String HOSTS = "hosts";
         public static final String DISABLE = "disable";

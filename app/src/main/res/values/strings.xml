@@ -66,12 +66,12 @@
     <string name="about">About</string>
     <string name="app_developers">Main developers</string>
     <string name="app_developers_"><![CDATA[App created by <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-    <string name="app_changelog">App\'s changelog</string>
+    <string name="app_changelog">Changelog</string>
     <string name="translators" />
-    <string name="app_version">App\'s version</string>
+    <string name="app_version">Version</string>
     <string name="app_source_code">Source code</string>
     <string name="donation">Donation</string>
-    <string name="app_translators">App\'s translators</string>
+    <string name="app_translators">Translators</string>
     <string name="support_thread">Support thread</string>
 
     <!--Toasts, Dialogs-->

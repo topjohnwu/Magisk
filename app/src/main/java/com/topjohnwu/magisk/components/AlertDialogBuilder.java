@@ -9,8 +9,6 @@ import android.support.annotation.StyleRes;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,7 +27,6 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
     @BindView(R.id.positive) Button positive;
     @BindView(R.id.neutral) Button neutral;
     @BindView(R.id.message) TextView messageView;
-    @BindView(R.id.custom_view) ViewStub custom;
 
     private DialogInterface.OnClickListener positiveListener;
     private DialogInterface.OnClickListener negativeListener;
@@ -59,20 +56,15 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
     }
 
     @Override
-    public AlertDialog.Builder setView(int layoutResId) {
-        custom.setLayoutResource(layoutResId);
-        custom.inflate();
-        return this;
+    public AlertDialog.Builder setTitle(int titleId) {
+        return super.setTitle(titleId);
     }
 
     @Override
-    public AlertDialog.Builder setView(View view) {
-        ViewGroup parent = (ViewGroup) custom.getParent();
-        int idx = parent.indexOfChild(custom);
-        parent.removeView(custom);
-        parent.addView(view, idx);
-        return this;
-    }
+    public AlertDialog.Builder setView(int layoutResId) { return this; }
+
+    @Override
+    public AlertDialog.Builder setView(View view) { return this; }
 
     @Override
     public AlertDialog.Builder setMessage(@Nullable CharSequence message) {

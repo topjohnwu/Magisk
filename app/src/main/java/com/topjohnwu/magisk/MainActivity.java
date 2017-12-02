@@ -16,11 +16,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +46,7 @@ public class MainActivity extends Activity
     protected void onCreate(final Bundle savedInstanceState) {
 
         MagiskManager mm = getMagiskManager();
+        prefs = mm.prefs;
 
         if (!mm.hasInit) {
             Intent intent = new Intent(this, SplashActivity.class);
@@ -58,11 +63,6 @@ public class MainActivity extends Activity
             ActivityCompat.requestPermissions(this, new String[] { perm }, 0);
         }
 
-        prefs = mm.prefs;
-
-        if (mm.isDarkTheme) {
-            setTheme(R.style.AppTheme_Dark);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -91,6 +91,17 @@ public class MainActivity extends Activity
             navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        if (mm.appVersion < BuildConfig.VERSION_CODE) {
+            prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
+            mm.appVersion = BuildConfig.VERSION_CODE;
+            try {
+                InputStream is = getAssets().open("changelog.md");
+                new MarkDownWindow(this, getString(R.string.app_changelog), is).exec();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

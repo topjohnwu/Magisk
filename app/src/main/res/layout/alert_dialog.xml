@@ -8,7 +8,7 @@
     <LinearLayout
         android:id="@+id/message_panel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="12dip"
         android:paddingEnd="20dip"
@@ -24,11 +24,6 @@
             android:padding="5dip" />
 
     </LinearLayout>
-
-    <ViewStub
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/custom_view"/>
 
     <LinearLayout
         style="?android:attr/buttonBarStyle"
@@ -46,7 +41,7 @@
             android:id="@+id/negative"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dip"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="start"
             android:layout_weight="1"
             android:maxLines="2" />
@@ -55,7 +50,7 @@
             android:id="@+id/neutral"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dip"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             android:maxLines="2" />
@@ -64,7 +59,7 @@
             android:id="@+id/positive"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dip"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="end"
             android:layout_weight="1"
             android:maxLines="2" />

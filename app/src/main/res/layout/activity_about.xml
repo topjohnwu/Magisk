@@ -24,14 +24,12 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
                 style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -71,13 +69,6 @@
                         app:text="@string/app_changelog"/>
 
                     <com.topjohnwu.magisk.components.AboutCardRow
-                        android:id="@+id/app_developers"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:icon="@drawable/ic_person"
-                        app:text="@string/app_developers"/>
-
-                    <com.topjohnwu.magisk.components.AboutCardRow
                         android:id="@+id/app_translators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -99,14 +90,12 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
                 style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:orientation="vertical">
 
                     <com.topjohnwu.magisk.components.AboutCardRow

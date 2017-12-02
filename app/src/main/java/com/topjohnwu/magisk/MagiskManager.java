@@ -52,6 +52,7 @@ public class MagiskManager extends Application {
     public String bootBlock = null;
     public int snet_version;
     public int updateServiceVersion;
+    public int appVersion;
 
     // Data
     public Map<String, Module> moduleMap;
@@ -163,6 +164,7 @@ public class MagiskManager extends Application {
         snet_version = prefs.getInt(Const.Key.SNET_VER, -1);
         updateServiceVersion = prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1);
         customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
+        appVersion = prefs.getInt(Const.Key.APP_VER, 0);
     }
 
     public static void toast(String msg, int duration) {

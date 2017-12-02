@@ -38,10 +38,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getMagiskManager().isDarkTheme) {
-            setTheme(R.style.AppTheme_Transparent_Dark);
-        }
-
         setContentView(R.layout.activity_settings);
         ButterKnife.bind(this);
 

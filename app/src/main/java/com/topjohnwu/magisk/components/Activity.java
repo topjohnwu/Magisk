@@ -37,6 +37,9 @@ public class Activity extends AppCompatActivity {
         if (this instanceof Topic.Subscriber) {
             ((Topic.Subscriber) this).subscribeTopics();
         }
+        if (getMagiskManager().isDarkTheme) {
+            setTheme(R.style.AppTheme_Dark);
+        }
     }
 
     @Override
