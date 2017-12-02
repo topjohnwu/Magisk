@@ -8,6 +8,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,6 +20,7 @@ import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -50,6 +54,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_modules, container, false);
         unbinder = ButterKnife.bind(this, view);
+        setHasOptionsMenu(true);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
@@ -97,6 +102,31 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_reboot, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.reboot:
+                Shell.su_raw("/system/bin/reboot");
+                return true;
+            case R.id.reboot_recovery:
+                Shell.su_raw("/system/bin/reboot recovery");
+                return true;
+            case R.id.reboot_bootloader:
+                Shell.su_raw("/system/bin/reboot bootloader");
+                return true;
+            case R.id.reboot_download:
+                Shell.su_raw("/system/bin/reboot download");
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void updateUI() {

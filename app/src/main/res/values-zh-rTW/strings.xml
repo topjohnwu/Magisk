@@ -207,5 +207,8 @@
     <string name="settings_update_custom">自訂</string>
     <string name="settings_update_custom_msg">請輸入自訂網址</string>
     <string name="su_db_corrupt">SU 資料庫已毀損，將會重新建置</string>
+    <string name="reboot_recovery">重啟到 Recovery</string>
+    <string name="reboot_bootloader">重啟到 Bootloader</string>
+    <string name="reboot_download">重啟到 Download</string>
 
 </resources>

@@ -45,6 +45,9 @@
     <string name="disable_file_created">Module will be disabled at next reboot</string>
     <string name="disable_file_removed">Module will be enabled at next reboot</string>
     <string name="author">Created by %1$s</string>
+    <string name="reboot_recovery">Reboot to Recovery</string>
+    <string name="reboot_bootloader">Reboot to Bootloader</string>
+    <string name="reboot_download">Reboot to Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Update Available</string>
