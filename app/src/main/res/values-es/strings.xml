@@ -43,6 +43,9 @@
     <string name="disable_file_created">El módulo se desactivará en el siguiente reinicio</string>
     <string name="disable_file_removed">El módulo se activará en el siguiente reinicio</string>
     <string name="author">Creado por %1$s</string>
+    <string name="reboot_recovery">Reiniciar en Modo Recovery</string>
+    <string name="reboot_bootloader">Reiniciar en Modo Bootloader</string>
+    <string name="reboot_download">Reiniciar en Modo Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualización disponible</string>
@@ -61,12 +64,12 @@
     <string name="about">Acerca de</string>
     <string name="app_developers">Desarrolladores principales</string>
     <string name="app_developers_"><![CDATA[Aplicación creada por <a href="https://github.com/topjohnwu">topjohnwu</a> en colaboración con <a href="https://github.com/d8ahazard">Digitalhigh</a> y <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-    <string name="app_changelog">Registro de cambios de la aplicación</string>
+    <string name="app_changelog">Registro de cambios</string>
     <string name="translators">Gawenda, netizen, Deiki, Nosi>, dark-basic</string>
-    <string name="app_version">Versión de la aplicación</string>
+    <string name="app_version">Versión</string>
     <string name="app_source_code">Código fuente</string>
     <string name="donation">Donar</string>
-    <string name="app_translators">Traductores de la aplicación</string>
+    <string name="app_translators">Traductores</string>
     <string name="support_thread">Hilo de soporte</string>
 
     <!--Toasts, Dialogs-->
@@ -175,6 +178,7 @@
     <string name="global_summary">Todas las sesiones de root utilizan el soporte Global Namespace</string>
     <string name="requester_summary">Las sesiones de root heredarán las peticiones Namespace</string>
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
+    <string name="android_o_not_support">No es compatible con Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
