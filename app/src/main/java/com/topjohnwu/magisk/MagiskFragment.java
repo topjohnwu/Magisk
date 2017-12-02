@@ -91,7 +91,7 @@ public class MagiskFragment extends Fragment
             new CheckSafetyNet(getActivity()).exec();
             collapse();
         };
-        if (mm.snet_version < 0) {
+        if (mm.snetVersion < 0) {
             // Show dialog
             new AlertDialogBuilder(getActivity())
                     .setTitle(R.string.proprietary_title)

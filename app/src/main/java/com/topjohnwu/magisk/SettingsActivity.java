@@ -141,7 +141,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
             // Remove re-authentication option on Android O, it will not work
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                suCategory.removePreference(reauth);
+                reauth.setEnabled(false);
+                reauth.setSummary(R.string.android_o_not_support);
             }
 
             if (mm.getPackageName().equals(Const.ORIG_PKG_NAME) && mm.magiskVersionCode >= 1440) {
@@ -204,18 +205,14 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            boolean enabled;
 
             switch (key) {
                 case Const.Key.DARK_THEME:
-                    enabled = prefs.getBoolean(Const.Key.DARK_THEME, false);
-                    if (mm.isDarkTheme != enabled) {
-                        mm.reloadActivity.publish(false);
-                    }
+                    mm.isDarkTheme = prefs.getBoolean(key, false);
+                    mm.reloadActivity.publish(false);
                     break;
-                case Const.Key.DISABLE:
-                    enabled = prefs.getBoolean(Const.Key.DISABLE, false);
-                    if (enabled) {
+                case Const.Key.COREONLY:
+                    if (prefs.getBoolean(key, false)) {
                         Utils.createFile(Const.MAGISK_DISABLE_FILE);
                     } else {
                         Utils.removeItem(Const.MAGISK_DISABLE_FILE);
@@ -223,16 +220,14 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;
                 case Const.Key.MAGISKHIDE:
-                    enabled = prefs.getBoolean(Const.Key.MAGISKHIDE, false);
-                    if (enabled) {
+                    if (prefs.getBoolean(key, false)) {
                         Shell.su_raw("magiskhide --enable");
                     } else {
                         Shell.su_raw("magiskhide --disable");
                     }
                     break;
                 case Const.Key.HOSTS:
-                    enabled = prefs.getBoolean(Const.Key.HOSTS, false);
-                    if (enabled) {
+                    if (prefs.getBoolean(key, false)) {
                         Shell.su_raw(
                                 "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE(),
                                 "mount -o bind " + Const.MAGISK_HOST_FILE() + " /system/etc/hosts");
@@ -243,13 +238,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     }
                     break;
                 case Const.Key.ROOT_ACCESS:
-                    mm.suDB.setSettings(Const.Key.ROOT_ACCESS, Utils.getPrefsInt(prefs, Const.Key.ROOT_ACCESS));
-                    break;
                 case Const.Key.SU_MULTIUSER_MODE:
-                    mm.suDB.setSettings(Const.Key.SU_MULTIUSER_MODE, Utils.getPrefsInt(prefs, Const.Key.SU_MULTIUSER_MODE));
-                    break;
                 case Const.Key.SU_MNT_NS:
-                    mm.suDB.setSettings(Const.Key.SU_MNT_NS, Utils.getPrefsInt(prefs, Const.Key.SU_MNT_NS));
+                    mm.suDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                     break;
                 case Const.Key.LOCALE:
                     mm.setLocale();

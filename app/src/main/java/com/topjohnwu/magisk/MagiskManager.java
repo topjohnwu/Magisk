@@ -50,9 +50,7 @@ public class MagiskManager extends Application {
     public int remoteManagerVersionCode = -1;
     public String managerLink;
     public String bootBlock = null;
-    public int snet_version;
-    public int updateServiceVersion;
-    public int appVersion;
+    public int snetVersion;
 
     // Data
     public Map<String, Module> moduleMap;
@@ -66,7 +64,6 @@ public class MagiskManager extends Application {
     public boolean isDarkTheme;
     public boolean updateNotification;
     public boolean suReauth;
-    public boolean coreOnly;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -146,8 +143,6 @@ public class MagiskManager extends Application {
     }
 
     public void loadConfig() {
-        isDarkTheme = prefs.getBoolean(Const.Key.DARK_THEME, false);
-
         // su
         suRequestTimeout = Utils.getPrefsInt(prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
         suResponseType = Utils.getPrefsInt(prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
@@ -157,14 +152,13 @@ public class MagiskManager extends Application {
         multiuserMode = suDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         suNamespaceMode = suDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
 
-        coreOnly = prefs.getBoolean(Const.Key.DISABLE, false);
+        // config
+        isDarkTheme = prefs.getBoolean(Const.Key.DARK_THEME, false);
         updateNotification = prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true);
         updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-        snet_version = prefs.getInt(Const.Key.SNET_VER, -1);
-        updateServiceVersion = prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1);
+        snetVersion = prefs.getInt(Const.Key.SNET_VER, -1);
         customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
-        appVersion = prefs.getInt(Const.Key.APP_VER, 0);
     }
 
     public static void toast(String msg, int duration) {

@@ -121,7 +121,7 @@ public class Const {
         public static final String APP_VER = "app_version";
         public static final String MAGISKHIDE = "magiskhide";
         public static final String HOSTS = "hosts";
-        public static final String DISABLE = "disable";
+        public static final String COREONLY = "disable";
         public static final String LOCALE = "locale";
         public static final String DARK_THEME = "dark_theme";
         public static final String ETAG_KEY = "ETag";

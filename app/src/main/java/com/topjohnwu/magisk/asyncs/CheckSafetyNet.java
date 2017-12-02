@@ -32,10 +32,10 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     @Override
     protected void onPreExecute() {
         MagiskManager mm = MagiskManager.get();
-        if (mm.snet_version != Const.Value.SNET_VER) {
+        if (mm.snetVersion != Const.Value.SNET_VER) {
             Shell.sh("rm -rf " + dexPath.getParent());
         }
-        mm.snet_version = Const.Value.SNET_VER;
+        mm.snetVersion = Const.Value.SNET_VER;
         mm.prefs.edit().putInt(Const.Key.SNET_VER, Const.Value.SNET_VER).apply();
     }
 

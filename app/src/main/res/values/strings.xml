@@ -180,6 +180,7 @@
     <string name="global_summary">All root sessions use the global mount namespace</string>
     <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
+    <string name="android_o_not_support">Does not support on Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>

@@ -69,7 +69,7 @@ public class SplashActivity extends Activity {
             SuDatabaseHelper.setupSuDB();
 
             // Add update checking service
-            if (Const.Value.UPDATE_SERVICE_VER > mm.updateServiceVersion) {
+            if (Const.Value.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
                 ComponentName service = new ComponentName(this, UpdateCheckService.class);
                 JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -77,7 +77,6 @@ public class SplashActivity extends Activity {
                         .setPeriodic(8 * 60 * 60 * 1000)
                         .build();
                 ((JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(info);
-                mm.updateServiceVersion = Const.Value.UPDATE_SERVICE_VER;
             }
 
             // Fire asynctasks
@@ -93,7 +92,7 @@ public class SplashActivity extends Activity {
                 .putBoolean(Const.Key.MAGISKHIDE, mm.magiskHide)
                 .putBoolean(Const.Key.UPDATE_NOTIFICATION, mm.updateNotification)
                 .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
-                .putBoolean(Const.Key.DISABLE, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
+                .putBoolean(Const.Key.COREONLY, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
                 .putBoolean(Const.Key.SU_REAUTH, mm.suReauth)
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(mm.suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(mm.suResponseType))
@@ -104,7 +103,7 @@ public class SplashActivity extends Activity {
                 .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(mm.updateChannel))
                 .putString(Const.Key.LOCALE, mm.localeConfig)
                 .putString(Const.Key.BOOT_FORMAT, mm.bootFormat)
-                .putInt(Const.Key.UPDATE_SERVICE_VER, mm.updateServiceVersion)
+                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.Value.UPDATE_SERVICE_VER)
                 .apply();
 
         mm.hasInit = true;

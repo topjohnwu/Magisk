@@ -92,9 +92,8 @@ public class MainActivity extends Activity
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        if (mm.appVersion < BuildConfig.VERSION_CODE) {
+        if (mm.prefs.getInt(Const.Key.APP_VER, -1) < BuildConfig.VERSION_CODE) {
             prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
-            mm.appVersion = BuildConfig.VERSION_CODE;
             try {
                 InputStream is = getAssets().open("changelog.md");
                 new MarkDownWindow(this, getString(R.string.app_changelog), is).exec();
@@ -149,7 +148,7 @@ public class MainActivity extends Activity
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);
-        menu.setGroupVisible(R.id.second_group, !mm.coreOnly);
+        menu.setGroupVisible(R.id.second_group, !mm.prefs.getBoolean(Const.Key.COREONLY, false));
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess());
     }

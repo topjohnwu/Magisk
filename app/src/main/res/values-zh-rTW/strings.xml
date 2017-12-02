@@ -210,5 +210,6 @@
     <string name="reboot_recovery">重啟到 Recovery</string>
     <string name="reboot_bootloader">重啟到 Bootloader</string>
     <string name="reboot_download">重啟到 Download</string>
+    <string name="android_o_not_support">不支援 Android 8.0+</string>
 
 </resources>
