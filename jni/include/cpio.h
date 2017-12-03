@@ -17,7 +17,7 @@ typedef struct cpio_entry {
 	// uint32_t devminor;
 	// uint32_t rdevmajor;
 	// uint32_t rdevminor;
-	uint32_t namesize;
+	// uint32_t namesize;
 	// uint32_t check;
 	char *filename;
 	char *data;
@@ -41,17 +41,20 @@ typedef struct cpio_newc_header {
 	char check[8];
 } cpio_newc_header;
 
-void parse_cpio(const char *filename, struct vector *v);
-void dump_cpio(const char *filename, struct vector *v);
+// Basic cpio functions
+void parse_cpio(struct vector *v, const char *filename);
+void dump_cpio(struct vector *v, const char *filename);
 void cpio_vec_destroy(struct vector *v);
-void cpio_rm(int recursive, const char *entry, struct vector *v);
-void cpio_mkdir(mode_t mode, const char *entry, struct vector *v);
-void cpio_add(mode_t mode, const char *entry, const char *filename, struct vector *v);
-void cpio_mv(struct vector *v, const char *from, const char *to);
-void cpio_test(struct vector *v);
-void cpio_extract(const char *entry, const char *filename, struct vector *v);
-void cpio_backup(const char *orig, const char *sha1, struct vector *v);
+void cpio_rm(struct vector *v, int recursive, const char *entry);
+void cpio_mkdir(struct vector *v, mode_t mode, const char *entry);
+void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename);
+int cpio_mv(struct vector *v, const char *from, const char *to);
+int cpio_extract(struct vector *v, const char *entry, const char *filename);
+
+// Magisk specific
+int cpio_test(struct vector *v);
+void cpio_backup(struct vector *v, const char *orig, const char *sha1);
 int cpio_restore(struct vector *v);
-void cpio_stocksha1(struct vector *v);
+char *cpio_stocksha1(struct vector *v);
 
 #endif

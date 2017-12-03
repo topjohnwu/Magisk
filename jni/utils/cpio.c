@@ -48,9 +48,10 @@ static int cpio_cmp(const void *a, const void *b) {
 }
 
 // Parse cpio file to a vector of cpio_entry
-void parse_cpio(const char *filename, struct vector *v) {
+void parse_cpio(struct vector *v, const char *filename) {
 	fprintf(stderr, "Loading cpio: [%s]\n\n", filename);
-	int fd = xopen(filename, O_RDONLY);
+	int fd = open(filename, O_RDONLY);
+	if (fd < 0) return;
 	cpio_newc_header header;
 	cpio_entry *f;
 	while(xxread(fd, &header, 110) != -1) {
@@ -66,10 +67,10 @@ void parse_cpio(const char *filename, struct vector *v) {
 		// f->devminor = x8u(header.devminor);
 		// f->rdevmajor = x8u(header.rdevmajor);
 		// f->rdevminor = x8u(header.rdevminor);
-		f->namesize = x8u(header.namesize);
+		uint32_t namesize = x8u(header.namesize);
 		// f->check = x8u(header.check);
-		f->filename = xmalloc(f->namesize);
-		xxread(fd, f->filename, f->namesize);
+		f->filename = xmalloc(namesize);
+		xxread(fd, f->filename, namesize);
 		file_align(fd, 4, 0);
 		if (strcmp(f->filename, ".") == 0 || strcmp(f->filename, "..") == 0) {
 			cpio_free(f);
@@ -80,7 +81,7 @@ void parse_cpio(const char *filename, struct vector *v) {
 			break;
 		}
 		if (f->filesize) {
-			f->data = malloc(f->filesize);
+			f->data = xmalloc(f->filesize);
 			xxread(fd, f->data, f->filesize);
 			file_align(fd, 4, 0);
 		}
@@ -89,7 +90,7 @@ void parse_cpio(const char *filename, struct vector *v) {
 	close(fd);
 }
 
-void dump_cpio(const char *filename, struct vector *v) {
+void dump_cpio(struct vector *v, const char *filename) {
 	fprintf(stderr, "\nDump cpio: [%s]\n\n", filename);
 	int fd = creat(filename, 0644);
 	unsigned inode = 300000;
@@ -111,11 +112,11 @@ void dump_cpio(const char *filename, struct vector *v) {
 			0,			// f->devminor
 			0,			// f->rdevmajor
 			0,			// f->rdevminor
-			f->namesize,
+			(uint32_t) strlen(f->filename) + 1,
 			0			// f->check
 		);
 		xwrite(fd, header, 110);
-		xwrite(fd, f->filename, f->namesize);
+		xwrite(fd, f->filename, strlen(f->filename) + 1);
 		file_align(fd, 4, 1);
 		if (f->filesize) {
 			xwrite(fd, f->data, f->filesize);
@@ -139,7 +140,7 @@ void cpio_vec_destroy(struct vector *v) {
 	vec_destroy(v);
 }
 
-void cpio_rm(int recursive, const char *entry, struct vector *v) {
+void cpio_rm(struct vector *v, int recursive, const char *entry) {
 	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (strncmp(f->filename, entry, strlen(entry)) == 0) {
@@ -155,20 +156,18 @@ void cpio_rm(int recursive, const char *entry, struct vector *v) {
 	}
 }
 
-void cpio_mkdir(mode_t mode, const char *entry, struct vector *v) {
+void cpio_mkdir(struct vector *v, mode_t mode, const char *entry) {
 	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFDIR | mode;
-	f->namesize = strlen(entry) + 1;
 	f->filename = strdup(entry);
 	cpio_vec_insert(v, f);
 	fprintf(stderr, "Create directory [%s] (%04o)\n",entry, mode);
 }
 
-void cpio_add(mode_t mode, const char *entry, const char *filename, struct vector *v) {
+void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename) {
 	int fd = xopen(filename, O_RDONLY);
 	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFREG | mode;
-	f->namesize = strlen(entry) + 1;
 	f->filename = strdup(entry);
 	f->filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
@@ -179,7 +178,7 @@ void cpio_add(mode_t mode, const char *entry, const char *filename, struct vecto
 	fprintf(stderr, "Add entry [%s] (%04o)\n", entry, mode);
 }
 
-void cpio_mv(struct vector *v, const char *from, const char *to) {
+int cpio_mv(struct vector *v, const char *from, const char *to) {
 	struct cpio_entry *f, *t;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, from) == 0) {
@@ -191,16 +190,36 @@ void cpio_mv(struct vector *v, const char *from, const char *to) {
 				}
 			}
 			free(f->filename);
-			f->namesize = strlen(to) + 1;
 			f->filename = strdup(to);
-			return;
+			return 0;
 		}
 	}
 	fprintf(stderr, "Cannot find entry %s\n", from);
-	exit(1);
+	return 1;
 }
 
-void cpio_test(struct vector *v) {
+int cpio_extract(struct vector *v, const char *entry, const char *filename) {
+	cpio_entry *f;
+	vec_for_each(v, f) {
+		if (strcmp(f->filename, entry) == 0) {
+			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
+			unlink(filename);
+			if (S_ISREG(f->mode)) {
+				int fd = creat(filename, f->mode & 0777);
+				xwrite(fd, f->data, f->filesize);
+				fchown(fd, f->uid, f->gid);
+				close(fd);
+			} else if (S_ISLNK(f->mode)) {
+				symlink(f->data, filename);
+			}
+			return 0;
+		}
+	}
+	fprintf(stderr, "Cannot find the file entry [%s]\n", entry);
+	return 1;
+}
+
+int cpio_test(struct vector *v) {
 	#define STOCK_BOOT      0x0
 	#define MAGISK_PATCH    0x1
 	#define OTHER_PATCH     0x2
@@ -222,73 +241,51 @@ void cpio_test(struct vector *v) {
 		}
 	}
 	cpio_vec_destroy(v);
-	exit(ret);
+	return ret;
 }
 
-
-
-void cpio_extract(const char *entry, const char *filename, struct vector *v) {
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		if (strcmp(f->filename, entry) == 0 && S_ISREG(f->mode)) {
-			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
-			int fd = creat(filename, 0644);
-			xwrite(fd, f->data, f->filesize);
-			fchmod(fd, f->mode);
-			fchown(fd, f->uid, f->gid);
-			close(fd);
-			exit(0);
-		}
-	}
-	LOGE("Cannot find the file entry [%s]\n", entry);
-}
-
-void cpio_backup(const char *orig, const char *sha1, struct vector *v) {
+void cpio_backup(struct vector *v, const char *orig, const char *sha1) {
 	struct vector o_body, *o = &o_body, bak;
 	cpio_entry *m, *n, *rem, *cksm;
 	char buf[PATH_MAX];
 	int res, doBak;
 
-	if (sha1) cksm = xcalloc(sizeof(*cksm), 1);
 	vec_init(o);
 	vec_init(&bak);
 
 	m = xcalloc(sizeof(*m), 1);
 	m->filename = strdup(".backup");
-	m->namesize = strlen(m->filename) + 1;
 	m->mode = S_IFDIR;
 	vec_push_back(&bak, m);
 
 	m = xcalloc(sizeof(*m), 1);
 	m->filename = strdup(".backup/.magisk");
-	m->namesize = strlen(m->filename) + 1;
 	m->mode = S_IFREG;
 	vec_push_back(&bak, m);
 
 	rem = xcalloc(sizeof(*rem), 1);
 	rem->filename = strdup(".backup/.rmlist");
-	rem->namesize = strlen(rem->filename) + 1;
 	rem->mode = S_IFREG;
 	vec_push_back(&bak, rem);
 
-	if (sha1) vec_push_back(&bak, cksm);
-	parse_cpio(orig, o);
-	// Remove possible backups in original ramdisk
-	cpio_rm(1, ".backup", o);
-	cpio_rm(1, ".backup", v);
-
-	// Sort both vectors before comparing
-	vec_sort(v, cpio_cmp);
-	vec_sort(o, cpio_cmp);
-
 	if (sha1) {
 		fprintf(stderr, "Save SHA1: [%s] -> [.backup/.sha1]\n", sha1);
+		cksm = xcalloc(sizeof(*cksm), 1);
+		vec_push_back(&bak, cksm);
 		cksm->filename = strdup(".backup/.sha1");
-		cksm->namesize = strlen(cksm->filename) + 1;
 		cksm->mode = S_IFREG;
 		cksm->data = strdup(sha1);
 		cksm->filesize = strlen(sha1) + 1;
 	}
+
+	parse_cpio(o, orig);
+	// Remove possible backups in original ramdisk
+	cpio_rm(o, 1, ".backup");
+	cpio_rm(v, 1, ".backup");
+
+	// Sort both vectors before comparing
+	vec_sort(v, cpio_cmp);
+	vec_sort(o, cpio_cmp);
 
 	// Start comparing
 	size_t i = 0, j = 0;
@@ -322,16 +319,15 @@ void cpio_backup(const char *orig, const char *sha1, struct vector *v) {
 			// Someting new in ramdisk, record in rem
 			++j;
 			if (n->remove) continue;
-			rem->data = xrealloc(rem->data, rem->filesize + n->namesize);
-			memcpy(rem->data + rem->filesize, n->filename, n->namesize);
-			rem->filesize += n->namesize;
+			rem->data = xrealloc(rem->data, rem->filesize + strlen(n->filename) + 1);
+			memcpy(rem->data + rem->filesize, n->filename, strlen(n->filename) + 1);
+			rem->filesize += strlen(n->filename) + 1;
 			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
 		}
 		if (doBak) {
-			m->namesize += 8;
-			m->filename = realloc(m->filename, m->namesize);
-			strcpy(buf, m->filename);
-			sprintf(m->filename, ".backup/%s", buf);
+			sprintf(buf, ".backup/%s", m->filename);
+			free(m->filename);
+			m->filename = strdup(buf);
 			fprintf(stderr, "[%s] -> [%s]\n", buf, m->filename);
 			vec_push_back(&bak, m);
 			// NULL the original entry, so it won't be freed
@@ -362,13 +358,12 @@ int cpio_restore(struct vector *v) {
 			if (f->filename[8] == '.') {
 				if (strcmp(f->filename, ".backup/.rmlist") == 0) {
 					for (int pos = 0; pos < f->filesize; pos += strlen(f->data + pos) + 1)
-						cpio_rm(0, f->data + pos, v);
+						cpio_rm(v, 0, f->data + pos);
 				}
 				continue;
 			} else {
 				n = xcalloc(sizeof(*n), 1);
 				memcpy(n, f, sizeof(*f));
-				n->namesize -= 8;
 				n->filename = strdup(f->filename + 8);
 				n->data = f->data;
 				f->data = NULL;
@@ -379,13 +374,13 @@ int cpio_restore(struct vector *v) {
 		}
 	}
 	// Some known stuff we can remove
-	cpio_rm(0, "sbin/magic_mask.sh", v);
-	cpio_rm(0, "init.magisk.rc", v);
-	cpio_rm(0, "magisk", v);
+	cpio_rm(v, 0, "sbin/magic_mask.sh");
+	cpio_rm(v, 0, "init.magisk.rc");
+	cpio_rm(v, 0, "magisk");
 	return ret;
 }
 
-void cpio_stocksha1(struct vector *v) {
+char *cpio_stocksha1(struct vector *v) {
 	cpio_entry *f;
 	char sha1[41];
 	vec_for_each(v, f) {
@@ -396,12 +391,12 @@ void cpio_stocksha1(struct vector *v) {
 					pos += 12;
 					memcpy(sha1, pos, 40);
 					sha1[40] = '\0';
-					printf("%s\n", sha1);
-					return;
+					return strdup(sha1);
 				}
 			}
 		} else if (strcmp(f->filename, ".backup/.sha1") == 0) {
-			printf("%s\n", f->data);
+			return f->data;
 		}
 	}
+	return NULL;
 }

@@ -71,76 +71,47 @@ void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 }
 
 int cpio_commands(const char *command, int argc, char *argv[]) {
-	int recursive = 0, ret = 0;
-	command_t cmd;
+	int ret = 0;
 	char *incpio = argv[0];
 	++argv;
 	--argc;
+	struct vector v;
+	vec_init(&v);
+	parse_cpio(&v, incpio);
+
 	if (strcmp(command, "test") == 0) {
-		cmd = TEST;
+		return cpio_test(&v);
 	} else if (strcmp(command, "restore") == 0) {
-		cmd = RESTORE;
+		ret = cpio_restore(&v);
 	} else if (strcmp(command, "stocksha1") == 0) {
-		cmd = STOCKSHA1;
+		printf("%s\n", cpio_stocksha1(&v));
+		return 0;
 	} else if (argc >= 1 && strcmp(command, "backup") == 0) {
-		cmd = BACKUP;
+		cpio_backup(&v, argv[0], argc > 1 ? argv[1] : NULL);
 	} else if (argc > 0 && strcmp(command, "rm") == 0) {
-		cmd = RM;
+		int recursive = 0;
 		if (argc == 2 && strcmp(argv[0], "-r") == 0) {
 			recursive = 1;
 			++argv;
 			--argc;
 		}
+		cpio_rm(&v, recursive, argv[0]);
 	} else if (argc == 2 && strcmp(command, "mv") == 0) {
-		cmd = MV;
+		if (cpio_mv(&v, argv[0], argv[1]))
+			return 1;
 	} else if (argc == 2 && strcmp(command, "patch") == 0) {
-		cmd = PATCH;
-	} else if (argc == 2 && strcmp(command, "extract") == 0) {
-		cmd = EXTRACT;
-	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
-		cmd = MKDIR;
-	} else if (argc == 3 && strcmp(command, "add") == 0) {
-		cmd = ADD;
-	} else {
-		cmd = NONE;
-	}
-	struct vector v;
-	vec_init(&v);
-	parse_cpio(incpio, &v);
-	switch(cmd) {
-	case TEST:
-		cpio_test(&v);
-		break;
-	case RESTORE:
-		ret = cpio_restore(&v);
-		break;
-	case STOCKSHA1:
-		cpio_stocksha1(&v);
-		return 0;
-	case BACKUP:
-		cpio_backup(argv[0], argc > 1 ? argv[1] : NULL, &v);
-	case RM:
-		cpio_rm(recursive, argv[0], &v);
-		break;
-	case PATCH:
 		cpio_patch(&v, strcmp(argv[0], "true") == 0, strcmp(argv[1], "true") == 0);
-		break;
-	case EXTRACT:
-		cpio_extract(argv[0], argv[1], &v);
-		break;
-	case MKDIR:
-		cpio_mkdir(strtoul(argv[0], NULL, 8), argv[1], &v);
-		break;
-	case ADD:
-		cpio_add(strtoul(argv[0], NULL, 8), argv[1], argv[2], &v);
-		break;
-	case MV:
-		cpio_mv(&v, argv[0], argv[1]);
-		break;
-	case NONE:
+	} else if (argc == 2 && strcmp(command, "extract") == 0) {
+		return cpio_extract(&v, argv[0], argv[1]);
+	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
+		cpio_mkdir(&v, strtoul(argv[0], NULL, 8), argv[1]);
+	} else if (argc == 3 && strcmp(command, "add") == 0) {
+		cpio_add(&v, strtoul(argv[0], NULL, 8), argv[1], argv[2]);
+	} else {
 		return 1;
 	}
-	dump_cpio(incpio, &v);
+
+	dump_cpio(&v, incpio);
 	cpio_vec_destroy(&v);
 	exit(ret);
 }

@@ -96,6 +96,7 @@ static void usage(char *arg0) {
 int main(int argc, char *argv[]) {
 	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
 
+	umask(0);
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
 		fprintf(stderr, "Cleaning up...\n\n");
 		char name[PATH_MAX];
