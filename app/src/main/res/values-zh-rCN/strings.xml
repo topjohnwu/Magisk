@@ -42,6 +42,9 @@
     <string name="disable_file_created">模块将在下次重启后禁用</string>
     <string name="disable_file_removed">模块将在下次重启后启用</string>
     <string name="author">作者：%1$s</string>
+    <string name="reboot_recovery">重启到 Recovery</string>
+    <string name="reboot_bootloader">重启到 Bootloader</string>
+    <string name="reboot_download">重启到 Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">可更新</string>
@@ -174,6 +177,7 @@
     <string name="global_summary">所有的 ROOT 会话使用全局挂载命名空间</string>
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
+    <string name="android_o_not_support">不支持 Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
