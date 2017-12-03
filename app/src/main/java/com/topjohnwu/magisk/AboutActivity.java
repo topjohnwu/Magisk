@@ -32,6 +32,11 @@ public class AboutActivity extends Activity {
     @BindView(R.id.donation) AboutCardRow donation;
 
     @Override
+    public int getDarkTheme() {
+        return R.style.AppTheme_Transparent_Dark;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);

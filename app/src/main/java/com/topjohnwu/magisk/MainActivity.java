@@ -43,6 +43,11 @@ public class MainActivity extends Activity
     private float toolbarElevation;
 
     @Override
+    public int getDarkTheme() {
+        return R.style.AppTheme_Dark;
+    }
+
+    @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
         MagiskManager mm = getMagiskManager();

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
@@ -17,7 +18,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
-public class Activity extends AppCompatActivity {
+public abstract class Activity extends AppCompatActivity {
 
     private AssetManager swappedAssetManager = null;
     private Resources swappedResources = null;
@@ -31,14 +32,17 @@ public class Activity extends AppCompatActivity {
         applyOverrideConfiguration(configuration);
     }
 
+    @StyleRes
+    abstract public int getDarkTheme();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (this instanceof Topic.Subscriber) {
             ((Topic.Subscriber) this).subscribeTopics();
         }
-        if (getMagiskManager().isDarkTheme) {
-            setTheme(R.style.AppTheme_Dark);
+        if (getMagiskManager().isDarkTheme && getDarkTheme() > 0) {
+            setTheme(getDarkTheme());
         }
     }
 

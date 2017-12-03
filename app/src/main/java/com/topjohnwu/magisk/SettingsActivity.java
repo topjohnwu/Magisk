@@ -36,6 +36,11 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     @BindView(R.id.toolbar) Toolbar toolbar;
 
     @Override
+    public int getDarkTheme() {
+        return R.style.AppTheme_Transparent_Dark;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);

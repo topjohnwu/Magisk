@@ -26,6 +26,11 @@ import java.util.List;
 public class SplashActivity extends Activity {
 
     @Override
+    public int getDarkTheme() {
+        return -1;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

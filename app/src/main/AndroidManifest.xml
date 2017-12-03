@@ -52,11 +52,6 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity="internal.superuser"
-            android:theme="@android:style/Theme.NoDisplay" />
-        <activity
-            android:name=".superuser.SuRequestActivity"
-            android:excludeFromRecents="true"
-            android:taskAffinity="internal.superuser"
             android:theme="@style/SuRequest" />
 
         <receiver android:name=".superuser.SuReceiver" />

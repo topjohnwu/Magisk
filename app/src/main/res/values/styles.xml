@@ -52,7 +52,11 @@
 
     <style name="SuRequest" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:windowCloseOnTouchOutside">false</item>
-        <item name="android:colorBackground">@color/su_request_background</item>
+        <item name="colorBackgroundFloating">@color/su_request_background</item>
+    </style>
+
+    <style name="SuRequest.Dark" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowCloseOnTouchOutside">false</item>
     </style>
 
 </resources>

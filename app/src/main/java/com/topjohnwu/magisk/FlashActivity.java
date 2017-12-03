@@ -76,6 +76,11 @@ public class FlashActivity extends Activity {
     }
 
     @Override
+    public int getDarkTheme() {
+        return R.style.AppTheme_Transparent_Dark;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
