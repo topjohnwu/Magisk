@@ -47,6 +47,7 @@ void dump_cpio(struct vector *v, const char *filename);
 void cpio_vec_destroy(struct vector *v);
 void cpio_rm(struct vector *v, int recursive, const char *entry);
 void cpio_mkdir(struct vector *v, mode_t mode, const char *entry);
+void cpio_ln(struct vector *v, const char *target, const char *entry);
 void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename);
 int cpio_mv(struct vector *v, const char *from, const char *to);
 int cpio_extract(struct vector *v, const char *entry, const char *filename);

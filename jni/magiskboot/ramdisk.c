@@ -105,6 +105,8 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		return cpio_extract(&v, argv[0], argv[1]);
 	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
 		cpio_mkdir(&v, strtoul(argv[0], NULL, 8), argv[1]);
+	} else if (argc == 2 && strcmp(command, "ln") == 0) {
+		cpio_ln(&v, argv[0], argv[1]);
 	} else if (argc == 3 && strcmp(command, "add") == 0) {
 		cpio_add(&v, strtoul(argv[0], NULL, 8), argv[1], argv[2]);
 	} else {

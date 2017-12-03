@@ -164,6 +164,15 @@ void cpio_mkdir(struct vector *v, mode_t mode, const char *entry) {
 	fprintf(stderr, "Create directory [%s] (%04o)\n",entry, mode);
 }
 
+void cpio_ln(struct vector *v, const char *target, const char *entry) {
+	cpio_entry *f = xcalloc(sizeof(*f), 1);
+	f->mode = S_IFLNK;
+	f->filename = strdup(entry);
+	f->data = strdup(target);
+	cpio_vec_insert(v, f);
+	fprintf(stderr, "Create symlink [%s] -> [%s]\n", entry, target);
+}
+
 void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename) {
 	int fd = xopen(filename, O_RDONLY);
 	cpio_entry *f = xcalloc(sizeof(*f), 1);
