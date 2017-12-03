@@ -11,16 +11,16 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
@@ -116,21 +116,15 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             updateChannel.setOnPreferenceChangeListener((pref, o) -> {
                 mm.updateChannel = Integer.parseInt((String) o);
                 if (mm.updateChannel == Const.Value.CUSTOM_CHANNEL) {
-                    LinearLayout layout = new LinearLayout(getActivity());
-                    EditText url = new EditText(getActivity());
-                    url.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+                    View v = LayoutInflater.from(getActivity()).inflate(R.layout.custom_channel_dialog, null);
+                    EditText url = v.findViewById(R.id.custom_url);
                     url.setText(mm.customChannelUrl);
-                    layout.setOrientation(LinearLayout.VERTICAL);
-                    layout.addView(url);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) url.getLayoutParams();
-                    params.setMargins(Utils.dpInPx(15), 0, Utils.dpInPx(15), 0);
-                    new AlertDialogBuilder(getActivity())
+                    new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.settings_update_custom)
-                        .setMessage(R.string.settings_update_custom_msg)
-                        .setView(layout)
-                        .setPositiveButton(R.string.ok, (d, i) -> {
-                            prefs.edit().putString(Const.Key.CUSTOM_CHANNEL, url.getText().toString()).apply();
-                        })
+                        .setView(v)
+                        .setPositiveButton(R.string.ok, (d, i) ->
+                                prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
+                                        url.getText().toString()).apply())
                         .setNegativeButton(R.string.close, null)
                         .show();
                 }
