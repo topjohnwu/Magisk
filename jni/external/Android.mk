@@ -3,6 +3,7 @@ LOCAL_PATH:= $(call my-dir)
 # libsqlite.so (stub)
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libsqlite
+LOCAL_C_INCLUDES := jni/external/include
 LOCAL_SRC_FILES := stubs/sqlite3_stub.c
 include $(BUILD_SHARED_LIBRARY)
 
@@ -58,7 +59,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := liblzma
 LOCAL_C_INCLUDES += \
-	$(EXT_PATH)/xz_config \
+	$(EXT_PATH)/include/xz_config \
 	$(EXT_PATH)/xz/src/common \
 	$(EXT_PATH)/xz/src/liblzma/api \
 	$(EXT_PATH)/xz/src/liblzma/check \

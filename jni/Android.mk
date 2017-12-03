@@ -23,7 +23,7 @@ LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
 	jni/include \
-	jni/external \
+	jni/external/include \
 	$(LIBSELINUX)
 
 LOCAL_SRC_FILES := \
@@ -89,17 +89,18 @@ LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := liblzma liblz4 libbz2 libfdt
 LOCAL_C_INCLUDES := \
 	jni/include \
+	jni/external/include \
 	$(LIBLZMA) \
 	$(LIBLZ4) \
 	$(LIBBZ2) \
 	$(LIBFDT)
 
 LOCAL_SRC_FILES := \
+	external/sha1/sha1.c \
 	magiskboot/main.c \
 	magiskboot/bootimg.c \
 	magiskboot/hexpatch.c \
 	magiskboot/compress.c \
-	magiskboot/sha1.c \
 	magiskboot/types.c \
 	magiskboot/dtb.c \
 	magiskboot/ramdisk.c \
