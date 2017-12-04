@@ -260,7 +260,7 @@ int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fgetattr(int fd, struct file_attr *a) {
-#ifndef NO_SELINUX
+#ifdef SELINUX
 	char path[PATH_MAX];
 	fd_getpath(fd, path, sizeof(path));
 	return getattr(path, a);

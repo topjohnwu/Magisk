@@ -80,7 +80,7 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	parse_cpio(&v, incpio);
 
 	if (strcmp(command, "test") == 0) {
-		return cpio_test(&v);
+		exit(cpio_test(&v));
 	} else if (strcmp(command, "restore") == 0) {
 		ret = cpio_restore(&v);
 	} else if (strcmp(command, "stocksha1") == 0) {
