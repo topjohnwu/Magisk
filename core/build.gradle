@@ -13,7 +13,7 @@ android {
         externalNativeBuild {
             ndkBuild {
                 // Passes an optional argument to ndk-build.
-                arguments "COMPILEALL=true"
+                arguments "GRADLE=true"
             }
         }
     }

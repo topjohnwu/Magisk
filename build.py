@@ -88,8 +88,8 @@ def build_all(args):
 def build_binary(args):
 	header('* Building Magisk binaries')
 
-	# Force update Android.mk timestamp to trigger recompilation
-	os.utime(os.path.join('core', 'jni', 'Android.mk'))
+	# Force update logging.h timestamp to trigger recompilation
+	os.utime(os.path.join('core', 'jni', 'include', 'logging.h'))
 
 	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
 	cflag = 'MAGISK_FLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
@@ -385,7 +385,8 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning binaries')
-		subprocess.run(ndk_build + ' -C core COMPILEALL=true clean', shell=True)
+		subprocess.run(ndk_build + ' -C core PRECOMPILE=true clean', shell=True)
+		subprocess.run(ndk_build + ' -C core clean', shell=True)
 		for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
 			shutil.rmtree(os.path.join('out', arch), ignore_errors=True)
 

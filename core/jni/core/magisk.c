@@ -40,7 +40,7 @@ static void usage() {
 		"   -c                        print current binary version\n"
 		"   -v                        print running daemon version\n"
 		"   -V                        print running daemon version code\n"
-		"   --list                    list all availible applets\n"
+		"   --list                    list all available applets\n"
 		"   --install [SOURCE] DIR    symlink all applets to DIR. SOURCE is optional\n"
 		"   --createimg IMG SIZE      create ext4 image. SIZE is interpreted in MB\n"
 		"   --imgsize IMG             report ext4 image used/total size\n"
