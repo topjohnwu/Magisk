@@ -168,7 +168,7 @@ void cpio_ln(struct vector *v, const char *target, const char *entry) {
 	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFLNK;
 	f->filename = strdup(entry);
-	f->filesize = strlen(target) + 1;
+	f->filesize = strlen(target);
 	f->data = strdup(target);
 	cpio_vec_insert(v, f);
 	fprintf(stderr, "Create symlink [%s] -> [%s]\n", entry, target);
@@ -220,13 +220,36 @@ int cpio_extract(struct vector *v, const char *entry, const char *filename) {
 				fchown(fd, f->uid, f->gid);
 				close(fd);
 			} else if (S_ISLNK(f->mode)) {
-				symlink(f->data, filename);
+				char *target = xcalloc(f->filesize + 1, 1);
+				memcpy(target, f->data, f->filesize);
+				symlink(target, filename);
 			}
 			return 0;
 		}
 	}
 	fprintf(stderr, "Cannot find the file entry [%s]\n", entry);
 	return 1;
+}
+
+void cpio_extract_all(struct vector *v) {
+	cpio_entry *f;
+	vec_for_each(v, f) {
+		fprintf(stderr, "Extracting [%s]\n", f->filename);
+		unlink(f->filename);
+		rmdir(f->filename);
+		if (S_ISDIR(f->mode)) {
+			mkdir(f->filename, f->mode & 0777);
+		} else if (S_ISREG(f->mode)) {
+			int fd = creat(f->filename, f->mode & 0777);
+			xwrite(fd, f->data, f->filesize);
+			fchown(fd, f->uid, f->gid);
+			close(fd);
+		} else if (S_ISLNK(f->mode)) {
+			char *target = xcalloc(f->filesize + 1, 1);
+			memcpy(target, f->data, f->filesize);
+			symlink(target, f->filename);
+		}
+	}
 }
 
 int cpio_test(struct vector *v) {

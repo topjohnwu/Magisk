@@ -51,6 +51,7 @@ void cpio_ln(struct vector *v, const char *target, const char *entry);
 void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename);
 int cpio_mv(struct vector *v, const char *from, const char *to);
 int cpio_extract(struct vector *v, const char *entry, const char *filename);
+void cpio_extract_all(struct vector *v);
 
 // Magisk specific
 int cpio_test(struct vector *v);

@@ -93,7 +93,6 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 		if (argc == 2 && strcmp(argv[0], "-r") == 0) {
 			recursive = 1;
 			++argv;
-			--argc;
 		}
 		cpio_rm(&v, recursive, argv[0]);
 	} else if (argc == 2 && strcmp(command, "mv") == 0) {
@@ -101,8 +100,13 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 			return 1;
 	} else if (argc == 2 && strcmp(command, "patch") == 0) {
 		cpio_patch(&v, strcmp(argv[0], "true") == 0, strcmp(argv[1], "true") == 0);
-	} else if (argc == 2 && strcmp(command, "extract") == 0) {
-		return cpio_extract(&v, argv[0], argv[1]);
+	} else if (strcmp(command, "extract") == 0) {
+		if (argc == 2) {
+			return cpio_extract(&v, argv[0], argv[1]);
+		} else {
+			cpio_extract_all(&v);
+			return 0;
+		}
 	} else if (argc == 2 && strcmp(command, "mkdir") == 0) {
 		cpio_mkdir(&v, strtoul(argv[0], NULL, 8), argv[1]);
 	} else if (argc == 2 && strcmp(command, "ln") == 0) {
