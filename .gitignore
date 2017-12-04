@@ -5,7 +5,7 @@
 /build
 app/release
 *.hprof
-app/.externalNativeBuild/
+.externalNativeBuild/
 *.sh
 public.certificate.x509.pem
 private.key.pk8
