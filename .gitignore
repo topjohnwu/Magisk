@@ -1,9 +1,18 @@
-out/
-obj/
-libs/
+/out
+/obj
+/libs
 *.zip
 *.jks
 *.apk
 
 # Built binaries
 ziptools/zipadjust
+
+# Android Studio / Gradle
+*.iml
+.gradle
+/local.properties
+/.idea
+/build
+/captures
+.externalNativeBuild

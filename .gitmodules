@@ -1,27 +1,27 @@
 [submodule "jni/selinux"]
-	path = jni/external/selinux
+	path = core/jni/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
 [submodule "jni/su"]
-	path = jni/su
+	path = core/jni/su
 	url = https://github.com/topjohnwu/MagiskSU.git
 [submodule "jni/magiskpolicy"]
-	path = jni/magiskpolicy
+	path = core/jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
 [submodule "MagiskManager"]
-	path = java
+	path = app
 	url = https://github.com/topjohnwu/MagiskManager.git
 [submodule "jni/busybox"]
-	path = jni/external/busybox
+	path = core/jni/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
 [submodule "jni/external/dtc"]
-	path = jni/external/dtc
+	path = core/jni/external/dtc
 	url = https://github.com/dgibson/dtc
 [submodule "jni/external/lz4"]
-	path = jni/external/lz4
+	path = core/jni/external/lz4
 	url = https://github.com/lz4/lz4.git
 [submodule "jni/external/bzip2"]
-	path = jni/external/bzip2
+	path = core/jni/external/bzip2
 	url = https://github.com/nemequ/bzip2.git
 [submodule "jni/external/xz"]
-	path = jni/external/xz
+	path = core/jni/external/xz
 	url = https://github.com/xz-mirror/xz.git

@@ -43,6 +43,11 @@ import lzma
 import base64
 import tempfile
 
+if 'ANDROID_NDK' in os.environ:
+	ndk_build = os.path.join(os.environ['ANDROID_NDK'], 'ndk-build')
+else:
+	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
+
 def mv(source, target):
 	print('mv: {} -> {}'.format(source, target))
 	shutil.move(source, target)
@@ -84,18 +89,13 @@ def build_binary(args):
 	header('* Building Magisk binaries')
 
 	# Force update Android.mk timestamp to trigger recompilation
-	os.utime(os.path.join('jni', 'Android.mk'))
+	os.utime(os.path.join('core', 'jni', 'Android.mk'))
 
 	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
 	cflag = 'MAGISK_FLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
 
-	if 'ANDROID_NDK' in os.environ:
-		ndk_build = os.path.join(os.environ['ANDROID_NDK'], 'ndk-build')
-	else:
-		ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
-
 	# Prebuild
-	proc = subprocess.run('{} PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
+	proc = subprocess.run('{} -C core PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
 
@@ -104,7 +104,7 @@ def build_binary(args):
 		mkdir_p(os.path.join('out', arch))
 		with open(os.path.join('out', arch, 'dump.h'), 'w') as dump:
 			dump.write('#include "stdlib.h"\n')
-			mv(os.path.join('libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
+			mv(os.path.join('core', 'libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
 			with open(os.path.join('out', arch, 'magisk'), 'rb') as bin:
 				dump.write('const uint8_t magisk_dump[] = "')
 				dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
@@ -112,7 +112,7 @@ def build_binary(args):
 
 	print('')
 
-	proc = subprocess.run('{} {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
+	proc = subprocess.run('{} -C core {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
 
@@ -120,7 +120,7 @@ def build_binary(args):
 	for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
 		for binary in ['magiskinit', 'magiskboot', 'b64xz', 'busybox']:
 			try:
-				mv(os.path.join('libs', arch, binary), os.path.join('out', arch, binary))
+				mv(os.path.join('core', 'libs', arch, binary), os.path.join('out', arch, binary))
 			except:
 				pass
 
@@ -129,18 +129,16 @@ def build_apk(args):
 
 	for key in ['public.certificate.x509.pem', 'private.key.pk8']:
 		source = os.path.join('ziptools', key)
-		target = os.path.join('java', 'app', 'src', 'main', 'assets', key)
+		target = os.path.join('app', 'src', 'main', 'assets', key)
 		cp(source, target)
 
 	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
 		source = os.path.join('scripts', script)
-		target = os.path.join('java', 'app', 'src', 'main', 'assets', script)
+		target = os.path.join('app', 'src', 'main', 'assets', script)
 		cp(source, target)
 
-	os.chdir('java')
-
 	if args.release:
-		if not os.path.exists(os.path.join('..', 'release_signature.jks')):
+		if not os.path.exists('release_signature.jks'):
 			error('Please generate a java keystore and place it in \'release_signature.jks\'')
 
 		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
@@ -173,17 +171,15 @@ def build_apk(args):
 			error('Cannot find apksigner.jar in Android SDK build tools')
 
 		proc = subprocess.run('java -jar {} sign --ks {} --out {} {}'.format(
-			apksigner,
-			os.path.join('..', 'release_signature.jks'),
-			release, aligned), shell=True)
+			apksigner, 'release_signature.jks', release, aligned), shell=True)
 		if proc.returncode != 0:
 			error('Release sign Magisk Manager failed!')
 
 		rm(unsigned)
 		rm(aligned)
 
-		mkdir(os.path.join('..', 'out'))
-		target = os.path.join('..', 'out', 'app-release.apk')
+		mkdir('out')
+		target = os.path.join('out', 'app-release.apk')
 		print('')
 		mv(release, target)
 	else:
@@ -192,25 +188,20 @@ def build_apk(args):
 			error('Build Magisk Manager failed!')
 
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk')
-		mkdir(os.path.join('..', 'out'))
-		target = os.path.join('..', 'out', 'app-debug.apk')
+		mkdir('out')
+		target = os.path.join('out', 'app-debug.apk')
 		print('')
 		mv(source, target)
 
-	# Return to upper directory
-	os.chdir('..')
-
 def build_snet(args):
-	os.chdir('java')
 	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 	if proc.returncode != 0:
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
-	mkdir(os.path.join('..', 'out'))
-	target = os.path.join('..', 'out', 'snet.apk')
+	mkdir('out')
+	target = os.path.join('out', 'snet.apk')
 	print('')
 	mv(source, target)
-	os.chdir('..')
 
 def gen_update_binary():
 	update_bin = []
@@ -342,8 +333,8 @@ def zip_uninstaller(args):
 	sign_adjust_zip(unsigned, output)
 
 def sign_adjust_zip(unsigned, output):
-	signer_name = 'zipsigner-1.0.jar'
-	jarsigner = os.path.join('java', 'crypto', 'build', 'libs', signer_name)
+	signer_name = 'zipsigner-1.1.jar'
+	jarsigner = os.path.join('crypto', 'build', 'libs', signer_name)
 
 	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
 		header('* Building zipadjust')
@@ -353,11 +344,9 @@ def sign_adjust_zip(unsigned, output):
 			error('Build zipadjust failed!')
 	if not os.path.exists(jarsigner):
 		header('* Building ' + signer_name)
-		os.chdir('java')
 		proc = subprocess.run('{} crypto:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
-		os.chdir('..')
 
 	header('* Signing / Adjusting Zip')
 
@@ -396,15 +385,13 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning binaries')
-		subprocess.run(os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build') + ' clean', shell=True)
+		subprocess.run(ndk_build + ' -C core COMPILEALL=true clean', shell=True)
 		for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
 			shutil.rmtree(os.path.join('out', arch), ignore_errors=True)
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		os.chdir('java')
 		subprocess.run('{} clean'.format(os.path.join('.', 'gradlew')), shell=True)
-		os.chdir('..')
 		for f in os.listdir('out'):
 			if '.apk' in f:
 				rm(os.path.join('out', f))

@@ -14,7 +14,7 @@ LIBFDT := $(EXT_PATH)/dtc/libfdt
 # Binaries
 ########################
 
-ifdef PRECOMPILE
+ifneq "$(or $(PRECOMPILE), $(COMPILEALL))" ""
 
 # magisk main binary
 include $(CLEAR_VARS)
@@ -54,8 +54,9 @@ LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
 
-# precompile
-else
+endif
+
+ifndef PRECOMPILE
 
 # magiskinit
 include $(CLEAR_VARS)
@@ -64,7 +65,7 @@ LOCAL_STATIC_LIBRARIES := libsepol liblzma
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
-	out/$(TARGET_ARCH_ABI) \
+	../out/$(TARGET_ARCH_ABI) \
 	$(LIBSEPOL) \
 	$(LIBLZMA)
 
