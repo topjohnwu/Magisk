@@ -40,6 +40,9 @@
     <string name="disable_file_created">Modulul va fi dezactivat la următoarea repornire</string>
     <string name="disable_file_removed">Modulul va fi activat la următoarea repornire</string>
     <string name="author">Creat de %1$s</string>
+    <string name="reboot_recovery">Repornire în Recovery</string>
+    <string name="reboot_bootloader">Repornire în Bootloader</string>
+    <string name="reboot_download">Repornire în Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Actualizare disponibilă</string>
@@ -60,7 +63,7 @@
     <string name="app_developers_"><![CDATA[Aplicație creată de <a href="https://github.com/topjohnwu">topjohnwu</a> în colaborare cu <a href="https://github.com/d8ahazard">Digitalhigh</a> şi <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Lista modificărilor</string>
     <string name="translators" />
-    <string name="app_version">Versiune aplicaţie</string>
+    <string name="app_version">Versiune</string>
     <string name="app_source_code">Cod sursă</string>
     <string name="donation">Donaţie</string>
     <string name="app_translators">Traducători</string>
@@ -172,6 +175,7 @@
     <string name="global_summary">Toate sesiunile de root utilizează spațiul de nume global</string>
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
+    <string name="android_o_not_support">Nu se acceptă pe Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare Superuser</string>
