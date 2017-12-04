@@ -11,8 +11,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include <dirent.h>
-#include <linux/loop.h>
-#include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <selinux/selinux.h>

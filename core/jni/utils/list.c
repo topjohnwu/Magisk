@@ -1,9 +1,6 @@
 /* list.h - Double link list implementation
  */
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "list.h"
 
 void init_list_head(struct list_head *head) {

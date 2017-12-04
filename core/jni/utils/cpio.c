@@ -168,6 +168,7 @@ void cpio_ln(struct vector *v, const char *target, const char *entry) {
 	cpio_entry *f = xcalloc(sizeof(*f), 1);
 	f->mode = S_IFLNK;
 	f->filename = strdup(entry);
+	f->filesize = strlen(target) + 1;
 	f->data = strdup(target);
 	cpio_vec_insert(v, f);
 	fprintf(stderr, "Create symlink [%s] -> [%s]\n", entry, target);

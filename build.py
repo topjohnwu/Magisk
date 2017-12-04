@@ -58,7 +58,7 @@ def cp(source, target):
 
 def rm(file):
 	try:
-	    os.remove(file)
+		os.remove(file)
 	except OSError as e:
 		if e.errno != errno.ENOENT:
 			raise
@@ -435,8 +435,8 @@ clean_parser.add_argument('target', nargs='*')
 clean_parser.set_defaults(func=cleanup)
 
 if len(sys.argv) == 1:
-    parser.print_help()
-    sys.exit(1)
+	parser.print_help()
+	sys.exit(1)
 
 args = parser.parse_args()
 

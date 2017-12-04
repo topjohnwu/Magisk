@@ -1,6 +1,4 @@
-/out
-/obj
-/libs
+out
 *.zip
 *.jks
 *.apk
