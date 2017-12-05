@@ -21,6 +21,7 @@
  */
 
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -385,7 +386,6 @@ static void magisk_init_daemon() {
 			exit(1);
 		}
 	}
-	exit(0);
 }
 
 int main(int argc, char *argv[]) {
@@ -402,6 +402,14 @@ int main(int argc, char *argv[]) {
 		else if (strcmp(argv[2], "magiskrc") == 0)
 			return dump_magiskrc(argv[3], 0755);
 	}
+
+	// Prevent file descriptor confusion
+	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
+	int null = open("/null", O_RDWR | O_CLOEXEC);
+	unlink("/null");
+	dup3(null, STDIN_FILENO, O_CLOEXEC);
+	dup3(null, STDOUT_FILENO, O_CLOEXEC);
+	dup3(null, STDERR_FILENO, O_CLOEXEC);
 
 	// Extract and link files
 	mkdir("/overlay", 0000);
@@ -456,24 +464,26 @@ int main(int argc, char *argv[]) {
 		link("/.backup/init", "/init");
 	}
 
-	int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
-	mv_dir(overlay, root);
+	// Only patch initramfs if not intended to run in recovery (legacy devices)
+	if (access("/etc/recovery.fstab", F_OK) != 0) {
+		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
+		mv_dir(overlay, root);
 
-	// Clean up
-	rmdir("/overlay");
-	close(overlay);
-	close(root);
+		// Clean up
+		rmdir("/overlay");
+		close(overlay);
+		close(root);
 
-	patch_ramdisk();
-	patch_sepolicy();
+		patch_ramdisk();
+		patch_sepolicy();
 
-	umount("/vendor");
-
-	if (fork_dont_care() == 0) {
-		strcpy(argv[0], "magiskinit");
-		magisk_init_daemon();
+		if (fork_dont_care() == 0) {
+			strcpy(argv[0], "magiskinit");
+			magisk_init_daemon();
+		}
 	}
 
+	umount("/vendor");
 	// Finally, give control back!
 	execv("/init", argv);
 }
