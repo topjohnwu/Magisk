@@ -138,6 +138,9 @@ public class MagiskFragment extends Fragment
         expandableContainer.expandLayout = expandLayout;
         setupExpandable();
 
+        keepVerityChkbox.setChecked(mm.keepVerity);
+        keepEncChkbox.setChecked(mm.keepEnc);
+
         mSwipeRefreshLayout.setOnRefreshListener(this);
         updateUI();
 

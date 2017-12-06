@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -104,8 +105,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 console.add("! Cannot unzip zip");
                 throw e;
             }
+            Shell.sh("chmod 755 " + install + "/*");
 
             File boot = new File(install, "boot.img");
+            boolean highCompression = false;
             switch (mode) {
                 case PATCH_MODE:
                     console.add("- Use boot image: " + boot);
@@ -141,6 +144,18 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     break;
                 case DIRECT_MODE:
                     console.add("- Use boot image: " + mBootLocation);
+                    if (mm.remoteMagiskVersionCode >= 1463) {
+                        List<String> ret = new ArrayList<>();
+                         Shell.getShell().run(ret, logs,
+                                install + "/magiskboot --parse " + mBootLocation,
+                                "echo $?"
+                        );
+                        if (Utils.isValidShellResponse(ret)) {
+                            highCompression = Integer.parseInt(ret.get(ret.size() - 1)) == 2;
+                            if (highCompression)
+                                console.add("! Insufficient boot partition size detected");
+                        }
+                    }
                     if (boot.createNewFile()) {
                         Shell.su("cat " + mBootLocation + " > " + boot);
                     } else {
@@ -173,8 +188,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             // Patch boot image
             shell.run(console, logs,
                     "cd " + install,
-                    "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " sh " +
-                            "update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'");
+                    "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " HIGHCOMP=" + highCompression +
+                    " sh update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'");
 
             if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;

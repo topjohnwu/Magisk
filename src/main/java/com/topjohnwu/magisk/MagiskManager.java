@@ -51,6 +51,8 @@ public class MagiskManager extends Application {
     public String managerLink;
     public String bootBlock = null;
     public int snetVersion;
+    public boolean keepVerity;
+    public boolean keepEnc;
 
     // Data
     public Map<String, Module> moduleMap;
@@ -196,6 +198,23 @@ public class MagiskManager extends Application {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
         } catch (NumberFormatException e) {
             magiskHide = true;
+        }
+
+        ret = Shell.su(
+                "getvar KEEPVERITY",
+                "echo $KEEPVERITY");
+        try {
+            keepVerity = Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
+        } catch (NumberFormatException e) {
+            keepVerity = false;
+        }
+        ret = Shell.su(
+                "getvar KEEPFORCEENCRYPT",
+                "echo $KEEPFORCEENCRYPT");
+        try {
+            keepEnc = Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
+        } catch (NumberFormatException e) {
+            keepEnc = false;
         }
     }
 
