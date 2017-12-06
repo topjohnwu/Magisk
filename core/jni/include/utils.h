@@ -102,6 +102,7 @@ struct file_attr {
 
 int fd_getpath(int fd, char *path, size_t size);
 int mkdir_p(const char *pathname, mode_t mode);
+void in_order_walk(int dirfd, void (*callback)(int, struct dirent*));
 void rm_rf(const char *path);
 void frm_rf(int dirfd);
 void mv_f(const char *source, const char *destination);
@@ -119,7 +120,9 @@ void clone_attr(const char *source, const char *target);
 void restorecon(int dirfd, int force);
 int mmap_ro(const char *filename, void **buf, size_t *size);
 int mmap_rw(const char *filename, void **buf, size_t *size);
+void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
+void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
 void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 void mem_align(size_t *pos, size_t align);
@@ -142,7 +145,7 @@ void trim_img(const char *img);
 // pattern.c
 
 void patch_init_rc(void **buf, size_t *size);
-int patch_verity(char **buf, uint32_t *size, int patch);
-void patch_encryption(char **buf, uint32_t *size);
+int patch_verity(void **buf, uint32_t *size, int patch);
+void patch_encryption(void **buf, uint32_t *size);
 
 #endif

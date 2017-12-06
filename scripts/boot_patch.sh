@@ -64,7 +64,7 @@ BOOTIMAGE="$1"
 # Presets
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
-[ -z $HIGH_COMP ] && HIGH_COMP=false
+[ -z $HIGHCOMP ] && HIGHCOMP=false
 
 chmod -R 755 .
 
@@ -89,7 +89,7 @@ case $? in
   2 )
     ui_print "! Insufficient boot partition size detected"
     ui_print "- Enable high compression mode"
-    HIGH_COMP=true
+    HIGHCOMP=true
     ;;
   3 )
     ui_print "- ChromeOS boot image detected"
@@ -139,11 +139,10 @@ esac
 
 ui_print "- Patching ramdisk"
 
-[ -f /sdcard/ramdisk-recovery.img ] && HIGH_COMP=true
+[ -f /sdcard/ramdisk-recovery.img ] && HIGHCOMP=true
 
-./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
 ./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
-./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $HIGH_COMP $SHA1
+./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1
 
 rm -f ramdisk.cpio.orig
 

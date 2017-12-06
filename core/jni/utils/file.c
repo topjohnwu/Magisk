@@ -17,13 +17,13 @@
 
 #include "utils.h"
 
-char **excl_list = (char *[]) { NULL };
+char **excl_list = NULL;
 
 static int is_excl(const char *name) {
-	for (int i = 0; excl_list[i]; ++i) {
-		if (strcmp(name, excl_list[i]) == 0)
-			return 1;
-	}
+	if (excl_list)
+		for (int i = 0; excl_list[i]; ++i)
+			if (strcmp(name, excl_list[i]) == 0)
+				return 1;
 	return 0;
 }
 
@@ -55,6 +55,36 @@ int mkdir_p(const char *pathname, mode_t mode) {
 	return 0;
 }
 
+void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
+	struct dirent *entry;
+	int newfd;
+	DIR *dir = xfdopendir(dirfd);
+
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		if (is_excl(entry->d_name))
+			continue;
+		if (entry->d_type == DT_DIR) {
+			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			in_order_walk(newfd, callback);
+			close(newfd);
+		}
+		callback(dirfd, entry);
+	}
+}
+
+static void rm_cb(int dirfd, struct dirent *entry) {
+	switch (entry->d_type) {
+	case DT_DIR:
+		unlinkat(dirfd, entry->d_name, AT_REMOVEDIR);
+		break;
+	default:
+		unlinkat(dirfd, entry->d_name, 0);
+		break;
+	}
+}
+
 void rm_rf(const char *path) {
 	int fd = xopen(path, O_RDONLY | O_CLOEXEC);
 	if (fd < 0)
@@ -65,27 +95,7 @@ void rm_rf(const char *path) {
 }
 
 void frm_rf(int dirfd) {
-	struct dirent *entry;
-	int newfd;
-	DIR *dir = xfdopendir(dirfd);
-
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (is_excl(entry->d_name))
-			continue;
-		switch (entry->d_type) {
-		case DT_DIR:
-			newfd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			frm_rf(newfd);
-			close(newfd);
-			unlinkat(dirfd, entry->d_name, AT_REMOVEDIR);
-			break;
-		default:
-			unlinkat(dirfd, entry->d_name, 0);
-			break;
-		}
-	}
+	in_order_walk(dirfd, rm_cb);
 }
 
 /* This will only on the same file system */
@@ -360,6 +370,13 @@ int mmap_rw(const char *filename, void **buf, size_t *size) {
 	return _mmap(1, filename, buf, size);
 }
 
+void fd_full_read(int fd, void **buf, size_t *size) {
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = xmalloc(*size);
+	xxread(fd, *buf, *size);
+}
+
 void full_read(const char *filename, void **buf, size_t *size) {
 	int fd = xopen(filename, O_RDONLY);
 	if (fd < 0) {
@@ -367,10 +384,18 @@ void full_read(const char *filename, void **buf, size_t *size) {
 		*size = 0;
 		return;
 	}
-	*size = lseek(fd, 0, SEEK_END);
-	lseek(fd, 0, SEEK_SET);
-	*buf = xmalloc(*size);
-	xxread(fd, *buf, *size);
+	fd_full_read(fd, buf, size);
+	close(fd);
+}
+
+void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
+	int fd = xopenat(dirfd, filename, O_RDONLY);
+	if (fd < 0) {
+		*buf = NULL;
+		*size = 0;
+		return;
+	}
+	fd_full_read(fd, buf, size);
 	close(fd);
 }
 

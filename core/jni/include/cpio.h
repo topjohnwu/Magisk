@@ -20,7 +20,7 @@ typedef struct cpio_entry {
 	// uint32_t namesize;
 	// uint32_t check;
 	char *filename;
-	char *data;
+	void *data;
 	int remove;
 } cpio_entry;
 

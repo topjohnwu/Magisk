@@ -58,12 +58,12 @@ void patch_init_rc(void **buf, size_t *size) {
 	*buf = new_data;
 }
 
-int patch_verity(char **buf, uint32_t *size, int patch) {
+int patch_verity(void **buf, uint32_t *size, int patch) {
 	int skip, found = 0;
 	for (int pos = 0; pos < *size; ++pos) {
 		if ((skip = check_verity_pattern(*buf + pos)) > 0) {
 			found = 1;
-			fprintf(stderr, "%s pattern [%.*s]\n", patch ? "Remove" : "Found", skip, *buf + pos);
+			fprintf(stderr, "%s pattern [%.*s]\n", patch ? "Remove" : "Found", skip, (char *) *buf + pos);
 			if (patch) {
 				memcpy(*buf + pos, *buf + pos + skip, *size - pos - skip);
 				memset(*buf + *size - skip, '\0', skip);
@@ -76,11 +76,11 @@ int patch_verity(char **buf, uint32_t *size, int patch) {
 	return found;
 }
 
-void patch_encryption(char **buf, uint32_t *size) {
+void patch_encryption(void **buf, uint32_t *size) {
 	int skip;
 	for (int pos = 0; pos < *size; ++pos) {
 		if ((skip = check_encryption_pattern(*buf + pos)) > 0) {
-			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, *buf + pos);
+			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, (char *) *buf + pos);
 			memcpy(*buf + pos, "encryptable", 11);
 			memcpy(*buf + pos + 11, *buf + pos + skip, *size - pos - skip);
 			memset(*buf + *size - skip + 11, '\0', skip - 11);

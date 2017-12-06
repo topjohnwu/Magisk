@@ -47,10 +47,15 @@
 #include "cpio.h"
 #include "magisk.h"
 
-// #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
+#ifdef MAGISK_DEBUG
+#define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)
+#else
 #define VLOG(fmt, ...)
+#endif
 
+extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
+static int keepverity = 0, keepencrypt = 0;
 
 struct cmdline {
 	int skip_initramfs;
@@ -64,8 +69,6 @@ struct device {
 	char partname[32];
 	char path[64];
 };
-
-extern policydb_t *policydb;
 
 static void parse_cmdline(struct cmdline *cmd) {
 	// cleanup
@@ -143,7 +146,24 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static void patch_ramdisk() {
+static void fstab_patch_cb(int dirfd, struct dirent *entry) {
+	if (entry->d_type == DT_REG && strstr(entry->d_name, "fstab")) {
+		void *buf;
+		size_t _size;
+		uint32_t size;
+		full_read_at(dirfd, entry->d_name, &buf, &_size);
+		size = _size;  /* Type conversion */
+		if (!keepverity)
+			patch_verity(&buf, &size, 1);
+		if (!keepencrypt)
+			patch_encryption(&buf, &size);
+		int fstab = xopenat(dirfd, entry->d_name, O_WRONLY | O_CLOEXEC);
+		write(fstab, buf, size);
+		close(fstab);
+	}
+}
+
+static void patch_ramdisk(int root) {
 	void *addr;
 	size_t size;
 	mmap_rw("/init", &addr, &size);
@@ -161,6 +181,23 @@ static void patch_ramdisk() {
 	write(fd, addr, size);
 	close(fd);
 	free(addr);
+
+	char *key, *value;
+	full_read("/.backup/.magisk", &addr, &size);
+	for (char *tok = strtok(addr, "\n"); tok; tok = strtok(NULL, "\n")) {
+		key = tok;
+		value = strchr(tok, '=') + 1;
+		value[-1] = '\0';
+		if (strcmp(key, "KEEPVERITY") == 0)
+			keepverity = strcmp(value, "true") == 0;
+		else if (strcmp(key, "KEEPFORCEENCRYPT") == 0)
+			keepencrypt = strcmp(value, "true") == 0;
+	}
+
+	excl_list = (char *[]) { "system_root", "system", "vendor", NULL };
+	in_order_walk(root, fstab_patch_cb);
+	if (!keepverity)
+		unlink("/verity_key");
 }
 
 static int strend(const char *s1, const char *s2) {
@@ -456,17 +493,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	// Only patch initramfs if not intended to run in recovery (legacy devices)
+	int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
+
+	// Only patch rootfs if not intended to run in recovery
 	if (access("/etc/recovery.fstab", F_OK) != 0) {
-		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 		mv_dir(overlay, root);
 
-		// Clean up
-		rmdir("/overlay");
-		close(overlay);
-		close(root);
-
-		patch_ramdisk();
+		patch_ramdisk(root);
 		patch_sepolicy();
 
 		if (fork_dont_care() == 0) {
@@ -475,7 +508,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	// Clean up
+	close(overlay);
+	close(root);
 	umount("/vendor");
+	rmdir("/overlay");
+
 	// Finally, give control back!
 	execv("/init", argv);
 }
