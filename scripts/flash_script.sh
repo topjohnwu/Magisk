@@ -123,7 +123,7 @@ if [ -f stock_boot* ]; then
   is_mounted /data && mv stock_boot* /data
 fi
 
-patch_dtbo_image
+$KEEPVERITY || patch_dtbo_image
 
 if [ -f stock_dtbo* ]; then
   rm -f /data/stock_dtbo* 2>/dev/null

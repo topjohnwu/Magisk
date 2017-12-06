@@ -88,7 +88,6 @@ case $? in
     ;;
   2 )
     ui_print "! Insufficient boot partition size detected"
-    ui_print "- Enable high compression mode"
     HIGHCOMP=true
     ;;
   3 )
@@ -103,6 +102,13 @@ case $? in
     ui_print "! Sony ELF64 format detected"
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
+
+if [ -f /sdcard/ramdisk-recovery.img ]; then
+  HIGHCOMP=true
+  ui_print "- Detected ramdisk-recovery.img"
+fi
+
+$HIGHCOMP && ui_print "- Enable high compression mode"
 
 ##########################################################################################
 # Ramdisk restores
@@ -138,8 +144,6 @@ esac
 ##########################################################################################
 
 ui_print "- Patching ramdisk"
-
-[ -f /sdcard/ramdisk-recovery.img ] && HIGHCOMP=true
 
 ./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
 ./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1
