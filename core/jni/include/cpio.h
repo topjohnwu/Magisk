@@ -42,8 +42,10 @@ typedef struct cpio_newc_header {
 } cpio_newc_header;
 
 // Basic cpio functions
+int cpio_cmp(const void *a, const void *b);
 void parse_cpio(struct vector *v, const char *filename);
 void dump_cpio(struct vector *v, const char *filename);
+void cpio_vec_insert(struct vector *v, cpio_entry *n);
 void cpio_vec_destroy(struct vector *v);
 void cpio_rm(struct vector *v, int recursive, const char *entry);
 void cpio_mkdir(struct vector *v, mode_t mode, const char *entry);
@@ -52,11 +54,5 @@ void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *file
 int cpio_mv(struct vector *v, const char *from, const char *to);
 int cpio_extract(struct vector *v, const char *entry, const char *filename);
 void cpio_extract_all(struct vector *v);
-
-// Magisk specific
-int cpio_test(struct vector *v);
-struct vector *cpio_backup(struct vector *v, const char *orig, const char *sha1);
-void cpio_restore(struct vector *v);
-char *cpio_stocksha1(struct vector *v);
 
 #endif

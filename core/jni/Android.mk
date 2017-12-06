@@ -9,6 +9,14 @@ LIBLZMA := $(EXT_PATH)/xz/src/liblzma/api
 LIBLZ4 := $(EXT_PATH)/lz4/lib
 LIBBZ2 := $(EXT_PATH)/bzip2
 LIBFDT := $(EXT_PATH)/dtc/libfdt
+UTIL_SRC := utils/cpio.c \
+            utils/file.c \
+            utils/img.c \
+            utils/list.c \
+            utils/misc.c \
+            utils/pattern.c \
+            utils/vector.c \
+            utils/xwrap.c
 
 ########################
 # Binaries
@@ -32,12 +40,6 @@ LOCAL_SRC_FILES := \
 	core/log_monitor.c \
 	core/bootstages.c \
 	core/socket.c \
-	utils/misc.c \
-	utils/vector.c \
-	utils/xwrap.c \
-	utils/list.c \
-	utils/img.c \
-	utils/file.c \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
@@ -48,7 +50,8 @@ LOCAL_SRC_FILES := \
 	su/db.c \
 	su/pts.c \
 	su/su_daemon.c \
-	su/su_socket.c
+	su/su_socket.c \
+	$(UTIL_SRC)
 
 LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX
 LOCAL_LDLIBS := -llog
@@ -72,15 +75,11 @@ LOCAL_C_INCLUDES := \
 LOCAL_SRC_FILES := \
 	core/magiskinit.c \
 	core/socket.c \
-	utils/misc.c \
-	utils/vector.c \
-	utils/file.c \
-	utils/xwrap.c \
-	utils/cpio.c \
 	magiskpolicy/api.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
-	magiskpolicy/sepolicy.c
+	magiskpolicy/sepolicy.c \
+	$(UTIL_SRC)
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
@@ -106,10 +105,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/types.c \
 	magiskboot/dtb.c \
 	magiskboot/ramdisk.c \
-	utils/xwrap.c \
-	utils/file.c \
-	utils/cpio.c \
-	utils/vector.c
+	$(UTIL_SRC)
 
 LOCAL_CFLAGS := -DXWRAP_EXIT
 LOCAL_LDLIBS := -lz

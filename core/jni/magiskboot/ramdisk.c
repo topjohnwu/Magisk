@@ -8,47 +8,12 @@
 #include "magiskboot.h"
 #include "cpio.h"
 
-int check_verity_pattern(const char *s) {
-	int pos = 0;
-	if (s[0] == ',') ++pos;
-	if (strncmp(s + pos, "verify", 6) == 0)
-		pos += 6;
-	else if (strncmp(s + pos, "avb", 3) == 0)
-		pos += 3;
-	else
-		return -1;
-
-	if (s[pos] == '=') {
-		while (s[pos] != '\0' && s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
-	}
-	return pos;
-}
-
-int check_encryption_pattern(const char *s) {
-	const char *encrypt_list[] = { "forceencrypt", "forcefdeorfbe", NULL };
-	for (int i = 0 ; encrypt_list[i]; ++i) {
-		int len = strlen(encrypt_list[i]);
-		if (strncmp(s, encrypt_list[i], len) == 0)
-			return len;
-	}
-	return -1;
-}
-
-void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
+static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	cpio_entry *f;
-	int skip, write;
 	vec_for_each(v, f) {
 		if (!keepverity) {
 			if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-				write = 0;
-				for (int read = 0; read < f->filesize; ++write, ++read) {
-					if ((skip = check_verity_pattern(f->data + read)) > 0) {
-						fprintf(stderr, "Remove pattern [%.*s] in [%s]\n", skip, f->data + read, f->filename);
-						read += skip;
-					}
-					f->data[write] = f->data[read];
-				}
-				f->filesize = write;
+				patch_verity(&f->data, &f->filesize, 1);
 			} else if (strcmp(f->filename, "verity_key") == 0) {
 				fprintf(stderr, "Remove [verity_key]\n");
 				f->remove = 1;
@@ -56,35 +21,207 @@ void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 		}
 		if (!keepforceencrypt) {
 			if (strstr(f->filename, "fstab") != NULL && S_ISREG(f->mode)) {
-				write = 0;
-				for (int read = 0; read < f->filesize; ++write, ++read) {
-					if ((skip = check_encryption_pattern(f->data + read)) > 0) {
-						// assert(skip > 11)!
-						fprintf(stderr, "Replace pattern [%.*s] with [encryptable] in [%s]\n", skip, f->data + read, f->filename);
-						memcpy(f->data + write, "encryptable", 11);
-						write += 11;
-						read += skip;
-					}
-					f->data[write] = f->data[read];
-				}
-				f->filesize = write;
+				patch_encryption(&f->data, &f->filesize);
 			}
 		}
 	}
 }
 
+#define STOCK_BOOT      0x0
+#define MAGISK_PATCH    0x1
+#define OTHER_PATCH     0x2
+
+static int cpio_test(struct vector *v) {
+	int ret = STOCK_BOOT;
+	cpio_entry *f;
+	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
+	const char *MAGISK_LIST[] = { ".backup/.magisk", "init.magisk.rc", "overlay/init.magisk.rc", NULL };
+	vec_for_each(v, f) {
+		for (int i = 0; OTHER_LIST[i]; ++i) {
+			if (strcmp(f->filename, OTHER_LIST[i]) == 0) {
+				// Already find other files, abort
+				return OTHER_PATCH;
+			}
+		}
+		for (int i = 0; MAGISK_LIST[i]; ++i) {
+			if (strcmp(f->filename, MAGISK_LIST[i]) == 0)
+				ret = MAGISK_PATCH;
+		}
+	}
+	cpio_vec_destroy(v);
+	return ret;
+}
+
+static char *cpio_stocksha1(struct vector *v) {
+	cpio_entry *f;
+	char sha1[41];
+	vec_for_each(v, f) {
+		if (strcmp(f->filename, "init.magisk.rc") == 0
+			|| strcmp(f->filename, "overlay/init.magisk.rc") == 0) {
+			for (char *pos = f->data; pos < f->data + f->filesize; pos = strchr(pos + 1, '\n') + 1) {
+				if (memcmp(pos, "# STOCKSHA1=", 12) == 0) {
+					pos += 12;
+					memcpy(sha1, pos, 40);
+					sha1[40] = '\0';
+					return strdup(sha1);
+				}
+			}
+		} else if (strcmp(f->filename, ".backup/.sha1") == 0) {
+			return f->data;
+		}
+	}
+	return NULL;
+}
+
+static struct vector *cpio_backup(struct vector *v, const char *orig, const char *keepverity,
+								 const char *keepforceencrypt, const char *sha1) {
+	struct vector o_body, *o = &o_body, *ret;
+	cpio_entry *m, *n, *rem, *cksm;
+	char buf[PATH_MAX];
+	int res, backup;
+
+	ret = xcalloc(sizeof(*ret), 1);
+
+	vec_init(o);
+	vec_init(ret);
+
+	m = xcalloc(sizeof(*m), 1);
+	m->filename = strdup(".backup");
+	m->mode = S_IFDIR;
+	vec_push_back(ret, m);
+
+	m = xcalloc(sizeof(*m), 1);
+	m->filename = strdup(".backup/.magisk");
+	m->mode = S_IFREG;
+	m->data = xmalloc(50);
+	snprintf(m->data, 50, "KEEPVERITY=%s\nKEEPFORCEENCRYPT=%s\n", keepverity, keepforceencrypt);
+	m->filesize = strlen(m->data) + 1;
+	vec_push_back(ret, m);
+
+	rem = xcalloc(sizeof(*rem), 1);
+	rem->filename = strdup(".backup/.rmlist");
+	rem->mode = S_IFREG;
+	vec_push_back(ret, rem);
+
+	if (sha1) {
+		fprintf(stderr, "Save SHA1: [%s] -> [.backup/.sha1]\n", sha1);
+		cksm = xcalloc(sizeof(*cksm), 1);
+		vec_push_back(ret, cksm);
+		cksm->filename = strdup(".backup/.sha1");
+		cksm->mode = S_IFREG;
+		cksm->data = strdup(sha1);
+		cksm->filesize = strlen(sha1) + 1;
+	}
+
+	parse_cpio(o, orig);
+	// Remove possible backups in original ramdisk
+	cpio_rm(o, 1, ".backup");
+	cpio_rm(v, 1, ".backup");
+
+	// Sort both vectors before comparing
+	vec_sort(v, cpio_cmp);
+	vec_sort(o, cpio_cmp);
+
+	// Start comparing
+	size_t i = 0, j = 0;
+	while(i != vec_size(o) || j != vec_size(v)) {
+		backup = 0;
+		if (i != vec_size(o) && j != vec_size(v)) {
+			m = vec_entry(o)[i];
+			n = vec_entry(v)[j];
+			res = strcmp(m->filename, n->filename);
+		} else if (i == vec_size(o)) {
+			n = vec_entry(v)[j];
+			res = 1;
+		} else if (j == vec_size(v)) {
+			m = vec_entry(o)[i];
+			res = -1;
+		}
+
+		if (res < 0) {
+			// Something is missing in new ramdisk, backup!
+			++i;
+			backup = 1;
+			fprintf(stderr, "Backup missing entry: ");
+		} else if (res == 0) {
+			++i; ++j;
+			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
+				continue;
+			// Not the same!
+			backup = 1;
+			fprintf(stderr, "Backup mismatch entry: ");
+		} else {
+			// Someting new in ramdisk, record in rem
+			++j;
+			if (n->remove) continue;
+			rem->data = xrealloc(rem->data, rem->filesize + strlen(n->filename) + 1);
+			memcpy(rem->data + rem->filesize, n->filename, strlen(n->filename) + 1);
+			rem->filesize += strlen(n->filename) + 1;
+			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
+		}
+		if (backup) {
+			sprintf(buf, ".backup/%s", m->filename);
+			free(m->filename);
+			m->filename = strdup(buf);
+			fprintf(stderr, "[%s] -> [%s]\n", buf, m->filename);
+			vec_push_back(ret, m);
+			// NULL the original entry, so it won't be freed
+			vec_entry(o)[i - 1] = NULL;
+		}
+	}
+
+	if (rem->filesize == 0)
+		rem->remove = 1;
+
+	// Cleanup
+	cpio_vec_destroy(o);
+
+	return ret;
+}
+
+static void cpio_restore(struct vector *v) {
+	cpio_entry *f, *n;
+	vec_for_each(v, f) {
+		if (strncmp(f->filename, ".backup", 7) == 0) {
+			f->remove = 1;
+			if (f->filename[7] == '\0') continue;
+			if (f->filename[8] == '.') {
+				if (strcmp(f->filename, ".backup/.rmlist") == 0) {
+					for (int pos = 0; pos < f->filesize; pos += strlen(f->data + pos) + 1)
+						cpio_rm(v, 0, f->data + pos);
+				}
+				continue;
+			} else {
+				n = xcalloc(sizeof(*n), 1);
+				memcpy(n, f, sizeof(*f));
+				n->filename = strdup(f->filename + 8);
+				n->data = f->data;
+				f->data = NULL;
+				n->remove = 0;
+				fprintf(stderr, "Restore [%s] -> [%s]\n", f->filename, n->filename);
+				cpio_vec_insert(v, n);
+			}
+		}
+		if (strncmp(f->filename, "overlay", 7) == 0)
+			f->remove = 1;
+	}
+	// Some known stuff we can remove
+	cpio_rm(v, 0, "sbin/magic_mask.sh");
+	cpio_rm(v, 0, "init.magisk.rc");
+	cpio_rm(v, 0, "magisk");
+	cpio_rm(v, 0, "ramdisk-recovery.xz");
+}
+
 static void restore_high_compress(struct vector *v, const char *incpio) {
 	// Check if the ramdisk is in high compression mode
 	if (cpio_extract(v, "ramdisk.cpio.xz", incpio) == 0) {
-		void *addr, *xz;
+		void *xz;
 		size_t size;
-		mmap_ro(incpio, &addr, &size);
-		xz = xmalloc(size);
-		memcpy(xz, addr, size);
-		munmap(addr, size);
+		full_read(incpio, &xz, &size);
 		int fd = creat(incpio, 0644);
 		lzma(0, fd, xz, size);
 		close(fd);
+		free(xz);
 		cpio_rm(v, 0, "ramdisk.cpio.xz");
 		cpio_rm(v, 0, "init");
 		struct vector vv;
@@ -120,15 +257,13 @@ static void enable_high_compress(struct vector *v, struct vector *b, const char 
 
 	dump_cpio(v, incpio);
 	cpio_vec_destroy(v);
-	void *addr, *cpio;
+	void *cpio;
 	size_t size;
-	mmap_ro(incpio, &addr, &size);
-	cpio = xmalloc(size);
-	memcpy(cpio, addr, size);
-	munmap(addr, size);
+	full_read(incpio, &cpio, &size);
 	int fd = creat(incpio, 0644);
 	lzma(1, fd, cpio, size);
 	close(fd);
+	free(cpio);
 	vec_init(v);
 	vec_push_back(v, magiskinit);
 	cpio_add(v, 0, "ramdisk.cpio.xz", incpio);
@@ -150,10 +285,10 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	} else if (strcmp(command, "stocksha1") == 0) {
 		printf("%s\n", cpio_stocksha1(&v));
 		return 0;
-	} else if (argc >= 2 && strcmp(command, "backup") == 0) {
+	} else if (argc >= 4 && strcmp(command, "backup") == 0) {
 		struct vector *back;
 		cpio_entry *e;
-		back = cpio_backup(&v, argv[0], argc > 2 ? argv[2] : NULL);
+		back = cpio_backup(&v, argv[0], argv[2], argv[3], argc > 4 ? argv[4] : NULL);
 
 		// Enable high compression mode
 		if (strcmp(argv[1], "true") == 0)

@@ -5,8 +5,6 @@
 #include "magiskboot.h"
 #include "utils.h"
 
-extern int check_verity_pattern(const char *s);
-
 static void print_props(const void *fdt, int node, int depth) {
 	int prop;
 	fdt_for_each_property_offset(prop, fdt, node) {
@@ -79,21 +77,9 @@ static void dtb_patch(const char *file, int patch) {
 				int block;
 				fdt_for_each_subnode(block, fdt, fstab) {
 					fprintf(stderr, "Found block [%s] in fstab\n", fdt_get_name(fdt, block, NULL));
-					int skip, value_size;
+					uint32_t value_size;
 					char *value = (char *) fdt_getprop(fdt, block, "fsmgr_flags", &value_size);
-					for (int i = 0; i < value_size; ++i) {
-						if ((skip = check_verity_pattern(value + i)) > 0) {
-							if (patch) {
-								fprintf(stderr, "Remove pattern [%.*s] in [fsmgr_flags]\n", skip, value + i);
-								memcpy(value + i, value + i + skip, value_size - i - skip);
-								memset(value + value_size - skip, '\0', skip);
-							} else {
-								fprintf(stderr, "Found pattern [%.*s] in [fsmgr_flags]\n", skip, value + i);
-								i += skip - 1;
-							}
-							found = 1;
-						}
-					}
+					found |= patch_verity(&value, &value_size, patch);
 				}
 			}
 		}

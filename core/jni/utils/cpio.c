@@ -30,7 +30,11 @@ static void cpio_free(cpio_entry *f) {
 	}
 }
 
-static void cpio_vec_insert(struct vector *v, cpio_entry *n) {
+int cpio_cmp(const void *a, const void *b) {
+	return strcmp((*(cpio_entry **) a)->filename, (*(cpio_entry **) b)->filename);
+}
+
+void cpio_vec_insert(struct vector *v, cpio_entry *n) {
 	cpio_entry *f;
 	vec_for_each(v, f) {
 		if (strcmp(f->filename, n->filename) == 0) {
@@ -41,10 +45,6 @@ static void cpio_vec_insert(struct vector *v, cpio_entry *n) {
 		}
 	}
 	vec_push_back(v, n);
-}
-
-static int cpio_cmp(const void *a, const void *b) {
-	return strcmp((*(cpio_entry **) a)->filename, (*(cpio_entry **) b)->filename);
 }
 
 // Parse cpio file to a vector of cpio_entry
@@ -250,184 +250,4 @@ void cpio_extract_all(struct vector *v) {
 			symlink(target, f->filename);
 		}
 	}
-}
-
-int cpio_test(struct vector *v) {
-	#define STOCK_BOOT      0x0
-	#define MAGISK_PATCH    0x1
-	#define OTHER_PATCH     0x2
-	int ret = STOCK_BOOT;
-	cpio_entry *f;
-	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
-	const char *MAGISK_LIST[] = { ".backup/.magisk", "init.magisk.rc", "overlay/init.magisk.rc", NULL };
-	vec_for_each(v, f) {
-		for (int i = 0; OTHER_LIST[i]; ++i) {
-			if (strcmp(f->filename, OTHER_LIST[i]) == 0) {
-				// Already find other files, abort
-				return OTHER_PATCH;
-			}
-		}
-		for (int i = 0; MAGISK_LIST[i]; ++i) {
-			if (strcmp(f->filename, MAGISK_LIST[i]) == 0)
-				ret = MAGISK_PATCH;
-		}
-	}
-	cpio_vec_destroy(v);
-	return ret;
-}
-
-struct vector * cpio_backup(struct vector *v, const char *orig, const char *sha1) {
-	struct vector o_body, *o = &o_body, *ret;
-	cpio_entry *m, *n, *rem, *cksm;
-	char buf[PATH_MAX];
-	int res, backup;
-
-	ret = xcalloc(sizeof(*ret), 1);
-
-	vec_init(o);
-	vec_init(ret);
-
-	m = xcalloc(sizeof(*m), 1);
-	m->filename = strdup(".backup");
-	m->mode = S_IFDIR;
-	vec_push_back(ret, m);
-
-	m = xcalloc(sizeof(*m), 1);
-	m->filename = strdup(".backup/.magisk");
-	m->mode = S_IFREG;
-	vec_push_back(ret, m);
-
-	rem = xcalloc(sizeof(*rem), 1);
-	rem->filename = strdup(".backup/.rmlist");
-	rem->mode = S_IFREG;
-	vec_push_back(ret, rem);
-
-	if (sha1) {
-		fprintf(stderr, "Save SHA1: [%s] -> [.backup/.sha1]\n", sha1);
-		cksm = xcalloc(sizeof(*cksm), 1);
-		vec_push_back(ret, cksm);
-		cksm->filename = strdup(".backup/.sha1");
-		cksm->mode = S_IFREG;
-		cksm->data = strdup(sha1);
-		cksm->filesize = strlen(sha1) + 1;
-	}
-
-	parse_cpio(o, orig);
-	// Remove possible backups in original ramdisk
-	cpio_rm(o, 1, ".backup");
-	cpio_rm(v, 1, ".backup");
-
-	// Sort both vectors before comparing
-	vec_sort(v, cpio_cmp);
-	vec_sort(o, cpio_cmp);
-
-	// Start comparing
-	size_t i = 0, j = 0;
-	while(i != vec_size(o) || j != vec_size(v)) {
-		backup = 0;
-		if (i != vec_size(o) && j != vec_size(v)) {
-			m = vec_entry(o)[i];
-			n = vec_entry(v)[j];
-			res = strcmp(m->filename, n->filename);
-		} else if (i == vec_size(o)) {
-			n = vec_entry(v)[j];
-			res = 1;
-		} else if (j == vec_size(v)) {
-			m = vec_entry(o)[i];
-			res = -1;
-		}
-
-		if (res < 0) {
-			// Something is missing in new ramdisk, backup!
-			++i;
-			backup = 1;
-			fprintf(stderr, "Backup missing entry: ");
-		} else if (res == 0) {
-			++i; ++j;
-			if (m->filesize == n->filesize && memcmp(m->data, n->data, m->filesize) == 0)
-				continue;
-			// Not the same!
-			backup = 1;
-			fprintf(stderr, "Backup mismatch entry: ");
-		} else {
-			// Someting new in ramdisk, record in rem
-			++j;
-			if (n->remove) continue;
-			rem->data = xrealloc(rem->data, rem->filesize + strlen(n->filename) + 1);
-			memcpy(rem->data + rem->filesize, n->filename, strlen(n->filename) + 1);
-			rem->filesize += strlen(n->filename) + 1;
-			fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", n->filename);
-		}
-		if (backup) {
-			sprintf(buf, ".backup/%s", m->filename);
-			free(m->filename);
-			m->filename = strdup(buf);
-			fprintf(stderr, "[%s] -> [%s]\n", buf, m->filename);
-			vec_push_back(ret, m);
-			// NULL the original entry, so it won't be freed
-			vec_entry(o)[i - 1] = NULL;
-		}
-	}
-
-	if (rem->filesize == 0)
-		rem->remove = 1;
-
-	// Cleanup
-	cpio_vec_destroy(o);
-
-	return ret;
-}
-
-void cpio_restore(struct vector *v) {
-	cpio_entry *f, *n;
-	vec_for_each(v, f) {
-		if (strncmp(f->filename, ".backup", 7) == 0) {
-			f->remove = 1;
-			if (f->filename[7] == '\0') continue;
-			if (f->filename[8] == '.') {
-				if (strcmp(f->filename, ".backup/.rmlist") == 0) {
-					for (int pos = 0; pos < f->filesize; pos += strlen(f->data + pos) + 1)
-						cpio_rm(v, 0, f->data + pos);
-				}
-				continue;
-			} else {
-				n = xcalloc(sizeof(*n), 1);
-				memcpy(n, f, sizeof(*f));
-				n->filename = strdup(f->filename + 8);
-				n->data = f->data;
-				f->data = NULL;
-				n->remove = 0;
-				fprintf(stderr, "Restore [%s] -> [%s]\n", f->filename, n->filename);
-				cpio_vec_insert(v, n);
-			}
-		}
-		if (strncmp(f->filename, "overlay", 7) == 0)
-			f->remove = 1;
-	}
-	// Some known stuff we can remove
-	cpio_rm(v, 0, "sbin/magic_mask.sh");
-	cpio_rm(v, 0, "init.magisk.rc");
-	cpio_rm(v, 0, "magisk");
-	cpio_rm(v, 0, "ramdisk-recovery.xz");
-}
-
-char *cpio_stocksha1(struct vector *v) {
-	cpio_entry *f;
-	char sha1[41];
-	vec_for_each(v, f) {
-		if (strcmp(f->filename, "init.magisk.rc") == 0
-			|| strcmp(f->filename, "overlay/init.magisk.rc") == 0) {
-			for (char *pos = f->data; pos < f->data + f->filesize; pos = strchr(pos + 1, '\n') + 1) {
-				if (memcmp(pos, "# STOCKSHA1=", 12) == 0) {
-					pos += 12;
-					memcpy(sha1, pos, 40);
-					sha1[40] = '\0';
-					return strdup(sha1);
-				}
-			}
-		} else if (strcmp(f->filename, ".backup/.sha1") == 0) {
-			return f->data;
-		}
-	}
-	return NULL;
 }

@@ -9,7 +9,6 @@
 #include <libgen.h>
 #include <sys/sendfile.h>
 #include <sys/mman.h>
-#include <sys/inotify.h>
 #include <linux/fs.h>
 
 #ifdef SELINUX
@@ -218,23 +217,6 @@ void clone_dir(int src, int dest) {
 	}
 }
 
-void wait_till_exists(const char *target) {
-	if (access(target, F_OK) == 0)
-		return;
-	int fd = inotify_init();
-	char *dir = dirname(target);
-	char crap[PATH_MAX];
-	inotify_add_watch(fd, dir, IN_CREATE);
-	while (1) {
-		struct inotify_event event;
-		read(fd, &event, sizeof(event));
-		read(fd, crap, event.len);
-		if (access(target, F_OK) == 0)
-			break;
-	}
-	close(fd);
-}
-
 int getattr(const char *path, struct file_attr *a) {
 	if (xlstat(path, &a->st) == -1)
 		return -1;
@@ -378,7 +360,21 @@ int mmap_rw(const char *filename, void **buf, size_t *size) {
 	return _mmap(1, filename, buf, size);
 }
 
-void full_read(int fd, void **buf, size_t *size) {
+void full_read(const char *filename, void **buf, size_t *size) {
+	int fd = xopen(filename, O_RDONLY);
+	if (fd < 0) {
+		*buf = NULL;
+		*size = 0;
+		return;
+	}
+	*size = lseek(fd, 0, SEEK_END);
+	lseek(fd, 0, SEEK_SET);
+	*buf = xmalloc(*size);
+	xxread(fd, *buf, *size);
+	close(fd);
+}
+
+void stream_full_read(int fd, void **buf, size_t *size) {
 	size_t cap = 1 << 20;
 	uint8_t tmp[1 << 20];
 	*buf = xmalloc(cap);

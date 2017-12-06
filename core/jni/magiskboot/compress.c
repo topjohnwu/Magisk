@@ -392,7 +392,7 @@ void decomp_file(char *from, const char *to) {
 	void *file;
 	size_t size = 0;
 	if (strcmp(from, "-") == 0)
-		full_read(STDIN_FILENO, &file, &size);
+		stream_full_read(STDIN_FILENO, &file, &size);
 	else
 		mmap_ro(from, &file, &size);
 	file_t type = check_type(file);
@@ -483,7 +483,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 	void *file;
 	size_t size;
 	if (strcmp(from, "-") == 0)
-		full_read(STDIN_FILENO, &file, &size);
+		stream_full_read(STDIN_FILENO, &file, &size);
 	else
 		mmap_ro(from, &file, &size);
 	if (to == NULL) {

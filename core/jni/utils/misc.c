@@ -11,15 +11,15 @@
 #include <signal.h>
 #include <sched.h>
 #include <unistd.h>
+#include <libgen.h>
 #include <sys/types.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <sys/inotify.h>
 
 #include "logging.h"
 #include "utils.h"
-
-int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -313,4 +313,21 @@ int fork_dont_care() {
 		exit(0);
 	}
 	return 0;
+}
+
+void wait_till_exists(const char *target) {
+	if (access(target, F_OK) == 0)
+		return;
+	int fd = inotify_init();
+	char *dir = dirname(target);
+	char crap[PATH_MAX];
+	inotify_add_watch(fd, dir, IN_CREATE);
+	while (1) {
+		struct inotify_event event;
+		read(fd, &event, sizeof(event));
+		read(fd, crap, event.len);
+		if (access(target, F_OK) == 0)
+			break;
+	}
+	close(fd);
 }

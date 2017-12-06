@@ -72,7 +72,6 @@ static void parse_cmdline(struct cmdline *cmd) {
 	cmd->skip_initramfs = 0;
 	cmd->slot[0] = '\0';
 
-	char *tok;
 	char cmdline[4096];
 	mkdir("/proc", 0555);
 	mount("proc", "/proc", "proc", 0, NULL);
@@ -80,8 +79,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
 	umount("/proc");
-	tok = strtok(cmdline, " ");
-	while (tok != NULL) {
+	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(NULL, " ")) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
 		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
@@ -90,7 +88,6 @@ static void parse_cmdline(struct cmdline *cmd) {
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
 			cmd->skip_initramfs = 1;
 		}
-		tok = strtok(NULL, " ");
 	}
 }
 
@@ -146,34 +143,6 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static void *patch_init_rc(char *data, uint32_t *size) {
-	int injected = 0;
-	char *new_data = malloc(*size + 23);
-	char *old_data = data;
-	uint32_t pos = 0;
-
-	for (char *tok = strsep(&old_data, "\n"); tok; tok = strsep(&old_data, "\n")) {
-		if (!injected && strncmp(tok, "import", 6) == 0) {
-			if (strstr(tok, "init.magisk.rc")) {
-				injected = 1;
-			} else {
-				strcpy(new_data + pos, "import /init.magisk.rc\n");
-				pos += 23;
-				injected = 1;
-			}
-		} else if (strstr(tok, "selinux.reload_policy")) {
-			continue;
-		}
-		// Copy the line
-		strcpy(new_data + pos, tok);
-		pos += strlen(tok);
-		new_data[pos++] = '\n';
-	}
-
-	*size = pos;
-	return new_data;
-}
-
 static void patch_ramdisk() {
 	void *addr;
 	size_t size;
@@ -186,15 +155,12 @@ static void patch_ramdisk() {
 	}
 	munmap(addr, size);
 
-	mmap_rw("/init.rc", &addr, &size);
-	uint32_t new_size = size;
-	void *init_rc = patch_init_rc(addr, &new_size);
-	munmap(addr, size);
-
-	int fd = open("/init.rc", O_WRONLY | O_TRUNC | O_CLOEXEC);
-	write(fd, init_rc, new_size);
+	full_read("/init.rc", &addr, &size);
+	patch_init_rc(&addr, &size);
+	int fd = creat("/init.rc", 0750);
+	write(fd, addr, size);
 	close(fd);
-	free(init_rc);
+	free(addr);
 }
 
 static int strend(const char *s1, const char *s2) {

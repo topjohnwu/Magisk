@@ -70,7 +70,7 @@ pid_t xfork();
 
 // misc.c
 
-extern int quit_signals[];
+#define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
 
 unsigned get_shell_uid();
 unsigned get_system_uid();
@@ -119,7 +119,8 @@ void clone_attr(const char *source, const char *target);
 void restorecon(int dirfd, int force);
 int mmap_ro(const char *filename, void **buf, size_t *size);
 int mmap_rw(const char *filename, void **buf, size_t *size);
-void full_read(int fd, void **buf, size_t *size);
+void full_read(const char *filename, void **buf, size_t *size);
+void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 void mem_align(size_t *pos, size_t align);
 void file_align(int fd, size_t align, int out);
@@ -137,5 +138,11 @@ char *mount_image(const char *img, const char *target);
 void umount_image(const char *target, const char *device);
 int merge_img(const char *source, const char *target);
 void trim_img(const char *img);
+
+// pattern.c
+
+void patch_init_rc(void **buf, size_t *size);
+int patch_verity(char **buf, uint32_t *size, int patch);
+void patch_encryption(char **buf, uint32_t *size);
 
 #endif
