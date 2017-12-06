@@ -84,7 +84,7 @@ getvar() {
   local VARNAME=$1
   local VALUE=$(eval echo \$$VARNAME)
   [ ! -z $VALUE ] && return
-  for DIR in /dev /data /cache /system; do
+  for DIR in /.backup /data /cache /system; do
     VALUE=`grep_prop $VARNAME $DIR/.magisk`
     [ ! -z $VALUE ] && break;
   done

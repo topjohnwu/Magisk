@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <utils.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 
 #include "magiskboot.h"
 #include "cpio.h"
@@ -70,8 +73,68 @@ void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	}
 }
 
+static void restore_high_compress(struct vector *v, const char *incpio) {
+	// Check if the ramdisk is in high compression mode
+	if (cpio_extract(v, "ramdisk.cpio.xz", incpio) == 0) {
+		void *addr, *xz;
+		size_t size;
+		mmap_ro(incpio, &addr, &size);
+		xz = xmalloc(size);
+		memcpy(xz, addr, size);
+		munmap(addr, size);
+		int fd = creat(incpio, 0644);
+		lzma(0, fd, xz, size);
+		close(fd);
+		cpio_rm(v, 0, "ramdisk.cpio.xz");
+		cpio_rm(v, 0, "init");
+		struct vector vv;
+		vec_init(&vv);
+		parse_cpio(&vv, incpio);
+		cpio_entry *e;
+		vec_for_each(&vv, e)
+			vec_push_back(v, e);
+		vec_destroy(&vv);
+	}
+}
+
+static void enable_high_compress(struct vector *v, struct vector *b, const char *incpio) {
+	cpio_entry *e, *magiskinit, *init;
+
+	// Swap magiskinit with original init
+	vec_for_each(b, e) {
+		if (strcmp(e->filename, ".backup/init") == 0) {
+			free(e->filename);
+			e->filename = strdup("init");
+			init = e;
+			vec_for_each(v, e) {
+				if (strcmp(e->filename, "init") == 0) {
+					magiskinit = e;
+					vec_cur(v) = init;
+					break;
+				}
+			}
+			vec_cur(b) = NULL;
+			break;
+		}
+	}
+
+	dump_cpio(v, incpio);
+	cpio_vec_destroy(v);
+	void *addr, *cpio;
+	size_t size;
+	mmap_ro(incpio, &addr, &size);
+	cpio = xmalloc(size);
+	memcpy(cpio, addr, size);
+	munmap(addr, size);
+	int fd = creat(incpio, 0644);
+	lzma(1, fd, cpio, size);
+	close(fd);
+	vec_init(v);
+	vec_push_back(v, magiskinit);
+	cpio_add(v, 0, "ramdisk.cpio.xz", incpio);
+}
+
 int cpio_commands(const char *command, int argc, char *argv[]) {
-	int ret = 0;
 	char *incpio = argv[0];
 	++argv;
 	--argc;
@@ -82,12 +145,23 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 	if (strcmp(command, "test") == 0) {
 		exit(cpio_test(&v));
 	} else if (strcmp(command, "restore") == 0) {
-		ret = cpio_restore(&v);
+		restore_high_compress(&v, incpio);
+		cpio_restore(&v);
 	} else if (strcmp(command, "stocksha1") == 0) {
 		printf("%s\n", cpio_stocksha1(&v));
 		return 0;
-	} else if (argc >= 1 && strcmp(command, "backup") == 0) {
-		cpio_backup(&v, argv[0], argc > 1 ? argv[1] : NULL);
+	} else if (argc >= 2 && strcmp(command, "backup") == 0) {
+		struct vector *back;
+		cpio_entry *e;
+		back = cpio_backup(&v, argv[0], argc > 2 ? argv[2] : NULL);
+
+		// Enable high compression mode
+		if (strcmp(argv[1], "true") == 0)
+			enable_high_compress(&v, back, incpio);
+
+		vec_for_each(back, e)
+			if (e) vec_push_back(&v, e);
+
 	} else if (argc > 0 && strcmp(command, "rm") == 0) {
 		int recursive = 0;
 		if (argc == 2 && strcmp(argv[0], "-r") == 0) {
@@ -119,5 +193,5 @@ int cpio_commands(const char *command, int argc, char *argv[]) {
 
 	dump_cpio(&v, incpio);
 	cpio_vec_destroy(&v);
-	exit(ret);
+	exit(0);
 }

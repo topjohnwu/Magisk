@@ -64,6 +64,7 @@ BOOTIMAGE="$1"
 # Presets
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+[ -z $HIGH_COMP ] && HIGH_COMP=false
 
 chmod -R 755 .
 
@@ -86,14 +87,19 @@ case $? in
     abort "! Unable to unpack boot image"
     ;;
   2 )
+    ui_print "! Insufficient boot partition size detected"
+    ui_print "- Enable high compression mode"
+    HIGH_COMP=true
+    ;;
+  3 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  3 )
+  4 )
     ui_print "! Sony ELF32 format detected"
     abort "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
-  4 )
+  5 )
     ui_print "! Sony ELF64 format detected"
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
@@ -118,30 +124,7 @@ case $? in
     ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
-    OK=false
     ./magiskboot --cpio-restore ramdisk.cpio
-    if [ $? -eq 0 ]; then
-      ui_print "- Ramdisk restored from internal backup"
-      OK=true
-    else
-      # Restore failed
-      ui_print "! Cannot restore from internal backup"
-      # If we are root and SHA1 known, we try to find the stock backup
-      if [ ! -z $SHA1 ]; then
-        STOCKDUMP=/data/stock_boot_${SHA1}.img.gz
-        if [ -f $STOCKDUMP ]; then
-          ui_print "- Stock boot image backup found"
-          ./magiskboot --decompress $STOCKDUMP stock_boot.img
-          ./magiskboot --unpack stock_boot.img
-          rm -f stock_boot.img
-          OK=true
-        fi
-      fi
-    fi
-    if ! $OK; then
-      ui_print "! Ramdisk restoration incomplete"
-      ui_print "! Will still try to continue installation"
-    fi
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 ) # Other patched
@@ -156,13 +139,20 @@ esac
 
 ui_print "- Patching ramdisk"
 
-./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
-./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
+[ -f /sdcard/ramdisk-recovery.img ] && HIGH_COMP=true
 
-# Create ramdisk backups
-./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $SHA1
+./magiskboot --cpio-patch ramdisk.cpio $KEEPVERITY $KEEPFORCEENCRYPT
+./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
+./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $HIGH_COMP $SHA1
 
 rm -f ramdisk.cpio.orig
+
+if [ -f /sdcard/ramdisk-recovery.img ]; then
+  ui_print "- Adding ramdisk-recovery.img"
+  ./magiskboot --decompress - < /sdcard/ramdisk-recovery.img | ./magiskboot --compress=xz - ramdisk-recovery.xz
+  ./magiskboot --cpio-add ramdisk.cpio 0 ramdisk-recovery.xz ramdisk-recovery.xz
+  rm ramdisk-recovery.xz
+fi
 
 ##########################################################################################
 # Binary patches

@@ -8,6 +8,11 @@
 #include "utils.h"
 #include "logging.h"
 
+#define INSUF_BLOCK_RET    2
+#define CHROMEOS_RET       3
+#define ELF32_RET          4
+#define ELF64_RET          5
+
 static void dump(void *buf, size_t size, const char *filename) {
 	int fd = creat(filename, 0644);
 	xwrite(fd, buf, size);
@@ -53,60 +58,61 @@ static void print_hdr(const boot_img_hdr *hdr) {
 	fprintf(stderr, "\n");
 }
 
-int parse_img(void *orig, size_t size, boot_img *boot) {
-	void *base, *end;
-	size_t pos = 0;
-	int ret = 0;
+int parse_img(const char *image, boot_img *boot) {
 	memset(boot, 0, sizeof(*boot));
-	for(base = orig, end = orig + size; base < end; base += 256, size -= 256) {
-		switch (check_type(base)) {
+	int is_blk = mmap_ro(image, &boot->map_addr, &boot->map_size);
+
+	// Parse image
+	fprintf(stderr, "Parsing boot image: [%s]\n\n", image);
+	for (size_t pos = 0; pos < boot->map_size; pos += 256) {
+		switch (check_type(boot->map_addr + pos)) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
-			ret = 2;
+			boot->flags |= CHROMEOS_FLAG;
 			continue;
 		case ELF32:
-			exit(3);
+			exit(ELF32_RET);
 		case ELF64:
-			exit(4);
+			exit(ELF64_RET);
 		case AOSP:
 			// Read the header
-			memcpy(&boot->hdr, base, sizeof(boot->hdr));
+			memcpy(&boot->hdr, boot->map_addr + pos, sizeof(boot->hdr));
 			pos += boot->hdr.page_size;
 
 			print_hdr(&boot->hdr);
 
-			boot->kernel = base + pos;
+			boot->kernel = boot->map_addr + pos;
 			pos += boot->hdr.kernel_size;
 			mem_align(&pos, boot->hdr.page_size);
 
-			boot->ramdisk = base + pos;
+			boot->ramdisk = boot->map_addr + pos;
 			pos += boot->hdr.ramdisk_size;
 			mem_align(&pos, boot->hdr.page_size);
 
 			if (boot->hdr.second_size) {
-				boot->second = base + pos;
+				boot->second = boot->map_addr + pos;
 				pos += boot->hdr.second_size;
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
 			if (boot->hdr.extra_size) {
-				boot->extra = base + pos;
+				boot->extra = boot->map_addr + pos;
 				pos += boot->hdr.extra_size;
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
-			if (pos < size) {
-				boot->tail = base + pos;
-				boot->tail_size = end - base - pos;
+			if (pos < boot->map_size) {
+				boot->tail = boot->map_addr + pos;
+				boot->tail_size = boot->map_size - pos;
 			}
 
 			// Search for dtb in kernel
-			for (int i = 0; i < boot->hdr.kernel_size; ++i) {
+			for (uint32_t i = 0; i < boot->hdr.kernel_size; ++i) {
 				if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
 					boot->dtb = boot->kernel + i;
 					boot->dt_size = boot->hdr.kernel_size - i;
 					boot->hdr.kernel_size = i;
-					fprintf(stderr, "DTB [%d]\n", boot->dt_size);
+					fprintf(stderr, "DTB [%u]\n", boot->dt_size);
 				}
 			}
 
@@ -139,25 +145,19 @@ int parse_img(void *orig, size_t size, boot_img *boot) {
 			fprintf(stderr, "RAMDISK_FMT [%s]\n", fmt);
 			fprintf(stderr, "\n");
 
-			return ret;
+			return boot->flags & CHROMEOS_FLAG ? CHROMEOS_RET :
+				   ((is_blk && boot->tail_size < 500 * 1024) ? INSUF_BLOCK_RET : 0);
 		default:
 			continue;
 		}
 	}
 	LOGE("No boot image magic found!\n");
-	return 1;
 }
 
 void unpack(const char* image) {
-	size_t size;
-	void *orig;
-	mmap_ro(image, &orig, &size);
-	int fd;
 	boot_img boot;
-
-	// Parse image
-	fprintf(stderr, "Parsing boot image: [%s]\n\n", image);
-	int ret = parse_img(orig, size, &boot);
+	int ret = parse_img(image, &boot);
+	int fd;
 
 	// Dump kernel
 	if (COMPRESSED(boot.kernel_type)) {
@@ -193,24 +193,18 @@ void unpack(const char* image) {
 		dump(boot.extra, boot.hdr.extra_size, EXTRA_FILE);
 	}
 
-	munmap(orig, size);
+	munmap(boot.map_addr, boot.map_size);
 	exit(ret);
 }
 
 void repack(const char* orig_image, const char* out_image) {
-	size_t size;
-	void *orig;
 	boot_img boot;
 
 	// There are possible two MTK headers
 	size_t mtk_kernel_off, mtk_ramdisk_off;
 
-	// Load original image
-	mmap_ro(orig_image, &orig, &size);
-
 	// Parse original image
-	fprintf(stderr, "Parsing boot image: [%s]\n\n", orig_image);
-	parse_img(orig, size, &boot);
+	parse_img(orig_image, &boot);
 
 	fprintf(stderr, "Repack to boot image: [%s]\n\n", out_image);
 
@@ -309,7 +303,6 @@ void repack(const char* orig_image, const char* out_image) {
 	// Print new image info
 	print_hdr(&boot.hdr);
 
-	munmap(orig, size);
+	munmap(boot.map_addr, boot.map_size);
 	close(fd);
 }
-

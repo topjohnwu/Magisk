@@ -55,8 +55,8 @@ void cpio_extract_all(struct vector *v);
 
 // Magisk specific
 int cpio_test(struct vector *v);
-void cpio_backup(struct vector *v, const char *orig, const char *sha1);
-int cpio_restore(struct vector *v);
+struct vector *cpio_backup(struct vector *v, const char *orig, const char *sha1);
+void cpio_restore(struct vector *v);
 char *cpio_stocksha1(struct vector *v);
 
 #endif

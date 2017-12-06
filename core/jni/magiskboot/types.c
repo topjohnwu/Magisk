@@ -3,10 +3,6 @@
 #include "bootimg.h"
 #include "types.h"
 
-char *SUP_LIST[] = { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL };
-char *SUP_EXT_LIST[] = { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL };
-file_t SUP_TYPE_LIST[] = { GZIP, XZ, LZMA, BZIP2, LZ4, LZ4_LEGACY, 0 };
-
 file_t check_type(const void *buf) {
 	if (memcmp(buf, CHROMEOS_MAGIC, 8) == 0) {
 		return CHROMEOS;

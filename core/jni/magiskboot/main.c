@@ -17,16 +17,21 @@ static void usage(char *arg0) {
 		"Usage: %s <action> [args...]\n"
 		"\n"
 		"Supported actions:\n"
+		" --parse <bootimg>\n"
+		"  Parse <bootimg> only, do not unpack. Return value: \n"
+		"    0:OK   1:error   2:insufficient boot partition size\n"
+		"    3:chromeos   4:ELF32   5:ELF64\n"
+		"\n"
 		" --unpack <bootimg>\n"
 		"  Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb), (extra) into\n"
-		"  the current directory\n"
+		"  the current directory. Return value is the same as parse command\n"
 		"\n"
 		" --repack <origbootimg> [outbootimg]\n"
 		"  Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
 		"  to [outbootimg], or new-boot.img if not specified.\n"
-		"  It will compress ramdisk.cpio with the same method used in <origbootimg>\n"
-		"  if exists, or attempt to find ramdisk.cpio.[ext], and repack\n"
-		"  directly with the compressed ramdisk file\n"
+		"  It will compress ramdisk.cpio with the same method used in <origbootimg>,\n"
+		"  or attempt to find ramdisk.cpio.[ext], and repack directly with the\n"
+		"  compressed ramdisk file\n"
 		"\n"
 		" --hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"  Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
@@ -40,18 +45,19 @@ static void usage(char *arg0) {
 		"      Create directory as an <entry>\n"
 		"    -ln <target> <entry>\n"
 		"      Create symlink <entry> to point to <target>\n"
-		"    -add <mode> <entry> <infile>\n"
-		"      Add <infile> as an <entry>; replaces <entry> if already exists\n"
 		"    -mv <from-entry> <to-entry>\n"
 		"      Move <from-entry> to <to-entry>\n"
+		"    -add <mode> <entry> <infile>\n"
+		"      Add <infile> as an <entry>; replaces <entry> if already exists\n"
 		"    -extract [<entry> <outfile>]\n"
 		"      Extract <entry> to <outfile>, or extract all to current directory\n"
 		"    -test\n"
 		"      Return value: 0/stock 1/Magisk 2/other (phh, SuperSU, Xposed)\n"
 		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n"
-		"      Patch cpio for Magisk. KEEP**** are true/false values\n"
-		"    -backup <origcpio> [SHA1]\n"
+		"      Patch cpio for Magisk. KEEP**** are boolean values\n"
+		"    -backup <origcpio> <HIGH_COMP> [SHA1]\n"
 		"      Create ramdisk backups into <incpio> from <origcpio>\n"
+		"      HIGH_COMP is a boolean value, toggles high compression mode\n"
 		"      SHA1 of stock boot image is optional\n"
 		"    -restore\n"
 		"      Restore ramdisk from ramdisk backup within <incpio>\n"
@@ -63,6 +69,9 @@ static void usage(char *arg0) {
 		"  Supported commands:\n"
 		"    -dump\n"
 		"      Dump all contents from dtb for debugging\n"
+		"    -test\n"
+		"      Check if fstab has verity/avb flags\n"
+		"      Return value: 0/no flags 1/flag exists"
 		"    -patch\n"
 		"      Search for fstab and remove verity/avb\n"
 		"\n"
@@ -74,8 +83,7 @@ static void usage(char *arg0) {
 	for (int i = 0; SUP_LIST[i]; ++i)
 		fprintf(stderr, "%s ", SUP_LIST[i]);
 	fprintf(stderr,
-		"\n"
-		"\n"
+		"\n\n"
 		" --decompress <infile> [outfile]\n"
 		"  Detect method and decompress <infile>, optionally to [outfile]\n"
 		"  <infile>/[outfile] can be '-' to be STDIN/STDOUT\n"
@@ -83,8 +91,7 @@ static void usage(char *arg0) {
 	for (int i = 0; SUP_LIST[i]; ++i)
 		fprintf(stderr, "%s ", SUP_LIST[i]);
 	fprintf(stderr,
-		"\n"
-		"\n"
+		"\n\n"
 		" --sha1 <file>\n"
 		"  Print the SHA1 checksum for <file>\n"
 		"\n"
@@ -121,6 +128,9 @@ int main(int argc, char *argv[]) {
 			printf("%02x", sha1[i]);
 		printf("\n");
 		munmap(buf, size);
+	} else if (argc > 2 && strcmp(argv[1], "--parse") == 0) {
+		boot_img boot;
+		exit(parse_img(argv[2], &boot));
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
 		unpack(argv[2]);
 	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {

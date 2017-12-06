@@ -103,20 +103,25 @@ typedef struct mtk_hdr {
 // Flags
 #define MTK_KERNEL    0x1
 #define MTK_RAMDISK   0x2
+#define CHROMEOS_FLAG 0x4
 
 typedef struct boot_img {
+    size_t map_size;
+    uint32_t dt_size;
+    size_t tail_size;
+    uint8_t flags;
+    file_t kernel_type, ramdisk_type;
+
     boot_img_hdr hdr;
+    mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
+
+    void *map_addr;
     void *kernel;
     void *dtb;
-    uint32_t dt_size;
     void *ramdisk;
     void *second;
     void *extra;
     void *tail;
-    uint32_t tail_size;
-    uint32_t flags;
-    file_t kernel_type, ramdisk_type;
-    mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
 } boot_img;
 
 #endif

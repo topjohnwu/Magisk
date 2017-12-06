@@ -76,6 +76,7 @@ LOCAL_SRC_FILES := \
 	utils/vector.c \
 	utils/file.c \
 	utils/xwrap.c \
+	utils/cpio.c \
 	magiskpolicy/api.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \

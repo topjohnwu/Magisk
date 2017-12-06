@@ -44,6 +44,7 @@
 #include "utils.h"
 #include "magiskpolicy.h"
 #include "daemon.h"
+#include "cpio.h"
 #include "magisk.h"
 
 // #define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)   /* Enable to debug */
@@ -459,9 +460,34 @@ int main(int argc, char *argv[]) {
 
 		close(system_root);
 	} else {
-		// Revert original init binary
-		unlink("/init");
-		link("/.backup/init", "/init");
+		char *ramdisk_xz = NULL;
+		if (access("/ramdisk-recovery.xz", R_OK) == 0)
+			ramdisk_xz = "/ramdisk-recovery.xz";
+		else if (access("/ramdisk.cpio.xz", R_OK) == 0)
+			ramdisk_xz = "/ramdisk.cpio.xz";
+
+		if (ramdisk_xz) {
+			// High compress mode
+			void *addr;
+			size_t size;
+			mmap_ro(ramdisk_xz, &addr, &size);
+			int fd = creat("/ramdisk.cpio", 0);
+			unxz(addr, size, fd);
+			munmap(addr, size);
+			close(fd);
+			struct vector v;
+			vec_init(&v);
+			parse_cpio(&v, "/ramdisk.cpio");
+			excl_list = (char *[]) { "overlay", ".backup", NULL };
+			frm_rf(root);
+			chdir("/");
+			cpio_extract_all(&v);
+			cpio_vec_destroy(&v);
+		} else {
+			// Revert original init binary
+			unlink("/init");
+			link("/.backup/init", "/init");
+		}
 	}
 
 	// Only patch initramfs if not intended to run in recovery (legacy devices)

@@ -33,9 +33,8 @@ typedef enum {
 #define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 
-extern char *SUP_LIST[];
-extern char *SUP_EXT_LIST[];
-extern file_t SUP_TYPE_LIST[];
+#define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
+#define SUP_EXT_LIST  ((char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })
 
 file_t check_type(const void *buf);
 void get_type_name(file_t type, char *name);

@@ -357,24 +357,25 @@ void restorecon(int dirfd, int force) {
 
 #endif   // SELINUX
 
-static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
+static int _mmap(int rw, const char *filename, void **buf, size_t *size) {
 	struct stat st;
-	stat(filename, &st);
 	int fd = xopen(filename, rw ? O_RDWR : O_RDONLY);
+	fstat(fd, &st);
 	if (S_ISBLK(st.st_mode))
 		ioctl(fd, BLKGETSIZE64, size);
 	else
 		*size = st.st_size;
 	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : NULL;
 	close(fd);
+	return S_ISBLK(st.st_mode);
 }
 
-void mmap_ro(const char *filename, void **buf, size_t *size) {
-	_mmap(0, filename, buf, size);
+int mmap_ro(const char *filename, void **buf, size_t *size) {
+	return _mmap(0, filename, buf, size);
 }
 
-void mmap_rw(const char *filename, void **buf, size_t *size) {
-	_mmap(1, filename, buf, size);
+int mmap_rw(const char *filename, void **buf, size_t *size) {
+	return _mmap(1, filename, buf, size);
 }
 
 void full_read(int fd, void **buf, size_t *size) {
