@@ -50,7 +50,7 @@ static void *logger_thread(void *args) {
 static void *magisk_log_thread(void *args) {
 	int have_data = 0;
 
-	// Temp buffer for logs before we have data access
+	// Buffer logs before we have data access
 	struct vector logs;
 	vec_init(&logs);
 
@@ -70,8 +70,7 @@ static void *magisk_log_thread(void *args) {
 			if (!have_data) {
 				if ((have_data = check_data())) {
 					// Dump buffered logs to file
-					if (!is_daemon_init)
-						rename(LOGFILE, LASTLOG);
+					rename(LOGFILE, LASTLOG);
 					log = xfopen(LOGFILE, "a");
 					setbuf(log, NULL);
 					char *tmp;

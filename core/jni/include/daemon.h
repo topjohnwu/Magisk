@@ -7,7 +7,6 @@
 #include <pthread.h>
 #include <sys/un.h>
 
-extern pthread_t sepol_patch;
 extern int is_daemon_init, seperate_vendor;
 
 // Commands require connecting to daemon
