@@ -131,6 +131,7 @@ public class RequestActivity extends Activity {
             handleAction(Policy.ALLOW);
             timer.cancel();
         });
+        grant_btn.requestFocus();
         deny_btn.setOnClickListener(v -> {
             handleAction(Policy.DENY);
             timer.cancel();
