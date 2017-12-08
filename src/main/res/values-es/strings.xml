@@ -9,9 +9,8 @@
     <string name="settings">Ajustes</string>
     <string name="install">Instalar</string>
 
-    <!--Magisk Fragment-->
+    <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no está instalado</string>
-
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
