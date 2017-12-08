@@ -116,8 +116,8 @@ public class MagiskManager extends Application {
         } else {
             String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null);
             if (pkg != null) {
-                Shell.su_raw("pm uninstall " + pkg);
                 suDB.setStrings(Const.Key.SU_REQUESTER, null);
+                Shell.su_raw("pm uninstall " + pkg);
             }
         }
 

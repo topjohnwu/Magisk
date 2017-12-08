@@ -25,7 +25,7 @@ public class Const {
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
-    public static final String MANAGER_CONFIGS = "/data/.tmp.magisk.config";
+    public static final String MANAGER_CONFIGS = ".tmp.magisk.config";
 
     public static String BUSYBOX_PATH() {
         if (Utils.itemExist("/sbin/.core/busybox/busybox")) {

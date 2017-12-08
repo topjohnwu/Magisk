@@ -47,9 +47,7 @@ public class SplashActivity extends Activity {
         }
 
         mm.loadMagiskInfo();
-        if (Utils.itemExist(Const.MANAGER_CONFIGS)) {
-            Utils.loadPrefs();
-        }
+        Utils.loadPrefs();
 
         LoadModules loadModuleTask = new LoadModules();
 

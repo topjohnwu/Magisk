@@ -188,8 +188,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             // Patch boot image
             shell.run(console, logs,
                     "cd " + install,
-                    "KEEPFORCEENCRYPT=" + mKeepEnc + " KEEPVERITY=" + mKeepVerity + " HIGHCOMP=" + highCompression +
-                    " sh update-binary indep boot_patch.sh " + boot + " || echo 'Failed!'");
+                    Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b HIGHCOMP=%b " +
+                                    "sh update-binary indep boot_patch.sh %s || echo 'Failed!'",
+                            mKeepEnc, mKeepVerity, highCompression, boot));
 
             if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;

@@ -46,25 +46,21 @@ public class Utils {
     public static boolean isDownloading = false;
 
     public static boolean itemExist(String path) {
-        String command = "[ -e " + path + " ] && echo true || echo false";
-        List<String> ret = Shell.su(command);
+        List<String> ret = Shell.su(fmt("[ -e %s ] && echo true || echo false", path));
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static void createFile(String path) {
         String folder = path.substring(0, path.lastIndexOf('/'));
-        String command = "mkdir -p " + folder + " 2>/dev/null; touch " + path + " 2>/dev/null;";
-        Shell.su_raw(command);
+        Shell.su_raw(fmt("mkdir -p %s 2>/dev/null; touch %s 2>/dev/null", folder, path));
     }
 
     public static void removeItem(String path) {
-        String command = "rm -rf " + path + " 2>/dev/null";
-        Shell.su_raw(command);
+        Shell.su_raw(fmt("rm -rf %s 2>/dev/null", path));
     }
 
     public static List<String> readFile(String path) {
-        String command = "cat " + path + " | sed '$a\\ ' | sed '$d'";
-        return Shell.su(command);
+        return Shell.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
@@ -256,16 +252,16 @@ public class Utils {
     }
 
     public static void dumpPrefs() {
-        Map<String, ?> prefMap = MagiskManager.get().prefs.getAll();
         Gson gson = new Gson();
-        String json = gson.toJson(prefMap, new TypeToken<Map<String, ?>>(){}.getType());
-        Shell.su("echo '" + json + "' > " + Const.MANAGER_CONFIGS);
+        String json = gson.toJson(MagiskManager.get().prefs.getAll(), new TypeToken<Map<String, ?>>(){}.getType());
+        Shell.su(fmt("for usr in /data/user/*; do echo '%s' > ${usr}/%s; done", json, Const.MANAGER_CONFIGS));
     }
 
     public static void loadPrefs() {
-        List<String> ret = Utils.readFile(Const.MANAGER_CONFIGS);
+        String config = fmt("/data/user/%d/%s", MagiskManager.get().userId, Const.MANAGER_CONFIGS);
+        List<String> ret = readFile(config);
         if (isValidShellResponse(ret)) {
-            removeItem(Const.MANAGER_CONFIGS);
+            removeItem(config);
             SharedPreferences.Editor editor = MagiskManager.get().prefs.edit();
             String json = ret.get(0);
             Gson gson = new Gson();
@@ -285,5 +281,9 @@ public class Utils {
             editor.apply();
             MagiskManager.get().loadConfig();
         }
+    }
+
+    public static String fmt(String fmt, Object... args) {
+        return String.format(Locale.US, fmt, args);
     }
 }
