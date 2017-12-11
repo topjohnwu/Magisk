@@ -51,18 +51,20 @@ migrate_boot_backup
 ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
 CHROMEOS=false
+
 case $? in
   1 )
     abort "! Unable to unpack boot image"
     ;;
-  2 )
+  3 )
+    ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  3 )
+  4 )
     ui_print "! Sony ELF32 format detected"
     abort "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
-  4 )
+  5 )
     ui_print "! Sony ELF64 format detected"
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
@@ -102,6 +104,6 @@ cd /
 ui_print "- Removing Magisk files"
 rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
         /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/app/com.topjohnwu.magisk* \
-        /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk 2>/dev/null
+        /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/adb/*magisk* 2>/dev/null
 
 $BOOTMODE && reboot
