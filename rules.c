@@ -6,10 +6,11 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "rootfs", "lnk_file", ALL);
 	sepol_allow(target, "su", "unix_stream_socket", "connectto");
 	sepol_allow(target, "su", "unix_stream_socket", "getopt");
-	sepol_allow(target, "su_device", "dir", "search");
-	sepol_allow(target, "su_device", "dir", "read");
-	sepol_allow(target, "su_device", "sock_file", "read");
-	sepol_allow(target, "su_device", "sock_file", "write");
+	sepol_allow(target, "su_file", "dir", "search");
+	sepol_allow(target, "su_file", "dir", "read");
+	sepol_allow(target, "su_file", "sock_file", "read");
+	sepol_allow(target, "su_file", "sock_file", "write");
+	sepol_allow(target, "su_file", "file", ALL);
 	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow("su", target, "fd", "use");
 	sepol_allow("su", target, "fifo_file", ALL);
@@ -100,13 +101,12 @@ void sepol_magisk_rules() {
 
 	if (!sepol_exists("su"))
 		sepol_create("su");
-	if (!sepol_exists("su_device"))
-		sepol_create("su_device");
+	if (!sepol_exists("su_file"))
+		sepol_create("su_file");
 	sepol_permissive("su");
-	sepol_permissive("init");
 
 	sepol_attradd("su", "mlstrustedsubject");
-	sepol_attradd("su_device", "mlstrustedobject");
+	sepol_attradd("su_file", "mlstrustedobject");
 
 	// Allow magiskinit daemon to run and run in su context
 	sepol_allow("kernel", "device", "dir", ALL);
@@ -115,12 +115,13 @@ void sepol_magisk_rules() {
 	sepol_allow("kernel", "kernel", "process", "setcurrent");
 	sepol_allow("kernel", "su", "process", "dyntransition");
 
-	// Let init run stuffs in su context
+	// Let init run stuffs
 	sepol_allow("kernel", "su", "fd", "use");
 	sepol_allow("init", "su", "process", ALL);
 	sepol_allow("init", "system_file", "dir", ALL);
 	sepol_allow("init", "system_file", "lnk_file", ALL);
 	sepol_allow("init", "system_file", "file", ALL);
+	sepol_allow("init", "rootfs", "lnk_file", ALL);
 
 	// Shell, prop management, simple su rights, logs
 	sepol_allow("su", "property_socket", "sock_file", "write");
@@ -138,8 +139,8 @@ void sepol_magisk_rules() {
 	sepol_allow("su", "rootfs", "filesystem", "remount");
 	sepol_allow("su", "devpts", "chr_file", ALL);
 	sepol_allow("su", "untrusted_app_devpts", "chr_file", ALL);
-	sepol_allow("su", "su_device", "dir", ALL);
-	sepol_allow("su", "su_device", "sock_file", ALL);
+	sepol_allow("su", "su_file", "dir", ALL);
+	sepol_allow("su", "su_file", "sock_file", ALL);
 	sepol_allow("su", "zygote_exec", "file", ALL);
 	sepol_allow("su", "zygote_exec", "lnk_file", ALL);
 	sepol_allow("su", "app_data_file", "dir", ALL);
@@ -159,7 +160,7 @@ void sepol_magisk_rules() {
 		sepol_allow("su", "logdr_socket", "sock_file", "write");
 	if (sepol_exists("logd"))
 		sepol_allow("su", "logd", "unix_stream_socket", "connectto");
-	sepol_allow("su_device", "tmpfs", "filesystem", "associate");
+	sepol_allow("su_file", "tmpfs", "filesystem", "associate");
 
 	// For sepolicy live patching
 	sepol_allow("su", "kernel", "security", "read_policy");
@@ -198,6 +199,7 @@ void sepol_magisk_rules() {
 
 	// For changing attributes
 	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
+	sepol_allow("su_file", "labeledfs", "filesystem", "associate");
 
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
