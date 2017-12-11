@@ -26,7 +26,6 @@
 
 #include "magisk.h"
 #include "utils.h"
-#include "resetprop.h"
 #include "su.h"
 
 struct su_context *su_ctx;
@@ -148,9 +147,9 @@ static __attribute__ ((noreturn)) void deny() {
 }
 
 static void socket_cleanup() {
-	if (su_ctx && su_ctx->path.sock_path[0]) {
-		unlink(su_ctx->path.sock_path);
-		su_ctx->path.sock_path[0] = 0;
+	if (su_ctx && su_ctx->sock_path[0]) {
+		unlink(su_ctx->sock_path);
+		su_ctx->sock_path[0] = 0;
 	}
 }
 
@@ -352,7 +351,7 @@ int su_daemon_main(int argc, char **argv) {
 
 	// New request or no db exist, notify user for response
 	if (su_ctx->info->policy == QUERY) {
-		socket_serv_fd = socket_create_temp(su_ctx->path.sock_path, sizeof(su_ctx->path.sock_path));
+		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
 		setup_sighandlers(cleanup_signal);
 
 		// Start activity

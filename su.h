@@ -41,57 +41,52 @@
 #define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
 
 #define DEFAULT_SHELL "/system/bin/sh"
+#define DATABASE_PATH "/data/adb/magisk.db"
 
 typedef enum {
-    QUERY = 0,
-    DENY = 1,
-    ALLOW = 2,
+	QUERY = 0,
+	DENY = 1,
+	ALLOW = 2,
 } policy_t;
 
 struct su_info {
-    unsigned uid;  /* Key to find su_info */
-    pthread_mutex_t lock;  /* Internal lock */
-    int count;  /* Just a count for debugging purpose */
+	unsigned uid;  /* Key to find su_info */
+	pthread_mutex_t lock;  /* Internal lock */
+	int count;  /* Just a count for debugging purpose */
 
-    /* These values should be guarded with internal lock */
-    policy_t policy;
-    int multiuser_mode;
-    int root_access;
-    int mnt_ns;
+	/* These values should be guarded with internal lock */
+	policy_t policy;
+	int multiuser_mode;
+	int root_access;
+	int mnt_ns;
 
-    /* These should be guarded with global list lock */
-    struct list_head pos;
-    int ref;
-    int clock;
+	/* These should be guarded with global list lock */
+	struct list_head pos;
+	int ref;
+	int clock;
 };
 
 struct su_request {
-    unsigned uid;
-    int login;
-    int keepenv;
-    char *shell;
-    char *command;
-    char **argv;
-    int argc;
-};
-
-struct su_path {
-    char base_path[PATH_MAX];
-    char multiuser_path[PATH_MAX];
-    char pkg_name[PATH_MAX];
-    char sock_path[PATH_MAX];
+	unsigned uid;
+	int login;
+	int keepenv;
+	char *shell;
+	char *command;
+	char **argv;
+	int argc;
 };
 
 struct su_context {
-    struct su_info *info;
-    struct su_request to;
-    struct su_path path;
-    pid_t pid;
-    int notify;
-    mode_t umask;
-    char *cwd;
-    struct stat st;
-    int pipefd[2];
+	struct su_info *info;
+	struct su_request to;
+	char pkg_name[PATH_MAX];
+	char sock_path[PATH_MAX];
+	pid_t pid;
+	int notify;
+	mode_t umask;
+	char *cwd;
+	struct stat st;
+	int pipefd[2];
 };
 
 extern struct su_context *su_ctx;

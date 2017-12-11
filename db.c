@@ -6,7 +6,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 #include <sqlite3.h>
 #include <time.h>
 #include <string.h>
@@ -64,7 +63,7 @@ static int strings_callback(void *v, int argc, char **argv, char **azColName) {
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(azColName[i], "key") == 0) {
 			if (strcmp(argv[i], REQUESTER_ENTRY) == 0)
-				target = ctx->path.pkg_name;
+				target = ctx->pkg_name;
 			entry = argv[i];
 		} else if (strcmp(azColName[i], "value") == 0) {
 			value = argv[i];
@@ -75,92 +74,76 @@ static int strings_callback(void *v, int argc, char **argv, char **azColName) {
 	return 0;
 }
 
-#define BASE_FMT  "/data/user%s/%d"
-#define USE_MULTI(info) (info->uid / 100000 != 0 && info->multiuser_mode == MULTIUSER_MODE_USER)
-
 void database_check(struct su_context *ctx) {
 	sqlite3 *db = NULL;
 	int ret;
 	char buffer[PATH_MAX], *err = NULL;
+	const char *base = access("/data/user_de", F_OK) == 0 ? "/data/user_de" : "/data/user";
 
 	// Set default values
 	ctx->info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 	ctx->info->multiuser_mode = MULTIUSER_MODE_OWNER_ONLY;
 	ctx->info->mnt_ns = NAMESPACE_MODE_REQUESTER;
-	strcpy(ctx->path.pkg_name, "???");  /* bad string so it doesn't exist */
-
-	// Populate paths
-	sprintf(ctx->path.base_path, BASE_FMT, "_de", 0);
-	if (access(ctx->path.base_path, R_OK) == -1)
-		sprintf(ctx->path.base_path, BASE_FMT, "", 0);
-
-	sprintf(ctx->path.multiuser_path, BASE_FMT, "_de", ctx->info->uid / 100000);
-	if (access(ctx->path.multiuser_path, R_OK) == -1)
-		sprintf(ctx->path.multiuser_path, BASE_FMT, "", ctx->info->uid / 100000);
+	strcpy(ctx->pkg_name, "???");  /* bad string so it doesn't exist */
 
 	// Open database
-	sprintf(buffer, "%s/magisk.db", ctx->path.base_path);
-	LOGD("su_db: open %s", buffer);
-	ret = sqlite3_open_v2(buffer, &db, SQLITE_OPEN_READONLY, NULL);
+	ret = sqlite3_open_v2(DATABASE_PATH, &db, SQLITE_OPEN_READONLY, NULL);
 	if (ret) {
-		LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
+		LOGE("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 		sqlite3_close(db);
 		goto stat_requester;
 	}
 
-	// Check multiuser mode settings
-	sprintf(buffer, "SELECT key, value FROM settings WHERE key='%s'", MULTIUSER_MODE_ENTRY);
-	sqlite3_exec(db, buffer, settings_callback, ctx, &err);
-	if (err != NULL)
-		LOGE("sqlite3_exec: %s\n", err);
-	err = NULL;
-
-	// Open database based on multiuser settings
-	if (USE_MULTI(ctx->info)) {
-		sqlite3_close(db);
-		sprintf(buffer, "%s/magisk.db", ctx->path.multiuser_path);
-		LOGD("su_db: open %s", buffer);
-		ret = sqlite3_open_v2(buffer, &db, SQLITE_OPEN_READONLY, NULL);
-		if (ret) {
-			LOGD("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
-			sqlite3_close(db);
-			goto stat_requester;
-		}
-	}
-
-	// Read PKG name from DB
-	strcpy(buffer, "SELECT key, value FROM strings");
-	sqlite3_exec(db, buffer, strings_callback, ctx, &err);
-	if (err != NULL)
-		LOGE("sqlite3_exec: %s\n", err);
-	err = NULL;
-
-	// Query for policy
-	sprintf(buffer, "SELECT policy, until FROM policies WHERE uid=%d", ctx->info->uid % 100000);
-	sqlite3_exec(db, buffer, policy_callback, ctx, &err);
-	if (err != NULL)
+	// Query for strings
+	sqlite3_exec(db, "SELECT key, value FROM strings", strings_callback, ctx, &err);
+	if (err)
 		LOGE("sqlite3_exec: %s\n", err);
 	err = NULL;
 
 	// Query for settings
-	sprintf(buffer, "SELECT key, value FROM settings WHERE key!='%s'", MULTIUSER_MODE_ENTRY);
-	sqlite3_exec(db, buffer, settings_callback, ctx, &err);
-	if (err != NULL)
+	sqlite3_exec(db, "SELECT key, value FROM settings", settings_callback, ctx, &err);
+	if (err)
+		LOGE("sqlite3_exec: %s\n", err);
+	err = NULL;
+
+	// Query for policy
+	int uid = -1;
+	switch (ctx->info->multiuser_mode) {
+	case MULTIUSER_MODE_OWNER_ONLY:
+		if (ctx->info->uid / 100000) {
+			uid = -1;
+			ctx->info->policy = DENY;
+			ctx->notify = 0;
+		} else {
+			uid = ctx->info->uid;
+		}
+		break;
+	case MULTIUSER_MODE_OWNER_MANAGED:
+		uid = ctx->info->uid % 100000;
+		break;
+	case MULTIUSER_MODE_USER:
+		uid = ctx->info->uid;
+		break;
+	}
+
+	sprintf(buffer, "SELECT policy, until FROM policies WHERE uid=%d", uid);
+	sqlite3_exec(db, buffer, policy_callback, ctx, &err);
+	if (err)
 		LOGE("sqlite3_exec: %s\n", err);
 
 	sqlite3_close(db);
 
 stat_requester:
-	// We prefer the orignal name
-	sprintf(buffer, "%s/%s", USE_MULTI(ctx->info) ? ctx->path.multiuser_path : ctx->path.base_path, JAVA_PACKAGE_NAME);
-	if (stat(buffer, &ctx->st) == -1) {
-		sprintf(buffer, "%s/%s", USE_MULTI(ctx->info) ? ctx->path.multiuser_path : ctx->path.base_path, ctx->path.pkg_name);
+	// We prefer the original name
+	sprintf(buffer, "%s/0/" JAVA_PACKAGE_NAME, base);
+	if (stat(buffer, &ctx->st) == 0) {
+		strcpy(ctx->pkg_name, JAVA_PACKAGE_NAME);
+	} else {
+		sprintf(buffer, "%s/0/%s", base, ctx->pkg_name);
 		if (stat(buffer, &ctx->st) == -1) {
 			LOGE("su: cannot find requester");
 			ctx->info->policy = DENY;
 			ctx->notify = 0;
 		}
-	} else {
-		strcpy(ctx->path.pkg_name, JAVA_PACKAGE_NAME);
 	}
 }

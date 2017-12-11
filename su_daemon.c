@@ -1,4 +1,4 @@
-/* su_client.c - The entrypoint for su, connect to daemon and send correct info
+/* su_daemon.c - The entrypoint for su, connect to daemon and send correct info
  */
 
 #define _GNU_SOURCE
@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -17,7 +16,6 @@
 
 #include "magisk.h"
 #include "daemon.h"
-#include "resetprop.h"
 #include "utils.h"
 #include "su.h"
 #include "pts.h"
@@ -104,7 +102,7 @@ void su_daemon_receiver(int client) {
 		xpthread_create(&su_collector, NULL, collector, NULL);
 	}
 
-	// Get client credntial
+	// Get client credential
 	struct ucred credential;
 	get_client_cred(client, &credential);
 
@@ -156,13 +154,6 @@ void su_daemon_receiver(int client) {
 	if (info->policy == QUERY) {
 		// Get data from database
 		database_check(&ctx);
-
-		// Handle multiuser denies
-		if (info->uid / 100000 &&
-			info->multiuser_mode == MULTIUSER_MODE_OWNER_ONLY) {
-			info->policy = DENY;
-			ctx.notify = 0;
-		}
 
 		// Check requester
 		if (info->policy == QUERY) {

@@ -42,7 +42,7 @@ int socket_create_temp(char *path, size_t len) {
     xlisten(fd, 1);
 
     // Set attributes so requester can access it
-    setfilecon(path, "u:object_r:su_device:s0");
+    setfilecon(path, "u:object_r:su_file:s0");
     chown(path, su_ctx->st.st_uid, su_ctx->st.st_gid);
 
     return fd;
