@@ -15,10 +15,12 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,78 +36,75 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
     private static final String STRINGS_TABLE = "strings";
-
-    private static String GLOBAL_DB;
+    private static final File GLOBAL_DB = new File("/data/adb/magisk.db");
 
     private Context mContext;
     private PackageManager pm;
     private SQLiteDatabase mDb;
 
-    private static Context preProcess() {
+    private static Context initDB(boolean local) {
         Context context;
+        MagiskManager ce = MagiskManager.get();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Context ce = MagiskManager.get();
-            context = ce.createDeviceProtectedStorageContext();
-            File oldDB = Utils.getDatabasePath(ce, DB_NAME);
-            if (oldDB.exists()) {
+            Context de = ce.createDeviceProtectedStorageContext();
+            File deDB = Utils.getDatabasePath(de, DB_NAME);
+            if (deDB.exists()) {
+                context = de;
+            } else if (ce.magiskVersionCode > 1410) {
                 // Migrate DB path
-                context.moveDatabaseFrom(ce, DB_NAME);
+                context = de;
+                de.moveDatabaseFrom(ce, DB_NAME);
+            } else {
+                context = ce;
             }
         } else {
-            context = MagiskManager.get();
+            context = ce;
         }
-        GLOBAL_DB = context.getFilesDir().getParentFile().getParent() + "/magisk.db";
+
         File db = Utils.getDatabasePath(context, DB_NAME);
-        if (!db.exists() && Utils.itemExist(GLOBAL_DB)) {
-            // Migrate global DB to ours
-            db.getParentFile().mkdirs();
-            Shell.su(
-                    "magisk --clone-attr " + context.getFilesDir() + " " + GLOBAL_DB,
-                    "chmod 660 " + GLOBAL_DB,
-                    "ln " + GLOBAL_DB + " " + db
-            );
+        if (local && db.length() == 0) {
+            ce.loadMagiskInfo();
+            return initDB(false);
+        }
+
+        // Only care about local db (no shell involved)
+        if (local)
+            return context;
+
+        // We need to make sure the global db is setup properly
+        if (ce.magiskVersionCode >= 1464 && Shell.rootAccess()) {
+            Shell.su_raw(Utils.fmt("mkdir %s; chmod 700 %s", GLOBAL_DB.getParent(), GLOBAL_DB.getParent()));
+            if (!Utils.itemExist(GLOBAL_DB)) {
+                db = context.getDatabasePath(DB_NAME);
+                Shell.su(Utils.fmt("cp -af %s %s; rm -f %s*", db, GLOBAL_DB, db));
+            }
+
+            try {
+                db.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Make sure the global and local db matches
+            if (!TextUtils.equals(Utils.checkMD5(GLOBAL_DB), Utils.checkMD5(db))) {
+                Shell.su(Utils.fmt(
+                        "chown 0.0 %s; chmod 666 %s; chcon u:object_r:su_file:s0 %s;" +
+                                "mount -o bind %s %s",
+                        GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, db));
+            }
         }
         return context;
     }
 
-    public static void setupSuDB() {
-        MagiskManager mm = MagiskManager.get();
-        // Check if we need to migrate suDB
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && mm.magiskVersionCode >= 1410 &&
-                Utils.getDatabasePath(mm, SuDatabaseHelper.DB_NAME).exists()) {
-            mm.suDB.close();
-            mm.suDB = new SuDatabaseHelper();
-        }
-
-        File suDbFile = mm.suDB.getDbFile();
-
-        if (!Utils.itemExist(GLOBAL_DB)) {
-            // Hard link our DB globally
-            Shell.su_raw("ln " + suDbFile + " " + GLOBAL_DB);
-        }
-
-        // Check if we are linked globally
-        List<String> ret = Shell.sh("ls -l " + suDbFile);
-        if (Utils.isValidShellResponse(ret)) {
-            try {
-                int links = Integer.parseInt(ret.get(0).trim().split("\\s+")[1]);
-                if (links < 2) {
-                    mm.suDB.close();
-                    suDbFile.delete();
-                    new File(suDbFile + "-journal").delete();
-                    mm.suDB = new SuDatabaseHelper();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public SuDatabaseHelper() {
-        this(preProcess());
+        this(false);
     }
 
-    public SuDatabaseHelper(Context context) {
+    public SuDatabaseHelper(boolean local) {
+        this(initDB(local));
+    }
+
+    private SuDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VER);
         mContext = context;
         pm = context.getPackageManager();
@@ -127,43 +126,31 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             }
             if (oldVersion == 1) {
                 // We're dropping column app_name, rename and re-construct table
-                db.execSQL("ALTER TABLE " + POLICY_TABLE + " RENAME TO " + POLICY_TABLE + "_old");
+                db.execSQL(Utils.fmt("ALTER TABLE %s RENAME TO %s_old", POLICY_TABLE));
 
                 // Create the new tables
                 createTables(db);
 
                 // Migrate old data to new tables
-                db.execSQL(
-                        "INSERT INTO " + POLICY_TABLE + " SELECT " +
-                                "uid, package_name, policy, until, logging, notification " +
-                                "FROM " + POLICY_TABLE + "_old");
-                db.execSQL("DROP TABLE " + POLICY_TABLE + "_old");
+                db.execSQL(Utils.fmt("INSERT INTO %s SELECT " +
+                        "uid, package_name, policy, until, logging, notification FROM %s_old",
+                        POLICY_TABLE, POLICY_TABLE));
+                db.execSQL(Utils.fmt("DROP TABLE %s_old", POLICY_TABLE));
 
-                File oldDB = Utils.getDatabasePath(MagiskManager.get(), "sulog.db");
-                if (oldDB.exists()) {
-                    migrateLegacyLogList(oldDB, db);
-                    MagiskManager.get().deleteDatabase("sulog.db");
-                }
+                MagiskManager.get().deleteDatabase("sulog.db");
                 ++oldVersion;
             }
             if (oldVersion == 2) {
-                db.execSQL("UPDATE " + LOG_TABLE + " SET time=time*1000");
+                db.execSQL(Utils.fmt("UPDATE %s SET time=time*1000", LOG_TABLE));
                 ++oldVersion;
             }
             if (oldVersion == 3) {
-                db.execSQL(
-                        "CREATE TABLE IF NOT EXISTS " + STRINGS_TABLE + " " +
-                                "(key TEXT, value TEXT, PRIMARY KEY(key))");
+                db.execSQL(Utils.fmt("CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, PRIMARY KEY(key))", STRINGS_TABLE));
                 ++oldVersion;
             }
             if (oldVersion == 4) {
-                db.execSQL("UPDATE " + POLICY_TABLE + " SET uid=uid%100000");
+                db.execSQL(Utils.fmt("UPDATE %s SET uid=uid%%100000", POLICY_TABLE));
                 ++oldVersion;
-            }
-
-            if (!Utils.itemExist(GLOBAL_DB)) {
-                // Hard link our DB globally
-                Shell.su_raw("ln " + getDbFile() + " " + GLOBAL_DB);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,15 +195,13 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     private void cleanup() {
         // Clear outdated policies
-        mDb.delete(POLICY_TABLE, "until > 0 AND until < ?",
-                new String[] { String.valueOf(System.currentTimeMillis() / 1000) });
+        mDb.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < ?", System.currentTimeMillis() / 1000), null);
         // Clear outdated logs
-        mDb.delete(LOG_TABLE, "time < ?", new String[] { String.valueOf(
-                System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000) });
+        mDb.delete(LOG_TABLE, Utils.fmt("time < ?", System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000), null);
     }
 
     public void deletePolicy(Policy policy) {
-        deletePolicy(policy.packageName);
+        deletePolicy(policy.uid);
     }
 
     public void deletePolicy(String pkg) {
@@ -224,12 +209,12 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deletePolicy(int uid) {
-        mDb.delete(POLICY_TABLE, "uid=?", new String[]{String.valueOf(uid)});
+        mDb.delete(POLICY_TABLE, Utils.fmt("uid=%d", uid), null);
     }
 
     public Policy getPolicy(int uid) {
         Policy policy = null;
-        try (Cursor c = mDb.query(POLICY_TABLE, null, "uid=?", new String[] { String.valueOf(uid % 100000) }, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, Utils.fmt("uid=%d", uid), null, null, null, null)) {
             if (c.moveToNext()) {
                 policy = new Policy(c, pm);
             }
@@ -240,30 +225,17 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         return policy;
     }
 
-    public Policy getPolicy(String pkg) {
-        Policy policy = null;
-        try (Cursor c = mDb.query(POLICY_TABLE, null, "package_name=?", new String[] { pkg }, null, null, null)) {
-            if (c.moveToNext()) {
-                policy = new Policy(c, pm);
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            deletePolicy(pkg);
-            return null;
-        }
-        return policy;
-    }
-
     public void addPolicy(Policy policy) {
         mDb.replace(POLICY_TABLE, null, policy.getContentValues());
     }
 
     public void updatePolicy(Policy policy) {
-        mDb.update(POLICY_TABLE, policy.getContentValues(), "package_name=?",
-                new String[] { policy.packageName });
+        mDb.update(POLICY_TABLE, policy.getContentValues(), Utils.fmt("uid=%d", policy.uid), null);
     }
 
     public List<Policy> getPolicyList(PackageManager pm) {
-        try (Cursor c = mDb.query(POLICY_TABLE, null, null, null, null, null, null)) {
+        try (Cursor c = mDb.query(POLICY_TABLE, null, Utils.fmt("uid/100000=%d", Const.USER_ID),
+                null, null, null, null)) {
             List<Policy> ret = new ArrayList<>(c.getCount());
             while (c.moveToNext()) {
                 try {
@@ -280,7 +252,8 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<List<Integer>> getLogStructure() {
-        try (Cursor c = mDb.query(LOG_TABLE, new String[] { "time" }, null, null, null, null, "time DESC")) {
+        try (Cursor c = mDb.query(LOG_TABLE, new String[] { "time" }, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+                null, null, null, "time DESC")) {
             List<List<Integer>> ret = new ArrayList<>();
             List<Integer> list = null;
             String dateString = null, newString;
@@ -299,22 +272,8 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getLogCursor() {
-        return getLogCursor(mDb);
-    }
-
-    public Cursor getLogCursor(SQLiteDatabase db) {
-        return db.query(LOG_TABLE, null, null, null, null, null, "time DESC");
-    }
-
-    private void migrateLegacyLogList(File oldDB, SQLiteDatabase newDB) {
-        try (SQLiteDatabase oldDb = SQLiteDatabase.openDatabase(oldDB.getPath(), null, SQLiteDatabase.OPEN_READWRITE);
-             Cursor c = getLogCursor(oldDb)) {
-            while (c.moveToNext()) {
-                ContentValues values = new ContentValues();
-                DatabaseUtils.cursorRowToContentValues(c, values);
-                newDB.insert(LOG_TABLE, null, values);
-            }
-        }
+        return mDb.query(LOG_TABLE, null, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+                null, null, null, "time DESC");
     }
 
     public void addLog(SuLogEntry log) {

@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
 
-public class RestoreStockBoot extends ParallelTask<Void, Void, Boolean> {
+public class RestoreImages extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {

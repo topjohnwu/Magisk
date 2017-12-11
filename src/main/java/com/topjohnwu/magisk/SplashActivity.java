@@ -15,7 +15,6 @@ import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
@@ -67,9 +66,6 @@ public class SplashActivity extends Activity {
             if (Utils.isValidShellResponse(ret)) {
                 mm.bootBlock = ret.get(0);
             }
-
-            // Setup suDB
-            SuDatabaseHelper.setupSuDB();
 
             // Add update checking service
             if (Const.Value.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {

@@ -133,12 +133,12 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
             setSummary();
 
-            // Disable dangerous settings in user mode if selected owner manage
-            if (mm.userId > 0) {
+            // Disable dangerous settings in secondary user
+            if (Const.USER_ID > 0) {
                 suCategory.removePreference(multiuserMode);
             }
 
-            // Remove re-authentication option on Android O, it will not work
+            // Disable re-authentication option on Android O, it will not work
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 reauth.setEnabled(false);
                 reauth.setSummary(R.string.android_o_not_support);
@@ -155,9 +155,13 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 generalCatagory.removePreference(hideManager);
             }
 
+            if (!Shell.rootAccess() || (Const.USER_ID > 0 &&
+                    mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+                prefScreen.removePreference(suCategory);
+            }
+
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
-                prefScreen.removePreference(suCategory);
                 generalCatagory.removePreference(hideManager);
             } else if (mm.magiskVersionCode < 1300) {
                 prefScreen.removePreference(magiskCategory);

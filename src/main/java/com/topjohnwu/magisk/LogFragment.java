@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.utils.Const;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +34,9 @@ public class LogFragment extends Fragment {
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 
-        adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
+        if (!(Const.USER_ID > 0 && getApplication().multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+            adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
+        }
         adapter.addTab(new MagiskLogFragment(), getString(R.string.magisk));
         tab.setupWithViewPager(viewPager);
         tab.setVisibility(View.VISIBLE);

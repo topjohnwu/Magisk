@@ -45,22 +45,30 @@ public class Utils {
 
     public static boolean isDownloading = false;
 
-    public static boolean itemExist(String path) {
+    public static boolean itemExist(Object path) {
         List<String> ret = Shell.su(fmt("[ -e %s ] && echo true || echo false", path));
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
-    public static void createFile(String path) {
-        String folder = path.substring(0, path.lastIndexOf('/'));
-        Shell.su_raw(fmt("mkdir -p %s 2>/dev/null; touch %s 2>/dev/null", folder, path));
+    public static void createFile(Object path) {
+        Shell.su_raw(fmt("mkdir -p `dirname '%s'` 2>/dev/null; touch '%s' 2>/dev/null", path, path));
     }
 
-    public static void removeItem(String path) {
+    public static void removeItem(Object path) {
         Shell.su_raw(fmt("rm -rf %s 2>/dev/null", path));
     }
 
-    public static List<String> readFile(String path) {
+    public static List<String> readFile(Object path) {
         return Shell.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
+    }
+
+    public static String checkMD5(Object path) {
+        List<String> ret = Shell.su(fmt("md5sum %s", path));
+        return isValidShellResponse(ret) ? ret.get(0).split("\\s+")[0] : null;
+    }
+
+    public static void uninstallPkg(String pkg) {
+        Shell.su_raw(fmt("find /data/user*/*/%s -exec umount -l {} 2>/dev/null \\;; pm uninstall %s", pkg, pkg));
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
@@ -209,6 +217,10 @@ public class Utils {
         }
     }
 
+    public static File getDatabasePath(String dbName) {
+        return getDatabasePath(MagiskManager.get(), dbName);
+    }
+
     public static File getDatabasePath(Context context, String dbName) {
         return new File(context.getFilesDir().getParent() + "/databases", dbName);
     }
@@ -258,7 +270,7 @@ public class Utils {
     }
 
     public static void loadPrefs() {
-        String config = fmt("/data/user/%d/%s", MagiskManager.get().userId, Const.MANAGER_CONFIGS);
+        String config = fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS);
         List<String> ret = readFile(config);
         if (isValidShellResponse(ret)) {
             removeItem(config);

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
 import android.os.Environment;
+import android.os.Process;
 
 import java.io.File;
 import java.util.Arrays;
@@ -62,6 +63,8 @@ public class Const {
             "com.google.android.apps.walletnfcrel",
             "com.nianticlabs.pokemongo"
     );
+
+    public static final int USER_ID = Process.myUid() / 100000;
 
     public static class ID {
         public static final int UPDATE_SERVICE_ID = 1;

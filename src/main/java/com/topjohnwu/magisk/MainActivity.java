@@ -149,13 +149,13 @@ public class MainActivity extends Activity
         menu.findItem(R.id.magiskhide).setVisible(
                 Shell.rootAccess() && mm.magiskVersionCode >= 1300
                         && prefs.getBoolean(Const.Key.MAGISKHIDE, false));
-        menu.findItem(R.id.modules).setVisible(
+        menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(Utils.checkNetworkStatus() &&
-                Shell.rootAccess() && mm.magiskVersionCode >= 0);
-        menu.setGroupVisible(R.id.second_group, !mm.prefs.getBoolean(Const.Key.COREONLY, false));
+        menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)
+                && Utils.checkNetworkStatus() && Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess());
+        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
+                !(Const.USER_ID > 0 && mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
     }
 
     public void navigate(String item) {

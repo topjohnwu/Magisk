@@ -39,7 +39,6 @@ public class MagiskManager extends Application {
 
     // Info
     public boolean hasInit = false;
-    public int userId;
     public String magiskVersionString;
     public int magiskVersionCode = -1;
     public String remoteMagiskVersionString;
@@ -95,14 +94,6 @@ public class MagiskManager extends Application {
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        userId = getApplicationInfo().uid / 100000;
-
-        if (Utils.getDatabasePath(this, SuDatabaseHelper.DB_NAME).exists()) {
-            // Don't migrate yet, wait and check Magisk version
-            suDB = new SuDatabaseHelper(this);
-        } else {
-            suDB = new SuDatabaseHelper();
-        }
 
         // Handle duplicate package
         if (!getPackageName().equals(Const.ORIG_PKG_NAME)) {
@@ -113,11 +104,15 @@ public class MagiskManager extends Application {
                 startActivity(intent);
                 return;
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
-        } else {
+        }
+
+        suDB = new SuDatabaseHelper(true);
+
+        if (getPackageName().equals(Const.ORIG_PKG_NAME)) {
             String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null);
             if (pkg != null) {
                 suDB.setStrings(Const.Key.SU_REQUESTER, null);
-                Shell.su_raw("pm uninstall " + pkg);
+                Utils.uninstallPkg(pkg);
             }
         }
 
@@ -215,6 +210,11 @@ public class MagiskManager extends Application {
             keepEnc = Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
         } catch (NumberFormatException e) {
             keepEnc = false;
+        }
+
+        if (suDB != null) {
+            suDB.close();
+            suDB = new SuDatabaseHelper();
         }
     }
 

@@ -21,7 +21,7 @@ public class Policy implements Comparable<Policy>{
     public Policy(int uid, PackageManager pm) throws PackageManager.NameNotFoundException {
         String[] pkgs = pm.getPackagesForUid(uid);
         if (pkgs == null || pkgs.length == 0) throw new PackageManager.NameNotFoundException();
-        this.uid = uid % 100000;
+        this.uid = uid;
         packageName = pkgs[0];
         info = pm.getApplicationInfo(packageName, 0);
         appName = info.loadLabel(pm).toString();

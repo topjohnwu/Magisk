@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Locale;
 import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
@@ -130,7 +129,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
         mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
         Utils.dumpPrefs();
-        Shell.su_raw("pm uninstall " + Const.ORIG_PKG_NAME);
+        Utils.uninstallPkg(Const.ORIG_PKG_NAME);
 
         return true;
     }

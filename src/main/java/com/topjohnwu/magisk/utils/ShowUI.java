@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AlertDialog;
@@ -16,14 +17,13 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.asyncs.RestoreStockBoot;
+import com.topjohnwu.magisk.asyncs.RestoreImages;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.receivers.RebootReceiver;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -258,42 +258,35 @@ public class ShowUI {
             .setTitle(R.string.uninstall_magisk_title)
             .setMessage(R.string.uninstall_magisk_msg)
             .setPositiveButton(R.string.complete_uninstall, (d, i) -> {
-                try {
-                    InputStream in = mm.getAssets().open(Const.UNINSTALLER);
-                    File uninstaller = new File(mm.getCacheDir(), Const.UNINSTALLER);
-                    FileOutputStream out = new FileOutputStream(uninstaller);
-                    byte[] bytes = new byte[1024];
-                    int read;
-                    while ((read = in.read(bytes)) != -1) {
-                        out.write(bytes, 0, read);
-                    }
-                    in.close();
-                    out.close();
-                    in = mm.getAssets().open(Const.UTIL_FUNCTIONS);
-                    File utils = new File(mm.getCacheDir(), Const.UTIL_FUNCTIONS);
-                    out = new FileOutputStream(utils);
-                    while ((read = in.read(bytes)) != -1) {
-                        out.write(bytes, 0, read);
-                    }
-                    in.close();
-                    out.close();
-                    Shell.su(
-                            "cat " + uninstaller + " > /cache/" + Const.UNINSTALLER,
-                            "cat " + utils + " > /data/magisk/" + Const.UTIL_FUNCTIONS
-                    );
-                    MagiskManager.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
-                    Shell.su_raw(
-                            "sleep 5",
-                            "pm uninstall " + mm.getApplicationInfo().packageName
-                    );
+                ByteArrayOutputStream uninstaller = new ByteArrayOutputStream();
+                try (InputStream in = mm.getAssets().open(Const.UNINSTALLER)) {
+                    Utils.inToOut(in, uninstaller);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return;
                 }
+                ByteArrayOutputStream utils = new ByteArrayOutputStream();
+                try (InputStream in = mm.getAssets().open(Const.UTIL_FUNCTIONS)) {
+                    Utils.inToOut(in, utils);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                Shell.su(
+                        Utils.fmt("echo '%s' > /cache/%s", uninstaller.toString().replace("'", "'\\''"), Const.UNINSTALLER),
+                        Utils.fmt("echo '%s' > /data/magisk/%s", utils.toString().replace("'", "'\\''"), Const.UTIL_FUNCTIONS)
+                );
+                try {
+                    uninstaller.close();
+                    utils.close();
+                } catch (IOException ignored) {}
+
+                MagiskManager.toast(R.string.uninstall_toast, Toast.LENGTH_LONG);
+                new Handler().postDelayed(() -> Utils.uninstallPkg(mm.getPackageName()), 5000);
             })
-            .setNeutralButton(R.string.restore_stock_boot, (d, i) -> {
-                new RestoreStockBoot().exec();
-            })
-            .setNegativeButton(R.string.no_thanks, null)
+            .setNeutralButton(R.string.restore_img, (d, i) -> new RestoreImages().exec())
+            .setNegativeButton(R.string.uninstall_app, (d, i) -> Utils.uninstallPkg(mm.getPackageName()))
             .show();
     }
 }
