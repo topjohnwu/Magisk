@@ -410,8 +410,6 @@ static int prepare_img() {
 	if (magiskloop == NULL)
 		return 1;
 
-	vec_init(&module_list);
-
 	xmkdir(COREDIR, 0755);
 	xmkdir(COREDIR "/post-fs-data.d", 0755);
 	xmkdir(COREDIR "/service.d", 0755);
@@ -506,6 +504,7 @@ void post_fs_data(int client) {
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
+	vec_init(&module_list);
 
 	// Initialize
 	if (!is_daemon_init)
@@ -627,6 +626,7 @@ void late_start(int client) {
 
 	// Wait till the full patch is done
 	wait_till_exists(PATCHDONE);
+	unlink(PATCHDONE);
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");

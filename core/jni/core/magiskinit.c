@@ -362,6 +362,12 @@ static void magisk_init_daemon() {
 	// Wait till init cold boot done
 	wait_till_exists("/dev/.coldboot_done");
 
+	int null = open("/dev/null", O_RDWR | O_CLOEXEC);
+	dup3(null, STDIN_FILENO, O_CLOEXEC);
+	dup3(null, STDOUT_FILENO, O_CLOEXEC);
+	dup3(null, STDERR_FILENO, O_CLOEXEC);
+	close(null);
+
 	// Transit our context to su (mimic setcon)
 	int fd, crap;
 	fd = open("/proc/self/attr/current", O_WRONLY);
@@ -414,6 +420,8 @@ int main(int argc, char *argv[]) {
 	dup3(null, STDIN_FILENO, O_CLOEXEC);
 	dup3(null, STDOUT_FILENO, O_CLOEXEC);
 	dup3(null, STDERR_FILENO, O_CLOEXEC);
+	if (null > STDERR_FILENO)
+		close(null);
 
 	// Extract and link files
 	mkdir("/overlay", 0000);
@@ -504,6 +512,8 @@ int main(int argc, char *argv[]) {
 
 		if (fork_dont_care() == 0) {
 			strcpy(argv[0], "magiskinit");
+			close(overlay);
+			close(root);
 			magisk_init_daemon();
 		}
 	}

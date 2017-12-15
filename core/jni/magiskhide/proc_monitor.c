@@ -76,6 +76,7 @@ static void lazy_unmount(const char* mountpoint) {
 
 static void hide_daemon(int pid, int ppid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
+	strcpy(argv0, "hide_daemon");
 
 	char *line, buffer[PATH_MAX];
 	struct vector mount_list;

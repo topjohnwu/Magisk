@@ -127,6 +127,7 @@ void daemon_init() {
 	rm_rf("/data/magisk");
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
+	chmod("/data/adb", 0700);
 
 	// Use shell glob to match files
 	exec_command_sync("sh", "-c",
@@ -154,13 +155,6 @@ void daemon_init() {
 	}
 	close(sbin);
 
-	// Backward compatibility
-	xsymlink(DATABIN, "/data/magisk");
-	xsymlink(MAINIMG, "/data/magisk.img");
-	xsymlink(MOUNTPOINT, "/magisk");
-
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-
 	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
@@ -180,6 +174,13 @@ void daemon_init() {
 		xsymlink("/root/magiskinit", buf2);
 	}
 	close(root);
+
+	// Backward compatibility
+	xsymlink(DATABIN, "/data/magisk");
+	xsymlink(MAINIMG, "/data/magisk.img");
+	xsymlink(MOUNTPOINT, "/magisk");
+
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	LOGI("* Mounting mirrors");
 	struct vector mounts;
