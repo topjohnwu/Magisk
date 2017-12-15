@@ -275,7 +275,8 @@ public class ShowUI {
 
                 Shell.su(
                         Utils.fmt("echo '%s' > /cache/%s", uninstaller.toString().replace("'", "'\\''"), Const.UNINSTALLER),
-                        Utils.fmt("echo '%s' > /data/magisk/%s", utils.toString().replace("'", "'\\''"), Const.UTIL_FUNCTIONS)
+                        Utils.fmt("echo '%s' > %s/%s", utils.toString().replace("'", "'\\''"),
+                                mm.magiskVersionCode >= 1464 ? "/data/adb/magisk" : "/data/magisk", Const.UTIL_FUNCTIONS)
                 );
                 try {
                     uninstaller.close();
