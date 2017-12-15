@@ -58,7 +58,8 @@ int mkdir_p(const char *pathname, mode_t mode) {
 void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
 	struct dirent *entry;
 	int newfd;
-	DIR *dir = xfdopendir(dirfd);
+	DIR *dir = fdopendir(dirfd);
+	if (dir == NULL) return;
 
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -86,12 +87,12 @@ static void rm_cb(int dirfd, struct dirent *entry) {
 }
 
 void rm_rf(const char *path) {
-	int fd = xopen(path, O_RDONLY | O_CLOEXEC);
-	if (fd < 0)
-		return;
-	frm_rf(fd);
-	close(fd);
-	rmdir(path);
+	int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+	if (fd >= 0) {
+		frm_rf(fd);
+		close(fd);
+	}
+	remove(path);
 }
 
 void frm_rf(int dirfd) {

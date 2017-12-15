@@ -77,10 +77,17 @@ chmod -R 755 $CHROMEDIR $BINDIR
 
 ui_print "- Constructing environment"
 
-is_mounted /data && MAGISKBIN=/data/magisk || MAGISKBIN=/cache/data_bin
+if is_mounted /data; then
+  MAGISKBIN=/data/adb/magisk
+  mkdir -p /data/adb 2>/dev/null
+  chmod 700 /data/adb 2>/dev/null
 
-# Save our stock boot image dump before removing it
-mv /data/magisk/stock_boot* /data 2>/dev/null
+  # Some legacy migration
+  mv /data/magisk/stock_boot* /data 2>/dev/null
+  mv /data/magisk.img /data/adb/magisk.img
+else
+  MAGISKBIN=/cache/data_bin
+fi
 
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null

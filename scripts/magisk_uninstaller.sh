@@ -23,7 +23,7 @@
 
 [ -z $BOOTMODE ] && BOOTMODE=false
 
-MAGISKBIN=/data/magisk
+[ -d /data/adb/magisk ] && MAGISKBIN=/data/adb/magisk || MAGISKBIN=/data/magisk
 CHROMEDIR=$MAGISKBIN/chromeos
 
 if [ ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then

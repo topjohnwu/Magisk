@@ -12,7 +12,7 @@
 
 main() {
   # Magisk binaries
-  MAGISKBIN=/data/magisk
+  MAGISKBIN=/data/adb/magisk
   # This script always runs in recovery
   BOOTMODE=false
 
@@ -56,14 +56,14 @@ main() {
 
   if [ -f stock_boot* ]; then
     rm -f /data/stock_boot* 2>/dev/null
-    is_mounted /data && mv stock_boot* /data
+    mv stock_boot* /data
   fi
 
   patch_dtbo_image
 
   if [ -f stock_dtbo* ]; then
     rm -f /data/stock_dtbo* 2>/dev/null
-    is_mounted /data && mv stock_dtbo* /data
+    mv stock_dtbo* /data
   fi
 
   cd /

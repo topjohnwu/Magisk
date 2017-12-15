@@ -54,8 +54,6 @@ BINDIR=$INSTALLER/$ARCH
 # Detection all done, start installing
 ##########################################################################################
 
-MAGISKBIN=/data/magisk
-
 if is_mounted /data; then
   recovery_actions
   # Save our stock boot image dump before removing it

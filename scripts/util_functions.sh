@@ -11,7 +11,7 @@ MAGISK_VERSION_STUB
 SCRIPT_VERSION=$MAGISK_VER_CODE
 
 # Default location, will override if needed
-MAGISKBIN=/data/magisk
+MAGISKBIN=/data/adb/magisk
 
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
 BOOTSIGNED=false

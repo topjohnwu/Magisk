@@ -507,23 +507,6 @@ void post_fs_data(int client) {
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
-	// Magisk binaries
-	char *bin_path = NULL;
-	if (access("/cache/data_bin", F_OK) == 0)
-		bin_path = "/cache/data_bin";
-	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
-		bin_path = "/data/data/com.topjohnwu.magisk/install";
-	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
-		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
-	if (bin_path) {
-		rm_rf(DATABIN);
-		cp_afc(bin_path, DATABIN);
-		rm_rf(bin_path);
-	}
-
-	// Lazy.... use shell blob to match files
-	exec_command_sync("sh", "-c", "mv -f /data/magisk/stock_*.img.gz /data", NULL);
-
 	// Initialize
 	if (!is_daemon_init)
 		daemon_init();

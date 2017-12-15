@@ -42,7 +42,9 @@ static void hide_done(int sig) {
 	--hide_queue;
 	if (hide_queue == 0) {
 		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-		xsymlink(MOUNTPOINT, FAKEPOINT);
+		xsymlink(DATABIN, "/data/magisk");
+		xsymlink(MAINIMG, "/data/magisk.img");
+		xsymlink(MOUNTPOINT, "/magisk");
 		xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 	}
 }
@@ -243,15 +245,18 @@ void proc_monitor() {
 
 					LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
 
+					xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+					unlink("/magisk");
+					unlink("/data/magisk");
+					unlink("/data/magisk.img");
+					unlink(MAGISKRC);
+					xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+					++hide_queue;
+
 					/*
 					 * The setns system call do not support multithread processes
 					 * We have to fork a new process, setns, then do the unmounts
 					 */
-					xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-					unlink(FAKEPOINT);
-					unlink(MAGISKRC);
-					xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-					++hide_queue;
 					int selfpid = getpid();
 					if (fork_dont_care() == 0)
 						hide_daemon(pid, selfpid);

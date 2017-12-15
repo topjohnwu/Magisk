@@ -106,8 +106,33 @@ void auto_start_magiskhide() {
 	free(hide_prop);
 }
 
- void daemon_init() {
+void daemon_init() {
 	is_daemon_init = 1;
+
+	 // Magisk binaries
+	char *bin_path = NULL;
+	if (access("/cache/data_bin", F_OK) == 0)
+		bin_path = "/cache/data_bin";
+	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/data/com.topjohnwu.magisk/install";
+	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
+	if (bin_path) {
+		rm_rf(DATABIN);
+		cp_afc(bin_path, DATABIN);
+		rm_rf(bin_path);
+	}
+
+	// Migration
+	rm_rf("/data/magisk");
+	unlink("/data/magisk.img");
+	unlink("/data/magisk_debug.log");
+
+	// Use shell glob to match files
+	exec_command_sync("sh", "-c",
+			"mv -f /data/adb/magisk/stock_*.img.gz /data;"
+			"rm -f /data/user*/*/magisk.db;", NULL);
+
 	LOGI("* Creating /sbin overlay");
 	DIR *dir;
 	struct dirent *entry;
@@ -128,7 +153,12 @@ void auto_start_magiskhide() {
 			unlinkat(sbin, entry->d_name, 0);
 	}
 	close(sbin);
-	xsymlink(MOUNTPOINT, FAKEPOINT);
+
+	// Backward compatibility
+	xsymlink(DATABIN, "/data/magisk");
+	xsymlink(MAINIMG, "/data/magisk.img");
+	xsymlink(MOUNTPOINT, "/magisk");
+
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
@@ -234,7 +264,7 @@ void start_daemon() {
 	// Start the log monitor
 	monitor_logs();
 
-	if ((is_daemon_init = access(MAGISKTMP, F_OK) == 0)) {
+	if ((is_daemon_init = (access(MAGISKTMP, F_OK) == 0))) {
 		// Restart stuffs if the daemon is restarted
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 		auto_start_magiskhide();
