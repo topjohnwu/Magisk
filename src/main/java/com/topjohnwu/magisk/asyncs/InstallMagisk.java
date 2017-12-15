@@ -247,7 +247,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     String binPath = mm.remoteMagiskVersionCode >= 1464 ? "/data/adb/magisk" : "/data/magisk";
                     Shell.getShell().run(console, logs,
                             Utils.fmt("rm -rf %s/*; mkdir -p %s; chmod 700 /data/adb", binPath, binPath),
-                            Utils.fmt("mv -f %s/* %s; rm -rf %s", install, binPath, install),
+                            Utils.fmt("cp -af %s/* %s; rm -rf %s", install, binPath, install),
                             Utils.fmt("flash_boot_image %s %s", patched_boot, mBootLocation),
                             mm.remoteMagiskVersionCode >= 1464 ? "cp /data/magisk.img /data/adb/magisk.img" : "",
                             "patch_dtbo_image");

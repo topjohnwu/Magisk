@@ -8,7 +8,7 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 72
+        versionCode 73
         versionName "5.4.3"
         ndk {
             moduleName 'zipadjust'
