@@ -137,7 +137,7 @@
     <string name="close">關閉</string>
     <string name="internal_storage">Zip 已被儲存到:\n[內部儲存空間]%1$s</string>
     <string name="ok">好</string>
-    <string name="process_error">處裡失敗</string>
+    <string name="process_error">處理失敗</string>
     <string name="download">下載</string>
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
