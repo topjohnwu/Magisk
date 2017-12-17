@@ -380,9 +380,9 @@ static void magisk_init_daemon() {
 	destroy_policydb();
 
 	// Keep Magisk daemon always alive
-	struct sockaddr_un sun;
-	fd = setup_socket(&sun);
 	while (1) {
+		struct sockaddr_un sun;
+		fd = setup_socket(&sun);
 		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
 			usleep(10000); /* Wait 10 ms after each try */
 
@@ -391,6 +391,7 @@ static void magisk_init_daemon() {
 
 		/* If things went here, it means the other side of the socket is closed
 		 * We restart the daemon again */
+		close(fd);
 		if (fork_dont_care() == 0) {
 			execv("/sbin/magisk", (char *[]) { "resetprop", "magisk.daemon", "1", NULL } );
 			exit(1);

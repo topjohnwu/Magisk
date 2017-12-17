@@ -39,7 +39,14 @@ static void *logger_thread(void *args) {
 			if (kill(log_pid, 0))
 				break;
 		}
-		// Clear buffer if restart required
+
+		// Cleanup
+		close(log_fd);
+		log_fd = -1;
+		kill(log_pid, SIGTERM);
+		waitpid(log_pid, NULL, 0);
+
+		// Clear buffer before restart
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
 	}
 
@@ -54,7 +61,6 @@ static void *magisk_log_thread(void *args) {
 	struct vector logs;
 	vec_init(&logs);
 
-	FILE *log;
 	int pipefd[2];
 	if (xpipe2(pipefd, O_CLOEXEC) == -1)
 		return NULL;
@@ -64,14 +70,14 @@ static void *magisk_log_thread(void *args) {
 
 	LOGD("log_monitor: magisk log dumper start");
 
+	FILE *log;
+	char *ss;
 	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
-		char *ss;
 		if ((ss = strstr(line, " Magisk")) && (ss[-1] != 'D') && (ss[-1] != 'V')) {
 			if (!have_data) {
 				if ((have_data = check_data())) {
 					// Dump buffered logs to file
-					rename(LOGFILE, LASTLOG);
-					log = xfopen(LOGFILE, "a");
+					log = xfopen(LOGFILE, "w");
 					setbuf(log, NULL);
 					char *tmp;
 					vec_for_each(&logs, tmp) {

@@ -14,7 +14,6 @@
 #endif
 
 #define LOGFILE         "/cache/magisk.log"
-#define LASTLOG         "/cache/last_magisk.log"
 #define DEBUG_LOG       "/data/adb/magisk_debug.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
 #define PATCHDONE       "/dev/.magisk.patch.done"
