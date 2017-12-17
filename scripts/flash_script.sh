@@ -84,7 +84,7 @@ if is_mounted /data; then
 
   # Some legacy migration
   mv /data/magisk/stock_boot* /data 2>/dev/null
-  mv /data/magisk.img /data/adb/magisk.img
+  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img
 else
   MAGISKBIN=/cache/data_bin
 fi
