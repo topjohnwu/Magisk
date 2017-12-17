@@ -1,4 +1,4 @@
-### v5.4.3 (73)
+### v5.4.3 (74)
 - Fix dynamic resource loading, should prevent crashing when checking SafetyNet
 - Update SignAPK to use very little RAM, should expand old device support
 - Support settings migration after hiding Magisk Manager

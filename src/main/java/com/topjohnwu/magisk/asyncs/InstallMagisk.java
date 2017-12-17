@@ -249,7 +249,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             Utils.fmt("rm -rf %s/*; mkdir -p %s; chmod 700 /data/adb", binPath, binPath),
                             Utils.fmt("cp -af %s/* %s; rm -rf %s", install, binPath, install),
                             Utils.fmt("flash_boot_image %s %s", patched_boot, mBootLocation),
-                            mm.remoteMagiskVersionCode >= 1464 ? "cp /data/magisk.img /data/adb/magisk.img" : "",
+                            mm.remoteMagiskVersionCode >= 1464 ? "[ -L /data/magisk.img ] || cp /data/magisk.img /data/adb/magisk.img" : "",
                             "patch_dtbo_image");
                     break;
                 default:
