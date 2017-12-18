@@ -6,6 +6,7 @@
 
 #include <pthread.h>
 #include <sys/un.h>
+#include <sys/socket.h>
 
 extern int is_daemon_init, seperate_vendor;
 
@@ -77,6 +78,6 @@ void ls_hide_list(int client);
  * Superuser *
  *************/
 
-void su_daemon_receiver(int client);
+void su_daemon_receiver(int client, struct ucred *credential);
 
 #endif

@@ -27,8 +27,8 @@ static void *request_handler(void *args) {
 	free(args);
 	client_request req = read_int(client);
 
-	struct ucred credentials;
-	get_client_cred(client, &credentials);
+	struct ucred credential;
+	get_client_cred(client, &credential);
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
@@ -39,7 +39,7 @@ static void *request_handler(void *args) {
 	case POST_FS:
 	case POST_FS_DATA:
 	case LATE_START:
-		if (credentials.uid != 0) {
+		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
 			return NULL;
@@ -65,7 +65,7 @@ static void *request_handler(void *args) {
 		ls_hide_list(client);
 		break;
 	case SUPERUSER:
-		su_daemon_receiver(client);
+		su_daemon_receiver(client, &credential);
 		break;
 	case CHECK_VERSION:
 		write_string(client, MAGISK_VER_STR);
