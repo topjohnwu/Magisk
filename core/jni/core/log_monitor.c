@@ -13,8 +13,35 @@
 #include "magisk.h"
 #include "utils.h"
 
-int logcat_events[] = { -1, -1, -1 };
 extern int is_daemon_init;
+
+static int am_proc_start_filter(const char *log) {
+	return strstr(log, "am_proc_start") != NULL;
+}
+
+static int magisk_log_filter(const char *log) {
+	char *ss;
+	return (ss = strstr(log, " Magisk")) && (ss[-1] != 'D') && (ss[-1] != 'V');
+}
+
+static int magisk_debug_log_filter(const char *log) {
+	return strstr(log, "Magisk") != NULL;
+}
+
+struct log_listener log_events[] = {
+	{	/* HIDE_EVENT */
+		.fd = -1,
+		.filter = am_proc_start_filter
+	},
+	{	/* LOG_EVENT */
+		.fd = -1,
+		.filter = magisk_log_filter
+	},
+	{	/* DEBUG_EVENT */
+		.fd = -1,
+		.filter = magisk_debug_log_filter
+	}
+};
 
 #ifdef MAGISK_DEBUG
 static int debug_log_pid, debug_log_fd;
@@ -30,10 +57,10 @@ static void *logger_thread(void *args) {
 		// Start logcat
 		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "all" , "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
 		while (fdgets(line, sizeof(line), log_fd)) {
-			for (int i = 0; i < (sizeof(logcat_events) / sizeof(int)); ++i) {
-				if (logcat_events[i] > 0) {
+			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
+				if (log_events[i].fd > 0 && log_events[i].filter(line)) {
 					char *s = strdup(line);
-					xwrite(logcat_events[i], &s, sizeof(s));
+					xwrite(log_events[i].fd, &s, sizeof(s));
 				}
 			}
 			if (kill(log_pid, 0))
@@ -66,32 +93,29 @@ static void *magisk_log_thread(void *args) {
 		return NULL;
 
 	// Register our listener
-	logcat_events[LOG_EVENT] = pipefd[1];
+	log_events[LOG_EVENT].fd = pipefd[1];
 
 	LOGD("log_monitor: magisk log dumper start");
 
 	FILE *log;
-	char *ss;
 	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
-		if ((ss = strstr(line, " Magisk")) && (ss[-1] != 'D') && (ss[-1] != 'V')) {
-			if (!have_data) {
-				if ((have_data = check_data())) {
-					// Dump buffered logs to file
-					log = xfopen(LOGFILE, "w");
-					setbuf(log, NULL);
-					char *tmp;
-					vec_for_each(&logs, tmp) {
-						fprintf(log, "%s", tmp);
-						free(tmp);
-					}
-					vec_destroy(&logs);
-				} else {
-					vec_push_back(&logs, strdup(line));
+		if (!have_data) {
+			if ((have_data = check_data())) {
+				// Dump buffered logs to file
+				log = xfopen(LOGFILE, "w");
+				setbuf(log, NULL);
+				char *tmp;
+				vec_for_each(&logs, tmp) {
+					fprintf(log, "%s", tmp);
+					free(tmp);
 				}
+				vec_destroy(&logs);
+			} else {
+				vec_push_back(&logs, strdup(line));
 			}
-			if (have_data)
-				fprintf(log, "%s", line);
 		}
+		if (have_data)
+			fprintf(log, "%s", line);
 	}
 	return NULL;
 }
@@ -106,13 +130,11 @@ static void *debug_magisk_log_thread(void *args) {
 	LOGD("log_monitor: debug log dumper start");
 
 	// Register our listener
-	logcat_events[DEBUG_EVENT] = pipefd[1];
+	log_events[DEBUG_EVENT].fd = pipefd[1];
 
-	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
-		char *ss;
-		if ((ss = strstr(line, "Magisk")))
-			fprintf(log, "%s", line);
-	}
+	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line))
+		fprintf(log, "%s", line);
+
 	return NULL;
 }
 

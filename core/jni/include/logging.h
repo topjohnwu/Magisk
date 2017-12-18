@@ -51,7 +51,13 @@ enum {
 	LOG_EVENT,
 	DEBUG_EVENT
 };
-extern int logcat_events[];
+
+struct log_listener {
+	int fd;
+	int (*filter) (const char*);
+};
+
+extern struct log_listener log_events[];
 
 void monitor_logs();
 void start_debug_full_log();

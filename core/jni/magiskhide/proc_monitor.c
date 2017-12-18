@@ -28,7 +28,7 @@ static void term_thread(int sig) {
 	destroy_list();
 	hideEnabled = 0;
 	// Unregister listener
-	logcat_events[HIDE_EVENT] = -1;
+	log_events[HIDE_EVENT].fd = -1;
 	close(pipefd[0]);
 	close(pipefd[1]);
 	pipefd[0] = pipefd[1] = -1;
@@ -193,79 +193,75 @@ void proc_monitor() {
 
 	// Register our listener to logcat monitor
 	xpipe2(pipefd, O_CLOEXEC);
-	logcat_events[HIDE_EVENT] = pipefd[1];
+	log_events[HIDE_EVENT].fd = pipefd[1];
 
-	for (char *log, *line; 1; free(log)) {
+	for (char *log, *line;; free(log)) {
 		if (read(pipefd[0], &log, sizeof(log)) != sizeof(log)) {
 			/* It might be interrupted */
 			log = NULL;
 			continue;
 		}
-		char *ss;
-		if ((ss = strstr(log, "am_proc_start")) && (ss = strchr(ss, '['))) {
-			int pid, ret, comma = 0;
-			char *pos = ss, processName[256], ns[32];
+		char *ss = strchr(log, '[');
+		int pid, ret, comma = 0;
+		char *pos = ss, processName[256], ns[32];
 
-			while(1) {
-				pos = strchr(pos, ',');
-				if(pos == NULL)
-					break;
-				pos[0] = ' ';
-				++comma;
-			}
-
-			if (comma == 6)
-				ret = sscanf(ss, "[%*d %d %*d %*d %256s", &pid, processName);
-			else
-				ret = sscanf(ss, "[%*d %d %*d %256s", &pid, processName);
-
-			if(ret != 2)
-				continue;
-
-			ret = 0;
-
-			// Critical region
-			pthread_mutex_lock(&hide_lock);
-			vec_for_each(hide_list, line) {
-				if (strcmp(processName, line) == 0) {
-					while(1) {
-						ret = 1;
-						for (int i = 0; i < zygote_num; ++i) {
-							read_namespace(pid, ns, sizeof(ns));
-							if (strcmp(ns, zygote_ns[i]) == 0) {
-								usleep(50);
-								ret = 0;
-								break;
-							}
-						}
-						if (ret) break;
-					}
-
-					// Send pause signal ASAP
-					if (kill(pid, SIGSTOP) == -1) continue;
-
-					LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
-
-					xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-					unlink("/magisk");
-					unlink("/data/magisk");
-					unlink("/data/magisk.img");
-					unlink(MAGISKRC);
-					xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-					++hide_queue;
-
-					/*
-					 * The setns system call do not support multithread processes
-					 * We have to fork a new process, setns, then do the unmounts
-					 */
-					int selfpid = getpid();
-					if (fork_dont_care() == 0)
-						hide_daemon(pid, selfpid);
-
-					break;
-				}
-			}
-			pthread_mutex_unlock(&hide_lock);
+		while(1) {
+			pos = strchr(pos, ',');
+			if(pos == NULL)
+				break;
+			pos[0] = ' ';
+			++comma;
 		}
+
+		if (comma == 6)
+			ret = sscanf(ss, "[%*d %d %*d %*d %256s", &pid, processName);
+		else
+			ret = sscanf(ss, "[%*d %d %*d %256s", &pid, processName);
+
+		if(ret != 2)
+			continue;
+
+		// Critical region
+		pthread_mutex_lock(&hide_lock);
+		vec_for_each(hide_list, line) {
+			if (strcmp(processName, line) == 0) {
+				while(1) {
+					ret = 1;
+					for (int i = 0; i < zygote_num; ++i) {
+						read_namespace(pid, ns, sizeof(ns));
+						if (strcmp(ns, zygote_ns[i]) == 0) {
+							usleep(50);
+							ret = 0;
+							break;
+						}
+					}
+					if (ret) break;
+				}
+
+				// Send pause signal ASAP
+				if (kill(pid, SIGSTOP) == -1) continue;
+
+				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
+
+				xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+				unlink("/magisk");
+				unlink("/data/magisk");
+				unlink("/data/magisk.img");
+				unlink(MAGISKRC);
+				xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+				++hide_queue;
+
+				/*
+				 * The setns system call do not support multithread processes
+				 * We have to fork a new process, setns, then do the unmounts
+				 */
+				int selfpid = getpid();
+				if (fork_dont_care() == 0)
+					hide_daemon(pid, selfpid);
+
+				break;
+			}
+		}
+		pthread_mutex_unlock(&hide_lock);
 	}
 }
