@@ -88,7 +88,7 @@ static void *collector(void *args) {
 	}
 }
 
-void su_daemon_receiver(int client) {
+void su_daemon_receiver(int client, struct ucred *credential) {
 	LOGD("su: request from client: %d\n", client);
 
 	struct su_info *info = NULL, *node;
@@ -102,13 +102,9 @@ void su_daemon_receiver(int client) {
 		xpthread_create(&su_collector, NULL, collector, NULL);
 	}
 
-	// Get client credential
-	struct ucred credential;
-	get_client_cred(client, &credential);
-
 	// Search for existing in the active list
 	list_for_each(node, &active_list, struct su_info, pos) {
-		if (node->uid == credential.uid) {
+		if (node->uid == credential->uid) {
 			info = node;
 			break;
 		}
@@ -118,7 +114,7 @@ void su_daemon_receiver(int client) {
 	if (info == NULL) {
 		new_request = 1;
 		info = malloc(sizeof(*info));
-		info->uid = credential.uid;
+		info->uid = credential->uid;
 		info->policy = QUERY;
 		info->ref = 0;
 		info->count = 0;
@@ -142,8 +138,7 @@ void su_daemon_receiver(int client) {
 			.shell = DEFAULT_SHELL,
 			.command = NULL,
 		},
-		.pid = credential.pid,
-		.umask = 022,
+		.pid = credential->pid,
 		.notify = new_request,
 	};
 
@@ -157,11 +152,11 @@ void su_daemon_receiver(int client) {
 
 		// Check requester
 		if (info->policy == QUERY) {
-			if (ctx.st.st_gid != ctx.st.st_uid) {
-				LOGE("Bad uid/gid %d/%d for Superuser Requestor", ctx.st.st_uid, ctx.st.st_gid);
+			if (info->st.st_gid != info->st.st_uid) {
+				LOGE("Bad uid/gid %d/%d for Superuser Requestor", info->st.st_gid, info->st.st_uid);
 				info->policy = DENY;
 				ctx.notify = 0;
-			} else if ((info->uid % 100000) == (ctx.st.st_uid % 100000)) {
+			} else if ((info->uid % 100000) == (info->st.st_uid % 100000)) {
 				info->policy = ALLOW;
 				info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 				ctx.notify = 0;
@@ -243,6 +238,20 @@ void su_daemon_receiver(int client) {
 	// Become session leader
 	xsetsid();
 
+	// Migrate environment from client
+	char path[32], buf[4096];
+	snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
+	xreadlink(path, ctx.cwd, sizeof(ctx.cwd));
+	snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
+	memset(buf, 0, sizeof(buf));
+	int fd = open(path, O_RDONLY);
+	read(fd, buf, sizeof(buf));
+	clearenv();
+	for (size_t pos = 0; buf[pos];) {
+		putenv(buf + pos);
+		pos += strlen(buf + pos) + 1;
+	}
+
 	// Let's read some info from the socket
 	int argc = read_int(client);
 	if (argc < 0 || argc > 512) {
@@ -262,10 +271,6 @@ void su_daemon_receiver(int client) {
 		else if (strcmp(argv[i], "-mm") == 0)
 			strcpy(argv[i], "-M");
 	}
-
-	// Get cwd
-	ctx.cwd = read_string(client);
-	LOGD("su: cwd=[%s]\n", ctx.cwd);
 
 	// Get pts_slave
 	char *pts_slave = read_string(client);
@@ -344,10 +349,6 @@ int su_client_main(int argc, char *argv[]) {
 	for (int i = 0; i < argc; i++) {
 		write_string(socketfd, argv[i]);
 	}
-
-	// CWD
-	getcwd(buffer, sizeof(buffer));
-	write_string(socketfd, buffer);
 
 	// Determine which one of our streams are attached to a TTY
 	int atty = 0;

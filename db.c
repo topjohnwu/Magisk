@@ -63,7 +63,7 @@ static int strings_callback(void *v, int argc, char **argv, char **azColName) {
 	for (int i = 0; i < argc; ++i) {
 		if (strcmp(azColName[i], "key") == 0) {
 			if (strcmp(argv[i], REQUESTER_ENTRY) == 0)
-				target = ctx->pkg_name;
+				target = ctx->info->pkg_name;
 			entry = argv[i];
 		} else if (strcmp(azColName[i], "value") == 0) {
 			value = argv[i];
@@ -84,7 +84,7 @@ void database_check(struct su_context *ctx) {
 	ctx->info->root_access = ROOT_ACCESS_APPS_AND_ADB;
 	ctx->info->multiuser_mode = MULTIUSER_MODE_OWNER_ONLY;
 	ctx->info->mnt_ns = NAMESPACE_MODE_REQUESTER;
-	strcpy(ctx->pkg_name, "???");  /* bad string so it doesn't exist */
+	strcpy(ctx->info->pkg_name, "???");  /* bad string so it doesn't exist */
 
 	// Open database
 	ret = sqlite3_open_v2(DATABASE_PATH, &db, SQLITE_OPEN_READONLY, NULL);
@@ -136,11 +136,11 @@ void database_check(struct su_context *ctx) {
 stat_requester:
 	// We prefer the original name
 	sprintf(buffer, "%s/0/" JAVA_PACKAGE_NAME, base);
-	if (stat(buffer, &ctx->st) == 0) {
-		strcpy(ctx->pkg_name, JAVA_PACKAGE_NAME);
+	if (stat(buffer, &ctx->info->st) == 0) {
+		strcpy(ctx->info->pkg_name, JAVA_PACKAGE_NAME);
 	} else {
-		sprintf(buffer, "%s/0/%s", base, ctx->pkg_name);
-		if (stat(buffer, &ctx->st) == -1) {
+		sprintf(buffer, "%s/0/%s", base, ctx->info->pkg_name);
+		if (stat(buffer, &ctx->info->st) == -1) {
 			LOGE("su: cannot find requester");
 			ctx->info->policy = DENY;
 			ctx->notify = 0;

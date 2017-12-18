@@ -59,6 +59,8 @@ struct su_info {
 	int multiuser_mode;
 	int root_access;
 	int mnt_ns;
+	char pkg_name[PATH_MAX];
+	struct stat st;
 
 	/* These should be guarded with global list lock */
 	struct list_head pos;
@@ -72,20 +74,15 @@ struct su_request {
 	int keepenv;
 	char *shell;
 	char *command;
-	char **argv;
-	int argc;
 };
 
 struct su_context {
 	struct su_info *info;
 	struct su_request to;
-	char pkg_name[PATH_MAX];
-	char sock_path[PATH_MAX];
 	pid_t pid;
 	int notify;
-	mode_t umask;
-	char *cwd;
-	struct stat st;
+	char cwd[PATH_MAX];
+	char sock_path[PATH_MAX];
 	int pipefd[2];
 };
 
