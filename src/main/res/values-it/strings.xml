@@ -112,6 +112,8 @@
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
 	<string name="restore_stock_boot">Ripristina boot originale</string>
+	<string name="restore_img">Ripristina Immagini</string>
+	<string name="uninstall_app">Disinstalla App</string>
 	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
 	<string name="uninstall_toast">Disinstallazione di Magisk Manager in 5 secondi, riavvia manualmente per completare</string>
