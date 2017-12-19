@@ -51,8 +51,6 @@
 
     <!--About Activity-->
     <string name="about">Thông tin</string>
-    <string name="app_developers">Nhà phát triển chính</string>
-    <string name="app_developers_"><![CDATA[Ứng dụng do <a href="https://github.com/topjohnwu">topjohnwu</a> viết, phối hợp với <a href="https://github.com/d8ahazard">Digitalhigh</a> và <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Nhật ký thay đổi của ứng dụng</string>
     <string name="translators"><![CDATA[<a href="https://github.com/thanhtai2009">thanhtai2009@tekcafe.vn</a>]]></string>
     <string name="app_version">Phiên bản ứng dụng</string>

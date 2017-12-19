@@ -50,8 +50,6 @@
 
     <!--About Activity-->
     <string name="about">關於</string>
-    <string name="app_developers">主要開發者</string>
-    <string name="app_developers_"><![CDATA[此應用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 與 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作開發。]]></string>
     <string name="app_changelog">應用更新日誌</string>
     <string name="translators">topjohnwu</string>
     <string name="app_version">應用版本</string>
@@ -190,7 +188,6 @@
     <string name="zip_download_msg">正在下載 Zip 文件 (%1$d%%) …</string>
     <string name="settings_boot_format_summary">選擇已補丁 Boot 映像文件輸出格式\n若要透過 fastboot/download 模式刷入，請選擇 .img 格式；若要透過 ODIN 刷入，則選擇 .img.tar\n</string>
     <string name="complete_uninstall">完全解除安裝</string>
-    <string name="restore_stock_boot">還原原廠 boot 映像</string>
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
     <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
@@ -211,5 +208,7 @@
     <string name="reboot_bootloader">重啟到 Bootloader</string>
     <string name="reboot_download">重啟到 Download</string>
     <string name="android_o_not_support">不支援 Android 8.0+</string>
+    <string name="uninstall_app">解除安裝應用程式</string>
+    <string name="restore_img">還原原廠映像檔</string>
 
 </resources>

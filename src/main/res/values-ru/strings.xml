@@ -58,8 +58,6 @@
 
     <!--About Activity-->
     <string name="about">О приложении</string>
-    <string name="app_developers">Разработчики</string>
-    <string name="app_developers_"><![CDATA[Приложение создано <a href="https://github.com/topjohnwu">topjohnwu</a>, совместно с <a href="https://github.com/d8ahazard">Digitalhigh</a> и <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Список изменений</string>
     <string name="translators">Displax</string>
     <string name="app_version">Версия</string>
@@ -108,7 +106,6 @@
     <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
     <string name="boot_file_patch_msg">Выберите файл ядра (boot), .img либо .img.tar формата</string>
     <string name="complete_uninstall">Удалить</string>
-    <string name="restore_stock_boot">Восстановить исходное ядро</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="uninstall_toast">Удаление Magisk Manager в течении 5 секунд. Выполните перезагрузку.</string>

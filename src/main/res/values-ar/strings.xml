@@ -54,8 +54,6 @@
 
     <!--About Activity-->
     <string name="about">حول</string>
-    <string name="app_developers">المطورين الرئيسيين</string>
-    <string name="app_developers_"><![CDATA[التطبيق إنشئ بواسطة <a href="https://github.com/topjohnwu">topjohnwu</a> بالتعاون مع <a href="https://github.com/d8ahazard">Digitalhigh</a> و <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">تغييرات التطبيق</string>
     <string name="translators">xx6600xx ,silent_6600</string>
     <string name="app_version">إصدار التطبيق</string>

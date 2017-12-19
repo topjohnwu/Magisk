@@ -64,8 +64,6 @@
 
     <!--About Activity-->
     <string name="about">Über</string>
-    <string name="app_developers">Hauptentwickler</string>
-    <string name="app_developers_"><![CDATA[App entwickelt von <a href="https://github.com/topjohnwu">topjohnwu</a> unter Mitwirkung von <a href="https://github.com/d8ahazard">Digitalhigh</a> und <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Änderungen</string>
     <string name="translators">skalnet, c727, jenslody</string>
     <string name="app_version">Version</string>
@@ -114,7 +112,6 @@
     <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Boot-Images nicht</string>
     <string name="boot_file_patch_msg">Selektiere das originale Boot image dump im Format .img oder .img.tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
-    <string name="restore_stock_boot">Stelle originalen Boot wieder her</string>
     <string name="restore_img">Stelle Images wieder her</string>
     <string name="uninstall_app">Deinstalliere die Anwendung</string>
     <string name="restore_done">Wiederherstellung durchgeführt!</string>

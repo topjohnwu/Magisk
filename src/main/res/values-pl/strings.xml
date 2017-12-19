@@ -64,8 +64,6 @@
 
     <!--About Activity-->
     <string name="about">O Aplikacji</string>
-    <string name="app_developers">Developerzy</string>
-    <string name="app_developers_"><![CDATA[Autorzy aplikacji <a href="https://github.com/topjohnwu">topjohnwu</a> in collaboration with <a href="https://github.com/d8ahazard">Digitalhigh</a> and <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Zmiany w Aplikacji</string>
     <string name="translators" />
     <string name="app_version">Wersja Aplikacji</string>
@@ -114,7 +112,6 @@
     <string name="no_boot_file_patch_support">Wersja docelowa programu Magisk nie obsługuje ładowania pliku boot image</string>
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
-    <string name="restore_stock_boot">Przywróć Stockowy Boot</string>
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Stock backup nie istnieje!</string>
     <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>

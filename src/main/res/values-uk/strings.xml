@@ -57,8 +57,6 @@
 
     <!--About Activity-->
     <string name="about">Про програму</string>
-    <string name="app_developers">Головні розробники</string>
-    <string name="app_developers_"><![CDATA[Програму створив <a href="https://github.com/topjohnwu">topjohnwu</a>, разом з <a href="https://github.com/d8ahazard">Digitalhigh</a> і <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Список змін</string>
     <string name="translators" />
     <string name="app_version">Версія</string>
@@ -105,7 +103,6 @@
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
-    <string name="restore_stock_boot">Відновити оригінальний образ</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="uninstall_toast">Видалення Менеджера Magisk протягом 5 секунд, потім, будь ласка, вручну перезавантажте</string>

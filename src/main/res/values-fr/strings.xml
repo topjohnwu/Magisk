@@ -50,8 +50,6 @@
     <string name="logs_save_failed">Impossible d\'écrire le journal sur la carte SD:</string>
     <!--About Activity-->
     <string name="about">À propos</string>
-    <string name="app_developers">Principaux développeurs</string>
-    <string name="app_developers_"><![CDATA[Appli créée par <a href="https://github.com/topjohnwu">topjohnwu</a> en collaboration avec <a href="https://github.com/d8ahazard">Digitalhigh</a> et <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Modifications de l\'application</string>
     <string name="translators">Primokorn, Naboleo, tonymanou</string>
     <string name="app_version">Version de l\'application</string>
@@ -99,8 +97,7 @@
 	<string name="no_boot_file_patch_support">La version cible de Magisk ne supporte pas la modification du fichier image Boot</string>
     <string name="boot_file_patch_msg">Sélectionnez l\'image Boot stock au format .img ou .img.tar</string>
 	<string name="complete_uninstall">Désinstaller complètement</string>
-	<string name="restore_stock_boot">Restaurer le Boot stock</string>
-	<string name="restore_done">Restauration effectuée !</string>
+    <string name="restore_done">Restauration effectuée !</string>
 	<string name="restore_fail">Pas de sauvegarde stock disponible !</string>
     <string name="uninstall_toast">Désinstallation de Magisk Manager dans 5 secondes, n\'oubliez pas de redémarrer par la suite</string>
     <string name="proprietary_title">Télécharger le code propriétaire</string>

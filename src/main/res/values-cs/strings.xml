@@ -51,8 +51,6 @@
 
     <!--About Activity-->
     <string name="about">O aplikaci</string>
-    <string name="app_developers">Hlavní vývojáři</string>
-    <string name="app_developers_"><![CDATA[Aplikaci vytvořil <a href="https://github.com/topjohnwu">topjohnwu</a> ve spolupráci s <a href="https://github.com/d8ahazard">Digitalhigh</a> a <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Seznam změn</string>
     <string name="translators" />
     <string name="app_version">Verze aplikace</string>

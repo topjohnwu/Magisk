@@ -58,8 +58,6 @@
 
     <!--About Activity-->
     <string name="about">О апликацији</string>
-    <string name="app_developers">Главни развијачи</string>
-    <string name="app_developers_"><![CDATA[Апликацију креирао <a href="https://github.com/topjohnwu">topjohnwu</a> у сарадњи са <a href="https://github.com/d8ahazard">Digitalhigh</a> и <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Дневник промена апликације</string>
     <string name="translators" />
     <string name="app_version">Верзија апликације</string>
@@ -108,7 +106,6 @@
     <string name="no_boot_file_patch_support">Циљана Магиск верзија не подржава закрпу фајла слике покретања</string>
     <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или img.tar формату</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
-    <string name="restore_stock_boot">Поврати Фабричко Покретање</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
     <string name="uninstall_toast">Уклањање Магиск Менаџера за 5 секунди, молим вас да ручно рестартујете телефон</string>

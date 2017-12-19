@@ -62,8 +62,6 @@
 
     <!--About Activity-->
     <string name="about">Περί</string>
-    <string name="app_developers">Κύριοι προγραμματιστές</string>
-    <string name="app_developers_"><![CDATA[Η εφαρμογή δημιουργήθηκε από τον <a href="https://github.com/topjohnwu">topjohnwu</a> σε συνεργασία με <a href="https://github.com/d8ahazard">Digitalhigh</a> και <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Καταγραφή αλλαγών εφαρμογής</string>
     <string name="translators">JpegXguy, GreatApo</string>
     <string name="app_version">Έκδοση εφαρμογής</string>
@@ -114,7 +112,6 @@
     <string name="no_boot_file_patch_support">Αυτή η Magisk έκδοση δεν υποστηρίζει patch του boot image αρχείου</string>
     <string name="boot_file_patch_msg">Επιλογή stock boot image dump σε μορφή .img ή .img.tar</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
-    <string name="restore_stock_boot">Ανάκτηση Stock Boot</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
     <string name="uninstall_toast">Απεγκατάσταση του Magisk Manager σε 5 δευτερόλεπτα, παρακαλώ επανεκκινήστε χειροκίνητα αμέσως μετά</string>

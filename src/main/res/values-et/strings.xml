@@ -59,8 +59,6 @@
 
     <!--About Activity-->
     <string name="about">Teave</string>
-    <string name="app_developers">Põhilised arendajad</string>
-    <string name="app_developers_"><![CDATA[Rakendus on loodud <a href="https://github.com/topjohnwu">topjohnwu</a> poolt, kaasa aitasid <a href="https://github.com/d8ahazard">Digitalhigh</a> ja <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Rakenduse muutuste logi</string>
     <string name="translators" />
     <string name="app_version">Rakenduse versioon</string>
@@ -109,7 +107,6 @@
     <string name="no_boot_file_patch_support">Magisk\'i sihtversioon ei toeta käivituspildi faili paikamist</string>
     <string name="boot_file_patch_msg">Vali originaalne käivituspildi väljastus .img või .img.tar vormingus</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
-    <string name="restore_stock_boot">Taasta originaalne käivitus</string>
     <string name="restore_done">Taastus valmis!</string>
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="uninstall_toast">Eemaldan Magisk Manager\'i 5 sekundi pärast, palun tee peale seda käsitsi taaskäivitus</string>

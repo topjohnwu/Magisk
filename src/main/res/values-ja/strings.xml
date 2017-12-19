@@ -51,8 +51,6 @@
 
     <!--About Activity-->
     <string name="about">このアプリについて</string>
-    <string name="app_developers">主な開発者</string>
-    <string name="app_developers_"><![CDATA[このアプリは<a href="https://github.com/topjohnwu">topjohnwu</a>と<a href="https://github.com/d8ahazard">Digitalhigh</a>と<a href="https://github.com/dvdandroid">Dvdandroid</a>によって作られました。]]></string>
     <string name="app_changelog">アプリの更新履歴</string>
     <string name="translators">神楽坂桜（Sakura_Sa233#Twitter）/ hota (@lindwurm)</string>
     <string name="app_version">アプリのバージョン</string>

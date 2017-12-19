@@ -58,8 +58,6 @@
 
     <!--About Activity-->
     <string name="about">Tentang</string>
-    <string name="app_developers">Pengembang utama</string>
-    <string name="app_developers_"><![CDATA[Apl dibuat oleh <a href="https://github.com/topjohnwu">topjohnwu</a> dalam kolaborasi dengan <a href="https://github.com/d8ahazard">Digitalhigh</a> dan <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Log pembaruan apl</string>
     <string name="translators"><![CDATA[<a href="https://github.com/krasCGQ">Albert I (krasCGQ)</a>]]></string>
     <string name="app_version">Versi apl</string>
@@ -108,7 +106,6 @@
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
     <string name="complete_uninstall">Copot Total</string>
-    <string name="restore_stock_boot">Pulihkan Stock Boot</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="uninstall_toast">Mencopot Magisk Manager dalam 5 detik, silahkan reboot secara manual setelahnya</string>

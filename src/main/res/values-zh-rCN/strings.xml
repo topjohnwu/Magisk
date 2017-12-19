@@ -61,8 +61,6 @@
 
     <!--About Activity-->
     <string name="about">关于</string>
-    <string name="app_developers">主要开发者</string>
-    <string name="app_developers_"><![CDATA[此应用由 <a href="https://github.com/topjohnwu">topjohnwu</a> 与 <a href="https://github.com/d8ahazard">Digitalhigh</a> 和 <a href="https://github.com/dvdandroid">Dvdandroid</a> 合作开发。]]></string>
     <string name="app_changelog">应用更新日志</string>
     <string name="translators">gh2923, vvb2060</string>
     <string name="app_version">应用版本</string>
@@ -111,7 +109,6 @@
     <string name="no_boot_file_patch_support">目标安装版本不支持修补 Boot 镜像文件</string>
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
     <string name="complete_uninstall">完全卸载</string>
-    <string name="restore_stock_boot">还原原厂 Boot 镜像</string>
     <string name="restore_done">还原完成！</string>
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>
     <string name="uninstall_toast">将在 5 秒内卸载 Magisk Manager，接下来请手动重新启动</string>

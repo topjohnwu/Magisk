@@ -59,8 +59,6 @@
 
     <!--About Activity-->
     <string name="about">Despre</string>
-    <string name="app_developers">Dezvoltatori principali</string>
-    <string name="app_developers_"><![CDATA[Aplicație creată de <a href="https://github.com/topjohnwu">topjohnwu</a> în colaborare cu <a href="https://github.com/d8ahazard">Digitalhigh</a> şi <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Lista modificărilor</string>
     <string name="translators" />
     <string name="app_version">Versiune</string>
@@ -109,7 +107,6 @@
     <string name="no_boot_file_patch_support">Versiunea Magisk nu acceptă modificarea imaginii de Boot</string>
     <string name="boot_file_patch_msg">Selectaţi formatul .img sau .img.tar pentru imaginea de Boot stoc</string>
     <string name="complete_uninstall">Dezinstalare totală</string>
-    <string name="restore_stock_boot">Restabilire Boot stoc</string>
     <string name="restore_done">Restabilire finalizată!</string>
     <string name="restore_fail">Backup stoc nu există!</string>
     <string name="uninstall_toast">Dezinstalare Magisk Manager în 5 secunde, ulterior reporniți manual</string>

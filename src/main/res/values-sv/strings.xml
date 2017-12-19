@@ -56,8 +56,6 @@
 
     <!--About Activity-->
     <string name="about">Om</string>
-    <string name="app_developers">Huvudutvecklare</string>
-    <string name="app_developers_"><![CDATA[Appen skapades av <a href="https://github.com/topjohnwu">topjohnwu</a> i samarbete med <a href="https://github.com/d8ahazard">Digitalhigh</a> och <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Ändringslogg</string>
     <string name="translators" />
     <string name="app_version">Version</string>

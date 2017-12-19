@@ -57,9 +57,7 @@
 
 <!--About Activity-->
 <string name="about">Sobre</string>
-<string name="app_developers">Principais programadores</string>
-<string name="app_developers_"><![CDATA[App criado por <a href="https://github.com/topjohnwu">topjohnwu</a> em colaboração com <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-<string name="app_changelog">Lista de alterações da aplicação</string>
+    <string name="app_changelog">Lista de alterações da aplicação</string>
 <string name="app_version">Versão do aplicação</string>
 <string name="app_source_code">Código fonte</string>
 <string name="donation">Doar</string>

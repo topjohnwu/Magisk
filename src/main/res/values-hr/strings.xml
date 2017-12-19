@@ -58,8 +58,6 @@
 
     <!--About Activity-->
     <string name="about">O aplikaciji</string>
-    <string name="app_developers">Glavni razvojni programeri</string>
-    <string name="app_developers_"><![CDATA[Aplikaciju izradio <a href="https://github.com/topjohnwu">topjohnwu</a> u suradnji s <a href="https://github.com/d8ahazard">Digitalhigh</a> i <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Popis izmjena aplikacije</string>
     <string name="translators" />
     <string name="app_version">Verzija aplikacije</string>
@@ -105,7 +103,6 @@
     <string name="no_boot_file_patch_support">Ciljana verzija Magiska ne podržava zakrpu datoteke za podizanje sustava</string>
     <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .img.tar formatu</string>
     <string name="complete_uninstall">Potpuna deinstalacija</string>
-    <string name="restore_stock_boot">Obnovi standardnu datoteku za podizanje sustava</string>
     <string name="restore_done">Obnova je dovršena!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="uninstall_toast">Deinstaliranje Magisk Manager aplikacije unutar 5 sekundi, molimo ponovno pokrenite uređaj nakon toga</string>

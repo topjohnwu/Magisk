@@ -61,9 +61,7 @@
 
 	<!--About Activity-->
 	<string name="about">Informazioni</string>
-	<string name="app_developers">Sviluppatori</string>
-	<string name="app_developers_"><![CDATA[App creata da <a href="https://github.com/topjohnwu">topjohnwu</a> in collaborazione con <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
-	<string name="app_changelog">Novità</string>
+    <string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps | Fabb2303 | bovirus</string>
 	<string name="app_version">Versione</string>
 	<string name="app_source_code">Codice sorgente</string>
@@ -111,8 +109,7 @@
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
-	<string name="restore_stock_boot">Ripristina boot originale</string>
-	<string name="restore_img">Ripristina Immagini</string>
+    <string name="restore_img">Ripristina Immagini</string>
 	<string name="uninstall_app">Disinstalla App</string>
 	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>

@@ -61,8 +61,6 @@
 
     <!--About Activity-->
     <string name="about">Sobre</string>
-    <string name="app_developers">Principais desenvolvedores</string>
-    <string name="app_developers_"><![CDATA[App criado por <a href="https://github.com/topjohnwu">topjohnwu</a> em colaboração com <a href="https://github.com/d8ahazard">Digitalhigh</a> e <a href="https://github.com/dvdandroid">Dvdandroid</a>.]]></string>
     <string name="app_changelog">Registro de Mudanças do App</string>
     <string name="translators">Killer7Mod</string>
     <string name="app_version">Versão do App</string>
@@ -108,7 +106,6 @@
     <string name="no_boot_file_patch_support">Versão do Magisk escolhida não suporta arquivo de patch boot image</string>
     <string name="boot_file_patch_msg">Selecione a stock boot image despejada(dump) no formato .img ou img.tar</string>
     <string name="complete_uninstall">Desinstalação Completa</string>
-    <string name="restore_stock_boot">Restaurar Stock Boot</string>
     <string name="restore_done">Restauração Completa!</string>
     <string name="restore_fail">backup da Stock não existe!</string>
     <string name="uninstall_toast">Desinstalando o Magisk Manager em 5 segundos, por favor reinicie manualmente depois</string>
