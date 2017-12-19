@@ -393,7 +393,7 @@ static void magisk_init_daemon() {
 		 * We restart the daemon again */
 		close(fd);
 		if (fork_dont_care() == 0) {
-			execv("/sbin/magisk", (char *[]) { "resetprop", "magisk.daemon", "1", NULL } );
+			execv("/sbin/magisk", (char *[]) { "magisk", "--daemon", NULL } );
 			exit(1);
 		}
 	}

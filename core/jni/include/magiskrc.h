@@ -16,10 +16,6 @@ const char magiskrc[] =
 "   rm /dev/.magisk.unblock\n"
 "\n"
 
-"on property:magisk.daemon=1\n"
-"   start magisk_daemon\n"
-"\n"
-
 // Services
 
 "service magisk_daemon /sbin/magisk --daemon\n"
