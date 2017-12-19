@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -79,7 +79,7 @@ public class SafetyNetHelper
             clazz.getMethod("swapResources", String.class, int.class).invoke(mActivity, dexPath,
                     isDarkTheme ? android.R.style.Theme_Material : android.R.style.Theme_Material_Light);
             try {
-                GoogleApiAvailability.getInstance().getErrorDialog(mActivity, result.getErrorCode(), 0).show();
+                GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
             } catch (Exception e) {
                 e.printStackTrace();
             }

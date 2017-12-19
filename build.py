@@ -392,7 +392,7 @@ def cleanup(args):
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		subprocess.run('{} clean'.format(os.path.join('.', 'gradlew')), shell=True)
+		subprocess.run('{} app:clean snet:clean crypto:clean'.format(os.path.join('.', 'gradlew')), shell=True)
 		for f in os.listdir('out'):
 			if '.apk' in f:
 				rm(os.path.join('out', f))

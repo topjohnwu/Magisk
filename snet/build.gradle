@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.1"
+    buildToolsVersion "27.0.2"
 
     defaultConfig {
         applicationId "com.topjohnwu.snet"
@@ -26,5 +26,5 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.gms:play-services-safetynet:11.6.0'
+    implementation 'com.google.android.gms:play-services-safetynet:7.0.0'  /* The oldest version */
 }
