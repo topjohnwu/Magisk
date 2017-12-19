@@ -38,12 +38,12 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
+        MagiskManager mm = MagiskManager.get();
         String md;
         if (mUrl != null) {
             md = WebService.getString(mUrl);
         } else {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 Utils.inToOut(is, out);
                 md = out.toString();
                 is.close();
@@ -52,12 +52,21 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
                 return "";
             }
         }
+        String css;
+        try (
+            InputStream in = mm.getAssets().open(mm.isDarkTheme ? "dark.css" : "light.css");
+            ByteArrayOutputStream out = new ByteArrayOutputStream()
+        ) {
+            Utils.inToOut(in, out);
+            css = out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         Node doc = parser.parse(md);
-        return String.format(
-                "<link rel='stylesheet' type='text/css' href='file:///android_asset/%s.css'/> %s",
-                MagiskManager.get().isDarkTheme ? "dark" : "light", renderer.render(doc));
+        return String.format("<style>%s</style>%s", css, renderer.render(doc));
     }
 
     @Override
