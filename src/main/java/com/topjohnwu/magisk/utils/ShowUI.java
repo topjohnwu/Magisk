@@ -98,7 +98,7 @@ public class ShowUI {
 
     public static void magiskInstallDialog(Activity activity, boolean enc, boolean verity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
-        String filename = Utils.getLegalFilename("Magisk-v" + mm.remoteMagiskVersionString + ".zip");
+        String filename = Utils.fmt("Magisk-v%s.zip", mm.remoteMagiskVersionString);
         new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)))
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
@@ -236,8 +236,7 @@ public class ShowUI {
         new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.app_name)))
             .setMessage(mm.getString(R.string.repo_install_msg,
-                    Utils.getLegalFilename("MagiskManager-v" +
-                            mm.remoteManagerVersionString + ".apk")))
+                    Utils.fmt("MagiskManager-v%s.apk", mm.remoteManagerVersionString)))
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
                 Utils.dumpPrefs();

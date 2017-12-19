@@ -68,7 +68,7 @@ public class Utils {
     }
 
     public static void uninstallPkg(String pkg) {
-        Shell.su_raw(fmt("find /data/user*/*/%s -exec umount -l {} 2>/dev/null \\;; pm uninstall %s", pkg, pkg));
+        Shell.su(fmt("umount -l /data/user*/*/%s/*/*.db 2>/dev/null; pm uninstall %s", pkg, pkg));
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
@@ -76,7 +76,7 @@ public class Utils {
             return;
 
         runWithPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
-            File file = new File(Const.EXTERNAL_PATH, filename);
+            File file = new File(Const.EXTERNAL_PATH, getLegalFilename(filename));
 
             if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs())
                     || (file.exists() && !file.delete())) {
@@ -87,14 +87,12 @@ public class Utils {
             Toast.makeText(context, context.getString(R.string.downloading_toast, filename), Toast.LENGTH_LONG).show();
             isDownloading = true;
 
-            DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            DownloadManager.Request request = new DownloadManager
+                    .Request(Uri.parse(link))
+                    .setDestinationUri(Uri.fromFile(file));
 
-            if (link != null) {
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(link));
-                request.setDestinationUri(Uri.fromFile(file));
-                receiver.setDownloadID(downloadManager.enqueue(request));
-            }
-            receiver.setFilename(filename);
+            DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            receiver.setDownloadID(dm.enqueue(request)).setFile(file);
             context.getApplicationContext().registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         });
     }
@@ -273,7 +271,6 @@ public class Utils {
         String config = fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS);
         List<String> ret = readFile(config);
         if (isValidShellResponse(ret)) {
-            removeItem(config);
             SharedPreferences.Editor editor = MagiskManager.get().prefs.edit();
             String json = ret.get(0);
             Gson gson = new Gson();
@@ -285,13 +282,14 @@ public class Utils {
                     editor.putString(entry.getKey(), (String) value);
                 } else if (value instanceof Boolean) {
                     editor.putBoolean(entry.getKey(), (boolean) value);
-                } else if (value instanceof Integer) {
-                    editor.putInt(entry.getKey(), (int) value);
+                } else if (value instanceof Number) {
+                    editor.putInt(entry.getKey(), ((Number) value).intValue());
                 }
             }
             editor.remove(Const.Key.ETAG_KEY);
             editor.apply();
             MagiskManager.get().loadConfig();
+            removeItem(config);
         }
     }
 

@@ -12,11 +12,11 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 
-public abstract class DownloadReceiver extends BroadcastReceiver {
-    public String mFilename;
-    long downloadID;
+import java.io.File;
 
-    public DownloadReceiver() {}
+public abstract class DownloadReceiver extends BroadcastReceiver {
+    protected File mFile;
+    private long downloadID;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -45,12 +45,14 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
         Utils.isDownloading = false;
     }
 
-    public void setDownloadID(long id) {
+    public DownloadReceiver setDownloadID(long id) {
         downloadID = id;
+        return this;
     }
 
-    public void setFilename(String filename) {
-        mFilename = filename;
+    public DownloadReceiver setFile(File file) {
+        mFile = file;
+        return this;
     }
 
     public abstract void onDownloadDone(Uri uri);

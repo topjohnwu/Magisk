@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.asyncs;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.widget.Toast;
 
 import com.topjohnwu.crypto.JarMap;
@@ -17,6 +19,12 @@ import java.util.List;
 import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
+
+    private ProgressDialog dialog;
+
+    public HideManager(Activity activity) {
+        super(activity);
+    }
 
     private String genPackageName(String prefix, int length) {
         StringBuilder builder = new StringBuilder(length);
@@ -86,8 +94,9 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        MagiskManager.toast(R.string.hide_manager_toast, Toast.LENGTH_SHORT);
-        MagiskManager.toast(R.string.hide_manager_toast2, Toast.LENGTH_LONG);
+        dialog = ProgressDialog.show(getActivity(),
+                getActivity().getString(R.string.hide_manager_toast),
+                getActivity().getString(R.string.hide_manager_toast2));
     }
 
     @Override
@@ -136,6 +145,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean b) {
+        dialog.dismiss();
         if (!b) {
             MagiskManager.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         }

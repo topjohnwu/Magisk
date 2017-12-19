@@ -111,8 +111,8 @@ public class MagiskManager extends Application {
         if (getPackageName().equals(Const.ORIG_PKG_NAME)) {
             String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null);
             if (pkg != null) {
-                suDB.setStrings(Const.Key.SU_REQUESTER, null);
                 Utils.uninstallPkg(pkg);
+                suDB.setStrings(Const.Key.SU_REQUESTER, null);
             }
         }
 

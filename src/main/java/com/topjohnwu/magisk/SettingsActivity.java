@@ -148,7 +148,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 hideManager.setOnPreferenceClickListener((pref) -> {
                     Utils.runWithPermission(getActivity(),
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            () -> new HideManager().exec());
+                            () -> new HideManager(getActivity()).exec());
                     return true;
                 });
             } else {
