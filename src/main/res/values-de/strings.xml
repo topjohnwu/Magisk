@@ -45,6 +45,9 @@
     <string name="disable_file_created">Modul wird beim nächsten Neustart deaktiviert</string>
     <string name="disable_file_removed">Modul wird beim nächsten Neustart aktiviert</string>
     <string name="author">Erstellt von %1$s</string>
+    <string name="reboot_recovery">Neustart in die Recovery</string>
+    <string name="reboot_bootloader">Neustart in den Bootloader</string>
+    <string name="reboot_download">Neustart in den Download-Modus</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Aktualisierung verfügbar</string>
@@ -112,13 +115,15 @@
     <string name="boot_file_patch_msg">Selektiere das originale Boot image dump im Format .img oder .img.tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_stock_boot">Stelle originalen Boot wieder her</string>
+    <string name="restore_img">Stelle Images wieder her</string>
+    <string name="uninstall_app">Deinstalliere die Anwendung</string>
     <string name="restore_done">Wiederherstellung durchgeführt!</string>
     <string name="restore_fail">Kein Original Backup vorhanden!</string>
     <string name="uninstall_toast">Deinstalliere Magisk Manager in 5 Sekunden, bitte im Anschluss manuell neustarten</string>
     <string name="proprietary_title">Lade proprietären Code herunter</string>
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
     <string name="su_db_corrupt">Datenbank für SU ist fehlerhaft, es wird eine neue erstellt</string>
-	
+
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
