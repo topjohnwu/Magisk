@@ -106,16 +106,7 @@ public class MagiskManager extends Application {
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
         }
 
-        suDB = new SuDatabaseHelper(true);
-
-        if (getPackageName().equals(Const.ORIG_PKG_NAME)) {
-            String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, null);
-            if (pkg != null) {
-                Utils.uninstallPkg(pkg);
-                suDB.setStrings(Const.Key.SU_REQUESTER, null);
-            }
-        }
-
+        suDB = new SuDatabaseHelper(false);
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
@@ -212,7 +203,7 @@ public class MagiskManager extends Application {
             keepEnc = false;
         }
 
-        if (suDB != null) {
+        if (suDB != null && !SuDatabaseHelper.verified) {
             suDB.close();
             suDB = new SuDatabaseHelper();
         }

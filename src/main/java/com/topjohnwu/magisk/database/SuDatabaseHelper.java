@@ -29,6 +29,7 @@ import java.util.List;
 public class SuDatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "su.db";
+    public static boolean verified = false;
 
     private static final int DATABASE_VER = 5;
     private static final String POLICY_TABLE = "policies";
@@ -41,7 +42,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     private PackageManager pm;
     private SQLiteDatabase mDb;
 
-    private static Context initDB(boolean local) {
+    private static Context initDB(boolean verify) {
         Context context;
         MagiskManager ce = MagiskManager.get();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -61,46 +62,49 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         }
 
         File db = Utils.getDatabasePath(context, DB_NAME);
-        if (local && db.length() == 0) {
+        if (!verify && db.length() == 0) {
             ce.loadMagiskInfo();
-            return initDB(false);
+            return initDB(true);
         }
 
         // Only care about local db (no shell involved)
-        if (local)
+        if (!verify)
             return context;
 
         // We need to make sure the global db is setup properly
         if (ce.magiskVersionCode >= 1464 && Shell.rootAccess()) {
-            Shell.su_raw(Utils.fmt("mkdir %s; chmod 700 %s", GLOBAL_DB.getParent(), GLOBAL_DB.getParent()));
+            Shell.su(Utils.fmt("mkdir %s 2>/dev/null; chmod 700 %s", GLOBAL_DB.getParent(), GLOBAL_DB.getParent()));
             if (!Utils.itemExist(GLOBAL_DB)) {
                 db = context.getDatabasePath(DB_NAME);
                 Shell.su(Utils.fmt("cp -af %s %s; rm -f %s*", db, GLOBAL_DB, db));
             }
 
             try {
+                db.getParentFile().mkdirs();
                 db.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            // Make sure the global and local db matches
-            if (!TextUtils.equals(Utils.checkMD5(GLOBAL_DB), Utils.checkMD5(db))) {
+            // Make sure the global and local db is the same inode
+            verified = TextUtils.equals(Utils.checkInode(GLOBAL_DB), Utils.checkInode(db));
+            if (!verified) {
                 Shell.su(Utils.fmt(
                         "chown 0.0 %s; chmod 666 %s; chcon u:object_r:su_file:s0 %s;" +
                                 "mount -o bind %s %s",
                         GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, db));
+                verified = TextUtils.equals(Utils.checkInode(GLOBAL_DB), Utils.checkInode(db));
             }
         }
         return context;
     }
 
     public SuDatabaseHelper() {
-        this(false);
+        this(true);
     }
 
-    public SuDatabaseHelper(boolean local) {
-        this(initDB(local));
+    public SuDatabaseHelper(boolean verify) {
+        this(initDB(verify));
     }
 
     private SuDatabaseHelper(Context context) {
@@ -109,6 +113,14 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         pm = context.getPackageManager();
         mDb = getWritableDatabase();
         cleanup();
+
+        if (context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
+            String pkg = getStrings(Const.Key.SU_REQUESTER, null);
+            if (pkg != null) {
+                Utils.uninstallPkg(pkg);
+                setStrings(Const.Key.SU_REQUESTER, null);
+            }
+        }
     }
 
     @Override

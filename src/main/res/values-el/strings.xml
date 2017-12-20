@@ -1,6 +1,5 @@
 <resources>
     <!--Welcome Activity-->
-    <string name="magiskhide" translatable="false">Απόκρυψη του Magisk</string>
     <string name="modules">Modules</string>
 	
     <string name="downloads">Λήψεις</string>

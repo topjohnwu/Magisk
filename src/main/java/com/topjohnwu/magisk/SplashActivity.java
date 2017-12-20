@@ -35,6 +35,9 @@ public class SplashActivity extends Activity {
 
         MagiskManager mm = getMagiskManager();
 
+        mm.loadMagiskInfo();
+        Utils.loadPrefs();
+
         // Dynamic detect all locales
         new LoadLocale().exec();
 
@@ -44,9 +47,6 @@ public class SplashActivity extends Activity {
                     getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
             getSystemService(NotificationManager.class).createNotificationChannel(channel);
         }
-
-        mm.loadMagiskInfo();
-        Utils.loadPrefs();
 
         LoadModules loadModuleTask = new LoadModules();
 

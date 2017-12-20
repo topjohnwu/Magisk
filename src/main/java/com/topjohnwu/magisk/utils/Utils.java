@@ -62,9 +62,9 @@ public class Utils {
         return Shell.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
     }
 
-    public static String checkMD5(Object path) {
-        List<String> ret = Shell.su(fmt("md5sum %s", path));
-        return isValidShellResponse(ret) ? ret.get(0).split("\\s+")[0] : null;
+    public static String checkInode(Object path) {
+        List<String> ret = Shell.su(fmt("ls -i %s", path));
+        return isValidShellResponse(ret) ? ret.get(0).trim().split("\\s+")[0] : null;
     }
 
     public static void uninstallPkg(String pkg) {
