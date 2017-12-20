@@ -266,7 +266,7 @@ def zip_main(args):
 		with open(source, 'r') as script:
 			# Add version info util_functions.sh
 			util_func = script.read().replace(
-				'MAGISK_VERSION_STUB', 'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(args.versionString, args.versionCode))
+				'#MAGISK_VERSION_STUB', 'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(args.versionString, args.versionCode))
 			target = os.path.join('common', 'util_functions.sh')
 			print('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, util_func)
@@ -316,11 +316,9 @@ def zip_uninstaller(args):
 		source = os.path.join('scripts', 'util_functions.sh')
 		with open(source, 'r') as script:
 			# Remove the stub
-			util_func = script.read().replace(
-				'MAGISK_VERSION_STUB', '')
 			target = os.path.join('util_functions.sh')
 			print('zip: ' + source + ' -> ' + target)
-			zipf.writestr(target, util_func)
+			zipf.writestr(target, script.read())
 
 		# Prebuilts
 		for chromeos in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:

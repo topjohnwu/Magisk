@@ -71,7 +71,7 @@ esac
 
 # Detect boot image state
 ui_print "- Checking ramdisk status"
-./magiskboot --cpio-test ramdisk.cpio
+./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
     ui_print "- Stock boot image detected!"
@@ -80,13 +80,13 @@ case $? in
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     OK=false
     [ ! -z $SHA1 ] && restore_imgs $SHA1 && OK=true
     if ! $OK; then
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
-      ./magiskboot --cpio-restore ramdisk.cpio
+      ./magiskboot --cpio ramdisk.cpio restore
       ./magiskboot --repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
@@ -104,6 +104,7 @@ cd /
 ui_print "- Removing Magisk files"
 rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
         /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/app/com.topjohnwu.magisk* \
-        /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/adb/*magisk* 2>/dev/null
+        /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/user*/*/.tmp.magisk.config \
+        /data/adb/*magisk* 2>/dev/null
 
 $BOOTMODE && reboot

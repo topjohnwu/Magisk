@@ -7,8 +7,8 @@
 #include <sys/types.h>
 
 struct vector {
-	size_t size;
-	size_t cap;
+	unsigned size;
+	unsigned cap;
 	void **data;
 };
 
@@ -26,11 +26,11 @@ struct vector *vec_dup(struct vector *v);
 /* Usage: vec_for_each(vector *v, void *e) */
 #define vec_for_each(v, e) \
 	e = v ? (v)->data[0] : NULL; \
-	for (size_t _ = 0; v && _ < (v)->size; ++_, e = (v)->data[_])
+	for (int _ = 0; v && _ < (v)->size; ++_, e = (v)->data[_])
 
 #define vec_for_each_r(v, e) \
 	e = v ? (v)->data[(v)->size - 1] : NULL; \
-	for (size_t _ = (v)->size; v && _ > 0; --_, e = (v)->data[_ - 1])
+	for (int _ = ((int) (v)->size) - 1; v && _ >= 0; --_, e = (v)->data[_])
 
 #define vec_cur(v) vec_entry(v)[_]
 

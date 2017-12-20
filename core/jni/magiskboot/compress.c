@@ -437,7 +437,7 @@ void decomp_file(char *from, const char *to) {
 		fd = STDOUT_FILENO;
 	} else {
 		fd = creat(to, 0644);
-		fprintf(stderr, "Decompressing to [%s]\n\n", to);
+		fprintf(stderr, "Decompressing to [%s]\n", to);
 	}
 
 	decomp(type, fd, file, size);
@@ -498,7 +498,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 		fd = STDOUT_FILENO;
 	} else {
 		fd = creat(dest, 0644);
-		fprintf(stderr, "Compressing to [%s]\n\n", dest);
+		fprintf(stderr, "Compressing to [%s]\n", dest);
 	}
 	comp(type, fd, file, size);
 	close(fd);

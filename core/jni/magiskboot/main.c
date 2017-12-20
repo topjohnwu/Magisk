@@ -36,34 +36,39 @@ static void usage(char *arg0) {
 		" --hexpatch <file> <hexpattern1> <hexpattern2>\n"
 		"  Search <hexpattern1> in <file>, and replace with <hexpattern2>\n"
 		"\n"
-		" --cpio-<cmd> <incpio> [flags...] [args...]\n"
-		"  Do cpio related cmds to <incpio> (modifications are done directly)\n"
+		" --cpio <incpio> [commands...]\n"
+		"  Do cpio commands to <incpio> (modifications are done directly)\n"
+		"  Each command is a single argument, use quotes if necessary\n"
 		"  Supported commands:\n"
-		"    -rm [-r] <entry>\n"
-		"      Remove entry from <incpio>, flag [-r] to remove recursively\n"
-		"    -mkdir <mode> <entry>\n"
-		"      Create directory as an <entry>\n"
-		"    -ln <target> <entry>\n"
-		"      Create symlink <entry> to point to <target>\n"
-		"    -mv <from-entry> <to-entry>\n"
-		"      Move <from-entry> to <to-entry>\n"
-		"    -add <mode> <entry> <infile>\n"
-		"      Add <infile> as an <entry>; replaces <entry> if already exists\n"
-		"    -extract [<entry> <outfile>]\n"
-		"      Extract <entry> to <outfile>, or extract all to current directory\n"
-		"    -test\n"
+		"    rm [-r] ENTRY\n"
+		"      Remove ENTRY, specify [-r] to remove recursively\n"
+		"    mkdir MODE ENTRY\n"
+		"      Create directory ENTRY in permissions MODE\n"
+		"    ln TARGET ENTRY\n"
+		"      Create a symlink to TARGET with the name ENTRY\n"
+		"    mv SOURCE DEST\n"
+		"      Move SOURCE to DEST\n"
+		"    add MODE ENTRY INFILE\n"
+		"      Add INFILE as ENTRY in permissions MODE; replaces ENTRY if exists\n"
+		"    extract [ENTRY OUT]\n"
+		"      Extract ENTRY to OUT, or extract all entries to current directory\n"
+		"    test\n"
+		"      Test the current cpio's patch status\n"
 		"      Return value: 0/stock 1/Magisk 2/other (phh, SuperSU, Xposed)\n"
-		"    -patch <KEEPVERITY> <KEEPFORCEENCRYPT>\n"
+		"    patch KEEPVERITY KEEPFORCEENCRYPT\n"
 		"      Ramdisk patches. KEEP**** are boolean values\n"
-		"      This command is no longer used in Magisk installations\n"
-		"    -backup <origcpio> <HIGHCOMP> <KEEPVERITY> <KEEPFORCEENCRYPT> [SHA1]\n"
-		"      Create ramdisk backups into <incpio> from <origcpio>\n"
+		"    backup ORIG [SHA1]\n"
+		"      Create ramdisk backups from ORIG\n"
+		"      SHA1 of stock boot image is optional\n"
+		"    restore\n"
+		"      Restore ramdisk from ramdisk backup stored within incpio\n"
+		"    magisk ORIG HIGHCOMP KEEPVERITY KEEPFORCEENCRYPT [SHA1]\n"
+		"      Do Magisk patches and backups all in one step\n"
+		"      Create ramdisk backups from ORIG\n"
 		"      HIGHCOMP, KEEP**** are boolean values\n"
 		"      SHA1 of stock boot image is optional\n"
-		"    -restore\n"
-		"      Restore ramdisk from ramdisk backup within <incpio>\n"
-		"    -stocksha1\n"
-		"      Get stock boot SHA1 recorded within <incpio>\n"
+		"    sha1\n"
+		"      Print stock boot SHA1 if previously stored\n"
 		"\n"
 		" --dtb-<cmd> <dtb>\n"
 		"  Do dtb related cmds to <dtb> (modifications are done directly)\n"
@@ -104,11 +109,11 @@ static void usage(char *arg0) {
 }
 
 int main(int argc, char *argv[]) {
-	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n\n");
+	fprintf(stderr, "MagiskBoot v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Boot Image Modification Tool\n");
 
 	umask(0);
 	if (argc > 1 && strcmp(argv[1], "--cleanup") == 0) {
-		fprintf(stderr, "Cleaning up...\n\n");
+		fprintf(stderr, "Cleaning up...\n");
 		char name[PATH_MAX];
 		unlink(KERNEL_FILE);
 		unlink(RAMDISK_FILE);
@@ -146,11 +151,8 @@ int main(int argc, char *argv[]) {
 		comp_file(method, argv[2], argc > 3 ? argv[3] : NULL);
 	} else if (argc > 4 && strcmp(argv[1], "--hexpatch") == 0) {
 		hexpatch(argv[2], argv[3], argv[4]);
-	} else if (argc > 2 && strncmp(argv[1], "--cpio", 6) == 0) {
-		char *cmd = argv[1] + 6;
-		if (*cmd == '\0') usage(argv[0]);
-		else ++cmd;
-		if (cpio_commands(cmd, argc - 2, argv + 2)) usage(argv[0]);
+	} else if (argc > 2 && strcmp(argv[1], "--cpio") == 0) {
+		if (cpio_commands(argc - 2, argv + 2)) usage(argv[0]);
 	} else if (argc > 2 && strncmp(argv[1], "--dtb", 5) == 0) {
 		char *cmd = argv[1] + 5;
 		if (*cmd == '\0') usage(argv[0]);

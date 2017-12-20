@@ -55,7 +55,6 @@ static void print_hdr(const boot_img_hdr *hdr) {
 	}
 	fprintf(stderr, "NAME [%s]\n", hdr->name);
 	fprintf(stderr, "CMDLINE [%s]\n", hdr->cmdline);
-	fprintf(stderr, "\n");
 }
 
 int parse_img(const char *image, boot_img *boot) {
@@ -63,7 +62,7 @@ int parse_img(const char *image, boot_img *boot) {
 	int is_blk = mmap_ro(image, &boot->map_addr, &boot->map_size);
 
 	// Parse image
-	fprintf(stderr, "Parsing boot image: [%s]\n\n", image);
+	fprintf(stderr, "Parsing boot image: [%s]\n", image);
 	for (size_t pos = 0; pos < boot->map_size; pos += 256) {
 		switch (check_type(boot->map_addr + pos)) {
 		case CHROMEOS:
@@ -143,7 +142,6 @@ int parse_img(const char *image, boot_img *boot) {
 			fprintf(stderr, "KERNEL_FMT [%s]\n", fmt);
 			get_type_name(boot->ramdisk_type, fmt);
 			fprintf(stderr, "RAMDISK_FMT [%s]\n", fmt);
-			fprintf(stderr, "\n");
 
 			return boot->flags & CHROMEOS_FLAG ? CHROMEOS_RET :
 				   ((is_blk && boot->tail_size < 500 * 1024) ? INSUF_BLOCK_RET : 0);
@@ -206,7 +204,7 @@ void repack(const char* orig_image, const char* out_image) {
 	// Parse original image
 	parse_img(orig_image, &boot);
 
-	fprintf(stderr, "Repack to boot image: [%s]\n\n", out_image);
+	fprintf(stderr, "Repack to boot image: [%s]\n", out_image);
 
 	// Create new image
 	int fd = creat(out_image, 0644);

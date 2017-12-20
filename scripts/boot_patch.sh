@@ -89,6 +89,7 @@ case $? in
   2 )
     ui_print "! Insufficient boot partition size detected"
     HIGHCOMP=true
+    ui_print "- Enable high compression mode"
     ;;
   3 )
     ui_print "- ChromeOS boot image detected"
@@ -103,20 +104,13 @@ case $? in
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
 
-if [ -f /sdcard/ramdisk-recovery.img ]; then
-  HIGHCOMP=true
-  ui_print "- Detected ramdisk-recovery.img"
-fi
-
-$HIGHCOMP && ui_print "- Enable high compression mode"
-
 ##########################################################################################
 # Ramdisk restores
 ##########################################################################################
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print "- Checking ramdisk status"
-./magiskboot --cpio-test ramdisk.cpio
+./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
     ui_print "- Stock boot image detected!"
@@ -129,8 +123,8 @@ case $? in
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected!"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio-stocksha1 ramdisk.cpio 2>/dev/null`
-    ./magiskboot --cpio-restore ramdisk.cpio
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    ./magiskboot --cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 ) # Other patched
@@ -145,17 +139,11 @@ esac
 
 ui_print "- Patching ramdisk"
 
-./magiskboot --cpio-add ramdisk.cpio 750 init magiskinit
-./magiskboot --cpio-backup ramdisk.cpio ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1
+./magiskboot --cpio ramdisk.cpio \
+'add 750 init magiskinit' \
+"magisk ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1"
 
 rm -f ramdisk.cpio.orig
-
-if [ -f /sdcard/ramdisk-recovery.img ]; then
-  ui_print "- Adding ramdisk-recovery.img"
-  ./magiskboot --decompress - < /sdcard/ramdisk-recovery.img | ./magiskboot --compress=xz - ramdisk-recovery.xz
-  ./magiskboot --cpio-add ramdisk.cpio 0 ramdisk-recovery.xz ramdisk-recovery.xz
-  rm ramdisk-recovery.xz
-fi
 
 ##########################################################################################
 # Binary patches

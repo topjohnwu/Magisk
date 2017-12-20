@@ -209,7 +209,7 @@ public:
 vector prop_list;
 
 static int prop_cmp(const void *p1, const void *p2) {
-	return strcmp((*((property **) p1))->name, (*((property **) p2))->name);
+	return strcmp(((property *) p1)->name, ((property *) p2)->name);
 }
 
 static void print_all_props_cb(const char *name, const char *value) {

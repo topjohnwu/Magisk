@@ -182,22 +182,24 @@ static void patch_ramdisk(int root) {
 	close(fd);
 	free(addr);
 
-	char *key, *value;
-	full_read("/.backup/.magisk", &addr, &size);
-	for (char *tok = strtok(addr, "\n"); tok; tok = strtok(NULL, "\n")) {
-		key = tok;
-		value = strchr(tok, '=') + 1;
-		value[-1] = '\0';
-		if (strcmp(key, "KEEPVERITY") == 0)
-			keepverity = strcmp(value, "true") == 0;
-		else if (strcmp(key, "KEEPFORCEENCRYPT") == 0)
-			keepencrypt = strcmp(value, "true") == 0;
-	}
+	/* Disabled for now */
 
-	excl_list = (char *[]) { "system_root", "system", "vendor", NULL };
-	in_order_walk(root, fstab_patch_cb);
-	if (!keepverity)
-		unlink("/verity_key");
+	// char *key, *value;
+	// full_read("/.backup/.magisk", &addr, &size);
+	// for (char *tok = strtok(addr, "\n"); tok; tok = strtok(NULL, "\n")) {
+	// 	key = tok;
+	// 	value = strchr(tok, '=') + 1;
+	// 	value[-1] = '\0';
+	// 	if (strcmp(key, "KEEPVERITY") == 0)
+	// 		keepverity = strcmp(value, "true") == 0;
+	// 	else if (strcmp(key, "KEEPFORCEENCRYPT") == 0)
+	// 		keepencrypt = strcmp(value, "true") == 0;
+	// }
+
+	// excl_list = (char *[]) { "system_root", "system", "vendor", NULL };
+	// in_order_walk(root, fstab_patch_cb);
+	// if (!keepverity)
+	// 	unlink("/verity_key");
 }
 
 static int strend(const char *s1, const char *s2) {
@@ -472,17 +474,11 @@ int main(int argc, char *argv[]) {
 
 		close(system_root);
 	} else {
-		char *ramdisk_xz = NULL;
-		if (access("/ramdisk-recovery.xz", R_OK) == 0)
-			ramdisk_xz = "/ramdisk-recovery.xz";
-		else if (access("/ramdisk.cpio.xz", R_OK) == 0)
-			ramdisk_xz = "/ramdisk.cpio.xz";
-
-		if (ramdisk_xz) {
-			// High compress mode
+		if (access("/ramdisk.cpio.xz", R_OK) == 0) {
+			// High compression mode
 			void *addr;
 			size_t size;
-			mmap_ro(ramdisk_xz, &addr, &size);
+			mmap_ro("/ramdisk.cpio.xz", &addr, &size);
 			int fd = creat("/ramdisk.cpio", 0);
 			unxz(addr, size, fd);
 			munmap(addr, size);

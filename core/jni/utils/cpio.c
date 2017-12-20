@@ -22,34 +22,42 @@ static uint32_t x8u(char *hex) {
   return val;
 }
 
-static void cpio_free(cpio_entry *f) {
-	if (f) {
-		free(f->filename);
-		free(f->data);
-		free(f);
+void cpio_free(cpio_entry *e) {
+	if (e) {
+		free(e->filename);
+		free(e->data);
+		free(e);
 	}
 }
 
+int cpio_find(struct vector *v, const char *entry) {
+	cpio_entry *e;
+	vec_for_each(v, e) {
+		if (!e) continue;
+		if (strcmp(e->filename, entry) == 0)
+			return _;
+	}
+	return -1;
+}
+
 int cpio_cmp(const void *a, const void *b) {
-	return strcmp((*(cpio_entry **) a)->filename, (*(cpio_entry **) b)->filename);
+	return strcmp(((cpio_entry *) a)->filename, ((cpio_entry *) b)->filename);
 }
 
 void cpio_vec_insert(struct vector *v, cpio_entry *n) {
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		if (strcmp(f->filename, n->filename) == 0) {
-			// Replace, then all is done
-			cpio_free(f);
-			vec_cur(v) = n;
-			return;
-		}
+	int i = cpio_find(v, n->filename);
+	if (i > 0) {
+		// Replace, then all is done
+		cpio_free(vec_entry(v)[i]);
+		vec_entry(v)[i] = n;
+		return;
 	}
 	vec_push_back(v, n);
 }
 
 // Parse cpio file to a vector of cpio_entry
 void parse_cpio(struct vector *v, const char *filename) {
-	fprintf(stderr, "Loading cpio: [%s]\n\n", filename);
+	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0) return;
 	cpio_newc_header header;
@@ -91,35 +99,34 @@ void parse_cpio(struct vector *v, const char *filename) {
 }
 
 void dump_cpio(struct vector *v, const char *filename) {
-	fprintf(stderr, "\nDump cpio: [%s]\n\n", filename);
-	int fd = creat(filename, 0644);
+	fprintf(stderr, "Dump cpio: [%s]\n", filename);
 	unsigned inode = 300000;
 	char header[111];
 	// Sort by name
 	vec_sort(v, cpio_cmp);
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		if (f->remove) continue;
+	cpio_entry *e;
+	int fd = creat(filename, 0644);
+	vec_for_each(v, e) {
 		sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
-			inode++,	// f->ino
-			f->mode,
-			f->uid,
-			f->gid,
-			1,			// f->nlink
-			0,			// f->mtime
-			f->filesize,
-			0,			// f->devmajor
-			0,			// f->devminor
-			0,			// f->rdevmajor
-			0,			// f->rdevminor
-			(uint32_t) strlen(f->filename) + 1,
-			0			// f->check
+			inode++,    // e->ino
+			e->mode,
+			e->uid,
+			e->gid,
+			1,          // e->nlink
+			0,          // e->mtime
+			e->filesize,
+			0,          // e->devmajor
+			0,          // e->devminor
+			0,          // e->rdevmajor
+			0,          // e->rdevminor
+			(uint32_t) strlen(e->filename) + 1,
+			0           // e->check
 		);
 		xwrite(fd, header, 110);
-		xwrite(fd, f->filename, strlen(f->filename) + 1);
+		xwrite(fd, e->filename, strlen(e->filename) + 1);
 		file_align(fd, 4, 1);
-		if (f->filesize) {
-			xwrite(fd, f->data, f->filesize);
+		if (e->filesize) {
+			xwrite(fd, e->data, e->filesize);
 			file_align(fd, 4, 1);
 		}
 	}
@@ -133,23 +140,22 @@ void dump_cpio(struct vector *v, const char *filename) {
 
 void cpio_vec_destroy(struct vector *v) {
 	// Free each cpio_entry
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		cpio_free(f);
-	}
+	cpio_entry *e;
+	vec_for_each(v, e)
+		cpio_free(e);
 	vec_destroy(v);
 }
 
 void cpio_rm(struct vector *v, int recursive, const char *entry) {
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		if (strncmp(f->filename, entry, strlen(entry)) == 0) {
-			char next = f->filename[strlen(entry)];
-			if ((recursive && next == '/') || next == '\0') {
-				if (!f->remove) {
-					fprintf(stderr, "Remove [%s]\n", f->filename);
-					f->remove = 1;
-				}
+	cpio_entry *e;
+	size_t len = strlen(entry);
+	vec_for_each(v, e) {
+		if (!e) continue;
+		if (strncmp(e->filename, entry, len) == 0) {
+			if ((recursive && e->filename[len] == '/') || e->filename[len] == '\0') {
+				fprintf(stderr, "Remove [%s]\n", e->filename);
+				cpio_free(e);
+				vec_cur(v) = NULL;
 				if (!recursive) return;
 			}
 		}
@@ -157,97 +163,94 @@ void cpio_rm(struct vector *v, int recursive, const char *entry) {
 }
 
 void cpio_mkdir(struct vector *v, mode_t mode, const char *entry) {
-	cpio_entry *f = xcalloc(sizeof(*f), 1);
-	f->mode = S_IFDIR | mode;
-	f->filename = strdup(entry);
-	cpio_vec_insert(v, f);
+	cpio_entry *e = xcalloc(sizeof(*e), 1);
+	e->mode = S_IFDIR | mode;
+	e->filename = strdup(entry);
+	cpio_vec_insert(v, e);
 	fprintf(stderr, "Create directory [%s] (%04o)\n",entry, mode);
 }
 
 void cpio_ln(struct vector *v, const char *target, const char *entry) {
-	cpio_entry *f = xcalloc(sizeof(*f), 1);
-	f->mode = S_IFLNK;
-	f->filename = strdup(entry);
-	f->filesize = strlen(target);
-	f->data = strdup(target);
-	cpio_vec_insert(v, f);
+	cpio_entry *e = xcalloc(sizeof(*e), 1);
+	e->mode = S_IFLNK;
+	e->filename = strdup(entry);
+	e->filesize = strlen(target);
+	e->data = strdup(target);
+	cpio_vec_insert(v, e);
 	fprintf(stderr, "Create symlink [%s] -> [%s]\n", entry, target);
 }
 
 void cpio_add(struct vector *v, mode_t mode, const char *entry, const char *filename) {
 	int fd = xopen(filename, O_RDONLY);
-	cpio_entry *f = xcalloc(sizeof(*f), 1);
-	f->mode = S_IFREG | mode;
-	f->filename = strdup(entry);
-	f->filesize = lseek(fd, 0, SEEK_END);
+	cpio_entry *e = xcalloc(sizeof(*e), 1);
+	e->mode = S_IFREG | mode;
+	e->filename = strdup(entry);
+	e->filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	f->data = xmalloc(f->filesize);
-	xxread(fd, f->data, f->filesize);
+	e->data = xmalloc(e->filesize);
+	xxread(fd, e->data, e->filesize);
 	close(fd);
-	cpio_vec_insert(v, f);
+	cpio_vec_insert(v, e);
 	fprintf(stderr, "Add entry [%s] (%04o)\n", entry, mode);
 }
 
 int cpio_mv(struct vector *v, const char *from, const char *to) {
-	struct cpio_entry *f, *t;
-	vec_for_each(v, f) {
-		if (strcmp(f->filename, from) == 0) {
-			fprintf(stderr, "Move [%s] -> [%s]\n", from, to);
-			vec_for_each(v, t) {
-				if (strcmp(t->filename, to) == 0) {
-					t->remove = 1;
-					break;
-				}
-			}
-			free(f->filename);
-			f->filename = strdup(to);
-			return 0;
+	struct cpio_entry *e;
+	int f = cpio_find(v, from), t = cpio_find(v, to);
+	if (f > 0) {
+		if (t > 0) {
+			cpio_free(vec_entry(v)[t]);
+			vec_entry(v)[t] = NULL;
 		}
+		e = vec_entry(v)[f];
+		free(e->filename);
+		e->filename = strdup(to);
+		return 0;
 	}
 	fprintf(stderr, "Cannot find entry %s\n", from);
 	return 1;
 }
 
 int cpio_extract(struct vector *v, const char *entry, const char *filename) {
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		if (strcmp(f->filename, entry) == 0) {
-			fprintf(stderr, "Extracting [%s] to [%s]\n\n", entry, filename);
-			if (S_ISREG(f->mode)) {
-				int fd = creat(filename, f->mode & 0777);
-				xwrite(fd, f->data, f->filesize);
-				fchown(fd, f->uid, f->gid);
-				close(fd);
-			} else if (S_ISLNK(f->mode)) {
-				char *target = xcalloc(f->filesize + 1, 1);
-				memcpy(target, f->data, f->filesize);
-				unlink(filename);
-				symlink(target, filename);
-			}
-			return 0;
+	int i = cpio_find(v, entry);
+	if (i > 0) {
+		cpio_entry *e = vec_entry(v)[i];
+		fprintf(stderr, "Extracting [%s] to [%s]\n", entry, filename);
+		if (S_ISREG(e->mode)) {
+			int fd = creat(filename, e->mode & 0777);
+			xwrite(fd, e->data, e->filesize);
+			fchown(fd, e->uid, e->gid);
+			close(fd);
+		} else if (S_ISLNK(e->mode)) {
+			char *target = xcalloc(e->filesize + 1, 1);
+			memcpy(target, e->data, e->filesize);
+			unlink(filename);
+			symlink(target, filename);
 		}
+		return 0;
 	}
 	fprintf(stderr, "Cannot find the file entry [%s]\n", entry);
 	return 1;
 }
 
 void cpio_extract_all(struct vector *v) {
-	cpio_entry *f;
-	vec_for_each(v, f) {
-		fprintf(stderr, "Extracting [%s]\n", f->filename);
-		unlink(f->filename);
-		rmdir(f->filename);
-		if (S_ISDIR(f->mode)) {
-			mkdir(f->filename, f->mode & 0777);
-		} else if (S_ISREG(f->mode)) {
-			int fd = creat(f->filename, f->mode & 0777);
-			xwrite(fd, f->data, f->filesize);
-			fchown(fd, f->uid, f->gid);
+	cpio_entry *e;
+	vec_for_each(v, e) {
+		if (!e) continue;
+		fprintf(stderr, "Extracting [%s]\n", e->filename);
+		unlink(e->filename);
+		rmdir(e->filename);
+		if (S_ISDIR(e->mode)) {
+			mkdir(e->filename, e->mode & 0777);
+		} else if (S_ISREG(e->mode)) {
+			int fd = creat(e->filename, e->mode & 0777);
+			xwrite(fd, e->data, e->filesize);
+			fchown(fd, e->uid, e->gid);
 			close(fd);
-		} else if (S_ISLNK(f->mode)) {
-			char *target = xcalloc(f->filesize + 1, 1);
-			memcpy(target, f->data, f->filesize);
-			symlink(target, f->filename);
+		} else if (S_ISLNK(e->mode)) {
+			char *target = xcalloc(e->filesize + 1, 1);
+			memcpy(target, e->data, e->filesize);
+			symlink(target, e->filename);
 		}
 	}
 }

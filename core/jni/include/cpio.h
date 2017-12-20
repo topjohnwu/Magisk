@@ -42,6 +42,8 @@ typedef struct cpio_newc_header {
 } cpio_newc_header;
 
 // Basic cpio functions
+void cpio_free(cpio_entry *e);
+int cpio_find(struct vector *v, const char *entry);
 int cpio_cmp(const void *a, const void *b);
 void parse_cpio(struct vector *v, const char *filename);
 void dump_cpio(struct vector *v, const char *filename);

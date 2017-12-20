@@ -29,9 +29,25 @@ void *vec_pop_back(struct vector *v) {
 	return ret;
 }
 
+static int (*cmp)(const void *, const void *);
+
+static int vec_comp(const void *a, const void *b) {
+	void *aa = *((void **)a), *bb = *((void **)b);
+	if (aa == NULL && bb == NULL) return 0;
+	else if (aa == NULL) return 1;
+	else if (bb == NULL) return -1;
+	else return cmp ? cmp(aa, bb) : 0;
+}
+
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *)) {
 	if (v == NULL) return;
-	qsort(vec_entry(v), vec_size(v), sizeof(void*), compar);
+	cmp = compar;
+	qsort(vec_entry(v), vec_size(v), sizeof(void*), vec_comp);
+	void *e;
+	vec_for_each_r(v, e) {
+		if (e) break;
+		--vec_size(v);
+	}
 }
 
 /* Will cleanup only the vector itself
