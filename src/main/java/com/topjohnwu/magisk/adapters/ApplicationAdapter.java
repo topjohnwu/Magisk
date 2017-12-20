@@ -149,7 +149,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             mOriginalList = pm.getInstalledApplications(0);
             for (Iterator<ApplicationInfo> i = mOriginalList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
-                if (Const.SN_BLACKLIST.contains(info.packageName) || !info.enabled) {
+                if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
                     i.remove();
                 }
             }

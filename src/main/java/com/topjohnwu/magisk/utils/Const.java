@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.utils;
 import android.os.Environment;
 import android.os.Process;
 
+import com.topjohnwu.magisk.MagiskManager;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -51,9 +53,9 @@ public class Const {
     }
 
     /* A list of apps that should not be shown as hide-able */
-    public static final List<String> SN_BLACKLIST =  Arrays.asList(
+    public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
             "android",
-            "com.topjohnwu.magisk",
+            MagiskManager.get().getPackageName(),
             "com.google.android.gms"
     );
 
