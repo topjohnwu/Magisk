@@ -62,11 +62,6 @@ public class SplashActivity extends Activity {
         // Magisk working as expected
         if (Shell.rootAccess() && mm.magiskVersionCode > 0) {
 
-            List<String> ret = Shell.su("echo \"$BOOTIMAGE\"");
-            if (Utils.isValidShellResponse(ret)) {
-                mm.bootBlock = ret.get(0);
-            }
-
             // Add update checking service
             if (Const.Value.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
                 ComponentName service = new ComponentName(this, UpdateCheckService.class);

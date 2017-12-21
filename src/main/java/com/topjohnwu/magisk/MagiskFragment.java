@@ -117,8 +117,7 @@ public class MagiskFragment extends Fragment
         }
 
         ((NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-        ShowUI.magiskInstallDialog(getActivity(),
-                keepEncChkbox.isChecked(), keepVerityChkbox.isChecked());
+        ShowUI.magiskInstallDialog(getActivity());
     }
 
     @OnClick(R.id.uninstall_button)
@@ -139,7 +138,13 @@ public class MagiskFragment extends Fragment
         setupExpandable();
 
         keepVerityChkbox.setChecked(mm.keepVerity);
+        keepVerityChkbox.setOnCheckedChangeListener((view, isChecked) -> {
+            mm.keepVerity = isChecked;
+        });
         keepEncChkbox.setChecked(mm.keepEnc);
+        keepEncChkbox.setOnCheckedChangeListener((view, isChecked) -> {
+            mm.keepEnc = isChecked;
+        });
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
         updateUI();

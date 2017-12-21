@@ -112,9 +112,6 @@ public class Const {
         public static final String INTENT_PERM = "perm_dialog";
         public static final String FLASH_ACTION = "action";
         public static final String FLASH_SET_BOOT = "boot";
-        public static final String FLASH_SET_ENC = "enc";
-        public static final String FLASH_SET_VERITY = "verity";
-
 
         // others
         public static final String UPDATE_NOTIFICATION = "notification";

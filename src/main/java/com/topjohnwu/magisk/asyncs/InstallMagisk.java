@@ -40,26 +40,23 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private Uri mBootImg, mZip;
     private List<String> console, logs;
     private String mBootLocation;
-    private boolean mKeepEnc, mKeepVerity;
     private int mode;
 
-    private InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity) {
+    private InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip) {
         super(context);
         this.console = console;
         this.logs = logs;
         mZip = zip;
-        mKeepEnc = enc;
-        mKeepVerity = verity;
     }
 
-    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity, Uri boot) {
-        this(context, console, logs, zip, enc, verity);
+    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, Uri boot) {
+        this(context, console, logs, zip);
         mBootImg = boot;
         mode = PATCH_MODE;
     }
 
-    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, boolean enc, boolean verity, String boot) {
-        this(context, console, logs, zip, enc, verity);
+    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, String boot) {
+        this(context, console, logs, zip);
         mBootLocation = boot;
         mode = DIRECT_MODE;
     }
@@ -190,7 +187,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     "cd " + install,
                     Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b HIGHCOMP=%b " +
                                     "sh update-binary indep boot_patch.sh %s || echo 'Failed!'",
-                            mKeepEnc, mKeepVerity, highCompression, boot));
+                            mm.keepEnc, mm.keepVerity, highCompression, boot));
 
             if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;
@@ -250,7 +247,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             Utils.fmt("cp -af %s/* %s; rm -rf %s", install, binPath, install),
                             Utils.fmt("flash_boot_image %s %s", patched_boot, mBootLocation),
                             mm.remoteMagiskVersionCode >= 1464 ? "[ -L /data/magisk.img ] || cp /data/magisk.img /data/adb/magisk.img" : "",
-                            "patch_dtbo_image");
+                            mm.keepVerity ? "" : "patch_dtbo_image");
                     break;
                 default:
                     return false;

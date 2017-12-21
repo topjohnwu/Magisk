@@ -21,7 +21,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Paramètres avancés</string>
     <string name="keep_force_encryption">Garder le chiffrement forcé</string>
-    <string name="keep_dm_verity">Garder dm-verity</string>
+    <string name="keep_dm_verity">Garder AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Version installée : %1$s</string>
     <string name="install_magisk_title">Dernière Magisk : %1$s</string>
     <string name="uninstall">Désinstaller</string>

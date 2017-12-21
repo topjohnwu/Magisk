@@ -96,7 +96,7 @@ public class ShowUI {
         notificationManager.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
     }
 
-    public static void magiskInstallDialog(Activity activity, boolean enc, boolean verity) {
+    public static void magiskInstallDialog(Activity activity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
         String filename = Utils.fmt("Magisk-v%s.zip", mm.remoteMagiskVersionString);
         new AlertDialogBuilder(activity)
@@ -145,8 +145,6 @@ public class ShowUI {
                                                             intent.setData(uri)
                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                                 .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
-                                                                .putExtra(Const.Key.FLASH_SET_ENC, enc)
-                                                                .putExtra(Const.Key.FLASH_SET_VERITY, verity)
                                                                 .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
                                                             mm.startActivity(intent);
                                                         }
@@ -175,8 +173,6 @@ public class ShowUI {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                 .putExtra(Const.Key.FLASH_SET_BOOT, boot)
-                                                .putExtra(Const.Key.FLASH_SET_ENC, enc)
-                                                .putExtra(Const.Key.FLASH_SET_VERITY, verity)
                                                 .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                                             activity.startActivity(intent);
                                         }
@@ -203,8 +199,6 @@ public class ShowUI {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                     .putExtra(Const.Key.FLASH_SET_BOOT, boot)
-                                                    .putExtra(Const.Key.FLASH_SET_ENC, enc)
-                                                    .putExtra(Const.Key.FLASH_SET_VERITY, verity)
                                                     .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                                             activity.startActivity(intent);
                                         }

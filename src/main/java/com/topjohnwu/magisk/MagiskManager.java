@@ -50,8 +50,8 @@ public class MagiskManager extends Application {
     public String managerLink;
     public String bootBlock = null;
     public int snetVersion;
-    public boolean keepVerity;
-    public boolean keepEnc;
+    public boolean keepVerity = false;
+    public boolean keepEnc = false;
 
     // Data
     public Map<String, Module> moduleMap;
@@ -186,22 +186,33 @@ public class MagiskManager extends Application {
             magiskHide = true;
         }
 
+        ret = Shell.su("echo \"$BOOTIMAGE\"");
+        if (Utils.isValidShellResponse(ret))
+            bootBlock = ret.get(0);
+
+        ret = Shell.su("echo \"$DTBOIMAGE\"");
+        if (Utils.isValidShellResponse(ret))
+            keepVerity = true;
+
         ret = Shell.su(
                 "getvar KEEPVERITY",
                 "echo $KEEPVERITY");
         try {
-            keepVerity = Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
-        } catch (NumberFormatException e) {
-            keepVerity = false;
-        }
+            if (Utils.isValidShellResponse(ret))
+                keepVerity = Boolean.parseBoolean(ret.get(0));
+        } catch (NumberFormatException ignored) {}
+
+        ret = Shell.sh("getprop ro.crypto.state");
+        if (Utils.isValidShellResponse(ret) && ret.get(0).equals("encrypted"))
+            keepEnc = true;
+
         ret = Shell.su(
                 "getvar KEEPFORCEENCRYPT",
                 "echo $KEEPFORCEENCRYPT");
         try {
-            keepEnc = Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
-        } catch (NumberFormatException e) {
-            keepEnc = false;
-        }
+            if (Utils.isValidShellResponse(ret))
+                keepEnc = Boolean.parseBoolean(ret.get(0));
+        } catch (NumberFormatException ignored) {}
 
         if (suDB != null && !SuDatabaseHelper.verified) {
             suDB.close();

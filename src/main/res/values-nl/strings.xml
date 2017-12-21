@@ -25,7 +25,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Geavanceerde instellingen</string>
     <string name="keep_force_encryption">Behoud afgedwongen versleuteling</string>
-    <string name="keep_dm_verity">Behoud dm-verity</string>
+    <string name="keep_dm_verity">Behoud AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Geïnstalleerde versie: %1$s</string>
     <string name="install_magisk_title">Recentste versie: %1$s</string>
     <string name="uninstall">Deïnstalleren</string>

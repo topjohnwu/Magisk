@@ -94,6 +94,7 @@ public class Shell {
                         "export PATH=" + bbpath + ":$PATH",
                         "mount_partitions",
                         "find_boot_image",
+                        "find_dtbo_image",
                         "migrate_boot_backup");
             }
         }

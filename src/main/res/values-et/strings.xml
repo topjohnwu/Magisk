@@ -26,7 +26,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Täpsemad seaded</string>
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
-    <string name="keep_dm_verity">Säilita dm-verity</string>
+    <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Installitud versioon: %1$s</string>
     <string name="install_magisk_title">Viimane versioon: %1$s</string>
     <string name="uninstall">Eemalda</string>

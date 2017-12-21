@@ -25,7 +25,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Pengaturan Lanjutan</string>
     <string name="keep_force_encryption">Biarkan enkripsi paksa</string>
-    <string name="keep_dm_verity">Biarkan dm-verity</string>
+    <string name="keep_dm_verity">Biarkan AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Versi yang Terpasang: %1$s</string>
     <string name="install_magisk_title">Versi Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>

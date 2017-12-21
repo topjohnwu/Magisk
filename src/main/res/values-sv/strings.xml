@@ -24,7 +24,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Advancerade inställningar</string>
     <string name="keep_force_encryption">Fortsätt tvinga kryptering</string>
-    <string name="keep_dm_verity">Behåll dm-verity</string>
+    <string name="keep_dm_verity">Behåll AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Installerad: %1$s</string>
     <string name="install_magisk_title">Senaste: %1$s</string>
     <string name="uninstall">Avinstallera</string>

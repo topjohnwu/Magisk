@@ -25,7 +25,7 @@
     <!--Install Fragment-->
     <string name="advanced_settings_title">Расширенные настройки</string>
     <string name="keep_force_encryption">Оставить шифрование</string>
-    <string name="keep_dm_verity">Оставить dm-verity</string>
+    <string name="keep_dm_verity">Оставить AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Установлена версия: %1$s</string>
     <string name="install_magisk_title">Последняя версия: %1$s</string>
     <string name="uninstall">Удаление</string>
