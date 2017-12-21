@@ -50,6 +50,8 @@ static char *loopsetup(const char *img) {
 }
 
 int create_img(const char *img, int size) {
+	if (size == 128)  /* WTF...? */
+		size = 132;
 	unlink(img);
 	LOGI("Create %s with size %dM\n", img, size);
 	int ret;
