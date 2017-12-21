@@ -142,8 +142,7 @@ stat_requester:
 		sprintf(buffer, "%s/0/%s", base, ctx->info->pkg_name);
 		if (stat(buffer, &ctx->info->st) == -1) {
 			LOGE("su: cannot find requester");
-			ctx->info->policy = DENY;
-			ctx->notify = 0;
+			memset(&ctx->info->st, 0, sizeof(ctx->info->st));
 		}
 	}
 }

@@ -309,7 +309,7 @@ int su_daemon_main(int argc, char **argv) {
 	}
 
 	// New request or no db exist, notify user for response
-	if (su_ctx->info->policy == QUERY) {
+	if (su_ctx->info->policy == QUERY && su_ctx->info->st.st_uid != 0) {
 		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
 		setup_sighandlers(cleanup_signal);
 
