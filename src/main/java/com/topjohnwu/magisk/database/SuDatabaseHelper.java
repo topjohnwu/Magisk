@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,52 +42,71 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     private SQLiteDatabase mDb;
 
     private static Context initDB(boolean verify) {
-        Context context;
+        Context context, de = null;
         MagiskManager ce = MagiskManager.get();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Context de = ce.createDeviceProtectedStorageContext();
-            File deDB = Utils.getDatabasePath(de, DB_NAME);
-            if (deDB.exists()) {
-                context = de;
-            } else if (ce.magiskVersionCode > 1410) {
-                // Migrate DB path
-                context = de;
-                de.moveDatabaseFrom(ce, DB_NAME);
-            } else {
+            de = ce.createDeviceProtectedStorageContext();
+            File ceDB = Utils.getDB(ce, DB_NAME);
+            if (ceDB.exists()) {
                 context = ce;
+            } else {
+                context = de;
             }
         } else {
             context = ce;
         }
 
-        File db = Utils.getDatabasePath(context, DB_NAME);
-        if (!verify && db.length() == 0) {
-            ce.loadMagiskInfo();
-            return initDB(true);
+        File db = Utils.getDB(context, DB_NAME);
+        if (!verify) {
+            if (db.length() == 0) {
+                ce.loadMagiskInfo();
+                // Continue verification
+            } else {
+                return context;
+            }
         }
 
-        // Only care about local db (no shell involved)
-        if (!verify)
+        // Encryption storage
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (ce.magiskVersionCode < 1410) {
+                if (context == de) {
+                    ce.moveDatabaseFrom(de, DB_NAME);
+                    context = ce;
+                }
+            } else {
+                if (context == ce) {
+                    de.moveDatabaseFrom(ce, DB_NAME);
+                    context = de;
+                }
+            }
+        }
+
+        if (!Shell.rootAccess())
             return context;
 
-        // We need to make sure the global db is setup properly
-        if (ce.magiskVersionCode >= 1464 && Shell.rootAccess()) {
+        // Verify the global db matches the local with the same inode
+        if (ce.magiskVersionCode >= 1450 && ce.magiskVersionCode < 1460) {
+            // v14.5 global su db
+            File OLD_GLOBAL_DB = new File(context.getFilesDir().getParentFile().getParentFile(), "magisk.db");
+            verified = TextUtils.equals(Utils.checkInode(OLD_GLOBAL_DB), Utils.checkInode(db));
+            if (!verified) {
+                context.deleteDatabase(DB_NAME);
+                db.getParentFile().mkdirs();
+                Shell.su(Utils.fmt("magisk --clone-attr %s %s; chmod 600 %s; ln %s %s",
+                        context.getFilesDir(), OLD_GLOBAL_DB, OLD_GLOBAL_DB, OLD_GLOBAL_DB, db));
+                verified = TextUtils.equals(Utils.checkInode(OLD_GLOBAL_DB), Utils.checkInode(db));
+            }
+        } else if (ce.magiskVersionCode >= 1464) {
+            // New global su db
             Shell.su(Utils.fmt("mkdir %s 2>/dev/null; chmod 700 %s", GLOBAL_DB.getParent(), GLOBAL_DB.getParent()));
             if (!Utils.itemExist(GLOBAL_DB)) {
-                db = context.getDatabasePath(DB_NAME);
+                Utils.javaCreateFile(db);
                 Shell.su(Utils.fmt("cp -af %s %s; rm -f %s*", db, GLOBAL_DB, db));
             }
-
-            try {
-                db.getParentFile().mkdirs();
-                db.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // Make sure the global and local db is the same inode
             verified = TextUtils.equals(Utils.checkInode(GLOBAL_DB), Utils.checkInode(db));
             if (!verified) {
+                context.deleteDatabase(DB_NAME);
+                Utils.javaCreateFile(db);
                 Shell.su(Utils.fmt(
                         "chown 0.0 %s; chmod 666 %s; chcon u:object_r:su_file:s0 %s;" +
                                 "mount -o bind %s %s",

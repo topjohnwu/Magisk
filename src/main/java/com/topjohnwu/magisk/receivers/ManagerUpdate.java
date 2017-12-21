@@ -8,7 +8,6 @@ import android.os.Build;
 import android.support.v4.content.FileProvider;
 
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.File;
@@ -21,30 +20,22 @@ public class ManagerUpdate extends BroadcastReceiver {
                 new DownloadReceiver() {
                     @Override
                     public void onDownloadDone(Uri uri) {
-                        if (Shell.rootAccess()) {
-                            Shell.su(Utils.fmt("pm install -r %s", mFile));
-                            if (!context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-                                Utils.dumpPrefs();
-                                Shell.su(Utils.fmt("rm -rf /data/user*/*/%s/*", Const.ORIG_PKG_NAME));
-                                Intent intent = context.getPackageManager().getLaunchIntentForPackage(Const.ORIG_PKG_NAME);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(intent);
-                            }
+                        if (!context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
+                            Utils.dumpPrefs();
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
+                            install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            Uri content = FileProvider.getUriForFile(context,
+                                    context.getPackageName() + ".provider", new File(uri.getPath()));
+                            install.setData(content);
+                            context.startActivity(install);
                         } else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);
-                                install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                Uri content = FileProvider.getUriForFile(context,
-                                        context.getPackageName() + ".provider", new File(uri.getPath()));
-                                install.setData(content);
-                                context.startActivity(install);
-                            } else {
-                                Intent install = new Intent(Intent.ACTION_VIEW);
-                                install.setDataAndType(uri, "application/vnd.android.package-archive");
-                                install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(install);
-                            }
+                            Intent install = new Intent(Intent.ACTION_VIEW);
+                            install.setDataAndType(uri, "application/vnd.android.package-archive");
+                            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(install);
                         }
                     }
                 },

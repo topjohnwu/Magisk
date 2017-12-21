@@ -54,6 +54,17 @@ public class Utils {
         Shell.su_raw(fmt("mkdir -p `dirname '%s'` 2>/dev/null; touch '%s' 2>/dev/null", path, path));
     }
 
+    public static boolean javaCreateFile(File path) {
+        path.getParentFile().mkdirs();
+        try {
+            path.createNewFile();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static void removeItem(Object path) {
         Shell.su_raw(fmt("rm -rf %s 2>/dev/null", path));
     }
@@ -64,7 +75,7 @@ public class Utils {
 
     public static String checkInode(Object path) {
         List<String> ret = Shell.su(fmt("ls -i %s", path));
-        return isValidShellResponse(ret) ? ret.get(0).trim().split("\\s+")[0] : null;
+        return isValidShellResponse(ret) ? ret.get(0).trim().split("\\s+")[0] : path.toString();
     }
 
     public static void uninstallPkg(String pkg) {
@@ -215,11 +226,11 @@ public class Utils {
         }
     }
 
-    public static File getDatabasePath(String dbName) {
-        return getDatabasePath(MagiskManager.get(), dbName);
+    public static File getDB(String dbName) {
+        return getDB(MagiskManager.get(), dbName);
     }
 
-    public static File getDatabasePath(Context context, String dbName) {
+    public static File getDB(Context context, String dbName) {
         return new File(context.getFilesDir().getParent() + "/databases", dbName);
     }
 
@@ -263,7 +274,9 @@ public class Utils {
 
     public static void dumpPrefs() {
         Gson gson = new Gson();
-        String json = gson.toJson(MagiskManager.get().prefs.getAll(), new TypeToken<Map<String, ?>>(){}.getType());
+        Map<String, ?> prefs = MagiskManager.get().prefs.getAll();
+        prefs.remove("App Restrictions");
+        String json = gson.toJson(prefs, new TypeToken<Map<String, ?>>(){}.getType());
         Shell.su(fmt("for usr in /data/user/*; do echo '%s' > ${usr}/%s; done", json, Const.MANAGER_CONFIGS));
     }
 

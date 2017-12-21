@@ -20,8 +20,6 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.List;
-
 public class SplashActivity extends Activity {
 
     @Override
