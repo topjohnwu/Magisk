@@ -113,6 +113,13 @@ $BOOTMODE || recovery_actions
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found boot image: $BOOTIMAGE"
 
+find_dtbo_image
+if [ ! -z $DTBOIMAGE ]; then
+  ui_print "- Found dtbo image: $DTBOIMAGE"
+  # Disable dtbo patch by default
+  [ -z $KEEPVERITY ] && KEEPVERITY=true
+fi
+
 eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
 $BOOTSIGNED && ui_print "- Signed boot image detected"
 

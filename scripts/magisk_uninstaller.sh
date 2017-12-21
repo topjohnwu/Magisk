@@ -74,11 +74,11 @@ ui_print "- Checking ramdisk status"
 ./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
-    ui_print "- Stock boot image detected!"
+    ui_print "- Stock boot image detected"
     abort "! Magisk is not installed!"
     ;;
   1 )  # Magisk patched
-    ui_print "- Magisk patched image detected!"
+    ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     OK=false
@@ -94,7 +94,7 @@ case $? in
     fi
     ;;
   2 ) # Other patched
-    ui_print "! Boot image patched by other programs!"
+    ui_print "! Boot image patched by other programs"
     abort "! Cannot uninstall"
     ;;
 esac

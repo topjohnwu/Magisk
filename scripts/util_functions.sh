@@ -133,6 +133,7 @@ migrate_boot_backup() {
     $MAGISKBIN/magiskboot --compress $STOCKDUMP
   fi
   mv /data/magisk/stock_boot* /data 2>/dev/null
+  mv /data/magisk/adb/stock_boot* /data 2>/dev/null
 }
 
 flash_boot_image() {
@@ -161,9 +162,7 @@ find_dtbo_image() {
 }
 
 patch_dtbo_image() {
-  find_dtbo_image
   if [ ! -z $DTBOIMAGE ]; then
-    ui_print "- Found dtbo image: $DTBOIMAGE"
     if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
       ui_print "- Backing up stock dtbo image"
       $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz

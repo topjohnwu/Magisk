@@ -63,8 +63,16 @@ BOOTIMAGE="$1"
 
 # Presets
 [ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $HIGHCOMP ] && HIGHCOMP=false
+
+if [ -z $KEEPFORCEENCRYPT ]; then
+  if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
+    KEEPFORCEENCRYPT=true
+    ui_print "- Encrypted data detected"
+  else
+    KEEPFORCEENCRYPT=false
+  fi
+fi
 
 chmod -R 755 .
 
@@ -113,7 +121,7 @@ ui_print "- Checking ramdisk status"
 ./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
-    ui_print "- Stock boot image detected!"
+    ui_print "- Stock boot image detected"
     ui_print "- Backing up stock boot image"
     SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
@@ -121,14 +129,14 @@ case $? in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
-    ui_print "- Magisk patched image detected!"
+    ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot --cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   2 ) # Other patched
-    ui_print "! Boot image patched by other programs!"
+    ui_print "! Boot image patched by other programs"
     abort "! Please restore stock boot image"
     ;;
 esac
