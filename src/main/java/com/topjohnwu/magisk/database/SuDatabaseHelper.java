@@ -222,11 +222,11 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 "(key TEXT, value INT, PRIMARY KEY(key))");
     }
 
-    private void cleanup() {
+    public void cleanup() {
         // Clear outdated policies
-        mDb.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < ?", System.currentTimeMillis() / 1000), null);
+        mDb.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < %d", System.currentTimeMillis() / 1000), null);
         // Clear outdated logs
-        mDb.delete(LOG_TABLE, Utils.fmt("time < ?", System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000), null);
+        mDb.delete(LOG_TABLE, Utils.fmt("time < %d", System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000), null);
     }
 
     public void deletePolicy(Policy policy) {
