@@ -11,9 +11,9 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk niet geïnstalleerd</string>
-
     <string name="checking_for_updates">Controleren op updates…</string>
     <string name="magisk_update_available">Magisk v%1$s beschikbaar!</string>
+    <string name="invalid_update_channel">Ongeldig bijwerkkanaal</string>
     <string name="safetyNet_check_text">Tik om SafetyNet controle te starten</string>
     <string name="checking_safetyNet_status">SafetyNet status controleren…</string>
     <string name="safetyNet_check_success">SafetyNet controle succesvol</string>
@@ -42,6 +42,9 @@
     <string name="disable_file_created">Module wordt uitgeschakeld bij volgende herstart</string>
     <string name="disable_file_removed">Module wordt ingeschakeld bij volgende herstart</string>
     <string name="author">Gemaakt door %1$s</string>
+    <string name="reboot_recovery">Herstart naar Recovery</string>
+    <string name="reboot_bootloader">Herstart naar Bootloader</string>
+    <string name="reboot_download">Herstart naar Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Update beschikbaar</string>
@@ -91,11 +94,13 @@
     <string name="zip_process_msg">Zip-bestand verwerken…</string>
     <string name="manager_update_title">Nieuwe Magisk Manager update beschikbaar!</string>
     <string name="manager_download_install">Tik om te downloaden en installeren</string>
+    <string name="dtbo_patched_title">DTBO is gepatched!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager heeft dtbo.img gepatched, herstarten a.u.b.</string>
     <string name="magisk_updates">Magisk updates</string>
     <string name="flashing">Flashen</string>
     <string name="hide_manager_toast">Magisk Manager verbergen…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
     <string name="hide_manager_toast2">Dit kan even duren…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>
     <string name="direct_install">Direct installeren (aangeraden)</string>
@@ -104,11 +109,14 @@
     <string name="no_boot_file_patch_support">Magisk versie ondersteund geen boot image-bestand patchen</string>
     <string name="boot_file_patch_msg">Kies originele boot image-dump in .img- of .img.tar-formaat</string>
     <string name="complete_uninstall">Compleet deïnstalleren</string>
+    <string name="restore_img">Images herstellen</string>
+    <string name="uninstall_app">App deïnstalleren</string>
     <string name="restore_done">Herstel voltooid!</string>
     <string name="restore_fail">Originele back-up bestaat niet!</string>
     <string name="uninstall_toast">Magisk Manager wordt over 5 seconden verwijderd, hierna handmatig herstarten aub</string>
     <string name="proprietary_title">Google\'s code downloaden</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, dus bevat geen SafetyNet API code van Google.\n\nSta je Magisk Manager toe om een extensie te downloaden (bevat GoogleApiClient) voor SafetyNet controles?</string>
+    <string name="su_db_corrupt">SU database is corrupt, nieuwe db maken…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Algemeen</string>
@@ -126,6 +134,8 @@
     <string name="settings_update_channel_title">Update-kanaal</string>
     <string name="settings_update_stable">Stabiel</string>
     <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Aangepast</string>
+    <string name="settings_update_custom_msg">Aangepaste URL invoeren</string>
     <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
     <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
     <string name="settings_core_only_title">Magisk basismodus</string>
@@ -166,6 +176,7 @@
     <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
     <string name="requester_summary">Rootsessies verkrijgen de verzoeker\'s naamruimte</string>
     <string name="isolate_summary">Iedere rootsessie heeft een eigen geïsoleerde naamruimte</string>
+    <string name="android_o_not_support">Ondersteunt geen Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
