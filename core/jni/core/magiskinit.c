@@ -220,6 +220,8 @@ static int compile_cil() {
 
 	cil_db_init(&db);
 	cil_set_mls(db, 1);
+	cil_set_multiple_decls(db, 1);
+	cil_set_disable_neverallow(db, 1);
 	cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
 	cil_set_policy_version(db, POLICYDB_VERSION_XPERMS_IOCTL);
 	cil_set_attrs_expand_generated(db, 0);
