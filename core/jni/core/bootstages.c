@@ -394,6 +394,10 @@ static void simple_mount(const char *path) {
 
 static int prepare_img() {
 	// First merge images
+	if (merge_img("/cache/magisk.img", MAINIMG)) {
+		LOGE("Image merge /cache/magisk.img -> " MAINIMG " failed!\n");
+		return 1;
+	}
 	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
 		LOGE("Image merge /data/magisk_merge.img -> " MAINIMG " failed!\n");
 		return 1;
