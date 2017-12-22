@@ -82,8 +82,6 @@ static void *logger_thread(void *args) {
 }
 
 static void *magisk_log_thread(void *args) {
-	int have_data = 0;
-
 	// Buffer logs before we have data access
 	struct vector logs;
 	vec_init(&logs);
@@ -97,10 +95,12 @@ static void *magisk_log_thread(void *args) {
 
 	LOGD("log_monitor: magisk log dumper start");
 
-	FILE *log;
+	FILE *log = NULL;
 	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
-		if (!have_data) {
-			if ((have_data = check_data())) {
+		if (!is_daemon_init) {
+			vec_push_back(&logs, strdup(line));
+		} else {
+			if (log == NULL) {
 				// Dump buffered logs to file
 				log = xfopen(LOGFILE, "w");
 				setbuf(log, NULL);
@@ -110,12 +110,9 @@ static void *magisk_log_thread(void *args) {
 					free(tmp);
 				}
 				vec_destroy(&logs);
-			} else {
-				vec_push_back(&logs, strdup(line));
 			}
-		}
-		if (have_data)
 			fprintf(log, "%s", line);
+		}
 	}
 	return NULL;
 }

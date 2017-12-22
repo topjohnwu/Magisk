@@ -497,7 +497,7 @@ void post_fs_data(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
-	if (!check_data())
+	if (!is_daemon_init && !check_data())
 		goto unblock;
 
 	// Start the debug log

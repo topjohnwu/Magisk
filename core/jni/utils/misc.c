@@ -20,6 +20,7 @@
 
 #include "logging.h"
 #include "utils.h"
+#include "resetprop.h"
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -46,18 +47,22 @@ unsigned get_radio_uid() {
 }
 
 int check_data() {
-	int ret = 0;
-	char buffer[4096];
-	FILE *fp = xfopen("/proc/mounts", "r");
-	while (fgets(buffer, sizeof(buffer), fp)) {
-		if (strstr(buffer, " /data ")) {
-			if (strstr(buffer, "tmpfs") == NULL)
-				ret = 1;
+	struct vector v;
+	vec_init(&v);
+	file_to_vector("/proc/mounts", &v);
+	char *line, *crypto;
+	int mnt = 0;
+	vec_for_each(&v, line) {
+		if (strstr(line, " /data ")) {
+			if (strstr(line, "tmpfs") == NULL)
+				mnt = 1;
 			break;
 		}
 	}
-	fclose(fp);
-	return ret;
+	vec_deep_destroy(&v);
+	// /data is mounted and not tmpfs and data is unencrypted or vold is started
+	return mnt && (((crypto = getprop("ro.crypto.state")) && strcmp(crypto, "unencrypted") == 0)
+		   || getprop("init.svc.vold"));
 }
 
 /* All the string should be freed manually!! */
