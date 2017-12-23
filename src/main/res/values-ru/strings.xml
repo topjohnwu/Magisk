@@ -1,11 +1,14 @@
 <resources>
     <!--Universal-->
 
+
+
     <!--Welcome Activity-->
+    
     <string name="modules">Модули</string>
-    <string name="downloads">Загрузки</string>
+    <string name="downloads">Репозиторий</string>
     <string name="superuser">Суперпользователь</string>
-    <string name="log">Журнал</string>
+    <string name="log">Логи</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
 
@@ -16,7 +19,7 @@
     <string name="invalid_update_channel">Неверный канал обновлений</string>
     <string name="safetyNet_check_text">Проверить статус SafetyNet</string>
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
-    <string name="safetyNet_check_success">Проверка SafetyNet пройдена</string>
+    <string name="safetyNet_check_success">Результат проверки SafetyNet</string>
     <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
     <string name="safetyNet_network_loss">Нет подключения к сети</string>
     <string name="safetyNet_service_disconnected">Служба была остановлена</string>
@@ -24,24 +27,27 @@
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Расширенные настройки</string>
-    <string name="keep_force_encryption">Оставить шифрование</string>
-    <string name="keep_dm_verity">Оставить AVB 2.0/dm-verity</string>
+    <string name="keep_force_encryption">Сохранить шифрование</string>
+    <string name="keep_dm_verity">Сохранить AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Установлена версия: %1$s</string>
     <string name="install_magisk_title">Последняя версия: %1$s</string>
     <string name="uninstall">Удаление</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены/удалены. Root-права будут удалены. Данные будут зашифрованы.</string>
     <string name="update">Обновить %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Нет информации)</string>
-    <string name="no_modules_found">Модули не обнаружены</string>
+    <string name="no_modules_found">Модули не найдены</string>
     <string name="update_file_created">Модуль будет обновлен после перезагрузки</string>
     <string name="remove_file_created">Модуль будет удален после перезагрузки</string>
     <string name="remove_file_deleted">Модуль не будет удален после перезагрузки</string>
     <string name="disable_file_created">Модуль будет отключен после перезагрузки</string>
     <string name="disable_file_removed">Модуль будет активирован после перезагрузки</string>
     <string name="author">Разработчик: %1$s</string>
+    <string name="reboot_recovery">Перезагрузка в Recovery</string>
+    <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
+    <string name="reboot_download">Перезагрузка в Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступно обновление</string>
@@ -49,12 +55,12 @@
     <string name="not_installed">Не установлены</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveLog">Сохранить логи</string>
+    <string name="menuSaveLog">Сохранить лог</string>
     <string name="menuReload">Обновить</string>
-    <string name="menuClearLog">Очистить логи</string>
-    <string name="logs_cleared">История успешно очищена</string>
-    <string name="log_is_empty">Журнал пуст</string>
-    <string name="logs_save_failed">Не удалось сохранить лог-файл в SD Card:</string>
+    <string name="menuClearLog">Очистить лог</string>
+    <string name="logs_cleared">Лог успешно очищен</string>
+    <string name="log_is_empty">Лог пуст</string>
+    <string name="logs_save_failed">Не удалось сохранить лог в SD Card:</string>
 
     <!--About Activity-->
     <string name="about">О приложении</string>
@@ -67,7 +73,7 @@
     <string name="support_thread">Страница поддержки</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Данная функция не будет работать без разрешения на запись во внешнее хранилище</string>
+    <string name="permissionNotGranted">Требуется разрешение на запись во внешнее хранилище.</string>
     <string name="no_thanks">Нет</string>
     <string name="yes">Да</string>
     <string name="ok">OK</string>
@@ -106,10 +112,12 @@
     <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
     <string name="boot_file_patch_msg">Выберите файл ядра (boot), .img либо .img.tar формата</string>
     <string name="complete_uninstall">Удалить</string>
+    <string name="restore_img">Восстановить образы</string>
+    <string name="uninstall_app">Удалить приложение</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="uninstall_toast">Удаление Magisk Manager в течении 5 секунд. Выполните перезагрузку.</string>
-    <string name="proprietary_title">Загрузка собственного кода</string>
+    <string name="proprietary_title">Загрузка SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
     <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>
 
@@ -126,10 +134,10 @@
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (системный)</string>
     <string name="settings_update">Настройки обновления</string>
-    <string name="settings_update_channel_title">Источник обновления</string>
-    <string name="settings_update_stable">Стабильный релиз</string>
-    <string name="settings_update_beta">Beta релиз</string>
-    <string name="settings_update_custom">Неофициальная сборка</string>
+    <string name="settings_update_channel_title">Источник обновлений</string>
+    <string name="settings_update_stable">Стабильный канал</string>
+    <string name="settings_update_beta">Beta канал</string>
+    <string name="settings_update_custom">Сторонний канал</string>
     <string name="settings_update_custom_msg">Вставьте ссылку</string>
     <string name="settings_boot_format_title">Формат образа ядра</string>
     <string name="settings_boot_format_summary">Выберите формат патченого образа ядра.\n.img - для прошивки через fastboot/download режим.\n.img.tar - для прошивки через ODIN.</string>
@@ -148,18 +156,18 @@
     <string name="settings_su_request_30">30 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
     <string name="superuser_access">Уровень доступа</string>
-    <string name="auto_response">Автоответ</string>
+    <string name="auto_response">Автоматический ответ</string>
     <string name="request_timeout">Период запроса</string>
-    <string name="superuser_notification">Уведомление суперпользователя</string>
-    <string name="request_timeout_summary">%1$s сек.</string>
-    <string name="settings_su_reauth_title">Реаутентификация после обновления</string>
-    <string name="settings_su_reauth_summary">Перевыдача прав суперпользователя после обновлений приложения</string>
+    <string name="superuser_notification">Уведомление Суперпользователя</string>
+    <string name="request_timeout_summary">%1$s секунд</string>
+    <string name="settings_su_reauth_title">Повторная аутентификация</string>
+    <string name="settings_su_reauth_summary">Повторный запрос прав Суперпользователя после обновления приложения</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
     <string name="settings_owner_manage">Регулировка владельцем</string>
     <string name="settings_user_independent">Независимый пользователь</string>
-    <string name="owner_only_summary">Только владелец имеет root-доступ</string>
+    <string name="owner_only_summary">Только владелец имеет Root-доступ</string>
     <string name="owner_manage_summary">Только владелец может управлять root-доступом и обрабатывать запросы на предоставление</string>
     <string name="user_indepenent_summary">Каждый пользователь имеет свои собственные правила root-доступа</string>
     <string name="multiuser_hint_owner_request">Запрос был отправлен владельцу устройства. Пожалуйста, переключитесь на профиль владельца и предоставьте разрешение</string>
@@ -171,7 +179,8 @@
     <string name="global_summary">Все сеансы Суперпользователя используют глобальное пространство имён</string>
     <string name="requester_summary">Сессии Суперпользователя наследуют пространство имен запрашивающего</string>
     <string name="isolate_summary">Каждая сессия Суперпользователя будет иметь собственное изолированное пространство имен</string>
-
+    <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
+    
     <!--Superuser-->
     <string name="su_request_title">Запрос прав Суперпользователя</string>
     <string name="deny_with_str">Отказать %1$s</string>
@@ -202,7 +211,7 @@
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
-    <string name="target_uid">Целевой UID:\u0020</string>
+    <string name="target_uid">UID:\u0020</string>
     <string name="command">Команда:\u0020</string>
 
 </resources>
