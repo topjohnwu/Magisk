@@ -11,7 +11,6 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk pole installitud</string>
-    
     <string name="checking_for_updates">Kontrollin uuendusi...</string>
     <string name="magisk_update_available">Magisk v%1$s on saadaval!</string>
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
@@ -43,6 +42,9 @@
     <string name="disable_file_created">Moodul keelatakse järgmisel taaskäivitusel</string>
     <string name="disable_file_removed">Moodul lubatakse järgmisel taaskäivitusel</string>
     <string name="author">Loodud %1$s poolt</string>
+    <string name="reboot_recovery">Taaskäivita taastusesse</string>
+    <string name="reboot_bootloader">Taaskäivita käivitushaldurisse</string>
+    <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Uuendus saadaval</string>
@@ -107,6 +109,8 @@
     <string name="no_boot_file_patch_support">Magisk\'i sihtversioon ei toeta käivituspildi faili paikamist</string>
     <string name="boot_file_patch_msg">Vali originaalne käivituspildi väljastus .img või .img.tar vormingus</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
+    <string name="restore_img">Taasta pildid</string>
+    <string name="uninstall_app">Desinstalli rakendus</string>
     <string name="restore_done">Taastus valmis!</string>
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="uninstall_toast">Eemaldan Magisk Manager\'i 5 sekundi pärast, palun tee peale seda käsitsi taaskäivitus</string>
@@ -173,6 +177,7 @@
     <string name="global_summary">Kõik juurkasutaja sessioonid kasutavad globaalset monteerimise nimeruumi</string>
     <string name="requester_summary">Juurkasutaja sessioonid võtavad üle selle taotleja nimeruumi</string>
     <string name="isolate_summary">Iga juurkasutaja sessioon saab oma isoleeritud nimeruumi</string>
+    <string name="android_o_not_support">Pole toetatud Androidi versioonis 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superkasutaja taotlus</string>
@@ -187,18 +192,18 @@
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">%1$s anti superkasutaja õigused</string>
-    <string name="su_deny_toast">%1$s keelati superkasutaja õigused</string>
+    <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
+    <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
     <string name="no_apps_found">Rakendusi ei leitud</string>
-    <string name="su_snack_grant">%1$s superkasutaja õigused on antud</string>
-    <string name="su_snack_deny">%1$s superkasutaja õigused on keelatud</string>
-    <string name="su_snack_notif_on">%1$s teated on lubatud</string>
-    <string name="su_snack_notif_off">%1$s teated on keelatud</string>
-    <string name="su_snack_log_on">%1$s logimine on lubatud</string>
-    <string name="su_snack_log_off">%1$s logimine on keelatud</string>
-    <string name="su_snack_revoke">%1$s õigused on eemaldatud</string>
+    <string name="su_snack_grant">Rakenduse %1$s superkasutaja õigused on antud</string>
+    <string name="su_snack_deny">Rakenduse %1$s superkasutaja õigused on keelatud</string>
+    <string name="su_snack_notif_on">Rakenduse %1$s teated on lubatud</string>
+    <string name="su_snack_notif_off">Rakenduse %1$s teated on keelatud</string>
+    <string name="su_snack_log_on">Rakenduse %1$s logimine on lubatud</string>
+    <string name="su_snack_log_off">Rakenduse %1$s logimine on keelatud</string>
+    <string name="su_snack_revoke">Rakenduse %1$s õigused on eemaldatud</string>
     <string name="su_revoke_title">Eemaldad?</string>
-    <string name="su_revoke_msg">Kinnitad %1$s õiguste eemaldamise?</string>
+    <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
     <string name="toast">Hüpik</string>
     <string name="none">Puudub</string>
 
