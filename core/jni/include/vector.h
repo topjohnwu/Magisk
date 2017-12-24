@@ -29,7 +29,7 @@ struct vector *vec_dup(struct vector *v);
 	for (int _ = 0; v && _ < (v)->size; ++_, e = (v)->data[_])
 
 #define vec_for_each_r(v, e) \
-	e = v ? (v)->data[(v)->size - 1] : NULL; \
+	e = (v && (v)->size > 0) ? (v)->data[(v)->size - 1] : NULL; \
 	for (int _ = ((int) (v)->size) - 1; v && _ >= 0; --_, e = (v)->data[_])
 
 #define vec_cur(v) vec_entry(v)[_]

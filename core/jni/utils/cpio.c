@@ -57,9 +57,9 @@ void cpio_vec_insert(struct vector *v, cpio_entry *n) {
 
 // Parse cpio file to a vector of cpio_entry
 void parse_cpio(struct vector *v, const char *filename) {
-	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0) return;
+	fprintf(stderr, "Loading cpio: [%s]\n", filename);
 	cpio_newc_header header;
 	cpio_entry *f;
 	while(xxread(fd, &header, 110) != -1) {

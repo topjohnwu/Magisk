@@ -49,7 +49,7 @@ static void dtb_dump(const char *file) {
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(dtb + i, DTB_MAGIC, 4) == 0) {
 			fdt = dtb + i;
-			fprintf(stderr, "Dumping dtb.%04d\n\n", dtb_num++);
+			fprintf(stderr, "Dumping dtb.%04d\n", dtb_num++);
 			print_subnode(fdt, 0, 0);
 		}
 	}
@@ -61,7 +61,7 @@ static void dtb_dump(const char *file) {
 static void dtb_patch(const char *file, int patch) {
 	size_t size ;
 	void *dtb, *fdt;
-	fprintf(stderr, "Loading dtbs from [%s]\n\n", file);
+	fprintf(stderr, "Loading dtbs from [%s]\n", file);
 	if (patch)
 		mmap_rw(file, &dtb, &size);
 	else
@@ -84,7 +84,6 @@ static void dtb_patch(const char *file, int patch) {
 			}
 		}
 	}
-	fprintf(stderr, "\n");
 	munmap(dtb, size);
 	exit(!found);
 }
