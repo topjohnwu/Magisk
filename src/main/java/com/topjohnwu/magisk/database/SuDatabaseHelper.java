@@ -41,6 +41,10 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
     private PackageManager pm;
     private SQLiteDatabase mDb;
 
+    private static void unmntDB() {
+        Shell.su(Utils.fmt("umount -l /data/user*/*/%s/*/*.db", MagiskManager.get().getPackageName()));
+    }
+
     private static Context initDB(boolean verify) {
         Context context, de = null;
         MagiskManager ce = MagiskManager.get();
@@ -70,16 +74,20 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (ce.magiskVersionCode < 1410) {
                 if (context == de) {
+                    unmntDB();
                     ce.moveDatabaseFrom(de, DB_NAME);
                     context = ce;
                 }
             } else {
                 if (context == ce) {
+                    unmntDB();
                     de.moveDatabaseFrom(ce, DB_NAME);
                     context = de;
                 }
             }
         }
+        // Context might be updated
+        db = Utils.getDB(context, DB_NAME);
 
         if (!Shell.rootAccess())
             return context;
