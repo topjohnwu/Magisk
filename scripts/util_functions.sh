@@ -11,7 +11,9 @@
 SCRIPT_VERSION=$MAGISK_VER_CODE
 
 # Default location, will override if needed
-[ -d /data/adb/magisk ] && MAGISKBIN=/data/adb/magisk || MAGISKBIN=/data/magisk
+MAGISKBIN=/data/adb/magisk
+[ -z $MAGISKBIN ] && MOUNTPATH=/sbin/.core/img
+[ -z $IMG ] && IMG=/data/adb/magisk.img
 
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
 BOOTSIGNED=false
@@ -331,5 +333,38 @@ image_size_check() {
   curUsedM=`echo "$SIZE" | cut -d" " -f1`
   curSizeM=`echo "$SIZE" | cut -d" " -f2`
   curFreeM=$((curSizeM - curUsedM))
+}
+
+mount_magisk_img() {
+  [ -z reqSizeM ] && reqSizeM=0
+  if [ -f "$IMG" ]; then
+    ui_print "- Found $IMG"
+    image_size_check $IMG
+    if [ "$reqSizeM" -gt "$curFreeM" ]; then
+      newSizeM=$(((reqSizeM + curUsedM) / 32 * 32 + 64))
+      ui_print "- Resizing $IMG to ${newSizeM}M"
+      $MAGISKBIN/magisk --resizeimg $IMG $newSizeM >&2
+    fi
+  else
+    newSizeM=$((reqSizeM / 32 * 32 + 64));
+    ui_print "- Creating $IMG with size ${newSizeM}M"
+    $MAGISKBIN/magisk --createimg $IMG $newSizeM >&2
+  fi
+
+  ui_print "- Mounting $IMG to $MOUNTPATH"
+  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
+  is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
+}
+
+unmount_magisk_img() {
+  $MAGISKBIN/magisk --umountimg $MOUNTPATH $MAGISKLOOP
+
+  # Shrink the image if possible
+  image_size_check $IMG
+  newSizeM=$((curUsedM / 32 * 32 + 64))
+  if [ $curSizeM -gt $newSizeM ]; then
+    ui_print "- Shrinking $IMG to ${newSizeM}M"
+    $MAGISKBIN/magisk --resizeimg $IMG $newSizeM
+  fi
 }
 

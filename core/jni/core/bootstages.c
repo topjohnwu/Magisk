@@ -392,15 +392,16 @@ static void simple_mount(const char *path) {
  * Miscellaneous *
  *****************/
 
+#define alt_img ((char *[]) \
+{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img", NULL })
+
 static int prepare_img() {
-	// First merge images
-	if (merge_img("/cache/magisk.img", MAINIMG)) {
-		LOGE("Image merge /cache/magisk.img -> " MAINIMG " failed!\n");
-		return 1;
-	}
-	if (merge_img("/data/magisk_merge.img", MAINIMG)) {
-		LOGE("Image merge /data/magisk_merge.img -> " MAINIMG " failed!\n");
-		return 1;
+	// Merge images
+	for (int i = 0; alt_img[i]; ++i) {
+		if (merge_img(alt_img[i], MAINIMG)) {
+			LOGE("Image merge %s -> " MAINIMG " failed!\n", alt_img[i]);
+			return 1;
+		}
 	}
 
 	if (access(MAINIMG, F_OK) == -1) {
