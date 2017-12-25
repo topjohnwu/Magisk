@@ -32,12 +32,18 @@ public class SafetyNetHelper
     public static final int BASIC_PASS = 0x10;
     public static final int CTS_PASS = 0x20;
 
+    public static final int SNET_EXT_VER = 7;
+
     private GoogleApiClient mGoogleApiClient;
     private Activity mActivity;
     private int responseCode;
     private SafetyNetCallback cb;
     private String dexPath;
     private boolean isDarkTheme;
+
+    public static int getVersion() {
+        return SNET_EXT_VER;
+    }
 
     public SafetyNetHelper(Activity activity, String dexPath, SafetyNetCallback cb) {
         mActivity = activity;
