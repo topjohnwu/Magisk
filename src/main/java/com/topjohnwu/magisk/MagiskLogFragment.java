@@ -114,7 +114,7 @@ public class MagiskLogFragment extends Fragment {
             switch (mode) {
                 case 0:
                     StringBuildingList logList = new StringBuildingList();
-                    Shell.su(logList, "cat " + Const.MAGISK_LOG + " | tail -n 1000");
+                    Shell.su(logList, "cat " + Const.MAGISK_LOG + " | tail -n 5000");
                     return logList.getCharSequence();
 
                 case 1:
@@ -125,7 +125,7 @@ public class MagiskLogFragment extends Fragment {
                 case 2:
                     Calendar now = Calendar.getInstance();
                     String filename = String.format(Locale.US,
-                            "magisk_log_%04d%02d%02d_%02d:%02d:%02d.log",
+                            "magisk_log_%04d%02d%02d_%02d%02d%02d.log",
                             now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
                             now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                             now.get(Calendar.MINUTE), now.get(Calendar.SECOND));

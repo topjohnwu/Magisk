@@ -1,3 +1,6 @@
+### v5.5.1
+- Fix an issue in setting up superuser database
+
 ### v5.5.0
 - Fix dynamic resource loading, prevent crashes when checking SafetyNet
 - Update SignAPK to use very little RAM for supporting old devices
