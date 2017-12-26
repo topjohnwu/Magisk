@@ -61,7 +61,7 @@ public class SplashActivity extends Activity {
         if (Shell.rootAccess() && mm.magiskVersionCode > 0) {
 
             // Add update checking service
-            if (Const.Value.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
+            if (Const.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
                 ComponentName service = new ComponentName(this, UpdateCheckService.class);
                 JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -95,7 +95,7 @@ public class SplashActivity extends Activity {
                 .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(mm.updateChannel))
                 .putString(Const.Key.LOCALE, mm.localeConfig)
                 .putString(Const.Key.BOOT_FORMAT, mm.bootFormat)
-                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.Value.UPDATE_SERVICE_VER)
+                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
                 .apply();
 
         mm.hasInit = true;

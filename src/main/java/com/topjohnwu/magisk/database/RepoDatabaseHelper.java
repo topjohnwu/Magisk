@@ -28,7 +28,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
         // Clear bad repos
         mDb.delete(TABLE_NAME, "minMagisk<?",
-                new String[] { String.valueOf(Const.Value.MIN_MODULE_VER) });
+                new String[] { String.valueOf(Const.MIN_MODULE_VER) });
     }
 
     @Override

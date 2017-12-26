@@ -49,7 +49,6 @@ public class MagiskManager extends Application {
     public int remoteManagerVersionCode = -1;
     public String managerLink;
     public String bootBlock = null;
-    public int snetVersion;
     public boolean keepVerity = false;
     public boolean keepEnc = false;
 
@@ -145,7 +144,6 @@ public class MagiskManager extends Application {
         updateNotification = prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true);
         updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-        snetVersion = prefs.getInt(Const.Key.SNET_VER, -1);
         customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
     }
 

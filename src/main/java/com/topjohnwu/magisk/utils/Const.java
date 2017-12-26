@@ -30,6 +30,11 @@ public class Const {
     public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
     public static final String MANAGER_CONFIGS = ".tmp.magisk.config";
 
+    // Versions
+    public static final int UPDATE_SERVICE_VER = 1;
+    public static final int SNET_VER = 7;
+    public static final int MIN_MODULE_VER = 1400;
+
     public static String BUSYBOX_PATH() {
         if (Utils.itemExist("/sbin/.core/busybox/busybox")) {
             return "/sbin/.core/busybox";
@@ -118,7 +123,6 @@ public class Const {
         public static final String UPDATE_CHANNEL = "update_channel";
         public static final String CUSTOM_CHANNEL = "custom_channel";
         public static final String BOOT_FORMAT = "boot_format";
-        public static final String SNET_VER = "snet_version";
         public static final String UPDATE_SERVICE_VER = "update_service_version";
         public static final String APP_VER = "app_version";
         public static final String MAGISKHIDE = "magiskhide";
@@ -158,8 +162,5 @@ public class Const {
         public static final String PATCH_BOOT = "patch";
         public static final String FLASH_MAGISK = "magisk";
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
-        public static final int UPDATE_SERVICE_VER = 1;
-        public static final int SNET_VER = 7;
-        public static final int MIN_MODULE_VER = 1400;
     }
 }

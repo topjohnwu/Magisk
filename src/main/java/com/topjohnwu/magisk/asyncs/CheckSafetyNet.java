@@ -22,13 +22,13 @@ import dalvik.system.DexClassLoader;
 
 public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
-    private File dexPath;
+    public static final File dexPath =
+            new File(MagiskManager.get().getFilesDir().getParent() + "/snet", "snet.apk");
     private DexClassLoader loader;
     private Class<?> helperClazz, callbackClazz;
 
     public CheckSafetyNet(Activity activity) {
         super(activity);
-        dexPath = new File(activity.getCacheDir().getParent() + "/snet", "snet.apk");
     }
 
     private void dlSnet() throws IOException {
@@ -65,7 +65,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 e.printStackTrace();
             }
 
-            if (snet_ver != Const.Value.SNET_VER) {
+            if (snet_ver != Const.SNET_VER) {
                 dlSnet();
                 loadClasses();
             }
@@ -79,8 +79,6 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     @Override
     protected void onPostExecute(Exception err) {
         MagiskManager mm = MagiskManager.get();
-        mm.snetVersion = Const.Value.SNET_VER;
-        mm.prefs.edit().putInt(Const.Key.SNET_VER, Const.Value.SNET_VER).apply();
         try {
             if (err != null) throw err;
             Object helper = helperClazz.getConstructors()[0].newInstance(
