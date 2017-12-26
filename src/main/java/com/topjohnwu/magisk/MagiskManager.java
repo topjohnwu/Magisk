@@ -75,6 +75,7 @@ public class MagiskManager extends Application {
     public int updateChannel;
     public String bootFormat;
     public String customChannelUrl;
+    public int repoOrder;
 
     // Global resources
     public SharedPreferences prefs;
@@ -145,6 +146,29 @@ public class MagiskManager extends Application {
         updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
         customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
+        repoOrder = prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_NAME);
+    }
+
+    public void writeConfig() {
+        prefs.edit()
+                .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
+                .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
+                .putBoolean(Const.Key.UPDATE_NOTIFICATION, updateNotification)
+                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
+                .putBoolean(Const.Key.COREONLY, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
+                .putBoolean(Const.Key.SU_REAUTH, suReauth)
+                .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
+                .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
+                .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
+                .putString(Const.Key.ROOT_ACCESS, String.valueOf(suAccessState))
+                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
+                .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
+                .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
+                .putString(Const.Key.LOCALE, localeConfig)
+                .putString(Const.Key.BOOT_FORMAT, bootFormat)
+                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
+                .putInt(Const.Key.REPO_ORDER, repoOrder)
+                .apply();
     }
 
     public static void toast(String msg, int duration) {

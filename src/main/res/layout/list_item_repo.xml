@@ -67,6 +67,15 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textIsSelectable="false" />
 
+            <TextView
+                android:id="@+id/update_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/tertiary_text_dark"
+                android:textIsSelectable="false"
+                android:textStyle="bold|italic" />
+
         </LinearLayout>
 
         <ImageView

@@ -95,6 +95,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         String author = repo.getAuthor();
         holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
         holder.description.setText(repo.getDescription());
+        holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->
                 new MarkDownWindow((Activity) context, null, repo.getDetailUrl()).exec());
@@ -180,6 +181,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         @BindView(R.id.author) TextView author;
         @BindView(R.id.info_layout) LinearLayout infoLayout;
         @BindView(R.id.download) ImageView downloadImage;
+        @BindView(R.id.update_time) TextView updateTime;
 
         RepoHolder(View itemView) {
             super(itemView);

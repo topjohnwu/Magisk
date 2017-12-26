@@ -79,24 +79,7 @@ public class SplashActivity extends Activity {
         }
 
         // Write back default values
-        mm.prefs.edit()
-                .putBoolean(Const.Key.DARK_THEME, mm.isDarkTheme)
-                .putBoolean(Const.Key.MAGISKHIDE, mm.magiskHide)
-                .putBoolean(Const.Key.UPDATE_NOTIFICATION, mm.updateNotification)
-                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
-                .putBoolean(Const.Key.COREONLY, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
-                .putBoolean(Const.Key.SU_REAUTH, mm.suReauth)
-                .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(mm.suRequestTimeout))
-                .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(mm.suResponseType))
-                .putString(Const.Key.SU_NOTIFICATION, String.valueOf(mm.suNotificationType))
-                .putString(Const.Key.ROOT_ACCESS, String.valueOf(mm.suAccessState))
-                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(mm.multiuserMode))
-                .putString(Const.Key.SU_MNT_NS, String.valueOf(mm.suNamespaceMode))
-                .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(mm.updateChannel))
-                .putString(Const.Key.LOCALE, mm.localeConfig)
-                .putString(Const.Key.BOOT_FORMAT, mm.bootFormat)
-                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
-                .apply();
+        mm.writeConfig();
 
         mm.hasInit = true;
 

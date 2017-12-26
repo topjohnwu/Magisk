@@ -83,4 +83,9 @@
         <item>.img.tar</item>
     </string-array>
 
+    <string-array name="sorting_orders">
+        <item>@string/sort_by_name</item>
+        <item>@string/sort_by_update</item>
+    </string-array>
+
 </resources>

@@ -52,7 +52,6 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="?android:attr/textColorPrimary"
                     android:textIsSelectable="false"/>
 
                 <TextView

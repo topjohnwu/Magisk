@@ -53,6 +53,10 @@
     <string name="update_available">Update Available</string>
     <string name="installed">Installed</string>
     <string name="not_installed">Not Installed</string>
+    <string name="updated_on">Updated on: %1$s</string>
+    <string name="sorting_order">Sorting Order</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_update">Sort by last update</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Save log</string>

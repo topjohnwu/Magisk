@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -7,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
@@ -96,6 +99,22 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        MagiskManager mm = getApplication();
+        if (item.getItemId() == R.id.repo_sort) {
+            new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.sorting_order)
+                .setSingleChoiceItems(R.array.sorting_orders, mm.repoOrder, (d, which) -> {
+                    mm.repoOrder = which;
+                    mm.prefs.edit().putInt(Const.Key.REPO_ORDER, mm.repoOrder).apply();
+                    adapter.notifyDBChanged();
+                    d.dismiss();
+                }).show();
+        }
+        return true;
     }
 
     @Override

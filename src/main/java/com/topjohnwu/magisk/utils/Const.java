@@ -133,6 +133,7 @@ public class Const {
         public static final String ETAG_KEY = "ETag";
         public static final String LINK_KEY = "Link";
         public static final String IF_NONE_MATCH = "If-None-Match";
+        public static final String REPO_ORDER = "repo_order";
     }
 
 
@@ -162,5 +163,7 @@ public class Const {
         public static final String PATCH_BOOT = "patch";
         public static final String FLASH_MAGISK = "magisk";
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
+        public static final int ORDER_NAME = 0;
+        public static final int ORDER_DATE = 1;
     }
 }

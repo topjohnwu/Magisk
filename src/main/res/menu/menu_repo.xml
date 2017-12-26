@@ -3,8 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/repo_sort"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/repo_search"
         android:title=""
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always"/>
+
 </menu>
