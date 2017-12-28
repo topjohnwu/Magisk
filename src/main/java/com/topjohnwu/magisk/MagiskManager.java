@@ -106,7 +106,7 @@ public class MagiskManager extends Application {
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
         }
 
-        suDB = new SuDatabaseHelper(false);
+        suDB = SuDatabaseHelper.getSuDB(false);
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
@@ -214,7 +214,7 @@ public class MagiskManager extends Application {
 
         if (suDB != null && !SuDatabaseHelper.verified) {
             suDB.close();
-            suDB = new SuDatabaseHelper();
+            suDB = SuDatabaseHelper.getSuDB(true);
         }
     }
 
