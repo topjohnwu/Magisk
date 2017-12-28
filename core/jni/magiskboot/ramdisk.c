@@ -9,6 +9,8 @@
 #include "cpio.h"
 
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
+	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",
+			keepverity ? "true" : "false", keepforceencrypt ? "true" : "false");
 	cpio_entry *e;
 	vec_for_each(v, e) {
 		if (!e) continue;
@@ -134,7 +136,7 @@ static void cpio_backup(struct vector *v, struct vector *bak, const char *orig, 
 			backup = 1;
 			fprintf(stderr, "Backup mismatch entry: ");
 		} else {
-			// Someting new in ramdisk, record in rem
+			// Something new in ramdisk, record in rem
 			++j;
 			rem->data = xrealloc(rem->data, rem->filesize + strlen(n->filename) + 1);
 			memcpy(rem->data + rem->filesize, n->filename, strlen(n->filename) + 1);

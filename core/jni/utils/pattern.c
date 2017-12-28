@@ -4,19 +4,19 @@
 #include "utils.h"
 
 static int check_verity_pattern(const char *s) {
-	int pos = 0;
-	if (s[0] == ',') ++pos;
-	if (strncmp(s + pos, "verify", 6) == 0)
-		pos += 6;
-	else if (strncmp(s + pos, "avb", 3) == 0)
-		pos += 3;
+	int skip = 0;
+	if (s[0] == ',') ++skip;
+	if (strncmp(s + skip, "verify", 6) == 0)
+		skip += 6;
+	else if (strncmp(s + skip, "avb", 3) == 0)
+		skip += 3;
 	else
 		return -1;
 
-	if (s[pos] == '=') {
-		while (s[pos] != '\0' && s[pos] != ' ' && s[pos] != '\n' && s[pos] != ',') ++pos;
+	if (s[skip] == '=') {
+		while (s[skip] != '\0' && s[skip] != ' ' && s[skip] != '\n' && s[skip] != ',') ++skip;
 	}
-	return pos;
+	return skip;
 }
 
 static int check_encryption_pattern(const char *s) {
@@ -59,34 +59,39 @@ void patch_init_rc(void **buf, size_t *size) {
 }
 
 int patch_verity(void **buf, uint32_t *size, int patch) {
-	int skip, found = 0;
-	for (int pos = 0; pos < *size; ++pos) {
-		if ((skip = check_verity_pattern(*buf + pos)) > 0) {
-			found = 1;
-			fprintf(stderr, "%s pattern [%.*s]\n", patch ? "Remove" : "Found", skip, (char *) *buf + pos);
-			if (patch) {
-				memcpy(*buf + pos, *buf + pos + skip, *size - pos - skip);
-				memset(*buf + *size - skip, '\0', skip);
-				*size -= skip;
-			} else {
-				pos += skip - 1;
-			}
+	int skip, src_size = *size;
+	char *src = *buf, *patched = patch ? xcalloc(src_size, 1) : NULL;
+	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
+		if ((skip = check_verity_pattern(src + read)) > 0) {
+			if (!patch)
+				return 1;
+			fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
+			read += skip;
+			*size -= skip;
 		}
+		if (patch)
+			patched[write] = src[read];
 	}
-	return found;
+	free(*buf);
+	*buf = patched;
+	return 0;
 }
 
 void patch_encryption(void **buf, uint32_t *size) {
-	int skip;
-	for (int pos = 0; pos < *size; ++pos) {
-		if ((skip = check_encryption_pattern(*buf + pos)) > 0) {
-			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, (char *) *buf + pos);
-			memcpy(*buf + pos, "encryptable", 11);
-			memcpy(*buf + pos + 11, *buf + pos + skip, *size - pos - skip);
-			memset(*buf + *size - skip + 11, '\0', skip - 11);
+	int skip, src_size = *size;
+	char *src = *buf, *patched = xcalloc(src_size, 1);
+	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
+		if ((skip = check_encryption_pattern(src + read)) > 0) {
+			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, src + read);
+			memcpy(patched + read, "encryptable", 11);
+			read += skip;
+			write += 11;
 			*size -= (skip - 11);
 		}
+		patched[write] = src[read];
 	}
+	free(*buf);
+	*buf = patched;
 }
 
 
