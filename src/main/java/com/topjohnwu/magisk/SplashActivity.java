@@ -34,6 +34,7 @@ public class SplashActivity extends Activity {
         MagiskManager mm = getMagiskManager();
 
         mm.loadMagiskInfo();
+        mm.getDefaultInstallFlags();
         Utils.loadPrefs();
 
         // Dynamic detect all locales

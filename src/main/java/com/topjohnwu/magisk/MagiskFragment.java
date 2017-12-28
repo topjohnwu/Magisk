@@ -138,13 +138,9 @@ public class MagiskFragment extends Fragment
         setupExpandable();
 
         keepVerityChkbox.setChecked(mm.keepVerity);
-        keepVerityChkbox.setOnCheckedChangeListener((view, isChecked) -> {
-            mm.keepVerity = isChecked;
-        });
+        keepVerityChkbox.setOnCheckedChangeListener((view, checked) -> mm.keepVerity = checked);
         keepEncChkbox.setChecked(mm.keepEnc);
-        keepEncChkbox.setOnCheckedChangeListener((view, isChecked) -> {
-            mm.keepEnc = isChecked;
-        });
+        keepEncChkbox.setOnCheckedChangeListener((view, checked) -> mm.keepEnc = checked);
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
         updateUI();

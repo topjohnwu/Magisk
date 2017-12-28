@@ -212,6 +212,14 @@ public class MagiskManager extends Application {
         if (Utils.isValidShellResponse(ret))
             bootBlock = ret.get(0);
 
+        if (suDB != null && !SuDatabaseHelper.verified) {
+            suDB.close();
+            suDB = new SuDatabaseHelper();
+        }
+    }
+
+    public void getDefaultInstallFlags() {
+        List<String> ret;
         ret = Shell.su("echo \"$DTBOIMAGE\"");
         if (Utils.isValidShellResponse(ret))
             keepVerity = true;
@@ -235,11 +243,6 @@ public class MagiskManager extends Application {
             if (Utils.isValidShellResponse(ret))
                 keepEnc = Boolean.parseBoolean(ret.get(0));
         } catch (NumberFormatException ignored) {}
-
-        if (suDB != null && !SuDatabaseHelper.verified) {
-            suDB.close();
-            suDB = new SuDatabaseHelper();
-        }
     }
 
     public void setPermissionGrantCallback(Runnable callback) {
