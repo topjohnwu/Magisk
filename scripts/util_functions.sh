@@ -12,7 +12,7 @@ SCRIPT_VERSION=$MAGISK_VER_CODE
 
 # Default location, will override if needed
 MAGISKBIN=/data/adb/magisk
-[ -z $MAGISKBIN ] && MOUNTPATH=/sbin/.core/img
+[ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
 [ -z $IMG ] && IMG=/data/adb/magisk.img
 
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
@@ -86,7 +86,7 @@ getvar() {
   local VARNAME=$1
   local VALUE=$(eval echo \$$VARNAME)
   [ ! -z $VALUE ] && return
-  for DIR in /.backup /data /cache /system; do
+  for DIR in /.backup /dev /data /cache /system; do
     VALUE=`grep_prop $VARNAME $DIR/.magisk`
     [ ! -z $VALUE ] && break;
   done
