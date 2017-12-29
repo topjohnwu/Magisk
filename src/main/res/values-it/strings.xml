@@ -50,6 +50,10 @@
 	<string name="update_available">Aggiornamento disponibile</string>
 	<string name="installed">Installato</string>
 	<string name="not_installed">Non installato</string>
+	<string name="updated_on">Aggiornato il: %1$s</string>
+	<string name="sorting_order">Ordinamento</string>
+	<string name="sort_by_name">Ordina per nome</string>
+	<string name="sort_by_update">Ordina per ultimo aggiornamento</string>
 	
 	<!--Log Fragment-->
 	<string name="menuSaveLog">Salva registro eventi</string>
