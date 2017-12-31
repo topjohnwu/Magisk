@@ -274,7 +274,7 @@ static void clone_skeleton(struct node_entry *node) {
 		char *con;
 		xstat(full_path, &s);
 		getfilecon(full_path, &con);
-		LOGI("tmpfs: %s\n", full_path);
+		LOGI("mnt_tmpfs : %s\n", full_path);
 		xmount("tmpfs", full_path, "tmpfs", 0, NULL);
 		chmod(full_path, s.st_mode & 0777);
 		chown(full_path, s.st_uid, s.st_gid);
@@ -295,7 +295,7 @@ static void clone_skeleton(struct node_entry *node) {
 		if (child->parent->parent == NULL && strcmp(child->name, "vendor") == 0) {
 			if (IS_LNK(child)) {
 				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
-				LOGI("cplink: %s -> %s\n", MIRRDIR "/system/vendor", "/system/vendor");
+				LOGI("creat_link: %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
 			}
 			// Skip
 			continue;
@@ -315,9 +315,9 @@ static void clone_skeleton(struct node_entry *node) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
 			#ifdef MAGISK_DEBUG
-				LOGI("cplink: %s -> %s\n",buf2, buf);
+				LOGI("creat_link: %s <- %s\n",buf, buf2);
 			#else
-				LOGI("cplink: %s\n", buf);
+				LOGI("creat_link: %s\n", buf);
 			#endif
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
