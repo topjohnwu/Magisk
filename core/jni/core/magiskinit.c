@@ -364,7 +364,8 @@ static void magisk_init_daemon() {
 	sepol_allow("su", ALL, ALL, ALL);
 
 	// Wait till init cold boot done
-	wait_till_exists("/dev/.coldboot_done");
+	while (access("/dev/.coldboot_done", F_OK))
+		usleep(1);
 
 	int null = open("/dev/null", O_RDWR | O_CLOEXEC);
 	dup3(null, STDIN_FILENO, O_CLOEXEC);
