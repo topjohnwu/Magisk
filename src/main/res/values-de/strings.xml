@@ -53,6 +53,10 @@
     <string name="update_available">Aktualisierung verfügbar</string>
     <string name="installed">Installiert</string>
     <string name="not_installed">Nicht installiert</string>
+    <string name="updated_on">Zuletzt aktualisiert: %1$s</string>
+    <string name="sorting_order">Sortierung</string>
+    <string name="sort_by_name">Nach Namen sortiert</string>
+    <string name="sort_by_update">Nach Aktualisierung sortiert</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Protokoll speichern</string>
@@ -179,6 +183,7 @@
     <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namensraum</string>
     <string name="requester_summary">Root-Sitzungen erben den Namensraum des Abfragenden</string>
     <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namensraum</string>
+    <string name="android_o_not_support">Android 8.0+ wird nicht unterstützt</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
