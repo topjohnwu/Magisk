@@ -131,8 +131,8 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
         } catch(Exception e) {
             // Try to catch runtime exceptions and remove all db for retry
             unmntDB();
-            Shell.su(Utils.fmt("rm -rf /data/user*/*/magisk.db /data/adb/magisk.db /data/user*/*/%s/databases"),
-                    MagiskManager.get().getPackageName());
+            Shell.su(Utils.fmt("rm -rf /data/user*/*/magisk.db /data/adb/magisk.db /data/user*/*/%s/databases",
+                    MagiskManager.get().getPackageName()));
             e.printStackTrace();
             return new SuDatabaseHelper(initDB(false));
         }
