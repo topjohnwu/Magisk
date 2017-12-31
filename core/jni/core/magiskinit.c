@@ -305,16 +305,20 @@ static int verify_precompiled() {
 	return strcmp(sys_sha, ven_sha) == 0;
 }
 
-static void patch_sepolicy() {
+static int patch_sepolicy() {
 	if (access("/sepolicy", R_OK) == 0)
 		load_policydb("/sepolicy");
 	else if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled())
 		load_policydb(SPLIT_PRECOMPILE);
 	else if (access(SPLIT_PLAT_CIL, R_OK) == 0)
 		compile_cil();
+	else
+		return 0;
 
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
+
+	return 1;
 }
 
 #define BUFSIZE (1 << 20)
@@ -508,7 +512,24 @@ int main(int argc, char *argv[]) {
 		mv_dir(overlay, root);
 
 		patch_ramdisk(root);
-		patch_sepolicy();
+		if (!patch_sepolicy()) {
+			// failed to load sepolicy:
+			// 1. no 'sepolicy' under rootfs
+			// 2. no /vendor partition but /system is not mounted
+			// => mount /system and try to load again
+			mkdir("/sys", 0755);
+			mount("sysfs", "/sys", "sysfs", 0, NULL);
+
+			struct device dev;
+			setup_block(&dev, "system");
+
+			mkdir("/system", 0755);
+			mount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+
+			patch_sepolicy();
+
+			umount("/system");
+		}
 
 		if (fork_dont_care() == 0) {
 			strcpy(argv[0], "magiskinit");
