@@ -313,12 +313,12 @@ static int patch_sepolicy() {
 	else if (access(SPLIT_PLAT_CIL, R_OK) == 0)
 		compile_cil();
 	else
-		return 0;
+		return 1;
 
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
 
-	return 1;
+	return 0;
 }
 
 #define BUFSIZE (1 << 20)
@@ -512,19 +512,16 @@ int main(int argc, char *argv[]) {
 		mv_dir(overlay, root);
 
 		patch_ramdisk(root);
-		if (!patch_sepolicy()) {
-			// failed to load sepolicy:
-			// 1. no 'sepolicy' under rootfs
-			// 2. no /vendor partition but /system is not mounted
-			// => mount /system and try to load again
-			mkdir("/sys", 0755);
+		if (patch_sepolicy()) {
+			/* Non skip_initramfs devices using separate sepolicy
+			 * Mount /system and try to load again */
 			mount("sysfs", "/sys", "sysfs", 0, NULL);
-
 			struct device dev;
 			setup_block(&dev, "system");
-
-			mkdir("/system", 0755);
 			mount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+			// We need to mount independent vendor partition
+			if (setup_block(&dev, "vendor") == 0)
+				mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 
 			patch_sepolicy();
 
