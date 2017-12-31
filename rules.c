@@ -124,50 +124,22 @@ void sepol_magisk_rules() {
 	sepol_allow("init", "rootfs", "lnk_file", ALL);
 
 	// Shell, prop management, simple su rights, logs
-	sepol_allow("su", "property_socket", "sock_file", "write");
-	sepol_allow("su", "properties_device", "file", "write");
 	if (sepol_exists("default_prop")) {
 		sepol_allow("su", "default_prop", "property_service", "set");
 		sepol_allow("su", "default_prop", "file", "write");
 	}
-	if (sepol_exists("properties_serial"))
-		sepol_allow("su", "properties_serial", "file", "write");
 	sepol_allow("su", "init", "unix_stream_socket", "connectto");
-	sepol_allow("su", "rootfs", "file", "entrypoint");
-	sepol_allow("su", "rootfs", "file", "getattr");
-	sepol_allow("su", "rootfs", "file", "read");
 	sepol_allow("su", "rootfs", "filesystem", "remount");
-	sepol_allow("su", "devpts", "chr_file", ALL);
-	sepol_allow("su", "untrusted_app_devpts", "chr_file", ALL);
-	sepol_allow("su", "su_file", "dir", ALL);
-	sepol_allow("su", "su_file", "sock_file", ALL);
-	sepol_allow("su", "zygote_exec", "file", ALL);
-	sepol_allow("su", "zygote_exec", "lnk_file", ALL);
-	sepol_allow("su", "app_data_file", "dir", ALL);
-	sepol_allow("su", "app_data_file", "file", ALL);
-	sepol_allow("su", "shell_exec", "file", ALL);
 	sepol_allow("su", "su", "unix_dgram_socket", ALL);
 	sepol_allow("su", "su", "unix_stream_socket", ALL);
 	sepol_allow("su", "su", "process", ALL);
 	sepol_allow("su", "su", "capability", ALL);
-	sepol_allow("su", "su", "file", ALL);
-	sepol_allow("su", "su", "fifo_file", ALL);
-	sepol_allow("su", "su", "lnk_file", ALL);
-	sepol_allow("su", "su", "dir", ALL);
-	if (sepol_exists("toolbox_exec"))
-		sepol_allow("su", "toolbox_exec", "file", ALL);
-	if (sepol_exists("logdr_socket"))
-		sepol_allow("su", "logdr_socket", "sock_file", "write");
 	if (sepol_exists("logd"))
 		sepol_allow("su", "logd", "unix_stream_socket", "connectto");
-	sepol_allow("su_file", "tmpfs", "filesystem", "associate");
 
 	// For sepolicy live patching
 	sepol_allow("su", "kernel", "security", "read_policy");
 	sepol_allow("su", "kernel", "security", "load_policy");
-	sepol_allow("su", "selinuxfs", "file", "read");
-	sepol_allow("su", "selinuxfs", "file", "open");
-	sepol_allow("su", "selinuxfs", "file", "write");
 
 	// Allow these client to access su
 	allowSuClient("shell");
@@ -176,8 +148,6 @@ void sepol_magisk_rules() {
 	allowSuClient("platform_app");
 	if (sepol_exists("priv_app"))
 		allowSuClient("priv_app");
-	if (sepol_exists("ssd_tool"))
-		allowSuClient("ssd_tool");
 	if (sepol_exists("untrusted_app_25"))
 		allowSuClient("untrusted_app_25");
 
@@ -185,10 +155,12 @@ void sepol_magisk_rules() {
 	suRights();
 	otherToSU();
 
-	// For mounting loop devices and mirrors
+	// For mounting loop devices, mirrors, tmpfs
 	sepol_allow("su", "kernel", "process", "setsched");
 	sepol_allow("su", "labeledfs", "filesystem", "mount");
 	sepol_allow("su", "labeledfs", "filesystem", "unmount");
+	sepol_allow("su", "tmpfs", "filesystem", "mount");
+	sepol_allow("su", "tmpfs", "filesystem", "unmount");
 	sepol_allow("kernel", ALL, "file", "read");
 
 	// Allow su to do anything to any files/dir/links
@@ -196,10 +168,14 @@ void sepol_magisk_rules() {
 	sepol_allow("su", ALL, "dir", ALL);
 	sepol_allow("su", ALL, "lnk_file", ALL);
 	sepol_allow("su", ALL, "blk_file", ALL);
+	sepol_allow("su", ALL, "sock_file", ALL);
+	sepol_allow("su", ALL, "chr_file", ALL);
+	sepol_allow("su", ALL, "fifo_file", ALL);
 
 	// For changing attributes
 	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
 	sepol_allow("su_file", "labeledfs", "filesystem", "associate");
+	sepol_allow("su_file", "tmpfs", "filesystem", "associate");
 
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
@@ -208,7 +184,8 @@ void sepol_magisk_rules() {
 	// xperms
 	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
 		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
-		sepol_allowxperm("domain", "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+		if (sepol_exists("untrusted_app_25_devpts"))
+			sepol_allowxperm("domain", "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
 	}
 }
 
