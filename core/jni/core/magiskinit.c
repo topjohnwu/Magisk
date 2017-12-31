@@ -305,16 +305,20 @@ static int verify_precompiled() {
 	return strcmp(sys_sha, ven_sha) == 0;
 }
 
-static void patch_sepolicy() {
+static int patch_sepolicy() {
 	if (access("/sepolicy", R_OK) == 0)
 		load_policydb("/sepolicy");
 	else if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled())
 		load_policydb(SPLIT_PRECOMPILE);
 	else if (access(SPLIT_PLAT_CIL, R_OK) == 0)
 		compile_cil();
+	else
+		return 1;
 
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
+
+	return 0;
 }
 
 #define BUFSIZE (1 << 20)
@@ -508,7 +512,21 @@ int main(int argc, char *argv[]) {
 		mv_dir(overlay, root);
 
 		patch_ramdisk(root);
-		patch_sepolicy();
+		if (patch_sepolicy()) {
+			/* Non skip_initramfs devices using separate sepolicy
+			 * Mount /system and try to load again */
+			mount("sysfs", "/sys", "sysfs", 0, NULL);
+			struct device dev;
+			setup_block(&dev, "system");
+			mount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+			// We need to mount independent vendor partition
+			if (setup_block(&dev, "vendor") == 0)
+				mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+
+			patch_sepolicy();
+
+			umount("/system");
+		}
 
 		if (fork_dont_care() == 0) {
 			strcpy(argv[0], "magiskinit");
