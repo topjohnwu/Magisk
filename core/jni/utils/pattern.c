@@ -72,8 +72,10 @@ int patch_verity(void **buf, uint32_t *size, int patch) {
 		if (patch)
 			patched[write] = src[read];
 	}
-	free(*buf);
-	*buf = patched;
+	if (patch) {
+		free(*buf);
+		*buf = patched;
+	}
 	return 0;
 }
 

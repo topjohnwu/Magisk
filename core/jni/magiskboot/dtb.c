@@ -78,8 +78,17 @@ static void dtb_patch(const char *file, int patch) {
 				fdt_for_each_subnode(block, fdt, fstab) {
 					fprintf(stderr, "Found block [%s] in fstab\n", fdt_get_name(fdt, block, NULL));
 					uint32_t value_size;
-					void *value = (char *) fdt_getprop(fdt, block, "fsmgr_flags", &value_size);
-					found |= patch_verity(&value, &value_size, patch);
+					void *value = (void *) fdt_getprop(fdt, block, "fsmgr_flags", &value_size);
+					if (patch) {
+						void *dup = xmalloc(value_size);
+						memcpy(dup, value, value_size);
+						memset(value, 0, value_size);
+						found |= patch_verity(&dup, &value_size, 1);
+						memcpy(value, dup, value_size);
+						free(dup);
+					} else {
+						found |= patch_verity(&value, &value_size, 0);
+					}
 				}
 			}
 		}
