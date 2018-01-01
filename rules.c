@@ -123,19 +123,14 @@ void sepol_magisk_rules() {
 	sepol_allow("init", "system_file", "file", ALL);
 	sepol_allow("init", "rootfs", "lnk_file", ALL);
 
-	// Shell, prop management, simple su rights, logs
-	if (sepol_exists("default_prop")) {
+	// Shell, properties, logs
+	if (sepol_exists("default_prop"))
 		sepol_allow("su", "default_prop", "property_service", "set");
-		sepol_allow("su", "default_prop", "file", "write");
-	}
 	sepol_allow("su", "init", "unix_stream_socket", "connectto");
 	sepol_allow("su", "rootfs", "filesystem", "remount");
-	sepol_allow("su", "su", "unix_dgram_socket", ALL);
-	sepol_allow("su", "su", "unix_stream_socket", ALL);
-	sepol_allow("su", "su", "process", ALL);
-	sepol_allow("su", "su", "capability", ALL);
 	if (sepol_exists("logd"))
 		sepol_allow("su", "logd", "unix_stream_socket", "connectto");
+	sepol_allow("su", "su", ALL, ALL);
 
 	// For sepolicy live patching
 	sepol_allow("su", "kernel", "security", "read_policy");
