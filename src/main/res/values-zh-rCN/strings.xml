@@ -50,6 +50,10 @@
     <string name="update_available">可更新</string>
     <string name="installed">已安装</string>
     <string name="not_installed">未安装</string>
+    <string name="updated_on">更新于: %1$s</string>
+    <string name="sorting_order">排序方式</string>
+    <string name="sort_by_name">按名称排序</string>
+    <string name="sort_by_update">按更新时间排序</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">保存日志</string>
