@@ -89,13 +89,10 @@ public class Shell {
                 }
 
                 // Root shell initialization
-                String bbpath = Const.BUSYBOX_PATH();
                 mm.shell.run_raw(false, false,
-                        "export PATH=" + bbpath + ":$PATH",
+                        "export PATH=" + Const.BUSYBOX_PATH() + ":$PATH",
                         "mount_partitions",
-                        "find_boot_image",
-                        "find_dtbo_image",
-                        "migrate_boot_backup");
+                        "run_migrations");
             }
         }
 
