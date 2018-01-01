@@ -55,7 +55,7 @@ static void *logger_thread(void *args) {
 
 	while (1) {
 		// Start logcat
-		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "all" , "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
+		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "events", "-b", "main", "-v", "threadtime", "-s", "am_proc_start", "-s", "Magisk", NULL);
 		while (fdgets(line, sizeof(line), log_fd)) {
 			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
 				if (log_events[i].fd > 0 && log_events[i].filter(line)) {
@@ -74,7 +74,7 @@ static void *logger_thread(void *args) {
 		waitpid(log_pid, NULL, 0);
 
 		// Clear buffer before restart
-		exec_command_sync("logcat", "-b", "all", "-c", NULL);
+		exec_command_sync("logcat", "-b", "events", "-b", "main", "-c", NULL);
 	}
 
 	// Should never be here, but well...

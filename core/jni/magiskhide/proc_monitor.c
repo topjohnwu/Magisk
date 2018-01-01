@@ -176,8 +176,8 @@ void proc_monitor() {
 	// Get the mount namespace of zygote
 	zygote_num = 0;
 	while(!zygote_num) {
-		// Check zygote every 2 secs
-		sleep(2);
+		// Check zygote every 10 ms
+		usleep(10000);
 		ps_filter_proc_name("zygote", store_zygote_ns);
 	}
 	ps_filter_proc_name("zygote64", store_zygote_ns);
