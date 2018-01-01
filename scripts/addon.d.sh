@@ -13,8 +13,6 @@
 main() {
   # Magisk binaries
   MAGISKBIN=/data/adb/magisk
-  # This script always runs in recovery
-  BOOTMODE=false
 
   mount /data 2>/dev/null
 
@@ -41,7 +39,6 @@ main() {
 
   remove_system_su
 
-  find_boot_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
   ui_print "- Found boot image: $BOOTIMAGE"
 
@@ -57,13 +54,6 @@ main() {
   if [ -f stock_boot* ]; then
     rm -f /data/stock_boot* 2>/dev/null
     mv stock_boot* /data
-  fi
-
-  patch_dtbo_image
-
-  if [ -f stock_dtbo* ]; then
-    rm -f /data/stock_dtbo* 2>/dev/null
-    mv stock_dtbo* /data
   fi
 
   cd /

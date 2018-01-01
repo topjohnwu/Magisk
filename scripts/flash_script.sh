@@ -13,10 +13,6 @@
 # Preparation
 ##########################################################################################
 
-# Detect whether in boot mode
-ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
-
 # This path should work in any cases
 TMPDIR=/dev/tmp
 
@@ -24,7 +20,6 @@ INSTALLER=$TMPDIR/install
 COMMONDIR=$INSTALLER/common
 APK=$COMMONDIR/magisk.apk
 CHROMEDIR=$INSTALLER/chromeos
-COREDIR=/magisk/.core
 
 # Default permissions
 umask 022
@@ -83,8 +78,8 @@ if is_mounted /data; then
   chmod 700 /data/adb 2>/dev/null
 
   # Some legacy migration
-  mv /data/magisk/stock_boot* /data 2>/dev/null
-  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img
+  run_migrations
+  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
 else
   MAGISKBIN=/cache/data_bin
 fi
@@ -113,7 +108,6 @@ $BOOTMODE || recovery_actions
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found boot image: $BOOTIMAGE"
 
-find_dtbo_image
 if [ ! -z $DTBOIMAGE ]; then
   ui_print "- Found dtbo image: $DTBOIMAGE"
   # Disable dtbo patch by default

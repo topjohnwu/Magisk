@@ -129,11 +129,6 @@ void daemon_init() {
 	unlink("/data/magisk_debug.log");
 	chmod("/data/adb", 0700);
 
-	// Use shell glob to match files
-	exec_command_sync("sh", "-c",
-			"mv -f /data/adb/magisk/stock_*.img.gz /data;"
-			"rm -f /data/user*/*/magisk.db;", NULL);
-
 	LOGI("* Creating /sbin overlay");
 	DIR *dir;
 	struct dirent *entry;

@@ -83,8 +83,6 @@ chmod -R 755 .
 # Unpack
 ##########################################################################################
 
-migrate_boot_backup
-
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"

@@ -34,19 +34,15 @@ fi
 if $BOOTMODE; then
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
+  BOOTMODE=true
   boot_actions
   mount_partitions
 fi
 
 cd $MAGISKBIN
 
-# Find the boot image
-find_boot_image
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-
 ui_print "- Found Boot Image: $BOOTIMAGE"
-
-migrate_boot_backup
 
 ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
