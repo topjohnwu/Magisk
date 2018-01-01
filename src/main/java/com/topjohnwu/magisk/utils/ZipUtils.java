@@ -11,8 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
 
@@ -30,9 +30,9 @@ public class ZipUtils {
 
     public static void unzip(InputStream zip, File folder, String path, boolean junkPath) throws Exception {
         try {
-            JarInputStream zipfile = new JarInputStream(zip);
-            JarEntry entry;
-            while ((entry = zipfile.getNextJarEntry()) != null) {
+            ZipInputStream zipfile = new ZipInputStream(zip);
+            ZipEntry entry;
+            while ((entry = zipfile.getNextEntry()) != null) {
                 if (!entry.getName().startsWith(path) || entry.isDirectory()){
                     // Ignore directories, only create files
                     continue;
