@@ -210,5 +210,9 @@
     <string name="android_o_not_support">不支援 Android 8.0+</string>
     <string name="uninstall_app">解除安裝應用程式</string>
     <string name="restore_img">還原原廠映像檔</string>
+    <string name="updated_on">更新於：%1$s</string>
+    <string name="sorting_order">排序方式</string>
+    <string name="sort_by_name">按名稱排序</string>
+    <string name="sort_by_update">按更新時間排序</string>
 
 </resources>
