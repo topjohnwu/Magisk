@@ -43,12 +43,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **MagiskManager** (`app`)
 
-* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016-2018, John Wu (@topjohnwu)
 * All contributors and translators on Github
 
 **MagiskSU** (`core/jni/su`)
 
-* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016-2018, John Wu (@topjohnwu)
 * Copyright 2015, Pierre-Hugues Husson (phh@phh.me)
 * Copyright 2013, Koushik Dutta (@koush)
 * Copyright 2010, Adam Shanks (@ChainsDD)
@@ -56,18 +56,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 **MagiskPolicy** (`core/jni/magiskpolicy`)
 
-* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016-2018, John Wu (@topjohnwu)
 * Copyright 2015, Pierre-Hugues Husson (phh@phh.me)
 * Copyright 2015, Joshua Brindle (@joshua_brindle)
 
 **MagiskHide** (`core/jni/magiskhide`)
 
-* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016-2018, John Wu (@topjohnwu)
 * Copyright 2016, Pierre-Hugues Husson (phh@phh.me)
 
 **resetprop** (`core/jni/resetprop`)
 
- * Copyright 2016-2017 John Wu (@topjohnwu)
+ * Copyright 2016-2018 John Wu (@topjohnwu)
  * Copyright 2016 nkk71 (nkk71x@gmail.com)
 
 **External Dependencies** (`core/jni/external`)
@@ -78,4 +78,4 @@ All of them are either GPL or GPL compatible.
 
 **Others Not Mentioned**
 
-* Copyright 2016-2017, John Wu (@topjohnwu)
+* Copyright 2016-2018, John Wu (@topjohnwu)
