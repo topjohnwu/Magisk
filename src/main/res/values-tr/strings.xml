@@ -12,11 +12,11 @@
     <string name="magisk_version_error">Magisk yüklü değil</string>
     <string name="checking_for_updates">Güncelleştirmeler denetleniyor…</string>
     <string name="magisk_update_available">Magisk v%1$s mevcut!</string>
-	<string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
+    <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="safetyNet_check_text">SafetyNet kontrolünü başlatmak için dokunun</string>
     <string name="checking_safetyNet_status">SafetyNet durumu kontrol ediliyor…</string>
     <string name="safetyNet_check_success">SafetyNet Kontrolü Başarılı</string>
-	<string name="safetyNet_api_error">SafetyNet API Hatası</string>
+    <string name="safetyNet_api_error">SafetyNet API Hatası</string>
     <string name="safetyNet_network_loss">Ağ bağlantısı kullanılamıyor</string>
     <string name="safetyNet_service_disconnected">Hizmet sonlandırıldı</string>
     <string name="safetyNet_res_invalid">Yanıt geçersiz</string>
@@ -49,6 +49,10 @@
     <string name="update_available">Güncelleme Mevcut</string>
     <string name="installed">Yüklenmiş</string>
     <string name="not_installed">Yüklenmemiş</string>
+    <string name="updated_on">Updated on: %1$s</string>
+    <string name="sorting_order">Sıralama Düzeni</string>
+    <string name="sort_by_name">İsme göre sırala</string>
+    <string name="sort_by_update">Son güncellemeye göre sırala</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Günlüğü kaydet</string>
@@ -93,27 +97,29 @@
     <string name="zip_process_msg">Zip dosyası işleniyor …</string>
     <string name="manager_update_title">Yeni Magisk Manager Güncellemesi Mevcut!</string>
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
-	<string name="dtbo_patched_title">DTBO yamalandı!</string>
-	<string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
+    <string name="dtbo_patched_title">DTBO yamalandı!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="magisk_updates">Magisk Güncellemeleri</string>
     <string name="flashing">Yükleniyor</string>
     <string name="hide_manager_toast">Magisk Manager Gizleniyor…</string>
-	<string name="hide_manager_toast2">Bu biraz zaman alabilir…</string>
+    <string name="hide_manager_toast2">Bu biraz zaman alabilir…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
     <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>
     <string name="patch_boot_file">Önyükleme İmaj Dosyasını Yamala</string>
     <string name="direct_install">Doğrudan Yükle (Önerilen)</string>
-	<string name="install_second_slot">İkinci Yuvaya Yükle (OTA\'dan sonra)</string>
+    <string name="install_second_slot">İkinci Yuvaya Yükle (OTA\'dan sonra)</string>
     <string name="select_method">Yöntem Seçin</string>
     <string name="no_boot_file_patch_support">Hedef Magisk sürümü önyükleme imaj dosyasını yamalamayı desteklemiyor</string>
     <string name="boot_file_patch_msg">.img veya .img.tar formatında stok önyükleme imajını seçin</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
+    <string name="restore_img">Önyükleme İmajını Geri Yükle</string>
+    <string name="uninstall_app">Uygulamayı Kaldır</string>
     <string name="restore_done">Yenileme tamamlandı!</string>
     <string name="restore_fail">Stok önyükleme yedeği yok!</string>
-	<string name="uninstall_toast">Magisk Manager\'ı 5 saniye içinde kaldırdıktan sonra lütfen daha sonra elle yeniden başlatın</string>
-	<string name="proprietary_title">Tescil Kodunu İndirin</string>
-	<string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
-	<string name="su_db_corrupt">SU veritabanı bozuk, yeni db oluşturacak</string>
+    <string name="uninstall_toast">Magisk Manager\'ı 5 saniye içinde kaldırdıktan sonra lütfen daha sonra elle yeniden başlatın</string>
+    <string name="proprietary_title">Tescil Kodunu İndirin</string>
+    <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
+    <string name="su_db_corrupt">SU veritabanı bozuk, yeni db oluşturacak</string>
  
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
@@ -124,15 +130,15 @@
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
     <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
-	<string name="settings_hide_manager_summary">Rastgele seçilen bir paket adı ile Magisk Manager yeniden paketlenecek</string>
+    <string name="settings_hide_manager_summary">Rastgele seçilen bir paket adı ile Magisk Manager yeniden paketlenecek</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
     <string name="settings_update_stable">Kararlı</string>
     <string name="settings_update_beta">Beta</string>
-	<string name="settings_update_custom">Özel</string>
-	<string name="settings_update_custom_msg">Özel bir URL ekleyin</string>
+    <string name="settings_update_custom">Özel</string>
+    <string name="settings_update_custom_msg">Özel bir URL ekleyin</string>
     <string name="settings_boot_format_title">Yamalı Önyükleme Formatı</string>
     <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/indirme modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
     <string name="settings_core_only_title">Magisk Sadece Çekirdek Modu</string>
