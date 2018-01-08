@@ -9,7 +9,7 @@
 
 The following are for developers
 
-- [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/f927c1b997f5590d86b22217988361325de04745/docs/procedures.html)
+- [Procedure Diagram](https://cdn.rawgit.com/topjohnwu/Magisk/7d1082b1cb91db90ed0a29d8b092723fc3d69c58/docs/procedures.html)
 - [Magisk Details](details.md)
     - [Boot Stages](details.md#boot-stages)
     - [Magic Mount Details](details.md#magic-mount-details)
