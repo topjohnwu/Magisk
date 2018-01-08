@@ -110,7 +110,7 @@
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed…</string>
     <string name="download_zip_only">Download Zip Only</string>
     <string name="patch_boot_file">Patch Boot Image File</string>
-    <string name="direct_install">Direct Install (Recommend)</string>
+    <string name="direct_install">Direct Install (Recommended)</string>
     <string name="install_second_slot">Install to Second Slot (After OTA)</string>
     <string name="select_method">Select Method</string>
     <string name="no_boot_file_patch_support">Target Magisk version doesn\'t support boot image file patching</string>
@@ -122,7 +122,7 @@
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="uninstall_toast">Uninstalling Magisk Manager in 5 seconds, please manually reboot afterwards</string>
     <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk Manager is FOSS so doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS, which doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
     <string name="su_db_corrupt">SU database is corrupted, will recreate new db</string>
 
     <!--Settings Activity -->
@@ -174,7 +174,7 @@
     <string name="owner_only_summary">Only owner has root access</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
     <string name="user_indepenent_summary">Each user has its own separate root rules</string>
-    <string name="multiuser_hint_owner_request">A request has been sent to the device owner. Please switch to the owner and grant the permission</string>
+    <string name="multiuser_hint_owner_request">A request has been sent to the device owner. Please switch to the owner and grant the permissions required</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
@@ -183,7 +183,7 @@
     <string name="global_summary">All root sessions use the global mount namespace</string>
     <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
-    <string name="android_o_not_support">Does not support on Android 8.0+</string>
+    <string name="android_o_not_support">Does not support Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
