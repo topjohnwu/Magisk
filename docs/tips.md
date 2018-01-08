@@ -10,8 +10,8 @@ Magisk do modifications systemless-ly, which means applying official OTAs is muc
 #### Prerequisites
 1. Please disable *Automatic system updates* in developer options, so it won't install OTAs without your acknowledgement.  
     <img src="images/disable_auto_ota.png" width="250">
-1. When an OTA is available, please go to Magisk Manager → Uninstall → Restore Stock Boot. **Do not reboot immediately or you will have Magisk uninstalled.** This will restore your boot back to 100% untouched stock boot image in order to pass boot verification. **This step is required before doing any of the following steps written below!**  
-    <img src="images/restore_boot.png" width="250">
+1. When an OTA is available, please go to Magisk Manager → Uninstall → Restore Images. **Do not reboot immediately or you will have Magisk uninstalled.** This will restore your boot (or dtbo if available) back to 100% untouched stock images in order to pass verifications. **This step is required before doing any of the following steps written below!**  
+    <img src="images/restore_img.png" width="250">
 
 #### Devices with A/B Partitions
 (Includes Pixel family)
@@ -36,7 +36,7 @@ The [FlashFire](https://play.google.com/store/apps/details?id=eu.chainfire.flash
 1. Press the big **Flash** button, after a few minutes it should reboot updated with Magisk installed.
 
 #### Other Devices - General Case
-Unfortunately, there are no real good ways to apply OTAs on all devices. Also, the tutorial provided below will not preserve Magisk - you will have to manually re-root your device after the upgrade, and this will require PC access. Here I share my personal experience with my daily driver - HTC U11.
+Unfortunately, there are no real good ways to apply OTAs on all devices. Also, the tutorial provided below will not preserve Magisk - you will have to manually re-root your device after the upgrade, and this will require PC access. Here I share my personal experience with HTC U11.
 
 1. To properly install OTAs, you should have your stock recovery installed on your device. If you have custom recovery installed, you can restore it from your previous backup, or dumps found online, or factory images provided by OEMs.  
 If you decide to start by installing Magisk without touching your recovery partition, you have a few choices, either way you will end up with a Magisk rooted device, but recovery remain stock untouched:
@@ -47,7 +47,7 @@ If you decide to start by installing Magisk without touching your recovery parti
 1. Once it's done you will be left with an upgraded, 100% stock, un-rooted device. You will have to manually flash Magisk back. Consider using the methods stated in step 1. to flash Magisk without touching the recovery partition if you want to receive stock OTAs frequently.
 
 ## Remove Files
-How to efficiently remove a file systemless-ly? To actually make the file **disappear** is complicated (possible, not worth the effort). **Replacing it with a dummy file should be good enough**! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
+How to remove a file systemless-ly? To actually make the file **disappear** is complicated (possible, not worth the effort). **Replacing it with a dummy file should be good enough**! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
 
 ## Remove Folders
 Same as mentioned above, actually making the folder to **disappear** is not worth the effort. **Replacing it with an empty folder should be good enough**! A handy trick for module developers using [Magisk Module Template](https://github.com/topjohnwu/magisk-module-template) is to add the folder you want to remove into the `REPLACE` list within `config.sh`. If your module doesn't provide a correspond folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.
