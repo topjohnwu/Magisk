@@ -41,6 +41,7 @@ public class OnBootIntentService extends IntentService {
          * */
         MagiskManager mm = Utils.getMagiskManager(this);
         mm.loadMagiskInfo();
+        mm.getDefaultInstallFlags();
         if (Shell.rootAccess()) {
             Utils.patchDTBO();
         }
