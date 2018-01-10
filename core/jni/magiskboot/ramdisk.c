@@ -21,6 +21,7 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 				fprintf(stderr, "Remove [verity_key]\n");
 				cpio_free(e);
 				vec_cur(v) = NULL;
+				continue;
 			}
 		}
 		if (!keepforceencrypt) {
