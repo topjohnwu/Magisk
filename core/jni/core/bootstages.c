@@ -140,14 +140,14 @@ static void pm_setenv(struct vector *v) {
 static void exec_common_script(const char* stage) {
 	DIR *dir;
 	struct dirent *entry;
-	snprintf(buf, PATH_MAX, "%s/%s.d", COREDIR, stage);
+	snprintf(buf2, PATH_MAX, "%s/%s.d", COREDIR, stage);
 
-	if (!(dir = xopendir(buf)))
+	if (!(dir = xopendir(buf2)))
 		return;
 
 	while ((entry = xreaddir(dir))) {
 		if (entry->d_type == DT_REG) {
-			snprintf(buf2, PATH_MAX, "%s/%s", buf, entry->d_name);
+			snprintf(buf2, PATH_MAX, "%s/%s.d/%s", COREDIR, stage, entry->d_name);
 			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
