@@ -304,7 +304,7 @@ int switch_mnt_ns(int pid) {
 	fd = xopen(mnt, O_RDONLY);
 	if (fd < 0) return 1;
 	// Switch to its namespace
-	ret = setns(fd, 0);
+	ret = xsetns(fd, 0);
 	close(fd);
 	return ret;
 }

@@ -186,7 +186,7 @@ void daemon_init() {
 	// Check whether skip_initramfs device
 	vec_for_each(&mounts, line) {
 		if (strstr(line, " /system_root ")) {
-			xmkdir_p(MIRRDIR "/system", 0755);
+			xmkdirs(MIRRDIR "/system", 0755);
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 			break;
@@ -195,7 +195,7 @@ void daemon_init() {
 	vec_for_each(&mounts, line) {
 		if (!skip_initramfs && strstr(line, " /system ")) {
 			sscanf(line, "%s", buf);
-			xmkdir_p(MIRRDIR "/system", 0755);
+			xmkdirs(MIRRDIR "/system", 0755);
 			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
 				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
@@ -205,7 +205,7 @@ void daemon_init() {
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
 			sscanf(line, "%s", buf);
-			xmkdir_p(MIRRDIR "/vendor", 0755);
+			xmkdirs(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
 				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
@@ -224,11 +224,11 @@ void daemon_init() {
 			LOGI("link: %s\n", MIRRDIR "/vendor");
 		#endif
 	}
-	xmkdir_p(MIRRDIR "/bin", 0755);
+	xmkdirs(MIRRDIR "/bin", 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
 
 	LOGI("* Setting up internal busybox");
-	xmkdir_p(BBPATH, 0755);
+	xmkdirs(BBPATH, 0755);
 	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
 	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 }

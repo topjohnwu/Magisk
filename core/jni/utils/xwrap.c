@@ -156,14 +156,6 @@ int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
 	return ret;
 }
 
-int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-	int ret = connect(sockfd, addr, addrlen);
-	if (ret == -1) {
-		PLOGE("connect");
-	}
-	return ret;
-}
-
 int xlisten(int sockfd, int backlog) {
 	int ret = listen(sockfd, backlog);
 	if (ret == -1) {
@@ -229,14 +221,6 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	return errno;
 }
 
-int xsocketpair(int domain, int type, int protocol, int sv[2]) {
-	int ret = socketpair(domain, type, protocol, sv);
-	if (ret == -1) {
-		PLOGE("socketpair");
-	}
-	return ret;
-}
-
 int xstat(const char *pathname, struct stat *buf) {
 	int ret = stat(pathname, buf);
 	if (ret == -1) {
@@ -292,7 +276,7 @@ int xsymlink(const char *target, const char *linkpath) {
 int xmount(const char *source, const char *target,
 	const char *filesystemtype, unsigned long mountflags,
 	const void *data) {
-	int ret = mount(source, target, filesystemtype, mountflags, data);
+	int ret = mount(source, target, filesystemtype, MS_SILENT | mountflags, data);
 	if (ret == -1) {
 		PLOGE("mount %s->%s", source, target);
 	}
@@ -331,10 +315,10 @@ int xmkdir(const char *pathname, mode_t mode) {
 	return ret;
 }
 
-int xmkdir_p(const char *pathname, mode_t mode) {
-	int ret = mkdir_p(pathname, mode);
+int xmkdirs(const char *pathname, mode_t mode) {
+	int ret = mkdirs(pathname, mode);
 	if (ret == -1) {
-		PLOGE("mkdir_p %s", pathname);
+		PLOGE("mkdirs %s", pathname);
 	}
 	return ret;
 }

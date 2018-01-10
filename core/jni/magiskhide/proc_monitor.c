@@ -68,10 +68,8 @@ static void store_zygote_ns(int pid) {
 }
 
 static void lazy_unmount(const char* mountpoint) {
-	if (umount2(mountpoint, MNT_DETACH) != -1)
+	if (xumount2(mountpoint, MNT_DETACH) != -1)
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
-	else
-		LOGD("hide_daemon: Unmount Failed (%s)\n", mountpoint);
 }
 
 static void hide_daemon(int pid, int ppid) {

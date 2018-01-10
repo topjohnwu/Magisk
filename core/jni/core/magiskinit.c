@@ -77,7 +77,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 
 	char cmdline[4096];
 	mkdir("/proc", 0555);
-	mount("proc", "/proc", "proc", 0, NULL);
+	xmount("proc", "/proc", "proc", 0, NULL);
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
@@ -455,7 +455,7 @@ int main(int argc, char *argv[]) {
 		frm_rf(root);
 
 		mkdir("/sys", 0755);
-		mount("sysfs", "/sys", "sysfs", 0, NULL);
+		xmount("sysfs", "/sys", "sysfs", 0, NULL);
 
 		char partname[32];
 		snprintf(partname, sizeof(partname), "system%s", cmd.slot);
@@ -464,20 +464,20 @@ int main(int argc, char *argv[]) {
 		setup_block(&dev, partname);
 
 		mkdir("/system_root", 0755);
-		mount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
+		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
 		// Exclude system folder
 		excl_list = (char *[]) { "system", NULL };
 		clone_dir(system_root, root);
 		mkdir("/system", 0755);
-		mount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+		xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
 
 		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
 
 		// We need to mount independent vendor partition
 		if (setup_block(&dev, partname) == 0)
-			mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 
 		close(system_root);
 	} else {
@@ -515,13 +515,13 @@ int main(int argc, char *argv[]) {
 		if (patch_sepolicy()) {
 			/* Non skip_initramfs devices using separate sepolicy
 			 * Mount /system and try to load again */
-			mount("sysfs", "/sys", "sysfs", 0, NULL);
+			xmount("sysfs", "/sys", "sysfs", 0, NULL);
 			struct device dev;
 			setup_block(&dev, "system");
-			mount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
 			// We need to mount independent vendor partition
 			if (setup_block(&dev, "vendor") == 0)
-				mount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+				xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 
 			patch_sepolicy();
 

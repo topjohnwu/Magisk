@@ -34,7 +34,7 @@ int fd_getpath(int fd, char *path, size_t size) {
 	return 0;
 }
 
-int mkdir_p(const char *pathname, mode_t mode) {
+int mkdirs(const char *pathname, mode_t mode) {
 	char *path = strdup(pathname), *p;
 	errno = 0;
 	for (p = path + 1; *p; ++p) {
@@ -107,7 +107,7 @@ void mv_f(const char *source, const char *destination) {
 	struct file_attr a;
 
 	if (S_ISDIR(st.st_mode)) {
-		xmkdir_p(destination, st.st_mode & 0777);
+		xmkdirs(destination, st.st_mode & 0777);
 		src = xopen(source, O_RDONLY | O_CLOEXEC);
 		dest = xopen(destination, O_RDONLY | O_CLOEXEC);
 		fclone_attr(src, dest);
@@ -162,7 +162,7 @@ void cp_afc(const char *source, const char *destination) {
 	getattr(source, &a);
 
 	if (S_ISDIR(a.st.st_mode)) {
-		xmkdir_p(destination, a.st.st_mode & 0777);
+		xmkdirs(destination, a.st.st_mode & 0777);
 		src = xopen(source, O_RDONLY | O_CLOEXEC);
 		dest = xopen(destination, O_RDONLY | O_CLOEXEC);
 		fsetattr(dest, &a);

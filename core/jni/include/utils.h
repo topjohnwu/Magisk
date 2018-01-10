@@ -61,7 +61,7 @@ int xumount(const char *target);
 int xumount2(const char *target, int flags);
 int xrename(const char *oldpath, const char *newpath);
 int xmkdir(const char *pathname, mode_t mode);
-int xmkdir_p(const char *pathname, mode_t mode);
+int xmkdirs(const char *pathname, mode_t mode);
 int xmkdirat(int dirfd, const char *pathname, mode_t mode);
 void *xmmap(void *addr, size_t length, int prot, int flags,
 	int fd, off_t offset);
@@ -101,7 +101,7 @@ struct file_attr {
 };
 
 int fd_getpath(int fd, char *path, size_t size);
-int mkdir_p(const char *pathname, mode_t mode);
+int mkdirs(const char *pathname, mode_t mode);
 void in_order_walk(int dirfd, void (*callback)(int, struct dirent*));
 void rm_rf(const char *path);
 void frm_rf(int dirfd);
