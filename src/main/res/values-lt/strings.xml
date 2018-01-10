@@ -1,0 +1,214 @@
+<resources>
+    <!--Universal-->
+
+    <!--Welcome Activity-->
+    <string name="modules">Moduliai</string>
+    <string name="downloads">Atsisiuntimai</string>
+    <string name="superuser">Super Naudotojas</string>
+    <string name="log">Surašyti (Log)</string>
+    <string name="settings">Nustatymai</string>
+    <string name="install">Instaliuoti</string>
+
+    <!--Status Fragment-->
+    <string name="magisk_version_error">Magisk yra neinstaliuotas</string>
+    <string name="checking_for_updates">Ieškoma atnaujinimų…</string>
+    <string name="magisk_update_available">Magisk v%1$s yra galima!</string>
+    <string name="invalid_update_channel">Neteisingas atnaujinimų nustatymas</string>
+    <string name="safetyNet_check_text">Paspauskite SafetyNet paieškai</string>
+    <string name="checking_safetyNet_status">Ieškomas SafetyNet statusas…</string>
+    <string name="safetyNet_check_success">SafetyNet Paieška sėkminga</string>
+    <string name="safetyNet_api_error">SafetyNet API Klaida</string>
+    <string name="safetyNet_network_loss">Nėra prieigos prie interneto</string>
+    <string name="safetyNet_service_disconnected">Paslauga atjungta</string>
+    <string name="safetyNet_res_invalid">Gautas neteisingas atsakas</string>
+
+    <!--Install Fragment-->
+    <string name="advanced_settings_title">Išplėstiniai nustatymai</string>
+    <string name="keep_force_encryption">Palikti priverstinį šifravimą</string>
+    <string name="keep_dm_verity">Palikti dm-verity</string>
+    <string name="current_magisk_title">Instaliuota versija: %1$s</string>
+    <string name="install_magisk_title">Naujausia versija: %1$s</string>
+    <string name="uninstall">Ištrinti</string>
+    <string name="uninstall_magisk_title">Ištrinti Magisk</string>
+    <string name="uninstall_magisk_msg">Visi moduliai bus išjungti/panaikinti. Roo bus panaikintas ir duomenys bus potencialiai užšifruoti, jeigu jie nėra užšifruoti.</string>
+    <string name="update">Atnaujinti %1$s</string>
+
+    <!--Module Fragment-->
+    <string name="no_info_provided">(Nėra informacijos)</string>
+    <string name="no_modules_found">Modulių nesurasta</string>
+    <string name="update_file_created">Perkrovus sistemą modulis bus atnaulintas</string>
+    <string name="remove_file_created">Perkrovus sistemą modulis bus panaikintas</string>
+    <string name="remove_file_deleted">Perkrovus sistemą modulis nebus panaikintas</string>
+    <string name="disable_file_created">Perkrovus sistemą modulis bus išjungtas, bet ne panaikintas</string>
+    <string name="disable_file_removed">Perkrovus sistemą modulis bus įjungtas</string>
+    <string name="author">Sukūrė %1$s</string>
+    <string name="reboot_recovery">Perkrauti į Recovery</string>
+    <string name="reboot_bootloader">Perkrauti į Bootloader</string>
+    <string name="reboot_download">Perkraukite, kad atsisiųstumėte</string>
+
+    <!--Repo Fragment-->
+    <string name="update_available">Galimas atnaujinimas</string>
+    <string name="installed">Instaliuota</string>
+    <string name="not_installed">Ne instaliuota</string>
+
+    <!--Log Fragment-->
+    <string name="menuSaveLog">Išsauguti surašymus (log)</string>
+    <string name="menuReload">Iš naujo</string>
+    <string name="menuClearLog">Išvalyti surašymus (log)</string>
+    <string name="logs_cleared">Surašymas (log) sėkmingai užrašytas</string>
+    <string name="log_is_empty">Surašymas yra tuščias</string>
+    <string name="logs_save_failed">Nesugebėjome įrašyti surašymų į SD kortelę:</string>
+
+    <!--About Activity-->
+    <string name="about">Apie</string>
+    <string name="app_changelog">Pakeitimų sąrašas</string>
+    <string name="translators" />Vv2233Bb
+    <string name="app_version">Versija</string>
+    <string name="app_source_code">Pagrindinis kodas</string>
+    <string name="donation">Auka</string>
+    <string name="app_translators">Vertėjai</string>
+    <string name="support_thread">Paremti mūsų XDA puslapį</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="permissionNotGranted">Ši įpatybė neveiks be prieigos prie saugyklos.</string>
+    <string name="no_thanks">Ačiū, nereikia</string>
+    <string name="yes">Taip</string>
+    <string name="ok">Gerai</string>
+    <string name="close">Uždaryti</string>
+    <string name="repo_install_title">Instaliuoti %1$s</string>
+    <string name="repo_install_msg">Ar jūs norite dabar instaliuoti %1$s?</string>
+    <string name="download">Atsisiųsti</string>
+    <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
+    <string name="reboot">Perkrauti</string>
+    <string name="downloading_toast">Atsisiunčiamas %1$s</string>
+    <string name="magisk_update_title">Naujas Magisk atnaujinimas egzistuoja!</string>
+    <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
+    <string name="release_notes">Šios versijos naujos įpatybės</string>
+    <string name="repo_cache_cleared">Repo failai išvalyti</string>
+    <string name="safetyNet_hide_notice">Ši programėlė naudoja SafetyNet\nMagiskHide tai automatiškai sutvarko</string>
+    <string name="process_error">Proceso klaida</string>
+    <string name="internal_storage">Zip failas yra saugomas:\n[Internal Storage]%1$s</string>
+    <string name="zip_download_title">Atsisiunčiama</string>
+    <string name="zip_download_msg">Atsiunčiamas zip failas(%1$d%%) …</string>
+    <string name="zip_process_title">Vyksta procesas</string>
+    <string name="zip_process_msg">Zip failas apdorojamas…</string>
+    <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
+    <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
+    <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager ištaisė dtbo.img, prašome perkrauti telefoną</string>
+    <string name="magisk_updates">Magisk Atnaujinimai</string>
+    <string name="flashing">Instaliuojama</string>
+    <string name="hide_manager_toast">Magisk Manager paslėpiamas…</string>
+    <string name="hide_manager_toast2">Tai užtruks sekundėlę…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager paslėpimas nepavyko…</string>
+    <string name="download_zip_only">Atsisiųsti zip failą</string>
+    <string name="patch_boot_file">Ištaisyti įsijungimo failą</string>
+    <string name="direct_install">Tiesioginis atsisiuntimas (Rekomenduojamas)</string>
+    <string name="install_second_slot">Instaliuoti į antrą vietą (Po OTA)</string>
+    <string name="select_method">Pasirinkite metodą</string>
+    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų įjungimo faile.</string>
+    <string name="boot_file_patch_msg">Pasirinkti įsijungimo failą .img ar .img.tar formate.</string>
+    <string name="complete_uninstall">Pilnas pašalinimas</string>
+    <string name="restore_img">Atstatyti įsijungimo failą.</string>
+    <string name="uninstall_app">Ištrinti programėlę</string>
+    <string name="restore_done">Atstatymas įvykdytas!</string>
+    <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
+    <string name="uninstall_toast">Magisk Manager bus pašalintas po 5 sekundžių, pašalinus perkraukite telefoną.</string>
+    <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
+    <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
+    <string name="su_db_corrupt">SU duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
+
+    <!--Settings Activity -->
+    <string name="settings_general_category">Pagrininiai</string>
+    <string name="settings_dark_theme_title">Tamsi tema</string>
+    <string name="settings_dark_theme_summary">Įjungti tamsią temą</string>
+    <string name="settings_notification_title">Pranešimai atsiradus atnaujinimui</string>
+    <string name="settings_notification_summary">Parodyti pranešmus atsiradus naujai versijai</string>
+    <string name="settings_clear_cache_title">Išvalyti saugyklos nereikalingus failus</string>
+    <string name="settings_clear_cache_summary">Išvalyti patalpintą informaciją talpykloms internete, priverčia perkrauti inerneto jungtį</string>
+    <string name="settings_hide_manager_title">Paslėpti Magisk Manager</string>
+    <string name="settings_hide_manager_summary">Perpakuoti Magisk Manager su atsitiktiniu pakuotės pavadinimu</string>
+    <string name="language">Kalbas</string>
+    <string name="system_default">(Sistemos)</string>
+    <string name="settings_update">Atnaujinimų nustatymai</string>
+    <string name="settings_update_channel_title">Atnaujinimų tipai</string>
+    <string name="settings_update_stable">Stabilūs</string>
+    <string name="settings_update_beta"> Esantys Beta versijoje</string>
+    <string name="settings_update_custom">Pasirinktiniai</string>
+    <string name="settings_update_custom_msg">Įvesti pasirinktinį URL</string>
+    <string name="settings_boot_format_title">Įsijungimo failo formatas</string>
+    <string name="settings_boot_format_summary">Pasirinkite įsijungimo failo formatą.\nPasirinkite .img įdiegimui per fastboot/download; Pasirinkite .img.tar įdiegimui per ODIN.</string>
+    <string name="settings_core_only_title">Magisk Pagrindinis režimas</string>
+    <string name="settings_core_only_summary">Įgalinkite tik pagrindines funkcijas, visi moduliai bus išjungti. MagiskSU, MagiskHide, ir Sistemos pedejėjai liks įgalinti</string>
+    <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
+    <string name="settings_hosts_title">Sistemos padejėjai</string>
+    <string name="settings_hosts_summary">Sistemų padejėjų įgalinimas Adblock programėlėms</string>
+
+    <string name="settings_su_app_adb">Programėlėms ir ADB</string>
+    <string name="settings_su_app">Tik programėlėms</string>
+    <string name="settings_su_adb">Tik ADB</string>
+    <string name="settings_su_disable">Išjungta</string>
+    <string name="settings_su_request_10">10 sekundžių</string>
+    <string name="settings_su_request_20">20 sekundžių</string>
+    <string name="settings_su_request_30">30 sekundžių</string>
+    <string name="settings_su_request_60">60 sekundžių</string>
+    <string name="superuser_access">Supervartotojo prieiga</string>
+    <string name="auto_response">Automatinis atsakymas</string>
+    <string name="request_timeout">Prašymo laikas baigėsi</string>
+    <string name="superuser_notification">Supervartotojo pranešimai</string>
+    <string name="request_timeout_summary">%1$s sekundžių</string>
+    <string name="settings_su_reauth_title">Pakartotinai patvirtinti po atnaujinimo</string>
+    <string name="settings_su_reauth_summary">Pakartotinai patvirtint supervartotojo leidimus po programėlės atnaujinimo</string>
+
+    <string name="multiuser_mode">Daugialypio vartotojo režimas</string>
+    <string name="settings_owner_only">Tik įrenginio savininkas</string>
+    <string name="settings_owner_manage">Įrenginio savininko valdomas</string>
+    <string name="settings_user_independent">Visų</string>
+    <string name="owner_only_summary">Tik įrenginio savininkas turi root prieigą</string>
+    <string name="owner_manage_summary">Tik įrenginio savinkas gali tvarkyti root prieigą ir gauti lenteles prašančias root prieigos</string>
+    <string name="user_indepenent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
+    <string name="multiuser_hint_owner_request">Prašymas buvo nusiųstas savininkui. Prašome tapti savininku ir suteikite leidimą.</string>
+
+    <string name="mount_namespace_mode">Root sesijos vardų srities režimas</string>
+    <string name="settings_ns_global">Globali vardų sritis</string>
+    <string name="settings_ns_requester">Paveldima vardų sritis</string>
+    <string name="settings_ns_isolate">Izoliuota vardų sritis</string>
+    <string name="global_summary">Visos root sesijos naudoja globalią vardų sritį</string>
+    <string name="requester_summary">Root sesijos paveldi jos išprašytojo/s vardų sritį</string>
+    <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
+    <string name="android_o_not_support">Negalima įrenginiams naudojantiems Android 8.0+</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Supervartotojo prašymas</string>
+    <string name="deny_with_str">Atmesti%1$s</string>
+    <string name="deny">Atmesti</string>
+    <string name="prompt">Klausti</string>
+    <string name="grant">Suteikti</string>
+    <string name="su_warning">Suteikia pilną prieigą prie jūsų įrenginio\nAtmeskite jei neesate tikri dėl programėlės šaltinio!</string>
+    <string name="forever">Visados</string>
+    <string name="once">Vieną kartą</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">%1$s gavo Supervartotojo teises</string>
+    <string name="su_deny_toast">%1$s negavo Supervartotojo teisių</string>
+    <string name="no_apps_found">Nėra surastų programėlių</string>
+    <string name="su_snack_grant">Supervartotojo teisių buvo %1$s suteikta</string>
+    <string name="su_snack_deny">Supervartotojo teisių buvo %1$s atmesta</string>
+    <string name="su_snack_notif_on">Buvo įjungta %1$s pranešimų</string>
+    <string name="su_snack_notif_off">Buvo išjungta %1$s pranešimų</string>
+    <string name="su_snack_log_on">%1$s surašymų buvo įjungta</string>
+    <string name="su_snack_log_off">%1$s surašymų buvo išjungta</string>
+    <string name="su_snack_revoke">%1$s teisių atšaukta</string>
+    <string name="su_revoke_title">Atšaukti?</string>
+    <string name="su_revoke_msg">Atšaukti %1$s teisių?</string>
+    <string name="toast">Išmesti</string>
+    <string name="none">Nėra</string>
+
+    <!--Superuser logs-->
+    <string name="pid">PID:\u0020</string>
+    <string name="target_uid">Target UID:\u0020</string>
+    <string name="command">Komanda:\u0020</string>
+
+</resources>
