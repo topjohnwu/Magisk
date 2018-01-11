@@ -89,6 +89,7 @@ rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
 cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $TMPDIR/bin/busybox $MAGISKBIN
 chmod -R 755 $MAGISKBIN
+mv $MAGISKBIN/magisk.apk /data
 
 # addon.d
 if [ -d /system/addon.d ]; then
