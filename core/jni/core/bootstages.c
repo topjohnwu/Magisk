@@ -647,13 +647,14 @@ void late_start(int client) {
 core_only:
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
+		rename(MANAGERAPK, "/data/magisk.apk");
 		while (1) {
 			sleep(5);
 			int apk_res = -1, pid;
 			pid = exec_command(1, &apk_res, pm_setenv,
 				"app_process",
 				"/system/bin", "com.android.commands.pm.Pm",
-				"install", "-r", MANAGERAPK, NULL);
+				"install", "-r", "/data/magisk.apk", NULL);
 			if (pid != -1) {
 				waitpid(pid, NULL, 0);
 				fdgets(buf, PATH_MAX, apk_res);
@@ -663,7 +664,7 @@ core_only:
 					break;
 			}
 		}
-		unlink(MANAGERAPK);
+		unlink("/data/magisk.apk");
 	}
 
 	// All boot stage done, cleanup everything
