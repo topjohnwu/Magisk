@@ -1,4 +1,3 @@
-### v5.5.3
-- Update translations
-- Update internal scripts
-- Minor bug fixes
+### v5.5.4
+- Fix on-boot dtbo detection
+- Add fingerprint authentication for Superuser requests
