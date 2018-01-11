@@ -62,8 +62,6 @@ public class MagiskManager extends Application {
 
     public boolean magiskHide;
     public boolean isDarkTheme;
-    public boolean updateNotification;
-    public boolean suReauth;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
     public int suAccessState;
@@ -74,7 +72,6 @@ public class MagiskManager extends Application {
     public String localeConfig;
     public int updateChannel;
     public String bootFormat;
-    public String customChannelUrl;
     public int repoOrder;
 
     // Global resources
@@ -135,17 +132,14 @@ public class MagiskManager extends Application {
         suRequestTimeout = Utils.getPrefsInt(prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
         suResponseType = Utils.getPrefsInt(prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
         suNotificationType = Utils.getPrefsInt(prefs, Const.Key.SU_NOTIFICATION, Const.Value.NOTIFICATION_TOAST);
-        suReauth = prefs.getBoolean(Const.Key.SU_REAUTH, false);
         suAccessState = suDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
         multiuserMode = suDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         suNamespaceMode = suDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
 
         // config
         isDarkTheme = prefs.getBoolean(Const.Key.DARK_THEME, false);
-        updateNotification = prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true);
         updateChannel = Utils.getPrefsInt(prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         bootFormat = prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-        customChannelUrl = prefs.getString(Const.Key.CUSTOM_CHANNEL, "");
         repoOrder = prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_NAME);
     }
 
@@ -153,10 +147,8 @@ public class MagiskManager extends Application {
         prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
-                .putBoolean(Const.Key.UPDATE_NOTIFICATION, updateNotification)
                 .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
                 .putBoolean(Const.Key.COREONLY, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
-                .putBoolean(Const.Key.SU_REAUTH, suReauth)
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
                 .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
@@ -171,7 +163,7 @@ public class MagiskManager extends Application {
                 .apply();
     }
 
-    public static void toast(String msg, int duration) {
+    public static void toast(CharSequence msg, int duration) {
         mHandler.post(() -> Toast.makeText(weakSelf.get(), msg, duration).show());
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -18,7 +19,7 @@ public class PackageReceiver extends BroadcastReceiver {
         switch (intent.getAction()) {
             case Intent.ACTION_PACKAGE_REPLACED:
                 // This will only work pre-O
-                if (mm.suReauth) {
+                if (mm.prefs.getBoolean(Const.Key.SU_REAUTH, false)) {
                     mm.suDB.deletePolicy(pkg);
                 }
                 break;

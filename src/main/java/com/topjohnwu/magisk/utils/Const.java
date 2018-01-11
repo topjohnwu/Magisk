@@ -23,6 +23,8 @@ public class Const {
     public static final String UTIL_FUNCTIONS= "util_functions.sh";
     public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
 
+    public static final String SU_KEYSTORE_KEY = "su_key";
+
     // Paths
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
@@ -109,6 +111,7 @@ public class Const {
         public static final String SU_AUTO_RESPONSE = "su_auto_response";
         public static final String SU_NOTIFICATION = "su_notification";
         public static final String SU_REAUTH = "su_reauth";
+        public static final String SU_FINGERPRINT = "su_fingerprint";
 
         // intents
         public static final String OPEN_SECTION = "section";

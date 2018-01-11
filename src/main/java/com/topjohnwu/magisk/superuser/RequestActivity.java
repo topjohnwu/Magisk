@@ -3,12 +3,14 @@ package com.topjohnwu.magisk.superuser;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.fingerprint.FingerprintManager;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.FileObserver;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +25,7 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.DataInputStream;
@@ -40,6 +43,8 @@ public class RequestActivity extends Activity {
     @BindView(R.id.package_name) TextView packageNameView;
     @BindView(R.id.grant_btn) Button grant_btn;
     @BindView(R.id.deny_btn) Button deny_btn;
+    @BindView(R.id.fingerprint) ImageView fingerprintImg;
+    @BindView(R.id.warning) TextView warning;
 
     private String socketPath;
     private LocalSocket socket;
@@ -49,6 +54,7 @@ public class RequestActivity extends Activity {
     private boolean hasTimeout;
     private Policy policy;
     private CountDownTimer timer;
+    private FingerprintHelper fingerprintHelper;
 
     @Override
     public int getDarkTheme() {
@@ -78,6 +84,15 @@ public class RequestActivity extends Activity {
         }.startWatching();
 
         new SocketManager(this).exec();
+    }
+
+    @Override
+    public void finish() {
+        if (timer != null)
+            timer.cancel();
+        if (fingerprintHelper != null)
+            fingerprintHelper.cancel();
+        super.finish();
     }
 
     private boolean cancelTimeout() {
@@ -128,11 +143,49 @@ public class RequestActivity extends Activity {
             }
         };
 
-        grant_btn.setOnClickListener(v -> {
-            handleAction(Policy.ALLOW);
-            timer.cancel();
-        });
-        grant_btn.requestFocus();
+        boolean useFingerprint = mm.prefs.getBoolean(Const.Key.SU_FINGERPRINT, false) && FingerprintHelper.canUseFingerprint();
+
+        if (useFingerprint) {
+            try {
+                fingerprintHelper = new FingerprintHelper() {
+                    @Override
+                    public void onAuthenticationError(int errorCode, CharSequence errString) {
+                        warning.setText(errString);
+                    }
+
+                    @Override
+                    public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                        warning.setText(helpString);
+                    }
+
+                    @Override
+                    public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                        handleAction(Policy.ALLOW);
+                    }
+
+                    @Override
+                    public void onAuthenticationFailed() {
+                        warning.setText(R.string.auth_fail);
+                    }
+                };
+                fingerprintHelper.startAuth();
+            } catch (Exception e) {
+                e.printStackTrace();
+                useFingerprint = false;
+            }
+        }
+
+        if (!useFingerprint) {
+            grant_btn.setOnClickListener(v -> {
+                handleAction(Policy.ALLOW);
+                timer.cancel();
+            });
+            grant_btn.requestFocus();
+        }
+
+        grant_btn.setVisibility(useFingerprint ? View.GONE : View.VISIBLE);
+        fingerprintImg.setVisibility(useFingerprint ? View.VISIBLE : View.GONE);
+
         deny_btn.setOnClickListener(v -> {
             handleAction(Policy.DENY);
             timer.cancel();
@@ -151,8 +204,9 @@ public class RequestActivity extends Activity {
     public void onBackPressed() {
         if (policy != null) {
             handleAction(Policy.DENY);
+        } else {
+            finish();
         }
-        finish();
     }
 
     void handleAction() {

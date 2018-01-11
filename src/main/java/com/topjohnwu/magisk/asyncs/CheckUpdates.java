@@ -33,7 +33,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                 jsonStr = WebService.getString(Const.Url.BETA_URL);
                 break;
             case Const.Value.CUSTOM_CHANNEL:
-                jsonStr = WebService.getString(mm.customChannelUrl);
+                jsonStr = WebService.getString(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                 break;
         }
         try {
@@ -54,7 +54,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         MagiskManager mm = MagiskManager.get();
-        if (showNotification && mm.updateNotification) {
+        if (showNotification && mm.prefs.getBoolean(Const.Key.UPDATE_NOTIFICATION, true)) {
             if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
                 ShowUI.managerUpdateNotification();
             } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {

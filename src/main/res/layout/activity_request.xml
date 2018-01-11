@@ -101,18 +101,27 @@
         <Button
             style="?android:buttonBarButtonStyle"
             android:text="@string/deny_with_str"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/deny_btn"
             android:layout_weight="1" />
 
         <Button
-            style="?android:buttonBarButtonStyle"
-            android:text="@string/grant"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/grant_btn"
-            android:layout_weight="1" />
+            style="?android:buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/grant" />
+
+        <ImageView
+            android:id="@+id/fingerprint"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="7dp"
+            android:tint="?attr/colorAccent"
+            android:src="@drawable/ic_fingerprint" />
     </LinearLayout>
 
 </LinearLayout>

@@ -166,6 +166,8 @@
     <string name="request_timeout_summary">%1$s seconds</string>
     <string name="settings_su_reauth_title">Re-authenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Re-authenticate superuser permissions after an application upgrades</string>
+    <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
+    <string name="settings_su_fingerprint_summary">Use fingerprint scanner to allow superuser requests</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
@@ -212,6 +214,7 @@
     <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
     <string name="toast">Toast</string>
     <string name="none">None</string>
+    <string name="auth_fail">Authentication Failed</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>

@@ -108,6 +108,11 @@
             android:entryValues="@array/value_array" />
 
         <SwitchPreference
+            android:key="su_fingerprint"
+            android:title="@string/settings_su_fingerprint_title"
+            android:summary="@string/settings_su_fingerprint_summary"/>
+
+        <SwitchPreference
             android:key="su_reauth"
             android:title="@string/settings_su_reauth_title"
             android:summary="@string/settings_su_reauth_summary"/>

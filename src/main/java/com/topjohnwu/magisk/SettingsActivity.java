@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -112,13 +113,14 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             multiuserMode = (ListPreference) findPreference(Const.Key.SU_MULTIUSER_MODE);
             namespaceMode = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
             SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
+            SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
 
             updateChannel.setOnPreferenceChangeListener((pref, o) -> {
                 mm.updateChannel = Integer.parseInt((String) o);
                 if (mm.updateChannel == Const.Value.CUSTOM_CHANNEL) {
                     View v = LayoutInflater.from(getActivity()).inflate(R.layout.custom_channel_dialog, null);
                     EditText url = v.findViewById(R.id.custom_url);
-                    url.setText(mm.customChannelUrl);
+                    url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                     new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.settings_update_custom)
                         .setView(v)
@@ -142,6 +144,11 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 reauth.setEnabled(false);
                 reauth.setSummary(R.string.android_o_not_support);
+            }
+
+            // Remove fingerprint option if not possible
+            if (!FingerprintHelper.canUseFingerprint()) {
+                suCategory.removePreference(fingerprint);
             }
 
             if (mm.getPackageName().equals(Const.ORIG_PKG_NAME) && mm.magiskVersionCode >= 1440) {
