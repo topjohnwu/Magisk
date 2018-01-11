@@ -29,7 +29,7 @@
 #define HIDELIST        COREDIR "/hidelist"
 #define MAINIMG         "/data/adb/magisk.img"
 #define DATABIN         "/data/adb/magisk"
-#define MANAGERAPK      DATABIN "/magisk.apk"
+#define MANAGERAPK      "/data/magisk.apk"
 #define MAGISKRC        "/init.magisk.rc"
 
 
