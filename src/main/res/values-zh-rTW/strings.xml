@@ -214,5 +214,8 @@
     <string name="sorting_order">排序方式</string>
     <string name="sort_by_name">按名稱排序</string>
     <string name="sort_by_update">按更新時間排序</string>
+    <string name="settings_su_fingerprint_title">啟用指紋認證</string>
+    <string name="settings_su_fingerprint_summary">用指紋辨識來允許超級用戶權限</string>
+    <string name="auth_fail">認證失敗</string>
 
 </resources>
