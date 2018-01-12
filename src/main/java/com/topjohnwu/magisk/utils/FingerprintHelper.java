@@ -30,7 +30,7 @@ public abstract class FingerprintHelper extends FingerprintManager.Authenticatio
         MagiskManager mm = MagiskManager.get();
         KeyguardManager km = mm.getSystemService(KeyguardManager.class);
         FingerprintManager fm = mm.getSystemService(FingerprintManager.class);
-        return km.isKeyguardSecure() && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
+        return km.isKeyguardSecure() && fm != null && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
     }
 
     protected FingerprintHelper() throws Exception {
