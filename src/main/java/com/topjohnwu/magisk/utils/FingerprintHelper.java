@@ -18,7 +18,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 @TargetApi(Build.VERSION_CODES.M)
-public abstract class FingerprintHelper extends FingerprintManager.AuthenticationCallback {
+public abstract class FingerprintHelper {
 
     private FingerprintManager manager;
     private Cipher cipher;
@@ -54,10 +54,38 @@ public abstract class FingerprintHelper extends FingerprintManager.Authenticatio
         }
     }
 
+    public abstract void onAuthenticationError(int errorCode, CharSequence errString);
+
+    public abstract void onAuthenticationHelp(int helpCode, CharSequence helpString);
+
+    public abstract void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result);
+
+    public abstract void onAuthenticationFailed();
+
     public void startAuth() {
         cancel = new CancellationSignal();
         FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(cipher);
-        manager.authenticate(cryptoObject, cancel, 0, this, null);
+        manager.authenticate(cryptoObject, cancel, 0, new FingerprintManager.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                FingerprintHelper.this.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                FingerprintHelper.this.onAuthenticationHelp(helpCode, helpString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                FingerprintHelper.this.onAuthenticationSucceeded(result);
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                FingerprintHelper.this.onAuthenticationFailed();
+            }
+        }, null);
     }
 
     public void cancel() {
