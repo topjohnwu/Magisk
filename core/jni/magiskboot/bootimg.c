@@ -63,8 +63,10 @@ int parse_img(const char *image, boot_img *boot) {
 
 	// Parse image
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
-	for (size_t pos = 0; pos < boot->map_size; pos += 256) {
-		switch (check_type(boot->map_addr + pos)) {
+	for (void *head = boot->map_addr; head < boot->map_addr + boot->map_size; head += 256) {
+		size_t pos = 0;
+
+		switch (check_type(head)) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
 			boot->flags |= CHROMEOS_FLAG;
@@ -75,33 +77,33 @@ int parse_img(const char *image, boot_img *boot) {
 			exit(ELF64_RET);
 		case AOSP:
 			// Read the header
-			memcpy(&boot->hdr, boot->map_addr + pos, sizeof(boot->hdr));
+			memcpy(&boot->hdr, head + pos, sizeof(boot->hdr));
 			pos += boot->hdr.page_size;
 
 			print_hdr(&boot->hdr);
 
-			boot->kernel = boot->map_addr + pos;
+			boot->kernel = head + pos;
 			pos += boot->hdr.kernel_size;
 			mem_align(&pos, boot->hdr.page_size);
 
-			boot->ramdisk = boot->map_addr + pos;
+			boot->ramdisk = head + pos;
 			pos += boot->hdr.ramdisk_size;
 			mem_align(&pos, boot->hdr.page_size);
 
 			if (boot->hdr.second_size) {
-				boot->second = boot->map_addr + pos;
+				boot->second = head + pos;
 				pos += boot->hdr.second_size;
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
 			if (boot->hdr.extra_size) {
-				boot->extra = boot->map_addr + pos;
+				boot->extra = head + pos;
 				pos += boot->hdr.extra_size;
 				mem_align(&pos, boot->hdr.page_size);
 			}
 
 			if (pos < boot->map_size) {
-				boot->tail = boot->map_addr + pos;
+				boot->tail = head + pos;
 				boot->tail_size = boot->map_size - pos;
 			}
 
