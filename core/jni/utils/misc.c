@@ -111,7 +111,12 @@ static int is_num(const char *s) {
 ssize_t fdgets(char *buf, const size_t size, int fd) {
 	ssize_t len = 0;
 	buf[0] = '\0';
-	while (read(fd, buf + len, 1) >= 0 && len < size - 1) {
+	while (len < size - 1) {
+		int ret = read(fd, buf + len, 1);
+		if (ret < 0)
+			return -1;
+		if (ret == 0)
+			break;
 		if (buf[len] == '\0' || buf[len++] == '\n') {
 			buf[len] = '\0';
 			break;

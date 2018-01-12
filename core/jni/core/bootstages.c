@@ -648,6 +648,7 @@ core_only:
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
 		rename(MANAGERAPK, "/data/magisk.apk");
+		setfilecon("/data/magisk.apk", "u:object_r:su_file:s0");
 		while (1) {
 			sleep(5);
 			int apk_res = -1, pid;
@@ -656,12 +657,17 @@ core_only:
 				"/system/bin", "com.android.commands.pm.Pm",
 				"install", "-r", "/data/magisk.apk", NULL);
 			if (pid != -1) {
+				int err = 0;
+				while (fdgets(buf, PATH_MAX, apk_res) > 0) {
+					LOGD("apk_install: %s", buf);
+					err |= strstr(buf, "Error:") != NULL;
+				}
 				waitpid(pid, NULL, 0);
-				fdgets(buf, PATH_MAX, apk_res);
 				close(apk_res);
 				// Keep trying until pm is started
-				if (strstr(buf, "Error:") == NULL)
-					break;
+				if (err)
+					continue;
+				break;
 			}
 		}
 		unlink("/data/magisk.apk");
