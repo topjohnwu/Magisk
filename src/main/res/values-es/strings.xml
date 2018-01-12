@@ -163,7 +163,10 @@
     <string name="request_timeout_summary">%1$s segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
-
+    <string name="settings_su_fingerprint_title">Habilitar la autenticación de huellas digitales</string>
+    <string name="settings_su_fingerprint_summary">Utilice el escáner de huellas digitales para permitir las solicitudes de superusuario</string>
+ 
+    
     <string name="multiuser_mode">Modo MultiUsuario</string> 
     <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
     <string name="settings_owner_manage">Administrador del Dispositivo</string>
@@ -209,6 +212,7 @@
     <string name="su_revoke_msg">¿Confirmar para revocar derechos de %1$s?</string>
     <string name="toast">Aviso</string>
     <string name="none">Nada</string>
+    <string name="auth_fail">Autenticación fallida</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
