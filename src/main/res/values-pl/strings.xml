@@ -166,8 +166,10 @@
     <string name="request_timeout_summary">%1$s sekund</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelnienia po aktualizacji</string>
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
+    <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
+    <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
     
-    <string name="multiuser_mode">Tryb Multiusera</string>
+	<string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
     <string name="settings_user_independent">Niezależny Użytkownik</string>
@@ -212,6 +214,7 @@
     <string name="su_revoke_msg">Potwierdzasz odwołanie uprawnień %1$s?</string>
     <string name="toast">Powiadomienie</string>
     <string name="none">Brak</string>
+    <string name="auth_fail">Uwierzytelnienie Nieudane</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
