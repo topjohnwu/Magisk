@@ -163,6 +163,8 @@
 	<string name="request_timeout_summary">%1$s secondi</string>
 	<string name="settings_su_reauth_title">Ri-autentica dopo aggiornamento</string>
 	<string name="settings_su_reauth_summary">Ri-autentica i permessi Superuser dopo un aggiornamento dell\'app</string>
+	<string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>
+	<string name="settings_su_fingerprint_summary">Utilizza il sensore di impronte per accettare le richieste Superuser</string>
 
 	<string name="multiuser_mode">Modalità multiutente</string>    
 	<string name="settings_owner_only">Solo proprietario del dispositivo</string>
@@ -209,6 +211,7 @@
 	<string name="su_revoke_msg">Confermi la revoca dei diritti di %1$s?</string>
 	<string name="toast">Toast</string>
 	<string name="none">Nessuno</string>
+	<string name="auth_fail">Autenticatione fallita</string>
 	
 	<!--Superuser logs-->
 	<string name="pid">PID:\u0020</string>
