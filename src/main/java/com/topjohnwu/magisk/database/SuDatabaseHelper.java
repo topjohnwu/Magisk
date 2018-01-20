@@ -15,8 +15,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 import java.text.DateFormat;

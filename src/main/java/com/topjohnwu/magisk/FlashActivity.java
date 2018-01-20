@@ -16,9 +16,9 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.container.CallbackList;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellCallbackVector;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -96,10 +96,10 @@ public class FlashActivity extends Activity {
             reboot.setVisibility(View.GONE);
 
         logs = new ArrayList<>();
-        List<String> console = new CallbackList<String>() {
+        ShellCallbackVector console = new ShellCallbackVector() {
             @Override
-            public synchronized void onAddElement(String e) {
-                logs.add(e);
+            public void onShellOutput(String s) {
+                logs.add(s);
                 flashLogs.setText(TextUtils.join("\n", this));
                 sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
             }

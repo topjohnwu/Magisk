@@ -29,6 +29,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 import java.io.IOException;

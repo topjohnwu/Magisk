@@ -6,8 +6,8 @@ import android.content.Intent;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 
 public class PackageReceiver extends BroadcastReceiver {
     @Override

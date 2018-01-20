@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.superuser.Shell;
 
 import java.util.List;
 

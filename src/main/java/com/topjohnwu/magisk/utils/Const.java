@@ -27,6 +27,7 @@ public class Const {
 
     // Paths
     public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
+    public static final String BUSYBOX_PATH = "/sbin/.core/busybox";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final File EXTERNAL_PATH = new File(Environment.getExternalStorageDirectory(), "MagiskManager");
@@ -36,14 +37,6 @@ public class Const {
     public static final int UPDATE_SERVICE_VER = 1;
     public static final int SNET_VER = 7;
     public static final int MIN_MODULE_VER = 1400;
-
-    public static String BUSYBOX_PATH() {
-        if (Utils.itemExist("/sbin/.core/busybox/busybox")) {
-            return "/sbin/.core/busybox";
-        } else {
-            return "/dev/magisk/bin";
-        }
-    }
 
     public static String MAGISK_PATH() {
         if (Utils.itemExist("/sbin/.core/img")) {

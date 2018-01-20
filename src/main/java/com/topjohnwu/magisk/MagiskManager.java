@@ -14,16 +14,20 @@ import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellContainer;
+import com.topjohnwu.superuser.ShellInitializer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MagiskManager extends Application {
+public class MagiskManager extends Application implements ShellContainer {
 
     // Global weak reference to self
     private static WeakReference<MagiskManager> weakSelf;
@@ -85,6 +89,21 @@ public class MagiskManager extends Application {
 
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
+        Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
+        Shell.setGlobalContainer(this);
+        Shell.setInitializer(new ShellInitializer() {
+            @Override
+            public void onRootShellInit(Shell shell) {
+                try (InputStream in  = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS)) {
+                    shell.loadInputStream(in);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                shell.run_raw("export PATH=" + Const.BUSYBOX_PATH + ":$PATH",
+                        "mount_partitions",
+                        "run_migrations");
+            }
+        });
     }
 
     @Override
@@ -108,6 +127,16 @@ public class MagiskManager extends Application {
         defaultLocale = Locale.getDefault();
         setLocale();
         loadConfig();
+    }
+
+    @Override
+    public Shell getShell() {
+        return shell;
+    }
+
+    @Override
+    public void setShell(Shell shell) {
+        this.shell = shell;
     }
 
     public static MagiskManager get() {

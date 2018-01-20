@@ -12,9 +12,9 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.superuser.Shell;
 
 import org.kamranzafar.jtar.TarInputStream;
 import org.kamranzafar.jtar.TarOutputStream;
@@ -178,7 +178,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             // Force non-root shell
             Shell shell;
             if (Shell.rootAccess())
-                shell = new Shell("sh");
+                shell = Shell.newShell("sh");
             else
                 shell = Shell.getShell();
 
@@ -192,8 +192,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;
 
-            shell.run(null, null,
-                    "mv -f new-boot.img ../",
+            shell.run("mv -f new-boot.img ../",
                     "mv bin/busybox busybox",
                     "rm -rf bin *.img update-binary",
                     "cd /");
@@ -212,7 +211,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 ) {
                     SignBoot.doSignature("/boot", in, out, keyIn, certIn);
                 }
-                shell.run_raw(false, false, "mv -f " + signed + " " + patched_boot);
+                shell.run_raw("mv -f " + signed + " " + patched_boot);
             }
 
             switch (mode) {

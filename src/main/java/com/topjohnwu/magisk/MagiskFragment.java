@@ -22,10 +22,10 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 
 import butterknife.BindColor;
 import butterknife.BindView;

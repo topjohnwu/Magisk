@@ -21,8 +21,9 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellCallback;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -188,7 +189,7 @@ public class MagiskLogFragment extends Fragment {
         }
     }
 
-    private static class StringBuildingList extends Shell.AbstractList<String> {
+    private static class StringBuildingList extends ShellCallback {
 
         StringBuilder builder;
 
@@ -196,18 +197,17 @@ public class MagiskLogFragment extends Fragment {
             builder = new StringBuilder();
         }
 
-        @Override
-        public boolean add(String s) {
-            builder.append(s).append("\n");
-            return true;
-        }
-
         public CharSequence getCharSequence() {
             return builder;
         }
+
+        @Override
+        public void onShellOutput(String s) {
+            builder.append(s).append("\n");
+        }
     }
 
-    private static class FileWritingList extends Shell.AbstractList<String> {
+    private static class FileWritingList extends ShellCallback {
 
         private FileWriter writer;
 
@@ -216,11 +216,10 @@ public class MagiskLogFragment extends Fragment {
         }
 
         @Override
-        public boolean add(String s) {
+        public void onShellOutput(String s) {
             try {
                 writer.write(s + "\n");
             } catch (IOException ignored) {}
-            return true;
         }
     }
 

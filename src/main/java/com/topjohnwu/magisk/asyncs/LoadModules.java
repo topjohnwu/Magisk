@@ -4,7 +4,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
+import com.topjohnwu.superuser.Shell;
 
 import java.util.List;
 

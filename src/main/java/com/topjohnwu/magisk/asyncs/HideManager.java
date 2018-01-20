@@ -8,9 +8,9 @@ import com.topjohnwu.crypto.JarMap;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Shell;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.File;
 import java.io.FileInputStream;

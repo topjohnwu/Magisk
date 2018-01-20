@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.receivers.RebootReceiver;
+import com.topjohnwu.superuser.Shell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
