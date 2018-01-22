@@ -2,8 +2,10 @@ package com.topjohnwu.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.security.Security;
 
@@ -32,8 +34,9 @@ public class ZipSigner {
 
         try (InputStream pub = new FileInputStream(pubKey);
              InputStream priv = new FileInputStream(privKey);
-             JarMap jar = new JarMap(input, false)) {
-            SignAPK.signZip(pub, priv, jar, output, minSign);
+             JarMap jar = new JarMap(input, false);
+             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
+            SignAPK.signZip(pub, priv, jar, out, minSign);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);

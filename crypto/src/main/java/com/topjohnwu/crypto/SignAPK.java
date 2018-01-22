@@ -70,9 +70,8 @@ public class SignAPK {
     }
 
     public static void signZip(InputStream publicIn, InputStream privateIn,
-                               JarMap input, File output, boolean minSign) throws Exception {
+                               JarMap input, OutputStream output, boolean minSign) throws Exception {
         int alignment = 4;
-        BufferedOutputStream outputFile;
         int hashes = 0;
         X509Certificate publicKey = CryptoUtils.readPublicKey(publicIn);
         hashes |= getDigestAlgorithm(publicKey);
@@ -83,11 +82,10 @@ public class SignAPK {
         long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
         PrivateKey privateKey = CryptoUtils.readPrivateKey(privateIn);
 
-        outputFile = new BufferedOutputStream(new FileOutputStream(output));
         if (minSign) {
-            signWholeFile(input.getFile(), publicKey, privateKey, outputFile);
+            signWholeFile(input.getFile(), publicKey, privateKey, output);
         } else {
-            JarOutputStream outputJar = new JarOutputStream(outputFile);
+            JarOutputStream outputJar = new JarOutputStream(output);
             // For signing .apks, use the maximum compression to make
             // them as small as possible (since they live forever on
             // the system partition).  For OTA packages, use the
@@ -98,10 +96,7 @@ public class SignAPK {
             Manifest manifest = addDigestsToManifest(input, hashes);
             copyFiles(manifest, input, outputJar, timestamp, alignment);
             signFile(manifest, input, publicKey, privateKey, outputJar);
-            outputJar.close();
         }
-        input.close();
-        outputFile.close();
     }
 
     /**
