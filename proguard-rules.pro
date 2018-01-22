@@ -20,7 +20,9 @@
 -keepnames class ** { *; }
 
 # BouncyCastle
--keep class org.bouncycastle.jcajce.provider.** { *; }
+-keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
+-keep class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
+-keep class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
 # Gson
