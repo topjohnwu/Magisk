@@ -1,0 +1,36 @@
+dist: trusty
+language: java
+sudo: false
+
+addons:
+  apt:
+    sources:
+    - deadsnakes
+    packages:
+    - python3.6
+
+jdk:
+  - oraclejdk8
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+before_install:
+ - wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip -O $HOME/android-sdk.tgz
+ - mkdir $HOME/android
+ - unzip $HOME/android-sdk.tgz -d $HOME/android/sdk
+ - export PATH=$PATH:$HOME/android/sdk/tools:$HOME/android/sdk/tools/bin
+
+install:
+  - echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager 'cmake;3.6.4111459'
+  - export ANDROID_HOME=$HOME/android/sdk
+  - export ANDROID_NDK_HOME=$HOME/android/sdk/ndk-bundle
+
+script:
+  - python3.6 build.py all 123.456 012345
