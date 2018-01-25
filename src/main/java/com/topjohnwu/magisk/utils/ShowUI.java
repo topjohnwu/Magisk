@@ -111,7 +111,7 @@ public class ShowUI {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                List<String> res = Shell.su("echo $SLOT");
+                List<String> res = Shell.Sync.su("echo $SLOT");
                 if (Utils.isValidShellResponse(res)) {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
@@ -185,13 +185,13 @@ public class ShowUI {
                                     if (slot[1] == 'a') slot[1] = 'b';
                                     else slot[1] = 'a';
                                     // Then find the boot image again
-                                    List<String> ret = Shell.su(
+                                    List<String> ret = Shell.Sync.su(
                                             "SLOT=" + String.valueOf(slot),
                                             "find_boot_image",
                                             "echo \"$BOOTIMAGE\""
                                     );
                                     boot = Utils.isValidShellResponse(ret) ? ret.get(ret.size() - 1) : null;
-                                    Shell.su_raw("mount_partitions");
+                                    Shell.Async.su("mount_partitions");
                                     if (boot == null)
                                         return;
                                     receiver = new DownloadReceiver() {
@@ -266,7 +266,7 @@ public class ShowUI {
                     return;
                 }
 
-                Shell.su(
+                Shell.Sync.su(
                         Utils.fmt("echo '%s' > /cache/%s", uninstaller.toString().replace("'", "'\\''"), Const.UNINSTALLER),
                         Utils.fmt("echo '%s' > %s/%s", utils.toString().replace("'", "'\\''"),
                                 mm.magiskVersionCode >= 1464 ? "/data/adb/magisk" : "/data/magisk", Const.UTIL_FUNCTIONS)

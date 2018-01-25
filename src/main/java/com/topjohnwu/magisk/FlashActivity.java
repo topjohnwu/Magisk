@@ -17,8 +17,8 @@ import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellCallbackVector;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -49,7 +49,7 @@ public class FlashActivity extends Activity {
 
     @OnClick(R.id.reboot)
     void reboot() {
-        Shell.su_raw("/system/bin/reboot");
+        Shell.Async.su("/system/bin/reboot");
     }
 
     @OnClick(R.id.save_logs)
@@ -96,9 +96,9 @@ public class FlashActivity extends Activity {
             reboot.setVisibility(View.GONE);
 
         logs = new ArrayList<>();
-        ShellCallbackVector console = new ShellCallbackVector() {
+        CallbackList console = new CallbackList<String>(new ArrayList<>()) {
             @Override
-            public void onShellOutput(String s) {
+            public void onAddElement(String s) {
                 logs.add(s);
                 flashLogs.setText(TextUtils.join("\n", this));
                 sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);

@@ -25,7 +25,7 @@ public class PackageReceiver extends BroadcastReceiver {
                 break;
             case Intent.ACTION_PACKAGE_FULLY_REMOVED:
                 mm.suDB.deletePolicy(pkg);
-                Shell.su_raw("magiskhide --rm " + pkg);
+                Shell.Async.su("magiskhide --rm " + pkg);
                 break;
         }
     }

@@ -131,7 +131,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
         // Install the application
 
-        List<String> ret = Shell.su(Utils.fmt("pm install %s >/dev/null && echo true || echo false", repack));
+        List<String> ret = Shell.Sync.su(Utils.fmt("pm install %s >/dev/null && echo true || echo false", repack));
         repack.delete();
         if (!Utils.isValidShellResponse(ret) || !Boolean.parseBoolean(ret.get(0)))
             return false;

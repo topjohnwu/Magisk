@@ -81,10 +81,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.checkBox.setChecked(mHideList.contains(info.packageName));
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
                 if (isChecked) {
-                    Shell.su_raw("magiskhide --add " + info.packageName);
+                    Shell.Async.su("magiskhide --add " + info.packageName);
                     mHideList.add(info.packageName);
                 } else {
-                    Shell.su_raw("magiskhide --rm " + info.packageName);
+                    Shell.Async.su("magiskhide --rm " + info.packageName);
                     mHideList.remove(info.packageName);
                 }
             });
@@ -155,7 +155,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             }
             Collections.sort(mOriginalList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
                     .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            mHideList = Shell.su("magiskhide --ls");
+            mHideList = Shell.Sync.su("magiskhide --ls");
             return null;
         }
 

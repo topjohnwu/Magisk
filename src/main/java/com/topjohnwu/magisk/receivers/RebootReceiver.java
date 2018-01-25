@@ -9,6 +9,6 @@ import com.topjohnwu.superuser.Shell;
 public class RebootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Shell.su_raw("/system/bin/reboot");
+        Shell.Async.su("/system/bin/reboot");
     }
 }

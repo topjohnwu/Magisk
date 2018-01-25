@@ -22,8 +22,8 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellCallback;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -114,12 +114,18 @@ public class MagiskLogFragment extends Fragment {
             mode = (int) params[0];
             switch (mode) {
                 case 0:
-                    StringBuildingList logList = new StringBuildingList();
-                    Shell.su(logList, "cat " + Const.MAGISK_LOG + " | tail -n 5000");
-                    return logList.getCharSequence();
+                    StringBuilder builder = new StringBuilder();
+                    CallbackList<String> logs = new CallbackList<String>() {
+                        @Override
+                        public void onAddElement(String s) {
+                            builder.append(s).append('\n');
+                        }
+                    };
+                    Shell.Sync.su(logs, "cat " + Const.MAGISK_LOG + " | tail -n 5000");
+                    return builder;
 
                 case 1:
-                    Shell.su_raw("echo -n > " + Const.MAGISK_LOG);
+                    Shell.Async.su("echo -n > " + Const.MAGISK_LOG);
                     SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
                     return "";
 
@@ -139,8 +145,16 @@ public class MagiskLogFragment extends Fragment {
                     }
 
                     try (FileWriter out = new FileWriter(targetFile)) {
-                        FileWritingList fileWritingList = new FileWritingList(out);
-                        Shell.su(fileWritingList, "cat " + Const.MAGISK_LOG);
+                        CallbackList<String> list = new CallbackList<String>() {
+                            @Override
+                            public void onAddElement(String s) {
+                                try {
+                                    out.write(s);
+                                    out.write("\n");
+                                } catch (IOException ignored) {}
+                            }
+                        };
+                        Shell.Sync.su(list, "cat " + Const.MAGISK_LOG);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return false;
@@ -188,39 +202,4 @@ public class MagiskLogFragment extends Fragment {
             exec(2);
         }
     }
-
-    private static class StringBuildingList extends ShellCallback {
-
-        StringBuilder builder;
-
-        StringBuildingList() {
-            builder = new StringBuilder();
-        }
-
-        public CharSequence getCharSequence() {
-            return builder;
-        }
-
-        @Override
-        public void onShellOutput(String s) {
-            builder.append(s).append("\n");
-        }
-    }
-
-    private static class FileWritingList extends ShellCallback {
-
-        private FileWriter writer;
-
-        FileWritingList(FileWriter out) {
-            writer = out;
-        }
-
-        @Override
-        public void onShellOutput(String s) {
-            try {
-                writer.write(s + "\n");
-            } catch (IOException ignored) {}
-        }
-    }
-
 }

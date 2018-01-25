@@ -12,7 +12,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     private List<String> getModList() {
         String command = "ls -d " + Const.MAGISK_PATH() + "/* | grep -v lost+found";
-        return Shell.su(command);
+        return Shell.Sync.su(command);
     }
 
     @Override

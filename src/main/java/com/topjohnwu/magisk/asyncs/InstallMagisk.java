@@ -70,7 +70,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         mm.createDeviceProtectedStorageContext() :
                         mm).getFilesDir().getParent()
                 , "install");
-        Shell.sh_raw("rm -rf " + install);
+        Shell.Async.sh("rm -rf " + install);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
@@ -102,7 +102,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 console.add("! Cannot unzip zip");
                 throw e;
             }
-            Shell.sh("chmod 755 " + install + "/*");
+            Shell.Sync.sh("chmod 755 " + install + "/*");
 
             File boot = new File(install, "boot.img");
             boolean highCompression = false;
@@ -154,7 +154,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         }
                     }
                     if (boot.createNewFile()) {
-                        Shell.su("cat " + mBootLocation + " > " + boot);
+                        Shell.Sync.su("cat " + mBootLocation + " > " + boot);
                     } else {
                         console.add("! Dump boot image failed");
                         return false;
@@ -178,7 +178,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             // Force non-root shell
             Shell shell;
             if (Shell.rootAccess())
-                shell = Shell.newShell("sh");
+                shell = Shell.newInstance("sh");
             else
                 shell = Shell.getShell();
 
@@ -192,7 +192,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
                 return false;
 
-            shell.run("mv -f new-boot.img ../",
+            shell.run(null, null, "mv -f new-boot.img ../",
                     "mv bin/busybox busybox",
                     "rm -rf bin *.img update-binary",
                     "cd /");
@@ -211,7 +211,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 ) {
                     SignBoot.doSignature("/boot", in, out, keyIn, certIn);
                 }
-                shell.run_raw("mv -f " + signed + " " + patched_boot);
+                shell.run(null, null, "mv -f " + signed + " " + patched_boot);
             }
 
             switch (mode) {

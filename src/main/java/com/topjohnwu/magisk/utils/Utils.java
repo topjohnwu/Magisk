@@ -47,12 +47,12 @@ public class Utils {
     public static boolean isDownloading = false;
 
     public static boolean itemExist(Object path) {
-        List<String> ret = Shell.su(fmt("[ -e %s ] && echo true || echo false", path));
+        List<String> ret = Shell.Sync.su(fmt("[ -e %s ] && echo true || echo false", path));
         return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
     }
 
     public static void createFile(Object path) {
-        Shell.su_raw(fmt("mkdir -p `dirname '%s'` 2>/dev/null; touch '%s' 2>/dev/null", path, path));
+        Shell.Async.su(fmt("mkdir -p `dirname '%s'` 2>/dev/null; touch '%s' 2>/dev/null", path, path));
     }
 
     public static boolean javaCreateFile(File path) {
@@ -67,20 +67,20 @@ public class Utils {
     }
 
     public static void removeItem(Object path) {
-        Shell.su_raw(fmt("rm -rf %s 2>/dev/null", path));
+        Shell.Async.su(fmt("rm -rf %s 2>/dev/null", path));
     }
 
     public static List<String> readFile(Object path) {
-        return Shell.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
+        return Shell.Sync.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
     }
 
     public static String checkInode(Object path) {
-        List<String> ret = Shell.su(fmt("ls -i %s", path));
+        List<String> ret = Shell.Sync.su(fmt("ls -i %s", path));
         return isValidShellResponse(ret) ? ret.get(0).trim().split("\\s+")[0] : path.toString();
     }
 
     public static void uninstallPkg(String pkg) {
-        Shell.su(fmt("umount -l /data/user*/*/%s/*/*.db 2>/dev/null; pm uninstall %s", pkg, pkg));
+        Shell.Sync.su(fmt("umount -l /data/user*/*/%s/*/*.db 2>/dev/null; pm uninstall %s", pkg, pkg));
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {
@@ -260,7 +260,7 @@ public class Utils {
     public static void patchDTBO() {
         MagiskManager mm = MagiskManager.get();
         if (mm.magiskVersionCode >= 1446 && !mm.keepVerity) {
-            List<String> ret = Shell.su("patch_dtbo_image && echo true || echo false");
+            List<String> ret = Shell.Sync.su("patch_dtbo_image && echo true || echo false");
             if (Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
                 ShowUI.dtboPatchedNotification();
             }
@@ -278,7 +278,7 @@ public class Utils {
         Map<String, ?> prefs = MagiskManager.get().prefs.getAll();
         prefs.remove("App Restrictions");
         String json = gson.toJson(prefs, new TypeToken<Map<String, ?>>(){}.getType());
-        Shell.su(fmt("for usr in /data/user/*; do echo '%s' > ${usr}/%s; done", json, Const.MANAGER_CONFIGS));
+        Shell.Sync.su(fmt("for usr in /data/user/*; do echo '%s' > ${usr}/%s; done", json, Const.MANAGER_CONFIGS));
     }
 
     public static void loadPrefs() {

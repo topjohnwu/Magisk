@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -8,6 +7,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.container.Module;
@@ -17,8 +17,6 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellContainer;
-import com.topjohnwu.superuser.ShellInitializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MagiskManager extends Application implements ShellContainer {
+public class MagiskManager extends Shell.ContainerApp {
 
     // Global weak reference to self
     private static WeakReference<MagiskManager> weakSelf;
@@ -82,7 +80,6 @@ public class MagiskManager extends Application implements ShellContainer {
     public SharedPreferences prefs;
     public SuDatabaseHelper suDB;
     public RepoDatabaseHelper repoDB;
-    public Shell shell;
     public Runnable permissionGrantCallback = null;
 
     private static Handler mHandler = new Handler();
@@ -90,16 +87,16 @@ public class MagiskManager extends Application implements ShellContainer {
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
         Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
-        Shell.setGlobalContainer(this);
-        Shell.setInitializer(new ShellInitializer() {
+        Shell.setInitializer(new Shell.Initializer() {
             @Override
-            public void onRootShellInit(Shell shell) {
+            public void onRootShellInit(@NonNull Shell shell) {
                 try (InputStream in  = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS)) {
-                    shell.loadInputStream(in);
+                    shell.loadInputStream(null, null, in);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                shell.run_raw("export PATH=" + Const.BUSYBOX_PATH + ":$PATH",
+                shell.run(null, null,
+                        "export PATH=" + Const.BUSYBOX_PATH + ":$PATH",
                         "mount_partitions",
                         "run_migrations");
             }
@@ -127,16 +124,6 @@ public class MagiskManager extends Application implements ShellContainer {
         defaultLocale = Locale.getDefault();
         setLocale();
         loadConfig();
-    }
-
-    @Override
-    public Shell getShell() {
-        return shell;
-    }
-
-    @Override
-    public void setShell(Shell shell) {
-        this.shell = shell;
     }
 
     public static MagiskManager get() {
@@ -202,9 +189,9 @@ public class MagiskManager extends Application implements ShellContainer {
 
     public void loadMagiskInfo() {
         List<String> ret;
-        ret = Shell.sh("magisk -v");
+        ret = Shell.Sync.sh("magisk -v");
         if (!Utils.isValidShellResponse(ret)) {
-            ret = Shell.sh("getprop magisk.version");
+            ret = Shell.Sync.sh("getprop magisk.version");
             if (Utils.isValidShellResponse(ret)) {
                 try {
                     magiskVersionString = ret.get(0);
@@ -213,15 +200,15 @@ public class MagiskManager extends Application implements ShellContainer {
             }
         } else {
             magiskVersionString = ret.get(0).split(":")[0];
-            ret = Shell.sh("magisk -V");
+            ret = Shell.Sync.sh("magisk -V");
             try {
                 magiskVersionCode = Integer.parseInt(ret.get(0));
             } catch (NumberFormatException ignored) {}
         }
         if (magiskVersionCode > 1435) {
-            ret = Shell.su("resetprop -p " + Const.MAGISKHIDE_PROP);
+            ret = Shell.Sync.su("resetprop -p " + Const.MAGISKHIDE_PROP);
         } else {
-            ret = Shell.sh("getprop " + Const.MAGISKHIDE_PROP);
+            ret = Shell.Sync.sh("getprop " + Const.MAGISKHIDE_PROP);
         }
         try {
             magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
@@ -229,7 +216,7 @@ public class MagiskManager extends Application implements ShellContainer {
             magiskHide = true;
         }
 
-        ret = Shell.su("echo \"$BOOTIMAGE\"");
+        ret = Shell.Sync.su("echo \"$BOOTIMAGE\"");
         if (Utils.isValidShellResponse(ret))
             bootBlock = ret.get(0);
 
@@ -241,11 +228,11 @@ public class MagiskManager extends Application implements ShellContainer {
 
     public void getDefaultInstallFlags() {
         List<String> ret;
-        ret = Shell.su("echo \"$DTBOIMAGE\"");
+        ret = Shell.Sync.su("echo \"$DTBOIMAGE\"");
         if (Utils.isValidShellResponse(ret))
             keepVerity = true;
 
-        ret = Shell.su(
+        ret = Shell.Sync.su(
                 "getvar KEEPVERITY",
                 "echo $KEEPVERITY");
         try {
@@ -253,11 +240,11 @@ public class MagiskManager extends Application implements ShellContainer {
                 keepVerity = Boolean.parseBoolean(ret.get(0));
         } catch (NumberFormatException ignored) {}
 
-        ret = Shell.sh("getprop ro.crypto.state");
+        ret = Shell.Sync.sh("getprop ro.crypto.state");
         if (Utils.isValidShellResponse(ret) && ret.get(0).equals("encrypted"))
             keepEnc = true;
 
-        ret = Shell.su(
+        ret = Shell.Sync.su(
                 "getvar KEEPFORCEENCRYPT",
                 "echo $KEEPFORCEENCRYPT");
         try {

@@ -32,7 +32,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     }
 
     private void dlSnet() throws IOException {
-        Shell.sh("rm -rf " + dexPath.getParent());
+        Shell.Sync.sh("rm -rf " + dexPath.getParent());
         HttpURLConnection conn = WebService.request(Const.Url.SNET_URL, null);
         dexPath.getParentFile().mkdir();
         try (

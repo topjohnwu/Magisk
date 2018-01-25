@@ -85,7 +85,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     @Override
     protected void onPostExecute(Integer result) {
         FlashActivity activity = (FlashActivity) getActivity();
-        Shell.su_raw(
+        Shell.Async.su(
                 "rm -rf " + mCachedFile.getParent(),
                 "rm -rf " + Const.TMP_FOLDER_PATH
         );
