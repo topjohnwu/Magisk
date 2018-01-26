@@ -6,8 +6,6 @@ import com.topjohnwu.crypto.SignBoot;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class BootSigner {
 
@@ -15,30 +13,23 @@ public class BootSigner {
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && "-verify".equals(args[0])) {
             String certPath = "";
-            if (args.length >= 3 && "-certificate".equals(args[1])) {
-                /* args[2] is the path to a public key certificate */
-                certPath = args[2];
+            if (args.length >= 2) {
+                /* args[1] is the path to a public key certificate */
+                certPath = args[1];
             }
-            /* args[1] is the path to a signed boot image */
             boolean signed = SignBoot.verifySignature(System.in,
                     certPath.isEmpty() ? null : new FileInputStream(certPath));
             System.exit(signed ? 0 : 1);
         } else if (args.length > 0 && "-sign".equals(args[0])) {
-            InputStream keyIn, certIn;
-            if (args.length >= 3) {
-                keyIn = new FileInputStream(args[1]);
-                certIn = new FileInputStream(args[2]);
-            } else {
-                /* Use internal test keys */
-                JarFile apk = new JarFile(System.getProperty("java.class.path"));
-                JarEntry keyEntry = apk.getJarEntry("assets/" + Const.PRIVATE_KEY_NAME);
-                JarEntry sigEntry = apk.getJarEntry("assets/" + Const.PUBLIC_KEY_NAME);
+            InputStream cert = null;
+            InputStream key = null;
 
-                keyIn = apk.getInputStream(keyEntry);
-                certIn = apk.getInputStream(sigEntry);
+            if (args.length >= 3) {
+                cert = new FileInputStream(args[1]);
+                key = new FileInputStream(args[2]);
             }
 
-            boolean success = SignBoot.doSignature("/boot", System.in, System.out, keyIn, certIn);
+            boolean success = SignBoot.doSignature("/boot", System.in, System.out, cert, key);
             System.exit(success ? 0 : 1);
         } else {
             System.err.println(
@@ -48,8 +39,8 @@ public class BootSigner {
                     "Actions:\n" +
                     "   -verify [x509.pem]\n" +
                     "      verify image, cert is optional\n" +
-                    "   -sign [pk8] [x509.pem]\n" +
-                    "      sign image, key and cert are optional\n"
+                    "   -sign [x509.pem] [pk8]\n" +
+                    "      sign image, cert and key pair is optional\n"
             );
         }
     }

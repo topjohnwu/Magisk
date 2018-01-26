@@ -76,9 +76,6 @@ public class ZipUtils {
     }
 
     public static void signZip(JarMap input, OutputStream output, boolean minSign) throws Exception {
-        AssetManager assets = MagiskManager.get().getAssets();
-        SignAPK.signZip(
-                assets.open(Const.PUBLIC_KEY_NAME), assets.open(Const.PRIVATE_KEY_NAME),
-                input, output, minSign);
+        SignAPK.signZip(null, null, input, output, minSign);
     }
 }

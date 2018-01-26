@@ -205,11 +205,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 AssetManager assets = mm.getAssets();
                 try (
                         InputStream in = new FileInputStream(patched_boot);
-                        OutputStream out = new BufferedOutputStream(new FileOutputStream(signed));
-                        InputStream keyIn = assets.open(Const.PRIVATE_KEY_NAME);
-                        InputStream certIn = assets.open(Const.PUBLIC_KEY_NAME)
+                        OutputStream out = new BufferedOutputStream(new FileOutputStream(signed))
                 ) {
-                    SignBoot.doSignature("/boot", in, out, keyIn, certIn);
+                    SignBoot.doSignature("/boot", in, out, null, null);
                 }
                 shell.run(null, null, "mv -f " + signed + " " + patched_boot);
             }

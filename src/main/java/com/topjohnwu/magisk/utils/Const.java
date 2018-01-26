@@ -17,8 +17,6 @@ public class Const {
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
-    public static final String PUBLIC_KEY_NAME = "public.certificate.x509.pem";
-    public static final String PRIVATE_KEY_NAME = "private.key.pk8";
     public static final String UNINSTALLER = "magisk_uninstaller.sh";
     public static final String UTIL_FUNCTIONS= "util_functions.sh";
     public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
