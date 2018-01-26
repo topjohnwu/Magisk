@@ -127,11 +127,6 @@ def build_binary(args):
 def build_apk(args):
 	header('* Building Magisk Manager')
 
-	for key in ['public.certificate.x509.pem', 'private.key.pk8']:
-		source = os.path.join('ziptools', key)
-		target = os.path.join('app', 'src', 'main', 'assets', key)
-		cp(source, target)
-
 	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
 		source = os.path.join('scripts', script)
 		target = os.path.join('app', 'src', 'main', 'assets', script)
@@ -331,7 +326,7 @@ def zip_uninstaller(args):
 	sign_adjust_zip(unsigned, output)
 
 def sign_adjust_zip(unsigned, output):
-	signer_name = 'zipsigner-1.1.jar'
+	signer_name = 'zipsigner-2.0.jar'
 	jarsigner = os.path.join('crypto', 'build', 'libs', signer_name)
 
 	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
@@ -348,14 +343,10 @@ def sign_adjust_zip(unsigned, output):
 
 	header('* Signing / Adjusting Zip')
 
-	publicKey = os.path.join('ziptools', 'public.certificate.x509.pem')
-	privateKey = os.path.join('ziptools', 'private.key.pk8')
-
 	signed = tempfile.mkstemp()[1]
 
 	# Unsigned->signed
-	proc = subprocess.run(['java', '-jar', jarsigner,
-		publicKey, privateKey, unsigned, signed])
+	proc = subprocess.run(['java', '-jar', jarsigner, unsigned, signed])
 	if proc.returncode != 0:
 		error('First sign flashable zip failed!')
 
@@ -367,8 +358,7 @@ def sign_adjust_zip(unsigned, output):
 		error('Adjust flashable zip failed!')
 
 	# Adjusted -> output
-	proc = subprocess.run(['java', '-jar', jarsigner,
-		"-m", publicKey, privateKey, adjusted, output])
+	proc = subprocess.run(['java', '-jar', jarsigner, "-m", adjusted, output])
 	if proc.returncode != 0:
 		error('Second sign flashable zip failed!')
 

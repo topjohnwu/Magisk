@@ -102,7 +102,7 @@ class CryptoUtils {
         return signer.sign();
     }
 
-    static X509Certificate readPublicKey(InputStream input)
+    static X509Certificate readCertificate(InputStream input)
             throws IOException, GeneralSecurityException {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -116,9 +116,9 @@ class CryptoUtils {
     static PrivateKey readPrivateKey(InputStream input)
             throws IOException, GeneralSecurityException {
         try {
-            byte[] buffer = new byte[4096];
-            int size = input.read(buffer);
-            byte[] bytes = Arrays.copyOf(buffer, size);
+            ByteArrayStream buf = new ByteArrayStream();
+            buf.readFrom(input);
+            byte[] bytes = buf.toByteArray();
             /* Check to see if this is in an EncryptedPrivateKeyInfo structure. */
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(bytes);
             /*

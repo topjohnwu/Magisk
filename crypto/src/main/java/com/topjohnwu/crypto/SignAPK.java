@@ -18,11 +18,9 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,21 +67,27 @@ public class SignAPK {
         Security.insertProviderAt(sBouncyCastleProvider, 1);
     }
 
-    public static void signZip(InputStream publicIn, InputStream privateIn,
+    public static void signZip(InputStream cert, InputStream key,
                                JarMap input, OutputStream output, boolean minSign) throws Exception {
         int alignment = 4;
         int hashes = 0;
-        X509Certificate publicKey = CryptoUtils.readPublicKey(publicIn);
-        hashes |= getDigestAlgorithm(publicKey);
+        if (cert == null) {
+            cert = SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem");
+        }
+        X509Certificate certificate = CryptoUtils.readCertificate(cert);
+        hashes |= getDigestAlgorithm(certificate);
 
         // Set the ZIP file timestamp to the starting valid time
         // of the 0th certificate plus one hour (to match what
         // we've historically done).
-        long timestamp = publicKey.getNotBefore().getTime() + 3600L * 1000;
-        PrivateKey privateKey = CryptoUtils.readPrivateKey(privateIn);
+        long timestamp = certificate.getNotBefore().getTime() + 3600L * 1000;
+        if (key == null) {
+            key = SignAPK.class.getResourceAsStream("/keys/testkey.pk8");
+        }
+        PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
 
         if (minSign) {
-            signWholeFile(input.getFile(), publicKey, privateKey, output);
+            signWholeFile(input.getFile(), certificate, privateKey, output);
         } else {
             JarOutputStream outputJar = new JarOutputStream(output);
             // For signing .apks, use the maximum compression to make
@@ -95,7 +99,8 @@ public class SignAPK {
             outputJar.setLevel(9);
             Manifest manifest = addDigestsToManifest(input, hashes);
             copyFiles(manifest, input, outputJar, timestamp, alignment);
-            signFile(manifest, input, publicKey, privateKey, outputJar);
+            signFile(manifest, input, certificate, privateKey, outputJar);
+            outputJar.close();
         }
     }
 

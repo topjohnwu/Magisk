@@ -2,44 +2,58 @@ package com.topjohnwu.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.Security;
 
 public class ZipSigner {
-    public static void main(String[] args) {
+
+    public static void usage() {
+        System.err.println("Usage: zipsigner [-m] [x509.pem] [pk8] input.jar output.jar");
+        System.err.println("If no certificate/private key pair is specified, it will use the embedded test keys.");
+        System.err.println("   -m:  enable minimal signing");
+        System.exit(2);
+    }
+
+    public static void main(String[] args) throws Exception {
         boolean minSign = false;
         int argStart = 0;
 
-        if (args.length < 4) {
-            System.err.println("Usage: zipsigner [-m] publickey.x509[.pem] privatekey.pk8 input.jar output.jar");
-            System.exit(2);
-        }
+        if (args.length < 2)
+            usage();
 
         if (args[0].equals("-m")) {
             minSign = true;
             argStart = 1;
         }
 
+        InputStream cert = null;
+        InputStream key = null;
+
+        if (args.length - argStart == 4) {
+            cert = new BufferedInputStream(new FileInputStream(new File(args[argStart])));
+            key = new BufferedInputStream(new FileInputStream(new File(args[argStart + 1])));
+            argStart += 2;
+        }
+
+        if (args.length - argStart != 2)
+            usage();
+
         SignAPK.sBouncyCastleProvider = new BouncyCastleProvider();
         Security.insertProviderAt(SignAPK.sBouncyCastleProvider, 1);
 
-        File pubKey = new File(args[argStart]);
-        File privKey = new File(args[argStart + 1]);
-        File input = new File(args[argStart + 2]);
-        File output = new File(args[argStart + 3]);
+        File input = new File(args[argStart]);
+        File output = new File(args[argStart + 1]);
 
-        try (InputStream pub = new FileInputStream(pubKey);
-             InputStream priv = new FileInputStream(privKey);
-             JarMap jar = new JarMap(input, false);
+        try (JarMap jar = new JarMap(input, false);
              BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
-            SignAPK.signZip(pub, priv, jar, out, minSign);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+            SignAPK.signZip(cert, key, jar, out, minSign);
         }
     }
 }

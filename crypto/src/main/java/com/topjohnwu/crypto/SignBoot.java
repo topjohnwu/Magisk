@@ -35,7 +35,7 @@ public class SignBoot {
     }
 
     public static boolean doSignature(String target, InputStream imgIn, OutputStream imgOut,
-                                   InputStream keyIn, InputStream certIn) {
+                                      InputStream cert, InputStream key) {
         try {
             ByteArrayStream bas = new ByteArrayStream();
             bas.readFrom(imgIn);
@@ -51,23 +51,29 @@ public class SignBoot {
                         signableSize + " bytes");
             }
             BootSignature bootsig = new BootSignature(target, image.length);
-            X509Certificate cert = CryptoUtils.readPublicKey(certIn);
-            bootsig.setCertificate(cert);
-            PrivateKey key = CryptoUtils.readPrivateKey(keyIn);
-            bootsig.setSignature(bootsig.sign(image, key),
-                    CryptoUtils.getSignatureAlgorithmIdentifier(key));
+            if (cert == null) {
+                cert = SignBoot.class.getResourceAsStream("/keys/testkey.x509.pem");
+            }
+            X509Certificate certificate = CryptoUtils.readCertificate(cert);
+            bootsig.setCertificate(certificate);
+            if (key == null) {
+                key = SignBoot.class.getResourceAsStream("/keys/testkey.pk8");
+            }
+            PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
+            bootsig.setSignature(bootsig.sign(image, privateKey),
+                    CryptoUtils.getSignatureAlgorithmIdentifier(privateKey));
             byte[] encoded_bootsig = bootsig.getEncoded();
             imgOut.write(image);
             imgOut.write(encoded_bootsig);
             imgOut.flush();
             return true;
         } catch (Exception e) {
-            e.printStackTrace(System.err);
+            e.printStackTrace();
             return false;
         }
     }
 
-    public static boolean verifySignature(InputStream imgIn, InputStream certPath) {
+    public static boolean verifySignature(InputStream imgIn, InputStream certIn) {
         try {
             ByteArrayStream bas = new ByteArrayStream();
             bas.readFrom(imgIn);
@@ -80,8 +86,8 @@ public class SignBoot {
             }
             byte[] signature = Arrays.copyOfRange(image, signableSize, image.length);
             BootSignature bootsig = new BootSignature(signature);
-            if (certPath != null) {
-                bootsig.setCertificate(CryptoUtils.readPublicKey(certPath));
+            if (certIn != null) {
+                bootsig.setCertificate(CryptoUtils.readCertificate(certIn));
             }
             if (bootsig.verify(Arrays.copyOf(image, signableSize))) {
                 System.err.println("Signature is VALID");
@@ -90,7 +96,6 @@ public class SignBoot {
                 System.err.println("Signature is INVALID");
             }
         } catch (Exception e) {
-            e.printStackTrace(System.err);
             System.err.println("Invalid image: not signed");
         }
         return false;
