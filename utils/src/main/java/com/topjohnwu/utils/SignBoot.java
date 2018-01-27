@@ -1,4 +1,4 @@
-package com.topjohnwu.crypto;
+package com.topjohnwu.utils;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;

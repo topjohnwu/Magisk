@@ -1,4 +1,4 @@
-package com.topjohnwu.crypto;
+package com.topjohnwu.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

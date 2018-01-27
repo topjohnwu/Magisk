@@ -320,11 +320,11 @@ def zip_uninstaller(args):
 
 def sign_adjust_zip(unsigned, output):
 	signer_name = 'zipsigner-2.1.jar'
-	jarsigner = os.path.join('crypto', 'build', 'libs', signer_name)
+	jarsigner = os.path.join('utils', 'build', 'libs', signer_name)
 
 	if not os.path.exists(jarsigner):
 		header('* Building ' + signer_name)
-		proc = subprocess.run('{} crypto:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} utils:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
@@ -349,7 +349,7 @@ def cleanup(args):
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		subprocess.run('{} app:clean snet:clean crypto:clean'.format(os.path.join('.', 'gradlew')), shell=True)
+		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True)
 		for f in os.listdir('out'):
 			if '.apk' in f:
 				rm(os.path.join('out', f))

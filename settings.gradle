@@ -1,1 +1,1 @@
-include ':app', ':core', ':crypto', ':snet'
+include ':app', ':core', ':utils', ':snet'
