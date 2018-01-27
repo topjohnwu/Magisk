@@ -10,10 +10,6 @@ android {
         targetSdkVersion 27
         versionCode 91
         versionName "5.5.5"
-        ndk {
-            moduleName 'zipadjust'
-            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-        }
         javaCompileOptions {
             annotationProcessorOptions {
                 argument('butterknife.debuggable', 'false')
@@ -35,11 +31,6 @@ android {
     dexOptions {
         preDexLibraries true
         javaMaxHeapSize "2g"
-    }
-    externalNativeBuild {
-        cmake {
-            path 'src/main/jni/CMakeLists.txt'
-        }
     }
     lintOptions {
         disable 'MissingTranslation'

@@ -123,7 +123,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
             apk.getOutputStream(je).write(xml);
 
             // Sign the APK
-            ZipUtils.signZip(apk, repack, false);
+            ZipUtils.signZip(apk, repack);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -96,7 +96,7 @@ public class FlashActivity extends Activity {
             reboot.setVisibility(View.GONE);
 
         logs = new ArrayList<>();
-        CallbackList console = new CallbackList<String>(new ArrayList<>()) {
+        CallbackList<String> console = new CallbackList<String>(new ArrayList<>()) {
             @Override
             public void onAddElement(String s) {
                 logs.add(s);

@@ -120,14 +120,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             // First remove top folder in Github source zip, temp1 -> temp2
             removeTopFolder(temp1, temp2);
 
-            // Then sign the zip for the first time, temp2 -> temp1
-            ZipUtils.signZip(temp2, temp1, false);
-
-            // Adjust the zip to prevent unzip issues, temp1 -> temp2
-            ZipUtils.zipAdjust(temp1.getPath(), temp2.getPath());
-
-            // Finally, sign the whole zip file again, temp2 -> target
-            ZipUtils.signZip(temp2, mFile, true);
+            // Then sign the zip
+            ZipUtils.signZip(temp2, mFile);
 
             // Delete temp files
             temp1.delete();
