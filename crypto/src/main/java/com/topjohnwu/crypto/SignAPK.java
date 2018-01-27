@@ -18,9 +18,13 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +69,26 @@ public class SignAPK {
     static {
         sBouncyCastleProvider = new BouncyCastleProvider();
         Security.insertProviderAt(sBouncyCastleProvider, 1);
+    }
+
+    public static void signZip(InputStream cert, InputStream key,
+                               JarMap input, OutputStream output) throws Exception {
+        File temp1 = File.createTempFile("signAPK", null);
+        File temp2 = File.createTempFile("signAPK", null);
+        try {
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))) {
+                signZip(cert, key, input, out, false);
+            }
+
+            ZipAdjust.adjust(temp1, temp2);
+
+            try (JarMap map = new JarMap(temp2, false)) {
+                signZip(cert, key, map, output, true);
+            }
+        } finally {
+            temp1.delete();
+            temp2.delete();
+        }
     }
 
     public static void signZip(InputStream cert, InputStream key,

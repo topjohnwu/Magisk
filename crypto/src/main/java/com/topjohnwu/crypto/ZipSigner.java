@@ -15,23 +15,16 @@ import java.security.Security;
 public class ZipSigner {
 
     public static void usage() {
-        System.err.println("Usage: zipsigner [-m] [x509.pem] [pk8] input.jar output.jar");
-        System.err.println("If no certificate/private key pair is specified, it will use the embedded test keys.");
-        System.err.println("   -m:  enable minimal signing");
+        System.err.println("Usage: zipsigner [x509.pem] [pk8] input.jar output.jar");
+        System.err.println("Note: If no certificate/private key pair is specified, it will use the embedded test keys.");
         System.exit(2);
     }
 
     public static void main(String[] args) throws Exception {
-        boolean minSign = false;
         int argStart = 0;
 
         if (args.length < 2)
             usage();
-
-        if (args[0].equals("-m")) {
-            minSign = true;
-            argStart = 1;
-        }
 
         InputStream cert = null;
         InputStream key = null;
@@ -53,7 +46,7 @@ public class ZipSigner {
 
         try (JarMap jar = new JarMap(input, false);
              BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
-            SignAPK.signZip(cert, key, jar, out, minSign);
+            SignAPK.signZip(cert, key, jar, out);
         }
     }
 }

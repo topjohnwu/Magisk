@@ -26,13 +26,6 @@ try:
 except FileNotFoundError:
 	error('Please install Java and make sure \'java\' is available in PATH')
 
-# If not Windows, we need gcc to compile
-if os.name != 'nt':
-	try:
-		subprocess.run(['gcc', '-v'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-	except FileNotFoundError:
-		error('Please install C compiler and make sure \'gcc\' is available in PATH')
-
 import argparse
 import multiprocessing
 import zipfile
@@ -326,46 +319,22 @@ def zip_uninstaller(args):
 	sign_adjust_zip(unsigned, output)
 
 def sign_adjust_zip(unsigned, output):
-	signer_name = 'zipsigner-2.0.jar'
+	signer_name = 'zipsigner-2.1.jar'
 	jarsigner = os.path.join('crypto', 'build', 'libs', signer_name)
 
-	if os.name != 'nt' and not os.path.exists(os.path.join('ziptools', 'zipadjust')):
-		header('* Building zipadjust')
-		# Compile zipadjust
-		proc = subprocess.run('gcc -o ziptools/zipadjust ziptools/zipadjust_src/*.c -lz', shell=True)
-		if proc.returncode != 0:
-			error('Build zipadjust failed!')
 	if not os.path.exists(jarsigner):
 		header('* Building ' + signer_name)
 		proc = subprocess.run('{} crypto:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
-	header('* Signing / Adjusting Zip')
+	header('* Signing Zip')
 
 	signed = tempfile.mkstemp()[1]
 
-	# Unsigned->signed
-	proc = subprocess.run(['java', '-jar', jarsigner, unsigned, signed])
+	proc = subprocess.run(['java', '-jar', jarsigner, unsigned, output])
 	if proc.returncode != 0:
-		error('First sign flashable zip failed!')
-
-	adjusted = tempfile.mkstemp()[1]
-
-	# Adjust zip
-	proc = subprocess.run([os.path.join('ziptools', 'zipadjust'), signed, adjusted])
-	if proc.returncode != 0:
-		error('Adjust flashable zip failed!')
-
-	# Adjusted -> output
-	proc = subprocess.run(['java', '-jar', jarsigner, "-m", adjusted, output])
-	if proc.returncode != 0:
-		error('Second sign flashable zip failed!')
-
-	# Cleanup
-	rm(unsigned)
-	rm(signed)
-	rm(adjusted)
+		error('Signing zip failed!')
 
 def cleanup(args):
 	if len(args.target) == 0:
