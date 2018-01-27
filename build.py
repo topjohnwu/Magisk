@@ -82,13 +82,13 @@ def build_binary(args):
 	header('* Building Magisk binaries')
 
 	# Force update logging.h timestamp to trigger recompilation
-	os.utime(os.path.join('core', 'jni', 'include', 'logging.h'))
+	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
 
 	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
 	cflag = 'MAGISK_FLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
 
 	# Prebuild
-	proc = subprocess.run('{} -C core PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
+	proc = subprocess.run('{} -C native PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
 
@@ -97,7 +97,7 @@ def build_binary(args):
 		mkdir_p(os.path.join('out', arch))
 		with open(os.path.join('out', arch, 'dump.h'), 'w') as dump:
 			dump.write('#include "stdlib.h"\n')
-			mv(os.path.join('core', 'libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
+			mv(os.path.join('native', 'libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
 			with open(os.path.join('out', arch, 'magisk'), 'rb') as bin:
 				dump.write('const uint8_t magisk_dump[] = "')
 				dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
@@ -105,7 +105,7 @@ def build_binary(args):
 
 	print('')
 
-	proc = subprocess.run('{} -C core {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
+	proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
 	if proc.returncode != 0:
 		error('Build Magisk binary failed!')
 
@@ -113,7 +113,7 @@ def build_binary(args):
 	for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
 		for binary in ['magiskinit', 'magiskboot', 'b64xz', 'busybox']:
 			try:
-				mv(os.path.join('core', 'libs', arch, binary), os.path.join('out', arch, binary))
+				mv(os.path.join('native', 'libs', arch, binary), os.path.join('out', arch, binary))
 			except:
 				pass
 
@@ -342,8 +342,8 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning binaries')
-		subprocess.run(ndk_build + ' -C core PRECOMPILE=true clean', shell=True)
-		subprocess.run(ndk_build + ' -C core clean', shell=True)
+		subprocess.run(ndk_build + ' -C native PRECOMPILE=true clean', shell=True)
+		subprocess.run(ndk_build + ' -C native clean', shell=True)
 		for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
 			shutil.rmtree(os.path.join('out', arch), ignore_errors=True)
 
