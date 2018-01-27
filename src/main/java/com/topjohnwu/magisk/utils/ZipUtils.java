@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.utils;
 
-import com.topjohnwu.crypto.JarMap;
-import com.topjohnwu.crypto.SignAPK;
+import com.topjohnwu.utils.JarMap;
+import com.topjohnwu.utils.SignAPK;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.support.annotation.Keep;
 
-import com.topjohnwu.crypto.SignBoot;
+import com.topjohnwu.utils.SignBoot;
 
 import java.io.FileInputStream;
 import java.io.InputStream;

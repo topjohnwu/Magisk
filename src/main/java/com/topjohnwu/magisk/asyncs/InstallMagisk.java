@@ -7,7 +7,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.crypto.SignBoot;
+import com.topjohnwu.utils.SignBoot;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.TarEntry;
