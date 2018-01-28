@@ -13,6 +13,14 @@
 #define ELF32_RET          4
 #define ELF64_RET          5
 
+// Macros to determine header on-the-go
+#define lheader(b, e, o) \
+	((b)->flags & PXA_FLAG) ? \
+	(((struct pxa_boot_img_hdr*) (b)->hdr)->e o) : \
+	(((struct boot_img_hdr*) (b)->hdr)->e o)
+
+#define header(b, e) (lheader(b, e,))
+
 static void dump(void *buf, size_t size, const char *filename) {
 	int fd = creat(filename, 0644);
 	xwrite(fd, buf, size);
@@ -32,29 +40,42 @@ static void restore_buf(int fd, const void *buf, size_t size) {
 	xwrite(fd, buf, size);
 }
 
-static void print_hdr(const boot_img_hdr *hdr) {
-	fprintf(stderr, "KERNEL [%d] @ 0x%08x\n", hdr->kernel_size, hdr->kernel_addr);
-	fprintf(stderr, "RAMDISK [%d] @ 0x%08x\n", hdr->ramdisk_size, hdr->ramdisk_addr);
-	fprintf(stderr, "SECOND [%d] @ 0x%08x\n", hdr->second_size, hdr->second_addr);
-	fprintf(stderr, "EXTRA [%d] @ 0x%08x\n", hdr->extra_size, hdr->tags_addr);
-	fprintf(stderr, "PAGESIZE [%d]\n", hdr->page_size);
-	if (hdr->os_version != 0) {
-		int a,b,c,y,m = 0;
-		int os_version, os_patch_level;
-		os_version = hdr->os_version >> 11;
-		os_patch_level = hdr->os_version & 0x7ff;
+static void print_hdr(const boot_img *boot) {
+	fprintf(stderr, "KERNEL [%u]\n", header(boot, kernel_size));
+	fprintf(stderr, "RAMDISK [%u]\n", header(boot, ramdisk_size));
+	fprintf(stderr, "SECOND [%u]\n", header(boot, second_size));
+	fprintf(stderr, "EXTRA [%u]\n", header(boot, extra_size));
+	fprintf(stderr, "PAGESIZE [%u]\n", header(boot, page_size));
 
-		a = (os_version >> 14) & 0x7f;
-		b = (os_version >> 7) & 0x7f;
-		c = os_version & 0x7f;
-		fprintf(stderr, "OS_VERSION [%d.%d.%d]\n", a, b, c);
+	if (!(boot->flags & PXA_FLAG)) {
+		uint32_t os_version = ((boot_img_hdr*) boot->hdr)->os_version;
+		if (os_version) {
+			int a,b,c,y,m = 0;
+			int version, patch_level;
+			version = os_version >> 11;
+			patch_level = os_version & 0x7ff;
 
-		y = (os_patch_level >> 4) + 2000;
-		m = os_patch_level & 0xf;
-		fprintf(stderr, "PATCH_LEVEL [%d-%02d]\n", y, m);
+			a = (version >> 14) & 0x7f;
+			b = (version >> 7) & 0x7f;
+			c = version & 0x7f;
+			fprintf(stderr, "OS_VERSION [%d.%d.%d]\n", a, b, c);
+
+			y = (patch_level >> 4) + 2000;
+			m = patch_level & 0xf;
+			fprintf(stderr, "PATCH_LEVEL [%d-%02d]\n", y, m);
+		}
 	}
-	fprintf(stderr, "NAME [%s]\n", hdr->name);
-	fprintf(stderr, "CMDLINE [%s]\n", hdr->cmdline);
+
+	fprintf(stderr, "NAME [%s]\n", header(boot, name));
+	fprintf(stderr, "CMDLINE [%s]\n", header(boot, cmdline));
+}
+
+static void clean_boot(boot_img *boot) {
+	munmap(boot->map_addr, boot->map_size);
+	free(boot->hdr);
+	free(boot->k_hdr);
+	free(boot->r_hdr);
+	memset(boot, 0, sizeof(*boot));
 }
 
 int parse_img(const char *image, boot_img *boot) {
@@ -77,29 +98,37 @@ int parse_img(const char *image, boot_img *boot) {
 			exit(ELF64_RET);
 		case AOSP:
 			// Read the header
-			memcpy(&boot->hdr, head + pos, sizeof(boot->hdr));
-			pos += boot->hdr.page_size;
+			if (((boot_img_hdr*) head)->page_size >= 0x02000000) {
+				boot->flags |= PXA_FLAG;
+				fprintf(stderr, "PXA_BOOT_HDR\n");
+				boot->hdr = malloc(sizeof(pxa_boot_img_hdr));
+				memcpy(boot->hdr, head, sizeof(pxa_boot_img_hdr));
+			} else {
+				boot->hdr = malloc(sizeof(boot_img_hdr));
+				memcpy(boot->hdr, head, sizeof(boot_img_hdr));
+			}
+			pos += header(boot, page_size);
 
-			print_hdr(&boot->hdr);
+			print_hdr(boot);
 
 			boot->kernel = head + pos;
-			pos += boot->hdr.kernel_size;
-			mem_align(&pos, boot->hdr.page_size);
+			pos += header(boot, kernel_size);
+			mem_align(&pos, header(boot, page_size));
 
 			boot->ramdisk = head + pos;
-			pos += boot->hdr.ramdisk_size;
-			mem_align(&pos, boot->hdr.page_size);
+			pos += header(boot, ramdisk_size);
+			mem_align(&pos, header(boot, page_size));
 
-			if (boot->hdr.second_size) {
+			if (header(boot, second_size)) {
 				boot->second = head + pos;
-				pos += boot->hdr.second_size;
-				mem_align(&pos, boot->hdr.page_size);
+				pos += header(boot, second_size);
+				mem_align(&pos, header(boot, page_size));
 			}
 
-			if (boot->hdr.extra_size) {
+			if (header(boot, extra_size)) {
 				boot->extra = head + pos;
-				pos += boot->hdr.extra_size;
-				mem_align(&pos, boot->hdr.page_size);
+				pos += header(boot, extra_size);
+				mem_align(&pos, header(boot, page_size));
 			}
 
 			if (pos < boot->map_size) {
@@ -108,33 +137,40 @@ int parse_img(const char *image, boot_img *boot) {
 			}
 
 			// Search for dtb in kernel
-			for (uint32_t i = 0; i < boot->hdr.kernel_size; ++i) {
+			for (uint32_t i = 0; i < header(boot, kernel_size); ++i) {
 				if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
 					boot->dtb = boot->kernel + i;
-					boot->dt_size = boot->hdr.kernel_size - i;
-					boot->hdr.kernel_size = i;
+					boot->dt_size = header(boot, kernel_size) - i;
+					lheader(boot, kernel_size, = i);
 					fprintf(stderr, "DTB [%u]\n", boot->dt_size);
+					break;
 				}
 			}
 
-			boot->ramdisk_type = check_type(boot->ramdisk);
 			boot->kernel_type = check_type(boot->kernel);
+			boot->ramdisk_type = check_type(boot->ramdisk);
 
 			// Check MTK
 			if (boot->kernel_type == MTK) {
-				fprintf(stderr, "MTK_KERNEL_HDR [512]\n");
+				fprintf(stderr, "MTK_KERNEL_HDR\n");
 				boot->flags |= MTK_KERNEL;
-				memcpy(&boot->mtk_kernel_hdr, boot->kernel, sizeof(mtk_hdr));
+				boot->k_hdr = malloc(sizeof(mtk_hdr));
+				memcpy(boot->k_hdr, boot->kernel, sizeof(mtk_hdr));
+				fprintf(stderr, "KERNEL [%u]\n", boot->k_hdr->size);
+				fprintf(stderr, "NAME [%s]\n", boot->k_hdr->name);
 				boot->kernel += 512;
-				boot->hdr.kernel_size -= 512;
+				lheader(boot, kernel_size, -= 512);
 				boot->kernel_type = check_type(boot->kernel);
 			}
 			if (boot->ramdisk_type == MTK) {
-				fprintf(stderr, "MTK_RAMDISK_HDR [512]\n");
+				fprintf(stderr, "MTK_RAMDISK_HDR\n");
 				boot->flags |= MTK_RAMDISK;
-				memcpy(&boot->mtk_ramdisk_hdr, boot->ramdisk, sizeof(mtk_hdr));
+				boot->r_hdr = malloc(sizeof(mtk_hdr));
+				memcpy(boot->r_hdr, boot->kernel, sizeof(mtk_hdr));
+				fprintf(stderr, "RAMDISK [%u]\n", boot->r_hdr->size);
+				fprintf(stderr, "NAME [%s]\n", boot->r_hdr->name);
 				boot->ramdisk += 512;
-				boot->hdr.ramdisk_size -= 512;
+				lheader(boot, ramdisk_size, -= 512);
 				boot->ramdisk_type = check_type(boot->ramdisk);
 			}
 
@@ -154,7 +190,7 @@ int parse_img(const char *image, boot_img *boot) {
 	LOGE("No boot image magic found!\n");
 }
 
-void unpack(const char* image) {
+int unpack(const char *image) {
 	boot_img boot;
 	int ret = parse_img(image, &boot);
 	int fd;
@@ -162,10 +198,10 @@ void unpack(const char* image) {
 	// Dump kernel
 	if (COMPRESSED(boot.kernel_type)) {
 		fd = creat(KERNEL_FILE, 0644);
-		decomp(boot.kernel_type, fd, boot.kernel, boot.hdr.kernel_size);
+		decomp(boot.kernel_type, fd, boot.kernel, header(&boot, kernel_size));
 		close(fd);
 	} else {
-		dump(boot.kernel, boot.hdr.kernel_size, KERNEL_FILE);
+		dump(boot.kernel, header(&boot, kernel_size), KERNEL_FILE);
 	}
 
 	if (boot.dt_size) {
@@ -176,32 +212,32 @@ void unpack(const char* image) {
 	// Dump ramdisk
 	if (COMPRESSED(boot.ramdisk_type)) {
 		fd = creat(RAMDISK_FILE, 0644);
-		decomp(boot.ramdisk_type, fd, boot.ramdisk, boot.hdr.ramdisk_size);
+		decomp(boot.ramdisk_type, fd, boot.ramdisk, header(&boot, ramdisk_size));
 		close(fd);
 	} else {
-		dump(boot.ramdisk, boot.hdr.ramdisk_size, RAMDISK_FILE ".raw");
+		dump(boot.ramdisk, header(&boot, ramdisk_size), RAMDISK_FILE ".raw");
 		LOGE("Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
 	}
 
-	if (boot.hdr.second_size) {
+	if (header(&boot, second_size)) {
 		// Dump second
-		dump(boot.second, boot.hdr.second_size, SECOND_FILE);
+		dump(boot.second, header(&boot, second_size), SECOND_FILE);
 	}
 
-	if (boot.hdr.extra_size) {
+	if (header(&boot, extra_size)) {
 		// Dump extra
-		dump(boot.extra, boot.hdr.extra_size, EXTRA_FILE);
+		dump(boot.extra, header(&boot, extra_size), EXTRA_FILE);
 	}
 
-	munmap(boot.map_addr, boot.map_size);
-	exit(ret);
+	clean_boot(&boot);
+	return ret;
 }
 
 void repack(const char* orig_image, const char* out_image) {
 	boot_img boot;
 
 	// There are possible two MTK headers
-	size_t mtk_kernel_off, mtk_ramdisk_off;
+	off_t mtk_kernel_off, mtk_ramdisk_off;
 
 	// Parse original image
 	parse_img(orig_image, &boot);
@@ -212,7 +248,7 @@ void repack(const char* orig_image, const char* out_image) {
 	int fd = creat(out_image, 0644);
 
 	// Skip a page for header
-	write_zero(fd, boot.hdr.page_size);
+	write_zero(fd, header(&boot, page_size));
 
 	if (boot.flags & MTK_KERNEL) {
 		// Record position and skip MTK header
@@ -223,16 +259,16 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t raw_size;
 		void *kernel_raw;
 		mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
-		boot.hdr.kernel_size = comp(boot.kernel_type, fd, kernel_raw, raw_size);
+		lheader(&boot, kernel_size, = comp(boot.kernel_type, fd, kernel_raw, raw_size));
 		munmap(kernel_raw, raw_size);
 	} else {
-		boot.hdr.kernel_size = restore(KERNEL_FILE, fd);
+		lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
 	}
 	// Restore dtb
 	if (boot.dt_size && access(DTB_FILE, R_OK) == 0) {
-		boot.hdr.kernel_size += restore(DTB_FILE, fd);
+		lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
 	}
-	file_align(fd, boot.hdr.page_size, 1);
+	file_align(fd, header(&boot, page_size), 1);
 
 	if (boot.flags & MTK_RAMDISK) {
 		// Record position and skip MTK header
@@ -244,7 +280,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t cpio_size;
 		void *cpio;
 		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
-		boot.hdr.ramdisk_size = comp(boot.ramdisk_type, fd, cpio, cpio_size);
+		lheader(&boot, ramdisk_size, = comp(boot.ramdisk_type, fd, cpio, cpio_size));
 		munmap(cpio, cpio_size);
 	} else {
 		// Find compressed ramdisk
@@ -259,20 +295,20 @@ void repack(const char* orig_image, const char* out_image) {
 		}
 		if (!found)
 			LOGE("No ramdisk exists!\n");
-		boot.hdr.ramdisk_size = restore(name, fd);
+		lheader(&boot, ramdisk_size, = restore(name, fd));
 	}
-	file_align(fd, boot.hdr.page_size, 1);
+	file_align(fd, header(&boot, page_size), 1);
 
 	// Restore second
-	if (boot.hdr.second_size && access(SECOND_FILE, R_OK) == 0) {
-		boot.hdr.second_size = restore(SECOND_FILE, fd);
-		file_align(fd, boot.hdr.page_size, 1);
+	if (header(&boot, second_size) && access(SECOND_FILE, R_OK) == 0) {
+		lheader(&boot, second_size, = restore(SECOND_FILE, fd));
+		file_align(fd, header(&boot, page_size), 1);
 	}
 
 	// Restore extra
-	if (boot.hdr.extra_size && access(EXTRA_FILE, R_OK) == 0) {
-		boot.hdr.extra_size = restore(EXTRA_FILE, fd);
-		file_align(fd, boot.hdr.page_size, 1);
+	if (header(&boot, extra_size) && access(EXTRA_FILE, R_OK) == 0) {
+		lheader(&boot, extra_size, = restore(EXTRA_FILE, fd));
+		file_align(fd, header(&boot, page_size), 1);
 	}
 
 	// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
@@ -286,23 +322,23 @@ void repack(const char* orig_image, const char* out_image) {
 	// Write MTK headers back
 	if (boot.flags & MTK_KERNEL) {
 		lseek(fd, mtk_kernel_off, SEEK_SET);
-		boot.mtk_kernel_hdr.size = boot.hdr.kernel_size;
-		boot.hdr.kernel_size += 512;
-		restore_buf(fd, &boot.mtk_kernel_hdr, sizeof(mtk_hdr));
+		boot.k_hdr->size = header(&boot, kernel_size);
+		lheader(&boot, kernel_size, += 512);
+		restore_buf(fd, boot.k_hdr, sizeof(mtk_hdr));
 	}
 	if (boot.flags & MTK_RAMDISK) {
 		lseek(fd, mtk_ramdisk_off, SEEK_SET);
-		boot.mtk_ramdisk_hdr.size = boot.hdr.ramdisk_size;
-		boot.hdr.ramdisk_size += 512;
-		restore_buf(fd, &boot.mtk_ramdisk_hdr, sizeof(mtk_hdr));
+		boot.r_hdr->size = header(&boot, ramdisk_size);
+		lheader(&boot, ramdisk_size, += 512);
+		restore_buf(fd, boot.r_hdr, sizeof(mtk_hdr));
 	}
 	// Main header
 	lseek(fd, 0, SEEK_SET);
-	restore_buf(fd, &boot.hdr, sizeof(boot.hdr));
+	restore_buf(fd, boot.hdr, (boot.flags & PXA_FLAG) ? sizeof(pxa_boot_img_hdr) : sizeof(boot_img_hdr));
 
 	// Print new image info
-	print_hdr(&boot.hdr);
+	print_hdr(&boot);
 
-	munmap(boot.map_addr, boot.map_size);
+	clean_boot(&boot);
 	close(fd);
 }

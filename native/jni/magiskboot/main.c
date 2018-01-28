@@ -136,9 +136,9 @@ int main(int argc, char *argv[]) {
 		munmap(buf, size);
 	} else if (argc > 2 && strcmp(argv[1], "--parse") == 0) {
 		boot_img boot;
-		exit(parse_img(argv[2], &boot));
+		return parse_img(argv[2], &boot);
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
-		unpack(argv[2]);
+		return unpack(argv[2]);
 	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {
 		repack(argv[2], argc > 3 ? argv[3] : NEW_BOOT);
 	} else if (argc > 2 && strcmp(argv[1], "--decompress") == 0) {
@@ -157,7 +157,8 @@ int main(int argc, char *argv[]) {
 		char *cmd = argv[1] + 5;
 		if (*cmd == '\0') usage(argv[0]);
 		else ++cmd;
-		if (dtb_commands(cmd, argc - 2, argv + 2)) usage(argv[0]);
+		if (dtb_commands(cmd, argc - 2, argv + 2))
+			usage(argv[0]);
 	} else {
 		usage(argv[0]);
 	}

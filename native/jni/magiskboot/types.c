@@ -6,7 +6,7 @@
 file_t check_type(const void *buf) {
 	if (memcmp(buf, CHROMEOS_MAGIC, 8) == 0) {
 		return CHROMEOS;
-	} else if (memcmp(buf, BOOT_MAGIC, BOOT_MAGIC_SIZE) == 0) {
+	} else if (memcmp(buf, BOOT_MAGIC, 8) == 0) {
 		return AOSP;
 	} else if (memcmp(buf, ELF32_MAGIC, 5) == 0) {
 		return ELF32;

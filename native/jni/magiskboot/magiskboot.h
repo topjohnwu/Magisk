@@ -14,7 +14,7 @@
 #define NEW_BOOT        "new-boot.img"
 
 // Main entries
-void unpack(const char *image);
+int unpack(const char *image);
 void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
 int parse_img(const char *image, boot_img *boot);

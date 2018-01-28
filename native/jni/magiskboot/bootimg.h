@@ -21,48 +21,69 @@
 #ifndef _BOOT_IMAGE_H_
 #define _BOOT_IMAGE_H_
 
-typedef struct boot_img_hdr boot_img_hdr;
-
 #define BOOT_MAGIC "ANDROID!"
-#define BOOT_MAGIC_SIZE 8
-#define BOOT_NAME_SIZE 16
-#define BOOT_ARGS_SIZE 512
-#define BOOT_EXTRA_ARGS_SIZE 1024
 
-struct boot_img_hdr
-{
-    uint8_t magic[BOOT_MAGIC_SIZE];
+typedef struct boot_img_hdr {
+	char magic[8];
 
-    uint32_t kernel_size;  /* size in bytes */
-    uint32_t kernel_addr;  /* physical load addr */
+	uint32_t kernel_size;  /* size in bytes */
+	uint32_t kernel_addr;  /* physical load addr */
 
-    uint32_t ramdisk_size; /* size in bytes */
-    uint32_t ramdisk_addr; /* physical load addr */
+	uint32_t ramdisk_size; /* size in bytes */
+	uint32_t ramdisk_addr; /* physical load addr */
 
-    uint32_t second_size;  /* size in bytes */
-    uint32_t second_addr;  /* physical load addr */
+	uint32_t second_size;  /* size in bytes */
+	uint32_t second_addr;  /* physical load addr */
 
-    uint32_t tags_addr;    /* physical addr for kernel tags */
-    uint32_t page_size;    /* flash page size we assume */
-    uint32_t extra_size;   /* extra blob size in bytes */
+	uint32_t tags_addr;    /* physical addr for kernel tags */
+	uint32_t page_size;    /* flash page size we assume */
+	uint32_t extra_size;   /* extra blob size in bytes */
 
-    /* operating system version and security patch level; for
-     * version "A.B.C" and patch level "Y-M-D":
-     * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
-     * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
-     * os_version = ver << 11 | lvl */
-    uint32_t os_version;
+	/* operating system version and security patch level; for
+	 * version "A.B.C" and patch level "Y-M-D":
+	 * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
+	 * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
+	 * os_version = ver << 11 | lvl */
+	uint32_t os_version;
 
-    uint8_t name[BOOT_NAME_SIZE]; /* asciiz product name */
+	char name[16];         /* asciiz product name */
 
-    uint8_t cmdline[BOOT_ARGS_SIZE];
+	char cmdline[512];
 
-    uint32_t id[8]; /* timestamp / checksum / sha1 / etc */
+	uint32_t id[8];        /* timestamp / checksum / sha1 / etc */
 
-    /* Supplemental command line data; kept here to maintain
-     * binary compatibility with older versions of mkbootimg */
-    uint8_t extra_cmdline[BOOT_EXTRA_ARGS_SIZE];
-} __attribute__((packed));
+	/* Supplemental command line data; kept here to maintain
+	 * binary compatibility with older versions of mkbootimg */
+	char extra_cmdline[1024];
+} __attribute__((packed)) boot_img_hdr ;
+
+typedef struct pxa_boot_img_hdr {
+	char magic[8];
+
+	uint32_t kernel_size;  /* size in bytes */
+	uint32_t kernel_addr;  /* physical load addr */
+
+	uint32_t ramdisk_size; /* size in bytes */
+	uint32_t ramdisk_addr; /* physical load addr */
+
+	uint32_t second_size;  /* size in bytes */
+	uint32_t second_addr;  /* physical load addr */
+
+	uint32_t extra_size;   /* extra blob size in bytes */
+	uint32_t unknown;      /* unknown value */
+	uint32_t tags_addr;    /* physical addr for kernel tags */
+	uint32_t page_size;    /* flash page size we assume */
+
+	char name[24];         /* asciiz product name */
+
+	char cmdline[512];
+
+	uint32_t id[8];        /* timestamp / checksum / sha1 / etc */
+
+	/* Supplemental command line data; kept here to maintain
+	 * binary compatibility with older versions of mkbootimg */
+	char extra_cmdline[1024];
+} __attribute__((packed)) pxa_boot_img_hdr;
 
 /*
 ** +-----------------+
@@ -74,7 +95,7 @@ struct boot_img_hdr
 ** +-----------------+
 ** | second stage    | o pages
 ** +-----------------+
-** | extra blobs     | p pages
+** | extra blob      | p pages
 ** +-----------------+
 **
 ** n = (kernel_size + page_size - 1) / page_size
@@ -95,33 +116,47 @@ struct boot_img_hdr
 */
 
 typedef struct mtk_hdr {
-   uint8_t magic[4];    /* MTK magic */
-   uint32_t size;       /* Size of the content */
-   uint8_t name[32];    /* The type of the header */
-} mtk_hdr;
+	uint32_t magic;      /* MTK magic */
+	uint32_t size;       /* Size of the content */
+	char name[32];       /* The type of the header */
+} __attribute__((packed)) mtk_hdr;
 
 // Flags
-#define MTK_KERNEL    0x1
-#define MTK_RAMDISK   0x2
-#define CHROMEOS_FLAG 0x4
+#define MTK_KERNEL    0x01
+#define MTK_RAMDISK   0x02
+#define CHROMEOS_FLAG 0x04
+#define PXA_FLAG      0x08
 
 typedef struct boot_img {
-    size_t map_size;
-    uint32_t dt_size;
-    size_t tail_size;
-    uint8_t flags;
-    file_t kernel_type, ramdisk_type;
+	// Memory map of the whole image
+	void *map_addr;
+	size_t map_size;
 
-    boot_img_hdr hdr;
-    mtk_hdr mtk_kernel_hdr, mtk_ramdisk_hdr;
+	// Headers
+	void *hdr;  		/* Either boot_img_hdr or pxa_boot_img_hdr */
+	mtk_hdr *k_hdr;		/* MTK kernel header */
+	mtk_hdr *r_hdr;		/* MTK ramdisk header */
 
-    void *map_addr;
-    void *kernel;
-    void *dtb;
-    void *ramdisk;
-    void *second;
-    void *extra;
-    void *tail;
+	// Flags to indicate the state of current boot image
+	uint8_t flags;
+
+	// The format of kernel and ramdisk
+	file_t kernel_type;
+	file_t ramdisk_type;
+
+	// Pointer to dtb that is appended after kernel
+	void *dtb;
+	uint32_t dt_size;
+
+	// Pointer to end of image
+	void *tail;
+	size_t tail_size;
+
+	// Pointers to blocks defined in header
+	void *kernel;
+	void *ramdisk;
+	void *second;
+	void *extra;
 } boot_img;
 
 #endif
