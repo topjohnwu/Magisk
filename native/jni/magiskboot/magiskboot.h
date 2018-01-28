@@ -29,7 +29,7 @@ size_t lzma(int mode, int fd, const void *buf, size_t size);
 size_t lz4(int mode, int fd, const void *buf, size_t size);
 size_t bzip2(int mode, int fd, const void *buf, size_t size);
 size_t lz4_legacy(int mode, int fd, const void *buf, size_t size);
-long long comp(file_t type, int to, const void *from, size_t size);
-long long decomp(file_t type, int to, const void *from, size_t size);
+long long comp(format_t type, int to, const void *from, size_t size);
+long long decomp(format_t type, int to, const void *from, size_t size);
 
 #endif

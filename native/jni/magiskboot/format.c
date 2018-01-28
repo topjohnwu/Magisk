@@ -1,9 +1,9 @@
 #include <string.h>
 
 #include "bootimg.h"
-#include "types.h"
+#include "format.h"
 
-file_t check_type(const void *buf) {
+format_t check_fmt(const void *buf) {
 	if (memcmp(buf, CHROMEOS_MAGIC, 8) == 0) {
 		return CHROMEOS;
 	} else if (memcmp(buf, BOOT_MAGIC, 8) == 0) {
@@ -36,9 +36,9 @@ file_t check_type(const void *buf) {
 	}
 }
 
-void get_type_name(file_t type, char *name) {
+void get_fmt_name(format_t fmt, char *name) {
 	char *s;
-	switch (type) {
+	switch (fmt) {
 		case CHROMEOS:
 			s = "chromeos";
 			break;

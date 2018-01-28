@@ -1,27 +1,8 @@
-/* tools/mkbootimg/bootimg.h
-**
-** Copyright 2007, The Android Open Source Project
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-*/
-
 #include <stdint.h>
-#include "types.h"
+#include "format.h"
 
 #ifndef _BOOT_IMAGE_H_
 #define _BOOT_IMAGE_H_
-
-#define BOOT_MAGIC "ANDROID!"
 
 typedef struct boot_img_hdr {
 	char magic[8];
@@ -141,8 +122,8 @@ typedef struct boot_img {
 	uint8_t flags;
 
 	// The format of kernel and ramdisk
-	file_t kernel_type;
-	file_t ramdisk_type;
+	format_t k_fmt;
+	format_t r_fmt;
 
 	// Pointer to dtb that is appended after kernel
 	void *dtb;

@@ -343,7 +343,7 @@ done:
 	return total;
 }
 
-long long decomp(file_t type, int to, const void *from, size_t size) {
+long long decomp(format_t type, int to, const void *from, size_t size) {
 	switch (type) {
 		case GZIP:
 			return gzip(0, to, from, size);
@@ -363,7 +363,7 @@ long long decomp(file_t type, int to, const void *from, size_t size) {
 	}
 }
 
-long long comp(file_t type, int to, const void *from, size_t size) {
+long long comp(format_t type, int to, const void *from, size_t size) {
 	switch (type) {
 		case GZIP:
 			return gzip(1, to, from, size);
@@ -395,7 +395,7 @@ void decomp_file(char *from, const char *to) {
 		stream_full_read(STDIN_FILENO, &file, &size);
 	else
 		mmap_ro(from, &file, &size);
-	file_t type = check_type(file);
+	format_t type = check_fmt(file);
 	char *ext;
 	ext = strrchr(from, '.');
 	if (to == NULL)
@@ -453,7 +453,7 @@ void decomp_file(char *from, const char *to) {
 }
 
 void comp_file(const char *method, const char *from, const char *to) {
-	file_t type;
+	format_t type;
 	char *ext, dest[PATH_MAX];
 	if (strcmp(method, "gzip") == 0) {
 		type = GZIP;

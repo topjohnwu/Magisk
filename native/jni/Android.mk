@@ -102,7 +102,7 @@ LOCAL_SRC_FILES := \
 	magiskboot/bootimg.c \
 	magiskboot/hexpatch.c \
 	magiskboot/compress.c \
-	magiskboot/types.c \
+	magiskboot/format.c \
 	magiskboot/dtb.c \
 	magiskboot/ramdisk.c \
 	$(UTIL_SRC)

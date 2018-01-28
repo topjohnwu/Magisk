@@ -1,5 +1,5 @@
-#ifndef _TYPES_H_
-#define _TYPES_H_
+#ifndef _FORMAT_H_
+#define _FORMAT_H_
 
 typedef enum {
     UNKNOWN,
@@ -16,10 +16,11 @@ typedef enum {
     LZ4_LEGACY,
     MTK,
     DTB
-} file_t;
+} format_t;
 
-#define COMPRESSED(type)  (type >= GZIP && type <= LZ4_LEGACY)
+#define COMPRESSED(fmt)  (fmt >= GZIP && fmt <= LZ4_LEGACY)
 
+#define BOOT_MAGIC      "ANDROID!"
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define ELF32_MAGIC     "\x7f""ELF\x01"
 #define ELF64_MAGIC     "\x7f""ELF\x02"
@@ -36,7 +37,7 @@ typedef enum {
 #define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
 #define SUP_EXT_LIST  ((char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })
 
-file_t check_type(const void *buf);
-void get_type_name(file_t type, char *name);
+format_t check_fmt(const void *buf);
+void get_fmt_name(format_t fmt, char *name);
 
 #endif

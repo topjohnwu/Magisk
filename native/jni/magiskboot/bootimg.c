@@ -87,7 +87,7 @@ int parse_img(const char *image, boot_img *boot) {
 	for (void *head = boot->map_addr; head < boot->map_addr + boot->map_size; head += 256) {
 		size_t pos = 0;
 
-		switch (check_type(head)) {
+		switch (check_fmt(head)) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
 			boot->flags |= CHROMEOS_FLAG;
@@ -147,11 +147,11 @@ int parse_img(const char *image, boot_img *boot) {
 				}
 			}
 
-			boot->kernel_type = check_type(boot->kernel);
-			boot->ramdisk_type = check_type(boot->ramdisk);
+			boot->k_fmt = check_fmt(boot->kernel);
+			boot->r_fmt = check_fmt(boot->ramdisk);
 
 			// Check MTK
-			if (boot->kernel_type == MTK) {
+			if (boot->k_fmt == MTK) {
 				fprintf(stderr, "MTK_KERNEL_HDR\n");
 				boot->flags |= MTK_KERNEL;
 				boot->k_hdr = malloc(sizeof(mtk_hdr));
@@ -160,9 +160,9 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "NAME [%s]\n", boot->k_hdr->name);
 				boot->kernel += 512;
 				lheader(boot, kernel_size, -= 512);
-				boot->kernel_type = check_type(boot->kernel);
+				boot->k_fmt = check_fmt(boot->kernel);
 			}
-			if (boot->ramdisk_type == MTK) {
+			if (boot->r_fmt == MTK) {
 				fprintf(stderr, "MTK_RAMDISK_HDR\n");
 				boot->flags |= MTK_RAMDISK;
 				boot->r_hdr = malloc(sizeof(mtk_hdr));
@@ -171,14 +171,13 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "NAME [%s]\n", boot->r_hdr->name);
 				boot->ramdisk += 512;
 				lheader(boot, ramdisk_size, -= 512);
-				boot->ramdisk_type = check_type(boot->ramdisk);
+				boot->r_fmt = check_fmt(boot->ramdisk);
 			}
 
 			char fmt[16];
-
-			get_type_name(boot->kernel_type, fmt);
+			get_fmt_name(boot->k_fmt, fmt);
 			fprintf(stderr, "KERNEL_FMT [%s]\n", fmt);
-			get_type_name(boot->ramdisk_type, fmt);
+			get_fmt_name(boot->r_fmt, fmt);
 			fprintf(stderr, "RAMDISK_FMT [%s]\n", fmt);
 
 			return boot->flags & CHROMEOS_FLAG ? CHROMEOS_RET :
@@ -196,9 +195,9 @@ int unpack(const char *image) {
 	int fd;
 
 	// Dump kernel
-	if (COMPRESSED(boot.kernel_type)) {
+	if (COMPRESSED(boot.k_fmt)) {
 		fd = creat(KERNEL_FILE, 0644);
-		decomp(boot.kernel_type, fd, boot.kernel, header(&boot, kernel_size));
+		decomp(boot.k_fmt, fd, boot.kernel, header(&boot, kernel_size));
 		close(fd);
 	} else {
 		dump(boot.kernel, header(&boot, kernel_size), KERNEL_FILE);
@@ -210,9 +209,9 @@ int unpack(const char *image) {
 	}
 
 	// Dump ramdisk
-	if (COMPRESSED(boot.ramdisk_type)) {
+	if (COMPRESSED(boot.r_fmt)) {
 		fd = creat(RAMDISK_FILE, 0644);
-		decomp(boot.ramdisk_type, fd, boot.ramdisk, header(&boot, ramdisk_size));
+		decomp(boot.r_fmt, fd, boot.ramdisk, header(&boot, ramdisk_size));
 		close(fd);
 	} else {
 		dump(boot.ramdisk, header(&boot, ramdisk_size), RAMDISK_FILE ".raw");
@@ -255,11 +254,11 @@ void repack(const char* orig_image, const char* out_image) {
 		mtk_kernel_off = lseek(fd, 0, SEEK_CUR);
 		write_zero(fd, 512);
 	}
-	if (COMPRESSED(boot.kernel_type)) {
+	if (COMPRESSED(boot.k_fmt)) {
 		size_t raw_size;
 		void *kernel_raw;
 		mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
-		lheader(&boot, kernel_size, = comp(boot.kernel_type, fd, kernel_raw, raw_size));
+		lheader(&boot, kernel_size, = comp(boot.k_fmt, fd, kernel_raw, raw_size));
 		munmap(kernel_raw, raw_size);
 	} else {
 		lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
@@ -280,7 +279,7 @@ void repack(const char* orig_image, const char* out_image) {
 		size_t cpio_size;
 		void *cpio;
 		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
-		lheader(&boot, ramdisk_size, = comp(boot.ramdisk_type, fd, cpio, cpio_size));
+		lheader(&boot, ramdisk_size, = comp(boot.r_fmt, fd, cpio, cpio_size));
 		munmap(cpio, cpio_size);
 	} else {
 		// Find compressed ramdisk
