@@ -93,6 +93,9 @@ void wait_till_exists(const char *target);
 
 // file.c
 
+#define align(p, a)     (((p) + (a) - 1) / (a) * (a))
+#define align_off(p, a) (align(p, a) - (p))
+
 extern char **excl_list;
 
 struct file_attr {
@@ -125,8 +128,6 @@ void full_read(const char *filename, void **buf, size_t *size);
 void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
 void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
-void mem_align(size_t *pos, size_t align);
-void file_align(int fd, size_t align, int out);
 
 // img.c
 

@@ -56,6 +56,7 @@ void cpio_vec_insert(struct vector *v, cpio_entry *n) {
 }
 
 // Parse cpio file to a vector of cpio_entry
+#define parse_align() lseek(fd, align(lseek(fd, 0, SEEK_CUR), 4), SEEK_SET)
 void parse_cpio(struct vector *v, const char *filename) {
 	int fd = open(filename, O_RDONLY);
 	if (fd < 0) return;
@@ -79,7 +80,7 @@ void parse_cpio(struct vector *v, const char *filename) {
 		// f->check = x8u(header.check);
 		f->filename = xmalloc(namesize);
 		xxread(fd, f->filename, namesize);
-		file_align(fd, 4, 0);
+		parse_align();
 		if (strcmp(f->filename, ".") == 0 || strcmp(f->filename, "..") == 0) {
 			cpio_free(f);
 			continue;
@@ -91,13 +92,14 @@ void parse_cpio(struct vector *v, const char *filename) {
 		if (f->filesize) {
 			f->data = xmalloc(f->filesize);
 			xxread(fd, f->data, f->filesize);
-			file_align(fd, 4, 0);
+			parse_align();
 		}
 		vec_push_back(v, f);
 	}
 	close(fd);
 }
 
+#define dump_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), 4))
 void dump_cpio(struct vector *v, const char *filename) {
 	fprintf(stderr, "Dump cpio: [%s]\n", filename);
 	unsigned inode = 300000;
@@ -124,17 +126,17 @@ void dump_cpio(struct vector *v, const char *filename) {
 		);
 		xwrite(fd, header, 110);
 		xwrite(fd, e->filename, strlen(e->filename) + 1);
-		file_align(fd, 4, 1);
+		dump_align();
 		if (e->filesize) {
 			xwrite(fd, e->data, e->filesize);
-			file_align(fd, 4, 1);
+			dump_align();
 		}
 	}
 	// Write trailer
 	sprintf(header, "070701%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x", inode++, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 11, 0);
 	xwrite(fd, header, 110);
 	xwrite(fd, "TRAILER!!!\0", 11);
-	file_align(fd, 4, 1);
+	dump_align();
 	close(fd);
 }
 

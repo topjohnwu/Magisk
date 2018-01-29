@@ -28,10 +28,8 @@ typedef struct boot_img_hdr {
 	uint32_t os_version;
 
 	char name[16];         /* asciiz product name */
-
 	char cmdline[512];
-
-	uint32_t id[8];        /* timestamp / checksum / sha1 / etc */
+	char id[32];           /* timestamp / checksum / sha1 / etc */
 
 	/* Supplemental command line data; kept here to maintain
 	 * binary compatibility with older versions of mkbootimg */
@@ -56,10 +54,8 @@ typedef struct pxa_boot_img_hdr {
 	uint32_t page_size;    /* flash page size we assume */
 
 	char name[24];         /* asciiz product name */
-
 	char cmdline[512];
-
-	uint32_t id[8];        /* timestamp / checksum / sha1 / etc */
+	char id[32];           /* timestamp / checksum / sha1 / etc */
 
 	/* Supplemental command line data; kept here to maintain
 	 * binary compatibility with older versions of mkbootimg */
@@ -102,11 +98,21 @@ typedef struct mtk_hdr {
 	char name[32];       /* The type of the header */
 } __attribute__((packed)) mtk_hdr;
 
+typedef struct dhtb_hdr {
+	char magic[8];      /* DHTB magic */
+	char checksum[40];  /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	uint32_t size;      /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+} __attribute__((packed)) dhtb_hdr;
+
 // Flags
-#define MTK_KERNEL    0x01
-#define MTK_RAMDISK   0x02
-#define CHROMEOS_FLAG 0x04
-#define PXA_FLAG      0x08
+#define MTK_KERNEL      0x01
+#define MTK_RAMDISK     0x02
+#define CHROMEOS_FLAG   0x04
+#define PXA_FLAG        0x08
+#define DHTB_FLAG       0x10
+#define SEANDROID_FLAG  0x20
+#define LG_BUMP_FLAG    0x40
+#define SHA256_FLAG     0x80
 
 typedef struct boot_img {
 	// Memory map of the whole image
@@ -114,9 +120,9 @@ typedef struct boot_img {
 	size_t map_size;
 
 	// Headers
-	void *hdr;  		/* Either boot_img_hdr or pxa_boot_img_hdr */
-	mtk_hdr *k_hdr;		/* MTK kernel header */
-	mtk_hdr *r_hdr;		/* MTK ramdisk header */
+	void *hdr;          /* Either boot_img_hdr or pxa_boot_img_hdr */
+	mtk_hdr *k_hdr;     /* MTK kernel header */
+	mtk_hdr *r_hdr;     /* MTK ramdisk header */
 
 	// Flags to indicate the state of current boot image
 	uint8_t flags;

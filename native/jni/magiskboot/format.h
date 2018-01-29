@@ -2,20 +2,21 @@
 #define _FORMAT_H_
 
 typedef enum {
-    UNKNOWN,
-    CHROMEOS,
-    AOSP,
-    ELF32,
-    ELF64,
-    GZIP,
-    LZOP,
-    XZ,
-    LZMA,
-    BZIP2,
-    LZ4,
-    LZ4_LEGACY,
-    MTK,
-    DTB
+	UNKNOWN,
+	CHROMEOS,
+	AOSP,
+	ELF32,
+	ELF64,
+	GZIP,
+	LZOP,
+	XZ,
+	LZMA,
+	BZIP2,
+	LZ4,
+	LZ4_LEGACY,
+	MTK,
+	DTB,
+	DHTB
 } format_t;
 
 #define COMPRESSED(fmt)  (fmt >= GZIP && fmt <= LZ4_LEGACY)
@@ -33,6 +34,8 @@ typedef enum {
 #define MTK_MAGIC       "\x88\x16\x88\x58"
 #define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
+#define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
+#define SEANDROID_MAGIC "SEANDROIDENFORCE"
 
 #define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
 #define SUP_EXT_LIST  ((char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })

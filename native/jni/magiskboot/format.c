@@ -31,6 +31,8 @@ format_t check_fmt(const void *buf) {
 		return MTK;
 	} else if (memcmp(buf, DTB_MAGIC, 4) == 0) {
 		return DTB;
+	} else if (memcmp(buf, DHTB_MAGIC, 8) == 0) {
+		return DHTB;
 	} else {
 		return UNKNOWN;
 	}

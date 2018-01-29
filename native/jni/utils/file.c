@@ -424,24 +424,3 @@ void write_zero(int fd, size_t size) {
 	ftruncate(fd, pos + size);
 	lseek(fd, pos + size, SEEK_SET);
 }
-
-void mem_align(size_t *pos, size_t align) {
-	size_t mask = align - 1;
-	if (*pos & mask) {
-		*pos += align - (*pos & mask);
-	}
-}
-
-void file_align(int fd, size_t align, int out) {
-	size_t pos = lseek(fd, 0, SEEK_CUR);
-	size_t mask = align - 1;
-	size_t off;
-	if (pos & mask) {
-		off = align - (pos & mask);
-		if (out) {
-			write_zero(fd, off);
-		} else {
-			lseek(fd, pos + off, SEEK_SET);
-		}
-	}
-}

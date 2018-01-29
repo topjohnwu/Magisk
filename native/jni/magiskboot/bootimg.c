@@ -7,6 +7,8 @@
 #include "magiskboot.h"
 #include "utils.h"
 #include "logging.h"
+#include "mincrypt/sha.h"
+#include "mincrypt/sha256.h"
 
 #define INSUF_BLOCK_RET    2
 #define CHROMEOS_RET       3
@@ -68,6 +70,10 @@ static void print_hdr(const boot_img *boot) {
 
 	fprintf(stderr, "NAME [%s]\n", header(boot, name));
 	fprintf(stderr, "CMDLINE [%s]\n", header(boot, cmdline));
+	fprintf(stderr, "CHECKSUM [");
+	for (int i = 0; i < ((boot->flags & SHA256_FLAG) ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE); ++i)
+		fprintf(stderr, "%02x", header(boot, id)[i]);
+	fprintf(stderr, "]\n");
 }
 
 static void clean_boot(boot_img *boot) {
@@ -78,6 +84,7 @@ static void clean_boot(boot_img *boot) {
 	memset(boot, 0, sizeof(*boot));
 }
 
+#define pos_align() pos = align(pos, header(boot, page_size))
 int parse_img(const char *image, boot_img *boot) {
 	memset(boot, 0, sizeof(*boot));
 	int is_blk = mmap_ro(image, &boot->map_addr, &boot->map_size);
@@ -91,6 +98,11 @@ int parse_img(const char *image, boot_img *boot) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
 			boot->flags |= CHROMEOS_FLAG;
+			continue;
+		case DHTB:
+			boot->flags |= DHTB_FLAG;
+			boot->flags |= SEANDROID_FLAG;
+			fprintf(stderr, "DHTB_HDR\n");
 			continue;
 		case ELF32:
 			exit(ELF32_RET);
@@ -109,31 +121,45 @@ int parse_img(const char *image, boot_img *boot) {
 			}
 			pos += header(boot, page_size);
 
+			for (int i = SHA_DIGEST_SIZE; i < SHA256_DIGEST_SIZE; ++i) {
+				if (header(boot, id)[i]) {
+					boot->flags |= SHA256_FLAG;
+					break;
+				}
+			}
+
 			print_hdr(boot);
 
 			boot->kernel = head + pos;
 			pos += header(boot, kernel_size);
-			mem_align(&pos, header(boot, page_size));
+			pos_align();
 
 			boot->ramdisk = head + pos;
 			pos += header(boot, ramdisk_size);
-			mem_align(&pos, header(boot, page_size));
+			pos_align();
 
 			if (header(boot, second_size)) {
 				boot->second = head + pos;
 				pos += header(boot, second_size);
-				mem_align(&pos, header(boot, page_size));
+				pos_align();
 			}
 
 			if (header(boot, extra_size)) {
 				boot->extra = head + pos;
 				pos += header(boot, extra_size);
-				mem_align(&pos, header(boot, page_size));
+				pos_align();
 			}
 
 			if (pos < boot->map_size) {
 				boot->tail = head + pos;
 				boot->tail_size = boot->map_size - pos;
+			}
+
+			// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
+			if (boot->tail_size >= 16 && memcmp(boot->tail, SEANDROID_MAGIC, 16) == 0) {
+				boot->flags |= SEANDROID_FLAG;
+			} else if (boot->tail_size >= 16 && memcmp(boot->tail, LG_BUMP_MAGIC, 16) == 0) {
+				boot->flags |= LG_BUMP_FLAG;
 			}
 
 			// Search for dtb in kernel
@@ -232,11 +258,11 @@ int unpack(const char *image) {
 	return ret;
 }
 
+#define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, header(&boot, page_size)))
 void repack(const char* orig_image, const char* out_image) {
 	boot_img boot;
-
-	// There are possible two MTK headers
-	off_t mtk_kernel_off, mtk_ramdisk_off;
+	
+	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
 
 	// Parse original image
 	parse_img(orig_image, &boot);
@@ -246,12 +272,19 @@ void repack(const char* orig_image, const char* out_image) {
 	// Create new image
 	int fd = creat(out_image, 0644);
 
+	if (boot.flags & DHTB_FLAG) {
+		// Skip DHTB header
+		write_zero(fd, 512);
+	}
+
 	// Skip a page for header
+	header_off = lseek(fd, 0, SEEK_CUR);
 	write_zero(fd, header(&boot, page_size));
 
+	// kernel
+	kernel_off = lseek(fd, 0, SEEK_CUR);
 	if (boot.flags & MTK_KERNEL) {
-		// Record position and skip MTK header
-		mtk_kernel_off = lseek(fd, 0, SEEK_CUR);
+		// Skip MTK header
 		write_zero(fd, 512);
 	}
 	if (COMPRESSED(boot.k_fmt)) {
@@ -263,15 +296,16 @@ void repack(const char* orig_image, const char* out_image) {
 	} else {
 		lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
 	}
-	// Restore dtb
+	// dtb
 	if (boot.dt_size && access(DTB_FILE, R_OK) == 0) {
 		lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
 	}
-	file_align(fd, header(&boot, page_size), 1);
+	file_align();
 
+	// ramdisk
+	ramdisk_off = lseek(fd, 0, SEEK_CUR);
 	if (boot.flags & MTK_RAMDISK) {
-		// Record position and skip MTK header
-		mtk_ramdisk_off = lseek(fd, 0, SEEK_CUR);
+		// Skip MTK header
 		write_zero(fd, 512);
 	}
 	if (access(RAMDISK_FILE, R_OK) == 0) {
@@ -296,48 +330,83 @@ void repack(const char* orig_image, const char* out_image) {
 			LOGE("No ramdisk exists!\n");
 		lheader(&boot, ramdisk_size, = restore(name, fd));
 	}
-	file_align(fd, header(&boot, page_size), 1);
+	file_align();
 
-	// Restore second
+	// second
+	second_off = lseek(fd, 0, SEEK_CUR);
 	if (header(&boot, second_size) && access(SECOND_FILE, R_OK) == 0) {
 		lheader(&boot, second_size, = restore(SECOND_FILE, fd));
-		file_align(fd, header(&boot, page_size), 1);
+		file_align();
 	}
 
-	// Restore extra
+	// extra
+	extra_off = lseek(fd, 0, SEEK_CUR);
 	if (header(&boot, extra_size) && access(EXTRA_FILE, R_OK) == 0) {
 		lheader(&boot, extra_size, = restore(EXTRA_FILE, fd));
-		file_align(fd, header(&boot, page_size), 1);
+		file_align();
 	}
 
-	// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
-	if (boot.tail_size >= 16) {
-		if (memcmp(boot.tail, "SEANDROIDENFORCE", 16) == 0 ||
-			memcmp(boot.tail, LG_BUMP_MAGIC, 16) == 0 ) {
-			restore_buf(fd, boot.tail, 16);
-		}
+	// Append tail info
+	if (boot.flags & SEANDROID_FLAG) {
+		restore_buf(fd, SEANDROID_MAGIC "\xFF\xFF\xFF\xFF", 20);
+	}
+	if (boot.flags & LG_BUMP_FLAG) {
+		restore_buf(fd, LG_BUMP_MAGIC, 16);
 	}
 
-	// Write MTK headers back
+	close(fd);
+
+	// Map output image as rw
+	munmap(boot.map_addr, boot.map_size);
+	mmap_rw(out_image, &boot.map_addr, &boot.map_size);
+
+	// MTK headers
 	if (boot.flags & MTK_KERNEL) {
-		lseek(fd, mtk_kernel_off, SEEK_SET);
 		boot.k_hdr->size = header(&boot, kernel_size);
 		lheader(&boot, kernel_size, += 512);
-		restore_buf(fd, boot.k_hdr, sizeof(mtk_hdr));
+		memcpy(boot.map_addr + kernel_off, boot.k_hdr, sizeof(mtk_hdr));
 	}
 	if (boot.flags & MTK_RAMDISK) {
-		lseek(fd, mtk_ramdisk_off, SEEK_SET);
 		boot.r_hdr->size = header(&boot, ramdisk_size);
 		lheader(&boot, ramdisk_size, += 512);
-		restore_buf(fd, boot.r_hdr, sizeof(mtk_hdr));
+		memcpy(boot.map_addr + ramdisk_off, boot.r_hdr, sizeof(mtk_hdr));
 	}
-	// Main header
-	lseek(fd, 0, SEEK_SET);
-	restore_buf(fd, boot.hdr, (boot.flags & PXA_FLAG) ? sizeof(pxa_boot_img_hdr) : sizeof(boot_img_hdr));
+
+	// Update checksum
+	HASH_CTX ctx;
+	(boot.flags & SHA256_FLAG) ? SHA256_init(&ctx) : SHA_init(&ctx);
+	uint32_t size = header(&boot, kernel_size);
+	HASH_update(&ctx, boot.map_addr + kernel_off, size);
+	HASH_update(&ctx, &size, sizeof(size));
+	size = header(&boot, ramdisk_size);
+	HASH_update(&ctx, boot.map_addr + ramdisk_off, size);
+	HASH_update(&ctx, &size, sizeof(size));
+	size = header(&boot, second_size);
+	HASH_update(&ctx, boot.map_addr + second_off, size);
+	HASH_update(&ctx, &size, sizeof(size));
+	size = header(&boot, extra_size);
+	if (size) {
+		HASH_update(&ctx, boot.map_addr + extra_off, size);
+		HASH_update(&ctx, &size, sizeof(size));
+	}
+	memset(header(&boot, id), 0, 32);
+	memcpy(header(&boot, id), HASH_final(&ctx),
+		   (boot.flags & SHA256_FLAG) ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
 
 	// Print new image info
 	print_hdr(&boot);
 
+	// Main header
+	memcpy(boot.map_addr + header_off, boot.hdr,
+		   (boot.flags & PXA_FLAG) ? sizeof(pxa_boot_img_hdr) : sizeof(boot_img_hdr));
+
+	// DHTB header
+	if (boot.flags & DHTB_FLAG) {
+		dhtb_hdr *hdr = boot.map_addr;
+		memcpy(hdr, DHTB_MAGIC, 8);
+		hdr->size = boot.map_size - 512;
+		SHA256_hash(boot.map_addr + 512, hdr->size, hdr->checksum);
+	}
+
 	clean_boot(&boot);
-	close(fd);
 }
