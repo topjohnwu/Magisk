@@ -81,6 +81,7 @@ static void clean_boot(boot_img *boot) {
 	free(boot->hdr);
 	free(boot->k_hdr);
 	free(boot->r_hdr);
+	free(boot->b_hdr);
 	memset(boot, 0, sizeof(*boot));
 }
 
@@ -91,7 +92,7 @@ int parse_img(const char *image, boot_img *boot) {
 
 	// Parse image
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
-	for (void *head = boot->map_addr; head < boot->map_addr + boot->map_size; head += 256) {
+	for (void *head = boot->map_addr; head < boot->map_addr + boot->map_size; ++head) {
 		size_t pos = 0;
 
 		switch (check_fmt(head)) {
@@ -108,6 +109,12 @@ int parse_img(const char *image, boot_img *boot) {
 			exit(ELF32_RET);
 		case ELF64:
 			exit(ELF64_RET);
+		case BLOB:
+			boot->flags |= BLOB_FLAG;
+			fprintf(stderr, "TEGRA_BLOB\n");
+			boot->b_hdr = malloc(sizeof(blob_hdr));
+			memcpy(boot->b_hdr, head, sizeof(blob_hdr));
+			continue;
 		case AOSP:
 			// Read the header
 			if (((boot_img_hdr*) head)->page_size >= 0x02000000) {
@@ -261,7 +268,7 @@ int unpack(const char *image) {
 #define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, header(&boot, page_size)))
 void repack(const char* orig_image, const char* out_image) {
 	boot_img boot;
-	
+
 	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
 
 	// Parse original image
@@ -275,6 +282,9 @@ void repack(const char* orig_image, const char* out_image) {
 	if (boot.flags & DHTB_FLAG) {
 		// Skip DHTB header
 		write_zero(fd, 512);
+	} else if (boot.flags & BLOB_FLAG) {
+		// Skip blob header
+		write_zero(fd, sizeof(blob_hdr));
 	}
 
 	// Skip a page for header
@@ -400,12 +410,16 @@ void repack(const char* orig_image, const char* out_image) {
 	memcpy(boot.map_addr + header_off, boot.hdr,
 		   (boot.flags & PXA_FLAG) ? sizeof(pxa_boot_img_hdr) : sizeof(boot_img_hdr));
 
-	// DHTB header
 	if (boot.flags & DHTB_FLAG) {
+		// DHTB header
 		dhtb_hdr *hdr = boot.map_addr;
 		memcpy(hdr, DHTB_MAGIC, 8);
 		hdr->size = boot.map_size - 512;
 		SHA256_hash(boot.map_addr + 512, hdr->size, hdr->checksum);
+	} else if (boot.flags & BLOB_FLAG) {
+		// Blob headers
+		boot.b_hdr->size = boot.map_size - sizeof(blob_hdr);
+		memcpy(boot.map_addr, boot.b_hdr, sizeof(blob_hdr));
 	}
 
 	clean_boot(&boot);

@@ -33,6 +33,8 @@ format_t check_fmt(const void *buf) {
 		return DTB;
 	} else if (memcmp(buf, DHTB_MAGIC, 8) == 0) {
 		return DHTB;
+	} else if (memcmp(buf, TEGRABLOB_MAGIC, 20) == 0) {
+		return BLOB;
 	} else {
 		return UNKNOWN;
 	}

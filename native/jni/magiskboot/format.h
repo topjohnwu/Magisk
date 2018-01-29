@@ -16,7 +16,8 @@ typedef enum {
 	LZ4_LEGACY,
 	MTK,
 	DTB,
-	DHTB
+	DHTB,
+	BLOB
 } format_t;
 
 #define COMPRESSED(fmt)  (fmt >= GZIP && fmt <= LZ4_LEGACY)
@@ -36,6 +37,7 @@ typedef enum {
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
+#define TEGRABLOB_MAGIC "-SIGNED-BY-SIGNBLOB-"
 
 #define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
 #define SUP_EXT_LIST  ((char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })

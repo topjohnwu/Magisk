@@ -104,15 +104,32 @@ typedef struct dhtb_hdr {
 	uint32_t size;      /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
 } __attribute__((packed)) dhtb_hdr;
 
+typedef struct blob_hdr {
+	char secure_magic[20];  /* "-SIGNED-BY-SIGNBLOB-" */
+	uint32_t datalen;       /* 0x00000000 */
+	uint32_t signature;     /* 0x00000000 */
+	char magic[16];         /* "MSM-RADIO-UPDATE" */
+	uint32_t hdr_version;   /* 0x00010000 */
+	uint32_t hdr_size;      /* Size of header */
+	uint32_t part_offset;   /* Same as size */
+	uint32_t num_parts;     /* Number of partitions */
+	uint32_t unknown[7];    /* All 0x00000000 */
+	char name[4];           /* Name of partition */
+	uint32_t offset;        /* offset in blob where this partition starts */
+	uint32_t size;          /* Size of data */
+	uint32_t version;       /* 0x00000001 */
+} __attribute__((packed)) blob_hdr;
+
 // Flags
-#define MTK_KERNEL      0x01
-#define MTK_RAMDISK     0x02
-#define CHROMEOS_FLAG   0x04
-#define PXA_FLAG        0x08
-#define DHTB_FLAG       0x10
-#define SEANDROID_FLAG  0x20
-#define LG_BUMP_FLAG    0x40
-#define SHA256_FLAG     0x80
+#define MTK_KERNEL      0x0001
+#define MTK_RAMDISK     0x0002
+#define CHROMEOS_FLAG   0x0004
+#define PXA_FLAG        0x0008
+#define DHTB_FLAG       0x0010
+#define SEANDROID_FLAG  0x0020
+#define LG_BUMP_FLAG    0x0040
+#define SHA256_FLAG     0x0080
+#define BLOB_FLAG       0x0100
 
 typedef struct boot_img {
 	// Memory map of the whole image
@@ -123,9 +140,10 @@ typedef struct boot_img {
 	void *hdr;          /* Either boot_img_hdr or pxa_boot_img_hdr */
 	mtk_hdr *k_hdr;     /* MTK kernel header */
 	mtk_hdr *r_hdr;     /* MTK ramdisk header */
+	blob_hdr *b_hdr;    /* Tegra blob header */
 
 	// Flags to indicate the state of current boot image
-	uint8_t flags;
+	uint16_t flags;
 
 	// The format of kernel and ramdisk
 	format_t k_fmt;
