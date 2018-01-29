@@ -3,7 +3,7 @@ LOCAL_PATH:= $(call my-dir)
 # libsqlite.so (stub)
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libsqlite
-LOCAL_C_INCLUDES := jni/external/include
+LOCAL_C_INCLUDES := $(EXT_PATH)/include
 LOCAL_SRC_FILES := stubs/sqlite3_stub.c
 include $(BUILD_SHARED_LIBRARY)
 
@@ -13,6 +13,20 @@ LOCAL_MODULE:= libselinux
 LOCAL_C_INCLUDES := $(LIBSELINUX)
 LOCAL_SRC_FILES := stubs/selinux_stub.c
 include $(BUILD_SHARED_LIBRARY)
+
+# libmincrypt.a
+include $(CLEAR_VARS)
+LOCAL_MODULE:= libmincrypt
+LOCAL_C_INCLUDES := $(EXT_PATH)/include
+LOCAL_SRC_FILES := \
+	mincrypt/dsa_sig.c \
+	mincrypt/p256.c \
+	mincrypt/p256_ec.c \
+	mincrypt/p256_ecdsa.c \
+	mincrypt/rsa.c \
+	mincrypt/sha.c \
+	mincrypt/sha256.c
+include $(BUILD_STATIC_LIBRARY)
 
 # libfdt.a
 include $(CLEAR_VARS)

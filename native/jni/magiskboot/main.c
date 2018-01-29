@@ -6,7 +6,7 @@
 
 #include "magiskboot.h"
 #include "utils.h"
-#include "sha1.h"
+#include "mincrypt/sha.h"
 
 /********************
   Patch Boot Image
@@ -126,11 +126,12 @@ int main(int argc, char *argv[]) {
 			unlink(name);
 		}
 	} else if (argc > 2 && strcmp(argv[1], "--sha1") == 0) {
-		char sha1[21], *buf;
+		uint8_t sha1[SHA_DIGEST_SIZE];
+		void *buf;
 		size_t size;
-		mmap_ro(argv[2], (void **) &buf, &size);
-		SHA1(sha1, buf, size);
-		for (int i = 0; i < 20; ++i)
+		mmap_ro(argv[2], &buf, &size);
+		SHA_hash(buf, size, sha1);
+		for (int i = 0; i < SHA_DIGEST_SIZE; ++i)
 			printf("%02x", sha1[i]);
 		printf("\n");
 		munmap(buf, size);
