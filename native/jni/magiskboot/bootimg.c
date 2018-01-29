@@ -122,6 +122,11 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "PXA_BOOT_HDR\n");
 				boot->hdr = malloc(sizeof(pxa_boot_img_hdr));
 				memcpy(boot->hdr, head, sizeof(pxa_boot_img_hdr));
+			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOK_MAGIC, 12) == 0) {
+				boot->flags |= NOOK_FLAG;
+				fprintf(stderr, "NOOK_GREEN_LOADER\n");
+				head += NOOK_PRE_HEADER_SZ - 1;
+				continue;
 			} else {
 				boot->hdr = malloc(sizeof(boot_img_hdr));
 				memcpy(boot->hdr, head, sizeof(boot_img_hdr));
@@ -285,6 +290,8 @@ void repack(const char* orig_image, const char* out_image) {
 	} else if (boot.flags & BLOB_FLAG) {
 		// Skip blob header
 		write_zero(fd, sizeof(blob_hdr));
+	} else if (boot.flags & NOOK_FLAG) {
+		restore_buf(fd, boot.map_addr, NOOK_PRE_HEADER_SZ);
 	}
 
 	// Skip a page for header

@@ -130,6 +130,7 @@ typedef struct blob_hdr {
 #define LG_BUMP_FLAG    0x0040
 #define SHA256_FLAG     0x0080
 #define BLOB_FLAG       0x0100
+#define NOOK_FLAG       0x0200
 
 typedef struct boot_img {
 	// Memory map of the whole image
