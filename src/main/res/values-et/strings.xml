@@ -50,6 +50,10 @@
     <string name="update_available">Uuendus saadaval</string>
     <string name="installed">Installitud</string>
     <string name="not_installed">Pole installitud</string>
+    <string name="updated_on">Uuendatud: %1$s</string>
+    <string name="sorting_order">Sorteerimisjärjekord</string>
+    <string name="sort_by_name">Sorteeri nime järgi</string>
+    <string name="sort_by_update">Sorteeri viimase uuenduse järgi</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Salvesta logi</string>
@@ -85,9 +89,11 @@
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks</string>
     <string name="release_notes">Väljalaskemärkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
-    <string name="safetyNet_hide_notice">See rakendus kasutab SafetyNet\'i\nJuba vaikimisi hallatud MagiskHide poolt</string>
+    <string name="safetyNet_hide_notice">See rakendus kasutab SafetyNet\'i\n
+  Juba vaikimisi hallatud MagiskHide poolt</string>
     <string name="process_error">Protsessi viga</string>
-    <string name="internal_storage">ZIP on salvestatud:\n[Sisemälu]%1$s</string>
+    <string name="internal_storage">ZIP on salvestatud:\n
+  [Sisemälu]%1$s</string>
     <string name="zip_download_title">Laadin alla</string>
     <string name="zip_download_msg">Laadin ZIP-faili alla (%1$d%%)...</string>
     <string name="zip_process_title">Töötlen</string>
@@ -95,11 +101,11 @@
     <string name="manager_update_title">Magisk Manager\'ile on uuendus saadaval!</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string> 
+    <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string>
     <string name="magisk_updates">Magisk\'i uuendused</string>
     <string name="flashing">Välgutamine</string>
     <string name="hide_manager_toast">Peidan Magisk Manager\'i...</string>
-    <string name="hide_manager_toast2">See võib aega võtta...</string> 
+    <string name="hide_manager_toast2">See võib aega võtta...</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus...</string>
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>
@@ -115,9 +121,11 @@
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="uninstall_toast">Eemaldan Magisk Manager\'i 5 sekundi pärast, palun tee peale seda käsitsi taaskäivitus</string>
     <string name="proprietary_title">Laadi alla suletud koodi</string>
-    <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, seega ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n\nKas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClient\'i)?</string>
-    <string name="su_db_corrupt">Superkasutaja andmebaas on korrumpteerunud, loon uue andmebaasi</string> 
-    
+    <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, mis ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n
+  \n
+  Kas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClient\'i)?</string>
+    <string name="su_db_corrupt">Superkasutaja andmebaas on korrumpteerunud, loon uue andmebaasi</string>
+
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>
     <string name="settings_dark_theme_title">Tume teema</string>
@@ -127,20 +135,20 @@
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda võrgus olevate hoidlate vahemälus olev teave, sunnib rakendust võrgust värskendama</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Taaspaki Magisk Manager juhusliku nimega</string> 
+    <string name="settings_hide_manager_summary">Taaspaki Magisk Manager juhusliku nimega</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_update">Uuenda seadeid</string>
     <string name="settings_update_channel_title">Uuenduste kanal</string>
     <string name="settings_update_stable">Stabiilne</string>
     <string name="settings_update_beta">Beeta</string>
-    <string name="settings_update_custom">Kohandatud</string> 			
-	<string name="settings_update_custom_msg">Sisesta kohandatud URL</string> 
+    <string name="settings_update_custom">Kohandatud</string>
+    <string name="settings_update_custom_msg">Sisesta kohandatud URL</string>
     <string name="settings_boot_format_title">Paigatud käivitusväljundi vorming</string>
-    <string name="settings_boot_format_summary">Vali väljutatava paigatud käivituspildi vorming.\nVali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
-
+    <string name="settings_boot_format_summary">Vali väljutatava paigatud käivituspildi vorming.\n
+  Vali .img, mida välgutada fastboot/allalaadimisrežiimi kaudu; vali .img.tar, mida välgutada ODIN\'i kaudu.</string>
     <string name="settings_core_only_title">Magisk\'i ainult tuuma režiim</string>
-    <string name="settings_core_only_summary">Luba ainult põhifunktsioonid, kõiki mooduleid ei laadita. MagiskSU, MagiskHide ja süsteemivaba hosts siiski lubatakse</string>
+    <string name="settings_core_only_summary">Luba ainult põhifunktsioonid. MagiskSU, MagiskHide ja süsteemivaba hosts siiski lubatakse, ent mooduleid ei laadita.</string>
     <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
@@ -160,6 +168,8 @@
     <string name="request_timeout_summary">%1$s sekundit</string>
     <string name="settings_su_reauth_title">Taas-autendi peale uuendust</string>
     <string name="settings_su_reauth_summary">Taas-autendi superkasutaja õigused peale rakenduse uuendust</string>
+    <string name="settings_su_fingerprint_title">Luba sõrmejäljega autentimine</string>
+    <string name="settings_su_fingerprint_summary">Kasuta sõrmejäljelugejat superkasutaja taotluste lubamiseks</string>
 
     <string name="multiuser_mode">Mitmikkasutaja režiim</string>
     <string name="settings_owner_only">Ainult seadme omanik</string>
@@ -168,7 +178,7 @@
     <string name="owner_only_summary">Ainult omanikul on juurkasutaja õigused</string>
     <string name="owner_manage_summary">Ainult omanik saab hallata juurkasutaja ligipääsu ja saada taotlusküsimusi</string>
     <string name="user_indepenent_summary">Igal kasutajal on oma isiklikud juurkasutaja reeglid</string>
-    <string name="multiuser_hint_owner_request">Taotlus on saadetud seadme omanikule. Palun lülitu omanikule ja anna luba</string>
+    <string name="multiuser_hint_owner_request">Taotlus on saadetud seadme omanikule. Palun lülitu omanikule ja anna vajalikud load</string>
 
     <string name="mount_namespace_mode">Nimeruumi monteerimisrežiim</string>
     <string name="settings_ns_global">Globaalne nimeruum</string>
@@ -185,7 +195,8 @@
     <string name="deny">Keela</string>
     <string name="prompt">Küsi</string>
     <string name="grant">Luba</string>
-    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\nKeela, kui sa pole kindel!</string>
+    <string name="su_warning">Annab täieliku ligipääsu sinu seadmele.\n
+  Keela, kui sa pole kindel!</string>
     <string name="forever">Igavesti</string>
     <string name="once">Üks kord</string>
     <string name="tenmin">10 min</string>
@@ -195,17 +206,18 @@
     <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
     <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
     <string name="no_apps_found">Rakendusi ei leitud</string>
-    <string name="su_snack_grant">Rakenduse %1$s superkasutaja õigused on antud</string>
-    <string name="su_snack_deny">Rakenduse %1$s superkasutaja õigused on keelatud</string>
-    <string name="su_snack_notif_on">Rakenduse %1$s teated on lubatud</string>
-    <string name="su_snack_notif_off">Rakenduse %1$s teated on keelatud</string>
-    <string name="su_snack_log_on">Rakenduse %1$s logimine on lubatud</string>
-    <string name="su_snack_log_off">Rakenduse %1$s logimine on keelatud</string>
+    <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s/string>
+    <string name="su_snack_deny">Superkasutaja õigused keelatud rakendusele %1$s</string>
+    <string name="su_snack_notif_on">Teated lubatud rakendusele %1$s</string>
+    <string name="su_snack_notif_off">Teated keelatud rakendusele %1$s</string>
+    <string name="su_snack_log_on">Logimine lubatud rakendusele %1$s</string>
+    <string name="su_snack_log_off">Logimine keelatud rakendusele %1$s</string>
     <string name="su_snack_revoke">Rakenduse %1$s õigused on eemaldatud</string>
     <string name="su_revoke_title">Eemaldad?</string>
     <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
     <string name="toast">Hüpik</string>
     <string name="none">Puudub</string>
+    <string name="auth_fail">Autentimine ebaõnnestus</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\\u0020</string>
