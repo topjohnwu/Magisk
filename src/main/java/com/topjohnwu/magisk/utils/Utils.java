@@ -28,6 +28,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.superuser.Shell;
 
@@ -80,7 +81,8 @@ public class Utils {
     }
 
     public static void uninstallPkg(String pkg) {
-        Shell.Sync.su(fmt("umount -l /data/user*/*/%s/*/*.db 2>/dev/null; pm uninstall %s", pkg, pkg));
+        SuDatabaseHelper.cleanup();
+        Shell.Sync.su("pm uninstall " + pkg);
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {

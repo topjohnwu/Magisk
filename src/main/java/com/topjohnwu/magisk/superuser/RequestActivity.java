@@ -68,7 +68,7 @@ public class RequestActivity extends Activity {
 
         pm = getPackageManager();
         mm = Utils.getMagiskManager(this);
-        mm.suDB.cleanup();
+        mm.suDB.clearOutdated();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");

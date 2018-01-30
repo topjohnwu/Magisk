@@ -7,7 +7,6 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.topjohnwu.utils.SignBoot;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.TarEntry;
@@ -15,6 +14,7 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.utils.SignBoot;
 
 import org.kamranzafar.jtar.TarInputStream;
 import org.kamranzafar.jtar.TarOutputStream;

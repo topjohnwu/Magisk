@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.Toast;
 
-import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.utils.JarMap;
 
 import java.io.File;
 import java.io.FileInputStream;

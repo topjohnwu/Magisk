@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
+import android.os.Process;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -25,142 +25,99 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class SuDatabaseHelper extends SQLiteOpenHelper {
-
-    public static final String DB_NAME = "su.db";
-    public static boolean verified = false;
+public class SuDatabaseHelper {
 
     private static final int DATABASE_VER = 5;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
     private static final String STRINGS_TABLE = "strings";
-    private static final File GLOBAL_DB = new File("/data/adb/magisk.db");
 
-    private Context mContext;
     private PackageManager pm;
     private SQLiteDatabase mDb;
 
-    private static void unmntDB() {
-        Shell.Sync.su(Utils.fmt("umount -l /data/user*/*/%s/*/*.db", MagiskManager.get().getPackageName()));
-    }
-
-    private static Context initDB(boolean verify) {
-        Context context, de = null;
-        MagiskManager ce = MagiskManager.get();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            de = ce.createDeviceProtectedStorageContext();
-            File ceDB = Utils.getDB(ce, DB_NAME);
-            if (ceDB.exists()) {
-                context = ce;
-            } else {
-                context = de;
-            }
-        } else {
-            context = ce;
-        }
-
-        File db = Utils.getDB(context, DB_NAME);
-        if (!verify) {
-            if (db.exists() && db.length() == 0) {
-                ce.loadMagiskInfo();
-                // Continue verification
-            } else {
-                return context;
-            }
-        }
-
-        // Encryption storage
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (ce.magiskVersionCode < 1410) {
-                if (context == de) {
-                    unmntDB();
-                    ce.moveDatabaseFrom(de, DB_NAME);
-                    context = ce;
-                }
-            } else {
-                if (context == ce) {
-                    unmntDB();
-                    de.moveDatabaseFrom(ce, DB_NAME);
-                    context = de;
-                }
-            }
-        }
-        // Context might be updated
-        db = Utils.getDB(context, DB_NAME);
-
-        if (!Shell.rootAccess())
-            return context;
-
-        // Verify the global db matches the local with the same inode
-        if (ce.magiskVersionCode >= 1450 && ce.magiskVersionCode < 1460) {
-            // v14.5 global su db
-            File OLD_GLOBAL_DB = new File(context.getFilesDir().getParentFile().getParentFile(), "magisk.db");
-            verified = TextUtils.equals(Utils.checkInode(OLD_GLOBAL_DB), Utils.checkInode(db));
-            if (!verified) {
-                context.deleteDatabase(DB_NAME);
-                db.getParentFile().mkdirs();
-                Shell.Sync.su(Utils.fmt("magisk --clone-attr %s %s; chmod 600 %s; ln %s %s",
-                        context.getFilesDir(), OLD_GLOBAL_DB, OLD_GLOBAL_DB, OLD_GLOBAL_DB, db));
-                verified = TextUtils.equals(Utils.checkInode(OLD_GLOBAL_DB), Utils.checkInode(db));
-            }
-        } else if (ce.magiskVersionCode >= 1464) {
-            // New global su db
-            Shell.Sync.su(Utils.fmt("mkdir %s 2>/dev/null; chmod 700 %s", GLOBAL_DB.getParent(), GLOBAL_DB.getParent()));
-            if (!Utils.itemExist(GLOBAL_DB)) {
-                context.openOrCreateDatabase(DB_NAME, 0, null).close();
-                Shell.Sync.su(Utils.fmt("cp -af %s %s; rm -f %s*", db, GLOBAL_DB, db));
-            }
-            verified = TextUtils.equals(Utils.checkInode(GLOBAL_DB), Utils.checkInode(db));
-            if (!verified) {
-                context.deleteDatabase(DB_NAME);
-                Utils.javaCreateFile(db);
-                Shell.Sync.su(Utils.fmt(
-                        "chown 0.0 %s; chmod 666 %s; chcon u:object_r:su_file:s0 %s;" +
-                                "mount -o bind %s %s",
-                        GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, GLOBAL_DB, db));
-                verified = TextUtils.equals(Utils.checkInode(GLOBAL_DB), Utils.checkInode(db));
-            }
-        }
-        return context;
-    }
-
-    public static SuDatabaseHelper getSuDB(boolean verify) {
+    public static SuDatabaseHelper getInstance(MagiskManager mm) {
         try {
-            return new SuDatabaseHelper(initDB(verify));
-        } catch(Exception e) {
-            // Try to catch runtime exceptions and remove all db for retry
-            unmntDB();
-            Shell.Sync.su(Utils.fmt("rm -rf /data/user*/*/magisk.db /data/adb/magisk.db /data/user*/*/%s/databases",
-                    MagiskManager.get().getPackageName()));
-            e.printStackTrace();
-            return new SuDatabaseHelper(initDB(false));
+            return new SuDatabaseHelper(mm);
+        } catch (Exception e) {
+            // Let's cleanup and try again
+            cleanup();
+            return new SuDatabaseHelper(mm);
         }
     }
 
-    private SuDatabaseHelper(Context context) {
-        super(context, DB_NAME, null, DATABASE_VER);
-        mContext = context;
-        pm = context.getPackageManager();
-        mDb = getWritableDatabase();
-        cleanup();
+    public static void cleanup() {
+        Shell.Sync.su(
+                "umount -l /data/user*/*/*/databases/su.db /sbin/.core/db-*/magisk.db",
+                "rm -rf /sbin/.core/db-*");
+    }
 
-        if (context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-            String pkg = getStrings(Const.Key.SU_REQUESTER, null);
-            if (pkg != null) {
-                Utils.uninstallPkg(pkg);
-                setStrings(Const.Key.SU_REQUESTER, null);
+    private SuDatabaseHelper(MagiskManager mm) {
+        pm = mm.getPackageManager();
+        mDb = openDatabase(mm);
+        clearOutdated();
+    }
+
+    private SQLiteDatabase openDatabase(MagiskManager mm) {
+        SQLiteDatabase db = null;
+        String GLOBAL_DB = "/data/adb/magisk.db";
+        File dbFile = new File(Utils.fmt("/sbin/.core/db-%s/magisk.db", mm.getPackageName()));
+        Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                ? mm.createDeviceProtectedStorageContext() : mm;
+        if (!dbFile.exists()) {
+            if (!Shell.rootAccess()) {
+                // We don't want the app to crash, create a db and return
+                return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
+            }
+            mm.loadMagiskInfo();
+            // Cleanup
+            cleanup();
+            if (mm.magiskVersionCode < 1410) {
+                // Super old legacy mode
+                db = mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
+            } else if (mm.magiskVersionCode < 1450) {
+                // Legacy mode with FBE aware
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    de.moveDatabaseFrom(mm, "su.db");
+                }
+                db = de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
+            } else {
+                mm.deleteDatabase("su.db");
+                de.deleteDatabase("su.db");
+                if (mm.magiskVersionCode < 1460) {
+                    // v14.5 global DB location
+                    GLOBAL_DB = new File(de.getFilesDir().getParentFile().getParentFile(),
+                            "magisk.db").getPath();
+                    // We need some additional policies on old versions
+                    Shell.Sync.su("magiskpolicy --live 'create su_file' 'allow * su_file file *'");
+                }
+                // Touch global DB and setup db in tmpfs
+                Shell.Sync.su(Utils.fmt("touch %s; mkdir -p %s; touch %s; touch %s-journal;" +
+                                "mount -o bind %s %s;" +
+                                "chcon u:object_r:su_file:s0 %s/*; chown %d.%d %s;" +
+                                "chmod 666 %s/*; chmod 700 %s;",
+                        GLOBAL_DB, dbFile.getParent(), dbFile, dbFile,
+                        GLOBAL_DB, dbFile,
+                        dbFile.getParent(), Process.myUid(), Process.myUid(), dbFile.getParent(),
+                        dbFile.getParent(), dbFile.getParent()
+                ));
             }
         }
+        if (db == null) {
+            // Not using legacy mode, open the mounted global DB
+            db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
+        }
+        int version = db.getVersion();
+        if (version < DATABASE_VER) {
+            onUpgrade(db, version);
+        } else if (version > DATABASE_VER) {
+            onDowngrade(db);
+        }
+        db.setVersion(DATABASE_VER);
+        return db;
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        onUpgrade(db, 0, DATABASE_VER);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion) {
         try {
             if (oldVersion == 0) {
                 createTables(db);
@@ -196,23 +153,18 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            onDowngrade(db, DATABASE_VER, 0);
+            onDowngrade(db);
         }
     }
 
-    @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    // Remove everything, we do not support downgrade
+    public void onDowngrade(SQLiteDatabase db) {
         MagiskManager.toast(R.string.su_db_corrupt, Toast.LENGTH_LONG);
-        // Remove everything, we do not support downgrade
         db.execSQL("DROP TABLE IF EXISTS " + POLICY_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + LOG_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + SETTINGS_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + STRINGS_TABLE);
-        onUpgrade(db, 0, DATABASE_VER);
-    }
-
-    public File getDbFile() {
-        return mContext.getDatabasePath(DB_NAME);
+        onUpgrade(db, 0);
     }
 
     private void createTables(SQLiteDatabase db) {
@@ -235,7 +187,7 @@ public class SuDatabaseHelper extends SQLiteOpenHelper {
                 "(key TEXT, value INT, PRIMARY KEY(key))");
     }
 
-    public void cleanup() {
+    public void clearOutdated() {
         // Clear outdated policies
         mDb.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < %d", System.currentTimeMillis() / 1000), null);
         // Clear outdated logs

@@ -119,7 +119,7 @@ public class MagiskManager extends Shell.ContainerApp {
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
         }
 
-        suDB = SuDatabaseHelper.getSuDB(false);
+        suDB = SuDatabaseHelper.getInstance(this);
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
@@ -219,11 +219,6 @@ public class MagiskManager extends Shell.ContainerApp {
         ret = Shell.Sync.su("echo \"$BOOTIMAGE\"");
         if (Utils.isValidShellResponse(ret))
             bootBlock = ret.get(0);
-
-        if (suDB != null && !SuDatabaseHelper.verified) {
-            suDB.close();
-            suDB = SuDatabaseHelper.getSuDB(true);
-        }
     }
 
     public void getDefaultInstallFlags() {
