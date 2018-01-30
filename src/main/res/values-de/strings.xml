@@ -166,6 +166,8 @@
     <string name="request_timeout_summary">%1$s Sekunden</string>
     <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
+    <string name="settings_su_fingerprint_title">Aktiviere Authentifizierung durch Fingerabdruck</string>
+    <string name="settings_su_fingerprint_summary">Fingerabdrucksensor benutzen um Superuser-Anfragen zu erlauben</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
@@ -212,6 +214,7 @@
     <string name="su_revoke_msg">Möchtest du die Rechte für %1$s entziehen?</string>
     <string name="toast">Popup</string>
     <string name="none">Keine</string>
+    <string name="auth_fail">Authentifizierung fehlgeschlagen</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
