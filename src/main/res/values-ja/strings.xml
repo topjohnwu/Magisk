@@ -163,6 +163,8 @@
     <string name="request_timeout_summary">%1$s秒</string>
     <string name="settings_su_reauth_title">アップグレード後の再認証</string>
     <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
+    <string name="settings_su_fingerprint_title">指紋認証の有効化</string>
+    <string name="settings_su_fingerprint_summary">スーパーユーザー権限のリクエストの許可に指紋認証を使います</string>
 
     <string name="multiuser_mode">マルチユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>
@@ -206,9 +208,10 @@
     <string name="su_snack_log_off">%1$s のログは無効です</string>
     <string name="su_snack_revoke">%1$s の権限は取り消されました</string>
     <string name="su_revoke_title">確認</string>
-    <string name="su_revoke_msg">%1$s の権限を取り消すことを承認しますか？</string>
+    <string name="su_revoke_msg">%1$s の権限を取り消しますか？</string>
     <string name="toast">トースト通知</string>
     <string name="none">なし</string>
+    <string name="auth_fail">認証に失敗しました</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
