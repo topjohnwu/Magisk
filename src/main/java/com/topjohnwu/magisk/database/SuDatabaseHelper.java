@@ -55,6 +55,13 @@ public class SuDatabaseHelper {
     private SuDatabaseHelper(MagiskManager mm) {
         pm = mm.getPackageManager();
         mDb = openDatabase(mm);
+        int version = mDb.getVersion();
+        if (version < DATABASE_VER) {
+            onUpgrade(mDb, version);
+        } else if (version > DATABASE_VER) {
+            onDowngrade(mDb);
+        }
+        mDb.setVersion(DATABASE_VER);
         clearOutdated();
     }
 
@@ -107,13 +114,6 @@ public class SuDatabaseHelper {
             // Not using legacy mode, open the mounted global DB
             db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
         }
-        int version = db.getVersion();
-        if (version < DATABASE_VER) {
-            onUpgrade(db, version);
-        } else if (version > DATABASE_VER) {
-            onDowngrade(db);
-        }
-        db.setVersion(DATABASE_VER);
         return db;
     }
 
