@@ -206,7 +206,7 @@
     <string name="su_allow_toast">Rakendusele %1$s anti superkasutaja õigused</string>
     <string name="su_deny_toast">Rakendusel %1$s keelati superkasutaja õigused</string>
     <string name="no_apps_found">Rakendusi ei leitud</string>
-    <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s/string>
+    <string name="su_snack_grant">Superkasutaja õigused antud rakendusele %1$s</string>
     <string name="su_snack_deny">Superkasutaja õigused keelatud rakendusele %1$s</string>
     <string name="su_snack_notif_on">Teated lubatud rakendusele %1$s</string>
     <string name="su_snack_notif_off">Teated keelatud rakendusele %1$s</string>
