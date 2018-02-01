@@ -318,6 +318,12 @@ static int patch_sepolicy() {
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
 
+	// Remove the stupid debug sepolicy and use our own
+	if (access("/sepolicy_debug", F_OK) == 0) {
+		unlink("/sepolicy_debug");
+		link("/sepolicy", "/sepolicy_debug");
+	}
+
 	return 0;
 }
 
