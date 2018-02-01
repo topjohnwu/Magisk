@@ -24,8 +24,8 @@
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Pengaturan Lanjutan</string>
-    <string name="keep_force_encryption">Biarkan enkripsi paksa</string>
-    <string name="keep_dm_verity">Biarkan AVB 2.0/dm-verity</string>
+    <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
+    <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Versi yang Terpasang: %1$s</string>
     <string name="install_magisk_title">Versi Terbaru: %1$s</string>
     <string name="uninstall">Copot</string>
@@ -42,11 +42,18 @@
     <string name="disable_file_created">Modul akan dinonaktifkan pada reboot berikutnya</string>
     <string name="disable_file_removed">Modul akan diaktifkan pada reboot berikutnya</string>
     <string name="author">Dibuat oleh %1$s</string>
+    <string name="reboot_recovery">Reboot ke Recovery</string>
+    <string name="reboot_bootloader">Reboot ke Bootloader</string>
+    <string name="reboot_download">Reboot ke Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Pembaruan Tersedia</string>
     <string name="installed">Terpasang</string>
     <string name="not_installed">Tidak Terpasang</string>
+    <string name="updated_on">Diperbarui pada: %1$s</string>
+    <string name="sorting_order">Urutkan Susunan</string>
+    <string name="sort_by_name">Urut berdasarkan nama</string>
+    <string name="sort_by_update">Urut berdasarkan pembaruan terakhir</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Simpan log</string>
@@ -58,12 +65,12 @@
 
     <!--About Activity-->
     <string name="about">Tentang</string>
-    <string name="app_changelog">Log pembaruan apl</string>
+    <string name="app_changelog">Log pembaruan</string>
     <string name="translators"><![CDATA[<a href="https://github.com/krasCGQ">Albert I (krasCGQ)</a>]]></string>
-    <string name="app_version">Versi apl</string>
+    <string name="app_version">Versi</string>
     <string name="app_source_code">Kode sumber</string>
     <string name="donation">Donasi</string>
-    <string name="app_translators">Penerjemah apl</string>
+    <string name="app_translators">Penerjemah</string>
     <string name="support_thread">Thread dukungan</string>
 
     <!--Toasts, Dialogs-->
@@ -100,17 +107,19 @@
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager…</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
-    <string name="direct_install">Pasang Langsung (Rekomendasikan)</string>
+    <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
     <string name="install_second_slot">Pasang ke Slot Kedua (Setelah OTA)</string>
     <string name="select_method">Pilih Metode</string>
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
+    <string name="restore_img">Pulihkan Image</string>
+    <string name="uninstall_app">Copot Apl</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="uninstall_toast">Mencopot Magisk Manager dalam 5 detik, silahkan reboot secara manual setelahnya</string>
     <string name="proprietary_title">Unduh Kode Proprieter</string>
-    <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS sehingga tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS, yang tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>
 
     <!--Settings Activity -->
@@ -134,7 +143,7 @@
     <string name="settings_boot_format_title">Format Keluaran Boot yang Ditambal</string>
     <string name="settings_boot_format_summary">Pilih format keluaran boot image yang ditambal.\nPilih .img untuk flash melalui mode recovery/download; pilih .img.tar untuk flash melalui ODIN.</string>
     <string name="settings_core_only_title">Magisk Mode Inti Saja</string>
-    <string name="settings_core_only_summary">Aktifkan fitur inti saja, semua modul tidak akan dimuat. MagiskSU, MagiskHide, dan host tanpa sistem akan tetap diaktifkan</string>
+    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU, MagiskHide, dan host tanpa sistem akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>
@@ -154,6 +163,8 @@
     <string name="request_timeout_summary">%1$s detik</string>
     <string name="settings_su_reauth_title">Otentikasi ulang setelah pembaruan</string>
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
+    <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>
+    <string name="settings_su_fingerprint_summary">Gunakan pemindai sidik jari untuk mengizinkan permintaan superuser</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>
@@ -162,7 +173,7 @@
     <string name="owner_only_summary">Hanya pemilik yang memiliki akses root</string>
     <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima permintaan</string>
     <string name="user_indepenent_summary">Setiap pengguna memiliki aturan root tersendiri</string>
-    <string name="multiuser_hint_owner_request">Permintaan telah dikirim kepada pemilik perangkat. Silakan beralih ke pemilik dan berikan izin</string>
+    <string name="multiuser_hint_owner_request">Permintaan telah dikirim kepada pemilik perangkat. Silakan beralih ke pemilik dan berikan izin yang diperlukan</string>
 
     <string name="mount_namespace_mode">Mode Mount Ruang Nama</string>
     <string name="settings_ns_global">Ruang Nama Global</string>
@@ -171,6 +182,7 @@
     <string name="global_summary">Semua sesi root menggunakan mount ruang nama global</string>
     <string name="requester_summary">Sesi root akan mewarisi ruang nama pemintanya</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
+    <string name="android_o_not_support">Tidak mendukung Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan Superuser</string>
@@ -199,6 +211,7 @@
     <string name="su_revoke_msg">Konfirmasi untuk mencabut akses %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Tidak ada</string>
+    <string name="auth_fail">Otentikasi Gagal</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
