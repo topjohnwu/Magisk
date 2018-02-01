@@ -228,6 +228,33 @@ void clone_dir(int src, int dest) {
 	}
 }
 
+void link_dir(int src, int dest) {
+	struct dirent *entry;
+	DIR *dir;
+	int newsrc, newdest;
+	struct file_attr a;
+
+	dir = xfdopendir(src);
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		if (is_excl(entry->d_name))
+			continue;
+		if (entry->d_type == DT_DIR) {
+			getattrat(src, entry->d_name, &a);
+			xmkdirat(dest, entry->d_name, a.st.st_mode & 0777);
+			setattrat(dest, entry->d_name, &a);
+			newsrc = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
+			newdest = xopenat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
+			link_dir(newsrc, newdest);
+			close(newsrc);
+			close(newdest);
+		} else {
+			linkat(src, entry->d_name, dest, entry->d_name, 0);
+		}
+	}
+}
+
 int getattr(const char *path, struct file_attr *a) {
 	if (xlstat(path, &a->st) == -1)
 		return -1;

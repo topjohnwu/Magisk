@@ -141,13 +141,8 @@ void daemon_init() {
 	chmod("/root", 0755);
 	root = xopen("/root", O_RDONLY | O_CLOEXEC);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
-	dir = xfdopendir(sbin);
-	while((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
-		linkat(sbin, entry->d_name, root, entry->d_name, 0);
-		if (strcmp(entry->d_name, "magisk") == 0)
-			unlinkat(sbin, entry->d_name, 0);
-	}
+	link_dir(sbin, root);
+	unlink("/sbin/magisk");
 	close(sbin);
 
 	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);

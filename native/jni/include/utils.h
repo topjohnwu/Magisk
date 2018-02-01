@@ -111,6 +111,7 @@ void frm_rf(int dirfd);
 void mv_f(const char *source, const char *destination);
 void mv_dir(int src, int dest);
 void cp_afc(const char *source, const char *destination);
+void link_dir(int src, int dest);
 void clone_dir(int src, int dest);
 int getattr(const char *path, struct file_attr *a);
 int getattrat(int dirfd, const char *pathname, struct file_attr *a);

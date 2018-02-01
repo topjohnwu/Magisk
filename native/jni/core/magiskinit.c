@@ -152,7 +152,7 @@ static void fstab_patch_cb(int dirfd, struct dirent *entry) {
 		size_t _size;
 		uint32_t size;
 		full_read_at(dirfd, entry->d_name, &buf, &_size);
-		size = _size;  /* Type conversion */
+		size = (uint32_t) _size;  /* Type conversion */
 		if (!keepverity)
 			patch_verity(&buf, &size, 1);
 		if (!keepencrypt)
@@ -203,8 +203,8 @@ static void patch_ramdisk(int root) {
 }
 
 static int strend(const char *s1, const char *s2) {
-	int l1 = strlen(s1);
-	int l2 = strlen(s2);
+	size_t l1 = strlen(s1);
+	size_t l2 = strlen(s2);
 	return strcmp(s1 + l1 - l2, s2);
 }
 
@@ -327,7 +327,7 @@ static int unxz(const void *buf, size_t size, int fd) {
 	lzma_stream strm = LZMA_STREAM_INIT;
 	if (lzma_auto_decoder(&strm, UINT64_MAX, 0) != LZMA_OK)
 		return 1;
-	lzma_ret ret = 0;
+	lzma_ret ret;
 	void *out = malloc(BUFSIZE);
 	strm.next_in = buf;
 	strm.avail_in = size;
@@ -505,10 +505,10 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 
 	// Only patch rootfs if not intended to run in recovery
 	if (access("/etc/recovery.fstab", F_OK) != 0) {
+		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 		mv_dir(overlay, root);
 
 		patch_ramdisk(root);
@@ -528,16 +528,16 @@ int main(int argc, char *argv[]) {
 			umount("/system");
 		}
 
+		close(overlay);
+
 		if (fork_dont_care() == 0) {
 			strcpy(argv[0], "magiskinit");
-			close(overlay);
 			close(root);
 			magisk_init_daemon();
 		}
 	}
 
 	// Clean up
-	close(overlay);
 	close(root);
 	umount("/vendor");
 	rmdir("/overlay");
