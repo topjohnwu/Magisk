@@ -51,7 +51,7 @@ struct node_entry {
 static void concat_path(struct node_entry *node) {
 	if (node->parent)
 		concat_path(node->parent);
-	int len = strlen(buf);
+	size_t len = strlen(buf);
 	buf[len] = '/';
 	strcpy(buf + len + 1, node->name);
 }

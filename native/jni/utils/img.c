@@ -3,9 +3,11 @@
 
 #include <unistd.h>
 #include <libgen.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
+#include <sys/sendfile.h>
 #include <linux/loop.h>
 
 #include "magisk.h"
@@ -167,7 +169,15 @@ int merge_img(const char *source, const char *target) {
 		return 0;
 	LOGI("* Merging %s  -> %s\n", source, target);
 	if (access(target, F_OK) == -1) {
-		xrename(source, target);
+		if (rename(source, target) < 0) {
+			// Copy and remove
+			int tgt = creat(target, 0644);
+			int src = xopen(source, O_RDONLY | O_CLOEXEC);
+			sendfile(tgt, src, 0, INT_MAX);
+			close(tgt);
+			close(src);
+			unlink(source);
+		}
 		return 0;
 	}
 
