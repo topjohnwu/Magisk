@@ -401,8 +401,9 @@ int mmap_rw(const char *filename, void **buf, size_t *size) {
 void fd_full_read(int fd, void **buf, size_t *size) {
 	*size = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
-	*buf = xmalloc(*size);
+	*buf = xmalloc(*size + 1);
 	xxread(fd, *buf, *size);
+	((char *) *buf)[*size] = '\0';
 }
 
 void full_read(const char *filename, void **buf, size_t *size) {
