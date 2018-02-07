@@ -10,12 +10,12 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk не встановлено</string>
-
     <string name="checking_for_updates">Перевірка оновлень…</string>
     <string name="magisk_update_available">Доступно Magisk v%1$s!</string>
+    <string name="invalid_update_channel">Неправильний канал оновлень</string>
     <string name="safetyNet_check_text">Перевірити статус SafetyNet</string>
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
-    <string name="safetyNet_check_success">Перевірку SafetyNet завершено</string>
+    <string name="safetyNet_check_success">Результат перевірки SafetyNet</string>
     <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
     <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
     <string name="safetyNet_service_disconnected">Службу зупинено</string>
@@ -41,11 +41,18 @@
     <string name="disable_file_created">Модуль вимкнеться при перезавантаженні</string>
     <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні</string>
     <string name="author">Автор: %1$s</string>
+    <string name="reboot_recovery">Перезавантаження в Recovery</string>
+    <string name="reboot_bootloader">Перезавантаження в Bootloader</string>
+    <string name="reboot_download">Перезавантаження в Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
     <string name="installed">Встановлено</string>
     <string name="not_installed">Не встановлено</string>
+    <string name="updated_on">Оновлено: %1$s</string>
+    <string name="sorting_order">Порядок сортування</string>
+    <string name="sort_by_name">Сортувати за ім'ям</string>
+    <string name="sort_by_update">Сортувати за оновленням</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Зберегти логи</string>
@@ -90,6 +97,8 @@
     <string name="zip_process_msg">Опрацювання архіву …</string>
     <string name="manager_update_title">Доступне оновлення Magisk Manager!</string>
     <string name="manager_download_install">Натисніть, щоб завантажити і встановити</string>
+    <string name="dtbo_patched_title">DTBO пропатчено!</string>
+    <string name="dtbo_patched_reboot">Magisk Manager пропатчив dtbo.img, будь ласка, перезавантажте пристрій</string>
     <string name="magisk_updates">Оновлення Magisk</string>
     <string name="flashing">Прошивання</string>
     <string name="hide_manager_toast">Приховування Magisk Manager…</string>
@@ -103,11 +112,14 @@
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
+    <string name="restore_img">Відновити образ</string>
+    <string name="uninstall_app">Видалити додаток</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
-    <string name="uninstall_toast">Видалення Менеджера Magisk протягом 5 секунд, потім, будь ласка, вручну перезавантажте</string>
+    <string name="uninstall_toast">Видалення Magisk Manager протягом 5 секунд, потім, будь ласка, вручну перезавантажте пристрій</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
-    <string name="proprietary_notice">Менеджер Magisk - це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Менеджеру Magisk завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager — це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+    <string name="su_db_corrupt">База даних SU пошкоджена, буде створено нову БД</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>
@@ -118,13 +130,15 @@
     <string name="settings_clear_cache_title">Очищення кешу</string>
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії, змушуючи програму примусово оновлюватися через Інтернет</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Перезібрати Менеджер Magisk з випадковим іменем пакету</string>
+    <string name="settings_hide_manager_summary">Перезібрати Magisk Manager з випадковим іменем пакету</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
     <string name="settings_update">Оновити налаштування</string>
     <string name="settings_update_channel_title">Канал оновлення</string>
     <string name="settings_update_stable">Стабільний реліз</string>
     <string name="settings_update_beta">Бета реліз</string>
+    <string name="settings_update_custom">Власний</string>
+    <string name="settings_update_custom_msg">Вставте власний URL</string>
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
     <string name="settings_core_only_title">Режим ядра Magisk</string>
@@ -148,6 +162,8 @@
     <string name="request_timeout_summary">%1$s сек.</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
+    <string name="settings_su_fingerprint_title">Увімкнути автентифікацію за відбитком</string>
+    <string name="settings_su_fingerprint_summary">Використовувати сканер відбитків пальців, щоб надавати дозвіл суперкористувача</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
@@ -165,6 +181,7 @@
     <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен</string>
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен</string>
+    <string name="android_o_not_support">Не підтримує Android 8.0+</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>
@@ -193,6 +210,7 @@
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>
     <string name="none">Нічого</string>
+    <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
