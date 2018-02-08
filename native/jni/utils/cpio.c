@@ -46,7 +46,7 @@ int cpio_cmp(const void *a, const void *b) {
 
 void cpio_vec_insert(struct vector *v, cpio_entry *n) {
 	int i = cpio_find(v, n->filename);
-	if (i > 0) {
+	if (i >= 0) {
 		// Replace, then all is done
 		cpio_free(vec_entry(v)[i]);
 		vec_entry(v)[i] = n;
