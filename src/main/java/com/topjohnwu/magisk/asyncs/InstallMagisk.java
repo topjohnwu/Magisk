@@ -108,7 +108,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             boolean highCompression = false;
             switch (mode) {
                 case PATCH_MODE:
-                    console.add("- Use boot image: " + boot);
+                    console.add("- Use boot/ramdisk image: " + boot);
                     // Copy boot image to local
                     try (
                         InputStream in = mm.getContentResolver().openInputStream(mBootImg);
@@ -140,7 +140,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     }
                     break;
                 case DIRECT_MODE:
-                    console.add("- Use boot image: " + mBootLocation);
+                    console.add("- Use boot/ramdisk image: " + mBootLocation);
                     if (mm.remoteMagiskVersionCode >= 1463) {
                         List<String> ret = new ArrayList<>();
                          Shell.getShell().run(ret, logs,
@@ -168,7 +168,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             try (InputStream in = new FileInputStream(boot)) {
                 isSigned = SignBoot.verifySignature(in, null);
                 if (isSigned) {
-                    console.add("- Signed boot image detected");
+                    console.add("- Boot image is signed with AVB 1.0");
                 }
             } catch (Exception e) {
                 console.add("! Unable to check signature");
@@ -200,7 +200,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             File patched_boot = new File(install.getParent(), "new-boot.img");
 
             if (isSigned) {
-                console.add("- Signing boot image");
+                console.add("- Signing boot image with test keys");
                 File signed = new File(install.getParent(), "signed.img");
                 AssetManager assets = mm.getAssets();
                 try (
