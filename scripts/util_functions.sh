@@ -94,21 +94,12 @@ grep_prop() {
 
 getvar() {
   local VARNAME=$1
-  local VALUE=$(eval echo \$$VARNAME)
-  [ ! -z $VALUE ] && return
+  local VALUE=
   for DIR in /.backup /dev /data /cache /system; do
     VALUE=`grep_prop $VARNAME $DIR/.magisk`
     [ ! -z $VALUE ] && break;
   done
-  eval $VARNAME=\$VALUE
-}
-
-resolve_link() {
-  RESOLVED="$1"
-  while RESOLVE=`readlink $RESOLVED`; do
-    RESOLVED=$RESOLVE
-  done
-  echo $RESOLVED
+  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
 find_boot_image() {
@@ -116,22 +107,22 @@ find_boot_image() {
   if [ ! -z $SLOT ]; then
     BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
   fi
-  if [ -z "$BOOTIMAGE" ]; then
+  if [ -z $BOOTIMAGE ]; then
     # The slot info is incorrect...
     SLOT=
-    for BLOCK in boot_a kern-a android_boot kernel boot lnx bootimg; do
+    for BLOCK in ramdisk boot_a kern-a android_boot kernel boot lnx bootimg; do
       BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
   # Recovery fallback
-  if [ -z "$BOOTIMAGE" ]; then
+  if [ -z $BOOTIMAGE ]; then
     for FSTAB in /etc/*fstab*; do
       BOOTIMAGE=`grep -v '#' $FSTAB | grep -E '/boot[^a-zA-Z]' | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
       [ ! -z $BOOTIMAGE ] && break
     done
   fi
-  [ ! -z "$BOOTIMAGE" ] && BOOTIMAGE=`resolve_link $BOOTIMAGE`
+  [ ! -z $BOOTIMAGE ] && BOOTIMAGE=`readlink -f $BOOTIMAGE`
 }
 
 run_migrations() {
@@ -158,6 +149,7 @@ run_migrations() {
   fi
   # Remove old dbs
   rm -f /data/user*/*/magisk.db
+  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
 }
 
 flash_boot_image() {
@@ -167,7 +159,12 @@ flash_boot_image() {
     *.gz) COMMAND="gzip -d < '$1'";;
     *)    COMMAND="cat '$1'";;
   esac
-  $BOOTSIGNED && SIGNCOM="$BOOTSIGNER -sign" || SIGNCOM="cat -"
+  if $BOOTSIGNED; then
+    SIGNCOM="$BOOTSIGNER -sign"
+    ui_print "- Sign boot image with test keys"
+  else
+    SIGNCOM="cat -"
+  fi
   case "$2" in
     /dev/block/*)
       ui_print "- Flashing new boot image"
@@ -182,7 +179,7 @@ flash_boot_image() {
 
 find_dtbo_image() {
   DTBOIMAGE=`find /dev/block -iname dtbo$SLOT | head -n 1` 2>/dev/null
-  [ ! -z $DTBOIMAGE ] && DTBOIMAGE=`resolve_link $DTBOIMAGE`
+  [ ! -z $DTBOIMAGE ] && DTBOIMAGE=`readlink -f $DTBOIMAGE`
 }
 
 patch_dtbo_image() {
@@ -232,7 +229,7 @@ sign_chromeos() {
 }
 
 is_mounted() {
-  TARGET="`resolve_link $1`"
+  TARGET="`readlink -f $1`"
   cat /proc/mounts | grep " $TARGET " >/dev/null
   return $?
 }
@@ -321,9 +318,9 @@ abort() {
 }
 
 set_perm() {
-  chown $2:$3 $1 || exit 1
-  chmod $4 $1 || exit 1
-  [ -z $5 ] && chcon 'u:object_r:system_file:s0' $1 || chcon $5 $1
+  chown $2:$3 $1 || return 1
+  chmod $4 $1 || return 1
+  [ -z $5 ] && chcon 'u:object_r:system_file:s0' $1 || chcon $5 $1 || return 1
 }
 
 set_perm_recursive() {

@@ -24,6 +24,8 @@
 #define header(b, e) (lheader(b, e,))
 
 static void dump(void *buf, size_t size, const char *filename) {
+	if (size == 0)
+		return;
 	int fd = creat(filename, 0644);
 	xwrite(fd, buf, size);
 	close(fd);
@@ -95,7 +97,7 @@ int parse_img(const char *image, boot_img *boot) {
 	for (void *head = boot->map_addr; head < boot->map_addr + boot->map_size; ++head) {
 		size_t pos = 0;
 
-		switch (check_fmt(head)) {
+		switch (check_fmt(head, boot->map_size)) {
 		case CHROMEOS:
 			// The caller should know it's chromeos, as it needs additional signing
 			boot->flags |= CHROMEOS_FLAG;
@@ -150,17 +152,13 @@ int parse_img(const char *image, boot_img *boot) {
 			pos += header(boot, ramdisk_size);
 			pos_align();
 
-			if (header(boot, second_size)) {
-				boot->second = head + pos;
-				pos += header(boot, second_size);
-				pos_align();
-			}
+			boot->second = head + pos;
+			pos += header(boot, second_size);
+			pos_align();
 
-			if (header(boot, extra_size)) {
-				boot->extra = head + pos;
-				pos += header(boot, extra_size);
-				pos_align();
-			}
+			boot->extra = head + pos;
+			pos += header(boot, extra_size);
+			pos_align();
 
 			if (pos < boot->map_size) {
 				boot->tail = head + pos;
@@ -185,8 +183,8 @@ int parse_img(const char *image, boot_img *boot) {
 				}
 			}
 
-			boot->k_fmt = check_fmt(boot->kernel);
-			boot->r_fmt = check_fmt(boot->ramdisk);
+			boot->k_fmt = check_fmt(boot->kernel, header(boot, kernel_size));
+			boot->r_fmt = check_fmt(boot->ramdisk, header(boot, ramdisk_size));
 
 			// Check MTK
 			if (boot->k_fmt == MTK) {
@@ -198,7 +196,7 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "NAME [%s]\n", boot->k_hdr->name);
 				boot->kernel += 512;
 				lheader(boot, kernel_size, -= 512);
-				boot->k_fmt = check_fmt(boot->kernel);
+				boot->k_fmt = check_fmt(boot->kernel, header(boot, kernel_size));
 			}
 			if (boot->r_fmt == MTK) {
 				fprintf(stderr, "MTK_RAMDISK_HDR\n");
@@ -209,7 +207,7 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "NAME [%s]\n", boot->r_hdr->name);
 				boot->ramdisk += 512;
 				lheader(boot, ramdisk_size, -= 512);
-				boot->r_fmt = check_fmt(boot->ramdisk);
+				boot->k_fmt = check_fmt(boot->ramdisk, header(boot, ramdisk_size));
 			}
 
 			char fmt[16];
@@ -241,10 +239,8 @@ int unpack(const char *image) {
 		dump(boot.kernel, header(&boot, kernel_size), KERNEL_FILE);
 	}
 
-	if (boot.dt_size) {
-		// Dump dtb
-		dump(boot.dtb, boot.dt_size, DTB_FILE);
-	}
+	// Dump dtb
+	dump(boot.dtb, boot.dt_size, DTB_FILE);
 
 	// Dump ramdisk
 	if (COMPRESSED(boot.r_fmt)) {
@@ -252,19 +248,14 @@ int unpack(const char *image) {
 		decomp(boot.r_fmt, fd, boot.ramdisk, header(&boot, ramdisk_size));
 		close(fd);
 	} else {
-		dump(boot.ramdisk, header(&boot, ramdisk_size), RAMDISK_FILE ".raw");
-		LOGE("Unknown ramdisk format! Dumped to %s\n", RAMDISK_FILE ".raw");
+		dump(boot.ramdisk, header(&boot, ramdisk_size), RAMDISK_FILE);
 	}
 
-	if (header(&boot, second_size)) {
-		// Dump second
-		dump(boot.second, header(&boot, second_size), SECOND_FILE);
-	}
+	// Dump second
+	dump(boot.second, header(&boot, second_size), SECOND_FILE);
 
-	if (header(&boot, extra_size)) {
-		// Dump extra
-		dump(boot.extra, header(&boot, extra_size), EXTRA_FILE);
-	}
+	// Dump extra
+	dump(boot.extra, header(&boot, extra_size), EXTRA_FILE);
 
 	clean_boot(&boot);
 	return ret;
@@ -278,6 +269,13 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Parse original image
 	parse_img(orig_image, &boot);
+
+	// Reset all sizes
+	lheader(&boot, kernel_size, = 0);
+	lheader(&boot, ramdisk_size, = 0);
+	lheader(&boot, second_size, = 0);
+	lheader(&boot, extra_size, = 0);
+	boot.dt_size = 0;
 
 	fprintf(stderr, "Repack to boot image: [%s]\n", out_image);
 
@@ -304,20 +302,22 @@ void repack(const char* orig_image, const char* out_image) {
 		// Skip MTK header
 		write_zero(fd, 512);
 	}
-	if (COMPRESSED(boot.k_fmt)) {
-		size_t raw_size;
-		void *kernel_raw;
-		mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
-		lheader(&boot, kernel_size, = comp(boot.k_fmt, fd, kernel_raw, raw_size));
-		munmap(kernel_raw, raw_size);
-	} else {
-		lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
+	if (access(KERNEL_FILE, R_OK) == 0) {
+		if (COMPRESSED(boot.k_fmt)) {
+			size_t raw_size;
+			void *kernel_raw;
+			mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
+			lheader(&boot, kernel_size, = comp(boot.k_fmt, fd, kernel_raw, raw_size));
+			munmap(kernel_raw, raw_size);
+		} else {
+			lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
+		}
+		// dtb
+		if (access(DTB_FILE, R_OK) == 0) {
+			lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
+		}
+		file_align();
 	}
-	// dtb
-	if (boot.dt_size && access(DTB_FILE, R_OK) == 0) {
-		lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
-	}
-	file_align();
 
 	// ramdisk
 	ramdisk_off = lseek(fd, 0, SEEK_CUR);
@@ -326,39 +326,28 @@ void repack(const char* orig_image, const char* out_image) {
 		write_zero(fd, 512);
 	}
 	if (access(RAMDISK_FILE, R_OK) == 0) {
-		// If we found raw cpio, compress to original format
-		size_t cpio_size;
-		void *cpio;
-		mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
-		lheader(&boot, ramdisk_size, = comp(boot.r_fmt, fd, cpio, cpio_size));
-		munmap(cpio, cpio_size);
-	} else {
-		// Find compressed ramdisk
-		char name[PATH_MAX];
-		int found = 0;
-		for (int i = 0; SUP_EXT_LIST[i]; ++i) {
-			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
-			if (access(name, R_OK) == 0) {
-				found = 1;
-				break;
-			}
+		if (COMPRESSED(boot.r_fmt)) {
+			size_t cpio_size;
+			void *cpio;
+			mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
+			lheader(&boot, ramdisk_size, = comp(boot.r_fmt, fd, cpio, cpio_size));
+			munmap(cpio, cpio_size);
+		} else {
+			lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
 		}
-		if (!found)
-			LOGE("No ramdisk exists!\n");
-		lheader(&boot, ramdisk_size, = restore(name, fd));
+		file_align();
 	}
-	file_align();
 
 	// second
 	second_off = lseek(fd, 0, SEEK_CUR);
-	if (header(&boot, second_size) && access(SECOND_FILE, R_OK) == 0) {
+	if (access(SECOND_FILE, R_OK) == 0) {
 		lheader(&boot, second_size, = restore(SECOND_FILE, fd));
 		file_align();
 	}
 
 	// extra
 	extra_off = lseek(fd, 0, SEEK_CUR);
-	if (header(&boot, extra_size) && access(EXTRA_FILE, R_OK) == 0) {
+	if (access(EXTRA_FILE, R_OK) == 0) {
 		lheader(&boot, extra_size, = restore(EXTRA_FILE, fd));
 		file_align();
 	}

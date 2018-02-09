@@ -395,7 +395,7 @@ void decomp_file(char *from, const char *to) {
 		stream_full_read(STDIN_FILENO, &file, &size);
 	else
 		mmap_ro(from, &file, &size);
-	format_t type = check_fmt(file);
+	format_t type = check_fmt(file, size);
 	char *ext;
 	ext = strrchr(from, '.');
 	if (to == NULL)

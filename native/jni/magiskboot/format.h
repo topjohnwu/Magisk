@@ -44,7 +44,7 @@ typedef enum {
 #define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
 #define SUP_EXT_LIST  ((char *[]) { "gz", "xz", "lzma", "bz2", "lz4", "lz4", NULL })
 
-format_t check_fmt(const void *buf);
+format_t check_fmt(const void *buf, size_t len);
 void get_fmt_name(format_t fmt, char *name);
 
 #endif

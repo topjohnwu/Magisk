@@ -3,37 +3,39 @@
 #include "bootimg.h"
 #include "format.h"
 
-format_t check_fmt(const void *buf) {
-	if (memcmp(buf, CHROMEOS_MAGIC, 8) == 0) {
+#define MATCH(s) (len >= (sizeof(s) - 1) && memcmp(buf, s, sizeof(s) - 1) == 0)
+
+format_t check_fmt(const void *buf, size_t len) {
+	if (MATCH(CHROMEOS_MAGIC)) {
 		return CHROMEOS;
-	} else if (memcmp(buf, BOOT_MAGIC, 8) == 0) {
+	} else if (MATCH(BOOT_MAGIC)) {
 		return AOSP;
-	} else if (memcmp(buf, ELF32_MAGIC, 5) == 0) {
+	} else if (MATCH(ELF32_MAGIC)) {
 		return ELF32;
-	} else if (memcmp(buf, ELF64_MAGIC, 5) == 0) {
+	} else if (MATCH(ELF64_MAGIC)) {
 		return ELF64;
-	} else if (memcmp(buf, GZIP_MAGIC, 4) == 0) {
+	} else if (MATCH(GZIP_MAGIC)) {
 		return GZIP;
-	} else if (memcmp(buf, LZOP_MAGIC, 9) == 0) {
+	} else if (MATCH(LZOP_MAGIC)) {
 		return LZOP;
-	} else if (memcmp(buf, XZ_MAGIC, 6) == 0) {
+	} else if (MATCH(XZ_MAGIC)) {
 		return XZ;
-	} else if (memcmp(buf, "\x5d\x00\x00", 3) == 0
+	} else if (len >= 13 && memcmp(buf, "\x5d\x00\x00", 3) == 0
 			&& (((char *)buf)[12] == '\xff' || ((char *)buf)[12] == '\x00')) {
 		return LZMA;
-	} else if (memcmp(buf, BZIP_MAGIC, 3) == 0) {
+	} else if (MATCH(BZIP_MAGIC)) {
 		return BZIP2;
-	} else if (memcmp(buf, LZ4_MAGIC, 4) == 0) {
+	} else if (MATCH(LZ4_MAGIC)) {
 		return LZ4;
-	} else if (memcmp(buf, LZ4_LEG_MAGIC, 4) == 0) {
+	} else if (MATCH(LZ4_LEG_MAGIC)) {
 		return LZ4_LEGACY;
-	} else if (memcmp(buf, MTK_MAGIC, 4) == 0) {
+	} else if (MATCH(MTK_MAGIC)) {
 		return MTK;
-	} else if (memcmp(buf, DTB_MAGIC, 4) == 0) {
+	} else if (MATCH(DTB_MAGIC)) {
 		return DTB;
-	} else if (memcmp(buf, DHTB_MAGIC, 8) == 0) {
+	} else if (MATCH(DHTB_MAGIC)) {
 		return DHTB;
-	} else if (memcmp(buf, TEGRABLOB_MAGIC, 20) == 0) {
+	} else if (MATCH(TEGRABLOB_MAGIC)) {
 		return BLOB;
 	} else {
 		return UNKNOWN;
