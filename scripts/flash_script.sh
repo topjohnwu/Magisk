@@ -53,18 +53,27 @@ getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT
 getvar BOOTIMAGE
 
+[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
+ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
+
+if [ ! -z $DTBOIMAGE ]; then
+  ui_print "- Found dtbo image: $DTBOIMAGE"
+  # Disable dtbo patch by default
+  [ -z $KEEPVERITY ] && KEEPVERITY=true
+fi
+
 # Detect version and architecture
 api_level_arch_detect
 
 [ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
 
-# Check if system root is installed and remove
-remove_system_su
-
 ui_print "- Device platform: $ARCH"
 
 BINDIR=$INSTALLER/$ARCH
 chmod -R 755 $CHROMEDIR $BINDIR
+
+# Check if system root is installed and remove
+remove_system_su
 
 ##########################################################################################
 # Environment
@@ -72,14 +81,16 @@ chmod -R 755 $CHROMEDIR $BINDIR
 
 ui_print "- Constructing environment"
 
-if is_mounted /data; then
-  MAGISKBIN=/data/adb/magisk
-  mkdir -p /data/adb 2>/dev/null
-  chmod 700 /data/adb 2>/dev/null
+# Check if we can actually access the data (DE storage)
+DATA=false
+if grep ' /data ' /proc/mounts | grep -vq 'tmpfs'; then
+  [ ! -d /data/adb ] && mkdir /data/adb
+  touch /data/adb/.write_test && rm /data/adb/.write_test && DATA=true
+fi
 
-  # Some legacy migration
+if $DATA; then
+  MAGISKBIN=/data/adb/magisk
   run_migrations
-  [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
 else
   MAGISKBIN=/cache/data_bin
 fi
@@ -104,18 +115,8 @@ $BOOTMODE || recovery_actions
 # Boot patching
 ##########################################################################################
 
-[ -z $BOOTIMAGE ] && find_boot_image
-[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-ui_print "- Found boot image: $BOOTIMAGE"
-
-if [ ! -z $DTBOIMAGE ]; then
-  ui_print "- Found dtbo image: $DTBOIMAGE"
-  # Disable dtbo patch by default
-  [ -z $KEEPVERITY ] && KEEPVERITY=true
-fi
-
 eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
-$BOOTSIGNED && ui_print "- Signed boot image detected"
+$BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 
 SOURCEDMODE=true
 cd $MAGISKBIN
@@ -128,14 +129,14 @@ rm -f new-boot.img
 
 if [ -f stock_boot* ]; then
   rm -f /data/stock_boot* 2>/dev/null
-  is_mounted /data && mv stock_boot* /data
+  $DATA && mv stock_boot* /data
 fi
 
 $KEEPVERITY || patch_dtbo_image
 
 if [ -f stock_dtbo* ]; then
   rm -f /data/stock_dtbo* 2>/dev/null
-  is_mounted /data && mv stock_dtbo* /data
+  $DATA && mv stock_dtbo* /data
 fi
 
 cd /
