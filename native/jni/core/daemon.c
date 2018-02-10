@@ -134,6 +134,7 @@ void daemon_init() {
 	struct dirent *entry;
 	int root, sbin;
 	char buf[PATH_MAX], buf2[PATH_MAX];
+	char magisk_name[10], init_name[10];
 
 	// Setup links under /sbin
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
@@ -155,14 +156,26 @@ void daemon_init() {
 		snprintf(buf2, PATH_MAX, "/sbin/%s", entry->d_name);
 		xsymlink(buf, buf2);
 	}
+
+	gen_rand_str(magisk_name, sizeof(magisk_name));
+	snprintf(buf, PATH_MAX, "/root/%s", magisk_name);
+	unlink("/sbin/magisk");
+	rename("/root/magisk", buf);
+	xsymlink(buf, "/sbin/magisk");
 	for (int i = 0; applet[i]; ++i) {
 		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
-		xsymlink("/root/magisk", buf2);
+		xsymlink(buf, buf2);
 	}
+
+	gen_rand_str(init_name, sizeof(init_name));
+	snprintf(buf, PATH_MAX, "/root/%s", init_name);
+	unlink("/sbin/magiskinit");
+	rename("/root/magiskinit", buf);
 	for (int i = 0; init_applet[i]; ++i) {
 		snprintf(buf2, PATH_MAX, "/sbin/%s", init_applet[i]);
-		xsymlink("/root/magiskinit", buf2);
+		xsymlink(buf, buf2);
 	}
+
 	close(root);
 
 	// Backward compatibility
@@ -193,7 +206,7 @@ void daemon_init() {
 			xmkdirs(MIRRDIR "/system", 0755);
 			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
-				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/system");
+				LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/system");
 			#endif
@@ -203,7 +216,7 @@ void daemon_init() {
 			xmkdirs(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
 			#ifdef MAGISK_DEBUG
-				LOGI("mount: %s -> %s\n", buf, MIRRDIR "/vendor");
+				LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
 			#else
 				LOGI("mount: %s\n", MIRRDIR "/vendor");
 			#endif
@@ -214,7 +227,7 @@ void daemon_init() {
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 		#ifdef MAGISK_DEBUG
-			LOGI("link: %s -> %s\n", MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+			LOGI("link: %s <- %s\n", MIRRDIR "/vendor", MIRRDIR "/system/vendor");
 		#else
 			LOGI("link: %s\n", MIRRDIR "/vendor");
 		#endif
