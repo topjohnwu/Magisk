@@ -56,6 +56,8 @@
 extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
 static int keepverity = 0, keepencrypt = 0;
+static char RAND_SOCKET_NAME[sizeof(SOCKET_NAME)];
+static int SOCKET_OFF = -1;
 
 struct cmdline {
 	int skip_initramfs;
@@ -367,6 +369,23 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 	return 0;
 }
 
+static void patch_socket_name(const char *path) {
+	void *buf;
+	size_t size;
+	mmap_rw(path, &buf, &size);
+	if (SOCKET_OFF < 0) {
+		for (int i = 0; i < size; ++i) {
+			if (memcmp(buf + i, SOCKET_NAME, sizeof(SOCKET_NAME)) == 0) {
+				SOCKET_OFF = i;
+				break;
+			}
+		}
+	}
+	gen_rand_str(RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
+	memcpy(buf + SOCKET_OFF, RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
+	munmap(buf, size);
+}
+
 static void magisk_init_daemon() {
 	setsid();
 
@@ -381,7 +400,8 @@ static void magisk_init_daemon() {
 	dup3(null, STDIN_FILENO, O_CLOEXEC);
 	dup3(null, STDOUT_FILENO, O_CLOEXEC);
 	dup3(null, STDERR_FILENO, O_CLOEXEC);
-	close(null);
+	if (null > STDERR_FILENO)
+		close(null);
 
 	// Transit our context to su (mimic setcon)
 	int fd, crap;
@@ -398,6 +418,7 @@ static void magisk_init_daemon() {
 	while (1) {
 		struct sockaddr_un sun;
 		fd = setup_socket(&sun);
+		memcpy(sun.sun_path + 1, RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
 		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
 			usleep(10000); /* Wait 10 ms after each try */
 
@@ -446,6 +467,7 @@ int main(int argc, char *argv[]) {
 	dump_magisk("/overlay/sbin/magisk", 0755);
 	mkdir("/overlay/root", 0755);
 	link("/init", "/overlay/root/magiskinit");
+	patch_socket_name("/overlay/sbin/magisk");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
@@ -535,6 +557,9 @@ int main(int argc, char *argv[]) {
 		}
 
 		close(overlay);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
 
 		if (fork_dont_care() == 0) {
 			strcpy(argv[0], "magiskinit");

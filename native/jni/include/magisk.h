@@ -7,7 +7,7 @@
 #include "logging.h"
 
 #define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
-#define REQUESTOR_DAEMON_PATH     "\0MAGISK"
+#define SOCKET_NAME     "d30138f2310a9fb9c54a3e0c21f58591"
 
 #ifndef ARG_MAX
 #define ARG_MAX 4096

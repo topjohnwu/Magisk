@@ -17,6 +17,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <sys/inotify.h>
+#include <sys/sysmacros.h>
 
 #include "logging.h"
 #include "utils.h"
@@ -340,4 +341,22 @@ void wait_till_exists(const char *target) {
 			break;
 	}
 	close(fd);
+}
+
+void gen_rand_str(char *buf, int len) {
+	const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
+	int urandom;
+	if (access("/dev/urandom", R_OK) == 0) {
+		urandom = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+	} else {
+		mknod("/urandom", S_IFCHR | 0666, makedev(1, 9));
+		urandom = xopen("/urandom", O_RDONLY | O_CLOEXEC);
+		unlink("/urandom");
+	}
+	xxread(urandom, buf, len - 1);
+	close(urandom);
+	for (int i = 0; i < len - 1; ++i) {
+		buf[i] = base[buf[i] % (sizeof(base) - 1)];
+	}
+	buf[len - 1] = '\0';
 }
