@@ -265,6 +265,9 @@ void start_daemon() {
 		exit(1);
 	xlisten(fd, 10);
 
+	// Start the log monitor
+	monitor_logs();
+
 	if ((is_daemon_init = (access(MAGISKTMP, F_OK) == 0))) {
 		// Restart stuffs if the daemon is restarted
 		exec_command_sync("logcat", "-b", "all", "-c", NULL);
@@ -273,9 +276,6 @@ void start_daemon() {
 	} else if (check_data()) {
 		daemon_init();
 	}
-
-	// Start the log monitor
-	monitor_logs();
 
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 

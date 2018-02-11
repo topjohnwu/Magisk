@@ -12,8 +12,10 @@
 
 #include "magisk.h"
 #include "utils.h"
+#include "resetprop.h"
 
 extern int is_daemon_init;
+int logd = 0;
 
 static int am_proc_start_filter(const char *log) {
 	return strstr(log, "am_proc_start") != NULL;
@@ -44,8 +46,19 @@ struct log_listener log_events[] = {
 };
 
 #ifdef MAGISK_DEBUG
-static int debug_log_pid, debug_log_fd;
+static int debug_log_pid = -1, debug_log_fd = -1;
 #endif
+
+static void check_logd() {
+	char *prop = getprop("init.svc.logd");
+	if (prop != NULL) {
+		free(prop);
+		logd = 1;
+	} else {
+		LOGD("log_monitor: logd not started, disable logging");
+		logd = 0;
+	}
+}
 
 static void *logger_thread(void *args) {
 	int log_fd = -1, log_pid;
@@ -54,6 +67,15 @@ static void *logger_thread(void *args) {
 	LOGD("log_monitor: logger start");
 
 	while (1) {
+		if (!logd) {
+			// Disable all services
+			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
+				close(log_events[i].fd);
+				log_events[i].fd = -1;
+			}
+			return NULL;
+		}
+
 		// Start logcat
 		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "events", "-b", "main", "-v", "threadtime", "-s", "am_proc_start", "-s", "Magisk", NULL);
 		while (fdgets(line, sizeof(line), log_fd)) {
@@ -75,6 +97,8 @@ static void *logger_thread(void *args) {
 
 		// Clear buffer before restart
 		exec_command_sync("logcat", "-b", "events", "-b", "main", "-c", NULL);
+
+		check_logd();
 	}
 
 	// Should never be here, but well...
@@ -139,40 +163,49 @@ static void *debug_magisk_log_thread(void *args) {
 void monitor_logs() {
 	pthread_t thread;
 
-	// Start log file dumper before monitor
-	xpthread_create(&thread, NULL, magisk_log_thread, NULL);
-	pthread_detach(thread);
+	check_logd();
 
-	// Start logcat monitor
-	xpthread_create(&thread, NULL, logger_thread, NULL);
-	pthread_detach(thread);
+	if (logd) {
+		// Start log file dumper before monitor
+		xpthread_create(&thread, NULL, magisk_log_thread, NULL);
+		pthread_detach(thread);
 
+		// Start logcat monitor
+		xpthread_create(&thread, NULL, logger_thread, NULL);
+		pthread_detach(thread);
+	}
 }
 
 void start_debug_full_log() {
 #ifdef MAGISK_DEBUG
-	// Log everything initially
-	debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-	debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "threadtime", NULL);
-	close(debug_log_fd);
+	if (logd) {
+		// Log everything initially
+		debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
+		debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "threadtime", NULL);
+		close(debug_log_fd);
+	}
 #endif
 }
 
 void stop_debug_full_log() {
 #ifdef MAGISK_DEBUG
 	// Stop recording the boot logcat after every boot task is done
-	kill(debug_log_pid, SIGTERM);
-	waitpid(debug_log_pid, NULL, 0);
-	// Start debug thread
-	start_debug_log();
+	if (debug_log_pid > 0) {
+		kill(debug_log_pid, SIGTERM);
+		waitpid(debug_log_pid, NULL, 0);
+		// Start debug thread
+		start_debug_log();
+	}
 #endif
 }
 
 void start_debug_log() {
 #ifdef MAGISK_DEBUG
-	pthread_t thread;
-	// Start debug thread
-	xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
-	pthread_detach(thread);
+	if (logd) {
+		pthread_t thread;
+		// Start debug thread
+		xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
+		pthread_detach(thread);
+	}
 #endif
 }

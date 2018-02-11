@@ -49,6 +49,14 @@ void launch_magiskhide(int client) {
 		return;
 	}
 
+	if (!logd) {
+		if (client > 0) {
+			write_int(client, LOGD_DISABLED);
+			close(client);
+		}
+		return;
+	}
+
 	hideEnabled = 1;
 	LOGI("* Starting MagiskHide\n");
 
@@ -136,6 +144,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	case ROOT_REQUIRED:
 		fprintf(stderr, "Root is required for this operation\n");
 		return code;
+	case LOGD_DISABLED:
+		fprintf(stderr, "Logd is not running, cannot run logcat\n");
+		return (code);
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "Magisk hide is not enabled yet\n");
 		return code;
