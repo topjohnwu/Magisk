@@ -86,8 +86,8 @@ int get_img_size(const char *img, int *used, int *total) {
 			}
 			if (status) continue;
 			sscanf(tok, "%d/%d", used, total);
-			*used = *used / 256 + 1;
-			*total /= 256;
+			*used = (*used + 255) / 256;
+			*total = (*total + 128) / 256;
 			break;
 		}
 	}
