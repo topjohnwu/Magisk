@@ -1,6 +1,6 @@
 <resources>
     <!--Universal-->
-
+    
     <!--Welcome Activity-->
     <string name="modules">Moduliai</string>
     <string name="downloads">Atsisiuntimai</string>
@@ -50,7 +50,11 @@
     <string name="update_available">Galimas atnaujinimas</string>
     <string name="installed">Instaliuota</string>
     <string name="not_installed">Ne instaliuota</string>
-
+    <string name="updated_on">Atnaujinta: %1$s</string>
+    <string name="sorting_order">Išdėliojimo tvarka</string>
+    <string name="sort_by_name">Išdėlioti pagal pavadinimą</string>
+    <string name="sort_by_update">Išdėlioti pagal paskutinį atnaujinimą</string>
+    
     <!--Log Fragment-->
     <string name="menuSaveLog">Išsauguti surašymus (log)</string>
     <string name="menuReload">Iš naujo</string>
@@ -100,7 +104,7 @@
     <string name="flashing">Instaliuojama</string>
     <string name="hide_manager_toast">Magisk Manager paslėpiamas…</string>
     <string name="hide_manager_toast2">Tai užtruks sekundėlę…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager paslėpimas nepavyko…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>
     <string name="direct_install">Tiesioginis atsisiuntimas (Rekomenduojamas)</string>
@@ -139,7 +143,7 @@
     <string name="settings_boot_format_title">Boot failo formatas</string>
     <string name="settings_boot_format_summary">Pasirinkite boot failo formatą.\nPasirinkite .img įdiegimui per fastboot/download; Pasirinkite .img.tar įdiegimui per ODIN.</string>
     <string name="settings_core_only_title">Magisk Pagrindinis režimas</string>
-    <string name="settings_core_only_summary">Įgalinkite tik pagrindines funkcijas, visi moduliai bus išjungti. MagiskSU, MagiskHide ir Sistemos pedejėjai liks įgalinti</string>
+    <string name="settings_core_only_summary">Įgalintos bus tik pagrindines funkcijos, visi moduliai bus išjungti. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Sistemų padejėjų įgalinimas Adblock programėlėms</string>
@@ -158,8 +162,10 @@
     <string name="superuser_notification">Supervartotojo pranešimai</string>
     <string name="request_timeout_summary">%1$s sekundžių</string>
     <string name="settings_su_reauth_title">Pakartotinai patvirtinti po atnaujinimo</string>
-    <string name="settings_su_reauth_summary">Pakartotinai patvirtint supervartotojo leidimus po programėlės atnaujinimo</string>
-
+    <string name="settings_su_reauth_summary">Pakartotinai patvirtinti supervartotojo leidimus po programėlės atnaujinimo</string>
+    <string name="settings_su_fingerprint_title">Įgalinti patvirtinimą piršto antspaudu</string>
+    <string name="settings_su_fingerprint_summary">Naudoti piršto antspaudą supervartotojo leidimo prašymų atsakymui</string>
+    
     <string name="multiuser_mode">Daugialypio vartotojo režimas</string>
     <string name="settings_owner_only">Tik įrenginio savininkas</string>
     <string name="settings_owner_manage">Įrenginio savininko valdomas</string>
@@ -205,7 +211,8 @@
     <string name="su_revoke_msg">Atšaukti %1$s teisių?</string>
     <string name="toast">Išmesti</string>
     <string name="none">Nėra</string>
-
+    <string name="auth_fail">Patvirtinimas žlugo</string>
+    
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
     <string name="target_uid">Target UID:\u0020</string>
