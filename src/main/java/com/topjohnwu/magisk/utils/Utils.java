@@ -114,7 +114,8 @@ public class Utils {
     public static String getLegalFilename(CharSequence filename) {
         return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
                 .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
-                .replace("#", "").replace("@", "").replace("*", "");
+                .replace("#", "").replace("@", "").replace("*", "").replace("/", "_")
+                .replace("\\", "_");
     }
 
     public static boolean isValidShellResponse(List<String> list) {
