@@ -1,7 +1,7 @@
 # Tips and Tricks
 
 ## OTA Installation Tips
-Magisk do modifications systemless-ly, which means applying official OTAs is much simpler. Here I provide a few tutorials for several different kind of devices to apply OTAs and preserve Magisk after the installation if possible.
+Magisk does modifications systemless-ly, which means applying official OTAs is much simpler. Here I provide a few tutorials for several different kind of devices to apply OTAs and preserve Magisk after the installation if possible.
 
 **This tutorial is only for Magisk v14.1+**
 
