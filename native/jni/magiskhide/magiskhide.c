@@ -110,7 +110,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (argc < 2) {
 		usage(argv[0]);
 	}
-	client_request req = DO_NOTHING;
+	int req = DO_NOTHING;
 	if (strcmp(argv[1], "--enable") == 0) {
 		req = LAUNCH_MAGISKHIDE;
 	} else if (strcmp(argv[1], "--disable") == 0) {
@@ -129,11 +129,8 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
 	}
-	daemon_response code = read_int(fd);
+	int code = read_int(fd);
 	switch (code) {
-	case DAEMON_ERROR:
-		fprintf(stderr, "Error occured in daemon...\n");
-		return code;
 	case DAEMON_SUCCESS:
 		break;
 	case ROOT_REQUIRED:
@@ -150,6 +147,10 @@ int magiskhide_main(int argc, char *argv[]) {
 		return code;
 	case HIDE_ITEM_NOT_EXIST:
 		fprintf(stderr, "Process [%s] does not exist in hide list\n", argv[2]);
+		return code;
+	case DAEMON_ERROR:
+	default:
+		fprintf(stderr, "Error occured in daemon...\n");
 		return code;
 	}
 

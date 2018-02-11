@@ -25,7 +25,7 @@ int is_daemon_init = 0, seperate_vendor = 0;
 static void *request_handler(void *args) {
 	int client = *((int *) args);
 	free(args);
-	client_request req = read_int(client);
+	int req = read_int(client);
 
 	struct ucred credential;
 	get_client_cred(client, &credential);

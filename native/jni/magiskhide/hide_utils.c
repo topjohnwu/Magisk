@@ -113,7 +113,7 @@ int rm_list(char *proc) {
 		return HIDE_NOT_ENABLED;
 	}
 
-	daemon_response ret = DAEMON_ERROR;
+	int ret = DAEMON_ERROR;
 	char *line;
 	int do_rm = 0;
 	struct vector *new_list = xmalloc(sizeof(*new_list));

@@ -11,7 +11,7 @@
 extern int is_daemon_init, seperate_vendor;
 
 // Commands require connecting to daemon
-typedef enum {
+enum {
 	DO_NOTHING = 0,
 	LAUNCH_MAGISKHIDE,
 	STOP_MAGISKHIDE,
@@ -25,10 +25,10 @@ typedef enum {
 	POST_FS_DATA,
 	LATE_START,
 	TEST
-} client_request;
+};
 
 // Return codes for daemon
-typedef enum {
+enum {
 	DAEMON_ERROR = -1,
 	DAEMON_SUCCESS = 0,
 	ROOT_REQUIRED,
@@ -36,7 +36,7 @@ typedef enum {
 	HIDE_NOT_ENABLED,
 	HIDE_ITEM_EXIST,
 	HIDE_ITEM_NOT_EXIST,
-} daemon_response;
+};
 
 // daemon.c
 
