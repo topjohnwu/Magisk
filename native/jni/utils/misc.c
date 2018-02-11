@@ -51,7 +51,7 @@ int check_data() {
 	struct vector v;
 	vec_init(&v);
 	file_to_vector("/proc/mounts", &v);
-	char *line, *crypto;
+	char *line;
 	int mnt = 0;
 	vec_for_each(&v, line) {
 		if (strstr(line, " /data ")) {
@@ -61,9 +61,28 @@ int check_data() {
 		}
 	}
 	vec_deep_destroy(&v);
-	// /data is mounted and not tmpfs and data is unencrypted or vold is started
-	return mnt && (((crypto = getprop("ro.crypto.state")) && strcmp(crypto, "unencrypted") == 0)
-		   || getprop("init.svc.vold"));
+	int data = 0;
+	if (mnt) {
+		char *crypto = getprop("ro.crypto.state");
+		if (crypto != NULL) {
+			if (strcmp(crypto, "unencrypted") == 0) {
+				// Unencrypted, we can directly access data
+				data = 1;
+			} else {
+				// Encrypted, check whether vold is started
+				char *vold = getprop("init.svc.vold");
+				if (vold != NULL) {
+					free(vold);
+					data = 1;
+				}
+			}
+			free(crypto);
+		} else {
+			// ro.crypto.state is not set, assume it's unencrypted
+			data = 1;
+		}
+	}
+	return data;
 }
 
 /* All the string should be freed manually!! */
