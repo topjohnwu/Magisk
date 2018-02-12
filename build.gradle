@@ -8,8 +8,8 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 96
-        versionName "5.5.5"
+        versionCode 100
+        versionName "5.6.0"
         javaCompileOptions {
             annotationProcessorOptions {
                 argument('butterknife.debuggable', 'false')
