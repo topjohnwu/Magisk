@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.receivers.RebootReceiver;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,11 +112,11 @@ public class ShowUI {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                List<String> res = Shell.Sync.su("echo $SLOT");
-                if (Utils.isValidShellResponse(res)) {
+                String s = Utils.cmd("echo $SLOT");
+                if (s != null) {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
-                char[] slot = Utils.isValidShellResponse(res) ? res.get(0).toCharArray() : null;
+                char[] slot = s == null ? null : s.toCharArray();
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.select_method)
                     .setItems(
@@ -185,12 +186,11 @@ public class ShowUI {
                                     if (slot[1] == 'a') slot[1] = 'b';
                                     else slot[1] = 'a';
                                     // Then find the boot image again
-                                    List<String> ret = Shell.Sync.su(
-                                            "SLOT=" + String.valueOf(slot),
-                                            "find_boot_image",
+                                    boot = Utils.cmd(
+                                            "SLOT=" + String.valueOf(slot) +
+                                            "; find_boot_image;" +
                                             "echo \"$BOOTIMAGE\""
                                     );
-                                    boot = Utils.isValidShellResponse(ret) ? ret.get(ret.size() - 1) : null;
                                     Shell.Async.su("mount_partitions");
                                     if (boot == null)
                                         return;
@@ -253,14 +253,14 @@ public class ShowUI {
             .setPositiveButton(R.string.complete_uninstall, (d, i) -> {
                 ByteArrayOutputStream uninstaller = new ByteArrayOutputStream();
                 try (InputStream in = mm.getAssets().open(Const.UNINSTALLER)) {
-                    Utils.inToOut(in, uninstaller);
+                    ShellUtils.pump(in, uninstaller);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
                 }
                 ByteArrayOutputStream utils = new ByteArrayOutputStream();
                 try (InputStream in = mm.getAssets().open(Const.UTIL_FUNCTIONS)) {
-                    Utils.inToOut(in, utils);
+                    ShellUtils.pump(in, utils);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;

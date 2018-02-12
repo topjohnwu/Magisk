@@ -19,7 +19,6 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -31,11 +30,10 @@ import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -47,37 +45,8 @@ public class Utils {
 
     public static boolean isDownloading = false;
 
-    public static boolean itemExist(Object path) {
-        List<String> ret = Shell.Sync.su(fmt("[ -e %s ] && echo true || echo false", path));
-        return isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(0));
-    }
-
-    public static void createFile(Object path) {
-        Shell.Async.su(fmt("mkdir -p `dirname '%s'` 2>/dev/null; touch '%s' 2>/dev/null", path, path));
-    }
-
-    public static boolean javaCreateFile(File path) {
-        path.getParentFile().mkdirs();
-        try {
-            path.createNewFile();
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static void removeItem(Object path) {
-        Shell.Async.su(fmt("rm -rf %s 2>/dev/null", path));
-    }
-
-    public static List<String> readFile(Object path) {
-        return Shell.Sync.su(fmt("cat %s | sed '$a\\ ' | sed '$d'", path));
-    }
-
-    public static String checkInode(Object path) {
-        List<String> ret = Shell.Sync.su(fmt("ls -i %s", path));
-        return isValidShellResponse(ret) ? ret.get(0).trim().split("\\s+")[0] : path.toString();
+    public static String cmd(String cmd) {
+        return ShellUtils.fastCmd(Shell.getShell(), cmd);
     }
 
     public static void uninstallPkg(String pkg) {
@@ -116,16 +85,6 @@ public class Utils {
                 .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
                 .replace("#", "").replace("@", "").replace("*", "").replace("/", "_")
                 .replace("\\", "_");
-    }
-
-    public static boolean isValidShellResponse(List<String> list) {
-        if (list != null && list.size() != 0) {
-            // Check if all empty
-            for (String res : list) {
-                if (!TextUtils.isEmpty(res)) return true;
-            }
-        }
-        return false;
     }
 
     public static int getPrefsInt(SharedPreferences prefs, String key, int def) {
@@ -230,14 +189,6 @@ public class Utils {
         }
     }
 
-    public static File getDB(String dbName) {
-        return getDB(MagiskManager.get(), dbName);
-    }
-
-    public static File getDB(Context context, String dbName) {
-        return new File(context.getFilesDir().getParent() + "/databases", dbName);
-    }
-
     public static AssetManager getAssets(String apk) {
         try {
             AssetManager asset = AssetManager.class.newInstance();
@@ -249,22 +200,10 @@ public class Utils {
         }
     }
 
-    public static int inToOut(InputStream in, OutputStream out) throws IOException {
-        int read, total = 0;
-        byte buffer[] = new byte[4096];
-        while ((read = in.read(buffer)) > 0) {
-            out.write(buffer, 0, read);
-            total += read;
-        }
-        out.flush();
-        return total;
-    }
-
     public static void patchDTBO() {
         MagiskManager mm = MagiskManager.get();
         if (mm.magiskVersionCode >= 1446 && !mm.keepVerity) {
-            List<String> ret = Shell.Sync.su("patch_dtbo_image && echo true || echo false");
-            if (Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(ret.size() - 1))) {
+            if (ShellUtils.fastCmdResult(Shell.getShell(), "patch_dtbo_image")) {
                 ShowUI.dtboPatchedNotification();
             }
         }
@@ -285,9 +224,9 @@ public class Utils {
     }
 
     public static void loadPrefs() {
-        String config = fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS);
-        List<String> ret = readFile(config);
-        if (isValidShellResponse(ret)) {
+        SuFile config = new SuFile(fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS), true);
+        List<String> ret = Shell.Sync.su("cat " + config);
+        if (ShellUtils.isValidOutput(ret)) {
             SharedPreferences.Editor editor = MagiskManager.get().prefs.edit();
             String json = ret.get(0);
             Gson gson = new Gson();
@@ -306,7 +245,7 @@ public class Utils {
             editor.remove(Const.Key.ETAG_KEY);
             editor.apply();
             MagiskManager.get().loadConfig();
-            removeItem(config);
+            config.delete();
         }
     }
 

@@ -6,27 +6,22 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
-
-import java.util.List;
+import com.topjohnwu.superuser.ShellUtils;
 
 public class RestoreImages extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
         String sha1;
-        List<String> ret = Utils.readFile("/.backup/.sha1");
-        if (Utils.isValidShellResponse(ret)) {
-            sha1 = ret.get(0);
-        } else {
-            ret = Shell.Sync.su("cat /init.magisk.rc | grep STOCKSHA1");
-            if (!Utils.isValidShellResponse(ret))
+        sha1 = Utils.cmd("cat /.backup/.sha1");
+        if (sha1 == null) {
+            sha1 = Utils.cmd("cat /init.magisk.rc | grep STOCKSHA1");
+            if (sha1 == null)
                 return false;
-            sha1 = ret.get(0).substring(ret.get(0).indexOf('=') + 1);
+            sha1 = sha1.substring(sha1.indexOf('=') + 1);
         }
 
-        ret = Shell.Sync.su("restore_imgs " + sha1 + " && echo true || echo false");
-
-        return Utils.isValidShellResponse(ret) && Boolean.parseBoolean(ret.get(ret.size() - 1));
+        return ShellUtils.fastCmdResult(Shell.getShell(), "restore_imgs " + sha1);
     }
 
     @Override

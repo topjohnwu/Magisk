@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
+import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.utils.SignAPK;
 
@@ -39,7 +40,7 @@ public class ZipUtils {
                 File dest = new File(folder, name);
                 dest.getParentFile().mkdirs();
                 try (FileOutputStream out = new FileOutputStream(dest)) {
-                    Utils.inToOut(zipfile, out);
+                    ShellUtils.pump(zipfile, out);
                 }
             }
         } catch(Exception e) {

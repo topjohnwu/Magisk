@@ -10,12 +10,12 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.utils.JarMap;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
@@ -130,11 +130,10 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         }
 
         // Install the application
-
-        List<String> ret = Shell.Sync.su(Utils.fmt("pm install %s >/dev/null && echo true || echo false", repack));
-        repack.delete();
-        if (!Utils.isValidShellResponse(ret) || !Boolean.parseBoolean(ret.get(0)))
+        if (ShellUtils.fastCmdResult(Shell.getShell(), "pm install " + repack))
             return false;
+
+        repack.delete();
 
         mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
         Utils.dumpPrefs();

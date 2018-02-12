@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.container.Module;
@@ -16,8 +17,10 @@ import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -86,26 +89,28 @@ public class MagiskManager extends Shell.ContainerApp {
 
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
-        Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
-        Shell.setInitializer(new Shell.Initializer() {
-            @Override
-            public void onRootShellInit(@NonNull Shell shell) {
-                try (InputStream in  = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS)) {
-                    shell.loadInputStream(null, null, in);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                shell.run(null, null,
-                        "export PATH=" + Const.BUSYBOX_PATH + ":$PATH",
-                        "mount_partitions",
-                        "run_migrations");
-            }
-        });
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
+        BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
+        Shell.setInitializer(new Shell.Initializer() {
+            @Override
+            public void onRootShellInit(@NonNull Shell shell) {
+                try (InputStream in = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS)) {
+                    shell.loadInputStream(null, null, in);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                shell.run(null, null,
+                        "mount_partitions",
+                        "run_migrations");
+            }
+        });
+
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Handle duplicate package
@@ -163,8 +168,8 @@ public class MagiskManager extends Shell.ContainerApp {
         prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
-                .putBoolean(Const.Key.HOSTS, Utils.itemExist(Const.MAGISK_HOST_FILE()))
-                .putBoolean(Const.Key.COREONLY, Utils.itemExist(Const.MAGISK_DISABLE_FILE))
+                .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE().exists())
+                .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
                 .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
@@ -188,64 +193,22 @@ public class MagiskManager extends Shell.ContainerApp {
     }
 
     public void loadMagiskInfo() {
-        List<String> ret;
-        ret = Shell.Sync.sh("magisk -v");
-        if (!Utils.isValidShellResponse(ret)) {
-            ret = Shell.Sync.sh("getprop magisk.version");
-            if (Utils.isValidShellResponse(ret)) {
-                try {
-                    magiskVersionString = ret.get(0);
-                    magiskVersionCode = (int) Double.parseDouble(ret.get(0)) * 10;
-                } catch (NumberFormatException ignored) {}
-            }
-        } else {
-            magiskVersionString = ret.get(0).split(":")[0];
-            ret = Shell.Sync.sh("magisk -V");
-            try {
-                magiskVersionCode = Integer.parseInt(ret.get(0));
-            } catch (NumberFormatException ignored) {}
-        }
-        if (magiskVersionCode > 1435) {
-            ret = Shell.Sync.su("resetprop -p " + Const.MAGISKHIDE_PROP);
-        } else {
-            ret = Shell.Sync.sh("getprop " + Const.MAGISKHIDE_PROP);
-        }
         try {
-            magiskHide = !Utils.isValidShellResponse(ret) || Integer.parseInt(ret.get(0)) != 0;
-        } catch (NumberFormatException e) {
-            magiskHide = true;
-        }
+            magiskVersionString = Utils.cmd("magisk -v").split(":")[0];
+            magiskVersionCode = Integer.parseInt(Utils.cmd("magisk -V"));
+            String s = Utils.cmd((magiskVersionCode > 1435 ? "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
+            magiskHide = s == null || Integer.parseInt(s) != 0;
+        } catch (Exception ignored) {}
 
-        ret = Shell.Sync.su("echo \"$BOOTIMAGE\"");
-        if (Utils.isValidShellResponse(ret))
-            bootBlock = ret.get(0);
+        bootBlock = Utils.cmd("echo \"$BOOTIMAGE\"");
     }
 
     public void getDefaultInstallFlags() {
-        List<String> ret;
-        ret = Shell.Sync.su("echo \"$DTBOIMAGE\"");
-        if (Utils.isValidShellResponse(ret))
-            keepVerity = true;
+        keepVerity = Boolean.parseBoolean(Utils.cmd("getvar KEEPVERITY; echo $KEEPVERITY")) ||
+                Utils.cmd("echo \"$DTBOIMAGE\"") != null;
 
-        ret = Shell.Sync.su(
-                "getvar KEEPVERITY",
-                "echo $KEEPVERITY");
-        try {
-            if (Utils.isValidShellResponse(ret))
-                keepVerity = Boolean.parseBoolean(ret.get(0));
-        } catch (NumberFormatException ignored) {}
-
-        ret = Shell.Sync.sh("getprop ro.crypto.state");
-        if (Utils.isValidShellResponse(ret) && ret.get(0).equals("encrypted"))
-            keepEnc = true;
-
-        ret = Shell.Sync.su(
-                "getvar KEEPFORCEENCRYPT",
-                "echo $KEEPFORCEENCRYPT");
-        try {
-            if (Utils.isValidShellResponse(ret))
-                keepEnc = Boolean.parseBoolean(ret.get(0));
-        } catch (NumberFormatException ignored) {}
+        keepEnc = Boolean.parseBoolean(Utils.cmd("getvar KEEPFORCEENCRYPT; echo $KEEPFORCEENCRYPT")) ||
+                TextUtils.equals("encrypted", Utils.cmd("getprop ro.crypto.state"));
     }
 
     public void setPermissionGrantCallback(Runnable callback) {

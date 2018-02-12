@@ -6,8 +6,8 @@ import android.webkit.WebView;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.superuser.ShellUtils;
 
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -44,7 +44,7 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
             md = WebService.getString(mUrl);
         } else {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                Utils.inToOut(is, out);
+                ShellUtils.pump(is, out);
                 md = out.toString();
                 is.close();
             } catch (IOException e) {
@@ -57,7 +57,7 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
             InputStream in = mm.getAssets().open(mm.isDarkTheme ? "dark.css" : "light.css");
             ByteArrayOutputStream out = new ByteArrayOutputStream()
         ) {
-            Utils.inToOut(in, out);
+            ShellUtils.pump(in, out);
             css = out.toString();
         } catch (IOException e) {
             e.printStackTrace();

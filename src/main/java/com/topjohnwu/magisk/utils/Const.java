@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.os.Process;
 
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,8 +25,8 @@ public class Const {
     public static final String SU_KEYSTORE_KEY = "su_key";
 
     // Paths
-    private static String MAGISK_PATH = null;
-    public static final String MAGISK_DISABLE_FILE = "/cache/.disable_magisk";
+    private static SuFile MAGISK_PATH = null;
+    public static final SuFile MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk", true);
     public static final String BUSYBOX_PATH = "/sbin/.core/busybox";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
@@ -37,21 +38,23 @@ public class Const {
     public static final int SNET_VER = 7;
     public static final int MIN_MODULE_VER = 1400;
 
-    public synchronized static String MAGISK_PATH() {
+    public synchronized static SuFile MAGISK_PATH() {
+        SuFile file;
         if (MAGISK_PATH == null) {
-            if (Utils.itemExist("/sbin/.core/img")) {
-                MAGISK_PATH = "/sbin/.core/img";
-            } else if (Utils.itemExist("/dev/magisk/img")) {
-                MAGISK_PATH = "/dev/magisk/img";
+            file = new SuFile("/sbin/.core/img", true);
+            if (file.exists()) {
+                MAGISK_PATH = file;
+            } else if ((file = new SuFile("/dev/magisk/img", true)).exists()) {
+                MAGISK_PATH = file;
             } else {
-                MAGISK_PATH = "/magisk";
+                MAGISK_PATH = new SuFile("/magisk", true);
             }
         }
         return MAGISK_PATH;
     }
 
-    public static String MAGISK_HOST_FILE() {
-        return MAGISK_PATH() + "/.core/hosts";
+    public static SuFile MAGISK_HOST_FILE() {
+        return new SuFile(MAGISK_PATH() + "/.core/hosts");
     }
 
     /* A list of apps that should not be shown as hide-able */

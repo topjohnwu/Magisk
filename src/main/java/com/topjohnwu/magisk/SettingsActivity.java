@@ -27,6 +27,7 @@ import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -223,9 +224,11 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
                 case Const.Key.COREONLY:
                     if (prefs.getBoolean(key, false)) {
-                        Utils.createFile(Const.MAGISK_DISABLE_FILE);
+                        try {
+                            Const.MAGISK_DISABLE_FILE.createNewFile();
+                        } catch (IOException ignored) {}
                     } else {
-                        Utils.removeItem(Const.MAGISK_DISABLE_FILE);
+                        Const.MAGISK_DISABLE_FILE.delete();
                     }
                     Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
                     break;

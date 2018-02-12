@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,8 +39,8 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
-        List<String> ret = Utils.readFile(new File(mCachedFile.getParentFile(), "updater-script"));
-        return Utils.isValidShellResponse(ret) && ret.get(0).contains("#MAGISK");
+        String s = Utils.cmd("head -n 1 " + new File(mCachedFile.getParentFile(), "updater-script"));
+        return s != null && s.contains("#MAGISK");
     }
 
     @Override
@@ -55,7 +56,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             ) {
                 if (in == null) throw new FileNotFoundException();
                 InputStream buf= new BufferedInputStream(in);
-                Utils.inToOut(buf, out);
+                ShellUtils.pump(buf, out);
             } catch (FileNotFoundException e) {
                 console.add("! Invalid Uri");
                 throw e;
@@ -65,7 +66,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             }
             if (!unzipAndCheck()) return 0;
             console.add("- Installing " + Utils.getNameFromUri(mm, mUri));
-            Shell.getShell().run(console, logs,
+            Shell.Sync.su(console, logs,
                     "cd " + mCachedFile.getParent(),
                     "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile + " || echo 'Failed!'"
             );

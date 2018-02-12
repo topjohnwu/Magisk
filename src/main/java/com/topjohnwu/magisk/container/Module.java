@@ -1,21 +1,24 @@
 package com.topjohnwu.magisk.container;
 
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
+
+import java.io.IOException;
 
 public class Module extends BaseModule {
 
-    private String mRemoveFile, mDisableFile, mUpdateFile;
+    private SuFile mRemoveFile, mDisableFile, mUpdateFile;
     private boolean mEnable, mRemove, mUpdated;
 
     public Module(String path) {
 
         try {
-            parseProps(Utils.readFile(path + "/module.prop"));
+            parseProps(Shell.Sync.su("cat " + path + "/module.prop"));
         } catch (NumberFormatException ignored) {}
 
-        mRemoveFile = path + "/remove";
-        mDisableFile = path + "/disable";
-        mUpdateFile = path + "/update";
+        mRemoveFile = new SuFile(path + "/remove", true);
+        mDisableFile = new SuFile(path + "/disable", true);
+        mUpdateFile = new SuFile(path + "/update", true);
 
         if (getId() == null) {
             int sep = path.lastIndexOf('/');
@@ -26,19 +29,21 @@ public class Module extends BaseModule {
             setName(getId());
         }
 
-        mEnable = !Utils.itemExist(mDisableFile);
-        mRemove = Utils.itemExist(mRemoveFile);
-        mUpdated = Utils.itemExist(mUpdateFile);
+        mEnable = !mDisableFile.exists();
+        mRemove = mRemoveFile.exists();
+        mUpdated = mUpdateFile.exists();
     }
 
     public void createDisableFile() {
         mEnable = false;
-        Utils.createFile(mDisableFile);
+        try {
+            mDisableFile.createNewFile();
+        } catch (IOException ignored) {}
     }
 
     public void removeDisableFile() {
         mEnable = true;
-        Utils.removeItem(mDisableFile);
+        mDisableFile.delete();
     }
 
     public boolean isEnabled() {
@@ -47,12 +52,14 @@ public class Module extends BaseModule {
 
     public void createRemoveFile() {
         mRemove = true;
-        Utils.createFile(mRemoveFile);
+        try {
+            mRemoveFile.createNewFile();
+        } catch (IOException ignored) {}
     }
 
     public void deleteRemoveFile() {
         mRemove = false;
-        Utils.removeItem(mRemoveFile);
+        mRemoveFile.delete();
     }
 
     public boolean willBeRemoved() {

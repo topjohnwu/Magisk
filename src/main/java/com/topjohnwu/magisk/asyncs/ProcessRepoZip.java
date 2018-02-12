@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -68,7 +69,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                     continue;
                 }
                 out.putNextEntry(new JarEntry(path));
-                Utils.inToOut(in, out);
+                ShellUtils.pump(in, out);
             }
         }
     }
@@ -107,7 +108,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                 InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))
             ) {
-                Utils.inToOut(in, out);
+                ShellUtils.pump(in, out);
                 in.close();
             }
             conn.disconnect();

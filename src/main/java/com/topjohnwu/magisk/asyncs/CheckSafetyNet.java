@@ -4,9 +4,9 @@ import android.app.Activity;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,7 +38,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         try (
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath));
                 InputStream in = new BufferedInputStream(conn.getInputStream())) {
-            Utils.inToOut(in, out);
+            ShellUtils.pump(in, out);
         }
         conn.disconnect();
     }
