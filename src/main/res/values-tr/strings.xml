@@ -130,7 +130,9 @@
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
     <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
-    <string name="settings_hide_manager_summary">Rastgele seçilen bir paket adı ile Magisk Manager yeniden paketlenecek</string>
+    <string name="settings_hide_manager_summary">Rastgele paket adı ile Magisk Manager\'ı yeniden paketle</string>
+    <string name="settings_restore_manager_title">Magisk Manager\'ı Geri Yükle</string>
+    <string name="settings_restore_manager_summary">Orijinal paket adı ile Magisk Manager\'ı geri yükle</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>
@@ -160,8 +162,8 @@
     <string name="request_timeout">İstek Zaman Aşımı</string>
     <string name="superuser_notification">Yetkili Kullanıcı Bildirimi</string>
     <string name="request_timeout_summary">%1$s saniye</string>
-    <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulama</string>
-    <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrulama</string>
+    <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrula</string>
+    <string name="settings_su_reauth_summary">Uygulama yükseltmeleri sonrasında yetkili kullanıcı izinlerini yeniden doğrula</string>
     <string name="settings_su_fingerprint_title">Parmak İzi Kimlik Doğrulamayı Etkinleştir</string>
     <string name="settings_su_fingerprint_summary">Yetkili kullanıcı isteklerine izin vermek için parmak izi tarayıcısını kullan</string>
 
