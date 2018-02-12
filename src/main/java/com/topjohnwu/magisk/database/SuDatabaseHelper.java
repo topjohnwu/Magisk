@@ -41,16 +41,21 @@ public class SuDatabaseHelper {
         try {
             return new SuDatabaseHelper(mm);
         } catch (Exception e) {
-            // Let's cleanup and try again
-            cleanup();
+            // Let's cleanup everything and try again
+            cleanup("*");
             return new SuDatabaseHelper(mm);
         }
     }
 
     public static void cleanup() {
+        cleanup(String.valueOf(Const.USER_ID));
+    }
+
+    public static void cleanup(String s) {
         Shell.Sync.su(
-                "umount -l /data/user*/*/*/databases/su.db /sbin/.core/db-*/magisk.db",
-                "rm -rf /sbin/.core/db-*");
+                "umount -l /data/user*/*/*/databases/su.db",
+                "umount -l /sbin/.core/db-" + s + "/magisk.db",
+                "rm -rf /sbin/.core/db-" + s);
     }
 
     private SuDatabaseHelper(MagiskManager mm) {
@@ -68,7 +73,7 @@ public class SuDatabaseHelper {
 
     private SQLiteDatabase openDatabase(MagiskManager mm) {
         String GLOBAL_DB = "/data/adb/magisk.db";
-        DB_FILE = new File(Utils.fmt("/sbin/.core/db-%s/magisk.db", mm.getPackageName()));
+        DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
         if (!DB_FILE.exists()) {
