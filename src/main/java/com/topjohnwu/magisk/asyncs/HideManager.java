@@ -130,12 +130,13 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         }
 
         // Install the application
-        if (ShellUtils.fastCmdResult(Shell.getShell(), "pm install " + repack))
+        if (!ShellUtils.fastCmdResult(Shell.getShell(), "pm install " + repack))
             return false;
 
         repack.delete();
 
         mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
+        mm.suDB.flush();
         Utils.dumpPrefs();
         Utils.uninstallPkg(Const.ORIG_PKG_NAME);
 

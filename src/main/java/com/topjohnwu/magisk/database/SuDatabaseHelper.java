@@ -35,6 +35,7 @@ public class SuDatabaseHelper {
 
     private PackageManager pm;
     private SQLiteDatabase mDb;
+    private File DB_FILE;
 
     public static SuDatabaseHelper getInstance(MagiskManager mm) {
         try {
@@ -66,14 +67,14 @@ public class SuDatabaseHelper {
     }
 
     private SQLiteDatabase openDatabase(MagiskManager mm) {
-        SQLiteDatabase db = null;
         String GLOBAL_DB = "/data/adb/magisk.db";
-        File dbFile = new File(Utils.fmt("/sbin/.core/db-%s/magisk.db", mm.getPackageName()));
+        DB_FILE = new File(Utils.fmt("/sbin/.core/db-%s/magisk.db", mm.getPackageName()));
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
-        if (!dbFile.exists()) {
+        if (!DB_FILE.exists()) {
             if (!Shell.rootAccess()) {
                 // We don't want the app to crash, create a db and return
+                DB_FILE = mm.getDatabasePath("su.db");
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             }
             mm.loadMagiskInfo();
@@ -81,13 +82,15 @@ public class SuDatabaseHelper {
             cleanup();
             if (mm.magiskVersionCode < 1410) {
                 // Super old legacy mode
-                db = mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
+                DB_FILE = mm.getDatabasePath("su.db");
+                return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             } else if (mm.magiskVersionCode < 1450) {
                 // Legacy mode with FBE aware
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     de.moveDatabaseFrom(mm, "su.db");
                 }
-                db = de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
+                DB_FILE = de.getDatabasePath("su.db");
+                return de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             } else {
                 mm.deleteDatabase("su.db");
                 de.deleteDatabase("su.db");
@@ -103,18 +106,15 @@ public class SuDatabaseHelper {
                                 "mount -o bind %s %s;" +
                                 "chcon u:object_r:su_file:s0 %s/*; chown %d.%d %s;" +
                                 "chmod 666 %s/*; chmod 700 %s;",
-                        GLOBAL_DB, dbFile.getParent(), dbFile, dbFile,
-                        GLOBAL_DB, dbFile,
-                        dbFile.getParent(), Process.myUid(), Process.myUid(), dbFile.getParent(),
-                        dbFile.getParent(), dbFile.getParent()
+                        GLOBAL_DB, DB_FILE.getParent(), DB_FILE, DB_FILE,
+                        GLOBAL_DB, DB_FILE,
+                        DB_FILE.getParent(), Process.myUid(), Process.myUid(), DB_FILE.getParent(),
+                        DB_FILE.getParent(), DB_FILE.getParent()
                 ));
             }
         }
-        if (db == null) {
-            // Not using legacy mode, open the mounted global DB
-            db = SQLiteDatabase.openOrCreateDatabase(dbFile, null);
-        }
-        return db;
+        // Not using legacy mode, open the mounted global DB
+        return SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion) {
@@ -314,5 +314,10 @@ public class SuDatabaseHelper {
             }
         }
         return value;
+    }
+
+    public void flush() {
+        mDb.close();
+        mDb = SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);
     }
 }

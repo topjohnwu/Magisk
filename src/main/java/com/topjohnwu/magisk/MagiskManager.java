@@ -96,6 +96,7 @@ public class MagiskManager extends Shell.ContainerApp {
         super.onCreate();
 
         Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
+        Shell.verboseLogging(BuildConfig.DEBUG);
         BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
         Shell.setInitializer(new Shell.Initializer() {
             @Override
@@ -125,6 +126,14 @@ public class MagiskManager extends Shell.ContainerApp {
         }
 
         suDB = SuDatabaseHelper.getInstance(this);
+
+        String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, Const.ORIG_PKG_NAME);
+        if (getPackageName().equals(Const.ORIG_PKG_NAME) && !pkg.equals(Const.ORIG_PKG_NAME)) {
+            suDB.setStrings(Const.Key.SU_REQUESTER, null);
+            Utils.uninstallPkg(pkg);
+            suDB = SuDatabaseHelper.getInstance(this);
+        }
+
         repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
