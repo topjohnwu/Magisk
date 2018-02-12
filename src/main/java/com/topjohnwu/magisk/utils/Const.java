@@ -113,7 +113,7 @@ public class Const {
 
         // intents
         public static final String OPEN_SECTION = "section";
-        public static final String INTENT_SET_VERSION = "version";
+        public static final String INTENT_SET_FILENAME = "filename";
         public static final String INTENT_SET_LINK = "link";
         public static final String INTENT_PERM = "perm_dialog";
         public static final String FLASH_ACTION = "action";

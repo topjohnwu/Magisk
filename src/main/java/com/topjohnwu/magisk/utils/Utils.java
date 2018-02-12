@@ -82,9 +82,8 @@ public class Utils {
 
     public static String getLegalFilename(CharSequence filename) {
         return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")
-                .replace("$", "").replace("`", "").replace("(", "").replace(")", "")
-                .replace("#", "").replace("@", "").replace("*", "").replace("/", "_")
-                .replace("\\", "_");
+                .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
+                .replace("#", "").replace("@", "").replace("\\", "_");
     }
 
     public static int getPrefsInt(SharedPreferences prefs, String key, int def) {

@@ -40,7 +40,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                     }
                 },
                 intent.getStringExtra(Const.Key.INTENT_SET_LINK),
-                Utils.fmt("MagiskManager-v%s.apk", intent.getStringExtra(Const.Key.INTENT_SET_VERSION))
+                intent.getStringExtra(Const.Key.INTENT_SET_FILENAME)
         );
     }
 }

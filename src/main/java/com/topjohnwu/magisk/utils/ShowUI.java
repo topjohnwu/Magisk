@@ -59,10 +59,12 @@ public class ShowUI {
 
     public static void managerUpdateNotification() {
         MagiskManager mm = MagiskManager.get();
+        String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
+                mm.remoteManagerVersionString, mm.remoteManagerVersionCode);
 
         Intent intent = new Intent(mm, ManagerUpdate.class);
         intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
-        intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
+        intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -100,7 +102,8 @@ public class ShowUI {
 
     public static void magiskInstallDialog(Activity activity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
-        String filename = Utils.fmt("Magisk-v%s.zip", mm.remoteMagiskVersionString);
+        String filename = Utils.fmt("Magisk-v%s(%d).zip",
+                mm.remoteMagiskVersionString, mm.remoteMagiskVersionCode);
         new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)))
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
@@ -206,12 +209,7 @@ public class ShowUI {
                                     };
                                 default:
                             }
-                            Utils.dlAndReceive(
-                                    activity,
-                                    receiver,
-                                    mm.magiskLink,
-                                    filename
-                            );
+                            Utils.dlAndReceive(activity, receiver, mm.magiskLink, filename);
                         }
                     ).show();
             })
@@ -228,16 +226,17 @@ public class ShowUI {
 
     public static void managerInstallDialog(Activity activity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
+        String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
+                mm.remoteManagerVersionString, mm.remoteManagerVersionCode);
         new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.app_name)))
-            .setMessage(mm.getString(R.string.repo_install_msg,
-                    Utils.fmt("MagiskManager-v%s.apk", mm.remoteManagerVersionString)))
+            .setMessage(mm.getString(R.string.repo_install_msg, filename))
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
                 Utils.runWithPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
                     Intent intent = new Intent(mm, ManagerUpdate.class);
                     intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
-                    intent.putExtra(Const.Key.INTENT_SET_VERSION, mm.remoteManagerVersionString);
+                    intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
                     mm.sendBroadcast(intent);
                 });
             })
