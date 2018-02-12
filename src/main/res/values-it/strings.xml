@@ -132,6 +132,8 @@
 	<string name="settings_clear_cache_summary">Svuota la cache delle repository e forza l\'aggiornamento online dell\'app</string>
 	<string name="settings_hide_manager_title">Nascondi Magisk Manager</string>
 	<string name="settings_hide_manager_summary">Reinstalla Magisk Manager con un nome pacchetto casuale</string>
+	<string name="settings_restore_manager_title">Ripristina Magisk Manager</string>
+	<string name="settings_restore_manager_summary">Ripristina Magisk Manager con il nome pacchetto originale</string>
 	<string name="language">Lingua</string>
 	<string name="system_default">(Sistema)</string>
 	<string name="settings_update">Impostazioni aggiornamento</string>
