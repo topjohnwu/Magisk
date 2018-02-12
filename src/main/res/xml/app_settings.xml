@@ -20,6 +20,11 @@
             android:title="@string/settings_hide_manager_title"
             android:summary="@string/settings_hide_manager_summary" />
 
+        <Preference
+            android:key="restore"
+            android:summary="@string/settings_restore_manager_summary"
+            android:title="@string/settings_restore_manager_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

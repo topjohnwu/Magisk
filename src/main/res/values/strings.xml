@@ -135,6 +135,8 @@
     <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>
     <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package name</string>
+    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_update">Update Settings</string>
