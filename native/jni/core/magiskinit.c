@@ -55,12 +55,11 @@
 
 extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
-static int keepverity = 0, keepencrypt = 0;
 static char RAND_SOCKET_NAME[sizeof(SOCKET_NAME)];
 static int SOCKET_OFF = -1;
 
 struct cmdline {
-	int skip_initramfs;
+	char skip_initramfs;
 	char slot[3];
 };
 
@@ -74,8 +73,7 @@ struct device {
 
 static void parse_cmdline(struct cmdline *cmd) {
 	// cleanup
-	cmd->skip_initramfs = 0;
-	cmd->slot[0] = '\0';
+	memset(cmd, 0, sizeof(&cmd));
 
 	char cmdline[4096];
 	mkdir("/proc", 0555);
@@ -89,11 +87,13 @@ static void parse_cmdline(struct cmdline *cmd) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
 		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
 			cmd->slot[0] = '_';
-			sscanf(tok, "androidboot.slot=%s", cmd->slot + 1);
+			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
 			cmd->skip_initramfs = 1;
 		}
 	}
+
+	VLOG("cmdline: skip_initramfs[%d] slot[%s]\n", cmd->skip_initramfs, cmd->slot);
 }
 
 static void parse_device(struct device *dev, char *uevent) {
@@ -148,24 +148,7 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static void fstab_patch_cb(int dirfd, struct dirent *entry) {
-	if (entry->d_type == DT_REG && strstr(entry->d_name, "fstab")) {
-		void *buf;
-		size_t _size;
-		uint32_t size;
-		full_read_at(dirfd, entry->d_name, &buf, &_size);
-		size = (uint32_t) _size;  /* Type conversion */
-		if (!keepverity)
-			patch_verity(&buf, &size, 1);
-		if (!keepencrypt)
-			patch_encryption(&buf, &size);
-		int fstab = xopenat(dirfd, entry->d_name, O_WRONLY | O_CLOEXEC);
-		write(fstab, buf, size);
-		close(fstab);
-	}
-}
-
-static void patch_ramdisk(int root) {
+static void patch_ramdisk() {
 	void *addr;
 	size_t size;
 	mmap_rw("/init", &addr, &size);
@@ -183,25 +166,6 @@ static void patch_ramdisk(int root) {
 	write(fd, addr, size);
 	close(fd);
 	free(addr);
-
-	/* Disabled for now */
-
-	// char *key, *value;
-	// full_read("/.backup/.magisk", &addr, &size);
-	// for (char *tok = strtok(addr, "\n"); tok; tok = strtok(NULL, "\n")) {
-	// 	key = tok;
-	// 	value = strchr(tok, '=') + 1;
-	// 	value[-1] = '\0';
-	// 	if (strcmp(key, "KEEPVERITY") == 0)
-	// 		keepverity = strcmp(value, "true") == 0;
-	// 	else if (strcmp(key, "KEEPFORCEENCRYPT") == 0)
-	// 		keepencrypt = strcmp(value, "true") == 0;
-	// }
-
-	// excl_list = (char *[]) { "system_root", "system", "vendor", NULL };
-	// in_order_walk(root, fstab_patch_cb);
-	// if (!keepverity)
-	// 	unlink("/verity_key");
 }
 
 static int strend(const char *s1, const char *s2) {
@@ -465,98 +429,98 @@ int main(int argc, char *argv[]) {
 	dump_magiskrc("/overlay/init.magisk.rc", 0750);
 	mkdir("/overlay/sbin", 0755);
 	dump_magisk("/overlay/sbin/magisk", 0755);
+	patch_socket_name("/overlay/sbin/magisk");
 	mkdir("/overlay/root", 0755);
 	link("/init", "/overlay/root/magiskinit");
-	patch_socket_name("/overlay/sbin/magisk");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
 
-	VLOG("cmdline: skip_initramfs=[%d] slot_suffix=[%s]\n", cmd.skip_initramfs, cmd.slot);
+	/* ***********
+	 * Initialize
+	 * ***********/
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
 
 	if (cmd.skip_initramfs) {
-		// Exclude overlay folder
-		excl_list = (char *[]) { "overlay", ".backup", NULL };
 		// Clear rootfs
+		excl_list = (char *[]) { "overlay", ".backup", NULL };
 		frm_rf(root);
+	} else if (access("/ramdisk.cpio.xz", R_OK) == 0) {
+		// High compression mode
+		void *addr;
+		size_t size;
+		mmap_ro("/ramdisk.cpio.xz", &addr, &size);
+		int fd = creat("/ramdisk.cpio", 0);
+		unxz(addr, size, fd);
+		munmap(addr, size);
+		close(fd);
+		struct vector v;
+		vec_init(&v);
+		parse_cpio(&v, "/ramdisk.cpio");
+		excl_list = (char *[]) { "overlay", ".backup", NULL };
+		frm_rf(root);
+		chdir("/");
+		cpio_extract_all(&v);
+		cpio_vec_destroy(&v);
+	} else {
+		// Revert original init binary
+		unlink("/init");
+		link("/.backup/init", "/init");
+	}
 
+	/* ************
+	 * Early Mount
+	 * ************/
+
+	// If skip_initramfs or using split policies, we need early mount
+	if (cmd.skip_initramfs || access("/sepolicy", R_OK) != 0) {
+		char partname[32];
+		struct device dev;
+
+		// Mount sysfs
 		mkdir("/sys", 0755);
 		xmount("sysfs", "/sys", "sysfs", 0, NULL);
 
-		char partname[32];
+		// Mount system
 		snprintf(partname, sizeof(partname), "system%s", cmd.slot);
-
-		struct device dev;
 		setup_block(&dev, partname);
+		if (cmd.skip_initramfs) {
+			mkdir("/system_root", 0755);
+			xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
+			int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
-		mkdir("/system_root", 0755);
-		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
-		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
+			// Clone rootfs except /system
+			excl_list = (char *[]) { "system", NULL };
+			clone_dir(system_root, root);
+			close(system_root);
 
-		// Exclude system folder
-		excl_list = (char *[]) { "system", NULL };
-		clone_dir(system_root, root);
-		mkdir("/system", 0755);
-		xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+			mkdir("/system", 0755);
+			xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+		} else {
+			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+		}
 
+		// Mount vendor
 		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
-
-		// We need to mount independent vendor partition
 		if (setup_block(&dev, partname) == 0)
 			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
-
-		close(system_root);
-	} else {
-		if (access("/ramdisk.cpio.xz", R_OK) == 0) {
-			// High compression mode
-			void *addr;
-			size_t size;
-			mmap_ro("/ramdisk.cpio.xz", &addr, &size);
-			int fd = creat("/ramdisk.cpio", 0);
-			unxz(addr, size, fd);
-			munmap(addr, size);
-			close(fd);
-			struct vector v;
-			vec_init(&v);
-			parse_cpio(&v, "/ramdisk.cpio");
-			excl_list = (char *[]) { "overlay", ".backup", NULL };
-			frm_rf(root);
-			chdir("/");
-			cpio_extract_all(&v);
-			cpio_vec_destroy(&v);
-		} else {
-			// Revert original init binary
-			unlink("/init");
-			link("/.backup/init", "/init");
-		}
 	}
 
+	/* *************
+	 * Patch rootfs
+	 * *************/
 
 	// Only patch rootfs if not intended to run in recovery
 	if (access("/etc/recovery.fstab", F_OK) != 0) {
 		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
 		mv_dir(overlay, root);
-
-		patch_ramdisk(root);
-		if (patch_sepolicy()) {
-			/* Non skip_initramfs devices using separate sepolicy
-			 * Mount /system and try to load again */
-			xmount("sysfs", "/sys", "sysfs", 0, NULL);
-			struct device dev;
-			setup_block(&dev, "system");
-			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
-			// We need to mount independent vendor partition
-			if (setup_block(&dev, "vendor") == 0)
-				xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
-
-			patch_sepolicy();
-
-			umount("/system");
-		}
-
 		close(overlay);
+		rmdir("/overlay");
+
+		patch_ramdisk();
+		patch_sepolicy();
+
 		close(STDIN_FILENO);
 		close(STDOUT_FILENO);
 		close(STDERR_FILENO);
@@ -570,8 +534,9 @@ int main(int argc, char *argv[]) {
 
 	// Clean up
 	close(root);
+	if (!cmd.skip_initramfs)
+		umount("/system");
 	umount("/vendor");
-	rmdir("/overlay");
 
 	// Finally, give control back!
 	execv("/init", argv);

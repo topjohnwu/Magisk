@@ -103,4 +103,4 @@ rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data
         /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/user*/*/.tmp.magisk.config \
         /data/adb/*magisk* 2>/dev/null
 
-$BOOTMODE && reboot
+$BOOTMODE && /system/bin/reboot
