@@ -132,6 +132,8 @@
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>
     <string name="settings_hide_manager_summary">Re-empaquetar Magisk Manager con un nombre de paquete al azar</string>
+    <string name="settings_restore_manager_title">Restaurar Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restaura Magisk Manager con el paquete original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_update">Ajustes de Actualización</string>
