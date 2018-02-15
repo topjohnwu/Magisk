@@ -245,6 +245,7 @@ void proc_monitor() {
 				unlink("/magisk");
 				unlink("/data/magisk");
 				unlink("/data/magisk.img");
+				unlink("/sbin/su");
 				unlink(MAGISKRC);
 				xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 				++hide_queue;
