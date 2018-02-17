@@ -132,6 +132,8 @@
     <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online, memaksa apl untuk menyegarkan online</string>
     <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>
     <string name="settings_hide_manager_summary">Pak ulang Magisk Manager dengan nama paket acak</string>
+    <string name="settings_restore_manager_title">Pulihkan Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan paket asli</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default Sistem)</string>
     <string name="settings_update">Pengaturan Pembaruan</string>
