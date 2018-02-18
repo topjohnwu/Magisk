@@ -181,6 +181,8 @@ void sepol_magisk_rules() {
 		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
 		if (sepol_exists("untrusted_app_25_devpts"))
 			sepol_allowxperm("domain", "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+		if (sepol_exists("untrusted_app_devpts"))
+			sepol_allowxperm("domain", "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
 	}
 }
 
