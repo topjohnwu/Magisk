@@ -27,7 +27,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;

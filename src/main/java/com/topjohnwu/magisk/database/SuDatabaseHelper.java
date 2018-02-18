@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -37,6 +39,7 @@ public class SuDatabaseHelper {
     private SQLiteDatabase mDb;
     private File DB_FILE;
 
+    @NonNull
     public static SuDatabaseHelper getInstance(MagiskManager mm) {
         try {
             return new SuDatabaseHelper(mm);
@@ -61,7 +64,7 @@ public class SuDatabaseHelper {
     }
 
     private SQLiteDatabase openDatabase(MagiskManager mm) {
-        String GLOBAL_DB = "/data/adb/magisk.db";
+        final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db", true);
         DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
@@ -89,16 +92,23 @@ public class SuDatabaseHelper {
                 mm.deleteDatabase("su.db");
                 de.deleteDatabase("su.db");
                 if (mm.magiskVersionCode < 1460) {
-                    // v14.5 global DB location
-                    GLOBAL_DB = new File(de.getFilesDir().getParentFile().getParentFile(),
-                            "magisk.db").getPath();
+                    // Link to new path
+                    File oldDB = new File(de.getFilesDir().getParentFile().getParentFile(),
+                            "magisk.db");
+                    Shell.Sync.su(Utils.fmt("mv -f %s %s; ln -s %s %s",
+                            oldDB, GLOBAL_DB, GLOBAL_DB, oldDB));
                 }
                 if (mm.magiskVersionCode < 1550) {
                     // We need some additional policies on old versions
                     Shell.Sync.su("magiskpolicy --live " +
                             "'create su_file' 'allow * su_file file *' 'allow * su_file dir *'");
                 }
-                Shell.Sync.su("sudb_setup " + Process.myUid() + " " + GLOBAL_DB);
+                if (!GLOBAL_DB.exists()) {
+                    Shell.Sync.su("sudb_init");
+                    SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
+                    Shell.Sync.su("sudb_restore");
+                }
+                Shell.Sync.su("sudb_setup " + Process.myUid());
             }
         }
         // Not using legacy mode, open the mounted global DB
@@ -106,42 +116,37 @@ public class SuDatabaseHelper {
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion) {
-        try {
-            if (oldVersion == 0) {
-                createTables(db);
-                oldVersion = 3;
-            }
-            if (oldVersion == 1) {
-                // We're dropping column app_name, rename and re-construct table
-                db.execSQL(Utils.fmt("ALTER TABLE %s RENAME TO %s_old", POLICY_TABLE));
+        if (oldVersion == 0) {
+            createTables(db);
+            oldVersion = 3;
+        }
+        if (oldVersion == 1) {
+            // We're dropping column app_name, rename and re-construct table
+            db.execSQL(Utils.fmt("ALTER TABLE %s RENAME TO %s_old", POLICY_TABLE));
 
-                // Create the new tables
-                createTables(db);
+            // Create the new tables
+            createTables(db);
 
-                // Migrate old data to new tables
-                db.execSQL(Utils.fmt("INSERT INTO %s SELECT " +
-                        "uid, package_name, policy, until, logging, notification FROM %s_old",
-                        POLICY_TABLE, POLICY_TABLE));
-                db.execSQL(Utils.fmt("DROP TABLE %s_old", POLICY_TABLE));
+            // Migrate old data to new tables
+            db.execSQL(Utils.fmt("INSERT INTO %s SELECT " +
+                            "uid, package_name, policy, until, logging, notification FROM %s_old",
+                    POLICY_TABLE, POLICY_TABLE));
+            db.execSQL(Utils.fmt("DROP TABLE %s_old", POLICY_TABLE));
 
-                MagiskManager.get().deleteDatabase("sulog.db");
-                ++oldVersion;
-            }
-            if (oldVersion == 2) {
-                db.execSQL(Utils.fmt("UPDATE %s SET time=time*1000", LOG_TABLE));
-                ++oldVersion;
-            }
-            if (oldVersion == 3) {
-                db.execSQL(Utils.fmt("CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, PRIMARY KEY(key))", STRINGS_TABLE));
-                ++oldVersion;
-            }
-            if (oldVersion == 4) {
-                db.execSQL(Utils.fmt("UPDATE %s SET uid=uid%%100000", POLICY_TABLE));
-                ++oldVersion;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            onDowngrade(db);
+            MagiskManager.get().deleteDatabase("sulog.db");
+            ++oldVersion;
+        }
+        if (oldVersion == 2) {
+            db.execSQL(Utils.fmt("UPDATE %s SET time=time*1000", LOG_TABLE));
+            ++oldVersion;
+        }
+        if (oldVersion == 3) {
+            db.execSQL(Utils.fmt("CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, PRIMARY KEY(key))", STRINGS_TABLE));
+            ++oldVersion;
+        }
+        if (oldVersion == 4) {
+            db.execSQL(Utils.fmt("UPDATE %s SET uid=uid%%100000", POLICY_TABLE));
+            ++oldVersion;
         }
     }
 
