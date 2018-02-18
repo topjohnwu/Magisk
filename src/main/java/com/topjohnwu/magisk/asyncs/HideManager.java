@@ -136,7 +136,6 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         repack.delete();
 
         mm.suDB.setStrings(Const.Key.SU_REQUESTER, pkg);
-        mm.suDB.flush();
         Utils.dumpPrefs();
         Utils.uninstallPkg(Const.ORIG_PKG_NAME);
 

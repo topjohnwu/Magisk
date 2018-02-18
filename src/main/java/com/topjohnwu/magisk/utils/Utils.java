@@ -50,8 +50,7 @@ public class Utils {
     }
 
     public static void uninstallPkg(String pkg) {
-        SuDatabaseHelper.cleanup();
-        Shell.Sync.su("pm uninstall " + pkg);
+        Shell.Sync.su("sudb_clean " + Const.USER_ID, "pm uninstall " + pkg);
     }
 
     public static void dlAndReceive(Context context, DownloadReceiver receiver, String link, String filename) {

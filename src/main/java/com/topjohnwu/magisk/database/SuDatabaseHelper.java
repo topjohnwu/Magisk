@@ -42,20 +42,9 @@ public class SuDatabaseHelper {
             return new SuDatabaseHelper(mm);
         } catch (Exception e) {
             // Let's cleanup everything and try again
-            cleanup("*");
+            Shell.Sync.su("sudb_clean '*'");
             return new SuDatabaseHelper(mm);
         }
-    }
-
-    public static void cleanup() {
-        cleanup(String.valueOf(Const.USER_ID));
-    }
-
-    public static void cleanup(String s) {
-        Shell.Sync.su(
-                "umount -l /data/user*/*/*/databases/su.db",
-                "umount -l /sbin/.core/db-" + s + "/magisk.db",
-                "rm -rf /sbin/.core/db-" + s);
     }
 
     private SuDatabaseHelper(MagiskManager mm) {
@@ -76,7 +65,7 @@ public class SuDatabaseHelper {
         DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
-        if (!DB_FILE.exists()) {
+        if (!DB_FILE.canWrite()) {
             if (!Shell.rootAccess()) {
                 // We don't want the app to crash, create a db and return
                 DB_FILE = mm.getDatabasePath("su.db");
@@ -84,7 +73,7 @@ public class SuDatabaseHelper {
             }
             mm.loadMagiskInfo();
             // Cleanup
-            cleanup();
+            Shell.Sync.su("sudb_clean " + Const.USER_ID);
             if (mm.magiskVersionCode < 1410) {
                 // Super old legacy mode
                 DB_FILE = mm.getDatabasePath("su.db");
@@ -103,19 +92,13 @@ public class SuDatabaseHelper {
                     // v14.5 global DB location
                     GLOBAL_DB = new File(de.getFilesDir().getParentFile().getParentFile(),
                             "magisk.db").getPath();
-                    // We need some additional policies on old versions
-                    Shell.Sync.su("magiskpolicy --live 'create su_file' 'allow * su_file file *'");
                 }
-                // Touch global DB and setup db in tmpfs
-                Shell.Sync.su(Utils.fmt("touch %s; mkdir -p %s; touch %s; touch %s-journal;" +
-                                "mount -o bind %s %s;" +
-                                "chcon u:object_r:su_file:s0 %s/*; chown %d.%d %s;" +
-                                "chmod 666 %s/*; chmod 700 %s;",
-                        GLOBAL_DB, DB_FILE.getParent(), DB_FILE, DB_FILE,
-                        GLOBAL_DB, DB_FILE,
-                        DB_FILE.getParent(), Process.myUid(), Process.myUid(), DB_FILE.getParent(),
-                        DB_FILE.getParent(), DB_FILE.getParent()
-                ));
+                if (mm.magiskVersionCode < 1550) {
+                    // We need some additional policies on old versions
+                    Shell.Sync.su("magiskpolicy --live " +
+                            "'create su_file' 'allow * su_file file *' 'allow * su_file dir *'");
+                }
+                Shell.Sync.su("sudb_setup " + Process.myUid() + " " + GLOBAL_DB);
             }
         }
         // Not using legacy mode, open the mounted global DB
@@ -319,10 +302,5 @@ public class SuDatabaseHelper {
             }
         }
         return value;
-    }
-
-    public void flush() {
-        mDb.close();
-        mDb = SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);
     }
 }

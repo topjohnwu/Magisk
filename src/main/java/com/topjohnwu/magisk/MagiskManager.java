@@ -101,8 +101,10 @@ public class MagiskManager extends Shell.ContainerApp {
         Shell.setInitializer(new Shell.Initializer() {
             @Override
             public void onRootShellInit(@NonNull Shell shell) {
-                try (InputStream in = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS)) {
-                    shell.loadInputStream(null, null, in);
+                try (InputStream utils = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS);
+                     InputStream sudb = getResources().openRawResource(R.raw.sudb)) {
+                    shell.loadInputStream(null, null, utils);
+                    shell.loadInputStream(null, null, sudb);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -205,7 +207,8 @@ public class MagiskManager extends Shell.ContainerApp {
         try {
             magiskVersionString = Utils.cmd("magisk -v").split(":")[0];
             magiskVersionCode = Integer.parseInt(Utils.cmd("magisk -V"));
-            String s = Utils.cmd((magiskVersionCode > 1435 ? "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
+            String s = Utils.cmd((magiskVersionCode > 1435 ? "resetprop -p " : "getprop ")
+                    + Const.MAGISKHIDE_PROP);
             magiskHide = s == null || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
 
