@@ -6,11 +6,10 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "rootfs", "lnk_file", ALL);
 	sepol_allow(target, "su", "unix_stream_socket", "connectto");
 	sepol_allow(target, "su", "unix_stream_socket", "getopt");
-	sepol_allow(target, "su_file", "dir", "search");
-	sepol_allow(target, "su_file", "dir", "read");
 	sepol_allow(target, "su_file", "sock_file", "read");
 	sepol_allow(target, "su_file", "sock_file", "write");
 	sepol_allow(target, "su_file", "file", ALL);
+	sepol_allow(target, "su_file", "dir", ALL);
 	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow("su", target, "fd", "use");
 	sepol_allow("su", target, "fifo_file", ALL);
