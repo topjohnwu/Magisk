@@ -32,9 +32,10 @@
         android:title="@string/settings_update">
 
         <SwitchPreference
-            android:key="notification"
-            android:title="@string/settings_notification_title"
-            android:summary="@string/settings_notification_summary" />
+            android:key="check_update"
+            android:defaultValue="true"
+            android:title="@string/settings_check_update_title"
+            android:summary="@string/settings_check_update_summary" />
 
         <ListPreference
             android:key="update_channel"

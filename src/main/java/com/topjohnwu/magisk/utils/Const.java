@@ -120,7 +120,7 @@ public class Const {
         public static final String FLASH_SET_BOOT = "boot";
 
         // others
-        public static final String UPDATE_NOTIFICATION = "notification";
+        public static final String CHECK_UPDATES = "check_update";
         public static final String UPDATE_CHANNEL = "update_channel";
         public static final String CUSTOM_CHANNEL = "custom_channel";
         public static final String BOOT_FORMAT = "boot_format";

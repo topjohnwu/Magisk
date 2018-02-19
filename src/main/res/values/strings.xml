@@ -140,6 +140,8 @@
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_update">Update Settings</string>
+    <string name="settings_check_update_title">Check Updates</string>
+    <string name="settings_check_update_summary">Check updates in the background periodically</string>
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
@@ -188,6 +190,7 @@
     <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
     <string name="android_o_not_support">Does not support Android 8.0+</string>
+    <string name="disable_fingerprint">No fingerprints were set or no device support</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>

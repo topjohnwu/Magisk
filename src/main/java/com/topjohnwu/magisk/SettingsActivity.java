@@ -150,9 +150,10 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 reauth.setSummary(R.string.android_o_not_support);
             }
 
-            // Remove fingerprint option if not possible
+            // Disable fingerprint option if not possible
             if (!FingerprintHelper.canUseFingerprint()) {
-                suCategory.removePreference(fingerprint);
+                fingerprint.setEnabled(false);
+                fingerprint.setSummary(R.string.disable_fingerprint);
             }
 
             if (mm.magiskVersionCode >= 1440) {
@@ -297,6 +298,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
                 case Const.Key.UPDATE_CHANNEL:
                     new CheckUpdates().exec();
+                    break;
+                case Const.Key.CHECK_UPDATES:
+                    mm.setupUpdateCheck();
                     break;
             }
             mm.loadConfig();
