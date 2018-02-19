@@ -14,8 +14,6 @@ import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
 
 import butterknife.BindView;
@@ -56,12 +54,8 @@ public class AboutActivity extends Activity {
 
         appChangelog.removeSummary();
         appChangelog.setOnClickListener(v -> {
-            try {
-                InputStream is = getAssets().open("changelog.md");
-                new MarkDownWindow(this, getString(R.string.app_changelog), is).exec();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new MarkDownWindow(this, getString(R.string.app_changelog),
+                    getResources().openRawResource(R.raw.changelog)).exec();
         });
 
         String translators = getString(R.string.translators);

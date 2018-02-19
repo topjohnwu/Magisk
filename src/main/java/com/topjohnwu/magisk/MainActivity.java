@@ -23,9 +23,6 @@ import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -99,12 +96,8 @@ public class MainActivity extends Activity
 
         if (mm.prefs.getInt(Const.Key.APP_VER, -1) < BuildConfig.VERSION_CODE) {
             prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
-            try {
-                InputStream is = getAssets().open("changelog.md");
-                new MarkDownWindow(this, getString(R.string.app_changelog), is).exec();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new MarkDownWindow(this, getString(R.string.app_changelog),
+                    getResources().openRawResource(R.raw.changelog)).exec();
         }
     }
 

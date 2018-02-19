@@ -54,11 +54,13 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
         }
         String css;
         try (
-            InputStream in = mm.getAssets().open(mm.isDarkTheme ? "dark.css" : "light.css");
+            InputStream in = mm.getResources().openRawResource(
+                    mm.isDarkTheme ? R.raw.dark : R.raw.light);
             ByteArrayOutputStream out = new ByteArrayOutputStream()
         ) {
             ShellUtils.pump(in, out);
             css = out.toString();
+            in.close();
         } catch (IOException e) {
             e.printStackTrace();
             return "";
