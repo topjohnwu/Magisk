@@ -217,5 +217,10 @@
     <string name="settings_su_fingerprint_title">啟用指紋認證</string>
     <string name="settings_su_fingerprint_summary">用指紋辨識來允許超級用戶權限</string>
     <string name="auth_fail">認證失敗</string>
+    <string name="settings_restore_manager_title">還原 Magisk Manager</string>
+    <string name="settings_restore_manager_summary">以原安裝包還原 Magisk Manager</string>
+    <string name="settings_check_update_title">檢查更新</string>
+    <string name="settings_check_update_summary">在背景定期檢查更新</string>
+    <string name="disable_fingerprint">沒有指紋加入或是裝置不支援</string>
 
 </resources>
