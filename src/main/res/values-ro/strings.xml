@@ -124,6 +124,8 @@
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
     <string name="settings_hide_manager_title">Ascundeţi Magisk Manager</string>
     <string name="settings_hide_manager_summary">Reîmpachetare Magisk Manager cu nume de pachet aleatoriu</string>
+    <string name="settings_restore_manager_title">Restabilire Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Restabilire Magisk Manager cu pachetul original</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicit)</string>
     <string name="settings_update">Setări actualizare</string>
@@ -155,6 +157,8 @@
     <string name="request_timeout_summary">%1$s secunde</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentificare permisiuni pentru superuser după o actualizare a aplicației</string>
+    <string name="settings_su_fingerprint_title">Activați autentificarea cu amprenta digitală</string>
+    <string name="settings_su_fingerprint_summary">Utilizați scanerul de amprentă pentru a permite solicitările superuser</string>
  
     <string name="multiuser_mode">Mod Multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
@@ -201,6 +205,7 @@
     <string name="su_revoke_msg">Confirmați revocarea drepturilor pentru %1$s?</string>
     <string name="toast">Mesaj</string>
     <string name="none">Nimic</string>
+    <string name="auth_fail">Autentificare eşuată</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
