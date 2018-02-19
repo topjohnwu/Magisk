@@ -135,6 +135,8 @@
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Online-Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
     <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
+    <string name="settings_restore_manager_title">Stelle Magisk Manager wieder her</string>
+    <string name="settings_restore_manager_summary">Stelle Magisk Manager mit ursprünglichem Paket wieder her</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
     <string name="settings_update">Aktualisierungs-Einstellungen</string>
