@@ -123,7 +123,7 @@
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
-    <string name="settings_dark_theme_title">Темная тема</string>
+    <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить темное оформление</string>
     <string name="settings_notification_title">Уведомление об обновлении</string>
     <string name="settings_notification_summary">Показывать уведомления о выходе новой версии</string>
@@ -162,6 +162,9 @@
     <string name="request_timeout_summary">%1$s секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав Суперпользователя после обновления приложения</string>
+    <string name="settings_su_fingerprint_title">Аутентификация по отпечатку пальца</string>
+    <string name="settings_su_fingerprint_summary">Использовать сканнер отпечатков пальцев для подтверждения запросов прав суперпользователя</string>
+
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>
@@ -208,6 +211,7 @@
     <string name="su_revoke_msg">Подтвердить отзыв прав для %1$s?</string>
     <string name="toast">Всплывающее уведомление</string>
     <string name="none">Ничего</string>
+    <string name="auth_fail">Ошибка аутентификации</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
