@@ -136,6 +136,8 @@
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>
+    <string name="settings_check_update_title">Güncellemeleri denetle</string>
+    <string name="settings_check_update_summary">Arka planda düzenli olarak güncellemeleri denetle</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
     <string name="settings_update_stable">Kararlı</string>
     <string name="settings_update_beta">Beta</string>
@@ -184,6 +186,7 @@
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
     <string name="android_o_not_support">Android 8.0 ve üzerinde desteklenmiyor</string>
+    <string name="disable_fingerprint">Parmak izi ayarlanmadı veya cihaz desteği yok</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
