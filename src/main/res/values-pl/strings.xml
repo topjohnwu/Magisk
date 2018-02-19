@@ -135,7 +135,9 @@
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
     <string name="settings_hide_manager_title">Ukryj Magisk Manager</string>
     <string name="settings_hide_manager_summary">Przepakowanie Magisk Manager z losową nazwą pakietu</string>
-	<string name="language">Język</string>
+    <string name="settings_restore_manager_title">Przywróć Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Przywróć oryginalną paczkę Magisk Manager</string>
+    <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
     <string name="settings_update">Aktualizacja Ustawień</string>
     <string name="settings_update_channel_title">Kanał Aktualizacji</string>
