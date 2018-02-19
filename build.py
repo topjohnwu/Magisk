@@ -120,6 +120,7 @@ def build_binary(args):
 def build_apk(args):
 	header('* Building Magisk Manager')
 
+	mkdir(os.path.join('app', 'src', 'main', 'assets'))
 	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
 		source = os.path.join('scripts', script)
 		target = os.path.join('app', 'src', 'main', 'assets', script)
