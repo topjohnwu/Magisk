@@ -2,10 +2,10 @@
     <!--Universal-->
     
     <!--Welcome Activity-->
-    <string name="modules">Moduliai</string>
+    <string name="modules">Papildiniai</string>
     <string name="downloads">Atsisiuntimai</string>
     <string name="superuser">Super Naudotojas</string>
-    <string name="log">Surašyti (Log)</string>
+    <string name="log">Surašymai</string>
     <string name="settings">Nustatymai</string>
     <string name="install">Instaliuoti</string>
 
@@ -30,21 +30,21 @@
     <string name="install_magisk_title">Naujausia versija: %1$s</string>
     <string name="uninstall">Ištrinti</string>
     <string name="uninstall_magisk_title">Ištrinti Magisk</string>
-    <string name="uninstall_magisk_msg">Visi moduliai bus išjungti/panaikinti. Roo bus panaikintas ir duomenys bus potencialiai užšifruoti, jeigu jie nėra užšifruoti.</string>
+    <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/panaikinti. Root bus panaikintas. Jei duomenys nėra užšifruoti, yra galimybė, kad jie taps užšifruotais..</string>
     <string name="update">Atnaujinti %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nėra informacijos)</string>
-    <string name="no_modules_found">Modulių nesurasta</string>
-    <string name="update_file_created">Perkrovus sistemą modulis bus atnaulintas</string>
-    <string name="remove_file_created">Perkrovus sistemą modulis bus panaikintas</string>
-    <string name="remove_file_deleted">Perkrovus sistemą modulis nebus panaikintas</string>
-    <string name="disable_file_created">Perkrovus sistemą modulis bus išjungtas, bet ne panaikintas</string>
-    <string name="disable_file_removed">Perkrovus sistemą modulis bus įjungtas</string>
+    <string name="no_modules_found">Papildinių nesurasta</string>
+    <string name="update_file_created">Perkrovus sistemą papildinys bus atnaujintas</string>
+    <string name="remove_file_created">Perkrovus sistemą papildinys bus panaikintas</string>
+    <string name="remove_file_deleted">Perkrovus sistemą papildinys nebus panaikintas</string>
+    <string name="disable_file_created">Perkrovus sistemą papildinys bus išjungtas, bet ne panaikintas</string>
+    <string name="disable_file_removed">Perkrovus sistemą papildinys bus įjungtas</string>
     <string name="author">Sukūrė %1$s</string>
     <string name="reboot_recovery">Perkrauti į Recovery</string>
     <string name="reboot_bootloader">Perkrauti į Bootloader</string>
-    <string name="reboot_download">Perkraukite, į Download režimą</string>
+    <string name="reboot_download">Perkrauti į Download režimą</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Galimas atnaujinimas</string>
@@ -52,14 +52,14 @@
     <string name="not_installed">Ne instaliuota</string>
     <string name="updated_on">Atnaujinta: %1$s</string>
     <string name="sorting_order">Išdėliojimo tvarka</string>
-    <string name="sort_by_name">Išdėlioti pagal pavadinimą</string>
-    <string name="sort_by_update">Išdėlioti pagal paskutinį atnaujinimą</string>
+    <string name="sort_by_name">Išdėlioti pagal pavadinimą (A-Z)</string>
+    <string name="sort_by_update">Išdėlioti pagal atnaujinimo datą (Naujausi-Seniausi)</string>
     
     <!--Log Fragment-->
-    <string name="menuSaveLog">Išsauguti surašymus (log)</string>
+    <string name="menuSaveLog">Išsaugoti surašymus</string>
     <string name="menuReload">Iš naujo</string>
-    <string name="menuClearLog">Išvalyti surašymus (log)</string>
-    <string name="logs_cleared">Surašymas (log) sėkmingai užrašytas</string>
+    <string name="menuClearLog">Išvalyti surašymus</string>
+    <string name="logs_cleared">Surašymas sėkmingai užrašytas</string>
     <string name="log_is_empty">Surašymas yra tuščias</string>
     <string name="logs_save_failed">Nesugebėjome įrašyti surašymų į SD kortelę:</string>
 
@@ -69,7 +69,7 @@
     <string name="translators">Vv2233Bb</string>
     <string name="app_version">Versija</string>
     <string name="app_source_code">Prisidėkite</string>
-    <string name="donation">Auka</string>
+    <string name="donation">Paaukoti</string>
     <string name="app_translators">Vertėjai</string>
     <string name="support_thread">Mūsų XDA puslapis</string>
 
@@ -87,7 +87,7 @@
     <string name="downloading_toast">Atsisiunčiamas %1$s</string>
     <string name="magisk_update_title">Naujas Magisk atnaujinimas egzistuoja!</string>
     <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
-    <string name="release_notes">Šios versijos naujos įpatybės</string>
+    <string name="release_notes">Šios versijos pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
     <string name="safetyNet_hide_notice">Ši programėlė naudoja SafetyNet\nMagiskHide tai automatiškai sutvarko</string>
     <string name="process_error">Proceso klaida</string>
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Boot failo formatas</string>
     <string name="settings_boot_format_summary">Pasirinkite boot failo formatą.\nPasirinkite .img įdiegimui per fastboot/download; Pasirinkite .img.tar įdiegimui per ODIN.</string>
     <string name="settings_core_only_title">Magisk Pagrindinis režimas</string>
-    <string name="settings_core_only_summary">Įgalintos bus tik pagrindines funkcijos, visi moduliai bus išjungti. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
+    <string name="settings_core_only_summary">Įgalintos bus tik pagrindines funkcijos, visi papildiniai bus išjungti. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Sistemų padejėjų įgalinimas Adblock programėlėms</string>
