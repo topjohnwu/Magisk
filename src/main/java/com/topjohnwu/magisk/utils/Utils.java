@@ -19,10 +19,9 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Xml;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -31,14 +30,18 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileInputStream;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class Utils {
 
@@ -213,35 +216,71 @@ public class Utils {
     }
 
     public static void dumpPrefs() {
-        Gson gson = new Gson();
-        Map<String, ?> prefs = MagiskManager.get().prefs.getAll();
-        prefs.remove("App Restrictions");
-        String json = gson.toJson(prefs, new TypeToken<Map<String, ?>>(){}.getType());
-        Shell.Sync.su(fmt("for usr in /data/user/*; do echo '%s' > ${usr}/%s; done", json, Const.MANAGER_CONFIGS));
+        MagiskManager mm = MagiskManager.get();
+        // Flush prefs to disk
+        mm.prefs.edit().commit();
+        File xml = new File(mm.getFilesDir().getParent() + "/shared_prefs",
+                mm.getPackageName() + "_preferences.xml");
+        Shell.Sync.su(fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS));
     }
 
     public static void loadPrefs() {
         SuFile config = new SuFile(fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS), true);
-        List<String> ret = Shell.Sync.su("cat " + config);
-        if (ShellUtils.isValidOutput(ret)) {
-            SharedPreferences.Editor editor = MagiskManager.get().prefs.edit();
-            String json = ret.get(0);
-            Gson gson = new Gson();
-            Map<String, ?> prefMap = gson.fromJson(json, new TypeToken<Map<String, ?>>(){}.getType());
-            editor.clear();
-            for (Map.Entry<String, ?> entry : prefMap.entrySet()) {
-                Object value = entry.getValue();
-                if (value instanceof String) {
-                    editor.putString(entry.getKey(), (String) value);
-                } else if (value instanceof Boolean) {
-                    editor.putBoolean(entry.getKey(), (boolean) value);
-                } else if (value instanceof Number) {
-                    editor.putInt(entry.getKey(), ((Number) value).intValue());
+        if (config.exists()) {
+            MagiskManager mm = MagiskManager.get();
+            SharedPreferences.Editor editor = mm.prefs.edit();
+            try {
+                SuFileInputStream is = new SuFileInputStream(config);
+                XmlPullParser parser = Xml.newPullParser();
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                parser.setInput(is, "UTF-8");
+                parser.nextTag();
+                parser.require(XmlPullParser.START_TAG, null, "map");
+                while (parser.next() != XmlPullParser.END_TAG) {
+                    if (parser.getEventType() != XmlPullParser.START_TAG)
+                        continue;
+                    String key = parser.getAttributeValue(null, "name");
+                    String value = parser.getAttributeValue(null, "value");
+                    switch (parser.getName()) {
+                        case "string":
+                            parser.require(XmlPullParser.START_TAG, null, "string");
+                            editor.putString(key, parser.nextText());
+                            parser.require(XmlPullParser.END_TAG, null, "string");
+                            break;
+                        case "boolean":
+                            parser.require(XmlPullParser.START_TAG, null, "boolean");
+                            editor.putBoolean(key, Boolean.parseBoolean(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "boolean");
+                            break;
+                        case "int":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putInt(key, Integer.parseInt(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        case "long":
+                            parser.require(XmlPullParser.START_TAG, null, "long");
+                            editor.putLong(key, Long.parseLong(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "long");
+                            break;
+                        case "float":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putFloat(key, Float.parseFloat(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        default:
+                            parser.next();
+                    }
                 }
+            } catch (IOException | XmlPullParserException e) {
+                e.printStackTrace();
             }
             editor.remove(Const.Key.ETAG_KEY);
             editor.apply();
-            MagiskManager.get().loadConfig();
+            mm.loadConfig();
             config.delete();
         }
     }
