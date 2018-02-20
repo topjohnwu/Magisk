@@ -137,6 +137,8 @@
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_update">Ajustes de Actualización</string>
+    <string name="settings_check_update_title">Comprobar Actualizaciones</string>
+    <string name="settings_check_update_summary">Comprobar periódicamente en segundo plano si existen actualizaciones</string>
     <string name="settings_update_channel_title">Canal de Actualización</string>
     <string name="settings_update_stable">Estable</string>
     <string name="settings_update_beta">Beta</string>
@@ -186,6 +188,7 @@
     <string name="requester_summary">Las sesiones de root heredarán las peticiones Namespace</string>
     <string name="isolate_summary">Cada sesión root tendrá su propia Namespace</string>
     <string name="android_o_not_support">No es compatible con Android 8.0+</string>
+    <string name="disable_fingerprint">No se establecieron huellas dactilares o no existe soporte del dispositivo</string>
 
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
