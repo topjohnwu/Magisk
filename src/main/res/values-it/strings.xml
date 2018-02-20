@@ -137,6 +137,8 @@
 	<string name="language">Lingua</string>
 	<string name="system_default">(Sistema)</string>
 	<string name="settings_update">Impostazioni aggiornamento</string>
+	<string name="settings_check_update_title">Controlla aggiornamenti</string>
+	<string name="settings_check_update_summary">Controlla automaticamente gli aggiornamenti in background</string>
 	<string name="settings_update_channel_title">Canale di aggiornamento</string>
 	<string name="settings_update_stable">Stabile</string>
 	<string name="settings_update_beta">Beta</string>
@@ -185,6 +187,7 @@
 	<string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente</string>
 	<string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
 	<string name="android_o_not_support">Non è supportato da Android 8.0+</string>
+	<string name="disable_fingerprint">Non è presente alcuna impronta o il dispositivo non è supportato</string
 	
 	<!--Superuser-->
 	<string name="su_request_title">Richiesta Superuser</string>
