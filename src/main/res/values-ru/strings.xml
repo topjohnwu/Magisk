@@ -140,6 +140,8 @@
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (Системный)</string>
     <string name="settings_update">Настройки обновления</string>
+    <string name="settings_check_update_title">Проверка обновлений</string>
+    <string name="settings_check_update_summary">Периодически проверять обновления в фоне</string>
     <string name="settings_update_channel_title">Источник обновлений</string>
     <string name="settings_update_stable">Стабильный канал</string>
     <string name="settings_update_beta">Beta канал</string>
@@ -188,6 +190,7 @@
     <string name="requester_summary">Сессии Суперпользователя наследуют именное пространство запрашивающего</string>
     <string name="isolate_summary">Сессии Суперпользователя будут иметь изолированные именные пространства</string>
     <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
+    <string name="disable_fingerprint">Не поддерживается устройством или не заданы опечатки</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав Суперпользователя</string>
