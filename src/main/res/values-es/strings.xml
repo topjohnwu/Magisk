@@ -149,7 +149,7 @@
     
     <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y archivo hosts fuera de la partición de sistema seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
-    <string name="settings_hosts_title">Habilitar archivo hosts fuera de la partición de sistema</string>
+    <string name="settings_hosts_title">Habilitar Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partición de sistema</string>
 
     <string name="settings_su_app_adb">Aplicaciones y ADB</string>
@@ -167,8 +167,8 @@
     <string name="request_timeout_summary">%1$s segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
-    <string name="settings_su_fingerprint_title">Habilitar la autenticación de huellas digitales</string>
-    <string name="settings_su_fingerprint_summary">Utilice el escáner de huellas digitales para permitir las solicitudes de superusuario</string>
+    <string name="settings_su_fingerprint_title">Habilitar autenticación de Huella Dactilar</string>
+    <string name="settings_su_fingerprint_summary">Utilice el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
  
     
     <string name="multiuser_mode">Modo MultiUsuario</string> 
