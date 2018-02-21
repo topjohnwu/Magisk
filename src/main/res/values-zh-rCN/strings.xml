@@ -14,7 +14,7 @@
     <string name="checking_for_updates">正在检查更新…</string>
     <string name="magisk_update_available">Magisk 可更新到 v%1$s！</string>
     <string name="invalid_update_channel">无效的更新通道</string>
-    <string name="safetyNet_check_text">点击启动 SafetyNet 检查</string>
+    <string name="safetyNet_check_text">点按启动 SafetyNet 检查</string>
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
     <string name="safetyNet_api_error">SafetyNet API 错误</string>
@@ -59,7 +59,7 @@
     <string name="menuSaveLog">保存日志</string>
     <string name="menuReload">刷新</string>
     <string name="menuClearLog">清除日志</string>
-    <string name="logs_cleared">日志已成功清除</string>
+    <string name="logs_cleared">日志已清除</string>
     <string name="log_is_empty">日志为空</string>
     <string name="logs_save_failed">无法将日志写入内置存储：</string>
 
@@ -97,7 +97,7 @@
     <string name="zip_process_title">正在处理</string>
     <string name="zip_process_msg">正在处理 zip 文件…</string>
     <string name="manager_update_title">Magisk Manager 有更新！</string>
-    <string name="manager_download_install">点击以下载并安装</string>
+    <string name="manager_download_install">点按以下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="magisk_updates">Magisk 更新</string>
@@ -124,17 +124,21 @@
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
-    <string name="settings_dark_theme_title">深色主题</string>
-    <string name="settings_dark_theme_summary">使用深色主题</string>
+    <string name="settings_dark_theme_title">暗色主题</string>
+    <string name="settings_dark_theme_summary">使用暗色主题</string>
     <string name="settings_notification_title">更新通知</string>
     <string name="settings_notification_summary">当有新版本时显示更新通知</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
     <string name="settings_hide_manager_summary">用随机包名重新安装 Magisk Manager</string>
+    <string name="settings_restore_manager_title">还原 Magisk Manager</string>
+    <string name="settings_restore_manager_summary">用原安装包还原 Magisk Manager</string>
     <string name="language">语言</string>
     <string name="system_default">（系统默认）</string>
     <string name="settings_update">更新设定</string>
+    <string name="settings_check_update_title">检查更新</string>
+    <string name="settings_check_update_summary">在后台定期检查更新</string>
     <string name="settings_update_channel_title">更新通道</string>
     <string name="settings_update_stable">稳定版</string>
     <string name="settings_update_beta">测试版</string>
@@ -163,6 +167,8 @@
     <string name="request_timeout_summary">%1$s 秒</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
+    <string name="settings_su_fingerprint_title">启用指纹验证</string>
+    <string name="settings_su_fingerprint_summary">使用指纹识别来允许超级用户请求</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
@@ -181,6 +187,7 @@
     <string name="requester_summary">ROOT 会话继承原程序的命名空间</string>
     <string name="isolate_summary">每一个 ROOT 会话使用自己独立的命名空间</string>
     <string name="android_o_not_support">不支持 Android 8.0+</string>
+    <string name="disable_fingerprint">没有设置指纹或设备不支持</string>
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
@@ -209,6 +216,7 @@
     <string name="su_revoke_msg">确认撤销 %1$s 的权限？</string>
     <string name="toast">消息提示</string>
     <string name="none">无</string>
+    <string name="auth_fail">验证失败</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
