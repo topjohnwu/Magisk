@@ -339,7 +339,7 @@ static void patch_socket_name(const char *path) {
 	mmap_rw(path, &buf, &size);
 	if (SOCKET_OFF < 0) {
 		for (int i = 0; i < size; ++i) {
-			if (memcmp(buf + i, SOCKET_NAME, sizeof(SOCKET_NAME)) == 0) {
+			if (memcmp(buf + i, socket_name, sizeof(SOCKET_NAME)) == 0) {
 				SOCKET_OFF = i;
 				break;
 			}

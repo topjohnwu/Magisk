@@ -8,13 +8,15 @@
 #include "utils.h"
 #include "magisk.h"
 
+char socket_name[] = SOCKET_NAME;
+
 /* Setup the address and return socket fd */
 int setup_socket(struct sockaddr_un *sun) {
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
 	sun->sun_path[0] = '\0';
-	memcpy(sun->sun_path + 1, SOCKET_NAME, sizeof(SOCKET_NAME));
+	memcpy(sun->sun_path + 1, socket_name, sizeof(SOCKET_NAME));
 	return fd;
 }
 
