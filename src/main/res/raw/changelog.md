@@ -1,5 +1,4 @@
-### v5.6.0
-- Remove JNI requirement, Magisk Manager is now pure Java
-- Update the method of handling su database, may fix the issue that root requests won't save
-- Add the option to restore Magisk Manager after repackaging with random package name
-- Massive under-the-hood optimizations
+### v5.6.1
+- Fix database crashes on F2FS with SQLite 3.21.0+
+- Optimize several settings options
+- Use native XML for settings migration

@@ -105,7 +105,7 @@ public class MagiskManager extends Shell.ContainerApp {
         Shell.setInitializer(new Shell.Initializer() {
             @Override
             public void onRootShellInit(@NonNull Shell shell) {
-                try (InputStream utils = MagiskManager.get().getAssets().open(Const.UTIL_FUNCTIONS);
+                try (InputStream utils = getAssets().open(Const.UTIL_FUNCTIONS);
                      InputStream sudb = getResources().openRawResource(R.raw.sudb)) {
                     shell.loadInputStream(null, null, utils);
                     shell.loadInputStream(null, null, sudb);
