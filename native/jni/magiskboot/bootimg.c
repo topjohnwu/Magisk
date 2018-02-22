@@ -124,7 +124,8 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "PXA_BOOT_HDR\n");
 				boot->hdr = malloc(sizeof(pxa_boot_img_hdr));
 				memcpy(boot->hdr, head, sizeof(pxa_boot_img_hdr));
-			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOK_MAGIC, 12) == 0) {
+			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOK_MAGIC, 12) == 0
+					|| memcmp(((boot_img_hdr*) head)->cmdline, NOOK_NEW_MAGIC, 26) == 0) {
 				boot->flags |= NOOK_FLAG;
 				fprintf(stderr, "NOOK_GREEN_LOADER\n");
 				head += NOOK_PRE_HEADER_SZ - 1;
