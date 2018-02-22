@@ -39,6 +39,7 @@ typedef enum {
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
 #define TEGRABLOB_MAGIC "-SIGNED-BY-SIGNBLOB-"
 #define NOOK_MAGIC      "Green Loader"
+#define NOOK_NEW_MAGIC "eMMC boot.img+secondloader"
 #define NOOK_PRE_HEADER_SZ 1048576
 
 #define SUP_LIST      ((char *[]) { "gzip", "xz", "lzma", "bzip2", "lz4", "lz4_legacy", NULL })
