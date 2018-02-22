@@ -124,11 +124,16 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "PXA_BOOT_HDR\n");
 				boot->hdr = malloc(sizeof(pxa_boot_img_hdr));
 				memcpy(boot->hdr, head, sizeof(pxa_boot_img_hdr));
-			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOK_MAGIC, 12) == 0
-					|| memcmp(((boot_img_hdr*) head)->cmdline, NOOK_NEW_MAGIC, 26) == 0) {
-				boot->flags |= NOOK_FLAG;
-				fprintf(stderr, "NOOK_GREEN_LOADER\n");
-				head += NOOK_PRE_HEADER_SZ - 1;
+			} else if (memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_MAGIC, 12) == 0
+					|| memcmp(((boot_img_hdr*) head)->cmdline, NOOKHD_NEW_MAGIC, 26) == 0) {
+				boot->flags |= NOOKHD_FLAG;
+				fprintf(stderr, "NOOKHD_GREEN_LOADER\n");
+				head += NOOKHD_PRE_HEADER_SZ - 1;
+				continue;
+			} else if (memcmp(((boot_img_hdr*) head)->name, ACCLAIM_MAGIC, 10) == 0) {
+				boot->flags |= ACCLAIM_FLAG;
+				fprintf(stderr, "ACCLAIM_BAUWKSBOOT\n");
+				head += ACCLAIM_PRE_HEADER_SZ - 1;
 				continue;
 			} else {
 				boot->hdr = malloc(sizeof(boot_img_hdr));
@@ -289,8 +294,10 @@ void repack(const char* orig_image, const char* out_image) {
 	} else if (boot.flags & BLOB_FLAG) {
 		// Skip blob header
 		write_zero(fd, sizeof(blob_hdr));
-	} else if (boot.flags & NOOK_FLAG) {
-		restore_buf(fd, boot.map_addr, NOOK_PRE_HEADER_SZ);
+	} else if (boot.flags & NOOKHD_FLAG) {
+		restore_buf(fd, boot.map_addr, NOOKHD_PRE_HEADER_SZ);
+	} else if (boot.flags & ACCLAIM_FLAG) {
+		restore_buf(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
 	}
 
 	// Skip a page for header
