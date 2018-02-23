@@ -50,6 +50,10 @@
     <string name="update_available">Update beschikbaar</string>
     <string name="installed">Geïnstalleerd</string>
     <string name="not_installed">Niet geïnstalleerd</string>
+    <string name="updated_on">Bijgewerkt op: %1$s</string>
+    <string name="sorting_order">Sorteervolgorde</string>
+    <string name="sort_by_name">Sorteren op naam</string>
+    <string name="sort_by_update">Sorteren op laatste update</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Opslaan log</string>
@@ -128,9 +132,13 @@
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
     <string name="settings_hide_manager_summary">Magisk Manager opnieuw inpakken met een willekeurige pakketnaam</string>
+    <string name="settings_restore_manager_title">Magisk Manager herstellen</string>
+    <string name="settings_restore_manager_summary">Magisk Manager met oorspronkelijk pakket herstellen</string>
     <string name="language">Taal</string>
     <string name="system_default">(Systeem standaard)</string>
     <string name="settings_update">Instellingen bijwerken</string>
+    <string name="settings_check_update_title">Updates controleren</string>
+    <string name="settings_check_update_summary">Periodiek op updates controleren in de achtergrond</string>
     <string name="settings_update_channel_title">Update-kanaal</string>
     <string name="settings_update_stable">Stabiel</string>
     <string name="settings_update_beta">Beta</string>
@@ -159,6 +167,8 @@
     <string name="request_timeout_summary">%1$s seconden</string>
     <string name="settings_su_reauth_title">Opnieuw verzoeken na bijwerken</string>
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
+    <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>
+    <string name="settings_su_fingerprint_summary">Vingerafdruk gebruiken om superuser verzoeken toe te staan</string>
     
     <string name="multiuser_mode">Multi-gebruiker modus</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
@@ -177,6 +187,7 @@
     <string name="requester_summary">Rootsessies verkrijgen de verzoeker\'s naamruimte</string>
     <string name="isolate_summary">Iedere rootsessie heeft een eigen geïsoleerde naamruimte</string>
     <string name="android_o_not_support">Ondersteunt geen Android 8.0+</string>
+    <string name="disable_fingerprint">Geen vingerafdrukken ingesteld, of geen apparaatondersteuning</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser verzoek</string>
@@ -205,6 +216,7 @@
     <string name="su_revoke_msg">De rechten van %1$s intrekken?</string>
     <string name="toast">Toast</string>
     <string name="none">Geen</string>
+    <string name="auth_fail">Authenticatie mislukt</string>
 
     <!--Superuser logs-->
     <string name="pid">PID:\u0020</string>
