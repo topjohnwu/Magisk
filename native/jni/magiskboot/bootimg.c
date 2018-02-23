@@ -207,7 +207,7 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "NAME [%s]\n", boot->r_hdr->name);
 				boot->ramdisk += 512;
 				lheader(boot, ramdisk_size, -= 512);
-				boot->k_fmt = check_fmt(boot->ramdisk, header(boot, ramdisk_size));
+				boot->r_fmt = check_fmt(boot->ramdisk, header(boot, ramdisk_size));
 			}
 
 			char fmt[16];
@@ -333,7 +333,7 @@ void repack(const char* orig_image, const char* out_image) {
 			lheader(&boot, ramdisk_size, = comp(boot.r_fmt, fd, cpio, cpio_size));
 			munmap(cpio, cpio_size);
 		} else {
-			lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
+			lheader(&boot, ramdisk_size, = restore(RAMDISK_FILE, fd));
 		}
 		file_align();
 	}
