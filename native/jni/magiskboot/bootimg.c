@@ -202,7 +202,7 @@ int parse_img(const char *image, boot_img *boot) {
 				fprintf(stderr, "MTK_RAMDISK_HDR\n");
 				boot->flags |= MTK_RAMDISK;
 				boot->r_hdr = malloc(sizeof(mtk_hdr));
-				memcpy(boot->r_hdr, boot->kernel, sizeof(mtk_hdr));
+				memcpy(boot->r_hdr, boot->ramdisk, sizeof(mtk_hdr));
 				fprintf(stderr, "RAMDISK [%u]\n", boot->r_hdr->size);
 				fprintf(stderr, "NAME [%s]\n", boot->r_hdr->name);
 				boot->ramdisk += 512;
