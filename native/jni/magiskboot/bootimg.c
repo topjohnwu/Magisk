@@ -312,12 +312,13 @@ void repack(const char* orig_image, const char* out_image) {
 		} else {
 			lheader(&boot, kernel_size, = restore(KERNEL_FILE, fd));
 		}
-		// dtb
-		if (access(DTB_FILE, R_OK) == 0) {
-			lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
-		}
-		file_align();
 	}
+
+	// dtb
+	if (access(DTB_FILE, R_OK) == 0) {
+		lheader(&boot, kernel_size, += restore(DTB_FILE, fd));
+	}
+	file_align();
 
 	// ramdisk
 	ramdisk_off = lseek(fd, 0, SEEK_CUR);
