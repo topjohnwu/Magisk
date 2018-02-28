@@ -51,7 +51,7 @@
     <string name="not_installed">Не встановлено</string>
     <string name="updated_on">Оновлено: %1$s</string>
     <string name="sorting_order">Порядок сортування</string>
-    <string name="sort_by_name">Сортувати за ім'ям</string>
+    <string name="sort_by_name">Сортувати за назвою</string>
     <string name="sort_by_update">Сортувати за оновленням</string>
 
     <!--Log Fragment-->
@@ -131,9 +131,13 @@
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії, змушуючи програму примусово оновлюватися через Інтернет</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
     <string name="settings_hide_manager_summary">Перезібрати Magisk Manager з випадковим іменем пакету</string>
+    <string name="settings_restore_manager_title">Відновити Magisk Manager</string>
+    <string name="settings_restore_manager_summary">Відновити Magisk Manager з оригінального пакету</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
     <string name="settings_update">Оновити налаштування</string>
+    <string name="settings_check_update_title">Перевіряти оновлення</string>
+    <string name="settings_check_update_summary">Періодично перевіряти оновлення у фоновому режимі</string>
     <string name="settings_update_channel_title">Канал оновлення</string>
     <string name="settings_update_stable">Стабільний реліз</string>
     <string name="settings_update_beta">Бета реліз</string>
@@ -182,6 +186,7 @@
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен</string>
     <string name="android_o_not_support">Не підтримує Android 8.0+</string>
+    <string name="disable_fingerprint">Немає відбитків пальців або пристрій не підтримується</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>
