@@ -129,6 +129,8 @@
     <string name="language">Limbă</string>
     <string name="system_default">(Implicit)</string>
     <string name="settings_update">Setări actualizare</string>
+    <string name="settings_check_update_title">Verificare actualizări</string>
+    <string name="settings_check_update_summary">Se verifică periodic în fundal dacă există actualizări</string>
     <string name="settings_update_channel_title">Canal de actualizare</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
@@ -177,6 +179,7 @@
     <string name="requester_summary">Sesiunile de root vor moșteni spațiul de nume al solicitantului</string>
     <string name="isolate_summary">Fiecare sesiune de root va avea propriul spațiu de nume izolat</string>
     <string name="android_o_not_support">Nu se acceptă pe Android 8.0+</string>
+    <string name="disable_fingerprint">Nu au fost setate amprente sau scanerul de apmrentă lipseşte</string>
 
     <!--Superuser-->
     <string name="su_request_title">Solicitare Superuser</string>
