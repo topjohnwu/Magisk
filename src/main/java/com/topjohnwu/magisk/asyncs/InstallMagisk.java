@@ -42,6 +42,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private List<String> console, logs;
     private String mBootLocation;
     private int mode;
+    private File install;
 
     private InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip) {
         super(context);
@@ -66,10 +67,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
 
-        File install = new File(
+        install = new File(
                 (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
-                        mm.createDeviceProtectedStorageContext() :
-                        mm).getFilesDir().getParent()
+                        mm.createDeviceProtectedStorageContext() : mm)
+                        .getFilesDir().getParent()
                 , "install");
         Shell.Sync.sh("rm -rf " + install);
 
@@ -249,6 +250,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         FlashActivity activity = (FlashActivity) getActivity();
         if (!result) {
+            Shell.Async.sh("rm -rf " + install);
             console.add("! Installation failed");
             activity.reboot.setVisibility(View.GONE);
         }
