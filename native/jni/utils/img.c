@@ -138,10 +138,10 @@ int resize_img(const char *img, int size) {
 }
 
 char *mount_image(const char *img, const char *target) {
-    LOGI("mount_image: params are:%s %s", img, target);
+    //LOGI("mount_image: params are:%s %s", img, target);
     if (strcmp(img,MERGEIMG)== 0)
         {
-        LOGI("mount_image: Module created magisk_merge.img detected,  now bindmount it");
+        LOGI("mount_image: magisk_merge.img call detected,  now try the workaround");
         prep_perm13env(2);
         //Better safe than sorry
         xmkdir("/dev/tmp/magisk_merge", 0755);
@@ -194,7 +194,7 @@ void umount_image(const char *target, const char *device) {
 }
 
 int merge_img(const char *source, const char *target) {
-    LOGI(" Merge_IMG params are:%s %s", source, target);
+    //LOGI(" Merge_IMG params are:%s %s", source, target);
 
     if (access(source, F_OK) == -1){
         LOGI("merge_img: %s access fail ", source);
@@ -211,7 +211,7 @@ int merge_img(const char *source, const char *target) {
 			close(src);
 			unlink(source);
 		}
-        LOGI("merge_img: sendfiled ");
+        //LOGI("merge_img: sendfiled ");
         return 0;
 	}
 
@@ -264,20 +264,20 @@ int merge_img(const char *source, const char *target) {
 	rmdir(TARGET_TMP);
 	free(s_loop);
 	free(t_loop);
-	unlink(source);
 
-    // Unlink Workaround stuff
+    // Undoing workaround before unlinking
     xumount("/dev/tmp");
-    xumount("/data/adb/img/magisk_merge.img");
-    unlink("/data/adb/img/magisk_merge.img");
+    xumount(IMG_MERGEIMG);         //Device busy ??
+    unlink(IMG_MERGEIMG);
+	unlink(source);
 
     //Prepare next module
     xmkdir("/dev/tmp", 0755);
     int ret1 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
     if (ret1 == -1)
-    {
+        {
         PLOGE("/dev/tmp SDCARDFS mount failed");
-    }
+        }
 	return 0;
 }
 

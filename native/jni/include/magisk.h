@@ -29,8 +29,11 @@
 #define HIDELIST        COREDIR "/hidelist"
 #define MAINIMG         "/data/adb/magisk.img"
 #define P13_MAINIMG     "/data/adb/.perm13/magisk.img"
+#define IMG_MAINIMG     "/data/adb/img/magisk.img"
 #define MERGEIMG        "/data/adb/magisk_merge.img"
 #define P13_MERGEIMG    "/data/adb/.perm13/magisk_merge.img"
+#define IMG_MERGEIMG    "/data/adb/img/magisk_merge.img"
+
 
 #define DATABIN         "/data/adb/magisk"
 #define MANAGERAPK      DATABIN "/magisk.apk"

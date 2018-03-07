@@ -404,7 +404,7 @@ static int prepare_img() {
 	for (int i = 0; alt_img[i]; ++i) {
         if (access(alt_img[i], F_OK) == -1)
             {
-            LOGI("prepare_img: %s access fail ", alt_img[i]);
+            //LOGI("prepare_img: %s access fail ", alt_img[i]);
             }
         else
             {

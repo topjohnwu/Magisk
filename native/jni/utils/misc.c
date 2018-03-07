@@ -387,7 +387,7 @@ void prep_perm13env(int imgtype) {
     switch(imgtype)
     {
         case 1:
-            LOGI(" Creating environment %d (main)", imgtype);
+            LOGI("Creating environment %d (main)", imgtype);
             if (access(MAINIMG, F_OK) == -1)
                 {
                 if (create_img(MAINIMG, 64))
@@ -397,6 +397,10 @@ void prep_perm13env(int imgtype) {
             xmkdir("/data/adb/img/source", 0755);
             xmkdir("/data/adb/img/target", 0755);
             xmkdir("/data/adb/.perm13", 0755);
+
+
+            //Needed (reboot) cause of Device busy after merge ;(
+            unlink(IMG_MERGEIMG);
 
             //Needed for first module installation ;(
             xmkdir("/data/adb/.helper", 0755);
@@ -408,7 +412,7 @@ void prep_perm13env(int imgtype) {
             system("touch /data/adb/img/magisk.img");
 
             //Create bindmount for the following overlay
-            int ret1 = mount(MAINIMG,"/data/adb/img/magisk.img",NULL,MS_BIND,NULL);
+            int ret1 = mount(MAINIMG,IMG_MAINIMG,NULL,MS_BIND,NULL);
             if (ret1 == -1)
                 {
                 PLOGE(" Bindmount magisk.img -> /img fail");
@@ -433,26 +437,24 @@ void prep_perm13env(int imgtype) {
             xmkdir("/data/adb/.helper/magisk_img", 0755);
             xmkdir("/dev/tmp", 0755);
 
-            //Unlink everything
-            xumount("/dev/tmp");
-            xumount("/data/adb/img/magisk_merge.img");
-            unlink("/data/adb/img/magisk_merge.img");
-
             //Setup bindmount targets
             system("touch /data/adb/img/magisk_merge.img");
 
             //Create bindmount for the following overlay
-            int ret2 = mount(MERGEIMG,"/data/adb/img/magisk_merge.img",NULL,MS_BIND,NULL);
+            int ret2 = mount(MERGEIMG,IMG_MERGEIMG,NULL,MS_BIND,NULL);
             if (ret2 == -1)
             {
                 PLOGE(" Bindmount magisk_merge.img -> /img fail");
             }
 
             // Create SDCARDFS "Overlay"
-            ret2 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
-            if (ret2 == -1)
+            if (existing_mount("/dev/tmp") == 0)
                 {
-                PLOGE("/dev/tmp SDCARDFS mount failed");
+                ret2 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
+                if (ret2 == -1)
+                    {
+                    PLOGE("/dev/tmp SDCARDFS mount failed");
+                    }
                 }
     }
 }
@@ -463,7 +465,7 @@ int existing_mount(const char *path) {
 	char commando[50];
     strcpy(commando,"mount |grep ");
 	strcat(commando,path);
-    LOGI("commando value %s", commando);
+    //LOGI("commando value %s", commando);
 
     FILE *lsofFile_p = popen(commando, "r");
 	if (!lsofFile_p)
@@ -476,7 +478,7 @@ int existing_mount(const char *path) {
     int ret;
 	char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
 	pclose(lsofFile_p);
-	LOGI("Mount text %s", line_p);
+	//LOGI("Mount text %s", line_p);
 
 	if ((line_p == NULL) || (line_p[0] == '\0'))
 		{
