@@ -14,11 +14,11 @@
     <string name="checking_for_updates">Comprobando actualizaciones…</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetyNet_check_text">Toque para empezar la comprobación de SafetyNet</string>
+    <string name="safetyNet_check_text">Toque para comprobar el estado de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
-    <string name="safetyNet_network_loss">Conexión de red perdida</string>
+    <string name="safetyNet_network_loss">Red no Disponible</string>
     <string name="safetyNet_service_disconnected">Se ha detenido el servicio</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
 
@@ -50,7 +50,7 @@
     <string name="update_available">Actualización disponible</string>
     <string name="installed">Instalado</string>
     <string name="not_installed">No Instalado</string>
-    <string name="updated_on">Actualizando en: %1$s</string>
+    <string name="updated_on">Actualizado el: %1$s</string>
     <string name="sorting_order">Orden de Clasificación</string>
     <string name="sort_by_name">Ordenar por nombre</string>
     <string name="sort_by_update">Ordenar según la última actualización</string>
