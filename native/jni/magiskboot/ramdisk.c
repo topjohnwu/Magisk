@@ -34,18 +34,22 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 
 #define STOCK_BOOT      0x0
 #define MAGISK_PATCH    0x1
-#define OTHER_PATCH     0x2
+#define HIGH_COMPRESS   0x2
+#define OTHER_PATCH     0x3
 
 static int cpio_test(struct vector *v) {
 	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
 	const char *MAGISK_LIST[] = { ".backup/.magisk", "init.magisk.rc", "overlay/init.magisk.rc", NULL };
 
 	for (int i = 0; OTHER_LIST[i]; ++i)
-		if (cpio_find(v, OTHER_LIST[i]) > 0)
+		if (cpio_find(v, OTHER_LIST[i]) >= 0)
 			return OTHER_PATCH;
 
+	if (cpio_find(v, "ramdisk.cpio.xz") >= 0)
+		return HIGH_COMPRESS;
+
 	for (int i = 0; MAGISK_LIST[i]; ++i)
-		if (cpio_find(v, MAGISK_LIST[i]) > 0)
+		if (cpio_find(v, MAGISK_LIST[i]) >= 0)
 			return MAGISK_PATCH;
 
 	return STOCK_BOOT;

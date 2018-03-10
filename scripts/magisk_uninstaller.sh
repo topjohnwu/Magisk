@@ -73,7 +73,7 @@ case $? in
     ui_print "- Stock boot image detected"
     abort "! Magisk is not installed!"
     ;;
-  1 )  # Magisk patched
+  1|2 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
@@ -89,7 +89,7 @@ case $? in
       flash_boot_image new-boot.img "$BOOTIMAGE"
     fi
     ;;
-  2 ) # Other patched
+  3 ) # Other patched
     ui_print "! Boot image patched by other programs"
     abort "! Cannot uninstall"
     ;;

@@ -91,9 +91,7 @@ case $? in
     abort "! Unable to unpack boot image"
     ;;
   2 )
-    ui_print "! Insufficient boot partition size detected"
     HIGHCOMP=true
-    ui_print "- Enable high compression mode"
     ;;
   3 )
     ui_print "- ChromeOS boot image detected"
@@ -114,6 +112,7 @@ esac
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print "- Checking ramdisk status"
+MAGISK_PATCHED=false
 ./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
@@ -125,17 +124,31 @@ case $? in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
-    ui_print "- Magisk patched image detected"
-    # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
-    ./magiskboot --cpio ramdisk.cpio restore
-    cp -af ramdisk.cpio ramdisk.cpio.orig
+    MAGISK_PATCHED=true
+    HIGHCOMP=false
     ;;
-  2 ) # Other patched
+  2 ) # High compression mode
+    MAGISK_PATCHED=true
+    HIGHCOMP=true
+    ;;
+  3 ) # Other patched
     ui_print "! Boot image patched by other programs"
     abort "! Please restore stock boot image"
     ;;
 esac
+
+if $MAGISK_PATCHED; then
+  ui_print "- Magisk patched image detected"
+  # Find SHA1 of stock boot image
+  [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+  ./magiskboot --cpio ramdisk.cpio restore
+  cp -af ramdisk.cpio ramdisk.cpio.orig
+fi
+
+if $HIGHCOMP; then
+  ui_print "! Insufficient boot partition size detected"
+  ui_print "- Enable high compression mode"
+fi
 
 ##########################################################################################
 # Ramdisk patches
