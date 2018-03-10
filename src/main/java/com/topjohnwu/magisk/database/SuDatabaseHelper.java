@@ -53,6 +53,7 @@ public class SuDatabaseHelper {
     private SuDatabaseHelper(MagiskManager mm) {
         pm = mm.getPackageManager();
         mDb = openDatabase(mm);
+        mDb.disableWriteAheadLogging();
         int version = mDb.getVersion();
         if (version < DATABASE_VER) {
             onUpgrade(mDb, version);
