@@ -2,6 +2,8 @@
 #include "sepolicy.h"
 
 void allowSuClient(char *target) {
+	if (!sepol_exists(target))
+		return;
 	sepol_allow(target, "rootfs", "file", ALL);
 	sepol_allow(target, "rootfs", "lnk_file", ALL);
 	sepol_allow(target, "su", "unix_stream_socket", "connectto");
@@ -140,10 +142,9 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app");
 	allowSuClient("system_app");
 	allowSuClient("platform_app");
-	if (sepol_exists("priv_app"))
-		allowSuClient("priv_app");
-	if (sepol_exists("untrusted_app_25"))
-		allowSuClient("untrusted_app_25");
+	allowSuClient("priv_app");
+	allowSuClient("untrusted_app_25");
+	allowSuClient("untrusted_app_27");
 
 	// Some superuser stuffs
 	suRights();
