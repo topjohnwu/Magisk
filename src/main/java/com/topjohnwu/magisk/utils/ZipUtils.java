@@ -49,21 +49,10 @@ public class ZipUtils {
         }
     }
 
-    public static void signZip(InputStream is, File output) throws Exception {
-        try (JarMap map = new JarMap(is, false)) {
-            signZip(map, output);
-        }
-    }
-
     public static void signZip(File input, File output) throws Exception {
-        try (JarMap map = new JarMap(input, false)) {
-            signZip(map, output);
-        }
-    }
-
-    public static void signZip(JarMap input, File output) throws Exception {
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
-            signZip(input, out);
+        try (JarMap map = new JarMap(input, false);
+             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
+            signZip(map, out);
         }
     }
 

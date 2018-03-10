@@ -159,9 +159,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (mm.magiskVersionCode >= 1440) {
                 if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                     hideManager.setOnPreferenceClickListener((pref) -> {
-                        Utils.runWithPermission(getActivity(),
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                () -> new HideManager(getActivity()).exec());
+                        new HideManager(getActivity()).exec();
                         return true;
                     });
                     generalCatagory.removePreference(restoreManager);
@@ -185,18 +183,6 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 }
             } else {
                 generalCatagory.removePreference(restoreManager);
-                generalCatagory.removePreference(hideManager);
-            }
-
-            if (mm.getPackageName().equals(Const.ORIG_PKG_NAME) && mm.magiskVersionCode >= 1440) {
-                hideManager.setOnPreferenceClickListener((pref) -> {
-                    Utils.runWithPermission(getActivity(),
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            () -> new HideManager(getActivity()).exec());
-                    return true;
-                });
-                generalCatagory.removePreference(restoreManager);
-            } else {
                 generalCatagory.removePreference(hideManager);
             }
 

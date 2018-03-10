@@ -11,9 +11,10 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.JarMap;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.util.jar.JarEntry;
@@ -104,8 +105,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         MagiskManager mm = MagiskManager.get();
 
         // Generate a new unhide app with random package name
-        File repack = new File(Const.EXTERNAL_PATH, "repack.apk");
-        repack.getParentFile().mkdirs();
+        SuFile repack = new SuFile("/data/local/tmp/repack.apk", true);
         String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
 
         try {
@@ -123,7 +123,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
             apk.getOutputStream(je).write(xml);
 
             // Sign the APK
-            ZipUtils.signZip(apk, repack);
+            ZipUtils.signZip(apk, new SuFileOutputStream(repack));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
