@@ -280,7 +280,7 @@ static int v_exec_command(int err, int *fd, void (*setupenv)(struct vector*), co
 	}
 
 	execvpe(argv0, (char **) vec_entry(&args), envp);
-	PLOGE("execvpe");
+	PLOGE("execvpe %s", argv0);
 	return -1;
 }
 
