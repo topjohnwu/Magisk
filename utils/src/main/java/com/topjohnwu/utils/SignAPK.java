@@ -494,6 +494,7 @@ public class SignAPK {
         outputStream.write(total_size & 0xff);
         outputStream.write((total_size >> 8) & 0xff);
         temp.writeTo(outputStream);
+        outputStream.close();
     }
     private static void signFile(Manifest manifest, JarMap inputJar,
                                  X509Certificate publicKey, PrivateKey privateKey,
