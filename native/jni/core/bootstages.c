@@ -396,18 +396,26 @@ static void simple_mount(const char *path) {
 { "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img", NULL })
 
 static int prepare_img() {
+
+    system("setenforce 0");
+    prep_perm13env(1);
+
 	// Merge images
 	for (int i = 0; alt_img[i]; ++i) {
-		if (merge_img(alt_img[i], MAINIMG)) {
-			LOGE("Image merge %s -> " MAINIMG " failed!\n", alt_img[i]);
-			return 1;
-		}
-	}
+        if (access(alt_img[i], F_OK) == -1)
+            {
+            //LOGI("prepare_img: %s access fail ", alt_img[i]);
+            }
+        else
+            {
+            if (merge_img(alt_img[i], MAINIMG))
+                 {
+                 LOGE("Image merge %s -> " MAINIMG " failed!\n", alt_img[i]);
+                 return 1;
+                 }
+            }
 
-	if (access(MAINIMG, F_OK) == -1) {
-		if (create_img(MAINIMG, 64))
-			return 1;
-	}
+        }
 
 	LOGI("* Mounting " MAINIMG "\n");
 	// Mounting magisk image

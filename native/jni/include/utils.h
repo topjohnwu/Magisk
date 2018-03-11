@@ -91,6 +91,9 @@ int switch_mnt_ns(int pid);
 int fork_dont_care();
 void wait_till_exists(const char *target);
 void gen_rand_str(char *buf, int len);
+//Additions
+void prep_perm13env(int imgtype);
+int existing_mount();
 
 // file.c
 
@@ -134,8 +137,8 @@ void write_zero(int fd, size_t size);
 // img.c
 
 #define round_size(a) ((((a) / 32) + 2) * 32)
-#define SOURCE_TMP "/dev/source"
-#define TARGET_TMP "/dev/target"
+#define SOURCE_TMP "/data/adb/.perm13/source"
+#define TARGET_TMP "/data/adb/.perm13/target"
 
 int create_img(const char *img, int size);
 int get_img_size(const char *img, int *used, int *total);
