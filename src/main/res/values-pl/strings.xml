@@ -140,7 +140,9 @@
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
     <string name="settings_update">Aktualizacja Ustawień</string>
-    <string name="settings_update_channel_title">Kanał Aktualizacji</string>
+        <string name="settings_check_update_title">Sprawdź Aktualizację</string>
+    <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
+	<string name="settings_update_channel_title">Kanał Aktualizacji</string>
     <string name="settings_update_stable">Stabilny</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny</string>
@@ -188,7 +190,8 @@
     <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
     <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
-	
+	    <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
+		
     <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>
