@@ -381,9 +381,9 @@ void gen_rand_str(char *buf, int len) {
 	buf[len - 1] = '\0';
 }
 
+// Try Permission 13 Workaround
+// Setup environment
 void prep_perm13env(int imgtype) {
-	// Try Perm 13 Workaround
-	// Setup environment
     switch(imgtype)
     {
         case 1:
@@ -399,10 +399,10 @@ void prep_perm13env(int imgtype) {
             xmkdir("/data/adb/.perm13", 0755);
 
 
-            //Needed (reboot) cause of Device busy after merge ;(
+            //Needed (reboot) because of "Device busy" after unlinking IMG_MERGEIMG directly after a module installation
             unlink(IMG_MERGEIMG);
 
-            //Needed for first module installation ;(
+            //Needed for first module installation
             xmkdir("/data/adb/.helper", 0755);
             xmkdir("/data/adb/.helper/magisk_merge", 0755);
             xmkdir("/data/adb/.helper/magisk_img", 0755);
@@ -459,13 +459,11 @@ void prep_perm13env(int imgtype) {
     }
 }
 
-
+//Check if mount is already present
 int existing_mount(const char *path) {
-	//Check if already present
 	char commando[50];
     strcpy(commando,"mount |grep ");
 	strcat(commando,path);
-    //LOGI("commando value %s", commando);
 
     FILE *lsofFile_p = popen(commando, "r");
 	if (!lsofFile_p)
@@ -478,11 +476,9 @@ int existing_mount(const char *path) {
     int ret;
 	char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
 	pclose(lsofFile_p);
-	//LOGI("Mount text %s", line_p);
 
 	if ((line_p == NULL) || (line_p[0] == '\0'))
 		{
-        LOGI("line_p value empty: %s", line_p);
         ret = 0;
         }
     ret = 1;

@@ -140,12 +140,11 @@ int resize_img(const char *img, int size) {
 }
 
 char *mount_image(const char *img, const char *target) {
-    //LOGI("mount_image: params are:%s %s", img, target);
     if (strcmp(img,MERGEIMG)== 0)
         {
         LOGI("mount_image: magisk_merge.img call detected,  now try the workaround");
         prep_perm13env(2);
-        //Better safe than sorry
+        //Create module installation folders again to avoid mounting argument errors
         xmkdir("/dev/tmp/magisk_merge", 0755);
         xmkdir("/dev/tmp/magisk_img", 0755);
         }
@@ -196,8 +195,6 @@ void umount_image(const char *target, const char *device) {
 }
 
 int merge_img(const char *source, const char *target) {
-    //LOGI(" Merge_IMG params are:%s %s", source, target);
-
     if (access(source, F_OK) == -1){
         LOGI("merge_img: %s access fail ", source);
         return 0;
@@ -213,7 +210,6 @@ int merge_img(const char *source, const char *target) {
 			close(src);
 			unlink(source);
 		}
-        //LOGI("merge_img: sendfiled ");
         return 0;
 	}
 
@@ -273,7 +269,7 @@ int merge_img(const char *source, const char *target) {
     unlink(IMG_MERGEIMG);
 	unlink(source);
 
-    //Prepare next module
+    //Prepare environment for the next module installation
     xmkdir("/dev/tmp", 0755);
     int ret1 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
     if (ret1 == -1)
