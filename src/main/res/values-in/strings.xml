@@ -185,6 +185,7 @@
     <string name="requester_summary">Sesi root akan mewarisi ruang nama pemintanya</string>
     <string name="isolate_summary">Setiap sesi root akan memiliki ruang nama tersendiri</string>
     <string name="android_o_not_support">Tidak mendukung Android 8.0+</string>
+    <string name="disable_fingerprint">Tidak ada sidik jari diatur atau tidak ada dukungan perangkat</string>
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan Superuser</string>
