@@ -1116,7 +1116,8 @@ static bool initialize_properties() {
     if (!initialize_properties_from_file("/system/etc/selinux/plat_property_contexts")) {
       return false;
     }
-    if (!initialize_properties_from_file("/vendor/etc/selinux/nonplat_property_contexts")) {
+    if (!initialize_properties_from_file("/vendor/etc/selinux/nonplat_property_contexts")
+            && !initialize_properties_from_file("/vendor/etc/selinux/vendor_property_contexts")) {
       return false;
     }
   } else {

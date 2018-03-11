@@ -58,11 +58,13 @@ int create_img(const char *img, int size) {
 	LOGI("Create %s with size %dM\n", img, size);
 	int ret;
 
-	char buffer[16];
-	snprintf(buffer, sizeof(buffer), "%dM", size);
-	ret = exec_command_sync("make_ext4fs", "-l", buffer, img, NULL);
-	if (ret < 0)
-		return 1;
+	char size_str[16];
+	snprintf(size_str, sizeof(size_str), "%dM", size);
+	ret = exec_command_sync("make_ext4fs", "-b", "4096", "-l", size_str, img, NULL);
+	if (ret < 0) {
+		// On Android P there is no make_ext4fs, use mke2fs
+		ret = exec_command_sync("mke2fs", "-b", "4096", "-t", "ext4", img, size_str, NULL);
+	}
 	return ret;
 }
 
