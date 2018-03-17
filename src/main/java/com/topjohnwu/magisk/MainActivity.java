@@ -190,22 +190,22 @@ public class MainActivity extends Activity
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
             case R.id.magisk:
-                displayFragment(new MagiskFragment(), "magisk", true);
+                displayFragment(new MagiskFragment(), true);
                 break;
             case R.id.superuser:
-                displayFragment(new SuperuserFragment(), "superuser", true);
+                displayFragment(new SuperuserFragment(), true);
                 break;
             case R.id.modules:
-                displayFragment(new ModulesFragment(), "modules", true);
+                displayFragment(new ModulesFragment(), true);
                 break;
             case R.id.downloads:
-                displayFragment(new ReposFragment(), "downloads", true);
+                displayFragment(new ReposFragment(), true);
                 break;
             case R.id.magiskhide:
-                displayFragment(new MagiskHideFragment(), Const.Key.MAGISKHIDE, true);
+                displayFragment(new MagiskHideFragment(), true);
                 break;
             case R.id.log:
-                displayFragment(new LogFragment(), "log", false);
+                displayFragment(new LogFragment(), false);
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -218,12 +218,13 @@ public class MainActivity extends Activity
         }
     }
 
-    private void displayFragment(@NonNull Fragment navFragment, String tag, boolean setElevation) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+    private void displayFragment(@NonNull Fragment navFragment, boolean setElevation) {
         supportInvalidateOptionsMenu();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        transaction.replace(R.id.content_frame, navFragment, tag).commitNow();
-        if (setElevation) toolbar.setElevation(toolbarElevation);
-        else toolbar.setElevation(0);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .replace(R.id.content_frame, navFragment)
+                .commitNow();
+        toolbar.setElevation(setElevation ? toolbarElevation : 0);
     }
 }
