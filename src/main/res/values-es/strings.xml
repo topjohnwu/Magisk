@@ -11,12 +11,12 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no está instalado</string>
-    <string name="checking_for_updates">Comprobando actualizaciones…</string>
+    <string name="checking_for_updates">Comprobando Actualizaciones…</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal de actualización inválido</string>
-    <string name="safetyNet_check_text">Toque para comprobar el estado de SafetyNet</string>
+    <string name="safetyNet_check_text">Comprobar el estado de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
-    <string name="safetyNet_check_success">La comprobación de SafetyNet fue exitosa</string>
+    <string name="safetyNet_check_success">La comprobación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_network_loss">Red no Disponible</string>
     <string name="safetyNet_service_disconnected">Se ha detenido el servicio</string>
@@ -29,13 +29,13 @@
     <string name="current_magisk_title">Versión instalada: %1$s</string>
     <string name="install_magisk_title">Última versión: %1$s</string>
     <string name="uninstall">Desinstalar</string>
-    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, encriptará los datos si los datos no están cifrados actualmente.</string>
+    <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Actualización %1$s</string>
     
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
-    <string name="no_modules_found">No se han encontrado módulos</string>
+    <string name="no_modules_found">No se encontraron módulos</string>
     <string name="update_file_created">El módulo se actualizará en el siguiente reinicio</string>
     <string name="remove_file_created">El módulo se eliminará en el siguiente reinicio</string>
     <string name="remove_file_deleted">El módulo no se eliminará en el siguiente reinicio</string>
@@ -47,7 +47,7 @@
     <string name="reboot_download">Reiniciar en Modo Download</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Actualización disponible</string>
+    <string name="update_available">Actualización Disponible</string>
     <string name="installed">Instalado</string>
     <string name="not_installed">No Instalado</string>
     <string name="updated_on">Actualizado el: %1$s</string>
@@ -84,7 +84,7 @@
     <string name="download">Descargar</string>
     <string name="download_file_error">Error descargando archivo</string>
     <string name="reboot">Reiniciar</string>
-    <string name="zip_process_msg">Procesando archivo zip …</string>
+    <string name="zip_process_msg">Procesando archivo zip…</string>
     <string name="downloading_toast">Descargando %1$s</string>
     <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
@@ -94,7 +94,7 @@
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Descargando</string>
-    <string name="zip_download_msg">Descargando el archivo zip (%1$d%%) …</string>
+    <string name="zip_download_msg">Descargando el archivo zip (%1$d%%)…</string>
     <string name="zip_process_title">Procesando</string>
     <string name="manager_update_title">Nueva actualización de Magisk Manager disponible!</string>
     <string name="manager_download_install">Pulse para descargar e instalar</string>
@@ -102,8 +102,8 @@
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
     <string name="magisk_updates">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
-    <string name="hide_manager_toast">Ocultando Magisk Manager...</string>
-    <string name="hide_manager_toast2">Esto podría tomar un tiempo...</string>
+    <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
+    <string name="hide_manager_toast2">Esto podría tomar un tiempo…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
     <string name="patch_boot_file">Parcheo de la imagen boot</string>
@@ -147,10 +147,10 @@
     <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
     <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
     
-    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y archivo hosts fuera de la partición de sistema seguirán habilitados</string>
+    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y Systemless Hosts seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
-    <string name="settings_hosts_title">Habilitar Systemless Hosts</string>
-    <string name="settings_hosts_summary">Soporte para aplicaciones de bloqueo de publicidad fuera de la partición de sistema</string>
+    <string name="settings_hosts_title">Systemless Hosts</string>
+    <string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
 
     <string name="settings_su_app_adb">Aplicaciones y ADB</string>
     <string name="settings_su_app">Sólo aplicaciones</string>
