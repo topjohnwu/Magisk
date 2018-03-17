@@ -159,8 +159,8 @@ public class MagiskFragment extends Fragment
 
         safetyNetStatusText.setText(R.string.safetyNet_check_text);
 
-        mm.safetyNetDone.hasPublished = false;
-        mm.updateCheckDone.hasPublished = false;
+        mm.safetyNetDone.reset();
+        mm.updateCheckDone.reset();
         mm.remoteMagiskVersionString = null;
         mm.remoteMagiskVersionCode = -1;
         collapse();
@@ -176,11 +176,11 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onTopicPublished(Topic topic, Object result) {
+    public void onTopicPublished(Topic topic) {
         if (topic == mm.updateCheckDone) {
             updateCheckUI();
         } else if (topic == mm.safetyNetDone) {
-            updateSafetyNetUI((int) result);
+            updateSafetyNetUI((int) topic.getResults()[0]);
         }
     }
 

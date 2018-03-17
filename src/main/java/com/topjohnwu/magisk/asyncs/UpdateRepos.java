@@ -42,7 +42,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         MagiskManager mm = MagiskManager.get();
         prefs = mm.prefs;
         repoDB = mm.repoDB;
-        mm.repoLoadDone.hasPublished = false;
+        mm.repoLoadDone.reset();
         // Legacy data cleanup
         File old = new File(mm.getApplicationInfo().dataDir + "/shared_prefs", "RepoMap.xml");
         if (old.exists() || prefs.getString("repomap", null) != null) {
@@ -158,6 +158,11 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     protected void onProgressUpdate(Void... values) {
         if (ReposFragment.adapter != null)
             ReposFragment.adapter.notifyDBChanged();
+    }
+
+    @Override
+    protected void onPreExecute() {
+        MagiskManager.get().repoLoadDone.setPending();
     }
 
     @Override

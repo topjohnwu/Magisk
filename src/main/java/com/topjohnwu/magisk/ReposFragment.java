@@ -27,6 +27,7 @@ import butterknife.Unbinder;
 public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
+    private MagiskManager mm;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -44,8 +45,9 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
+        mm = getApplication();
 
-        mSwipeRefreshLayout.setRefreshing(true);
+        mSwipeRefreshLayout.setRefreshing(mm.repoLoadDone.isPending());
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.VISIBLE);
@@ -60,7 +62,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     @Override
     public void onResume() {
-        adapter = new ReposAdapter(getApplication().repoDB, getApplication().moduleMap);
+        adapter = new ReposAdapter(mm.repoDB, mm.moduleMap);
         recyclerView.setAdapter(adapter);
         super.onResume();
     }
@@ -72,7 +74,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic, Object result) {
+    public void onTopicPublished(Topic topic) {
         mSwipeRefreshLayout.setRefreshing(false);
         recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
         emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
@@ -80,7 +82,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     @Override
     public Topic[] getSubscription() {
-        return new Topic[] { getApplication().repoLoadDone };
+        return new Topic[] { mm.repoLoadDone };
     }
 
     @Override
@@ -103,7 +105,6 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        MagiskManager mm = getApplication();
         if (item.getItemId() == R.id.repo_sort) {
             new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.sorting_order)
