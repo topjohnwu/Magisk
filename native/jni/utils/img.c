@@ -17,7 +17,7 @@ static int e2fsck(const char *img) {
 	// Check and repair ext4 image
 	char buffer[128];
 	int pid, fd = -1;
-	pid = exec_command(1, &fd, NULL, "e2fsck", "-yf", img, NULL);
+	pid = exec_command(1, &fd, NULL, "/system/bin/e2fsck", "-yf", img, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
@@ -60,10 +60,10 @@ int create_img(const char *img, int size) {
 
 	char size_str[16];
 	snprintf(size_str, sizeof(size_str), "%dM", size);
-	ret = exec_command_sync("make_ext4fs", "-b", "4096", "-l", size_str, img, NULL);
+	ret = exec_command_sync("/system/bin/make_ext4fs", "-b", "4096", "-l", size_str, img, NULL);
 	if (ret < 0) {
 		// On Android P there is no make_ext4fs, use mke2fs
-		ret = exec_command_sync("mke2fs", "-b", "4096", "-t", "ext4", img, size_str, NULL);
+		ret = exec_command_sync("/system/bin/mke2fs", "-b", "4096", "-t", "ext4", img, size_str, NULL);
 	}
 	return ret;
 }
@@ -73,7 +73,7 @@ int get_img_size(const char *img, int *used, int *total) {
 		return 1;
 	char buffer[PATH_MAX];
 	int pid, fd = -1, status = 1;
-	pid = exec_command(1, &fd, NULL, "e2fsck", "-n", img, NULL);
+	pid = exec_command(1, &fd, NULL, "/system/bin/e2fsck", "-n", img, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd)) {
@@ -105,7 +105,7 @@ int resize_img(const char *img, int size) {
 	char buffer[128];
 	int pid, fd = -1, used, total;
 	snprintf(buffer, sizeof(buffer), "%dM", size);
-	pid = exec_command(1, &fd, NULL, "resize2fs", img, buffer, NULL);
+	pid = exec_command(1, &fd, NULL, "/system/bin/resize2fs", img, buffer, NULL);
 	if (pid < 0)
 		return 1;
 	while (fdgets(buffer, sizeof(buffer), fd))
