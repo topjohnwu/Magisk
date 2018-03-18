@@ -188,7 +188,7 @@
     <string name="requester_summary">Root sesijos paveldi jos išprašytojo/s vardų sritį</string>
     <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
     <string name="android_o_not_support">Negalima įrenginiams naudojantiems Android 8.0+</string>
-    <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo/string>
+    <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo</string>
     
     <!--Superuser-->
     <string name="su_request_title">Supervartotojo prašymas</string>
