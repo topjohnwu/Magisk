@@ -1,3 +1,2 @@
-### v5.6.2
-- Cleanup folders if installation failed
-- Add support for Android P
+### v5.6.3
+- Fix repo loading UI logic
