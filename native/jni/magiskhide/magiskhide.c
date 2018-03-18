@@ -54,6 +54,9 @@ void launch_magiskhide(int client) {
 			write_int(client, LOGD_DISABLED);
 			close(client);
 		}
+		setprop(MAGISKHIDE_PROP, "0");
+		// Remove without actually removing persist props
+		deleteprop2(MAGISKHIDE_PROP, 0);
 		return;
 	}
 
