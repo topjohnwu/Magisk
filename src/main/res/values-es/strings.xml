@@ -167,8 +167,8 @@
     <string name="request_timeout_summary">%1$s segundos</string>
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
-    <string name="settings_su_fingerprint_title">Habilitar autenticación de Huella Dactilar</string>
-    <string name="settings_su_fingerprint_summary">Utilice el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
+    <string name="settings_su_fingerprint_title">Autenticación por Huella Dactilar</string>
+    <string name="settings_su_fingerprint_summary">Utilizar el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
  
     
     <string name="multiuser_mode">Modo MultiUsuario</string> 
