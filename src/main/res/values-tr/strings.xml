@@ -137,14 +137,14 @@
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_update">Güncelleme Ayarları</string>
     <string name="settings_check_update_title">Güncellemeleri denetle</string>
-    <string name="settings_check_update_summary">Arka planda düzenli olarak güncellemeleri denetle</string>
+    <string name="settings_check_update_summary">Düzenli aralıklarla arka planda güncellemeleri denetle</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
     <string name="settings_update_stable">Kararlı</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
     <string name="settings_update_custom_msg">Özel bir URL ekleyin</string>
     <string name="settings_boot_format_title">Yamalı Önyükleme Formatı</string>
-    <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/indirme modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
+    <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/download modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
     <string name="settings_core_only_title">Magisk Sadece Çekirdek Modu</string>
     <string name="settings_core_only_summary">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
