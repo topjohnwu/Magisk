@@ -19,7 +19,14 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "https://jitpack.io" }
     }
+}
+
+ext {
+    compileSdkVersion = 27
+    buildToolsVersion = "27.0.3"
+    supportLibVersion = "27.1.0"
 }
 
 task clean(type: Delete) {
