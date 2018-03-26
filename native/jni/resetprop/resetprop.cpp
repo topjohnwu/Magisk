@@ -2,52 +2,6 @@
  *
  * Copyright 2016 nkk71     <nkk71x@gmail.com>
  * Copyright 2016 topjohnwu <topjohnwu@gmail.com>
- *
- * Info:
- *
- * all changes are in
- *
- * bionic/libc/bionic/system_properties.cpp
- *
- * Functions that need to be patched/added in system_properties.cpp
- *
- * int __system_properties_init2()
- *     on android 7, first tear down the everything then let it initialize again:
- *         if (initialized) {
- *             //list_foreach(contexts, [](context_node* l) { l->reset_access(); });
- *             //return 0;
- *             free_and_unmap_contexts();
- *             initialized = false;
- *         }
- *
- *
- * static prop_area* map_prop_area(const char* filename, bool is_legacy)
- *     we dont want this read only so change: 'O_RDONLY' to 'O_RDWR'
- *
- * static prop_area* map_fd_ro(const int fd)
- *     we dont want this read only so change: 'PROT_READ' to 'PROT_READ | PROT_WRITE'
- *
- *
- * Copy the code of prop_info *prop_area::find_property, and modify to delete props
- * const prop_info *prop_area::find_property_and_del(prop_bt *const trie, const char *name)
- * {
- *    ...
- *    ...  Do not alloc a new prop_bt here, remove all code involve alloc_if_needed
- *    ...
- *
- *     if (prop_offset != 0) {
- *         atomic_store_explicit(&current->prop, 0, memory_order_release); // Add this line to nullify the prop entry
- *         return to_prop_info(&current->prop);
- *     } else {
- *
- *    ....
- * }
- *
- *
- * by patching just those functions directly, all other functions should be ok
- * as is.
- *
- *
  */
 
 #include <stdio.h>

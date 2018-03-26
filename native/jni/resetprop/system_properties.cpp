@@ -153,7 +153,7 @@ class prop_area {
   }
 
   const prop_info* find(const char* name);
-  bool del(const char *name);               // resetprop add
+  bool del(const char *name);  /* resetprop add */
   bool add(const char* name, unsigned int namelen, const char* value, unsigned int valuelen);
 
   bool foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
@@ -184,7 +184,7 @@ class prop_area {
   const prop_info* find_property(prop_bt* const trie, const char* name, uint32_t namelen,
                                  const char* value, uint32_t valuelen, bool alloc_if_needed);
 
-  bool find_property_and_del(prop_bt *const trie, const char *name);    // resetprop add
+  bool find_property_and_del(prop_bt *const trie, const char *name);  /* resetprop add */
 
   bool foreach_property(prop_bt* const trie, void (*propfn)(const prop_info* pi, void* cookie),
                         void* cookie);
@@ -283,7 +283,8 @@ static prop_area* map_prop_area_rw(const char* filename, const char* context,
   return pa;
 }
 
-static prop_area* map_fd_ro(const int fd) {
+// resetprop: map the memory as rw
+static prop_area* map_fd_rw(const int fd) {
   struct stat fd_stat;
   if (fstat(fd, &fd_stat) < 0) {
     return nullptr;
@@ -298,7 +299,7 @@ static prop_area* map_fd_ro(const int fd) {
   pa_size = fd_stat.st_size;
   pa_data_size = pa_size - sizeof(prop_area);
 
-  void* const map_result = mmap(nullptr, pa_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);  // resetprop: add PROT_WRITE
+  void* const map_result = mmap(nullptr, pa_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);  /* resetprop: add PROT_WRITE */
   if (map_result == MAP_FAILED) {
     return nullptr;
   }
@@ -313,10 +314,10 @@ static prop_area* map_fd_ro(const int fd) {
 }
 
 static prop_area* map_prop_area(const char* filename) {
-  int fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);       // resetprop: O_RDONLY -> O_RDWR
+  int fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);  /* resetprop: O_RDONLY -> O_RDWR */
   if (fd == -1) return nullptr;
 
-  prop_area* map_result = map_fd_ro(fd);
+  prop_area* map_result = map_fd_rw(fd);
   close(fd);
 
   return map_result;
@@ -530,7 +531,7 @@ bool prop_area::find_property_and_del(prop_bt* const trie, const char* name) {
 
   uint_least32_t prop_offset = atomic_load_explicit(&current->prop, memory_order_relaxed);
   if (prop_offset != 0) {
-    atomic_store_explicit(&current->prop, 0, memory_order_release);     // resetprop: nullify the offset to delete the prop
+    atomic_store_explicit(&current->prop, 0, memory_order_release);
     return true;
   } else {
     return false;
@@ -1116,17 +1117,16 @@ static bool initialize_properties() {
     if (!initialize_properties_from_file("/system/etc/selinux/plat_property_contexts")) {
       return false;
     }
-    if (!initialize_properties_from_file("/vendor/etc/selinux/nonplat_property_contexts")
-            && !initialize_properties_from_file("/vendor/etc/selinux/vendor_property_contexts")) {
-      return false;
-    }
+    // Don't check for failure here, so we always have a sane list of properties.
+    // E.g. In case of recovery, the vendor partition will not have mounted and we
+    // still need the system / platform properties to function.
+    initialize_properties_from_file("/vendor/etc/selinux/nonplat_property_contexts") ||
+            initialize_properties_from_file("/vendor/etc/selinux/vendor_property_contexts");
   } else {
     if (!initialize_properties_from_file("/plat_property_contexts")) {
       return false;
     }
-    if (!initialize_properties_from_file("/nonplat_property_contexts")) {
-      return false;
-    }
+    initialize_properties_from_file("/nonplat_property_contexts");
   }
 
   return true;
