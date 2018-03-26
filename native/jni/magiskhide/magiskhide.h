@@ -4,7 +4,6 @@
 #include <pthread.h>
 
 #define TERM_THREAD SIGUSR1
-#define HIDE_DONE   SIGUSR2
 
 // Kill process
 void kill_proc(int pid);

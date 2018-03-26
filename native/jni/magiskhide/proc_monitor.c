@@ -20,7 +20,7 @@
 #include "magiskhide.h"
 
 static char init_ns[32], zygote_ns[2][32], cache_block[256];
-static int hide_queue = 0, zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
+static int zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int sig) {
@@ -36,17 +36,6 @@ static void term_thread(int sig) {
 	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
 	pthread_exit(NULL);
-}
-
-static void hide_done(int sig) {
-	--hide_queue;
-	if (hide_queue == 0) {
-		xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-		xsymlink(DATABIN, "/data/magisk");
-		xsymlink(MAINIMG, "/data/magisk.img");
-		xsymlink(MOUNTPOINT, "/magisk");
-		xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-	}
 }
 
 static int read_namespace(const int pid, char* target, const size_t size) {
@@ -140,9 +129,6 @@ exit:
 	kill(pid, SIGCONT);
 	// Free up memory
 	vec_destroy(&mount_list);
-	// Wait a while and link it back
-	sleep(10);
-	kill(ppid, HIDE_DONE);
 	_exit(0);
 }
 
@@ -151,7 +137,6 @@ void proc_monitor() {
 	sigset_t block_set;
 	sigemptyset(&block_set);
 	sigaddset(&block_set, TERM_THREAD);
-	sigaddset(&block_set, HIDE_DONE);
 	pthread_sigmask(SIG_UNBLOCK, &block_set, NULL);
 
 	// Register the cancel signal
@@ -159,8 +144,6 @@ void proc_monitor() {
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = term_thread;
 	sigaction(TERM_THREAD, &act, NULL);
-	act.sa_handler = hide_done;
-	sigaction(HIDE_DONE, &act, NULL);
 
 	cache_block[0] = '\0';
 
@@ -240,14 +223,6 @@ void proc_monitor() {
 				if (kill(pid, SIGSTOP) == -1) continue;
 
 				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
-
-				xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-				unlink("/magisk");
-				unlink("/data/magisk");
-				unlink("/data/magisk.img");
-				unlink(MAGISKRC);
-				xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-				++hide_queue;
 
 				/*
 				 * The setns system call do not support multithread processes

@@ -127,6 +127,7 @@ void daemon_init() {
 	rm_rf("/data/magisk");
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
+	xmkdir("/data/adb", 0700);
 	chmod("/data/adb", 0700);
 
 	LOGI("* Creating /sbin overlay");
@@ -177,11 +178,6 @@ void daemon_init() {
 	}
 
 	close(root);
-
-	// Backward compatibility
-	xsymlink(DATABIN, "/data/magisk");
-	xsymlink(MAINIMG, "/data/magisk.img");
-	xsymlink(MOUNTPOINT, "/magisk");
 
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
