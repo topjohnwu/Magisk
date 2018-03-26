@@ -168,7 +168,7 @@ int parse_img(const char *image, boot_img *boot) {
 
 			if (pos < boot->map_size) {
 				boot->tail = head + pos;
-				boot->tail_size = boot->map_size - pos;
+				boot->tail_size = boot->map_size - (boot->tail - boot->map_addr);
 			}
 
 			// Check tail info, currently only for LG Bump and Samsung SEANDROIDENFORCE
