@@ -4,7 +4,7 @@
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Superutilisateur</string>
     <string name="log">Journal</string>
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
@@ -160,10 +160,10 @@
     <string name="settings_su_request_20">20 secondes</string>
     <string name="settings_su_request_30">30 secondes</string>
     <string name="settings_su_request_60">60 secondes</string>
-    <string name="superuser_access">Accès Superuser</string>
+    <string name="superuser_access">Accès Superulisateur</string>
     <string name="auto_response">Réponse automatique</string>
     <string name="request_timeout">Délai de requête</string>
-    <string name="superuser_notification">Notification Superuser</string>
+    <string name="superuser_notification">Notification Superutilisateur</string>
     <string name="request_timeout_summary">%1$s secondes</string>
     <string name="settings_su_reauth_title">Ré-authentifier après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Réauthentifier les autorisations de superutilisateur après une mise à niveau d\'application</string>
@@ -190,7 +190,7 @@
     <string name="disable_fingerprint">Aucune empreinte digitale n\'a été définie ou aucun support de périphérique</string>
 
 <!--Superuser-->
-    <string name="su_request_title">Requête Superuser</string>
+    <string name="su_request_title">Requête Superutilisateur</string>
     <string name="deny_with_str">Refuser%1$s</string>
     <string name="deny">Refuser</string>
     <string name="prompt">Demander</string>
@@ -202,11 +202,11 @@
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">%1$s a obtenu les droits Superuser</string>
-    <string name="su_deny_toast">%1$s n\'a pas obtenu les droits Superuser</string>
+    <string name="su_allow_toast">%1$s a obtenu les droits Superutilisateur</string>
+    <string name="su_deny_toast">%1$s n\'a pas obtenu les droits Superutilisateur</string>
     <string name="no_apps_found">Aucune application trouvée</string>
-    <string name="su_snack_grant">Les droits Superuser de %1$s sont accordés</string>
-    <string name="su_snack_deny">Les droits Superuser de %1$s sont refusés</string>
+    <string name="su_snack_grant">Les droits Superutilisateur de %1$s sont accordés</string>
+    <string name="su_snack_deny">Les droits Superutilisateur de %1$s sont refusés</string>
     <string name="su_snack_notif_on">Les notifications pour %1$s sont activées</string>
     <string name="su_snack_notif_off">Les notifications pour %1$s sont désactivées</string>
     <string name="su_snack_log_on">La journalisation pour %1$s est activée</string>
