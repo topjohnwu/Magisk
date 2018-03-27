@@ -30,7 +30,7 @@
     <string name="install_magisk_title">Najnovija inačica: %1$s</string>
     <string name="uninstall">Deinstaliraj</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
-    <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati vaše podatke, ukoliko vaši podaci trenutačno nisu šifrirani</string>
+    <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati Vaše podatke, ukoliko Vaši podaci trenutačno nisu šifrirani</string>
     <string name="update">Ažuriraj %1$s</string>
 
     <!--Module Fragment-->
@@ -54,7 +54,7 @@
     <string name="menuClearLog">Očisti zapisnik sada</string>
     <string name="logs_cleared">Zapisnik je uspješno izbrisan</string>
     <string name="log_is_empty">Zapisnik je prazan</string>
-    <string name="logs_save_failed">Nije moguće napisati zapisnik na SD karticu:</string>
+    <string name="logs_save_failed">Nije moguće spremiti zapisnik na SD karticu:</string>
 
     <!--About Activity-->
     <string name="about">O aplikaciji</string>
@@ -73,7 +73,7 @@
     <string name="ok">OK</string>
     <string name="close">Zatvori</string>
     <string name="repo_install_title">Instaliraj %1$s</string>
-    <string name="repo_install_msg">Da li želiš instalirati %1$s sada?</string>
+    <string name="repo_install_msg">Da li želite instalirati %1$s sada?</string>
     <string name="download">Preuzmi</string>
     <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
     <string name="reboot">Ponovno podizanje sustava</string>
@@ -134,7 +134,7 @@
     <string name="settings_hosts_title">Systemless hostovi</string>
     <string name="settings_hosts_summary">Systemless hostovi podržavaju Adblock aplikacije</string>
 
-    <string name="settings_su_app_adb">Aplikacije and ADB</string>
+    <string name="settings_su_app_adb">Aplikacije i ADB</string>
     <string name="settings_su_app">Samo aplikacije</string>
     <string name="settings_su_adb">Samo ADB</string>
     <string name="settings_su_disable">Onemogućeno</string>
@@ -161,10 +161,10 @@
 
     <string name="mount_namespace_mode">Postavljanje imenskog prostora</string>
     <string name="settings_ns_global">Globalni imenski prostor</string>
-    <string name="settings_ns_requester">Naslijedit imenski prostor</string>
+    <string name="settings_ns_requester">Naslijediti imenski prostor</string>
     <string name="settings_ns_isolate">Izolirani imenski prostor</string>
     <string name="global_summary">Sve root sesije koriste globalni imenski prostor</string>
-    <string name="requester_summary">Root sesije će nasljediti imenski prostor tražitelja</string>
+    <string name="requester_summary">Root sesije će naslijediti imenski prostor tražitelja</string>
     <string name="isolate_summary">Svaka root sesija ima svoj vlastiti imenski prostor</string>
 
     <!--Superuser-->
@@ -173,7 +173,7 @@
     <string name="deny">Odbij</string>
     <string name="prompt">Upitaj</string>
     <string name="grant">Odobri</string>
-    <string name="su_warning">Omogućuje potpuni pristup vašem uređaju.\nOdbijte ako niste sigurni!</string>
+    <string name="su_warning">Omogućuje potpuni pristup Vašem uređaju.\nOdbijte ako niste sigurni!</string>
     <string name="forever">Zauvijek</string>
     <string name="once">Jednom</string>
     <string name="tenmin">10 min</string>
