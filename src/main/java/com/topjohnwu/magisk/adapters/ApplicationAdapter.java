@@ -65,30 +65,17 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.appName.setText(info.loadLabel(pm));
         holder.appPackage.setText(info.packageName);
 
-        // Remove all listeners
-        holder.itemView.setOnClickListener(null);
         holder.checkBox.setOnCheckedChangeListener(null);
-
-        if (Const.SN_DEFAULTLIST.contains(info.packageName)) {
-            holder.checkBox.setChecked(true);
-            holder.checkBox.setEnabled(false);
-            holder.itemView.setOnClickListener(v ->
-                SnackbarMaker.make(holder.itemView,
-                        R.string.safetyNet_hide_notice, Snackbar.LENGTH_LONG).show()
-            );
-        } else {
-            holder.checkBox.setEnabled(true);
-            holder.checkBox.setChecked(mHideList.contains(info.packageName));
-            holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
-                if (isChecked) {
-                    Shell.Async.su("magiskhide --add " + info.packageName);
-                    mHideList.add(info.packageName);
-                } else {
-                    Shell.Async.su("magiskhide --rm " + info.packageName);
-                    mHideList.remove(info.packageName);
-                }
-            });
-        }
+        holder.checkBox.setChecked(mHideList.contains(info.packageName));
+        holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
+            if (isChecked) {
+                Shell.Async.su("magiskhide --add " + info.packageName);
+                mHideList.add(info.packageName);
+            } else {
+                Shell.Async.su("magiskhide --rm " + info.packageName);
+                mHideList.remove(info.packageName);
+            }
+        });
     }
 
     @Override

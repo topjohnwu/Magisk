@@ -64,13 +64,6 @@ public class Const {
             "com.google.android.gms"
     );
 
-    /* A list of apps that already uses SafetyNet
-     * They DO NOT need to be added to hide list */
-    public static final List<String> SN_DEFAULTLIST =  Arrays.asList(
-            "com.google.android.apps.walletnfcrel",
-            "com.nianticlabs.pokemongo"
-    );
-
     public static final int USER_ID = Process.myUid() / 100000;
 
     public static class ID {
