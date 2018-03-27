@@ -33,7 +33,9 @@ public abstract class Activity extends AppCompatActivity {
     }
 
     @StyleRes
-    abstract public int getDarkTheme();
+    public int getDarkTheme() {
+        return -1;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public abstract class Activity extends AppCompatActivity {
         if (this instanceof Topic.Subscriber) {
             ((Topic.Subscriber) this).subscribeTopics();
         }
-        if (getMagiskManager().isDarkTheme && getDarkTheme() > 0) {
+        if (getMagiskManager().isDarkTheme && getDarkTheme() != -1) {
             setTheme(getDarkTheme());
         }
     }

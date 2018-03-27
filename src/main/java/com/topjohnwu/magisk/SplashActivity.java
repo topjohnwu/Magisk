@@ -18,11 +18,6 @@ import com.topjohnwu.superuser.Shell;
 public class SplashActivity extends Activity {
 
     @Override
-    public int getDarkTheme() {
-        return -1;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
