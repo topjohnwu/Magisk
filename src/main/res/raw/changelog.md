@@ -1,2 +1,2 @@
-### v5.6.3
-- Fix repo loading UI logic
+### v5.6.4
+- Remove the blacklisted apps using SafetyNet (e.g. Pokemon GO)
