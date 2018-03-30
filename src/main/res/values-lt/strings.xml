@@ -3,11 +3,11 @@
     
     <!--Welcome Activity-->
     <string name="modules">Papildiniai</string>
-    <string name="downloads">Atsisiuntimai</string>
+    <string name="downloads">Papildinių parduotuvė</string>
     <string name="superuser">Supervartotojas</string>
-    <string name="log">Surašymai</string>
+    <string name="log">Įvykių sąrašas</string>
     <string name="settings">Nustatymai</string>
-    <string name="install">Instaliuoti</string>
+    <string name="install">Instaliuo-ti</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yra neinstaliuotas</string>
@@ -20,7 +20,7 @@
     <string name="safetyNet_api_error">SafetyNet API Klaida</string>
     <string name="safetyNet_network_loss">Nėra prieigos prie interneto</string>
     <string name="safetyNet_service_disconnected">Paslauga atjungta</string>
-    <string name="safetyNet_res_invalid">Gautas neteisingas atsakas</string>
+    <string name="safetyNet_res_invalid">Gautas neteisingas atsakymas</string>
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Išplėstiniai nustatymai</string>
@@ -30,7 +30,7 @@
     <string name="install_magisk_title">Naujausia versija: %1$s</string>
     <string name="uninstall">Pašalinti</string>
     <string name="uninstall_magisk_title">Pašalinti Magisk</string>
-    <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Jei duomenys nėra užšifruoti, yra galimybė, kad jie taps užšifruotais..</string>
+    <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Yra galimybė, kad duomenys bus užšifruoti...</string>
     <string name="update">Atnaujinti %1$s</string>
 
     <!--Module Fragment-->
@@ -39,7 +39,7 @@
     <string name="update_file_created">Perkrovus sistemą papildinys bus atnaujintas</string>
     <string name="remove_file_created">Perkrovus sistemą papildinys bus panaikintas</string>
     <string name="remove_file_deleted">Perkrovus sistemą papildinys nebus panaikintas</string>
-    <string name="disable_file_created">Perkrovus sistemą papildinys bus išjungtas, bet ne panaikintas</string>
+    <string name="disable_file_created">Perkrovus sistemą papildinys bus išjungtas, tačiau nepanaikintas</string>
     <string name="disable_file_removed">Perkrovus sistemą papildinys bus įjungtas</string>
     <string name="author">Sukūrė %1$s</string>
     <string name="reboot_recovery">Perkrauti į Recovery</string>
@@ -49,19 +49,19 @@
     <!--Repo Fragment-->
     <string name="update_available">Galimas atnaujinimas</string>
     <string name="installed">Instaliuota</string>
-    <string name="not_installed">Ne instaliuota</string>
+    <string name="not_installed">Neinstaliuota</string>
     <string name="updated_on">Atnaujinta: %1$s</string>
     <string name="sorting_order">Išdėliojimo tvarka</string>
     <string name="sort_by_name">Išdėlioti pagal pavadinimą (A-Z)</string>
     <string name="sort_by_update">Išdėlioti pagal atnaujinimo datą (Naujausi-Seniausi)</string>
     
     <!--Log Fragment-->
-    <string name="menuSaveLog">Išsaugoti surašymus</string>
-    <string name="menuReload">Iš naujo</string>
-    <string name="menuClearLog">Išvalyti surašymus</string>
-    <string name="logs_cleared">Surašymai pašalinti</string>
-    <string name="log_is_empty">Surašymų nėra</string>
-    <string name="logs_save_failed">Nesugebėjome įrašyti surašymų į SD kortelę:</string>
+    <string name="menuSaveLog">Išsaugoti įvykių sąrašą</string>
+    <string name="menuReload">Įvykių sąrašo atnaujinmas</string>
+    <string name="menuClearLog">Išvalyti įvykių sąrašą</string>
+    <string name="logs_cleared">Įvykių sąrašas pašalintas</string>
+    <string name="log_is_empty">Įvykių sąrašas tuščias</string>
+    <string name="logs_save_failed">Įvykių sąrašo įrašymas į SD kortelę nesėkmingas:</string>
 
     <!--About Activity-->
     <string name="about">Apie</string>
@@ -75,13 +75,13 @@
     <string name="support_thread">Mūsų XDA puslapis</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Ši įpatybė neveiks be prieigos prie saugyklos.</string>
+    <string name="permissionNotGranted">Ši funkija neveiks be prieigos prie saugyklos.</string>
     <string name="no_thanks">Ačiū, nereikia</string>
     <string name="yes">Taip</string>
     <string name="ok">Gerai</string>
     <string name="close">Uždaryti</string>
     <string name="repo_install_title">Instaliuoti %1$s</string>
-    <string name="repo_install_msg">Ar jūs norite dabar instaliuoti %1$s?</string>
+    <string name="repo_install_msg">Ar jūs norite instaliuoti %1$s?</string>
     <string name="download">Atsisiųsti</string>
     <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
     <string name="reboot">Perkrauti</string>
@@ -94,7 +94,7 @@
     <string name="process_error">Proceso klaida</string>
     <string name="internal_storage">Zip failas yra saugomas:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Atsisiunčiama</string>
-    <string name="zip_download_msg">Atsiunčiamas zip failas(%1$d%%) …</string>
+    <string name="zip_download_msg">Atsiunčiamas zip failas(%1$d%%)…</string>
     <string name="zip_process_title">Vyksta procesas</string>
     <string name="zip_process_msg">Zip failas apdorojamas…</string>
     <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
@@ -121,14 +121,14 @@
     <string name="uninstall_toast">Magisk Manager bus pašalintas po 5 sekundžių, pašalinus perkraukite telefoną.</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
-    <string name="su_db_corrupt">SU duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
+    <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>
     <string name="settings_dark_theme_title">Tamsi tema</string>
     <string name="settings_dark_theme_summary">Įjungti tamsią temą</string>
-    <string name="settings_notification_title">Pranešimai atsiradus atnaujinimui</string>
-    <string name="settings_notification_summary">Parodyti pranešmus atsiradus naujai versijai</string>
+    <string name="settings_notification_title">Pranešti atsiradus atnaujinimui</string>
+    <string name="settings_notification_summary">Parodyti pranešmus atsiradus naujai Magisk ar Magisk Manager versijai</string>
     <string name="settings_clear_cache_title">Išvalyti nereikalingus saugyklos failus</string>
     <string name="settings_clear_cache_summary">Išvalyti patalpintą informaciją talpykloms internete, priverčia perkrauti interneto jungtį</string>
     <string name="settings_hide_manager_title">Paslėpti Magisk Manager</string>
@@ -148,7 +148,7 @@
     <string name="settings_boot_format_title">Boot failo formatas</string>
     <string name="settings_boot_format_summary">Pasirinkti boot failo formatą.\n.img naudojamas įdiegimui per fastboot/download; .img.tar naudojamas įdiegimui per ODIN.</string>
     <string name="settings_core_only_title">Pagrindinis Magisk režimas</string>
-    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijos, išjungti visus papildinius. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
+    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti.</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Įgalinti sistemos padejėjus Adblock programėlėms</string>
@@ -187,7 +187,7 @@
     <string name="global_summary">Visos root sesijos naudoja globalią vardų sritį</string>
     <string name="requester_summary">Root sesijos paveldi jos išprašytojo/s vardų sritį</string>
     <string name="isolate_summary">Kiekviena root sesija turi savo izoliuotą vardų sritį</string>
-    <string name="android_o_not_support">Negalima įrenginiams naudojantiems Android 8.0+</string>
+    <string name="android_o_not_support">Įrenginiai su Android 8.0+ nepalaiko šio nustatymo</string>
     <string name="disable_fingerprint">Jūsų įrenginyje nebuvo surasta pirštų antspaudų arba jūsų įrenginys neturi pirštų antspaudų skaitytuvo</string>
     
     <!--Superuser-->
@@ -196,23 +196,23 @@
     <string name="deny">Atmesti</string>
     <string name="prompt">Klausti</string>
     <string name="grant">Suteikti(a)</string>
-    <string name="su_warning">Suteikia pilną prieigą prie jūsų įrenginio\nAtmeskite jei neesate tikri dėl programėlės šaltinio!</string>
+    <string name="su_warning">Supervartotojo prieiga suteikia pilną prieigą prie jūsų įrenginio\nAtmeskite jei neesate tikri dėl programėlės patikimumo!</string>
     <string name="forever">Visados</string>
     <string name="once">Vieną kartą</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">%1$s gavo Supervartotojo teises</string>
-    <string name="su_deny_toast">%1$s negavo Supervartotojo teisių</string>
+    <string name="su_allow_toast">%1$s gavo supervartotojo teises</string>
+    <string name="su_deny_toast">%1$s negavo supervartotojo teisių</string>
     <string name="no_apps_found">Nėra surastų programėlių</string>
     <string name="su_snack_grant">%1$s supervartotojo teisių prašymas buvo atsakytas teigiamai</string>
     <string name="su_snack_deny">%1$s supervartotojo teisių prašymas buvo atmestas</string>
     <string name="su_snack_notif_on">Buvo įjungta %1$s pranešimai</string>
     <string name="su_snack_notif_off">Buvo išjungta %1$s pranešimai</string>
-    <string name="su_snack_log_on">%1$s veiksmų surašymas yra įgalintas</string>
-    <string name="su_snack_log_off">%1$s veiksmų surašymas yra išjungtas</string>
-    <string name="su_snack_revoke">%1$s teisių atšaukta</string>
+    <string name="su_snack_log_on">%1$s įvykių surašymas yra įgalintas</string>
+    <string name="su_snack_log_off">%1$s įvykių surašymas yra išjungtas</string>
+    <string name="su_snack_revoke">%1$s supervartotojo teisės atimtos</string>
     <string name="su_revoke_title">Neleisti?</string>
     <string name="su_revoke_msg">Neleisti %1$s naudotis supervartotojo teisėmis?</string>
     <string name="toast">Išmesti</string>
