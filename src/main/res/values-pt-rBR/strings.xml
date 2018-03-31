@@ -14,12 +14,12 @@
     <string name="checking_for_updates">Verificando por atualizações…</string>
     <string name="magisk_update_available">Magisk v%1$s está disponível!</string>
     <string name="invalid_update_channel">Canal de Atualização Inválido</string>
-    <string name="safetyNet_check_text">Toque para iniciar verificação de SafetyNet</string>
+    <string name="safetyNet_check_text">Verificar SafetyNet</string>
     <string name="checking_safetyNet_status">Verificando status de SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet Verificado Com Sucesso</string>
     <string name="safetyNet_api_error">Erro de SafetyNet API</string>
     <string name="safetyNet_network_loss">Conexão de rede indisponível</string>
-    <string name="safetyNet_service_disconnected">O serviço foi morto</string>
+    <string name="safetyNet_service_disconnected">Serviço foi morto</string>
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
     <!--Install Fragment-->
@@ -36,11 +36,11 @@
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
     <string name="no_modules_found">Nenhum módulo encontrado</string>
-    <string name="update_file_created">O módulo será atualizado na próxima reinicialização</string>
-    <string name="remove_file_created">O módulo será removido na próxima reinicialização</string>
-    <string name="remove_file_deleted">O módulo não será removido na próxima reinicialização</string>
-    <string name="disable_file_created">O módulo será desativado na próxima reinicialização</string>
-    <string name="disable_file_removed">O módulo será ativado na próxima reinicialização</string>
+    <string name="update_file_created">Módulo será atualizado na próxima reinicialização</string>
+    <string name="remove_file_created">Módulo será removido na próxima reinicialização</string>
+    <string name="remove_file_deleted">Módulo não será removido na próxima reinicialização</string>
+    <string name="disable_file_created">Módulo será desativado na próxima reinicialização</string>
+    <string name="disable_file_removed">Módulo será ativado na próxima reinicialização</string>
     <string name="author">Criado por %1$s</string>
     <string name="reboot_recovery">Reiniciar na Recuperação</string>
     <string name="reboot_bootloader">Reiniciar no Bootloader</string>
@@ -51,7 +51,7 @@
     <string name="installed">Instalado</string>
     <string name="not_installed">Não Instalado</string>
     <string name="updated_on">Atualizado em: %1$s</string>
-    <string name="sorting_order">Ordem de Ordenação</string>
+    <string name="sorting_order">Ordenar</string>
     <string name="sort_by_name">Ordenar por nome</string>
     <string name="sort_by_update">Ordenar por última atualização</string>
 
@@ -60,8 +60,8 @@
     <string name="menuReload">Recarregar</string>
     <string name="menuClearLog">Limpar registro agora</string>
     <string name="logs_cleared">Registro limpo com sucesso</string>
-    <string name="log_is_empty">O registro está vazio</string>
-    <string name="logs_save_failed">Não foi possível gravar o registro no cartão SD:</string>
+    <string name="log_is_empty">Registro está vazio</string>
+    <string name="logs_save_failed">Incapaz de gravar registro no cartão SD:</string>
 
     <!--About Activity-->
     <string name="about">Sobre</string>
@@ -75,7 +75,7 @@
 
     <!--Toasts, Dialogs-->
     <string name="permissionNotGranted">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
-    <string name="no_thanks">Não, obrigado</string>
+    <string name="no_thanks">Não</string>
     <string name="yes">Sim</string>
     <string name="ok">OK</string>
     <string name="close">Fechar</string>
@@ -101,26 +101,26 @@
     <string name="dtbo_patched_title">DTBO foi emendado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager emendou dtbo.img, reinicie</string>
     <string name="magisk_updates">Atualizações do Magisk</string>
-    <string name="flashing">Flasheando</string>
+    <string name="flashing">Gravando</string>
     <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
     <string name="hide_manager_toast2">Isto pode demorar um pouco…</string>
-    <string name="hide_manager_fail_toast">Ocultar Magisk Manager falhou…</string>
+    <string name="hide_manager_fail_toast">Falha ao ocultar Magisk Manager…</string>
     <string name="download_zip_only">Baixar Zip Apenas</string>
     <string name="patch_boot_file">Emendar Arquivo de Imagem de Inicialização</string>
     <string name="direct_install">Instalação Direta (Recomendado)</string>
     <string name="install_second_slot">Instalar no Segundo Slot (Após OTA)</string>
     <string name="select_method">Selecionar Método</string>
     <string name="no_boot_file_patch_support">A versão alvo do Magisk não suporta emendamento de imagem de inicialização</string>
-    <string name="boot_file_patch_msg">Selecione o depósito de imagem de inicialização de stock em formato .img ou .img.tar</string>
-    <string name="complete_uninstall">Concluir Desinstalação</string>
+    <string name="boot_file_patch_msg">Selecionar depósito de imagem de inicialização de fábrica no formato .img ou .img.tar</string>
+    <string name="complete_uninstall">Completar Desinstalação</string>
     <string name="restore_img">Restaurar Imagens</string>
     <string name="uninstall_app">Desinstalar App</string>
     <string name="restore_done">Restauração concluída!</string>
-    <string name="restore_fail">O backup da stock não existe!</string>
+    <string name="restore_fail">Backup de fábrica não existe!</string>
     <string name="uninstall_toast">Desinstalando Magisk Manager em 5 segundos, manualmente reinicie logo após</string>
     <string name="proprietary_title">Baixar Código de Propriedade</string>
-    <string name="proprietary_notice">Magisk Manager é FOSS(Software Livre de Código Aberto), que não contém o código de propriedade de SafetyNet API da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para verificação de SafetyNet?</string>
-    <string name="su_db_corrupt">O banco de dados do SU está corrompido, será recriado novo db</string>
+    <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código de propriedade de SafetyNet API da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para verificação de SafetyNet?</string>
+    <string name="su_db_corrupt">Banco de dados do SU está corrompido, será recriado novo db</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>
@@ -145,12 +145,12 @@
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Inserir uma URL personalizada</string>
     <string name="settings_boot_format_title">Formato de Saída de Inicialização Emendada</string>
-    <string name="settings_boot_format_summary">Selecionar formato de saída de imagem de inicialização emendada.\nEscolha .img para flashear através do modo fastboot/download; escolha .img.tar para flashear com ODIN.</string>
+    <string name="settings_boot_format_summary">Selecionar formato de saída de imagem de inicialização emendada.\nEscolha .img para gravar através do modo fastboot/download; escolha .img.tar para gravar com ODIN.</string>
     <string name="settings_core_only_title">Modo Magisk de Núcleo Apenas</string>
-    <string name="settings_core_only_summary">Ativar apenas recursos de núcleo. MagiskSU, MagiskHide e hosts systemless ainda serão ativados, mas nenhum módulo será carregado.</string>
+    <string name="settings_core_only_summary">Ativar apenas recursos de núcleo. MagiskSU, MagiskHide e hosts sem sistema ainda serão ativados, mas nenhum módulo será carregado.</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de várias detecções</string>
-    <string name="settings_hosts_title">Hosts systemless</string>
-    <string name="settings_hosts_summary">Suporte de hosts systemless para apps de Adblock</string>
+    <string name="settings_hosts_title">Hosts sem sistema</string>
+    <string name="settings_hosts_summary">Suporte de hosts sem sistema para apps de Adblock</string>
 
     <string name="settings_su_app_adb">Apps e ADB</string>
     <string name="settings_su_app">Apps apenas</string>
@@ -193,7 +193,7 @@
     <string name="su_request_title">Solicitação de Superusuário</string>
     <string name="deny_with_str">Negar%1$s</string>
     <string name="deny">Negar</string>
-    <string name="prompt">Expedir</string>
+    <string name="prompt">Solicitar</string>
     <string name="grant">Conceder</string>
     <string name="su_warning">Concede acesso total ao seu dispositivo.\nNegue se você não tem certeza!</string>
     <string name="forever">Sempre</string>
@@ -205,13 +205,13 @@
     <string name="su_allow_toast">%1$s teve concedido direitos de Superusuário</string>
     <string name="su_deny_toast">%1$s teve negado direitos de Superusuário</string>
     <string name="no_apps_found">Nenhum app encontrado</string>
-    <string name="su_snack_grant">Os direitos de Superusuário de %1$s estão concedidos</string>
-    <string name="su_snack_deny">Os direitos de Superusuário de %1$s estão negados</string>
-    <string name="su_snack_notif_on">As notificações de %1$s estão ativadas</string>
-    <string name="su_snack_notif_off">As notificações de %1$s estão desativadas</string>
-    <string name="su_snack_log_on">A registração de %1$s está ativada</string>
-    <string name="su_snack_log_off">A registração de %1$s está desativada</string>
-    <string name="su_snack_revoke">Os direitos de %1$s estão revogados</string>
+    <string name="su_snack_grant">Direitos de Superusuário de %1$s estão concedidos</string>
+    <string name="su_snack_deny">Direitos de Superusuário de %1$s estão negados</string>
+    <string name="su_snack_notif_on">Notificações de %1$s estão ativadas</string>
+    <string name="su_snack_notif_off">Notificações de %1$s estão desativadas</string>
+    <string name="su_snack_log_on">Registração de %1$s está ativada</string>
+    <string name="su_snack_log_off">Registração de %1$s está desativada</string>
+    <string name="su_snack_revoke">Direitos de %1$s estão revogados</string>
     <string name="su_revoke_title">Revogar?</string>
     <string name="su_revoke_msg">Revogar os direitos de %1$s?</string>
     <string name="toast">Torrada</string>
@@ -224,6 +224,3 @@
     <string name="command">Comando:\u0020</string>
 
 </resources>
-
-
-
