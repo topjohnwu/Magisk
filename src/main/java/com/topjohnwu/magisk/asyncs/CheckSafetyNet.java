@@ -43,31 +43,26 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         conn.disconnect();
     }
 
-    private void loadClasses() throws ClassNotFoundException {
-        loader = new DexClassLoader(dexPath.toString(), dexPath.getParent(),
+    private void dyload() throws ReflectiveOperationException {
+        loader = new DexClassLoader(dexPath.getPath(), dexPath.getParent(),
                 null, ClassLoader.getSystemClassLoader());
         helperClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetHelper");
         callbackClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetCallback");
+        int snet_ver = (int) helperClazz.getMethod("getVersion").invoke(null);
+        if (snet_ver != Const.SNET_VER) {
+            throw new ReflectiveOperationException();
+        }
     }
 
     @Override
     protected Exception doInBackground(Void... voids) {
-        int snet_ver = -1;
-
         try {
-            if (!dexPath.exists())
-                dlSnet();
-            loadClasses();
-
             try {
-                snet_ver = (int) helperClazz.getMethod("getVersion").invoke(null);
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-
-            if (snet_ver != Const.SNET_VER) {
+                dyload();
+            } catch (ReflectiveOperationException e) {
+                // If dynamic load failed, try re-downloading and reload
                 dlSnet();
-                loadClasses();
+                dyload();
             }
         } catch (Exception e) {
             return e;
