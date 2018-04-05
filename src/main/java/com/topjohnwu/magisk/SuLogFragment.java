@@ -46,7 +46,7 @@ public class SuLogFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = ButterKnife.bind(this, v);
         mm = getApplication();
-        adapter = new SuLogAdapter(mm.suDB);
+        adapter = new SuLogAdapter(mm.mDB);
         recyclerView.setAdapter(adapter);
 
         updateList();
@@ -73,7 +73,7 @@ public class SuLogFragment extends Fragment {
                 updateList();
                 return true;
             case R.id.menu_clear:
-                mm.suDB.clearLogs();
+                mm.mDB.clearLogs();
                 updateList();
                 return true;
             default:

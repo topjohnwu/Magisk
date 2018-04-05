@@ -276,7 +276,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case Const.Key.ROOT_ACCESS:
                 case Const.Key.SU_MULTIUSER_MODE:
                 case Const.Key.SU_MNT_NS:
-                    mm.suDB.setSettings(key, Utils.getPrefsInt(prefs, key));
+                    mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                     break;
                 case Const.Key.LOCALE:
                     mm.setLocale();

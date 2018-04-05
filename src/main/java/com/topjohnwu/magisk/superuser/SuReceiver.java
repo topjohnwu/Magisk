@@ -43,7 +43,7 @@ public class SuReceiver extends BroadcastReceiver {
         action = intent.getStringExtra("action");
         if (action == null) return;
 
-        policy = mm.suDB.getPolicy(fromUid);
+        policy = mm.mDB.getPolicy(fromUid);
         if (policy == null) {
             try {
                 policy = new Policy(fromUid, context.getPackageManager());
@@ -84,7 +84,7 @@ public class SuReceiver extends BroadcastReceiver {
             log.fromPid = pid;
             log.command = command;
             log.date = new Date();
-            mm.suDB.addLog(log);
+            mm.mDB.addLog(log);
         }
     }
 }

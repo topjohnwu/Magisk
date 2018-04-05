@@ -20,11 +20,11 @@ public class PackageReceiver extends BroadcastReceiver {
             case Intent.ACTION_PACKAGE_REPLACED:
                 // This will only work pre-O
                 if (mm.prefs.getBoolean(Const.Key.SU_REAUTH, false)) {
-                    mm.suDB.deletePolicy(pkg);
+                    mm.mDB.deletePolicy(pkg);
                 }
                 break;
             case Intent.ACTION_PACKAGE_FULLY_REMOVED:
-                mm.suDB.deletePolicy(pkg);
+                mm.mDB.deletePolicy(pkg);
                 Shell.Async.su("magiskhide --rm " + pkg);
                 break;
         }

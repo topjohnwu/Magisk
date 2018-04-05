@@ -68,7 +68,7 @@ public class RequestActivity extends Activity {
 
         pm = getPackageManager();
         mm = Utils.getMagiskManager(this);
-        mm.suDB.clearOutdated();
+        mm.mDB.clearOutdated();
 
         Intent intent = getIntent();
         socketPath = intent.getStringExtra("socket");
@@ -233,7 +233,7 @@ public class RequestActivity extends Activity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            mm.suDB.addPolicy(policy);
+            mm.mDB.addPolicy(policy);
         }
         handleAction();
     }
@@ -273,7 +273,7 @@ public class RequestActivity extends Activity {
                 }
 
                 int uid = payload.getAsInteger("uid");
-                policy = mm.suDB.getPolicy(uid);
+                policy = mm.mDB.getPolicy(uid);
                 if (policy == null) {
                     policy = new Policy(uid, pm);
                 }

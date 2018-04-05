@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
@@ -85,7 +85,7 @@ public class MagiskManager extends Shell.ContainerApp {
 
     // Global resources
     public SharedPreferences prefs;
-    public SuDatabaseHelper suDB;
+    public MagiskDatabaseHelper mDB;
     public RepoDatabaseHelper repoDB;
     public Runnable permissionGrantCallback = null;
 
@@ -106,7 +106,7 @@ public class MagiskManager extends Shell.ContainerApp {
             @Override
             public void onRootShellInit(@NonNull Shell shell) {
                 try (InputStream utils = getAssets().open(Const.UTIL_FUNCTIONS);
-                     InputStream sudb = getResources().openRawResource(R.raw.sudb)) {
+                     InputStream sudb = getResources().openRawResource(R.raw.magiskdb)) {
                     shell.loadInputStream(null, null, utils);
                     shell.loadInputStream(null, null, sudb);
                 } catch (IOException e) {
@@ -131,13 +131,13 @@ public class MagiskManager extends Shell.ContainerApp {
             } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
         }
 
-        suDB = SuDatabaseHelper.getInstance(this);
+        mDB = MagiskDatabaseHelper.getInstance(this);
 
-        String pkg = suDB.getStrings(Const.Key.SU_REQUESTER, Const.ORIG_PKG_NAME);
+        String pkg = mDB.getStrings(Const.Key.SU_REQUESTER, Const.ORIG_PKG_NAME);
         if (getPackageName().equals(Const.ORIG_PKG_NAME) && !pkg.equals(Const.ORIG_PKG_NAME)) {
-            suDB.setStrings(Const.Key.SU_REQUESTER, null);
+            mDB.setStrings(Const.Key.SU_REQUESTER, null);
             Utils.uninstallPkg(pkg);
-            suDB = SuDatabaseHelper.getInstance(this);
+            mDB = MagiskDatabaseHelper.getInstance(this);
         }
 
         repoDB = new RepoDatabaseHelper(this);
@@ -168,9 +168,9 @@ public class MagiskManager extends Shell.ContainerApp {
         suRequestTimeout = Utils.getPrefsInt(prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
         suResponseType = Utils.getPrefsInt(prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
         suNotificationType = Utils.getPrefsInt(prefs, Const.Key.SU_NOTIFICATION, Const.Value.NOTIFICATION_TOAST);
-        suAccessState = suDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
-        multiuserMode = suDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
-        suNamespaceMode = suDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
+        suAccessState = mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
+        multiuserMode = mDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
+        suNamespaceMode = mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
 
         // config
         isDarkTheme = prefs.getBoolean(Const.Key.DARK_THEME, false);

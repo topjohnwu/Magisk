@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class SuDatabaseHelper {
+public class MagiskDatabaseHelper {
 
     private static final int DATABASE_VER = 5;
     private static final String POLICY_TABLE = "policies";
@@ -36,60 +36,57 @@ public class SuDatabaseHelper {
     private static final String STRINGS_TABLE = "strings";
 
     private PackageManager pm;
-    private SQLiteDatabase mDb;
-    private File DB_FILE;
+    private SQLiteDatabase db;
 
     @NonNull
-    public static SuDatabaseHelper getInstance(MagiskManager mm) {
+    public static MagiskDatabaseHelper getInstance(MagiskManager mm) {
         try {
-            return new SuDatabaseHelper(mm);
+            return new MagiskDatabaseHelper(mm);
         } catch (Exception e) {
             // Let's cleanup everything and try again
-            Shell.Sync.su("sudb_clean '*'");
-            return new SuDatabaseHelper(mm);
+            Shell.Sync.su("db_clean '*'");
+            return new MagiskDatabaseHelper(mm);
         }
     }
 
-    private SuDatabaseHelper(MagiskManager mm) {
+    private MagiskDatabaseHelper(MagiskManager mm) {
         pm = mm.getPackageManager();
-        mDb = openDatabase(mm);
-        mDb.disableWriteAheadLogging();
-        int version = mDb.getVersion();
+        db = openDatabase(mm);
+        db.disableWriteAheadLogging();
+        int version = db.getVersion();
         if (version < DATABASE_VER) {
-            onUpgrade(mDb, version);
+            onUpgrade(db, version);
         } else if (version > DATABASE_VER) {
-            onDowngrade(mDb);
+            onDowngrade(db);
         }
-        mDb.setVersion(DATABASE_VER);
+        db.setVersion(DATABASE_VER);
         clearOutdated();
     }
 
     private SQLiteDatabase openDatabase(MagiskManager mm) {
-        final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db", true);
-        DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
+        final File DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
         if (!DB_FILE.canWrite()) {
             if (!Shell.rootAccess()) {
                 // We don't want the app to crash, create a db and return
-                DB_FILE = mm.getDatabasePath("su.db");
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             }
             mm.loadMagiskInfo();
             // Cleanup
-            Shell.Sync.su("sudb_clean " + Const.USER_ID);
+            Shell.Sync.su("db_clean " + Const.USER_ID);
             if (mm.magiskVersionCode < 1410) {
                 // Super old legacy mode
-                DB_FILE = mm.getDatabasePath("su.db");
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             } else if (mm.magiskVersionCode < 1450) {
                 // Legacy mode with FBE aware
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     de.moveDatabaseFrom(mm, "su.db");
                 }
-                DB_FILE = de.getDatabasePath("su.db");
                 return de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             } else {
+                // Global database
+                final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db", true);
                 mm.deleteDatabase("su.db");
                 de.deleteDatabase("su.db");
                 if (mm.magiskVersionCode < 1460) {
@@ -105,11 +102,11 @@ public class SuDatabaseHelper {
                             "'create su_file' 'allow * su_file file *' 'allow * su_file dir *'");
                 }
                 if (!GLOBAL_DB.exists()) {
-                    Shell.Sync.su("sudb_init");
+                    Shell.Sync.su("db_init");
                     SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
-                    Shell.Sync.su("sudb_restore");
+                    Shell.Sync.su("db_restore");
                 }
-                Shell.Sync.su("sudb_setup " + Process.myUid());
+                Shell.Sync.su("db_setup " + Process.myUid());
             }
         }
         // Not using legacy mode, open the mounted global DB
@@ -183,9 +180,9 @@ public class SuDatabaseHelper {
 
     public void clearOutdated() {
         // Clear outdated policies
-        mDb.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < %d", System.currentTimeMillis() / 1000), null);
+        db.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < %d", System.currentTimeMillis() / 1000), null);
         // Clear outdated logs
-        mDb.delete(LOG_TABLE, Utils.fmt("time < %d", System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000), null);
+        db.delete(LOG_TABLE, Utils.fmt("time < %d", System.currentTimeMillis() - MagiskManager.get().suLogTimeout * 86400000), null);
     }
 
     public void deletePolicy(Policy policy) {
@@ -193,16 +190,16 @@ public class SuDatabaseHelper {
     }
 
     public void deletePolicy(String pkg) {
-        mDb.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
+        db.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
     }
 
     public void deletePolicy(int uid) {
-        mDb.delete(POLICY_TABLE, Utils.fmt("uid=%d", uid), null);
+        db.delete(POLICY_TABLE, Utils.fmt("uid=%d", uid), null);
     }
 
     public Policy getPolicy(int uid) {
         Policy policy = null;
-        try (Cursor c = mDb.query(POLICY_TABLE, null, Utils.fmt("uid=%d", uid), null, null, null, null)) {
+        try (Cursor c = db.query(POLICY_TABLE, null, Utils.fmt("uid=%d", uid), null, null, null, null)) {
             if (c.moveToNext()) {
                 policy = new Policy(c, pm);
             }
@@ -214,15 +211,15 @@ public class SuDatabaseHelper {
     }
 
     public void addPolicy(Policy policy) {
-        mDb.replace(POLICY_TABLE, null, policy.getContentValues());
+        db.replace(POLICY_TABLE, null, policy.getContentValues());
     }
 
     public void updatePolicy(Policy policy) {
-        mDb.update(POLICY_TABLE, policy.getContentValues(), Utils.fmt("uid=%d", policy.uid), null);
+        db.update(POLICY_TABLE, policy.getContentValues(), Utils.fmt("uid=%d", policy.uid), null);
     }
 
     public List<Policy> getPolicyList(PackageManager pm) {
-        try (Cursor c = mDb.query(POLICY_TABLE, null, Utils.fmt("uid/100000=%d", Const.USER_ID),
+        try (Cursor c = db.query(POLICY_TABLE, null, Utils.fmt("uid/100000=%d", Const.USER_ID),
                 null, null, null, null)) {
             List<Policy> ret = new ArrayList<>(c.getCount());
             while (c.moveToNext()) {
@@ -240,7 +237,7 @@ public class SuDatabaseHelper {
     }
 
     public List<List<Integer>> getLogStructure() {
-        try (Cursor c = mDb.query(LOG_TABLE, new String[] { "time" }, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+        try (Cursor c = db.query(LOG_TABLE, new String[] { "time" }, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
                 null, null, null, "time DESC")) {
             List<List<Integer>> ret = new ArrayList<>();
             List<Integer> list = null;
@@ -260,28 +257,28 @@ public class SuDatabaseHelper {
     }
 
     public Cursor getLogCursor() {
-        return mDb.query(LOG_TABLE, null, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+        return db.query(LOG_TABLE, null, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
                 null, null, null, "time DESC");
     }
 
     public void addLog(SuLogEntry log) {
-        mDb.insert(LOG_TABLE, null, log.getContentValues());
+        db.insert(LOG_TABLE, null, log.getContentValues());
     }
 
     public void clearLogs() {
-        mDb.delete(LOG_TABLE, null, null);
+        db.delete(LOG_TABLE, null, null);
     }
 
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
         data.put("key", key);
         data.put("value", value);
-        mDb.replace(SETTINGS_TABLE, null, data);
+        db.replace(SETTINGS_TABLE, null, data);
     }
 
     public int getSettings(String key, int defaultValue) {
         int value = defaultValue;
-        try (Cursor c = mDb.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+        try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
             if (c.moveToNext()) {
                 value = c.getInt(c.getColumnIndex("value"));
             }
@@ -291,18 +288,18 @@ public class SuDatabaseHelper {
 
     public void setStrings(String key, String value) {
         if (value == null) {
-            mDb.delete(STRINGS_TABLE, "key=?", new String[] { key });
+            db.delete(STRINGS_TABLE, "key=?", new String[] { key });
         } else {
             ContentValues data = new ContentValues();
             data.put("key", key);
             data.put("value", value);
-            mDb.replace(STRINGS_TABLE, null, data);
+            db.replace(STRINGS_TABLE, null, data);
         }
     }
 
     public String getStrings(String key, String defaultValue) {
         String value = defaultValue;
-        try (Cursor c = mDb.query(STRINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+        try (Cursor c = db.query(STRINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
             if (c.moveToNext()) {
                 value = c.getString(c.getColumnIndex("value"));
             }

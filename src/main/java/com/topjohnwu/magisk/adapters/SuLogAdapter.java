@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.container.SuLogEntry;
-import com.topjohnwu.magisk.database.SuDatabaseHelper;
+import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,10 +27,10 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
     private List<List<Integer>> logEntryList;
     private Set<Integer> itemExpanded, sectionExpanded;
-    private SuDatabaseHelper suDB;
+    private MagiskDatabaseHelper suDB;
     private Cursor suLogCursor = null;
 
-    public SuLogAdapter(SuDatabaseHelper db) {
+    public SuLogAdapter(MagiskDatabaseHelper db) {
         suDB = db;
         logEntryList = Collections.emptyList();
         sectionExpanded = new HashSet<>();
