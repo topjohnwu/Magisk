@@ -71,6 +71,11 @@
         </receiver>
         <receiver android:name=".receivers.ManagerUpdate" />
         <receiver android:name=".receivers.RebootReceiver" />
+        <receiver android:name=".receivers.ShortcutReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".services.OnBootIntentService" />
         <service

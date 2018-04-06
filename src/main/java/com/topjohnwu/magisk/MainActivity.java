@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -30,7 +29,6 @@ public class MainActivity extends Activity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
 
     private final Handler mDrawerHandler = new Handler();
-    private SharedPreferences prefs;
     private int mDrawerItem;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -48,7 +46,6 @@ public class MainActivity extends Activity
     protected void onCreate(final Bundle savedInstanceState) {
 
         MagiskManager mm = getMagiskManager();
-        prefs = mm.prefs;
 
         if (!mm.hasInit) {
             Intent intent = new Intent(this, SplashActivity.class);
@@ -95,7 +92,7 @@ public class MainActivity extends Activity
         navigationView.setNavigationItemSelectedListener(this);
 
         if (mm.prefs.getInt(Const.Key.APP_VER, -1) < BuildConfig.VERSION_CODE) {
-            prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
+            mm.prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
             new MarkDownWindow(this, getString(R.string.app_changelog),
                     getResources().openRawResource(R.raw.changelog)).exec();
         }
@@ -141,7 +138,7 @@ public class MainActivity extends Activity
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
                 Shell.rootAccess() && mm.magiskVersionCode >= 1300
-                        && prefs.getBoolean(Const.Key.MAGISKHIDE, false));
+                        && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)

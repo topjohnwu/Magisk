@@ -15,8 +15,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
