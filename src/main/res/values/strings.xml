@@ -92,7 +92,6 @@
     <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
-    <string name="safetyNet_hide_notice">This app uses SafetyNet\nAlready handled by MagiskHide by default</string>
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Downloading</string>
@@ -129,8 +128,6 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Dark Theme</string>
     <string name="settings_dark_theme_summary">Enable dark theme</string>
-    <string name="settings_notification_title">Update Notification</string>
-    <string name="settings_notification_summary">Show update notifications when new version is available</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>

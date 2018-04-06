@@ -76,7 +76,6 @@
     <string name="settings_reboot_toast">Restartovat pro použití nastavení</string>
     <string name="release_notes">Poznámky k vydání</string>
     <string name="repo_cache_cleared">Mezipaměť smazána</string>
-    <string name="safetyNet_hide_notice">Tato aplikace využívá SafetyNet\nVe výchozím nastavení již ovládaný skrze MagiskHide</string>
     <string name="process_error">Chyba při Zpracování</string>
     <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
     <string name="zip_process_title">Zpracování</string>
@@ -85,8 +84,6 @@
     <string name="settings_general_category">Obecné</string>
     <string name="settings_dark_theme_title">Tmavý Vzhled</string>
     <string name="settings_dark_theme_summary">Povolit tmavý vzhled</string>
-    <string name="settings_notification_title">Oznámení o Aktualizaci</string>
-    <string name="settings_notification_summary">Zobrazí oznámení aktualizace, když je k dispozici nová verze</string>
     <string name="settings_clear_cache_title">Smazat Uchovanou Mezipaměť</string>
     <string name="settings_clear_cache_summary">Smaže informace online použití v Mezipaměti, donutí aplikaci obnovit informace online</string>
 

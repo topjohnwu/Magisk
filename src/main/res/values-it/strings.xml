@@ -89,8 +89,7 @@
 	<string name="settings_reboot_toast">Riavvia per applicare</string>
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-	<string name="safetyNet_hide_notice">Quest\'app usa SafetyNet\ned è già gestita da Magisk Hide</string>
-	<string name="process_error">Errore di elaborazione</string>
+    <string name="process_error">Errore di elaborazione</string>
 	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
 	<string name="zip_download_title">Download in corso</string>
 	<string name="zip_download_msg">Download del file zip (%1$d%%) …</string>
@@ -126,9 +125,7 @@
 	<string name="settings_general_category">Generale</string>
 	<string name="settings_dark_theme_title">Tema scuro</string>
 	<string name="settings_dark_theme_summary">Abilita il tema scuro</string>
-	<string name="settings_notification_title">Notifica aggiornamenti</string>
-	<string name="settings_notification_summary">Mostra una notifica quando sono disponibili aggiornamenti</string>
-	<string name="settings_clear_cache_title">Svuota cache repository</string>
+    <string name="settings_clear_cache_title">Svuota cache repository</string>
 	<string name="settings_clear_cache_summary">Svuota la cache delle repository e forza l\'aggiornamento online dell\'app</string>
 	<string name="settings_hide_manager_title">Nascondi Magisk Manager</string>
 	<string name="settings_hide_manager_summary">Reinstalla Magisk Manager con un nome pacchetto casuale</string>

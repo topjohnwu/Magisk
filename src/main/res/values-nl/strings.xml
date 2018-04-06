@@ -89,7 +89,6 @@
     <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
     <string name="release_notes">Publicatie notities</string>
     <string name="repo_cache_cleared">Opslagcache gewist</string>
-    <string name="safetyNet_hide_notice">Deze app gebruikt SafetyNet\nReeds afgehandeld door standaard MagiskHide</string>
     <string name="process_error">Verwerkingsfout</string>
     <string name="internal_storage">De zip is opgeslagen in:\n[Interne opslag]%1$s</string>
     <string name="zip_download_title">Downloaden</string>
@@ -126,8 +125,6 @@
     <string name="settings_general_category">Algemeen</string>
     <string name="settings_dark_theme_title">Donker thema</string>
     <string name="settings_dark_theme_summary">Donker thema inschakelen</string>
-    <string name="settings_notification_title">Update melding</string>
-    <string name="settings_notification_summary">Een update melding weergeven wanneer een nieuwe versie beschikbaar is</string>
     <string name="settings_clear_cache_title">Opslagcache wissen</string>
     <string name="settings_clear_cache_summary">Wis de gecachte informatie voor online opslagplaatsen. Dit dwingt de app om online te verversen</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>

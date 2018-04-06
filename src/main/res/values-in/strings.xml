@@ -89,7 +89,6 @@
     <string name="settings_reboot_toast">Reboot untuk menerapkan pengaturan</string>
     <string name="release_notes">Catatan rilis</string>
     <string name="repo_cache_cleared">Cache repo dibersihkan</string>
-    <string name="safetyNet_hide_notice">Aplikasi ini menggunakan SafetyNet\nTelah ditangani oleh MagiskHide secara default</string>
     <string name="process_error">Kesalahan proses</string>
     <string name="internal_storage">Zip disimpan di:\n[Penyimpanan Internal]%1$s</string>
     <string name="zip_download_title">Mengunduh</string>
@@ -126,8 +125,6 @@
     <string name="settings_general_category">Umum</string>
     <string name="settings_dark_theme_title">Tema Gelap</string>
     <string name="settings_dark_theme_summary">Aktifkan tema gelap</string>
-    <string name="settings_notification_title">Notifikasi Pembaruan</string>
-    <string name="settings_notification_summary">Tampilkan notifikasi pembaruan bila versi baru tersedia</string>
     <string name="settings_clear_cache_title">Bersihkan Cache Repo</string>
     <string name="settings_clear_cache_summary">Bersihkan informasi ter-cache untuk repo online, memaksa apl untuk menyegarkan online</string>
     <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>

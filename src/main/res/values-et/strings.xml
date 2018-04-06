@@ -89,8 +89,6 @@
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks</string>
     <string name="release_notes">Väljalaskemärkmed</string>
     <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
-    <string name="safetyNet_hide_notice">See rakendus kasutab SafetyNet\'i\n
-  Juba vaikimisi hallatud MagiskHide poolt</string>
     <string name="process_error">Protsessi viga</string>
     <string name="internal_storage">ZIP on salvestatud:\n
   [Sisemälu]%1$s</string>
@@ -130,8 +128,6 @@
     <string name="settings_general_category">Üldine</string>
     <string name="settings_dark_theme_title">Tume teema</string>
     <string name="settings_dark_theme_summary">Luba tume teema</string>
-    <string name="settings_notification_title">Uuendusteade</string>
-    <string name="settings_notification_summary">Kuva uuendusteateid, kui uus versioon on saadaval</string>
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda võrgus olevate hoidlate vahemälus olev teave, sunnib rakendust võrgust värskendama</string>
     <string name="settings_hide_manager_title">Peida Magisk Manager</string>

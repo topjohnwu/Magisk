@@ -89,7 +89,6 @@
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">资源库缓存已清除</string>
-    <string name="safetyNet_hide_notice">此应用使用了 SafetyNet\n已默认由 MagiskHide 处理</string>
     <string name="process_error">处理失败</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储空间]%1$s</string>
     <string name="zip_download_title">正在下载</string>
@@ -126,8 +125,6 @@
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">暗色主题</string>
     <string name="settings_dark_theme_summary">使用暗色主题</string>
-    <string name="settings_notification_title">更新通知</string>
-    <string name="settings_notification_summary">当有新版本时显示更新通知</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>

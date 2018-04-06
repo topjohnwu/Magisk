@@ -76,7 +76,6 @@
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Ghi chú phát hành</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
-    <string name="safetyNet_hide_notice">Ứng dụng này dùng SafetyNet\nĐã được MagiskHide xử lý theo mặc định</string>
     <string name="process_error">Lỗi xử lý</string>
     <string name="internal_storage">Tập tin zip được lưu vào:\n[Bộ nhớ trong]%1$s</string>
     <string name="zip_process_title">Đang xử lý</string>
@@ -85,8 +84,6 @@
     <string name="settings_general_category">Chung</string>
     <string name="settings_dark_theme_title">Chủ đề tối</string>
     <string name="settings_dark_theme_summary">Dùng chủ đề tối</string>
-    <string name="settings_notification_title">Thông báo cập nhật</string>
-    <string name="settings_notification_summary">Hiện thông báo cập nhật khi có phiên bản mới</string>
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
     <string name="settings_clear_cache_summary">Xoá thông tin truy cập nhật về các kho mô-đun, buộc ứng dụng làm mới trực tuyến</string>
 

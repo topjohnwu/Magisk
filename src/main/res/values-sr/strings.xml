@@ -82,7 +82,6 @@
     <string name="settings_reboot_toast">Рестартуј да примениш подешавања</string>
     <string name="release_notes">Белешке обљављивања</string>
     <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
-    <string name="safetyNet_hide_notice">Ова апликација користи СигурнаМрежа\nФабрички већ управљано од стране MagiskHide-а</string>
     <string name="process_error">Грешка у обради</string>
     <string name="internal_storage">Зип је сачуван у:\n[Интерно складиште]%1$s</string>
     <string name="zip_download_title">Преузимање</string>
@@ -117,8 +116,6 @@
     <string name="settings_general_category">Генерално</string>
     <string name="settings_dark_theme_title">Црна тема</string>
     <string name="settings_dark_theme_summary">Омогући црну тему</string>
-    <string name="settings_notification_title">Нотификација Ажурирања</string>
-    <string name="settings_notification_summary">Прикажи нотификације ажурирања када је нова верзија доступна</string>
     <string name="settings_clear_cache_title">Обриши кеш спремишта</string>
     <string name="settings_clear_cache_summary">Очисти кеширану имформацију за онлајн спремишта, форсира апликацију да освежи онлајн</string>
     <string name="settings_hide_manager_title">Сакриј Магиск Менаџер</string>

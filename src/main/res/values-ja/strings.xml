@@ -89,7 +89,6 @@
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">更新履歴</string>
     <string name="repo_cache_cleared">リポジトリキャッシュを消去しました</string>
-    <string name="safetyNet_hide_notice">このアプリはSafetyNetを使用しています。\n既定ではMagiskHideで既に処理されています</string>
     <string name="process_error">プロセスエラー</string>
     <string name="internal_storage">ZIPは\n[内部ストレージ]%1$sに保存されます</string>
     <string name="zip_download_title">ダウンロード中</string>
@@ -126,8 +125,6 @@
     <string name="settings_general_category">一般</string>
     <string name="settings_dark_theme_title">ダークテーマ</string>
     <string name="settings_dark_theme_summary">ダークテーマを有効化します</string>
-    <string name="settings_notification_title">更新通知</string>
-    <string name="settings_notification_summary">新しいバージョンがあるときに通知します</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報を消去し、アプリをオンラインで更新します</string>
     <string name="settings_hide_manager_title">Magisk Managerを隠す</string>

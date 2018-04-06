@@ -79,7 +79,6 @@
     <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
     <string name="release_notes">ملاحظات الإصدار</string>
     <string name="repo_cache_cleared">تم مسح الذاكرة المؤقته للمستودع</string>
-    <string name="safetyNet_hide_notice">يستخدم هذا التطبيق SafetyNet, تم التعامل معها بالفعل من قبل MagiskHide بشكل افتراضي</string>
     <string name="process_error">خطأ في العملية</string>
     <string name="internal_storage">يتم تخزين الملف المضغوط في:\n[التخزين الداخلي]%1$s</string>
     <string name="zip_process_title">معالجة</string>
@@ -88,8 +87,6 @@
     <string name="settings_general_category">عام</string>
     <string name="settings_dark_theme_title">السمة الغامقة</string>
     <string name="settings_dark_theme_summary">تفعيل السمة الغامقة</string>
-    <string name="settings_notification_title">إشعارات التحديث</string>
-    <string name="settings_notification_summary">عرض إشعارات التحديث عند توفر الإصدار الجديد</string>
     <string name="settings_clear_cache_title">حذف الذاكرة المؤقتة للمستودع</string>
     <string name="settings_clear_cache_summary">حذف المعلومات المخزنة مؤقتا للمستودع على الانترنت، يجبر التطبيق لتحديث عبر الانترنت</string>
 

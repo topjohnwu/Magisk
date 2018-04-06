@@ -92,7 +92,6 @@
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
     <string name="release_notes">Zmiany</string>
     <string name="repo_cache_cleared">Cache repozytorium wyczyszczone</string>
-    <string name="safetyNet_hide_notice">Ta aplikacja wykorzystuje SafetyNet\nJest już domyślnie obsługiwana przez MagiskHide</string>
     <string name="process_error">Błąd procesu</string>
     <string name="internal_storage">Zip jest przechowywany w:\n[Pamięć Wewnętrzna]%1$s</string>
     <string name="zip_download_title">Pobieranie</string>
@@ -129,8 +128,6 @@
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
     <string name="settings_dark_theme_summary">Włącz ciemny motyw</string>
-    <string name="settings_notification_title">Powiadomienie o Aktualizacji</string>
-    <string name="settings_notification_summary">Pokaż powiadomienie o aktualizacji kiedy będzie dostępna nowa wersja</string>
     <string name="settings_clear_cache_title">Wyczyść Pamięć Repozytorium</string>
     <string name="settings_clear_cache_summary">Wymusza na aplikacji odświeżenie online repozytorium</string>
     <string name="settings_hide_manager_title">Ukryj Magisk Manager</string>

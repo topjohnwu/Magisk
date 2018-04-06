@@ -92,7 +92,6 @@
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
     <string name="release_notes">Änderungen</string>
     <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
-    <string name="safetyNet_hide_notice">Diese App benutzt SafetyNet, welches standardmäßig von Magisk Hide verwaltet wird</string>
     <string name="process_error">Prozessfehler</string>
     <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_download_title">Herunterladen</string>
@@ -129,8 +128,6 @@
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
     <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
-    <string name="settings_notification_title">Aktualisierungs-Benachrichtigung</string>
-    <string name="settings_notification_summary">Benachrichtigung, wenn eine neue Version verfügbar ist</string>
     <string name="settings_clear_cache_title">Repo-Cache löschen</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Online-Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>

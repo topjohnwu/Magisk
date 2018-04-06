@@ -82,7 +82,6 @@
     <string name="settings_reboot_toast">Ponovno pokrenite kako biste primjenili postavke</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>
     <string name="repo_cache_cleared">Predmemorija repozitorija izbrisana</string>
-    <string name="safetyNet_hide_notice">Ova aplikacija upotrebljava SafetyNet\nRiješeno pomoću MagiskHide prema zadanim postavkama</string>
     <string name="process_error">Pogreška u procesu</string>
     <string name="internal_storage">Zip je pohranjen u:\n[Unutarnja pohrana]%1$s</string>
     <string name="zip_download_title">Preuzimanje</string>
@@ -113,8 +112,6 @@
     <string name="settings_general_category">Općenito</string>
     <string name="settings_dark_theme_title">Tamna tema</string>
     <string name="settings_dark_theme_summary">Omogući tamnu temu</string>
-    <string name="settings_notification_title">Obavijest o ažuriranju</string>
-    <string name="settings_notification_summary">Prikaži obavijest o ažuriranju kada je dostupna nova verzija</string>
     <string name="settings_clear_cache_title">Izbriši predmemoriju repozitorija</string>
     <string name="settings_clear_cache_summary">Izbrišite predmemorirane informacije za online repozitorij, prisiljavajući aplikaciju da se osvježi online</string>
     <string name="settings_hide_manager_title">Sakrij Magisk Manager</string>

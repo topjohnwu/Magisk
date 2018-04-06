@@ -88,7 +88,6 @@
     <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Repo önbelleği temizlendi</string>
-    <string name="safetyNet_hide_notice">Bu uygulama, SafetyNet kullanıyor\nZaten MagiskHide tarafından varsayılan olarak ele alındı</string>
     <string name="process_error">İşlem hatası</string>
     <string name="internal_storage">Zip şuraya depolandı:\n[Dahili Hafıza]%1$s</string>
     <string name="zip_download_title">İndiriliyor</string>
@@ -125,8 +124,6 @@
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
     <string name="settings_dark_theme_summary">Karanlık temayı etkinleştir</string>
-    <string name="settings_notification_title">Güncelleme Bildirimi</string>
-    <string name="settings_notification_summary">Yeni sürüm kullanılabilir olduğunda güncelleme bildirimlerini göster</string>
     <string name="settings_clear_cache_title">Repo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrimiçi repolar için önbellek bilgilerini temizle, uygulamayı çevrimiçi yenilemeye zorla</string>
     <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>

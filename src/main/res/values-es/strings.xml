@@ -90,7 +90,6 @@
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>
     <string name="repo_cache_cleared">Caché del repositorio limpiada</string>
-    <string name="safetyNet_hide_notice">Esta aplicación usa SafetyNet\nYa manejado por defecto por MagiskHide</string>
     <string name="process_error">Error de proceso</string>
     <string name="internal_storage">El zip es almacenado en:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Descargando</string>
@@ -126,8 +125,6 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
     <string name="settings_dark_theme_summary">Habilitar el tema oscuro</string>
-    <string name="settings_notification_title">Notificar Actualización</string>
-    <string name="settings_notification_summary">Notificar cuando una nueva versión esté disponible</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
     <string name="settings_hide_manager_title">Ocultar Magisk Manager</string>

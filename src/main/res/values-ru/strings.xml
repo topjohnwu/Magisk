@@ -92,7 +92,6 @@
     <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
     <string name="release_notes">О версии</string>
     <string name="repo_cache_cleared">Кэш репозитория очищен</string>
-    <string name="safetyNet_hide_notice">Приложение использует SafetyNet API.\nПо умолчанию добавлено в MagiskHide.</string>
     <string name="process_error">Ошибка обработки</string>
     <string name="internal_storage">Расположение архива:\n[Внутреннее Хранилище]%1$s</string>
     <string name="zip_download_title">Загрузка</string>
@@ -129,8 +128,6 @@
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
     <string name="settings_dark_theme_summary">Включить темное оформление</string>
-    <string name="settings_notification_title">Уведомление об обновлении</string>
-    <string name="settings_notification_summary">Показывать уведомления о выходе новой версии</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
     <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозитории. Будет обновлено принудительно</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>

@@ -83,7 +83,6 @@
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>
     <string name="repo_cache_cleared">Arhive cache eliminate</string>
-    <string name="safetyNet_hide_notice">Această aplicație utilizează SafetyNet\nDeja gestionat de MagiskHide în mod implicit</string>
     <string name="process_error">Eroare de proces</string>
     <string name="internal_storage">Zip stocat în:\n[Stocare internă]%1$s</string>
     <string name="zip_download_title">Descărcare</string>
@@ -118,8 +117,6 @@
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Temă întunecată</string>
     <string name="settings_dark_theme_summary">Activare temă întunecată</string>
-    <string name="settings_notification_title">Notificare actualizare</string>
-    <string name="settings_notification_summary">Se afișează notificări de actualizare atunci când este disponibilă o nouă versiune</string>
     <string name="settings_clear_cache_title">Eliminare cache</string>
     <string name="settings_clear_cache_summary">Ștergeți informațiile memorate în cache, forțează actualizarea aplicației online</string>
     <string name="settings_hide_manager_title">Ascundeţi Magisk Manager</string>

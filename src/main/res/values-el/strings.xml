@@ -89,7 +89,6 @@
     <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
-    <string name="safetyNet_hide_notice">Αυτή η εφαρμογή χρησιμοποιεί SafetyNet\nΉδη διαχειρίζεται από το MagiskHide από προεπιλογή</string>
     <string name="process_error">Σφάλμα διαδικασίας</string>
     <string name="internal_storage">Το zip είναι αποθηκευμένο σε:\n[Εσωτερική μνήμη]%1$s</string>
     <string name="zip_download_title">Γίνεται λήψη</string>
@@ -124,8 +123,6 @@
     <string name="settings_general_category">Γενικά</string>
     <string name="settings_dark_theme_title">Σκούρο θέμα</string>
     <string name="settings_dark_theme_summary">Ενεργοποίηση σκούρου θέματος</string>
-    <string name="settings_notification_title">Ειδοποίηση Ενημέρωσης</string>
-    <string name="settings_notification_summary">Εμφάνιση ειδοποιήσεων ενημέρωσης όταν είναι διαθέσιμη νέα έκδοση</string>
     <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
     <string name="settings_hide_manager_title">Απόκρυψη του Magisk Manager</string>

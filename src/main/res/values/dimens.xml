@@ -10,6 +10,5 @@
     <dimen name="card_layout_padding">10dp</dimen>
     <dimen name="card_textview_width">300dip</dimen>
     <dimen name="checkbox_padding">3dp</dimen>
-    <dimen name="card_appicon_size">50dp</dimen>
     <dimen name="fab_padding">16dp</dimen>
 </resources>

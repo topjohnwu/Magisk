@@ -90,7 +90,6 @@
     <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
     <string name="release_notes">Pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
-    <string name="safetyNet_hide_notice">Ši programėlė naudoja SafetyNet\nMagiskHide tai automatiškai sutvarko</string>
     <string name="process_error">Proceso klaida</string>
     <string name="internal_storage">Zip failas yra saugomas:\n[Internal Storage]%1$s</string>
     <string name="zip_download_title">Atsisiunčiama</string>
@@ -127,8 +126,6 @@
     <string name="settings_general_category">Pagrininiai</string>
     <string name="settings_dark_theme_title">Tamsi tema</string>
     <string name="settings_dark_theme_summary">Įjungti tamsią temą</string>
-    <string name="settings_notification_title">Pranešti atsiradus atnaujinimui</string>
-    <string name="settings_notification_summary">Parodyti pranešmus atsiradus naujai Magisk ar Magisk Manager versijai</string>
     <string name="settings_clear_cache_title">Išvalyti nereikalingus saugyklos failus</string>
     <string name="settings_clear_cache_summary">Išvalyti patalpintą informaciją talpykloms internete, priverčia perkrauti interneto jungtį</string>
     <string name="settings_hide_manager_title">Paslėpti Magisk Manager</string>

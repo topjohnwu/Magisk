@@ -88,7 +88,6 @@
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
     <string name="release_notes">Особливості версії</string>
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
-    <string name="safetyNet_hide_notice">Ця програма використовує SafetyNet.\nВже опрацьовано MagiskHide за замовчуванням</string>
     <string name="process_error">Помилка опрацювання</string>
     <string name="internal_storage">Архів розташований:\n[Внутрішнє Сховище]%1$s</string>
     <string name="zip_download_title">Завантаження</string>
@@ -125,8 +124,6 @@
     <string name="settings_general_category">Основні</string>
     <string name="settings_dark_theme_title">Темна тема</string>
     <string name="settings_dark_theme_summary">Увімкнути темне оформлення</string>
-    <string name="settings_notification_title">Сповіщення про оновлення</string>
-    <string name="settings_notification_summary">Показувати сповіщення про оновлення в Панелі сповіщень, коли доступна нова версія</string>
     <string name="settings_clear_cache_title">Очищення кешу</string>
     <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії, змушуючи програму примусово оновлюватися через Інтернет</string>
     <string name="settings_hide_manager_title">Приховати Magisk Manager</string>
