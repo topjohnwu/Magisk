@@ -30,6 +30,7 @@ public class MainActivity extends Activity
 
     private final Handler mDrawerHandler = new Handler();
     private int mDrawerItem;
+    private boolean fromShortcut = true;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
@@ -108,7 +109,7 @@ public class MainActivity extends Activity
     public void onBackPressed() {
         if (drawer.isDrawerOpen(navigationView)) {
             drawer.closeDrawer(navigationView);
-        } else if (mDrawerItem != R.id.magisk) {
+        } else if (mDrawerItem != R.id.magisk && !fromShortcut) {
             navigate(R.id.magisk);
         } else {
             finish();
@@ -152,9 +153,6 @@ public class MainActivity extends Activity
         int itemId = R.id.magisk;
         if (item != null) {
             switch (item) {
-                case "magisk":
-                    itemId = R.id.magisk;
-                    break;
                 case "superuser":
                     itemId = R.id.superuser;
                     break;
@@ -187,6 +185,7 @@ public class MainActivity extends Activity
         navigationView.setCheckedItem(itemId);
         switch (itemId) {
             case R.id.magisk:
+                fromShortcut = false;
                 displayFragment(new MagiskFragment(), true);
                 break;
             case R.id.superuser:
