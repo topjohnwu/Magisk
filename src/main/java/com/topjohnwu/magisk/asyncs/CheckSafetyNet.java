@@ -43,14 +43,14 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         conn.disconnect();
     }
 
-    private void dyload() throws ReflectiveOperationException {
+    private void dyload() throws Exception {
         loader = new DexClassLoader(dexPath.getPath(), dexPath.getParent(),
                 null, ClassLoader.getSystemClassLoader());
         helperClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetHelper");
         callbackClazz = loader.loadClass(Const.SNET_PKG + ".SafetyNetCallback");
         int snet_ver = (int) helperClazz.getMethod("getVersion").invoke(null);
         if (snet_ver != Const.SNET_VER) {
-            throw new ReflectiveOperationException();
+            throw new Exception();
         }
     }
 
@@ -59,7 +59,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
         try {
             try {
                 dyload();
-            } catch (ReflectiveOperationException e) {
+            } catch (Exception e) {
                 // If dynamic load failed, try re-downloading and reload
                 dlSnet();
                 dyload();
