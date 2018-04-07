@@ -124,15 +124,6 @@ static void bb_setenv(struct vector *v) {
 	vec_push_back(v, NULL);
 }
 
-static void pm_setenv(struct vector *v) {
-	for (int i = 0; environ[i]; ++i) {
-		if (strncmp(environ[i], "CLASSPATH=", 10) != 0)
-			vec_push_back(v, strdup(environ[i]));
-	}
-	vec_push_back(v, strdup("CLASSPATH=/system/framework/pm.jar"));
-	vec_push_back(v, NULL);
-}
-
 /***********
  * Scripts *
  ***********/
@@ -651,11 +642,10 @@ core_only:
 		setfilecon("/data/magisk.apk", "u:object_r:su_file:s0");
 		while (1) {
 			sleep(5);
+			LOGD("apk_install: attempting to install APK");
 			int apk_res = -1, pid;
-			pid = exec_command(1, &apk_res, pm_setenv,
-				"app_process",
-				"/system/bin", "com.android.commands.pm.Pm",
-				"install", "-r", "/data/magisk.apk", NULL);
+			pid = exec_command(1, &apk_res, NULL,
+				"/system/bin/pm", "install", "-r", "/data/magisk.apk", NULL);
 			if (pid != -1) {
 				int err = 0;
 				while (fdgets(buf, PATH_MAX, apk_res) > 0) {
