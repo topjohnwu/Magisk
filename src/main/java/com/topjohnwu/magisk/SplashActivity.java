@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
@@ -24,6 +25,7 @@ public class SplashActivity extends Activity {
 
         MagiskManager mm = getMagiskManager();
 
+        mm.repoDB = new RepoDatabaseHelper(this);
         mm.loadMagiskInfo();
         mm.getDefaultInstallFlags();
         Utils.loadPrefs();

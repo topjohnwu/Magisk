@@ -106,9 +106,9 @@ public class MagiskManager extends Shell.ContainerApp {
             @Override
             public void onRootShellInit(@NonNull Shell shell) {
                 try (InputStream utils = getAssets().open(Const.UTIL_FUNCTIONS);
-                     InputStream sudb = getResources().openRawResource(R.raw.magiskdb)) {
+                     InputStream magiskDB = getResources().openRawResource(R.raw.magiskdb)) {
                     shell.loadInputStream(null, null, utils);
-                    shell.loadInputStream(null, null, sudb);
+                    shell.loadInputStream(null, null, magiskDB);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -140,7 +140,6 @@ public class MagiskManager extends Shell.ContainerApp {
             mDB = MagiskDatabaseHelper.getInstance(this);
         }
 
-        repoDB = new RepoDatabaseHelper(this);
         defaultLocale = Locale.getDefault();
         setLocale();
         loadConfig();

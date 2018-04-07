@@ -42,7 +42,7 @@ public class Repo extends BaseModule {
         if (getVersionCode() < 0) {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
         }
-        if (getMinMagiskVersion() < Const.MIN_MODULE_VER) {
+        if (getMinMagiskVersion() < Const.MIN_MODULE_VER()) {
             throw new IllegalRepoException("Repo [" + repoName + "] is outdated");
         }
     }

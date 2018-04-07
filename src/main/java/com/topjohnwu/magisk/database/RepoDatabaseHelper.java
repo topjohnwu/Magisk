@@ -26,9 +26,9 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         mm = Utils.getMagiskManager(context);
         mDb = getWritableDatabase();
 
-        // Clear bad repos
+        // Remove outdated repos
         mDb.delete(TABLE_NAME, "minMagisk<?",
-                new String[] { String.valueOf(Const.MIN_MODULE_VER) });
+                new String[] { String.valueOf(Const.MIN_MODULE_VER()) });
     }
 
     @Override

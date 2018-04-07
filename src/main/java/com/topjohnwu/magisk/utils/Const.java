@@ -36,7 +36,10 @@ public class Const {
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
     public static final int SNET_VER = 7;
-    public static final int MIN_MODULE_VER = 1400;
+
+    public static int MIN_MODULE_VER() {
+        return MagiskManager.get().magiskVersionCode >= 1630 ? 1500 : 1400;
+    }
 
     public synchronized static SuFile MAGISK_PATH() {
         SuFile file;
