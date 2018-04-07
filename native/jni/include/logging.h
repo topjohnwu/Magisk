@@ -58,7 +58,7 @@ struct log_listener {
 };
 
 extern struct log_listener log_events[];
-extern int logd;
+extern int loggable;
 
 void monitor_logs();
 void start_debug_full_log();

@@ -15,7 +15,7 @@
 #include "resetprop.h"
 
 extern int is_daemon_init;
-int logd = 0;
+int loggable = 1;
 
 static int am_proc_start_filter(const char *log) {
 	return strstr(log, "am_proc_start") != NULL;
@@ -49,15 +49,16 @@ struct log_listener log_events[] = {
 static int debug_log_pid = -1, debug_log_fd = -1;
 #endif
 
-static void check_logd() {
-	char *prop = getprop("init.svc.logd");
-	if (prop != NULL) {
-		free(prop);
-		logd = 1;
-	} else {
-		LOGD("log_monitor: logd not started, disable logging");
-		logd = 0;
+static void test_logcat() {
+	int log_fd = -1, log_pid;
+	char buf[1];
+	log_pid = exec_command(0, &log_fd, NULL, "logcat", NULL);
+	if (read(log_fd, buf, sizeof(buf)) != sizeof(buf)) {
+		loggable = 0;
+		LOGD("log_monitor: cannot read from logcat, disable logging");
 	}
+	kill(log_pid, SIGTERM);
+	waitpid(log_pid, NULL, 0);
 }
 
 static void *logger_thread(void *args) {
@@ -67,7 +68,7 @@ static void *logger_thread(void *args) {
 	LOGD("log_monitor: logger start");
 
 	while (1) {
-		if (!logd) {
+		if (!loggable) {
 			// Disable all services
 			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
 				close(log_events[i].fd);
@@ -98,7 +99,7 @@ static void *logger_thread(void *args) {
 		// Clear buffer before restart
 		exec_command_sync("logcat", "-b", "events", "-b", "main", "-c", NULL);
 
-		check_logd();
+		test_logcat();
 	}
 
 	// Should never be here, but well...
@@ -163,9 +164,9 @@ static void *debug_magisk_log_thread(void *args) {
 void monitor_logs() {
 	pthread_t thread;
 
-	check_logd();
+	test_logcat();
 
-	if (logd) {
+	if (loggable) {
 		// Start log file dumper before monitor
 		xpthread_create(&thread, NULL, magisk_log_thread, NULL);
 		pthread_detach(thread);
@@ -178,7 +179,7 @@ void monitor_logs() {
 
 void start_debug_full_log() {
 #ifdef MAGISK_DEBUG
-	if (logd) {
+	if (loggable) {
 		// Log everything initially
 		debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
 		debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "threadtime", NULL);
@@ -201,7 +202,7 @@ void stop_debug_full_log() {
 
 void start_debug_log() {
 #ifdef MAGISK_DEBUG
-	if (logd) {
+	if (loggable) {
 		pthread_t thread;
 		// Start debug thread
 		xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);

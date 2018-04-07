@@ -49,9 +49,9 @@ void launch_magiskhide(int client) {
 		return;
 	}
 
-	if (!logd) {
+	if (!loggable) {
 		if (client > 0) {
-			write_int(client, LOGD_DISABLED);
+			write_int(client, LOGCAT_DISABLED);
 			close(client);
 		}
 		setprop(MAGISKHIDE_PROP, "0");
@@ -147,14 +147,14 @@ int magiskhide_main(int argc, char *argv[]) {
 	case ROOT_REQUIRED:
 		fprintf(stderr, "Root is required for this operation\n");
 		return code;
-	case LOGD_DISABLED:
-		fprintf(stderr, "Logd is not running, cannot run logcat\n");
+	case LOGCAT_DISABLED:
+		fprintf(stderr, "Logcat is disabled, cannot start MagiskHide\n");
 		return (code);
 	case HIDE_NOT_ENABLED:
-		fprintf(stderr, "Magisk hide is not enabled yet\n");
+		fprintf(stderr, "MagiskHide is not enabled yet\n");
 		return code;
 	case HIDE_IS_ENABLED:
-		fprintf(stderr, "Magisk hide is already enabled\n");
+		fprintf(stderr, "MagiskHide is already enabled\n");
 		return code;
 	case HIDE_ITEM_EXIST:
 		fprintf(stderr, "Process [%s] already exists in hide list\n", argv[2]);
