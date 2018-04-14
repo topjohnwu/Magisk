@@ -48,7 +48,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setIcon(Icon.createWithResource(mm, R.drawable.sc_superuser))
                     .build());
         }
-        if (Shell.rootAccess() && mm.magiskVersionCode >= 1300
+        if (Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
                 && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "magiskhide")
                     .setShortLabel(mm.getString(R.string.magiskhide))

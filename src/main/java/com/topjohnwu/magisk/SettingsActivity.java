@@ -156,7 +156,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 fingerprint.setSummary(R.string.disable_fingerprint);
             }
 
-            if (mm.magiskVersionCode >= 1440) {
+            if (mm.magiskVersionCode >= Const.MAGISK_VER.MANAGER_HIDE) {
                 if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                     hideManager.setOnPreferenceClickListener((pref) -> {
                         new HideManager(getActivity()).exec();
@@ -194,7 +194,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
                 generalCatagory.removePreference(hideManager);
-            } else if (mm.magiskVersionCode < 1300) {
+            } else if (mm.magiskVersionCode < Const.MAGISK_VER.UNIFIED) {
                 prefScreen.removePreference(magiskCategory);
             }
         }

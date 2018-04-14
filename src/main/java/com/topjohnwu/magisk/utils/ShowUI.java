@@ -268,7 +268,7 @@ public class ShowUI {
                 Shell.Sync.su(
                         Utils.fmt("echo '%s' > /cache/%s", uninstaller.toString().replace("'", "'\\''"), Const.UNINSTALLER),
                         Utils.fmt("echo '%s' > %s/%s", utils.toString().replace("'", "'\\''"),
-                                mm.magiskVersionCode >= 1464 ? "/data/adb/magisk" : "/data/magisk", Const.UTIL_FUNCTIONS)
+                                mm.magiskVersionCode >= Const.MAGISK_VER.HIDDEN_PATH ? "/data/adb/magisk" : "/data/magisk", Const.UTIL_FUNCTIONS)
                 );
                 try {
                     uninstaller.close();

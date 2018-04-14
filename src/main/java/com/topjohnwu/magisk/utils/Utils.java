@@ -202,7 +202,7 @@ public class Utils {
 
     public static void patchDTBO() {
         MagiskManager mm = MagiskManager.get();
-        if (mm.magiskVersionCode >= 1446 && !mm.keepVerity) {
+        if (mm.magiskVersionCode >= Const.MAGISK_VER.DTBO_SUPPORT && !mm.keepVerity) {
             if (ShellUtils.fastCmdResult(Shell.getShell(), "patch_dtbo_image")) {
                 ShowUI.dtboPatchedNotification();
             }

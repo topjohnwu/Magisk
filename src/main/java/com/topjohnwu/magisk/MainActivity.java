@@ -138,7 +138,7 @@ public class MainActivity extends Activity
         MagiskManager mm = getMagiskManager();
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && mm.magiskVersionCode >= 1300
+                Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
                         && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);

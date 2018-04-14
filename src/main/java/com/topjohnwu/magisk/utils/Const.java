@@ -69,6 +69,16 @@ public class Const {
 
     public static final int USER_ID = Process.myUid() / 100000;
 
+    public static final class MAGISK_VER {
+        public static final int UNIFIED = 1300;
+        public static final int FBE_AWARE = 1410;
+        public static final int RESETPROP_PERSIST = 1436;
+        public static final int MANAGER_HIDE = 1440;
+        public static final int DTBO_SUPPORT = 1446;
+        public static final int LEGACY_GLOBAL_DB = 1450;
+        public static final int HIDDEN_PATH = 1460;
+    }
+
     public static class ID {
         public static final int UPDATE_SERVICE_ID = 1;
         public static final int FETCH_ZIP = 2;

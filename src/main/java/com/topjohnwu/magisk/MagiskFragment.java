@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -205,7 +206,7 @@ public class MagiskFragment extends Fragment
 
         boolean hasNetwork = Utils.checkNetworkStatus();
         boolean hasRoot = Shell.rootAccess();
-        boolean isUpToDate = mm.magiskVersionCode > 1300;
+        boolean isUpToDate = mm.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);

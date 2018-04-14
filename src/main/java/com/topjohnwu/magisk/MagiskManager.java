@@ -210,7 +210,7 @@ public class MagiskManager extends Shell.ContainerApp {
         try {
             magiskVersionString = Utils.cmd("magisk -v").split(":")[0];
             magiskVersionCode = Integer.parseInt(Utils.cmd("magisk -V"));
-            String s = Utils.cmd((magiskVersionCode > 1435 ? "resetprop -p " : "getprop ")
+            String s = Utils.cmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ? "resetprop -p " : "getprop ")
                     + Const.MAGISKHIDE_PROP);
             magiskHide = s == null || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
