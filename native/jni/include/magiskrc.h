@@ -1,3 +1,5 @@
+#include "magiskpolicy.h"
+
 const char magiskrc[] =
 
 // Triggers
@@ -20,25 +22,25 @@ const char magiskrc[] =
 
 "service magisk_daemon /sbin/magisk --daemon\n"
 "   user root\n"
-"   seclabel u:r:su:s0\n"
+"   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
 "   oneshot\n"
 "\n"
 
 "service magisk_pfs /sbin/magisk --post-fs\n"
 "   user root\n"
-"   seclabel u:r:su:s0\n"
+"   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
 "   oneshot\n"
 "\n"
 
 "service magisk_pfsd /sbin/magisk --post-fs-data\n"
 "   user root\n"
-"   seclabel u:r:su:s0\n"
+"   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
 "   oneshot\n"
 "\n"
 
-"service magisk_service /sbin/magisk  --service\n"
+"service magisk_service /sbin/magisk --service\n"
 "   class late_start\n"
 "   user root\n"
-"   seclabel u:r:su:s0\n"
+"   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
 "   oneshot\n"
 ;

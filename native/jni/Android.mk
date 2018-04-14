@@ -31,6 +31,7 @@ LOCAL_SHARED_LIBRARIES := libsqlite libselinux
 
 LOCAL_C_INCLUDES := \
 	jni/include \
+	jni/magiskpolicy \
 	$(EXT_PATH)/include \
 	$(LIBSELINUX)
 
@@ -74,7 +75,6 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_SRC_FILES := \
 	core/magiskinit.c \
-	core/socket.c \
 	magiskpolicy/api.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \

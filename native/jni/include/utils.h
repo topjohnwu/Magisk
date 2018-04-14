@@ -122,7 +122,7 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
-void restorecon(int dirfd, int force);
+void restorecon(int dirfd);
 int mmap_ro(const char *filename, void **buf, size_t *size);
 int mmap_rw(const char *filename, void **buf, size_t *size);
 void fd_full_read(int fd, void **buf, size_t *size);

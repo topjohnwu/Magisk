@@ -19,8 +19,11 @@
 #include "utils.h"
 #include "daemon.h"
 #include "resetprop.h"
+#include "magiskpolicy.h"
 
-int is_daemon_init = 0, seperate_vendor = 0;
+int is_daemon_init = 0;
+int seperate_vendor = 0;
+int full_patch_pid;
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);
@@ -133,23 +136,50 @@ void daemon_init() {
 	LOGI("* Creating /sbin overlay");
 	DIR *dir;
 	struct dirent *entry;
-	int root, sbin;
+	int root, sbin, fd;
 	char buf[PATH_MAX], buf2[PATH_MAX];
-	char magisk_name[10], init_name[10];
+	void *data;
+	size_t size;
 
-	// Setup links under /sbin
+	// Create hardlink mirror of /sbin to /root
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-	xmkdir("/root", 0755);
-	chmod("/root", 0755);
+	full_read("/sbin/magisk", &data, &size);
 	root = xopen("/root", O_RDONLY | O_CLOEXEC);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 	link_dir(sbin, root);
 	unlink("/sbin/magisk");
 	close(sbin);
 
+	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
+
+	// Setup magisk
+	fd = creat("/sbin/magisk", 0755);
+	xwrite(fd, data, size);
+	close(fd);
+	free(data);
+	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(buf, PATH_MAX, "/sbin/%s", applet[i]);
+		xsymlink("/sbin/magisk", buf);
+	}
+
+	// Setup magiskinit
+	full_read("/root/magiskinit", &data, &size);
+	unlink("/root/magiskinit");
+	fd = creat("/sbin/magiskinit", 0755);
+	xwrite(fd, data, size);
+	close(fd);
+	free(data);
+	setfilecon("/sbin/magiskinit", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	for (int i = 0; init_applet[i]; ++i) {
+		snprintf(buf, PATH_MAX, "/sbin/%s", init_applet[i]);
+		xsymlink("/sbin/magiskinit", buf);
+	}
+
+	// Create symlinks pointing back to /root
 	dir = xfdopendir(root);
 	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
@@ -158,28 +188,10 @@ void daemon_init() {
 		xsymlink(buf, buf2);
 	}
 
-	gen_rand_str(magisk_name, sizeof(magisk_name));
-	snprintf(buf, PATH_MAX, "/root/%s", magisk_name);
-	unlink("/sbin/magisk");
-	rename("/root/magisk", buf);
-	xsymlink(buf, "/sbin/magisk");
-	for (int i = 0; applet[i]; ++i) {
-		snprintf(buf2, PATH_MAX, "/sbin/%s", applet[i]);
-		xsymlink(buf, buf2);
-	}
-
-	gen_rand_str(init_name, sizeof(init_name));
-	snprintf(buf, PATH_MAX, "/root/%s", init_name);
-	unlink("/sbin/magiskinit");
-	rename("/root/magiskinit", buf);
-	for (int i = 0; init_applet[i]; ++i) {
-		snprintf(buf2, PATH_MAX, "/sbin/%s", init_applet[i]);
-		xsymlink(buf, buf2);
-	}
-
 	close(root);
-
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+
+	full_patch_pid = exec_command(0, NULL, NULL, "/sbin/magiskpolicy", "--live", "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
 
 	LOGI("* Mounting mirrors");
 	struct vector mounts;
@@ -239,7 +251,7 @@ void daemon_init() {
 
 void start_daemon() {
 	setsid();
-	setcon("u:r:su:s0");
+	setcon("u:r:"SEPOL_PROC_DOMAIN":s0");
 	umask(0);
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDIN_FILENO);

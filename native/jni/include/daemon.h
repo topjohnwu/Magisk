@@ -8,7 +8,9 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 
-extern int is_daemon_init, seperate_vendor;
+extern int is_daemon_init;
+extern int seperate_vendor;
+extern int full_patch_pid;
 
 // Commands require connecting to daemon
 enum {

@@ -339,7 +339,7 @@ static void patch_socket_name(const char *path) {
 	mmap_rw(path, &buf, &size);
 	if (SOCKET_OFF < 0) {
 		for (int i = 0; i < size; ++i) {
-			if (memcmp(buf + i, socket_name, sizeof(SOCKET_NAME)) == 0) {
+			if (memcmp(buf + i, SOCKET_NAME, sizeof(SOCKET_NAME)) == 0) {
 				SOCKET_OFF = i;
 				break;
 			}
@@ -348,55 +348,6 @@ static void patch_socket_name(const char *path) {
 	gen_rand_str(RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
 	memcpy(buf + SOCKET_OFF, RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
 	munmap(buf, size);
-}
-
-static void magisk_init_daemon() {
-	setsid();
-
-	// Full patch
-	sepol_allow("su", ALL, ALL, ALL);
-
-	// Wait till init cold boot done
-	while (access("/dev/.coldboot_done", F_OK))
-		usleep(1);
-
-	int null = open("/dev/null", O_RDWR | O_CLOEXEC);
-	dup3(null, STDIN_FILENO, O_CLOEXEC);
-	dup3(null, STDOUT_FILENO, O_CLOEXEC);
-	dup3(null, STDERR_FILENO, O_CLOEXEC);
-	if (null > STDERR_FILENO)
-		close(null);
-
-	// Transit our context to su (mimic setcon)
-	int fd, crap;
-	fd = open("/proc/self/attr/current", O_WRONLY);
-	write(fd, "u:r:su:s0", 9);
-	close(fd);
-
-	// Dump full patch to kernel
-	dump_policydb(SELINUX_LOAD);
-	close(creat(PATCHDONE, 0));
-	destroy_policydb();
-
-	// Keep Magisk daemon always alive
-	while (1) {
-		struct sockaddr_un sun;
-		fd = setup_socket(&sun);
-		memcpy(sun.sun_path + 1, RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
-		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
-			usleep(10000); /* Wait 10 ms after each try */
-
-		/* Should hold forever */
-		read(fd, &crap, sizeof(crap));
-
-		/* If things went here, it means the other side of the socket is closed
-		 * We restart the daemon again */
-		close(fd);
-		if (fork_dont_care() == 0) {
-			execv("/sbin/magisk", (char *[]) { "magisk", "--daemon", NULL } );
-			exit(1);
-		}
-	}
 }
 
 int main(int argc, char *argv[]) {
@@ -430,7 +381,7 @@ int main(int argc, char *argv[]) {
 	mkdir("/overlay/sbin", 0755);
 	dump_magisk("/overlay/sbin/magisk", 0755);
 	patch_socket_name("/overlay/sbin/magisk");
-	mkdir("/overlay/root", 0755);
+	mkdir("/overlay/root", 0750);
 	link("/init", "/overlay/root/magiskinit");
 
 	struct cmdline cmd;
@@ -520,20 +471,13 @@ int main(int argc, char *argv[]) {
 
 		patch_ramdisk();
 		patch_sepolicy();
-
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		close(STDERR_FILENO);
-
-		if (fork_dont_care() == 0) {
-			strcpy(argv[0], "magiskinit");
-			close(root);
-			magisk_init_daemon();
-		}
 	}
 
 	// Clean up
 	close(root);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 	if (!cmd.skip_initramfs)
 		umount("/system");
 	umount("/vendor");

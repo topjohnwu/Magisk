@@ -344,7 +344,7 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
 
-void restorecon(int dirfd, int force) {
+void restorecon(int dirfd) {
 	struct dirent *entry;
 	DIR *dir;
 	int fd;
@@ -352,7 +352,7 @@ void restorecon(int dirfd, int force) {
 
 	fd_getpath(dirfd, path, sizeof(path));
 	lgetfilecon(path, &con);
-	if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+	if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
 		lsetfilecon(path, SYSTEM_CON);
 	freecon(con);
 
@@ -362,12 +362,12 @@ void restorecon(int dirfd, int force) {
 			continue;
 		if (entry->d_type == DT_DIR) {
 			fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			restorecon(fd, force);
+			restorecon(fd);
 		} else {
 			fd = xopenat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
 			fd_getpath(fd, path, sizeof(path));
 			lgetfilecon(path, &con);
-			if (force || strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+			if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
 				lsetfilecon(path, SYSTEM_CON);
 			freecon(con);
 		}
@@ -379,7 +379,7 @@ void restorecon(int dirfd, int force) {
 
 static int _mmap(int rw, const char *filename, void **buf, size_t *size) {
 	struct stat st;
-	int fd = xopen(filename, rw ? O_RDWR : O_RDONLY);
+	int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
 	fstat(fd, &st);
 	if (S_ISBLK(st.st_mode))
 		ioctl(fd, BLKGETSIZE64, size);
@@ -407,7 +407,7 @@ void fd_full_read(int fd, void **buf, size_t *size) {
 }
 
 void full_read(const char *filename, void **buf, size_t *size) {
-	int fd = xopen(filename, O_RDONLY);
+	int fd = xopen(filename, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
 		*buf = NULL;
 		*size = 0;
@@ -418,7 +418,7 @@ void full_read(const char *filename, void **buf, size_t *size) {
 }
 
 void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
-	int fd = xopenat(dirfd, filename, O_RDONLY);
+	int fd = xopenat(dirfd, filename, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
 		*buf = NULL;
 		*size = 0;

@@ -8,7 +8,7 @@
 #include "utils.h"
 #include "magisk.h"
 
-char socket_name[] = SOCKET_NAME;
+static char socket_name[] = SOCKET_NAME;  /* Workaround compiler bug pre NDK r13 */
 
 /* Setup the address and return socket fd */
 int setup_socket(struct sockaddr_un *sun) {

@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "daemon.h"
 #include "resetprop.h"
+#include "magiskpolicy.h"
 
 static char *buf, *buf2;
 static struct vector module_list;
@@ -451,7 +452,7 @@ static int prepare_img() {
 
 void fix_filecon() {
 	int dirfd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
-	restorecon(dirfd, 0);
+	restorecon(dirfd);
 	close(dirfd);
 }
 
@@ -621,8 +622,7 @@ void late_start(int client) {
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
-	wait_till_exists(PATCHDONE);
-	unlink(PATCHDONE);
+	waitpid(full_patch_pid, NULL, 0);
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");
@@ -639,7 +639,7 @@ core_only:
 	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
 		rename(MANAGERAPK, "/data/magisk.apk");
-		setfilecon("/data/magisk.apk", "u:object_r:su_file:s0");
+		setfilecon("/data/magisk.apk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 		while (1) {
 			sleep(5);
 			LOGD("apk_install: attempting to install APK");
