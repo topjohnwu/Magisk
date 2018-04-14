@@ -7,6 +7,8 @@
 #include <stdlib.h>
 
 #define ALL NULL
+#define SEPOL_PROC_DOMAIN "magisk"
+#define SEPOL_FILE_DOMAIN "magisk_file"
 
 // policydb functions
 int load_policydb(const char *filename);
