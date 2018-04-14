@@ -121,7 +121,6 @@ static __attribute__ ((noreturn)) void allow() {
 	umask(022);
 	populate_environment(su_ctx);
 	set_identity(su_ctx->to.uid);
-	setexeccon("u:r:su:s0");
 
 	execvp(su_ctx->to.shell, argv);
 	fprintf(stderr, "Cannot execute %s: %s\n", su_ctx->to.shell, strerror(errno));
