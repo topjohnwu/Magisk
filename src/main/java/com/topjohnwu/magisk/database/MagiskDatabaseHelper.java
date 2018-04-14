@@ -96,10 +96,9 @@ public class MagiskDatabaseHelper {
                     Shell.Sync.su(Utils.fmt("mv -f %s %s; ln -s %s %s",
                             oldDB, GLOBAL_DB, GLOBAL_DB, oldDB));
                 }
-                if (mm.magiskVersionCode < 1550) {
+                if (mm.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {
                     // We need some additional policies on old versions
-                    Shell.Sync.su("magiskpolicy --live " +
-                            "'create su_file' 'allow * su_file file *' 'allow * su_file dir *'");
+                    Shell.Sync.su("db_sepatch");
                 }
                 if (!GLOBAL_DB.exists()) {
                     Shell.Sync.su("db_init");
