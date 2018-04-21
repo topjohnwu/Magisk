@@ -9,6 +9,7 @@ void allowSuClient(char *target) {
 	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
+	sepol_allow(target, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
 	// Allow access to magisk files
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "sock_file", "read");
@@ -49,28 +50,6 @@ void otherToSU() {
 	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
 	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "transfer");
 
-	// ES Explorer opens a sokcet
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "ioctl");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "read");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "getattr");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "write");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "setattr");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "lock");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "append");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "bind");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "connect");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "setopt");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "shutdown");
-	sepol_allow("untrusted_app", SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-
-	// Any domain is allowed to send su "sigchld"
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
-
-	// uNetworkL0
-	sepol_attradd(SEPOL_PROC_DOMAIN, "netdomain");
-	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
-
 	// suBackL6
 	sepol_allow("surfaceflinger", "app_data_file", "dir", ALL);
 	sepol_allow("surfaceflinger", "app_data_file", "file", ALL);
@@ -107,15 +86,13 @@ void sepol_magisk_rules() {
 	sepol_permissive(SEPOL_PROC_DOMAIN);
 
 	sepol_attradd(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
+	sepol_attradd(SEPOL_PROC_DOMAIN, "netdomain");
+	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
 	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
 
 	// Let init run stuffs
 	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
 	sepol_allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-	sepol_allow("init", "system_file", "dir", ALL);
-	sepol_allow("init", "system_file", "lnk_file", ALL);
-	sepol_allow("init", "system_file", "file", ALL);
-	sepol_allow("init", "rootfs", "lnk_file", ALL);
 
 	// Shell, properties, logs
 	if (sepol_exists("default_prop"))
