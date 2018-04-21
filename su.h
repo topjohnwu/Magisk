@@ -41,7 +41,6 @@
 #define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
 
 #define DEFAULT_SHELL "/system/bin/sh"
-#define DATABASE_PATH "/data/adb/magisk.db"
 
 typedef enum {
 	QUERY = 0,

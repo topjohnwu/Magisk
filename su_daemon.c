@@ -337,7 +337,7 @@ int su_client_main(int argc, char *argv[]) {
 	int ptmx, socketfd;
 
 	// Connect to client
-	socketfd = connect_daemon();
+	socketfd = connect_daemon(0);
 
 	// Tell the daemon we are su
 	write_int(socketfd, SUPERUSER);

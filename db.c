@@ -87,7 +87,7 @@ void database_check(struct su_context *ctx) {
 	strcpy(ctx->info->pkg_name, "???");  /* bad string so it doesn't exist */
 
 	// Open database
-	ret = sqlite3_open_v2(DATABASE_PATH, &db, SQLITE_OPEN_READONLY, NULL);
+	ret = sqlite3_open_v2(MAGISKDB, &db, SQLITE_OPEN_READONLY, NULL);
 	if (ret) {
 		LOGE("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 		sqlite3_close(db);
