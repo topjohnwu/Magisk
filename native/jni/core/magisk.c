@@ -47,13 +47,14 @@ static void usage() {
 		"   --resizeimg IMG SIZE      resize ext4 image. SIZE is interpreted in MB\n"
 		"   --mountimg IMG PATH       mount IMG to PATH and prints the loop device\n"
 		"   --umountimg PATH LOOP     unmount PATH and delete LOOP device\n"
-		"   --[init service]          start init service\n"
+		"   --daemon                  manually start magisk daemon\n"
+		"   --[init trigger]          start service for init trigger\n"
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
 		"   --restorecon              fix selinux context on Magisk files and folders\n"
 		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
 		"\n"
-		"Supported init services:\n"
-		"   daemon, post-fs, post-fs-data, service\n"
+		"Supported init triggers:\n"
+		"   startup, post-fs-data, service\n"
 		"\n"
 		"Supported applets:\n"
 	, argv0, argv0);
@@ -65,6 +66,7 @@ static void usage() {
 }
 
 int main(int argc, char *argv[]) {
+	umask(0);
 	argv0 = argv[0];
 	if (strcmp(basename(argv[0]), "magisk") == 0) {
 		if (argc < 2) usage();
@@ -72,14 +74,14 @@ int main(int argc, char *argv[]) {
 			printf("%s (%d)\n", MAGISK_VER_STR, MAGISK_VER_CODE);
 			return 0;
 		} else if (strcmp(argv[1], "-v") == 0) {
-			int fd = connect_daemon();
+			int fd = connect_daemon(0);
 			write_int(fd, CHECK_VERSION);
 			char *v = read_string(fd);
 			printf("%s\n", v);
 			free(v);
 			return 0;
 		} else if (strcmp(argv[1], "-V") == 0) {
-			int fd = connect_daemon();
+			int fd = connect_daemon(0);
 			write_int(fd, CHECK_VERSION_CODE);
 			printf("%d\n", read_int(fd));
 			return 0;
@@ -144,19 +146,18 @@ int main(int argc, char *argv[]) {
 			clone_attr(argv[2], argv[3]);
 			return 0;
 		} else if (strcmp(argv[1], "--daemon") == 0) {
-			if (xfork() == 0)
-				start_daemon();
+			int fd = connect_daemon(0);
+			close(fd);
 			return 0;
-		} else if (strcmp(argv[1], "--post-fs") == 0) {
-			int fd = connect_daemon();
-			write_int(fd, POST_FS);
-			return read_int(fd);
+		} else if (strcmp(argv[1], "--startup") == 0) {
+			startup();
+			return 0;
 		} else if (strcmp(argv[1], "--post-fs-data") == 0) {
-			int fd = connect_daemon();
+			int fd = connect_daemon(1);
 			write_int(fd, POST_FS_DATA);
 			return read_int(fd);
 		} else if (strcmp(argv[1], "--service") == 0) {
-			int fd = connect_daemon();
+			int fd = connect_daemon(0);
 			write_int(fd, LATE_START);
 			return read_int(fd);
 		} else {

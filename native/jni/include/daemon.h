@@ -18,7 +18,6 @@ enum {
 	SUPERUSER,
 	CHECK_VERSION,
 	CHECK_VERSION_CODE,
-	POST_FS,
 	POST_FS_DATA,
 	LATE_START,
 	LAUNCH_MAGISKHIDE,
@@ -42,10 +41,9 @@ enum {
 
 // daemon.c
 
-void start_daemon();
-int connect_daemon();
+void start_daemon(int post_fs_data);
+int connect_daemon(int post_fs_data);
 void auto_start_magiskhide();
-void daemon_init();
 
 // socket.c
 
@@ -61,7 +59,7 @@ void write_string(int fd, const char* val);
  * Boot Stages *
  ***************/
 
-void post_fs(int client);
+void startup();
 void post_fs_data(int client);
 void late_start(int client);
 void fix_filecon();

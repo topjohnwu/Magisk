@@ -6,14 +6,12 @@ const char magiskrc[] =
 
 "on post-fs\n"
 "   start logd\n"
-"   start magisk_pfs\n"
-"   wait /dev/.magisk.unblock 10\n"
 "\n"
 
 "on post-fs-data\n"
 "   load_persist_props\n"
 "   rm /dev/.magisk.unblock\n"
-"   start magisk_pfsd\n"
+"   start magisk_startup\n"
 "   wait /dev/.magisk.unblock 10\n"
 "   rm /dev/.magisk.unblock\n"
 "\n"
@@ -26,13 +24,7 @@ const char magiskrc[] =
 "   oneshot\n"
 "\n"
 
-"service magisk_pfs /sbin/magisk --post-fs\n"
-"   user root\n"
-"   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
-"   oneshot\n"
-"\n"
-
-"service magisk_pfsd /sbin/magisk --post-fs-data\n"
+"service magisk_startup /sbin/magisk --startup\n"
 "   user root\n"
 "   seclabel u:r:"SEPOL_PROC_DOMAIN":s0\n"
 "   oneshot\n"

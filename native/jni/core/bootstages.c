@@ -351,7 +351,7 @@ static void simple_mount(const char *path) {
 	DIR *dir;
 	struct dirent *entry;
 
-	snprintf(buf, PATH_MAX, "%s%s", CACHEMOUNT, path);
+	snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, path);
 	if (!(dir = opendir(buf)))
 		return;
 
@@ -369,7 +369,7 @@ static void simple_mount(const char *path) {
 			free(new_path);
 		} else if (entry->d_type == DT_REG) {
 			// Actual file path
-			snprintf(buf, PATH_MAX, "%s%s", CACHEMOUNT, buf2);
+			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);
 			// Clone all attributes
 			clone_attr(buf2, buf);
 			// Finally, mount the file
@@ -465,15 +465,13 @@ static void unblock_boot_process() {
 	pthread_exit(NULL);
 }
 
-void post_fs(int client) {
-	LOGI("** post-fs mode running\n");
-	// ack
-	write_int(client, 0);
-	close(client);
+void startup() {
+	if (!check_data())
+		return;
 
-	// Uninstall or core only mode
+	// uninstaller or core-only mode
 	if (access(UNINSTALLER, F_OK) == 0 || access(DISABLEFILE, F_OK) == 0)
-		goto unblock;
+		goto initialize;
 
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
@@ -482,38 +480,176 @@ void post_fs(int client) {
 	simple_mount("/system");
 	simple_mount("/vendor");
 
-unblock:
-	unblock_boot_process();
-}
+initialize:
+	LOGI("** Initializing Magisk\n");
 
-void post_fs_data(int client) {
-	// ack
-	write_int(client, 0);
-	close(client);
-	if (!is_daemon_init && !check_data())
-		goto unblock;
+	// Unlock all blocks for rw
+	unlock_blocks();
 
-	// Start the debug log
-	start_debug_full_log();
+	// Magisk binaries
+	char *bin_path = NULL;
+	if (access("/cache/data_bin", F_OK) == 0)
+		bin_path = "/cache/data_bin";
+	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/data/com.topjohnwu.magisk/install";
+	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
+		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
+	if (bin_path) {
+		rm_rf(DATABIN);
+		cp_afc(bin_path, DATABIN);
+		rm_rf(bin_path);
+	}
 
-	LOGI("** post-fs-data mode running\n");
+	// Migration
+	rm_rf("/data/magisk");
+	unlink("/data/magisk.img");
+	unlink("/data/magisk_debug.log");
+	xmkdir("/data/adb", 0700);
+	chmod("/data/adb", 0700);
 
-	// Allocate buffer
-	if (buf == NULL) buf = xmalloc(PATH_MAX);
-	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
-	vec_init(&module_list);
+	LOGI("* Creating /sbin overlay");
+	DIR *dir;
+	struct dirent *entry;
+	int root, sbin, fd;
+	char buf[PATH_MAX];
+	void *magisk, *init;
+	size_t magisk_size, init_size;
 
-	// Initialize
-	if (!is_daemon_init)
-		daemon_init();
+	// Create hardlink mirror of /sbin to /root
+	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	mkdir("/root", 0750);
+	full_read("/sbin/magisk", &magisk, &magisk_size);
+	unlink("/sbin/magisk");
+	full_read("/sbin/magiskinit", &init, &init_size);
+	unlink("/sbin/magiskinit");
+	root = xopen("/root", O_RDONLY | O_CLOEXEC);
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+	link_dir(sbin, root);
+	close(sbin);
 
-	// uninstaller
+	// Mount the /sbin tmpfs overlay
+	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
+	chmod("/sbin", 0755);
+	setfilecon("/sbin", "u:object_r:rootfs:s0");
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+
+	// Setup magisk symlinks
+	fd = creat("/sbin/magisk", 0755);
+	xwrite(fd, magisk, magisk_size);
+	close(fd);
+	free(magisk);
+	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	for (int i = 0; applet[i]; ++i) {
+		snprintf(buf, PATH_MAX, "/sbin/%s", applet[i]);
+		xsymlink("/sbin/magisk", buf);
+	}
+
+	// Setup magiskinit symlinks
+	fd = creat("/sbin/magiskinit", 0755);
+	xwrite(fd, init, init_size);
+	close(fd);
+	free(init);
+	setfilecon("/sbin/magiskinit", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	for (int i = 0; init_applet[i]; ++i) {
+		snprintf(buf, PATH_MAX, "/sbin/%s", init_applet[i]);
+		xsymlink("/sbin/magiskinit", buf);
+	}
+
+	// Create symlinks pointing back to /root
+	dir = xfdopendir(root);
+	while((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
+		symlinkat(buf, sbin, entry->d_name);
+	}
+
+	close(sbin);
+	close(root);
+
+	LOGI("* Mounting mirrors");
+	struct vector mounts;
+	vec_init(&mounts);
+	file_to_vector("/proc/mounts", &mounts);
+	char *line;
+	int skip_initramfs = 0;
+	// Check whether skip_initramfs device
+	vec_for_each(&mounts, line) {
+		if (strstr(line, " /system_root ")) {
+			xmkdirs(MIRRDIR "/system", 0755);
+			bind_mount("/system_root/system", MIRRDIR "/system");
+			skip_initramfs = 1;
+			break;
+		}
+	}
+	vec_for_each(&mounts, line) {
+		if (!skip_initramfs && strstr(line, " /system ")) {
+			sscanf(line, "%s", buf);
+			xmkdirs(MIRRDIR "/system", 0755);
+			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
+#ifdef MAGISK_DEBUG
+			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
+#else
+			LOGI("mount: %s\n", MIRRDIR "/system");
+#endif
+		} else if (strstr(line, " /vendor ")) {
+			seperate_vendor = 1;
+			sscanf(line, "%s", buf);
+			xmkdirs(MIRRDIR "/vendor", 0755);
+			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
+#ifdef MAGISK_DEBUG
+			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
+#else
+			LOGI("mount: %s\n", MIRRDIR "/vendor");
+#endif
+		}
+		free(line);
+	}
+	vec_destroy(&mounts);
+	if (!seperate_vendor) {
+		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+#ifdef MAGISK_DEBUG
+		LOGI("link: %s <- %s\n", MIRRDIR "/vendor", MIRRDIR "/system/vendor");
+#else
+		LOGI("link: %s\n", MIRRDIR "/vendor");
+#endif
+	}
+	xmkdirs(MIRRDIR "/bin", 0755);
+	bind_mount(DATABIN, MIRRDIR "/bin");
+
+	LOGI("* Setting up internal busybox");
+	xmkdirs(BBPATH, 0755);
+	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
+	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+
+	// uninstall
 	if (access(UNINSTALLER, F_OK) == 0) {
 		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
 		setenv("BOOTMODE", "true", 1);
 		exec_command(0, NULL, bb_setenv, "sh", UNINSTALLER, NULL);
 		return;
 	}
+
+	// Start post-fs-data mode
+	execv("/sbin/magisk", (char *[]) { "magisk", "--post-fs-data", NULL });
+}
+
+void post_fs_data(int client) {
+	// ack
+	write_int(client, 0);
+	close(client);
+
+	// Start the debug log
+	start_debug_full_log();
+
+	LOGI("** post-fs-data mode running\n");
+
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	full_patch_pid = exec_command(0, NULL, NULL, "/sbin/magiskpolicy", "--live", "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
+
+	// Allocate buffer
+	buf = xmalloc(PATH_MAX);
+	buf2 = xmalloc(PATH_MAX);
+	vec_init(&module_list);
 
 	// Merge, trim, mount magisk.img, which will also travel through the modules
 	// After this, it will create the module list
@@ -606,8 +742,6 @@ core_only:
 	}
 
 	auto_start_magiskhide();
-
-unblock:
 	unblock_boot_process();
 }
 

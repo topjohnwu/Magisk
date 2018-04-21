@@ -14,12 +14,9 @@
 #endif
 
 #define LOGFILE         "/cache/magisk.log"
-#define DEBUG_LOG       "/data/adb/magisk_debug.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
-#define PATCHDONE       "/dev/.magisk.patch.done"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define UNINSTALLER     "/cache/magisk_uninstaller.sh"
-#define CACHEMOUNT      "/cache/magisk_mount"
 #define MAGISKTMP       "/sbin/.core"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define BBPATH          MAGISKTMP "/busybox"
@@ -27,8 +24,12 @@
 #define COREDIR         MOUNTPOINT "/.core"
 #define HOSTSFILE       COREDIR "/hosts"
 #define HIDELIST        COREDIR "/hidelist"
-#define MAINIMG         "/data/adb/magisk.img"
-#define DATABIN         "/data/adb/magisk"
+#define SECURE_DIR      "/data/adb/"
+#define MAINIMG         SECURE_DIR "magisk.img"
+#define DATABIN         SECURE_DIR "magisk"
+#define MAGISKDB        SECURE_DIR "magisk.db"
+#define SIMPLEMOUNT     SECURE_DIR "magisk_simple"
+#define DEBUG_LOG       SECURE_DIR "magisk_debug.log"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKRC        "/init.magisk.rc"
 

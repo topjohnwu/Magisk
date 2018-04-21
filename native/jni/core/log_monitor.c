@@ -14,7 +14,6 @@
 #include "utils.h"
 #include "resetprop.h"
 
-extern int is_daemon_init;
 int loggable = 1;
 
 static int am_proc_start_filter(const char *log) {
@@ -107,38 +106,20 @@ static void *logger_thread(void *args) {
 }
 
 static void *magisk_log_thread(void *args) {
-	// Buffer logs before we have data access
-	struct vector logs;
-	vec_init(&logs);
-
+	FILE *log = xfopen(LOGFILE, "w");
+	setbuf(log, NULL);
 	int pipefd[2];
 	if (xpipe2(pipefd, O_CLOEXEC) == -1)
 		return NULL;
 
+	LOGD("log_monitor: magisk log dumper start");
+
 	// Register our listener
 	log_events[LOG_EVENT].fd = pipefd[1];
 
-	LOGD("log_monitor: magisk log dumper start");
+	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line))
+		fprintf(log, "%s", line);
 
-	FILE *log = NULL;
-	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line)) {
-		if (!is_daemon_init) {
-			vec_push_back(&logs, strdup(line));
-		} else {
-			if (log == NULL) {
-				// Dump buffered logs to file
-				log = xfopen(LOGFILE, "w");
-				setbuf(log, NULL);
-				char *tmp;
-				vec_for_each(&logs, tmp) {
-					fprintf(log, "%s", tmp);
-					free(tmp);
-				}
-				vec_destroy(&logs);
-			}
-			fprintf(log, "%s", line);
-		}
-	}
 	return NULL;
 }
 
