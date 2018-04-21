@@ -16,6 +16,7 @@
 #include "magisk.h"
 #include "utils.h"
 #include "su.h"
+#include "magiskpolicy.h"
 
 int socket_create_temp(char *path, size_t len) {
     int fd;
@@ -42,7 +43,7 @@ int socket_create_temp(char *path, size_t len) {
     xlisten(fd, 1);
 
     // Set attributes so requester can access it
-    setfilecon(path, "u:object_r:su_file:s0");
+    setfilecon(path, "u:object_r:"SEPOL_FILE_DOMAIN":s0");
     chown(path, su_ctx->info->st.st_uid, su_ctx->info->st.st_gid);
 
     return fd;
