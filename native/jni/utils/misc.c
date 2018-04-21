@@ -22,6 +22,7 @@
 #include "logging.h"
 #include "utils.h"
 #include "resetprop.h"
+#include "magisk.h"
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -378,4 +379,108 @@ void gen_rand_str(char *buf, int len) {
 		buf[i] = base[buf[i] % (sizeof(base) - 1)];
 	}
 	buf[len - 1] = '\0';
+}
+
+// Try Permission 13 Workaround
+// Setup environment
+void prep_perm13env(int imgtype) {
+    switch(imgtype)
+    {
+        case 1:
+            LOGI("Creating environment %d (main)", imgtype);
+            if (access(MAINIMG, F_OK) == -1)
+                {
+                if (create_img(MAINIMG, 64))
+                    LOGI("/data/adb/magisk.img created");
+                }
+            xmkdir("/data/adb/img", 0755);
+            xmkdir("/data/adb/img/source", 0755);
+            xmkdir("/data/adb/img/target", 0755);
+            xmkdir("/data/adb/.perm13", 0755);
+
+
+            //Needed (reboot) because of "Device busy" after unlinking IMG_MERGEIMG directly after a module installation
+            unlink(IMG_MERGEIMG);
+
+            //Needed for first module installation
+            xmkdir("/data/adb/.helper", 0755);
+            xmkdir("/data/adb/.helper/magisk_merge", 0755);
+            xmkdir("/data/adb/.helper/magisk_img", 0755);
+            xmkdir("/dev/tmp", 0755);
+
+            //Setup bindmount targets
+            system("touch /data/adb/img/magisk.img");
+
+            //Create bindmount for the following overlay
+            int ret1 = mount(MAINIMG,IMG_MAINIMG,NULL,MS_BIND,NULL);
+            if (ret1 == -1)
+                {
+                PLOGE(" Bindmount magisk.img -> /img fail");
+                }
+
+            // Create SDCARDFS "Overlay"
+            ret1 = mount("/data/adb/img","/data/adb/.perm13","sdcardfs",0,NULL);
+            if (ret1 == -1)
+                {
+                PLOGE("/adb/img SDCARDFS mount failed");
+                }
+            ret1 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
+            if (ret1 == -1)
+            {
+                PLOGE("/dev/tmp SDCARDFS mount failed");
+            }
+            break;
+        case 2:
+            LOGI(" Creating environment %d (merge)", imgtype);
+            xmkdir("/data/adb/.helper", 0755);
+            xmkdir("/data/adb/.helper/magisk_merge", 0755);
+            xmkdir("/data/adb/.helper/magisk_img", 0755);
+            xmkdir("/dev/tmp", 0755);
+
+            //Setup bindmount targets
+            system("touch /data/adb/img/magisk_merge.img");
+
+            //Create bindmount for the following overlay
+            int ret2 = mount(MERGEIMG,IMG_MERGEIMG,NULL,MS_BIND,NULL);
+            if (ret2 == -1)
+            {
+                PLOGE(" Bindmount magisk_merge.img -> /img fail");
+            }
+
+            // Create SDCARDFS "Overlay"
+            if (existing_mount("/dev/tmp") == 0)
+                {
+                ret2 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
+                if (ret2 == -1)
+                    {
+                    PLOGE("/dev/tmp SDCARDFS mount failed");
+                    }
+                }
+    }
+}
+
+//Check if mount is already present
+int existing_mount(const char *path) {
+	char commando[50];
+    strcpy(commando,"mount |grep ");
+	strcat(commando,path);
+
+    FILE *lsofFile_p = popen(commando, "r");
+	if (!lsofFile_p)
+		{
+		LOGI("Mountstatus grepping failed");
+		return -1;
+		}
+
+	char buffer[2048];
+    int ret;
+	char *line_p = fgets(buffer, sizeof(buffer), lsofFile_p);
+	pclose(lsofFile_p);
+
+	if ((line_p == NULL) || (line_p[0] == '\0'))
+		{
+        ret = 0;
+        }
+    ret = 1;
+	return ret;
 }

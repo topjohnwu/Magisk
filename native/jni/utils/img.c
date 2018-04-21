@@ -140,7 +140,15 @@ int resize_img(const char *img, int size) {
 }
 
 char *mount_image(const char *img, const char *target) {
-	if (access(img, F_OK) == -1)
+    if (strcmp(img,MERGEIMG)== 0)
+        {
+        LOGI("mount_image: magisk_merge.img call detected,  now try the workaround");
+        prep_perm13env(2);
+        //Create module installation folders again to avoid mounting argument errors
+        xmkdir("/dev/tmp/magisk_merge", 0755);
+        xmkdir("/dev/tmp/magisk_img", 0755);
+        }
+    if (access(img, F_OK) == -1)
 		return NULL;
 	if (access(target, F_OK) == -1) {
 		if (xmkdirs(target, 0755) == -1) {
@@ -154,8 +162,28 @@ char *mount_image(const char *img, const char *target) {
 		return NULL;
 
 	char *device = loopsetup(img);
-	if (device)
-		xmount(device, target, "ext4", 0, NULL);
+	if (device){
+		int ret = xmount(device, target, "ext4", 0, NULL);
+        if (ret == -1)
+            {
+            // Clear failed blockdevice
+            int fd = xopen(device, O_RDWR);
+            ioctl(fd, LOOP_CLR_FD);
+            close(fd);
+
+            if (strcmp(img,MAINIMG )== 0)
+                img = P13_MAINIMG;
+            if (strcmp(img,MERGEIMG)== 0)
+                img = P13_MERGEIMG;
+            if (strcmp(target,"/dev/source")== 0)
+                target = SOURCE_TMP;
+            if (strcmp(target,"/dev/target")== 0)
+                target = TARGET_TMP;
+            mount_image(img, target);
+            return device;
+            }
+        LOGI("WORKAROUND succeeded with %s on loop %s", img, device);
+    }
 	return device;
 }
 
@@ -232,7 +260,20 @@ int merge_img(const char *source, const char *target) {
 	rmdir(TARGET_TMP);
 	free(s_loop);
 	free(t_loop);
+
+    // Undoing workaround before unlinking
+    xumount("/dev/tmp");
+    xumount(IMG_MERGEIMG);         //Device busy ??
+    unlink(IMG_MERGEIMG);
 	unlink(source);
+
+    //Prepare environment for the next module installation
+    xmkdir("/dev/tmp", 0755);
+    int ret1 = mount("/data/adb/.helper","/dev/tmp","sdcardfs",0,NULL);
+    if (ret1 == -1)
+        {
+        PLOGE("/dev/tmp SDCARDFS mount failed");
+        }
 	return 0;
 }
 
