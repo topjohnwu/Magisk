@@ -137,29 +137,33 @@ void daemon_init() {
 	DIR *dir;
 	struct dirent *entry;
 	int root, sbin, fd;
-	char buf[PATH_MAX], buf2[PATH_MAX];
-	void *data;
-	size_t size;
+	char buf[PATH_MAX];
+	void *magisk, *init;
+	size_t magisk_size, init_size;
 
 	// Create hardlink mirror of /sbin to /root
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-	full_read("/sbin/magisk", &data, &size);
+	mkdir("/root", 0750);
+	full_read("/sbin/magisk", &magisk, &magisk_size);
+	full_read("/sbin/magiskinit", &init, &init_size);
 	root = xopen("/root", O_RDONLY | O_CLOEXEC);
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+//	unlink("/sbin/magisk");
+	unlink("/sbin/magiskinit");
 	link_dir(sbin, root);
-	unlink("/sbin/magisk");
 	close(sbin);
 
 	// Mount the /sbin tmpfs overlay
 	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
+	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 
 	// Setup magisk
 	fd = creat("/sbin/magisk", 0755);
-	xwrite(fd, data, size);
+	xwrite(fd, magisk, magisk_size);
 	close(fd);
-	free(data);
+	free(magisk);
 	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 	for (int i = 0; applet[i]; ++i) {
 		snprintf(buf, PATH_MAX, "/sbin/%s", applet[i]);
@@ -167,12 +171,10 @@ void daemon_init() {
 	}
 
 	// Setup magiskinit
-	full_read("/root/magiskinit", &data, &size);
-	unlink("/root/magiskinit");
 	fd = creat("/sbin/magiskinit", 0755);
-	xwrite(fd, data, size);
+	xwrite(fd, init, init_size);
 	close(fd);
-	free(data);
+	free(init);
 	setfilecon("/sbin/magiskinit", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 	for (int i = 0; init_applet[i]; ++i) {
 		snprintf(buf, PATH_MAX, "/sbin/%s", init_applet[i]);
@@ -184,10 +186,10 @@ void daemon_init() {
 	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
 		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
-		snprintf(buf2, PATH_MAX, "/sbin/%s", entry->d_name);
-		xsymlink(buf, buf2);
+		symlinkat(buf, sbin, entry->d_name);
 	}
 
+	close(sbin);
 	close(root);
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 

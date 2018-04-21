@@ -375,14 +375,8 @@ int main(int argc, char *argv[]) {
 	if (null > STDERR_FILENO)
 		close(null);
 
-	// Extract and link files
-	mkdir("/overlay", 0000);
-	dump_magiskrc("/overlay/init.magisk.rc", 0750);
-	mkdir("/overlay/sbin", 0755);
-	dump_magisk("/overlay/sbin/magisk", 0755);
-	patch_socket_name("/overlay/sbin/magisk");
-	mkdir("/overlay/root", 0750);
-	link("/init", "/overlay/root/magiskinit");
+	// Backup self
+	link("/init", "/init.bak");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
@@ -395,7 +389,7 @@ int main(int argc, char *argv[]) {
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
-		excl_list = (char *[]) { "overlay", ".backup", NULL };
+		excl_list = (char *[]) { "overlay", ".backup", "init.bak", NULL };
 		frm_rf(root);
 	} else if (access("/ramdisk.cpio.xz", R_OK) == 0) {
 		// High compression mode
@@ -464,20 +458,28 @@ int main(int argc, char *argv[]) {
 
 	// Only patch rootfs if not intended to run in recovery
 	if (access("/etc/recovery.fstab", F_OK) != 0) {
-		int overlay = open("/overlay", O_RDONLY | O_CLOEXEC);
-		mv_dir(overlay, root);
-		close(overlay);
-		rmdir("/overlay");
+		int fd;
+
+		// Handle ramdisk overlays
+		fd = open("/overlay", O_RDONLY | O_CLOEXEC);
+		if (fd >= 0) {
+			mv_dir(fd, root);
+			close(fd);
+			rmdir("/overlay");
+		}
 
 		patch_ramdisk();
 		patch_sepolicy();
+
+		// Dump binaries
+		dump_magiskrc("/init.magisk.rc", 0750);
+		dump_magisk("/sbin/magisk", 0755);
+		patch_socket_name("/sbin/magisk");
+		rename("/init.bak", "/sbin/magiskinit");
 	}
 
 	// Clean up
 	close(root);
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
 	if (!cmd.skip_initramfs)
 		umount("/system");
 	umount("/vendor");
