@@ -9,7 +9,7 @@ db_clean() {
   local DIR="/sbin/.core/db-${USERID}"
   umount -l /data/user*/*/*/databases/su.db $DIR $DIR/*
   rm -rf $DIR
-  [ "$USERID" = "*" ] && rm -f /data/adb/magisk.db
+  [ "$USERID" = "*" ] && rm -fv /data/adb/magisk.db*
 }
 
 db_init() {
@@ -30,7 +30,7 @@ db_setup() {
   mkdir -p $DIR
   touch $DIR/magisk.db
   mount -o bind /data/adb/magisk.db $DIR/magisk.db
-  rm -f /data/adb/magisk.db-journal
+  rm -f /data/adb/magisk.db-*
   chcon u:object_r:magisk_file:s0 $DIR $DIR/*
   chmod 700 $DIR
   chown $USER.$USER $DIR
