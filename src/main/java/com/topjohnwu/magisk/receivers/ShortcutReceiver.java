@@ -46,6 +46,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                     .setIcon(Icon.createWithResource(mm, R.drawable.sc_superuser))
+                    .setRank(0)
                     .build());
         }
         if (Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
@@ -57,6 +58,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                     .setIcon(Icon.createWithResource(mm, R.drawable.sc_magiskhide))
+                    .setRank(1)
                     .build());
         }
         if (!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
@@ -68,6 +70,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                     .setIcon(Icon.createWithResource(mm, R.drawable.sc_extension))
+                    .setRank(3)
                     .build());
             shortCuts.add(new ShortcutInfo.Builder(mm, "downloads")
                     .setShortLabel(mm.getString(R.string.download))
@@ -76,6 +79,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
                     .setIcon(Icon.createWithResource(mm, R.drawable.sc_cloud_download))
+                    .setRank(2)
                     .build());
         }
         return shortCuts;
