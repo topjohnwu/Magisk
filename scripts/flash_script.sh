@@ -69,7 +69,7 @@ api_level_arch_detect
 
 ui_print "- Device platform: $ARCH"
 
-BINDIR=$INSTALLER/$ARCH
+BINDIR=$INSTALLER/$ARCH32
 chmod -R 755 $CHROMEDIR $BINDIR
 
 # Check if system root is installed and remove
@@ -105,7 +105,7 @@ chmod -R 755 $MAGISKBIN
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
-  cp -af $INSTALLER/addon.d/99-magisk.sh /system/addon.d/99-magisk.sh
+  cp -af $INSTALLER/common/99-magisk.sh /system/addon.d/99-magisk.sh
   chmod 755 /system/addon.d/99-magisk.sh
 fi
 

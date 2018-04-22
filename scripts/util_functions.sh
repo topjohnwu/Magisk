@@ -266,11 +266,12 @@ api_level_arch_detect() {
   ABILONG=`grep_prop ro.product.cpu.abi`
 
   ARCH=arm
+  ARCH32=arm
   IS64BIT=false
-  if [ "$ABI" = "x86" ]; then ARCH=x86; fi;
-  if [ "$ABI2" = "x86" ]; then ARCH=x86; fi;
-  if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; IS64BIT=true; fi;
-  if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; IS64BIT=true; fi;
+  if [ "$ABI" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
+  if [ "$ABI2" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
+  if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; ARCH32=arm; IS64BIT=true; fi;
+  if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
 }
 
 boot_actions() {
@@ -297,7 +298,7 @@ recovery_actions() {
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Add all possible library paths
-  $IS64BIT && export LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64 || export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
+  export LD_LIBRARY_PATH=/system/lib:/system/vendor/lib
 }
 
 recovery_cleanup() {

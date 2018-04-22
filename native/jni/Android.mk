@@ -110,10 +110,8 @@ LOCAL_CFLAGS := -DXWRAP_EXIT
 LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
 
-# 32-bit static binaries
+# static binaries
 ifndef GRADLE  # Do not run gradle sync on these binaries
-ifneq ($(TARGET_ARCH_ABI), x86_64)
-ifneq ($(TARGET_ARCH_ABI), arm64-v8a)
 # b64xz
 include $(CLEAR_VARS)
 LOCAL_MODULE := b64xz
@@ -124,8 +122,6 @@ LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 # Busybox
 include jni/external/busybox/Android.mk
-endif
-endif
 endif
 
 # Precompile

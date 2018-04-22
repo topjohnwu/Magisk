@@ -93,7 +93,7 @@ def build_binary(args):
 		error('Build Magisk binary failed!')
 
 	print('')
-	for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
+	for arch in ['armeabi-v7a', 'x86']:
 		mkdir_p(os.path.join('out', arch))
 		with open(os.path.join('out', arch, 'dump.h'), 'w') as dump:
 			dump.write('#include "stdlib.h"\n')
@@ -110,7 +110,7 @@ def build_binary(args):
 		error('Build Magisk binary failed!')
 
 	print('')
-	for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
+	for arch in ['armeabi-v7a', 'x86']:
 		for binary in ['magiskinit', 'magiskboot', 'b64xz', 'busybox']:
 			try:
 				mv(os.path.join('native', 'libs', arch, binary), os.path.join('out', arch, binary))
@@ -234,7 +234,7 @@ def zip_main(args):
 		zip_with_msg(zipf, source, target)
 
 		# Binaries
-		for lib_dir, zip_dir in [('arm64-v8a', 'arm64'), ('armeabi-v7a', 'arm'), ('x86', 'x86'), ('x86_64', 'x64')]:
+		for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
 			for binary in ['magiskinit', 'magiskboot']:
 				source = os.path.join('out', lib_dir, binary)
 				target = os.path.join(zip_dir, binary)
@@ -261,7 +261,7 @@ def zip_main(args):
 			zipf.writestr(target, util_func)
 		# addon.d.sh
 		source = os.path.join('scripts', 'addon.d.sh')
-		target = os.path.join('addon.d', '99-magisk.sh')
+		target = os.path.join('common', '99-magisk.sh')
 		zip_with_msg(zipf, source, target)
 
 		# Prebuilts
@@ -291,7 +291,7 @@ def zip_uninstaller(args):
 		zip_with_msg(zipf, source, target)
 
 		# Binaries
-		for lib_dir, zip_dir in [('arm64-v8a', 'arm64'), ('armeabi-v7a', 'arm'), ('x86', 'x86'), ('x86_64', 'x64')]:
+		for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
 			source = os.path.join('out', lib_dir, 'magiskboot')
 			target = os.path.join(zip_dir, 'magiskboot')
 			zip_with_msg(zipf, source, target)
