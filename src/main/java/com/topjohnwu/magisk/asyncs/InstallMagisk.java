@@ -76,11 +76,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
-        if (abis.contains("x86_64")) arch = "x64";
-        else if (abis.contains("arm64-v8a")) arch = "arm64";
-        else if (abis.contains("x86")) arch = "x86";
-        else arch = "arm";
-        console.add("- Device platform: " + arch);
+        if (abis.contains("x86"))
+            arch = "x86";
+        else
+            arch = "arm";
+        console.add("- Device platform: " + Build.SUPPORTED_ABIS[0]);
 
         try {
             // Unzip files

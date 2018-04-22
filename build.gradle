@@ -8,7 +8,7 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 112
+        versionCode 113
         versionName "5.6.4"
         javaCompileOptions {
             annotationProcessorOptions {
