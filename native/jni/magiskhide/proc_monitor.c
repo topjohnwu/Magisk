@@ -205,7 +205,7 @@ void proc_monitor() {
 		// Critical region
 		pthread_mutex_lock(&hide_lock);
 		vec_for_each(hide_list, line) {
-			if (strcmp(processName, line) == 0) {
+			if (strcmp(strtok(processName,":"), line) == 0) {
 				while(1) {
 					ret = 1;
 					for (int i = 0; i < zygote_num; ++i) {
