@@ -56,7 +56,7 @@ void hide_sensitive_props() {
 	}
 }
 
-static void rm_magisk_prop(const char *name, const char *value) {
+static void rm_magisk_prop(const char *name, const char *value, void *v) {
 	if (strstr(name, "magisk")) {
 		deleteprop2(name, 0);
 	}
@@ -64,7 +64,7 @@ static void rm_magisk_prop(const char *name, const char *value) {
 
 void clean_magisk_props() {
 	LOGD("hide_utils: Cleaning magisk props\n");
-	getprop_all(rm_magisk_prop);
+	getprop_all(rm_magisk_prop, NULL);
 }
 
 int add_list(char *proc) {

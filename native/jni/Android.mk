@@ -9,6 +9,7 @@ LIBLZMA := $(EXT_PATH)/xz/src/liblzma/api
 LIBLZ4 := $(EXT_PATH)/lz4/lib
 LIBBZ2 := $(EXT_PATH)/bzip2
 LIBFDT := $(EXT_PATH)/dtc/libfdt
+LIBNANOPB := $(EXT_PATH)/nanopb
 UTIL_SRC := utils/cpio.c \
             utils/file.c \
             utils/img.c \
@@ -28,12 +29,13 @@ ifneq "$(or $(PRECOMPILE), $(GRADLE))" ""
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_SHARED_LIBRARIES := libsqlite libselinux
-
+LOCAL_STATIC_LIBRARIES := libnanopb
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
 	$(EXT_PATH)/include \
-	$(LIBSELINUX)
+	$(LIBSELINUX) \
+	$(LIBNANOPB)
 
 LOCAL_SRC_FILES := \
 	core/magisk.c \
@@ -44,7 +46,8 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
-	resetprop/resetprop.cpp \
+	resetprop/persist_props.c \
+	resetprop/resetprop.c \
 	resetprop/system_properties.cpp \
 	su/su.c \
 	su/activity.c \

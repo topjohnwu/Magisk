@@ -19,15 +19,11 @@
 
 #include "magisk.h"
 #include "resetprop.h"
-extern "C" {
+#include "_resetprop.h"
 #include "vector.h"
-}
+#include "utils.h"
 
-#define PRINT_D(...)  { LOGD(__VA_ARGS__); if (verbose) fprintf(stderr, __VA_ARGS__); }
-#define PRINT_E(...)  { LOGE(__VA_ARGS__); fprintf(stderr, __VA_ARGS__); }
-#define PERSISTENT_PROPERTY_DIR  "/data/property"
-
-static int verbose = 0;
+int prop_verbose = 0;
 
 static int check_legal_property_name(const char *name) {
 	int namelen = strlen(name);
@@ -83,6 +79,49 @@ static int usage(char* arg0) {
 	return 1;
 }
 
+// The callback passes to __system_property_read_callback2, actually runs the callback in read_cb
+static void callback_wrapper(void *read_cb, const char *name, const char *value, uint32_t serial) {
+	((struct read_cb_t *) read_cb)->func(name, value, ((struct read_cb_t *) read_cb)->cookie);
+}
+
+/* **********************************
+ * Callback functions for read_cb_t
+ * **********************************/
+
+void collect_props(const char *name, const char *value, void *prop_list) {
+	struct prop_t *p = (struct prop_t *) xmalloc(sizeof(*p));
+	p->name = strdup(name);
+	strcpy(p->value, value);
+	vec_push_back(prop_list, p);
+}
+
+static void collect_unique_props(const char *name, const char *value, void *prop_list) {
+	struct vector *v = prop_list;
+	struct prop_t *p;
+	bool uniq = true;
+	vec_for_each(v, p) {
+		if (strcmp(name, p->name) == 0) {
+			uniq = 0;
+			break;
+		}
+	}
+	if (uniq)
+		collect_props(name, value, prop_list);
+}
+
+static void store_prop_value(const char *name, const char *value, void *dst) {
+	strcpy(dst, value);
+}
+
+static void prop_foreach_cb(const prop_info* pi, void* read_cb) {
+	__system_property_read_callback2(pi, callback_wrapper, read_cb);
+}
+
+// Comparision function used to sort prop vectors
+static int prop_cmp(const void *p1, const void *p2) {
+	return strcmp(((struct prop_t *) p1)->name, ((struct prop_t *) p2)->name);
+}
+
 static int init_resetprop() {
 	if (__system_properties_init2()) {
 		PRINT_E("resetprop: Initialize error\n");
@@ -91,15 +130,35 @@ static int init_resetprop() {
 	return 0;
 }
 
+static void print_props(int persist) {
+	struct prop_t *p;
+	struct vector prop_list;
+	vec_init(&prop_list);
+	getprop_all(collect_props, &prop_list);
+	if (persist) {
+		struct read_cb_t read_cb = {
+			.func = collect_unique_props,
+			.cookie = &prop_list
+		};
+		persist_getprop_all(&read_cb);
+	}
+	vec_sort(&prop_list, prop_cmp);
+	vec_for_each(&prop_list, p) {
+		printf("[%s]: [%s]\n", p->name, p->value);
+		free(p->name);
+		free(p);
+	}
+	vec_destroy(&prop_list);
+}
+
+/* **************************************************
+ * Implementations of functions in resetprop.h (APIs)
+ * **************************************************/
+
 int prop_exist(const char *name) {
 	if (init_resetprop()) return 0;
 	return __system_property_find2(name) != NULL;
 }
-
-static void read_prop_info(void* cookie, const char *name, const char *value, uint32_t serial) {
-	strcpy((char *) cookie, value);
-}
-
 
 char *getprop(const char *name) {
 	return getprop2(name, 0);
@@ -109,103 +168,35 @@ char *getprop(const char *name) {
 char *getprop2(const char *name, int persist) {
 	if (check_legal_property_name(name))
 		return NULL;
-	char value[PROP_VALUE_MAX];
 	if (init_resetprop()) return NULL;
 	const prop_info *pi = __system_property_find2(name);
 	if (pi == NULL) {
 		if (persist && strncmp(name, "persist.", 8) == 0) {
-			// Try to read from file
-			char path[PATH_MAX];
-			snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
-			int fd = open(path, O_RDONLY | O_CLOEXEC);
-			if (fd < 0) goto no_prop;
-			PRINT_D("resetprop: read prop from [%s]\n", path);
-			size_t len = read(fd, value, sizeof(value));
-			value[len] = '\0';  // Null terminate the read value
-		} else {
-no_prop:
+			char *value = persist_getprop(name);
+			if (value)
+				return value;
+		}
 		PRINT_D("resetprop: prop [%s] does not exist\n", name);
 		return NULL;
-		}
 	} else {
-		__system_property_read_callback2(pi, read_prop_info, value);
+		char value[PROP_VALUE_MAX];
+		struct read_cb_t read_cb = {
+			.func = store_prop_value,
+			.cookie = value
+		};
+		__system_property_read_callback2(pi, callback_wrapper, &read_cb);
+		PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
+		return strdup(value);
 	}
-	PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
-	return strdup(value);
 }
 
-struct wrapper {
-	void (*func)(const char *, const char *);
-};
-
-static void cb_wrapper(void* cookie, const char *name, const char *value, uint32_t serial) {
-	((wrapper *) cookie)->func(name, value);
-}
-
-static void prop_foreach_cb(const prop_info* pi, void* cookie) {
-	__system_property_read_callback2(pi, cb_wrapper, cookie);
-}
-
-class property {
-public:
-	property(const char *n, const char *v) {
-		name = strdup(n);
-		value = strdup(v);
-	}
-	~property() {
-		free((void *)name);
-		free((void *)value);
-	}
-	const char *name;
-	const char *value;
-};
-
-vector prop_list;
-
-static int prop_cmp(const void *p1, const void *p2) {
-	return strcmp(((property *) p1)->name, ((property *) p2)->name);
-}
-
-static void print_all_props_cb(const char *name, const char *value) {
-	vec_push_back(&prop_list, new property(name, value));
-}
-
-static void print_all_props(int persist) {
-	void *p;
-	vec_init(&prop_list);
-	getprop_all(print_all_props_cb);
-	if (persist) {
-		// Check all persist props in data
-		DIR *dir = opendir(PERSISTENT_PROPERTY_DIR);
-		struct dirent *entry;
-		while ((entry = readdir(dir))) {
-			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 )
-				continue;
-			int found = 0;
-			vec_for_each(&prop_list, p) {
-				if (strcmp(((property *) p)->name, entry->d_name) == 0) {
-					found = 1;
-					break;
-				}
-			}
-			if (!found)
-				vec_push_back(&prop_list, new property(entry->d_name, getprop2(entry->d_name, 1)));
-		}
-	}
-	vec_sort(&prop_list, prop_cmp);
-	vec_for_each(&prop_list, p) {
-		printf("[%s]: [%s]\n", ((property *) p)->name, ((property *) p)->value);
-		delete((property *) p);
-	}
-	vec_destroy(&prop_list);
-}
-
-void getprop_all(void (*callback)(const char*, const char*)) {
+void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie) {
 	if (init_resetprop()) return;
-	struct wrapper wrap = {
-		.func = callback
+	struct read_cb_t read_cb = {
+		.func = callback,
+		.cookie = cookie
 	};
-	__system_property_foreach2(prop_foreach_cb, &wrap);
+	__system_property_foreach2(prop_foreach_cb, &read_cb);
 }
 
 int setprop(const char *name, const char *value) {
@@ -248,7 +239,7 @@ int deleteprop(const char *name) {
 	return deleteprop2(name, 1);
 }
 
-int deleteprop2(const char *name, const int persist) {
+int deleteprop2(const char *name, int persist) {
 	if (check_legal_property_name(name))
 		return 1;
 	if (init_resetprop()) return -1;
@@ -256,8 +247,8 @@ int deleteprop2(const char *name, const int persist) {
 	path[0] = '\0';
 	PRINT_D("resetprop: deleteprop [%s]\n", name);
 	if (persist && strncmp(name, "persist.", 8) == 0)
-		snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
-	return __system_property_del(name) && unlink(path);
+		persist = persist_deleteprop(name);
+	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
 }
 
 int read_prop_file(const char* filename, const int trigger) {
@@ -290,7 +281,7 @@ int read_prop_file(const char* filename, const int trigger) {
 		}
 		if (comment) continue;
 		pch = strchr(line, '=');
-		// Ignore ivalid formats
+		// Ignore invalid formats
 		if ( ((pch == NULL) || (i >= (pch - line))) || (pch >= line + read - 1) ) continue;
 		// Separate the string
 		*pch = '\0';
@@ -321,7 +312,7 @@ int resetprop_main(int argc, char *argv[]) {
 					goto usage;
 				}
 			case 'v':
-				verbose = 1;
+				prop_verbose = 1;
 				continue;
 			case 'p':
 				persist = 1;
@@ -344,7 +335,7 @@ int resetprop_main(int argc, char *argv[]) {
 
 	switch (argc) {
 	case 0:
-		print_all_props(persist);
+		print_props(persist);
 		return 0;
 	case 1:
 		prop = getprop2(argv[0], persist);

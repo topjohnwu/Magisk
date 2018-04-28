@@ -25,3 +25,6 @@
 [submodule "xz"]
 	path = native/jni/external/xz
 	url = https://github.com/xz-mirror/xz.git
+[submodule "nanopb"]
+	path = native/jni/external/nanopb
+	url = https://github.com/nanopb/nanopb.git
