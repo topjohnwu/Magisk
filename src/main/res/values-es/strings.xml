@@ -120,6 +120,9 @@
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
     <string name="su_db_corrupt">La base de datos SU está dañada, se creará nueva base de datos</string>
+    <string name="cannot_check_sn_title">No es posible verificar SafetyNet!</string>
+    <string name="cannot_check_sn_notice">Debido a algunos cambios en los Servicios de Google Play, no es posible verificar SafetyNet en la versión reempaquetada de Magisk Manager</string>
+ 
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
