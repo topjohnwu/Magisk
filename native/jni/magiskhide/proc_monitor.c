@@ -61,7 +61,7 @@ static void lazy_unmount(const char* mountpoint) {
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
-static void hide_daemon(int pid, int ppid) {
+static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 	strcpy(argv0, "hide_daemon");
 
@@ -202,6 +202,11 @@ void proc_monitor() {
 		if(ret != 2)
 			continue;
 
+		// Allow hiding sub-services of applications
+		char *colon = strchr(processName, ':');
+		if (colon)
+			*colon = '\0';
+
 		// Critical region
 		pthread_mutex_lock(&hide_lock);
 		vec_for_each(hide_list, line) {
@@ -222,15 +227,17 @@ void proc_monitor() {
 				// Send pause signal ASAP
 				if (kill(pid, SIGSTOP) == -1) continue;
 
+				// Restore the colon so we can log the actual process name
+				if (colon)
+					*colon = ':';
 				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
 
 				/*
 				 * The setns system call do not support multithread processes
 				 * We have to fork a new process, setns, then do the unmounts
 				 */
-				int selfpid = getpid();
 				if (fork_dont_care() == 0)
-					hide_daemon(pid, selfpid);
+					hide_daemon(pid);
 
 				break;
 			}
