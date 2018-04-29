@@ -515,8 +515,12 @@ initialize:
 	void *magisk, *init;
 	size_t magisk_size, init_size;
 
-	// Create hardlink mirror of /sbin to /root
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+
+	// Remove some traits of Magisk
+	unlink("/init.magisk.rc");
+
+	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
 	full_read("/sbin/magisk", &magisk, &magisk_size);
 	unlink("/sbin/magisk");
