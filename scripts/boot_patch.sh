@@ -84,7 +84,7 @@ chmod -R 755 .
 CHROMEOS=false
 
 ui_print "- Unpacking boot image"
-./magiskboot --unpack "$BOOTIMAGE"
+eval $LIB32PFX ./magiskboot --unpack "$BOOTIMAGE"
 
 case $? in
   1 )
@@ -113,14 +113,14 @@ esac
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print "- Checking ramdisk status"
 MAGISK_PATCHED=false
-./magiskboot --cpio ramdisk.cpio test
+eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     ui_print "- Backing up stock boot image"
-    SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
+    SHA1=`eval $LIB32PFX ./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
-    ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
+    eval $LIB32PFX ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
@@ -140,8 +140,8 @@ esac
 if $MAGISK_PATCHED; then
   ui_print "- Magisk patched image detected"
   # Find SHA1 of stock boot image
-  [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
-  ./magiskboot --cpio ramdisk.cpio restore
+  [ -z $SHA1 ] && SHA1=`eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+  eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio restore
   cp -af ramdisk.cpio ramdisk.cpio.orig
 fi
 
@@ -156,9 +156,9 @@ fi
 
 ui_print "- Patching ramdisk"
 
-./magiskboot --cpio ramdisk.cpio \
-'add 750 init magiskinit' \
-"magisk ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1"
+eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio \
+\"add 750 init magiskinit\" \
+\"magisk ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1\"
 
 rm -f ramdisk.cpio.orig
 
@@ -167,17 +167,17 @@ rm -f ramdisk.cpio.orig
 ##########################################################################################
 
 if ! $KEEPVERITY && [ -f dtb ]; then
-  ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
+  eval $LIB32PFX ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
 fi
 
 if [ -f kernel ]; then
   # Remove Samsung RKP in stock kernel
-  ./magiskboot --hexpatch kernel \
+  eval $LIB32PFX ./magiskboot --hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
   A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
   # skip_initramfs -> want_initramfs
-  ./magiskboot --hexpatch kernel \
+  eval $LIB32PFX ./magiskboot --hexpatch kernel \
   736B69705F696E697472616D6673 \
   77616E745F696E697472616D6673
 fi
@@ -187,9 +187,9 @@ fi
 ##########################################################################################
 
 ui_print "- Repacking boot image"
-./magiskboot --repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
+eval $LIB32PFX ./magiskboot --repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
 
-./magiskboot --cleanup
+eval $LIB32PFX ./magiskboot --cleanup
