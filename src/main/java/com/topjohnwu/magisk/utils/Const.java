@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.os.Environment;
 import android.os.Process;
 
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.superuser.io.SuFile;
 
@@ -13,7 +14,7 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String ORIG_PKG_NAME = "com.topjohnwu.magisk";
+    public static final String ORIG_PKG_NAME = BuildConfig.APPLICATION_ID;
     public static final String SNET_PKG = "com.topjohnwu.snet";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 

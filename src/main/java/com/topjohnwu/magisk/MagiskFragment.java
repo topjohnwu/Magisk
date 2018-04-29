@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +93,14 @@ public class MagiskFragment extends Fragment
             new CheckSafetyNet(getActivity()).exec();
             collapse();
         };
-        if (!CheckSafetyNet.dexPath.exists()) {
+        if (!TextUtils.equals(mm.getPackageName(), Const.ORIG_PKG_NAME)) {
+            new AlertDialogBuilder(getActivity())
+                    .setTitle(R.string.cannot_check_sn_title)
+                    .setMessage(R.string.cannot_check_sn_notice)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, null)
+                    .show();
+        } else if (!CheckSafetyNet.dexPath.exists()) {
             // Show dialog
             new AlertDialogBuilder(getActivity())
                     .setTitle(R.string.proprietary_title)

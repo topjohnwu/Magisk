@@ -219,5 +219,7 @@
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">在背景定期檢查更新</string>
     <string name="disable_fingerprint">沒有指紋加入或是裝置不支援</string>
+    <string name="cannot_check_sn_title">無法檢查 SafetyNet</string>
+    <string name="cannot_check_sn_notice">由於一些 Google Play Service 的改變，重新包裝過的 Magisk Manager 無法進行 SafetyNet 檢查。</string>
 
 </resources>
