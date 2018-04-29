@@ -182,7 +182,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
             Shell.Sync.sh("mv -f new-boot.img ../",
                     "mv bin/busybox busybox",
-                    "rm -rf bin *.img update-binary",
+                    "rm -rf magisk.apk bin *.img update-binary",
                     "cd /");
 
             SuFile patched_boot = new SuFile(install.getParent(), "new-boot.img");
