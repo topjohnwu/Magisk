@@ -94,6 +94,30 @@ static void *start_magisk_hide(void *args) {
 	return NULL;
 }
 
+static void daemon_saver() {
+	int fd, val;
+	struct sockaddr_un sun;
+
+	// Change process name
+	strcpy(argv0, "magisk_saver");
+
+	while (1) {
+		fd = setup_socket(&sun);
+		while(connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
+			usleep(10000);
+
+		write_int(fd, DO_NOTHING);
+
+		// Should hold forever unless the other side is closed
+		read(fd, &val, sizeof(int));
+
+		// If it came here, the daemon is terminated
+		close(fd);
+		if (fork_dont_care() == 0)
+			start_daemon(0);
+	}
+}
+
 void auto_start_magiskhide() {
 	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
 	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
@@ -112,6 +136,9 @@ void start_daemon(int post_fs_data) {
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
+
+	if (post_fs_data && fork_dont_care() == 0)
+		daemon_saver();
 
 	// Block user signals
 	sigset_t block_set;
@@ -140,7 +167,7 @@ void start_daemon(int post_fs_data) {
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Change process name
-	strcpy(argv0, "magisk_daemon");
+	strcpy(argv0, "magiskd");
 
 	// Loop forever to listen for requests
 	while(1) {
@@ -165,7 +192,7 @@ int connect_daemon(int post_fs_data) {
 			exit(1);
 		}
 
-		if (xfork() == 0) {
+		if (fork_dont_care() == 0) {
 			LOGD("client: connect fail, try launching new daemon process\n");
 			close(fd);
 			start_daemon(post_fs_data);
