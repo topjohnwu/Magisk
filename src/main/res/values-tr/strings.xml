@@ -119,7 +119,9 @@
     <string name="proprietary_title">Tescil Kodunu İndirin</string>
     <string name="proprietary_notice">Magisk Yöneticisi, FOSS olduğundan Google\'ın tescilli olduğu SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için bir uzantıyı (GoogleApiClient içeriyor) indirmesine izin veriyor musunuz?</string>
     <string name="su_db_corrupt">SU veritabanı bozuk, yeni db oluşturacak</string>
- 
+    <string name="cannot_check_sn_title">SafetyNet denetlenemiyor</string>
+    <string name="cannot_check_sn_notice">Google Play Hizmetleri\'ndeki bazı değişiklikler nedeniyle, yeniden paketlenmiş Magisk Manager\'da SafetyNet\'i denetlemek mümkün değildir</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
@@ -194,10 +196,10 @@
     <string name="su_warning">Cihazınıza tam erişim izni verir.\nEmin değilseniz, reddedin!</string>
     <string name="forever">Daima</string>
     <string name="once">Bir kere</string>
-    <string name="tenmin">10 dak</string>
-    <string name="twentymin">20 dak</string>
-    <string name="thirtymin">30 dak</string>
-    <string name="sixtymin">60 dak</string>
+    <string name="tenmin">10 dakika</string>
+    <string name="twentymin">20 dakika</string>
+    <string name="thirtymin">30 dakika</string>
+    <string name="sixtymin">60 dakika</string>
     <string name="su_allow_toast">%1$s için yetkili kullanıcı hakları verildi</string>
     <string name="su_deny_toast">%1$s için yetkili kullanıcı hakları reddedildi</string>
     <string name="no_apps_found">Hiçbir uygulama bulunamadı</string>
