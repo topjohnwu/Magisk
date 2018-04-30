@@ -88,7 +88,7 @@
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
-    <string name="repo_cache_cleared">资源库缓存已清除</string>
+    <string name="repo_cache_cleared">仓库缓存已清除</string>
     <string name="process_error">处理失败</string>
     <string name="internal_storage">Zip 已被储存到：\n[内部存储空间]%1$s</string>
     <string name="zip_download_title">正在下载</string>
@@ -120,6 +120,8 @@
     <string name="proprietary_title">下载专有代码</string>
     <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n你允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
     <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>
+    <string name="cannot_check_sn_title">无法检查 SafetyNet</string>
+    <string name="cannot_check_sn_notice">由于一些 Google Play 服务的改变，隐藏后的 Magisk Manager 无法进行 SafetyNet 检查。</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
