@@ -120,6 +120,8 @@
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS, yang tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>
+    <string name="cannot_check_sn_title">Tidak dapat memeriksa SafetyNet</string>
+    <string name="cannot_check_sn_notice">Karena beberapa perubahan dalam Layanan Google Play, adalah tidak mungkin untuk memeriksa SafetyNet di Magisk Manager yang dipak ulang</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>
