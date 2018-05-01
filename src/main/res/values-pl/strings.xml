@@ -116,13 +116,15 @@
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
-	<string name="uninstall_app">Odinstaluj Aplikację</string>
-	<string name="restore_done">Przywracanie zakończone!</string>
+    <string name="uninstall_app">Odinstaluj Aplikację</string>
+    <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Stock backup nie istnieje!</string>
     <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>
     <string name="proprietary_title">Pobierz Kod</string>
     <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzenia SafetyNet?</string>
     <string name="su_db_corrupt">Baza danych SU jest uszkodzona, odtworzy nową bazę danych</string>
+    <string name="cannot_check_sn_title">Nie mogę sprawdzić SafetyNet</string>
+    <string name="cannot_check_sn_notice">Z powodu pewnych zmian w Usługach Google Play nie jest możliwe sprawdzenie SafetyNet w przepakowanym Magisk Managerze</string>
 	
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
@@ -137,14 +139,14 @@
     <string name="language">Język</string>
     <string name="system_default">(Domyślny Systemu)</string>
     <string name="settings_update">Aktualizacja Ustawień</string>
-        <string name="settings_check_update_title">Sprawdź Aktualizację</string>
+    <string name="settings_check_update_title">Sprawdź Aktualizację</string>
     <string name="settings_check_update_summary">Regularnie sprawdzaj aktualizacje w tle</string>
-	<string name="settings_update_channel_title">Kanał Aktualizacji</string>
+    <string name="settings_update_channel_title">Kanał Aktualizacji</string>
     <string name="settings_update_stable">Stabilny</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny</string>
-	<string name="settings_update_custom_msg">Wstaw własny URL</string>
-	<string name="settings_boot_format_title">Poprawny format pliku rozruchowego</string>
+    <string name="settings_update_custom_msg">Wstaw własny URL</string>
+    <string name="settings_boot_format_title">Poprawny format pliku rozruchowego</string>
     <string name="settings_boot_format_summary">Wybierz format pliku boot image.\nWybierz .img dla wgrywania poprzez Fastboot/Download Mode. Wybierz .img.tar dla ODINA.</string>
     <string name="settings_core_only_title">Tylko Podstawowy Tryb Magisk</string>
     <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
@@ -170,7 +172,7 @@
     <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
     <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
     
-	<string name="multiuser_mode">Tryb Multiusera</string>
+    <string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
     <string name="settings_user_independent">Niezależny Użytkownik</string>
@@ -187,7 +189,7 @@
     <string name="requester_summary">Sesje Root będzie dziedziczyć prośby i nazwy</string>
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
     <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
-	    <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
+    <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
 		
     <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
