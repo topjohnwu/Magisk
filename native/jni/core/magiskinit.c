@@ -131,7 +131,7 @@ static int setup_block(struct device *dev, const char *partname) {
 		buffer[size] = '\0';
 		close(fd);
 		parse_device(dev, buffer);
-		if (strcmp(dev->partname, partname) == 0) {
+		if (strcasecmp(dev->partname, partname) == 0) {
 			snprintf(dev->path, sizeof(dev->path), "/dev/block/%s", dev->devname);
 			found = 1;
 			break;
