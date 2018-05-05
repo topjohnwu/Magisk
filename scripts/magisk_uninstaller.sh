@@ -45,7 +45,7 @@ cd $MAGISKBIN
 ui_print "- Found Boot Image: $BOOTIMAGE"
 
 ui_print "- Unpacking boot image"
-eval $LIB32PFX ./magiskboot --unpack "$BOOTIMAGE"
+./magiskboot --unpack "$BOOTIMAGE"
 CHROMEOS=false
 
 case $? in
@@ -67,7 +67,7 @@ esac
 
 # Detect boot image state
 ui_print "- Checking ramdisk status"
-eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio test
+./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
@@ -76,14 +76,14 @@ case $? in
   1|2 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     OK=false
     [ ! -z $SHA1 ] && restore_imgs $SHA1 && OK=true
     if ! $OK; then
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
-      eval $LIB32PFX ./magiskboot --cpio ramdisk.cpio restore
-      eval $LIB32PFX ./magiskboot --repack $BOOTIMAGE
+      ./magiskboot --cpio ramdisk.cpio restore
+      ./magiskboot --repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
       flash_boot_image new-boot.img "$BOOTIMAGE"

@@ -20,7 +20,7 @@ MAGISKBIN=/data/adb/magisk
 [ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
 [ -z $IMG ] && IMG=/data/adb/magisk.img
 
-BOOTSIGNER="eval \$LIBPFX /system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
 BOOTSIGNED=false
 
 get_outfd() {
@@ -128,15 +128,15 @@ find_boot_image() {
 run_migrations() {
   # Update the broken boot backup
   if [ -f /data/stock_boot_.img.gz ]; then
-    eval $LIB32PFX $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz /data/stock_boot.img
+    $MAGISKBIN/magiskboot --decompress /data/stock_boot_.img.gz /data/stock_boot.img
   fi
   # Update our previous backup to new format if exists
   if [ -f /data/stock_boot.img ]; then
     ui_print "- Migrating boot image backup"
-    SHA1=`eval $LIB32PFX $MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
+    SHA1=`$MAGISKBIN/magiskboot --sha1 /data/stock_boot.img 2>/dev/null`
     STOCKDUMP=/data/stock_boot_${SHA1}.img
     mv /data/stock_boot.img $STOCKDUMP
-    eval $LIB32PFX $MAGISKBIN/magiskboot --compress $STOCKDUMP
+    $MAGISKBIN/magiskboot --compress $STOCKDUMP
   fi
   # Move the stock backups
   if [ -f /data/magisk/stock_boot* ]; then
@@ -154,7 +154,7 @@ run_migrations() {
 
 flash_boot_image() {
   # Make sure all blocks are writable
-  eval $LIB32PFX $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
+  $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
     *.gz) COMMAND="gzip -d < '$1'";;
     *)    COMMAND="cat '$1'";;
@@ -184,11 +184,11 @@ find_dtbo_image() {
 
 patch_dtbo_image() {
   if [ ! -z $DTBOIMAGE ]; then
-    if eval $LIB32PFX $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
+    if $MAGISKBIN/magiskboot --dtb-test $DTBOIMAGE; then
       ui_print "- Backing up stock dtbo image"
-      eval $LIB32PFX $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
+      $MAGISKBIN/magiskboot --compress $DTBOIMAGE $MAGISKBIN/stock_dtbo.img.gz
       ui_print "- Patching fstab in dtbo to remove avb-verity"
-      eval $LIB32PFX $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
+      $MAGISKBIN/magiskboot --dtb-patch $DTBOIMAGE
       return 0
     fi
   fi
@@ -200,7 +200,7 @@ restore_imgs() {
   STOCKDTBO=/data/stock_dtbo.img.gz
 
   # Make sure all blocks are writable
-  eval $LIB32PFX $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
+  $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   find_dtbo_image
   if [ ! -z "$DTBOIMAGE" -a -f "$STOCKDTBO" ]; then
     ui_print "- Restoring stock dtbo image"
@@ -220,7 +220,7 @@ sign_chromeos() {
   ui_print "- Signing ChromeOS boot image"
 
   echo > empty
-  eval $LIBPFX ./chromeos/futility vbutil_kernel --pack new-boot.img.signed \
+  ./chromeos/futility vbutil_kernel --pack new-boot.img.signed \
   --keyblock ./chromeos/kernel.keyblock --signprivate ./chromeos/kernel_data_key.vbprivk \
   --version 1 --vmlinuz new-boot.img --config empty --arch arm --bootloader empty --flags 0x1
 
@@ -296,14 +296,18 @@ recovery_actions() {
   fi
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
-  # Set library paths
-  $IS64BIT && LIBPFX="LD_LIBRARY_PATH=/system/lib64:/system/vendor/lib64" || LIBPFX="LD_LIBRARY_PATH=/system/lib:/system/vendor/lib"
-  LIB32PFX="LD_LIBRARY_PATH=/system/lib:/system/vendor/lib"
+  # Unset library paths
+  OLD_LD_LIB=$LD_LIBRARY_PATH
+  OLD_LD_PRE=$LD_PRELOAD
+  unset LD_LIBRARY_PATH
+  unset LD_PRELOAD
 }
 
 recovery_cleanup() {
   mv /sbin_tmp /sbin 2>/dev/null
   [ -z $OLD_PATH ] || export PATH=$OLD_PATH
+  [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
+  [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   ui_print "- Unmounting partitions"
   umount -l /system_root 2>/dev/null
   umount -l /system 2>/dev/null
@@ -348,7 +352,7 @@ request_zip_size_check() {
 }
 
 image_size_check() {
-  SIZE="`eval $LIB32PFX $MAGISKBIN/magisk --imgsize $IMG`"
+  SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
   curUsedM=`echo "$SIZE" | cut -d" " -f1`
   curSizeM=`echo "$SIZE" | cut -d" " -f2`
   curFreeM=$((curSizeM - curUsedM))
@@ -362,28 +366,28 @@ mount_magisk_img() {
     if [ "$reqSizeM" -gt "$curFreeM" ]; then
       newSizeM=$(((reqSizeM + curUsedM) / 32 * 32 + 64))
       ui_print "- Resizing $IMG to ${newSizeM}M"
-      eval $LIB32PFX $MAGISKBIN/magisk --resizeimg $IMG $newSizeM >&2
+      $MAGISKBIN/magisk --resizeimg $IMG $newSizeM >&2
     fi
   else
     newSizeM=$((reqSizeM / 32 * 32 + 64));
     ui_print "- Creating $IMG with size ${newSizeM}M"
-    eval $LIB32PFX $MAGISKBIN/magisk --createimg $IMG $newSizeM >&2
+    $MAGISKBIN/magisk --createimg $IMG $newSizeM >&2
   fi
 
   ui_print "- Mounting $IMG to $MOUNTPATH"
-  MAGISKLOOP=`eval $LIB32PFX $MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
+  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
   is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 }
 
 unmount_magisk_img() {
-  eval $LIB32PFX $MAGISKBIN/magisk --umountimg $MOUNTPATH $MAGISKLOOP
+  $MAGISKBIN/magisk --umountimg $MOUNTPATH $MAGISKLOOP
 
   # Shrink the image if possible
   image_size_check $IMG
   newSizeM=$((curUsedM / 32 * 32 + 64))
   if [ $curSizeM -gt $newSizeM ]; then
     ui_print "- Shrinking $IMG to ${newSizeM}M"
-    eval $LIB32PFX $MAGISKBIN/magisk --resizeimg $IMG $newSizeM
+    $MAGISKBIN/magisk --resizeimg $IMG $newSizeM
   fi
 }
 
