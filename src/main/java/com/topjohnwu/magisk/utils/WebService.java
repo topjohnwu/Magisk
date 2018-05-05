@@ -24,11 +24,12 @@ public class WebService {
         try {
             StringBuilder builder = new StringBuilder();
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                int len;
-                char buf[] = new char[4096];
-                while ((len = br.read(buf)) != -1) {
-                    builder.append(buf, 0, len);
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                    int len;
+                    char buf[] = new char[4096];
+                    while ((len = br.read(buf)) != -1) {
+                        builder.append(buf, 0, len);
+                    }
                 }
             }
             conn.disconnect();

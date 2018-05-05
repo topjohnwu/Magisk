@@ -13,7 +13,7 @@ public class Module extends BaseModule {
     public Module(String path) {
 
         try {
-            parseProps(Shell.Sync.su("cat " + path + "/module.prop"));
+            parseProps(Shell.Sync.su("dos2unix <  " + path + "/module.prop"));
         } catch (NumberFormatException ignored) {}
 
         mRemoveFile = new SuFile(path + "/remove", true);

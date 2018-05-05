@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONArray;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
     private MagiskManager mm;
-    private List<String> cached, etags, newEtags = new ArrayList<>();
+    private List<String> cached, etags, newEtags = new LinkedList<>();
     private boolean forceUpdate;
     private AtomicInteger taskCount = new AtomicInteger(0);
     final private Object allDone = new Object();
@@ -92,6 +94,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             String id = rawRepo.getString("description");
             String name = rawRepo.getString("name");
             Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
+            final List<String> c = cached;
             queueTask(() -> {
                 Repo repo = mm.repoDB.getRepo(id);
                 Boolean updated;
@@ -101,7 +104,9 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                         updated = true;
                     } else {
                         // Popout from cached
-                        cached.remove(id);
+                        synchronized (c) {
+                            c.remove(id);
+                        }
                         if (forceUpdate) {
                             repo.update();
                             updated = true;
@@ -114,7 +119,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                         publishProgress();
                     }
                     if (!id.equals(repo.getId())) {
-                        Logger.error("Repo [" + name + "] id=[" + repo.getId() + "] has illegal repo id");
+                        Logger.error("Repo [" + name + "] rid=[" + id + "] id=[" + repo.getId() + "] mismatch");
                     }
                 } catch (Repo.IllegalRepoException e) {
                     Logger.error(e.getMessage());
@@ -126,19 +131,16 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     private boolean loadPage(int page, int mode) {
         Map<String, String> header = new HashMap<>();
-        String etag = "";
-        if (mode == CHECK_ETAG && page < etags.size()) {
-            etag = etags.get(page);
-        }
+        String etag = (mode == CHECK_ETAG && page < etags.size()) ? etags.get(page) : "";
         header.put(Const.Key.IF_NONE_MATCH, etag);
-        String url = String.format(Locale.US, Const.Url.REPO_URL, page + 1);
+        String url = Utils.fmt(Const.Url.REPO_URL, page + 1);
         HttpURLConnection conn = WebService.request(url, header);
 
         try {
             if (conn == null)
                 throw new Exception();
             if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                newEtags.add(etag);
+                // Current page is not updated, check the next page
                 return page + 1 < etags.size() && loadPage(page + 1, CHECK_ETAG);
             }
             loadJSON(WebService.getString(conn));
@@ -148,10 +150,17 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             return true;
         }
 
+        /* If one page is updated, we force update all pages */
+
         // Update ETAG
         etag = header.get(Const.Key.ETAG_KEY);
         etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
-        newEtags.add(etag);
+        if (mode == LOAD_PREV) {
+            // We are loading a previous page, push the new tag to the front
+            newEtags.add(0, etag);
+        } else {
+            newEtags.add(etag);
+        }
 
         String links = header.get(Const.Key.LINK_KEY);
         if (links != null) {
@@ -159,7 +168,8 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                 if (mode != LOAD_PREV && s.contains("next")) {
                     // Force load all next pages
                     loadPage(page + 1, LOAD_NEXT);
-                } else if (mode != LOAD_NEXT && s.contains("prev")) {
+                }
+                if (mode != LOAD_NEXT && s.contains("prev")) {
                     // Back propagation
                     loadPage(page - 1, LOAD_PREV);
                 }

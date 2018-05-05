@@ -288,4 +288,13 @@ public class Utils {
     public static String fmt(String fmt, Object... args) {
         return String.format(Locale.US, fmt, args);
     }
+
+    public static String dos2unix(String s) {
+        String newString = s.replace("\r\n", "\n");
+        if(!newString.endsWith("\n")) {
+            return newString + "\n";
+        } else {
+            return newString;
+        }
+    }
 }

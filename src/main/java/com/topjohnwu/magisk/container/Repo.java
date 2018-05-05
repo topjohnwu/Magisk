@@ -5,6 +5,8 @@ import android.database.Cursor;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
 import java.text.DateFormat;
@@ -28,10 +30,9 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws IllegalRepoException {
-        String props = WebService.getString(getManifestUrl());
-        String lines[] = props.split("\\n");
+        String props[] = Utils.dos2unix(WebService.getString(getManifestUrl())).split("\\n");
         try {
-            parseProps(lines);
+            parseProps(props);
         } catch (NumberFormatException e) {
             throw new IllegalRepoException("Repo [" + repoName + "] parse error: " + e.getMessage());
         }
@@ -43,7 +44,7 @@ public class Repo extends BaseModule {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
         }
         if (getMinMagiskVersion() < Const.MIN_MODULE_VER()) {
-            throw new IllegalRepoException("Repo [" + repoName + "] is outdated");
+            Logger.error("Repo [" + repoName + "] is outdated");
         }
     }
 

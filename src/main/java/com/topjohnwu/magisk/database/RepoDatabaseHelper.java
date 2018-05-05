@@ -103,8 +103,8 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             case Const.Value.ORDER_DATE:
                 orderBy = "last_update DESC";
         }
-        return mDb.query(TABLE_NAME, null, "minMagisk<=?",
-                new String[] { String.valueOf(mm.magiskVersionCode) },
+        return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
+                new String[] { String.valueOf(mm.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER()) },
                 null, null, orderBy);
     }
 
