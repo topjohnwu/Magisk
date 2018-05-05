@@ -7,7 +7,7 @@
     <string name="superuser">Supervartotojas</string>
     <string name="log">Įvykių sąrašas</string>
     <string name="settings">Nustatymai</string>
-    <string name="install">Instaliuo-ti</string>
+    <string name="install">Instaliuoti</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk yra neinstaliuotas</string>
@@ -75,7 +75,7 @@
     <string name="support_thread">Mūsų XDA puslapis</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Ši funkija neveiks be prieigos prie saugyklos.</string>
+    <string name="permissionNotGranted">Ši funkija neveiks be prieigos prie saugyklos</string>
     <string name="no_thanks">Ačiū, nereikia</string>
     <string name="yes">Taip</string>
     <string name="ok">Gerai</string>
@@ -110,17 +110,19 @@
     <string name="direct_install">Tiesioginis atsisiuntimas (Rekomenduojamas)</string>
     <string name="install_second_slot">Instaliuoti į antrą vietą (Po OTA)</string>
     <string name="select_method">Pasirinkite metodą</string>
-    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile.</string>    
-    <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate.</string>
+    <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>    
+    <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
-    <string name="restore_img">Atstatyti boot failą.</string>
+    <string name="restore_img">Atstatyti boot failą</string>
     <string name="uninstall_app">Pašalinti programėlę</string>
     <string name="restore_done">Atstatymas įvykdytas!</string>
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
-    <string name="uninstall_toast">Magisk Manager bus pašalintas po 5 sekundžių, pašalinus perkraukite telefoną.</string>
+    <string name="uninstall_toast">Magisk Manager bus pašalintas po 5 sekundžių, pašalinus perkraukite telefoną</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
     <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
+    <string name="cannot_check_sn_title">Negalime surasti SafetyNet</string>
+    <string name="cannot_check_sn_notice">Dėl Google Play Services pakeitimų, SafetyNet suradimas perpakuotame Magisk Manager yra neįmanomas</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>
@@ -136,16 +138,16 @@
     <string name="system_default">(Sistemos)</string>
     <string name="settings_update">Atnaujinimų nustatymai</string>
     <string name="settings_check_update_title">Automatiškas atnaujinimų ieškojimas</string>
-    <string name="settings_check_update_summary">Automatiškai ieškoti Magisk ir Magisk Manager atnaujinimų.</string>
+    <string name="settings_check_update_summary">Automatiškai ieškoti Magisk ir Magisk Manager atnaujinimų</string>
     <string name="settings_update_channel_title">Atnaujinimų tipai</string>
     <string name="settings_update_stable">Stabilūs</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Pasirinktiniai</string>
     <string name="settings_update_custom_msg">Įvesti pasirinktinį URL</string>
     <string name="settings_boot_format_title">Boot failo formatas</string>
-    <string name="settings_boot_format_summary">Pasirinkti boot failo formatą.\n.img naudojamas įdiegimui per fastboot/download; .img.tar naudojamas įdiegimui per ODIN.</string>
+    <string name="settings_boot_format_summary">Pasirinkti boot failo formatą.\n.img naudojamas įdiegimui per fastboot/download; .img.tar naudojamas įdiegimui per ODIN</string>
     <string name="settings_core_only_title">Pagrindinis Magisk režimas</string>
-    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti.</string>
+    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU, Magisk Hide ir Sistemos pedejėjai liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Įgalinti sistemos padejėjus Adblock programėlėms</string>
@@ -175,7 +177,7 @@
     <string name="owner_only_summary">Tik įrenginio savininkas turi root prieigą</string>
     <string name="owner_manage_summary">Tik įrenginio savinkas gali tvarkyti root prieigą ir gauti lenteles prašančias root prieigos</string>
     <string name="user_indepenent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
-    <string name="multiuser_hint_owner_request">Prašymas buvo nusiųstas savininkui. Prašome tapti savininku ir suteikite leidimą.</string>
+    <string name="multiuser_hint_owner_request">Prašymas buvo nusiųstas savininkui. Prašome tapti savininku ir suteikite leidimą</string>
 
     <string name="mount_namespace_mode">Root sesijos vardų srities režimas</string>
     <string name="settings_ns_global">Globali vardų sritis</string>
