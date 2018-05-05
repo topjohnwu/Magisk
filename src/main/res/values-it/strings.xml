@@ -120,6 +120,8 @@
 	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS, quindi non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi permettere il download di un\'estensione (che contiene GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
+	<string name="cannot_check_sn_title">Impossibile controllare SafetyNet</string>
+	<string name="cannot_check_sn_notice">In seguito a dei cambiamenti in Google Play Services, non è possibile controllare SafetyNet quando Magisk Manager è nascosto</string>
 	
 	<!--Settings Activity -->
 	<string name="settings_general_category">Generale</string>
