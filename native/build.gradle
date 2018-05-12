@@ -13,8 +13,9 @@ android {
     defaultConfig {
         externalNativeBuild {
             ndkBuild {
-                // Passes an optional argument to ndk-build.
-                arguments "GRADLE=true"
+                // Pass arguments to ndk-build.
+                arguments('B_MAGISK=true', 'B_INIT=true', 'B_BOOT=true', 'MAGISK_VERSION=debug',
+                        'MAGISK_VER_CODE=99999', 'MAGISK_DEBUG=-DMAGISK_DEBUG')
             }
         }
     }

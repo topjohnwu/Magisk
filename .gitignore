@@ -2,9 +2,10 @@ out
 *.zip
 *.jks
 *.apk
+config.prop
 
 # Built binaries
-ziptools/zipadjust
+native/out
 
 # Android Studio / Gradle
 *.iml

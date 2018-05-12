@@ -1,0 +1,13 @@
+# The version string and version code of Magisk
+version=
+versionCode=
+
+outdir=out
+
+# Whether use pretty names for zips, e.g. Magisk-v${version}.zip, Magisk-uninstaller-${date}.zip
+# The default output names are magisk-${release/debug/uninstaller}.zip
+prettyName=false
+
+# These pwds are passed to apksigner for release-key.jks. Necessary when building release apks
+keyStorePass=
+keyPass=

@@ -4,8 +4,8 @@ import os
 import subprocess
 
 if os.name == 'nt':
-	from colorama import init
-	init()
+	import colorama
+	colorama.init()
 
 def error(str):
 	print('\n' + '\033[41m' + str + '\033[0m' + '\n')
@@ -16,7 +16,7 @@ def header(str):
 
 # Environment checks
 if not sys.version_info >= (3, 5):
-	error('Requires Python >= 3.5')
+	error('Requires Python 3.5+')
 
 if 'ANDROID_HOME' not in os.environ:
 	error('Please add Android SDK path to ANDROID_HOME environment variable!')
@@ -24,7 +24,7 @@ if 'ANDROID_HOME' not in os.environ:
 try:
 	subprocess.run(['java', '-version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except FileNotFoundError:
-	error('Please install Java and make sure \'java\' is available in PATH')
+	error('Please install JDK and make sure \'java\' is available in PATH')
 
 import argparse
 import multiprocessing
@@ -41,13 +41,20 @@ if 'ANDROID_NDK' in os.environ:
 else:
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 
+cpu_count = multiprocessing.cpu_count()
+
 def mv(source, target):
-	print('mv: {} -> {}'.format(source, target))
-	shutil.move(source, target)
+	try:
+		shutil.move(source, target)
+	except:
+		pass
 
 def cp(source, target):
-	print('cp: {} -> {}'.format(source, target))
-	shutil.copyfile(source, target)
+	try:
+		shutil.copyfile(source, target)
+		print('cp: {} -> {}'.format(source, target))
+	except:
+		pass
 
 def rm(file):
 	try:
@@ -78,44 +85,68 @@ def build_all(args):
 	zip_uninstaller(args)
 	build_snet(args)
 
-def build_binary(args):
-	header('* Building Magisk binaries')
+def collect_binary():
+	for arch in ['armeabi-v7a', 'x86']:
+		mkdir_p(os.path.join('native', 'out', arch))
+		for bin in ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']:
+			source = os.path.join('native', 'libs', arch, bin)
+			target = os.path.join('native', 'out', arch, bin)
+			mv(source, target)
 
-	# Force update logging.h timestamp to trigger recompilation
+def build_binary(args):
+	# If nothing specified, build everything
+	if len(args.target) == 0:
+		args.target = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
+
+	header('* Building binaries: ' + ' '.join(args.target))
+
+	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
 	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
 
-	debug_flag = '' if args.release else '-DMAGISK_DEBUG'
-	cflag = 'MAGISK_FLAGS=\"-DMAGISK_VERSION=\\\"{}\\\" -DMAGISK_VER_CODE={} {}\"'.format(args.versionString, args.versionCode, debug_flag)
+	# Basic flags
+	flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
+		'' if args.release else '-DMAGISK_DEBUG')
 
-	# Prebuild
-	proc = subprocess.run('{} -C native PRECOMPILE=true {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
-	if proc.returncode != 0:
-		error('Build Magisk binary failed!')
+	if 'magisk' in args.target:
+		# Magisk is special case as it is a dependency of magiskinit
+		proc = subprocess.run('{} -C native {} B_MAGISK=true -j{}'.format(ndk_build, flags, cpu_count), shell=True)
+		if proc.returncode != 0:
+			error('Build Magisk binary failed!')
+		collect_binary()
 
-	print('')
-	for arch in ['armeabi-v7a', 'x86']:
-		mkdir_p(os.path.join('out', arch))
-		with open(os.path.join('out', arch, 'dump.h'), 'w') as dump:
-			dump.write('#include "stdlib.h"\n')
-			mv(os.path.join('native', 'libs', arch, 'magisk'), os.path.join('out', arch, 'magisk'))
-			with open(os.path.join('out', arch, 'magisk'), 'rb') as bin:
-				dump.write('const uint8_t magisk_dump[] = "')
-				dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
-				dump.write('";\n')
+	non_magisk = False
 
-	print('')
+	if 'magiskinit' in args.target:
+		# We need to create dump.h beforehand
+		if not os.path.exists(os.path.join('native', 'out', 'armeabi-v7a', 'magisk')):
+			error('Build "magisk" before building "magiskinit"')
+		for arch in ['armeabi-v7a', 'x86']:
+			with open(os.path.join('native', 'out', arch, 'dump.h'), 'w') as dump:
+				dump.write('#include "stdlib.h"\n')
+				with open(os.path.join('native', 'out', arch, 'magisk'), 'rb') as bin:
+					dump.write('const uint8_t magisk_dump[] = "')
+					dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
+					dump.write('";\n')
+		flags += ' B_INIT=true'
+		non_magisk = True
 
-	proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, cflag, multiprocessing.cpu_count()), shell=True)
-	if proc.returncode != 0:
-		error('Build Magisk binary failed!')
+	if 'magiskboot' in args.target:
+		flags += ' B_BOOT=true'
+		non_magisk = True
 
-	print('')
-	for arch in ['armeabi-v7a', 'x86']:
-		for binary in ['magiskinit', 'magiskboot', 'b64xz', 'busybox']:
-			try:
-				mv(os.path.join('native', 'libs', arch, binary), os.path.join('out', arch, binary))
-			except:
-				pass
+	if 'busybox' in args.target:
+		flags += ' B_BB=true'
+		non_magisk = True
+
+	if 'b64xz' in args.target:
+		flags += ' B_BXZ=true'
+		non_magisk = True
+
+	if non_magisk:
+		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True)
+		if proc.returncode != 0:
+			error('Build binaries failed!')
+		collect_binary()
 
 def build_apk(args):
 	header('* Building Magisk Manager')
@@ -127,8 +158,8 @@ def build_apk(args):
 		cp(source, target)
 
 	if args.release:
-		if not os.path.exists('release_signature.jks'):
-			error('Please generate a java keystore and place it in \'release_signature.jks\'')
+		if not os.path.exists('release-key.jks'):
+			error('Please generate a java keystore and place it in \'release-key.jks\'')
 
 		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
@@ -136,79 +167,70 @@ def build_apk(args):
 
 		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-unsigned.apk')
 		aligned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-aligned.apk')
-		release = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')
+		release = os.path.join(config['outdir'], 'app-release.apk')
 
 		# Find the latest build tools
-		build_tool = sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1]
+		build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
+			sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1])
 
-		rm(aligned)
-		rm(release)
-
-		proc = subprocess.run([
-			os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool, 'zipalign'),
-			'-v', '-p', '4', unsigned, aligned], stdout=subprocess.DEVNULL)
+		proc = subprocess.run([os.path.join(build_tool, 'zipalign'), '-vpf', '4', unsigned, aligned], stdout=subprocess.DEVNULL)
 		if proc.returncode != 0:
 			error('Zipalign Magisk Manager failed!')
 
 		# Find apksigner.jar
 		apksigner = ''
-		for root, dirs, files in os.walk(os.path.join(os.environ['ANDROID_HOME'], 'build-tools', build_tool)):
+		for root, dirs, files in os.walk(build_tool):
 			if 'apksigner.jar' in files:
 				apksigner = os.path.join(root, 'apksigner.jar')
 				break
 		if not apksigner:
 			error('Cannot find apksigner.jar in Android SDK build tools')
 
-		proc = subprocess.run('java -jar {} sign --ks {} --out {} {}'.format(
-			apksigner, 'release_signature.jks', release, aligned), shell=True)
+		proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --key-pass pass:{} --out {} {}'.format(
+			apksigner, config['keyStorePass'], config['keyPass'], release, aligned), shell=True)
 		if proc.returncode != 0:
 			error('Release sign Magisk Manager failed!')
 
 		rm(unsigned)
 		rm(aligned)
 
-		mkdir('out')
-		target = os.path.join('out', 'app-release.apk')
-		print('')
-		mv(release, target)
+		header('Output: ' + release)
 	else:
 		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk')
-		mkdir('out')
-		target = os.path.join('out', 'app-debug.apk')
-		print('')
+		target = os.path.join(config['outdir'], 'app-debug.apk')
 		mv(source, target)
+		header('Output: ' + target)
 
 def build_snet(args):
 	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
 	if proc.returncode != 0:
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
-	mkdir('out')
-	target = os.path.join('out', 'snet.apk')
-	print('')
+	target = os.path.join(config['outdir'], 'snet.apk')
 	mv(source, target)
+	header('Output: ' + target)
 
 def gen_update_binary():
 	update_bin = []
-	binary = os.path.join('out', 'armeabi-v7a', 'b64xz')
+	binary = os.path.join('native', 'out', 'armeabi-v7a', 'b64xz')
 	if not os.path.exists(binary):
 		error('Please build \'binary\' before zipping!')
 	with open(binary, 'rb') as b64xz:
 		update_bin.append('#! /sbin/sh\nEX_ARM=\'')
 		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
-	binary = os.path.join('out', 'x86', 'b64xz')
+	binary = os.path.join('native', 'out', 'x86', 'b64xz')
 	with open(binary, 'rb') as b64xz:
 		update_bin.append('\'\nEX_X86=\'')
 		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
-	binary = os.path.join('out', 'armeabi-v7a', 'busybox')
+	binary = os.path.join('native', 'out', 'armeabi-v7a', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\'\nBB_ARM=')
 		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9)).decode('ascii'))
-	binary = os.path.join('out', 'x86', 'busybox')
+	binary = os.path.join('native', 'out', 'x86', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\nBB_X86=')
 		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9)).decode('ascii'))
@@ -236,12 +258,12 @@ def zip_main(args):
 		# Binaries
 		for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
 			for binary in ['magiskinit', 'magiskboot']:
-				source = os.path.join('out', lib_dir, binary)
+				source = os.path.join('native', 'out', lib_dir, binary)
 				target = os.path.join(zip_dir, binary)
 				zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join('out', 'app-release.apk' if args.release else 'app-debug.apk')
+		source = os.path.join(config['outdir'], 'app-release.apk' if args.release else 'app-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
 
@@ -254,8 +276,8 @@ def zip_main(args):
 		source = os.path.join('scripts', 'util_functions.sh')
 		with open(source, 'r') as script:
 			# Add version info util_functions.sh
-			util_func = script.read().replace(
-				'#MAGISK_VERSION_STUB', 'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(args.versionString, args.versionCode))
+			util_func = script.read().replace('#MAGISK_VERSION_STUB',
+				'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(config['version'], config['versionCode']))
 			target = os.path.join('common', 'util_functions.sh')
 			print('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, util_func)
@@ -271,8 +293,10 @@ def zip_main(args):
 
 		# End of zipping
 
-	output = os.path.join('out', 'Magisk-v{}.zip'.format(args.versionString))
+	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else 
+		'magisk-release.zip' if args.release else 'magisk-debug.zip')
 	sign_adjust_zip(unsigned, output)
+	header('Output: ' + output)
 
 def zip_uninstaller(args):
 	header('* Packing Uninstaller Zip')
@@ -292,7 +316,7 @@ def zip_uninstaller(args):
 
 		# Binaries
 		for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
-			source = os.path.join('out', lib_dir, 'magiskboot')
+			source = os.path.join('native', 'out', lib_dir, 'magiskboot')
 			target = os.path.join(zip_dir, 'magiskboot')
 			zip_with_msg(zipf, source, target)
 
@@ -316,8 +340,10 @@ def zip_uninstaller(args):
 
 		# End of zipping
 
-	output = os.path.join('out', 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')))
+	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')) 
+		if config['prettyName'] else 'magisk-uninstaller.zip')
 	sign_adjust_zip(unsigned, output)
+	header('Output: ' + output)
 
 def sign_adjust_zip(unsigned, output):
 	signer_name = 'zipsigner-2.1.jar'
@@ -343,36 +369,61 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning binaries')
-		subprocess.run(ndk_build + ' -C native PRECOMPILE=true clean', shell=True)
-		subprocess.run(ndk_build + ' -C native clean', shell=True)
-		for arch in ['arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64']:
-			shutil.rmtree(os.path.join('out', arch), ignore_errors=True)
+		subprocess.run(ndk_build + ' -C native B_MAGISK=true B_INIT=true B_BOOT=true B_BXZ=true B_BB=true clean', shell=True)
+		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:
 		header('* Cleaning java')
 		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True)
-		for f in os.listdir('out'):
+		for f in os.listdir(config['outdir']):
 			if '.apk' in f:
-				rm(os.path.join('out', f))
+				rm(os.path.join(config['outdir'], f))
 
 	if 'zip' in args.target:
 		header('* Cleaning zip files')
-		for f in os.listdir('out'):
+		for f in os.listdir(config['outdir']):
 			if '.zip' in f:
-				rm(os.path.join('out', f))
+				rm(os.path.join(config['outdir'], f))
+
+def parse_config():
+	c = {}
+	with open('config.prop', 'r') as f:
+		for line in [l.strip(' \t\r\n') for l in f]:
+			if line.startswith('#') or len(line) == 0:
+				continue
+			prop = line.split('=')
+			c[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+
+	if 'version' not in c or 'versionCode' not in c:
+		error('"version" and "versionCode" is required in "config.prop"')
+
+	try:
+		c['versionCode'] = int(c['versionCode'])
+	except ValueError:
+		error('"versionCode" is required to be an integer')
+
+	if 'prettyName' not in c:
+		c['prettyName'] = 'false'
+
+	c['prettyName'] = c['prettyName'].lower() == 'true'
+
+	if 'outdir' not in c:
+		c['outdir'] = 'out'
+
+	mkdir_p(c['outdir'])
+	return c
+
+config = parse_config()
 
 parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('--release', action='store_true', help='compile Magisk for release')
 subparsers = parser.add_subparsers(title='actions')
 
-all_parser = subparsers.add_parser('all', help='build everything and create flashable zip with uninstaller')
-all_parser.add_argument('versionString')
-all_parser.add_argument('versionCode', type=int)
+all_parser = subparsers.add_parser('all', help='build everything (binaries/apks/zips)')
 all_parser.set_defaults(func=build_all)
 
-binary_parser = subparsers.add_parser('binary', help='build Magisk binaries')
-binary_parser.add_argument('versionString')
-binary_parser.add_argument('versionCode', type=int)
+binary_parser = subparsers.add_parser('binary', help='build binaries. target: magisk magiskinit magiskboot busybox b64xz')
+binary_parser.add_argument('target', nargs='*')
 binary_parser.set_defaults(func=build_binary)
 
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
@@ -382,14 +433,12 @@ snet_parser = subparsers.add_parser('snet', help='build snet extention for Magis
 snet_parser.set_defaults(func=build_snet)
 
 zip_parser = subparsers.add_parser('zip', help='zip and sign Magisk into a flashable zip')
-zip_parser.add_argument('versionString')
-zip_parser.add_argument('versionCode', type=int)
 zip_parser.set_defaults(func=zip_main)
 
 uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
 uninstaller_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='clean [target...] targets: binary java zip')
+clean_parser = subparsers.add_parser('clean', help='cleanup. target: binary java zip')
 clean_parser.add_argument('target', nargs='*')
 clean_parser.set_defaults(func=cleanup)
 

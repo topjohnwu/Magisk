@@ -23,7 +23,7 @@ UTIL_SRC := utils/cpio.c \
 # Binaries
 ########################
 
-ifneq "$(or $(PRECOMPILE), $(GRADLE))" ""
+ifdef B_MAGISK
 
 # magisk main binary
 include $(CLEAR_VARS)
@@ -57,13 +57,14 @@ LOCAL_SRC_FILES := \
 	su/su_socket.c \
 	$(UTIL_SRC)
 
-LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX
+LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX ${MAGISK_DEBUG} \
+	-DMAGISK_VERSION="${MAGISK_VERSION}" -DMAGISK_VER_CODE=${MAGISK_VER_CODE} 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
 
 endif
 
-ifndef PRECOMPILE
+ifdef B_INIT
 
 # magiskinit
 include $(CLEAR_VARS)
@@ -72,7 +73,7 @@ LOCAL_STATIC_LIBRARIES := libsepol liblzma
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
-	../out/$(TARGET_ARCH_ABI) \
+	out/$(TARGET_ARCH_ABI) \
 	$(LIBSEPOL) \
 	$(LIBLZMA)
 
@@ -86,6 +87,10 @@ LOCAL_SRC_FILES := \
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
+
+endif
+
+ifdef B_BOOT
 
 # magiskboot
 include $(CLEAR_VARS)
@@ -113,8 +118,10 @@ LOCAL_CFLAGS := -DXWRAP_EXIT
 LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
 
-# static binaries
-ifndef GRADLE  # Do not run gradle sync on these binaries
+endif
+
+ifdef B_BXZ
+
 # b64xz
 include $(CLEAR_VARS)
 LOCAL_MODULE := b64xz
@@ -123,11 +130,14 @@ LOCAL_C_INCLUDES := $(LIBLZMA)
 LOCAL_SRC_FILES := b64xz.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
-# Busybox
-include jni/external/busybox/Android.mk
+
 endif
 
-# Precompile
+ifdef B_BB
+
+# Busybox
+include jni/external/busybox/Android.mk
+
 endif
 
 ########################

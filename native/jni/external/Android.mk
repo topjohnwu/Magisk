@@ -1,4 +1,4 @@
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 # libsqlite.so (stub)
 include $(CLEAR_VARS)
