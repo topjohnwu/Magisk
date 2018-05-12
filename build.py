@@ -104,17 +104,35 @@ def build_binary(args):
 	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
 
 	# Basic flags
-	flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
+	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
 		'' if args.release else '-DMAGISK_DEBUG')
 
 	if 'magisk' in args.target:
 		# Magisk is special case as it is a dependency of magiskinit
-		proc = subprocess.run('{} -C native {} B_MAGISK=true -j{}'.format(ndk_build, flags, cpu_count), shell=True)
+		proc = subprocess.run('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk binary failed!')
 		collect_binary()
 
-	non_magisk = False
+	old_platform = False
+	flags = base_flags
+
+	if 'busybox' in args.target:
+		flags += ' B_BB=1'
+		old_platform = True
+
+	if 'b64xz' in args.target:
+		flags += ' B_BXZ=1'
+		old_platform = True
+
+	if old_platform:
+		proc = subprocess.run('{} -C native OLD_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True)
+		if proc.returncode != 0:
+			error('Build binaries failed!')
+		collect_binary()
+
+	other = False
+	flags = base_flags
 
 	if 'magiskinit' in args.target:
 		# We need to create dump.h beforehand
@@ -127,22 +145,14 @@ def build_binary(args):
 					dump.write('const uint8_t magisk_dump[] = "')
 					dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
 					dump.write('";\n')
-		flags += ' B_INIT=true'
-		non_magisk = True
+		flags += ' B_INIT=1'
+		other = True
 
 	if 'magiskboot' in args.target:
-		flags += ' B_BOOT=true'
-		non_magisk = True
+		flags += ' B_BOOT=1'
+		other = True
 
-	if 'busybox' in args.target:
-		flags += ' B_BB=true'
-		non_magisk = True
-
-	if 'b64xz' in args.target:
-		flags += ' B_BXZ=true'
-		non_magisk = True
-
-	if non_magisk:
+	if other:
 		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True)
 		if proc.returncode != 0:
 			error('Build binaries failed!')
@@ -369,7 +379,7 @@ def cleanup(args):
 
 	if 'binary' in args.target:
 		header('* Cleaning binaries')
-		subprocess.run(ndk_build + ' -C native B_MAGISK=true B_INIT=true B_BOOT=true B_BXZ=true B_BB=true clean', shell=True)
+		subprocess.run(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean', shell=True)
 		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:

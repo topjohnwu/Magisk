@@ -175,7 +175,7 @@ LOCAL_SRC_FILES := \
 	xz/src/liblzma/simple/simple_encoder.c \
 	xz/src/liblzma/simple/sparc.c \
 	xz/src/liblzma/simple/x86.c
-LOCAL_CFLAGS += -DHAVE_CONFIG_H -std=c99
+LOCAL_CFLAGS += -DHAVE_CONFIG_H -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
 
 # libsepol.a
