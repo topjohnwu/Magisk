@@ -109,7 +109,7 @@
     <string name="restore_fail">Фабрички бекап не постоји!</string>
     <string name="uninstall_toast">Уклањање Магиск Менаџера за 5 секунди, молим вас да ручно рестартујете телефон</string>
     <string name="proprietary_title">Преузми Власнички Код</string>
-    <string name="proprietary_notice">Магиск Менаџер је 'FOSS' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
+    <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
     <string name="su_db_corrupt">СК база података оштећена, креирам нову</string>
 
     <!--Settings Activity -->
