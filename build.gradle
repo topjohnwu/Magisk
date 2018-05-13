@@ -8,7 +8,7 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 115
+        versionCode 117
         versionName "5.7.0"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -46,7 +46,7 @@ dependencies {
     implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:support-v4:${rootProject.ext.supportLibVersion}"
     implementation 'com.jakewharton:butterknife:8.8.1'
-    implementation 'com.atlassian.commonmark:commonmark:0.10.0'
+    implementation 'com.atlassian.commonmark:commonmark:0.11.0'
     implementation 'org.kamranzafar:jtar:2.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

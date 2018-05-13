@@ -259,17 +259,22 @@ public class MagiskFragment extends Fragment
             }
         }
 
-        if (!shownDialog && (mm.remoteMagiskVersionCode > mm.magiskVersionCode
-                || mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE)) {
-                install();
-        }
-
         magiskUpdateIcon.setImageResource(image);
         magiskUpdateIcon.setColorFilter(color);
         magiskUpdateIcon.setVisibility(View.VISIBLE);
 
         magiskUpdateProgress.setVisibility(View.GONE);
         mSwipeRefreshLayout.setRefreshing(false);
+
+        if (!shownDialog) {
+            if (mm.remoteMagiskVersionCode > mm.magiskVersionCode
+                    || mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
+                install();
+            } else if (mm.remoteMagiskVersionCode >= Const.MAGISK_VER.FIX_ENV &&
+                    !Utils.cmdResult("env_check")) {
+                ShowUI.envFixDialog(getActivity());
+            }
+        }
     }
 
     private void updateSafetyNetUI(int response) {

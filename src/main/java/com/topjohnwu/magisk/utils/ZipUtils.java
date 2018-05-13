@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.utils;
 
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.JarMap;
 import com.topjohnwu.utils.SignAPK;
 
@@ -9,6 +11,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
@@ -16,13 +19,13 @@ import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
 
-    public static void unzip(File zip, File folder, String path, boolean junkPath) throws Exception {
+    public static void unzip(File zip, File folder, String path, boolean junkPath) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(zip));
         unzip(in, folder, path, junkPath);
         in.close();
     }
 
-    public static void unzip(InputStream zip, File folder, String path, boolean junkPath) throws Exception {
+    public static void unzip(InputStream zip, File folder, String path, boolean junkPath) throws IOException {
         try {
             ZipInputStream zipfile = new ZipInputStream(zip);
             ZipEntry entry;
@@ -37,13 +40,14 @@ public class ZipUtils {
                 } else {
                     name = entry.getName();
                 }
-                File dest = new File(folder, name);
+                SuFile dest = new SuFile(folder, name);
                 dest.getParentFile().mkdirs();
-                try (FileOutputStream out = new FileOutputStream(dest)) {
+                try (OutputStream out = new SuFileOutputStream(dest)) {
                     ShellUtils.pump(zipfile, out);
                 }
             }
-        } catch(Exception e) {
+        }
+        catch(IOException e) {
             e.printStackTrace();
             throw e;
         }

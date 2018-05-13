@@ -36,3 +36,10 @@ db_setup() {
   chown $USER.$USER $DIR
   chmod 666 $DIR/*
 }
+
+env_check() {
+  for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
+    [ -e /data/adb/magisk/$file ] || return 1
+  done
+  return 0
+}

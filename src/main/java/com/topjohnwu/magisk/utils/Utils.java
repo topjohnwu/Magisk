@@ -51,6 +51,10 @@ public class Utils {
         return ShellUtils.fastCmd(Shell.getShell(), cmd);
     }
 
+    public static boolean cmdResult(String cmd) {
+        return ShellUtils.fastCmdResult(Shell.getShell(), cmd);
+    }
+
     public static void uninstallPkg(String pkg) {
         Shell.Sync.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg);
     }

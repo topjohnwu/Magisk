@@ -105,10 +105,11 @@ public class MagiskManager extends Shell.ContainerApp {
         Shell.setInitializer(new Shell.Initializer() {
             @Override
             public void onRootShellInit(@NonNull Shell shell) {
-                try (InputStream utils = getAssets().open(Const.UTIL_FUNCTIONS);
-                     InputStream magiskDB = getResources().openRawResource(R.raw.magiskdb)) {
-                    shell.loadInputStream(null, null, utils);
-                    shell.loadInputStream(null, null, magiskDB);
+                try (InputStream magiskUtils = getAssets().open(Const.UTIL_FUNCTIONS);
+                     InputStream managerUtils = getResources().openRawResource(R.raw.utils)
+                ) {
+                    shell.loadInputStream(null, null, magiskUtils);
+                    shell.loadInputStream(null, null, managerUtils);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

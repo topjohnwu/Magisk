@@ -80,6 +80,7 @@ public class Const {
         public static final int HIDDEN_PATH = 1460;
         public static final int REMOVE_LEGACY_LINK = 1630;
         public static final int SEPOL_REFACTOR = 1640;
+        public static final int FIX_ENV = 1650;
     }
 
     public static class ID {

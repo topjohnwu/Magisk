@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.asyncs.RestoreImages;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
@@ -98,6 +99,26 @@ public class ShowUI {
         NotificationManager notificationManager =
                 (NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Const.ID.DTBO_NOTIFICATION_ID, builder.build());
+    }
+
+    public static void envFixDialog(Activity activity) {
+        MagiskManager mm = Utils.getMagiskManager(activity);
+        String filename = Utils.fmt("Magisk-v%s(%d).zip",
+                mm.remoteMagiskVersionString, mm.remoteMagiskVersionCode);
+        new AlertDialogBuilder(activity)
+                .setTitle(R.string.env_fix_title)
+                .setMessage(R.string.env_fix_msg)
+                .setCancelable(true)
+                .setPositiveButton(R.string.yes, (d, i) -> {
+                    Utils.dlAndReceive(activity, new DownloadReceiver() {
+                        @Override
+                        public void onDownloadDone(Uri uri) {
+                            new InstallMagisk(activity, uri).exec();
+                        }
+                    }, mm.magiskLink, filename);
+                })
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
     }
 
     public static void magiskInstallDialog(Activity activity) {
