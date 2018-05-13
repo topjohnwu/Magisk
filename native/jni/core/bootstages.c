@@ -629,12 +629,15 @@ initialize:
 #endif
 	}
 	xmkdirs(MIRRDIR "/bin", 0755);
+	xmkdirs(DATABIN, 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
 
-	LOGI("* Setting up internal busybox");
 	xmkdirs(BBPATH, 0755);
-	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
-	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+	if (access(MIRRDIR "/bin/busybox", X_OK) == 0) {
+		LOGI("* Setting up internal busybox");
+		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
+		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+	}
 
 	// uninstall
 	if (access(UNINSTALLER, F_OK) == 0) {
