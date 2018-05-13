@@ -16,6 +16,17 @@ void allowSuClient(char *target) {
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "sock_file", "write");
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "file", ALL);
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "dir", ALL);
+
+	// Fix several terminal apps running root shell
+	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
+		sepol_allowxperm(target, "devpts", "chr_file", "0x5400-0x54FF");
+		if (sepol_exists("untrusted_app_devpts"))
+			sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
+		if (sepol_exists("untrusted_app_25_devpts"))
+			sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+		if (sepol_exists("untrusted_app_all_devpts"))
+			sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
+	}
 }
 
 void suRights() {
@@ -110,10 +121,10 @@ void sepol_magisk_rules() {
 	// Allow these client to access su
 	allowSuClient("init");
 	allowSuClient("shell");
-	allowSuClient("untrusted_app");
 	allowSuClient("system_app");
-	allowSuClient("platform_app");
 	allowSuClient("priv_app");
+	allowSuClient("platform_app");
+	allowSuClient("untrusted_app");
 	allowSuClient("untrusted_app_25");
 	allowSuClient("untrusted_app_27");
 
@@ -146,13 +157,4 @@ void sepol_magisk_rules() {
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
 	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
-
-	// xperms
-	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
-		sepol_allowxperm("domain", "devpts", "chr_file", "0x5400-0x54FF");
-		if (sepol_exists("untrusted_app_25_devpts"))
-			sepol_allowxperm("domain", "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
-		if (sepol_exists("untrusted_app_devpts"))
-			sepol_allowxperm("domain", "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
-	}
 }
