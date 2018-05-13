@@ -465,6 +465,12 @@ static void unblock_boot_process() {
 	pthread_exit(NULL);
 }
 
+static const char wrapper[] =
+"#!/system/bin/sh\n"
+"unset LD_LIBRARY_PATH\n"
+"unset LD_PRELOAD\n"
+"exec /sbin/magisk.bin \"${0##*/}\" \"$@\"\n";
+
 void startup() {
 	if (!check_data())
 		return;
@@ -537,12 +543,17 @@ initialize:
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 
-	// Setup magisk symlinks
+	// Create wrapper
 	fd = creat("/sbin/magisk", 0755);
+	xwrite(fd, wrapper, sizeof(wrapper) - 1);
+	close(fd);
+	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	// Setup magisk symlinks
+	fd = creat("/sbin/magisk.bin", 0755);
 	xwrite(fd, magisk, magisk_size);
 	close(fd);
 	free(magisk);
-	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	setfilecon("/sbin/magisk.bin", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 	for (int i = 0; applet[i]; ++i) {
 		snprintf(buf, PATH_MAX, "/sbin/%s", applet[i]);
 		xsymlink("/sbin/magisk", buf);
