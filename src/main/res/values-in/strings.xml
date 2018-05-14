@@ -66,7 +66,7 @@
     <!--About Activity-->
     <string name="about">Tentang</string>
     <string name="app_changelog">Log pembaruan</string>
-    <string name="translators"><![CDATA[<a href="https://github.com/krasCGQ">Albert I (krasCGQ)</a>]]></string>
+    <string name="translators">Albert I (krasCGQ)</string>
     <string name="app_version">Versi</string>
     <string name="app_source_code">Kode sumber</string>
     <string name="donation">Donasi</string>
@@ -122,6 +122,10 @@
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>
     <string name="cannot_check_sn_title">Tidak dapat memeriksa SafetyNet</string>
     <string name="cannot_check_sn_notice">Karena beberapa perubahan dalam Layanan Google Play, adalah tidak mungkin untuk memeriksa SafetyNet di Magisk Manager yang dipak ulang</string>
+    <string name="setup_done">Penyiapan selesai</string>
+    <string name="setup_fail">Penyiapan gagal</string>
+    <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
+    <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>
