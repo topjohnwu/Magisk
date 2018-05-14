@@ -127,8 +127,8 @@
     <string name="cannot_check_sn_notice">Due to some changes in Google Play Services, it is not possible to check SafetyNet on repackaged Magisk Manager</string>
     <string name="setup_done">Setup done</string>
     <string name="setup_fail">Setup failed</string>
-    <string name="env_fix_title">Require Additional Setup</string>
-    <string name="env_fix_msg">Your device need additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+    <string name="env_fix_title">Requires Additional Setup</string>
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
