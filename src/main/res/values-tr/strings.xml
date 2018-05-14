@@ -121,6 +121,10 @@
     <string name="su_db_corrupt">SU veritabanı bozuk, yeni db oluşturacak</string>
     <string name="cannot_check_sn_title">SafetyNet denetlenemiyor</string>
     <string name="cannot_check_sn_notice">Google Play Hizmetleri\'ndeki bazı değişiklikler nedeniyle, yeniden paketlenmiş Magisk Manager\'da SafetyNet\'i denetlemek mümkün değildir</string>
+    <string name="setup_done">Kurulum tamamlandı</string>
+    <string name="setup_fail">Kurulum başarısız</string>
+    <string name="env_fix_title">Ek Kurulum İste</string>
+    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
