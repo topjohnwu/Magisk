@@ -1,7 +1,7 @@
 <resources>
 	<!--Universal-->
-
-    <!--Welcome Activity-->
+    
+	<!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
     <string name="superuser">Superuser</string>
@@ -101,8 +101,8 @@
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer</string>
     <string name="magisk_updates">Mises  à jours Magisk</string>
     <string name="flashing">Flahage</string>
-    <string name="hide_manager_toast">Masquage du Gestionnaire Magisk…</string>
-    <string name="hide_manager_toast2">Cela pourrait prendre un certain temps …</string>
+    <string name="hide_manager_toast">Masquage du Gestionnaire Magisk...</string>
+    <string name="hide_manager_toast2">Cela pourrait prendre un certain temps ...</string>
     <string name="hide_manager_fail_toast">Masquage du Gestionnaire Magisk échoué…</string>
     <string name="download_zip_only">Uniquement télécharger le zip</string>
     <string name="patch_boot_file">Patch Fichier Image Démarrage</string>
@@ -121,7 +121,11 @@
     <string name="proprietary_notice">Magisk Manager est Libre, il ne contient pas le code API SafetyNet propriétaire de Google. \ N \ nAutorisez vous le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet? </string>
     <string name = "su_db_corrupt"> La base de données SU est corrompue, une nouvelle base de donnée va être re-créé</string>
     <string name="cannot_check_sn_title">Vérification SafetyNet impossible</string>
-+   <string name="cannot_check_sn_notice">En raison de certains changements dans les services Google Play, il n\'est pas possible de vérifier SafetyNet via Magisk Manager reconstruit</string>
+    <string name="cannot_check_sn_notice">En raison de certains changements dans les services Google Play, il n\'est pas possible de vérifier SafetyNet via Magisk Manager reconstruit</string>
+    <string name="setup_done">Installation terminée</string>
+    <string name="setup_fail">Échec de l\'installation</string>
+    <string name="env_fix_title">Installation additionnelle requise</string>
+    <string name="env_fix_msg">Votre appareil a besoin d\'une configuration supplémentaire pour que Magisk fonctionne correctement. Il téléchargera le zip d\'installation de Magisk, voulez-vous procéder maintenant ?</string>
  
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
