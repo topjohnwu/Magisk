@@ -122,6 +122,10 @@
 	<string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
 	<string name="cannot_check_sn_title">Impossibile controllare SafetyNet</string>
 	<string name="cannot_check_sn_notice">In seguito a dei cambiamenti in Google Play Services, non è possibile controllare SafetyNet quando Magisk Manager è nascosto</string>
+	<string name="setup_done">Configurazione completata</string>
+	<string name="setup_fail">Configurazione fallita</string>
+	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
+	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
 	
 	<!--Settings Activity -->
 	<string name="settings_general_category">Generale</string>
