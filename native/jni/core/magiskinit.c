@@ -418,6 +418,9 @@ int main(int argc, char *argv[]) {
 	 * Early Mount
 	 * ************/
 
+	int mounted_system = 0;
+	int mounted_vendor = 0;
+
 	// If skip_initramfs or using split policies, we need early mount
 	if (cmd.skip_initramfs || access("/sepolicy", R_OK) != 0) {
 		char partname[32];
@@ -444,12 +447,15 @@ int main(int argc, char *argv[]) {
 			xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
 		} else {
 			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+			mounted_system = 1;
 		}
 
 		// Mount vendor
 		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
-		if (setup_block(&dev, partname) == 0)
+		if (setup_block(&dev, partname) == 0) {
 			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+			mounted_vendor = 1;
+		}
 	}
 
 	/* *************
@@ -480,9 +486,10 @@ int main(int argc, char *argv[]) {
 
 	// Clean up
 	close(root);
-	if (!cmd.skip_initramfs)
+	if (mounted_system)
 		umount("/system");
-	umount("/vendor");
+	if (mounted_vendor)
+		umount("/vendor");
 
 	// Finally, give control back!
 	execv("/init", argv);
