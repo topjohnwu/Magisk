@@ -158,6 +158,15 @@ int magisk_main(int argc, char *argv[]) {
 		write_int(fd, LATE_START);
 		return read_int(fd);
 	}
+
+	// Applets
+	argc--;
+	argv++;
+	for (int i = 0; applet[i]; ++i) {
+		if (strcmp(basename(argv[0]), applet[i]) == 0)
+			return (*applet_main[i])(argc, argv);
+	}
+
 	usage();
 	return 1;
 }
