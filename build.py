@@ -95,10 +95,15 @@ def collect_binary():
 
 def build_binary(args):
 	# If nothing specified, build everything
-	if len(args.target) == 0:
-		args.target = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
+	try:
+		targets = args.target
+	except:
+		targets = []
 
-	header('* Building binaries: ' + ' '.join(args.target))
+	if len(targets) == 0:
+		targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
+
+	header('* Building binaries: ' + ' '.join(targets))
 
 	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
 	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
@@ -107,7 +112,7 @@ def build_binary(args):
 	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
 		'' if args.release else '-DMAGISK_DEBUG')
 
-	if 'magisk' in args.target:
+	if 'magisk' in targets:
 		# Magisk is special case as it is a dependency of magiskinit
 		proc = subprocess.run('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count), shell=True)
 		if proc.returncode != 0:
@@ -117,11 +122,11 @@ def build_binary(args):
 	old_platform = False
 	flags = base_flags
 
-	if 'busybox' in args.target:
+	if 'busybox' in targets:
 		flags += ' B_BB=1'
 		old_platform = True
 
-	if 'b64xz' in args.target:
+	if 'b64xz' in targets:
 		flags += ' B_BXZ=1'
 		old_platform = True
 
@@ -134,7 +139,7 @@ def build_binary(args):
 	other = False
 	flags = base_flags
 
-	if 'magiskinit' in args.target:
+	if 'magiskinit' in targets:
 		# We need to create dump.h beforehand
 		if not os.path.exists(os.path.join('native', 'out', 'armeabi-v7a', 'magisk')):
 			error('Build "magisk" before building "magiskinit"')
@@ -148,7 +153,7 @@ def build_binary(args):
 		flags += ' B_INIT=1'
 		other = True
 
-	if 'magiskboot' in args.target:
+	if 'magiskboot' in targets:
 		flags += ' B_BOOT=1'
 		other = True
 
