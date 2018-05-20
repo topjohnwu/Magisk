@@ -293,7 +293,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 );
             } else {
                 File boot = new File(install, "boot.img");
-                SuFile patched_boot = new SuFile(install.getParent(), "new-boot.img");
+                SuFile patched_boot = new SuFile(install.getParent() + "/new-boot.img", true);
 
                 if (!dumpBoot(boot) || !patchBoot(boot, patched_boot))
                     return false;
