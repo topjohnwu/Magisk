@@ -125,6 +125,10 @@
     <string name="su_db_corrupt">Datenbank für SU ist fehlerhaft, es wird eine neue erstellt</string>
     <string name="cannot_check_sn_title">Überprüfung von SafetyNet nicht möglich</string>
     <string name="cannot_check_sn_notice">Aufgrund von Änderungen in den Google Play-Diensten, ist es nicht möglich SafetyNet auf neu verpackten Magisk Manager Versionen zu überprüfen</string>
+    <string name="setup_done">Einrichtung abgeschlossen</string>
+    <string name="setup_fail">Einrichtung fehlgeschlagen</string>
+    <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
+    <string name="env_fix_msg">Um Magisk ordnungsgemäß zu nutzen, benötigt das Geräte eine zusätzliche Einrichtung. Magisk Einrichtungs-zip wird heruntergeladen, fortsetzen?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
