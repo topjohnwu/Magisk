@@ -15,7 +15,7 @@ jar {
 shadowJar {
     baseName = 'zipsigner'
     classifier = null
-    version = 2.1
+    version = 2.2
 }
 
 buildscript {
@@ -23,7 +23,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
     }
 }
 
@@ -33,6 +33,6 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.58'
-    implementation 'org.bouncycastle:bcpkix-jdk15on:1.58'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.59'
 }

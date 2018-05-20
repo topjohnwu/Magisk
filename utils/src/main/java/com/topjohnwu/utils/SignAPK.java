@@ -18,6 +18,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,19 +74,31 @@ public class SignAPK {
                                JarMap input, OutputStream output) throws Exception {
         File temp1 = File.createTempFile("signAPK", null);
         File temp2 = File.createTempFile("signAPK", null);
+        if (cert == null) {
+            cert = SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem");
+        }
+        if (key == null) {
+            key = SignAPK.class.getResourceAsStream("/keys/testkey.pk8");
+        }
+
+        ReusableInputStream c = new ReusableInputStream(cert);
+        ReusableInputStream k = new ReusableInputStream(key);
+
         try {
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))) {
-                signZip(cert, key, input, out, false);
+                signZip(c, k, input, out, false);
             }
 
             ZipAdjust.adjust(temp1, temp2);
 
             try (JarMap map = new JarMap(temp2, false)) {
-                signZip(cert, key, map, output, true);
+                signZip(c, k, map, output, true);
             }
         } finally {
             temp1.delete();
             temp2.delete();
+            c.destroy();
+            k.destroy();
         }
     }
 

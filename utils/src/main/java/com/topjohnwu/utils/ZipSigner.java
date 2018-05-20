@@ -28,8 +28,8 @@ public class ZipSigner {
         InputStream key = null;
 
         if (args.length - argStart == 4) {
-            cert = new BufferedInputStream(new FileInputStream(new File(args[argStart])));
-            key = new BufferedInputStream(new FileInputStream(new File(args[argStart + 1])));
+            cert = new FileInputStream(new File(args[argStart]));
+            key = new FileInputStream(new File(args[argStart + 1]));
             argStart += 2;
         }
 

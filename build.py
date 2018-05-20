@@ -361,7 +361,7 @@ def zip_uninstaller(args):
 	header('Output: ' + output)
 
 def sign_adjust_zip(unsigned, output):
-	signer_name = 'zipsigner-2.1.jar'
+	signer_name = 'zipsigner-2.2.jar'
 	jarsigner = os.path.join('utils', 'build', 'libs', signer_name)
 
 	if not os.path.exists(jarsigner):
