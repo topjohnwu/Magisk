@@ -70,7 +70,7 @@
     <string name="app_version">应用版本</string>
     <string name="app_source_code">源代码</string>
     <string name="donation">捐赠</string>
-    <string name="app_translators">翻译者</string>
+    <string name="app_translators">翻译人员</string>
     <string name="support_thread">支持主题</string>
 
     <!--Toasts, Dialogs-->
@@ -80,7 +80,7 @@
     <string name="ok">好</string>
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
-    <string name="repo_install_msg">你想要立即安装 %1$s 吗？</string>
+    <string name="repo_install_msg">是否立即安装 %1$s ？</string>
     <string name="download">下载</string>
     <string name="download_file_error">下载文件时出错</string>
     <string name="reboot">重启</string>
@@ -118,10 +118,14 @@
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>
     <string name="uninstall_toast">将在 5 秒内卸载 Magisk Manager，接下来请手动重新启动</string>
     <string name="proprietary_title">下载专有代码</string>
-    <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n你允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
+    <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
     <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>
     <string name="cannot_check_sn_title">无法检查 SafetyNet</string>
     <string name="cannot_check_sn_notice">由于一些 Google Play 服务的改变，隐藏后的 Magisk Manager 无法进行 SafetyNet 检查。</string>
+    <string name="setup_done">安装完成</string>
+    <string name="setup_fail">安装失败</string>
+    <string name="env_fix_title">需要额外安装</string>
+    <string name="env_fix_msg">您的设备需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常规</string>
@@ -194,7 +198,7 @@
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
     <string name="grant">允许</string>
-    <string name="su_warning">将授予对你设备的最高权限。\n如果你不确定，请拒绝！</string>
+    <string name="su_warning">将授予对该设备的最高权限。\n如果不确定，请拒绝！</string>
     <string name="forever">永久</string>
     <string name="once">一次</string>
     <string name="tenmin">10 分钟</string>
