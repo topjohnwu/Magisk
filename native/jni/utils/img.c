@@ -140,15 +140,8 @@ int resize_img(const char *img, int size) {
 }
 
 char *mount_image(const char *img, const char *target) {
-	if (access(img, F_OK) == -1)
+	if (access(img, F_OK) == -1 || access(target, F_OK) == -1)
 		return NULL;
-	if (access(target, F_OK) == -1) {
-		if (xmkdirs(target, 0755) == -1) {
-			xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
-			xmkdirs(target, 0755);
-			xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-		}
-	}
 
 	if (e2fsck(img))
 		return NULL;

@@ -581,6 +581,12 @@ initialize:
 	close(sbin);
 	close(root);
 
+	// Create directories in tmpfs overlay
+	xmkdirs(MIRRDIR "/system", 0755);
+	xmkdir(MIRRDIR "/bin", 0755);
+	xmkdir(BBPATH, 0755);
+	xmkdir(MOUNTPOINT, 0755);
+
 	LOGI("* Mounting mirrors");
 	struct vector mounts;
 	vec_init(&mounts);
@@ -590,16 +596,10 @@ initialize:
 	// Check whether skip_initramfs device
 	vec_for_each(&mounts, line) {
 		if (strstr(line, " /system_root ")) {
-			xmkdirs(MIRRDIR "/system", 0755);
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
-			break;
-		}
-	}
-	vec_for_each(&mounts, line) {
-		if (!skip_initramfs && strstr(line, " /system ")) {
+		} else if (!skip_initramfs && strstr(line, " /system ")) {
 			sscanf(line, "%s", buf);
-			xmkdirs(MIRRDIR "/system", 0755);
 			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
@@ -609,7 +609,7 @@ initialize:
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
 			sscanf(line, "%s", buf);
-			xmkdirs(MIRRDIR "/vendor", 0755);
+			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
@@ -628,11 +628,8 @@ initialize:
 		LOGI("link: %s\n", MIRRDIR "/vendor");
 #endif
 	}
-	xmkdirs(MIRRDIR "/bin", 0755);
 	xmkdirs(DATABIN, 0755);
 	bind_mount(DATABIN, MIRRDIR "/bin");
-
-	xmkdirs(BBPATH, 0755);
 	if (access(MIRRDIR "/bin/busybox", X_OK) == 0) {
 		LOGI("* Setting up internal busybox");
 		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
