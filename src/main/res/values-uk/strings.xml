@@ -121,6 +121,10 @@
     <string name="su_db_corrupt">База даних SU пошкоджена, буде створено нову БД</string>
     <string name="cannot_check_sn_title">Неможливо перевірити SafetyNet</string>
     <string name="cannot_check_sn_notice">Через деякі зміни в Сервісах Google Play, неможливо перевірити статус SafetyNet на перепакованому Magisk Manager</string>
+    <string name="setup_done">Налаштування завершено</string>
+    <string name="setup_fail">Не вдалося налаштувати</string>
+    <string name="env_fix_title">Потрібне додаткове налаштування</string>
+    <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>
