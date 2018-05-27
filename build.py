@@ -163,13 +163,36 @@ def build_binary(args):
 			error('Build binaries failed!')
 		collect_binary()
 
+def sign_apk(source, target):
+	# Find the latest build tools
+	build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
+		sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1])
+
+	proc = subprocess.run([os.path.join(build_tool, 'zipalign'), '-vpf', '4', source, target], stdout=subprocess.DEVNULL)
+	if proc.returncode != 0:
+		error('Zipalign Magisk Manager failed!')
+
+	# Find apksigner.jar
+	apksigner = ''
+	for root, dirs, files in os.walk(build_tool):
+		if 'apksigner.jar' in files:
+			apksigner = os.path.join(root, 'apksigner.jar')
+			break
+	if not apksigner:
+		error('Cannot find apksigner.jar in Android SDK build tools')
+
+	proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --key-pass pass:{} {}'.format(
+		apksigner, config['keyStorePass'], config['keyPass'], target), shell=True)
+	if proc.returncode != 0:
+		error('Release sign Magisk Manager failed!')
+
 def build_apk(args):
 	header('* Building Magisk Manager')
 
-	mkdir(os.path.join('app', 'src', 'main', 'assets'))
+	mkdir(os.path.join('app', 'src', 'full', 'assets'))
 	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
 		source = os.path.join('scripts', script)
-		target = os.path.join('app', 'src', 'main', 'assets', script)
+		target = os.path.join('app', 'src', 'full', 'assets', script)
 		cp(source, target)
 
 	if args.release:
@@ -180,43 +203,29 @@ def build_apk(args):
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
-		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-unsigned.apk')
-		aligned = os.path.join('app', 'build', 'outputs', 'apk', 'release', 'app-release-aligned.apk')
+		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'release', 'app-full-release-unsigned.apk')
 		release = os.path.join(config['outdir'], 'app-release.apk')
-
-		# Find the latest build tools
-		build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
-			sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1])
-
-		proc = subprocess.run([os.path.join(build_tool, 'zipalign'), '-vpf', '4', unsigned, aligned], stdout=subprocess.DEVNULL)
-		if proc.returncode != 0:
-			error('Zipalign Magisk Manager failed!')
-
-		# Find apksigner.jar
-		apksigner = ''
-		for root, dirs, files in os.walk(build_tool):
-			if 'apksigner.jar' in files:
-				apksigner = os.path.join(root, 'apksigner.jar')
-				break
-		if not apksigner:
-			error('Cannot find apksigner.jar in Android SDK build tools')
-
-		proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --key-pass pass:{} --out {} {}'.format(
-			apksigner, config['keyStorePass'], config['keyPass'], release, aligned), shell=True)
-		if proc.returncode != 0:
-			error('Release sign Magisk Manager failed!')
-
-		rm(unsigned)
-		rm(aligned)
-
+		sign_apk(unsigned, release)
 		header('Output: ' + release)
+		rm(unsigned)
+
+		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'release', 'app-stub-release-unsigned.apk')
+		release = os.path.join(config['outdir'], 'stub-release.apk')
+		sign_apk(unsigned, release)
+		header('Output: ' + release)
+		rm(unsigned)
 	else:
 		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
-		source = os.path.join('app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk')
+		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'debug', 'app-full-debug.apk')
 		target = os.path.join(config['outdir'], 'app-debug.apk')
+		mv(source, target)
+		header('Output: ' + target)
+
+		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'debug', 'app-stub-debug.apk')
+		target = os.path.join(config['outdir'], 'stub-debug.apk')
 		mv(source, target)
 		header('Output: ' + target)
 
