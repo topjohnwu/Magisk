@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.topjohnwu.magisk">
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+
+    <application
+        android:name=".MagiskManager"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true" />
+        <activity
+            android:name=".SplashActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AboutActivity"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".FlashActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="nosensor"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity
+            android:name=".superuser.RequestActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="internal.superuser"
+            android:theme="@style/SuRequest" />
+
+        <receiver android:name=".superuser.SuReceiver" />
+        <receiver android:name=".receivers.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receivers.PackageReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receivers.ManagerUpdate" />
+        <receiver android:name=".receivers.RebootReceiver" />
+        <receiver android:name=".receivers.ShortcutReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".services.OnBootIntentService" />
+        <service
+            android:name=".services.UpdateCheckService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- Hardcode GMS version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="7095000" />
+
+    </application>
+
+</manifest>

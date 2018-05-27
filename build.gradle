@@ -8,8 +8,6 @@ android {
         applicationId "com.topjohnwu.magisk"
         minSdkVersion 21
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 117
-        versionName "5.7.0"
         javaCompileOptions {
             annotationProcessorOptions {
                 argument('butterknife.debuggable', 'false')
@@ -24,6 +22,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "mode"
+
+    productFlavors {
+        full {
+            versionCode 117
+            versionName "5.7.0"
+        }
+        stub {
+            versionCode 1
+            versionName "stub"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,14 +51,14 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':utils')
-    implementation 'com.github.topjohnwu:libsu:1.1.1'
-    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
+    fullImplementation project(':utils')
     implementation "com.android.support:support-v4:${rootProject.ext.supportLibVersion}"
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    implementation 'com.atlassian.commonmark:commonmark:0.11.0'
-    implementation 'org.kamranzafar:jtar:2.3'
+    fullImplementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
+    fullImplementation "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
+    fullImplementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
+    fullImplementation 'com.github.topjohnwu:libsu:1.1.1'
+    fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
+    fullImplementation 'org.kamranzafar:jtar:2.3'
+    fullImplementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

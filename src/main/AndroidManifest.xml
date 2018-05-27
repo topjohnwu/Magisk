@@ -7,81 +7,15 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:name=".MagiskManager"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
         android:directBootAware="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
         tools:ignore="UnusedAttribute">
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="true" />
-        <activity
-            android:name=".SplashActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="true"
-            android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".AboutActivity"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
-            android:name=".SettingsActivity"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
-            android:name=".FlashActivity"
-            android:screenOrientation="nosensor"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme.Transparent" />
-
-        <activity
-            android:name=".superuser.RequestActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:taskAffinity="internal.superuser"
-            android:theme="@style/SuRequest" />
-
-        <receiver android:name=".superuser.SuReceiver" />
-        <receiver android:name=".receivers.BootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receivers.PackageReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receivers.ManagerUpdate" />
-        <receiver android:name=".receivers.RebootReceiver" />
-        <receiver android:name=".receivers.ShortcutReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.LOCALE_CHANGED" />
-            </intent-filter>
-        </receiver>
-
-        <service android:name=".services.OnBootIntentService" />
-        <service
-            android:name=".services.UpdateCheckService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -92,11 +26,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
-        <!-- Hardcode GMS version -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="7095000" />
 
     </application>
 
