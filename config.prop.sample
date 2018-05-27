@@ -9,5 +9,7 @@ outdir=out
 prettyName=false
 
 # These pwds are passed to apksigner for release-key.jks. Necessary when building release apks
+# keyPass is the pwd for the specified keyAlias
 keyStorePass=
+keyAlias=
 keyPass=

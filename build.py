@@ -181,8 +181,8 @@ def sign_apk(source, target):
 	if not apksigner:
 		error('Cannot find apksigner.jar in Android SDK build tools')
 
-	proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --key-pass pass:{} {}'.format(
-		apksigner, config['keyStorePass'], config['keyPass'], target), shell=True)
+	proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --ks-key-alias {} --key-pass pass:{} {}'.format(
+		apksigner, config['keyStorePass'], config['keyAlias'], config['keyPass'], target), shell=True)
 	if proc.returncode != 0:
 		error('Release sign Magisk Manager failed!')
 
