@@ -24,7 +24,7 @@ public class OnBootIntentService extends IntentService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationCompat.Builder builder =
                     new NotificationCompat.Builder(this, Const.ID.NOTIFICATION_CHANNEL);
-            builder.setSmallIcon(R.drawable.ic_magisk)
+            builder.setSmallIcon(R.drawable.ic_magisk_outline)
                     .setContentTitle("onBoot")
                     .setContentText("Running onBoot operations...");
             startForeground(Const.ID.ONBOOT_NOTIFICATION_ID, builder.build());

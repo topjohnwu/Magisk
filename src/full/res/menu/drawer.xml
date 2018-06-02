@@ -7,7 +7,7 @@
 
         <item
             android:id="@+id/magisk"
-            android:icon="@drawable/ic_magisk"
+            android:icon="@drawable/ic_magisk_outline"
             android:title="@string/magisk"/>
 
         <item

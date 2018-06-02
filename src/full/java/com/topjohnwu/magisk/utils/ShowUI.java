@@ -47,7 +47,7 @@ public class ShowUI {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
-        builder.setSmallIcon(R.drawable.ic_magisk)
+        builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(mm.getString(R.string.magisk_update_title))
                 .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
                 .setVibrate(new long[]{0, 100, 100, 100})
@@ -71,7 +71,7 @@ public class ShowUI {
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
-        builder.setSmallIcon(R.drawable.ic_magisk)
+        builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(mm.getString(R.string.manager_update_title))
                 .setContentText(mm.getString(R.string.manager_download_install))
                 .setVibrate(new long[]{0, 100, 100, 100})
@@ -91,7 +91,7 @@ public class ShowUI {
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
-        builder.setSmallIcon(R.drawable.ic_magisk)
+        builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(mm.getString(R.string.dtbo_patched_title))
                 .setContentText(mm.getString(R.string.dtbo_patched_reboot))
                 .setVibrate(new long[]{0, 100, 100, 100})

@@ -305,7 +305,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="5dp"
-                        app:srcCompat="@drawable/ic_launcher" />
+                        app:srcCompat="@drawable/ic_logo" />
 
                     <TextView
                         android:id="@+id/install_text"
