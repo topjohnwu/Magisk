@@ -1,0 +1,8 @@
+<resources>
+    <string name="download_file_error">Erreur de téléchargement du fichier</string>
+    <string name="downloading_toast">Téléchargement %1$s</string>
+    <string name="no_rw_storage">Cette fonctionnalité ne marchera pas sans la permission d\'écriture sur le stockage externe.</string>
+    <string name="no_thanks">Non merci</string>
+    <string name="yes">Oui</string>
+    <string name="ok">OK</string>
+</resources>

@@ -5,17 +5,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.preference.SwitchPreference;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.ListPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -63,7 +64,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         setFloating();
 
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction().add(R.id.container, new SettingsFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new SettingsFragment()).commit();
         }
 
     }
@@ -78,7 +79,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         return new Topic[] { getMagiskManager().reloadActivity };
     }
 
-    public static class SettingsFragment extends PreferenceFragment
+    public static class SettingsFragment extends PreferenceFragmentCompat
             implements SharedPreferences.OnSharedPreferenceChangeListener, Topic.Subscriber {
 
         private SharedPreferences prefs;
@@ -90,9 +91,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         private PreferenceCategory generalCatagory;
 
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.app_settings);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.app_settings, rootKey);
             mm = Utils.getMagiskManager(getActivity());
             prefs = mm.prefs;
             prefScreen = getPreferenceScreen();
@@ -126,13 +126,13 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     EditText url = v.findViewById(R.id.custom_url);
                     url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                     new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.settings_update_custom)
-                        .setView(v)
-                        .setPositiveButton(R.string.ok, (d, i) ->
-                                prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
-                                        url.getText().toString()).apply())
-                        .setNegativeButton(R.string.close, null)
-                        .show();
+                            .setTitle(R.string.settings_update_custom)
+                            .setView(v)
+                            .setPositiveButton(R.string.ok, (d, i) ->
+                                    prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
+                                            url.getText().toString()).apply())
+                            .setNegativeButton(R.string.close, null)
+                            .show();
                 }
                 return true;
             });
@@ -166,14 +166,15 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 } else {
                     if (Utils.checkNetworkStatus()) {
                         restoreManager.setOnPreferenceClickListener((pref) -> {
-                            Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
-                                Intent intent = new Intent(mm, ManagerUpdate.class);
-                                intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
-                                intent.putExtra(Const.Key.INTENT_SET_FILENAME,
-                                        Utils.fmt("MagiskManager-v%s(%d).apk",
-                                        mm.remoteManagerVersionString, mm.remoteManagerVersionCode));
-                                mm.sendBroadcast(intent);
-                            });
+                            Utils.runWithPermission(getActivity(),
+                                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+                                        Intent intent = new Intent(mm, ManagerUpdate.class);
+                                        intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
+                                        intent.putExtra(Const.Key.INTENT_SET_FILENAME,
+                                                Utils.fmt("MagiskManager-v%s(%d).apk",
+                                                        mm.remoteManagerVersionString, mm.remoteManagerVersionCode));
+                                        mm.sendBroadcast(intent);
+                                    });
                             return true;
                         });
                     } else {
@@ -224,17 +225,17 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         @Override
-        public void onResume() {
-            super.onResume();
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             prefs.registerOnSharedPreferenceChangeListener(this);
             subscribeTopics();
+            return super.onCreateView(inflater, container, savedInstanceState);
         }
 
         @Override
-        public void onPause() {
+        public void onDestroyView() {
             prefs.unregisterOnSharedPreferenceChangeListener(this);
             unsubscribeTopics();
-            super.onPause();
+            super.onDestroyView();
         }
 
         @Override
@@ -244,7 +245,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case Const.Key.DARK_THEME:
                     mm.isDarkTheme = prefs.getBoolean(key, false);
                     mm.reloadActivity.publish(false);
-                    break;
+                    return;
                 case Const.Key.COREONLY:
                     if (prefs.getBoolean(key, false)) {
                         try {
@@ -265,12 +266,12 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 case Const.Key.HOSTS:
                     if (prefs.getBoolean(key, false)) {
                         Shell.Async.su(
-                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE(),
-                                "mount -o bind " + Const.MAGISK_HOST_FILE() + " /system/etc/hosts");
+                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
+                                "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts");
                     } else {
                         Shell.Async.su(
                                 "umount -l /system/etc/hosts",
-                                "rm -f " + Const.MAGISK_HOST_FILE());
+                                "rm -f " + Const.MAGISK_HOST_FILE);
                     }
                     break;
                 case Const.Key.ROOT_ACCESS:

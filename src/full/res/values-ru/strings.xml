@@ -1,10 +1,7 @@
 <resources>
     <!--Universal-->
 
-
-
     <!--Welcome Activity-->
-    
     <string name="modules">Модули</string>
     <string name="downloads">Репозиторий</string>
     <string name="superuser">Суперпользователь</string>
@@ -77,17 +74,11 @@
     <string name="support_thread">Домашняя страница</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Требуется разрешение на запись во внешнее хранилище.</string>
-    <string name="no_thanks">Нет</string>
-    <string name="yes">Да</string>
-    <string name="ok">OK</string>
     <string name="close">Закрыть</string>
     <string name="repo_install_title">Установка %1$s</string>
     <string name="repo_install_msg">Установить %1$s ?</string>
     <string name="download">Скачать</string>
-    <string name="download_file_error">Ошибка загрузки файла</string>
     <string name="reboot">Перезагрузка</string>
-    <string name="downloading_toast">Загрузка %1$s</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
     <string name="settings_reboot_toast">Для применения настроек перезагрузите устройство</string>
     <string name="release_notes">О версии</string>

@@ -52,7 +52,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     fullImplementation project(':utils')
-    implementation "com.android.support:support-v4:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:support-core-utils:${rootProject.ext.supportLibVersion}"
+    fullImplementation "com.android.support:preference-v7:${rootProject.ext.supportLibVersion}"
     fullImplementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
     fullImplementation "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
     fullImplementation "com.android.support:design:${rootProject.ext.supportLibVersion}"

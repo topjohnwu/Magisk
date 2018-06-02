@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -136,8 +136,8 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         repack.delete();
 
         mm.mDB.setStrings(Const.Key.SU_REQUESTER, pkg);
-        Utils.dumpPrefs();
-        Utils.uninstallPkg(Const.ORIG_PKG_NAME);
+        mm.dumpPrefs();
+        RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
 
         return true;
     }

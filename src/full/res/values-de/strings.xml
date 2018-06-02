@@ -77,17 +77,11 @@
     <string name="support_thread">Hilfeforum</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Diese Funktion benötigt Rechte zum Schreiben auf den externen Speicher.</string>
-    <string name="no_thanks">Nein danke</string>
-    <string name="yes">Ja</string>
-    <string name="ok">OK</string>
     <string name="close">Schließen</string>
     <string name="repo_install_title">Installiere %1$s</string>
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
-    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="reboot">Neustart</string>
-    <string name="downloading_toast">Herunterladen von %1$s</string>
     <string name="magisk_update_title">Neue Magisk-Aktualisierung verfügbar!</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
     <string name="release_notes">Änderungen</string>

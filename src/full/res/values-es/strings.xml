@@ -74,18 +74,12 @@
     <string name="support_thread">Hilo de soporte</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
-    <string name="no_thanks">No gracias</string>
-    <string name="yes">Sí</string>
-    <string name="ok">Aceptar</string>
     <string name="close">Cerrar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">¿Quieres instalar %1$s ahora?</string>
     <string name="download">Descargar</string>
-    <string name="download_file_error">Error descargando archivo</string>
     <string name="reboot">Reiniciar</string>
     <string name="zip_process_msg">Procesando archivo zip…</string>
-    <string name="downloading_toast">Descargando %1$s</string>
     <string name="magisk_update_title">¡Nueva actualización de Magisk disponible!</string>
     <string name="settings_reboot_toast">Reinicia para aplicar los ajustes</string>
     <string name="release_notes">Notas de lanzamiento</string>

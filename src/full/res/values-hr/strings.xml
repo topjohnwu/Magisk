@@ -12,7 +12,7 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nije instaliran</string>
 
-    <string name="checking_for_updates">Provjera ažuriranja...</string>
+    <string name="checking_for_updates">Provjera ažuriranja…</string>
     <string name="magisk_update_available">Dostupna je Maigsk inačica v%1$s!</string>
     <string name="safetyNet_check_text">Dodirni za SafetyNet provjeru</string>
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
@@ -67,17 +67,11 @@
     <string name="support_thread">Tema podrške</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Ova značajka neće raditi bez dopuštenja za korištenje vanjske pohrane.</string>
-    <string name="no_thanks">Ne hvala</string>
-    <string name="yes">Da</string>
-    <string name="ok">OK</string>
     <string name="close">Zatvori</string>
     <string name="repo_install_title">Instaliraj %1$s</string>
     <string name="repo_install_msg">Da li želite instalirati %1$s sada?</string>
     <string name="download">Preuzmi</string>
-    <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
     <string name="reboot">Ponovno podizanje sustava</string>
-    <string name="downloading_toast">Preuzimanje %1$s</string>
     <string name="magisk_update_title">Dostupno je novo Magisk ažuriranje!</string>
     <string name="settings_reboot_toast">Ponovno pokrenite kako biste primjenili postavke</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>

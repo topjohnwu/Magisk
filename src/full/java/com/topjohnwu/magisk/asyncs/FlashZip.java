@@ -7,7 +7,9 @@ import android.view.View;
 
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
@@ -39,7 +41,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
-        String s = Utils.cmd("head -n 1 " + new File(mCachedFile.getParentFile(), "updater-script"));
+        String s = RootUtils.cmd("head -n 1 " + new File(mCachedFile.getParentFile(), "updater-script"));
         return s != null && s.contains("#MAGISK");
     }
 
@@ -93,7 +95,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
         switch (result) {
             case -1:
                 console.add("! Installation failed");
-                Utils.showUriSnack(getActivity(), mUri);
+                SnackbarMaker.showUri(getActivity(), mUri);
                 break;
             case 0:
                 console.add("! This zip is not a Magisk Module!");

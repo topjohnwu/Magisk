@@ -11,11 +11,11 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk pole installitud</string>
-    <string name="checking_for_updates">Kontrollin uuendusi...</string>
+    <string name="checking_for_updates">Kontrollin uuendusi…</string>
     <string name="magisk_update_available">Magisk v%1$s on saadaval!</string>
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
     <string name="safetyNet_check_text">Koputa, et alustada SafetyNet\'i kontrolli</string>
-    <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut...</string>
+    <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut…</string>
     <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>
     <string name="safetyNet_api_error">SafetyNet\'i API viga</string>
     <string name="safetyNet_network_loss">Võrguühendus puudub</string>
@@ -74,17 +74,11 @@
     <string name="support_thread">Foorumi tugiteema</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">See funktsioon ei tööta ilma välismälule kirjutamise õiguseta.</string>
-    <string name="no_thanks">Tänan ei</string>
-    <string name="yes">Jah</string>
-    <string name="ok">OK</string>
     <string name="close">Sulge</string>
     <string name="repo_install_title">Installi %1$s</string>
     <string name="repo_install_msg">Kas soovid kohe installida %1$s?</string>
     <string name="download">Allalaadimine</string>
-    <string name="download_file_error">Faili allalaadimisel esines viga</string>
     <string name="reboot">Taaskäivita</string>
-    <string name="downloading_toast">Laadin %1$s alla</string>
     <string name="magisk_update_title">Magisk\'ile on uuendus saadaval!</string>
     <string name="settings_reboot_toast">Taaskäivita seadete rakendamiseks</string>
     <string name="release_notes">Väljalaskemärkmed</string>
@@ -93,18 +87,18 @@
     <string name="internal_storage">ZIP on salvestatud:\n
   [Sisemälu]%1$s</string>
     <string name="zip_download_title">Laadin alla</string>
-    <string name="zip_download_msg">Laadin ZIP-faili alla (%1$d%%)...</string>
+    <string name="zip_download_msg">Laadin ZIP-faili alla (%1$d%%)…</string>
     <string name="zip_process_title">Töötlen</string>
-    <string name="zip_process_msg">Töötlen ZIP-faili...</string>
+    <string name="zip_process_msg">Töötlen ZIP-faili…</string>
     <string name="manager_update_title">Magisk Manager\'ile on uuendus saadaval!</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
     <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string>
     <string name="magisk_updates">Magisk\'i uuendused</string>
     <string name="flashing">Välgutamine</string>
-    <string name="hide_manager_toast">Peidan Magisk Manager\'i...</string>
-    <string name="hide_manager_toast2">See võib aega võtta...</string>
-    <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus...</string>
+    <string name="hide_manager_toast">Peidan Magisk Manager\'i…</string>
+    <string name="hide_manager_toast2">See võib aega võtta…</string>
+    <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus…</string>
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>
     <string name="direct_install">Otsene install (soovitatud)</string>

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -147,7 +148,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                 intent.setData(uri).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
                 activity.startActivity(intent);
             } else {
-                Utils.showUriSnack(activity, uri);
+                SnackbarMaker.showUri(activity, uri);
             }
         } else {
             MagiskManager.toast(R.string.process_error, Toast.LENGTH_LONG);
@@ -157,7 +158,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     @Override
     public ParallelTask<Void, Object, Boolean> exec(Void... voids) {
-        Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Utils.runWithPermission(getActivity(), new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                 () -> super.exec(voids));
         return this;
     }

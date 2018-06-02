@@ -74,17 +74,11 @@
     <string name="support_thread">Σύνδεσμος υποστήριξης</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Η λειτουργία αυτή δεν θα δουλέψει χωρίς την άδεια εγγραφής στον εξωτερικό χώρο αποθηκεύσης.</string>
-    <string name="no_thanks">Όχι ευχαριστώ</string>
-    <string name="yes">Ναι</string>
-    <string name="ok">OK</string>
     <string name="close">Κλείσιμο</string>
     <string name="repo_install_title">Εγκατάσταση %1$s</string>
     <string name="repo_install_msg">Θέλετε να εγκαταστήσετε το %1$s τώρα;</string>
     <string name="download">Λήψη</string>
-    <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
     <string name="reboot">Επανεκκίνηση</string>
-    <string name="downloading_toast">Κατέβασμα %1$s</string>
     <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>
     <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>

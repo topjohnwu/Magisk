@@ -73,17 +73,11 @@
     <string name="support_thread">Сторінка підтримки</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
-    <string name="no_thanks">Ні, дякую</string>
-    <string name="yes">Так</string>
-    <string name="ok">OK</string>
     <string name="close">Закрити</string>
     <string name="repo_install_title">Встановити %1$s</string>
     <string name="repo_install_msg">Бажаєте встановити %1$s ?</string>
     <string name="download">Завантажити</string>
-    <string name="download_file_error">Помилка завантаження файлу</string>
     <string name="reboot">Перезавантаження</string>
-    <string name="downloading_toast">Завантаження %1$s</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
     <string name="release_notes">Особливості версії</string>

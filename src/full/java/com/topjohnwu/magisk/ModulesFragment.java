@@ -40,7 +40,8 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     @BindView(R.id.empty_rv) TextView emptyRv;
     @OnClick(R.id.fab)
     public void selectFile() {
-        Utils.runWithPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE, () -> {
+        Utils.runWithPermission(getActivity(),
+                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },() -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
             startActivityForResult(intent, Const.ID.FETCH_ZIP);

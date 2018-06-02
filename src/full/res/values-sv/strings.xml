@@ -65,18 +65,12 @@
     <string name="support_thread">Supporttråd</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Denna funktionen måste ha behörighet att skriva till externt lagringsutrymme.</string>
-    <string name="no_thanks">Nej tack</string>
-    <string name="yes">Ja</string>
-    <string name="ok">OK</string>
     <string name="close">Stäng</string>
     <string name="repo_install_title">Installera %1$s</string>
     <string name="repo_install_msg">Vill du installera %1$s ?</string>
     <string name="download">Ladda ner</string>
-    <string name="download_file_error">Fel vid nerladdning av fil</string>
     <string name="reboot">Starta om</string>
     <string name="zip_process_msg">Bearbetar ZIP-filen …</string>
-    <string name="downloading_toast">Laddar ner %1$s</string>
     <string name="magisk_update_title">En uppdatering av Magisk finns tillgänglig!</string>
     <string name="settings_reboot_toast">Starta om för att tillämpa inställningar</string>
     <string name="release_notes">Release notes</string>

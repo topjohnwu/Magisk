@@ -60,18 +60,12 @@
     <string name="support_thread">Chủ đề hỗ trợ</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Tính năng này không hoạt động nếu thiếu quyền ghi vào bộ nhớ ngoài.</string>
-    <string name="no_thanks">Không, cảm ơn</string>
-    <string name="yes">Có</string>
-    <string name="ok">OK</string>
     <string name="close">Đóng</string>
     <string name="repo_install_title">Cài đặt %1$s</string>
     <string name="repo_install_msg">Bạn muốn cài đặt %1$s ?</string>
     <string name="download">Tải xuống</string>
-    <string name="download_file_error">Lỗi tải tập tin</string>
     <string name="reboot">Khởi động lại</string>
     <string name="zip_process_msg">Đang xử lý tập tin zip …</string>
-    <string name="downloading_toast">Đang tải xuống %1$s</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
     <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Ghi chú phát hành</string>

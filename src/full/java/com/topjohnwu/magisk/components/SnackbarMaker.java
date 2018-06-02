@@ -1,10 +1,14 @@
 package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
+
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 
 public class SnackbarMaker {
 
@@ -34,4 +38,10 @@ public class SnackbarMaker {
         text.setMaxLines(Integer.MAX_VALUE);
     }
 
+    public static void showUri(Activity activity, Uri uri) {
+        make(activity, activity.getString(R.string.internal_storage,
+                "/MagiskManager/" + Utils.getNameFromUri(activity, uri)),
+                Snackbar.LENGTH_LONG)
+                .setAction(R.string.ok, (v)->{}).show();
+    }
 }

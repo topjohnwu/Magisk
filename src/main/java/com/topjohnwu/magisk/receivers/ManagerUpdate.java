@@ -21,7 +21,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                     @Override
                     public void onDownloadDone(Uri uri) {
                         if (!context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-                            Utils.dumpPrefs();
+                            Utils.getMagiskManager(context).dumpPrefs();
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             Intent install = new Intent(Intent.ACTION_INSTALL_PACKAGE);

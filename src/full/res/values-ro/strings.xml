@@ -68,17 +68,11 @@
     <string name="support_thread">Pagina de suport</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
-    <string name="no_thanks">Nu, mulţumesc</string>
-    <string name="yes">Da</string>
-    <string name="ok">OK</string>
     <string name="close">Închide</string>
     <string name="repo_install_title">Instalare %1$s</string>
     <string name="repo_install_msg">Instalaţi %1$s?</string>
     <string name="download">Descărcare</string>
-    <string name="download_file_error">Eroare la descărcarea fișierului</string>
     <string name="reboot">Repornire</string>
-    <string name="downloading_toast">Descărcare %1$s</string>
     <string name="magisk_update_title">O nouă actualizare Magisk este disponibilă!</string>
     <string name="settings_reboot_toast">Reporniți pentru a aplica setările</string>
     <string name="release_notes">Note de lansare</string>

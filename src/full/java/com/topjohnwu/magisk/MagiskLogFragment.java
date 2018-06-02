@@ -89,7 +89,7 @@ public class MagiskLogFragment extends Fragment {
                 return true;
             case R.id.menu_save:
                 Utils.runWithPermission(getActivity(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                         () -> new LogManager().save());
                 return true;
             case R.id.menu_clear:

@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
@@ -147,7 +148,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             case DIRECT_MODE:
                 console.add("- Patch boot/ramdisk image: " + mBootLocation);
                 if (mm.remoteMagiskVersionCode >= 1463) {
-                    highCompression = Integer.parseInt(Utils.cmd(Utils.fmt(
+                    highCompression = Integer.parseInt(RootUtils.cmd(Utils.fmt(
                             "%s/magiskboot --parse %s; echo $?",
                             install, mBootLocation))) == 2;
                     if (highCompression)

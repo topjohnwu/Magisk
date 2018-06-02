@@ -74,17 +74,11 @@
 	<string name="support_thread">Thread di supporto</string>
 
 	<!--Toasts, Dialogs-->
-	<string name="permissionNotGranted">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione esterna</string>
-	<string name="no_thanks">No, grazie</string>
-	<string name="yes">Sì</string>
-	<string name="ok">OK</string>
 	<string name="close">Chiudi</string>
 	<string name="repo_install_title">Installazione di %1$s</string>
 	<string name="repo_install_msg">Vuoi installare %1$s?</string>
 	<string name="download">Download</string>
-	<string name="download_file_error">Errore nel download del file</string>
 	<string name="reboot">Riavvia</string>
-	<string name="downloading_toast">Download di %1$s</string>
 	<string name="magisk_update_title">È disponibile un nuovo aggiornamento di Magisk!</string>
 	<string name="settings_reboot_toast">Riavvia per applicare</string>
 	<string name="release_notes">Note di rilascio</string>
@@ -226,4 +220,4 @@
 	<string name="target_uid">UID destinazione:\u0020</string>
 	<string name="command">Comando:\u0020</string>
 	
-	</resources>
+</resources>

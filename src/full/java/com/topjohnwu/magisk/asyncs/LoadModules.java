@@ -11,7 +11,7 @@ import java.util.List;
 public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     private List<String> getModList() {
-        String command = "ls -d " + Const.MAGISK_PATH() + "/* | grep -v lost+found";
+        String command = "ls -d " + Const.MAGISK_PATH + "/* | grep -v lost+found";
         return Shell.Sync.su(command);
     }
 

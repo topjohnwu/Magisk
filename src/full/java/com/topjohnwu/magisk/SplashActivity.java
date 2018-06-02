@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -23,12 +24,13 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        RootUtils.init();
         MagiskManager mm = getMagiskManager();
 
         mm.repoDB = new RepoDatabaseHelper(this);
         mm.loadMagiskInfo();
         mm.getDefaultInstallFlags();
-        Utils.loadPrefs();
+        mm.loadPrefs();
 
         // Dynamic detect all locales
         new LoadLocale().exec();
@@ -59,7 +61,7 @@ public class SplashActivity extends Activity {
             // Fire asynctasks
             loadModuleTask.exec();
             // Check dtbo status
-            Utils.patchDTBO();
+            RootUtils.patchDTBO();
         }
 
         // Write back default values

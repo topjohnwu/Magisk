@@ -74,17 +74,11 @@
     <string name="support_thread">Tópico de suporte</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
-    <string name="no_thanks">Não</string>
-    <string name="yes">Sim</string>
-    <string name="ok">OK</string>
     <string name="close">Fechar</string>
     <string name="repo_install_title">Instalar %1$s</string>
     <string name="repo_install_msg">Instalar %1$s agora?</string>
     <string name="download">Baixar</string>
-    <string name="download_file_error">Erro ao baixar arquivo</string>
     <string name="reboot">Reiniciar</string>
-    <string name="downloading_toast">Baixando %1$s</string>
     <string name="magisk_update_title">Nova Atualização do Magisk Disponível!</string>
     <string name="settings_reboot_toast">Reinicie para aplicar as definições</string>
     <string name="release_notes">Notas de lançamento</string>

@@ -8,21 +8,28 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.widget.Toast;
+import android.util.Xml;
 
+import com.topjohnwu.magisk.components.Application;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileInputStream;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MagiskManager extends Shell.ContainerApp {
-
-    // Global weak reference to self
-    private static WeakReference<MagiskManager> weakSelf;
+public class MagiskManager extends Application implements Shell.Container {
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -65,10 +69,6 @@ public class MagiskManager extends Shell.ContainerApp {
     public Map<String, Module> moduleMap;
     public List<Locale> locales;
 
-    // Configurations
-    public static Locale locale;
-    public static Locale defaultLocale;
-
     public boolean magiskHide;
     public boolean isDarkTheme;
     public int suRequestTimeout;
@@ -87,12 +87,23 @@ public class MagiskManager extends Shell.ContainerApp {
     public SharedPreferences prefs;
     public MagiskDatabaseHelper mDB;
     public RepoDatabaseHelper repoDB;
-    public Runnable permissionGrantCallback = null;
 
-    private static Handler mHandler = new Handler();
+    private volatile Shell mShell;
 
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
+        Shell.setContainer(this);
+    }
+
+    @Nullable
+    @Override
+    public Shell getShell() {
+        return mShell;
+    }
+
+    @Override
+    public void setShell(@Nullable Shell shell) {
+        mShell = shell;
     }
 
     @Override
@@ -137,17 +148,16 @@ public class MagiskManager extends Shell.ContainerApp {
         String pkg = mDB.getStrings(Const.Key.SU_REQUESTER, Const.ORIG_PKG_NAME);
         if (getPackageName().equals(Const.ORIG_PKG_NAME) && !pkg.equals(Const.ORIG_PKG_NAME)) {
             mDB.setStrings(Const.Key.SU_REQUESTER, null);
-            Utils.uninstallPkg(pkg);
+            RootUtils.uninstallPkg(pkg);
             mDB = MagiskDatabaseHelper.getInstance(this);
         }
 
-        defaultLocale = Locale.getDefault();
         setLocale();
         loadConfig();
     }
 
     public static MagiskManager get() {
-        return weakSelf.get();
+        return (MagiskManager) weakSelf.get();
     }
 
     public void setLocale() {
@@ -183,7 +193,7 @@ public class MagiskManager extends Shell.ContainerApp {
         prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
-                .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE().exists())
+                .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
@@ -199,36 +209,24 @@ public class MagiskManager extends Shell.ContainerApp {
                 .apply();
     }
 
-    public static void toast(CharSequence msg, int duration) {
-        mHandler.post(() -> Toast.makeText(weakSelf.get(), msg, duration).show());
-    }
-
-    public static void toast(int resId, int duration) {
-        mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
-    }
-
     public void loadMagiskInfo() {
         try {
-            magiskVersionString = Utils.cmd("magisk -v").split(":")[0];
-            magiskVersionCode = Integer.parseInt(Utils.cmd("magisk -V"));
-            String s = Utils.cmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ? "resetprop -p " : "getprop ")
+            magiskVersionString = RootUtils.cmd("magisk -v").split(":")[0];
+            magiskVersionCode = Integer.parseInt(RootUtils.cmd("magisk -V"));
+            String s = RootUtils.cmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ? "resetprop -p " : "getprop ")
                     + Const.MAGISKHIDE_PROP);
             magiskHide = s == null || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
 
-        bootBlock = Utils.cmd("echo \"$BOOTIMAGE\"");
+        bootBlock = RootUtils.cmd("echo \"$BOOTIMAGE\"");
     }
 
     public void getDefaultInstallFlags() {
-        keepVerity = Boolean.parseBoolean(Utils.cmd("getvar KEEPVERITY; echo $KEEPVERITY")) ||
-                Utils.cmd("echo \"$DTBOIMAGE\"") != null;
+        keepVerity = Boolean.parseBoolean(RootUtils.cmd("getvar KEEPVERITY; echo $KEEPVERITY")) ||
+                RootUtils.cmd("echo \"$DTBOIMAGE\"") != null;
 
-        keepEnc = Boolean.parseBoolean(Utils.cmd("getvar KEEPFORCEENCRYPT; echo $KEEPFORCEENCRYPT")) ||
-                TextUtils.equals("encrypted", Utils.cmd("getprop ro.crypto.state"));
-    }
-
-    public void setPermissionGrantCallback(Runnable callback) {
-        permissionGrantCallback = callback;
+        keepEnc = Boolean.parseBoolean(RootUtils.cmd("getvar KEEPFORCEENCRYPT; echo $KEEPFORCEENCRYPT")) ||
+                TextUtils.equals("encrypted", RootUtils.cmd("getprop ro.crypto.state"));
     }
 
     public void setupUpdateCheck() {
@@ -247,6 +245,74 @@ public class MagiskManager extends Shell.ContainerApp {
             }
         } else {
             scheduler.cancel(Const.UPDATE_SERVICE_VER);
+        }
+    }
+
+    public void dumpPrefs() {
+        // Flush prefs to disk
+        prefs.edit().commit();
+        File xml = new File(getFilesDir().getParent() + "/shared_prefs",
+                getPackageName() + "_preferences.xml");
+        Shell.Sync.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS));
+    }
+
+    public void loadPrefs() {
+        SuFile config = new SuFile(Utils.fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS), true);
+        if (config.exists()) {
+            SharedPreferences.Editor editor = prefs.edit();
+            try {
+                SuFileInputStream is = new SuFileInputStream(config);
+                XmlPullParser parser = Xml.newPullParser();
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                parser.setInput(is, "UTF-8");
+                parser.nextTag();
+                parser.require(XmlPullParser.START_TAG, null, "map");
+                while (parser.next() != XmlPullParser.END_TAG) {
+                    if (parser.getEventType() != XmlPullParser.START_TAG)
+                        continue;
+                    String key = parser.getAttributeValue(null, "name");
+                    String value = parser.getAttributeValue(null, "value");
+                    switch (parser.getName()) {
+                        case "string":
+                            parser.require(XmlPullParser.START_TAG, null, "string");
+                            editor.putString(key, parser.nextText());
+                            parser.require(XmlPullParser.END_TAG, null, "string");
+                            break;
+                        case "boolean":
+                            parser.require(XmlPullParser.START_TAG, null, "boolean");
+                            editor.putBoolean(key, Boolean.parseBoolean(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "boolean");
+                            break;
+                        case "int":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putInt(key, Integer.parseInt(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        case "long":
+                            parser.require(XmlPullParser.START_TAG, null, "long");
+                            editor.putLong(key, Long.parseLong(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "long");
+                            break;
+                        case "float":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putFloat(key, Float.parseFloat(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        default:
+                            parser.next();
+                    }
+                }
+            } catch (IOException | XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            editor.remove(Const.Key.ETAG_KEY);
+            editor.apply();
+            loadConfig();
+            config.delete();
         }
     }
 }

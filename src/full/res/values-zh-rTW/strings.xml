@@ -59,15 +59,10 @@
     <string name="support_thread">討論串</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">未授予寫入外部存儲權限，此功能無法正常工作。</string>
-    <string name="no_thanks">不，謝謝</string>
-    <string name="yes">是</string>
     <string name="repo_install_title">安裝 %1$s</string>
     <string name="repo_install_msg">你想要安裝 %1$s 嗎？</string>
-    <string name="download_file_error">下載文件時出錯</string>
     <string name="reboot">重啟</string>
     <string name="zip_process_msg">正在處理 zip 文件 …</string>
-    <string name="downloading_toast">正在下載 %1$s</string>
     <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重啟以完成設定</string>
     <string name="release_notes">發布說明</string>
@@ -79,7 +74,6 @@
     <string name="settings_dark_theme_summary">使用深色主題</string>
     <string name="settings_clear_cache_title">清除資源庫快取</string>
     <string name="settings_clear_cache_summary">清除已暫存的在線資源庫快取，強制刷新在線數據</string>
-
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
     <string name="settings_magiskhide_summary">隱藏 Magisk 使其不被多種方法檢測到</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -133,7 +127,6 @@
     <string name="command">"指令: "</string>
     <string name="close">關閉</string>
     <string name="internal_storage">Zip 已被儲存到:\n[內部儲存空間]%1$s</string>
-    <string name="ok">好</string>
     <string name="process_error">處理失敗</string>
     <string name="download">下載</string>
     <string name="zip_process_title">處理中</string>

@@ -1,10 +1,7 @@
 <resources>
     <!--Universal-->
-
-    
     
     <!--Welcome Activity-->
-
     <string name="modules">Moduły</string>
     <string name="downloads">Pobieranie</string>
     <string name="superuser">Superuser</string>
@@ -77,17 +74,11 @@
     <string name="support_thread">Strona Wsparcia</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
-    <string name="no_thanks">Nie dziękuję</string>
-    <string name="yes">Tak</string>
-    <string name="ok">OK</string>
     <string name="close">Zamknij</string>
     <string name="repo_install_title">Zainstaluj %1$s</string>
     <string name="repo_install_msg">Czy chcesz zainstalować  %1$s ?</string>
     <string name="download">Pobierz</string>
-    <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="reboot">Restart</string>
-    <string name="downloading_toast">Pobieranie %1$s</string>
     <string name="magisk_update_title">Nowa Wersja Magisk Dostępna!</string>
     <string name="settings_reboot_toast">Uruchom ponownie, aby zastosować ustawienia</string>
     <string name="release_notes">Zmiany</string>

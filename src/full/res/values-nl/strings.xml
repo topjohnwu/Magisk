@@ -74,17 +74,11 @@
     <string name="support_thread">Hulp thread</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">Deze functie werkt niet zonder schrijfpermissie voor externe opslag.</string>
-    <string name="no_thanks">Nee bedankt</string>
-    <string name="yes">Ja</string>
-    <string name="ok">Oké</string>
     <string name="close">Sluiten</string>
     <string name="repo_install_title">%1$s installeren</string>
     <string name="repo_install_msg">Zeker weten %1$s installeren?</string>
     <string name="download">Downloaden</string>
-    <string name="download_file_error">Fout tijdens downloaden</string>
     <string name="reboot">Herstarten</string>
-    <string name="downloading_toast">%1$s downloaden</string>
     <string name="magisk_update_title">Nieuwe Magisk update beschikbaar!</string>
     <string name="settings_reboot_toast">Herstarten om instellingen toe te passen</string>
     <string name="release_notes">Publicatie notities</string>

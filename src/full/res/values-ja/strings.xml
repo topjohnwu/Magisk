@@ -11,7 +11,7 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magiskがインストールされていません</string>
-    <string name="checking_for_updates">更新を確認中...</string>
+    <string name="checking_for_updates">更新を確認中…</string>
     <string name="magisk_update_available">Magisk v%1$s が利用可能です！</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
     <string name="safetyNet_check_text">タップしてSafetyNetチェックを開始</string>
@@ -74,17 +74,11 @@
     <string name="support_thread">サポートスレッド</string>
 
     <!--Toasts, Dialogs-->
-    <string name="permissionNotGranted">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
-    <string name="no_thanks">いいえ</string>
-    <string name="yes">はい</string>
-    <string name="ok">OK</string>
     <string name="close">閉じる</string>
     <string name="repo_install_title">%1$s をインストール</string>
     <string name="repo_install_msg">%1$s をインストールしますか？</string>
     <string name="download">ダウンロード</string>
-    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
     <string name="reboot">再起動</string>
-    <string name="downloading_toast">%1$s をダウンロード中</string>
     <string name="magisk_update_title">新しいMagiskの更新が利用可能です！</string>
     <string name="settings_reboot_toast">再起動して設定を適用する</string>
     <string name="release_notes">更新履歴</string>

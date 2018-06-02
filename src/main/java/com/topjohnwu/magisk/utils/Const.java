@@ -5,7 +5,6 @@ import android.os.Process;
 
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
 import java.util.Arrays;
@@ -26,8 +25,10 @@ public class Const {
     public static final String SU_KEYSTORE_KEY = "su_key";
 
     // Paths
-    private static SuFile MAGISK_PATH = null;
-    public static final SuFile MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk", true);
+    public static File MAGISK_PATH;
+    public static File MAGISK_DISABLE_FILE;
+    public static File MAGISK_HOST_FILE;
+
     public static final String BUSYBOX_PATH = "/sbin/.core/busybox";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
@@ -40,25 +41,6 @@ public class Const {
 
     public static int MIN_MODULE_VER() {
         return MagiskManager.get().magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
-    }
-
-    public synchronized static SuFile MAGISK_PATH() {
-        SuFile file;
-        if (MAGISK_PATH == null) {
-            file = new SuFile("/sbin/.core/img", true);
-            if (file.exists()) {
-                MAGISK_PATH = file;
-            } else if ((file = new SuFile("/dev/magisk/img", true)).exists()) {
-                MAGISK_PATH = file;
-            } else {
-                MAGISK_PATH = new SuFile("/magisk", true);
-            }
-        }
-        return MAGISK_PATH;
-    }
-
-    public static SuFile MAGISK_HOST_FILE() {
-        return new SuFile(MAGISK_PATH() + "/.core/hosts");
     }
 
     /* A list of apps that should not be shown as hide-able */
