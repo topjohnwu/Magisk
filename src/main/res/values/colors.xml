@@ -14,10 +14,10 @@
     <color name="yellow500">#FFC107</color>
 
     <color name="dark_secondary_text">#dedede</color>
-
     <color name="su_request_background">#e0e0e0</color>
 
-
-<!-- Flashing colors -->
+    <!-- Flashing colors -->
     <color name="flashing_background_color">@android:color/black</color>
+
+    <color name="ic_launcher_background">#00AF9C</color>
 </resources>
