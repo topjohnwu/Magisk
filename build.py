@@ -79,6 +79,8 @@ def zip_with_msg(zipfile, source, target):
 	zipfile.write(source, target)
 
 def build_all(args):
+	if not hasattr(args,'target'):
+		args.target=[]
 	build_binary(args)
 	build_apk(args)
 	zip_main(args)
