@@ -1,7 +1,6 @@
 <resources>
-	<!--Universal-->
-    
-	<!--Welcome Activity-->
+	
+    <!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
     <string name="superuser">Superuser</string>
