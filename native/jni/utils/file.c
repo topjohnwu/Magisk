@@ -15,6 +15,7 @@
 #include <selinux/selinux.h>
 #endif
 
+#include "magisk.h"
 #include "utils.h"
 
 char **excl_list = NULL;
@@ -341,17 +342,22 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 
 #ifdef SELINUX
 
+#include "magiskpolicy.h"
+
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
+#define ADB_CON     "u:object_r:adb_data_file:s0"
+#define MAGISK_CON  "u:object_r:"SEPOL_FILE_DOMAIN":s0"
 
-void restorecon(int dirfd) {
+static void restore_syscon(int dirfd) {
 	struct dirent *entry;
 	DIR *dir;
-	int fd;
+
 	char path[PATH_MAX], *con;
 
 	fd_getpath(dirfd, path, sizeof(path));
-	lgetfilecon(path, &con);
+	size_t len = strlen(path);
+	getfilecon(path, &con);
 	if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
 		lsetfilecon(path, SYSTEM_CON);
 	freecon(con);
@@ -361,18 +367,63 @@ void restorecon(int dirfd) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (entry->d_type == DT_DIR) {
-			fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			restorecon(fd);
+			int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			restore_syscon(fd);
+			close(fd);
 		} else {
-			fd = xopenat(dirfd, entry->d_name, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-			fd_getpath(fd, path, sizeof(path));
+			path[len] = '/';
+			strcpy(path + len + 1, entry->d_name);
 			lgetfilecon(path, &con);
 			if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
 				lsetfilecon(path, SYSTEM_CON);
 			freecon(con);
+			path[len] = '\0';
 		}
-		close(fd);
 	}
+}
+
+static void restore_magiskcon(int dirfd) {
+	struct dirent *entry;
+	DIR *dir;
+
+	char path[PATH_MAX];
+
+	fd_getpath(dirfd, path, sizeof(path));
+	size_t len = strlen(path);
+	lsetfilecon(path, MAGISK_CON);
+	lchown(path, 0, 0);
+
+	dir = xfdopendir(dirfd);
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		if (entry->d_type == DT_DIR) {
+			int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			restore_magiskcon(fd);
+			close(fd);
+		} else {
+			path[len] = '/';
+			strcpy(path + len + 1, entry->d_name);
+			lsetfilecon(path, MAGISK_CON);
+			lchown(path, 0, 0);
+			path[len] = '\0';
+		}
+	}
+}
+
+void restorecon() {
+	int fd;
+	fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
+	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0) {
+		lsetfilecon(SECURE_DIR, ADB_CON);
+	}
+	close(fd);
+	fd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
+	restore_syscon(fd);
+	close(fd);
+	fd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);
+	restore_magiskcon(fd);
+	close(fd);
 }
 
 #endif   // SELINUX

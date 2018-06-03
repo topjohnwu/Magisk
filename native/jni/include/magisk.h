@@ -24,21 +24,22 @@
 #define COREDIR         MOUNTPOINT "/.core"
 #define HOSTSFILE       COREDIR "/hosts"
 #define HIDELIST        COREDIR "/hidelist"
-#define SECURE_DIR      "/data/adb/"
-#define MAINIMG         SECURE_DIR "magisk.img"
-#define DATABIN         SECURE_DIR "magisk"
-#define MAGISKDB        SECURE_DIR "magisk.db"
-#define SIMPLEMOUNT     SECURE_DIR "magisk_simple"
-#define DEBUG_LOG       SECURE_DIR "magisk_debug.log"
+#define SECURE_DIR      "/data/adb"
+#define MAINIMG         SECURE_DIR "/magisk.img"
+#define DATABIN         SECURE_DIR "/magisk"
+#define MAGISKDB        SECURE_DIR "/magisk.db"
+#define SIMPLEMOUNT     SECURE_DIR "/magisk_simple"
+#define DEBUG_LOG       SECURE_DIR "/magisk_debug.log"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKRC        "/init.magisk.rc"
 
 
 // selinuxfs paths
-#define SELINUX_PATH        "/sys/fs/selinux/"
-#define SELINUX_ENFORCE     SELINUX_PATH "enforce"
-#define SELINUX_POLICY      SELINUX_PATH "policy"
-#define SELINUX_LOAD        SELINUX_PATH "load"
+#define SELINUX_PATH        "/sys/fs/selinux"
+#define SELINUX_ENFORCE     SELINUX_PATH "/enforce"
+#define SELINUX_POLICY      SELINUX_PATH "/policy"
+#define SELINUX_LOAD        SELINUX_PATH "/load"
+#define SELINUX_CONTEXT     SELINUX_PATH "/context"
 
 // split policy paths
 #define PLAT_POLICY_DIR     "/system/etc/selinux/"

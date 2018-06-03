@@ -311,11 +311,11 @@ static void clone_skeleton(struct node_entry *node) {
 		if (IS_LNK(child)) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
-			#ifdef MAGISK_DEBUG
-				LOGI("creat_link: %s <- %s\n",buf, buf2);
-			#else
-				LOGI("creat_link: %s\n", buf);
-			#endif
+#ifdef MAGISK_DEBUG
+			LOGI("creat_link: %s <- %s\n",buf, buf2);
+#else
+			LOGI("creat_link: %s\n", buf);
+#endif
 		} else {
 			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
 			bind_mount(buf2, buf);
@@ -449,16 +449,7 @@ static int prepare_img() {
 	// Remount them back :)
 	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
 	free(magiskloop);
-
-	// Fix file selinux contexts
-	fix_filecon();
 	return 0;
-}
-
-void fix_filecon() {
-	int dirfd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
-	restorecon(dirfd);
-	close(dirfd);
 }
 
 /****************
@@ -674,6 +665,8 @@ void post_fs_data(int client) {
 	// After this, it will create the module list
 	if (prepare_img())
 		goto core_only; // Mounting fails, we can only do core only stuffs
+
+	restorecon();
 
 	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");
