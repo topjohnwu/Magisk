@@ -201,13 +201,9 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         private void setLocalePreference(ListPreference lp) {
-            boolean isNew = lp == null;
-            if (isNew) {
-                lp = new ListPreference(getActivity());
-            }
             CharSequence[] entries = new CharSequence[mm.locales.size() + 1];
             CharSequence[] entryValues = new CharSequence[mm.locales.size() + 1];
-            entries[0] = getString(R.string.system_default);
+            entries[0] = Utils.getLocaleString(MagiskManager.defaultLocale, R.string.system_default);
             entryValues[0] = "";
             int i = 1;
             for (Locale locale : mm.locales) {
@@ -216,12 +212,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             }
             lp.setEntries(entries);
             lp.setEntryValues(entryValues);
-            lp.setTitle(R.string.language);
-            lp.setKey(Const.Key.LOCALE);
             lp.setSummary(MagiskManager.locale.getDisplayName(MagiskManager.locale));
-            if (isNew) {
-                generalCatagory.addPreference(lp);
-            }
         }
 
         @Override

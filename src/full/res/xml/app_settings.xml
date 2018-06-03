@@ -10,6 +10,10 @@
             android:title="@string/settings_dark_theme_title"
             android:summary="@string/settings_dark_theme_summary" />
 
+        <ListPreference
+            android:key="locale"
+            android:title="@string/language"/>
+
         <Preference
             android:key="clear"
             android:title="@string/settings_clear_cache_title"
