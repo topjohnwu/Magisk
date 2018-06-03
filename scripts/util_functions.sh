@@ -375,6 +375,7 @@ mount_magisk_img() {
   fi
 
   ui_print "- Mounting $IMG to $MOUNTPATH"
+  mkdir -p $MOUNTPATH 2>/dev/null
   MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
   is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 }
