@@ -432,6 +432,8 @@ static int prepare_img() {
 				rm_rf(buf);
 				continue;
 			}
+			snprintf(buf, PATH_MAX, "%s/%s/update", MOUNTPOINT, entry->d_name);
+			unlink(buf);
 			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
 			if (access(buf, F_OK) == 0)
 				continue;
