@@ -36,4 +36,8 @@ public class Fragment extends android.support.v4.app.Fragment {
     public void startActivityForResult(Intent intent, int requestCode, Activity.ActivityResultListener listener) {
         ((Activity) getActivity()).startActivityForResult(intent, requestCode, listener);
     }
+
+    public void runWithPermission(String[] permissions, Runnable callback) {
+        Activity.runWithPermission(getActivity(), permissions, callback);
+    }
 }

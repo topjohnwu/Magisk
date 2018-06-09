@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -40,8 +39,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     @BindView(R.id.empty_rv) TextView emptyRv;
     @OnClick(R.id.fab)
     public void selectFile() {
-        Utils.runWithPermission(getActivity(),
-                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },() -> {
+        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
             startActivityForResult(intent, Const.ID.FETCH_ZIP);

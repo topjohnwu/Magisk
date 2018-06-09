@@ -1,15 +1,22 @@
 package com.topjohnwu.magisk.components;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.utils.Const;
 
 public abstract class Activity extends FlavorActivity {
+
+    private static Runnable permissionGrantCallback;
 
     private ActivityResultListener activityResultListener;
 
@@ -18,6 +25,33 @@ public abstract class Activity extends FlavorActivity {
         Configuration configuration = new Configuration();
         configuration.setLocale(MagiskManager.locale);
         applyOverrideConfiguration(configuration);
+    }
+
+    public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
+        boolean granted = true;
+        for (String perm : permissions) {
+            if (ContextCompat.checkSelfPermission(context, perm) != PackageManager.PERMISSION_GRANTED)
+                granted = false;
+        }
+        if (granted) {
+            callback.run();
+        } else {
+            // Passed in context should be an activity if not granted, need to show dialog!
+            permissionGrantCallback = callback;
+            if (!(context instanceof Activity)) {
+                // Start activity to show dialog
+                Intent intent = new Intent(context, SplashActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(Const.Key.INTENT_PERM, permissions);
+                context.startActivity(intent);
+            } else {
+                ActivityCompat.requestPermissions((android.app.Activity) context, permissions, 0);
+            }
+        }
+    }
+
+    public void runWithPermission(String[] permissions, Runnable callback) {
+        runWithPermission(this, permissions, callback);
     }
 
     @Override
@@ -32,15 +66,14 @@ public abstract class Activity extends FlavorActivity {
             if (result != PackageManager.PERMISSION_GRANTED)
                 grant = false;
         }
-        Application app = getApplicationContext();
         if (grant) {
-            if (app.permissionGrantCallback != null) {
-                app.permissionGrantCallback.run();
+            if (permissionGrantCallback != null) {
+                permissionGrantCallback.run();
             }
         } else {
             MagiskManager.toast(R.string.no_rw_storage, Toast.LENGTH_LONG);
         }
-        app.permissionGrantCallback = null;
+        permissionGrantCallback = null;
     }
 
     @Override

@@ -166,7 +166,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 } else {
                     if (Utils.checkNetworkStatus()) {
                         restoreManager.setOnPreferenceClickListener((pref) -> {
-                            Utils.runWithPermission(getActivity(),
+                            runWithPermission(getActivity(),
                                     new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
                                         Intent intent = new Intent(mm, ManagerUpdate.class);
                                         intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);

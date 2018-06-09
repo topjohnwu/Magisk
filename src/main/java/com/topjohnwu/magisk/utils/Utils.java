@@ -1,13 +1,10 @@
 package com.topjohnwu.magisk.utils;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -15,13 +12,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.support.annotation.StringRes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import java.io.File;
@@ -39,7 +34,8 @@ public class Utils {
         if (isDownloading)
             return;
 
-        runWithPermission(context, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+        Activity.runWithPermission(context,
+                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
             File file = new File(Const.EXTERNAL_PATH, getLegalFilename(filename));
 
             if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs())
@@ -47,7 +43,7 @@ public class Utils {
                 return;
             }
 
-            Toast.makeText(context, context.getString(R.string.downloading_toast, filename), Toast.LENGTH_LONG).show();
+            MagiskManager.toast(context.getString(R.string.downloading_toast, filename), Toast.LENGTH_LONG);
             isDownloading = true;
 
             DownloadManager.Request request = new DownloadManager
@@ -56,7 +52,8 @@ public class Utils {
 
             DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             receiver.setDownloadID(dm.enqueue(request)).setFile(file);
-            context.getApplicationContext().registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            context.getApplicationContext().registerReceiver(receiver,
+                    new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         });
     }
 
@@ -140,29 +137,6 @@ public class Utils {
         Collections.sort(locales, (l1, l2) -> l1.getDisplayName(l1).compareTo(l2.getDisplayName(l2)));
 
         return locales;
-    }
-
-    public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
-        boolean granted = true;
-        for (String perm : permissions) {
-            if (ContextCompat.checkSelfPermission(context, perm) != PackageManager.PERMISSION_GRANTED)
-                granted = false;
-        }
-        if (granted) {
-            callback.run();
-        } else {
-            // Passed in context should be an activity if not granted, need to show dialog!
-            getMagiskManager(context).setPermissionGrantCallback(callback);
-            if (!(context instanceof com.topjohnwu.magisk.components.Activity)) {
-                // Start activity to show dialog
-                Intent intent = new Intent(context, SplashActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(Const.Key.INTENT_PERM, permissions);
-                context.startActivity(intent);
-            } else {
-                ActivityCompat.requestPermissions((Activity) context, permissions, 0);
-            }
-        }
     }
 
     public static int dpInPx(int dp) {

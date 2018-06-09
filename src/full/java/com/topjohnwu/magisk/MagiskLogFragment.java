@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 
@@ -88,8 +87,7 @@ public class MagiskLogFragment extends Fragment {
                 new LogManager().read();
                 return true;
             case R.id.menu_save:
-                Utils.runWithPermission(getActivity(),
-                        new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                         () -> new LogManager().save());
                 return true;
             case R.id.menu_clear:

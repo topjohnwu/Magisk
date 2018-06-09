@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
@@ -158,7 +157,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     @Override
     public ParallelTask<Void, Object, Boolean> exec(Void... voids) {
-        Utils.runWithPermission(getActivity(), new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
+        com.topjohnwu.magisk.components.Activity.runWithPermission(
+                getActivity(), new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                 () -> super.exec(voids));
         return this;
     }

@@ -14,8 +14,6 @@ public abstract class Application extends android.app.Application {
 
     private static Handler mHandler = new Handler();
 
-    public Runnable permissionGrantCallback = null;
-
     public Application() {
         weakSelf = new WeakReference<>(this);
     }
@@ -24,10 +22,6 @@ public abstract class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         locale = defaultLocale = Locale.getDefault();
-    }
-
-    public void setPermissionGrantCallback(Runnable callback) {
-        permissionGrantCallback = callback;
     }
 
     public static void toast(CharSequence msg, int duration) {

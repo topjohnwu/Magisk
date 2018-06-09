@@ -45,7 +45,7 @@ public class SplashActivity extends Activity {
                             .setTitle(R.string.app_name)
                             .setMessage(R.string.upgrade_msg)
                             .setPositiveButton(R.string.yes, (d, w) -> {
-                                Utils.runWithPermission(this, new String[]
+                                runWithPermission(new String[]
                                         { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
                                     Intent intent = new Intent(this, ManagerUpdate.class);
                                     intent.putExtra(Const.Key.INTENT_SET_LINK, apkLink);

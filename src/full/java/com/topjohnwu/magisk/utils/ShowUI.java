@@ -255,7 +255,7 @@ public class ShowUI {
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
             .setCancelable(true)
             .setPositiveButton(R.string.install, (d, i) -> {
-                Utils.runWithPermission(activity,
+                com.topjohnwu.magisk.components.Activity.runWithPermission(activity,
                         new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
                     Intent intent = new Intent(mm, ManagerUpdate.class);
                     intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
