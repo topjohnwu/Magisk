@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <libfdt.h>
 #include <sys/mman.h>
 
 #include "bootimg.h"
@@ -181,6 +182,29 @@ int parse_img(const char *image, boot_img *boot) {
 			// Search for dtb in kernel
 			for (uint32_t i = 0; i < header(boot, kernel_size); ++i) {
 				if (memcmp(boot->kernel + i, DTB_MAGIC, 4) == 0) {
+					// Check that fdt_header.totalsize does not overflow kernel image size
+					uint32_t dt_size = fdt32_to_cpu(*(uint32_t *)(boot->kernel + i + 4));
+					if (dt_size > header(boot, kernel_size) - i) {
+						fprintf(stderr, "Invalid DTB detection at 0x%x: size (%u) > remaining (%u)\n",
+								i, dt_size, header(boot, kernel_size) - i);
+						continue;
+					}
+
+					// Check that fdt_header.off_dt_struct does not overflow kernel image size
+					uint32_t dt_struct_offset = fdt32_to_cpu(*(uint32_t *)(boot->kernel + i + 8));
+					if (dt_struct_offset > header(boot, kernel_size) - i) {
+						fprintf(stderr, "Invalid DTB detection at 0x%x: struct offset (%u) > remaining (%u)\n",
+								i, dt_struct_offset, header(boot, kernel_size) - i);
+						continue;
+					}
+
+					// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
+					uint32_t dt_begin_node = fdt32_to_cpu(*(uint32_t *)(boot->kernel + i + dt_struct_offset));
+					if (dt_begin_node != FDT_BEGIN_NODE) {
+						fprintf(stderr, "Invalid DTB detection at 0x%x: header tag of first node != FDT_BEGIN_NODE\n", i);
+						continue;
+					}
+
 					boot->dtb = boot->kernel + i;
 					boot->dt_size = header(boot, kernel_size) - i;
 					lheader(boot, kernel_size, = i);
