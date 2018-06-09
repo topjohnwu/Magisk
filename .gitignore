@@ -4,6 +4,9 @@ out
 *.apk
 config.prop
 
+# Manually dumped jars
+snet/libs
+
 # Built binaries
 native/out
 

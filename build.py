@@ -83,7 +83,6 @@ def build_all(args):
 	build_apk(args)
 	zip_main(args)
 	zip_uninstaller(args)
-	build_snet(args)
 
 def collect_binary():
 	for arch in ['armeabi-v7a', 'x86']:
@@ -235,7 +234,11 @@ def build_snet(args):
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
 	target = os.path.join(config['outdir'], 'snet.apk')
-	mv(source, target)
+	# Re-compress the whole APK for smaller size
+	with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zout:
+		with zipfile.ZipFile(source) as zin:
+			for item in zin.infolist():
+				zout.writestr(item.filename, zin.read(item))
 	header('Output: ' + target)
 
 def gen_update_binary():

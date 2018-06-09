@@ -1,7 +1,5 @@
 package com.topjohnwu.snet;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,18 +9,19 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.safetynet.SafetyNet;
 import com.google.android.gms.safetynet.SafetyNetApi;
+import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
+import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.security.SecureRandom;
 
-public class SafetyNetHelper
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SafetyNetHelper implements ISafetyNetHelper, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, ResultCallback<SafetyNetApi.AttestationResult> {
 
     public static final int CAUSE_SERVICE_DISCONNECTED = 0x01;
     public static final int CAUSE_NETWORK_LOST = 0x02;
@@ -32,36 +31,24 @@ public class SafetyNetHelper
     public static final int BASIC_PASS = 0x10;
     public static final int CTS_PASS = 0x20;
 
-    public static final int SNET_EXT_VER = 7;
+    public static final int SNET_EXT_VER = 8;
 
     private GoogleApiClient mGoogleApiClient;
     private Activity mActivity;
-    private int responseCode;
-    private SafetyNetCallback cb;
-    private String dexPath;
-    private boolean isDarkTheme;
+    private Callback callback;
 
-    public static int getVersion() {
+    @Override
+    public int getVersion() {
         return SNET_EXT_VER;
     }
 
-    public SafetyNetHelper(Activity activity, String dexPath, SafetyNetCallback cb) {
+    public SafetyNetHelper(Activity activity, Callback cb) {
         mActivity = activity;
-        this.cb = cb;
-        this.dexPath = dexPath;
-        responseCode = 0;
-
-        // Get theme
-        try {
-            Context context = activity.getApplicationContext();
-            Field theme = context.getClass().getField("isDarkTheme");
-            isDarkTheme = (boolean) theme.get(context);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        callback = cb;
     }
 
     // Entry point to start test
+    @Override
     public void attest() {
         // Connect Google Service
         mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
@@ -74,26 +61,15 @@ public class SafetyNetHelper
 
     @Override
     public void onConnectionSuspended(int i) {
-        cb.onResponse(i);
+        callback.onResponse(i);
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
-        Class<? extends Activity> clazz = mActivity.getClass();
-        try {
-            // Use external resources
-            clazz.getMethod("swapResources", String.class, int.class).invoke(mActivity, dexPath,
-                    isDarkTheme ? android.R.style.Theme_Material : android.R.style.Theme_Material_Light);
-            try {
-                GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            clazz.getMethod("restoreResources").invoke(mActivity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        cb.onResponse(CONNECTION_FAIL);
+        mActivity.swapResources(CheckSafetyNet.dexPath.getPath());
+        GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
+        mActivity.restoreResources();
+        callback.onResponse(CONNECTION_FAIL);
     }
 
     @Override
@@ -103,28 +79,28 @@ public class SafetyNetHelper
         new SecureRandom().nextBytes(nonce);
 
         // Call SafetyNet
-        SafetyNet.SafetyNetApi.attest(mGoogleApiClient, nonce)
-            .setResultCallback(new ResultCallback<SafetyNetApi.AttestationResult>() {
-                @Override
-                public void onResult(@NonNull SafetyNetApi.AttestationResult result) {
-                    Status status = result.getStatus();
-                    try {
-                        if (!status.isSuccess()) throw new JSONException("");
-                        String json = new String(Base64.decode(
-                                result.getJwsResult().split("\\.")[1], Base64.DEFAULT));
-                        JSONObject decoded = new JSONObject(json);
-                        responseCode |= decoded.getBoolean("ctsProfileMatch") ? CTS_PASS : 0;
-                        responseCode |= decoded.getBoolean("basicIntegrity") ? BASIC_PASS : 0;
-                    } catch (JSONException e) {
-                        responseCode = RESPONSE_ERR;
-                    }
+        SafetyNet.SafetyNetApi.attest(mGoogleApiClient, nonce).setResultCallback(this);
+    }
 
-                    // Disconnect
-                    mGoogleApiClient.disconnect();
+    @Override
+    public void onResult(SafetyNetApi.AttestationResult result) {
+        int code = 0;
+        try {
+            if (!result.getStatus().isSuccess())
+                throw new JSONException("");
+            String jsonStr = new String(Base64.decode(
+                    result.getJwsResult().split("\\.")[1], Base64.DEFAULT));
+            JSONObject json = new JSONObject(jsonStr);
+            code |= json.getBoolean("ctsProfileMatch") ? CTS_PASS : 0;
+            code |= json.getBoolean("basicIntegrity") ? BASIC_PASS : 0;
+        } catch (JSONException e) {
+            code = RESPONSE_ERR;
+        }
 
-                    // Return results
-                    cb.onResponse(responseCode);
-                }
-            });
+        // Disconnect
+        mGoogleApiClient.disconnect();
+
+        // Return results
+        callback.onResponse(code);
     }
 }

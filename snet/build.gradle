@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.topjohnwu.snet"
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion rootProject.ext.compileSdkVersion
         versionCode 1
         versionName "1.0"
@@ -15,12 +15,13 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.android.gms:play-services-safetynet:7.0.0'  /* The oldest version */
 }
