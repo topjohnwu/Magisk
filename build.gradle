@@ -27,7 +27,7 @@ android {
 
     productFlavors {
         full {
-            versionCode 117
+            versionCode 118
             versionName "5.7.0"
         }
         stub {
