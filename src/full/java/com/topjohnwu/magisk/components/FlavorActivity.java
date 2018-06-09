@@ -17,7 +17,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
 
     private AssetManager swappedAssetManager = null;
     private Resources swappedResources = null;
-    private Resources.Theme swappedTheme = null;
+    private Resources.Theme backupTheme = null;
 
     @StyleRes
     public int getDarkTheme() {
@@ -25,7 +25,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
     }
 
     public MagiskManager getMagiskManager() {
-        return (MagiskManager) super.getApplicationContext();
+        return (MagiskManager) super.getApplication();
     }
 
     @Override
@@ -48,17 +48,6 @@ public abstract class FlavorActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private static AssetManager getAssets(String apk) {
-        try {
-            AssetManager asset = AssetManager.class.newInstance();
-            AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, apk);
-            return asset;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     protected void setFloating() {
         boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if (isTablet) {
@@ -75,12 +64,23 @@ public abstract class FlavorActivity extends AppCompatActivity {
 
     @Override
     public Resources.Theme getTheme() {
-        return swappedTheme == null ? super.getTheme() : swappedTheme;
+        return backupTheme == null ? super.getTheme() : backupTheme;
     }
 
     @Override
     public AssetManager getAssets() {
         return swappedAssetManager == null ? super.getAssets() : swappedAssetManager;
+    }
+
+    private AssetManager getAssets(String apk) {
+        try {
+            AssetManager asset = AssetManager.class.newInstance();
+            AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, apk);
+            return asset;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -89,20 +89,20 @@ public abstract class FlavorActivity extends AppCompatActivity {
     }
 
     @Keep
-    public void swapResources(String dexPath, int resId) {
-        swappedAssetManager = getAssets(dexPath);
-        if (swappedAssetManager == null)
-            return;
-        Resources res = super.getResources();
-        swappedResources = new Resources(swappedAssetManager, res.getDisplayMetrics(), res.getConfiguration());
-        swappedTheme = swappedResources.newTheme();
-        swappedTheme.applyStyle(resId, true);
+    public void swapResources(String dexPath) {
+        AssetManager asset = getAssets(dexPath);
+        if (asset != null) {
+            backupTheme = super.getTheme();
+            Resources res = super.getResources();
+            swappedResources = new Resources(asset, res.getDisplayMetrics(), res.getConfiguration());
+            swappedAssetManager = asset;
+        }
     }
 
     @Keep
     public void restoreResources() {
         swappedAssetManager = null;
         swappedResources = null;
-        swappedTheme = null;
+        backupTheme = null;
     }
 }

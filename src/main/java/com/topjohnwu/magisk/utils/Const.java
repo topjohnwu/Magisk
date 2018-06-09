@@ -14,7 +14,6 @@ public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
     public static final String ORIG_PKG_NAME = BuildConfig.APPLICATION_ID;
-    public static final String SNET_PKG = "com.topjohnwu.snet";
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
@@ -37,7 +36,7 @@ public class Const {
 
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
-    public static final int SNET_VER = 7;
+    public static final int SNET_VER = 8;
 
     public static int MIN_MODULE_VER() {
         return MagiskManager.get().magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
@@ -81,7 +80,7 @@ public class Const {
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
-        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/a82a5e5a49285df65da91d2e8b24f4783841b515/snet.apk";
+        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/788f01f499714471949613820d43bc364786e85d/snet.apk";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";

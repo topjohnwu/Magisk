@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.ShowUI;
@@ -38,14 +39,6 @@ import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
         implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener, ExpandableView {
-
-    private static final int CAUSE_SERVICE_DISCONNECTED = 0x01;
-    private static final int CAUSE_NETWORK_LOST = 0x02;
-    private static final int RESPONSE_ERR = 0x04;
-    private static final int CONNECTION_FAIL = 0x08;
-
-    private static final int BASIC_PASS = 0x10;
-    private static final int CTS_PASS = 0x20;
 
     private Container expandableContainer = new Container();
 
@@ -285,12 +278,12 @@ public class MagiskFragment extends Fragment
             safetyNetStatusText.setText(R.string.safetyNet_check_success);
 
             boolean b;
-            b = (response & CTS_PASS) != 0;
+            b = (response & ISafetyNetHelper.CTS_PASS) != 0;
             ctsStatusText.setText("ctsProfile: " + b);
             ctsStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
             ctsStatusIcon.setColorFilter(b ? colorOK : colorBad);
 
-            b = (response & BASIC_PASS) != 0;
+            b = (response & ISafetyNetHelper.BASIC_PASS) != 0;
             basicStatusText.setText("basicIntegrity: " + b);
             basicStatusIcon.setImageResource(b ? R.drawable.ic_check_circle : R.drawable.ic_cancel);
             basicStatusIcon.setColorFilter(b ? colorOK : colorBad);
@@ -299,16 +292,16 @@ public class MagiskFragment extends Fragment
         } else {
             @StringRes int resid;
             switch (response) {
-                case CAUSE_SERVICE_DISCONNECTED:
+                case ISafetyNetHelper.CAUSE_SERVICE_DISCONNECTED:
                     resid = R.string.safetyNet_network_loss;
                     break;
-                case CAUSE_NETWORK_LOST:
+                case ISafetyNetHelper.CAUSE_NETWORK_LOST:
                     resid = R.string.safetyNet_service_disconnected;
                     break;
-                case RESPONSE_ERR:
+                case ISafetyNetHelper.RESPONSE_ERR:
                     resid = R.string.safetyNet_res_invalid;
                     break;
-                case CONNECTION_FAIL:
+                case ISafetyNetHelper.CONNECTION_FAIL:
                 default:
                     resid = R.string.safetyNet_api_error;
                     break;
