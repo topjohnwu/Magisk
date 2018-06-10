@@ -471,45 +471,30 @@ static const char wrapper[] =
 
 void startup() {
 	if (!check_data())
-		return;
+		unblock_boot_process();
 
-	// uninstaller or core-only mode
-	if (access(UNINSTALLER, F_OK) == 0 || access(DISABLEFILE, F_OK) == 0)
-		goto initialize;
+	if (access(SECURE_DIR, F_OK) != 0) {
+		/* If the folder is not automatically created by the system,
+		 * do NOT proceed further. Manual creation of the folder
+		 * will cause bootloops on FBE devices. */
+		LOGE(SECURE_DIR" is not present, abort...");
+		unblock_boot_process();
+	}
 
-	// Allocate buffer
-	buf = xmalloc(PATH_MAX);
-	buf2 = xmalloc(PATH_MAX);
+	// No uninstaller or core-only mode
+	if (access(UNINSTALLER, F_OK) != 0 && access(DISABLEFILE, F_OK) != 0) {
+		// Allocate buffer
+		buf = xmalloc(PATH_MAX);
+		buf2 = xmalloc(PATH_MAX);
 
-	simple_mount("/system");
-	simple_mount("/vendor");
+		simple_mount("/system");
+		simple_mount("/vendor");
+	}
 
-initialize:
 	LOGI("** Initializing Magisk\n");
 
 	// Unlock all blocks for rw
 	unlock_blocks();
-
-	// Magisk binaries
-	char *bin_path = NULL;
-	if (access("/cache/data_bin", F_OK) == 0)
-		bin_path = "/cache/data_bin";
-	else if (access("/data/data/com.topjohnwu.magisk/install", F_OK) == 0)
-		bin_path = "/data/data/com.topjohnwu.magisk/install";
-	else if (access("/data/user_de/0/com.topjohnwu.magisk/install", F_OK) == 0)
-		bin_path = "/data/user_de/0/com.topjohnwu.magisk/install";
-	if (bin_path) {
-		rm_rf(DATABIN);
-		cp_afc(bin_path, DATABIN);
-		rm_rf(bin_path);
-	}
-
-	// Migration
-	rm_rf("/data/magisk");
-	unlink("/data/magisk.img");
-	unlink("/data/magisk_debug.log");
-	xmkdir("/data/adb", 0700);
-	chmod("/data/adb", 0700);
 
 	LOGI("* Creating /sbin overlay");
 	DIR *dir;
@@ -578,6 +563,27 @@ initialize:
 
 	close(sbin);
 	close(root);
+
+	// Alternative binaries paths
+	char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
+						"/data/data/com.topjohnwu.magisk/install",
+						"/data/user_de/0/com.topjohnwu.magisk/install", NULL };
+	char *bin_path = NULL;
+	for (int i = 0; alt_bin[i]; ++i) {
+		if (access(alt_bin[i], F_OK) == 0) {
+			bin_path = alt_bin[i];
+			break;
+		}
+	}
+	if (bin_path) {
+		rm_rf(DATABIN);
+		cp_afc(bin_path, DATABIN);
+		rm_rf(bin_path);
+	}
+
+	// Remove legacy stuffs
+	unlink("/data/magisk.img");
+	unlink("/data/magisk_debug.log");
 
 	// Create directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
@@ -650,6 +656,9 @@ void post_fs_data(int client) {
 	write_int(client, 0);
 	close(client);
 
+	// If post-fs-data mode is started, it means startup succeeded
+	setup_done = 1;
+
 	// Start the debug log
 	start_debug_full_log();
 
@@ -669,6 +678,7 @@ void post_fs_data(int client) {
 		goto core_only; // Mounting fails, we can only do core only stuffs
 
 	restorecon();
+	chmod(SECURE_DIR, 0700);
 
 	// Run common scripts
 	LOGI("* Running post-fs-data.d scripts\n");
@@ -765,12 +775,24 @@ void late_start(int client) {
 	write_int(client, 0);
 	close(client);
 
+	if (access(SECURE_DIR, F_OK) != 0) {
+		// It's safe to create the folder at this point if the system didn't create it
+		xmkdir(SECURE_DIR, 0700);
+	}
+
+	if (!setup_done) {
+		// The setup failed for some reason, reboot and try again
+		exec_command_sync("/system/bin/reboot", NULL);
+		return;
+	}
+
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
-	waitpid(full_patch_pid, NULL, 0);
+	if (full_patch_pid > 0)
+		waitpid(full_patch_pid, NULL, 0);
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");

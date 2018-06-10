@@ -81,15 +81,18 @@ remove_system_su
 
 ui_print "- Constructing environment"
 
-# Check if we can actually access the data (DE storage)
 DATA=false
+DATA_DE=false
 if grep ' /data ' /proc/mounts | grep -vq 'tmpfs'; then
-  [ ! -d /data/adb ] && mkdir /data/adb
-  touch /data/adb/.write_test && rm /data/adb/.write_test && DATA=true
+  # Test if data is writable
+  touch /data/.rw && rm /data/.rw && DATA=true
+  # Test if DE storage is writable
+  $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
 fi
 
 if $DATA; then
-  MAGISKBIN=/data/adb/magisk
+  MAGISKBIN=/data/magisk
+  $DATA_DE && MAGISKBIN=/data/adb/magisk
   run_migrations
 else
   MAGISKBIN=/cache/data_bin

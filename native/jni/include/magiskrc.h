@@ -1,3 +1,4 @@
+#include "magisk.h"
 #include "magiskpolicy.h"
 
 const char magiskrc[] =
@@ -10,9 +11,9 @@ const char magiskrc[] =
 
 "on post-fs-data\n"
 "   load_persist_props\n"
-"   rm /dev/.magisk.unblock\n"
+"   rm "UNBLOCKFILE"\n"
 "   start magisk_startup\n"
-"   wait /dev/.magisk.unblock 10\n"
+"   wait "UNBLOCKFILE" 10\n"
 "   rm /dev/.magisk.unblock\n"
 "\n"
 

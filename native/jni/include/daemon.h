@@ -8,7 +8,7 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 
-extern int is_daemon_init;
+extern int setup_done;
 extern int seperate_vendor;
 extern int full_patch_pid;
 
