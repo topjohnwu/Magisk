@@ -59,15 +59,18 @@ void patch_init_rc(void **buf, size_t *size) {
 }
 
 int patch_verity(void **buf, uint32_t *size, int patch) {
-	int skip, src_size = *size;
+	int skip, src_size = *size, found = 0;
 	char *src = *buf, *patched = patch ? xcalloc(src_size, 1) : NULL;
 	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
 		if ((skip = check_verity_pattern(src + read)) > 0) {
-			if (!patch)
-				return 1;
-			fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
+			if (patch) {
+				fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
+				*size -= skip;
+			} else {
+				fprintf(stderr, "Found pattern [%.*s]\n", skip, src + read);
+			}
 			read += skip;
-			*size -= skip;
+			found = 1;
 		}
 		if (patch)
 			patched[write] = src[read];
@@ -76,7 +79,7 @@ int patch_verity(void **buf, uint32_t *size, int patch) {
 		free(*buf);
 		*buf = patched;
 	}
-	return 0;
+	return found;
 }
 
 void patch_encryption(void **buf, uint32_t *size) {
