@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.utils.WebService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SplashActivity extends Activity {
+public class NoUIActivity extends Activity {
 
     private String apkLink;
     private String version;
@@ -44,16 +44,14 @@ public class SplashActivity extends Activity {
                             .setCancelable(false)
                             .setTitle(R.string.app_name)
                             .setMessage(R.string.upgrade_msg)
-                            .setPositiveButton(R.string.yes, (d, w) -> {
-                                runWithPermission(new String[]
-                                        { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
-                                    Intent intent = new Intent(this, ManagerUpdate.class);
-                                    intent.putExtra(Const.Key.INTENT_SET_LINK, apkLink);
-                                    intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
-                                    sendBroadcast(intent);
-                                    finish();
-                                });
-                            })
+                            .setPositiveButton(R.string.yes, (d, w) -> runWithPermission(new String[]
+                                    { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+                                Intent intent = new Intent(this, ManagerUpdate.class);
+                                intent.putExtra(Const.Key.INTENT_SET_LINK, apkLink);
+                                intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
+                                sendBroadcast(intent);
+                                finish();
+                            }))
                             .setNegativeButton(R.string.no_thanks, (d, w) -> finish())
                             .show();
                 });

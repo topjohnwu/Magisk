@@ -4,7 +4,7 @@
 
     <application>
         <activity
-            android:name=".SplashActivity"
+            android:name=".NoUIActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

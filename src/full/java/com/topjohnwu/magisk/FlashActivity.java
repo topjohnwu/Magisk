@@ -77,7 +77,7 @@ public class FlashActivity extends Activity {
 
     @Override
     public int getDarkTheme() {
-        return R.style.AppTheme_Transparent_Dark;
+        return R.style.AppTheme_StatusBar_Dark;
     }
 
     @Override

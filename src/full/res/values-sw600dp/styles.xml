@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Transparent" parent="AppTheme">
+    <style name="AppTheme.StatusBar" parent="AppTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
@@ -9,7 +9,7 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.Transparent.Dark" parent="AppTheme.Dark">
+    <style name="AppTheme.StatusBar.Dark" parent="AppTheme.Dark">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>

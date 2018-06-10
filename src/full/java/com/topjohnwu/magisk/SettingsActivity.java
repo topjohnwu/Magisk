@@ -42,7 +42,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
     @Override
     public int getDarkTheme() {
-        return R.style.AppTheme_Transparent_Dark;
+        return R.style.AppTheme_StatusBar_Dark;
     }
 
     @Override

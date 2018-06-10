@@ -9,21 +9,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.utils.Const;
 
 public abstract class Activity extends FlavorActivity {
 
-    private static Runnable permissionGrantCallback;
+    protected static Runnable permissionGrantCallback;
 
     private ActivityResultListener activityResultListener;
 
     public Activity() {
         super();
         Configuration configuration = new Configuration();
-        configuration.setLocale(MagiskManager.locale);
+        configuration.setLocale(Application.locale);
         applyOverrideConfiguration(configuration);
     }
 
@@ -40,12 +39,12 @@ public abstract class Activity extends FlavorActivity {
             permissionGrantCallback = callback;
             if (!(context instanceof Activity)) {
                 // Start activity to show dialog
-                Intent intent = new Intent(context, SplashActivity.class);
+                Intent intent = new Intent(context, NoUIActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(Const.Key.INTENT_PERM, permissions);
                 context.startActivity(intent);
             } else {
-                ActivityCompat.requestPermissions((android.app.Activity) context, permissions, 0);
+                ActivityCompat.requestPermissions((Activity) context, permissions, 0);
             }
         }
     }
@@ -71,7 +70,7 @@ public abstract class Activity extends FlavorActivity {
                 permissionGrantCallback.run();
             }
         } else {
-            MagiskManager.toast(R.string.no_rw_storage, Toast.LENGTH_LONG);
+            Application.toast(R.string.no_rw_storage, Toast.LENGTH_LONG);
         }
         permissionGrantCallback = null;
     }
