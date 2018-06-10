@@ -39,7 +39,8 @@
 #include <lzma.h>
 #include <cil/cil.h>
 
-#include "dump.h"
+#include "binaries_arch_xz.h"
+
 #include "magiskrc.h"
 #include "utils.h"
 #include "magiskpolicy.h"
@@ -321,7 +322,7 @@ static int unxz(const void *buf, size_t size, int fd) {
 static int dump_magisk(const char *path, mode_t mode) {
 	unlink(path);
 	int fd = creat(path, mode);
-	int ret = unxz(magisk_dump, sizeof(magisk_dump), fd);
+	int ret = unxz(magisk_xz, sizeof(magisk_xz), fd);
 	close(fd);
 	return ret;
 }

@@ -42,6 +42,7 @@ else:
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 
 cpu_count = multiprocessing.cpu_count()
+archs = ['armeabi-v7a', 'x86']
 
 def mv(source, target):
 	try:
@@ -79,13 +80,13 @@ def zip_with_msg(zipfile, source, target):
 	zipfile.write(source, target)
 
 def build_all(args):
-	build_binary(args)
 	build_apk(args)
+	build_binary(args)
 	zip_main(args)
 	zip_uninstaller(args)
 
 def collect_binary():
-	for arch in ['armeabi-v7a', 'x86']:
+	for arch in archs:
 		mkdir_p(os.path.join('native', 'out', arch))
 		for bin in ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']:
 			source = os.path.join('native', 'libs', arch, bin)
@@ -139,16 +140,13 @@ def build_binary(args):
 	flags = base_flags
 
 	if 'magiskinit' in targets:
-		# We need to create dump.h beforehand
-		if not os.path.exists(os.path.join('native', 'out', 'armeabi-v7a', 'magisk')):
-			error('Build "magisk" before building "magiskinit"')
-		for arch in ['armeabi-v7a', 'x86']:
-			with open(os.path.join('native', 'out', arch, 'dump.h'), 'w') as dump:
-				dump.write('#include "stdlib.h"\n')
-				with open(os.path.join('native', 'out', arch, 'magisk'), 'rb') as bin:
-					dump.write('const uint8_t magisk_dump[] = "')
-					dump.write(''.join("\\x{:02X}".format(c) for c in lzma.compress(bin.read(), preset=9)))
-					dump.write('";\n')
+		for arch in archs:
+			bin_file = os.path.join('native', 'out', arch, 'magisk')
+			if not os.path.exists(bin_file):
+				error('Build "magisk" before building "magiskinit"')
+			with open(os.path.join('native', 'out', arch, 'binaries_arch_xz.h'), 'w') as out:
+				with open(bin_file, 'rb') as src:
+					xz_dump(src, out, 'magisk_xz')
 		flags += ' B_INIT=1'
 		other = True
 
@@ -239,7 +237,17 @@ def build_snet(args):
 		with zipfile.ZipFile(source) as zin:
 			for item in zin.infolist():
 				zout.writestr(item.filename, zin.read(item))
+	rm(source)
 	header('Output: ' + target)
+
+def xz_dump(src, out, var_name):
+	out.write('const static unsigned char {}[] = {{'.format(var_name))
+	for i, c in enumerate(lzma.compress(src.read(), preset=9)):
+		if i % 16 == 0:
+			out.write('\n')
+		out.write('0x{:02X},'.format(c))
+	out.write('\n};\n')
+	out.flush()
 
 def gen_update_binary():
 	update_bin = []
