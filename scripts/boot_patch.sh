@@ -166,8 +166,9 @@ rm -f ramdisk.cpio.orig
 # Binary patches
 ##########################################################################################
 
-if ! $KEEPVERITY && [ -f dtb ]; then
-  ./magiskboot --dtb-patch dtb && ui_print "- Patching fstab in dtb to remove dm-verity"
+if ! $KEEPVERITY; then
+  [ -f dtb ] && ./magiskboot --dtb-patch dtb && ui_print "- Removing dm(avb)-verity from fstab in dtb"
+  [ -f extra ] && ./magiskboot --dtb-patch extra && ui_print "- Removing dm(avb)-verity from fstab in extra-dtb"
 fi
 
 if [ -f kernel ]; then
