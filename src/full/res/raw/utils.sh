@@ -13,14 +13,14 @@ db_clean() {
 }
 
 db_init() {
-  ADB_CONTEXT=`/system/bin/ls -dZ /data/adb | awk '{print $1}'`
+  # Temporary let the folder rw by anyone
   chcon u:object_r:magisk_file:s0 /data/adb
   chmod 777 /data/adb
 }
 
 db_restore() {
-  chcon $ADB_CONTEXT /data/adb
   chmod 700 /data/adb
+  magisk --restorecon
 }
 
 db_setup() {

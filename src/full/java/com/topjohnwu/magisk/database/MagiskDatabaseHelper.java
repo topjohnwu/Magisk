@@ -78,7 +78,7 @@ public class MagiskDatabaseHelper {
             if (mm.magiskVersionCode < Const.MAGISK_VER.FBE_AWARE) {
                 // Super old legacy mode
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
-            } else if (mm.magiskVersionCode < Const.MAGISK_VER.LEGACY_GLOBAL_DB) {
+            } else if (mm.magiskVersionCode < Const.MAGISK_VER.HIDDEN_PATH) {
                 // Legacy mode with FBE aware
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     de.moveDatabaseFrom(mm, "su.db");
@@ -89,13 +89,6 @@ public class MagiskDatabaseHelper {
                 final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db", true);
                 mm.deleteDatabase("su.db");
                 de.deleteDatabase("su.db");
-                if (mm.magiskVersionCode < Const.MAGISK_VER.HIDDEN_PATH) {
-                    // Link to new path
-                    File oldDB = new File(de.getFilesDir().getParentFile().getParentFile(),
-                            "magisk.db");
-                    Shell.Sync.su(Utils.fmt("mv -f %s %s; ln -s %s %s",
-                            oldDB, GLOBAL_DB, GLOBAL_DB, oldDB));
-                }
                 if (mm.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {
                     // We need some additional policies on old versions
                     Shell.Sync.su("db_sepatch");
@@ -105,8 +98,8 @@ public class MagiskDatabaseHelper {
                     SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
                     Shell.Sync.su("db_restore");
                 }
-                Shell.Sync.su("db_setup " + Process.myUid());
             }
+            Shell.Sync.su("db_setup " + Process.myUid());
         }
         // Not using legacy mode, open the mounted global DB
         return SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);

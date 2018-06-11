@@ -57,7 +57,6 @@ public class Const {
         public static final int RESETPROP_PERSIST = 1436;
         public static final int MANAGER_HIDE = 1440;
         public static final int DTBO_SUPPORT = 1446;
-        public static final int LEGACY_GLOBAL_DB = 1450;
         public static final int HIDDEN_PATH = 1460;
         public static final int REMOVE_LEGACY_LINK = 1630;
         public static final int SEPOL_REFACTOR = 1640;
