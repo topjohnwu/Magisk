@@ -24,10 +24,11 @@ import java.util.zip.ZipFile;
 * */
 
 public class JarMap implements Closeable, AutoCloseable {
+
     private JarFile jarFile;
     private JarInputStream jis;
-    private boolean isInputStream = false;
     private LinkedHashMap<String, JarEntry> bufMap;
+    private Manifest manifest;
 
     public JarMap(File file) throws IOException {
         this(file, true);
@@ -39,6 +40,7 @@ public class JarMap implements Closeable, AutoCloseable {
 
     public JarMap(File file, boolean verify, int mode) throws IOException {
         jarFile = new JarFile(file, verify, mode);
+        manifest = jarFile.getManifest();
     }
 
     public JarMap(String name) throws IOException {
@@ -54,48 +56,54 @@ public class JarMap implements Closeable, AutoCloseable {
     }
 
     public JarMap(InputStream is, boolean verify) throws IOException {
-        isInputStream = true;
-        bufMap = new LinkedHashMap<>();
         jis = new JarInputStream(is, verify);
+        bufMap = new LinkedHashMap<>();
         JarEntry entry;
         while ((entry = jis.getNextJarEntry()) != null) {
             bufMap.put(entry.getName(), new JarMapEntry(entry, jis));
         }
+        manifest = jis.getManifest();
     }
 
     public File getFile() {
-        return isInputStream ? null : new File(jarFile.getName());
+        return jarFile == null ? null : new File(jarFile.getName());
     }
 
-    public Manifest getManifest() throws IOException {
-        return isInputStream ? jis.getManifest() : jarFile.getManifest();
+    public Manifest getManifest() {
+        return manifest;
     }
 
     public InputStream getInputStream(ZipEntry ze) throws IOException {
-        return isInputStream ? ((JarMapEntry) bufMap.get(ze.getName())).data.getInputStream() :
-                jarFile.getInputStream(ze);
+        if (bufMap != null) {
+            JarMapEntry e = (JarMapEntry) bufMap.get(ze.getName());
+            if (e != null)
+                return e.data.getInputStream();
+        }
+        return jarFile.getInputStream(ze);
     }
 
     public OutputStream getOutputStream(ZipEntry ze) {
-        if (!isInputStream) // Only support InputStream mode
-            return null;
-        ByteArrayStream bs = ((JarMapEntry) bufMap.get(ze.getName())).data;
-        bs.reset();
-        return bs;
+        manifest = null; /* Invalidate the manifest */
+        if (bufMap == null)
+            bufMap = new LinkedHashMap<>();
+        JarMapEntry e = new JarMapEntry(ze.getName());
+        bufMap.put(ze.getName(), e);
+        return e.data;
     }
 
     public byte[] getRawData(ZipEntry ze) throws IOException {
-        if (isInputStream) {
-            return ((JarMapEntry) bufMap.get(ze.getName())).data.toByteArray();
-        } else {
-            ByteArrayStream bytes = new ByteArrayStream();
-            bytes.readFrom(jarFile.getInputStream(ze));
-            return bytes.toByteArray();
+        if (bufMap != null) {
+            JarMapEntry e = (JarMapEntry) bufMap.get(ze.getName());
+            if (e != null)
+                return e.data.toByteArray();
         }
+        ByteArrayStream bytes = new ByteArrayStream();
+        bytes.readFrom(jarFile.getInputStream(ze));
+        return bytes.toByteArray();
     }
 
     public Enumeration<JarEntry> entries() {
-        return isInputStream ? Collections.enumeration(bufMap.values()) : jarFile.entries();
+        return jarFile == null ? Collections.enumeration(bufMap.values()) : jarFile.entries();
     }
 
     public ZipEntry getEntry(String name) {
@@ -103,20 +111,29 @@ public class JarMap implements Closeable, AutoCloseable {
     }
 
     public JarEntry getJarEntry(String name) {
-        return isInputStream ? bufMap.get(name) : jarFile.getJarEntry(name);
+        JarEntry e = jarFile == null ? bufMap.get(name) : jarFile.getJarEntry(name);
+        if (e == null && bufMap != null)
+            return bufMap.get(name);
+        return e;
     }
 
     @Override
     public void close() throws IOException {
-        (isInputStream ? jis : jarFile).close();
+        (jarFile == null ? jis : jarFile).close();
     }
 
     private static class JarMapEntry extends JarEntry {
         ByteArrayStream data;
+
         JarMapEntry(JarEntry je, InputStream is) {
             super(je);
             data = new ByteArrayStream();
             data.readFrom(is);
+        }
+
+        JarMapEntry(String s) {
+            super(s);
+            data = new ByteArrayStream();
         }
     }
 }
