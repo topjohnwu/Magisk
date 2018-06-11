@@ -7,17 +7,15 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.PatchAPK;
 import com.topjohnwu.magisk.utils.RootUtils;
-import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
-import com.topjohnwu.utils.JarMap;
 
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.security.SecureRandom;
-import java.util.jar.JarEntry;
 
 public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
@@ -48,51 +46,6 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         return builder.toString();
     }
 
-    private int findOffset(byte buf[], byte pattern[]) {
-        int offset = -1;
-        for (int i = 0; i < buf.length - pattern.length; ++i) {
-            boolean match = true;
-            for (int j = 0; j < pattern.length; ++j) {
-                if (buf[i + j] != pattern[j]) {
-                    match = false;
-                    break;
-                }
-            }
-            if (match) {
-                offset = i;
-                break;
-            }
-        }
-        return offset;
-    }
-
-    /* It seems that AAPT sometimes generate another type of string format */
-    private boolean fallbackPatch(byte xml[], String from, String to) {
-
-        byte[] target = new byte[from.length() * 2 + 2];
-        for (int i = 0; i < from.length(); ++i) {
-            target[i * 2] = (byte) from.charAt(i);
-        }
-        int offset = findOffset(xml, target);
-        if (offset < 0)
-            return false;
-        byte[] dest = new byte[target.length - 2];
-        for (int i = 0; i < to.length(); ++i) {
-            dest[i * 2] = (byte) to.charAt(i);
-        }
-        System.arraycopy(dest, 0, xml, offset, dest.length);
-        return true;
-    }
-
-    private boolean findAndPatch(byte xml[], String from, String to) {
-        byte target[] = (from + '\0').getBytes();
-        int offset = findOffset(xml, target);
-        if (offset < 0)
-            return fallbackPatch(xml, from, to);
-        System.arraycopy(to.getBytes(), 0, xml, offset, to.length());
-        return true;
-    }
-
     @Override
     protected void onPreExecute() {
         dialog = ProgressDialog.show(getActivity(),
@@ -104,28 +57,17 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
 
-        // Generate a new unhide app with random package name
+        // Generate a new app with random package name
         SuFile repack = new SuFile("/data/local/tmp/repack.apk", true);
         String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
 
         try {
-            // Read whole APK into memory
-            JarMap apk = new JarMap(new FileInputStream(mm.getPackageCodePath()));
-            JarEntry je = new JarEntry(Const.ANDROID_MANIFEST);
-            byte xml[] = apk.getRawData(je);
-
-            if (!findAndPatch(xml, Const.ORIG_PKG_NAME, pkg))
+            if (!PatchAPK.patchPackageID(
+                    mm.getPackageCodePath(),
+                    new SuFileOutputStream(repack),
+                    Const.ORIG_PKG_NAME, pkg))
                 return false;
-            if (!findAndPatch(xml, Const.ORIG_PKG_NAME + ".provider", pkg + ".provider"))
-                return false;
-
-            // Write in changes
-            apk.getOutputStream(je).write(xml);
-
-            // Sign the APK
-            ZipUtils.signZip(apk, new SuFileOutputStream(repack));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {
             return false;
         }
 

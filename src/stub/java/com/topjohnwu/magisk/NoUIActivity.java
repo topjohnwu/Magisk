@@ -2,12 +2,11 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
+import com.topjohnwu.magisk.receivers.ManagerInstall;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -46,10 +45,7 @@ public class NoUIActivity extends Activity {
                             .setMessage(R.string.upgrade_msg)
                             .setPositiveButton(R.string.yes, (d, w) -> runWithPermission(new String[]
                                     { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
-                                Intent intent = new Intent(this, ManagerUpdate.class);
-                                intent.putExtra(Const.Key.INTENT_SET_LINK, apkLink);
-                                intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
-                                sendBroadcast(intent);
+                                Utils.dlAndReceive(this, new ManagerInstall(), apkLink, filename);
                                 finish();
                             }))
                             .setNegativeButton(R.string.no_thanks, (d, w) -> finish())

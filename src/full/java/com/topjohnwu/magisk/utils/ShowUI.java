@@ -113,7 +113,7 @@ public class ShowUI {
                 .setPositiveButton(R.string.yes, (d, i) -> {
                     Utils.dlAndReceive(activity, new DownloadReceiver() {
                         @Override
-                        public void onDownloadDone(Uri uri) {
+                        public void onDownloadDone(Context context, Uri uri) {
                             new InstallMagisk(activity, uri).exec();
                         }
                     }, mm.magiskLink, filename);
@@ -167,7 +167,7 @@ public class ShowUI {
                                                     activity,
                                                     new DownloadReceiver() {
                                                         @Override
-                                                        public void onDownloadDone(Uri uri) {
+                                                        public void onDownloadDone(Context context, Uri uri) {
                                                             Intent intent = new Intent(mm, FlashActivity.class);
                                                             intent.setData(uri)
                                                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -185,7 +185,7 @@ public class ShowUI {
                                 case 0:
                                     receiver = new DownloadReceiver() {
                                         @Override
-                                        public void onDownloadDone(Uri uri) {
+                                        public void onDownloadDone(Context context, Uri uri) {
                                             SnackbarMaker.showUri(activity, uri);
                                         }
                                     };
@@ -196,7 +196,7 @@ public class ShowUI {
                                         return;
                                     receiver = new DownloadReceiver() {
                                         @Override
-                                        public void onDownloadDone(Uri uri) {
+                                        public void onDownloadDone(Context context, Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                 .putExtra(Const.Key.FLASH_SET_BOOT, boot)
@@ -221,7 +221,7 @@ public class ShowUI {
                                         return;
                                     receiver = new DownloadReceiver() {
                                         @Override
-                                        public void onDownloadDone(Uri uri) {
+                                        public void onDownloadDone(Context context, Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
                                             intent.setData(uri)
                                                     .putExtra(Const.Key.FLASH_SET_BOOT, boot)

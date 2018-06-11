@@ -32,7 +32,7 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                 switch (status) {
                     case DownloadManager.STATUS_SUCCESSFUL:
                         Uri uri = Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
-                        onDownloadDone(uri);
+                        onDownloadDone(context, uri);
                         break;
                     default:
                         MagiskManager.toast(R.string.download_file_error, Toast.LENGTH_LONG);
@@ -55,5 +55,5 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
         return this;
     }
 
-    public abstract void onDownloadDone(Uri uri);
+    public abstract void onDownloadDone(Context context, Uri uri);
 }

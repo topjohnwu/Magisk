@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.asyncs;
 import android.app.Activity;
 
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -13,7 +13,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
