@@ -43,6 +43,7 @@ LOCAL_SRC_FILES := \
 	core/log_monitor.c \
 	core/bootstages.c \
 	core/socket.c \
+	core/db.c \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
@@ -51,7 +52,6 @@ LOCAL_SRC_FILES := \
 	resetprop/system_properties.cpp \
 	su/su.c \
 	su/activity.c \
-	su/db.c \
 	su/pts.c \
 	su/su_daemon.c \
 	su/su_socket.c \

@@ -8,6 +8,7 @@
 
 #define MAGISK_VER_STR  xstr(MAGISK_VERSION) ":MAGISK"
 #define SOCKET_NAME     "d30138f2310a9fb9c54a3e0c21f58591"
+#define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 
 #ifndef ARG_MAX
 #define ARG_MAX 4096
