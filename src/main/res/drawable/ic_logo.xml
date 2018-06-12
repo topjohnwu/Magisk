@@ -6,8 +6,6 @@
         </shape>
     </item>
 
-    <item
-        android:drawable="@drawable/ic_magisk"
-        android:left="18dp" android:right="18dp" android:top="18dp" android:bottom="18dp" />
+    <item android:drawable="@drawable/ic_magisk" />
 
 </layer-list>
