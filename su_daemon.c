@@ -31,7 +31,7 @@
 #define LOCK_LIST()    pthread_mutex_lock(&list_lock)
 #define LOCK_UID()     pthread_mutex_lock(&info->lock)
 #define UNLOCK_LIST()  pthread_mutex_unlock(&list_lock)
-#define UNLOCK_UID()   pthread_mutex_unlock(&info->lock)
+#define UNLOCK_UID()   pthread_mutex_unlock(&ctx.info->lock)
 
 static struct list_head active_list, waiting_list;
 static pthread_t su_collector = 0;
@@ -88,11 +88,41 @@ static void *collector(void *args) {
 	}
 }
 
-void su_daemon_receiver(int client, struct ucred *credential) {
-	LOGD("su: request from client: %d\n", client);
+static void database_check(struct su_info *info) {
+	int uid = info->uid;
+	sqlite3 *db = get_magiskdb();
+	if (db) {
+		get_db_settings(db, -1, &info->dbs);
+		get_db_strings(db, -1, &info->str);
 
+		// Check multiuser settings
+		switch (info->dbs.v[SU_MULTIUSER_MODE]) {
+			case MULTIUSER_MODE_OWNER_ONLY:
+				if (info->uid / 100000) {
+					uid = -1;
+					info->access = NO_SU_ACCESS;
+				}
+				break;
+			case MULTIUSER_MODE_OWNER_MANAGED:
+				uid = info->uid % 100000;
+				break;
+			case MULTIUSER_MODE_USER:
+			default:
+				break;
+		}
+
+		if (uid > 0)
+			get_uid_policy(db, uid, &info->access);
+		sqlite3_close(db);
+	}
+
+	// We need to check our manager
+	if (info->access.log || info->access.notify)
+		validate_manager(info->str.s[SU_REQUESTER], uid / 100000, &info->st);
+}
+
+static struct su_info *get_su_info(unsigned uid) {
 	struct su_info *info = NULL, *node;
-	int new_request = 0;
 
 	LOCK_LIST();
 
@@ -104,7 +134,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 	// Search for existing in the active list
 	list_for_each(node, &active_list, struct su_info, pos) {
-		if (node->uid == credential->uid) {
+		if (node->uid == uid) {
 			info = node;
 			break;
 		}
@@ -112,10 +142,11 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 	// If no exist, create a new request
 	if (info == NULL) {
-		new_request = 1;
 		info = malloc(sizeof(*info));
-		info->uid = credential->uid;
-		info->policy = QUERY;
+		info->uid = uid;
+		info->dbs = DEFAULT_DB_SETTINGS;
+		info->access = DEFAULT_SU_ACCESS;
+		INIT_DB_STRINGS(&info->str);
 		info->ref = 0;
 		info->count = 0;
 		pthread_mutex_init(&info->lock, NULL);
@@ -128,65 +159,85 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
 
-	// Default values
-	struct su_context ctx = {
-		.info = info,
-		.to = {
-			.uid = UID_ROOT,
-			.login = 0,
-			.keepenv = 0,
-			.shell = DEFAULT_SHELL,
-			.command = NULL,
-		},
-		.pid = credential->pid,
-		.notify = new_request,
-	};
-
 	// Lock before the policy is determined
 	LOCK_UID();
 
-	// Not cached, do the checks
-	if (info->policy == QUERY) {
-		// Get data from database
-		database_check(&ctx);
+	if (info->access.policy == QUERY) {
+		//  Not cached, get data from database
+		database_check(info);
 
-		// Check requester
-		if (info->policy == QUERY) {
-			if (info->st.st_gid != info->st.st_uid) {
-				LOGE("Bad uid/gid %d/%d for Superuser Requestor", info->st.st_gid, info->st.st_uid);
-				info->policy = DENY;
-				ctx.notify = 0;
-			} else if ((info->uid % 100000) == (info->st.st_uid % 100000)) {
-				info->policy = ALLOW;
-				info->root_access = ROOT_ACCESS_APPS_AND_ADB;
-				ctx.notify = 0;
-			}
+		// Check su access settings
+		switch (info->dbs.v[ROOT_ACCESS]) {
+			case ROOT_ACCESS_DISABLED:
+				LOGE("Root access is disabled!\n");
+				info->access = NO_SU_ACCESS;
+				break;
+			case ROOT_ACCESS_ADB_ONLY:
+				if (info->uid != UID_SHELL) {
+					LOGE("Root access is disabled for ADB!\n");
+					info->access = NO_SU_ACCESS;
+				}
+				break;
+			case ROOT_ACCESS_APPS_ONLY:
+				if (info->uid == UID_SHELL) {
+					LOGE("Root access limited to ADB only!\n");
+					info->access = NO_SU_ACCESS;
+				}
+				break;
+			case ROOT_ACCESS_APPS_AND_ADB:
+			default:
+				break;
 		}
 
-		// always allow if it's root
-		if (info->uid == UID_ROOT) {
-			info->policy = ALLOW;
-			info->root_access = ROOT_ACCESS_APPS_AND_ADB;
-			ctx.notify = 0;
-		}
+		// If it's the manager, allow it silently
+		if ((info->uid % 100000) == (info->st.st_uid % 100000))
+			info->access = SILENT_SU_ACCESS;
 
-		// If still not determined, open a pipe and wait for results
-		if (info->policy == QUERY)
-			xpipe2(ctx.pipefd, O_CLOEXEC);
+		// Allow if it's root
+		if (info->uid == UID_ROOT)
+			info->access = SILENT_SU_ACCESS;
+
+		// If still not determined, check if manager exists
+		if (info->access.policy == QUERY && info->str.s[SU_REQUESTER][0] == '\0')
+			info->access = NO_SU_ACCESS;
 	}
+	return info;
+}
 
-	// Fork a new process, the child process will need to setsid,
-	// open a pseudo-terminal if needed, and will eventually run exec
-	// The parent process will wait for the result and
-	// send the return code back to our client
+void su_daemon_receiver(int client, struct ucred *credential) {
+	LOGD("su: request from client: %d\n", client);
+
+	// Default values
+	struct su_context ctx = {
+			.info = get_su_info(credential->uid),
+			.to = {
+					.uid = UID_ROOT,
+					.login = 0,
+					.keepenv = 0,
+					.shell = DEFAULT_SHELL,
+					.command = NULL,
+			},
+			.pid = credential->pid,
+			.pipefd = { -1, -1 }
+	};
+
+	// If still not determined, open a pipe and wait for results
+	if (ctx.info->access.policy == QUERY)
+		xpipe2(ctx.pipefd, O_CLOEXEC);
+
+	/* Fork a new process, the child process will need to setsid,
+	 * open a pseudo-terminal if needed, and will eventually run exec
+	 * The parent process will wait for the result and
+	 * send the return code back to our client
+	 */
 	int child = fork();
 	if (child < 0)
 		PLOGE("fork");
 
 	if (child) {
 		// Wait for results
-		if (info->policy == QUERY) {
-			xxread(ctx.pipefd[0], &info->policy, sizeof(info->policy));
+		if (ctx.pipefd[0] >= 0) {
+			xxread(ctx.pipefd[0], &ctx.info->access.policy, sizeof(policy_t));
 			close(ctx.pipefd[0]);
 			close(ctx.pipefd[1]);
 		}
@@ -223,7 +274,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 		// Decrement reference count
 		LOCK_LIST();
-		--info->ref;
+		--ctx.info->ref;
 		UNLOCK_LIST();
 
 		return;
@@ -276,7 +327,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	char *pts_slave = read_string(client);
 	LOGD("su: pts_slave=[%s]\n", pts_slave);
 
-	// The the FDs for each of the streams
+	// The FDs for each of the streams
 	int infd  = recv_fd(client);
 	int outfd = recv_fd(client);
 	int errfd = recv_fd(client);
@@ -286,12 +337,12 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	close(client);
 
 	if (pts_slave[0]) {
-		//Check pts_slave file is owned by daemon_from_uid
-		struct stat stbuf;
-		xstat(pts_slave, &stbuf);
+		// Check pts_slave file is owned by daemon_from_uid
+		struct stat st;
+		xstat(pts_slave, &st);
 
-		//If caller is not root, ensure the owner of pts_slave is the caller
-		if(stbuf.st_uid != info->uid && info->uid != 0) {
+		// If caller is not root, ensure the owner of pts_slave is the caller
+		if(st.st_uid != credential->uid && credential->uid != 0) {
 			LOGE("su: Wrong permission of pts_slave");
 			exit2(1);
 		}

@@ -45,7 +45,7 @@ static void silent_run(char* const args[]) {
 }
 
 static int setup_user(struct su_context *ctx, char* user) {
-	switch (ctx->info->multiuser_mode) {
+	switch (ctx->info->dbs.v[SU_MULTIUSER_MODE]) {
 	case MULTIUSER_MODE_OWNER_ONLY:   /* Should already be denied if not owner */
 	case MULTIUSER_MODE_OWNER_MANAGED:
 		sprintf(user, "%d", 0);
@@ -59,7 +59,7 @@ static int setup_user(struct su_context *ctx, char* user) {
 
 void app_send_result(struct su_context *ctx, policy_t policy) {
 	char fromUid[16];
-	if (ctx->info->multiuser_mode == MULTIUSER_MODE_OWNER_MANAGED)
+	if (ctx->info->dbs.v[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED)
 		sprintf(fromUid, "%d", ctx->info->uid % 100000);
 	else
 		sprintf(fromUid, "%d", ctx->info->uid);
@@ -74,7 +74,7 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	int notify = setup_user(ctx, user);
 
 	char activity[128];
-	sprintf(activity, ACTION_RESULT, ctx->info->pkg_name);
+	sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_REQUESTER]);
 
 	// Send notice to manager, enable logging
 	char *result_command[] = {
@@ -113,7 +113,7 @@ void app_send_request(struct su_context *ctx) {
 	int notify = setup_user(ctx, user);
 
 	char activity[128];
-	sprintf(activity, ACTION_REQUEST, ctx->info->pkg_name);
+	sprintf(activity, ACTION_REQUEST, ctx->info->str.s[SU_REQUESTER]);
 
 	char *request_command[] = {
 		AM_PATH, "start", "-n",
@@ -128,7 +128,7 @@ void app_send_request(struct su_context *ctx) {
 	// Send notice to user to tell them root is managed by owner
 	if (notify) {
 		sprintf(user, "%d", notify);
-		sprintf(activity, ACTION_RESULT, ctx->info->pkg_name);
+		sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_REQUESTER]);
 		char *notify_command[] = {
 			AM_PATH, "broadcast", "-n",
 			activity,

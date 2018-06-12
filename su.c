@@ -104,7 +104,7 @@ void set_identity(unsigned uid) {
 static __attribute__ ((noreturn)) void allow() {
 	char* argv[] = { NULL, NULL, NULL, NULL };
 
-	if (su_ctx->notify)
+	if (su_ctx->info->access.notify || su_ctx->info->access.log)
 		app_send_result(su_ctx, ALLOW);
 
 	if (su_ctx->to.login)
@@ -129,7 +129,7 @@ static __attribute__ ((noreturn)) void allow() {
 }
 
 static __attribute__ ((noreturn)) void deny() {
-	if (su_ctx->notify)
+	if (su_ctx->info->access.notify || su_ctx->info->access.log)
 		app_send_result(su_ctx, DENY);
 
 	LOGW("su: request rejected (%u->%u)", su_ctx->info->uid, su_ctx->to.uid);
@@ -140,7 +140,7 @@ static __attribute__ ((noreturn)) void deny() {
 static void socket_cleanup() {
 	if (su_ctx && su_ctx->sock_path[0]) {
 		unlink(su_ctx->sock_path);
-		su_ctx->sock_path[0] = 0;
+		su_ctx->sock_path[0] = '\0';
 	}
 }
 
@@ -151,8 +151,9 @@ static void cleanup_signal(int sig) {
 
 __attribute__ ((noreturn)) void exit2(int status) {
 	// Handle the pipe, or the daemon will get stuck
-	if (su_ctx->info->policy == QUERY) {
-		xwrite(su_ctx->pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+	if (su_ctx->pipefd[0] >= 0) {
+		int i = DENY;
+		xwrite(su_ctx->pipefd[1], &i, sizeof(i));
 		close(su_ctx->pipefd[0]);
 		close(su_ctx->pipefd[1]);
 	}
@@ -215,7 +216,6 @@ int su_daemon_main(int argc, char **argv) {
 		case 'c':
 			su_ctx->to.command = concat_commands(argc, argv);
 			optind = argc;
-			su_ctx->notify = 1;
 			break;
 		case 'h':
 			usage(EXIT_SUCCESS);
@@ -240,7 +240,7 @@ int su_daemon_main(int argc, char **argv) {
 			// Do nothing, placed here for legacy support :)
 			break;
 		case 'M':
-			su_ctx->info->mnt_ns = NAMESPACE_MODE_GLOBAL;
+			su_ctx->info->dbs.v[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
 			break;
 		default:
 			/* Bionic getopt_long doesn't terminate its error output by newline */
@@ -265,7 +265,7 @@ int su_daemon_main(int argc, char **argv) {
 	}
 
 	// Handle namespaces
-	switch (su_ctx->info->mnt_ns) {
+	switch (su_ctx->info->dbs.v[SU_MNT_NS]) {
 	case NAMESPACE_MODE_GLOBAL:
 		LOGD("su: use global namespace\n");
 		break;
@@ -285,30 +285,8 @@ int su_daemon_main(int argc, char **argv) {
 	// Change directory to cwd
 	chdir(su_ctx->cwd);
 
-	// Check root_access configuration
-	switch (su_ctx->info->root_access) {
-	case ROOT_ACCESS_DISABLED:
-		LOGE("Root access is disabled!\n");
-		exit(EXIT_FAILURE);
-	case ROOT_ACCESS_APPS_ONLY:
-		if (su_ctx->info->uid == UID_SHELL) {
-			LOGE("Root access is disabled for ADB!\n");
-			exit(EXIT_FAILURE);
-		}
-		break;
-	case ROOT_ACCESS_ADB_ONLY:
-		if (su_ctx->info->uid != UID_SHELL) {
-			LOGE("Root access limited to ADB only!\n");
-			exit(EXIT_FAILURE);
-		}
-		break;
-	case ROOT_ACCESS_APPS_AND_ADB:
-	default:
-		break;
-	}
-
 	// New request or no db exist, notify user for response
-	if (su_ctx->info->policy == QUERY && su_ctx->info->st.st_uid != 0) {
+	if (su_ctx->pipefd[0] >= 0) {
 		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
 		setup_sighandlers(cleanup_signal);
 
@@ -326,17 +304,17 @@ int su_daemon_main(int argc, char **argv) {
 		socket_cleanup();
 
 		if (strcmp(result, "socket:ALLOW") == 0)
-			su_ctx->info->policy = ALLOW;
+			su_ctx->info->access.policy = ALLOW;
 		else
-			su_ctx->info->policy = DENY;
+			su_ctx->info->access.policy = DENY;
 
 		// Report the policy to main daemon
-		xwrite(su_ctx->pipefd[1], &su_ctx->info->policy, sizeof(su_ctx->info->policy));
+		xwrite(su_ctx->pipefd[1], &su_ctx->info->access.policy, sizeof(policy_t));
 		close(su_ctx->pipefd[0]);
 		close(su_ctx->pipefd[1]);
 	}
 
-	if (su_ctx->info->policy == ALLOW)
+	if (su_ctx->info->access.policy == ALLOW)
 		allow();
 	else
 		deny();
