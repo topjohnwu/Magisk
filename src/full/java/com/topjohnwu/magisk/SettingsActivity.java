@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk;
 
-import android.Manifest;
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
@@ -23,9 +23,10 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
+import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -166,15 +167,18 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 } else {
                     if (Utils.checkNetworkStatus()) {
                         restoreManager.setOnPreferenceClickListener((pref) -> {
-                            runWithPermission(getActivity(),
-                                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
-                                        Intent intent = new Intent(mm, ManagerUpdate.class);
-                                        intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
-                                        intent.putExtra(Const.Key.INTENT_SET_FILENAME,
-                                                Utils.fmt("MagiskManager-v%s(%d).apk",
-                                                        mm.remoteManagerVersionString, mm.remoteManagerVersionCode));
-                                        mm.sendBroadcast(intent);
-                                    });
+                            Utils.dlAndReceive(
+                                getActivity(), new DownloadReceiver() {
+                                    @Override
+                                    public void onDownloadDone(Context context, Uri uri) {
+                                        mm.dumpPrefs();
+                                        if (RootUtils.cmdResult("pm install " + uri.getPath()))
+                                            RootUtils.uninstallPkg(context.getPackageName());
+                                    }
+                                },
+                                mm.managerLink,
+                                Utils.fmt("MagiskManager-v%s.apk", mm.remoteManagerVersionString)
+                            );
                             return true;
                         });
                     } else {

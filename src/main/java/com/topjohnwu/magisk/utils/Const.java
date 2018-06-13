@@ -94,7 +94,7 @@ public class Const {
         public static final String ROOT_ACCESS = "root_access";
         public static final String SU_MULTIUSER_MODE = "multiuser_mode";
         public static final String SU_MNT_NS = "mnt_ns";
-        public static final String SU_REQUESTER = "requester";
+        public static final String SU_MANAGER = "requester";
         public static final String SU_REQUEST_TIMEOUT = "su_request_timeout";
         public static final String SU_AUTO_RESPONSE = "su_auto_response";
         public static final String SU_NOTIFICATION = "su_notification";

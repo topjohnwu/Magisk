@@ -277,6 +277,10 @@ public class RequestActivity extends Activity {
                 if (policy == null) {
                     policy = new Policy(uid, pm);
                 }
+
+                /* Never allow com.topjohnwu.magisk (could be malware) */
+                if (TextUtils.equals(policy.packageName, Const.ORIG_PKG_NAME))
+                    return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.PatchAPK;

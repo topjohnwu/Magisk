@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -131,25 +130,19 @@ public class MagiskManager extends Application implements Shell.Container {
         });
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // Handle duplicate package
-        if (!getPackageName().equals(Const.ORIG_PKG_NAME)) {
-            try {
-                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
-                Intent intent = getPackageManager().getLaunchIntentForPackage(Const.ORIG_PKG_NAME);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return;
-            } catch (PackageManager.NameNotFoundException ignored) { /* Expected */ }
-        }
-
         mDB = MagiskDatabaseHelper.getInstance(this);
 
-        String pkg = mDB.getStrings(Const.Key.SU_REQUESTER, Const.ORIG_PKG_NAME);
-        if (getPackageName().equals(Const.ORIG_PKG_NAME) && !pkg.equals(Const.ORIG_PKG_NAME)) {
-            mDB.setStrings(Const.Key.SU_REQUESTER, null);
+        String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
+        if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
+            mDB.setStrings(Const.Key.SU_MANAGER, null);
             RootUtils.uninstallPkg(pkg);
-            mDB = MagiskDatabaseHelper.getInstance(this);
+        }
+        if (TextUtils.equals(pkg, getPackageName())) {
+            try {
+                // We are the manager, remove com.topjohnwu.magisk as it could be malware
+                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
+                RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
+            } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
         setLocale();
