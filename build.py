@@ -147,6 +147,15 @@ def build_binary(args):
 			with open(os.path.join('native', 'out', arch, 'binaries_arch_xz.h'), 'w') as out:
 				with open(bin_file, 'rb') as src:
 					xz_dump(src, out, 'magisk_xz')
+
+		stub_apk = os.path.join(config['outdir'], 'stub-release.apk')
+		if not os.path.exists(stub_apk):
+			error('Build release stub APK before building "magiskinit"')
+
+		with open(os.path.join('native', 'out', 'binaries_xz.h'), 'w') as out:
+			with open(stub_apk, 'rb') as src:
+				xz_dump(src, out, 'manager_xz')
+
 		flags += ' B_INIT=1'
 		other = True
 

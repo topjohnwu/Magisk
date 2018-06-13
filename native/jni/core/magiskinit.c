@@ -39,6 +39,7 @@
 #include <lzma.h>
 #include <cil/cil.h>
 
+#include "binaries_xz.h"
 #include "binaries_arch_xz.h"
 
 #include "magiskrc.h"
@@ -327,6 +328,14 @@ static int dump_magisk(const char *path, mode_t mode) {
 	return ret;
 }
 
+static int dump_manager(const char *path, mode_t mode) {
+	unlink(path);
+	int fd = creat(path, mode);
+	int ret = unxz(manager_xz, sizeof(manager_xz), fd);
+	close(fd);
+	return ret;
+}
+
 static int dump_magiskrc(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
 	write(fd, magiskrc, sizeof(magiskrc));
@@ -362,6 +371,8 @@ int main(int argc, char *argv[]) {
 	if (argc > 1 && strcmp(argv[1], "-x") == 0) {
 		if (strcmp(argv[2], "magisk") == 0)
 			return dump_magisk(argv[3], 0755);
+		else if (strcmp(argv[2], "manager") == 0)
+			return dump_manager(argv[3], 0644);
 		else if (strcmp(argv[2], "magiskrc") == 0)
 			return dump_magiskrc(argv[3], 0755);
 	}

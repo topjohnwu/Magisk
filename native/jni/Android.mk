@@ -72,6 +72,7 @@ LOCAL_STATIC_LIBRARIES := libsepol liblzma
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
+	out \
 	out/$(TARGET_ARCH_ABI) \
 	$(LIBSEPOL) \
 	$(LIBLZMA)
