@@ -74,7 +74,7 @@ void app_send_result(struct su_context *ctx, policy_t policy) {
 	int notify = setup_user(ctx, user);
 
 	char activity[128];
-	sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_REQUESTER]);
+	sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_MANAGER]);
 
 	// Send notice to manager, enable logging
 	char *result_command[] = {
@@ -113,7 +113,7 @@ void app_send_request(struct su_context *ctx) {
 	int notify = setup_user(ctx, user);
 
 	char activity[128];
-	sprintf(activity, ACTION_REQUEST, ctx->info->str.s[SU_REQUESTER]);
+	sprintf(activity, ACTION_REQUEST, ctx->info->str.s[SU_MANAGER]);
 
 	char *request_command[] = {
 		AM_PATH, "start", "-n",
@@ -128,7 +128,7 @@ void app_send_request(struct su_context *ctx) {
 	// Send notice to user to tell them root is managed by owner
 	if (notify) {
 		sprintf(user, "%d", notify);
-		sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_REQUESTER]);
+		sprintf(activity, ACTION_RESULT, ctx->info->str.s[SU_MANAGER]);
 		char *notify_command[] = {
 			AM_PATH, "broadcast", "-n",
 			activity,

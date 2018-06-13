@@ -106,7 +106,7 @@ static void database_check(struct su_info *info) {
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)
-		validate_manager(info->str.s[SU_REQUESTER], uid / 100000, &info->manager_stat);
+		validate_manager(info->str.s[SU_MANAGER], uid / 100000, &info->manager_stat);
 }
 
 static struct su_info *get_su_info(unsigned uid) {
@@ -191,7 +191,7 @@ static struct su_info *get_su_info(unsigned uid) {
 			info->access = SILENT_SU_ACCESS;
 
 		// If still not determined, check if manager exists
-		if (info->access.policy == QUERY && info->str.s[SU_REQUESTER][0] == '\0')
+		if (info->access.policy == QUERY && info->str.s[SU_MANAGER][0] == '\0')
 			info->access = NO_SU_ACCESS;
 	}
 	return info;
