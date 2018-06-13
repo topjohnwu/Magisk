@@ -174,13 +174,13 @@ static struct su_info *get_su_info(unsigned uid) {
 				break;
 			case ROOT_ACCESS_ADB_ONLY:
 				if (info->uid != UID_SHELL) {
-					LOGE("Root access is disabled for ADB!\n");
+					LOGE("Root access limited to ADB only!\n");
 					info->access = NO_SU_ACCESS;
 				}
 				break;
 			case ROOT_ACCESS_APPS_ONLY:
 				if (info->uid == UID_SHELL) {
-					LOGE("Root access limited to ADB only!\n");
+					LOGE("Root access is disabled for ADB!\n");
 					info->access = NO_SU_ACCESS;
 				}
 				break;
@@ -221,6 +221,13 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 			.pipefd = { -1, -1 }
 	};
 
+	// Fail fast
+	if (ctx.info->access.policy == DENY && !ctx.info->access.log && !ctx.info->access.notify) {
+		UNLOCK_UID();
+		write_int(client, DENY);
+		return;
+	}
+
 	// If still not determined, open a pipe and wait for results
 	if (ctx.info->access.policy == QUERY)
 		xpipe2(ctx.pipefd, O_CLOEXEC);
@@ -230,10 +237,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	 * The parent process will wait for the result and
 	 * send the return code back to our client
 	 */
-	int child = fork();
-	if (child < 0)
-		PLOGE("fork");
-
+	int child = xfork();
 	if (child) {
 		// Wait for results
 		if (ctx.pipefd[0] >= 0) {
@@ -284,7 +288,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	UNLOCK_UID();
 
 	// ack
-	write_int(client, 1);
+	write_int(client, 0);
 
 	// Become session leader
 	xsetsid();
@@ -445,7 +449,11 @@ int su_client_main(int argc, char *argv[]) {
 	}
 
 	// Wait for acknowledgement from daemon
-	read_int(socketfd);
+	if (read_int(socketfd)) {
+		// Fast fail
+		fprintf(stderr, "%s\n", strerror(EACCES));
+		return DENY;
+	}
 
 	if (atty & ATTY_IN) {
 		setup_sighandlers(sighandler);
