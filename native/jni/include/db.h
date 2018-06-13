@@ -66,7 +66,7 @@ NAMESPACE_MODE_REQUESTER \
 
 // Strings indices
 enum {
-	SU_REQUESTER = 0
+	SU_MANAGER = 0
 };
 
 struct db_strings {

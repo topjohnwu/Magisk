@@ -63,7 +63,7 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 	}
 	if (key >= 0) {
 		strcpy(dbs->s[key], value);
-		LOGD("su_db: query %s=[%s]\n", DB_SETTING_KEYS[key], value);
+		LOGD("su_db: query %s=[%s]\n", DB_STRING_KEYS[key], value);
 	}
 	return 0;
 }
