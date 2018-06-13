@@ -23,7 +23,7 @@ static int policy_cb(void *v, int col_num, char **data, char **col_name) {
 		else if (strcmp(col_name[i], "notification") == 0)
 			su->notify = atoi(data[i]);
 	}
-	LOGD("su_db: query policy=[%d] log=[%d] notify=[%d]\n", su->policy, su->log, su->notify);
+	LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", su->policy, su->log, su->notify);
 	return 0;
 }
 
@@ -42,7 +42,7 @@ static int settings_cb(void *v, int col_num, char **data, char **col_name) {
 	}
 	if (key >= 0) {
 		dbs->v[key] = value;
-		LOGD("su_db: query %s=[%d]\n", DB_SETTING_KEYS[key], value);
+		LOGD("magiskdb: query %s=[%d]\n", DB_SETTING_KEYS[key], value);
 	}
 	return 0;
 }
@@ -63,7 +63,7 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 	}
 	if (key >= 0) {
 		strcpy(dbs->s[key], value);
-		LOGD("su_db: query %s=[%s]\n", DB_STRING_KEYS[key], value);
+		LOGD("magiskdb: query %s=[%s]\n", DB_STRING_KEYS[key], value);
 	}
 	return 0;
 }
@@ -83,6 +83,8 @@ sqlite3 *get_magiskdb() {
 }
 
 int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
+	if (db == NULL)
+		return 1;
 	char *err;
 	if (key > 0) {
 		char query[128];
@@ -99,6 +101,8 @@ int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
 }
 
 int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
+	if (db == NULL)
+		return 1;
 	char *err;
 	if (key > 0) {
 		char query[128];
@@ -115,6 +119,8 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
 }
 
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su) {
+	if (db == NULL)
+		return 1;
 	char query[256], *err;
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
 			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(NULL));

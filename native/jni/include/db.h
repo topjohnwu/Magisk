@@ -2,6 +2,7 @@
 #define DB_H
 
 #include <sqlite3.h>
+#include <sys/stat.h>
 
 /***************
  * DB Settings *

@@ -16,6 +16,7 @@
 #include <selinux/selinux.h>
 
 #include "magisk.h"
+#include "db.h"
 #include "utils.h"
 #include "daemon.h"
 #include "resetprop.h"
@@ -454,6 +455,30 @@ static int prepare_img() {
 	return 0;
 }
 
+void install_apk(const char *apk) {
+	setfilecon(apk, "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	while (1) {
+		sleep(5);
+		LOGD("apk_install: attempting to install APK");
+		int apk_res = -1, pid;
+		pid = exec_command(1, &apk_res, NULL, "/system/bin/pm", "install", "-r", apk, NULL);
+		if (pid != -1) {
+			int err = 0;
+			while (fdgets(buf, PATH_MAX, apk_res) > 0) {
+				LOGD("apk_install: %s", buf);
+				err |= strstr(buf, "Error:") != NULL;
+			}
+			waitpid(pid, NULL, 0);
+			close(apk_res);
+			// Keep trying until pm is started
+			if (err)
+				continue;
+			break;
+		}
+	}
+	unlink(apk);
+}
+
 /****************
  * Entry points *
  ****************/
@@ -806,31 +831,21 @@ void late_start(int client) {
 	exec_module_script("service");
 
 core_only:
-	// Install Magisk Manager if exists
 	if (access(MANAGERAPK, F_OK) == 0) {
+		// Install Magisk Manager if exists
 		rename(MANAGERAPK, "/data/magisk.apk");
-		setfilecon("/data/magisk.apk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
-		while (1) {
-			sleep(5);
-			LOGD("apk_install: attempting to install APK");
-			int apk_res = -1, pid;
-			pid = exec_command(1, &apk_res, NULL,
-				"/system/bin/pm", "install", "-r", "/data/magisk.apk", NULL);
-			if (pid != -1) {
-				int err = 0;
-				while (fdgets(buf, PATH_MAX, apk_res) > 0) {
-					LOGD("apk_install: %s", buf);
-					err |= strstr(buf, "Error:") != NULL;
-				}
-				waitpid(pid, NULL, 0);
-				close(apk_res);
-				// Keep trying until pm is started
-				if (err)
-					continue;
-				break;
-			}
+		install_apk("/data/magisk.apk");
+	} else {
+		// Check whether we have a valid manager installed
+		sqlite3 *db = get_magiskdb();
+		struct db_strings str;
+		INIT_DB_STRINGS(&str);
+		get_db_strings(db, SU_MANAGER, &str);
+		if (validate_manager(str.s[SU_MANAGER], 0, NULL)) {
+			// There is no manager installed, install the stub
+			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", NULL);
+			install_apk("/data/magisk.apk");
 		}
-		unlink("/data/magisk.apk");
 	}
 
 	// All boot stage done, cleanup everything
