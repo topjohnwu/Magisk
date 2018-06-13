@@ -44,7 +44,7 @@ int socket_create_temp(char *path, size_t len) {
 
     // Set attributes so requester can access it
     setfilecon(path, "u:object_r:"SEPOL_FILE_DOMAIN":s0");
-    chown(path, su_ctx->info->st.st_uid, su_ctx->info->st.st_gid);
+    chown(path, su_ctx->info->manager_stat.st_uid, su_ctx->info->manager_stat.st_gid);
 
     return fd;
 }

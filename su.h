@@ -28,7 +28,7 @@ struct su_info {
 	struct db_settings dbs;
 	struct db_strings str;
 	struct su_access access;
-	struct stat st;
+	struct stat manager_stat;
 
 	/* These should be guarded with global list lock */
 	struct list_head pos;

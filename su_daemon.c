@@ -33,11 +33,8 @@
 #define UNLOCK_LIST()  pthread_mutex_unlock(&list_lock)
 #define UNLOCK_UID()   pthread_mutex_unlock(&ctx.info->lock)
 
-static struct list_head active_list, waiting_list;
-static pthread_t su_collector = 0;
+static struct list_head info_cache = { .prev = &info_cache, .next = &info_cache };
 static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
-
-int pipefd[2];
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -62,29 +59,20 @@ static void sighandler(int sig) {
 	}
 }
 
-// Maintain the lists periodically
-static void *collector(void *args) {
-	LOGD("su: collector started\n");
-	struct su_info *node;
-	while(1) {
+static void *info_collector(void *node) {
+	struct su_info *info = node;
+	while (1) {
 		sleep(1);
-		LOCK_LIST();
-		list_for_each(node, &active_list, struct su_info, pos) {
-			if (--node->clock == 0) {
-				// Timeout, move to waiting list
-				__ = list_pop(&node->pos);
-				list_insert_end(&waiting_list, &node->pos);
-			}
+		if (info->clock && --info->clock == 0) {
+			LOCK_LIST();
+			list_pop(&info->pos);
+			UNLOCK_LIST();
 		}
-		list_for_each(node, &waiting_list, struct su_info, pos) {
-			if (node->ref == 0) {
-				// Nothing is using the info, remove it
-				__ = list_pop(&node->pos);
-				pthread_mutex_destroy(&node->lock);
-				free(node);
-			}
+		if (!info->clock && !info->ref) {
+			pthread_mutex_destroy(&info->lock);
+			free(info);
+			return NULL;
 		}
-		UNLOCK_LIST();
 	}
 }
 
@@ -118,7 +106,7 @@ static void database_check(struct su_info *info) {
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)
-		validate_manager(info->str.s[SU_REQUESTER], uid / 100000, &info->st);
+		validate_manager(info->str.s[SU_REQUESTER], uid / 100000, &info->manager_stat);
 }
 
 static struct su_info *get_su_info(unsigned uid) {
@@ -126,22 +114,18 @@ static struct su_info *get_su_info(unsigned uid) {
 
 	LOCK_LIST();
 
-	if (!su_collector) {
-		init_list_head(&active_list);
-		init_list_head(&waiting_list);
-		xpthread_create(&su_collector, NULL, collector, NULL);
-	}
-
-	// Search for existing in the active list
-	list_for_each(node, &active_list, struct su_info, pos) {
+	// Search for existing info in cache
+	list_for_each(node, &info_cache, struct su_info, pos) {
 		if (node->uid == uid) {
 			info = node;
 			break;
 		}
 	}
 
-	// If no exist, create a new request
-	if (info == NULL) {
+	int cache_miss = info == NULL;
+
+	if (cache_miss) {
+		// If cache miss, create a new one and push to cache
 		info = malloc(sizeof(*info));
 		info->uid = uid;
 		info->dbs = DEFAULT_DB_SETTINGS;
@@ -150,10 +134,19 @@ static struct su_info *get_su_info(unsigned uid) {
 		info->ref = 0;
 		info->count = 0;
 		pthread_mutex_init(&info->lock, NULL);
-		list_insert_end(&active_list, &info->pos);
+		list_insert_end(&info_cache, &info->pos);
 	}
-	info->clock = TIMEOUT;  /* Reset timer */
-	++info->ref;  /* Increment reference count */
+
+	// Update the cache status
+	info->clock = TIMEOUT;
+	++info->ref;
+
+	// Start a thread to maintain the info cache
+	if (cache_miss) {
+		pthread_t thread;
+		xpthread_create(&thread, NULL, info_collector, info);
+		pthread_detach(thread);
+	}
 
 	UNLOCK_LIST();
 
@@ -190,7 +183,7 @@ static struct su_info *get_su_info(unsigned uid) {
 		}
 
 		// If it's the manager, allow it silently
-		if ((info->uid % 100000) == (info->st.st_uid % 100000))
+		if ((info->uid % 100000) == (info->manager_stat.st_uid % 100000))
 			info->access = SILENT_SU_ACCESS;
 
 		// Allow if it's root
@@ -249,6 +242,9 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 		// The policy is determined, unlock
 		UNLOCK_UID();
 
+		// Info is now useless to us, decrement reference count
+		--ctx.info->ref;
+
 		// Wait result
 		LOGD("su: waiting child: [%d]\n", child);
 		int status, code;
@@ -276,16 +272,10 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 		act.sa_handler = SIG_DFL;
 		sigaction(SIGPIPE, &act, NULL);
 
-		// Decrement reference count
-		LOCK_LIST();
-		--ctx.info->ref;
-		UNLOCK_LIST();
-
 		return;
 	}
 
 	LOGD("su: child process started\n");
-	UNLOCK_UID();
 
 	// ack
 	write_int(client, 0);
