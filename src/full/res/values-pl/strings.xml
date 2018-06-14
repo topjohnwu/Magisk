@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
     
     <!--Welcome Activity-->
     <string name="modules">Moduły</string>
@@ -116,6 +115,10 @@
     <string name="su_db_corrupt">Baza danych SU jest uszkodzona, odtworzy nową bazę danych</string>
     <string name="cannot_check_sn_title">Nie mogę sprawdzić SafetyNet</string>
     <string name="cannot_check_sn_notice">Z powodu pewnych zmian w Usługach Google Play nie jest możliwe sprawdzenie SafetyNet w przepakowanym Magisk Managerze</string>
+	<string name="setup_done">Konfiguracja gotowa</string>
+    <string name="setup_fail">Konfiguracja nieudana</string>
+    <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
+    <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
 	
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
