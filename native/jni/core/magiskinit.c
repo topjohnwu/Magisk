@@ -75,7 +75,7 @@ struct device {
 
 static void parse_cmdline(struct cmdline *cmd) {
 	// cleanup
-	memset(cmd, 0, sizeof(&cmd));
+	memset(cmd, 0, sizeof(*cmd));
 
 	char cmdline[4096];
 	mkdir("/proc", 0555);
