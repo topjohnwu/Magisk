@@ -163,8 +163,10 @@ int magisk_main(int argc, char *argv[]) {
 	argc--;
 	argv++;
 	for (int i = 0; applet[i]; ++i) {
-		if (strcmp(basename(argv[0]), applet[i]) == 0)
+		if (strcmp(basename(argv[0]), applet[i]) == 0) {
+			strcpy(argv0, basename(argv[0]));
 			return (*applet_main[i])(argc, argv);
+		}
 	}
 
 	usage();
@@ -184,8 +186,10 @@ int main(int argc, char *argv[]) {
 
 	// Applets
 	for (int i = 0; applet[i]; ++i) {
-		if (strcmp(basename(argv[0]), applet[i]) == 0)
+		if (strcmp(basename(argv[0]), applet[i]) == 0) {
+			strcpy(argv0, basename(argv[0]));
 			return (*applet_main[i])(argc, argv);
+		}
 	}
 
 	// Not an applet
