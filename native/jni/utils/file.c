@@ -166,7 +166,6 @@ void cp_afc(const char *source, const char *destination) {
 		xmkdirs(destination, a.st.st_mode & 0777);
 		src = xopen(source, O_RDONLY | O_CLOEXEC);
 		dest = xopen(destination, O_RDONLY | O_CLOEXEC);
-		fsetattr(dest, &a);
 		clone_dir(src, dest);
 		close(src);
 		close(dest);
@@ -176,16 +175,15 @@ void cp_afc(const char *source, const char *destination) {
 			src = xopen(source, O_RDONLY);
 			dest = xopen(destination, O_WRONLY | O_CREAT | O_TRUNC);
 			xsendfile(dest, src, NULL, a.st.st_size);
-			fsetattr(src, &a);
 			close(src);
 			close(dest);
 		} else if (S_ISLNK(a.st.st_mode)) {
 			char buf[PATH_MAX];
 			xreadlink(source, buf, sizeof(buf));
 			xsymlink(buf, destination);
-			setattr(destination, &a);
 		}
 	}
+	setattr(destination, &a);
 }
 
 void clone_dir(int src, int dest) {

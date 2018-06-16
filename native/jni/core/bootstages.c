@@ -534,8 +534,15 @@ void startup() {
 	// Remove some traits of Magisk
 	unlink("/init.magisk.rc");
 
+	// GSIs will have to override /sbin/adbd with /system/bin/adbd
+	if (access("/sbin/adbd", F_OK) == 0 && access("/system/bin/adbd", F_OK) == 0) {
+		umount2("/sbin/adbd", MNT_DETACH);
+		cp_afc("/system/bin/adbd", "/sbin/adbd");
+	}
+
 	// Create hardlink mirror of /sbin to /root
 	mkdir("/root", 0750);
+	clone_attr("/sbin", "/root");
 	full_read("/sbin/magisk", &magisk, &magisk_size);
 	unlink("/sbin/magisk");
 	full_read("/sbin/magiskinit", &init, &init_size);
