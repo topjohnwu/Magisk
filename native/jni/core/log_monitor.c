@@ -106,6 +106,7 @@ static void *logger_thread(void *args) {
 }
 
 static void *magisk_log_thread(void *args) {
+	rename(LOGFILE, LOGFILE ".bak");
 	FILE *log = xfopen(LOGFILE, "w");
 	setbuf(log, NULL);
 	int pipefd[2];
