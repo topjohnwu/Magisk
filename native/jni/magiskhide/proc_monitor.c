@@ -63,7 +63,6 @@ static void lazy_unmount(const char* mountpoint) {
 
 static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
-	strcpy(argv0, "hide_daemon");
 
 	char *line, buffer[PATH_MAX];
 	struct vector mount_list;
@@ -90,19 +89,9 @@ static void hide_daemon(int pid) {
 			has_cache = 0;
 	}
 
-	// Unmout cache mounts
-	if (has_cache) {
-		vec_for_each(&mount_list, line) {
-			if (strstr(line, cache_block) && (strstr(line, " /system/") || strstr(line, " /vendor/"))) {
-				sscanf(line, "%*s %4096s", buffer);
-				lazy_unmount(buffer);
-			}
-		}
-	}
-
-	// Unmount dummy skeletons, /sbin links
+	// Unmount dummy skeletons and /sbin links
 	vec_for_each(&mount_list, line) {
-		if (strstr(line, "tmpfs /system") || strstr(line, "tmpfs /vendor") || strstr(line, "tmpfs /sbin")) {
+		if (strstr(line, "tmpfs /system/") || strstr(line, "tmpfs /vendor/") || strstr(line, "tmpfs /sbin")) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
@@ -115,20 +104,19 @@ static void hide_daemon(int pid) {
 	vec_init(&mount_list);
 	file_to_vector(buffer, &mount_list);
 
-	// Unmount any loop mounts
+	// Unmount everything under /system, /vendor, and loop mounts
 	vec_for_each(&mount_list, line) {
-		if (strstr(line, "/dev/block/loop")) {
+		if (strstr(line, "/dev/block/loop") || strstr(line, " /system/") || strstr(line, " /vendor/")) {
 			sscanf(line, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
 		free(line);
 	}
+	vec_destroy(&mount_list);
 
 exit:
 	// Send resume signal
 	kill(pid, SIGCONT);
-	// Free up memory
-	vec_destroy(&mount_list);
 	_exit(0);
 }
 

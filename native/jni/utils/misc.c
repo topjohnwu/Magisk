@@ -87,6 +87,8 @@ int check_data() {
 
 /* All the string should be freed manually!! */
 int file_to_vector(const char* filename, struct vector *v) {
+	if (access(filename, R_OK) != 0)
+		return 1;
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
