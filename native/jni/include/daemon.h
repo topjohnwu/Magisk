@@ -41,8 +41,8 @@ enum {
 
 // daemon.c
 
-void start_daemon(int post_fs_data);
-int connect_daemon(int post_fs_data);
+void start_daemon();
+int connect_daemon();
 void auto_start_magiskhide();
 
 // socket.c

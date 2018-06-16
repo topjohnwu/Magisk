@@ -135,7 +135,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	} else {
 		usage(argv[0]);
 	}
-	int fd = connect_daemon(0);
+	int fd = connect_daemon();
 	write_int(fd, req);
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
