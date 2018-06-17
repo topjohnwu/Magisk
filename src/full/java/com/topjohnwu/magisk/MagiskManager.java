@@ -125,6 +125,9 @@ public class MagiskManager extends Application implements Shell.Container {
                 }
                 shell.run(null, null,
                         "mount_partitions",
+                        "find_boot_image",
+                        "find_dtbo_image",
+                        "get_flags",
                         "run_migrations");
             }
         });
@@ -215,11 +218,8 @@ public class MagiskManager extends Application implements Shell.Container {
     }
 
     public void getDefaultInstallFlags() {
-        keepVerity = Boolean.parseBoolean(RootUtils.cmd("getvar KEEPVERITY; echo $KEEPVERITY")) ||
-                RootUtils.cmd("echo \"$DTBOIMAGE\"") != null;
-
-        keepEnc = Boolean.parseBoolean(RootUtils.cmd("getvar KEEPFORCEENCRYPT; echo $KEEPFORCEENCRYPT")) ||
-                TextUtils.equals("encrypted", RootUtils.cmd("getprop ro.crypto.state"));
+        keepVerity = Boolean.parseBoolean(RootUtils.cmd("echo $KEEPVERITY"));
+        keepEnc = Boolean.parseBoolean(RootUtils.cmd("echo $KEEPFORCEENCRYPT"));
     }
 
     public void setupUpdateCheck() {
