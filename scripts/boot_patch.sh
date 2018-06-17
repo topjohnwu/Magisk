@@ -4,18 +4,25 @@
 # Magisk Boot Image Patcher
 # by topjohnwu
 #
+# Usage: sh boot_patch.sh <bootimage>
+#
+# The following additional flags can be set in environment variables:
+# KEEPVERITY, KEEPFORCEENCRYPT, HIGHCOMP
+#
 # This script should be placed in a directory with the following files:
 #
-# File name       type      Description
+# File name          Type      Description
 #
-# boot_patch.sh   script    A script to patch boot. Expect path to boot image as parameter.
-#               (this file) The script will use binaries and files in its same directory
-#                           to complete the patching process
-# monogisk        binary    The monolithic binary to replace /init
-# magiskboot      binary    A tool to unpack boot image, decompress ramdisk, extract ramdisk
-#                           , and patch the ramdisk for Magisk support
-# chromeos        folder    This folder should store all the utilities and keys to sign
-#               (optional)  a chromeos device, used in the tablet Pixel C
+# boot_patch.sh      script    A script to patch boot. Expect path to boot image as parameter.
+#                  (this file) The script will use binaries and files in its same directory
+#                              to complete the patching process
+# util_functions.sh  script    A script which hosts all functions requires for this script
+#                              to work properly
+# magiskinit         binary    The binary to replace /init, which has the magisk binary embedded
+# magiskboot         binary    A tool to unpack boot image, decompress ramdisk, extract ramdisk,
+#                              and patch the ramdisk for Magisk support
+# chromeos           folder    This folder should store all the utilities and keys to sign
+#                  (optional)  a chromeos device. Used for Pixel C
 #
 # If the script is not running as root, then the input boot image should be a stock image
 # or have a backup included in ramdisk internally, since we cannot access the stock boot
@@ -27,21 +34,11 @@
 ##########################################################################################
 
 # Pure bash dirname implementation
-dirname_wrap() {
+getdir() {
   case "$1" in
-    */*)
-      dir=${1%/*}
-      [ -z $dir ] && echo "/" || echo $dir
-      ;;
-    *)
-      echo "."
-      ;;
+    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
+    *) echo "." ;;
   esac
-}
-
-# Pure bash basename implementation
-basename_wrap() {
-  echo ${1##*/}
 }
 
 ##########################################################################################
@@ -50,27 +47,18 @@ basename_wrap() {
 
 if [ -z $SOURCEDMODE ]; then
   # Switch to the location of the script file
-  cd "`dirname_wrap "${BASH_SOURCE:-$0}"`"
+  cd "`getdir "${BASH_SOURCE:-$0}"`"
   # Load utility functions
   . ./util_functions.sh
 fi
 
 BOOTIMAGE="$1"
-
 [ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
 
-# Presets
+# Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
+[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $HIGHCOMP ] && HIGHCOMP=false
-
-if [ -z $KEEPFORCEENCRYPT ]; then
-  if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
-    KEEPFORCEENCRYPT=true
-    ui_print "- Encrypted data detected, keep forceencrypt"
-  else
-    KEEPFORCEENCRYPT=false
-  fi
-fi
 
 chmod -R 755 .
 

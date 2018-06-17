@@ -51,24 +51,16 @@ mount_partitions
 find_boot_image
 find_dtbo_image
 
-# read override variables
-getvar KEEPVERITY
-getvar KEEPFORCEENCRYPT
-getvar BOOTIMAGE
+get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
 ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
-
-if [ ! -z $DTBOIMAGE ]; then
-  ui_print "- Found dtbo image: $DTBOIMAGE"
-  # Disable dtbo patch by default
-  [ -z $KEEPVERITY ] && KEEPVERITY=true
-fi
+[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
 
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk is only for Lollipop 5.0+ (SDK 21+)"
+[ $API -lt 21 ] && abort "! Magisk is only for Android higher than Lollipop (5.0+) (SDK 21+)"
 
 ui_print "- Device platform: $ARCH"
 

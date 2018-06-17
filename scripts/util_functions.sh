@@ -82,6 +82,32 @@ mount_partitions() {
   fi
 }
 
+get_flags() {
+  # override variables
+  getvar KEEPVERITY
+  getvar KEEPFORCEENCRYPT
+  HIGHCOMP=false
+  if [ -z $KEEPVERITY ]; then
+    KEEPVERITY=false
+    hardware=`grep_cmdline androidboot.hardware`
+    for hw in taimen walleye; do
+      if [ "$hw" = "$hardware" ]; then
+        KEEPVERITY=true
+        ui_print "- Device on whitelist, keep avb-verity"
+        break
+      fi
+    done
+  fi
+  if [ -z $KEEPFORCEENCRYPT ]; then
+    if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
+      KEEPFORCEENCRYPT=true
+      ui_print "- Encrypted data detected, keep forceencrypt"
+    else
+      KEEPFORCEENCRYPT=false
+    fi
+  fi
+}
+
 grep_cmdline() {
   REGEX="s/^$1=//p"
   sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
