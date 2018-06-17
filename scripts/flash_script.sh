@@ -48,6 +48,9 @@ ui_print "************************"
 is_mounted /data || mount /data || is_mounted /cache || mount /cache || abort "! Unable to mount partitions"
 mount_partitions
 
+find_boot_image
+find_dtbo_image
+
 # read override variables
 getvar KEEPVERITY
 getvar KEEPFORCEENCRYPT

@@ -47,32 +47,30 @@ ui_print() {
 
 mount_partitions() {
   # Check A/B slot
-  SLOT=`getprop ro.boot.slot_suffix`
-  if [ -z $SLOT ]; then
-    SLOT=_`getprop ro.boot.slot`
-    [ $SLOT = "_" ] && SLOT=
+  if [ "`grep_prop ro.build.ab_update`" = "true" ]; then
+    SLOT=`grep_cmdline androidboot.slot_suffix`
+    if [ -z $SLOT ]; then
+      SLOT=_`grep_cmdline androidboot.slot`
+      [ $SLOT = "_" ] && SLOT=
+    fi
   fi
-
-  # Check the boot image to make sure the slot actually make sense
-  find_boot_image
-  find_dtbo_image
-  [ -z $SLOT ] || ui_print "- A/B partition detected, current slot: $SLOT"
+  [ -z $SLOT ] || ui_print "- A/B partition, current slot: $SLOT"
 
   ui_print "- Mounting /system, /vendor"
-  is_mounted /system || [ -f /system/build.prop ] || mount -o ro /system 2>/dev/null
+  [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
     SYSTEMBLOCK=`find /dev/block -iname system$SLOT | head -n 1`
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
-  is_mounted /system || [ -f /system/build.prop ] || abort "! Cannot mount /system"
-  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SKIP_INITRAMFS=true || SKIP_INITRAMFS=false
-  if [ -f /system/init.rc ]; then
-    SKIP_INITRAMFS=true
+  [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
+  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+  if [ -f /system/init ]; then
+    SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   fi
-  $SKIP_INITRAMFS && ui_print "- Device skip_initramfs detected"
+  $SYSTEM_ROOT && ui_print "- Device using system_root_image"
   if [ -L /system/vendor ]; then
     # Seperate /vendor partition
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
@@ -82,6 +80,11 @@ mount_partitions() {
     fi
     is_mounted /vendor || abort "! Cannot mount /vendor"
   fi
+}
+
+grep_cmdline() {
+  REGEX="s/^$1=//p"
+  sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
@@ -95,10 +98,7 @@ grep_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE=
-  for DIR in /.backup /dev /data /cache /system; do
-    VALUE=`grep_prop $VARNAME $DIR/.magisk`
-    [ ! -z $VALUE ] && break;
-  done
+  VALUE=`grep_prop $VARNAME /.backup/.magisk /data/.magisk /cache/.magisk /system/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
@@ -106,10 +106,7 @@ find_boot_image() {
   BOOTIMAGE=
   if [ ! -z $SLOT ]; then
     BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
-  fi
-  if [ -z $BOOTIMAGE ]; then
-    # The slot info is incorrect...
-    SLOT=
+  else
     for BLOCK in ramdisk boot_a kern-a android_boot kernel boot lnx bootimg; do
       BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
       [ ! -z $BOOTIMAGE ] && break
@@ -229,8 +226,7 @@ sign_chromeos() {
 }
 
 is_mounted() {
-  TARGET="`readlink -f $1`"
-  cat /proc/mounts | grep " $TARGET " >/dev/null
+  cat /proc/mounts | grep -q " `readlink -f $1` " 2>/dev/null
   return $?
 }
 
