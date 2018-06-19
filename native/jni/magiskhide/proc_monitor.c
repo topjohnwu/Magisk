@@ -19,8 +19,7 @@
 #include "utils.h"
 #include "magiskhide.h"
 
-static char init_ns[32], zygote_ns[2][32], cache_block[256];
-static int zygote_num, has_cache = 1, pipefd[2] = { -1, -1 };
+static int pipefd[2] = { -1, -1 };
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int sig) {
@@ -40,25 +39,28 @@ static void term_thread(int sig) {
 
 static int read_namespace(const int pid, char* target, const size_t size) {
 	char path[32];
-	snprintf(path, sizeof(path), "/proc/%d/ns/mnt", pid);
+	sprintf(path, "/proc/%d/ns/mnt", pid);
 	if (access(path, R_OK) == -1)
 		return 1;
 	xreadlink(path, target, size);
 	return 0;
 }
 
-static void store_zygote_ns(int pid) {
-	if (zygote_num == 2) return;
-	do {
-		usleep(500);
-		read_namespace(pid, zygote_ns[zygote_num], 32);
-	} while (strcmp(zygote_ns[zygote_num], init_ns) == 0);
-	++zygote_num;
-}
-
 static void lazy_unmount(const char* mountpoint) {
 	if (umount2(mountpoint, MNT_DETACH) != -1)
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
+}
+
+static int parse_ppid(int pid) {
+	char stat[512], path[32];
+	int fd, ppid;
+	sprintf(path, "/proc/%d/stat", pid);
+	fd = xopen(path, O_RDONLY);
+	xread(fd, stat, sizeof(stat));
+	close(fd);
+	/* PID COMM STATE PPID ..... */
+	sscanf(stat, "%*d %*s %*c %d", &ppid);
+	return ppid;
 }
 
 static void hide_daemon(int pid) {
@@ -76,18 +78,6 @@ static void hide_daemon(int pid) {
 	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
 	vec_init(&mount_list);
 	file_to_vector(buffer, &mount_list);
-
-	// Find the cache block name if not found yet
-	if (has_cache && cache_block[0] == '\0') {
-		vec_for_each(&mount_list, line) {
-			if (strstr(line, " /cache ")) {
-				sscanf(line, "%256s", cache_block);
-				break;
-			}
-		}
-		if (strlen(cache_block) == 0)
-			has_cache = 0;
-	}
 
 	// Unmount dummy skeletons and /sbin links
 	vec_for_each(&mount_list, line) {
@@ -133,31 +123,9 @@ void proc_monitor() {
 	act.sa_handler = term_thread;
 	sigaction(TERM_THREAD, &act, NULL);
 
-	cache_block[0] = '\0';
-
-	// Get the mount namespace of init
-	if (read_namespace(1, init_ns, 32)) {
+	if (access("/proc/1/ns/mnt", F_OK) != 0) {
 		LOGE("proc_monitor: Your kernel doesn't support mount namespace :(\n");
 		term_thread(TERM_THREAD);
-	}
-	LOGI("proc_monitor: init ns=%s\n", init_ns);
-
-	// Get the mount namespace of zygote
-	zygote_num = 0;
-	while(!zygote_num) {
-		// Check zygote every 10 ms
-		usleep(10000);
-		ps_filter_proc_name("zygote", store_zygote_ns);
-	}
-	ps_filter_proc_name("zygote64", store_zygote_ns);
-
-	switch(zygote_num) {
-	case 1:
-		LOGI("proc_monitor: zygote ns=%s\n", zygote_ns[0]);
-		break;
-	case 2:
-		LOGI("proc_monitor: zygote ns=%s zygote64 ns=%s\n", zygote_ns[0], zygote_ns[1]);
-		break;
 	}
 
 	// Register our listener to logcat monitor
@@ -171,8 +139,8 @@ void proc_monitor() {
 			continue;
 		}
 		char *ss = strchr(log, '[');
-		int pid, ret, comma = 0;
-		char *pos = ss, processName[256], ns[32];
+		int pid, ppid, ret, comma = 0;
+		char *pos = ss, proc[256], ns[32], pns[32];
 
 		while(1) {
 			pos = strchr(pos, ',');
@@ -183,42 +151,45 @@ void proc_monitor() {
 		}
 
 		if (comma == 6)
-			ret = sscanf(ss, "[%*d %d %*d %*d %256s", &pid, processName);
+			ret = sscanf(ss, "[%*d %d %*d %*d %256s", &pid, proc);
 		else
-			ret = sscanf(ss, "[%*d %d %*d %256s", &pid, processName);
+			ret = sscanf(ss, "[%*d %d %*d %256s", &pid, proc);
 
 		if(ret != 2)
 			continue;
 
+		ppid = parse_ppid(pid);
+
 		// Allow hiding sub-services of applications
-		char *colon = strchr(processName, ':');
+		char *colon = strchr(proc, ':');
 		if (colon)
 			*colon = '\0';
 
 		// Critical region
 		pthread_mutex_lock(&hide_lock);
 		vec_for_each(hide_list, line) {
-			if (strcmp(processName, line) == 0) {
-				while(1) {
-					ret = 1;
-					for (int i = 0; i < zygote_num; ++i) {
-						read_namespace(pid, ns, sizeof(ns));
-						if (strcmp(ns, zygote_ns[i]) == 0) {
-							usleep(50);
-							ret = 0;
-							break;
-						}
-					}
-					if (ret) break;
-				}
+			if (strcmp(proc, line) == 0) {
+				read_namespace(ppid, pns, sizeof(pns));
+				do {
+					read_namespace(pid, ns, sizeof(ns));
+					if (strcmp(ns, pns) == 0)
+						usleep(50);
+					else
+						break;
+				} while (1);
 
 				// Send pause signal ASAP
-				if (kill(pid, SIGSTOP) == -1) continue;
+				if (kill(pid, SIGSTOP) == -1)
+					continue;
 
 				// Restore the colon so we can log the actual process name
 				if (colon)
 					*colon = ':';
-				LOGI("proc_monitor: %s (PID=%d ns=%s)\n", processName, pid, ns);
+#ifdef MAGISK_DEBUG
+				LOGI("proc_monitor: %s (PID=[%d] ns=%s)(PPID=[%d] ns=%s)\n", proc, pid, ns + 4, ppid, pns + 4);
+#else
+				LOGI("proc_monitor: %s\n", proc);
+#endif
 
 				/*
 				 * The setns system call do not support multithread processes
