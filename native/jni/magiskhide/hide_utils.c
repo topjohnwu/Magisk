@@ -17,11 +17,14 @@
 #include "daemon.h"
 
 static char *prop_key[] =
-	{ "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit",
-	  "ro.debuggable", "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", NULL };
+	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode",
+	  "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable", "ro.secure",
+	  "ro.build.type", "ro.build.tags", "ro.build.selinux", NULL };
 
 static char *prop_value[] =
-	{ "green", "1", "enforcing", "0", "0", "0", "1", "user", "release-keys", "0", NULL };
+	{ "locked", "green", "1", "enforcing",
+	  "0", "0", "0", "1",
+	  "user", "release-keys", "0", NULL };
 
 static int mocked = 0;
 
