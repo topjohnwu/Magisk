@@ -27,7 +27,7 @@ android {
 
     productFlavors {
         full {
-            versionCode 118
+            versionCode 120
             versionName "5.7.0"
         }
         stub {
@@ -57,7 +57,7 @@ dependencies {
     fullImplementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
     fullImplementation "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
     fullImplementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
-    fullImplementation 'com.github.topjohnwu:libsu:1.1.1'
+    fullImplementation 'com.github.topjohnwu:libsu:1.2.0'
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
     fullImplementation 'com.jakewharton:butterknife:8.8.1'

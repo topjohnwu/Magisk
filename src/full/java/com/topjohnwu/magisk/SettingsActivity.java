@@ -30,6 +30,7 @@ import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -172,7 +173,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                                     @Override
                                     public void onDownloadDone(Context context, Uri uri) {
                                         mm.dumpPrefs();
-                                        if (RootUtils.cmdResult("pm install " + uri.getPath()))
+                                        if (ShellUtils.fastCmdResult("pm install " + uri.getPath()))
                                             RootUtils.uninstallPkg(context.getPackageName());
                                     }
                                 },

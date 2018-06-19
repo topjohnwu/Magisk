@@ -58,7 +58,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
         MagiskManager mm = MagiskManager.get();
 
         // Generate a new app with random package name
-        SuFile repack = new SuFile("/data/local/tmp/repack.apk", true);
+        SuFile repack = new SuFile("/data/local/tmp/repack.apk");
         String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
 
         try {

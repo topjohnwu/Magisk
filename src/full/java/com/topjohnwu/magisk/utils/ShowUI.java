@@ -137,7 +137,7 @@ public class ShowUI {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                String s = RootUtils.cmd("echo $SLOT");
+                String s = ShellUtils.fastCmd("echo $SLOT");
                 if (s != null) {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
@@ -211,9 +211,9 @@ public class ShowUI {
                                     if (slot[1] == 'a') slot[1] = 'b';
                                     else slot[1] = 'a';
                                     // Then find the boot image again
-                                    boot = RootUtils.cmd(
-                                            "SLOT=" + String.valueOf(slot) +
-                                            "; find_boot_image;" +
+                                    boot = ShellUtils.fastCmd(
+                                            "SLOT=" + String.valueOf(slot),
+                                            "find_boot_image",
                                             "echo \"$BOOTIMAGE\""
                                     );
                                     Shell.Async.su("mount_partitions");

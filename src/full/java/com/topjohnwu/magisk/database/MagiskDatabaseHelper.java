@@ -86,7 +86,7 @@ public class MagiskDatabaseHelper {
                 return de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             } else {
                 // Global database
-                final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db", true);
+                final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db");
                 mm.deleteDatabase("su.db");
                 de.deleteDatabase("su.db");
                 if (mm.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {

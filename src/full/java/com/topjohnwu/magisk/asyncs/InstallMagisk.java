@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
@@ -148,9 +147,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             case DIRECT_MODE:
                 console.add("- Patch boot/ramdisk image: " + mBootLocation);
                 if (mm.remoteMagiskVersionCode >= 1463) {
-                    highCompression = Integer.parseInt(RootUtils.cmd(Utils.fmt(
-                            "%s/magiskboot --parse %s; echo $?",
-                            install, mBootLocation))) == 2;
+                    highCompression = Integer.parseInt(ShellUtils.fastCmd(Utils.fmt(
+                            "%s/magiskboot --parse %s; echo $?", install, mBootLocation))) == 2;
                     if (highCompression)
                         console.add("! Insufficient boot partition size detected");
                 }
@@ -263,6 +261,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                             .getFilesDir().getParent()
                     , "install");
             Shell.Sync.sh("rm -rf " + install);
+            install.mkdirs();
         }
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
@@ -294,7 +293,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 );
             } else {
                 File boot = new File(install, "boot.img");
-                SuFile patched_boot = new SuFile(install.getParent() + "/new-boot.img", true);
+                SuFile patched_boot = new SuFile(install.getParent(), "new-boot.img");
 
                 if (!dumpBoot(boot) || !patchBoot(boot, patched_boot))
                     return false;

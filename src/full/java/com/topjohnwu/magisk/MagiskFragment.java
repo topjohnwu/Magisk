@@ -25,11 +25,11 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 
 import butterknife.BindColor;
 import butterknife.BindView;
@@ -265,7 +265,7 @@ public class MagiskFragment extends Fragment
                     || mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
                 install();
             } else if (mm.remoteMagiskVersionCode >= Const.MAGISK_VER.FIX_ENV &&
-                    !RootUtils.cmdResult("env_check")) {
+                    !ShellUtils.fastCmdResult("env_check")) {
                 ShowUI.envFixDialog(getActivity());
             }
         }

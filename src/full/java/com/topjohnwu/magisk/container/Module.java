@@ -3,8 +3,6 @@ package com.topjohnwu.magisk.container;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
-import java.io.IOException;
-
 public class Module extends BaseModule {
 
     private SuFile mRemoveFile, mDisableFile, mUpdateFile;
@@ -16,9 +14,9 @@ public class Module extends BaseModule {
             parseProps(Shell.Sync.su("dos2unix <  " + path + "/module.prop"));
         } catch (NumberFormatException ignored) {}
 
-        mRemoveFile = new SuFile(path + "/remove", true);
-        mDisableFile = new SuFile(path + "/disable", true);
-        mUpdateFile = new SuFile(path + "/update", true);
+        mRemoveFile = new SuFile(path + "/remove");
+        mDisableFile = new SuFile(path + "/disable");
+        mUpdateFile = new SuFile(path + "/update");
 
         if (getId() == null) {
             int sep = path.lastIndexOf('/');
@@ -36,9 +34,7 @@ public class Module extends BaseModule {
 
     public void createDisableFile() {
         mEnable = false;
-        try {
-            mDisableFile.createNewFile();
-        } catch (IOException ignored) {}
+        mDisableFile.createNewFile();
     }
 
     public void removeDisableFile() {
@@ -52,9 +48,7 @@ public class Module extends BaseModule {
 
     public void createRemoveFile() {
         mRemove = true;
-        try {
-            mRemoveFile.createNewFile();
-        } catch (IOException ignored) {}
+        mRemoveFile.createNewFile();
     }
 
     public void deleteRemoveFile() {

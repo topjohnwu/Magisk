@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Xml;
@@ -20,10 +19,11 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.RootUtils;
+import com.topjohnwu.magisk.utils.ShellInitializer;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 
@@ -32,7 +32,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
@@ -111,26 +110,7 @@ public class MagiskManager extends Application implements Shell.Container {
 
         Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
         Shell.verboseLogging(BuildConfig.DEBUG);
-        BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
-        Shell.setInitializer(new Shell.Initializer() {
-            @Override
-            public void onRootShellInit(@NonNull Shell shell) {
-                try (InputStream magiskUtils = getAssets().open(Const.UTIL_FUNCTIONS);
-                     InputStream managerUtils = getResources().openRawResource(R.raw.utils)
-                ) {
-                    shell.loadInputStream(null, null, magiskUtils);
-                    shell.loadInputStream(null, null, managerUtils);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                shell.run(null, null,
-                        "mount_partitions",
-                        "find_boot_image",
-                        "find_dtbo_image",
-                        "get_flags",
-                        "run_migrations");
-            }
-        });
+        Shell.setInitializer(ShellInitializer.class);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDatabaseHelper.getInstance(this);
@@ -207,19 +187,19 @@ public class MagiskManager extends Application implements Shell.Container {
 
     public void loadMagiskInfo() {
         try {
-            magiskVersionString = RootUtils.cmd("magisk -v").split(":")[0];
-            magiskVersionCode = Integer.parseInt(RootUtils.cmd("magisk -V"));
-            String s = RootUtils.cmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ? "resetprop -p " : "getprop ")
-                    + Const.MAGISKHIDE_PROP);
+            magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
+            magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
+            String s = ShellUtils.fastCmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ?
+                    "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
             magiskHide = s == null || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
 
-        bootBlock = RootUtils.cmd("echo \"$BOOTIMAGE\"");
+        bootBlock = ShellUtils.fastCmd("echo \"$BOOTIMAGE\"");
     }
 
     public void getDefaultInstallFlags() {
-        keepVerity = Boolean.parseBoolean(RootUtils.cmd("echo $KEEPVERITY"));
-        keepEnc = Boolean.parseBoolean(RootUtils.cmd("echo $KEEPFORCEENCRYPT"));
+        keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
+        keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
     }
 
     public void setupUpdateCheck() {
@@ -250,7 +230,7 @@ public class MagiskManager extends Application implements Shell.Container {
     }
 
     public void loadPrefs() {
-        SuFile config = new SuFile(Utils.fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS), true);
+        SuFile config = new SuFile(Utils.fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS));
         if (config.exists()) {
             SharedPreferences.Editor editor = prefs.edit();
             try {
