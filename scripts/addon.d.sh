@@ -13,7 +13,9 @@
 main() {
   # Magisk binaries
   MAGISKBIN=/data/adb/magisk
-  APK=/data/magisk.apk
+  APK=/data/adb/magisk.apk
+  [ -f $APK ] || APK=/data/magisk/magisk.apk
+  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
 
   mount /data 2>/dev/null
 
@@ -43,7 +45,7 @@ main() {
   [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
   ui_print "- Found boot image: $BOOTIMAGE"
 
-  eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
+  [ -f $APK ] && eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
   $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 
   SOURCEDMODE=true
