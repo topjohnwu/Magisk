@@ -45,21 +45,37 @@ ui_print() {
   $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
 }
 
+toupper() {
+  echo "$@" | tr '[:lower:]' '[:upper:]'
+}
+
+find_block() {
+  for uevent in /sys/dev/block/*/uevent; do
+    local DEVNAME=`grep_prop DEVNAME $uevent`
+    local PARTNAME=`grep_prop PARTNAME $uevent`
+    for p in "$@"; do
+      if [ "`toupper $p`" = "`toupper $PARTNAME`" ]; then
+        echo /dev/block/$DEVNAME
+        return 0
+      fi
+    done
+  done
+  return 1
+}
+
 mount_partitions() {
   # Check A/B slot
-  if [ "`grep_prop ro.build.ab_update`" = "true" ]; then
-    SLOT=`grep_cmdline androidboot.slot_suffix`
-    if [ -z $SLOT ]; then
-      SLOT=_`grep_cmdline androidboot.slot`
-      [ $SLOT = "_" ] && SLOT=
-    fi
+  SLOT=`grep_cmdline androidboot.slot_suffix`
+  if [ -z $SLOT ]; then
+    SLOT=_`grep_cmdline androidboot.slot`
+    [ $SLOT = "_" ] && SLOT=
   fi
-  [ -z $SLOT ] || ui_print "- A/B partition, current slot: $SLOT"
+  [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
   ui_print "- Mounting /system, /vendor"
   [ -f /system/build.prop ] || is_mounted /system || mount -o ro /system 2>/dev/null
   if ! is_mounted /system && ! [ -f /system/build.prop ]; then
-    SYSTEMBLOCK=`find /dev/block -iname system$SLOT | head -n 1`
+    SYSTEMBLOCK=`find_block system$SLOT`
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
@@ -75,7 +91,7 @@ mount_partitions() {
     # Seperate /vendor partition
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
     if ! is_mounted /vendor; then
-      VENDORBLOCK=`find /dev/block -iname vendor$SLOT | head -n 1`
+      VENDORBLOCK=`find_block vendor$SLOT`
       mount -t ext4 -o ro $VENDORBLOCK /vendor
     fi
     is_mounted /vendor || abort "! Cannot mount /vendor"
@@ -109,14 +125,14 @@ get_flags() {
 }
 
 grep_cmdline() {
-  REGEX="s/^$1=//p"
+  local REGEX="s/^$1=//p"
   sed -E 's/ +/\n/g' /proc/cmdline | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
-  REGEX="s/^$1=//p"
+  local REGEX="s/^$1=//p"
   shift
-  FILES=$@
+  local FILES=$@
   [ -z "$FILES" ] && FILES='/system/build.prop'
   sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
 }
@@ -126,26 +142,6 @@ getvar() {
   local VALUE=
   VALUE=`grep_prop $VARNAME /.backup/.magisk /data/.magisk /cache/.magisk /system/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
-}
-
-find_boot_image() {
-  BOOTIMAGE=
-  if [ ! -z $SLOT ]; then
-    BOOTIMAGE=`find /dev/block -iname boot$SLOT | head -n 1` 2>/dev/null
-  else
-    for BLOCK in ramdisk boot_a kern-a android_boot kernel boot lnx bootimg; do
-      BOOTIMAGE=`find /dev/block -iname $BLOCK | head -n 1` 2>/dev/null
-      [ ! -z $BOOTIMAGE ] && break
-    done
-  fi
-  # Recovery fallback
-  if [ -z $BOOTIMAGE ]; then
-    for FSTAB in /etc/*fstab*; do
-      BOOTIMAGE=`grep -v '#' $FSTAB | grep -E '/boot[^a-zA-Z]' | grep -oE '/dev/[a-zA-Z0-9_./-]*'`
-      [ ! -z $BOOTIMAGE ] && break
-    done
-  fi
-  [ ! -z $BOOTIMAGE ] && BOOTIMAGE=`readlink -f $BOOTIMAGE`
 }
 
 run_migrations() {
@@ -175,6 +171,15 @@ run_migrations() {
   [ -L /data/magisk.img ] || mv /data/magisk.img /data/adb/magisk.img 2>/dev/null
 }
 
+find_boot_image() {
+  BOOTIMAGE=
+  if [ ! -z $SLOT ]; then
+    BOOTIMAGE=`find_block boot$SLOT ramdisk$SLOT`
+  else
+    BOOTIMAGE=`find_block boot_a kern-a android_boot kernel boot lnx bootimg`
+  fi
+}
+
 flash_boot_image() {
   # Make sure all blocks are writable
   $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
@@ -201,8 +206,7 @@ flash_boot_image() {
 }
 
 find_dtbo_image() {
-  DTBOIMAGE=`find /dev/block -iname dtbo$SLOT | head -n 1` 2>/dev/null
-  [ ! -z $DTBOIMAGE ] && DTBOIMAGE=`readlink -f $DTBOIMAGE`
+  DTBOIMAGE=`find_block dtbo$SLOT`
 }
 
 patch_dtbo_image() {
