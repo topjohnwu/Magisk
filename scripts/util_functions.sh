@@ -8,7 +8,6 @@
 ##########################################################################################
 
 #MAGISK_VERSION_STUB
-SCRIPT_VERSION=$MAGISK_VER_CODE
 
 # Detect whether in boot mode
 ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
