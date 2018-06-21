@@ -12,7 +12,8 @@
 
 char *argv0;
 
-int (*applet_main[]) (int, char *[]) = { su_client_main, resetprop_main, magiskhide_main, NULL };
+int (*applet_main[]) (int, char *[]) =
+		{ su_client_main, resetprop_main, magiskhide_main, imgtool_main, NULL };
 
 int create_links(const char *bin, const char *path) {
 	char self[PATH_MAX], linkpath[PATH_MAX];
@@ -42,11 +43,6 @@ static void usage() {
 		"   -V                        print running daemon version code\n"
 		"   --list                    list all available applets\n"
 		"   --install [SOURCE] DIR    symlink all applets to DIR. SOURCE is optional\n"
-		"   --createimg IMG SIZE      create ext4 image. SIZE is interpreted in MB\n"
-		"   --imgsize IMG             report ext4 image used/total size\n"
-		"   --resizeimg IMG SIZE      resize ext4 image. SIZE is interpreted in MB\n"
-		"   --mountimg IMG PATH       mount IMG to PATH and prints the loop device\n"
-		"   --umountimg PATH LOOP     unmount PATH and delete LOOP device\n"
 		"   --daemon                  manually start magisk daemon\n"
 		"   --[init trigger]          start service for init trigger\n"
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
@@ -89,48 +85,6 @@ int magisk_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "--list") == 0) {
 		for (int i = 0; applet[i]; ++i)
 			printf("%s\n", applet[i]);
-		return 0;
-	} else if (strcmp(argv[1], "--createimg") == 0) {
-		if (argc < 4) usage();
-		int size;
-		sscanf(argv[3], "%d", &size);
-		return create_img(argv[2], size);
-	} else if (strcmp(argv[1], "--imgsize") == 0) {
-		if (argc < 3) usage();
-		int used, total;
-		if (get_img_size(argv[2], &used, &total)) {
-			fprintf(stderr, "Cannot check %s size\n", argv[2]);
-			return 1;
-		}
-		printf("%d %d\n", used, total);
-		return 0;
-	} else if (strcmp(argv[1], "--resizeimg") == 0) {
-		if (argc < 4) usage();
-		int used, total, size;
-		sscanf(argv[3], "%d", &size);
-		if (get_img_size(argv[2], &used, &total)) {
-			fprintf(stderr, "Cannot check %s size\n", argv[2]);
-			return 1;
-		}
-		if (size <= used) {
-			fprintf(stderr, "Cannot resize smaller than %dM\n", used);
-			return 1;
-		}
-		return resize_img(argv[2], size);
-	} else if (strcmp(argv[1], "--mountimg") == 0) {
-		if (argc < 4) usage();
-		char *loop = mount_image(argv[2], argv[3]);
-		if (loop == NULL) {
-			fprintf(stderr, "Cannot mount image!\n");
-			return 1;
-		} else {
-			printf("%s\n", loop);
-			free(loop);
-			return 0;
-		}
-	} else if (strcmp(argv[1], "--umountimg") == 0) {
-		if (argc < 4) usage();
-		umount_image(argv[2], argv[3]);
 		return 0;
 	} else if (strcmp(argv[1], "--unlock-blocks") == 0) {
 		unlock_blocks();

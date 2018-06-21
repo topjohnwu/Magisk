@@ -375,52 +375,55 @@ mktouch() {
 }
 
 request_size_check() {
-  reqSizeM=`du -s $1 | cut -f1`
-  reqSizeM=$((reqSizeM / 1024 + 1))
+  reqSizeM=`du -ms $1 | cut -f1`
 }
 
 request_zip_size_check() {
-  reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int($1 / 1048567 + 1) }'`
+  reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int(($1 - 1) / 1048576 + 1) }'`
 }
 
-image_size_check() {
-  SIZE="`$MAGISKBIN/magisk --imgsize $IMG`"
-  curUsedM=`echo "$SIZE" | cut -d" " -f1`
-  curSizeM=`echo "$SIZE" | cut -d" " -f2`
-  curFreeM=$((curSizeM - curUsedM))
+check_filesystem() {
+  curSizeM=`wc -c < $1`
+  curSizeM=$((curSizeM / 1048576))
+  local DF=`df -P $2 | grep $2`
+  curUsedM=`echo $DF | awk '{ print int($3 / 1024) }'`
+  curFreeM=`echo $DF | awk '{ print int($4 / 1024) }'`
+}
+
+mount_snippet() {
+  MAGISKLOOP=`$MAGISKBIN/magisk imgtool mount $IMG $MOUNTPATH`
+  is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 }
 
 mount_magisk_img() {
   [ -z reqSizeM ] && reqSizeM=0
+  mkdir -p $MOUNTPATH 2>/dev/null
   if [ -f "$IMG" ]; then
     ui_print "- Found $IMG"
-    image_size_check $IMG
-    if [ "$reqSizeM" -gt "$curFreeM" ]; then
-      newSizeM=$(((reqSizeM + curUsedM) / 32 * 32 + 64))
+    mount_snippet
+    check_filesystem $IMG $MOUNTPATH
+    if [ $reqSizeM -gt $curFreeM ]; then
+      newSizeM=$(((curSizeM + reqSizeM - curFreeM) / 32 * 32 + 64))
       ui_print "- Resizing $IMG to ${newSizeM}M"
-      $MAGISKBIN/magisk --resizeimg $IMG $newSizeM >&2
+      $MAGISKBIN/magisk imgtool umount $MOUNTPATH $MAGISKLOOP
+      $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
+      mount_snippet
     fi
+    ui_print "- Mount $IMG to $MOUNTPATH"
   else
-    newSizeM=$((reqSizeM / 32 * 32 + 64));
+    newSizeM=$((reqSizeM / 32 * 32 + 64))
     ui_print "- Creating $IMG with size ${newSizeM}M"
-    $MAGISKBIN/magisk --createimg $IMG $newSizeM >&2
+    $MAGISKBIN/magisk imgtool create $IMG $newSizeM >&2
+    mount_snippet
   fi
-
-  ui_print "- Mounting $IMG to $MOUNTPATH"
-  mkdir -p $MOUNTPATH 2>/dev/null
-  MAGISKLOOP=`$MAGISKBIN/magisk --mountimg $IMG $MOUNTPATH`
-  is_mounted $MOUNTPATH || abort "! $IMG mount failed..."
 }
 
 unmount_magisk_img() {
-  $MAGISKBIN/magisk --umountimg $MOUNTPATH $MAGISKLOOP
-
-  # Shrink the image if possible
-  image_size_check $IMG
+  check_filesystem $IMG $MOUNTPATH
   newSizeM=$((curUsedM / 32 * 32 + 64))
+  $MAGISKBIN/magisk imgtool umount $MOUNTPATH $MAGISKLOOP
   if [ $curSizeM -gt $newSizeM ]; then
     ui_print "- Shrinking $IMG to ${newSizeM}M"
-    $MAGISKBIN/magisk --resizeimg $IMG $newSizeM
+    $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
   fi
 }
-
