@@ -296,8 +296,14 @@ api_level_arch_detect() {
 }
 
 setup_bb() {
-  if [ ! -d $TMPDIR/bin ]; then
-    # Add busybox to PATH
+  if [ -x /sbin/.core/busybox/busybox ]; then
+    # Make sure this path is in the front
+    echo $PATH | grep -q '^/sbin/.core/busybox' || export PATH=/sbin/.core/busybox:$PATH
+  elif [ -x $TMPDIR/bin/busybox ]; then
+    # Make sure this path is in the front
+    echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
+  else
+    # Construct the PATH
     mkdir -p $TMPDIR/bin
     ln -s $MAGISKBIN/busybox $TMPDIR/bin/busybox
     $MAGISKBIN/busybox --install -s $TMPDIR/bin
