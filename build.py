@@ -327,7 +327,7 @@ def zip_main(args):
 			zipf.writestr(target, util_func)
 		# addon.d.sh
 		source = os.path.join('scripts', 'addon.d.sh')
-		target = os.path.join('common', '99-magisk.sh')
+		target = os.path.join('common', 'addon.d.sh')
 		zip_with_msg(zipf, source, target)
 
 		# Prebuilts
