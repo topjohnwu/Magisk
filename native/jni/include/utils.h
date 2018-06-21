@@ -134,16 +134,15 @@ void write_zero(int fd, size_t size);
 // img.c
 
 #define round_size(a) ((((a) / 32) + 2) * 32)
-#define SOURCE_TMP "/dev/source"
-#define TARGET_TMP "/dev/target"
+#define SOURCE_TMP "/dev/.img_src"
+#define TARGET_TMP "/dev/.img_tgt"
 
 int create_img(const char *img, int size);
-int get_img_size(const char *img, int *used, int *total);
-int resize_img(const char *img, int size);
+int resize_img(const char *img, int size, int enforce);
 char *mount_image(const char *img, const char *target);
-void umount_image(const char *target, const char *device);
+int umount_image(const char *target, const char *device);
 int merge_img(const char *source, const char *target);
-void trim_img(const char *img);
+int trim_img(const char *img, const char *mount, char *loop);
 
 // pattern.c
 

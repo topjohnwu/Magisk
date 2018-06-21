@@ -441,17 +441,10 @@ static int prepare_img() {
 			vec_push_back(&module_list, strdup(entry->d_name));
 		}
 	}
-
 	closedir(dir);
 
-	// Trim image
-	umount_image(MOUNTPOINT, magiskloop);
-	free(magiskloop);
-	trim_img(MAINIMG);
-
-	// Remount them back :)
-	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-	free(magiskloop);
+	if (trim_img(MAINIMG, MOUNTPOINT, magiskloop))
+		return 1;
 	return 0;
 }
 
