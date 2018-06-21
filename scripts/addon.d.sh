@@ -1,5 +1,4 @@
 #!/sbin/sh
-# ADDOND_VERSION=2
 ##########################################################################################
 #
 # Magisk Survival Script for ROMs with addon.d support
