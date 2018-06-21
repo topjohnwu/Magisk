@@ -23,15 +23,11 @@ BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.top
 BOOTSIGNED=false
 
 get_outfd() {
-  readlink /proc/$$/fd/$OUTFD 2>/dev/null | grep /tmp >/dev/null
-  if [ "$?" -eq "0" ]; then
-    OUTFD=0
-
-    for FD in `ls /proc/$$/fd`; do
-      readlink /proc/$$/fd/$FD 2>/dev/null | grep pipe >/dev/null
-      if [ "$?" -eq "0" ]; then
-        ps | grep " 3 $FD " | grep -v grep >/dev/null
-        if [ "$?" -eq "0" ]; then
+  if [ $OUTFD -eq 1 ]; then
+    # We will have to manually find out OUTFD
+    for FD in `ls /proc/self/fd`; do
+      if readlink /proc/self/fd/$FD | grep -q pipe; then
+        if ps | grep -v grep | grep -q " 3 $FD "; then
           OUTFD=$FD
           break
         fi
@@ -299,19 +295,7 @@ api_level_arch_detect() {
   if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
 }
 
-boot_actions() {
-  if [ ! -d /sbin/.core/mirror/bin ]; then
-    mkdir -p /sbin/.core/mirror/bin
-    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
-  fi
-  MAGISKBIN=/sbin/.core/mirror/bin
-}
-
-recovery_actions() {
-  # TWRP bug fix
-  mount -o bind /dev/urandom /dev/random
-  # Preserve environment varibles
-  OLD_PATH=$PATH
+setup_bb() {
   if [ ! -d $TMPDIR/bin ]; then
     # Add busybox to PATH
     mkdir -p $TMPDIR/bin
@@ -319,6 +303,23 @@ recovery_actions() {
     $MAGISKBIN/busybox --install -s $TMPDIR/bin
     export PATH=$TMPDIR/bin:$PATH
   fi
+}
+
+boot_actions() {
+  if [ ! -d /sbin/.core/mirror/bin ]; then
+    mkdir -p /sbin/.core/mirror/bin
+    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
+  fi
+  MAGISKBIN=/sbin/.core/mirror/bin
+  setup_bb
+}
+
+recovery_actions() {
+  # TWRP bug fix
+  mount -o bind /dev/urandom /dev/random
+  # Preserve environment varibles
+  OLD_PATH=$PATH
+  setup_bb
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Unset library paths
