@@ -120,7 +120,7 @@ SOURCEDMODE=true
 cd $MAGISKBIN
 
 # Source the boot patcher
-. $COMMONDIR/boot_patch.sh "$BOOTIMAGE"
+. ./boot_patch.sh "$BOOTIMAGE"
 
 flash_boot_image new-boot.img "$BOOTIMAGE"
 rm -f new-boot.img
