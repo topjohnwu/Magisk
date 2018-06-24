@@ -48,7 +48,7 @@ api_level_arch_detect
 
 ui_print "- Device platform: $ARCH"
 CHROMEDIR=$INSTALLER/chromeos
-BINDIR=$INSTALLER/$ARCH
+BINDIR=$INSTALLER/$ARCH32
 
 ##########################################################################################
 # Detection all done, start installing
