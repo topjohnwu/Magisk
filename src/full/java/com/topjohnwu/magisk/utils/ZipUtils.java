@@ -40,8 +40,11 @@ public class ZipUtils {
                 } else {
                     name = entry.getName();
                 }
-                SuFile dest = new SuFile(folder, name);
-                dest.getParentFile().mkdirs();
+                File dest = new File(folder, name);
+                if (!dest.getParentFile().mkdirs()) {
+                    dest = new SuFile(folder, name);
+                    dest.getParentFile().mkdirs();
+                }
                 try (OutputStream out = new SuFileOutputStream(dest)) {
                     ShellUtils.pump(zipfile, out);
                 }

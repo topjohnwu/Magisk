@@ -17,7 +17,6 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
-import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 import com.topjohnwu.utils.SignBoot;
 
@@ -43,17 +42,18 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private static final int DIRECT_MODE = 1;
     private static final int FIX_ENV_MODE = 2;
 
-    private Uri mBootImg, mZip;
+    private Uri bootUri, mZip;
     private List<String> console, logs;
-    private String mBootLocation;
+    private String mBoot;
     private int mode;
-    private File install;
+    private File installDir;
     private ProgressDialog dialog;
-    private boolean highCompression;
+    private MagiskManager mm;
 
     public InstallMagisk(Activity context, Uri zip) {
         super(context);
         mZip = zip;
+        mm = MagiskManager.get();
         mode = FIX_ENV_MODE;
     }
 
@@ -65,14 +65,13 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
     public InstallMagisk(FlashActivity context, List<String> console, List<String> logs, Uri zip, Uri boot) {
         this(context, console, logs, zip);
-        mBootImg = boot;
-        highCompression = false;
+        bootUri = boot;
         mode = PATCH_MODE;
     }
 
     public InstallMagisk(FlashActivity context, List<String> console, List<String> logs, Uri zip, String boot) {
         this(context, console, logs, zip);
-        mBootLocation = boot;
+        mBoot = boot;
         mode = DIRECT_MODE;
     }
 
@@ -86,19 +85,18 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     }
 
     private void extractFiles(String arch) throws IOException {
-        MagiskManager mm = MagiskManager.get();
         console.add("- Extracting files");
         try (InputStream in = mm.getContentResolver().openInputStream(mZip)) {
             if (in == null) throw new FileNotFoundException();
             BufferedInputStream buf = new BufferedInputStream(in);
             buf.mark(Integer.MAX_VALUE);
-            ZipUtils.unzip(buf, install, arch + "/", true);
+            ZipUtils.unzip(buf, installDir, arch + "/", true);
             buf.reset();
-            ZipUtils.unzip(buf, install, "common/", true);
+            ZipUtils.unzip(buf, installDir, "common/", true);
             buf.reset();
-            ZipUtils.unzip(buf, install, "chromeos/", false);
+            ZipUtils.unzip(buf, installDir, "chromeos/", false);
             buf.reset();
-            ZipUtils.unzip(buf, install, "META-INF/com/google/android/update-binary", true);
+            ZipUtils.unzip(buf, installDir, "META-INF/com/google/android/update-binary", true);
             buf.close();
         } catch (FileNotFoundException e) {
             console.add("! Invalid Uri");
@@ -108,68 +106,46 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             throw e;
         }
         Shell.Sync.sh(Utils.fmt("chmod -R 755 %s/*; %s/magiskinit -x magisk %s/magisk",
-                install, install, install));
+                installDir, installDir, installDir));
     }
 
-    private boolean dumpBoot(File boot) throws IOException {
-        MagiskManager mm = MagiskManager.get();
-        switch (mode) {
-            case PATCH_MODE:
-                // Copy boot image to local
-                try (InputStream in = mm.getContentResolver().openInputStream(mBootImg);
-                     OutputStream out = new FileOutputStream(boot)
-                ) {
-                    InputStream source;
-                    if (in == null) throw new FileNotFoundException();
+    private boolean dumpBoot() {
+        console.add("- Copying boot image to " + mBoot);
+        // Copy boot image to local
+        try (InputStream in = mm.getContentResolver().openInputStream(bootUri);
+             OutputStream out = new FileOutputStream(mBoot)
+        ) {
+            if (in == null)
+                throw new FileNotFoundException();
 
-                    if (Utils.getNameFromUri(mm, mBootImg).endsWith(".tar")) {
-                        // Extract boot.img from tar
-                        TarInputStream tar = new TarInputStream(new BufferedInputStream(in));
-                        org.kamranzafar.jtar.TarEntry entry;
-                        while ((entry = tar.getNextEntry()) != null) {
-                            if (entry.getName().equals("boot.img"))
-                                break;
-                        }
-                        source = tar;
-                    } else {
-                        // Direct copy raw image
-                        source = new BufferedInputStream(in);
-                    }
-                    ShellUtils.pump(source, out);
-                } catch (FileNotFoundException e) {
-                    console.add("! Invalid Uri");
-                    throw e;
-                } catch (IOException e) {
-                    console.add("! Copy failed");
-                    throw e;
+            InputStream src;
+            if (Utils.getNameFromUri(mm, bootUri).endsWith(".tar")) {
+                // Extract boot.img from tar
+                TarInputStream tar = new TarInputStream(new BufferedInputStream(in));
+                org.kamranzafar.jtar.TarEntry entry;
+                while ((entry = tar.getNextEntry()) != null) {
+                    if (entry.getName().equals("boot.img"))
+                        break;
                 }
-                break;
-            case DIRECT_MODE:
-                console.add("- Patch boot/ramdisk image: " + mBootLocation);
-                if (mm.remoteMagiskVersionCode >= 1463) {
-                    highCompression = Integer.parseInt(ShellUtils.fastCmd(Utils.fmt(
-                            "%s/magiskboot --parse %s; echo $?", install, mBootLocation))) == 2;
-                    if (highCompression)
-                        console.add("! Insufficient boot partition size detected");
-                }
-                if (boot.createNewFile()) {
-                    Shell.Sync.su("cat " + mBootLocation + " > " + boot);
-                } else {
-                    console.add("! Dump boot image failed");
-                    return false;
-                }
-                break;
-            default:
-                return false;
+                src = tar;
+            } else {
+                // Direct copy raw image
+                src = new BufferedInputStream(in);
+            }
+            ShellUtils.pump(src, out);
+        } catch (FileNotFoundException e) {
+            console.add("! Invalid Uri");
+            return false;
+        } catch (IOException e) {
+            console.add("! Copy failed");
+            return false;
         }
         return true;
     }
 
-    private boolean patchBoot(File boot, SuFile patched_boot) throws IOException {
-        MagiskManager mm = MagiskManager.get();
-
+    private File patchBoot() throws IOException {
         boolean isSigned;
-        try (InputStream in = new FileInputStream(boot)) {
+        try (InputStream in = new SuFileInputStream(mBoot)) {
             isSigned = SignBoot.verifySignature(in, null);
             if (isSigned) {
                 console.add("- Boot image is signed with AVB 1.0");
@@ -181,35 +157,33 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
         // Patch boot image
         Shell.Sync.sh(console, logs,
-                "cd " + install,
-                Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b HIGHCOMP=%b " +
-                                "sh update-binary indep boot_patch.sh %s || echo 'Failed!'",
-                        mm.keepEnc, mm.keepVerity, highCompression, boot));
+                "cd " + installDir,
+                Utils.fmt("KEEPFORCEENCRYPT=%b KEEPVERITY=%b sh update-binary indep " +
+                                "boot_patch.sh %s || echo 'Failed!'",
+                        mm.keepEnc, mm.keepVerity, mBoot));
 
         if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
-            return false;
+            return null;
 
-        Shell.Sync.sh("mv -f new-boot.img ../",
-                "mv bin/busybox busybox",
-                "rm -rf magisk.apk bin *.img update-binary",
+        Shell.Sync.sh("mv bin/busybox busybox",
+                "rm -rf magisk.apk bin boot.img update-binary",
                 "cd /");
 
+        File patched = new File(installDir, "new-boot.img");
         if (isSigned) {
             console.add("- Signing boot image with test keys");
-            File signed = new File(install.getParent(), "signed.img");
-            try (InputStream in = new SuFileInputStream(patched_boot);
+            File signed = new File(installDir, "signed.img");
+            try (InputStream in = new BufferedInputStream(new FileInputStream(patched));
                  OutputStream out = new BufferedOutputStream(new FileOutputStream(signed))
             ) {
                 SignBoot.doSignature("/boot", in, out, null, null);
             }
-            Shell.Sync.sh("mv -f " + signed + " " + patched_boot);
+            signed.renameTo(patched);
         }
-        return true;
+        return patched;
     }
 
-    private void outputBoot(SuFile patched_boot) throws IOException {
-        MagiskManager mm = MagiskManager.get();
-
+    private void outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
                 File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + mm.bootFormat);
@@ -218,14 +192,14 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 switch (mm.bootFormat) {
                     case ".img.tar":
                         out = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
-                        ((TarOutputStream) out).putNextEntry(new TarEntry(patched_boot, "boot.img"));
+                        ((TarOutputStream) out).putNextEntry(new TarEntry(patched, "boot.img"));
                         break;
                     default:
                     case ".img":
                         out = new BufferedOutputStream(new FileOutputStream(dest));
                         break;
                 }
-                try (InputStream in = new SuFileInputStream(patched_boot)) {
+                try (InputStream in = new FileInputStream(patched)) {
                     ShellUtils.pump(in, out);
                     out.close();
                 }
@@ -236,32 +210,37 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 console.add("*********************************");
                 break;
             case DIRECT_MODE:
-                String binPath = mm.remoteMagiskVersionCode >= Const.MAGISK_VER.HIDDEN_PATH ? "/data/adb/magisk" : "/data/magisk";
+                String binPath = mm.remoteMagiskVersionCode >= Const.MAGISK_VER.HIDDEN_PATH ?
+                        "/data/adb/magisk" : "/data/magisk";
                 Shell.Sync.su(console, logs,
+                        Utils.fmt("flash_boot_image %s %s; rm -f %s", patched, mBoot, patched),
                         Utils.fmt("rm -rf %s/*; mkdir -p %s; chmod 700 /data/adb", binPath, binPath),
-                        Utils.fmt("cp -af %s/* %s; rm -rf %s", install, binPath, install),
-                        Utils.fmt("flash_boot_image %s %s", patched_boot, mBootLocation),
+                        Utils.fmt("cp -af %s/* %s; rm -rf %s", installDir, binPath, installDir),
                         mm.keepVerity ? "" : "patch_dtbo_image");
                 break;
         }
-        patched_boot.delete();
+        patched.delete();
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        MagiskManager mm = MagiskManager.get();
-
         if (mode == FIX_ENV_MODE) {
-            install = new File("/data/adb/magisk");
-            Shell.Sync.sh("rm -rf " + install + "/*");
+            installDir = new File("/data/adb/magisk");
+            Shell.Sync.sh("rm -rf " + installDir + "/*");
         } else {
-            install = new File(
+            installDir = new File(
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
                             mm.createDeviceProtectedStorageContext() : mm)
                             .getFilesDir().getParent()
                     , "install");
-            Shell.Sync.sh("rm -rf " + install);
-            install.mkdirs();
+            Shell.Sync.sh("rm -rf " + installDir);
+            installDir.mkdirs();
+        }
+
+        if (mode == PATCH_MODE) {
+            mBoot = new File(installDir, "boot.img").getAbsolutePath();
+            if (!dumpBoot())
+                return false;
         }
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
@@ -284,7 +263,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             extractFiles(arch);
             if (mode == FIX_ENV_MODE) {
                 Shell.Sync.sh(
-                        "cd " + install,
+                        "cd " + installDir,
                         "sh update-binary extract",
                         "rm -f update-binary magisk.apk",
                         "cd /",
@@ -292,13 +271,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         "/sbin/.core/mirror/bin/busybox --install -s /sbin/.core/busybox"
                 );
             } else {
-                File boot = new File(install, "boot.img");
-                SuFile patched_boot = new SuFile(install.getParent(), "new-boot.img");
-
-                if (!dumpBoot(boot) || !patchBoot(boot, patched_boot))
+                File patched = patchBoot();
+                if (patched == null)
                     return false;
-                outputBoot(patched_boot);
-
+                outputBoot(patched);
                 console.add("- All done!");
             }
         } catch (Exception e) {
@@ -317,7 +293,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             // Running in FlashActivity
             FlashActivity activity = (FlashActivity) getActivity();
             if (!result) {
-                Shell.Async.sh("rm -rf " + install);
+                Shell.Async.sh("rm -rf " + installDir);
                 console.add("! Installation failed");
                 activity.reboot.setVisibility(View.GONE);
             }
