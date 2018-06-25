@@ -39,7 +39,16 @@ db_setup() {
 
 env_check() {
   for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
-    [ -e /data/adb/magisk/$file ] || return 1
+    [ -f /data/adb/magisk/$file ] || return 1
   done
   return 0
+}
+
+mm_patch_dtbo() {
+  if $KEEPVERITY; then
+    echo false
+  else
+    find_dtbo_image
+    patch_dtbo_image >/dev/null 2>&1 && echo true || echo false
+  fi
 }

@@ -137,17 +137,15 @@ public class ShowUI {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                String s = ShellUtils.fastCmd("echo $SLOT");
-                if (s != null) {
+                String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");
+                if (s != null && Boolean.parseBoolean(s)) {
                     options.add(mm.getString(R.string.install_second_slot));
                 }
-                char[] slot = s == null ? null : s.toCharArray();
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.select_method)
                     .setItems(
                         options.toArray(new String [0]),
                         (dialog, idx) -> {
-                            String boot;
                             DownloadReceiver receiver = null;
                             switch (idx) {
                                 case 1:
@@ -191,41 +189,23 @@ public class ShowUI {
                                     };
                                     break;
                                 case 2:
-                                    boot = mm.bootBlock;
-                                    if (boot == null)
-                                        return;
                                     receiver = new DownloadReceiver() {
                                         @Override
                                         public void onDownloadDone(Context context, Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
-                                            intent.setData(uri)
-                                                .putExtra(Const.Key.FLASH_SET_BOOT, boot)
-                                                .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
+                                            intent.setData(uri).putExtra(Const.Key.FLASH_ACTION,
+                                                    Const.Value.FLASH_MAGISK);
                                             activity.startActivity(intent);
                                         }
                                     };
                                     break;
                                 case 3:
-                                    assert (slot != null);
-                                    // Choose the other slot
-                                    if (slot[1] == 'a') slot[1] = 'b';
-                                    else slot[1] = 'a';
-                                    // Then find the boot image again
-                                    boot = ShellUtils.fastCmd(
-                                            "SLOT=" + String.valueOf(slot),
-                                            "find_boot_image",
-                                            "echo \"$BOOTIMAGE\""
-                                    );
-                                    Shell.Async.su("mount_partitions");
-                                    if (boot == null)
-                                        return;
                                     receiver = new DownloadReceiver() {
                                         @Override
                                         public void onDownloadDone(Context context, Uri uri) {
                                             Intent intent = new Intent(mm, FlashActivity.class);
-                                            intent.setData(uri)
-                                                    .putExtra(Const.Key.FLASH_SET_BOOT, boot)
-                                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
+                                            intent.setData(uri).putExtra(Const.Key.FLASH_ACTION,
+                                                    Const.Value.FLASH_SECOND_SLOT);
                                             activity.startActivity(intent);
                                         }
                                     };

@@ -39,8 +39,9 @@ import java.util.List;
 public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
     private static final int PATCH_MODE = 0;
-    private static final int DIRECT_MODE = 1;
+    public static final int DIRECT_MODE = 1;
     private static final int FIX_ENV_MODE = 2;
+    public static final int SECOND_SLOT_MODE = 3;
 
     private Uri bootUri, mZip;
     private List<String> console, logs;
@@ -57,22 +58,16 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         mode = FIX_ENV_MODE;
     }
 
-    private InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip) {
+    public InstallMagisk(Activity context, List<String> console, List<String> logs, Uri zip, int mode) {
         this(context, zip);
         this.console = console;
         this.logs = logs;
+        this.mode = mode;
     }
 
     public InstallMagisk(FlashActivity context, List<String> console, List<String> logs, Uri zip, Uri boot) {
-        this(context, console, logs, zip);
+        this(context, console, logs, zip, PATCH_MODE);
         bootUri = boot;
-        mode = PATCH_MODE;
-    }
-
-    public InstallMagisk(FlashActivity context, List<String> console, List<String> logs, Uri zip, String boot) {
-        this(context, console, logs, zip);
-        mBoot = boot;
-        mode = DIRECT_MODE;
     }
 
     @Override
@@ -209,6 +204,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 console.add(" " + dest + " ");
                 console.add("*********************************");
                 break;
+            case SECOND_SLOT_MODE:
             case DIRECT_MODE:
                 String binPath = mm.remoteMagiskVersionCode >= Const.MAGISK_VER.HIDDEN_PATH ?
                         "/data/adb/magisk" : "/data/magisk";
@@ -237,11 +233,32 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             installDir.mkdirs();
         }
 
-        if (mode == PATCH_MODE) {
-            mBoot = new File(installDir, "boot.img").getAbsolutePath();
-            if (!dumpBoot())
-                return false;
+        switch (mode) {
+            case PATCH_MODE:
+                mBoot = new File(installDir, "boot.img").getAbsolutePath();
+                if (!dumpBoot())
+                    return false;
+                break;
+            case DIRECT_MODE:
+                console.add("- Detecting ramdisk/boot image");
+                mBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
+                break;
+            case SECOND_SLOT_MODE:
+                console.add("- Detecting ramdisk/boot image");
+                char slot[] = ShellUtils.fastCmd("echo $SLOT").toCharArray();
+                if (slot[1] == 'a') slot[1] = 'b';
+                else slot[1] = 'a';
+                mBoot = ShellUtils.fastCmd("SLOT=" + String.valueOf(slot),
+                        "find_boot_image", "echo \"$BOOTIMAGE\"");
+                Shell.Async.su("mount_partitions");
+                break;
         }
+        if (mBoot == null) {
+            console.add("- Unable to detect ramdisk/boot image");
+            return false;
+        }
+
+        console.add("- Use ramdisk/boot image: " + mBoot);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;

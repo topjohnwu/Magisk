@@ -60,8 +60,6 @@ public class SplashActivity extends Activity {
             mm.setupUpdateCheck();
             // Fire asynctasks
             loadModuleTask.exec();
-            // Check dtbo status
-            RootUtils.patchDTBO();
         }
 
         // Write back default values

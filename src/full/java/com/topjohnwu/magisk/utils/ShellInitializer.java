@@ -23,8 +23,6 @@ public class ShellInitializer extends Shell.Initializer {
         }
         shell.run(null, null,
                 "mount_partitions",
-                "find_boot_image",
-                "find_dtbo_image",
                 "get_flags",
                 "run_migrations");
         return true;

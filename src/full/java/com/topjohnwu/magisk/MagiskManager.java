@@ -59,7 +59,6 @@ public class MagiskManager extends Application implements Shell.Container {
     public String remoteManagerVersionString;
     public int remoteManagerVersionCode = -1;
     public String managerLink;
-    public String bootBlock = null;
     public boolean keepVerity = false;
     public boolean keepEnc = false;
 
@@ -193,8 +192,6 @@ public class MagiskManager extends Application implements Shell.Container {
                     "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
             magiskHide = s == null || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
-
-        bootBlock = ShellUtils.fastCmd("echo \"$BOOTIMAGE\"");
     }
 
     public void getDefaultInstallFlags() {

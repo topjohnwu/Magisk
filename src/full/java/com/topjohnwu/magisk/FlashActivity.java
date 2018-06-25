@@ -113,13 +113,15 @@ public class FlashActivity extends Activity {
             case Const.Value.FLASH_ZIP:
                 new FlashZip(this, uri, console, logs).exec();
                 break;
-            case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs, uri, (Uri) intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT))
-                        .exec();
-                break;
             case Const.Value.FLASH_MAGISK:
-                new InstallMagisk(this, console, logs, uri, intent.getStringExtra(Const.Key.FLASH_SET_BOOT))
-                        .exec();
+                new InstallMagisk(this, console, logs, uri, InstallMagisk.DIRECT_MODE).exec();
+                break;
+            case Const.Value.FLASH_SECOND_SLOT:
+                new InstallMagisk(this, console, logs, uri, InstallMagisk.SECOND_SLOT_MODE).exec();
+                break;
+            case Const.Value.PATCH_BOOT:
+                new InstallMagisk(this, console, logs, uri,
+                        intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
                 break;
         }
     }

@@ -9,17 +9,13 @@ import com.topjohnwu.magisk.services.OnBootIntentService;
 
 public class BootReceiver extends BroadcastReceiver {
 
-    private void startIntentService(Context context) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(new Intent(context, OnBootIntentService.class));
         } else {
             context.startService(new Intent(context, OnBootIntentService.class));
         }
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        startIntentService(context);
     }
 
 }
