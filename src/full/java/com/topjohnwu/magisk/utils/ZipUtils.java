@@ -41,7 +41,7 @@ public class ZipUtils {
                     name = entry.getName();
                 }
                 File dest = new File(folder, name);
-                if (!dest.getParentFile().mkdirs()) {
+                if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
                     dest = new SuFile(folder, name);
                     dest.getParentFile().mkdirs();
                 }
