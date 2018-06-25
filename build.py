@@ -122,10 +122,6 @@ def build_binary(args):
 	old_platform = False
 	flags = base_flags
 
-	if 'busybox' in targets:
-		flags += ' B_BB=1'
-		old_platform = True
-
 	if 'b64xz' in targets:
 		flags += ' B_BXZ=1'
 		old_platform = True
@@ -161,6 +157,10 @@ def build_binary(args):
 
 	if 'magiskboot' in targets:
 		flags += ' B_BOOT=1'
+		other = True
+
+	if 'busybox' in targets:
+		flags += ' B_BB=1'
 		other = True
 
 	if other:
