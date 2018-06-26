@@ -168,12 +168,12 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         if (isSigned) {
             console.add("- Signing boot image with test keys");
             File signed = new File(installDir, "signed.img");
-            try (InputStream in = new BufferedInputStream(new FileInputStream(patched));
+            try (InputStream in = new SuFileInputStream(patched);
                  OutputStream out = new BufferedOutputStream(new FileOutputStream(signed))
             ) {
                 SignBoot.doSignature("/boot", in, out, null, null);
             }
-            signed.renameTo(patched);
+            Shell.Sync.su("mv -f " + signed + " " + patched);
         }
         return patched;
     }
@@ -194,7 +194,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         out = new BufferedOutputStream(new FileOutputStream(dest));
                         break;
                 }
-                try (InputStream in = new FileInputStream(patched)) {
+                try (InputStream in = new SuFileInputStream(patched)) {
                     ShellUtils.pump(in, out);
                     out.close();
                 }
@@ -215,7 +215,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         mm.keepVerity ? "" : "patch_dtbo_image");
                 break;
         }
-        patched.delete();
+        Shell.Sync.su("rm -f " + patched);
     }
 
     @Override
