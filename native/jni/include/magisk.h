@@ -17,7 +17,6 @@
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
 #define DISABLEFILE     "/cache/.disable_magisk"
-#define UNINSTALLER     "/cache/magisk_uninstaller.sh"
 #define MAGISKTMP       "/sbin/.core"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define BBPATH          MAGISKTMP "/busybox"

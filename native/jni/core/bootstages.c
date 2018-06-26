@@ -126,11 +126,6 @@ static void set_path(struct vector *v) {
 	vec_push_back(v, NULL);
 }
 
-static void uninstall_env(struct vector *v) {
-	vec_push_back(v, strdup("BOOTMODE=true"));
-	set_path(v);
-}
-
 /***********
  * Scripts *
  ***********/
@@ -500,7 +495,7 @@ void startup() {
 	}
 
 	// No uninstaller or core-only mode
-	if (access(UNINSTALLER, F_OK) != 0 && access(DISABLEFILE, F_OK) != 0) {
+	if (access(DISABLEFILE, F_OK) != 0) {
 		// Allocate buffer
 		buf = xmalloc(PATH_MAX);
 		buf2 = xmalloc(PATH_MAX);
@@ -663,13 +658,6 @@ void startup() {
 		LOGI("* Setting up internal busybox");
 		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
 		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
-	}
-
-	// uninstall
-	if (access(UNINSTALLER, F_OK) == 0) {
-		close(open(UNBLOCKFILE, O_RDONLY | O_CREAT));
-		exec_command(0, NULL, uninstall_env, "sh", UNINSTALLER, NULL);
-		return;
 	}
 
 	// Start post-fs-data mode
