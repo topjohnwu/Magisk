@@ -197,6 +197,106 @@ static struct su_info *get_su_info(unsigned uid) {
 	return info;
 }
 
+static void su_executor(int client) {
+	LOGD("su: executor started\n");
+
+	// ack
+	write_int(client, 0);
+
+	// Become session leader
+	xsetsid();
+
+	// Migrate environment from client
+	char path[32], buf[4096];
+	snprintf(path, sizeof(path), "/proc/%d/cwd", su_ctx->pid);
+	xreadlink(path, su_ctx->cwd, sizeof(su_ctx->cwd));
+	snprintf(path, sizeof(path), "/proc/%d/environ", su_ctx->pid);
+	memset(buf, 0, sizeof(buf));
+	int fd = open(path, O_RDONLY);
+	read(fd, buf, sizeof(buf));
+	clearenv();
+	for (size_t pos = 0; buf[pos];) {
+		putenv(buf + pos);
+		pos += strlen(buf + pos) + 1;
+	}
+
+	// Let's read some info from the socket
+	int argc = read_int(client);
+	if (argc < 0 || argc > 512) {
+		LOGE("unable to allocate args: %d", argc);
+		exit2(1);
+	}
+	LOGD("su: argc=[%d]\n", argc);
+
+	char **argv = (char**) xmalloc(sizeof(char*) * (argc + 1));
+	argv[argc] = NULL;
+	for (int i = 0; i < argc; i++) {
+		argv[i] = read_string(client);
+		LOGD("su: argv[%d]=[%s]\n", i, argv[i]);
+		// Replace -cn with -z, -mm with -M for supporting getopt_long
+		if (strcmp(argv[i], "-cn") == 0)
+			strcpy(argv[i], "-z");
+		else if (strcmp(argv[i], "-mm") == 0)
+			strcpy(argv[i], "-M");
+	}
+
+	// Get pts_slave
+	char *pts_slave = read_string(client);
+
+	// The FDs for each of the streams
+	int infd  = recv_fd(client);
+	int outfd = recv_fd(client);
+	int errfd = recv_fd(client);
+	int ptsfd = -1;
+
+	// We no longer need the access to socket in the child, close it
+	close(client);
+
+	if (pts_slave[0]) {
+		LOGD("su: pts_slave=[%s]\n", pts_slave);
+		// Check pts_slave file is owned by daemon_from_uid
+		struct stat st;
+		xstat(pts_slave, &st);
+
+		// If caller is not root, ensure the owner of pts_slave is the caller
+		if(st.st_uid != su_ctx->info->uid && su_ctx->info->uid != 0) {
+			LOGE("su: Wrong permission of pts_slave");
+			su_ctx->info->access.policy = DENY;
+			exit2(1);
+		}
+
+		// Opening the TTY has to occur after the
+		// fork() and setsid() so that it becomes
+		// our controlling TTY and not the daemon's
+		ptsfd = xopen(pts_slave, O_RDWR);
+
+		if (infd < 0)  {
+			LOGD("su: stdin using PTY");
+			infd  = ptsfd;
+		}
+		if (outfd < 0) {
+			LOGD("su: stdout using PTY");
+			outfd = ptsfd;
+		}
+		if (errfd < 0) {
+			LOGD("su: stderr using PTY");
+			errfd = ptsfd;
+		}
+	}
+
+	free(pts_slave);
+
+	// Swap out stdin, stdout, stderr
+	xdup2(infd, STDIN_FILENO);
+	xdup2(outfd, STDOUT_FILENO);
+	xdup2(errfd, STDERR_FILENO);
+
+	close(ptsfd);
+
+	// Run the actual main
+	su_daemon_main(argc, argv);
+}
+
 void su_daemon_receiver(int client, struct ucred *credential) {
 	LOGD("su: request from client: %d\n", client);
 
@@ -231,147 +331,52 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	 * send the return code back to our client
 	 */
 	int child = xfork();
-	if (child) {
-		// Wait for results
-		if (ctx.pipefd[0] >= 0) {
-			xxread(ctx.pipefd[0], &ctx.info->access.policy, sizeof(policy_t));
-			close(ctx.pipefd[0]);
-			close(ctx.pipefd[1]);
-		}
-
-		// The policy is determined, unlock
-		UNLOCK_UID();
-
-		// Info is now useless to us, decrement reference count
-		--ctx.info->ref;
-
-		// Wait result
-		LOGD("su: waiting child: [%d]\n", child);
-		int status, code;
-
-		if (waitpid(child, &status, 0) > 0)
-			code = WEXITSTATUS(status);
-		else
-			code = -1;
-
-		/* Passing the return code back to the client:
-		 * The client might be closed unexpectedly (e.g. swipe a root app out of recents)
-		 * In that case, writing to the client (which doesn't exist) will result in SIGPIPE
-		 * Here we simply just ignore the situation.
-		 */
-		struct sigaction act;
-		memset(&act, 0, sizeof(act));
-		act.sa_handler = SIG_IGN;
-		sigaction(SIGPIPE, &act, NULL);
-
-		LOGD("su: return code: [%d]\n", code);
-		write(client, &code, sizeof(code));
-		close(client);
-
-		// Restore default handler for SIGPIPE
-		act.sa_handler = SIG_DFL;
-		sigaction(SIGPIPE, &act, NULL);
-
-		return;
+	if (child == 0) {
+		su_ctx = &ctx;
+		su_executor(client);
 	}
 
-	LOGD("su: child process started\n");
-
-	// ack
-	write_int(client, 0);
-
-	// Become session leader
-	xsetsid();
-
-	// Migrate environment from client
-	char path[32], buf[4096];
-	snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
-	xreadlink(path, ctx.cwd, sizeof(ctx.cwd));
-	snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
-	memset(buf, 0, sizeof(buf));
-	int fd = open(path, O_RDONLY);
-	read(fd, buf, sizeof(buf));
-	clearenv();
-	for (size_t pos = 0; buf[pos];) {
-		putenv(buf + pos);
-		pos += strlen(buf + pos) + 1;
+	// Wait for results
+	if (ctx.pipefd[0] >= 0) {
+		xxread(ctx.pipefd[0], &ctx.info->access.policy, sizeof(policy_t));
+		close(ctx.pipefd[0]);
+		close(ctx.pipefd[1]);
 	}
 
-	// Let's read some info from the socket
-	int argc = read_int(client);
-	if (argc < 0 || argc > 512) {
-		LOGE("unable to allocate args: %d", argc);
-		exit2(1);
-	}
-	LOGD("su: argc=[%d]\n", argc);
+	// The policy is determined, unlock
+	UNLOCK_UID();
 
-	char **argv = (char**) xmalloc(sizeof(char*) * (argc + 1));
-	argv[argc] = NULL;
-	for (int i = 0; i < argc; i++) {
-		argv[i] = read_string(client);
-		LOGD("su: argv[%d]=[%s]\n", i, argv[i]);
-		// Replace -cn with -z, -mm with -M for supporting getopt_long
-		if (strcmp(argv[i], "-cn") == 0)
-			strcpy(argv[i], "-z");
-		else if (strcmp(argv[i], "-mm") == 0)
-			strcpy(argv[i], "-M");
-	}
+	// Info is now useless to us, decrement reference count
+	--ctx.info->ref;
 
-	// Get pts_slave
-	char *pts_slave = read_string(client);
-	LOGD("su: pts_slave=[%s]\n", pts_slave);
+	// Wait result
+	LOGD("su: waiting child: [%d]\n", child);
+	int status, code;
 
-	// The FDs for each of the streams
-	int infd  = recv_fd(client);
-	int outfd = recv_fd(client);
-	int errfd = recv_fd(client);
-	int ptsfd = -1;
+	if (waitpid(child, &status, 0) > 0)
+		code = WEXITSTATUS(status);
+	else
+		code = -1;
 
-	// We no longer need the access to socket in the child, close it
+	/* Passing the return code back to the client:
+	 * The client might be closed unexpectedly (e.g. swipe a root app out of recents)
+	 * In that case, writing to the client (which doesn't exist) will result in SIGPIPE
+	 * Here we simply just ignore the situation.
+	 */
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &act, NULL);
+
+	LOGD("su: return code: [%d]\n", code);
+	write(client, &code, sizeof(code));
 	close(client);
 
-	if (pts_slave[0]) {
-		// Check pts_slave file is owned by daemon_from_uid
-		struct stat st;
-		xstat(pts_slave, &st);
+	// Restore default handler for SIGPIPE
+	act.sa_handler = SIG_DFL;
+	sigaction(SIGPIPE, &act, NULL);
 
-		// If caller is not root, ensure the owner of pts_slave is the caller
-		if(st.st_uid != credential->uid && credential->uid != 0) {
-			LOGE("su: Wrong permission of pts_slave");
-			exit2(1);
-		}
-
-		// Opening the TTY has to occur after the
-		// fork() and setsid() so that it becomes
-		// our controlling TTY and not the daemon's
-		ptsfd = xopen(pts_slave, O_RDWR);
-
-		if (infd < 0)  {
-			LOGD("su: stdin using PTY");
-			infd  = ptsfd;
-		}
-		if (outfd < 0) {
-			LOGD("su: stdout using PTY");
-			outfd = ptsfd;
-		}
-		if (errfd < 0) {
-			LOGD("su: stderr using PTY");
-			errfd = ptsfd;
-		}
-	}
-
-	free(pts_slave);
-
-	// Swap out stdin, stdout, stderr
-	xdup2(infd, STDIN_FILENO);
-	xdup2(outfd, STDOUT_FILENO);
-	xdup2(errfd, STDERR_FILENO);
-
-	close(ptsfd);
-
-	// Give main the reference
-	su_ctx = &ctx;
-	su_daemon_main(argc, argv);
+	return;
 }
 
 /*

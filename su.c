@@ -22,7 +22,6 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/auxv.h>
 #include <selinux/selinux.h>
 
 #include "magisk.h"
@@ -160,42 +159,6 @@ __attribute__ ((noreturn)) void exit2(int status) {
 }
 
 int su_daemon_main(int argc, char **argv) {
-	// Sanitize all secure environment variables (from linker_environ.c in AOSP linker).
-	/* The same list than GLibc at this point */
-	static const char* const unsec_vars[] = {
-		"GCONV_PATH",
-		"GETCONF_DIR",
-		"HOSTALIASES",
-		"LD_AUDIT",
-		"LD_DEBUG",
-		"LD_DEBUG_OUTPUT",
-		"LD_DYNAMIC_WEAK",
-		"LD_LIBRARY_PATH",
-		"LD_ORIGIN_PATH",
-		"LD_PRELOAD",
-		"LD_PROFILE",
-		"LD_SHOW_AUXV",
-		"LD_USE_LOAD_BIAS",
-		"LOCALDOMAIN",
-		"LOCPATH",
-		"MALLOC_TRACE",
-		"MALLOC_CHECK_",
-		"NIS_PATH",
-		"NLSPATH",
-		"RESOLV_HOST_CONF",
-		"RES_OPTIONS",
-		"TMPDIR",
-		"TZDIR",
-		"LD_AOUT_LIBRARY_PATH",
-		"LD_AOUT_PRELOAD",
-		// not listed in linker, used due to system() call
-		"IFS",
-		NULL
-	};
-	if (getauxval(AT_SECURE))
-		for (int i = 0; unsec_vars[i]; ++i)
-			unsetenv(unsec_vars[i]);
-
 	int c, socket_serv_fd, fd;
 	char result[64];
 	struct option long_opts[] = {
