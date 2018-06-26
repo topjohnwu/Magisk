@@ -36,17 +36,23 @@ if $BOOTMODE; then
   . $MAGISKBIN/util_functions.sh
   BOOTMODE=true
   boot_actions
-  mount_partitions
 fi
+
+mount_partitions
+
+find_boot_image
+find_dtbo_image
+
+[ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
+ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
+[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
 
 cd $MAGISKBIN
 
-[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-ui_print "- Found Boot Image: $BOOTIMAGE"
+CHROMEOS=false
 
 ui_print "- Unpacking boot image"
 ./magiskboot --unpack "$BOOTIMAGE"
-CHROMEOS=false
 
 case $? in
   1 )
@@ -71,7 +77,6 @@ ui_print "- Checking ramdisk status"
 case $? in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
-    abort "! Magisk is not installed!"
     ;;
   1|2 )  # Magisk patched
     ui_print "- Magisk patched image detected"
@@ -102,5 +107,10 @@ rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data
         /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/app/com.topjohnwu.magisk* \
         /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/user*/*/.tmp.magisk.config \
         /data/adb/*magisk* 2>/dev/null
+
+if [ -f /system/addon.d/99-magisk.sh ]; then
+  mount -o rw,remount /system
+  rm -f /system/addon.d/99-magisk.sh
+fi
 
 $BOOTMODE && /system/bin/reboot

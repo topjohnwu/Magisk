@@ -76,14 +76,7 @@ remove_system_su
 
 ui_print "- Constructing environment"
 
-DATA=false
-DATA_DE=false
-if grep ' /data ' /proc/mounts | grep -vq 'tmpfs'; then
-  # Test if data is writable
-  touch /data/.rw && rm /data/.rw && DATA=true
-  # Test if DE storage is writable
-  $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
-fi
+check_data
 
 if $DATA; then
   MAGISKBIN=/data/magisk

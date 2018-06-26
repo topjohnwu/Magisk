@@ -295,6 +295,17 @@ api_level_arch_detect() {
   if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
 }
 
+check_data() {
+  DATA=false
+  DATA_DE=false
+  if grep ' /data ' /proc/mounts | grep -vq 'tmpfs'; then
+    # Test if data is writable
+    touch /data/.rw && rm /data/.rw && DATA=true
+    # Test if DE storage is writable
+    $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
+  fi
+}
+
 setup_bb() {
   if [ -x /sbin/.core/busybox/busybox ]; then
     # Make sure this path is in the front
