@@ -152,8 +152,7 @@ static void cleanup_signal(int sig) {
 __attribute__ ((noreturn)) void exit2(int status) {
 	// Handle the pipe, or the daemon will get stuck
 	if (su_ctx->pipefd[0] >= 0) {
-		int i = DENY;
-		xwrite(su_ctx->pipefd[1], &i, sizeof(i));
+		xwrite(su_ctx->pipefd[1], &su_ctx->info->access.policy, sizeof(policy_t));
 		close(su_ctx->pipefd[0]);
 		close(su_ctx->pipefd[1]);
 	}
