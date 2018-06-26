@@ -106,7 +106,7 @@ def build_binary(args):
 	header('* Building binaries: ' + ' '.join(targets))
 
 	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
-	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
+
 
 	# Basic flags
 	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
@@ -196,10 +196,9 @@ def build_apk(args):
 	header('* Building Magisk Manager')
 
 	mkdir(os.path.join('app', 'src', 'full', 'assets'))
-	for script in ['magisk_uninstaller.sh', 'util_functions.sh']:
-		source = os.path.join('scripts', script)
-		target = os.path.join('app', 'src', 'full', 'assets', script)
-		cp(source, target)
+	source = os.path.join('scripts', 'util_functions.sh')
+	target = os.path.join('app', 'src', 'full', 'assets', 'util_functions.sh')
+	cp(source, target)
 
 	if args.release:
 		if not os.path.exists('release-key.jks'):
@@ -354,19 +353,16 @@ def zip_uninstaller(args):
 		print('zip: ' + target)
 		zipf.writestr(target, gen_update_binary())
 		# updater-script
-		source = os.path.join('scripts', 'uninstaller_loader.sh')
+		source = os.path.join('scripts', 'magisk_uninstaller.sh')
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'updater-script')
 		zip_with_msg(zipf, source, target)
 
 		# Binaries
 		for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
-			source = os.path.join('native', 'out', lib_dir, 'magiskboot')
-			target = os.path.join(zip_dir, 'magiskboot')
-			zip_with_msg(zipf, source, target)
-
-		source = os.path.join('scripts', 'magisk_uninstaller.sh')
-		target = 'magisk_uninstaller.sh'
-		zip_with_msg(zipf, source, target)
+			for bin in ['magisk', 'magiskboot']:
+				source = os.path.join('native', 'out', lib_dir, bin)
+				target = os.path.join(zip_dir, bin)
+				zip_with_msg(zipf, source, target)
 
 		# Scripts
 		# util_functions.sh

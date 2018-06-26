@@ -1,44 +1,61 @@
-#!/system/bin/sh
+#MAGISK
 ##########################################################################################
 #
-# Magisk Uninstaller
+# Magisk Uninstaller (used in recovery)
 # by topjohnwu
 #
-# This script can be placed in /cache/magisk_uninstaller.sh
-# The Magisk main binary will pick up the script, and uninstall itself, following a reboot
-# This script can also be used in flashable zip with the uninstaller_loader.sh
-#
-# This script will try to do restoration with the following:
-# 1-1. Find and restore the original stock boot image dump (OTA proof)
-# 1-2. If 1-1 fails, restore ramdisk from the internal backup
-#      (ramdisk fully restored, not OTA friendly)
-# 1-3. If 1-2 fails, it will remove added files in ramdisk, however modified files
-#      are remained modified, because we have no backups. By doing so, Magisk will
-#      not be started at boot, but this isn't actually 100% cleaned up
-# 2. Remove all Magisk related files
-#    (The list is LARGE, most likely due to bad decision in early versions
-#    the latest versions has much less bloat to cleanup)
+# This script will load the real uninstaller in a flashable zip
 #
 ##########################################################################################
 
-[ -z $BOOTMODE ] && BOOTMODE=false
+##########################################################################################
+# Preparation
+##########################################################################################
 
-[ -d /data/adb/magisk ] && MAGISKBIN=/data/adb/magisk || MAGISKBIN=/data/magisk
-CHROMEDIR=$MAGISKBIN/chromeos
+# This path should work in any cases
+TMPDIR=/dev/tmp
 
-if [ ! -f $MAGISKBIN/magiskboot -o ! -f $MAGISKBIN/util_functions.sh ]; then
-  echo "! Cannot find $MAGISKBIN"
+INSTALLER=$TMPDIR/install
+CHROMEDIR=$INSTALLER/chromeos
+
+# Default permissions
+umask 022
+
+OUTFD=$2
+ZIP=$3
+
+if [ ! -f $INSTALLER/util_functions.sh ]; then
+  echo "! Unable to extract zip file!"
   exit 1
 fi
 
-if $BOOTMODE; then
-  # Load utility functions
-  . $MAGISKBIN/util_functions.sh
-  BOOTMODE=true
-  boot_actions
-fi
+# Load utility functions
+. $INSTALLER/util_functions.sh
 
+get_outfd
+
+ui_print "************************"
+ui_print "   Magisk Uninstaller   "
+ui_print "************************"
+
+is_mounted /data || mount /data || abort "! Unable to mount partitions"
+is_mounted /cache || mount /cache 2>/dev/null
 mount_partitions
+
+api_level_arch_detect
+
+ui_print "- Device platform: $ARCH"
+MAGISKBIN=$INSTALLER/$ARCH32
+mv $CHROMEDIR $MAGISKBIN
+chmod -R 755 $MAGISKBIN
+
+check_data
+$DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
+$BOOTMODE || recovery_actions
+
+##########################################################################################
+# Uninstall
+##########################################################################################
 
 find_boot_image
 find_dtbo_image
@@ -64,7 +81,7 @@ case $? in
     ;;
   4 )
     ui_print "! Sony ELF32 format detected"
-    abort "! Please use BootBridge from @AdrianDC to flash Magisk"
+    abort "! Please use BootBridge from @AdrianDC"
     ;;
   5 )
     ui_print "! Sony ELF64 format detected"
@@ -80,18 +97,26 @@ case $? in
     ;;
   1|2 )  # Magisk patched
     ui_print "- Magisk patched image detected"
+    ./magisk --unlock-blocks 2>/dev/null
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
-    OK=false
-    [ ! -z $SHA1 ] && restore_imgs $SHA1 && OK=true
-    if ! $OK; then
+    STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
+    STOCKDTBO=/data/stock_dtbo.img.gz
+    if [ -f $STOCKBOOT ]; then
+      ui_print "- Restoring stock boot image"
+      gzip -d < $STOCKBOOT | cat - /dev/zero > $BOOTIMAGE 2>/dev/null
+      if [ -f $DTBOIMAGE -a -f $STOCKDTBO ]; then
+        ui_print "- Restoring stock dtbo image"
+        gzip -d < $STOCKDTBO > $DTBOIMAGE
+      fi
+    else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
       ./magiskboot --cpio ramdisk.cpio restore
       ./magiskboot --repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
-      flash_boot_image new-boot.img "$BOOTIMAGE"
+      flash_boot_image new-boot.img $BOOTIMAGE
     fi
     ;;
   3 ) # Other patched
@@ -100,17 +125,33 @@ case $? in
     ;;
 esac
 
-cd /
-
 ui_print "- Removing Magisk files"
 rm -rf  /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
-        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/app/com.topjohnwu.magisk* \
-        /data/user*/*/magisk.db /data/user*/*/com.topjohnwu.magisk /data/user*/*/.tmp.magisk.config \
-        /data/adb/*magisk* 2>/dev/null
+        /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* 2>/dev/null
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
   mount -o rw,remount /system
   rm -f /system/addon.d/99-magisk.sh
 fi
 
-$BOOTMODE && /system/bin/reboot
+# Remove persist props (for Android P+ using protobuf)
+for prop in `./magisk resetprop -p | grep -E 'persist.*magisk' | grep -oE '^\[[a-zA-Z0-9.@:_-]+\]' | tr -d '[]'`; do
+  ./magisk resetprop -p --delete $prop
+done
+
+cd /
+
+if $BOOTMODE; then
+  ui_print "**********************************************"
+  ui_print "* Magisk Manager will uninstall itself, and  *"
+  ui_print "* the device will reboot after a few seconds *"
+  ui_print "**********************************************"
+  (sleep 8; /system/bin/reboot)&
+else
+  rm -rf /data/user*/*/*magisk* /data/app/*magisk*
+  recovery_cleanup
+  ui_print "- Done"
+fi
+
+rm -rf $TMPDIR
+exit 0

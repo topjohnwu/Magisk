@@ -34,7 +34,7 @@ case "$1" in
     ;;
   *)
     TMPDIR=/dev/tmp; rm -rf $TMPDIR 2>/dev/null; setup_bb
-    INSTALLER=$TMPDIR/install; mkdir -p $INSTALLER; unzip -o "$3" -d $INSTALLER
+    INSTALLER=$TMPDIR/install; mkdir -p $INSTALLER; unzip -o "$3" -d $INSTALLER >&2
     exec sh $INSTALLER/META-INF/com/google/android/updater-script $@
     ;;
 esac
