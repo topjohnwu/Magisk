@@ -106,10 +106,8 @@
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
     <string name="restore_img">Відновити образ</string>
-    <string name="uninstall_app">Видалити додаток</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
-    <string name="uninstall_toast">Видалення Magisk Manager протягом 5 секунд, потім, будь ласка, вручну перезавантажте пристрій</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
     <string name="proprietary_notice">Magisk Manager — це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
     <string name="su_db_corrupt">База даних SU пошкоджена, буде створено нову БД</string>

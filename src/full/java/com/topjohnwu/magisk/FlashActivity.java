@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 
@@ -113,6 +115,9 @@ public class FlashActivity extends Activity {
             case Const.Value.FLASH_ZIP:
                 new FlashZip(this, uri, console, logs).exec();
                 break;
+            case Const.Value.UNINSTALL:
+                new UninstallMagisk(this, uri, console, logs).exec();
+                break;
             case Const.Value.FLASH_MAGISK:
                 new InstallMagisk(this, console, logs, uri, InstallMagisk.DIRECT_MODE).exec();
                 break;
@@ -129,5 +134,22 @@ public class FlashActivity extends Activity {
     @Override
     public void onBackPressed() {
         // Prevent user accidentally press back button
+    }
+
+    private static class UninstallMagisk extends FlashZip {
+
+        private UninstallMagisk(Activity context, Uri uri, List<String> console, List<String> logs) {
+            super(context, uri, console, logs);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if (result == 1) {
+                new Handler().postDelayed(() ->
+                        RootUtils.uninstallPkg(getActivity().getPackageName()), 3000);
+            } else {
+                super.onPostExecute(result);
+            }
+        }
     }
 }

@@ -107,10 +107,8 @@
     <string name="boot_file_patch_msg">Selecionar depósito de imagem de inicialização de fábrica no formato .img ou .img.tar</string>
     <string name="complete_uninstall">Completar Desinstalação</string>
     <string name="restore_img">Restaurar Imagens</string>
-    <string name="uninstall_app">Desinstalar App</string>
     <string name="restore_done">Restauração concluída!</string>
     <string name="restore_fail">Backup de fábrica não existe!</string>
-    <string name="uninstall_toast">Desinstalando Magisk Manager em 5 segundos, manualmente reinicie logo após</string>
     <string name="proprietary_title">Baixar Código de Propriedade</string>
     <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código de propriedade de SafetyNet API da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para verificação de SafetyNet?</string>
     <string name="su_db_corrupt">Banco de dados do SU está corrompido, será recriado novo db</string>

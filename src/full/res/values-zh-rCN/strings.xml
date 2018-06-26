@@ -107,10 +107,8 @@
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
-    <string name="uninstall_app">卸载应用</string>
     <string name="restore_done">还原完成！</string>
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>
-    <string name="uninstall_toast">将在 5 秒内卸载 Magisk Manager，接下来请手动重新启动</string>
     <string name="proprietary_title">下载专有代码</string>
     <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
     <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>

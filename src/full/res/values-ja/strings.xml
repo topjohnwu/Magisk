@@ -107,10 +107,8 @@
     <string name="boot_file_patch_msg">StockのBootイメージ (.img または .img.tar形式) を選択してください</string>
     <string name="complete_uninstall">完全にアンインストール</string>
     <string name="restore_img">イメージのリストア</string>
-    <string name="uninstall_app">アプリのアンインストール</string>
     <string name="restore_done">リストア完了！</string>
     <string name="restore_fail">Stockのバックアップがありません！</string>
-    <string name="uninstall_toast">5秒以内にMagisk Managerをアンインストールします。手動で再起動してください</string>
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
     <string name="proprietary_notice">Magisk ManagerはFOSSのため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
     <string name="su_db_corrupt">SUデータベースが壊れています。DBを再生成します</string>

@@ -107,10 +107,8 @@
     <string name="boot_file_patch_msg">Изберете стоков Boot образ с формат .img или .img.tar</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
-    <string name="uninstall_app">Деинсталиране на приложението</string>
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
-    <string name="uninstall_toast">Деинсталиране на Magisk Manager до 5 секунди, моля по-късно да рестартирате</string>
     <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="proprietary_notice">Magisk Manager е FOSS и затова не включва частния код за SafetyNet ППИ на Google.\n\nПозволявате ли на Magisk Manager да изтегли добавката (включва GoogleApiClient) за SafetyNet проверки?</string>
     <string name="su_db_corrupt">Базата данни за SU е повредена, ще създадем нов db файл</string>

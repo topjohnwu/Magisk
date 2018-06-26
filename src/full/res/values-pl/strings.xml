@@ -106,10 +106,8 @@
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
     <string name="complete_uninstall">Odinstalowywanie Zakończone</string>
     <string name="restore_img">Przywróć Obraz</string>
-    <string name="uninstall_app">Odinstaluj Aplikację</string>
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Stock backup nie istnieje!</string>
-    <string name="uninstall_toast">Odinstalowanie Magisk Manager w ciągu 5 sekund, proszę następnie ręcznie ponownie uruchomić urządzenie</string>
     <string name="proprietary_title">Pobierz Kod</string>
     <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzenia SafetyNet?</string>
     <string name="su_db_corrupt">Baza danych SU jest uszkodzona, odtworzy nową bazę danych</string>

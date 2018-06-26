@@ -40,8 +40,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
     private boolean unzipAndCheck() throws Exception {
         ZipUtils.unzip(mCachedFile, mCachedFile.getParentFile(), "META-INF/com/google/android", true);
-        String s = ShellUtils.fastCmd("head -n 1 " + new File(mCachedFile.getParentFile(), "updater-script"));
-        return s != null && s.contains("#MAGISK");
+        return ShellUtils.fastCmdResult("grep -q '#MAGISK' " + new File(mCachedFile.getParentFile(), "updater-script"));
     }
 
     @Override

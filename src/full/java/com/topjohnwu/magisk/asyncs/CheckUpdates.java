@@ -47,6 +47,8 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             mm.remoteManagerVersionString = manager.getString("version");
             mm.remoteManagerVersionCode = manager.getInt("versionCode");
             mm.managerLink = manager.getString("link");
+            JSONObject uninstaller = json.getJSONObject("uninstaller");
+            mm.uninstallerLink = uninstaller.getString("link");
         } catch (JSONException ignored) {}
         return null;
     }

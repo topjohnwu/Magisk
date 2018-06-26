@@ -106,11 +106,9 @@
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
     <string name="restore_img">Pulihkan Image</string>
-    <string name="uninstall_app">Copot Apl</string>
     <string name="complete_uninstall">Copot Total</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
-    <string name="uninstall_toast">Mencopot Magisk Manager dalam 5 detik, silahkan reboot secara manual setelahnya</string>
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS, yang tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>

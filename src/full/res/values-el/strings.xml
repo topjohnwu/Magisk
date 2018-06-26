@@ -108,7 +108,6 @@
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
-    <string name="uninstall_toast">Απεγκατάσταση του Magisk Manager σε 5 δευτερόλεπτα, παρακαλώ επανεκκινήστε χειροκίνητα αμέσως μετά</string>
     <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
     <string name="proprietary_notice">Το Magisk Manager είναι FOSS οπότε δεν περιέχει της Google τον ιδιόκτητο κώδικα του SafetyNet API.\n\nΕπιτρέπετε στο Magisk Manager να κατεβάσει μια επέκταση (περιέχει το GoogleApiClient) για ελέγχους του SafetyNet?</string>
     <string name="su_db_corrupt">Η βάση δεδομένων SU είναι κατεστραμμένη, θα αναδημιουργηθεί νέα</string>

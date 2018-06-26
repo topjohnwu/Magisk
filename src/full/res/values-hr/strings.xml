@@ -98,7 +98,6 @@
     <string name="complete_uninstall">Potpuna deinstalacija</string>
     <string name="restore_done">Obnova je dovršena!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
-    <string name="uninstall_toast">Deinstaliranje Magisk Manager aplikacije unutar 5 sekundi, molimo ponovno pokrenite uređaj nakon toga</string>
     <string name="proprietary_title">Preuzmite vlasnički kod</string>
     <string name="proprietary_notice">Magisk Manager je FOSS aplikacija te ne sadrži Googleov SafetyNet API kod.\n\nDopuštate li Magisk Manager aplikaciji da preuzme proširenje (sadrži GoogleApiClient) za SafetyNet provjere?</string>
 

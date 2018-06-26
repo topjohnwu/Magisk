@@ -108,10 +108,8 @@
     <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
-    <string name="uninstall_app">Pašalinti programėlę</string>
     <string name="restore_done">Atstatymas įvykdytas!</string>
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
-    <string name="uninstall_toast">Magisk Manager bus pašalintas po 5 sekundžių, pašalinus perkraukite telefoną</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
     <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>

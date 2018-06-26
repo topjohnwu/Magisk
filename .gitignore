@@ -6,7 +6,7 @@
 app/release
 *.hprof
 .externalNativeBuild/
-src/full/assets
+src/full/res/raw/util_functions.sh
 public.certificate.x509.pem
 private.key.pk8
 *.apk

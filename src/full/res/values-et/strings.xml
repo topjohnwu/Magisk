@@ -108,10 +108,8 @@
     <string name="boot_file_patch_msg">Vali originaalne käivituspildi väljastus .img või .img.tar vormingus</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
     <string name="restore_img">Taasta pildid</string>
-    <string name="uninstall_app">Desinstalli rakendus</string>
     <string name="restore_done">Taastus valmis!</string>
     <string name="restore_fail">Originaalne varundus puudub!</string>
-    <string name="uninstall_toast">Eemaldan Magisk Manager\'i 5 sekundi pärast, palun tee peale seda käsitsi taaskäivitus</string>
     <string name="proprietary_title">Laadi alla suletud koodi</string>
     <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, mis ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n
   \n

@@ -15,7 +15,7 @@ public class ShellInitializer extends Shell.Initializer {
     @Override
     public boolean onRootShellInit(Context context, @NonNull Shell shell) throws Exception {
         BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
-        try (InputStream magiskUtils = context.getAssets().open(Const.UTIL_FUNCTIONS);
+        try (InputStream magiskUtils = context.getResources().openRawResource(R.raw.util_functions);
              InputStream managerUtils = context.getResources().openRawResource(R.raw.utils)
         ) {
             shell.loadInputStream(null, null, magiskUtils);

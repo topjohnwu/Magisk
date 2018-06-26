@@ -106,10 +106,10 @@
     <string name="boot_file_patch_msg">Select stock boot image dump in .img or .img.tar format</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
-    <string name="uninstall_app">Uninstall App</string>
+    <string name="restore_img_title">Restoring Images</string>
+    <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
-    <string name="uninstall_toast">Uninstalling Magisk Manager in 5 seconds, please manually reboot afterwards</string>
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, which doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
     <string name="su_db_corrupt">SU database is corrupted, will recreate new db</string>
@@ -119,6 +119,8 @@
     <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+    <string name="setup_title">Additional Setup</string>
+    <string name="setup_msg">Running environment setup…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

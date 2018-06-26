@@ -54,11 +54,14 @@ public class MagiskManager extends Application implements Shell.Container {
     public int magiskVersionCode = -1;
     public String remoteMagiskVersionString;
     public int remoteMagiskVersionCode = -1;
-    public String magiskLink;
-    public String releaseNoteLink;
     public String remoteManagerVersionString;
     public int remoteManagerVersionCode = -1;
+
+    public String magiskLink;
+    public String releaseNoteLink;
     public String managerLink;
+    public String uninstallerLink;
+
     public boolean keepVerity = false;
     public boolean keepEnc = false;
 

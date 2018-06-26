@@ -102,7 +102,6 @@
     <string name="complete_uninstall">Dezinstalare totală</string>
     <string name="restore_done">Restabilire finalizată!</string>
     <string name="restore_fail">Backup stoc nu există!</string>
-    <string name="uninstall_toast">Dezinstalare Magisk Manager în 5 secunde, ulterior reporniți manual</string>
     <string name="proprietary_title">Descărcare cod proprietar</string>
     <string name="proprietary_notice">Magisk Manager este FOSS așa că nu conține codul API SafetyNet de la Google.\n\nPermiteți ca Magisk Manager să descarce o extensie (conține GoogleApiClient) pentru verificările SafetyNet?</string>
     <string name="su_db_corrupt">Baza de date SU este defectă, va fi creată o bază nouă</string>

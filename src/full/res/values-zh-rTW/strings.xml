@@ -182,7 +182,6 @@
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
     <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
     <string name="install_second_slot">安裝到第二分區 (安裝完OTA後)</string>
-    <string name="uninstall_toast">將在 5 秒內解除安裝 Magisk Manager，接下來請手動重新啟動</string>
     <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
     <string name="proprietary_title">下載非開源程式</string>
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
@@ -198,7 +197,6 @@
     <string name="reboot_bootloader">重啟到 Bootloader</string>
     <string name="reboot_download">重啟到 Download</string>
     <string name="android_o_not_support">不支援 Android 8.0+</string>
-    <string name="uninstall_app">解除安裝應用程式</string>
     <string name="restore_img">還原原廠映像檔</string>
     <string name="updated_on">更新於：%1$s</string>
     <string name="sorting_order">排序方式</string>

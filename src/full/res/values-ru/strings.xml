@@ -107,10 +107,8 @@
     <string name="boot_file_patch_msg">Выберите файл ядра (boot), *.img либо *.img.tar формата</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
-    <string name="uninstall_app">Удалить приложение</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
-    <string name="uninstall_toast">Удаление Magisk Manager в течении 5 секунд. Перезагрузите устройство.</string>
     <string name="proprietary_title">Загрузка SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
     <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>

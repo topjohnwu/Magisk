@@ -107,11 +107,9 @@
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
     <string name="restore_img">Ripristina Immagini</string>
-	<string name="uninstall_app">Disinstalla App</string>
-	<string name="restore_done">Ripristino completato!</string>
+    <string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
-	<string name="uninstall_toast">Disinstallazione di Magisk Manager in 5 secondi, riavvia manualmente per completare</string>
-	<string name="proprietary_title">Scarica codice proprietario</string>
+    <string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS, quindi non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi permettere il download di un\'estensione (che contiene GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
 	<string name="cannot_check_sn_title">Impossibile controllare SafetyNet</string>

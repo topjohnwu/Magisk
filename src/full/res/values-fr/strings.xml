@@ -106,10 +106,8 @@
     <string name="boot_file_patch_msg">Sélectionnez l\'image par défaut de démarrage stockée au format .img ou .img.tar</string>
     <string name="complete_uninstall">Désinstallation terminée</string>
     <string name="restore_img">Restauration des images</string>
-    <string name="uninstall_app">Désinstallation de l\'application</string>
     <string name="restore_done">Restauration terminée!</string>
     <string name="restore_fail">Le sauvegarde par défaut n\'existe pas!</string>
-    <string name="uninstall_toast">Désinstallation du Gestionnaire Magisk dans 5 secondes, merci de redémarrer manuellement après celà</string>
     <string name="proprietary_title">Télécharger Code Propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est Libre, il ne contient pas le code API SafetyNet propriétaire de Google. \ N \ nAutorisez vous le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet? </string>
     <string name = "su_db_corrupt"> La base de données SU est corrompue, une nouvelle base de donnée va être re-créé</string>

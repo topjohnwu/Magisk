@@ -26,7 +26,6 @@ import org.kamranzafar.jtar.TarOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -73,8 +72,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected void onPreExecute() {
         if (mode == FIX_ENV_MODE) {
-            dialog = ProgressDialog.show(getActivity(),
-                    "Additional Setup", "Running environment setup...");
+            Activity a = getActivity();
+            dialog = ProgressDialog.show(a, a.getString(R.string.setup_title), a.getString(R.string.setup_msg));
             console = new NOPList<>();
         }
     }
