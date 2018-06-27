@@ -107,6 +107,8 @@
     <string name="boot_file_patch_msg">Изберете стоков Boot образ с формат .img или .img.tar</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
+    <string name="restore_img_title">Възстановяване на образи</string>
+    <string name="restore_img_msg">Възстановяване…</string>
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
     <string name="proprietary_title">Изтегляне на патентования код</string>
@@ -118,7 +120,9 @@
     <string name="setup_fail">Първоначалната настройка е неуспешна</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
     <string name="env_fix_msg">Вашето устройство се нуждае от допълнителни настройки за Magisk, за да работи перфектно. Ще бъде изтеглен архивът за настройка на Magisk. Желаете ли да продължите?</string>
-
+    <string name="setup_title">Допълнителни настройване</string>
+    <string name="setup_msg">Настройването на средата е в ход…</string>
+    
     <!--Settings Activity -->
     <string name="settings_general_category">Общи</string>
     <string name="settings_dark_theme_title">Тъмна тема</string>
