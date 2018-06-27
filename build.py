@@ -195,9 +195,8 @@ def sign_apk(source, target):
 def build_apk(args):
 	header('* Building Magisk Manager')
 
-	mkdir(os.path.join('app', 'src', 'full', 'assets'))
 	source = os.path.join('scripts', 'util_functions.sh')
-	target = os.path.join('app', 'src', 'full', 'assets', 'util_functions.sh')
+	target = os.path.join('app', 'src', 'full', 'res', 'raw', 'util_functions.sh')
 	cp(source, target)
 
 	if args.release:
