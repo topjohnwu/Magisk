@@ -107,6 +107,8 @@
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
     <string name="restore_img">Pulihkan Image</string>
     <string name="complete_uninstall">Copot Total</string>
+    <string name="restore_img_title">Memulihkan Image</string>
+    <string name="restore_img_msg">Memulihkan…</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="proprietary_title">Unduh Kode Proprieter</string>
@@ -118,6 +120,8 @@
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
+    <string name="setup_title">Penyiapan Tambahan</string>
+    <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>
