@@ -585,7 +585,7 @@ void startup() {
 	close(root);
 
 	// Alternative binaries paths
-	char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
+	char *alt_bin[] = { "/cache/data_bin", "/data/.magisk",
 						"/data/data/com.topjohnwu.magisk/install",
 						"/data/user_de/0/com.topjohnwu.magisk/install", NULL };
 	char *bin_path = NULL;
@@ -602,6 +602,7 @@ void startup() {
 	}
 
 	// Remove legacy stuffs
+	rm_rf("/data/magisk");
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
 

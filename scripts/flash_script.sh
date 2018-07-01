@@ -79,7 +79,7 @@ ui_print "- Constructing environment"
 check_data
 
 if $DATA; then
-  MAGISKBIN=/data/magisk
+  MAGISKBIN=/data/.magisk
   $DATA_DE && MAGISKBIN=/data/adb/magisk
   run_migrations
 else

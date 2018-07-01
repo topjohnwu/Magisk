@@ -106,7 +106,7 @@ def build_binary(args):
 	header('* Building binaries: ' + ' '.join(targets))
 
 	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
-
+	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
 
 	# Basic flags
 	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
