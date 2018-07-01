@@ -61,9 +61,6 @@ extern struct log_listener log_events[];
 extern int loggable;
 
 void monitor_logs();
-void start_debug_full_log();
-void stop_debug_full_log();
-void start_debug_log();
 
 #endif
 

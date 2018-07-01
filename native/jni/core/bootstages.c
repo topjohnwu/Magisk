@@ -673,9 +673,6 @@ void post_fs_data(int client) {
 	// If post-fs-data mode is started, it means startup succeeded
 	setup_done = 1;
 
-	// Start the debug log
-	start_debug_full_log();
-
 	LOGI("** post-fs-data mode running\n");
 
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
@@ -842,6 +839,4 @@ core_only:
 	free(buf2);
 	buf = buf2 = NULL;
 	vec_deep_destroy(&module_list);
-
-	stop_debug_full_log();
 }

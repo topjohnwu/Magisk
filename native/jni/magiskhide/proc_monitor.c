@@ -132,12 +132,12 @@ void proc_monitor() {
 	xpipe2(pipefd, O_CLOEXEC);
 	log_events[HIDE_EVENT].fd = pipefd[1];
 
-	for (char *log, *line;; free(log)) {
-		if (read(pipefd[0], &log, sizeof(log)) != sizeof(log)) {
-			/* It might be interrupted */
-			log = NULL;
+	FILE *logs = fdopen(pipefd[0], "r");
+	char log[PIPE_BUF], *line;
+	while (1) {
+		/* It might be interrupted */
+		if (fgets(log, sizeof(log), logs) == NULL)
 			continue;
-		}
 		char *ss = strchr(log, '[');
 		int pid, ppid, ret, comma = 0;
 		char *pos = ss, proc[256], ns[32], pns[32];

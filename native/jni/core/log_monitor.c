@@ -9,6 +9,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #include "magisk.h"
 #include "utils.h"
@@ -26,7 +27,7 @@ static int magisk_log_filter(const char *log) {
 }
 
 static int magisk_debug_log_filter(const char *log) {
-	return strstr(log, "Magisk") != NULL;
+	return strstr(log, "am_proc_start") == NULL;
 }
 
 struct log_listener log_events[] = {
@@ -43,10 +44,7 @@ struct log_listener log_events[] = {
 		.filter = magisk_debug_log_filter
 	}
 };
-
-#ifdef MAGISK_DEBUG
-static int debug_log_pid = -1, debug_log_fd = -1;
-#endif
+#define EVENT_NUM (sizeof(log_events) / sizeof(struct log_listener))
 
 static void test_logcat() {
 	int log_fd = -1, log_pid;
@@ -62,14 +60,14 @@ static void test_logcat() {
 
 static void *logger_thread(void *args) {
 	int log_fd = -1, log_pid;
-	char line[4096];
+	char line[PIPE_BUF];
 
 	LOGD("log_monitor: logger start");
 
 	while (1) {
 		if (!loggable) {
 			// Disable all services
-			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
+			for (int i = 0; i < EVENT_NUM; ++i) {
 				close(log_events[i].fd);
 				log_events[i].fd = -1;
 			}
@@ -77,68 +75,34 @@ static void *logger_thread(void *args) {
 		}
 
 		// Start logcat
-		log_pid = exec_command(0, &log_fd, NULL, "logcat", "-b", "events", "-b", "main", "-v", "threadtime", "-s", "am_proc_start", "-s", "Magisk", NULL);
-		while (fdgets(line, sizeof(line), log_fd)) {
-			for (int i = 0; i < (sizeof(log_events) / sizeof(struct log_listener)); ++i) {
-				if (log_events[i].fd > 0 && log_events[i].filter(line)) {
-					char *s = strdup(line);
-					xwrite(log_events[i].fd, &s, sizeof(s));
-				}
+		log_pid = exec_command(0, &log_fd, NULL,
+							   "/system/bin/logcat",
+							   "-b", "events", "-b", "main", "-b", "crash",
+							   "-v", "threadtime",
+							   "-s", "am_proc_start", "Magisk", "*:F",
+							   NULL);
+		FILE *logs = fdopen(log_fd, "r");
+		while (fgets(line, sizeof(line), logs)) {
+			if (line[0] == '-')
+				continue;
+			size_t len = strlen(line);
+			for (int i = 0; i < EVENT_NUM; ++i) {
+				if (log_events[i].fd > 0 && log_events[i].filter(line))
+					xwrite(log_events[i].fd, line, len);
 			}
 			if (kill(log_pid, 0))
 				break;
 		}
 
 		// Cleanup
-		close(log_fd);
+		fclose(logs);
 		log_fd = -1;
 		kill(log_pid, SIGTERM);
 		waitpid(log_pid, NULL, 0);
-
-		// Clear buffer before restart
-		exec_command_sync("logcat", "-b", "events", "-b", "main", "-c", NULL);
-
 		test_logcat();
 	}
 
 	// Should never be here, but well...
-	return NULL;
-}
-
-static void *magisk_log_thread(void *args) {
-	rename(LOGFILE, LOGFILE ".bak");
-	FILE *log = xfopen(LOGFILE, "w");
-	setbuf(log, NULL);
-	int pipefd[2];
-	if (xpipe2(pipefd, O_CLOEXEC) == -1)
-		return NULL;
-
-	LOGD("log_monitor: magisk log dumper start");
-
-	// Register our listener
-	log_events[LOG_EVENT].fd = pipefd[1];
-
-	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line))
-		fprintf(log, "%s", line);
-
-	return NULL;
-}
-
-static void *debug_magisk_log_thread(void *args) {
-	FILE *log = xfopen(DEBUG_LOG, "a");
-	setbuf(log, NULL);
-	int pipefd[2];
-	if (xpipe2(pipefd, O_CLOEXEC) == -1)
-		return NULL;
-
-	LOGD("log_monitor: debug log dumper start");
-
-	// Register our listener
-	log_events[DEBUG_EVENT].fd = pipefd[1];
-
-	for (char *line; xxread(pipefd[0], &line, sizeof(line)) > 0; free(line))
-		fprintf(log, "%s", line);
-
 	return NULL;
 }
 
@@ -149,46 +113,14 @@ void monitor_logs() {
 	test_logcat();
 
 	if (loggable) {
-		// Start log file dumper before monitor
-		xpthread_create(&thread, NULL, magisk_log_thread, NULL);
-		pthread_detach(thread);
+		rename(LOGFILE, LOGFILE ".bak");
+		log_events[LOG_EVENT].fd = creat(LOGFILE, 0644);
+#ifdef MAGISK_DEBUG
+		log_events[DEBUG_EVENT].fd = creat(DEBUG_LOG, 0644);
+#endif
 
 		// Start logcat monitor
 		xpthread_create(&thread, NULL, logger_thread, NULL);
 		pthread_detach(thread);
 	}
-}
-
-void start_debug_full_log() {
-#ifdef MAGISK_DEBUG
-	if (loggable) {
-		// Log everything initially
-		debug_log_fd = xopen(DEBUG_LOG, O_WRONLY | O_CREAT | O_CLOEXEC | O_TRUNC, 0644);
-		debug_log_pid = exec_command(0, &debug_log_fd, NULL, "logcat", "-v", "threadtime", NULL);
-		close(debug_log_fd);
-	}
-#endif
-}
-
-void stop_debug_full_log() {
-#ifdef MAGISK_DEBUG
-	// Stop recording the boot logcat after every boot task is done
-	if (debug_log_pid > 0) {
-		kill(debug_log_pid, SIGTERM);
-		waitpid(debug_log_pid, NULL, 0);
-		// Start debug thread
-		start_debug_log();
-	}
-#endif
-}
-
-void start_debug_log() {
-#ifdef MAGISK_DEBUG
-	if (loggable) {
-		pthread_t thread;
-		// Start debug thread
-		xpthread_create(&thread, NULL, debug_magisk_log_thread, NULL);
-		pthread_detach(thread);
-	}
-#endif
 }
