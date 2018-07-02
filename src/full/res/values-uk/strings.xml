@@ -105,7 +105,9 @@
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
-    <string name="restore_img">Відновити образ</string>
+    <string name="restore_img">Відновити образи</string>
+    <string name="restore_img_title">Відновлення образів</string>
+    <string name="restore_img_msg">Відновлення…</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
@@ -117,6 +119,8 @@
     <string name="setup_fail">Не вдалося налаштувати</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
+    <string name="setup_title">Додаткове налаштування</string>
+    <string name="setup_msg">Налаштування робочого середовища…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>
@@ -209,7 +213,7 @@
     <string name="su_revoke_title">Відкликати?</string>
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>
-    <string name="none">Нічого</string>
+    <string name="none">Ні</string>
     <string name="auth_fail">Помилка автентифікації</string>
 
     <!--Superuser logs-->
