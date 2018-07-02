@@ -22,8 +22,7 @@ static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 enum {
 	HIDE_EVENT,
-	LOG_EVENT,
-	DEBUG_EVENT
+	LOG_EVENT
 };
 
 struct log_listener {
@@ -36,12 +35,7 @@ static int am_proc_start_filter(const char *log) {
 }
 
 static int magisk_log_filter(const char *log) {
-	char *ss;
-	return (ss = strstr(log, " Magisk")) && (ss[-1] != 'D') && (ss[-1] != 'V');
-}
-
-static int magisk_debug_log_filter(const char *log) {
-	return strstr(log, "am_proc_start") == NULL;
+	return !am_proc_start_filter(log);
 }
 
 static struct log_listener log_events[] = {
@@ -52,10 +46,6 @@ static struct log_listener log_events[] = {
 	{	/* LOG_EVENT */
 		.fd = -1,
 		.filter = magisk_log_filter
-	},
-	{	/* DEBUG_EVENT */
-		.fd = -1,
-		.filter = magisk_debug_log_filter
 	}
 };
 #define EVENT_NUM (sizeof(log_events) / sizeof(struct log_listener))
@@ -114,9 +104,6 @@ void log_daemon() {
 	// Setup log dumps
 	rename(LOGFILE, LOGFILE ".bak");
 	log_events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0644);
-#ifdef MAGISK_DEBUG
-	log_events[DEBUG_EVENT].fd = xopen(DEBUG_LOG, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0644);
-#endif
 
 	int log_fd = -1, log_pid;
 	char line[PIPE_BUF];

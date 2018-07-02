@@ -30,7 +30,6 @@
 #define DATABIN         SECURE_DIR "/magisk"
 #define MAGISKDB        SECURE_DIR "/magisk.db"
 #define SIMPLEMOUNT     SECURE_DIR "/magisk_simple"
-#define DEBUG_LOG       SECURE_DIR "/magisk_debug.log"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKRC        "/init.magisk.rc"
 
