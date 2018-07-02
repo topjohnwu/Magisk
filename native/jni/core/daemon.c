@@ -84,6 +84,7 @@ static void *request_handler(void *args) {
 		late_start(client);
 		break;
 	default:
+		close(client);
 		break;
 	}
 	return NULL;
@@ -105,13 +106,15 @@ void auto_start_magiskhide() {
 	free(hide_prop);
 }
 
-void start_daemon() {
+void main_daemon() {
 	setsid();
 	setcon("u:r:"SEPOL_PROC_DOMAIN":s0");
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-	xdup2(fd, STDIN_FILENO);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
+	close(fd);
+	fd = xopen("/dev/zero", O_RDWR | O_CLOEXEC);
+	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
 	// Block user signals
@@ -121,16 +124,15 @@ void start_daemon() {
 	sigaddset(&block_set, SIGUSR2);
 	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
 
+	// Start the log monitor
+	monitor_logs();
+
 	struct sockaddr_un sun;
-	fd = setup_socket(&sun);
+	fd = setup_socket(&sun, MAIN_DAEMON);
 
 	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun)))
 		exit(1);
 	xlisten(fd, 10);
-
-	// Start the log monitor
-	monitor_logs();
-
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
 
 	// Change process name
@@ -147,13 +149,11 @@ void start_daemon() {
 	}
 }
 
-/* Connect the daemon, and return a socketfd */
-int connect_daemon() {
+/* Connect the daemon, set sockfd, and return if new daemon is spawned */
+int connect_daemon2(daemon_t d, int *sockfd) {
 	struct sockaddr_un sun;
-	int fd = setup_socket(&sun);
-	if (connect(fd, (struct sockaddr*) &sun, sizeof(sun))) {
-		// If we cannot access the daemon, we start a daemon in the child process if possible
-
+	*sockfd = setup_socket(&sun, d);
+	if (connect(*sockfd, (struct sockaddr*) &sun, sizeof(sun))) {
 		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
 			fprintf(stderr, "No daemon is currently running!\n");
 			exit(1);
@@ -161,12 +161,26 @@ int connect_daemon() {
 
 		if (fork_dont_care() == 0) {
 			LOGD("client: connect fail, try launching new daemon process\n");
-			close(fd);
-			start_daemon();
+			close(*sockfd);
+			switch (d) {
+				case MAIN_DAEMON:
+					main_daemon();
+					break;
+				case LOG_DAEMON:
+					log_daemon();
+					break;
+			}
 		}
 
-		while (connect(fd, (struct sockaddr*) &sun, sizeof(sun)))
+		while (connect(*sockfd, (struct sockaddr*) &sun, sizeof(sun)))
 			usleep(10000);
+		return 1;
 	}
+	return 0;
+}
+
+int connect_daemon() {
+	int fd;
+	connect_daemon2(MAIN_DAEMON, &fd);
 	return fd;
 }

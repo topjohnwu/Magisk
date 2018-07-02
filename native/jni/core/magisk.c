@@ -98,7 +98,7 @@ int magisk_main(int argc, char *argv[]) {
 		return 0;
 	} else if (strcmp(argv[1], "--daemon") == 0) {
 		int fd = connect_daemon();
-		close(fd);
+		write_int(fd, DO_NOTHING);
 		return 0;
 	} else if (strcmp(argv[1], "--startup") == 0) {
 		startup();

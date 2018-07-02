@@ -46,18 +46,6 @@
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
 
-enum {
-	HIDE_EVENT,
-	LOG_EVENT,
-	DEBUG_EVENT
-};
-
-struct log_listener {
-	int fd;
-	int (*filter) (const char*);
-};
-
-extern struct log_listener log_events[];
 extern int loggable;
 
 void monitor_logs();

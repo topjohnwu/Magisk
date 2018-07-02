@@ -8,18 +8,24 @@
 #include "utils.h"
 #include "magisk.h"
 
-static char socket_name[] = SOCKET_NAME;  /* Workaround compiler bug pre NDK r13 */
-
 /* Setup the address and return socket fd */
-int setup_socket(struct sockaddr_un *sun) {
+int setup_socket(struct sockaddr_un *sun, daemon_t d) {
 	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
 	sun->sun_path[0] = '\0';
-	memcpy(sun->sun_path + 1, socket_name, sizeof(SOCKET_NAME));
+	const char *name;
+	switch (d) {
+		case MAIN_DAEMON:
+			name = MAIN_SOCKET;
+			break;
+		case LOG_DAEMON:
+			name = LOG_SOCKET;
+			break;
+	}
+	strcpy(sun->sun_path + 1, name);
 	return fd;
 }
-
 
 /*
  * Receive a file descriptor from a Unix socket.

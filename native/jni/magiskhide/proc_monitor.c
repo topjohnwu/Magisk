@@ -16,21 +16,19 @@
 #include <sys/mount.h>
 
 #include "magisk.h"
+#include "daemon.h"
 #include "utils.h"
 #include "magiskhide.h"
 
-static int pipefd[2] = { -1, -1 };
+static int sockfd = -1;
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int sig) {
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
 	hideEnabled = 0;
-	// Unregister listener
-	log_events[HIDE_EVENT].fd = -1;
-	close(pipefd[0]);
-	close(pipefd[1]);
-	pipefd[0] = pipefd[1] = -1;
+	close(sockfd);
+	sockfd = -1;
 	pthread_mutex_destroy(&hide_lock);
 	pthread_mutex_destroy(&file_lock);
 	LOGD("proc_monitor: terminating...\n");
@@ -128,12 +126,12 @@ void proc_monitor() {
 		term_thread(TERM_THREAD);
 	}
 
-	// Register our listener to logcat monitor
-	xpipe2(pipefd, O_CLOEXEC);
-	log_events[HIDE_EVENT].fd = pipefd[1];
+	// Connect to the log daemon
+	connect_daemon2(LOG_DAEMON, &sockfd);
+	write_int(sockfd, HIDE_CONNECT);
 
-	FILE *logs = fdopen(pipefd[0], "r");
-	char log[PIPE_BUF], *line;
+	FILE *logs = fdopen(sockfd, "r");
+	char log[4096], *line;
 	while (1) {
 		/* It might be interrupted */
 		if (fgets(log, sizeof(log), logs) == NULL)

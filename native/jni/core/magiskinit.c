@@ -57,8 +57,6 @@
 
 extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
-static char RAND_SOCKET_NAME[sizeof(SOCKET_NAME)];
-static int SOCKET_OFF = -1;
 
 struct cmdline {
 	char skip_initramfs;
@@ -345,18 +343,21 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 
 static void patch_socket_name(const char *path) {
 	void *buf;
+	char name[sizeof(MAIN_SOCKET)];
 	size_t size;
 	mmap_rw(path, &buf, &size);
-	if (SOCKET_OFF < 0) {
-		for (int i = 0; i < size; ++i) {
-			if (memcmp(buf + i, SOCKET_NAME, sizeof(SOCKET_NAME)) == 0) {
-				SOCKET_OFF = i;
-				break;
-			}
+	for (int i = 0; i < size; ++i) {
+		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
+			gen_rand_str(name, sizeof(name));
+			memcpy(buf + i, name, sizeof(name));
+			i += sizeof(name);
+		}
+		if (memcmp(buf + i, LOG_SOCKET, sizeof(LOG_SOCKET)) == 0) {
+			gen_rand_str(name, sizeof(name));
+			memcpy(buf + i, name, sizeof(name));
+			i += sizeof(name);
 		}
 	}
-	gen_rand_str(RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
-	memcpy(buf + SOCKET_OFF, RAND_SOCKET_NAME, sizeof(SOCKET_NAME));
 	munmap(buf, size);
 }
 
