@@ -358,23 +358,9 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	else
 		code = -1;
 
-	/* Passing the return code back to the client:
-	 * The client might be closed unexpectedly (e.g. swipe a root app out of recents)
-	 * In that case, writing to the client (which doesn't exist) will result in SIGPIPE
-	 * Here we simply just ignore the situation.
-	 */
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = SIG_IGN;
-	sigaction(SIGPIPE, &act, NULL);
-
 	LOGD("su: return code: [%d]\n", code);
 	write(client, &code, sizeof(code));
 	close(client);
-
-	// Restore default handler for SIGPIPE
-	act.sa_handler = SIG_DFL;
-	sigaction(SIGPIPE, &act, NULL);
 
 	return;
 }
