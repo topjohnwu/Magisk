@@ -45,6 +45,14 @@ toupper() {
 }
 
 find_block() {
+  for BLOCK in "$@"; do
+    DEVICE=`find /dev/block -type l -iname $BLOCK | head -n 1` 2>/dev/null
+    if [ ! -z $DEVICE ]; then
+      readlink -f $DEVICE
+      return 0
+    fi
+  done
+  # Fallback by parsing sysfs uevents
   for uevent in /sys/dev/block/*/uevent; do
     local DEVNAME=`grep_prop DEVNAME $uevent`
     local PARTNAME=`grep_prop PARTNAME $uevent`
