@@ -662,7 +662,7 @@ void startup() {
 	}
 
 	// Start post-fs-data mode
-	execl("/sbin/magisk", "magisk", "--post-fs-data", NULL);
+	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", NULL);
 }
 
 void post_fs_data(int client) {

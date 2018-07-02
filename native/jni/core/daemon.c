@@ -83,6 +83,9 @@ static void *request_handler(void *args) {
 	case LATE_START:
 		late_start(client);
 		break;
+	case MONITOR:
+		/* Do NOT close the client, make it hold */
+		break;
 	default:
 		close(client);
 		break;
@@ -117,13 +120,6 @@ void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
-	// Block user signals
-	sigset_t block_set;
-	sigemptyset(&block_set);
-	sigaddset(&block_set, SIGUSR1);
-	sigaddset(&block_set, SIGUSR2);
-	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
-
 	// Start the log monitor
 	monitor_logs();
 
@@ -137,6 +133,19 @@ void main_daemon() {
 
 	// Change process name
 	strcpy(argv0, "magiskd");
+
+	// Block all user signals
+	sigset_t block_set;
+	sigemptyset(&block_set);
+	sigaddset(&block_set, SIGUSR1);
+	sigaddset(&block_set, SIGUSR2);
+	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
+
+	// Ignore SIGPIPE
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &act, NULL);
 
 	// Loop forever to listen for requests
 	while(1) {

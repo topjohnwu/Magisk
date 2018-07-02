@@ -85,6 +85,26 @@ static void *socket_thread(void *args) {
 	}
 }
 
+static void *monitor_thread(void *args) {
+	// Block SIGPIPE to prevent interruption
+	sigset_t block_set;
+	sigemptyset(&block_set);
+	sigaddset(&block_set, SIGPIPE);
+	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
+	// Give the main daemon some time before we monitor it
+	sleep(5);
+	int fd;
+	char b[1];
+	do {
+		fd = connect_daemon();
+		write_int(fd, MONITOR);
+		// This should hold unless the daemon is killed
+		read(fd, b, sizeof(b));
+		// The main daemon crashed, spawn a new one
+		close(fd);
+	} while (1);
+}
+
 void log_daemon() {
 	setsid();
 	strcpy(argv0, "magisklogd");
@@ -96,6 +116,13 @@ void log_daemon() {
 	xlisten(sockfd, 1);
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");
 
+	// Start invincible mode monitor
+	// TODO: Remove this when all crashes are fixed
+	pthread_t t;
+	pthread_create(&t, NULL, monitor_thread, NULL);
+	pthread_detach(t);
+
+	// Set SIGPIPE handler
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = sigpipe_handler;
