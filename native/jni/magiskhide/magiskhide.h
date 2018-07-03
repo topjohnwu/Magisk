@@ -5,9 +5,6 @@
 
 #define TERM_THREAD SIGUSR1
 
-// Kill process
-void kill_proc(int pid);
-
 // Process monitor
 void proc_monitor();
 

@@ -22,10 +22,6 @@ int hideEnabled = 0;
 static pthread_t proc_monitor_thread;
 pthread_mutex_t hide_lock, file_lock;
 
-void kill_proc(int pid) {
-	kill(pid, SIGTERM);
-}
-
 static void usage(char *arg0) {
 	fprintf(stderr,
 		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Hide Magisk!\n\n"

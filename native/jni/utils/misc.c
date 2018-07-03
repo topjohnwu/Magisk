@@ -170,22 +170,38 @@ void ps(void (*func)(int)) {
 static void (*ps_filter_cb)(int);
 static const char *ps_filter_pattern;
 static void proc_name_filter(int pid) {
-	char buf[64];
-	int fd;
-	snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-	if (access(buf, R_OK) == -1 || (fd = xopen(buf, O_RDONLY)) == -1)
+	char buf[128];
+	FILE *f;
+	sprintf(buf, "/proc/%d/comm", pid);
+	if ((f = fopen(buf, "r"))) {
+		fgets(buf, sizeof(buf), f);
+		if (strcmp(buf, ps_filter_pattern) == 0)
+			goto run_cb;
+	} else {
+		// The PID is already killed
 		return;
-	if (fdgets(buf, sizeof(buf), fd) == 0) {
-		snprintf(buf, sizeof(buf), "/proc/%d/comm", pid);
-		close(fd);
-		if (access(buf, R_OK) == -1 || (fd = xopen(buf, O_RDONLY)) == -1)
-			return;
-		fdgets(buf, sizeof(buf), fd);
 	}
-	if (strcmp(buf, ps_filter_pattern) == 0) {
-		ps_filter_cb(pid);
-	}
-	close(fd);
+	fclose(f);
+
+	sprintf(buf, "/proc/%d/cmdline", pid);
+	f = fopen(buf, "r");
+	fgets(buf, sizeof(buf), f);
+	if (strcmp(basename(buf), ps_filter_pattern) == 0)
+		goto run_cb;
+	fclose(f);
+
+	sprintf(buf, "/proc/%d/exe", pid);
+	if (access(buf, F_OK) != 0)
+		return;
+	xreadlink(buf, buf, sizeof(buf));
+	if (strcmp(basename(buf), ps_filter_pattern) == 0)
+		goto run_cb;
+
+	return;
+run_cb:
+	ps_filter_cb(pid);
+	fclose(f);
+	return;
 }
 
 /* Call func with process name filtered with pattern */

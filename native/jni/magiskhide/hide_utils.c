@@ -26,21 +26,15 @@ static char *prop_value[] =
 	  "0", "0", "0", "1",
 	  "user", "release-keys", "0", NULL };
 
-static int mocked = 0;
-
 void manage_selinux() {
-	if (mocked) return;
-	char val[1];
+	char val;
 	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
-	xxread(fd, val, 1);
+	xxread(fd, &val, sizeof(val));
 	close(fd);
 	// Permissive
-	if (val[0] == '0') {
-		LOGI("hide_daemon: Permissive detected, hide the state\n");
-
+	if (val == '0') {
 		chmod(SELINUX_ENFORCE, 0640);
 		chmod(SELINUX_POLICY, 0440);
-		mocked = 1;
 	}
 }
 
@@ -63,6 +57,10 @@ static void rm_magisk_prop(const char *name, const char *value, void *v) {
 	if (strstr(name, "magisk")) {
 		deleteprop2(name, 0);
 	}
+}
+
+static void kill_proc(int pid) {
+	kill(pid, SIGTERM);
 }
 
 void clean_magisk_props() {
