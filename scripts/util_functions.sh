@@ -181,6 +181,10 @@ find_boot_image() {
   else
     BOOTIMAGE=`find_block boot_a kern-a android_boot kernel boot lnx bootimg`
   fi
+  if [ -z $BOOTIMAGE ]; then
+    # Lets see what fstabs tells me
+    BOOTIMAGE=`grep -v '#' /etc/*fstab* | grep -E '/boot[^a-zA-Z]' | grep -oE '/dev/[a-zA-Z0-9_./-]*' | head -n 1`
+  fi
 }
 
 flash_boot_image() {
