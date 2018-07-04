@@ -64,7 +64,7 @@
     <!--About Activity-->
     <string name="about">À propos</string>
     <string name="app_changelog">Journal</string>
-    <string name="translators"></string>
+    <string name="translators">xerta555</string>
     <string name="app_version">Version</string>
     <string name="app_source_code">Code source</string>
     <string name="donation">Dons</string>
@@ -93,8 +93,8 @@
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer</string>
     <string name="magisk_updates">Mises  à jours Magisk</string>
     <string name="flashing">Flahage</string>
-    <string name="hide_manager_toast">Masquage du Gestionnaire Magisk...</string>
-    <string name="hide_manager_toast2">Cela pourrait prendre un certain temps ...</string>
+    <string name="hide_manager_toast">Masquage du Gestionnaire Magisk…</string>
+    <string name="hide_manager_toast2">Cela pourrait prendre un certain temps …</string>
     <string name="hide_manager_fail_toast">Masquage du Gestionnaire Magisk échoué…</string>
     <string name="download_zip_only">Uniquement télécharger le zip</string>
     <string name="patch_boot_file">Patch Fichier Image Démarrage</string>
@@ -105,6 +105,7 @@
     <string name="boot_file_patch_msg">Sélectionnez l\'image par défaut de démarrage stockée au format .img ou .img.tar</string>
     <string name="complete_uninstall">Désinstallation terminée</string>
     <string name="restore_img">Restauration des images</string>
+    <string name="restore_img_msg">Restauration…</string>
     <string name="restore_done">Restauration terminée!</string>
     <string name="restore_fail">Le sauvegarde par défaut n\'existe pas!</string>
     <string name="proprietary_title">Télécharger Code Propriétaire</string>
@@ -116,6 +117,8 @@
     <string name="setup_fail">Échec de l\'installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d\'une configuration supplémentaire pour que Magisk fonctionne correctement. Il téléchargera le zip d\'installation de Magisk, voulez-vous procéder maintenant ?</string>
+    <string name="setup_title">Installation Additionnel</string>
+    <string name="setup_msg">Démarrer l\'installation de l\'environnement…</string>
  
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
