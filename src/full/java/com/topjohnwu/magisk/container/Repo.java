@@ -44,7 +44,7 @@ public class Repo extends BaseModule {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain versionCode");
         }
         if (getMinMagiskVersion() < Const.MIN_MODULE_VER()) {
-            Logger.error("Repo [" + repoName + "] is outdated");
+            Logger.debug("Repo [" + repoName + "] is outdated");
         }
     }
 

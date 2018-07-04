@@ -118,11 +118,8 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                         mm.repoDB.addRepo(repo);
                         publishProgress();
                     }
-                    if (!id.equals(repo.getId())) {
-                        Logger.error("Repo [" + name + "] rid=[" + id + "] id=[" + repo.getId() + "] mismatch");
-                    }
                 } catch (Repo.IllegalRepoException e) {
-                    Logger.error(e.getMessage());
+                    Logger.debug(e.getMessage());
                     mm.repoDB.removeRepo(id);
                 }
             });
@@ -205,7 +202,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                             repo.update();
                             mm.repoDB.addRepo(repo);
                         } catch (Repo.IllegalRepoException e) {
-                            Logger.error(e.getMessage());
+                            Logger.debug(e.getMessage());
                             mm.repoDB.removeRepo(repo);
                         }
                     });
