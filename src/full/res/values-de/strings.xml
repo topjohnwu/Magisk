@@ -1,10 +1,6 @@
 <resources>
-    <!--Universal-->
-
-
 
     <!--Welcome Activity-->
-
     <string name="modules">Module</string>
     <string name="downloads">Downloads</string>
     <string name="superuser">Superuser</string>
@@ -109,7 +105,9 @@
     <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Boot-Images nicht</string>
     <string name="boot_file_patch_msg">Selektiere das originale Boot image dump im Format .img oder .img.tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
-    <string name="restore_img">Stelle Images wieder her</string>
+    <string name="restore_img">Images wiederherstellen</string>
+    <string name="restore_img_title">Stelle Images wieder her</string>
+    <string name="restore_img_msg">Wiederherstellen...</string>
     <string name="restore_done">Wiederherstellung durchgeführt!</string>
     <string name="restore_fail">Kein Original Backup vorhanden!</string>
     <string name="proprietary_title">Lade proprietären Code herunter</string>
@@ -121,6 +119,8 @@
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Um Magisk ordnungsgemäß zu nutzen, benötigt das Geräte eine zusätzliche Einrichtung. Magisk Einrichtungs-zip wird heruntergeladen, fortsetzen?</string>
+    <string name="setup_title">Zusätzliche Einrichtung</string>
+    <string name="setup_msg">Umgebungseinrichtung läuft…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>
