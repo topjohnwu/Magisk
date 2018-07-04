@@ -104,7 +104,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     }
 
     private boolean dumpBoot() {
-        console.add("- Copying boot image to " + mBoot);
+        console.add("- Copying image locally");
         // Copy boot image to local
         try (InputStream in = mm.getContentResolver().openInputStream(bootUri);
              OutputStream out = new FileOutputStream(mBoot)
@@ -197,31 +197,28 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     ShellUtils.pump(in, out);
                     out.close();
                 }
+                Shell.Sync.su("rm -f " + patched);
                 console.add("");
-                console.add("*********************************");
-                console.add(" Patched Boot Image is placed in ");
+                console.add("****************************");
+                console.add(" Patched image is placed in ");
                 console.add(" " + dest + " ");
-                console.add("*********************************");
+                console.add("****************************");
                 break;
             case SECOND_SLOT_MODE:
             case DIRECT_MODE:
-                String binPath = mm.remoteMagiskVersionCode >= Const.MAGISK_VER.HIDDEN_PATH ?
-                        "/data/adb/magisk" : "/data/magisk";
-                Shell.Sync.su(console, logs,
-                        Utils.fmt("flash_boot_image %s %s; rm -f %s", patched, mBoot, patched),
-                        Utils.fmt("rm -rf %s/*; mkdir -p %s; chmod 700 /data/adb", binPath, binPath),
-                        Utils.fmt("cp -af %s/* %s; rm -rf %s", installDir, binPath, installDir),
-                        mm.keepVerity ? "" : "patch_dtbo_image");
+                Shell.Sync.sh(console, logs,
+                        Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir));
+                if (!mm.keepVerity)
+                    Shell.Sync.sh(console, logs, "find_dtbo_image", "patch_dtbo_image");
                 break;
         }
-        Shell.Sync.su("rm -f " + patched);
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
         if (mode == FIX_ENV_MODE) {
             installDir = new File("/data/adb/magisk");
-            Shell.Sync.sh("rm -rf " + installDir + "/*");
+            Shell.Sync.sh("rm -rf /data/adb/magisk/*");
         } else {
             installDir = new File(
                     (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
@@ -239,11 +236,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                     return false;
                 break;
             case DIRECT_MODE:
-                console.add("- Detecting ramdisk/boot image");
+                console.add("- Detecting target image");
                 mBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
                 break;
             case SECOND_SLOT_MODE:
-                console.add("- Detecting ramdisk/boot image");
+                console.add("- Detecting target image");
                 char slot[] = ShellUtils.fastCmd("echo $SLOT").toCharArray();
                 if (slot[1] == 'a') slot[1] = 'b';
                 else slot[1] = 'a';
@@ -253,11 +250,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 break;
         }
         if (mBoot == null) {
-            console.add("- Unable to detect ramdisk/boot image");
+            console.add("! Unable to detect target image");
             return false;
         }
 
-        console.add("- Use ramdisk/boot image: " + mBoot);
+        console.add("- Target image: " + mBoot);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
@@ -278,14 +275,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         try {
             extractFiles(arch);
             if (mode == FIX_ENV_MODE) {
-                Shell.Sync.sh(
-                        "cd " + installDir,
-                        "sh update-binary extract",
-                        "rm -f update-binary magisk.apk",
-                        "cd /",
-                        "rm -rf /sbin/.core/busybox/*",
-                        "/sbin/.core/mirror/bin/busybox --install -s /sbin/.core/busybox"
-                );
+                Shell.Sync.sh("fix_env");
             } else {
                 File patched = patchBoot();
                 if (patched == null)

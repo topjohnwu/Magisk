@@ -44,6 +44,25 @@ env_check() {
   return 0
 }
 
+fix_env() {
+  cd /data/adb/magisk
+  sh update-binary extract
+  rm -f update-binary magisk.apk
+  cd /
+  rm -rf /sbin/.core/busybox/*
+  /sbin/.core/mirror/bin/busybox --install -s /sbin/.core/busybox
+}
+
+direct_install() {
+  flash_boot_image $1 $2
+  rm -f $1
+  rm -rf /data/adb/magisk/* 2>/dev/null
+  mkdir -p /data/adb/magisk 2>/dev/null
+  chmod 700 /data/adb
+  cp -f $3/* /data/adb/magisk
+  rm -rf $3
+}
+
 mm_patch_dtbo() {
   if $KEEPVERITY; then
     echo false
