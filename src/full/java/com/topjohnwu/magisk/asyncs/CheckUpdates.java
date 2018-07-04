@@ -42,11 +42,12 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
             mm.remoteMagiskVersionString = magisk.getString("version");
             mm.remoteMagiskVersionCode = magisk.getInt("versionCode");
             mm.magiskLink = magisk.getString("link");
-            mm.releaseNoteLink = magisk.getString("note");
+            mm.magiskNoteLink = magisk.getString("note");
             JSONObject manager = json.getJSONObject("app");
             mm.remoteManagerVersionString = manager.getString("version");
             mm.remoteManagerVersionCode = manager.getInt("versionCode");
             mm.managerLink = manager.getString("link");
+            mm.managerNoteLink = manager.getString("note");
             JSONObject uninstaller = json.getJSONObject("uninstaller");
             mm.uninstallerLink = uninstaller.getString("link");
         } catch (JSONException ignored) {}

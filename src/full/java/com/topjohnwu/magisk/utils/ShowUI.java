@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
+import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.RestoreImages;
 import com.topjohnwu.magisk.components.AlertDialogBuilder;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -25,7 +26,6 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.receivers.RebootReceiver;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +123,7 @@ public class ShowUI {
         MagiskManager mm = Utils.getMagiskManager(activity);
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
                 mm.remoteMagiskVersionString, mm.remoteMagiskVersionCode);
-        new AlertDialogBuilder(activity)
+        AlertDialog.Builder b = new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)))
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
             .setCancelable(true)
@@ -208,22 +208,27 @@ public class ShowUI {
                         }
                     ).show();
             })
-            .setNeutralButton(R.string.release_notes, (d, i) -> {
-                if (mm.releaseNoteLink != null) {
-                    Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(mm.releaseNoteLink));
+            .setNegativeButton(R.string.no_thanks, null);
+        if (!TextUtils.isEmpty(mm.magiskNoteLink)) {
+            b.setNeutralButton(R.string.release_notes, (d, i) -> {
+                if (mm.magiskNoteLink.contains("forum.xda-developers")) {
+                    // Open forum links in browser
+                    Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(mm.magiskNoteLink));
                     openLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mm.startActivity(openLink);
+                } else {
+                    new MarkDownWindow(activity, null, mm.magiskNoteLink).exec();
                 }
-            })
-            .setNegativeButton(R.string.no_thanks, null)
-            .show();
+            });
+        }
+        b.show();
     }
 
     public static void managerInstallDialog(Activity activity) {
         MagiskManager mm = Utils.getMagiskManager(activity);
         String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
                 mm.remoteManagerVersionString, mm.remoteManagerVersionCode);
-        new AlertDialogBuilder(activity)
+        AlertDialog.Builder b = new AlertDialogBuilder(activity)
             .setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.app_name)))
             .setMessage(mm.getString(R.string.repo_install_msg, filename))
             .setCancelable(true)
@@ -236,8 +241,12 @@ public class ShowUI {
                     mm.sendBroadcast(intent);
                 });
             })
-            .setNegativeButton(R.string.no_thanks, null)
-            .show();
+            .setNegativeButton(R.string.no_thanks, null);
+        if (!TextUtils.isEmpty(mm.managerNoteLink)) {
+            b.setNeutralButton(R.string.app_changelog, (d, i) ->
+                    new MarkDownWindow(activity, null, mm.managerNoteLink).exec());
+        }
+        b.show();
     }
 
     public static void uninstallDialog(Activity activity) {
