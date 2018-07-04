@@ -87,7 +87,7 @@ public class Const {
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
         public static final String DONATION_URL = "https://www.paypal.me/topjohnwu";
-        public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3473445";
+        public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
         public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
     }
 
