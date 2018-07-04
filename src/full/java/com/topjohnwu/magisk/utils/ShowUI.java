@@ -134,10 +134,6 @@ public class ShowUI {
                 if (Shell.rootAccess()) {
                     options.add(mm.getString(R.string.direct_install));
                 }
-                String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");
-                if (s != null && Boolean.parseBoolean(s)) {
-                    options.add(mm.getString(R.string.install_second_slot));
-                }
                 new AlertDialog.Builder(activity)
                     .setTitle(R.string.select_method)
                     .setItems(
