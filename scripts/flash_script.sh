@@ -53,14 +53,14 @@ find_dtbo_image
 
 get_flags
 
-[ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
+[ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
+ui_print "- Target image: $BOOTIMAGE"
+[ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
 
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk is only for Android higher than Lollipop (5.0+) (SDK 21+)"
+[ $API -lt 21 ] && abort "! Magisk is only for Lollipop and above (5.0+) (SDK 21+)"
 
 ui_print "- Device platform: $ARCH"
 

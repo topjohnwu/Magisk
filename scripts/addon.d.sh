@@ -40,9 +40,9 @@ show_logo() {
 detection() {
   find_boot_image
   find_dtbo_image
-  [ -z $BOOTIMAGE ] && abort "! Unable to detect boot image"
-  ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
-  [ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
+  [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
+  ui_print "- Target image: $BOOTIMAGE"
+  [ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
   get_flags
 }
 
