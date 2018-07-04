@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,11 +12,10 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -30,23 +28,17 @@ import butterknife.ButterKnife;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
-    private List<ApplicationInfo> mOriginalList, mList;
-    private List<String> mHideList;
+    private List<ApplicationInfo> fullList, showList;
+    private List<String> hideList;
     private PackageManager pm;
     private ApplicationFilter filter;
-    private Topic magiskHideDone;
 
-    public ApplicationAdapter(Context context) {
-        mOriginalList = mList = Collections.emptyList();
-        mHideList = Collections.emptyList();
+    public ApplicationAdapter() {
+        fullList = showList = Collections.emptyList();
+        hideList = Collections.emptyList();
         filter = new ApplicationFilter();
-        pm = context.getPackageManager();
-        magiskHideDone = Utils.getMagiskManager(context).magiskHideDone;
+        pm = MagiskManager.get().getPackageManager();
         new LoadApps().exec();
-    }
-
-    private boolean lowercaseContains(CharSequence string, CharSequence nonNullLowercaseSearch) {
-        return !TextUtils.isEmpty(string) && string.toString().toLowerCase().contains(nonNullLowercaseSearch);
     }
 
     @Override
@@ -57,28 +49,28 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        ApplicationInfo info = mList.get(position);
+        ApplicationInfo info = showList.get(position);
 
         holder.appIcon.setImageDrawable(info.loadIcon(pm));
         holder.appName.setText(info.loadLabel(pm));
         holder.appPackage.setText(info.packageName);
 
         holder.checkBox.setOnCheckedChangeListener(null);
-        holder.checkBox.setChecked(mHideList.contains(info.packageName));
+        holder.checkBox.setChecked(hideList.contains(info.packageName));
         holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
             if (isChecked) {
                 Shell.Async.su("magiskhide --add " + info.packageName);
-                mHideList.add(info.packageName);
+                hideList.add(info.packageName);
             } else {
                 Shell.Async.su("magiskhide --rm " + info.packageName);
-                mHideList.remove(info.packageName);
+                hideList.remove(info.packageName);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return showList.size();
     }
 
     public void filter(String constraint) {
@@ -104,17 +96,21 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     private class ApplicationFilter extends Filter {
 
+        private boolean lowercaseContains(String s, CharSequence filter) {
+            return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
+        }
+
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             if (constraint == null || constraint.length() == 0) {
-                mList = mOriginalList;
+                showList = fullList;
             } else {
-                mList = new ArrayList<>();
+                showList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
-                for (ApplicationInfo info : mOriginalList) {
-                    if (lowercaseContains(info.loadLabel(pm), filter)
+                for (ApplicationInfo info : fullList) {
+                    if (lowercaseContains(info.loadLabel(pm).toString(), filter)
                             || lowercaseContains(info.packageName, filter)) {
-                        mList.add(info);
+                        showList.add(info);
                     }
                 }
             }
@@ -131,22 +127,32 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mOriginalList = pm.getInstalledApplications(0);
-            for (Iterator<ApplicationInfo> i = mOriginalList.iterator(); i.hasNext(); ) {
+            fullList = pm.getInstalledApplications(0);
+            hideList = Shell.Sync.su("magiskhide --ls");
+            for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
                 if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
                     i.remove();
                 }
             }
-            Collections.sort(mOriginalList, (a, b) -> a.loadLabel(pm).toString().toLowerCase()
-                    .compareTo(b.loadLabel(pm).toString().toLowerCase()));
-            mHideList = Shell.Sync.su("magiskhide --ls");
+            Collections.sort(fullList, (a, b) -> {
+                boolean ah = hideList.contains(a.packageName);
+                boolean bh = hideList.contains(b.packageName);
+                if (ah == bh) {
+                    return a.loadLabel(pm).toString().toLowerCase().compareTo(
+                            b.loadLabel(pm).toString().toLowerCase());
+                } else if (ah) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            });
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v) {
-            magiskHideDone.publish(false);
+            MagiskManager.get().magiskHideDone.publish(false);
         }
     }
 }

@@ -28,7 +28,6 @@ public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
     private ApplicationAdapter appAdapter;
 
     private SearchView.OnQueryTextListener searchListener;
-    private String lastFilter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,25 +40,22 @@ public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
         unbinder = ButterKnife.bind(this, view);
-        lastFilter = "";
 
         mSwipeRefreshLayout.setRefreshing(true);
         mSwipeRefreshLayout.setOnRefreshListener(() -> appAdapter.refresh());
 
-        appAdapter = new ApplicationAdapter(getActivity());
+        appAdapter = new ApplicationAdapter();
         recyclerView.setAdapter(appAdapter);
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                lastFilter = query;
                 appAdapter.filter(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                lastFilter = newText;
                 appAdapter.filter(newText);
                 return false;
             }
@@ -86,7 +82,7 @@ public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
     @Override
     public void onTopicPublished(Topic topic) {
         mSwipeRefreshLayout.setRefreshing(false);
-        appAdapter.filter(lastFilter);
+        appAdapter.filter(null);
     }
 
     @Override
