@@ -106,10 +106,12 @@
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
-    <string name="restore_img">Ripristina Immagini</string>
-    <string name="restore_done">Ripristino completato!</string>
+   	<string name="restore_img">Ripristina Immagini</string>
+	<string name="restore_img_title">Ripristino immagini in corso</string>
+	<string name="restore_img_msg">Ripristino…</string>
+    	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
-    <string name="proprietary_title">Scarica codice proprietario</string>
+   	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS, quindi non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi permettere il download di un\'estensione (che contiene GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
 	<string name="cannot_check_sn_title">Impossibile controllare SafetyNet</string>
@@ -118,6 +120,9 @@
 	<string name="setup_fail">Configurazione fallita</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
+	<string name="setup_title">Configurazione aggiuntiva</string>
+	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
+	
 	
 	<!--Settings Activity -->
 	<string name="settings_general_category">Generale</string>
