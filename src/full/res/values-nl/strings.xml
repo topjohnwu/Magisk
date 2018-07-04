@@ -61,7 +61,6 @@
     <string name="menuClearLog">Log nu wissen</string>
     <string name="logs_cleared">Log succesvol gewist</string>
     <string name="log_is_empty">Log is leeg</string>
-    <string name="logs_save_failed">Kon log niet naar SD-kaart schrijven:</string>
 
     <!--About Activity-->
     <string name="about">Over</string>

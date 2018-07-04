@@ -61,7 +61,6 @@
     <string name="menuClearLog">Limpiar registro ahora</string>
     <string name="logs_cleared">Registro limpiado correctamente</string>
     <string name="log_is_empty">El registro está vacio</string>
-    <string name="logs_save_failed">No se ha podido escribir el registro en la tarjeta SD:</string>
 
     <!--About Activity-->
     <string name="about">Acerca de</string>
@@ -108,7 +107,6 @@
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
     <string name="restore_done">¡Restauración Terminada!</string>
-     <string name="restore_img_title">Restaurando Imágenes</string>
     <string name="restore_img_msg">Restaurando ...</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar Código Propietario</string>

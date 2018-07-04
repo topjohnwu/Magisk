@@ -61,7 +61,6 @@
     <string name="menuClearLog">ログの消去</string>
     <string name="logs_cleared">ログを消去しました</string>
     <string name="log_is_empty">ログは空です</string>
-    <string name="logs_save_failed">SDカードにログを書き込めません:</string>
 
     <!--About Activity-->
     <string name="about">このアプリについて</string>

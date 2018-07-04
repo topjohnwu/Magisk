@@ -60,7 +60,6 @@
     <string name="menuClearLog">清除日志</string>
     <string name="logs_cleared">日志已清除</string>
     <string name="log_is_empty">日志为空</string>
-    <string name="logs_save_failed">无法将日志写入内置存储：</string>
 
     <!--About Activity-->
     <string name="about">关于</string>
@@ -106,7 +105,6 @@
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂镜像</string>
-    <string name="restore_img_title">还原镜像</string>
     <string name="restore_img_msg">还原中…</string>
     <string name="restore_done">还原完成！</string>
     <string name="restore_fail">原厂 Boot 镜像备份不存在！</string>

@@ -60,7 +60,6 @@
     <string name="menuClearLog">Clear log now</string>
     <string name="logs_cleared">Log successfully cleared</string>
     <string name="log_is_empty">Log is empty</string>
-    <string name="logs_save_failed">Could not write log to SD card:</string>
 
     <!--About Activity-->
     <string name="about">About</string>
@@ -106,7 +105,6 @@
     <string name="boot_file_patch_msg">Select stock boot image dump in .img or .img.tar format</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
-    <string name="restore_img_title">Restoring Images</string>
     <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>

@@ -60,7 +60,6 @@
     <string name="menuClearLog">Effacer le journal maintenant</string>
     <string name="logs_cleared">Journal effacé avec succès</string>
     <string name="log_is_empty">Journal vide</string>
-    <string name="logs_save_failed">Impossible d\'écrire le journal sur la carte SD:</string>
 
     <!--About Activity-->
     <string name="about">À propos</string>

@@ -60,7 +60,6 @@
     <string name="menuClearLog">Wyczyść Log</string>
     <string name="logs_cleared">Log wyczyszczony</string>
     <string name="log_is_empty">Log jest pusty</string>
-    <string name="logs_save_failed">Nie można zapisać logu na karcie SD:</string>
 
     <!--About Activity-->
     <string name="about">O Aplikacji</string>

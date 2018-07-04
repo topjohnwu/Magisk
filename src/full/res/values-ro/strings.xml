@@ -55,7 +55,6 @@
     <string name="menuClearLog">Șterge jurnal acum</string>
     <string name="logs_cleared">Jurnal şters</string>
     <string name="log_is_empty">Jurnal gol</string>
-    <string name="logs_save_failed">Nu s-a putut scrie jurnalul pe cardul SD:</string>
 
     <!--About Activity-->
     <string name="about">Despre</string>

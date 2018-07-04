@@ -52,7 +52,6 @@
     <string name="menuClearLog">Rensa loggen</string>
     <string name="logs_cleared">Loggen rensad</string>
     <string name="log_is_empty">Loggen är tom</string>
-    <string name="logs_save_failed">Loggen kunde inte skrivas till SD-kort:</string>
 
     <!--About Activity-->
     <string name="about">Om</string>

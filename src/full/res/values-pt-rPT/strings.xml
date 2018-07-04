@@ -52,7 +52,6 @@
     <string name="menuClearLog">Limpar registo agora</string>
     <string name="logs_cleared">Registo limpo com sucesso</string>
     <string name="log_is_empty">Registo está vazio</string>
-    <string name="logs_save_failed">Não foi possível gravar o registo para o cartão SD:</string>
 
     <!--About Activity-->
     <string name="about">Sobre</string>

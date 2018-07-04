@@ -54,7 +54,6 @@
     <string name="menuClearLog">Očisti zapisnik sada</string>
     <string name="logs_cleared">Zapisnik je uspješno izbrisan</string>
     <string name="log_is_empty">Zapisnik je prazan</string>
-    <string name="logs_save_failed">Nije moguće spremiti zapisnik na SD karticu:</string>
 
     <!--About Activity-->
     <string name="about">O aplikaciji</string>

@@ -19,7 +19,7 @@ public class RestoreImages extends ParallelTask<Void, Void, Boolean> {
     @Override
     protected void onPreExecute() {
         Activity a = getActivity();
-        dialog = ProgressDialog.show(a, a.getString(R.string.restore_img_title), a.getString(R.string.restore_img_msg));
+        dialog = ProgressDialog.show(a, a.getString(R.string.restore_img), a.getString(R.string.restore_img_msg));
     }
 
     @Override

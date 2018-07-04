@@ -47,7 +47,6 @@
     <string name="menuClearLog">지금 로그 비우기</string>
     <string name="logs_cleared">로그가 성공적으로 비워짐</string>
     <string name="log_is_empty">로그가 비어 있음</string>
-    <string name="logs_save_failed">SD 카드에 로그를 쓸 수 없음:</string>
 
     <!--About Activity-->
     <string name="about">정보</string>

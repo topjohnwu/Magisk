@@ -54,7 +54,6 @@
     <string name="menuClearLog">Обриши дневник</string>
     <string name="logs_cleared">Дневник успешно креиран</string>
     <string name="log_is_empty">Дневник је празан</string>
-    <string name="logs_save_failed">Неуспешно писање на СД картицу:</string>
 
     <!--About Activity-->
     <string name="about">О апликацији</string>

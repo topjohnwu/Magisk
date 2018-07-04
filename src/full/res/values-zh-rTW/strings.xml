@@ -46,7 +46,6 @@
     <string name="menuClearLog">清除日誌</string>
     <string name="logs_cleared">日誌已成功清除</string>
     <string name="log_is_empty">日誌為空</string>
-    <string name="logs_save_failed">無法將日誌寫入 SD 卡：</string>
 
     <!--About Activity-->
     <string name="about">關於</string>
@@ -212,5 +211,12 @@
     <string name="disable_fingerprint">沒有指紋加入或是裝置不支援</string>
     <string name="cannot_check_sn_title">無法檢查 SafetyNet</string>
     <string name="cannot_check_sn_notice">由於一些 Google Play Service 的改變，重新包裝過的 Magisk Manager 無法進行 SafetyNet 檢查。</string>
+    <string name="setup_done">安裝完成</string>
+    <string name="setup_fail">安裝失敗</string>
+    <string name="env_fix_title">需要額外的安裝</string>
+    <string name="env_fix_msg">您的設備需要额外的安装才能正常使用 Magisk。將下載 Magisk 安装包，是否繼續？</string>
+    <string name="setup_title">額外安裝</string>
+    <string name="setup_msg">安裝環境進行中…</string>
+    <string name="restore_img_msg">還原中…</string>
 
 </resources>

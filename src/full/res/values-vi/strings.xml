@@ -47,7 +47,6 @@
     <string name="menuClearLog">Xoá nhật ký ngay</string>
     <string name="logs_cleared">Đã xoá nhật ký thành công</string>
     <string name="log_is_empty">Nhật ký trống</string>
-    <string name="logs_save_failed">Không thể ghi nhật ký ra thẻ nhớ:</string>
 
     <!--About Activity-->
     <string name="about">Thông tin</string>

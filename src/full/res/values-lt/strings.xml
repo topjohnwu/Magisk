@@ -61,7 +61,6 @@
     <string name="menuClearLog">Išvalyti įvykių sąrašą</string>
     <string name="logs_cleared">Įvykių sąrašas pašalintas</string>
     <string name="log_is_empty">Įvykių sąrašas tuščias</string>
-    <string name="logs_save_failed">Įvykių sąrašo įrašymas į SD kortelę nesėkmingas:</string>
 
     <!--About Activity-->
     <string name="about">Apie</string>

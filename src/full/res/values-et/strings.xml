@@ -61,7 +61,6 @@
     <string name="menuClearLog">Tühjenda logi nüüd</string>
     <string name="logs_cleared">Logi edukalt tühjendatud</string>
     <string name="log_is_empty">Logi on tühi</string>
-    <string name="logs_save_failed">Logi ei saanud SD-kaardile kirjutada:</string>
 
     <!--About Activity-->
     <string name="about">Teave</string>

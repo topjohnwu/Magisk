@@ -61,9 +61,8 @@
 	<string name="menuClearLog">Svuota il registro eventi</string>
 	<string name="logs_cleared">Registro eventi svuotato correttamente</string>
 	<string name="log_is_empty">Il registro eventi è vuoto</string>
-	<string name="logs_save_failed">Impossibile scrivere il registro eventi nella SD:</string>
 
-	<!--About Activity-->
+    <!--About Activity-->
 	<string name="about">Informazioni</string>
     <string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps | Fabb2303 | bovirus</string>
@@ -107,8 +106,7 @@
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
-	<string name="restore_img_title">Ripristino immagini in corso</string>
-	<string name="restore_img_msg">Ripristino…</string>
+    <string name="restore_img_msg">Ripristino…</string>
     	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>

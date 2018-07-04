@@ -60,7 +60,6 @@
     <string name="menuClearLog">Очистить лог</string>
     <string name="logs_cleared">Лог успешно очищен</string>
     <string name="log_is_empty">Лог пуст</string>
-    <string name="logs_save_failed">Не удалось сохранить лог в SD Card:</string>
 
     <!--About Activity-->
     <string name="about">О приложении</string>
@@ -106,7 +105,6 @@
     <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.img.tar</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
-    <string name="restore_img_title">Восстановление разделов</string>
     <string name="restore_img_msg">Восстановление…</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>

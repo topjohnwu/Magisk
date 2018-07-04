@@ -61,7 +61,6 @@
     <string name="menuClearLog">Изчистване на дневника</string>
     <string name="logs_cleared">Успешно изчистване на дневника</string>
     <string name="log_is_empty">Дневникът е празен</string>
-    <string name="logs_save_failed">Неуспех при записване на доклада в SD картата:</string>
 
     <!--About Activity-->
     <string name="about">Относно</string>
@@ -107,7 +106,6 @@
     <string name="boot_file_patch_msg">Изберете стоков Boot образ с формат .img или .img.tar</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>
     <string name="restore_img">Възстановяване на образи</string>
-    <string name="restore_img_title">Възстановяване на образи</string>
     <string name="restore_img_msg">Възстановяване…</string>
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>

@@ -50,7 +50,6 @@
     <string name="menuClearLog">حذف السجل الآن</string>
     <string name="logs_cleared">تم حذف السجل بنجاح</string>
     <string name="log_is_empty">السجل فارغ</string>
-    <string name="logs_save_failed">لا يمكن كتابة السجل على بطاقة ذاكرة SD:</string>
 
     <!--About Activity-->
     <string name="about">حول</string>
@@ -69,7 +68,6 @@
     <string name="download">التنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="zip_process_msg">معالجة الملف المضغوط …</string>
-    <string name="downloading_toast">جاري التنزيل %1$s</string>
     <string name="magisk_update_title">تحديث Magisk جديد متوفر!</string>
     <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
     <string name="release_notes">ملاحظات الإصدار</string>

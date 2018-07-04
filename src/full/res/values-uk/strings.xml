@@ -60,7 +60,6 @@
     <string name="menuClearLog">Очистити логи</string>
     <string name="logs_cleared">Логи очищено</string>
     <string name="log_is_empty">Логи пусті</string>
-    <string name="logs_save_failed">Не вдалося записати логи на карту пам\'яті:</string>
 
     <!--About Activity-->
     <string name="about">Про програму</string>
@@ -106,7 +105,6 @@
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
     <string name="complete_uninstall">Видалення виконано</string>
     <string name="restore_img">Відновити образи</string>
-    <string name="restore_img_title">Відновлення образів</string>
     <string name="restore_img_msg">Відновлення…</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>

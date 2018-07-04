@@ -60,7 +60,6 @@
     <string name="menuClearLog">Günlüğü temizle</string>
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
     <string name="log_is_empty">Günlük boş</string>
-    <string name="logs_save_failed">Günlük SD karta yazılamadı:</string>
 
     <!--About Activity-->
     <string name="about">Hakkında</string>
