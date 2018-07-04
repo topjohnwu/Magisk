@@ -129,7 +129,7 @@ void log_daemon() {
 
 	// Setup log dumps
 	rename(LOGFILE, LOGFILE ".bak");
-	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC, 0644);
+	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC | O_APPEND, 0644);
 
 	int log_fd = -1, log_pid;
 	char line[PIPE_BUF];
