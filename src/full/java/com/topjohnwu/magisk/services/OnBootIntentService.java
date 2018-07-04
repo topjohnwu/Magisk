@@ -23,8 +23,8 @@ public class OnBootIntentService extends IntentService {
             startForeground(Const.ID.ONBOOT_NOTIFICATION_ID,
                     new NotificationCompat.Builder(this, Const.ID.NOTIFICATION_CHANNEL)
                             .setSmallIcon(R.drawable.ic_magisk_outline)
-                            .setContentTitle("onBoot")
-                            .setContentText("Running onBoot operations...")
+                            .setContentTitle("Startup Operations")
+                            .setContentText("Running startup operations...")
                             .build());
         }
     }
