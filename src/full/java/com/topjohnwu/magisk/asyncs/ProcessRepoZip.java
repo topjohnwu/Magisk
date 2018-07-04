@@ -90,7 +90,6 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             HttpURLConnection conn;
             do {
                 conn = WebService.request(mLink, null);
-                if (conn == null) return null;
                 total = conn.getContentLength();
                 if (total < 0)
                     conn.disconnect();

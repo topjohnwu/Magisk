@@ -17,10 +17,8 @@ public class Repo extends BaseModule {
     private String repoName;
     private Date mLastUpdate;
 
-    public Repo(String name, Date lastUpdate) throws IllegalRepoException {
-        mLastUpdate = lastUpdate;
+    public Repo(String name) {
         repoName = name;
-        update();
     }
 
     public Repo(Cursor c) {
@@ -48,13 +46,9 @@ public class Repo extends BaseModule {
         }
     }
 
-    public boolean update(Date lastUpdate) throws IllegalRepoException {
-        if (lastUpdate.after(mLastUpdate)) {
-            mLastUpdate = lastUpdate;
-            update();
-            return true;
-        }
-        return false;
+    public void update(Date lastUpdate) throws IllegalRepoException {
+        mLastUpdate = lastUpdate;
+        update();
     }
 
     @Override

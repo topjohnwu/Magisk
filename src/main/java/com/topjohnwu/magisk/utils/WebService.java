@@ -15,9 +15,13 @@ public class WebService {
     }
 
     public static String getString(String url, Map<String, String> header) {
-        HttpURLConnection conn = request(url, header);
-        if (conn == null) return "";
-        return getString(conn);
+        try {
+            HttpURLConnection conn = request(url, header);
+            return getString(conn);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public static String getString(HttpURLConnection conn) {
@@ -40,34 +44,29 @@ public class WebService {
         }
     }
 
-    public static HttpURLConnection request(String address, Map<String, String> header) {
-        try {
-            URL url = new URL(address);
+    public static HttpURLConnection request(String address, Map<String, String> header) throws IOException {
+        URL url = new URL(address);
 
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(15000);
-            conn.setConnectTimeout(15000);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setReadTimeout(15000);
+        conn.setConnectTimeout(15000);
 
-            if (header != null) {
-                for (Map.Entry<String, String> entry : header.entrySet()) {
-                    conn.setRequestProperty(entry.getKey(), entry.getValue());
-                }
+        if (header != null) {
+            for (Map.Entry<String, String> entry : header.entrySet()) {
+                conn.setRequestProperty(entry.getKey(), entry.getValue());
             }
-
-            conn.connect();
-
-            if (header != null) {
-                header.clear();
-                for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
-                    List<String> l = entry.getValue();
-                    header.put(entry.getKey(), l.get(l.size() - 1));
-                }
-            }
-
-            return conn;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+
+        conn.connect();
+
+        if (header != null) {
+            header.clear();
+            for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+                List<String> l = entry.getValue();
+                header.put(entry.getKey(), l.get(l.size() - 1));
+            }
+        }
+
+        return conn;
     }
 }

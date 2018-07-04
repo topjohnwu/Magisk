@@ -10,8 +10,8 @@ import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
@@ -74,7 +74,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         mDb.delete(TABLE_NAME, "repo_name=?", new String[] { repo.getRepoName() });
     }
 
-    public void removeRepo(List<String> list) {
+    public void removeRepo(Iterable<String> list) {
         for (String id : list) {
             if (id == null) continue;
             mDb.delete(TABLE_NAME, "id=?", new String[] { id });
@@ -94,6 +94,10 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    public Cursor getRawCursor() {
+        return mDb.query(TABLE_NAME, null, null, null, null, null, null);
+    }
+
     public Cursor getRepoCursor() {
         String orderBy = null;
         switch (mm.repoOrder) {
@@ -108,13 +112,13 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                 null, null, orderBy);
     }
 
-    public List<String> getRepoIDList() {
-        LinkedList<String> ret = new LinkedList<>();
+    public Set<String> getRepoIDSet() {
+        HashSet<String> set = new HashSet<>(300);
         try (Cursor c = mDb.query(TABLE_NAME, null, null, null, null, null, null)) {
             while (c.moveToNext()) {
-                ret.add(c.getString(c.getColumnIndex("id")));
+                set.add(c.getString(c.getColumnIndex("id")));
             }
         }
-        return ret;
+        return set;
     }
 }
