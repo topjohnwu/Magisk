@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
@@ -41,7 +40,7 @@
     <string name="remove_file_deleted">Модуль не будет удален после перезагрузки</string>
     <string name="disable_file_created">Модуль будет отключен после перезагрузки</string>
     <string name="disable_file_removed">Модуль будет активирован после перезагрузки</string>
-    <string name="author">Разработчик: %1$s</string>
+    <string name="author">Автор: %1$s</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
@@ -104,14 +103,24 @@
     <string name="install_second_slot">Установка во Второй Слот (После OTA)</string>
     <string name="select_method">Выбор способа</string>
     <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
-    <string name="boot_file_patch_msg">Выберите файл ядра (boot), *.img либо *.img.tar формата</string>
+    <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.img.tar</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
+    <string name="restore_img_title">Восстановление разделов</string>
+    <string name="restore_img_msg">Восстановление…</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="proprietary_title">Загрузка SafetyNet</string>
-    <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение (содержит GoogleApiClient) для проверки SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение для проверки SafetyNet? (содержит GoogleApiClient)</string>
     <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>
+    <string name="cannot_check_sn_title">Невозможно проверить SafetyNet</string>
+    <string name="cannot_check_sn_notice">В связи с изменениями в сервисах Google Play, невозможно выполнить проверку статуса SafetyNet с пересобранным Magisk Manager</string>
+    <string name="setup_done">Установка завершена</string>
+    <string name="setup_fail">Ошибка установки</string>
+    <string name="env_fix_title">Требуется дополнительная установка</string>
+    <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
+    <string name="setup_title">Дополнительная установка</string>
+    <string name="setup_msg">Настройка рабочей среды…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
@@ -122,10 +131,10 @@
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с оригинальным именем пакета</string>
+    <string name="settings_restore_manager_summary">Восстановить Magisk Manager с исходным именем пакета</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию (Системный)</string>
-    <string name="settings_update">Настройки обновления</string>
+    <string name="settings_update">Настройки обновлений</string>
     <string name="settings_check_update_title">Проверка обновлений</string>
     <string name="settings_check_update_summary">Периодически проверять обновления в фоне</string>
     <string name="settings_update_channel_title">Источник обновлений</string>
@@ -152,7 +161,7 @@
     <string name="superuser_access">Уровень доступа</string>
     <string name="auto_response">Автоматический ответ</string>
     <string name="request_timeout">Ожидание ответа</string>
-    <string name="superuser_notification">Уведомление Суперпользователя</string>
+    <string name="superuser_notification">Уведомления Суперпользователя</string>
     <string name="request_timeout_summary">%1$s секунд</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав Суперпользователя после обновления приложений</string>
@@ -164,9 +173,9 @@
     <string name="settings_owner_manage">Регулировка владельцем</string>
     <string name="settings_user_independent">Правила пользователей</string>
     <string name="owner_only_summary">Только владелец имеет Root-доступ</string>
-    <string name="owner_manage_summary">Только владелец может управлять Root-доступом и обрабатывать запросы</string>
+    <string name="owner_manage_summary">Только владелец управляет Root-доступом и обрабатывает запросы</string>
     <string name="user_indepenent_summary">Каждый пользователь имеет свои собственные правила Root-доступа</string>
-    <string name="multiuser_hint_owner_request">Запрос отправлен владельцу устройства. Переключитесь на профиль владельца для обработки запроса</string>
+    <string name="multiuser_hint_owner_request">Запрос отправлен владельцу устройства. Переключитесь в профиль владельца для обработки запроса</string>
 
     <string name="mount_namespace_mode">Настройка именных пространств</string>
     <string name="settings_ns_global">Общее именное пространство</string>
@@ -174,9 +183,9 @@
     <string name="settings_ns_isolate">Изолированное именное пространство</string>
     <string name="global_summary">Сессии Суперпользователя используют общее именное пространство</string>
     <string name="requester_summary">Сессии Суперпользователя наследуют именное пространство запрашивающего</string>
-    <string name="isolate_summary">Сессии Суперпользователя будут иметь изолированные именные пространства</string>
+    <string name="isolate_summary">Сессии Суперпользователя используют изолированные именные пространства</string>
     <string name="android_o_not_support">Не поддерживается в Android 8.0+</string>
-    <string name="disable_fingerprint">Не поддерживается устройством или не заданы опечатки</string>
+    <string name="disable_fingerprint">Не поддерживается устройством или не заданы отпечатки</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав Суперпользователя</string>
@@ -203,8 +212,8 @@
     <string name="su_snack_revoke">Настройки для %1$s сброшены</string>
     <string name="su_revoke_title">Сброс настроек</string>
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
-    <string name="toast">Всплывающее уведомление</string>
-    <string name="none">Ничего</string>
+    <string name="toast">Всплывающие уведомления</string>
+    <string name="none">Нет</string>
     <string name="auth_fail">Ошибка аутентификации</string>
 
     <!--Superuser logs-->
