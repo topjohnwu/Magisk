@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
@@ -91,12 +90,6 @@ public class MainActivity extends Activity
             navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
 
         navigationView.setNavigationItemSelectedListener(this);
-
-        if (mm.prefs.getInt(Const.Key.APP_VER, -1) < BuildConfig.VERSION_CODE) {
-            mm.prefs.edit().putInt(Const.Key.APP_VER, BuildConfig.VERSION_CODE).apply();
-            new MarkDownWindow(this, getString(R.string.app_changelog),
-                    getResources().openRawResource(R.raw.changelog)).exec();
-        }
     }
 
     @Override
