@@ -59,7 +59,7 @@ direct_install() {
   rm -rf /data/adb/magisk/* 2>/dev/null
   mkdir -p /data/adb/magisk 2>/dev/null
   chmod 700 /data/adb
-  cp -f $3/* /data/adb/magisk
+  cp -rf $3/* /data/adb/magisk
   rm -rf $3
 }
 
