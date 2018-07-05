@@ -23,7 +23,7 @@ BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.top
 BOOTSIGNED=false
 
 get_outfd() {
-  if [ $OUTFD -eq 1 ]; then
+  if [ -z $OUTFD ] || readlink /proc/self/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
     for FD in `ls /proc/self/fd`; do
       if readlink /proc/self/fd/$FD | grep -q pipe; then
@@ -162,11 +162,9 @@ run_migrations() {
   fi
   # Move the stock backups
   if [ -f /data/magisk/stock_boot* ]; then
-    rm -rf /data/stock_boot*
     mv /data/magisk/stock_boot* /data 2>/dev/null
   fi
   if [ -f /data/adb/magisk/stock_boot* ]; then
-    rm -rf /data/stock_boot*
     mv /data/adb/magisk/stock_boot* /data 2>/dev/null
   fi
   # Remove old dbs

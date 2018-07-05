@@ -124,7 +124,7 @@ case "$1" in
       # addon.d-v2
       main_v2
     else
-      OUTFD=1
+      OUTFD=
       get_outfd
       # Run in background, hack for addon.d-v1
       (main_v1) &
