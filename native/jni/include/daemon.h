@@ -25,8 +25,8 @@ enum {
 	ADD_HIDELIST,
 	RM_HIDELIST,
 	LS_HIDELIST,
-	MONITOR,
-	HIDE_CONNECT
+	HIDE_CONNECT,
+	HANDSHAKE
 };
 
 // Return codes for daemon
@@ -55,6 +55,7 @@ void auto_start_magiskhide();
 
 // log_monitor.c
 
+extern int loggable;
 void log_daemon();
 
 // socket.c

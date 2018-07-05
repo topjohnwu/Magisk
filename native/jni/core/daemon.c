@@ -83,7 +83,7 @@ static void *request_handler(void *args) {
 	case LATE_START:
 		late_start(client);
 		break;
-	case MONITOR:
+	case HANDSHAKE:
 		/* Do NOT close the client, make it hold */
 		break;
 	default:
@@ -121,7 +121,12 @@ void main_daemon() {
 	close(fd);
 
 	// Start the log monitor
-	monitor_logs();
+	loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
+	if (loggable) {
+		connect_daemon2(LOG_DAEMON, &fd);
+		write_int(fd, HANDSHAKE);
+		close(fd);
+	}
 
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun, MAIN_DAEMON);

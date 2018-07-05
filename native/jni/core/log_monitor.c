@@ -55,24 +55,6 @@ static void sigpipe_handler(int sig) {
 	events[HIDE_EVENT].fd = -1;
 }
 
-static void *socket_thread(void *args) {
-	/* This would block, so separate thread */
-	while(1) {
-		int fd = xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
-		switch(read_int(fd)) {
-			case HIDE_CONNECT:
-				pthread_mutex_lock(&lock);
-				close(events[HIDE_EVENT].fd);
-				events[HIDE_EVENT].fd = fd;
-				pthread_mutex_unlock(&lock);
-				break;
-			default:
-				close(fd);
-				break;
-		}
-	}
-}
-
 static void *monitor_thread(void *args) {
 	// Block SIGPIPE to prevent interruption
 	sigset_t block_set;
@@ -83,61 +65,19 @@ static void *monitor_thread(void *args) {
 	sleep(5);
 	int fd;
 	char b;
-	do {
+	while (1) {
 		fd = connect_daemon();
-		write_int(fd, MONITOR);
+		write_int(fd, HANDSHAKE);
 		// This should hold unless the daemon is killed
 		read(fd, &b, sizeof(b));
 		// The main daemon crashed, spawn a new one
 		close(fd);
-	} while (1);
+	}
 }
 
-void log_daemon() {
-	setsid();
-	struct sockaddr_un sun;
-	sockfd = setup_socket(&sun, LOG_DAEMON);
-	if (xbind(sockfd, (struct sockaddr*) &sun, sizeof(sun)))
-		exit(1);
-	xlisten(sockfd, 10);
-	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");
-	strcpy(argv0, "magisklogd");
-
-	// Start worker threads
-	pthread_t t;
-	pthread_create(&t, NULL, monitor_thread, NULL);
-	pthread_detach(t);
-	xpthread_create(&t, NULL, socket_thread, NULL);
-	pthread_detach(t);
-
-	// Set SIGPIPE handler
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = sigpipe_handler;
-	sigaction(SIGPIPE, &act, NULL);
-
-	// Setup log dumps
-	rename(LOGFILE, LOGFILE ".bak");
-	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC | O_APPEND, 0644);
-
-	// Construct cmdline
-	vec_init(&log_cmd);
-	vec_push_back(&log_cmd, "/system/bin/logcat");
-	// Test whether these buffers actually works
-	const char* b[] = { "main", "events", "crash" };
-	for (int i = 0; i < 3; ++i) {
-		if (exec_command_sync("/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
-			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
-	}
-	vec_dup(&log_cmd, &clear_cmd);
-	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", "*:F", NULL);
-	vec_push_back(&log_cmd, NULL);
-	vec_push_back(&clear_cmd, "-c");
-	vec_push_back(&clear_cmd, NULL);
-
+static void *logcat_thread(void *args) {
 	int log_fd = -1, log_pid;
-	char line[PIPE_BUF];
-
+	char line[4096];
 	while (1) {
 		// Start logcat
 		log_pid = exec_array(0, &log_fd, NULL, (char **) vec_entry(&log_cmd));
@@ -166,13 +106,61 @@ void log_daemon() {
 	}
 }
 
-/* Start new threads to monitor logcat and dump to logfile */
-void monitor_logs() {
-	loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
-	if (loggable) {
-		int fd;
-		connect_daemon2(LOG_DAEMON, &fd);
-		write_int(fd, DO_NOTHING);
-		close(fd);
+void log_daemon() {
+	setsid();
+	struct sockaddr_un sun;
+	sockfd = setup_socket(&sun, LOG_DAEMON);
+	if (xbind(sockfd, (struct sockaddr*) &sun, sizeof(sun)))
+		exit(1);
+	xlisten(sockfd, 10);
+	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");
+	strcpy(argv0, "magisklogd");
+
+	// Set SIGPIPE handler
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = sigpipe_handler;
+	sigaction(SIGPIPE, &act, NULL);
+
+	// Setup log dumps
+	rename(LOGFILE, LOGFILE ".bak");
+	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC | O_APPEND, 0644);
+
+	// Construct cmdline
+	vec_init(&log_cmd);
+	vec_push_back(&log_cmd, "/system/bin/logcat");
+	// Test whether these buffers actually works
+	const char* b[] = { "main", "events", "crash" };
+	for (int i = 0; i < 3; ++i) {
+		if (exec_command_sync("/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
+			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
+	}
+	vec_dup(&log_cmd, &clear_cmd);
+	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", "*:F", NULL);
+	vec_push_back(&log_cmd, NULL);
+	vec_push_back(&clear_cmd, "-c");
+	vec_push_back(&clear_cmd, NULL);
+
+	// Start worker threads
+	pthread_t thread;
+	pthread_create(&thread, NULL, monitor_thread, NULL);
+	pthread_detach(thread);
+	xpthread_create(&thread, NULL, logcat_thread, NULL);
+	pthread_detach(thread);
+
+	while(1) {
+		int fd = xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
+		switch(read_int(fd)) {
+			case HIDE_CONNECT:
+				pthread_mutex_lock(&lock);
+				close(events[HIDE_EVENT].fd);
+				events[HIDE_EVENT].fd = fd;
+				pthread_mutex_unlock(&lock);
+				break;
+			case HANDSHAKE:
+			default:
+				close(fd);
+				break;
+		}
 	}
 }
