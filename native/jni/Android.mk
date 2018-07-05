@@ -40,7 +40,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_SRC_FILES := \
 	core/magisk.c \
 	core/daemon.c \
-	core/log_monitor.c \
+	core/log_daemon.c \
 	core/bootstages.c \
 	core/socket.c \
 	core/db.c \

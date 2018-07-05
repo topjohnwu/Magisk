@@ -1,7 +1,7 @@
-/* log_monitor.c - New thread to monitor logcat
+/* log_daemon.c - A dedicated daemon to monitor logcat
  *
  * A universal logcat monitor for many usages. Add listeners to the list,
- * and the pointer of the new log line will be sent through pipes to trigger
+ * and the new log line will be sent through sockets to trigger
  * asynchronous events without polling
  */
 
