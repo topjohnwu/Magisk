@@ -16,6 +16,7 @@
 #include "daemon.h"
 
 int loggable = 1;
+static struct vector log_cmd, clear_cmd;
 static int sockfd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -49,18 +50,6 @@ static struct log_listener events[] = {
 };
 #define EVENT_NUM (sizeof(events) / sizeof(struct log_listener))
 
-static void test_logcat() {
-	int log_fd = -1, log_pid;
-	char buf[1];
-	log_pid = exec_command(0, &log_fd, NULL, "logcat", NULL);
-	if (read(log_fd, buf, sizeof(buf)) != sizeof(buf)) {
-		loggable = 0;
-		LOGD("magisklogd: cannot read from logcat, disable logging");
-	}
-	kill(log_pid, SIGTERM);
-	waitpid(log_pid, NULL, 0);
-}
-
 static void sigpipe_handler(int sig) {
 	close(events[HIDE_EVENT].fd);
 	events[HIDE_EVENT].fd = -1;
@@ -93,12 +82,12 @@ static void *monitor_thread(void *args) {
 	// Give the main daemon some time before we monitor it
 	sleep(5);
 	int fd;
-	char b[1];
+	char b;
 	do {
 		fd = connect_daemon();
 		write_int(fd, MONITOR);
 		// This should hold unless the daemon is killed
-		read(fd, b, sizeof(b));
+		read(fd, &b, sizeof(b));
 		// The main daemon crashed, spawn a new one
 		close(fd);
 	} while (1);
@@ -131,17 +120,27 @@ void log_daemon() {
 	rename(LOGFILE, LOGFILE ".bak");
 	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC | O_APPEND, 0644);
 
+	// Construct cmdline
+	vec_init(&log_cmd);
+	vec_push_back(&log_cmd, "/system/bin/logcat");
+	// Test whether these buffers actually works
+	const char* b[] = { "main", "events", "crash" };
+	for (int i = 0; i < 3; ++i) {
+		if (exec_command_sync("/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
+			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
+	}
+	vec_dup(&log_cmd, &clear_cmd);
+	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", "*:F", NULL);
+	vec_push_back(&log_cmd, NULL);
+	vec_push_back(&clear_cmd, "-c");
+	vec_push_back(&clear_cmd, NULL);
+
 	int log_fd = -1, log_pid;
 	char line[PIPE_BUF];
 
 	while (1) {
 		// Start logcat
-		log_pid = exec_command(0, &log_fd, NULL,
-							   "/system/bin/logcat",
-							   "-b", "events", "-b", "main", "-b", "crash",
-							   "-v", "threadtime",
-							   "-s", "am_proc_start", "Magisk", "*:F",
-							   NULL);
+		log_pid = exec_array(0, &log_fd, NULL, (char **) vec_entry(&log_cmd));
 		FILE *logs = fdopen(log_fd, "r");
 		while (fgets(line, sizeof(line), logs)) {
 			if (line[0] == '-')
@@ -162,13 +161,14 @@ void log_daemon() {
 
 		LOGI("magisklogd: logcat output EOF");
 		// Clear buffer
-		exec_command_sync("logcat", "-b", "events", "-b", "main", "-b", "crash", "-c", NULL);
+		log_pid = exec_array(0, NULL, NULL, (char **) vec_entry(&clear_cmd));
+		waitpid(log_pid, NULL, 0);
 	}
 }
 
 /* Start new threads to monitor logcat and dump to logfile */
 void monitor_logs() {
-	test_logcat();
+	loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
 	if (loggable) {
 		int fd;
 		connect_daemon2(LOG_DAEMON, &fd);

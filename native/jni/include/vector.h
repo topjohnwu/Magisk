@@ -14,11 +14,12 @@ struct vector {
 
 void vec_init(struct vector *v);
 void vec_push_back(struct vector *v, void *p);
+void vec_push_back_all(struct vector *v, void *p, ...);
 void *vec_pop_back(struct vector *v);
 void vec_sort(struct vector *v, int (*compar)(const void *, const void *));
 void vec_destroy(struct vector *v);
 void vec_deep_destroy(struct vector *v);
-struct vector *vec_dup(struct vector *v);
+void vec_dup(struct vector *v, struct vector *vv);
 
 #define vec_size(v) (v)->size
 #define vec_cap(v) (v)->cap

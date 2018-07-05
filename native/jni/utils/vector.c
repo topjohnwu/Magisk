@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "vector.h"
 
@@ -21,6 +22,15 @@ void vec_push_back(struct vector *v, void *p) {
 	}
 	vec_entry(v)[vec_size(v)] = p;
 	++vec_size(v);
+}
+
+void vec_push_back_all(struct vector *v, void *p, ...) {
+	va_list argv;
+	va_start(argv, p);
+	vec_push_back(v, p);
+	for (void *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
+		vec_push_back(v, arg);
+	va_end(argv);
 }
 
 void *vec_pop_back(struct vector *v) {
@@ -73,11 +83,9 @@ void vec_deep_destroy(struct vector *v) {
 	vec_destroy(v);
 }
 
-struct vector *vec_dup(struct vector *v) {
-	struct vector *ret = malloc(sizeof(*ret));
-	vec_size(ret) = vec_size(v);
-	vec_cap(ret) = vec_cap(v);
-	vec_entry(v) = malloc(sizeof(void*) * vec_cap(ret));
-	memcpy(vec_entry(ret), vec_entry(v), sizeof(void*) * vec_cap(ret));
-	return ret;
+void vec_dup(struct vector *v, struct vector *vv) {
+	vec_size(vv) = vec_size(v);
+	vec_cap(vv) = vec_cap(v);
+	vec_entry(vv) = malloc(sizeof(void*) * vec_cap(v));
+	memcpy(vec_entry(vv), vec_entry(v), sizeof(void*) * vec_cap(v));
 }
