@@ -248,6 +248,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                         "find_boot_image", "echo \"$BOOTIMAGE\"");
                 Shell.Async.su("mount_partitions");
                 break;
+            case FIX_ENV_MODE:
+                mBoot = "";
+                break;
         }
         if (mBoot == null) {
             console.add("! Unable to detect target image");
