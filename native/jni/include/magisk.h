@@ -19,6 +19,7 @@
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define MAGISKTMP       "/sbin/.core"
+#define BLOCKDIR        MAGISKTMP "/block"
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define BBPATH          MAGISKTMP "/busybox"
 #define MOUNTPOINT      MAGISKTMP "/img"

@@ -612,6 +612,7 @@ void startup() {
 	xmkdir(MIRRDIR "/bin", 0755);
 	xmkdir(BBPATH, 0755);
 	xmkdir(MOUNTPOINT, 0755);
+	xmkdir(BLOCKDIR, 0755);
 
 	LOGI("* Mounting mirrors");
 	struct vector mounts;

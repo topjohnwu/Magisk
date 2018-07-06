@@ -9,6 +9,7 @@
 #include <sys/mount.h>
 #include <sys/sendfile.h>
 #include <sys/statvfs.h>
+#include <sys/sysmacros.h>
 #include <linux/loop.h>
 
 #include "magisk.h"
@@ -26,23 +27,41 @@ struct fs_info {
 };
 
 static char *loopsetup(const char *img) {
-	char device[20];
+	char device[32];
 	struct loop_info64 info;
-	int i, lfd, ffd;
+	int lfd = -1, ffd;
 	memset(&info, 0, sizeof(info));
-	// First get an empty loop device
-	for (i = 0; i <= 7; ++i) {
-		sprintf(device, "/dev/block/loop%d", i);
-		lfd = xopen(device, O_RDWR);
-		if (ioctl(lfd, LOOP_GET_STATUS64, &info) == -1)
-			break;
-		close(lfd);
+	if (access(BLOCKDIR, F_OK) == 0) {
+		for (int i = 8; i < 100; ++i) {
+			sprintf(device, BLOCKDIR "/loop%02d", i);
+			if (access(device, F_OK) != 0)
+				mknod(device, S_IFBLK | 0600, makedev(7, i * 8));
+			lfd = open(device, O_RDWR);
+			if (lfd < 0) /* Kernel does not support this */
+				break;
+			if (ioctl(lfd, LOOP_GET_STATUS64, &info) == -1)
+				break;
+			close(lfd);
+			lfd = -1;
+		}
 	}
-	if (i == 8) return NULL;
+	// Fallback to existing loop in dev, but in reverse order
+	if (lfd < 0) {
+		for (int i = 7; i >= 0; --i) {
+			sprintf(device, "/dev/block/loop%d", i);
+			lfd = xopen(device, O_RDWR);
+			if (ioctl(lfd, LOOP_GET_STATUS64, &info) == -1)
+				break;
+			close(lfd);
+			lfd = -1;
+		}
+	}
+	if (lfd < 0)
+		return NULL;
 	ffd = xopen(img, O_RDWR);
 	if (ioctl(lfd, LOOP_SET_FD, ffd) == -1)
 		return NULL;
-	strcpy((char *) info.lo_file_name, img);
+	strncpy((char *) info.lo_file_name, img, sizeof(info.lo_file_name));
 	ioctl(lfd, LOOP_SET_STATUS64, &info);
 	close(lfd);
 	close(ffd);
