@@ -440,6 +440,7 @@ static int prepare_img() {
 
 	if (trim_img(MAINIMG, MOUNTPOINT, magiskloop))
 		return 1;
+	free(magiskloop);
 	return 0;
 }
 

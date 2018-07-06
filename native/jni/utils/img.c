@@ -14,25 +14,16 @@
 #include "magisk.h"
 #include "utils.h"
 
+#define round_size(a) ((((a) / 32) + 2) * 32)
+#define SOURCE_TMP "/dev/.img_src"
+#define TARGET_TMP "/dev/.img_tgt"
+#define MERGE_TMP  "/dev/.img_mrg"
+
 struct fs_info {
 	unsigned size;
 	unsigned free;
 	unsigned used;
 };
-
-static int e2fsck(const char *img) {
-	// Check and repair ext4 image
-	char buffer[128];
-	int pid, fd = -1;
-	pid = exec_command(1, &fd, NULL, "/system/bin/e2fsck", "-yf", img, NULL);
-	if (pid < 0)
-		return 1;
-	while (fdgets(buffer, sizeof(buffer), fd))
-		LOGD("magisk_img: %s", buffer);
-	waitpid(pid, NULL, 0);
-	close(fd);
-	return 0;
-}
 
 static char *loopsetup(const char *img) {
 	char device[20];
@@ -79,6 +70,8 @@ static void usage() {
 			"   resize IMG SIZE      resize ext4 image. SIZE is interpreted in MB\n"
 			"   mount  IMG PATH      mount IMG to PATH and prints the loop device\n"
 			"   umount PATH LOOP     unmount PATH and delete LOOP device\n"
+			"   merge  SRC TGT       merge SRC to TGT\n"
+			"   trim   IMG           trim IMG to save space\n"
 	);
 	exit(1);
 }
@@ -93,11 +86,19 @@ int imgtool_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "resize") == 0) {
 		if (argc < 4)
 			usage();
-		return resize_img(argv[2], atoi(argv[3]), 1);
+		return resize_img(argv[2], atoi(argv[3]));
 	} else if (strcmp(argv[1], "mount") == 0) {
 		if (argc < 4)
 			usage();
+		// Redirect 1 > /dev/null
+		int fd = open("/dev/null", O_WRONLY);
+		int out = dup(STDOUT_FILENO);
+		xdup2(fd, STDOUT_FILENO);
 		char *loop = mount_image(argv[2], argv[3]);
+		// Restore stdin
+		xdup2(out, STDOUT_FILENO);
+		close(fd);
+		close(out);
 		if (loop == NULL) {
 			fprintf(stderr, "Cannot mount image!\n");
 			return 1;
@@ -111,6 +112,20 @@ int imgtool_main(int argc, char *argv[]) {
 			usage();
 		umount_image(argv[2], argv[3]);
 		return 0;
+	} else if (strcmp(argv[1], "merge") == 0) {
+		if (argc < 4)
+			usage();
+		return merge_img(argv[2], argv[3]);
+	} else if (strcmp(argv[1], "trim") == 0) {
+		if (argc < 3)
+			usage();
+		xmkdir(SOURCE_TMP, 0755);
+		char *loop = mount_image(argv[2], SOURCE_TMP);
+		int ret = trim_img(argv[2], SOURCE_TMP, loop);
+		umount_image(SOURCE_TMP, loop);
+		rmdir(SOURCE_TMP);
+		free(loop);
+		return ret;
 	}
 	usage();
 	return 1;
@@ -132,57 +147,18 @@ int create_img(const char *img, int size) {
 		return 1;
 }
 
-int resize_img(const char *img, int size, int enforce) {
+int resize_img(const char *img, int size) {
 	LOGI("Resize %s to %dM\n", img, size);
-	if (e2fsck(img))
-		return 1;
-	char buffer[128];
-	int pid, fd = -1;
-	snprintf(buffer, sizeof(buffer), "%dM", size);
-	pid = exec_command(1, &fd, NULL, "/system/bin/resize2fs", img, buffer, NULL);
-	if (pid < 0)
-		return 1;
-	while (fdgets(buffer, sizeof(buffer), fd))
-		LOGD("magisk_img: %s", buffer);
-	close(fd);
-	waitpid(pid, NULL, 0);
-
-	if (enforce) {
-		// Check the image size
-		struct stat st;
-		stat(img, &st);
-		if (st.st_size / 1048576 != size) {
-			// Sammy crap occurs or resize2fs failed, lets create a new image!
-			snprintf(buffer, sizeof(buffer), "%s/tmp.img", dirname(img));
-			create_img(buffer, size);
-			char *s_loop, *t_loop;
-			s_loop = mount_image(img, SOURCE_TMP);
-			if (s_loop == NULL)
-				return 1;
-			t_loop = mount_image(buffer, TARGET_TMP);
-			if (t_loop == NULL)
-				return 1;
-
-			cp_afc(SOURCE_TMP, TARGET_TMP);
-			umount_image(SOURCE_TMP, s_loop);
-			umount_image(TARGET_TMP, t_loop);
-			rmdir(SOURCE_TMP);
-			rmdir(TARGET_TMP);
-			free(s_loop);
-			free(t_loop);
-			rename(buffer, img);
-		}
-	}
-	return 0;
+	exec_command_sync("/system/bin/e2fsck", "-yf", img, NULL);
+	char ss[16];
+	snprintf(ss, sizeof(ss), "%dM", size);
+	return exec_command_sync("/system/bin/resize2fs", img, ss, NULL);
 }
 
 char *mount_image(const char *img, const char *target) {
 	if (access(img, F_OK) == -1 || access(target, F_OK) == -1)
 		return NULL;
-
-	if (e2fsck(img))
-		return NULL;
-
+	exec_command_sync("/system/bin/e2fsck", "-yf", img, NULL);
 	char *device = loopsetup(img);
 	if (device)
 		xmount(device, target, "ext4", 0, NULL);
@@ -201,8 +177,8 @@ int umount_image(const char *target, const char *device) {
 int merge_img(const char *source, const char *target) {
 	if (access(source, F_OK) == -1)
 		return 0;
-	LOGI("* Merging %s  -> %s\n", source, target);
 	if (access(target, F_OK) == -1) {
+		LOGI("* Move %s  -> %s\n", source, target);
 		if (rename(source, target) < 0) {
 			// Copy and remove
 			int tgt = creat(target, 0644);
@@ -215,11 +191,11 @@ int merge_img(const char *source, const char *target) {
 		return 0;
 	}
 
-	char buffer[PATH_MAX];
+	char buf[PATH_MAX];
 
 	xmkdir(SOURCE_TMP, 0755);
 	xmkdir(TARGET_TMP, 0755);
-	char *s_loop, *t_loop;
+	char *s_loop, *t_loop, *m_loop;
 	s_loop = mount_image(source, SOURCE_TMP);
 	if (s_loop == NULL)
 		return 1;
@@ -227,20 +203,10 @@ int merge_img(const char *source, const char *target) {
 	if (t_loop == NULL)
 		return 1;
 
-	struct fs_info src, tgt;
-	check_filesystem(&src, source, SOURCE_TMP);
-	check_filesystem(&tgt, target, TARGET_TMP);
-
-	// resize target to worst case
-	if (src.used >= tgt.free) {
-		umount_image(TARGET_TMP, t_loop);
-		free(t_loop);
-		resize_img(target, round_size(tgt.size + src.used - tgt.free), 1);
-		t_loop = mount_image(target, TARGET_TMP);
-	}
-
-	snprintf(buffer, sizeof(buffer), "%s/%s", TARGET_TMP, "lost+found");
-	rm_rf(buffer);
+	snprintf(buf, sizeof(buf), "%s/%s", SOURCE_TMP, "lost+found");
+	rm_rf(buf);
+	snprintf(buf, sizeof(buf), "%s/%s", TARGET_TMP, "lost+found");
+	rm_rf(buf);
 	DIR *dir;
 	struct dirent *entry;
 	if (!(dir = xopendir(SOURCE_TMP)))
@@ -249,27 +215,45 @@ int merge_img(const char *source, const char *target) {
 		if (entry->d_type == DT_DIR) {
 			if (strcmp(entry->d_name, ".") == 0 ||
 				strcmp(entry->d_name, "..") == 0 ||
-				strcmp(entry->d_name, ".core") == 0 ||
-				strcmp(entry->d_name, "lost+found") == 0)
+				strcmp(entry->d_name, ".core") == 0)
 				continue;
 			// Cleanup old module if exists
-			snprintf(buffer, sizeof(buffer), "%s/%s", TARGET_TMP, entry->d_name);
-			if (access(buffer, F_OK) == 0)
-				rm_rf(buffer);
+			snprintf(buf, sizeof(buf), "%s/%s", TARGET_TMP, entry->d_name);
+			if (access(buf, F_OK) == 0)
+				rm_rf(buf);
 			LOGI("Upgrade/New module: %s\n", entry->d_name);
 		}
 	}
 	closedir(dir);
-	cp_afc(SOURCE_TMP, TARGET_TMP);
+
+	struct fs_info src, tgt;
+	check_filesystem(&src, source, SOURCE_TMP);
+	check_filesystem(&tgt, target, TARGET_TMP);
+	snprintf(buf, sizeof(buf), "%s/tmp.img", dirname(target));
+	create_img(buf, round_size(src.used + tgt.used));
+	xmkdir(MERGE_TMP, 0755);
+	m_loop = mount_image(buf, MERGE_TMP);
+	if (m_loop == NULL)
+		return 1;
+
+	LOGI("* Merging %s + %s -> %s", source, target, buf);
+	cp_afc(TARGET_TMP, MERGE_TMP);
+	cp_afc(SOURCE_TMP, MERGE_TMP);
 
 	// Unmount all loop devices
 	umount_image(SOURCE_TMP, s_loop);
 	umount_image(TARGET_TMP, t_loop);
+	umount_image(MERGE_TMP, m_loop);
 	rmdir(SOURCE_TMP);
 	rmdir(TARGET_TMP);
+	rmdir(MERGE_TMP);
 	free(s_loop);
 	free(t_loop);
+	free(m_loop);
+	// Cleanup
 	unlink(source);
+	LOGI("* Move %s -> %s", buf, target);
+	rename(buf, target);
 	return 0;
 }
 
@@ -279,12 +263,12 @@ int trim_img(const char *img, const char *mount, char *loop) {
 	int new_size = round_size(info.used);
 	if (info.size > new_size) {
 		umount_image(mount, loop);
-		free(loop);
-		resize_img(img, new_size, 0);
-		loop = mount_image(img, mount);
-		if (loop == NULL)
+		resize_img(img, new_size);
+		char *loop2 = mount_image(img, mount);
+		if (loop2 == NULL)
 			return 1;
+		strcpy(loop, loop2);
+		free(loop2);
 	}
-	free(loop);
 	return 0;
 }
