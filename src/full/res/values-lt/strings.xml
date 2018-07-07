@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
     
     <!--Welcome Activity-->
     <string name="modules">Papildiniai</string>
@@ -30,7 +29,7 @@
     <string name="install_magisk_title">Naujausia versija: %1$s</string>
     <string name="uninstall">Pašalinti</string>
     <string name="uninstall_magisk_title">Pašalinti Magisk</string>
-    <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Yra galimybė, kad duomenys bus užšifruoti...</string>
+    <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Yra galimybė, kad duomenys bus užšifruoti…</string>
     <string name="update">Atnaujinti %1$s</string>
 
     <!--Module Fragment-->
@@ -67,7 +66,6 @@
     <string name="app_changelog">Pakeitimų sąrašas</string>
     <string name="translators">Vv2233Bb</string>
     <string name="app_version">Versija</string>
-
     <string name="app_source_code">Prisidėkite</string>
     <string name="donation">Paaukoti</string>
     <string name="app_translators">Vertėjai</string>
@@ -100,13 +98,14 @@
     <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>
-    <string name="direct_install">Tiesioginis atsisiuntimas (Rekomenduojamas)</string>
+    <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
     <string name="install_second_slot">Instaliuoti į antrą vietą (Po OTA)</string>
     <string name="select_method">Pasirinkite metodą</string>
     <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>    
     <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
+    <string name="restore_img_msg">Atstatome…</string>
     <string name="restore_done">Atstatymas įvykdytas!</string>
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
@@ -114,6 +113,12 @@
     <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
     <string name="cannot_check_sn_title">Negalime surasti SafetyNet</string>
     <string name="cannot_check_sn_notice">Dėl Google Play Services pakeitimų, SafetyNet suradimas perpakuotame Magisk Manager yra neįmanomas</string>
+    <string name="setup_done">Pasiruošimas baigtas</string>
+    <string name="setup_fail">Pasiruošimas nesėkmingas</string>
+    <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
+    <string name="env_fix_msg">Kad Magisk veiktų tinkamai, jūsų įrenginiui reikia papildomo paruošimo. Tai atsisiųs papildomą Magisk zip failą, ar norite tęsti?</string>
+    <string name="setup_title">Papildomas pasiruošimas</string>    
+    <string name="setup_msg">Paruošiama aplinka…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>
