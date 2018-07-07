@@ -23,10 +23,10 @@ BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.top
 BOOTSIGNED=false
 
 get_outfd() {
-  if [ -z $OUTFD ] || readlink /proc/self/fd/$OUTFD | grep -q /tmp; then
+  if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
-    for FD in `ls /proc/self/fd`; do
-      if readlink /proc/self/fd/$FD | grep -q pipe; then
+    for FD in `ls /proc/$$/fd`; do
+      if readlink /proc/$$/fd/$FD | grep -q pipe; then
         if ps | grep -v grep | grep -q " 3 $FD "; then
           OUTFD=$FD
           break
