@@ -1,5 +1,6 @@
-### v5.7.0
-- Add app shortcuts for Android 7.1+
-- Bump minimal module `minMagisk` to `1500`
-- Adjustments for new sepolicies on v16.4+
-- Fix crashes when refreshing the online repo
+### v5.8.0
+- Remain hidden when upgrading within repackaged Magisk Manager
+- New feature: support reconstructing a proper Magisk environment if error detected (e.g. after factory reset)
+- New uninstall method: download uninstaller and completely remove Magisk + Magisk Manager, following with a reboot
+- Hidden apps are now shown on the top of the list in MagiskHide fragment
+- Tons of under-the-hood bug fixes and improvements
