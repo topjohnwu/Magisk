@@ -404,25 +404,16 @@ def sign_adjust_zip(unsigned, output):
 
 def cleanup(args):
 	if len(args.target) == 0:
-		args.target = ['binary', 'java', 'zip']
+		args.target = ['native', 'java']
 
-	if 'binary' in args.target:
-		header('* Cleaning binaries')
+	if 'native' in args.target:
+		header('* Cleaning native')
 		subprocess.run(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean', shell=True)
 		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:
 		header('* Cleaning java')
 		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True)
-		for f in os.listdir(config['outdir']):
-			if '.apk' in f:
-				rm(os.path.join(config['outdir'], f))
-
-	if 'zip' in args.target:
-		header('* Cleaning zip files')
-		for f in os.listdir(config['outdir']):
-			if '.zip' in f:
-				rm(os.path.join(config['outdir'], f))
 
 def parse_config():
 	c = {}
