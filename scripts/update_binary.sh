@@ -1,10 +1,4 @@
 # EX_ARM, EX_X86, BB_ARM, and BB_X86 should be generated in build.py
-getdir() {
-  case "$1" in
-    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
-    *) echo "." ;;
-  esac
-}
 extract_bb() {
   EXBIN=$BBDIR/b64xz; BBBIN=$BBDIR/busybox
   touch $EXBIN; touch $BBBIN; chmod 755 $EXBIN $BBBIN
@@ -29,12 +23,12 @@ case "$1" in
     extract_bb
     ;;
   "indep")
-    TMPDIR="`getdir "${BASH_SOURCE:-$0}"`"; setup_bb
-    shift; exec sh "$@"
+    TMPDIR=.; setup_bb; shift
+    exec /system/bin/sh "$@"
     ;;
   *)
-    TMPDIR=/dev/tmp; rm -rf $TMPDIR 2>/dev/null; setup_bb
-    INSTALLER=$TMPDIR/install; mkdir -p $INSTALLER; unzip -o "$3" -d $INSTALLER >&2
-    exec sh $INSTALLER/META-INF/com/google/android/updater-script $@
+    export TMPDIR=/dev/tmp; rm -rf $TMPDIR 2>/dev/null; setup_bb
+    export INSTALLER=$TMPDIR/install; mkdir -p $INSTALLER; unzip -o "$3" -d $INSTALLER >&2
+    exec sh $INSTALLER/META-INF/com/google/android/updater-script "$@"
     ;;
 esac

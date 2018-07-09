@@ -13,10 +13,6 @@
 # Preparation
 ##########################################################################################
 
-# This path should work in any cases
-TMPDIR=/dev/tmp
-
-INSTALLER=$TMPDIR/install
 COMMONDIR=$INSTALLER/common
 APK=$COMMONDIR/magisk.apk
 CHROMEDIR=$INSTALLER/chromeos
