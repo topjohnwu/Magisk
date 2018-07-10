@@ -144,7 +144,10 @@ def build_binary(args):
 				with open(bin_file, 'rb') as src:
 					xz_dump(src, out, 'magisk_xz')
 
-		stub_apk = os.path.join(config['outdir'], 'stub-release.apk')
+		if args.release:
+			stub_apk = os.path.join(config['outdir'], 'stub-release.apk')
+		else:
+			stub_apk = os.path.join(config['outdir'], 'stub-debug.apk')
 		if not os.path.exists(stub_apk):
 			error('Build release stub APK before building "magiskinit"')
 
