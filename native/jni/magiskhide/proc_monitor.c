@@ -35,13 +35,10 @@ static void term_thread(int sig) {
 	pthread_exit(NULL);
 }
 
-static int read_namespace(const int pid, char* target, const size_t size) {
+static int read_ns(const int pid, struct stat *st) {
 	char path[32];
 	sprintf(path, "/proc/%d/ns/mnt", pid);
-	if (access(path, R_OK) == -1)
-		return 1;
-	xreadlink(path, target, size);
-	return 0;
+	return stat(path, st);
 }
 
 static void lazy_unmount(const char* mountpoint) {
@@ -136,7 +133,8 @@ void proc_monitor() {
 		while (fgets(buf, sizeof(buf), log_in)) {
 			char *ss = strchr(buf, '[');
 			int pid, ppid, num = 0;
-			char *pos = ss, proc[256], ns[32], pns[32];
+			char *pos = ss, proc[256];
+			struct stat ns, pns;
 
 			while(1) {
 				pos = strchr(pos, ',');
@@ -172,10 +170,10 @@ void proc_monitor() {
 				continue;
 
 			ppid = parse_ppid(pid);
-			read_namespace(ppid, pns, sizeof(pns));
+			read_ns(ppid, &pns);
 			do {
-				read_namespace(pid, ns, sizeof(ns));
-				if (strcmp(ns, pns) == 0)
+				read_ns(pid, &ns);
+				if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
 					usleep(50);
 				else
 					break;
@@ -189,8 +187,8 @@ void proc_monitor() {
 			if (colon)
 				*colon = ':';
 #ifdef MAGISK_DEBUG
-			LOGI("proc_monitor: %s (PID=[%d] ns=%s)(PPID=[%d] ns=%s)\n",
-				 proc, pid, ns + 4, ppid, pns + 4);
+			LOGI("proc_monitor: %s (PID=[%d] ns=%llu)(PPID=[%d] ns=%llu)\n",
+				 proc, pid, ns.st_ino, ppid, pns.st_ino);
 #else
 			LOGI("proc_monitor: %s\n", proc);
 #endif
