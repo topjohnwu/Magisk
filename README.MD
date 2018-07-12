@@ -5,7 +5,7 @@
 1. Python 3.5+: run `build.py` script
 2. Java Development Kit (JDK) 8: Compile Magisk Manager and sign zips
 3. Latest Android SDK: set `ANDROID_HOME` environment variable to the path to Android SDK
-4. Android NDK: Install NDK along with SDK (`$ANDROID_HOME/ndk-bundle`), or optionally specify a custom path `ANDROID_NDK`
+4. Android NDK: Install NDK along with SDK (`$ANDROID_HOME/ndk-bundle`), or optionally specify a custom path `ANDROID_NDK_HOME`
 5. (Windows Only) Python package Colorama: Install with `pip install colorama`, used for ANSI color codes
 
 ## Building Notes and Instructions

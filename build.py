@@ -36,8 +36,8 @@ import lzma
 import base64
 import tempfile
 
-if 'ANDROID_NDK' in os.environ:
-	ndk_build = os.path.join(os.environ['ANDROID_NDK'], 'ndk-build')
+if 'ANDROID_NDK_HOME' in os.environ:
+	ndk_build = os.path.join(os.environ['ANDROID_NDK_HOME'], 'ndk-build')
 else:
 	ndk_build = os.path.join(os.environ['ANDROID_HOME'], 'ndk-bundle', 'ndk-build')
 
