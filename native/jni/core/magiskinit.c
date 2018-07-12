@@ -382,9 +382,9 @@ int main(int argc, char *argv[]) {
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
 	int null = open("/null", O_RDWR | O_CLOEXEC);
 	unlink("/null");
-	dup3(null, STDIN_FILENO, O_CLOEXEC);
-	dup3(null, STDOUT_FILENO, O_CLOEXEC);
-	dup3(null, STDERR_FILENO, O_CLOEXEC);
+	xdup3(null, STDIN_FILENO, O_CLOEXEC);
+	xdup3(null, STDOUT_FILENO, O_CLOEXEC);
+	xdup3(null, STDERR_FILENO, O_CLOEXEC);
 	if (null > STDERR_FILENO)
 		close(null);
 

@@ -579,7 +579,7 @@ void startup() {
 	while((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
 		snprintf(buf, PATH_MAX, "/root/%s", entry->d_name);
-		symlinkat(buf, sbin, entry->d_name);
+		xsymlinkat(buf, sbin, entry->d_name);
 	}
 
 	close(sbin);

@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 #include <sys/sendfile.h>
-#include <sys/statvfs.h>
+#include <sys/statfs.h>
 #include <sys/sysmacros.h>
 #include <linux/loop.h>
 
@@ -70,12 +70,12 @@ static char *loopsetup(const char *img) {
 
 static void check_filesystem(struct fs_info *info, const char *img, const char *mount) {
 	struct stat st;
-	struct statvfs vfs;
+	struct statfs fs;
 	stat(img, &st);
-	statvfs(mount, &vfs);
+	statfs(mount, &fs);
 	info->size = st.st_size / 1048576;
-	info->free = vfs.f_bfree * vfs.f_frsize / 1048576;
-	info->used = (vfs.f_blocks - vfs.f_bfree) * vfs.f_frsize / 1048576;
+	info->free = fs.f_bfree * (uint64_t)fs.f_frsize / 1048576;
+	info->used = (fs.f_blocks - fs.f_bfree) * (uint64_t)fs.f_frsize / 1048576;
 }
 
 static void usage() {

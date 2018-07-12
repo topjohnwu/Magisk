@@ -114,7 +114,7 @@ def build_binary(args):
 
 	if 'magisk' in targets:
 		# Magisk is special case as it is a dependency of magiskinit
-		proc = subprocess.run('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count), shell=True)
+		proc = subprocess.run('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build Magisk binary failed!')
 		collect_binary()
@@ -125,15 +125,6 @@ def build_binary(args):
 	if 'b64xz' in targets:
 		flags += ' B_BXZ=1'
 		old_platform = True
-
-	if old_platform:
-		proc = subprocess.run('{} -C native OLD_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True)
-		if proc.returncode != 0:
-			error('Build binaries failed!')
-		collect_binary()
-
-	other = False
-	flags = base_flags
 
 	if 'magiskinit' in targets:
 		for arch in archs:
@@ -153,18 +144,27 @@ def build_binary(args):
 				xz_dump(src, out, 'manager_xz')
 
 		flags += ' B_INIT=1'
-		other = True
+		old_platform = True
 
 	if 'magiskboot' in targets:
 		flags += ' B_BOOT=1'
-		other = True
+		old_platform = True
+
+	if old_platform:
+		proc = subprocess.run('{} -C native OLD_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
+		if proc.returncode != 0:
+			error('Build binaries failed!')
+		collect_binary()
+
+	other = False
+	flags = base_flags
 
 	if 'busybox' in targets:
 		flags += ' B_BB=1'
 		other = True
 
 	if other:
-		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True)
+		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()
@@ -203,7 +203,7 @@ def build_apk(args):
 		if not os.path.exists('release-key.jks'):
 			error('Please generate a java keystore and place it in \'release-key.jks\'')
 
-		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -219,7 +219,7 @@ def build_apk(args):
 		header('Output: ' + release)
 		rm(unsigned)
 	else:
-		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -234,7 +234,7 @@ def build_apk(args):
 		header('Output: ' + target)
 
 def build_snet(args):
-	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
+	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True, stdout=STDOUT)
 	if proc.returncode != 0:
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
@@ -390,7 +390,7 @@ def sign_adjust_zip(unsigned, output):
 
 	if not os.path.exists(jarsigner):
 		header('* Building ' + signer_name)
-		proc = subprocess.run('{} utils:shadowJar'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
+		proc = subprocess.run('{} utils:shadowJar'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
@@ -408,12 +408,12 @@ def cleanup(args):
 
 	if 'native' in args.target:
 		header('* Cleaning native')
-		subprocess.run(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean', shell=True)
+		subprocess.run(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean', shell=True, stdout=STDOUT)
 		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True)
+		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True, stdout=STDOUT)
 
 def parse_config():
 	c = {}
@@ -446,13 +446,14 @@ def parse_config():
 config = parse_config()
 
 parser = argparse.ArgumentParser(description='Magisk build script')
-parser.add_argument('--release', action='store_true', help='compile Magisk for release')
+parser.add_argument('-r', '--release', action='store_true', help='compile Magisk for release')
+parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser('all', help='build everything (binaries/apks/zips)')
 all_parser.set_defaults(func=build_all)
 
-binary_parser = subparsers.add_parser('binary', help='build binaries. target: magisk magiskinit magiskboot busybox b64xz')
+binary_parser = subparsers.add_parser('binary', help='build binaries. Target: magisk magiskinit magiskboot busybox b64xz')
 binary_parser.add_argument('target', nargs='*')
 binary_parser.set_defaults(func=build_binary)
 
@@ -468,7 +469,7 @@ zip_parser.set_defaults(func=zip_main)
 uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
 uninstaller_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='cleanup. target: binary java zip')
+clean_parser = subparsers.add_parser('clean', help='cleanup. Target: native java')
 clean_parser.add_argument('target', nargs='*')
 clean_parser.set_defaults(func=cleanup)
 
@@ -477,5 +478,5 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 args = parser.parse_args()
-
+STDOUT = None if args.verbose else subprocess.DEVNULL
 args.func(args)

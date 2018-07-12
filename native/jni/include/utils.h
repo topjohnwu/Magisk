@@ -19,6 +19,13 @@
 
 // xwrap.c
 
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC O_CLOEXEC
+#endif
+#ifndef SOCK_NONBLOCK
+#define SOCK_NONBLOCK O_NONBLOCK
+#endif
+
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
 #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
@@ -51,9 +58,12 @@ int xsocketpair(int domain, int type, int protocol, int sv[2]);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xdup2(int oldfd, int newfd);
+int xdup3(int oldfd, int newfd, int flags);
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz);
 ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz);
 int xsymlink(const char *target, const char *linkpath);
+int xsymlinkat(const char *target, int newdirfd, const char *linkpath);
+int xlinkat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath, int flags);
 int xmount(const char *source, const char *target,
 	const char *filesystemtype, unsigned long mountflags,
 	const void *data);
@@ -105,7 +115,6 @@ struct file_attr {
 	char con[128];
 };
 
-int fd_getpath(int fd, char *path, size_t size);
 int mkdirs(const char *pathname, mode_t mode);
 void in_order_walk(int dirfd, void (*callback)(int, struct dirent*));
 void rm_rf(const char *path);

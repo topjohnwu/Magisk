@@ -4,7 +4,8 @@ APP_CFLAGS := -std=gnu99 ${MAGISK_DEBUG} \
 APP_CPPFLAGS := -std=c++11
 APP_SHORT_COMMANDS := true
 ifdef OLD_PLAT
-APP_PLATFORM := android-9
+APP_PLATFORM := android-16
+APP_CFLAGS += -Wno-implicit-function-declaration
 else
 APP_PLATFORM := android-21	
 endif

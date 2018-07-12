@@ -28,11 +28,16 @@ static int is_excl(const char *name) {
 	return 0;
 }
 
-int fd_getpath(int fd, char *path, size_t size) {
+static int fd_getpath(int fd, char *path, size_t size) {
 	snprintf(path, size, "/proc/self/fd/%d", fd);
-	if (xreadlink(path, path, size) == -1)
-		return -1;
-	return 0;
+    return xreadlink(path, path, size) == -1;
+}
+
+static int fd_getpathat(int dirfd, const char *name, char *path, size_t size) {
+    if (fd_getpath(dirfd, path, size))
+        return 1;
+    snprintf(path, size, "%s/%s", path, name);
+    return 0;
 }
 
 int mkdirs(const char *pathname, mode_t mode) {
@@ -220,7 +225,7 @@ void clone_dir(int src, int dest) {
 			break;
 		case DT_LNK:
 			xreadlinkat(src, entry->d_name, buf, sizeof(buf));
-			symlinkat(buf, dest, entry->d_name);
+			xsymlinkat(buf, dest, entry->d_name);
 			setattrat(dest, entry->d_name, &a);
 			break;
 		}
@@ -249,7 +254,7 @@ void link_dir(int src, int dest) {
 			close(newsrc);
 			close(newdest);
 		} else {
-			linkat(src, entry->d_name, dest, entry->d_name, 0);
+			xlinkat(src, entry->d_name, dest, entry->d_name, 0);
 		}
 	}
 }
@@ -270,12 +275,9 @@ int getattr(const char *path, struct file_attr *a) {
 }
 
 int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
-	int fd = xopenat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-	if (fd < 0)
-		return -1;
-	int ret = fgetattr(fd, a);
-	close(fd);
-	return ret;
+	char path[PATH_MAX];
+	fd_getpathat(dirfd, pathname, path, sizeof(path));
+	return getattr(path, a);
 }
 
 int fgetattr(int fd, struct file_attr *a) {
@@ -304,12 +306,9 @@ int setattr(const char *path, struct file_attr *a) {
 }
 
 int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
-	int fd = xopenat(dirfd, pathname, O_PATH | O_NOFOLLOW | O_CLOEXEC);
-	if (fd < 0)
-		return -1;
-	int ret = fsetattr(fd, a);
-	close(fd);
-	return ret;
+	char path[PATH_MAX];
+	fd_getpathat(dirfd, pathname, path, sizeof(path));
+	return setattr(path, a);
 }
 
 int fsetattr(int fd, struct file_attr *a) {

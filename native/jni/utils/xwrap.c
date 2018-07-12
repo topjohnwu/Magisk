@@ -21,6 +21,7 @@
 #include <sys/mount.h>
 #include <sys/mman.h>
 #include <sys/sendfile.h>
+#include <sys/syscall.h>
 
 #include "logging.h"
 #include "utils.h"
@@ -100,7 +101,7 @@ int xpipe2(int pipefd[2], int flags) {
 }
 
 int xsetns(int fd, int nstype) {
-	int ret = setns(fd, nstype);
+	int ret = (int) syscall(__NR_setns, fd, nstype);
 	if (ret == -1) {
 		PLOGE("setns");
 	}
@@ -165,9 +166,14 @@ int xlisten(int sockfd, int backlog) {
 }
 
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
-	int fd = accept4(sockfd, addr, addrlen, flags);
+#ifndef __NR_accept4
+#ifdef __i386__
+#define __NR_accept4 364
+#endif
+#endif
+	int fd = (int) syscall(__NR_accept4, sockfd, addr, addrlen, flags);
 	if (fd == -1) {
-		PLOGE("accept");
+		PLOGE("accept4");
 	}
 	return fd;
 }
@@ -212,8 +218,8 @@ ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags) {
 	return rec;
 }
 
-int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                          void *(*start_routine) (void *), void *arg) {
+int xpthread_create(pthread_t *thread, const pthread_attr_t *attr, 
+					void *(*start_routine) (void *), void *arg) {
 	errno = pthread_create(thread, attr, start_routine, arg);
 	if (errno) {
 		PLOGE("pthread_create");
@@ -245,6 +251,14 @@ int xdup2(int oldfd, int newfd) {
 	return ret;
 }
 
+int xdup3(int oldfd, int newfd, int flags) {
+	int ret = (int) syscall(__NR_dup3, oldfd, newfd, flags);
+	if (ret == -1) {
+		PLOGE("dup3");
+	}
+	return ret;
+}
+
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
 	ssize_t ret = readlink(pathname, buf, bufsiz);
 	if (ret == -1) {
@@ -256,7 +270,7 @@ ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
 }
 
 ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
-	ssize_t ret = readlinkat(dirfd, pathname, buf, bufsiz);
+	ssize_t ret = syscall(__NR_readlinkat, dirfd, pathname, buf, bufsiz);
 	if (ret == -1) {
 		PLOGE("readlinkat %s", pathname);
 	} else {
@@ -273,10 +287,26 @@ int xsymlink(const char *target, const char *linkpath) {
 	return ret;
 }
 
+int xsymlinkat(const char *target, int newdirfd, const char *linkpath) {
+	int ret = (int) syscall(__NR_symlinkat, target, newdirfd, linkpath);
+	if (ret == -1) {
+		PLOGE("symlinkat %s->%s", target, linkpath);
+	}
+	return ret;
+}
+
+int xlinkat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath, int flags) {
+	int ret = (int) syscall(__NR_linkat, olddirfd, oldpath, newdirfd, newpath, flags);
+	if (ret == -1) {
+		PLOGE("linkat %s->%s", oldpath, newpath);
+	}
+	return ret;
+}
+
 int xmount(const char *source, const char *target,
 	const char *filesystemtype, unsigned long mountflags,
 	const void *data) {
-	int ret = mount(source, target, filesystemtype, MS_SILENT | mountflags, data);
+	int ret = mount(source, target, filesystemtype, mountflags, data);
 	if (ret == -1) {
 		PLOGE("mount %s->%s", source, target);
 	}
