@@ -203,7 +203,7 @@ def build_apk(args):
 		if not os.path.exists('release-key.jks'):
 			error('Please generate a java keystore and place it in \'release-key.jks\'')
 
-		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -219,7 +219,7 @@ def build_apk(args):
 		header('Output: ' + release)
 		rm(unsigned)
 	else:
-		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} app:assembleDebug'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -234,7 +234,7 @@ def build_apk(args):
 		header('Output: ' + target)
 
 def build_snet(args):
-	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew')), shell=True)
+	proc = subprocess.run('{} snet:assembleRelease'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
 	if proc.returncode != 0:
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
@@ -390,7 +390,7 @@ def sign_adjust_zip(unsigned, output):
 
 	if not os.path.exists(jarsigner):
 		header('* Building ' + signer_name)
-		proc = subprocess.run('{} utils:shadowJar'.format(os.path.join('.', 'gradlew')), shell=True)
+		proc = subprocess.run('{} utils:shadowJar'.format(os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')), shell=True)
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
