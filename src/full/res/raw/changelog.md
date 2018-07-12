@@ -1,6 +1,11 @@
-### v5.8.0
-- Remain hidden when upgrading within repackaged Magisk Manager
-- New feature: support reconstructing a proper Magisk environment if error detected (e.g. after factory reset)
-- New uninstall method: download uninstaller and completely remove Magisk + Magisk Manager, following with a reboot
-- Hidden apps are now shown on the top of the list in MagiskHide fragment
-- Tons of under-the-hood bug fixes and improvements
+### v5.8.1
+- Fix a bug that cause the root shell initializer not running in BusyBox.
+This is the cause of freezes on some older devices and DTBO being patched unconditionally.
+
+### Note
+If your device has a separate DTBO, and you do NOT want it patched but it was patched due to the bug,
+follow these instructions to fix it:
+
+1. Uninstall → Restore Images. Do **NOT** reboot afterwards!
+2. Check **Preserve AVB 2.0/dm-verity** in Advanced Settings
+3. Install → Install → Direct Install to install correctly with proper settings
