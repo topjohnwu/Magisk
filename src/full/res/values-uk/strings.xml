@@ -63,7 +63,7 @@
 
     <!--About Activity-->
     <string name="about">Про програму</string>
-    <string name="app_changelog">Список змін</string>
+    <string name="app_changelog">Перелік змін</string>
     <string name="translators" />
     <string name="app_version">Версія</string>
     <string name="app_source_code">Вихідний код</string>
@@ -132,7 +132,7 @@
     <string name="settings_restore_manager_summary">Відновити Magisk Manager з оригінального пакету</string>
     <string name="language">Мова</string>
     <string name="system_default">Стандартна (системна)</string>
-    <string name="settings_update">Оновити налаштування</string>
+    <string name="settings_update">Налаштування оновлень</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>
     <string name="settings_check_update_summary">Періодично перевіряти оновлення у фоновому режимі</string>
     <string name="settings_update_channel_title">Канал оновлення</string>
@@ -163,7 +163,7 @@
     <string name="request_timeout_summary">%1$s сек.</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
-    <string name="settings_su_fingerprint_title">Увімкнути автентифікацію за відбитком</string>
+    <string name="settings_su_fingerprint_title">Автентифікація за відбитком</string>
     <string name="settings_su_fingerprint_summary">Використовувати сканер відбитків пальців, щоб надавати дозвіл суперкористувача</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
@@ -189,7 +189,7 @@
     <string name="su_request_title">Запит прав Суперкористувача</string>
     <string name="deny_with_str">Відмовити %1$s</string>
     <string name="deny">Відмовити</string>
-    <string name="prompt">Запит</string>
+    <string name="prompt">Запитувати</string>
     <string name="grant">Надати</string>
     <string name="su_warning">Надати повний доступ до пристрою.\nЯкщо не впевнені, що бажаєте продовжити, відхиліть дану дію.</string>
     <string name="forever">Назавжди</string>
