@@ -14,8 +14,8 @@
 #include <sys/types.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include "_system_properties.h"
-#include "system_properties.h"
+#include "private/_system_properties.h"
+#include "private/system_properties.h"
 
 #include "magisk.h"
 #include "resetprop.h"
@@ -79,7 +79,7 @@ static int usage(char* arg0) {
 	return 1;
 }
 
-// The callback passes to __system_property_read_callback2, actually runs the callback in read_cb
+// The callback passes to __system_property_read_callback, actually runs the callback in read_cb
 static void callback_wrapper(void *read_cb, const char *name, const char *value, uint32_t serial) {
 	((struct read_cb_t *) read_cb)->func(name, value, ((struct read_cb_t *) read_cb)->cookie);
 }
@@ -114,7 +114,7 @@ static void store_prop_value(const char *name, const char *value, void *dst) {
 }
 
 static void prop_foreach_cb(const prop_info* pi, void* read_cb) {
-	__system_property_read_callback2(pi, callback_wrapper, read_cb);
+	__system_property_read_callback(pi, callback_wrapper, read_cb);
 }
 
 // Comparision function used to sort prop vectors
@@ -123,7 +123,7 @@ static int prop_cmp(const void *p1, const void *p2) {
 }
 
 static int init_resetprop() {
-	if (__system_properties_init2()) {
+	if (__system_properties_init()) {
 		PRINT_E("resetprop: Initialize error\n");
 		return -1;
 	}
@@ -157,7 +157,7 @@ static void print_props(int persist) {
 
 int prop_exist(const char *name) {
 	if (init_resetprop()) return 0;
-	return __system_property_find2(name) != NULL;
+	return __system_property_find(name) != NULL;
 }
 
 char *getprop(const char *name) {
@@ -169,7 +169,7 @@ char *getprop2(const char *name, int persist) {
 	if (check_legal_property_name(name))
 		return NULL;
 	if (init_resetprop()) return NULL;
-	const prop_info *pi = __system_property_find2(name);
+	const prop_info *pi = __system_property_find(name);
 	if (pi == NULL) {
 		if (persist && strncmp(name, "persist.", 8) == 0) {
 			char *value = persist_getprop(name);
@@ -184,7 +184,7 @@ char *getprop2(const char *name, int persist) {
 			.func = store_prop_value,
 			.cookie = value
 		};
-		__system_property_read_callback2(pi, callback_wrapper, &read_cb);
+		__system_property_read_callback(pi, callback_wrapper, &read_cb);
 		PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
 		return strdup(value);
 	}
@@ -196,7 +196,7 @@ void getprop_all(void (*callback)(const char *, const char *, void *), void *coo
 		.func = callback,
 		.cookie = cookie
 	};
-	__system_property_foreach2(prop_foreach_cb, &read_cb);
+	__system_property_foreach(prop_foreach_cb, &read_cb);
 }
 
 int setprop(const char *name, const char *value) {
@@ -209,20 +209,20 @@ int setprop2(const char *name, const char *value, const int trigger) {
 	if (init_resetprop()) return -1;
 	int ret;
 
-	prop_info *pi = (prop_info*) __system_property_find2(name);
+	prop_info *pi = (prop_info*) __system_property_find(name);
 	if (pi != NULL) {
 		if (trigger) {
 			if (strncmp(name, "ro.", 3) == 0) deleteprop(name);
-			ret = __system_property_set2(name, value);
+			ret = __system_property_set(name, value);
 		} else {
-			ret = __system_property_update2(pi, value, strlen(value));
+			ret = __system_property_update(pi, value, strlen(value));
 		}
 	} else {
 		PRINT_D("resetprop: New prop [%s]\n", name);
 		if (trigger) {
-			ret = __system_property_set2(name, value);
+			ret = __system_property_set(name, value);
 		} else {
-			ret = __system_property_add2(name, strlen(name), value, strlen(value));
+			ret = __system_property_add(name, strlen(name), value, strlen(value));
 		}
 	}
 

@@ -5,7 +5,7 @@
 #ifndef MAGISK_PROPS_H
 #define MAGISK_PROPS_H
 
-#include "system_properties.h"
+#include "resetprop/private/system_properties.h"
 #include "logging.h"
 
 extern int prop_verbose;

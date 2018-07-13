@@ -34,6 +34,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "redefs.h"
+
 __BEGIN_DECLS
 
 typedef struct prop_info prop_info;
@@ -43,7 +45,7 @@ typedef struct prop_info prop_info;
 /*
  * Sets system property `key` to `value`, creating the system property if it doesn't already exist.
  */
-int __system_property_set2(const char* key, const char* value);
+int __system_property_set(const char *key, const char *value);
 
 /*
  * Returns a `prop_info` corresponding system property `name`, or nullptr if it doesn't exist.
@@ -51,12 +53,12 @@ int __system_property_set2(const char* key, const char* value);
  *
  * Property lookup is expensive, so it can be useful to cache the result of this function.
  */
-const prop_info* __system_property_find2(const char* name);
+const prop_info* __system_property_find(const char *name);
 
 /*
  * Calls `callback` with a consistent trio of name, value, and serial number for property `pi`.
  */
-void __system_property_read_callback2(const prop_info *pi,
+void __system_property_read_callback(const prop_info *pi,
     void (*callback)(void* cookie, const char *name, const char *value, uint32_t serial),
     void* cookie);
 
@@ -66,7 +68,7 @@ void __system_property_read_callback2(const prop_info *pi,
  *
  * This method is for inspecting and debugging the property system, and not generally useful.
  */
-int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
+int __system_property_foreach(void (*propfn)(const prop_info *pi, void *cookie), void *cookie);
 
 /*
  * Waits for the specific system property identified by `pi` to be updated
@@ -81,19 +83,19 @@ int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie)
  * timed out.
  */
 struct timespec;
-bool __system_property_wait2(const prop_info* pi,
-                            uint32_t old_serial,
-                            uint32_t* new_serial_ptr,
-                            const struct timespec* relative_timeout);
+bool __system_property_wait(const prop_info *pi,
+							uint32_t old_serial,
+							uint32_t *new_serial_ptr,
+							const struct timespec *relative_timeout);
 
 /* Deprecated. In Android O and above, there's no limit on property name length. */
 #define PROP_NAME_MAX   32
 /* Deprecated. Use __system_property_read_callback instead. */
-int __system_property_read2(const prop_info* pi, char* name, char* value);
+int __system_property_read(const prop_info* pi, char* name, char* value);
 /* Deprecated. Use __system_property_read_callback instead. */
-int __system_property_get2(const char* name, char* value);
+int __system_property_get(const char* name, char* value);
 /* Deprecated. Use __system_property_foreach instead. */
-const prop_info* __system_property_find_nth2(unsigned n);
+const prop_info* __system_property_find_nth(unsigned n);
 
 __END_DECLS
 

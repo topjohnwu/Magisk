@@ -53,8 +53,8 @@
 //#include <sys/xattr.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include "_system_properties.h"
-#include "system_properties.h"
+#include "private/_system_properties.h"
+#include "private/system_properties.h"
 
 // #include <async_safe/log.h>
 
@@ -1158,7 +1158,7 @@ static void free_and_unmap_contexts() {
   }
 }
 
-int __system_properties_init2() {
+int __system_properties_init() {
   // This is called from __libc_init_common, and should leave errno at 0 (http://b/37248982).
   // ErrnoRestorer errno_restorer;
 
@@ -1186,7 +1186,7 @@ int __system_properties_init2() {
   return 0;
 }
 
-int __system_property_set_filename2(const char* filename) {
+int __system_property_set_filename(const char* filename) {
   size_t len = strlen(filename);
   if (len >= sizeof(property_filename)) return -1;
 
@@ -1194,7 +1194,7 @@ int __system_property_set_filename2(const char* filename) {
   return 0;
 }
 
-int __system_property_area_init2() {
+int __system_property_area_init() {
   free_and_unmap_contexts();
   mkdir(property_filename, S_IRWXU | S_IXGRP | S_IXOTH);
   if (!initialize_properties()) {
@@ -1215,7 +1215,7 @@ int __system_property_area_init2() {
   return fsetxattr_failed ? -2 : 0;
 }
 
-uint32_t __system_property_area_serial2() {
+uint32_t __system_property_area_serial() {
   prop_area* pa = __system_property_area__;
   if (!pa) {
     return -1;
@@ -1224,14 +1224,14 @@ uint32_t __system_property_area_serial2() {
   return atomic_load_explicit(pa->serial(), memory_order_acquire);
 }
 
-const prop_info* __system_property_find2(const char* name) {
+const prop_info* __system_property_find(const char* name) {
   if (!__system_property_area__) {
     return nullptr;
   }
 
   prop_area* pa = get_prop_area_for_name(name);
   if (!pa) {
-    // async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
+    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
     return nullptr;
   }
 
@@ -1267,9 +1267,9 @@ static inline uint_least32_t load_const_atomic(const atomic_uint_least32_t* s, m
   return atomic_load_explicit(non_const_s, mo);
 }
 
-int __system_property_read2(const prop_info* pi, char* name, char* value) {
+int __system_property_read(const prop_info* pi, char* name, char* value) {
   while (true) {
-    uint32_t serial = __system_property_serial2(pi);  // acquire semantics
+    uint32_t serial = __system_property_serial(pi);  // acquire semantics
     size_t len = SERIAL_VALUE_LEN(serial);
     memcpy(value, pi->value, len + 1);
     // TODO: Fix the synchronization scheme here.
@@ -1297,14 +1297,14 @@ int __system_property_read2(const prop_info* pi, char* name, char* value) {
   }
 }
 
-void __system_property_read_callback2(const prop_info* pi,
+void __system_property_read_callback(const prop_info* pi,
                                      void (*callback)(void* cookie,
                                                       const char* name,
                                                       const char* value,
                                                       uint32_t serial),
                                      void* cookie) {
   while (true) {
-    uint32_t serial = __system_property_serial2(pi);  // acquire semantics
+    uint32_t serial = __system_property_serial(pi);  // acquire semantics
     size_t len = SERIAL_VALUE_LEN(serial);
     char value_buf[len + 1];
 
@@ -1320,11 +1320,11 @@ void __system_property_read_callback2(const prop_info* pi,
   }
 }
 
-int __system_property_get2(const char* name, char* value) {
-  const prop_info* pi = __system_property_find2(name);
+int __system_property_get(const char* name, char* value) {
+  const prop_info* pi = __system_property_find(name);
 
   if (pi != 0) {
-    return __system_property_read2(pi, nullptr, value);
+    return __system_property_read(pi, nullptr, value);
   } else {
     value[0] = 0;
     return 0;
@@ -1338,7 +1338,7 @@ static uint32_t g_propservice_protocol_version = 0;
 
 static void detect_protocol_version() {
   char value[PROP_VALUE_MAX];
-  if (__system_property_get2(kServiceVersionPropertyName, value) == 0) {
+  if (__system_property_get(kServiceVersionPropertyName, value) == 0) {
     g_propservice_protocol_version = kProtocolVersion1;
     async_safe_format_log(ANDROID_LOG_WARN, "libc",
                           "Using old property service protocol (\"%s\" is not set)",
@@ -1356,7 +1356,7 @@ static void detect_protocol_version() {
   }
 }
 
-int __system_property_set2(const char* key, const char* value) {
+int __system_property_set(const char* key, const char* value) {
   if (key == nullptr) return -1;
   if (value == nullptr) value = "";
   if (strlen(value) >= PROP_VALUE_MAX) return -1;
@@ -1431,7 +1431,7 @@ int __system_property_set2(const char* key, const char* value) {
   }
 }
 
-int __system_property_update2(prop_info* pi, const char* value, unsigned int len) {
+int __system_property_update(prop_info* pi, const char* value, unsigned int len) {
   if (len >= PROP_VALUE_MAX) {
     return -1;
   }
@@ -1461,7 +1461,7 @@ int __system_property_update2(prop_info* pi, const char* value, unsigned int len
   return 0;
 }
 
-int __system_property_add2(const char* name, unsigned int namelen, const char* value,
+int __system_property_add(const char* name, unsigned int namelen, const char* value,
                           unsigned int valuelen) {
   if (valuelen >= PROP_VALUE_MAX) {
     return -1;
@@ -1498,7 +1498,7 @@ int __system_property_add2(const char* name, unsigned int namelen, const char* v
 }
 
 // Wait for non-locked serial, and retrieve it with acquire semantics.
-uint32_t __system_property_serial2(const prop_info* pi) {
+uint32_t __system_property_serial(const prop_info* pi) {
   uint32_t serial = load_const_atomic(&pi->serial, memory_order_acquire);
   while (SERIAL_DIRTY(serial)) {
     __futex_wait(const_cast<atomic_uint_least32_t*>(&pi->serial), serial, nullptr);
@@ -1507,13 +1507,13 @@ uint32_t __system_property_serial2(const prop_info* pi) {
   return serial;
 }
 
-uint32_t __system_property_wait_any2(uint32_t old_serial) {
+uint32_t __system_property_wait_any(uint32_t old_serial) {
   uint32_t new_serial;
-  __system_property_wait2(nullptr, old_serial, &new_serial, nullptr);
+  __system_property_wait(nullptr, old_serial, &new_serial, nullptr);
   return new_serial;
 }
 
-bool __system_property_wait2(const prop_info* pi,
+bool __system_property_wait(const prop_info* pi,
                             uint32_t old_serial,
                             uint32_t* new_serial_ptr,
                             const timespec* relative_timeout) {
@@ -1539,7 +1539,7 @@ bool __system_property_wait2(const prop_info* pi,
   return true;
 }
 
-const prop_info* __system_property_find_nth2(unsigned n) {
+const prop_info* __system_property_find_nth(unsigned n) {
   struct find_nth {
     const uint32_t sought;
     uint32_t current;
@@ -1551,11 +1551,11 @@ const prop_info* __system_property_find_nth2(unsigned n) {
       if (self->current++ == self->sought) self->result = pi;
     }
   } state(n);
-  __system_property_foreach2(find_nth::fn, &state);
+  __system_property_foreach(find_nth::fn, &state);
   return state.result;
 }
 
-int __system_property_foreach2(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
+int __system_property_foreach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
   if (!__system_property_area__) {
     return -1;
   }
