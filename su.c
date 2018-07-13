@@ -235,12 +235,12 @@ int su_daemon_main(int argc, char **argv) {
 		LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
 		if (switch_mnt_ns(su_ctx->pid)) {
 			LOGD("su: setns failed, fallback to isolated\n");
-			unshare(CLONE_NEWNS);
+			xunshare(CLONE_NEWNS);
 		}
 		break;
 	case NAMESPACE_MODE_ISOLATE:
 		LOGD("su: use new isolated namespace\n");
-		unshare(CLONE_NEWNS);
+		xunshare(CLONE_NEWNS);
 		break;
 	}
 
