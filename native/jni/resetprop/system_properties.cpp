@@ -26,13 +26,13 @@
  * SUCH DAMAGE.
  */
 
+#define typeof __typeof__
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <stdio.h>
-#include <stdatomic.h>
-#include <stdbool.h>
+#include "private/stdatomic.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@
 #include <unistd.h>
 #include <new>
 
-#include <linux/xattr.h>
+#include "private/xattr.h"
 #include <netinet/in.h>
 #include <sys/mman.h>
 #include <sys/select.h>
@@ -50,10 +50,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/un.h>
-
-#undef XATTR_CREATE
-#undef XATTR_REPLACE
-#include <sys/xattr.h>
+//#include <sys/xattr.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include "_system_properties.h"
@@ -61,10 +58,32 @@
 
 // #include <async_safe/log.h>
 
-#include "ErrnoRestorer.h"
-#include "bionic_futex.h"
-#include "bionic_lock.h"
-#include "bionic_macros.h"
+// #include "private/ErrnoRestorer.h"
+#include "private/bionic_futex.h"
+#include "private/bionic_lock.h"
+#include "private/bionic_macros.h"
+// #include "private/bionic_sdk_version.h"
+
+/***************
+ * Workarounds *
+ ***************/
+#define async_safe_format_buffer snprintf
+#define async_safe_format_log(...)  /* NOP */
+#define CHECK(...)  /* NOP */
+#define getline my_getline
+static int fsetxattr(int fd, const char *name, const void *value, size_t size, int flags) {
+	return (int) syscall(__NR_fsetxattr, fd, name, value, size, flags);
+}
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC O_CLOEXEC
+#endif
+#ifndef INT32_MAX
+#define INT32_MAX (2147483647)
+#endif
+extern "C" ssize_t my_getline(char**, size_t*, FILE*);
+/******************
+ * Workaround End *
+ ******************/
 
 static constexpr int PROP_FILENAME_MAX = 1024;
 
@@ -95,16 +114,6 @@ static const char* kServiceVersionPropertyName = "ro.property_service.version";
  *                  | net |   | sys |     | com |            |     1     |
  *                  +-----+   +-----+     +-----+            +===========+
  */
-
-// This is a alternative implementation for async_safe_format_buffer
-// A workaround to not include the async_safe header
-static int async_safe_format_buffer(char * s, size_t n, const char * format, ...) {
-  va_list vl;
-  va_start(vl, format);
-  int ret = vsnprintf(s, n, format, vl);
-  va_end(vl);
-  return ret;
-}
 
 // Represents a node in the trie.
 struct prop_bt {
@@ -246,8 +255,8 @@ static prop_area* map_prop_area_rw(const char* filename, const char* context,
 
   if (context) {
     if (fsetxattr(fd, XATTR_NAME_SELINUX, context, strlen(context) + 1, 0) != 0) {
-      // async_safe_format_log(ANDROID_LOG_ERROR, "libc",
-      //                       "fsetxattr failed to set context (%s) for \"%s\"", context, filename);
+      async_safe_format_log(ANDROID_LOG_ERROR, "libc",
+                            "fsetxattr failed to set context (%s) for \"%s\"", context, filename);
       /*
        * fsetxattr() will fail during system properties tests due to selinux policy.
        * We do not want to create a custom policy for the tester, so we will continue in
@@ -610,8 +619,8 @@ class SocketWriter {
   {}
 
   SocketWriter& WriteUint32(uint32_t value) {
-    // CHECK(uint_buf_index_ < kUintBufSize);
-    // CHECK(iov_index_ < kIovSize);
+    CHECK(uint_buf_index_ < kUintBufSize);
+    CHECK(iov_index_ < kIovSize);
     uint32_t* ptr = uint_buf_ + uint_buf_index_;
     uint_buf_[uint_buf_index_++] = value;
     iov_[iov_index_].iov_base = ptr;
@@ -627,7 +636,7 @@ class SocketWriter {
       return *this;
     }
 
-    // CHECK(iov_index_ < kIovSize);
+    CHECK(iov_index_ < kIovSize);
     iov_[iov_index_].iov_base = const_cast<char*>(value);
     iov_[iov_index_].iov_len = valuelen;
     ++iov_index_;
@@ -703,9 +712,9 @@ static int send_prop_msg(const prop_msg* msg) {
       // ms so callers who do read-after-write can reliably see
       // what they've written.  Most of the time.
       // TODO: fix the system properties design.
-      // async_safe_format_log(ANDROID_LOG_WARN, "libc",
-      //                       "Property service has timed out while trying to set \"%s\" to \"%s\"",
-      //                       msg->name, msg->value);
+      async_safe_format_log(ANDROID_LOG_WARN, "libc",
+                            "Property service has timed out while trying to set \"%s\" to \"%s\"",
+                            msg->name, msg->value);
       result = 0;
     }
   }
@@ -1151,7 +1160,7 @@ static void free_and_unmap_contexts() {
 
 int __system_properties_init2() {
   // This is called from __libc_init_common, and should leave errno at 0 (http://b/37248982).
-  ErrnoRestorer errno_restorer;
+  // ErrnoRestorer errno_restorer;
 
   if (initialized) {
     // list_foreach(contexts, [](context_node* l) { l->reset_access(); });    // resetprop remove
@@ -1275,13 +1284,13 @@ int __system_property_read2(const prop_info* pi, char* name, char* value) {
     if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
       if (name != nullptr) {
         size_t namelen = strlcpy(name, pi->name, PROP_NAME_MAX);
-        // if (namelen >= PROP_NAME_MAX) {
-        //   async_safe_format_log(ANDROID_LOG_ERROR, "libc",
-        //                         "The property name length for \"%s\" is >= %d;"
-        //                         " please use __system_property_read_callback2"
-        //                         " to read this property. (the name is truncated to \"%s\")",
-        //                         pi->name, PROP_NAME_MAX - 1, name);
-        // }
+        if (namelen >= PROP_NAME_MAX) {
+          async_safe_format_log(ANDROID_LOG_ERROR, "libc",
+                                "The property name length for \"%s\" is >= %d;"
+                                " please use __system_property_read_callback"
+                                " to read this property. (the name is truncated to \"%s\")",
+                                pi->name, PROP_NAME_MAX - 1, name);
+        }
       }
       return len;
     }
@@ -1331,17 +1340,17 @@ static void detect_protocol_version() {
   char value[PROP_VALUE_MAX];
   if (__system_property_get2(kServiceVersionPropertyName, value) == 0) {
     g_propservice_protocol_version = kProtocolVersion1;
-    // async_safe_format_log(ANDROID_LOG_WARN, "libc",
-    //                       "Using old property service protocol (\"%s\" is not set)",
-    //                       kServiceVersionPropertyName);
+    async_safe_format_log(ANDROID_LOG_WARN, "libc",
+                          "Using old property service protocol (\"%s\" is not set)",
+                          kServiceVersionPropertyName);
   } else {
     uint32_t version = static_cast<uint32_t>(atoll(value));
     if (version >= kProtocolVersion2) {
       g_propservice_protocol_version = kProtocolVersion2;
     } else {
-      // async_safe_format_log(ANDROID_LOG_WARN, "libc",
-      //                       "Using old property service protocol (\"%s\"=\"%s\")",
-      //                       kServiceVersionPropertyName, value);
+      async_safe_format_log(ANDROID_LOG_WARN, "libc",
+                            "Using old property service protocol (\"%s\"=\"%s\")",
+                            kServiceVersionPropertyName, value);
       g_propservice_protocol_version = kProtocolVersion1;
     }
   }
@@ -1371,50 +1380,50 @@ int __system_property_set2(const char* key, const char* value) {
     // Use proper protocol
     PropertyServiceConnection connection;
     if (!connection.IsValid()) {
-      // errno = connection.GetLastError();
-      // async_safe_format_log(ANDROID_LOG_WARN,
-      //                       "libc",
-      //                       "Unable to set property \"%s\" to \"%s\": connection failed; errno=%d (%s)",
-      //                       key,
-      //                       value,
-      //                       errno,
-      //                       strerror(errno));
+      errno = connection.GetLastError();
+      async_safe_format_log(ANDROID_LOG_WARN,
+                            "libc",
+                            "Unable to set property \"%s\" to \"%s\": connection failed; errno=%d (%s)",
+                            key,
+                            value,
+                            errno,
+                            strerror(errno));
       return -1;
     }
 
     SocketWriter writer(&connection);
     if (!writer.WriteUint32(PROP_MSG_SETPROP2).WriteString(key).WriteString(value).Send()) {
-      // errno = connection.GetLastError();
-      // async_safe_format_log(ANDROID_LOG_WARN,
-      //                       "libc",
-      //                       "Unable to set property \"%s\" to \"%s\": write failed; errno=%d (%s)",
-      //                       key,
-      //                       value,
-      //                       errno,
-      //                       strerror(errno));
+      errno = connection.GetLastError();
+      async_safe_format_log(ANDROID_LOG_WARN,
+                            "libc",
+                            "Unable to set property \"%s\" to \"%s\": write failed; errno=%d (%s)",
+                            key,
+                            value,
+                            errno,
+                            strerror(errno));
       return -1;
     }
 
     int result = -1;
     if (!connection.RecvInt32(&result)) {
-      // errno = connection.GetLastError();
-      // async_safe_format_log(ANDROID_LOG_WARN,
-      //                       "libc",
-      //                       "Unable to set property \"%s\" to \"%s\": recv failed; errno=%d (%s)",
-      //                       key,
-      //                       value,
-      //                       errno,
-      //                       strerror(errno));
+      errno = connection.GetLastError();
+      async_safe_format_log(ANDROID_LOG_WARN,
+                            "libc",
+                            "Unable to set property \"%s\" to \"%s\": recv failed; errno=%d (%s)",
+                            key,
+                            value,
+                            errno,
+                            strerror(errno));
       return -1;
     }
 
     if (result != PROP_SUCCESS) {
-      // async_safe_format_log(ANDROID_LOG_WARN,
-      //                       "libc",
-      //                       "Unable to set property \"%s\" to \"%s\": error code: 0x%x",
-      //                       key,
-      //                       value,
-      //                       result);
+      async_safe_format_log(ANDROID_LOG_WARN,
+                            "libc",
+                            "Unable to set property \"%s\" to \"%s\": error code: 0x%x",
+                            key,
+                            value,
+                            result);
       return -1;
     }
 
@@ -1469,7 +1478,7 @@ int __system_property_add2(const char* name, unsigned int namelen, const char* v
   prop_area* pa = get_prop_area_for_name(name);
 
   if (!pa) {
-    // async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied adding property \"%s\"", name);
+    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied adding property \"%s\"", name);
     return -1;
   }
 

@@ -38,6 +38,7 @@ ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
 int xpipe2(int pipefd[2], int flags);
 int xsetns(int fd, int nstype);
+int xunshare(int flags);
 DIR *xopendir(const char *name);
 DIR *xfdopendir(int fd);
 struct dirent *xreaddir(DIR *dirp);
@@ -81,6 +82,8 @@ pid_t xfork();
 // misc.c
 
 #define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
+#define getline my_getline
+#define getdelim my_getdelim
 
 unsigned get_shell_uid();
 unsigned get_system_uid();
@@ -89,6 +92,8 @@ int check_data();
 int file_to_vector(const char* filename, struct vector *v);
 int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
+ssize_t my_getline(char **lineptr, size_t *n, FILE *stream);
+ssize_t my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 void ps(void (*func)(int));
 void ps_filter_proc_name(const char *filter, void (*func)(int));
 void unlock_blocks();

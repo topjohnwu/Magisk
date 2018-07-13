@@ -76,12 +76,11 @@ static void parse_cmdline(struct cmdline *cmd) {
 	memset(cmd, 0, sizeof(*cmd));
 
 	char cmdline[4096];
-	mkdir("/proc", 0555);
+	mkdir("/proc", 0755);
 	xmount("proc", "/proc", "proc", 0, NULL);
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
-	umount("/proc");
 	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(NULL, " ")) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
@@ -402,7 +401,7 @@ int main(int argc, char *argv[]) {
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
-		excl_list = (char *[]) { "overlay", ".backup", "init.bak", NULL };
+		excl_list = (char *[]) { "overlay", ".backup", "proc", "init.bak", NULL };
 		frm_rf(root);
 	} else if (access("/ramdisk.cpio.xz", R_OK) == 0) {
 		// High compression mode
@@ -499,6 +498,8 @@ int main(int argc, char *argv[]) {
 
 	// Clean up
 	close(root);
+	umount("/proc");
+	umount("/sys");
 	if (mounted_system)
 		umount("/system");
 	if (mounted_vendor)

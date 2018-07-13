@@ -29,7 +29,7 @@
 #define _BIONIC_FUTEX_H
 
 #include <errno.h>
-#include <linux/futex.h>
+#include "futex.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/cdefs.h>
@@ -40,7 +40,7 @@ __BEGIN_DECLS
 
 struct timespec;
 
-static inline __always_inline int __futex(volatile void* ftx, int op, int value,
+static inline int __futex(volatile void* ftx, int op, int value,
                                           const struct timespec* timeout,
                                           int bitset) {
   // Our generated syscall assembler sets errno, but our callers (pthread functions) don't want to.

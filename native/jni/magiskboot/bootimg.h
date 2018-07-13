@@ -99,9 +99,9 @@ typedef struct mtk_hdr {
 } __attribute__((packed)) mtk_hdr;
 
 typedef struct dhtb_hdr {
-	char magic[8];      /* DHTB magic */
-	char checksum[40];  /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
-	uint32_t size;      /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	char magic[8];         /* DHTB magic */
+	uint8_t checksum[40];  /* Payload SHA256, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
+	uint32_t size;         /* Payload size, whole image + SEANDROIDENFORCE + 0xFFFFFFFF */
 } __attribute__((packed)) dhtb_hdr;
 
 typedef struct blob_hdr {

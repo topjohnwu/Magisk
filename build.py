@@ -119,12 +119,12 @@ def build_binary(args):
 			error('Build Magisk binary failed!')
 		collect_binary()
 
-	old_platform = False
+	old_plat = False
 	flags = base_flags
 
 	if 'b64xz' in targets:
 		flags += ' B_BXZ=1'
-		old_platform = True
+		old_plat = True
 
 	if 'magiskinit' in targets:
 		for arch in archs:
@@ -144,27 +144,27 @@ def build_binary(args):
 				xz_dump(src, out, 'manager_xz')
 
 		flags += ' B_INIT=1'
-		old_platform = True
+		old_plat = True
 
 	if 'magiskboot' in targets:
 		flags += ' B_BOOT=1'
-		old_platform = True
+		old_plat = True
 
-	if old_platform:
-		proc = subprocess.run('{} -C native OLD_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
+	if old_plat:
+		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()
 
-	other = False
+	new_plat = False
 	flags = base_flags
 
 	if 'busybox' in targets:
 		flags += ' B_BB=1'
-		other = True
+		new_plat = True
 
-	if other:
-		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
+	if new_plat:
+		proc = subprocess.run('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()

@@ -108,6 +108,14 @@ int xsetns(int fd, int nstype) {
 	return ret;
 }
 
+int xunshare(int flags) {
+	int ret = (int) syscall(__NR_unshare, flags);
+	if (ret == -1) {
+		PLOGE("unshare");
+	}
+	return ret;
+}
+
 DIR *xopendir(const char *name) {
 	DIR *d = opendir(name);
 	if (d == NULL) {
