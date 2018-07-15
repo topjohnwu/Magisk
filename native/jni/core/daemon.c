@@ -122,6 +122,7 @@ void main_daemon() {
 
 	// Start the log monitor
 	loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
+	chmod("/dev/null", 0666);
 	if (loggable) {
 		connect_daemon2(LOG_DAEMON, &fd);
 		write_int(fd, HANDSHAKE);

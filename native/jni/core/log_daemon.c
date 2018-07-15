@@ -135,6 +135,7 @@ void log_daemon() {
 		if (exec_command_sync("/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
 			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
 	}
+	chmod("/dev/null", 0666);
 	vec_dup(&log_cmd, &clear_cmd);
 	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", "*:F", NULL);
 	vec_push_back(&log_cmd, NULL);

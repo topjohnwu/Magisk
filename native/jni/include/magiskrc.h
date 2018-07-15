@@ -14,7 +14,7 @@ const char magiskrc[] =
 "   rm "UNBLOCKFILE"\n"
 "   start magisk_startup\n"
 "   wait "UNBLOCKFILE" 10\n"
-"   rm /dev/.magisk.unblock\n"
+"   rm "UNBLOCKFILE"\n"
 "\n"
 
 // Services
