@@ -174,14 +174,15 @@ int xlisten(int sockfd, int backlog) {
 }
 
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
-#ifndef __NR_accept4
-#ifdef __i386__
-#define __NR_accept4 364
-#endif
-#endif
-	int fd = (int) syscall(__NR_accept4, sockfd, addr, addrlen, flags);
+	int fd = accept(sockfd, addr, addrlen);
 	if (fd == -1) {
 		PLOGE("accept4");
+	}
+	if (flags & SOCK_CLOEXEC)
+		fcntl(fd, F_SETFD, FD_CLOEXEC);
+	if (flags & SOCK_NONBLOCK) {
+		int i = fcntl(fd, F_GETFL);
+		fcntl(fd, F_SETFL, i | O_NONBLOCK);
 	}
 	return fd;
 }
