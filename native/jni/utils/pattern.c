@@ -29,35 +29,6 @@ static int check_encryption_pattern(const char *s) {
 	return -1;
 }
 
-void patch_init_rc(void **buf, size_t *size) {
-	int injected = 0;
-	char *new_data = malloc(*size + 23);
-	char *old_data = *buf;
-	size_t pos = 0;
-
-	for (char *tok = strsep(&old_data, "\n"); tok; tok = strsep(&old_data, "\n")) {
-		if (!injected && strncmp(tok, "import", 6) == 0) {
-			if (strstr(tok, "init.magisk.rc")) {
-				injected = 1;
-			} else {
-				strcpy(new_data + pos, "import /init.magisk.rc\n");
-				pos += 23;
-				injected = 1;
-			}
-		} else if (strstr(tok, "selinux.reload_policy")) {
-			continue;
-		}
-		// Copy the line
-		strcpy(new_data + pos, tok);
-		pos += strlen(tok);
-		new_data[pos++] = '\n';
-	}
-
-	free(*buf);
-	*size = pos;
-	*buf = new_data;
-}
-
 int patch_verity(void **buf, uint32_t *size, int patch) {
 	int skip, src_size = *size, found = 0;
 	char *src = *buf, *patched = patch ? xcalloc(src_size, 1) : NULL;

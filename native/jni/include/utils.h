@@ -157,7 +157,6 @@ int trim_img(const char *img, const char *mount, char *loop);
 
 // pattern.c
 
-void patch_init_rc(void **buf, size_t *size);
 int patch_verity(void **buf, uint32_t *size, int patch);
 void patch_encryption(void **buf, uint32_t *size);
 

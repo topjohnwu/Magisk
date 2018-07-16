@@ -147,26 +147,6 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static void patch_ramdisk() {
-	void *addr;
-	size_t size;
-	mmap_rw("/init", &addr, &size);
-	for (int i = 0; i < size; ++i) {
-		if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
-			memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
-			break;
-		}
-	}
-	munmap(addr, size);
-
-	full_read("/init.rc", &addr, &size);
-	patch_init_rc(&addr, &size);
-	int fd = creat("/init.rc", 0750);
-	write(fd, addr, size);
-	close(fd);
-	free(addr);
-}
-
 static int strend(const char *s1, const char *s2) {
 	size_t l1 = strlen(s1);
 	size_t l2 = strlen(s2);
@@ -306,7 +286,7 @@ static int unxz(const void *buf, size_t size, int fd) {
 		strm.next_out = out;
 		strm.avail_out = BUFSIZE;
 		ret = lzma_code(&strm, LZMA_RUN);
-		write(fd, out, BUFSIZE - strm.avail_out);
+		xwrite(fd, out, BUFSIZE - strm.avail_out);
 	} while (strm.avail_out == 0 && ret == LZMA_OK);
 
 	free(out);
@@ -335,7 +315,7 @@ static int dump_manager(const char *path, mode_t mode) {
 
 static int dump_magiskrc(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
-	write(fd, magiskrc, sizeof(magiskrc));
+	xwrite(fd, magiskrc, sizeof(magiskrc));
 	close(fd);
 	return 0;
 }
@@ -388,14 +368,10 @@ int main(int argc, char *argv[]) {
 		close(null);
 
 	// Backup self
-	link("/init", "/init.bak");
+	rename("/init", "/init.bak");
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
-
-	/* ***********
-	 * Initialize
-	 * ***********/
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
 
@@ -422,7 +398,6 @@ int main(int argc, char *argv[]) {
 		cpio_vec_destroy(&v);
 	} else {
 		// Revert original init binary
-		unlink("/init");
 		link("/.backup/init", "/init");
 	}
 
@@ -430,8 +405,8 @@ int main(int argc, char *argv[]) {
 	 * Early Mount
 	 * ************/
 
-	int mounted_system = 0;
-	int mounted_vendor = 0;
+	int mnt_system = 0;
+	int mnt_vendor = 0;
 
 	// If skip_initramfs or using split policies, we need early mount
 	if (cmd.skip_initramfs || access("/sepolicy", R_OK) != 0) {
@@ -459,34 +434,63 @@ int main(int argc, char *argv[]) {
 			xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
 		} else {
 			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
-			mounted_system = 1;
+			mnt_system = 1;
 		}
 
 		// Mount vendor
 		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
 		if (setup_block(&dev, partname) == 0) {
 			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
-			mounted_vendor = 1;
+			mnt_vendor = 1;
 		}
-	}
 
-	/* *************
-	 * Patch rootfs
-	 * *************/
+		// Force init to load monolithic sepolicy
+		void *addr;
+		size_t size;
+		mmap_rw("/init", &addr, &size);
+		for (int i = 0; i < size; ++i) {
+			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
+				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
+				break;
+			}
+		}
+		munmap(addr, size);
+	}
 
 	// Only patch rootfs if not intended to run in recovery
 	if (access("/etc/recovery.fstab", F_OK) != 0) {
-		int fd;
-
 		// Handle ramdisk overlays
-		fd = open("/overlay", O_RDONLY | O_CLOEXEC);
+		int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 		if (fd >= 0) {
 			mv_dir(fd, root);
 			close(fd);
 			rmdir("/overlay");
 		}
 
-		patch_ramdisk();
+		// Patch init.rc to load magisk scripts
+		int injected = 0;
+		char tok[4096];
+		FILE *fp = xfopen("/init.rc", "r");
+		fd = creat("/init.rc.new", 0750);
+		while(fgets(tok, sizeof(tok), fp)) {
+			if (!injected && strncmp(tok, "import", 6) == 0) {
+				if (strstr(tok, "init.magisk.rc")) {
+					injected = 1;
+				} else {
+					xwrite(fd, "import /init.magisk.rc\n", 23);
+					injected = 1;
+				}
+			} else if (strstr(tok, "selinux.reload_policy")) {
+				// Do not allow sepolicy patch
+				continue;
+			}
+			xwrite(fd, tok, strlen(tok));
+		}
+		fclose(fp);
+		close(fd);
+		rename("/init.rc.new", "/init.rc");
+
+		// Patch sepolicy
 		patch_sepolicy();
 
 		// Dump binaries
@@ -500,11 +504,10 @@ int main(int argc, char *argv[]) {
 	close(root);
 	umount("/proc");
 	umount("/sys");
-	if (mounted_system)
+	if (mnt_system)
 		umount("/system");
-	if (mounted_vendor)
+	if (mnt_vendor)
 		umount("/vendor");
 
-	// Finally, give control back!
 	execv("/init", argv);
 }
