@@ -119,6 +119,12 @@ def build_binary(args):
 		if proc.returncode != 0:
 			error('Build Magisk binary failed!')
 		collect_binary()
+		# Dump the binary to header
+		for arch in archs:
+			bin_file = os.path.join('native', 'out', arch, 'magisk')
+			with open(os.path.join('native', 'out', arch, 'binaries_arch_xz.h'), 'w') as out:
+				with open(bin_file, 'rb') as src:
+					xz_dump(src, out, 'magisk_xz')
 
 	old_plat = False
 	flags = base_flags
@@ -128,22 +134,10 @@ def build_binary(args):
 		old_plat = True
 
 	if 'magiskinit' in targets:
-		for arch in archs:
-			bin_file = os.path.join('native', 'out', arch, 'magisk')
-			if not os.path.exists(bin_file):
-				error('Build "magisk" before building "magiskinit"')
-			with open(os.path.join('native', 'out', arch, 'binaries_arch_xz.h'), 'w') as out:
-				with open(bin_file, 'rb') as src:
-					xz_dump(src, out, 'magisk_xz')
-
-		stub_apk = os.path.join(config['outdir'], 'stub-release.apk')
-		if not os.path.exists(stub_apk):
+		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch_xz.h')):
+			error('Build "magisk" before building "magiskinit"')
+		if not os.path.exists(os.path.join('native', 'out', 'binaries_xz.h')):
 			error('Build release stub APK before building "magiskinit"')
-
-		with open(os.path.join('native', 'out', 'binaries_xz.h'), 'w') as out:
-			with open(stub_apk, 'rb') as src:
-				xz_dump(src, out, 'manager_xz')
-
 		flags += ' B_INIT=1'
 		old_plat = True
 
@@ -219,6 +213,10 @@ def build_apk(args):
 		sign_apk(unsigned, release)
 		header('Output: ' + release)
 		rm(unsigned)
+		# Dump the stub APK to header
+		with open(os.path.join('native', 'out', 'binaries_xz.h'), 'w') as out:
+			with open(release, 'rb') as src:
+				xz_dump(src, out, 'manager_xz')
 	else:
 		proc = subprocess.run('{} app:assembleDebug'.format(gradlew), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
