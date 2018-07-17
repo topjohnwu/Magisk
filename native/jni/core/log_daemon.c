@@ -137,7 +137,10 @@ void log_daemon() {
 	}
 	chmod("/dev/null", 0666);
 	vec_dup(&log_cmd, &clear_cmd);
-	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", "*:F", NULL);
+	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
+#ifdef MAGISK_DEBUG
+	vec_push_back(&log_cmd, "*:F");
+#endif
 	vec_push_back(&log_cmd, NULL);
 	vec_push_back(&clear_cmd, "-c");
 	vec_push_back(&clear_cmd, NULL);
