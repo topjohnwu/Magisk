@@ -55,12 +55,20 @@
 #define VLOG(fmt, ...)
 #endif
 
+#define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
+
 extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
 
 struct cmdline {
 	char skip_initramfs;
 	char slot[3];
+	char dt_dir[128];
+};
+
+struct early_mnt {
+	char system[32];
+	char vendor[32];
 };
 
 struct device {
@@ -76,8 +84,6 @@ static void parse_cmdline(struct cmdline *cmd) {
 	memset(cmd, 0, sizeof(*cmd));
 
 	char cmdline[4096];
-	mkdir("/proc", 0755);
-	xmount("proc", "/proc", "proc", 0, NULL);
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
@@ -89,33 +95,38 @@ static void parse_cmdline(struct cmdline *cmd) {
 			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
 			cmd->skip_initramfs = 1;
+		} else if (strncmp(tok, "androidboot.android_dt_dir", 26) == 0) {
+			sscanf(tok, "androidboot.android_dt_dir=%s", cmd->dt_dir);
 		}
 	}
 
-	VLOG("cmdline: skip_initramfs[%d] slot[%s]\n", cmd->skip_initramfs, cmd->slot);
+	if (cmd->dt_dir[0] == '\0')
+		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
+
+	VLOG("cmdline: skip_initramfs[%d] slot[%s] dt_dir[%s]\n", cmd->skip_initramfs, cmd->slot, cmd->dt_dir);
 }
 
-static void parse_device(struct device *dev, char *uevent) {
+static void parse_device(struct device *dev, const char *uevent) {
 	dev->partname[0] = '\0';
-	char *tok;
-	tok = strtok(uevent, "\n");
-	while (tok != NULL) {
-		if (strncmp(tok, "MAJOR", 5) == 0) {
-			sscanf(tok, "MAJOR=%ld", (long*) &dev->major);
-		} else if (strncmp(tok, "MINOR", 5) == 0) {
-			sscanf(tok, "MINOR=%ld", (long*) &dev->minor);
-		} else if (strncmp(tok, "DEVNAME", 7) == 0) {
-			sscanf(tok, "DEVNAME=%s", dev->devname);
-		} else if (strncmp(tok, "PARTNAME", 8) == 0) {
-			sscanf(tok, "PARTNAME=%s", dev->partname);
+	FILE *fp = xfopen(uevent, "r");
+	char buf[64];
+	while (fgets(buf, sizeof(buf), fp)) {
+		if (strncmp(buf, "MAJOR", 5) == 0) {
+			sscanf(buf, "MAJOR=%ld", (long*) &dev->major);
+		} else if (strncmp(buf, "MINOR", 5) == 0) {
+			sscanf(buf, "MINOR=%ld", (long*) &dev->minor);
+		} else if (strncmp(buf, "DEVNAME", 7) == 0) {
+			sscanf(buf, "DEVNAME=%s", dev->devname);
+		} else if (strncmp(buf, "PARTNAME", 8) == 0) {
+			sscanf(buf, "PARTNAME=%s", dev->partname);
 		}
-		tok = strtok(NULL, "\n");
 	}
+	fclose(fp);
 	VLOG("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
 }
 
 static int setup_block(struct device *dev, const char *partname) {
-	char buffer[1024], path[128];
+	char path[128];
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
 	if (dir == NULL)
@@ -124,14 +135,10 @@ static int setup_block(struct device *dev, const char *partname) {
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
-		snprintf(path, sizeof(path), "/sys/dev/block/%s/uevent", entry->d_name);
-		int fd = open(path, O_RDONLY | O_CLOEXEC);
-		ssize_t size = read(fd, buffer, sizeof(buffer));
-		buffer[size] = '\0';
-		close(fd);
-		parse_device(dev, buffer);
+		sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
+		parse_device(dev, path);
 		if (strcasecmp(dev->partname, partname) == 0) {
-			snprintf(dev->path, sizeof(dev->path), "/dev/block/%s", dev->devname);
+			sprintf(dev->path, "/dev/block/%s", dev->devname);
 			found = 1;
 			break;
 		}
@@ -145,6 +152,35 @@ static int setup_block(struct device *dev, const char *partname) {
 	mkdir("/dev/block", 0755);
 	mknod(dev->path, S_IFBLK | 0600, makedev(dev->major, dev->minor));
 	return 0;
+}
+
+static void get_partname(const struct cmdline *cmd, struct early_mnt *mnt) {
+	char buf[128];
+	memset(mnt, 0, sizeof(mnt));
+	if (cmd->skip_initramfs) {
+		// System root, we have to early mount system
+		sprintf(mnt->system, "system%s", cmd->slot);
+	} else {
+		sprintf(buf, "%s/fstab/system/dev", cmd->dt_dir);
+		if (access(buf, F_OK) == 0) {
+			// Early mount system
+			int fd = open(buf, O_RDONLY | O_CLOEXEC);
+			read(fd, buf, sizeof(buf));
+			close(fd);
+			sprintf(mnt->system, "%s%s", strrchr(buf, '/') + 1, cmd->slot);
+		}
+	}
+
+	sprintf(buf, "%s/fstab/vendor/dev", cmd->dt_dir);
+	if (access(buf, F_OK) == 0) {
+		// Early mount system
+		int fd = open(buf, O_RDONLY | O_CLOEXEC);
+		read(fd, buf, sizeof(buf));
+		close(fd);
+		sprintf(mnt->vendor, "%s%s", strrchr(buf, '/') + 1, cmd->slot);
+	}
+
+	VLOG("system=[%s] vendor=[%s]\n", mnt->system, mnt->vendor);
 }
 
 static int strend(const char *s1, const char *s2) {
@@ -181,7 +217,7 @@ static int compile_cil() {
 	char plat[10];
 	int fd = open(SPLIT_NONPLAT_VER, O_RDONLY | O_CLOEXEC);
 	plat[read(fd, plat, sizeof(plat)) - 1] = '\0';
-	snprintf(path, sizeof(path), SPLIT_PLAT_MAPPING, plat);
+	sprintf(path, SPLIT_PLAT_MAPPING, plat);
 	mmap_ro(path, &addr, &size);
 	VLOG("cil_add[%s]\n", path);
 	cil_add_file(db, path, addr, size);
@@ -194,7 +230,7 @@ static int compile_cil() {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		if (strend(entry->d_name, ".cil") == 0) {
-			snprintf(path, sizeof(path), NONPLAT_POLICY_DIR "%s", entry->d_name);
+			sprintf(path, NONPLAT_POLICY_DIR "%s", entry->d_name);
 			mmap_ro(path, &addr, &size);
 			VLOG("cil_add[%s]\n", path);
 			cil_add_file(db, path, addr, size);
@@ -216,7 +252,7 @@ static int verify_precompiled() {
 	DIR *dir;
 	struct dirent *entry;
 	int fd;
-	char sys_sha[70], ven_sha[70];
+	char sys_sha[64], ven_sha[64];
 
 	// init the strings with different value
 	sys_sha[0] = 0;
@@ -228,7 +264,7 @@ static int verify_precompiled() {
 			continue;
 		if (strend(entry->d_name, ".sha256") == 0) {
 			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			ven_sha[read(fd, ven_sha, sizeof(ven_sha)) - 1] = '\0';
+			read(fd, ven_sha, sizeof(ven_sha));
 			close(fd);
 			break;
 		}
@@ -240,25 +276,29 @@ static int verify_precompiled() {
 			continue;
 		if (strend(entry->d_name, ".sha256") == 0) {
 			fd = openat(dirfd(dir), entry->d_name, O_RDONLY | O_CLOEXEC);
-			sys_sha[read(fd, sys_sha, sizeof(sys_sha)) - 1] = '\0';
+			read(fd, sys_sha, sizeof(sys_sha));
 			close(fd);
 			break;
 		}
 	}
 	closedir(dir);
-	VLOG("sys_sha[%s]\nven_sha[%s]\n", sys_sha, ven_sha);
-	return strcmp(sys_sha, ven_sha) == 0;
+	VLOG("sys_sha[%.*s]\nven_sha[%.*s]\n", sizeof(sys_sha), sys_sha, sizeof(ven_sha), ven_sha);
+	return memcmp(sys_sha, ven_sha, sizeof(sys_sha)) == 0;
 }
 
 static int patch_sepolicy() {
-	if (access("/sepolicy", R_OK) == 0)
-		load_policydb("/sepolicy");
-	else if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled())
+	int init_patch = 0;
+	if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled()) {
+		init_patch = 1;
 		load_policydb(SPLIT_PRECOMPILE);
-	else if (access(SPLIT_PLAT_CIL, R_OK) == 0)
+	} else if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
+		init_patch = 1;
 		compile_cil();
-	else
+	} else if (access("/sepolicy", R_OK) == 0) {
+		load_policydb("/sepolicy");
+	} else {
 		return 1;
+	}
 
 	sepol_magisk_rules();
 	dump_policydb("/sepolicy");
@@ -267,6 +307,20 @@ static int patch_sepolicy() {
 	if (access("/sepolicy_debug", F_OK) == 0) {
 		unlink("/sepolicy_debug");
 		link("/sepolicy", "/sepolicy_debug");
+	}
+
+	if (init_patch) {
+		// Force init to load /sepolicy
+		void *addr;
+		size_t size;
+		mmap_rw("/init", &addr, &size);
+		for (int i = 0; i < size; ++i) {
+			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
+				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
+				break;
+			}
+		}
+		munmap(addr, size);
 	}
 
 	return 0;
@@ -370,14 +424,24 @@ int main(int argc, char *argv[]) {
 	// Backup self
 	rename("/init", "/init.bak");
 
+	// Communicate with kernel using procfs and sysfs
+	mkdir("/proc", 0755);
+	xmount("proc", "/proc", "proc", 0, NULL);
+	mkdir("/sys", 0755);
+	xmount("sysfs", "/sys", "sysfs", 0, NULL);
+
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
+
+	/* ***********
+	 * Initialize
+	 * ***********/
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
-		excl_list = (char *[]) { "overlay", ".backup", "proc", "init.bak", NULL };
+		excl_list = (char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
 		frm_rf(root);
 	} else if (access("/ramdisk.cpio.xz", R_OK) == 0) {
 		// High compression mode
@@ -391,7 +455,7 @@ int main(int argc, char *argv[]) {
 		struct vector v;
 		vec_init(&v);
 		parse_cpio(&v, "/ramdisk.cpio");
-		excl_list = (char *[]) { "overlay", ".backup", NULL };
+		excl_list = (char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
 		frm_rf(root);
 		chdir("/");
 		cpio_extract_all(&v);
@@ -408,57 +472,41 @@ int main(int argc, char *argv[]) {
 	int mnt_system = 0;
 	int mnt_vendor = 0;
 
-	// If skip_initramfs or using split policies, we need early mount
-	if (cmd.skip_initramfs || access("/sepolicy", R_OK) != 0) {
-		char partname[32];
-		struct device dev;
+	struct early_mnt mnt;
+	get_partname(&cmd, &mnt);
+	struct device dev;
 
-		// Mount sysfs
-		mkdir("/sys", 0755);
-		xmount("sysfs", "/sys", "sysfs", 0, NULL);
+	if (cmd.skip_initramfs) {
+		setup_block(&dev, mnt.system);
+		xmkdir("/system_root", 0755);
+		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
+		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
-		// Mount system
-		snprintf(partname, sizeof(partname), "system%s", cmd.slot);
-		setup_block(&dev, partname);
-		if (cmd.skip_initramfs) {
-			mkdir("/system_root", 0755);
-			xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
-			int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
+		// Clone rootfs except /system
+		excl_list = (char *[]) { "system", NULL };
+		clone_dir(system_root, root);
+		close(system_root);
 
-			// Clone rootfs except /system
-			excl_list = (char *[]) { "system", NULL };
-			clone_dir(system_root, root);
-			close(system_root);
-
-			mkdir("/system", 0755);
-			xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
-		} else {
-			xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
-			mnt_system = 1;
-		}
-
-		// Mount vendor
-		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
-		if (setup_block(&dev, partname) == 0) {
-			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
-			mnt_vendor = 1;
-		}
-
-		// Force init to load monolithic sepolicy
-		void *addr;
-		size_t size;
-		mmap_rw("/init", &addr, &size);
-		for (int i = 0; i < size; ++i) {
-			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
-				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
-				break;
-			}
-		}
-		munmap(addr, size);
+		xmkdir("/system", 0755);
+		xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+	} else if (mnt.system[0]) {
+		setup_block(&dev, mnt.system);
+		xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+		mnt_system = 1;
 	}
 
+	if (mnt.vendor[0]) {
+		setup_block(&dev, mnt.vendor);
+		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+		mnt_vendor = 1;
+	}
+
+	/* ****************
+	 * Ramdisk Patches
+	 * ****************/
+
 	// Only patch rootfs if not intended to run in recovery
-	if (access("/etc/recovery.fstab", F_OK) != 0) {
+	if (access("/sbin/recovery", F_OK) != 0) {
 		// Handle ramdisk overlays
 		int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 		if (fd >= 0) {
