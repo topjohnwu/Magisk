@@ -45,31 +45,32 @@ public abstract class BaseModule implements Comparable<BaseModule> {
                 continue;
 
             String key = prop[0].trim();
-            if (key.charAt(0) == '#')
+            String value = prop[1].trim();
+            if (key.isEmpty() || key.charAt(0) == '#')
                 continue;
 
             switch (key) {
                 case "id":
-                    mId = prop[1];
+                    mId = value;
                     break;
                 case "name":
-                    mName = prop[1];
+                    mName = value;
                     break;
                 case "version":
-                    mVersion = prop[1];
+                    mVersion = value;
                     break;
                 case "versionCode":
-                    mVersionCode = Integer.parseInt(prop[1]);
+                    mVersionCode = Integer.parseInt(value);
                     break;
                 case "author":
-                    mAuthor = prop[1];
+                    mAuthor = value;
                     break;
                 case "description":
-                    mDescription = prop[1];
+                    mDescription = value;
                     break;
                 case "minMagisk":
                 case "template":
-                    minMagiskVersion = Integer.parseInt(prop[1]);
+                    minMagiskVersion = Integer.parseInt(value);
                     break;
                 default:
                     break;
