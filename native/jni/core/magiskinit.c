@@ -412,10 +412,23 @@ int main(int argc, char *argv[]) {
 	if (cmd.skip_initramfs || access("/sepolicy", R_OK) != 0) {
 		char partname[32];
 		struct device dev;
+		char vendor[10];
+		char vendorpath[128];
+		int fd;
 
 		// Mount sysfs
 		mkdir("/sys", 0755);
 		xmount("sysfs", "/sys", "sysfs", 0, NULL);
+
+		// Check if device uses early-mount
+		if (access("/sys/firmware/devicetree/base/firmware/android/fstab/vendor/dev", R_OK) == 0) {
+			fd = open("/sys/firmware/devicetree/base/firmware/android/fstab/vendor/dev", O_RDONLY | O_CLOEXEC);
+			vendorpath[read(fd, vendorpath, sizeof(vendorpath))] = '\0';
+			strcpy(vendor, strrchr(vendorpath, '/') + 1);
+			close(fd);
+		} else
+			strcpy(vendor, "vendor");
+
 
 		// Mount system
 		snprintf(partname, sizeof(partname), "system%s", cmd.slot);
@@ -438,7 +451,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		// Mount vendor
-		snprintf(partname, sizeof(partname), "vendor%s", cmd.slot);
+		snprintf(partname, sizeof(partname), "%s%s", vendor, cmd.slot);
 		if (setup_block(&dev, partname) == 0) {
 			xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 			mnt_vendor = 1;
