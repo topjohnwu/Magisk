@@ -80,15 +80,15 @@ public class Const {
     }
 
     public static class Url {
-        public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/stable.json";
-        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/MagiskManager/update/beta.json";
-        public static final String SNET_URL = "https://github.com/topjohnwu/MagiskManager/raw/788f01f499714471949613820d43bc364786e85d/snet.apk";
+        public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
+        public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/beta.json";
+        public static final String SNET_URL = "https://github.com/topjohnwu/magisk_files/raw/727aa3a8642bf5f0982e5ea89b3f818bd783d5a2/snet.apk";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
         public static final String DONATION_URL = "https://www.paypal.me/topjohnwu";
         public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
-        public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/MagiskManager";
+        public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk";
     }
 
 
