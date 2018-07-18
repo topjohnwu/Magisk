@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/message_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="12dip"
+        android:paddingEnd="20dip"
+        android:paddingStart="20dip"
+        android:paddingTop="12dip">
+
+        <TextView
+            android:id="@+id/message"
+            style="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:id="@+id/button_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="54dip"
+        android:measureWithLargestChild="true"
+        android:orientation="horizontal"
+        android:paddingEnd="2dip"
+        android:paddingStart="2dip"
+        android:paddingTop="4dip">
+
+        <Button
+            android:id="@+id/negative"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_weight="1"
+            android:maxLines="2" />
+
+        <Button
+            android:id="@+id/neutral"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:maxLines="2" />
+
+        <Button
+            android:id="@+id/positive"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:maxLines="2" />
+
+    </LinearLayout>
+
+</LinearLayout>

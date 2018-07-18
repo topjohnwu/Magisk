@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipeRefreshLayout"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:orientation="vertical">
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:dividerHeight="@dimen/card_divider_space"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+        <TextView
+            android:id="@+id/empty_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center"
+            android:text="@string/no_modules_found"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_margin="@dimen/fab_padding"
+            android:elevation="6dp"
+            android:src="@drawable/ic_add"
+            tools:fabSize="normal"
+            tools:pressedTranslationZ="12dp" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</android.support.v4.widget.SwipeRefreshLayout>

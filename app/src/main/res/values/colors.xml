@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">#009688</color>
+    <color name="primary_dark">#00796B</color>
+    <color name="accent">#FFC107</color>
+    <color name="accentFallback">#FBC02D</color>
+    <color name="icon_grey">#757575</color>
+
+    <color name="red500">#F44336</color>
+    <color name="green500">#4CAF50</color>
+    <color name="grey500">#9E9E9E</color>
+    <color name="blue500">#2196f3</color>
+    <color name="yellow500">#FFC107</color>
+
+    <color name="dark_secondary_text">#dedede</color>
+    <color name="su_request_background">#e0e0e0</color>
+
+    <!-- Flashing colors -->
+    <color name="flashing_background_color">@android:color/black</color>
+
+    <color name="ic_launcher_background">#00AF9C</color>
+</resources>
