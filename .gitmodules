@@ -7,9 +7,6 @@
 [submodule "magiskpolicy"]
 	path = native/jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
-[submodule "MagiskManager"]
-	path = app
-	url = https://github.com/topjohnwu/MagiskManager.git
 [submodule "busybox"]
 	path = native/jni/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
