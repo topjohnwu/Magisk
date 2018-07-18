@@ -66,11 +66,6 @@ struct cmdline {
 	char dt_dir[128];
 };
 
-struct early_mnt {
-	char system[32];
-	char vendor[32];
-};
-
 struct device {
 	dev_t major;
 	dev_t minor;
@@ -154,39 +149,24 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static void get_partname(const struct cmdline *cmd, struct early_mnt *mnt) {
-	char buf[128];
-	memset(mnt, 0, sizeof(mnt));
-	if (cmd->skip_initramfs) {
-		// System root, we have to early mount system
-		sprintf(mnt->system, "system%s", cmd->slot);
-	} else {
-		sprintf(buf, "%s/fstab/system/dev", cmd->dt_dir);
-		if (access(buf, F_OK) == 0) {
-			// Early mount system
-			int fd = open(buf, O_RDONLY | O_CLOEXEC);
-			read(fd, buf, sizeof(buf));
-			close(fd);
-			sprintf(mnt->system, "%s%s", strrchr(buf, '/') + 1, cmd->slot);
-		}
-	}
-
-	sprintf(buf, "%s/fstab/vendor/dev", cmd->dt_dir);
-	if (access(buf, F_OK) == 0) {
-		// Early mount system
-		int fd = open(buf, O_RDONLY | O_CLOEXEC);
-		read(fd, buf, sizeof(buf));
-		close(fd);
-		sprintf(mnt->vendor, "%s%s", strrchr(buf, '/') + 1, cmd->slot);
-	}
-
-	VLOG("system=[%s] vendor=[%s]\n", mnt->system, mnt->vendor);
-}
-
 static int strend(const char *s1, const char *s2) {
 	size_t l1 = strlen(s1);
 	size_t l2 = strlen(s2);
 	return strcmp(s1 + l1 - l2, s2);
+}
+
+static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
+	char buf[128];
+	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
+	if (access(buf, F_OK) == 0) {
+		int fd = open(buf, O_RDONLY | O_CLOEXEC);
+		read(fd, buf, sizeof(buf));
+		close(fd);
+		char *name = strrchr(buf, '/') + 1;
+		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
+		return 0;
+	}
+	return 1;
 }
 
 static int compile_cil() {
@@ -471,13 +451,12 @@ int main(int argc, char *argv[]) {
 
 	int mnt_system = 0;
 	int mnt_vendor = 0;
-
-	struct early_mnt mnt;
-	get_partname(&cmd, &mnt);
 	struct device dev;
+	char partname[32];
 
 	if (cmd.skip_initramfs) {
-		setup_block(&dev, mnt.system);
+		sprintf(partname, "system%s", cmd.slot);
+		setup_block(&dev, partname);
 		xmkdir("/system_root", 0755);
 		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
@@ -489,14 +468,14 @@ int main(int argc, char *argv[]) {
 
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
-	} else if (mnt.system[0]) {
-		setup_block(&dev, mnt.system);
+	} else if (read_fstab_dt(&cmd, "system", partname) == 0) {
+		setup_block(&dev, partname);
 		xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
 		mnt_system = 1;
 	}
 
-	if (mnt.vendor[0]) {
-		setup_block(&dev, mnt.vendor);
+	if (read_fstab_dt(&cmd, "vendor", partname) == 0) {
+		setup_block(&dev, partname);
 		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
 		mnt_vendor = 1;
 	}
