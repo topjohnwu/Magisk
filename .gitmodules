@@ -1,9 +1,6 @@
 [submodule "selinux"]
 	path = native/jni/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
-[submodule "su"]
-	path = native/jni/su
-	url = https://github.com/topjohnwu/MagiskSU.git
 [submodule "magiskpolicy"]
 	path = native/jni/magiskpolicy
 	url = https://github.com/topjohnwu/magiskpolicy.git
