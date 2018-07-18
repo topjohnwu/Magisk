@@ -1,9 +1,6 @@
 [submodule "selinux"]
 	path = native/jni/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
-[submodule "magiskpolicy"]
-	path = native/jni/magiskpolicy
-	url = https://github.com/topjohnwu/magiskpolicy.git
 [submodule "busybox"]
 	path = native/jni/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
