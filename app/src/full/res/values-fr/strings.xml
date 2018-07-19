@@ -92,7 +92,7 @@
     <string name="dtbo_patched_title">DTBO a été patché!</string>
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer</string>
     <string name="magisk_updates">Mises  à jours Magisk</string>
-    <string name="flashing">Flahage</string>
+    <string name="flashing">Flashage</string>
     <string name="hide_manager_toast">Masquage du Gestionnaire Magisk…</string>
     <string name="hide_manager_toast2">Cela pourrait prendre un certain temps …</string>
     <string name="hide_manager_fail_toast">Masquage du Gestionnaire Magisk échoué…</string>
