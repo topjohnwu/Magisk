@@ -47,6 +47,8 @@ detection() {
 }
 
 installation() {
+  remove_system_su
+
   [ -f $APK ] && eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
   $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
 
