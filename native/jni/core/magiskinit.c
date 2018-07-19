@@ -157,6 +157,12 @@ static int strend(const char *s1, const char *s2) {
 
 static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
 	char buf[128];
+	struct stat st;
+	sprintf(buf, "/%s", mnt_point);
+	lstat(buf, &st);
+	// Don't early mount if the mount point is symlink
+	if (S_ISLNK(st.st_mode))
+		return 1;
 	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
 	if (access(buf, F_OK) == 0) {
 		int fd = open(buf, O_RDONLY | O_CLOEXEC);
