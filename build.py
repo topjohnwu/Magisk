@@ -214,6 +214,7 @@ def build_apk(args):
 		header('Output: ' + release)
 		rm(unsigned)
 		# Dump the stub APK to header
+		mkdir(os.path.join('native', 'out'))
 		with open(os.path.join('native', 'out', 'binaries_xz.h'), 'w') as out:
 			with open(release, 'rb') as src:
 				xz_dump(src, out, 'manager_xz')
