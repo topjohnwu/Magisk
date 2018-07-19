@@ -160,4 +160,20 @@ void sepol_magisk_rules() {
 
 	// Support deodexed ROM on Oreo
 	sepol_allow("zygote", "dalvikcache_data_file", "file", "execute");
+
+	// Cmd
+	sepol_allow("system_server", "devpts", "chr_file", "read");
+	sepol_allow("system_server", "devpts", "chr_file", "write");
+	if (sepol_exists("untrusted_app_devpts")){
+		sepol_allow("system_server", "untrusted_app_devpts", "chr_file", "read");
+		sepol_allow("system_server", "untrusted_app_devpts", "chr_file", "write");
+	}
+	if (sepol_exists("untrusted_app_25_devpts")){
+		sepol_allow("system_server", "untrusted_app_25_devpts", "chr_file", "read");
+		sepol_allow("system_server", "untrusted_app_25_devpts", "chr_file", "write");
+	}
+	if (sepol_exists("untrusted_app_all_devpts")){
+		sepol_allow("system_server", "untrusted_app_all_devpts", "chr_file", "read");
+		sepol_allow("system_server", "untrusted_app_all_devpts", "chr_file", "write");
+	}
 }
