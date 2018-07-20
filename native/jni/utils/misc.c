@@ -477,3 +477,9 @@ void gen_rand_str(char *buf, int len) {
 	}
 	buf[len - 1] = '\0';
 }
+
+int strend(const char *s1, const char *s2) {
+	size_t l1 = strlen(s1);
+	size_t l2 = strlen(s2);
+	return strcmp(s1 + l1 - l2, s2);
+}

@@ -42,14 +42,6 @@
 #define SELINUX_LOAD        SELINUX_PATH "/load"
 #define SELINUX_CONTEXT     SELINUX_PATH "/context"
 
-// split policy paths
-#define PLAT_POLICY_DIR     "/system/etc/selinux/"
-#define NONPLAT_POLICY_DIR  "/vendor/etc/selinux/"
-#define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
-#define SPLIT_PLAT_MAPPING  PLAT_POLICY_DIR "mapping/%s.cil"
-#define SPLIT_PRECOMPILE    NONPLAT_POLICY_DIR "precompiled_sepolicy"
-#define SPLIT_NONPLAT_VER   NONPLAT_POLICY_DIR "plat_sepolicy_vers.txt"
-
 #define MAGISKHIDE_PROP     "persist.magisk.hide"
 
 extern char *argv0;     /* For changing process name */

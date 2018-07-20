@@ -10,8 +10,17 @@
 #define SEPOL_PROC_DOMAIN "magisk"
 #define SEPOL_FILE_DOMAIN "magisk_file"
 
+// split policy paths
+#define PLAT_POLICY_DIR     "/system/etc/selinux/"
+#define NONPLAT_POLICY_DIR  "/vendor/etc/selinux/"
+#define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
+#define SPLIT_PLAT_MAPPING  PLAT_POLICY_DIR "mapping/%s.cil"
+#define SPLIT_PRECOMPILE    NONPLAT_POLICY_DIR "precompiled_sepolicy"
+#define SPLIT_NONPLAT_VER   NONPLAT_POLICY_DIR "plat_sepolicy_vers.txt"
+
 // policydb functions
 int load_policydb(const char *filename);
+int compile_split_cil();
 int dump_policydb(const char *filename);
 void destroy_policydb();
 

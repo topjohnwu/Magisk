@@ -37,7 +37,6 @@
 #include <sys/sysmacros.h>
 
 #include <lzma.h>
-#include <cil/cil.h>
 
 #include "binaries_xz.h"
 #include "binaries_arch_xz.h"
@@ -50,14 +49,13 @@
 #include "magisk.h"
 
 #ifdef MAGISK_DEBUG
-#define VLOG(fmt, ...) printf(fmt, __VA_ARGS__)
+#define VLOG(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
 #else
 #define VLOG(fmt, ...)
 #endif
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
-extern policydb_t *policydb;
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
 
 struct cmdline {
@@ -149,12 +147,6 @@ static int setup_block(struct device *dev, const char *partname) {
 	return 0;
 }
 
-static int strend(const char *s1, const char *s2) {
-	size_t l1 = strlen(s1);
-	size_t l2 = strlen(s2);
-	return strcmp(s1 + l1 - l2, s2);
-}
-
 static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
 	char buf[128];
 	struct stat st;
@@ -173,65 +165,6 @@ static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char 
 		return 0;
 	}
 	return 1;
-}
-
-static int compile_cil() {
-	DIR *dir;
-	struct dirent *entry;
-	char path[128];
-
-	struct cil_db *db = NULL;
-	sepol_policydb_t *pdb = NULL;
-	void *addr;
-	size_t size;
-
-	cil_db_init(&db);
-	cil_set_mls(db, 1);
-	cil_set_multiple_decls(db, 1);
-	cil_set_disable_neverallow(db, 1);
-	cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
-	cil_set_policy_version(db, POLICYDB_VERSION_XPERMS_IOCTL);
-	cil_set_attrs_expand_generated(db, 0);
-
-	// plat
-	mmap_ro(SPLIT_PLAT_CIL, &addr, &size);
-	VLOG("cil_add[%s]\n", SPLIT_PLAT_CIL);
-	cil_add_file(db, SPLIT_PLAT_CIL, addr, size);
-	munmap(addr, size);
-
-	// mapping
-	char plat[10];
-	int fd = open(SPLIT_NONPLAT_VER, O_RDONLY | O_CLOEXEC);
-	plat[read(fd, plat, sizeof(plat)) - 1] = '\0';
-	sprintf(path, SPLIT_PLAT_MAPPING, plat);
-	mmap_ro(path, &addr, &size);
-	VLOG("cil_add[%s]\n", path);
-	cil_add_file(db, path, addr, size);
-	munmap(addr, size);
-	close(fd);
-
-	// nonplat
-	dir = opendir(NONPLAT_POLICY_DIR);
-	while ((entry = readdir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (strend(entry->d_name, ".cil") == 0) {
-			sprintf(path, NONPLAT_POLICY_DIR "%s", entry->d_name);
-			mmap_ro(path, &addr, &size);
-			VLOG("cil_add[%s]\n", path);
-			cil_add_file(db, path, addr, size);
-			munmap(addr, size);
-		}
-	}
-	closedir(dir);
-
-	cil_compile(db);
-	cil_build_policydb(db, &pdb);
-	cil_db_destroy(&db);
-
-	policydb = &pdb->p;
-
-	return 0;
 }
 
 static int verify_precompiled() {
@@ -279,7 +212,7 @@ static int patch_sepolicy() {
 		load_policydb(SPLIT_PRECOMPILE);
 	} else if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
 		init_patch = 1;
-		compile_cil();
+		compile_split_cil();
 	} else if (access("/sepolicy", R_OK) == 0) {
 		load_policydb("/sepolicy");
 	} else {
