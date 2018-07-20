@@ -29,7 +29,8 @@ void allowSuClient(char *target) {
 	}
 }
 
-void suRights() {
+void otherToSU() {
+	// suRights
 	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
 	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
 	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
@@ -48,9 +49,7 @@ void suRights() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
 	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
 	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
-}
 
-void otherToSU() {
 	// allowLog
 	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
 	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
@@ -84,6 +83,13 @@ void otherToSU() {
 	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
 	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
 	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
+
+	// bootctl
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 }
 
 void sepol_magisk_rules() {
@@ -129,7 +135,6 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app_27");
 
 	// Some superuser stuffs
-	suRights();
 	otherToSU();
 
 	// For mounting loop devices, mirrors, tmpfs
