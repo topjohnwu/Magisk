@@ -3,8 +3,11 @@
  * Includes all the parsing logic for the policy statements
  */
 
-#include "magiskpolicy.h"
+#include <stdio.h>
+
 #include "sepolicy.h"
+#include "vector.h"
+#include "magiskpolicy.h"
 #include "magisk.h"
 
 static int syntax_err = 0;
@@ -59,14 +62,20 @@ static void statements() {
 static void usage(char *arg0) {
 	fprintf(stderr,
 		"MagiskPolicy v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu)\n\n"
-		"Usage: %s [--options...] [policystatements...]\n\n"
+		"Usage: %s [--options...] [policy statements...]\n"
+		"\n"
 		"Options:\n"
-		"  --live            directly apply patched policy live\n"
-		"  --magisk          built-in rules for a Magisk selinux environment\n"
-		"  --load FILE       load policies from <infile>\n"
-		"  --save FILE       save policies to <outfile>\n\n"
-		"If no input file is specified, it will load from current policies\n"
-		"If neither --live nor --save is specified, nothing will happen\n\n"
+		"   --live            directly apply sepolicy live\n"
+		"   --magisk          inject built-in rules for a Magisk\n"
+		"                     selinux environment\n"
+		"   --load FILE       load policies from FILE\n"
+		"   --compile-split   compile and load split cil policies\n"
+		"                     from system and vendor just like init\n"
+		"   --save FILE       save policies to FILE\n"
+		"\n"
+		"If neither --load or --compile-split is specified, it will load\n"
+		"from current live policies (" SELINUX_POLICY ")\n"
+		"\n"
 		, arg0);
 	statements();
 	exit(1);
@@ -381,8 +390,8 @@ static void syntax_error_msg() {
 }
 
 int magiskpolicy_main(int argc, char *argv[]) {
-	char *infile = NULL, *outfile = NULL, *tok, *saveptr;
-	int live = 0, magisk = 0;
+	char *outfile = NULL, *tok, *saveptr;
+	int magisk = 0;
 	struct vector rules;
 
 	vec_init(&rules);
@@ -390,31 +399,39 @@ int magiskpolicy_main(int argc, char *argv[]) {
 	if (argc < 2) usage(argv[0]);
 	for (int i = 1; i < argc; ++i) {
 		if (argv[i][0] == '-' && argv[i][1] == '-') {
-			if (strcmp(argv[i], "--live") == 0)
-				live = 1;
-			else if (strcmp(argv[i], "--magisk") == 0)
+			if (strcmp(argv[i] + 2, "live") == 0)
+				outfile = SELINUX_LOAD;
+			else if (strcmp(argv[i] + 2, "magisk") == 0)
 				magisk = 1;
-			else if (strcmp(argv[i], "--load") == 0) {
-				if (i + 1 >= argc) usage(argv[0]);
-				infile = argv[i + 1];
-				i += 1;
-			} else if (strcmp(argv[i], "--save") == 0) {
-				if (i + 1 >= argc) usage(argv[0]);
+			else if (strcmp(argv[i] + 2, "load") == 0) {
+				if (i + 1 >= argc)
+					usage(argv[0]);
+				if (load_policydb(argv[i + 1])) {
+					fprintf(stderr, "Cannot load policy from %s\n", argv[i + 1]);
+					return 1;
+				}
+				++i;
+			} else if (strcmp(argv[i] + 2, "compile-split") == 0) {
+				if (compile_split_cil()) {
+					fprintf(stderr, "Cannot compile split cil\n");
+					return 1;
+				}
+			} else if (strcmp(argv[i] + 2, "save") == 0) {
+				if (i + 1 >= argc)
+					usage(argv[0]);
 				outfile = argv[i + 1];
-				i += 1;
-			} else
+				++i;
+			} else {
 				usage(argv[0]);
+			}
 		} else {
 			vec_push_back(&rules, argv[i]);
 		}
 	}
 
-	// Use current policy if not specified
-	if(!infile)
-		infile = SELINUX_POLICY;
-
-	if (load_policydb(infile)) {
-		fprintf(stderr, "Cannot load policy from %s\n", infile);
+	// Use current policy if nothing is loaded
+	if(policydb == NULL && load_policydb(SELINUX_POLICY)) {
+		fprintf(stderr, "Cannot load policy from " SELINUX_POLICY "\n");
 		return 1;
 	}
 
@@ -470,9 +487,6 @@ int magiskpolicy_main(int argc, char *argv[]) {
 		statements();
 
 	vec_destroy(&rules);
-
-	if (live)
-		outfile = SELINUX_LOAD;
 
 	if (outfile && dump_policydb(outfile)) {
 		fprintf(stderr, "Cannot dump policy to %s\n", outfile);

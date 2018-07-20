@@ -107,6 +107,7 @@ int switch_mnt_ns(int pid);
 int fork_dont_care();
 void wait_till_exists(const char *target);
 void gen_rand_str(char *buf, int len);
+int strend(const char *s1, const char *s2);
 
 // file.c
 
