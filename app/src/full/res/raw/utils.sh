@@ -73,11 +73,11 @@ mm_patch_dtbo() {
 }
 
 restore_imgs() {
-  SHA1=`cat /.backup/.sha1`
-  [ -z $SHA1 ] && SHA1=`grep_prop #STOCKSHA1`
+  local SHA1=`cat /.backup/.sha1`
+  [ -z $SHA1 ] && local SHA1=`grep_prop #STOCKSHA1`
   [ -z $SHA1 ] && return 1
-  STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
-  STOCKDTBO=/data/stock_dtbo.img.gz
+  local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
+  local STOCKDTBO=/data/stock_dtbo.img.gz
   [ -f $STOCKBOOT ] || return 1
 
   find_boot_image
@@ -92,4 +92,15 @@ restore_imgs() {
     return 0
   fi
   return 1
+}
+
+post_ota() {
+  cd $1
+  chmod 755 bootctl
+  ./bootctl hal-info || return
+  [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
+  ./bootctl set-active-boot-slot $SLOT_NUM
+  echo '${0%/*}/../bootctl mark-boot-successful;rm -f ${0%/*}/../bootctl $0' > post-fs-data.d/post_ota.sh
+  chmod 755 post-fs-data.d/post_ota.sh
+  cd /
 }

@@ -17,7 +17,9 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
+import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.SignBoot;
 
 import org.kamranzafar.jtar.TarInputStream;
@@ -214,6 +216,20 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         }
     }
 
+    private void postOTA() {
+        SuFile bootctl = new SuFile(Const.MAGISK_PATH + "/.core/bootctl");
+        try (InputStream in = mm.getResources().openRawResource(R.raw.bootctl);
+             OutputStream out = new SuFileOutputStream(bootctl)) {
+            ShellUtils.pump(in, out);
+            Shell.Sync.su("post_ota " + bootctl.getParent());
+            console.add("***************************************");
+            console.add(" Next reboot will boot to second slot!");
+            console.add("***************************************");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected Boolean doInBackground(Void... voids) {
         if (mode == FIX_ENV_MODE) {
@@ -240,13 +256,16 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 mBoot = ShellUtils.fastCmd("find_boot_image", "echo \"$BOOTIMAGE\"");
                 break;
             case SECOND_SLOT_MODE:
+                String slot = ShellUtils.fastCmd("echo $SLOT");
+                String target = (TextUtils.equals(slot, "_a") ? "_b" : "_a");
+                console.add("- Target slot: " + target);
                 console.add("- Detecting target image");
-                char slot[] = ShellUtils.fastCmd("echo $SLOT").toCharArray();
-                if (slot[1] == 'a') slot[1] = 'b';
-                else slot[1] = 'a';
-                mBoot = ShellUtils.fastCmd("SLOT=" + String.valueOf(slot),
-                        "find_boot_image", "echo \"$BOOTIMAGE\"");
-                Shell.Async.su("mount_partitions");
+                mBoot = ShellUtils.fastCmd(
+                        "SLOT=" + target,
+                        "find_boot_image",
+                        "SLOT=" + slot,
+                        "echo \"$BOOTIMAGE\""
+                );
                 break;
             case FIX_ENV_MODE:
                 mBoot = "";
@@ -257,7 +276,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             return false;
         }
 
-        console.add("- Target image: " + mBoot);
+        if (mode == DIRECT_MODE || mode == SECOND_SLOT_MODE)
+            console.add("- Target image: " + mBoot);
 
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
@@ -284,6 +304,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 if (patched == null)
                     return false;
                 outputBoot(patched);
+                if (mode == SECOND_SLOT_MODE)
+                    postOTA();
                 console.add("- All done!");
             }
         } catch (Exception e) {
