@@ -66,7 +66,10 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.OnBootIntentService" />
+        <service
+            android:name=".services.OnBootService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".services.UpdateCheckService"
             android:exported="true"

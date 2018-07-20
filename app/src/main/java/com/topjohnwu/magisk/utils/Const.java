@@ -59,7 +59,6 @@ public class Const {
         public static final int FBE_AWARE = 1410;
         public static final int RESETPROP_PERSIST = 1436;
         public static final int MANAGER_HIDE = 1440;
-        public static final int DTBO_SUPPORT = 1446;
         public static final int HIDDEN_PATH = 1460;
         public static final int REMOVE_LEGACY_LINK = 1630;
         public static final int SEPOL_REFACTOR = 1640;
@@ -70,11 +69,11 @@ public class Const {
         public static final int UPDATE_SERVICE_ID = 1;
         public static final int FETCH_ZIP = 2;
         public static final int SELECT_BOOT = 3;
+        public static final int ONBOOT_SERVICE_ID = 6;
 
         // notifications
         public static final int MAGISK_UPDATE_NOTIFICATION_ID = 4;
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
-        public static final int ONBOOT_NOTIFICATION_ID = 6;
         public static final int DTBO_NOTIFICATION_ID = 7;
         public static final String NOTIFICATION_CHANNEL = "magisk_notification";
     }

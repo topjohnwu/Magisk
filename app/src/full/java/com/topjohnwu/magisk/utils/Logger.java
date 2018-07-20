@@ -4,8 +4,6 @@ import android.util.Log;
 
 import com.topjohnwu.magisk.BuildConfig;
 
-import java.util.Locale;
-
 public class Logger {
 
     public static void debug(String line) {

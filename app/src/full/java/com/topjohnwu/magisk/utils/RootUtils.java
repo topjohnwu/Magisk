@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 
 public class RootUtils {
@@ -24,15 +22,5 @@ public class RootUtils {
 
     public static void uninstallPkg(String pkg) {
         Shell.Sync.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg);
-    }
-
-    public static void patchDTBO() {
-        if (Shell.rootAccess()) {
-            MagiskManager mm = MagiskManager.get();
-            if (mm.magiskVersionCode >= Const.MAGISK_VER.DTBO_SUPPORT) {
-                if (Boolean.parseBoolean(ShellUtils.fastCmd("mm_patch_dtbo")))
-                    ShowUI.dtboPatchedNotification();
-            }
-        }
     }
 }
