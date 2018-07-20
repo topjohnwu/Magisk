@@ -22,7 +22,7 @@
 #include "resetprop.h"
 #include "magiskpolicy.h"
 
-static char *buf, *buf2;
+static char *buf, *buf2, *buf3;
 static struct vector module_list;
 
 extern char **environ;
@@ -500,6 +500,7 @@ void startup() {
 		// Allocate buffer
 		buf = xmalloc(PATH_MAX);
 		buf2 = xmalloc(PATH_MAX);
+		buf3 = xmalloc(PATH_MAX); // used for detecting fs type
 
 		simple_mount("/system");
 		simple_mount("/vendor");
@@ -626,8 +627,8 @@ void startup() {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 		} else if (!skip_initramfs && strstr(line, " /system ")) {
-			sscanf(line, "%s", buf);
-			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
+			sscanf(line, "%s %*s %s", buf, buf3); // buf3 holds fs type
+			xmount(buf, MIRRDIR "/system", buf3, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
 #else
@@ -683,6 +684,7 @@ void post_fs_data(int client) {
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
 	buf2 = xmalloc(PATH_MAX);
+	buf3 = xmalloc(PATH_MAX); // used for detecting fs type
 	vec_init(&module_list);
 
 	// Merge, trim, mount magisk.img, which will also travel through the modules
@@ -802,6 +804,7 @@ void late_start(int client) {
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
+	if (buf3 == NULL) buf3 = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
 	if (full_patch_pid > 0)
