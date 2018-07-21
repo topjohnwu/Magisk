@@ -636,9 +636,9 @@ void startup() {
 #endif
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
-			sscanf(line, "%s", buf);
+			sscanf(line, "%s %*s %s", buf, buf3); // buf3 holds fs type
 			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
+			xmount(buf, MIRRDIR "/vendor", buf3, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
 #else
