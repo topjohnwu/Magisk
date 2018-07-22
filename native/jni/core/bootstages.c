@@ -22,7 +22,7 @@
 #include "resetprop.h"
 #include "magiskpolicy.h"
 
-static char *buf, *buf2, *buf3;
+static char *buf, *buf2, *buf_fs_type;
 static struct vector module_list;
 
 extern char **environ;
@@ -500,7 +500,7 @@ void startup() {
 		// Allocate buffer
 		buf = xmalloc(PATH_MAX);
 		buf2 = xmalloc(PATH_MAX);
-		buf3 = xmalloc(PATH_MAX); // used for detecting fs type
+		buf_fs_type = xmalloc(PATH_MAX); // used for detecting fs type
 
 		simple_mount("/system");
 		simple_mount("/vendor");
@@ -627,8 +627,8 @@ void startup() {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 		} else if (!skip_initramfs && strstr(line, " /system ")) {
-			sscanf(line, "%s %*s %s", buf, buf3); // buf3 holds fs type
-			xmount(buf, MIRRDIR "/system", buf3, MS_RDONLY, NULL);
+			sscanf(line, "%s %*s %s", buf, buf_fs_type); // buf_fs_type holds fs type
+			xmount(buf, MIRRDIR "/system", buf_fs_type, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
 #else
@@ -636,9 +636,9 @@ void startup() {
 #endif
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
-			sscanf(line, "%s %*s %s", buf, buf3); // buf3 holds fs type
+			sscanf(line, "%s %*s %s", buf, buf_fs_type); // buf_fs_type holds fs type
 			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", buf3, MS_RDONLY, NULL);
+			xmount(buf, MIRRDIR "/vendor", buf_fs_type, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
 #else
@@ -684,7 +684,7 @@ void post_fs_data(int client) {
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
 	buf2 = xmalloc(PATH_MAX);
-	buf3 = xmalloc(PATH_MAX); // used for detecting fs type
+	buf_fs_type = xmalloc(PATH_MAX); // used for detecting fs type
 	vec_init(&module_list);
 
 	// Merge, trim, mount magisk.img, which will also travel through the modules
@@ -804,7 +804,7 @@ void late_start(int client) {
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
-	if (buf3 == NULL) buf3 = xmalloc(PATH_MAX);
+	if (buf_fs_type == NULL) buf_fs_type = xmalloc(PATH_MAX);
 
 	// Wait till the full patch is done
 	if (full_patch_pid > 0)
@@ -842,6 +842,7 @@ core_only:
 	// All boot stage done, cleanup everything
 	free(buf);
 	free(buf2);
-	buf = buf2 = NULL;
+	free(buf_fs_type);
+	buf = buf2 = buf_fs_type = NULL;
 	vec_deep_destroy(&module_list);
 }
