@@ -500,7 +500,7 @@ void startup() {
 		// Allocate buffer
 		buf = xmalloc(PATH_MAX);
 		buf2 = xmalloc(PATH_MAX);
-		buf_fs_type = xmalloc(PATH_MAX); // used for detecting fs type
+		buf_fs_type = xmalloc(64);
 
 		simple_mount("/system");
 		simple_mount("/vendor");
@@ -627,7 +627,7 @@ void startup() {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 		} else if (!skip_initramfs && strstr(line, " /system ")) {
-			sscanf(line, "%s %*s %s", buf, buf_fs_type); // buf_fs_type holds fs type
+			sscanf(line, "%s %*s %s", buf, buf_fs_type);
 			xmount(buf, MIRRDIR "/system", buf_fs_type, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
@@ -636,7 +636,7 @@ void startup() {
 #endif
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
-			sscanf(line, "%s %*s %s", buf, buf_fs_type); // buf_fs_type holds fs type
+			sscanf(line, "%s %*s %s", buf, buf_fs_type);
 			xmkdir(MIRRDIR "/vendor", 0755);
 			xmount(buf, MIRRDIR "/vendor", buf_fs_type, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
@@ -684,7 +684,7 @@ void post_fs_data(int client) {
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
 	buf2 = xmalloc(PATH_MAX);
-	buf_fs_type = xmalloc(PATH_MAX); // used for detecting fs type
+	buf_fs_type = xmalloc(64);
 	vec_init(&module_list);
 
 	// Merge, trim, mount magisk.img, which will also travel through the modules
@@ -804,7 +804,7 @@ void late_start(int client) {
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
-	if (buf_fs_type == NULL) buf_fs_type = xmalloc(PATH_MAX);
+	if (buf_fs_type == NULL) buf_fs_type = xmalloc(64);
 
 	// Wait till the full patch is done
 	if (full_patch_pid > 0)
