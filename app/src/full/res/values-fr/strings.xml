@@ -85,7 +85,7 @@
     <string name="internal_storage">Le zip est enregistré dans:\n[Stockage Interne]%1$s</string>
     <string name="zip_download_title">Téléchargement</string>
     <string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%) …</string>
-    <string name="zip_process_title">Tritement en cours</string>
+    <string name="zip_process_title">Traitement en cours</string>
     <string name="zip_process_msg">Traitement du fichier zip…</string>
     <string name="manager_update_title">Nouvelle mise à jour du Gestionnaire Magisk disponible!</string>
     <string name="manager_download_install">Appuyer pour télécharger et installer</string>
