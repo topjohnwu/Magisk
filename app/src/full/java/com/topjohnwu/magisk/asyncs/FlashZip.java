@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.topjohnwu.magisk.FlashActivity;
@@ -66,12 +65,10 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
             }
             if (!unzipAndCheck()) return 0;
             console.add("- Installing " + Utils.getNameFromUri(mm, mUri));
-            Shell.Sync.su(console, logs,
-                    "cd " + mCachedFile.getParent(),
-                    "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile + " || echo 'Failed!'"
-            );
-
-            if (TextUtils.equals(console.get(console.size() - 1), "Failed!"))
+            if (!Shell.su("cd " + mCachedFile.getParent(),
+                    "BOOTMODE=true sh update-binary dummy 1 " + mCachedFile)
+                    .to(console, logs)
+                    .exec().isSuccess())
                 return -1;
 
         } catch (Exception e) {
@@ -86,10 +83,7 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
     @Override
     protected void onPostExecute(Integer result) {
         FlashActivity activity = (FlashActivity) getActivity();
-        Shell.Async.su(
-                "rm -rf " + mCachedFile.getParent(),
-                "rm -rf " + Const.TMP_FOLDER_PATH
-        );
+        Shell.su("rm -rf " + mCachedFile.getParent(), "rm -rf " + Const.TMP_FOLDER_PATH).submit();
         switch (result) {
             case -1:
                 console.add("! Installation failed");

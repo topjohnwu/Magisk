@@ -254,20 +254,20 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
                 case Const.Key.MAGISKHIDE:
                     if (prefs.getBoolean(key, false)) {
-                        Shell.Async.su("magiskhide --enable");
+                        Shell.su("magiskhide --enable").submit();
                     } else {
-                        Shell.Async.su("magiskhide --disable");
+                        Shell.su("magiskhide --disable").submit();
                     }
                     break;
                 case Const.Key.HOSTS:
                     if (prefs.getBoolean(key, false)) {
-                        Shell.Async.su(
-                                "cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
-                                "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts");
+                        Shell.su("cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
+                                "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts")
+                                .submit();
                     } else {
-                        Shell.Async.su(
-                                "umount -l /system/etc/hosts",
-                                "rm -f " + Const.MAGISK_HOST_FILE);
+                        Shell.su("umount -l /system/etc/hosts",
+                                "rm -f " + Const.MAGISK_HOST_FILE)
+                                .submit();
                     }
                     break;
                 case Const.Key.ROOT_ACCESS:

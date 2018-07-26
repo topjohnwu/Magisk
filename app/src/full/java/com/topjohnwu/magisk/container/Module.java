@@ -14,9 +14,9 @@ public class Module extends BaseModule {
             parseProps(Shell.Sync.su("dos2unix <  " + path + "/module.prop"));
         } catch (NumberFormatException ignored) {}
 
-        mRemoveFile = new SuFile(path + "/remove");
-        mDisableFile = new SuFile(path + "/disable");
-        mUpdateFile = new SuFile(path + "/update");
+        mRemoveFile = new SuFile(path, "remove");
+        mDisableFile = new SuFile(path, "disable");
+        mUpdateFile = new SuFile(path, "update");
 
         if (getId() == null) {
             int sep = path.lastIndexOf('/');

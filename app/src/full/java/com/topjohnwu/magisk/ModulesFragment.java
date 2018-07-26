@@ -112,16 +112,16 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.reboot:
-                Shell.Async.su("/system/bin/reboot");
+                Shell.su("/system/bin/reboot").submit();
                 return true;
             case R.id.reboot_recovery:
-                Shell.Async.su("/system/bin/reboot recovery");
+                Shell.su("/system/bin/reboot recovery").submit();
                 return true;
             case R.id.reboot_bootloader:
-                Shell.Async.su("/system/bin/reboot bootloader");
+                Shell.su("/system/bin/reboot bootloader").submit();
                 return true;
             case R.id.reboot_download:
-                Shell.Async.su("/system/bin/reboot download");
+                Shell.su("/system/bin/reboot download").submit();
                 return true;
             default:
                 return false;

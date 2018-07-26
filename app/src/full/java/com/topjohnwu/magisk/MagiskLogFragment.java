@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
@@ -22,12 +21,10 @@ import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -93,24 +90,15 @@ public class MagiskLogFragment extends Fragment {
     }
 
     public void readLogs() {
-        Shell.Async.su(new Shell.Async.Callback() {
-            @Override
-            public void onTaskResult(@Nullable List<String> out, @Nullable List<String> err) {
-                progressBar.setVisibility(View.GONE);
-                if (ShellUtils.isValidOutput(out)) {
-                    txtLog.setText(TextUtils.join("\n", out));
-                } else {
-                    txtLog.setText(R.string.log_is_empty);
-                }
-                svLog.postDelayed(() -> svLog.fullScroll(ScrollView.FOCUS_DOWN), 100);
-                hsvLog.postDelayed(() -> hsvLog.fullScroll(ScrollView.FOCUS_LEFT), 100);
-            }
-
-            @Override
-            public void onTaskError(@NonNull Throwable throwable) {
+        Shell.su("cat " + Const.MAGISK_LOG + " | tail -n 5000").submit(result -> {
+            progressBar.setVisibility(View.GONE);
+            if (result.getOut().isEmpty())
                 txtLog.setText(R.string.log_is_empty);
-            }
-        }, "cat " + Const.MAGISK_LOG + " | tail -n 5000");
+            else
+                txtLog.setText(TextUtils.join("\n", result.getOut()));
+            svLog.postDelayed(() -> svLog.fullScroll(ScrollView.FOCUS_DOWN), 100);
+            hsvLog.postDelayed(() -> hsvLog.fullScroll(ScrollView.FOCUS_LEFT), 100);
+        });
     }
 
     public void saveLogs() {
@@ -127,19 +115,13 @@ public class MagiskLogFragment extends Fragment {
         } catch (IOException e) {
             return;
         }
-        Shell.Async.su(new Shell.Async.Callback() {
-            @Override
-            public void onTaskResult(@Nullable List<String> out, @Nullable List<String> err) {
-                SnackbarMaker.make(txtLog, targetFile.getPath(), Snackbar.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onTaskError(@NonNull Throwable throwable) {}
-        }, "cat " + Const.MAGISK_LOG + " > " + targetFile);
+        Shell.su("cat " + Const.MAGISK_LOG + " > " + targetFile)
+                .submit(result ->
+                        SnackbarMaker.make(txtLog, targetFile.getPath(), Snackbar.LENGTH_SHORT).show());
     }
 
     public void clearLogs() {
-        Shell.Async.su("echo -n > " + Const.MAGISK_LOG);
+        Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
         SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 }

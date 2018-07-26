@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Xml;
 
@@ -19,7 +18,6 @@ import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.RootUtils;
-import com.topjohnwu.magisk.utils.ShellInitializer;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -37,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MagiskManager extends Application implements Shell.Container {
+public class MagiskManager extends Application {
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -89,31 +87,20 @@ public class MagiskManager extends Application implements Shell.Container {
     public MagiskDatabaseHelper mDB;
     public RepoDatabaseHelper repoDB;
 
-    private volatile Shell mShell;
+    private Shell.Container container;
 
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
-        Shell.setContainer(this);
-    }
-
-    @Nullable
-    @Override
-    public Shell getShell() {
-        return mShell;
-    }
-
-    @Override
-    public void setShell(@Nullable Shell shell) {
-        mShell = shell;
+        container = Shell.Config.newContainer();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Shell.setFlags(Shell.FLAG_MOUNT_MASTER);
-        Shell.verboseLogging(BuildConfig.DEBUG);
-        Shell.setInitializer(ShellInitializer.class);
+        Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER);
+        Shell.Config.verboseLogging(BuildConfig.DEBUG);
+        Shell.Config.setInitializer(RootUtils.class);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDatabaseHelper.getInstance(this);
@@ -194,7 +181,7 @@ public class MagiskManager extends Application implements Shell.Container {
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
             String s = ShellUtils.fastCmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ?
                     "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
-            magiskHide = s == null || Integer.parseInt(s) != 0;
+            magiskHide = Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
     }
 
@@ -227,7 +214,7 @@ public class MagiskManager extends Application implements Shell.Container {
         prefs.edit().commit();
         File xml = new File(getFilesDir().getParent() + "/shared_prefs",
                 getPackageName() + "_preferences.xml");
-        Shell.Sync.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS));
+        Shell.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
     public void loadPrefs() {

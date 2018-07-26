@@ -4,15 +4,13 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.superuser.Shell;
-
-import java.util.List;
+import com.topjohnwu.superuser.io.SuFile;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {
 
-    private List<String> getModList() {
-        String command = "ls -d " + Const.MAGISK_PATH + "/* | grep -v lost+found";
-        return Shell.Sync.su(command);
+    private String[] getModList() {
+        SuFile path = new SuFile(Const.MAGISK_PATH);
+        return path.list((file, name) -> !name.equals("lost+found") && !name.equals(".core"));
     }
 
     @Override
@@ -20,8 +18,8 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
         MagiskManager mm = MagiskManager.get();
         mm.moduleMap = new ValueSortedMap<>();
 
-        for (String path : getModList()) {
-            Module module = new Module(path);
+        for (String name : getModList()) {
+            Module module = new Module(Const.MAGISK_PATH + "/" + name);
             mm.moduleMap.put(module.getId(), module);
         }
 

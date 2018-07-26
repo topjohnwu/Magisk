@@ -44,7 +44,7 @@ public class MagiskDatabaseHelper {
             return new MagiskDatabaseHelper(mm);
         } catch (Exception e) {
             // Let's cleanup everything and try again
-            Shell.Sync.su("db_clean '*'");
+            Shell.su("db_clean '*'").exec();
             return new MagiskDatabaseHelper(mm);
         }
     }
@@ -74,7 +74,7 @@ public class MagiskDatabaseHelper {
             }
             mm.loadMagiskInfo();
             // Cleanup
-            Shell.Sync.su("db_clean " + Const.USER_ID);
+            Shell.su("db_clean " + Const.USER_ID).exec();
             if (mm.magiskVersionCode < Const.MAGISK_VER.FBE_AWARE) {
                 // Super old legacy mode
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
@@ -91,15 +91,15 @@ public class MagiskDatabaseHelper {
                 de.deleteDatabase("su.db");
                 if (mm.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {
                     // We need some additional policies on old versions
-                    Shell.Sync.su("db_sepatch");
+                    Shell.su("db_sepatch").exec();
                 }
                 if (!GLOBAL_DB.exists()) {
-                    Shell.Sync.su("db_init");
+                    Shell.su("db_init").exec();
                     SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
-                    Shell.Sync.su("db_restore");
+                    Shell.su("db_restore").exec();
                 }
             }
-            Shell.Sync.su("db_setup " + Process.myUid());
+            Shell.su("db_setup " + Process.myUid()).exec();
         }
         // Not using legacy mode, open the mounted global DB
         return SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);

@@ -59,10 +59,10 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.checkBox.setChecked(hideList.contains(info.packageName));
         holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
             if (isChecked) {
-                Shell.Async.su("magiskhide --add " + info.packageName);
+                Shell.su("magiskhide --add " + info.packageName).submit();
                 hideList.add(info.packageName);
             } else {
-                Shell.Async.su("magiskhide --rm " + info.packageName);
+                Shell.su("magiskhide --rm " + info.packageName).submit();
                 hideList.remove(info.packageName);
             }
         });
@@ -128,7 +128,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         @Override
         protected Void doInBackground(Void... voids) {
             fullList = pm.getInstalledApplications(0);
-            hideList = Shell.Sync.su("magiskhide --ls");
+            hideList = Shell.su("magiskhide --ls").exec().getOut();
             for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
                 ApplicationInfo info = i.next();
                 if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {

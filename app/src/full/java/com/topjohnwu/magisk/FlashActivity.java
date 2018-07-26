@@ -51,7 +51,7 @@ public class FlashActivity extends Activity {
 
     @OnClick(R.id.reboot)
     void reboot() {
-        Shell.Async.su("/system/bin/reboot");
+        Shell.su("/system/bin/reboot").submit();
     }
 
     @OnClick(R.id.save_logs)
