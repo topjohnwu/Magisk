@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.MagiskManager;
@@ -29,7 +28,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
@@ -37,47 +38,27 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private static final int LOAD_NEXT = 1;
     private static final int LOAD_PREV = 2;
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final int CORE_POOL_SIZE = Math.max(2, CPU_COUNT - 1);
 
     private MagiskManager mm;
     private List<String> etags, newEtags = new LinkedList<>();
     private Set<String> cached;
     private boolean forceUpdate;
-    private AtomicInteger taskCount = new AtomicInteger(0);
-    final private Object allDone = new Object();
+    private ExecutorService threadPool;
 
     public UpdateRepos(boolean force) {
         mm = MagiskManager.get();
         mm.repoLoadDone.reset();
         forceUpdate = force;
-    }
-
-    private void queueTask(Runnable task) {
-        // Thread pool's queue has an upper bound, batch it with 64 tasks
-        while (taskCount.get() >= 64) {
-            waitTasks();
-        }
-        taskCount.incrementAndGet();
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-            task.run();
-            if (taskCount.decrementAndGet() == 0) {
-                synchronized (allDone) {
-                    allDone.notify();
-                }
-            }
-        });
+        threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
     }
 
     private void waitTasks() {
-        if (taskCount.get() == 0)
-            return;
-        synchronized (allDone) {
-            try {
-                allDone.wait();
-            } catch (InterruptedException e) {
-                // Wait again
-                waitTasks();
-            }
-        }
+        threadPool.shutdown();
+        try {
+            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ignored) {}
     }
 
     private boolean loadJSON(String jsonString) throws JSONException, ParseException {
@@ -93,7 +74,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             String name = rawRepo.getString("name");
             Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
             Set<String> set = Collections.synchronizedSet(cached);
-            queueTask(() -> {
+            threadPool.execute(() -> {
                 Repo repo = mm.repoDB.getRepo(id);
                 try {
                     if (repo == null)
@@ -187,7 +168,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
             Cursor c = mm.repoDB.getRawCursor();
             while (c.moveToNext()) {
                 Repo repo = new Repo(c);
-                queueTask(() -> {
+                threadPool.execute(() -> {
                     try {
                         repo.update();
                         mm.repoDB.addRepo(repo);
