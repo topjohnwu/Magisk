@@ -16,8 +16,8 @@
 #   public *;
 #}
 
-# Keep all names, we are open source anyway :)
--keepnames class ** { *; }
+# Don't obfuscate, we are open source anyway :)
+-dontobfuscate
 
 # BouncyCastle
 -keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
@@ -27,3 +27,8 @@
 
 # Gson
 -keepattributes Signature
+
+# Strip logging
+-assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
+  public *** debug(...);
+}
