@@ -122,6 +122,7 @@ public class MagiskLogFragment extends Fragment {
 
     public void clearLogs() {
         Shell.su("echo -n > " + Const.MAGISK_LOG).submit();
+        txtLog.setText(R.string.log_is_empty);
         SnackbarMaker.make(txtLog, R.string.logs_cleared, Snackbar.LENGTH_SHORT).show();
     }
 }
