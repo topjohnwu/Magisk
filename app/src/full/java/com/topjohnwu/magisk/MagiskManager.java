@@ -181,7 +181,7 @@ public class MagiskManager extends Application {
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
             String s = ShellUtils.fastCmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ?
                     "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
-            magiskHide = Integer.parseInt(s) != 0;
+            magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
         } catch (Exception ignored) {}
     }
 
