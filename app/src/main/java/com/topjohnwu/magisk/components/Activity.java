@@ -17,8 +17,6 @@ public abstract class Activity extends FlavorActivity {
 
     protected static Runnable permissionGrantCallback;
 
-    private ActivityResultListener activityResultListener;
-
     public Activity() {
         super();
         Configuration configuration = new Configuration();
@@ -74,21 +72,4 @@ public abstract class Activity extends FlavorActivity {
         }
         permissionGrantCallback = null;
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (activityResultListener != null)
-            activityResultListener.onActivityResult(requestCode, resultCode, data);
-        activityResultListener = null;
-    }
-
-    public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
-        activityResultListener = listener;
-        super.startActivityForResult(intent, requestCode);
-    }
-
-    public interface ActivityResultListener {
-        void onActivityResult(int requestCode, int resultCode, Intent data);
-    }
-
 }

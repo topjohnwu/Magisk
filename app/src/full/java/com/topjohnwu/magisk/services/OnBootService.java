@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.ShowUI;
+import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
@@ -28,6 +28,6 @@ public class OnBootService extends JobIntentService {
         Shell shell = Shell.newInstance();
         if (shell.getStatus() >= Shell.ROOT_SHELL &&
                 Boolean.parseBoolean(ShellUtils.fastCmd(shell, "mm_patch_dtbo")))
-            ShowUI.dtboPatchedNotification();
+            NotificationMgr.dtboPatched();
     }
 }

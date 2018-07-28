@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,12 +21,16 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.CustomAlertDialog;
+import com.topjohnwu.magisk.components.EnvFixDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.MagiskInstallDialog;
+import com.topjohnwu.magisk.components.ManagerInstallDialog;
+import com.topjohnwu.magisk.components.UninstallDialog;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
-import com.topjohnwu.magisk.utils.ShowUI;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -84,11 +89,11 @@ public class MagiskFragment extends Fragment
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetRefreshIcon.setVisibility(View.GONE);
             safetyNetStatusText.setText(R.string.checking_safetyNet_status);
-            new CheckSafetyNet(getActivity()).exec();
+            new CheckSafetyNet(requireActivity()).exec();
             collapse();
         };
         if (!TextUtils.equals(mm.getPackageName(), Const.ORIG_PKG_NAME)) {
-            new AlertDialogBuilder(getActivity())
+            new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.cannot_check_sn_title)
                     .setMessage(R.string.cannot_check_sn_notice)
                     .setCancelable(true)
@@ -96,7 +101,7 @@ public class MagiskFragment extends Fragment
                     .show();
         } else if (!CheckSafetyNet.dexPath.exists()) {
             // Show dialog
-            new AlertDialogBuilder(getActivity())
+            new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.proprietary_title)
                     .setMessage(R.string.proprietary_notice)
                     .setCancelable(true)
@@ -115,25 +120,26 @@ public class MagiskFragment extends Fragment
 
         // Show Manager update first
         if (mm.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-            ShowUI.managerInstallDialog(getActivity());
+            new ManagerInstallDialog((Activity) requireActivity()).show();
             return;
         }
 
         ((NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-        ShowUI.magiskInstallDialog(getActivity());
+        new MagiskInstallDialog((Activity) getActivity()).show();
     }
 
     @OnClick(R.id.uninstall_button)
     void uninstall() {
-        ShowUI.uninstallDialog(getActivity());
+        new UninstallDialog(requireActivity()).show();
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
         unbinder = ButterKnife.bind(this, v);
-        getActivity().setTitle(R.string.magisk);
+        requireActivity().setTitle(R.string.magisk);
 
         mm = getApplication();
 
@@ -204,7 +210,7 @@ public class MagiskFragment extends Fragment
     }
 
     private void updateUI() {
-        ((MainActivity) getActivity()).checkHideSection();
+        ((MainActivity) requireActivity()).checkHideSection();
 
         boolean hasNetwork = Utils.checkNetworkStatus();
         boolean hasRoot = Shell.rootAccess();
@@ -266,7 +272,7 @@ public class MagiskFragment extends Fragment
                 install();
             } else if (mm.remoteMagiskVersionCode >= Const.MAGISK_VER.FIX_ENV &&
                     !ShellUtils.fastCmdResult("env_check")) {
-                ShowUI.envFixDialog(getActivity());
+                new EnvFixDialog(requireActivity()).show();
             }
         }
     }

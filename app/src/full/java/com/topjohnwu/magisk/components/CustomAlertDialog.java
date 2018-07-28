@@ -18,7 +18,7 @@ import com.topjohnwu.magisk.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AlertDialogBuilder extends AlertDialog.Builder {
+public class CustomAlertDialog extends AlertDialog.Builder {
 
     @BindView(R.id.button_panel) LinearLayout buttons;
     @BindView(R.id.message_panel) LinearLayout messagePanel;
@@ -34,17 +34,7 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
 
     private AlertDialog dialog;
 
-    public AlertDialogBuilder(@NonNull Activity context) {
-        super(context);
-        setup();
-    }
-
-    public AlertDialogBuilder(@NonNull Activity context, @StyleRes int themeResId) {
-        super(context, themeResId);
-        setup();
-    }
-
-    private void setup() {
+    {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog, null);
         ButterKnife.bind(this, v);
         super.setView(v);
@@ -55,9 +45,12 @@ public class AlertDialogBuilder extends AlertDialog.Builder {
         messagePanel.setVisibility(View.GONE);
     }
 
-    @Override
-    public AlertDialog.Builder setTitle(int titleId) {
-        return super.setTitle(titleId);
+    public CustomAlertDialog(@NonNull Activity context) {
+        super(context);
+    }
+
+    public CustomAlertDialog(@NonNull Activity context, @StyleRes int themeResId) {
+        super(context, themeResId);
     }
 
     @Override

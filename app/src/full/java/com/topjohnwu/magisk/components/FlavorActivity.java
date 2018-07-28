@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
@@ -11,6 +12,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Topic;
 
 public abstract class FlavorActivity extends AppCompatActivity {
+
+    private ActivityResultListener activityResultListener;
 
     @StyleRes
     public int getDarkTheme() {
@@ -27,7 +30,6 @@ public abstract class FlavorActivity extends AppCompatActivity {
         if (this instanceof Topic.Subscriber) {
             ((Topic.Subscriber) this).subscribeTopics();
         }
-
         if (getMagiskManager().isDarkTheme && getDarkTheme() != -1) {
             setTheme(getDarkTheme());
         }
@@ -53,5 +55,21 @@ public abstract class FlavorActivity extends AppCompatActivity {
             getWindow().setAttributes(params);
             setFinishOnTouchOutside(true);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (activityResultListener != null)
+            activityResultListener.onActivityResult(requestCode, resultCode, data);
+        activityResultListener = null;
+    }
+
+    public void startActivityForResult(Intent intent, int requestCode, ActivityResultListener listener) {
+        activityResultListener = listener;
+        super.startActivityForResult(intent, requestCode);
+    }
+
+    public interface ActivityResultListener {
+        void onActivityResult(int requestCode, int resultCode, Intent data);
     }
 }

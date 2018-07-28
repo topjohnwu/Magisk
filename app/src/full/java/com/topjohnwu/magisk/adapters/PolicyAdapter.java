@@ -12,7 +12,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Policy;
@@ -93,7 +93,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 dbHelper.updatePolicy(policy);
             }
         });
-        holder.delete.setOnClickListener(v -> new AlertDialogBuilder((Activity) v.getContext())
+        holder.delete.setOnClickListener(v -> new CustomAlertDialog((Activity) v.getContext())
                 .setTitle(R.string.su_revoke_title)
                 .setMessage(v.getContext().getString(R.string.su_revoke_msg, policy.appName))
                 .setPositiveButton(R.string.yes, (dialog, which) -> {

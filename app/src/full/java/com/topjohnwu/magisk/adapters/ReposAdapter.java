@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
-import com.topjohnwu.magisk.components.AlertDialogBuilder;
+import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
@@ -102,7 +102,7 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
         holder.downloadImage.setOnClickListener(v -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            new AlertDialogBuilder((Activity) context)
+            new CustomAlertDialog((Activity) context)
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)

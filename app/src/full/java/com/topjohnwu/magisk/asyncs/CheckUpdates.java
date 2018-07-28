@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.asyncs;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
-import com.topjohnwu.magisk.utils.ShowUI;
+import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONException;
@@ -59,9 +59,9 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         MagiskManager mm = MagiskManager.get();
         if (showNotification) {
             if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
-                ShowUI.managerUpdateNotification();
+                NotificationMgr.managerUpdate();
             } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
-                ShowUI.magiskUpdateNotification();
+                NotificationMgr.magiskUpdate();
             }
         }
         mm.updateCheckDone.publish();
