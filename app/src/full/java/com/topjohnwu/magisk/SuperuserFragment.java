@@ -22,6 +22,8 @@ import butterknife.Unbinder;
 public class SuperuserFragment extends Fragment {
 
     private Unbinder unbinder;
+    private PackageManager pm;
+    private MagiskManager mm;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
 
@@ -31,20 +33,8 @@ public class SuperuserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_superuser, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        PackageManager pm = getActivity().getPackageManager();
-        MagiskManager mm = getApplication();
-
-        List<Policy> policyList = mm.mDB.getPolicyList(pm);
-
-        if (policyList.size() == 0) {
-            emptyRv.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            recyclerView.setAdapter(new PolicyAdapter(policyList, mm.mDB, pm));
-            emptyRv.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
-
+        pm = getActivity().getPackageManager();
+        mm = getApplication();
         return view;
     }
 
@@ -55,9 +45,28 @@ public class SuperuserFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        displayPolicyList();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    private void displayPolicyList() {
+        List<Policy> policyList = mm.mDB.getPolicyList(pm);
+
+        if (policyList.size() == 0) {
+            emptyRv.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setAdapter(new PolicyAdapter(policyList, mm.mDB, pm));
+            emptyRv.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
 }
