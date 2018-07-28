@@ -1,5 +1,6 @@
 package com.topjohnwu.snet;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,16 +12,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.safetynet.SafetyNet;
 import com.google.android.gms.safetynet.SafetyNetApi;
-import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
-import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.security.SecureRandom;
 
-public class SafetyNetHelper implements ISafetyNetHelper, GoogleApiClient.ConnectionCallbacks,
+public class SafetyNetHelper implements InvocationHandler, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, ResultCallback<SafetyNetApi.AttestationResult> {
 
     public static final int CAUSE_SERVICE_DISCONNECTED = 0x01;
@@ -31,25 +31,24 @@ public class SafetyNetHelper implements ISafetyNetHelper, GoogleApiClient.Connec
     public static final int BASIC_PASS = 0x10;
     public static final int CTS_PASS = 0x20;
 
-    public static final int SNET_EXT_VER = 8;
+    public static final int SNET_EXT_VER = 9;
 
     private GoogleApiClient mGoogleApiClient;
     private Activity mActivity;
-    private Callback callback;
+    private Object callback;
 
-    @Override
-    public int getVersion() {
-        return SNET_EXT_VER;
-    }
-
-    public SafetyNetHelper(Activity activity, Callback cb) {
+    SafetyNetHelper(Activity activity, Object cb) {
         mActivity = activity;
         callback = cb;
     }
 
-    // Entry point to start test
-    @Override
-    public void attest() {
+    /* Override ISafetyNetHelper.getVersion */
+    private int getVersion() {
+        return SNET_EXT_VER;
+    }
+
+    /* Override ISafetyNetHelper.attest */
+    private void attest() {
         // Connect Google Service
         mGoogleApiClient = new GoogleApiClient.Builder(mActivity)
                 .addApi(SafetyNet.API)
@@ -60,16 +59,32 @@ public class SafetyNetHelper implements ISafetyNetHelper, GoogleApiClient.Connec
     }
 
     @Override
+    public Object invoke(Object o, Method method, Object[] args) {
+        if (method.getName().equals("attest")) {
+            attest();
+        } else if (method.getName().equals("getVersion")) {
+            return getVersion();
+        }
+        return null;
+    }
+
+    private void invokeCallback(int code) {
+        Class<?> clazz = callback.getClass();
+        try {
+            clazz.getMethod("onResponse", int.class).invoke(callback, code);
+        } catch (Exception ignored) {}
+    }
+
+    @Override
     public void onConnectionSuspended(int i) {
-        callback.onResponse(i);
+        invokeCallback(i);
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult result) {
-        mActivity.swapResources(CheckSafetyNet.dexPath.getPath());
-        GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
-        mActivity.restoreResources();
-        callback.onResponse(CONNECTION_FAIL);
+        if (GooglePlayServicesUtil.isUserRecoverableError(result.getErrorCode()))
+            ModdedGPSUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
+        invokeCallback(CONNECTION_FAIL);
     }
 
     @Override
@@ -101,6 +116,6 @@ public class SafetyNetHelper implements ISafetyNetHelper, GoogleApiClient.Connec
         mGoogleApiClient.disconnect();
 
         // Return results
-        callback.onResponse(code);
+        invokeCallback(code);
     }
 }

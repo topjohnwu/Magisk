@@ -45,10 +45,12 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     private void dyload() throws Exception {
         DexClassLoader loader = new DexClassLoader(dexPath.getPath(), dexPath.getParent(),
                 null, ISafetyNetHelper.class.getClassLoader());
-        Class<?> clazz = loader.loadClass("com.topjohnwu.snet.SafetyNetHelper");
-        helper = (ISafetyNetHelper) clazz.getConstructors()[0]
-                .newInstance(getActivity(), (ISafetyNetHelper.Callback)
-                        code -> MagiskManager.get().safetyNetDone.publish(false, code));
+        Class<?> clazz = loader.loadClass("com.topjohnwu.snet.Snet");
+        helper = (ISafetyNetHelper) clazz.getMethod("newHelper",
+                Class.class, String.class, Activity.class, Object.class)
+                .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
+                        (ISafetyNetHelper.Callback) code ->
+                                MagiskManager.get().safetyNetDone.publish(false, code));
         if (helper.getVersion() != Const.SNET_VER) {
             throw new Exception();
         }
