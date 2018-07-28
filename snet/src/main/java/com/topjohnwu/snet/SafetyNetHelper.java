@@ -2,8 +2,6 @@ package com.topjohnwu.snet;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +29,7 @@ public class SafetyNetHelper implements InvocationHandler, GoogleApiClient.Conne
     public static final int BASIC_PASS = 0x10;
     public static final int CTS_PASS = 0x20;
 
-    public static final int SNET_EXT_VER = 9;
+    public static final int SNET_EXT_VER = 10;
 
     private GoogleApiClient mGoogleApiClient;
     private Activity mActivity;
@@ -81,14 +79,14 @@ public class SafetyNetHelper implements InvocationHandler, GoogleApiClient.Conne
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult result) {
+    public void onConnectionFailed(ConnectionResult result) {
         if (GooglePlayServicesUtil.isUserRecoverableError(result.getErrorCode()))
             ModdedGPSUtil.getErrorDialog(result.getErrorCode(), mActivity, 0).show();
         invokeCallback(CONNECTION_FAIL);
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onConnected(Bundle bundle) {
         // Create nonce
         byte[] nonce = new byte[24];
         new SecureRandom().nextBytes(nonce);

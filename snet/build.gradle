@@ -16,12 +16,15 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.gms:play-services-safetynet:7.0.0'  /* The oldest version */
+    /* The oldest version */
+    implementation('com.google.android.gms:play-services-safetynet:7.0.0') {
+        exclude module: 'support-v4'
+    }
 }

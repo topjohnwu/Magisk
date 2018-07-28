@@ -39,7 +39,7 @@ public class Const {
 
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
-    public static final int SNET_VER = 9;
+    public static final int SNET_VER = 10;
 
     public static int MIN_MODULE_VER() {
         return MagiskManager.get().magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
@@ -81,7 +81,7 @@ public class Const {
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/beta.json";
-        public static final String SNET_URL = "https://github.com/topjohnwu/magisk_files/raw/fc819e3974e96d0e4430a2957df4410971ebd6f3/snet.apk";
+        public static final String SNET_URL = "https://github.com/topjohnwu/magisk_files/raw/a300521162587da23e45010797bfd8c9a03594f6/snet.apk";
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";

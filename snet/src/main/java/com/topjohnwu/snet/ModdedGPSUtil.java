@@ -5,13 +5,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.Log;
 
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.internal.zzg;
 import com.google.android.gms.internal.zzlu;
 
 /* Decompiled and modified from GooglePlayServiceUtil.class */
@@ -20,7 +21,7 @@ public class ModdedGPSUtil {
     private static final String TAG = "GooglePlayServicesUtil";
     static String dexPath;
 
-    static Dialog getErrorDialog(int errCode, Activity activity, int requestCode) {
+    static Dialog getErrorDialog(int errCode, final Activity activity, final int requestCode) {
         SwapResContext ctx = new SwapResContext(activity, dexPath);
         Resources res = ctx.getResources();
         if (zzlu.zzQ(ctx) && errCode == 2) {
@@ -33,8 +34,16 @@ public class ModdedGPSUtil {
 
         String btnMsg = GooglePlayServicesUtil.zzf(ctx, errCode);
         if (btnMsg != null) {
-            Intent intent = GooglePlayServicesUtil.zzan(errCode);
-            builder.setPositiveButton(btnMsg, new zzg(activity, intent, requestCode));
+            final Intent intent = GooglePlayServicesUtil.zzan(errCode);
+            builder.setPositiveButton(btnMsg, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    PackageManager pm = activity.getPackageManager();
+                    if (intent != null && intent.resolveActivity(pm) != null)
+                        activity.startActivityForResult(intent, requestCode);
+                    dialog.dismiss();
+                }
+            });
         }
 
         switch(errCode) {
@@ -116,20 +125,14 @@ public class ModdedGPSUtil {
 
         public SwapResContext(Context base, String apk) {
             super(base);
-            asset = getAssets(apk);
-            Resources res = base.getResources();
-            resources = new Resources(asset, res.getDisplayMetrics(), res.getConfiguration());
-        }
-
-        private AssetManager getAssets(String apk) {
             try {
-                AssetManager asset = AssetManager.class.newInstance();
+                asset = AssetManager.class.newInstance();
                 AssetManager.class.getMethod("addAssetPath", String.class).invoke(asset, apk);
-                return asset;
             } catch (Exception e) {
                 e.printStackTrace();
-                return null;
             }
+            Resources res = base.getResources();
+            resources = new Resources(asset, res.getDisplayMetrics(), res.getConfiguration());
         }
 
         @Override
