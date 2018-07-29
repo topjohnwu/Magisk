@@ -119,13 +119,13 @@ public class FlashActivity extends Activity {
                 new UninstallMagisk(this, uri, console, logs).exec();
                 break;
             case Const.Value.FLASH_MAGISK:
-                new InstallMagisk(this, console, logs, uri, InstallMagisk.DIRECT_MODE).exec();
+                new InstallMagisk(this, console, logs, InstallMagisk.DIRECT_MODE).exec();
                 break;
             case Const.Value.FLASH_INACTIVE_SLOT:
-                new InstallMagisk(this, console, logs, uri, InstallMagisk.SECOND_SLOT_MODE).exec();
+                new InstallMagisk(this, console, logs, InstallMagisk.SECOND_SLOT_MODE).exec();
                 break;
             case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs, uri,
+                new InstallMagisk(this, console, logs,
                         intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
                 break;
         }

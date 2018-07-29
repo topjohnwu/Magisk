@@ -23,7 +23,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         MagiskManager mm = Utils.getMagiskManager(activity);
         setTitle(R.string.select_method);
         setItems(options.toArray(new String [0]), (dialog, idx) -> {
-            DownloadReceiver receiver = null;
+            Intent intent;
             switch (idx) {
                 case 1:
                     if (mm.remoteMagiskVersionCode < 1400) {
@@ -32,70 +32,38 @@ class InstallMethodDialog extends AlertDialog.Builder {
                         return;
                     }
                     MagiskManager.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("*/*");
+                    intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
                     activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                             (requestCode, resultCode, data) -> {
                                 if (requestCode == Const.ID.SELECT_BOOT &&
                                         resultCode == Activity.RESULT_OK && data != null) {
-                                    Utils.dlAndReceive(activity, new SelectBoot(data),
-                                            mm.magiskLink, filename);
+                                    Intent i = new Intent(activity, FlashActivity.class)
+                                            .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                                    activity.startActivity(i);
                                 }
                             });
-                    return;
+                    break;
                 case 0:
-                    receiver = new DownloadReceiver() {
+                    Utils.dlAndReceive(activity, new DownloadReceiver() {
                         @Override
                         public void onDownloadDone(Context context, Uri uri) {
                             SnackbarMaker.showUri(activity, uri);
                         }
-                    };
+                    }, mm.magiskLink, filename);
                     break;
                 case 2:
-                    receiver = new DownloadReceiver() {
-                        @Override
-                        public void onDownloadDone(Context context, Uri uri) {
-                            Intent intent = new Intent(context, FlashActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .setData(uri).putExtra(Const.Key.FLASH_ACTION,
-                                    Const.Value.FLASH_MAGISK);
-                            context.startActivity(intent);
-                        }
-                    };
+                    intent = new Intent(activity, FlashActivity.class)
+                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
+                    activity.startActivity(intent);
                     break;
                 case 3:
-                    receiver = new DownloadReceiver() {
-                        @Override
-                        public void onDownloadDone(Context context, Uri uri) {
-                            Intent intent = new Intent(context, FlashActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    .setData(uri).putExtra(Const.Key.FLASH_ACTION,
-                                    Const.Value.FLASH_INACTIVE_SLOT);
-                            context.startActivity(intent);
-                        }
-                    };
+                    intent = new Intent(activity, FlashActivity.class)
+                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
+                    activity.startActivity(intent);
+                    break;
                 default:
             }
-            Utils.dlAndReceive(activity, receiver, mm.magiskLink, filename);
         });
-    }
-
-    private static class SelectBoot extends DownloadReceiver {
-
-        private Intent data;
-
-        public SelectBoot(Intent data) {
-            this.data = data;
-        }
-
-        @Override
-        public void onDownloadDone(Context context, Uri uri) {
-            Intent intent = new Intent(context, FlashActivity.class);
-            intent.setData(uri)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
-                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
-            context.startActivity(intent);
-        }
     }
 }

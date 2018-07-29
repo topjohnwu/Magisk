@@ -87,15 +87,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         if (activity == null) return null;
         try {
             // Request zip from Internet
-            HttpURLConnection conn;
-            do {
-                conn = WebService.request(mLink, null);
-                total = conn.getContentLength();
-                if (total < 0)
-                    conn.disconnect();
-                else
-                    break;
-            } while (true);
+            HttpURLConnection conn = WebService.mustRequest(mLink, null);
+            total = conn.getContentLength();
 
             // Temp files
             File temp1 = new File(activity.getCacheDir(), "1.zip");
@@ -170,7 +163,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
         private void updateDlProgress(int step) {
             progress += step;
-            progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg, (int) (100 * (double) progress / total + 0.5)));
+            progressDialog.setMessage(getActivity().getString(R.string.zip_download_msg,
+                    (int) (100 * (double) progress / total + 0.5)));
         }
 
         @Override

@@ -69,4 +69,17 @@ public class WebService {
 
         return conn;
     }
+
+    public static HttpURLConnection mustRequest(String address, Map<String, String> header) throws IOException {
+        HttpURLConnection conn;
+        do {
+            conn = WebService.request(address, header);
+            int total = conn.getContentLength();
+            if (total < 0)
+                conn.disconnect();
+            else
+                break;
+        } while (true);
+        return conn;
+    }
 }
