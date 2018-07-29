@@ -21,6 +21,34 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         showNotification = b;
     }
 
+    private int getInt(JSONObject json, String name, int defValue) {
+        if (json == null)
+            return defValue;
+        try {
+            return json.getInt(name);
+        } catch (JSONException e) {
+            return defValue;
+        }
+    }
+
+    private String getString(JSONObject json, String name, String defValue) {
+        if (json == null)
+            return defValue;
+        try {
+            return json.getString(name);
+        } catch (JSONException e) {
+            return defValue;
+        }
+    }
+
+    private JSONObject getJson(JSONObject json, String name) {
+        try {
+            return json.getJSONObject(name);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
     @Override
     protected Void doInBackground(Void... voids) {
         MagiskManager mm = MagiskManager.get();
@@ -36,21 +64,29 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                 jsonStr = WebService.getString(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                 break;
         }
+
+        JSONObject json;
         try {
-            JSONObject json = new JSONObject(jsonStr);
-            JSONObject magisk = json.getJSONObject("magisk");
-            mm.remoteMagiskVersionString = magisk.getString("version");
-            mm.remoteMagiskVersionCode = magisk.getInt("versionCode");
-            mm.magiskLink = magisk.getString("link");
-            mm.magiskNoteLink = magisk.getString("note");
-            JSONObject manager = json.getJSONObject("app");
-            mm.remoteManagerVersionString = manager.getString("version");
-            mm.remoteManagerVersionCode = manager.getInt("versionCode");
-            mm.managerLink = manager.getString("link");
-            mm.managerNoteLink = manager.getString("note");
-            JSONObject uninstaller = json.getJSONObject("uninstaller");
-            mm.uninstallerLink = uninstaller.getString("link");
-        } catch (JSONException ignored) {}
+            json = new JSONObject(jsonStr);
+        } catch (JSONException e) {
+            return null;
+        }
+
+        JSONObject magisk = getJson(json, "magisk");
+        mm.remoteMagiskVersionString = getString(magisk, "version", null);
+        mm.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
+        mm.magiskLink = getString(magisk, "link", null);
+        mm.magiskNoteLink = getString(magisk, "note", null);
+
+        JSONObject manager = getJson(json, "app");
+        mm.remoteManagerVersionString = getString(manager, "version", null);
+        mm.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
+        mm.managerLink = getString(manager, "link", null);
+        mm.managerNoteLink = getString(manager, "note", null);
+
+        JSONObject uninstaller = getJson(json, "uninstaller");
+        mm.uninstallerLink = getString(uninstaller, "link", null);
+
         return null;
     }
 
