@@ -93,7 +93,6 @@
     <string name="download_zip_only">Преузми само Зип</string>
     <string name="patch_boot_file">Закрпи фајл слике покретања</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
-    <string name="install_second_slot">Инсталирај у Други Слот (После ОТА)</string>
     <string name="select_method">Изабери Методу</string>
     <string name="no_boot_file_patch_support">Циљана Магиск верзија не подржава закрпу фајла слике покретања</string>
     <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или img.tar формату</string>

@@ -94,7 +94,6 @@
     <string name="download_zip_only">Doar descărcare fişier Zip</string>
     <string name="patch_boot_file">Modificare fişier imagine Boot</string>
     <string name="direct_install">Instalare directă (Recomandat)</string>
-    <string name="install_second_slot">Instalare în slotul secund (După OTA)</string>
     <string name="select_method">Selectaţi metoda</string>
     <string name="no_boot_file_patch_support">Versiunea Magisk nu acceptă modificarea imaginii de Boot</string>
     <string name="boot_file_patch_msg">Selectaţi formatul .img sau .img.tar pentru imaginea de Boot stoc</string>

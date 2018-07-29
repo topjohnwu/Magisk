@@ -101,7 +101,6 @@
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>
     <string name="direct_install">Otsene install (soovitatud)</string>
-    <string name="install_second_slot">Installi teise lahtrisse (pärast üle õhu uuendust)</string>
     <string name="select_method">Vali meetod</string>
     <string name="no_boot_file_patch_support">Magisk\'i sihtversioon ei toeta käivituspildi faili paikamist</string>
     <string name="boot_file_patch_msg">Vali originaalne käivituspildi väljastus .img või .img.tar vormingus</string>

@@ -99,7 +99,6 @@
     <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>
     <string name="patch_boot_file">Önyükleme İmaj Dosyasını Yamala</string>
     <string name="direct_install">Doğrudan Yükle (Önerilen)</string>
-    <string name="install_second_slot">İkinci Yuvaya Yükle (OTA\'dan sonra)</string>
     <string name="select_method">Yöntem Seçin</string>
     <string name="no_boot_file_patch_support">Hedef Magisk sürümü önyükleme imaj dosyasını yamalamayı desteklemiyor</string>
     <string name="boot_file_patch_msg">.img veya .img.tar formatında stok önyükleme imajını seçin</string>

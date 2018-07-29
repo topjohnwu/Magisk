@@ -100,7 +100,6 @@
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
-    <string name="install_second_slot">Εγκατάσταση σε Second Slot (Μετά από ΟΤΑ)</string>
     <string name="select_method">Επιλογή Μεθόδου</string>
     <string name="no_boot_file_patch_support">Αυτή η Magisk έκδοση δεν υποστηρίζει patch του boot image αρχείου</string>
     <string name="boot_file_patch_msg">Επιλογή stock boot image dump σε μορφή .img ή .img.tar</string>

@@ -155,7 +155,7 @@ public class Const {
         public static final String FLASH_ZIP = "flash";
         public static final String PATCH_BOOT = "patch";
         public static final String FLASH_MAGISK = "magisk";
-        public static final String FLASH_SECOND_SLOT = "slot";
+        public static final String FLASH_INACTIVE_SLOT = "slot";
         public static final String UNINSTALL = "uninstall";
         public static final int[] timeoutList = {0, -1, 10, 20, 30, 60};
         public static final int ORDER_NAME = 0;

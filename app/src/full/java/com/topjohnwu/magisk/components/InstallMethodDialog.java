@@ -70,7 +70,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                             Intent intent = new Intent(context, FlashActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     .setData(uri).putExtra(Const.Key.FLASH_ACTION,
-                                    Const.Value.FLASH_SECOND_SLOT);
+                                    Const.Value.FLASH_INACTIVE_SLOT);
                             context.startActivity(intent);
                         }
                     };
@@ -80,7 +80,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
         });
     }
 
-    private class SelectBoot extends DownloadReceiver {
+    private static class SelectBoot extends DownloadReceiver {
 
         private Intent data;
 

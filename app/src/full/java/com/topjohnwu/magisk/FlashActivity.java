@@ -121,7 +121,7 @@ public class FlashActivity extends Activity {
             case Const.Value.FLASH_MAGISK:
                 new InstallMagisk(this, console, logs, uri, InstallMagisk.DIRECT_MODE).exec();
                 break;
-            case Const.Value.FLASH_SECOND_SLOT:
+            case Const.Value.FLASH_INACTIVE_SLOT:
                 new InstallMagisk(this, console, logs, uri, InstallMagisk.SECOND_SLOT_MODE).exec();
                 break;
             case Const.Value.PATCH_BOOT:

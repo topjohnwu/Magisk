@@ -99,7 +99,6 @@
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>
     <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
-    <string name="install_second_slot">Instaliuoti į antrą vietą (Po OTA)</string>
     <string name="select_method">Pasirinkite metodą</string>
     <string name="no_boot_file_patch_support">Pasirinkta Magisk versija nepalaiko pakeitimų boot faile</string>    
     <string name="boot_file_patch_msg">Pasirinkti boot failą .img ar .img.tar formate</string>

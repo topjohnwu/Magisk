@@ -32,7 +32,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             }
             String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");
             if (!s.isEmpty() && Boolean.parseBoolean(s)) {
-                options.add(mm.getString(R.string.install_second_slot));
+                options.add(mm.getString(R.string.install_inactive_slot));
             }
             new InstallMethodDialog(activity, options, filename).show();
         });

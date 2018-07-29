@@ -180,7 +180,6 @@
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
     <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
-    <string name="install_second_slot">安裝到第二分區 (安裝完OTA後)</string>
     <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
     <string name="proprietary_title">下載非開源程式</string>
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>

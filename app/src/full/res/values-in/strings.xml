@@ -100,7 +100,6 @@
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
-    <string name="install_second_slot">Pasang ke Slot Kedua (Setelah OTA)</string>
     <string name="select_method">Pilih Metode</string>
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>

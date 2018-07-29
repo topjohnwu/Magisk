@@ -99,7 +99,6 @@
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>
     <string name="direct_install">Bezpośrednia instalacja (Zalecane)</string>
-	<string name="install_second_slot">Zainstaluj na Drugim Slocie (Po OTA)</string>
     <string name="select_method">Wybierz Metodę</string>
     <string name="no_boot_file_patch_support">Wersja docelowa programu Magisk nie obsługuje ładowania pliku boot image</string>
     <string name="boot_file_patch_msg">Wybierz stock boot image w formacie .img lub .img.tar</string>
