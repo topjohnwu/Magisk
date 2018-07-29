@@ -82,7 +82,7 @@
 	<string name="settings_reboot_toast">Riavvia per applicare</string>
 	<string name="release_notes">Note di rilascio</string>
 	<string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-    <string name="process_error">Errore di elaborazione</string>
+    	<string name="process_error">Errore di elaborazione</string>
 	<string name="internal_storage">Il file zip si trova in:\n[Memoria Interna]%1$s</string>
 	<string name="zip_download_title">Download in corso</string>
 	<string name="zip_download_msg">Download del file zip (%1$d%%) …</string>
@@ -100,12 +100,13 @@
 	<string name="download_zip_only">Scarica solo il file zip</string>
 	<string name="patch_boot_file">Aggiorna l\'immagine di boot</string>
 	<string name="direct_install">Installazione diretta (raccomandata)</string>
-    <string name="select_method">Seleziona un metodo</string>
+	<string name="install_inactive_slot">Installa nello slot inattivo (Dopo un OTA)</string>
+    	<string name="select_method">Seleziona un metodo</string>
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
-    <string name="restore_img_msg">Ripristino…</string>
+    	<string name="restore_img_msg">Ripristino…</string>
     	<string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
