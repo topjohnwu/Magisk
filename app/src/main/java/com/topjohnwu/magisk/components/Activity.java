@@ -3,26 +3,21 @@ package com.topjohnwu.magisk.components;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Const;
 
 public abstract class Activity extends FlavorActivity {
 
-    protected static Runnable permissionGrantCallback;
+    public static final String INTENT_PERM = "perm_dialog";
 
-    public Activity() {
-        super();
-        Configuration configuration = new Configuration();
-        configuration.setLocale(Application.locale);
-        applyOverrideConfiguration(configuration);
-    }
+    protected static Runnable permissionGrantCallback;
 
     public static void runWithPermission(Context context, String[] permissions, Runnable callback) {
         boolean granted = true;
@@ -39,7 +34,7 @@ public abstract class Activity extends FlavorActivity {
                 // Start activity to show dialog
                 Intent intent = new Intent(context, NoUIActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(Const.Key.INTENT_PERM, permissions);
+                intent.putExtra(INTENT_PERM, permissions);
                 context.startActivity(intent);
             } else {
                 ActivityCompat.requestPermissions((Activity) context, permissions, 0);
@@ -52,8 +47,11 @@ public abstract class Activity extends FlavorActivity {
     }
 
     @Override
-    public Application getApplicationContext() {
-        return (Application) super.getApplicationContext();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        String[] perms = getIntent().getStringArrayExtra(INTENT_PERM);
+        if (perms != null)
+            ActivityCompat.requestPermissions(this, perms, 0);
     }
 
     @Override
@@ -68,7 +66,7 @@ public abstract class Activity extends FlavorActivity {
                 permissionGrantCallback.run();
             }
         } else {
-            Application.toast(R.string.no_rw_storage, Toast.LENGTH_LONG);
+            Toast.makeText(this, R.string.no_rw_storage, Toast.LENGTH_LONG).show();
         }
         permissionGrantCallback = null;
     }

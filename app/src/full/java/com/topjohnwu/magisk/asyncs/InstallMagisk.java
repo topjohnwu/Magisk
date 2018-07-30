@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -132,7 +133,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         HttpURLConnection conn = WebService.mustRequest(mm.magiskLink, null);
         BufferedInputStream buf = new BufferedInputStream(new ProgressStream(conn));
         buf.mark(Integer.MAX_VALUE);
-        try (OutputStream out = new FileOutputStream(new File(Const.EXTERNAL_PATH, filename))) {
+        try (OutputStream out = new FileOutputStream(new File(Download.EXTERNAL_PATH, filename))) {
             ShellUtils.pump(buf, out);
             buf.reset();
         }
@@ -229,7 +230,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private void outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
-                File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + mm.bootFormat);
+                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + mm.bootFormat);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
                 switch (mm.bootFormat) {

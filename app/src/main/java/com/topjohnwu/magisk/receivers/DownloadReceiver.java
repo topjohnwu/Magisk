@@ -8,9 +8,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.magisk.utils.Download;
 
 import java.io.File;
 
@@ -35,14 +34,14 @@ public abstract class DownloadReceiver extends BroadcastReceiver {
                         onDownloadDone(context, uri);
                         break;
                     default:
-                        MagiskManager.toast(R.string.download_file_error, Toast.LENGTH_LONG);
+                        Toast.makeText(context, R.string.download_file_error, Toast.LENGTH_LONG).show();
                         break;
                 }
                 context.unregisterReceiver(this);
             }
             c.close();
         }
-        Utils.isDownloading = false;
+        Download.isDownloading = false;
     }
 
     public DownloadReceiver setDownloadID(long id) {

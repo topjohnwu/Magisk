@@ -30,9 +30,9 @@ import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
@@ -177,7 +177,7 @@ public class MagiskFragment extends Fragment
         shownDialog = false;
 
         // Trigger state check
-        if (Utils.checkNetworkStatus()) {
+        if (Download.checkNetworkStatus(mm)) {
             new CheckUpdates().exec();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
@@ -212,7 +212,7 @@ public class MagiskFragment extends Fragment
     private void updateUI() {
         ((MainActivity) requireActivity()).checkHideSection();
 
-        boolean hasNetwork = Utils.checkNetworkStatus();
+        boolean hasNetwork = Download.checkNetworkStatus(mm);
         boolean hasRoot = Shell.rootAccess();
         boolean isUpToDate = mm.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 

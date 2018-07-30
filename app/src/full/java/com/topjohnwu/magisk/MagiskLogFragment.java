@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -108,7 +109,7 @@ public class MagiskLogFragment extends Fragment {
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File targetFile = new File(Const.EXTERNAL_PATH + "/logs", filename);
+        File targetFile = new File(Download.EXTERNAL_PATH + "/logs", filename);
         targetFile.getParentFile().mkdirs();
         try {
             targetFile.createNewFile();

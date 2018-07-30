@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
-        android:name=".MagiskManager"
         android:allowBackup="false"
         android:directBootAware="true"
         android:icon="@drawable/ic_launcher"

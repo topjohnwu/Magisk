@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
@@ -63,7 +64,7 @@ public class FlashActivity extends Activity {
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File logFile = new File(Const.EXTERNAL_PATH + "/logs", filename);
+        File logFile = new File(Download.EXTERNAL_PATH + "/logs", filename);
         logFile.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(logFile)) {
             for (String s : logs) {

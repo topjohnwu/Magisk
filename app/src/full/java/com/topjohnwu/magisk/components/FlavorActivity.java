@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
@@ -14,6 +15,13 @@ import com.topjohnwu.magisk.utils.Topic;
 public abstract class FlavorActivity extends AppCompatActivity {
 
     private ActivityResultListener activityResultListener;
+
+    public FlavorActivity() {
+        super();
+        Configuration configuration = new Configuration();
+        configuration.setLocale(MagiskManager.locale);
+        applyOverrideConfiguration(configuration);
+    }
 
     @StyleRes
     public int getDarkTheme() {

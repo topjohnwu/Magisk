@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -17,8 +16,8 @@ import android.view.View;
 
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import butterknife.BindView;
@@ -55,11 +54,6 @@ public class MainActivity extends Activity
             }
             startActivity(intent);
             finish();
-        }
-
-        String perm = getIntent().getStringExtra(Const.Key.INTENT_PERM);
-        if (perm != null) {
-            ActivityCompat.requestPermissions(this, new String[] { perm }, 0);
         }
 
         super.onCreate(savedInstanceState);
@@ -136,7 +130,7 @@ public class MainActivity extends Activity
         menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
                 Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)
-                && Utils.checkNetworkStatus() && Shell.rootAccess() && mm.magiskVersionCode >= 0);
+                && Download.checkNetworkStatus(this) && Shell.rootAccess() && mm.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
                 !(Const.USER_ID > 0 && mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));

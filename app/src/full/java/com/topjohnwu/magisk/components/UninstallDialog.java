@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.RestoreImages;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 
 public class UninstallDialog extends CustomAlertDialog {
@@ -25,7 +26,7 @@ public class UninstallDialog extends CustomAlertDialog {
         setNeutralButton(R.string.restore_img, (d, i) -> new RestoreImages(activity).exec());
         if (!TextUtils.isEmpty(mm.uninstallerLink)) {
             setPositiveButton(R.string.complete_uninstall, (d, i) ->
-                    Utils.dlAndReceive(activity, new DownloadReceiver() {
+                    Download.receive(activity, new DownloadReceiver() {
                         @Override
                         public void onDownloadDone(Context context, Uri uri) {
                             Intent intent = new Intent(context, FlashActivity.class)

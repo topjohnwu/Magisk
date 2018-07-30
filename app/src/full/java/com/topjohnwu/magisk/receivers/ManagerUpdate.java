@@ -7,8 +7,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.PatchAPK;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,7 +19,7 @@ public class ManagerUpdate extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Utils.dlAndReceive(
+        Download.receive(
                 context, new PatchedInstall(),
                 intent.getStringExtra(Const.Key.INTENT_SET_LINK),
                 intent.getStringExtra(Const.Key.INTENT_SET_FILENAME)

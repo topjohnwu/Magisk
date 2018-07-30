@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
@@ -45,7 +46,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                             });
                     break;
                 case 0:
-                    Utils.dlAndReceive(activity, new DownloadReceiver() {
+                    Download.receive(activity, new DownloadReceiver() {
                         @Override
                         public void onDownloadDone(Context context, Uri uri) {
                             SnackbarMaker.showUri(activity, uri);

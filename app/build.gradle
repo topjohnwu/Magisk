@@ -61,5 +61,5 @@ dependencies {
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
     fullImplementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    fullAnnotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

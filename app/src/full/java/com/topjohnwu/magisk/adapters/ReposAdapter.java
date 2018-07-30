@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
@@ -16,11 +15,11 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
+import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,12 +106,10 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
                     .setPositiveButton(R.string.install, (d, i) ->
-                        new ProcessRepoZip((Activity) context, repo.getZipUrl(),
-                                Utils.getLegalFilename(filename), true).exec()
+                        new ProcessRepoZip((Activity) context, repo.getZipUrl(), filename, true).exec()
                     )
                     .setNeutralButton(R.string.download, (d, i) ->
-                        new ProcessRepoZip((Activity) context, repo.getZipUrl(),
-                                Utils.getLegalFilename(filename), false).exec())
+                        new ProcessRepoZip((Activity) context, repo.getZipUrl(), filename, false).exec())
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });

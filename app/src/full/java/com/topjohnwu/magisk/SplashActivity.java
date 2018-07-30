@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -45,7 +46,7 @@ public class SplashActivity extends Activity {
 
         LoadModules loadModuleTask = new LoadModules();
 
-        if (Utils.checkNetworkStatus()) {
+        if (Download.checkNetworkStatus(this)) {
             // Fire update check
             new CheckUpdates().exec();
             // Add repo update check
@@ -67,7 +68,7 @@ public class SplashActivity extends Activity {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION));
-        intent.putExtra(Const.Key.INTENT_PERM, getIntent().getStringExtra(Const.Key.INTENT_PERM));
+        intent.putExtra(Activity.INTENT_PERM, getIntent().getStringExtra(Activity.INTENT_PERM));
         startActivity(intent);
         finish();
     }

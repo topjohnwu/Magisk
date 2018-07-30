@@ -7,11 +7,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Xml;
+import android.widget.Toast;
 
-import com.topjohnwu.magisk.components.Application;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
@@ -20,6 +21,7 @@ import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
@@ -35,7 +37,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MagiskManager extends Application {
+public class MagiskManager extends ContainerApp {
+
+    public static WeakReference<MagiskManager> weakSelf;
+    public static Handler mHandler = new Handler();
+    public static Locale locale;
+    public static Locale defaultLocale;
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -87,11 +94,16 @@ public class MagiskManager extends Application {
     public MagiskDatabaseHelper mDB;
     public RepoDatabaseHelper repoDB;
 
-    private Shell.Container container;
-
     public MagiskManager() {
         weakSelf = new WeakReference<>(this);
-        container = Shell.Config.newContainer();
+    }
+
+    public static void toast(CharSequence msg, int duration) {
+        mHandler.post(() -> Toast.makeText(weakSelf.get(), msg, duration).show());
+    }
+
+    public static void toast(int resId, int duration) {
+        mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
     }
 
     @Override
@@ -104,6 +116,7 @@ public class MagiskManager extends Application {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDatabaseHelper.getInstance(this);
+        locale = defaultLocale = Locale.getDefault();
 
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
@@ -123,7 +136,7 @@ public class MagiskManager extends Application {
     }
 
     public static MagiskManager get() {
-        return (MagiskManager) weakSelf.get();
+        return weakSelf.get();
     }
 
     public void setLocale() {
