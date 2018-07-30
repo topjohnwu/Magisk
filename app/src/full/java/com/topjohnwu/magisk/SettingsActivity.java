@@ -108,7 +108,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
                 prefs.edit().remove(Const.Key.ETAG_KEY).apply();
                 mm.repoDB.clearRepo();
-                MagiskManager.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+                Global.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
                 return true;
             });
 
@@ -159,7 +159,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                 fingerprint.setSummary(R.string.disable_fingerprint);
             }
 
-            if (mm.magiskVersionCode >= Const.MAGISK_VER.MANAGER_HIDE) {
+            if (Global.magiskVersionCode >= Const.MAGISK_VER.MANAGER_HIDE) {
                 if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                     hideManager.setOnPreferenceClickListener((pref) -> {
                         new HideManager(getActivity()).exec();
@@ -183,8 +183,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                                         Shell.su("rm -f /data/local/tmp/manager.apk").exec();
                                     }
                                 },
-                                mm.managerLink,
-                                Utils.fmt("MagiskManager-v%s.apk", mm.remoteManagerVersionString)
+                                Global.managerLink,
+                                Utils.fmt("MagiskManager-v%s.apk", Global.remoteManagerVersionString)
                             );
                             return true;
                         });
@@ -206,7 +206,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             if (!Shell.rootAccess()) {
                 prefScreen.removePreference(magiskCategory);
                 generalCatagory.removePreference(hideManager);
-            } else if (mm.magiskVersionCode < Const.MAGISK_VER.UNIFIED) {
+            } else if (Global.magiskVersionCode < Const.MAGISK_VER.UNIFIED) {
                 prefScreen.removePreference(magiskCategory);
             }
         }
@@ -289,7 +289,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     new CheckUpdates().exec();
                     break;
                 case Const.Key.CHECK_UPDATES:
-                    mm.setupUpdateCheck();
+                    Utils.setupUpdateCheck();
                     break;
             }
             mm.loadConfig();

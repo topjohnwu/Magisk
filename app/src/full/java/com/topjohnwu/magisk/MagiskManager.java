@@ -1,8 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -16,14 +13,12 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileInputStream;
 
@@ -39,8 +34,6 @@ import java.util.Map;
 
 public class MagiskManager extends ContainerApp {
 
-    public static WeakReference<MagiskManager> weakSelf;
-    public static Handler mHandler = new Handler();
     public static Locale locale;
     public static Locale defaultLocale;
 
@@ -55,27 +48,11 @@ public class MagiskManager extends ContainerApp {
 
     // Info
     public boolean hasInit = false;
-    public String magiskVersionString;
-    public int magiskVersionCode = -1;
-    public String remoteMagiskVersionString;
-    public int remoteMagiskVersionCode = -1;
-    public String remoteManagerVersionString;
-    public int remoteManagerVersionCode = -1;
-
-    public String magiskLink;
-    public String magiskNoteLink;
-    public String managerLink;
-    public String managerNoteLink;
-    public String uninstallerLink;
-
-    public boolean keepVerity = false;
-    public boolean keepEnc = false;
 
     // Data
     public Map<String, Module> moduleMap;
     public List<Locale> locales;
 
-    public boolean magiskHide;
     public boolean isDarkTheme;
     public int suRequestTimeout;
     public int suLogTimeout = 14;
@@ -95,15 +72,7 @@ public class MagiskManager extends ContainerApp {
     public RepoDatabaseHelper repoDB;
 
     public MagiskManager() {
-        weakSelf = new WeakReference<>(this);
-    }
-
-    public static void toast(CharSequence msg, int duration) {
-        mHandler.post(() -> Toast.makeText(weakSelf.get(), msg, duration).show());
-    }
-
-    public static void toast(int resId, int duration) {
-        mHandler.post(() -> Toast.makeText(weakSelf.get(), resId, duration).show());
+        Global.weakApp = new WeakReference<>(this);
     }
 
     @Override
@@ -133,10 +102,6 @@ public class MagiskManager extends ContainerApp {
 
         setLocale();
         loadConfig();
-    }
-
-    public static MagiskManager get() {
-        return weakSelf.get();
     }
 
     public void setLocale() {
@@ -171,7 +136,7 @@ public class MagiskManager extends ContainerApp {
     public void writeConfig() {
         prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
-                .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
+                .putBoolean(Const.Key.MAGISKHIDE, Global.magiskHide)
                 .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
@@ -186,40 +151,6 @@ public class MagiskManager extends ContainerApp {
                 .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
                 .putInt(Const.Key.REPO_ORDER, repoOrder)
                 .apply();
-    }
-
-    public void loadMagiskInfo() {
-        try {
-            magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
-            magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
-            String s = ShellUtils.fastCmd((magiskVersionCode >= Const.MAGISK_VER.RESETPROP_PERSIST ?
-                    "resetprop -p " : "getprop ") + Const.MAGISKHIDE_PROP);
-            magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
-        } catch (Exception ignored) {}
-    }
-
-    public void getDefaultInstallFlags() {
-        keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
-        keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
-    }
-
-    public void setupUpdateCheck() {
-        JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-
-        if (prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
-            if (scheduler.getAllPendingJobs().isEmpty() ||
-                    Const.UPDATE_SERVICE_VER > prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
-                ComponentName service = new ComponentName(this, UpdateCheckService.class);
-                JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
-                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                        .setPersisted(true)
-                        .setPeriodic(8 * 60 * 60 * 1000)
-                        .build();
-                scheduler.schedule(info);
-            }
-        } else {
-            scheduler.cancel(Const.UPDATE_SERVICE_VER);
-        }
     }
 
     public void dumpPrefs() {

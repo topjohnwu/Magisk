@@ -75,7 +75,7 @@ public class FlashActivity extends Activity {
             e.printStackTrace();
             return;
         }
-        MagiskManager.toast(logFile.getPath(), Toast.LENGTH_LONG);
+        Global.toast(logFile.getPath(), Toast.LENGTH_LONG);
     }
 
     @Override

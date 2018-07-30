@@ -3,9 +3,11 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
+import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
@@ -18,24 +20,8 @@ public class RootUtils extends Shell.Initializer {
         BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
     }
 
-    private static boolean fileInit = false;
-
     public static void uninstallPkg(String pkg) {
         Shell.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg).exec();
-    }
-
-    private void initConsts() {
-        Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
-        SuFile file = new SuFile("/sbin/.core/img");
-        if (file.exists()) {
-            Const.MAGISK_PATH = file;
-        } else if ((file = new SuFile("/dev/magisk/img")).exists()) {
-            Const.MAGISK_PATH = file;
-        } else {
-            Const.MAGISK_PATH = new SuFile("/magisk");
-        }
-        Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
-        fileInit = true;
     }
 
     @Override
@@ -51,8 +37,22 @@ public class RootUtils extends Shell.Initializer {
             } catch (IOException e) {
                 return false;
             }
-            if (!fileInit)
-                initConsts();
+
+            Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
+            SuFile file = new SuFile("/sbin/.core/img");
+            if (file.exists()) {
+                Const.MAGISK_PATH = file;
+            } else if ((file = new SuFile("/dev/magisk/img")).exists()) {
+                Const.MAGISK_PATH = file;
+            } else {
+                Const.MAGISK_PATH = new SuFile("/magisk");
+            }
+            Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
+
+            Global.loadMagiskInfo();
+
+            Global.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
+            Global.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
         }
         return true;
     }

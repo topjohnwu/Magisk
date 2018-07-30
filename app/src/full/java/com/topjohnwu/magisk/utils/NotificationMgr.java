@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -16,7 +17,7 @@ import com.topjohnwu.magisk.receivers.RebootReceiver;
 public class NotificationMgr {
 
     public static void magiskUpdate() {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
 
         Intent intent = new Intent(mm, SplashActivity.class);
         intent.putExtra(Const.Key.OPEN_SECTION, "magisk");
@@ -29,7 +30,7 @@ public class NotificationMgr {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mm, Const.ID.NOTIFICATION_CHANNEL);
         builder.setSmallIcon(R.drawable.ic_magisk_outline)
                 .setContentTitle(mm.getString(R.string.magisk_update_title))
-                .setContentText(mm.getString(R.string.magisk_update_available, mm.remoteMagiskVersionString))
+                .setContentText(mm.getString(R.string.magisk_update_available, Global.remoteMagiskVersionString))
                 .setVibrate(new long[]{0, 100, 100, 100})
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
@@ -40,12 +41,12 @@ public class NotificationMgr {
     }
 
     public static void managerUpdate() {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
-                mm.remoteManagerVersionString, mm.remoteManagerVersionCode);
+                Global.remoteManagerVersionString, Global.remoteManagerVersionCode);
 
         Intent intent = new Intent(mm, ManagerUpdate.class);
-        intent.putExtra(Const.Key.INTENT_SET_LINK, mm.managerLink);
+        intent.putExtra(Const.Key.INTENT_SET_LINK, Global.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 Const.ID.APK_UPDATE_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -64,7 +65,7 @@ public class NotificationMgr {
     }
 
     public static void dtboPatched() {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
 
         Intent intent = new Intent(mm, RebootReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,

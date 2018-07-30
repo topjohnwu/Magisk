@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.asyncs;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
@@ -48,7 +49,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private ExecutorService threadPool;
 
     public UpdateRepos(boolean force) {
-        mm = MagiskManager.get();
+        mm = Global.MM();
         mm.repoLoadDone.reset();
         forceUpdate = force;
         threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);

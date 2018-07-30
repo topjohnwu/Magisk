@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v7.app.AlertDialog;
 import android.webkit.WebView;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.WebService;
@@ -38,7 +39,7 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... voids) {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         String md;
         if (mUrl != null) {
             md = WebService.getString(mUrl);

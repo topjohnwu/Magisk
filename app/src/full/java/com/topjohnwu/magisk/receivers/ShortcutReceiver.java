@@ -8,8 +8,8 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
@@ -25,10 +25,6 @@ public class ShortcutReceiver extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             MagiskManager mm = Utils.getMagiskManager(context);
             ShortcutManager manager = context.getSystemService(ShortcutManager.class);
-            if (TextUtils.equals(intent.getAction(), Intent.ACTION_LOCALE_CHANGED)) {
-                // It is triggered with locale change, manual load Magisk info
-                mm.loadMagiskInfo();
-            }
             manager.setDynamicShortcuts(getShortCuts(mm));
         }
     }
@@ -36,8 +32,8 @@ public class ShortcutReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
     private ArrayList<ShortcutInfo> getShortCuts(MagiskManager mm) {
         ArrayList<ShortcutInfo> shortCuts = new ArrayList<>();
-        if (Shell.rootAccess() &&
-                !(Const.USER_ID > 0 &&
+        boolean root = Shell.rootAccess();
+        if (root && !(Const.USER_ID > 0 &&
                         mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "superuser")
                     .setShortLabel(mm.getString(R.string.superuser))
@@ -49,7 +45,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(0)
                     .build());
         }
-        if (Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
+        if (root && Global.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
                 && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "magiskhide")
                     .setShortLabel(mm.getString(R.string.magiskhide))
@@ -61,8 +57,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(1)
                     .build());
         }
-        if (!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
-                Shell.rootAccess() && mm.magiskVersionCode >= 0) {
+        if (!mm.prefs.getBoolean(Const.Key.COREONLY, false) && root && Global.magiskVersionCode >= 0) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "modules")
                     .setShortLabel(mm.getString(R.string.modules))
                     .setIntent(new Intent(mm, SplashActivity.class)

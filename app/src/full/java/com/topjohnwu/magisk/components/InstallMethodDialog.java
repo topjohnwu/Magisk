@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
@@ -27,12 +28,12 @@ class InstallMethodDialog extends AlertDialog.Builder {
             Intent intent;
             switch (idx) {
                 case 1:
-                    if (mm.remoteMagiskVersionCode < 1400) {
+                    if (Global.remoteMagiskVersionCode < 1400) {
                         SnackbarMaker.make(activity, R.string.no_boot_file_patch_support,
                                 Snackbar.LENGTH_LONG).show();
                         return;
                     }
-                    MagiskManager.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
+                    Global.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                     intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
                     activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                             (requestCode, resultCode, data) -> {
@@ -51,7 +52,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                         public void onDownloadDone(Context context, Uri uri) {
                             SnackbarMaker.showUri(activity, uri);
                         }
-                    }, mm.magiskLink, filename);
+                    }, Global.magiskLink, filename);
                     break;
                 case 2:
                     intent = new Intent(activity, FlashActivity.class)

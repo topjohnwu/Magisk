@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
@@ -19,7 +20,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
         super(activity);
         MagiskManager mm = Utils.getMagiskManager(activity);
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                mm.remoteMagiskVersionString, mm.remoteMagiskVersionCode);
+                Global.remoteMagiskVersionString, Global.remoteMagiskVersionCode);
         setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)));
         setMessage(mm.getString(R.string.repo_install_msg, filename));
         setCancelable(true);
@@ -37,15 +38,15 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             new InstallMethodDialog(activity, options, filename).show();
         });
         setNegativeButton(R.string.no_thanks, null);
-        if (!TextUtils.isEmpty(mm.magiskNoteLink)) {
+        if (!TextUtils.isEmpty(Global.magiskNoteLink)) {
             setNeutralButton(R.string.release_notes, (d, i) -> {
-                if (mm.magiskNoteLink.contains("forum.xda-developers")) {
+                if (Global.magiskNoteLink.contains("forum.xda-developers")) {
                     // Open forum links in browser
-                    Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(mm.magiskNoteLink));
+                    Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(Global.magiskNoteLink));
                     openLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mm.startActivity(openLink);
                 } else {
-                    new MarkDownWindow(activity, null, mm.magiskNoteLink).exec();
+                    new MarkDownWindow(activity, null, Global.magiskNoteLink).exec();
                 }
             });
         }

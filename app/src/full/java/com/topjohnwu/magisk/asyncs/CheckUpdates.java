@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.asyncs;
 
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.NotificationMgr;
@@ -51,7 +52,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         String jsonStr = "";
         switch (mm.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
@@ -73,30 +74,30 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         }
 
         JSONObject magisk = getJson(json, "magisk");
-        mm.remoteMagiskVersionString = getString(magisk, "version", null);
-        mm.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
-        mm.magiskLink = getString(magisk, "link", null);
-        mm.magiskNoteLink = getString(magisk, "note", null);
+        Global.remoteMagiskVersionString = getString(magisk, "version", null);
+        Global.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
+        Global.magiskLink = getString(magisk, "link", null);
+        Global.magiskNoteLink = getString(magisk, "note", null);
 
         JSONObject manager = getJson(json, "app");
-        mm.remoteManagerVersionString = getString(manager, "version", null);
-        mm.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
-        mm.managerLink = getString(manager, "link", null);
-        mm.managerNoteLink = getString(manager, "note", null);
+        Global.remoteManagerVersionString = getString(manager, "version", null);
+        Global.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
+        Global.managerLink = getString(manager, "link", null);
+        Global.managerNoteLink = getString(manager, "note", null);
 
         JSONObject uninstaller = getJson(json, "uninstaller");
-        mm.uninstallerLink = getString(uninstaller, "link", null);
+        Global.uninstallerLink = getString(uninstaller, "link", null);
 
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         if (showNotification) {
-            if (BuildConfig.VERSION_CODE < mm.remoteManagerVersionCode) {
+            if (BuildConfig.VERSION_CODE < Global.remoteManagerVersionCode) {
                 NotificationMgr.managerUpdate();
-            } else if (mm.magiskVersionCode < mm.remoteMagiskVersionCode) {
+            } else if (Global.magiskVersionCode < Global.remoteMagiskVersionCode) {
                 NotificationMgr.magiskUpdate();
             }
         }

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
@@ -15,7 +16,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         mm.moduleMap = new ValueSortedMap<>();
 
         for (String name : getModList()) {
@@ -28,7 +29,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager.get().moduleLoadDone.publish();
+        Global.MM().moduleLoadDone.publish();
         super.onPostExecute(v);
     }
 }

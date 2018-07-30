@@ -9,6 +9,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 
 import java.security.KeyStore;
@@ -27,14 +28,14 @@ public abstract class FingerprintHelper {
     public static boolean canUseFingerprint() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         KeyguardManager km = mm.getSystemService(KeyguardManager.class);
         FingerprintManager fm = mm.getSystemService(FingerprintManager.class);
         return km.isKeyguardSecure() && fm != null && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
     }
 
     protected FingerprintHelper() throws Exception {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
         manager = mm.getSystemService(FingerprintManager.class);
         cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"

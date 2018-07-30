@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Const;
@@ -55,7 +56,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        MagiskManager mm = MagiskManager.get();
+        MagiskManager mm = Global.MM();
 
         // Generate a new app with random package name
         SuFile repack = new SuFile("/data/local/tmp/repack.apk");
@@ -88,7 +89,7 @@ public class HideManager extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean b) {
         dialog.dismiss();
         if (!b) {
-            MagiskManager.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
+            Global.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         }
         super.onPostExecute(b);
     }

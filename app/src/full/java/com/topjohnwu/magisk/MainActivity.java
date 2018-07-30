@@ -125,12 +125,12 @@ public class MainActivity extends Activity
         MagiskManager mm = getMagiskManager();
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
+                Shell.rootAccess() && Global.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
                         && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
-                Shell.rootAccess() && mm.magiskVersionCode >= 0);
+                Shell.rootAccess() && Global.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)
-                && Download.checkNetworkStatus(this) && Shell.rootAccess() && mm.magiskVersionCode >= 0);
+                && Download.checkNetworkStatus(this) && Shell.rootAccess() && Global.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
                 !(Const.USER_ID > 0 && mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));

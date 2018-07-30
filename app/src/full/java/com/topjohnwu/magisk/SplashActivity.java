@@ -25,10 +25,10 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         MagiskManager mm = getMagiskManager();
+        // Force create a shell if not created yet
+        boolean root = Shell.rootAccess();
 
         mm.repoDB = new RepoDatabaseHelper(this);
-        mm.loadMagiskInfo();
-        mm.getDefaultInstallFlags();
         mm.loadPrefs();
 
         // Dynamic detect all locales
@@ -54,9 +54,9 @@ public class SplashActivity extends Activity {
         }
 
         // Magisk working as expected
-        if (Shell.rootAccess() && mm.magiskVersionCode > 0) {
+        if (root && Global.magiskVersionCode > 0) {
             // Update check service
-            mm.setupUpdateCheck();
+            Utils.setupUpdateCheck();
             // Fire asynctasks
             loadModuleTask.exec();
         }
@@ -76,12 +76,12 @@ public class SplashActivity extends Activity {
     static class LoadLocale extends ParallelTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            MagiskManager.get().locales = Utils.getAvailableLocale();
+            Global.MM().locales = Utils.getAvailableLocale();
             return null;
         }
         @Override
         protected void onPostExecute(Void aVoid) {
-            MagiskManager.get().localeDone.publish();
+            Global.MM().localeDone.publish();
         }
     }
 }
