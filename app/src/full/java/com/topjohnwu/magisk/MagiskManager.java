@@ -121,7 +121,7 @@ public class MagiskManager extends ContainerApp {
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
             mDB.setStrings(Const.Key.SU_MANAGER, null);
-            RootUtils.uninstallPkg(pkg);
+            Shell.su("pm uninstall " + pkg).exec();
         }
         if (TextUtils.equals(pkg, getPackageName())) {
             try {
