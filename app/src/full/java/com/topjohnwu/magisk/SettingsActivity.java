@@ -174,8 +174,13 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                                     @Override
                                     public void onDownloadDone(Context context, Uri uri) {
                                         mm.dumpPrefs();
-                                        if (ShellUtils.fastCmdResult("pm install " + uri.getPath()))
+                                        Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
+                                        if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
+                                            Shell.su("rm -f /data/local/tmp/manager.apk").exec();
                                             RootUtils.uninstallPkg(context.getPackageName());
+                                            return;
+                                        }
+                                        Shell.su("rm -f /data/local/tmp/manager.apk").exec();
                                     }
                                 },
                                 mm.managerLink,
