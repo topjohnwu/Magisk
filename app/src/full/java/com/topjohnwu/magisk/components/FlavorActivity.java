@@ -8,7 +8,7 @@ import android.support.annotation.StyleRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.LocaleManager;
@@ -40,7 +40,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
         if (this instanceof Topic.Subscriber) {
             ((Topic.Subscriber) this).subscribeTopics();
         }
-        if (Global.isDarkTheme && getDarkTheme() != -1) {
+        if (Data.isDarkTheme && getDarkTheme() != -1) {
             setTheme(getDarkTheme());
         }
     }

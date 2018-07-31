@@ -29,7 +29,7 @@ public class SplashActivity extends Activity {
         boolean root = Shell.rootAccess();
 
         mm.repoDB = new RepoDatabaseHelper(this);
-        Global.importPrefs();
+        Data.importPrefs();
 
         // Dynamic detect all locales
         new LocaleManager.LoadLocale().exec();
@@ -54,7 +54,7 @@ public class SplashActivity extends Activity {
         }
 
         // Magisk working as expected
-        if (root && Global.magiskVersionCode > 0) {
+        if (root && Data.magiskVersionCode > 0) {
             // Update check service
             Utils.setupUpdateCheck();
             // Fire asynctasks
@@ -62,7 +62,7 @@ public class SplashActivity extends Activity {
         }
 
         // Write back default values
-        Global.writeConfig();
+        Data.writeConfig();
 
         mm.hasInit = true;
 

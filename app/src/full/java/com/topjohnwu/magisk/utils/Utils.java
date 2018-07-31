@@ -8,8 +8,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.services.UpdateCheckService;
 
@@ -48,7 +49,7 @@ public class Utils {
     }
 
     public static int dpInPx(int dp) {
-        Context context = Global.MM();
+        Context context = Data.MM();
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5);
     }
@@ -67,7 +68,7 @@ public class Utils {
     }
 
     public static void setupUpdateCheck() {
-        MagiskManager mm = Global.MM();
+        MagiskManager mm = Data.MM();
         JobScheduler scheduler = (JobScheduler) mm.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         if (mm.prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
@@ -84,5 +85,13 @@ public class Utils {
         } else {
             scheduler.cancel(Const.UPDATE_SERVICE_VER);
         }
+    }
+
+    public static void toast(CharSequence msg, int duration) {
+        Data.mainHandler.post(() -> Toast.makeText(Data.MM(), msg, duration).show());
+    }
+
+    public static void toast(int resId, int duration) {
+        Data.mainHandler.post(() -> Toast.makeText(Data.MM(), resId, duration).show());
     }
 }

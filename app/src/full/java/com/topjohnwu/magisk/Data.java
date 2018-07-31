@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Xml;
-import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
@@ -20,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-public class Global {
+public class Data {
     // Global app instance
     public static WeakReference<MagiskManager> weakApp;
     public static Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -71,14 +70,6 @@ public class Global {
 
     public static MagiskManager MM() {
         return weakApp.get();
-    }
-
-    public static void toast(CharSequence msg, int duration) {
-        mainHandler.post(() -> Toast.makeText(MM(), msg, duration).show());
-    }
-
-    public static void toast(int resId, int duration) {
-        mainHandler.post(() -> Toast.makeText(MM(), resId, duration).show());
     }
 
     public static void exportPrefs() {

@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
@@ -49,10 +49,10 @@ public class RootUtils extends Shell.Initializer {
             }
             Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
 
-            Global.loadMagiskInfo();
+            Data.loadMagiskInfo();
 
-            Global.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
-            Global.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
+            Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
+            Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
         }
         return true;
     }

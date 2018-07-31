@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 
@@ -75,7 +76,7 @@ public class FlashActivity extends Activity {
             e.printStackTrace();
             return;
         }
-        Global.toast(logFile.getPath(), Toast.LENGTH_LONG);
+        Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
     }
 
     @Override

@@ -4,7 +4,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.support.annotation.StringRes;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
@@ -21,12 +21,12 @@ public class LocaleManager {
     public static List<Locale> locales;
 
     public static void setLocale() {
-        MagiskManager mm = Global.MM();
-        Global.localeConfig = mm.prefs.getString(Const.Key.LOCALE, "");
-        if (Global.localeConfig.isEmpty()) {
+        MagiskManager mm = Data.MM();
+        Data.localeConfig = mm.prefs.getString(Const.Key.LOCALE, "");
+        if (Data.localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {
-            locale = Locale.forLanguageTag(Global.localeConfig);
+            locale = Locale.forLanguageTag(Data.localeConfig);
         }
         Resources res = mm.getResources();
         Configuration config = new Configuration(res.getConfiguration());
@@ -35,19 +35,19 @@ public class LocaleManager {
     }
 
     public static String getString(Locale locale, @StringRes int id) {
-        Configuration config = Global.MM().getResources().getConfiguration();
+        Configuration config = Data.MM().getResources().getConfiguration();
         config.setLocale(locale);
         return getString(config, id);
     }
 
     private static String getString(Configuration config, @StringRes int id) {
-        return Global.MM().createConfigurationContext(config).getString(id);
+        return Data.MM().createConfigurationContext(config).getString(id);
     }
 
     private static List<Locale> getAvailableLocale() {
         List<Locale> locales = new ArrayList<>();
         HashSet<String> set = new HashSet<>();
-        MagiskManager mm = Global.MM();
+        MagiskManager mm = Data.MM();
         Locale locale;
 
         @StringRes int compareId = R.string.download_file_error;
@@ -86,7 +86,7 @@ public class LocaleManager {
         }
         @Override
         protected void onPostExecute(Void aVoid) {
-            Global.MM().localeDone.publish();
+            Data.MM().localeDone.publish();
         }
     }
 }

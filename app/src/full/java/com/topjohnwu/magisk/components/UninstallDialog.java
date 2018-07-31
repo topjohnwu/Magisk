@@ -7,8 +7,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.RestoreImages;
@@ -25,7 +25,7 @@ public class UninstallDialog extends CustomAlertDialog {
         setTitle(R.string.uninstall_magisk_title);
         setMessage(R.string.uninstall_magisk_msg);
         setNeutralButton(R.string.restore_img, (d, i) -> new RestoreImages(activity).exec());
-        if (!TextUtils.isEmpty(Global.uninstallerLink)) {
+        if (!TextUtils.isEmpty(Data.uninstallerLink)) {
             setPositiveButton(R.string.complete_uninstall, (d, i) ->
                     Download.receive(activity, new DownloadReceiver() {
                         @Override
@@ -36,7 +36,7 @@ public class UninstallDialog extends CustomAlertDialog {
                                     .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);
                             context.startActivity(intent);
                         }
-                    }, Global.uninstallerLink, "magisk-uninstaller.zip"));
+                    }, Data.uninstallerLink, "magisk-uninstaller.zip"));
         }
     }
 }

@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Process;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
@@ -33,7 +33,7 @@ public class SuReceiver extends BroadcastReceiver {
         if (mode < 0) return;
 
         if (mode == Const.Value.NOTIFY_USER_TO_OWNER) {
-            Global.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
+            Utils.toast(R.string.multiuser_hint_owner_request, Toast.LENGTH_LONG);
             return;
         }
 
@@ -70,8 +70,8 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
         }
 
-        if (policy.notification && Global.suNotificationType == Const.Value.NOTIFICATION_TOAST) {
-            Global.toast(message, Toast.LENGTH_SHORT);
+        if (policy.notification && Data.suNotificationType == Const.Value.NOTIFICATION_TOAST) {
+            Utils.toast(message, Toast.LENGTH_SHORT);
         }
 
         if (mode == Const.Value.NOTIFY_NORMAL_LOG && policy.logging) {

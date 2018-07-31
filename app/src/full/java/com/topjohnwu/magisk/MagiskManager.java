@@ -42,7 +42,7 @@ public class MagiskManager extends ContainerApp {
     public RepoDatabaseHelper repoDB;
 
     public MagiskManager() {
-        Global.weakApp = new WeakReference<>(this);
+        Data.weakApp = new WeakReference<>(this);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class MagiskManager extends ContainerApp {
         }
 
         LocaleManager.setLocale();
-        Global.loadConfig();
+        Data.loadConfig();
     }
 
 }

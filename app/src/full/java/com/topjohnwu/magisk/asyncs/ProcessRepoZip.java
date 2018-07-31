@@ -9,12 +9,12 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.Shell;
@@ -148,7 +148,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
                 SnackbarMaker.showUri(activity, uri);
             }
         } else {
-            Global.toast(R.string.process_error, Toast.LENGTH_LONG);
+            Utils.toast(R.string.process_error, Toast.LENGTH_LONG);
         }
         super.onPostExecute(result);
     }

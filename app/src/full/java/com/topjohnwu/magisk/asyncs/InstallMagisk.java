@@ -9,8 +9,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
@@ -60,7 +60,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
     public InstallMagisk(Activity context) {
         super(context);
-        mm = Global.MM();
+        mm = Data.MM();
         mode = FIX_ENV_MODE;
     }
 
@@ -130,8 +130,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private void extractFiles(String arch) throws IOException {
         console.add("- Downloading zip");
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                Global.remoteMagiskVersionString, Global.remoteMagiskVersionCode);
-        HttpURLConnection conn = WebService.mustRequest(Global.magiskLink, null);
+                Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
+        HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
         BufferedInputStream buf = new BufferedInputStream(new ProgressStream(conn));
         buf.mark(Integer.MAX_VALUE);
         try (OutputStream out = new FileOutputStream(new File(Download.EXTERNAL_PATH, filename))) {
@@ -205,7 +205,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         // Patch boot image
         if (!Shell.sh("cd " + installDir, Utils.fmt(
                 "KEEPFORCEENCRYPT=%b KEEPVERITY=%b sh update-binary indep boot_patch.sh %s",
-                Global.keepEnc, Global.keepVerity, mBoot))
+                Data.keepEnc, Data.keepVerity, mBoot))
                 .to(console, logs).exec().isSuccess())
             return null;
 
@@ -231,10 +231,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private void outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
-                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + Global.bootFormat);
+                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + Data.bootFormat);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
-                switch (Global.bootFormat) {
+                switch (Data.bootFormat) {
                     case ".img.tar":
                         out = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
                         ((TarOutputStream) out).putNextEntry(new TarEntry(patched, "boot.img"));
@@ -259,7 +259,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             case DIRECT_MODE:
                 Shell.Job job = Shell.su(Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir))
                         .to(console, logs);
-                if (!Global.keepVerity)
+                if (!Data.keepVerity)
                     job.add("find_dtbo_image", "patch_dtbo_image");
                 job.exec();
                 break;
@@ -332,7 +332,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         List<String> abis = Arrays.asList(Build.SUPPORTED_ABIS);
         String arch;
 
-        if (Global.remoteMagiskVersionCode >= Const.MAGISK_VER.SEPOL_REFACTOR) {
+        if (Data.remoteMagiskVersionCode >= Const.MAGISK_VER.SEPOL_REFACTOR) {
             // 32-bit only
             if (abis.contains("x86")) arch = "x86";
             else arch = "arm";
@@ -369,7 +369,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         if (mode == FIX_ENV_MODE) {
             dialog.dismiss();
-            Global.toast(result ? R.string.setup_done : R.string.setup_fail, Toast.LENGTH_LONG);
+            Utils.toast(result ? R.string.setup_done : R.string.setup_fail, Toast.LENGTH_LONG);
         } else {
             // Running in FlashActivity
             FlashActivity activity = (FlashActivity) getActivity();

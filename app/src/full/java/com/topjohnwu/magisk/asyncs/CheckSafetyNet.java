@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.WebService;
@@ -22,7 +22,7 @@ import dalvik.system.DexClassLoader;
 public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
 
     public static final File dexPath =
-            new File(Global.MM().getFilesDir().getParent() + "/snet", "snet.apk");
+            new File(Data.MM().getFilesDir().getParent() + "/snet", "snet.apk");
     private ISafetyNetHelper helper;
 
     public CheckSafetyNet(Activity activity) {
@@ -50,7 +50,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 Class.class, String.class, Activity.class, Object.class)
                 .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
                         (ISafetyNetHelper.Callback) code ->
-                                Global.MM().safetyNetDone.publish(false, code));
+                                Data.MM().safetyNetDone.publish(false, code));
         if (helper.getVersion() != Const.SNET_VER) {
             throw new Exception();
         }
@@ -79,7 +79,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
             helper.attest();
         } else {
             e.printStackTrace();
-            Global.MM().safetyNetDone.publish(false, -1);
+            Data.MM().safetyNetDone.publish(false, -1);
         }
         super.onPostExecute(e);
     }

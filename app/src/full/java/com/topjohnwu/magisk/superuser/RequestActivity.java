@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
@@ -103,7 +103,7 @@ public class RequestActivity extends Activity {
     }
 
     private void showRequest() {
-        switch (Global.suResponseType) {
+        switch (Data.suResponseType) {
             case Const.Value.SU_AUTO_DENY:
                 handleAction(Policy.DENY, 0);
                 return;
@@ -132,7 +132,7 @@ public class RequestActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeout.setAdapter(adapter);
 
-        timer = new CountDownTimer(Global.suRequestTimeout * 1000, 1000) {
+        timer = new CountDownTimer(Data.suRequestTimeout * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));

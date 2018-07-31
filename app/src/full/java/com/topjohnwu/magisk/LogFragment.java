@@ -34,7 +34,7 @@ public class LogFragment extends Fragment {
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 
-        if (!(Const.USER_ID > 0 && Global.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+        if (!(Const.USER_ID > 0 && Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
             adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
         }
         adapter.addTab(new MagiskLogFragment(), getString(R.string.magisk));

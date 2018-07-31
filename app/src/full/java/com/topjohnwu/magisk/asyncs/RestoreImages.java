@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
 
 public class RestoreImages extends ParallelTask<Void, Void, Boolean> {
@@ -31,9 +31,9 @@ public class RestoreImages extends ParallelTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean result) {
         dialog.cancel();
         if (result) {
-            Global.toast(R.string.restore_done, Toast.LENGTH_SHORT);
+            Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT);
         } else {
-            Global.toast(R.string.restore_fail, Toast.LENGTH_LONG);
+            Utils.toast(R.string.restore_fail, Toast.LENGTH_LONG);
         }
     }
 }

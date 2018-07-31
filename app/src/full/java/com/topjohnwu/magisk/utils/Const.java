@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.os.Process;
 
 import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 
 import java.io.File;
 import java.util.Arrays;
@@ -40,13 +40,13 @@ public class Const {
     public static final int SNET_VER = 10;
 
     public static int MIN_MODULE_VER() {
-        return Global.magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
+        return Data.magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
     }
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
             "android",
-            Global.MM().getPackageName(),
+            Data.MM().getPackageName(),
             "com.google.android.gms"
     );
 

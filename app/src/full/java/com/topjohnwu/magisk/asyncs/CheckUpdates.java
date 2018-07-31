@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.asyncs;
 
 import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.NotificationMgr;
@@ -52,9 +52,9 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        MagiskManager mm = Global.MM();
+        MagiskManager mm = Data.MM();
         String jsonStr = "";
-        switch (Global.updateChannel) {
+        switch (Data.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
                 jsonStr = WebService.getString(Const.Url.STABLE_URL);
                 break;
@@ -74,30 +74,30 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         }
 
         JSONObject magisk = getJson(json, "magisk");
-        Global.remoteMagiskVersionString = getString(magisk, "version", null);
-        Global.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
-        Global.magiskLink = getString(magisk, "link", null);
-        Global.magiskNoteLink = getString(magisk, "note", null);
+        Data.remoteMagiskVersionString = getString(magisk, "version", null);
+        Data.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
+        Data.magiskLink = getString(magisk, "link", null);
+        Data.magiskNoteLink = getString(magisk, "note", null);
 
         JSONObject manager = getJson(json, "app");
-        Global.remoteManagerVersionString = getString(manager, "version", null);
-        Global.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
-        Global.managerLink = getString(manager, "link", null);
-        Global.managerNoteLink = getString(manager, "note", null);
+        Data.remoteManagerVersionString = getString(manager, "version", null);
+        Data.remoteManagerVersionCode = getInt(manager, "versionCode", -1);
+        Data.managerLink = getString(manager, "link", null);
+        Data.managerNoteLink = getString(manager, "note", null);
 
         JSONObject uninstaller = getJson(json, "uninstaller");
-        Global.uninstallerLink = getString(uninstaller, "link", null);
+        Data.uninstallerLink = getString(uninstaller, "link", null);
 
         return null;
     }
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = Global.MM();
+        MagiskManager mm = Data.MM();
         if (showNotification) {
-            if (BuildConfig.VERSION_CODE < Global.remoteManagerVersionCode) {
+            if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
                 NotificationMgr.managerUpdate();
-            } else if (Global.magiskVersionCode < Global.remoteMagiskVersionCode) {
+            } else if (Data.magiskVersionCode < Data.remoteMagiskVersionCode) {
                 NotificationMgr.magiskUpdate();
             }
         }

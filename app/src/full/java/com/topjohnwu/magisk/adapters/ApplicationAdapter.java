@@ -12,7 +12,7 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.Global;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.utils.Const;
@@ -37,7 +37,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         fullList = showList = Collections.emptyList();
         hideList = Collections.emptyList();
         filter = new ApplicationFilter();
-        pm = Global.MM().getPackageManager();
+        pm = Data.MM().getPackageManager();
         new LoadApps().exec();
     }
 
@@ -152,7 +152,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected void onPostExecute(Void v) {
-            Global.MM().magiskHideDone.publish(false);
+            Data.MM().magiskHideDone.publish(false);
         }
     }
 }
