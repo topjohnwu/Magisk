@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
@@ -236,7 +237,7 @@ public class MagiskDatabaseHelper {
             String dateString = null, newString;
             while (c.moveToNext()) {
                 Date date = new Date(c.getLong(c.getColumnIndex("time")));
-                newString = DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
+                newString = DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
                 if (!TextUtils.equals(dateString, newString)) {
                     dateString = newString;
                     list = new ArrayList<>();

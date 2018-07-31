@@ -2,8 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
@@ -11,20 +9,17 @@ import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class MagiskManager extends ContainerApp {
-
-    public static Locale locale;
-    public static Locale defaultLocale;
 
     // Topics
     public final Topic magiskHideDone = new Topic();
@@ -40,7 +35,6 @@ public class MagiskManager extends ContainerApp {
 
     // Data
     public Map<String, Module> moduleMap;
-    public List<Locale> locales;
 
     // Global resources
     public SharedPreferences prefs;
@@ -61,7 +55,7 @@ public class MagiskManager extends ContainerApp {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDatabaseHelper.getInstance(this);
-        locale = defaultLocale = Locale.getDefault();
+        LocaleManager.locale = LocaleManager.defaultLocale = Locale.getDefault();
 
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
@@ -76,21 +70,8 @@ public class MagiskManager extends ContainerApp {
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        setLocale();
+        LocaleManager.setLocale();
         Global.loadConfig();
-    }
-
-    public void setLocale() {
-        Global.localeConfig = prefs.getString(Const.Key.LOCALE, "");
-        if (Global.localeConfig.isEmpty()) {
-            locale = defaultLocale;
-        } else {
-            locale = Locale.forLanguageTag(Global.localeConfig);
-        }
-        Resources res = getBaseContext().getResources();
-        Configuration config = new Configuration(res.getConfiguration());
-        config.setLocale(locale);
-        res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
 }

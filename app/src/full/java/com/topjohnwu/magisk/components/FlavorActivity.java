@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
 
 public abstract class FlavorActivity extends AppCompatActivity {
@@ -20,7 +21,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
     public FlavorActivity() {
         super();
         Configuration configuration = new Configuration();
-        configuration.setLocale(MagiskManager.locale);
+        configuration.setLocale(LocaleManager.locale);
         applyOverrideConfiguration(configuration);
     }
 

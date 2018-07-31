@@ -27,6 +27,7 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -212,18 +213,18 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         private void setLocalePreference(ListPreference lp) {
-            CharSequence[] entries = new CharSequence[mm.locales.size() + 1];
-            CharSequence[] entryValues = new CharSequence[mm.locales.size() + 1];
-            entries[0] = Utils.getLocaleString(MagiskManager.defaultLocale, R.string.system_default);
+            CharSequence[] entries = new CharSequence[LocaleManager.locales.size() + 1];
+            CharSequence[] entryValues = new CharSequence[LocaleManager.locales.size() + 1];
+            entries[0] = LocaleManager.getString(LocaleManager.defaultLocale, R.string.system_default);
             entryValues[0] = "";
             int i = 1;
-            for (Locale locale : mm.locales) {
+            for (Locale locale : LocaleManager.locales) {
                 entries[i] = locale.getDisplayName(locale);
                 entryValues[i++] = locale.toLanguageTag();
             }
             lp.setEntries(entries);
             lp.setEntryValues(entryValues);
-            lp.setSummary(MagiskManager.locale.getDisplayName(MagiskManager.locale));
+            lp.setSummary(LocaleManager.locale.getDisplayName(LocaleManager.locale));
         }
 
         @Override
@@ -282,7 +283,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                     break;
                 case Const.Key.LOCALE:
-                    mm.setLocale();
+                    LocaleManager.setLocale();
                     mm.reloadActivity.publish(false);
                     break;
                 case Const.Key.UPDATE_CHANNEL:

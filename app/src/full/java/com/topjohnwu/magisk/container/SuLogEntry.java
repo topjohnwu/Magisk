@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.container;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.LocaleManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,10 +47,10 @@ public class SuLogEntry {
     }
 
     public String getDateString() {
-        return DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
+        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
     }
 
     public String getTimeString() {
-        return new SimpleDateFormat("h:mm a", MagiskManager.locale).format(date);
+        return new SimpleDateFormat("h:mm a", LocaleManager.locale).format(date);
     }
 }
