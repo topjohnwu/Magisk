@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 
-public class Fragment extends android.support.v4.app.Fragment {
+public class Fragment extends android.support.v4.app.Fragment implements Topic.AutoSubscriber {
 
     public MagiskManager getApplication() {
         return Utils.getMagiskManager(getActivity());
@@ -15,16 +15,12 @@ public class Fragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (this instanceof Topic.Subscriber) {
-            ((Topic.Subscriber) this).subscribeTopics();
-        }
+        Topic.subscribe(this);
     }
 
     @Override
     public void onPause() {
-        if (this instanceof Topic.Subscriber) {
-            ((Topic.Subscriber) this).unsubscribeTopics();
-        }
+        Topic.unsubscribe(this);
         super.onPause();
     }
 
@@ -39,5 +35,10 @@ public class Fragment extends android.support.v4.app.Fragment {
 
     public void runWithPermission(String[] permissions, Runnable callback) {
         ((Activity) requireActivity()).runWithPermission(permissions,callback);
+    }
+
+    @Override
+    public int[] getSubscribedTopics() {
+        return FlavorActivity.EMPTY_INT_ARRAY;
     }
 }

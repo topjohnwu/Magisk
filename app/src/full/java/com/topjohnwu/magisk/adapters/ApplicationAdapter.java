@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -152,7 +153,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         @Override
         protected void onPostExecute(Void v) {
-            Data.MM().magiskHideDone.publish(false);
+            Topic.publish(false, Topic.MAGISK_HIDE_DONE);
         }
     }
 }

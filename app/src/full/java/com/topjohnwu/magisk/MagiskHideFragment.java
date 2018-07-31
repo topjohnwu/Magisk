@@ -80,13 +80,13 @@ public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        mSwipeRefreshLayout.setRefreshing(false);
-        appAdapter.filter(null);
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.MAGISK_HIDE_DONE};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { getApplication().magiskHideDone };
+    public void onPublish(int topic, Object[] result) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        appAdapter.filter(null);
     }
 }

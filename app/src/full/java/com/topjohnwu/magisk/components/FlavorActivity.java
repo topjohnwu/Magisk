@@ -14,15 +14,21 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
 
-public abstract class FlavorActivity extends AppCompatActivity {
+public abstract class FlavorActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 
     private ActivityResultListener activityResultListener;
+    static int[] EMPTY_INT_ARRAY = new int[0];
 
     public FlavorActivity() {
         super();
         Configuration configuration = new Configuration();
         configuration.setLocale(LocaleManager.locale);
         applyOverrideConfiguration(configuration);
+    }
+
+    @Override
+    public int[] getSubscribedTopics() {
+        return EMPTY_INT_ARRAY;
     }
 
     @StyleRes
@@ -37,9 +43,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (this instanceof Topic.Subscriber) {
-            ((Topic.Subscriber) this).subscribeTopics();
-        }
+        Topic.subscribe(this);
         if (Data.isDarkTheme && getDarkTheme() != -1) {
             setTheme(getDarkTheme());
         }
@@ -47,9 +51,7 @@ public abstract class FlavorActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (this instanceof Topic.Subscriber) {
-            ((Topic.Subscriber) this).unsubscribeTopics();
-        }
+        Topic.unsubscribe(this);
         super.onDestroy();
     }
 

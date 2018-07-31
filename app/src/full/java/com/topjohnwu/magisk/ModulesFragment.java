@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -49,7 +50,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_modules, container, false);
         unbinder = ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
@@ -71,19 +72,19 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
             }
         });
 
-        getActivity().setTitle(R.string.modules);
+        requireActivity().setTitle(R.string.modules);
 
         return view;
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        updateUI();
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.MODULE_LOAD_DONE};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { getApplication().moduleLoadDone };
+    public void onPublish(int topic, Object[] result) {
+        updateUI();
     }
 
     @Override

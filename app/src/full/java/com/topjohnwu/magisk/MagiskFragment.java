@@ -42,7 +42,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class MagiskFragment extends Fragment
-        implements Topic.Subscriber, SwipeRefreshLayout.OnRefreshListener, ExpandableView {
+        implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
 
@@ -167,8 +167,7 @@ public class MagiskFragment extends Fragment
 
         safetyNetStatusText.setText(R.string.safetyNet_check_text);
 
-        mm.safetyNetDone.reset();
-        mm.updateCheckDone.reset();
+        Topic.reset(getSubscribedTopics());
         Data.remoteMagiskVersionString = null;
         Data.remoteMagiskVersionCode = -1;
         collapse();
@@ -184,17 +183,20 @@ public class MagiskFragment extends Fragment
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        if (topic == mm.updateCheckDone) {
-            updateCheckUI();
-        } else if (topic == mm.safetyNetDone) {
-            updateSafetyNetUI((int) topic.getResults()[0]);
-        }
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.SNET_CHECK_DONE, Topic.UPDATE_CHECK_DONE};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { mm.updateCheckDone, mm.safetyNetDone };
+    public void onPublish(int topic, Object[] result) {
+        switch (topic) {
+            case Topic.SNET_CHECK_DONE:
+                updateSafetyNetUI((int) result[0]);
+                break;
+            case Topic.UPDATE_CHECK_DONE:
+                updateCheckUI();
+                break;
+        }
     }
 
     @Override

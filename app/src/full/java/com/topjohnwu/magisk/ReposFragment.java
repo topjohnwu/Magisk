@@ -46,7 +46,7 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
         unbinder = ButterKnife.bind(this, view);
         mm = getApplication();
 
-        mSwipeRefreshLayout.setRefreshing(mm.repoLoadDone.isPending());
+        mSwipeRefreshLayout.setRefreshing(true);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.VISIBLE);
@@ -73,15 +73,15 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        mSwipeRefreshLayout.setRefreshing(false);
-        recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
-        emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.REPO_LOAD_DONE};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { mm.repoLoadDone };
+    public void onPublish(int topic, Object[] result) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+        emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     @Override

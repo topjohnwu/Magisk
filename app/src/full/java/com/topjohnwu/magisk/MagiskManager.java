@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
-import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
@@ -19,15 +18,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MagiskManager extends ContainerApp {
-
-    // Topics
-    public final Topic magiskHideDone = new Topic();
-    public final Topic reloadActivity = new Topic();
-    public final Topic moduleLoadDone = new Topic();
-    public final Topic repoLoadDone = new Topic();
-    public final Topic updateCheckDone = new Topic();
-    public final Topic safetyNetDone = new Topic();
-    public final Topic localeDone = new Topic();
 
     // Info
     public boolean hasInit = false;

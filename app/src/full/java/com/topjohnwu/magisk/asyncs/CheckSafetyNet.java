@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -50,7 +51,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 Class.class, String.class, Activity.class, Object.class)
                 .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
                         (ISafetyNetHelper.Callback) code ->
-                                Data.MM().safetyNetDone.publish(false, code));
+                                Topic.publish(false, Topic.SNET_CHECK_DONE, code));
         if (helper.getVersion() != Const.SNET_VER) {
             throw new Exception();
         }
@@ -79,7 +80,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
             helper.attest();
         } else {
             e.printStackTrace();
-            Data.MM().safetyNetDone.publish(false, -1);
+            Topic.publish(false, Topic.SNET_CHECK_DONE, -1);
         }
         super.onPostExecute(e);
     }

@@ -5,6 +5,7 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.io.SuFile;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {
@@ -29,7 +30,7 @@ public class LoadModules extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        Data.MM().moduleLoadDone.publish();
+        Topic.publish(Topic.MODULE_LOAD_DONE);
         super.onPostExecute(v);
     }
 }

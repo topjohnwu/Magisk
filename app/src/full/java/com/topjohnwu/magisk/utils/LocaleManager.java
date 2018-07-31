@@ -87,7 +87,7 @@ public class LocaleManager {
         }
         @Override
         protected void onPostExecute(Void aVoid) {
-            Data.MM().localeDone.publish();
+            Topic.publish(Topic.LOCAL_FETCH_DONE);
         }
     }
 }

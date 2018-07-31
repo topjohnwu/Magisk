@@ -5,6 +5,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.NotificationMgr;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.WebService;
 
 import org.json.JSONException;
@@ -93,7 +94,6 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        MagiskManager mm = Data.MM();
         if (showNotification) {
             if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
                 NotificationMgr.managerUpdate();
@@ -101,7 +101,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                 NotificationMgr.magiskUpdate();
             }
         }
-        mm.updateCheckDone.publish();
+        Topic.publish(Topic.UPDATE_CHECK_DONE);
         super.onPostExecute(v);
     }
 }

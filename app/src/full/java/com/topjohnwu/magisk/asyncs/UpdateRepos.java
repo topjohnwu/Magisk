@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -49,8 +50,8 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private ExecutorService threadPool;
 
     public UpdateRepos(boolean force) {
+        Topic.reset(Topic.REPO_LOAD_DONE);
         mm = Data.MM();
-        mm.repoLoadDone.reset();
         forceUpdate = force;
         threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
     }
@@ -148,11 +149,6 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onPreExecute() {
-        mm.repoLoadDone.setPending();
-    }
-
-    @Override
     protected Void doInBackground(Void... voids) {
         etags = Arrays.asList(mm.prefs.getString(Const.Key.ETAG_KEY, "").split(","));
         cached = mm.repoDB.getRepoIDSet();
@@ -186,7 +182,7 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-        mm.repoLoadDone.publish();
+        Topic.publish(Topic.REPO_LOAD_DONE);
         super.onPostExecute(v);
     }
 }

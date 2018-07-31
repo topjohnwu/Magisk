@@ -111,13 +111,13 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        recreate();
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.RELOAD_ACTIVITY};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { getMagiskManager().reloadActivity };
+    public void onPublish(int topic, Object[] result) {
+        recreate();
     }
 
     public void checkHideSection() {

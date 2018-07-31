@@ -73,17 +73,18 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
-        recreate();
+    public int[] getSubscribedTopics() {
+        return new int[] {Topic.RELOAD_ACTIVITY};
     }
 
     @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { getMagiskManager().reloadActivity };
+    public void onPublish(int topic, Object[] result) {
+        recreate();
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat
-            implements SharedPreferences.OnSharedPreferenceChangeListener, Topic.Subscriber {
+            implements SharedPreferences.OnSharedPreferenceChangeListener,
+            Topic.Subscriber, Topic.AutoSubscriber {
 
         private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
@@ -229,14 +230,14 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             prefs.registerOnSharedPreferenceChangeListener(this);
-            subscribeTopics();
+            Topic.subscribe(this);
             return super.onCreateView(inflater, container, savedInstanceState);
         }
 
         @Override
         public void onDestroyView() {
             prefs.unregisterOnSharedPreferenceChangeListener(this);
-            unsubscribeTopics();
+            Topic.unsubscribe(this);
             super.onDestroyView();
         }
 
@@ -246,7 +247,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             switch (key) {
                 case Const.Key.DARK_THEME:
                     Data.isDarkTheme = prefs.getBoolean(key, false);
-                    mm.reloadActivity.publish(false);
+                    Topic.publish(false, Topic.RELOAD_ACTIVITY);
                     return;
                 case Const.Key.COREONLY:
                     if (prefs.getBoolean(key, false)) {
@@ -283,7 +284,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     break;
                 case Const.Key.LOCALE:
                     LocaleManager.setLocale();
-                    mm.reloadActivity.publish(false);
+                    Topic.publish(false, Topic.RELOAD_ACTIVITY);
                     break;
                 case Const.Key.UPDATE_CHANNEL:
                     new CheckUpdates().exec();
@@ -314,13 +315,13 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         }
 
         @Override
-        public void onTopicPublished(Topic topic) {
+        public void onPublish(int topic, Object[] result) {
             setLocalePreference((ListPreference) findPreference(Const.Key.LOCALE));
         }
 
         @Override
-        public Topic[] getSubscription() {
-            return new Topic[] { mm.localeDone };
+        public int[] getSubscribedTopics() {
+            return new int[] {Topic.LOCAL_FETCH_DONE};
         }
     }
 
