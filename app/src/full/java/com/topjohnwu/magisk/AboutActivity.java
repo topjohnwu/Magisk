@@ -12,7 +12,6 @@ import android.view.View;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Const;
 
 import java.util.Locale;
 

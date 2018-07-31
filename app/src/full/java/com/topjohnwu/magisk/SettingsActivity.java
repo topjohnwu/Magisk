@@ -24,7 +24,6 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;

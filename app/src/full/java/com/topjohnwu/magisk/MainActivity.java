@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.services.UpdateCheckService;

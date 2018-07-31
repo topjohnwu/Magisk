@@ -7,12 +7,12 @@ import android.content.pm.PackageManager;
 import android.os.Process;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Date;

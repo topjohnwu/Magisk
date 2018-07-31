@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
 import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;

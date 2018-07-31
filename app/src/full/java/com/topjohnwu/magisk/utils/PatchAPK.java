@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.utils.JarMap;
 
 import java.io.OutputStream;

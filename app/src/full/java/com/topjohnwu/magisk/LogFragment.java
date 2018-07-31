@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Const;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

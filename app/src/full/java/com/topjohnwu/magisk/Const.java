@@ -1,9 +1,6 @@
-package com.topjohnwu.magisk.utils;
+package com.topjohnwu.magisk;
 
 import android.os.Process;
-
-import com.topjohnwu.magisk.BuildConfig;
-import com.topjohnwu.magisk.Data;
 
 import java.io.File;
 import java.util.Arrays;

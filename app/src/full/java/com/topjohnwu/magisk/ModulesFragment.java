@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.container.Module;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
 

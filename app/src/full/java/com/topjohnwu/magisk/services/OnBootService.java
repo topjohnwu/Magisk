@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;

@@ -8,7 +8,6 @@ import android.text.TextUtils;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;

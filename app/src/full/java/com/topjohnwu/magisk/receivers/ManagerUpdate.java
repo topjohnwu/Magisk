@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.PatchAPK;
 

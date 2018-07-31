@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.asyncs;
 
 import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.magisk.utils.WebService;
 

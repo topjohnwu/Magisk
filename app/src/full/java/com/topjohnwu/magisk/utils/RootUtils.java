@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.superuser.BusyBox;

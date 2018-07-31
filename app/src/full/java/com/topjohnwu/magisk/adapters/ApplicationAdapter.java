@@ -12,10 +12,10 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;

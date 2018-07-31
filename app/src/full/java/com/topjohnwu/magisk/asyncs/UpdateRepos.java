@@ -3,11 +3,11 @@ package com.topjohnwu.magisk.asyncs;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;

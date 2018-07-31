@@ -1,10 +1,10 @@
 package com.topjohnwu.magisk.asyncs;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.superuser.io.SuFile;
 
 public class LoadModules extends ParallelTask<Void, Void, Void> {

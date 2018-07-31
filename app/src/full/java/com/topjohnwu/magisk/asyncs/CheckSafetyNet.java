@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.superuser.Shell;

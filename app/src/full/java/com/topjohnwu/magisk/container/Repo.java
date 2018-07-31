@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.container;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;

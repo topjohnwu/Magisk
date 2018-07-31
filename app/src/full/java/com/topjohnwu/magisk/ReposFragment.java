@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.Fragment;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;

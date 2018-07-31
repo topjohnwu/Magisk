@@ -29,7 +29,6 @@ import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Topic;
