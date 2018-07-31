@@ -99,6 +99,7 @@
     <string name="download_zip_only">仅下载 Zip</string>
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
     <string name="direct_install">直接安装（推荐）</string>
+    <string name="install_inactive_slot">安装到未使用的槽位（安装完OTA后）</string>
     <string name="select_method">选择安装方法</string>
     <string name="no_boot_file_patch_support">目标安装版本不支持修补 Boot 镜像文件</string>
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
