@@ -52,9 +52,7 @@ public class Data {
     public static int suResponseType;
     public static int suNotificationType;
     public static int suNamespaceMode;
-    public static String localeConfig;
     public static int updateChannel;
-    public static String bootFormat;
     public static int repoOrder;
 
     public static void loadMagiskInfo() {
@@ -154,8 +152,7 @@ public class Data {
         // config
         isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
         updateChannel = Utils.getPrefsInt(mm.prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
-        bootFormat = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-        repoOrder = mm.prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_NAME);
+        repoOrder = mm.prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_DATE);
     }
 
     public static void writeConfig() {
@@ -171,8 +168,6 @@ public class Data {
                 .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
                 .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
                 .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
-                .putString(Const.Key.LOCALE, localeConfig)
-                .putString(Const.Key.BOOT_FORMAT, bootFormat)
                 .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
                 .putInt(Const.Key.REPO_ORDER, repoOrder)
                 .apply();

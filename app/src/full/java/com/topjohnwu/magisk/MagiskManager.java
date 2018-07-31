@@ -44,7 +44,6 @@ public class MagiskManager extends ContainerApp {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDatabaseHelper.getInstance(this);
-        LocaleManager.locale = LocaleManager.defaultLocale = Locale.getDefault();
 
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {

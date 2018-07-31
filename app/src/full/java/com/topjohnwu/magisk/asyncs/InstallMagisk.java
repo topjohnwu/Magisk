@@ -231,10 +231,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private void outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
-                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + Data.bootFormat);
+                String fmt = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
+                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + fmt);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
-                switch (Data.bootFormat) {
+                switch (fmt) {
                     case ".img.tar":
                         out = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
                         ((TarOutputStream) out).putNextEntry(new TarEntry(patched, "boot.img"));

@@ -17,20 +17,20 @@ import java.util.List;
 import java.util.Locale;
 
 public class LocaleManager {
-    public static Locale locale;
-    public static Locale defaultLocale;
+    public static Locale locale = Locale.getDefault();
+    public final static Locale defaultLocale = Locale.getDefault();
     public static List<Locale> locales;
 
     public static void setLocale() {
         MagiskManager mm = Data.MM();
-        Data.localeConfig = mm.prefs.getString(Const.Key.LOCALE, "");
-        if (Data.localeConfig.isEmpty()) {
+        String localeConfig = mm.prefs.getString(Const.Key.LOCALE, "");
+        if (localeConfig.isEmpty()) {
             locale = defaultLocale;
         } else {
-            locale = Locale.forLanguageTag(Data.localeConfig);
+            locale = Locale.forLanguageTag(localeConfig);
         }
         Resources res = mm.getResources();
-        Configuration config = new Configuration(res.getConfiguration());
+        Configuration config = res.getConfiguration();
         config.setLocale(locale);
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
