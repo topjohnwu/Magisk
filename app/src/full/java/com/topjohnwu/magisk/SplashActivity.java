@@ -29,7 +29,7 @@ public class SplashActivity extends Activity {
         boolean root = Shell.rootAccess();
 
         mm.repoDB = new RepoDatabaseHelper(this);
-        mm.loadPrefs();
+        Global.importPrefs();
 
         // Dynamic detect all locales
         new LoadLocale().exec();
@@ -62,7 +62,7 @@ public class SplashActivity extends Activity {
         }
 
         // Write back default values
-        mm.writeConfig();
+        Global.writeConfig();
 
         mm.hasInit = true;
 

@@ -34,7 +34,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
         ArrayList<ShortcutInfo> shortCuts = new ArrayList<>();
         boolean root = Shell.rootAccess();
         if (root && !(Const.USER_ID > 0 &&
-                        mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+                Global.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "superuser")
                     .setShortLabel(mm.getString(R.string.superuser))
                     .setIntent(new Intent(mm, SplashActivity.class)

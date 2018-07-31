@@ -9,8 +9,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.FlashActivity;
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
@@ -231,10 +231,10 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     private void outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
-                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + mm.bootFormat);
+                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + Global.bootFormat);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
-                switch (mm.bootFormat) {
+                switch (Global.bootFormat) {
                     case ".img.tar":
                         out = new TarOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
                         ((TarOutputStream) out).putNextEntry(new TarEntry(patched, "boot.img"));

@@ -70,7 +70,7 @@ public class SuReceiver extends BroadcastReceiver {
                 return;
         }
 
-        if (policy.notification && mm.suNotificationType == Const.Value.NOTIFICATION_TOAST) {
+        if (policy.notification && Global.suNotificationType == Const.Value.NOTIFICATION_TOAST) {
             Global.toast(message, Toast.LENGTH_SHORT);
         }
 

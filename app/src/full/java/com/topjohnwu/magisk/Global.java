@@ -1,12 +1,23 @@
 package com.topjohnwu.magisk;
 
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Xml;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
+import com.topjohnwu.superuser.io.SuFile;
+import com.topjohnwu.superuser.io.SuFileInputStream;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class Global {
@@ -34,6 +45,20 @@ public class Global {
     public static boolean keepVerity = false;
     public static boolean keepEnc = false;
 
+    // Configs
+    public static boolean isDarkTheme;
+    public static int suRequestTimeout;
+    public static int suLogTimeout = 14;
+    public static int suAccessState;
+    public static int multiuserMode;
+    public static int suResponseType;
+    public static int suNotificationType;
+    public static int suNamespaceMode;
+    public static String localeConfig;
+    public static int updateChannel;
+    public static String bootFormat;
+    public static int repoOrder;
+
     public static void loadMagiskInfo() {
         try {
             magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
@@ -54,5 +79,112 @@ public class Global {
 
     public static void toast(int resId, int duration) {
         mainHandler.post(() -> Toast.makeText(MM(), resId, duration).show());
+    }
+
+    public static void exportPrefs() {
+        // Flush prefs to disk
+        MagiskManager mm = MM();
+        mm.prefs.edit().commit();
+        File xml = new File(mm.getFilesDir().getParent() + "/shared_prefs",
+                mm.getPackageName() + "_preferences.xml");
+        Shell.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS)).exec();
+    }
+
+    public static void importPrefs() {
+        MagiskManager mm = MM();
+        SuFile config = new SuFile(Utils.fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS));
+        if (config.exists()) {
+            SharedPreferences.Editor editor = mm.prefs.edit();
+            try {
+                SuFileInputStream is = new SuFileInputStream(config);
+                XmlPullParser parser = Xml.newPullParser();
+                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+                parser.setInput(is, "UTF-8");
+                parser.nextTag();
+                parser.require(XmlPullParser.START_TAG, null, "map");
+                while (parser.next() != XmlPullParser.END_TAG) {
+                    if (parser.getEventType() != XmlPullParser.START_TAG)
+                        continue;
+                    String key = parser.getAttributeValue(null, "name");
+                    String value = parser.getAttributeValue(null, "value");
+                    switch (parser.getName()) {
+                        case "string":
+                            parser.require(XmlPullParser.START_TAG, null, "string");
+                            editor.putString(key, parser.nextText());
+                            parser.require(XmlPullParser.END_TAG, null, "string");
+                            break;
+                        case "boolean":
+                            parser.require(XmlPullParser.START_TAG, null, "boolean");
+                            editor.putBoolean(key, Boolean.parseBoolean(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "boolean");
+                            break;
+                        case "int":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putInt(key, Integer.parseInt(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        case "long":
+                            parser.require(XmlPullParser.START_TAG, null, "long");
+                            editor.putLong(key, Long.parseLong(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "long");
+                            break;
+                        case "float":
+                            parser.require(XmlPullParser.START_TAG, null, "int");
+                            editor.putFloat(key, Float.parseFloat(value));
+                            parser.nextTag();
+                            parser.require(XmlPullParser.END_TAG, null, "int");
+                            break;
+                        default:
+                            parser.next();
+                    }
+                }
+            } catch (IOException | XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            editor.remove(Const.Key.ETAG_KEY);
+            editor.apply();
+            loadConfig();
+            config.delete();
+        }
+    }
+
+    public static void loadConfig() {
+        MagiskManager mm = MM();
+        // su
+        suRequestTimeout = Utils.getPrefsInt(mm.prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
+        suResponseType = Utils.getPrefsInt(mm.prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
+        suNotificationType = Utils.getPrefsInt(mm.prefs, Const.Key.SU_NOTIFICATION, Const.Value.NOTIFICATION_TOAST);
+        suAccessState = mm.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
+        multiuserMode = mm.mDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
+        suNamespaceMode = mm.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
+
+        // config
+        isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
+        updateChannel = Utils.getPrefsInt(mm.prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
+        bootFormat = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
+        repoOrder = mm.prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_NAME);
+    }
+
+    public static void writeConfig() {
+        MM().prefs.edit()
+                .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
+                .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
+                .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
+                .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
+                .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
+                .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
+                .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
+                .putString(Const.Key.ROOT_ACCESS, String.valueOf(suAccessState))
+                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
+                .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
+                .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
+                .putString(Const.Key.LOCALE, localeConfig)
+                .putString(Const.Key.BOOT_FORMAT, bootFormat)
+                .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
+                .putInt(Const.Key.REPO_ORDER, repoOrder)
+                .apply();
     }
 }

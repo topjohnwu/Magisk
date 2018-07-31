@@ -7,8 +7,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.FlashActivity;
+import com.topjohnwu.magisk.Global;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.RestoreImages;

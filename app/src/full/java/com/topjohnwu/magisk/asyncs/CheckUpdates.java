@@ -54,7 +54,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         MagiskManager mm = Global.MM();
         String jsonStr = "";
-        switch (mm.updateChannel) {
+        switch (Global.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
                 jsonStr = WebService.getString(Const.Url.STABLE_URL);
                 break;

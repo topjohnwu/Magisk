@@ -133,7 +133,7 @@ public class MainActivity extends Activity
                 && Download.checkNetworkStatus(this) && Shell.rootAccess() && Global.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
-                !(Const.USER_ID > 0 && mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
+                !(Const.USER_ID > 0 && Global.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
     }
 
     public void navigate(String item) {

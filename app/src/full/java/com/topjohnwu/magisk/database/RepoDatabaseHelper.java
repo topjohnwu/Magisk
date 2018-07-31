@@ -101,7 +101,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getRepoCursor() {
         String orderBy = null;
-        switch (mm.repoOrder) {
+        switch (Global.repoOrder) {
             case Const.Value.ORDER_NAME:
                 orderBy = "name COLLATE NOCASE";
                 break;

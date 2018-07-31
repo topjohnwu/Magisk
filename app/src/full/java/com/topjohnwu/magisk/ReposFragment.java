@@ -108,9 +108,9 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
         if (item.getItemId() == R.id.repo_sort) {
             new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.sorting_order)
-                .setSingleChoiceItems(R.array.sorting_orders, mm.repoOrder, (d, which) -> {
-                    mm.repoOrder = which;
-                    mm.prefs.edit().putInt(Const.Key.REPO_ORDER, mm.repoOrder).apply();
+                .setSingleChoiceItems(R.array.sorting_orders, Global.repoOrder, (d, which) -> {
+                    Global.repoOrder = which;
+                    mm.prefs.edit().putInt(Const.Key.REPO_ORDER, Global.repoOrder).apply();
                     adapter.notifyDBChanged();
                     d.dismiss();
                 }).show();

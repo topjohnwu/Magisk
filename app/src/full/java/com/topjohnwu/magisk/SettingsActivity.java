@@ -123,8 +123,8 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
 
             updateChannel.setOnPreferenceChangeListener((pref, o) -> {
-                mm.updateChannel = Integer.parseInt((String) o);
-                if (mm.updateChannel == Const.Value.CUSTOM_CHANNEL) {
+                Global.updateChannel = Integer.parseInt((String) o);
+                if (Global.updateChannel == Const.Value.CUSTOM_CHANNEL) {
                     View v = LayoutInflater.from(getActivity()).inflate(R.layout.custom_channel_dialog, null);
                     EditText url = v.findViewById(R.id.custom_url);
                     url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
@@ -173,7 +173,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                                 getActivity(), new DownloadReceiver() {
                                     @Override
                                     public void onDownloadDone(Context context, Uri uri) {
-                                        mm.dumpPrefs();
+                                        Global.exportPrefs();
                                         Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
                                         if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
                                             Shell.su("rm -f /data/local/tmp/manager.apk").exec();
@@ -199,7 +199,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             }
 
             if (!Shell.rootAccess() || (Const.USER_ID > 0 &&
-                    mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+                    Global.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
                 prefScreen.removePreference(suCategory);
             }
 
@@ -245,7 +245,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
 
             switch (key) {
                 case Const.Key.DARK_THEME:
-                    mm.isDarkTheme = prefs.getBoolean(key, false);
+                    Global.isDarkTheme = prefs.getBoolean(key, false);
                     mm.reloadActivity.publish(false);
                     return;
                 case Const.Key.COREONLY:
@@ -292,25 +292,25 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     Utils.setupUpdateCheck();
                     break;
             }
-            mm.loadConfig();
+            Global.loadConfig();
             setSummary();
         }
 
         private void setSummary() {
             updateChannel.setSummary(getResources()
-                    .getStringArray(R.array.update_channel)[mm.updateChannel]);
+                    .getStringArray(R.array.update_channel)[Global.updateChannel]);
             suAccess.setSummary(getResources()
-                    .getStringArray(R.array.su_access)[mm.suAccessState]);
+                    .getStringArray(R.array.su_access)[Global.suAccessState]);
             autoRes.setSummary(getResources()
-                    .getStringArray(R.array.auto_response)[mm.suResponseType]);
+                    .getStringArray(R.array.auto_response)[Global.suResponseType]);
             suNotification.setSummary(getResources()
-                    .getStringArray(R.array.su_notification)[mm.suNotificationType]);
+                    .getStringArray(R.array.su_notification)[Global.suNotificationType]);
             requestTimeout.setSummary(
                     getString(R.string.request_timeout_summary, prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
             multiuserMode.setSummary(getResources()
-                    .getStringArray(R.array.multiuser_summary)[mm.multiuserMode]);
+                    .getStringArray(R.array.multiuser_summary)[Global.multiuserMode]);
             namespaceMode.setSummary(getResources()
-                    .getStringArray(R.array.namespace_summary)[mm.suNamespaceMode]);
+                    .getStringArray(R.array.namespace_summary)[Global.suNamespaceMode]);
         }
 
         @Override
