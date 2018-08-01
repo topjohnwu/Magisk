@@ -283,7 +283,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
                     mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
                     break;
                 case Const.Key.LOCALE:
-                    LocaleManager.setLocale();
+                    LocaleManager.setLocale(mm);
                     Topic.publish(false, Topic.RELOAD_ACTIVITY);
                     break;
                 case Const.Key.UPDATE_CHANNEL:

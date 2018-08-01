@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.components;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,11 +20,12 @@ public abstract class FlavorActivity extends AppCompatActivity implements Topic.
     private ActivityResultListener activityResultListener;
     static int[] EMPTY_INT_ARRAY = new int[0];
 
-    public FlavorActivity() {
-        super();
-        Configuration configuration = new Configuration();
-        configuration.setLocale(LocaleManager.locale);
-        applyOverrideConfiguration(configuration);
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        Configuration config = base.getResources().getConfiguration();
+        config.setLocale(LocaleManager.locale);
+        applyOverrideConfiguration(config);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
@@ -14,7 +15,6 @@ import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 import java.util.Map;
 
 public class MagiskManager extends ContainerApp {
@@ -58,8 +58,13 @@ public class MagiskManager extends ContainerApp {
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 
-        LocaleManager.setLocale();
+        LocaleManager.setLocale(this);
         Data.loadConfig();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        LocaleManager.setLocale(this);
+    }
 }

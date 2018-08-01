@@ -1,7 +1,12 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,9 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.ParallelTask;
+import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
 
@@ -34,26 +38,63 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private PackageManager pm;
     private ApplicationFilter filter;
 
-    public ApplicationAdapter() {
+    public ApplicationAdapter(Context context) {
         fullList = showList = Collections.emptyList();
         hideList = Collections.emptyList();
         filter = new ApplicationFilter();
-        pm = Data.MM().getPackageManager();
-        new LoadApps().exec();
+        pm = context.getPackageManager();
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
+        return new ViewHolder(v);
+    }
+
+    private String getLabel(ApplicationInfo info) {
+        if (info.labelRes > 0) {
+            try {
+                Resources res = pm.getResourcesForApplication(info);
+                Configuration config = new Configuration();
+                config.setLocale(LocaleManager.locale);
+                res.updateConfiguration(config, res.getDisplayMetrics());
+                return res.getString(info.labelRes);
+            } catch (PackageManager.NameNotFoundException ignored) { /* Impossible */ }
+        }
+        return info.loadLabel(pm).toString();
+    }
+
+    private void loadApps() {
+        fullList = pm.getInstalledApplications(0);
+        hideList = Shell.su("magiskhide --ls").exec().getOut();
+        for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
+            ApplicationInfo info = i.next();
+            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
+                i.remove();
+            }
+        }
+        Collections.sort(fullList, (a, b) -> {
+            boolean ah = hideList.contains(a.packageName);
+            boolean bh = hideList.contains(b.packageName);
+            if (ah == bh) {
+                return getLabel(a).toLowerCase().compareTo(getLabel(b).toLowerCase());
+            } else if (ah) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        Topic.publish(false, Topic.MAGISK_HIDE_DONE);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
-        return new ViewHolder(mView);
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ApplicationInfo info = showList.get(position);
 
         holder.appIcon.setImageDrawable(info.loadIcon(pm));
-        holder.appName.setText(info.loadLabel(pm));
+        holder.appName.setText(getLabel(info));
         holder.appPackage.setText(info.packageName);
 
         holder.checkBox.setOnCheckedChangeListener(null);
@@ -79,7 +120,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     }
 
     public void refresh() {
-        new LoadApps().exec();
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -109,7 +150,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 showList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : fullList) {
-                    if (lowercaseContains(info.loadLabel(pm).toString(), filter)
+                    if (lowercaseContains(getLabel(info), filter)
                             || lowercaseContains(info.packageName, filter)) {
                         showList.add(info);
                     }
@@ -121,39 +162,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             notifyDataSetChanged();
-        }
-    }
-
-    private class LoadApps extends ParallelTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            fullList = pm.getInstalledApplications(0);
-            hideList = Shell.su("magiskhide --ls").exec().getOut();
-            for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
-                ApplicationInfo info = i.next();
-                if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
-                    i.remove();
-                }
-            }
-            Collections.sort(fullList, (a, b) -> {
-                boolean ah = hideList.contains(a.packageName);
-                boolean bh = hideList.contains(b.packageName);
-                if (ah == bh) {
-                    return a.loadLabel(pm).toString().toLowerCase().compareTo(
-                            b.loadLabel(pm).toString().toLowerCase());
-                } else if (ah) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            Topic.publish(false, Topic.MAGISK_HIDE_DONE);
         }
     }
 }

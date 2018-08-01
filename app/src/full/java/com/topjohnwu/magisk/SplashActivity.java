@@ -31,7 +31,7 @@ public class SplashActivity extends Activity {
         Data.importPrefs();
 
         // Dynamic detect all locales
-        new LocaleManager.LoadLocale().exec();
+        LocaleManager.loadAvailableLocales();
 
         // Create notification channel on Android O
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
