@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class FlashActivity extends Activity {
+public class FlashActivity extends BaseActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.txtLog) TextView flashLogs;
@@ -139,7 +139,7 @@ public class FlashActivity extends Activity {
 
     private static class UninstallMagisk extends FlashZip {
 
-        private UninstallMagisk(Activity context, Uri uri, List<String> console, List<String> logs) {
+        private UninstallMagisk(BaseActivity context, Uri uri, List<String> console, List<String> logs) {
             super(context, uri, console, logs);
         }
 

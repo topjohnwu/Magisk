@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MagiskInstallDialog extends CustomAlertDialog {
-    public MagiskInstallDialog(Activity activity) {
+    public MagiskInstallDialog(BaseActivity activity) {
         super(activity);
         MagiskManager mm = Data.MM();
         String filename = Utils.fmt("Magisk-v%s(%d).zip",

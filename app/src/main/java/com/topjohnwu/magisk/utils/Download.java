@@ -11,7 +11,7 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public class Download {
         if (isDownloading)
             return;
 
-        Activity.runWithPermission(context,
+        BaseActivity.runWithPermission(context,
                 new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
             File file = new File(EXTERNAL_PATH, getLegalFilename(filename));
 

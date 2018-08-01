@@ -9,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class LogFragment extends Fragment {
+public class LogFragment extends BaseFragment {
 
     private Unbinder unbinder;
 

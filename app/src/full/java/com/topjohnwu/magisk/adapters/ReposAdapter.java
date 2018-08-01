@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.Repo;
@@ -97,19 +97,19 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->
-                new MarkDownWindow((Activity) context, null, repo.getDetailUrl()).exec());
+                new MarkDownWindow((BaseActivity) context, null, repo.getDetailUrl()).exec());
 
         holder.downloadImage.setOnClickListener(v -> {
             String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
-            new CustomAlertDialog((Activity) context)
+            new CustomAlertDialog((BaseActivity) context)
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
                     .setMessage(context.getString(R.string.repo_install_msg, filename))
                     .setCancelable(true)
                     .setPositiveButton(R.string.install, (d, i) ->
-                        new ProcessRepoZip((Activity) context, repo.getZipUrl(), filename, true).exec()
+                        new ProcessRepoZip((BaseActivity) context, repo.getZipUrl(), filename, true).exec()
                     )
                     .setNeutralButton(R.string.download, (d, i) ->
-                        new ProcessRepoZip((Activity) context, repo.getZipUrl(), filename, false).exec())
+                        new ProcessRepoZip((BaseActivity) context, repo.getZipUrl(), filename, false).exec())
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });

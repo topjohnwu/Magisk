@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
@@ -33,7 +33,7 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RequestActivity extends Activity {
+public class RequestActivity extends BaseActivity {
 
     @BindView(R.id.su_popup) LinearLayout suPopup;
     @BindView(R.id.timeout) Spinner timeout;
@@ -237,7 +237,7 @@ public class RequestActivity extends Activity {
 
     private class SocketManager extends ParallelTask<Void, Void, Boolean> {
 
-        SocketManager(Activity context) {
+        SocketManager(BaseActivity context) {
             super(context);
         }
 

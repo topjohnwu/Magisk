@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.HideManager;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -39,7 +39,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends Activity implements Topic.Subscriber {
+public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 

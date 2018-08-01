@@ -1,16 +1,17 @@
 package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Topic;
 
-public class Fragment extends android.support.v4.app.Fragment implements Topic.AutoSubscriber {
+public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     public MagiskManager mm;
 
-    public Fragment() {
+    public BaseFragment() {
         mm = Data.MM();
     }
 
@@ -31,12 +32,12 @@ public class Fragment extends android.support.v4.app.Fragment implements Topic.A
         startActivityForResult(intent, requestCode, this::onActivityResult);
     }
 
-    public void startActivityForResult(Intent intent, int requestCode, Activity.ActivityResultListener listener) {
-        ((Activity) requireActivity()).startActivityForResult(intent, requestCode, listener);
+    public void startActivityForResult(Intent intent, int requestCode, BaseActivity.ActivityResultListener listener) {
+        ((BaseActivity) requireActivity()).startActivityForResult(intent, requestCode, listener);
     }
 
     public void runWithPermission(String[] permissions, Runnable callback) {
-        ((Activity) requireActivity()).runWithPermission(permissions,callback);
+        ((BaseActivity) requireActivity()).runWithPermission(permissions,callback);
     }
 
     @Override

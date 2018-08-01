@@ -5,7 +5,7 @@ import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.ManagerInstall;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.WebService;
@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
-public class NoUIActivity extends Activity {
+public class NoUIActivity extends BaseActivity {
 
     private String apkLink;
     private String version;

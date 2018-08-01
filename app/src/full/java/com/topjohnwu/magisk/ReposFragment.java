@@ -16,14 +16,14 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class ReposFragment extends Fragment implements Topic.Subscriber {
+public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;

@@ -13,14 +13,14 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MagiskHideFragment extends Fragment implements Topic.Subscriber {
+public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;

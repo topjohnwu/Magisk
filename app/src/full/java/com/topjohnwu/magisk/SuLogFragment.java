@@ -12,13 +12,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class SuLogFragment extends Fragment {
+public class SuLogFragment extends BaseFragment {
 
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;

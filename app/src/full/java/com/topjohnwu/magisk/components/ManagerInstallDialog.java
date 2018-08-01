@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.utils.Utils;
 
 public class ManagerInstallDialog extends CustomAlertDialog {
 
-    public ManagerInstallDialog(@NonNull Activity activity) {
+    public ManagerInstallDialog(@NonNull BaseActivity activity) {
         super(activity);
         MagiskManager mm = Data.MM();
         String filename = Utils.fmt("MagiskManager-v%s(%d).apk",

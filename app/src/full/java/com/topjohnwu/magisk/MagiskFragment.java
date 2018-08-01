@@ -21,11 +21,11 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.EnvFixDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
-import com.topjohnwu.magisk.components.Fragment;
 import com.topjohnwu.magisk.components.MagiskInstallDialog;
 import com.topjohnwu.magisk.components.ManagerInstallDialog;
 import com.topjohnwu.magisk.components.UninstallDialog;
@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class MagiskFragment extends Fragment
+public class MagiskFragment extends BaseFragment
         implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
@@ -117,12 +117,12 @@ public class MagiskFragment extends Fragment
 
         // Show Manager update first
         if (Data.remoteManagerVersionCode > BuildConfig.VERSION_CODE) {
-            new ManagerInstallDialog((Activity) requireActivity()).show();
+            new ManagerInstallDialog((BaseActivity) requireActivity()).show();
             return;
         }
 
         ((NotificationManager) mm.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-        new MagiskInstallDialog((Activity) getActivity()).show();
+        new MagiskInstallDialog((BaseActivity) getActivity()).show();
     }
 
     @OnClick(R.id.uninstall_button)

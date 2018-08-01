@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
 import com.topjohnwu.magisk.asyncs.LoadModules;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
@@ -31,7 +31,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class ModulesFragment extends Fragment implements Topic.Subscriber {
+public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;

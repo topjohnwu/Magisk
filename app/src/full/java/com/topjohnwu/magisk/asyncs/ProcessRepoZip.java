@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
@@ -43,7 +43,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     private int progress = 0, total = -1;
     private Handler mHandler;
 
-    public ProcessRepoZip(Activity context, String link, String filename, boolean install) {
+    public ProcessRepoZip(BaseActivity context, String link, String filename, boolean install) {
         super(context);
         mLink = link;
         mFile = new File(Download.EXTERNAL_PATH, Download.getLegalFilename(filename));
@@ -76,20 +76,20 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     }
 
     @Override
-    protected Activity getActivity() {
-        return (Activity) super.getActivity();
+    protected BaseActivity getActivity() {
+        return (BaseActivity) super.getActivity();
     }
 
     @Override
     protected void onPreExecute() {
-        Activity activity = getActivity();
+        BaseActivity activity = getActivity();
         mFile.getParentFile().mkdirs();
         progressDialog = ProgressDialog.show(activity, activity.getString(R.string.zip_download_title), activity.getString(R.string.zip_download_msg, 0));
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        Activity activity = getActivity();
+        BaseActivity activity = getActivity();
         if (activity == null) return null;
         try {
             // Request zip from Internet
@@ -135,7 +135,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
-        Activity activity = getActivity();
+        BaseActivity activity = getActivity();
         if (activity == null) return;
         progressDialog.dismiss();
         if (result) {

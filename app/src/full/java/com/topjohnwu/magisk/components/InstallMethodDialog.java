@@ -19,7 +19,7 @@ import java.util.List;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 
-    InstallMethodDialog(Activity activity, List<String> options, String filename) {
+    InstallMethodDialog(BaseActivity activity, List<String> options, String filename) {
         super(activity);
         setTitle(R.string.select_method);
         setItems(options.toArray(new String [0]), (dialog, idx) -> {
@@ -36,7 +36,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
                             (requestCode, resultCode, data) -> {
                                 if (requestCode == Const.ID.SELECT_BOOT &&
-                                        resultCode == Activity.RESULT_OK && data != null) {
+                                        resultCode == BaseActivity.RESULT_OK && data != null) {
                                     Intent i = new Intent(activity, FlashActivity.class)
                                             .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
                                             .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);

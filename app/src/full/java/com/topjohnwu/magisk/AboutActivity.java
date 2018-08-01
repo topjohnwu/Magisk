@@ -11,14 +11,14 @@ import android.view.View;
 
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.AboutCardRow;
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends BaseActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.app_version_info) AboutCardRow appVersionInfo;

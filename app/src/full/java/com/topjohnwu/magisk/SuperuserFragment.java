@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
-import com.topjohnwu.magisk.components.Fragment;
+import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Policy;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class SuperuserFragment extends Fragment {
+public class SuperuserFragment extends BaseFragment {
 
     private Unbinder unbinder;
     private PackageManager pm;

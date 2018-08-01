@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.components.Activity;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
@@ -22,7 +22,7 @@ import com.topjohnwu.superuser.Shell;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends Activity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
 
     private final Handler mDrawerHandler = new Handler();

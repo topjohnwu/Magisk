@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
 
-public abstract class Activity extends FlavorActivity {
+public abstract class BaseActivity extends FlavorActivity {
 
     public static final String INTENT_PERM = "perm_dialog";
 
@@ -30,14 +30,14 @@ public abstract class Activity extends FlavorActivity {
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!
             permissionGrantCallback = callback;
-            if (!(context instanceof Activity)) {
+            if (!(context instanceof BaseActivity)) {
                 // Start activity to show dialog
                 Intent intent = new Intent(context, NoUIActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(INTENT_PERM, permissions);
                 context.startActivity(intent);
             } else {
-                ActivityCompat.requestPermissions((Activity) context, permissions, 0);
+                ActivityCompat.requestPermissions((BaseActivity) context, permissions, 0);
             }
         }
     }
