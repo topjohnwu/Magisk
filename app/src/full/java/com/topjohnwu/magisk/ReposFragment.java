@@ -2,6 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +18,10 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseFragment;
+import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Topic;
+
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,28 +44,22 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         mSwipeRefreshLayout.setRefreshing(true);
+        recyclerView.setVisibility(View.GONE);
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.VISIBLE);
             emptyRv.setVisibility(View.GONE);
-            new UpdateRepos(true).exec();
+            new UpdateRepos().exec(true);
         });
 
-        getActivity().setTitle(R.string.downloads);
+        requireActivity().setTitle(R.string.downloads);
 
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        adapter = new ReposAdapter(mm.repoDB, mm.moduleMap);
-        recyclerView.setAdapter(adapter);
-        super.onResume();
     }
 
     @Override
@@ -72,14 +70,23 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.REPO_LOAD_DONE};
+        return new int[] {Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
     }
 
     @Override
     public void onPublish(int topic, Object[] result) {
-        mSwipeRefreshLayout.setRefreshing(false);
-        recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
-        emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        if (topic == Topic.MODULE_LOAD_DONE) {
+            adapter = new ReposAdapter(mm.repoDB, (Map<String, Module>) result[0]);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyRv.setVisibility(View.GONE);
+        }
+        if (Topic.isPublished(getSubscribedTopics())) {
+            adapter.notifyDBChanged();
+            mSwipeRefreshLayout.setRefreshing(false);
+            recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+            emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override

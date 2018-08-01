@@ -94,8 +94,8 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
                 console.add("! This zip is not a Magisk Module!");
                 break;
             case 1:
-                // Success
-                new LoadModules().exec();
+                // Reload modules
+                Utils.loadModules();
                 break;
         }
         activity.reboot.setVisibility(result > 0 ? View.VISIBLE : View.GONE);

@@ -81,6 +81,16 @@ public class Topic {
         }
     }
 
+    public static boolean isPublished(@TopicID int... topics) {
+        for (int topic : topics) {
+            if (topicList[topic] == null)
+                return false;
+            if (!topicList[topic].published)
+                return false;
+        }
+        return true;
+    }
+
     private static class Store {
         boolean published = false;
         Set<Subscriber> subscribers = new HashSet<>();

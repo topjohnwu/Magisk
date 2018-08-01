@@ -17,14 +17,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
-import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,7 +58,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
         mSwipeRefreshLayout.setOnRefreshListener(() -> {
             recyclerView.setVisibility(View.GONE);
-            new LoadModules().exec();
+            Utils.loadModules();
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -84,7 +85,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
     @Override
     public void onPublish(int topic, Object[] result) {
-        updateUI();
+        updateUI((Map<String, Module>) result[0]);
     }
 
     @Override
@@ -128,9 +129,9 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
         }
     }
 
-    private void updateUI() {
+    private void updateUI(Map<String, Module> moduleMap) {
         listModules.clear();
-        listModules.addAll(mm.moduleMap.values());
+        listModules.addAll(moduleMap.values());
         if (listModules.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

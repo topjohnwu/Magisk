@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.asyncs.LoadModules;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
@@ -23,8 +22,13 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Force create a shell if not created yet
-        boolean root = Shell.rootAccess();
+        // Magisk working as expected
+        if (Shell.rootAccess() && Data.magiskVersionCode > 0) {
+            // Update check service
+            Utils.setupUpdateCheck();
+            // Load modules
+            Utils.loadModules();
+        }
 
         mm.repoDB = new RepoDatabaseHelper(this);
         Data.importPrefs();
@@ -42,21 +46,11 @@ public class SplashActivity extends BaseActivity {
         // Setup shortcuts
         sendBroadcast(new Intent(this, ShortcutReceiver.class));
 
-        LoadModules loadModuleTask = new LoadModules();
-
         if (Download.checkNetworkStatus(this)) {
             // Fire update check
-            new CheckUpdates().exec();
-            // Add repo update check
-            loadModuleTask.setCallBack(() -> new UpdateRepos(false).exec());
-        }
-
-        // Magisk working as expected
-        if (root && Data.magiskVersionCode > 0) {
-            // Update check service
-            Utils.setupUpdateCheck();
-            // Fire asynctasks
-            loadModuleTask.exec();
+            CheckUpdates.check();
+            // Repo update check
+            new UpdateRepos().exec();
         }
 
         // Write back default values

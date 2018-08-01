@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.Const;
@@ -34,7 +35,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class UpdateRepos extends ParallelTask<Void, Void, Void> {
+public class UpdateRepos {
 
     private static final int CHECK_ETAG = 0;
     private static final int LOAD_NEXT = 1;
@@ -44,16 +45,14 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
     private static final int CORE_POOL_SIZE = Math.max(2, CPU_COUNT - 1);
 
     private MagiskManager mm;
-    private List<String> etags, newEtags = new LinkedList<>();
+    private List<String> etags, newEtags;
     private Set<String> cached;
-    private boolean forceUpdate;
     private ExecutorService threadPool;
 
-    public UpdateRepos(boolean force) {
-        Topic.reset(Topic.REPO_LOAD_DONE);
+    public UpdateRepos() {
         mm = Data.MM();
-        forceUpdate = force;
         threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
+        newEtags = new LinkedList<>();
     }
 
     private void waitTasks() {
@@ -85,7 +84,10 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
                         set.remove(id);
                     repo.update(date);
                     mm.repoDB.addRepo(repo);
-                    publishProgress();
+                    Data.mainHandler.post(() -> {
+                        if (ReposFragment.adapter != null)
+                            ReposFragment.adapter.notifyDBChanged();
+                    });
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
                     mm.repoDB.removeRepo(id);
@@ -142,47 +144,45 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         return true;
     }
 
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        if (ReposFragment.adapter != null)
-            ReposFragment.adapter.notifyDBChanged();
-    }
-
-    @Override
-    protected Void doInBackground(Void... voids) {
-        etags = Arrays.asList(mm.prefs.getString(Const.Key.ETAG_KEY, "").split(","));
-        cached = mm.repoDB.getRepoIDSet();
-
-        if (loadPage(0, CHECK_ETAG)) {
-            waitTasks();
-
-            // The leftover cached means they are removed from online repo
-            mm.repoDB.removeRepo(cached);
-
-            // Update ETag
-            mm.prefs.edit().putString(Const.Key.ETAG_KEY, TextUtils.join(",", newEtags)).apply();
-        } else if (forceUpdate) {
-            Cursor c = mm.repoDB.getRawCursor();
-            while (c.moveToNext()) {
-                Repo repo = new Repo(c);
-                threadPool.execute(() -> {
-                    try {
-                        repo.update();
-                        mm.repoDB.addRepo(repo);
-                    } catch (Repo.IllegalRepoException e) {
-                        Logger.debug(e.getMessage());
-                        mm.repoDB.removeRepo(repo);
-                    }
-                });
-            }
-            waitTasks();
+    private void fullReload() {
+        Cursor c = mm.repoDB.getRawCursor();
+        while (c.moveToNext()) {
+            Repo repo = new Repo(c);
+            threadPool.execute(() -> {
+                try {
+                    repo.update();
+                    mm.repoDB.addRepo(repo);
+                } catch (Repo.IllegalRepoException e) {
+                    Logger.debug(e.getMessage());
+                    mm.repoDB.removeRepo(repo);
+                }
+            });
         }
-        return null;
+        waitTasks();
     }
 
-    @Override
-    protected void onPostExecute(Void v) {
-        Topic.publish(Topic.REPO_LOAD_DONE);
-        super.onPostExecute(v);
+    public void exec(boolean force) {
+        Topic.reset(Topic.REPO_LOAD_DONE);
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            etags = Arrays.asList(mm.prefs.getString(Const.Key.ETAG_KEY, "").split(","));
+            cached = mm.repoDB.getRepoIDSet();
+
+            if (loadPage(0, CHECK_ETAG)) {
+                waitTasks();
+
+                // The leftover cached means they are removed from online repo
+                mm.repoDB.removeRepo(cached);
+
+                // Update ETag
+                mm.prefs.edit().putString(Const.Key.ETAG_KEY, TextUtils.join(",", newEtags)).apply();
+            } else if (force) {
+                fullReload();
+            }
+            Topic.publish(Topic.REPO_LOAD_DONE);
+        });
+    }
+
+    public void exec() {
+        exec(false);
     }
 }

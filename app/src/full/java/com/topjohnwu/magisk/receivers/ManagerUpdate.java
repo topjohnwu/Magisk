@@ -7,12 +7,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.PatchAPK;
+import com.topjohnwu.magisk.utils.ZipUtils;
+import com.topjohnwu.utils.JarMap;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 public class ManagerUpdate extends BroadcastReceiver {
@@ -31,13 +32,14 @@ public class ManagerUpdate extends BroadcastReceiver {
         public void onDownloadDone(Context context, Uri uri) {
             if (!context.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                 AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-                    String o = uri.getPath();
-                    String p = o.substring(0, o.lastIndexOf('.')) + "-patched.apk";
+                    String orig = uri.getPath();
+                    String patch = orig.substring(0, orig.lastIndexOf('.')) + "-patched.apk";
                     try {
-                        PatchAPK.patchPackageID(o, new BufferedOutputStream(new FileOutputStream(p)),
-                                Const.ORIG_PKG_NAME, context.getPackageName());
-                    } catch (FileNotFoundException ignored) { }
-                    super.onDownloadDone(context, Uri.fromFile(new File(p)));
+                        JarMap apk = new JarMap(orig);
+                        PatchAPK.patchPackageID(apk, Const.ORIG_PKG_NAME, context.getPackageName());
+                        ZipUtils.signZip(apk, new BufferedOutputStream(new FileOutputStream(patch)));
+                        super.onDownloadDone(context, Uri.fromFile(new File(patch)));
+                    } catch (Exception ignored) { }
                 });
             } else {
                 super.onDownloadDone(context, uri);

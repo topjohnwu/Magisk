@@ -172,7 +172,7 @@ public class MagiskFragment extends BaseFragment
 
         // Trigger state check
         if (Download.checkNetworkStatus(mm)) {
-            new CheckUpdates().exec();
+            CheckUpdates.check();
         } else {
             mSwipeRefreshLayout.setRefreshing(false);
         }

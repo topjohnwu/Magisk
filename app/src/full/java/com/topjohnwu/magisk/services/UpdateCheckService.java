@@ -11,7 +11,7 @@ public class UpdateCheckService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         Shell.getShell();
-        new CheckUpdates(true).setCallBack(() -> jobFinished(params, false)).exec();
+        CheckUpdates.check(() -> jobFinished(params, false));
         return true;
     }
 

@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.asyncs;
 
+import android.os.AsyncTask;
+
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.WebService;
@@ -11,19 +12,9 @@ import com.topjohnwu.magisk.utils.WebService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CheckUpdates extends ParallelTask<Void, Void, Void> {
+public class CheckUpdates {
 
-    private boolean showNotification;
-
-    public CheckUpdates() {
-        this(false);
-    }
-
-    public CheckUpdates(boolean b) {
-        showNotification = b;
-    }
-
-    private int getInt(JSONObject json, String name, int defValue) {
+    private static int getInt(JSONObject json, String name, int defValue) {
         if (json == null)
             return defValue;
         try {
@@ -33,7 +24,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         }
     }
 
-    private String getString(JSONObject json, String name, String defValue) {
+    private static String getString(JSONObject json, String name, String defValue) {
         if (json == null)
             return defValue;
         try {
@@ -43,7 +34,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         }
     }
 
-    private JSONObject getJson(JSONObject json, String name) {
+    private static JSONObject getJson(JSONObject json, String name) {
         try {
             return json.getJSONObject(name);
         } catch (JSONException e) {
@@ -51,9 +42,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         }
     }
 
-    @Override
-    protected Void doInBackground(Void... voids) {
-        MagiskManager mm = Data.MM();
+    public static void fetchUpdates() {
         String jsonStr = "";
         switch (Data.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
@@ -63,7 +52,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
                 jsonStr = WebService.getString(Const.Url.BETA_URL);
                 break;
             case Const.Value.CUSTOM_CHANNEL:
-                jsonStr = WebService.getString(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                jsonStr = WebService.getString(Data.MM().prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                 break;
         }
 
@@ -71,7 +60,7 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
         try {
             json = new JSONObject(jsonStr);
         } catch (JSONException e) {
-            return null;
+            return;
         }
 
         JSONObject magisk = getJson(json, "magisk");
@@ -88,20 +77,24 @@ public class CheckUpdates extends ParallelTask<Void, Void, Void> {
 
         JSONObject uninstaller = getJson(json, "uninstaller");
         Data.uninstallerLink = getString(uninstaller, "link", null);
-
-        return null;
     }
 
-    @Override
-    protected void onPostExecute(Void v) {
-        if (showNotification) {
-            if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
-                NotificationMgr.managerUpdate();
-            } else if (Data.magiskVersionCode < Data.remoteMagiskVersionCode) {
-                NotificationMgr.magiskUpdate();
+    public static void check(Runnable cb) {
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            fetchUpdates();
+            if (cb != null) {
+                if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
+                    NotificationMgr.managerUpdate();
+                } else if (Data.magiskVersionCode < Data.remoteMagiskVersionCode) {
+                    NotificationMgr.magiskUpdate();
+                }
+                cb.run();
             }
-        }
-        Topic.publish(Topic.UPDATE_CHECK_DONE);
-        super.onPostExecute(v);
+            Topic.publish(Topic.UPDATE_CHECK_DONE);
+        });
+    }
+
+    public static void check() {
+        check(null);
     }
 }

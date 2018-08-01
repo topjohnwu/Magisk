@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
@@ -15,15 +14,11 @@ import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
 
 public class MagiskManager extends ContainerApp {
 
     // Info
     public boolean hasInit = false;
-
-    // Data
-    public Map<String, Module> moduleMap;
 
     // Global resources
     public SharedPreferences prefs;

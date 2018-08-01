@@ -21,7 +21,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.asyncs.HideManager;
+import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
@@ -163,7 +163,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             if (Data.magiskVersionCode >= Const.MAGISK_VER.MANAGER_HIDE) {
                 if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                     hideManager.setOnPreferenceClickListener((pref) -> {
-                        new HideManager(getActivity()).exec();
+                        PatchAPK.hideManager(requireActivity());
                         return true;
                     });
                     generalCatagory.removePreference(restoreManager);
@@ -287,7 +287,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                     Topic.publish(false, Topic.RELOAD_ACTIVITY);
                     break;
                 case Const.Key.UPDATE_CHANNEL:
-                    new CheckUpdates().exec();
+                    CheckUpdates.check();
                     break;
                 case Const.Key.CHECK_UPDATES:
                     Utils.setupUpdateCheck();
