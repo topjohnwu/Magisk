@@ -9,7 +9,6 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +23,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
-        mm = Utils.getMagiskManager(context);
+        mm = Data.MM();
         mDb = getWritableDatabase();
 
         // Remove outdated repos

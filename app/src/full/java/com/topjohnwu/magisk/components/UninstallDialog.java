@@ -15,13 +15,12 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.RestoreImages;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class UninstallDialog extends CustomAlertDialog {
 
     public UninstallDialog(@NonNull Activity activity) {
         super(activity);
-        MagiskManager mm = Utils.getMagiskManager(activity);
+        MagiskManager mm = Data.MM();
         setTitle(R.string.uninstall_magisk_title);
         setMessage(R.string.uninstall_magisk_msg);
         setNeutralButton(R.string.restore_img, (d, i) -> new RestoreImages(activity).exec());

@@ -21,13 +21,11 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.Activity;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
-import com.topjohnwu.magisk.utils.Utils;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -50,7 +48,6 @@ public class RequestActivity extends Activity {
     private String socketPath;
     private LocalSocket socket;
     private PackageManager pm;
-    private MagiskManager mm;
 
     private boolean hasTimeout;
     private Policy policy;
@@ -68,7 +65,6 @@ public class RequestActivity extends Activity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
 
         pm = getPackageManager();
-        mm = Utils.getMagiskManager(this);
         mm.mDB.clearOutdated();
 
         Intent intent = getIntent();

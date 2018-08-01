@@ -130,7 +130,7 @@ public class ModulesFragment extends Fragment implements Topic.Subscriber {
 
     private void updateUI() {
         listModules.clear();
-        listModules.addAll(getApplication().moduleMap.values());
+        listModules.addAll(mm.moduleMap.values());
         if (listModules.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

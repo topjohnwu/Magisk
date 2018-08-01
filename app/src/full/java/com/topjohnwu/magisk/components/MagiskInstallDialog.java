@@ -18,7 +18,7 @@ import java.util.List;
 public class MagiskInstallDialog extends CustomAlertDialog {
     public MagiskInstallDialog(Activity activity) {
         super(activity);
-        MagiskManager mm = Utils.getMagiskManager(activity);
+        MagiskManager mm = Data.MM();
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
                 Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
         setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.magisk)));

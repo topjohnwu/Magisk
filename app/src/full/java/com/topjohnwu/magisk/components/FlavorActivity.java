@@ -19,6 +19,7 @@ public abstract class FlavorActivity extends AppCompatActivity implements Topic.
 
     private ActivityResultListener activityResultListener;
     static int[] EMPTY_INT_ARRAY = new int[0];
+    public MagiskManager mm;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -26,6 +27,7 @@ public abstract class FlavorActivity extends AppCompatActivity implements Topic.
         Configuration config = base.getResources().getConfiguration();
         config.setLocale(LocaleManager.locale);
         applyOverrideConfiguration(config);
+        mm = Data.MM();
     }
 
     @Override
@@ -36,10 +38,6 @@ public abstract class FlavorActivity extends AppCompatActivity implements Topic.
     @StyleRes
     public int getDarkTheme() {
         return -1;
-    }
-
-    public MagiskManager getMagiskManager() {
-        return (MagiskManager) super.getApplication();
     }
 
     @Override

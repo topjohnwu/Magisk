@@ -45,8 +45,6 @@ public class MagiskFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
-
-    private MagiskManager mm;
     private Unbinder unbinder;
     private static boolean shownDialog = false;
 
@@ -139,8 +137,6 @@ public class MagiskFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
         unbinder = ButterKnife.bind(this, v);
         requireActivity().setTitle(R.string.magisk);
-
-        mm = getApplication();
 
         expandableContainer.expandLayout = expandLayout;
         setupExpandable();

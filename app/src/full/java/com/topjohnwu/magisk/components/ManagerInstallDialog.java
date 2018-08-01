@@ -17,7 +17,7 @@ public class ManagerInstallDialog extends CustomAlertDialog {
 
     public ManagerInstallDialog(@NonNull Activity activity) {
         super(activity);
-        MagiskManager mm = Utils.getMagiskManager(activity);
+        MagiskManager mm = Data.MM();
         String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
                 Data.remoteManagerVersionString, Data.remoteManagerVersionCode);
         setTitle(mm.getString(R.string.repo_install_title, mm.getString(R.string.app_name)));

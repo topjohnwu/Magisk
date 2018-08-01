@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            MagiskManager mm = Utils.getMagiskManager(context);
+            MagiskManager mm = Data.MM();
             ShortcutManager manager = context.getSystemService(ShortcutManager.class);
             manager.setDynamicShortcuts(getShortCuts(mm));
         }

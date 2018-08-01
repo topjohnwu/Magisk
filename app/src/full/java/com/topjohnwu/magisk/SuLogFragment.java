@@ -24,7 +24,6 @@ public class SuLogFragment extends Fragment {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
 
     private Unbinder unbinder;
-    private MagiskManager mm;
     private SuLogAdapter adapter;
 
     @Override
@@ -45,7 +44,6 @@ public class SuLogFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_su_log, container, false);
         unbinder = ButterKnife.bind(this, v);
-        mm = getApplication();
         adapter = new SuLogAdapter(mm.mDB);
         recyclerView.setAdapter(adapter);
 

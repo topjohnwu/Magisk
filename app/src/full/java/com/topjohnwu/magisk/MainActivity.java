@@ -42,9 +42,6 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-
-        MagiskManager mm = getMagiskManager();
-
         if (!mm.hasInit) {
             Intent intent = new Intent(this, SplashActivity.class);
             String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
@@ -121,7 +118,6 @@ public class MainActivity extends Activity
     }
 
     public void checkHideSection() {
-        MagiskManager mm = getMagiskManager();
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(
                 Shell.rootAccess() && Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED

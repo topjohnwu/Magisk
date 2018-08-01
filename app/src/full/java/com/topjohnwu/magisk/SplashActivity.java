@@ -23,7 +23,6 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MagiskManager mm = getMagiskManager();
         // Force create a shell if not created yet
         boolean root = Shell.rootAccess();
 

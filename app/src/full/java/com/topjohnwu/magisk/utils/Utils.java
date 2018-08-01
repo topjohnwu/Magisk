@@ -27,10 +27,6 @@ public class Utils {
         return getPrefsInt(prefs, key, 0);
     }
 
-    public static MagiskManager getMagiskManager(Context context) {
-        return (MagiskManager) context.getApplicationContext();
-    }
-
     public static String getNameFromUri(Context context, Uri uri) {
         String name = null;
         try (Cursor c = context.getContentResolver().query(uri, null, null, null, null)) {
@@ -50,8 +46,7 @@ public class Utils {
     }
 
     public static int dpInPx(int dp) {
-        Context context = Data.MM();
-        float scale = context.getResources().getDisplayMetrics().density;
+        float scale = Data.MM().getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5);
     }
 

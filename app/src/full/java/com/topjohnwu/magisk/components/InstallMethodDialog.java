@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
-import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
@@ -22,7 +21,6 @@ class InstallMethodDialog extends AlertDialog.Builder {
 
     InstallMethodDialog(Activity activity, List<String> options, String filename) {
         super(activity);
-        MagiskManager mm = Utils.getMagiskManager(activity);
         setTitle(R.string.select_method);
         setItems(options.toArray(new String [0]), (dialog, idx) -> {
             Intent intent;

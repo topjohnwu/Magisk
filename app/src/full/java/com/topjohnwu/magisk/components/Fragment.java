@@ -2,14 +2,16 @@ package com.topjohnwu.magisk.components;
 
 import android.content.Intent;
 
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.Utils;
 
 public class Fragment extends android.support.v4.app.Fragment implements Topic.AutoSubscriber {
 
-    public MagiskManager getApplication() {
-        return Utils.getMagiskManager(getActivity());
+    public MagiskManager mm;
+
+    public Fragment() {
+        mm = Data.MM();
     }
 
     @Override

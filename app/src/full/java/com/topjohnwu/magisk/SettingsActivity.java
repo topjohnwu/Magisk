@@ -97,7 +97,7 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.app_settings, rootKey);
-            mm = Utils.getMagiskManager(getActivity());
+            mm = Data.MM();
             prefs = mm.prefs;
             prefScreen = getPreferenceScreen();
 
@@ -126,10 +126,10 @@ public class SettingsActivity extends Activity implements Topic.Subscriber {
             updateChannel.setOnPreferenceChangeListener((pref, o) -> {
                 Data.updateChannel = Integer.parseInt((String) o);
                 if (Data.updateChannel == Const.Value.CUSTOM_CHANNEL) {
-                    View v = LayoutInflater.from(getActivity()).inflate(R.layout.custom_channel_dialog, null);
+                    View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                     EditText url = v.findViewById(R.id.custom_url);
                     url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
-                    new AlertDialog.Builder(getActivity())
+                    new AlertDialog.Builder(requireActivity())
                             .setTitle(R.string.settings_update_custom)
                             .setView(v)
                             .setPositiveButton(R.string.ok, (d, i) ->

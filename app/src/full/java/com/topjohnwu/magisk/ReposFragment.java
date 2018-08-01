@@ -26,7 +26,6 @@ import butterknife.Unbinder;
 public class ReposFragment extends Fragment implements Topic.Subscriber {
 
     private Unbinder unbinder;
-    private MagiskManager mm;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -44,7 +43,6 @@ public class ReposFragment extends Fragment implements Topic.Subscriber {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_repos, container, false);
         unbinder = ButterKnife.bind(this, view);
-        mm = getApplication();
 
         mSwipeRefreshLayout.setRefreshing(true);
 

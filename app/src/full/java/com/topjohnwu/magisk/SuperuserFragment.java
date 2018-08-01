@@ -23,7 +23,6 @@ public class SuperuserFragment extends Fragment {
 
     private Unbinder unbinder;
     private PackageManager pm;
-    private MagiskManager mm;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.empty_rv) TextView emptyRv;
 
@@ -34,14 +33,13 @@ public class SuperuserFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         pm = getActivity().getPackageManager();
-        mm = getApplication();
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        getActivity().setTitle(getString(R.string.superuser));
+        requireActivity().setTitle(getString(R.string.superuser));
     }
 
     @Override
