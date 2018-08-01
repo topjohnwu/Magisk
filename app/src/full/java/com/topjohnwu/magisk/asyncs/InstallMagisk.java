@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
@@ -74,6 +76,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     public InstallMagisk(FlashActivity context, List<String> console, List<String> logs, Uri boot) {
         this(context, console, logs, PATCH_MODE);
         bootUri = boot;
+    }
+
+    @Override
+    protected BaseActivity getActivity() {
+        return (BaseActivity) super.getActivity();
     }
 
     @Override
@@ -381,5 +388,11 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             }
             activity.buttonPanel.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void exec(Void... voids) {
+        getActivity().runWithPermission(
+                new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, super::exec);
     }
 }

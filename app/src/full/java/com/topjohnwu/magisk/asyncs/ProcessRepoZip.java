@@ -154,11 +154,9 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     }
 
     @Override
-    public ParallelTask<Void, Object, Boolean> exec(Void... voids) {
+    public void exec(Void... voids) {
         getActivity().runWithPermission(
-                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                () -> super.exec(voids));
-        return this;
+                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, super::exec);
     }
 
     private class ProgressInputStream extends FilterInputStream {
