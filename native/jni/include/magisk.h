@@ -17,6 +17,7 @@
 
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
+#define TMPSEPOLICY     "/dev/.tmp_sepolicy"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define MAGISKTMP       "/sbin/.core"
 #define BLOCKDIR        MAGISKTMP "/block"

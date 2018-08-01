@@ -678,7 +678,8 @@ void post_fs_data(int client) {
 	LOGI("** post-fs-data mode running\n");
 
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-	full_patch_pid = exec_command(0, NULL, NULL, "/sbin/magiskpolicy", "--live", "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
+	full_patch_pid = exec_command(0, NULL, NULL,
+		"/sbin/magiskpolicy", "--save", TMPSEPOLICY, "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
 
 	// Allocate buffer
 	buf = xmalloc(PATH_MAX);
@@ -803,9 +804,13 @@ void late_start(int client) {
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
 
-	// Wait till the full patch is done
-	if (full_patch_pid > 0)
+	if (full_patch_pid > 0) {
+		// Wait till the full patch is done
 		waitpid(full_patch_pid, NULL, 0);
+		// Load the policy
+		exec_command_sync("/sbin/magiskpolicy", "--live", "--load", TMPSEPOLICY, NULL);
+		unlink(TMPSEPOLICY);
+	}
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");
