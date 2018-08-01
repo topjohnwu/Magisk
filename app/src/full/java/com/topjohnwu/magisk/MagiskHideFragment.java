@@ -43,11 +43,11 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
         View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        mSwipeRefreshLayout.setRefreshing(true);
-        mSwipeRefreshLayout.setOnRefreshListener(appAdapter::refresh);
-
         appAdapter = new ApplicationAdapter(requireActivity());
         recyclerView.setAdapter(appAdapter);
+
+        mSwipeRefreshLayout.setRefreshing(true);
+        mSwipeRefreshLayout.setOnRefreshListener(appAdapter::refresh);
 
         searchListener = new SearchView.OnQueryTextListener() {
             @Override
