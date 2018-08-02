@@ -27,7 +27,7 @@ initialize() {
   . $MAGISKBIN/util_functions.sh
 
   APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/.magisk/magisk.apk
+  [ -f $APK ] || APK=/data/magisk/magisk.apk
   [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
 }
 

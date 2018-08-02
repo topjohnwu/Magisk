@@ -605,7 +605,7 @@ void startup() {
 	close(root);
 
 	// Alternative binaries paths
-	char *alt_bin[] = { "/cache/data_bin", "/data/.magisk",
+	char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
 						"/data/data/com.topjohnwu.magisk/install",
 						"/data/user_de/0/com.topjohnwu.magisk/install", NULL };
 	char *bin_path = NULL;
