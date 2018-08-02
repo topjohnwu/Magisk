@@ -115,10 +115,12 @@ static struct node_entry *insert_child(struct node_entry *p, struct node_entry *
  ***********/
 
 static void set_path(struct vector *v) {
+	char buffer[512];
 	for (int i = 0; environ[i]; ++i) {
 		if (strncmp(environ[i], "PATH=", 5) == 0) {
-			vec_push_back(v, strdup("PATH=" BBPATH ":/sbin:" MIRRDIR "/system/bin:"
-						MIRRDIR "/system/xbin:" MIRRDIR "/vendor/bin"));
+			// Prepend BBPATH to PATH
+			sprintf(buffer, "PATH="BBPATH":%s", environ[i] + 5);
+			vec_push_back(v, strdup(buffer));
 		} else {
 			vec_push_back(v, strdup(environ[i]));
 		}
