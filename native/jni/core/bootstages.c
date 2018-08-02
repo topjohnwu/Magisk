@@ -645,8 +645,8 @@ void startup() {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 		} else if (!skip_initramfs && strstr(line, " /system ")) {
-			sscanf(line, "%s", buf);
-			xmount(buf, MIRRDIR "/system", "ext4", MS_RDONLY, NULL);
+			sscanf(line, "%s %*s %s", buf, buf2);
+			xmount(buf, MIRRDIR "/system", buf2, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
 #else
@@ -654,9 +654,9 @@ void startup() {
 #endif
 		} else if (strstr(line, " /vendor ")) {
 			seperate_vendor = 1;
-			sscanf(line, "%s", buf);
+			sscanf(line, "%s %*s %s", buf, buf2);
 			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", "ext4", MS_RDONLY, NULL);
+			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, NULL);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
 #else
