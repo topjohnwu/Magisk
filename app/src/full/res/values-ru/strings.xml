@@ -99,6 +99,7 @@
     <string name="download_zip_only">Загрузка установочного ZIP</string>
     <string name="patch_boot_file">Пропатчить образ ядра (boot.img)</string>
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
+    <string name="install_inactive_slot">Установка в неактивный слот (После OTA)</string>
     <string name="select_method">Выбор способа</string>
     <string name="no_boot_file_patch_support">Целевая версия Magisk не поддерживает патчинг boot-образов</string>
     <string name="boot_file_patch_msg">Выберите файл ядра (boot) - *.img или *.img.tar</string>
