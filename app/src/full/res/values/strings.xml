@@ -100,6 +100,8 @@
     <string name="patch_boot_file">Patch Boot Image File</string>
     <string name="direct_install">Direct Install (Recommended)</string>
     <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
+    <string name="warning">Warning</string>
+    <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="select_method">Select Method</string>
     <string name="no_boot_file_patch_support">Target Magisk version doesn\'t support boot image file patching</string>
     <string name="boot_file_patch_msg">Select stock boot image dump in .img or .img.tar format</string>

@@ -58,9 +58,17 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     activity.startActivity(intent);
                     break;
                 case 3:
-                    intent = new Intent(activity, FlashActivity.class)
-                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
-                    activity.startActivity(intent);
+                    new CustomAlertDialog(activity)
+                            .setTitle(R.string.warning)
+                            .setMessage(R.string.install_inactive_slot_msg)
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.yes, (d, i) -> {
+                                Intent it = new Intent(activity, FlashActivity.class)
+                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
+                                activity.startActivity(it);
+                            })
+                            .setNegativeButton(R.string.no_thanks, null)
+                            .show();
                     break;
                 default:
             }
