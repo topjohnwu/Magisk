@@ -23,6 +23,10 @@ BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.top
 BOOTSIGNED=false
 
 get_outfd() {
+  $BOOTMODE && return
+  # Preserve environment varibles
+  OLD_PATH=$PATH
+  setup_bb
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
     for FD in `ls /proc/$$/fd`; do
@@ -323,9 +327,6 @@ boot_actions() {
 recovery_actions() {
   # TWRP bug fix
   mount -o bind /dev/urandom /dev/random
-  # Preserve environment varibles
-  OLD_PATH=$PATH
-  setup_bb
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Unset library paths
