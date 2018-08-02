@@ -45,7 +45,7 @@ void launch_magiskhide(int client) {
 		return;
 	}
 
-	if (!loggable) {
+	if (!check_and_start_logger()) {
 		if (client > 0) {
 			write_int(client, LOGCAT_DISABLED);
 			close(client);

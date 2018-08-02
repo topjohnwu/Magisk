@@ -5,11 +5,8 @@ const char magiskrc[] =
 
 // Triggers
 
-"on post-fs\n"
-"   start logd\n"
-"\n"
-
 "on post-fs-data\n"
+"   start logd\n"
 "   load_persist_props\n"
 "   rm "UNBLOCKFILE"\n"
 "   start magisk_startup\n"

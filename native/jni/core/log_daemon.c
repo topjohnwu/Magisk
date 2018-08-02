@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "daemon.h"
 
-int loggable = 1;
+static int loggable = 0;
 static struct vector log_cmd, clear_cmd;
 static int sockfd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -104,6 +104,20 @@ static void *logcat_thread(void *args) {
 		log_pid = exec_array(0, NULL, NULL, (char **) vec_entry(&clear_cmd));
 		waitpid(log_pid, NULL, 0);
 	}
+}
+
+int check_and_start_logger() {
+	if (!loggable) {
+		int fd;
+		loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
+		chmod("/dev/null", 0666);
+		if (loggable) {
+			connect_daemon2(LOG_DAEMON, &fd);
+			write_int(fd, HANDSHAKE);
+			close(fd);
+		}
+	}
+	return loggable;
 }
 
 void log_daemon() {

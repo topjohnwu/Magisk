@@ -468,6 +468,23 @@ void install_apk(const char *apk) {
 	unlink(apk);
 }
 
+static void *start_magisk_hide(void *args) {
+	launch_magiskhide(-1);
+	return NULL;
+}
+
+static void auto_start_magiskhide() {
+	if (!check_and_start_logger())
+		return;
+	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
+	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
+		pthread_t thread;
+		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
+		pthread_detach(thread);
+	}
+	free(hide_prop);
+}
+
 /****************
  * Entry points *
  ****************/
@@ -803,6 +820,8 @@ void late_start(int client) {
 	// Allocate buffer
 	if (buf == NULL) buf = xmalloc(PATH_MAX);
 	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
+
+	auto_start_magiskhide();
 
 	if (full_patch_pid > 0) {
 		// Wait till the full patch is done

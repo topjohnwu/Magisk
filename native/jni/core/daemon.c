@@ -93,22 +93,6 @@ static void *request_handler(void *args) {
 	return NULL;
 }
 
-
-static void *start_magisk_hide(void *args) {
-	launch_magiskhide(-1);
-	return NULL;
-}
-
-void auto_start_magiskhide() {
-	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
-	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
-		pthread_t thread;
-		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
-		pthread_detach(thread);
-	}
-	free(hide_prop);
-}
-
 void main_daemon() {
 	setsid();
 	setcon("u:r:"SEPOL_PROC_DOMAIN":s0");
@@ -121,13 +105,7 @@ void main_daemon() {
 	close(fd);
 
 	// Start the log monitor
-	loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
-	chmod("/dev/null", 0666);
-	if (loggable) {
-		connect_daemon2(LOG_DAEMON, &fd);
-		write_int(fd, HANDSHAKE);
-		close(fd);
-	}
+	check_and_start_logger();
 
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun, MAIN_DAEMON);

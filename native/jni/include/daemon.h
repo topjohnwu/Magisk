@@ -51,12 +51,11 @@ typedef enum {
 void main_daemon();
 int connect_daemon();
 int connect_daemon2(daemon_t d, int *sockfd);
-void auto_start_magiskhide();
 
 // log_monitor.c
 
-extern int loggable;
 void log_daemon();
+int check_and_start_logger();
 
 // socket.c
 
