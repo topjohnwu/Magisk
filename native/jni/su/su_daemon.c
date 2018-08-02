@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "daemon.h"
@@ -200,9 +201,6 @@ static struct su_info *get_su_info(unsigned uid) {
 static void su_executor(int client) {
 	LOGD("su: executor started\n");
 
-	// ack
-	write_int(client, 0);
-
 	// Become session leader
 	xsetsid();
 
@@ -249,9 +247,6 @@ static void su_executor(int client) {
 	int errfd = recv_fd(client);
 	int ptsfd = -1;
 
-	// We no longer need the access to socket in the child, close it
-	close(client);
-
 	if (pts_slave[0]) {
 		LOGD("su: pts_slave=[%s]\n", pts_slave);
 		// Check pts_slave file is owned by daemon_from_uid
@@ -264,6 +259,9 @@ static void su_executor(int client) {
 			su_ctx->info->access.policy = DENY;
 			exit2(1);
 		}
+
+		// Set our pts_slave to devpts, same restriction as adb shell
+		lsetfilecon(pts_slave, "u:object_r:devpts:s0");
 
 		// Opening the TTY has to occur after the
 		// fork() and setsid() so that it becomes
@@ -292,6 +290,10 @@ static void su_executor(int client) {
 	xdup2(errfd, STDERR_FILENO);
 
 	close(ptsfd);
+
+	// ack and close
+	write_int(client, 0);
+	close(client);
 
 	// Run the actual main
 	su_daemon_main(argc, argv);
@@ -369,7 +371,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
  * Connect daemon, send argc, argv, cwd, pts slave
  */
 int su_client_main(int argc, char *argv[]) {
-	char buffer[PATH_MAX];
+	char pts_slave[PATH_MAX];
 	int ptmx, socketfd;
 
 	// Connect to client
@@ -394,40 +396,20 @@ int su_client_main(int argc, char *argv[]) {
 
 	if (atty) {
 		// We need a PTY. Get one.
-		ptmx = pts_open(buffer, sizeof(buffer));
+		ptmx = pts_open(pts_slave, sizeof(pts_slave));
 	} else {
-		buffer[0] = '\0';
+		pts_slave[0] = '\0';
 	}
 
 	// Send the pts_slave path to the daemon
-	write_string(socketfd, buffer);
+	write_string(socketfd, pts_slave);
 
 	// Send stdin
-	if (atty & ATTY_IN) {
-		// Using PTY
-		send_fd(socketfd, -1);
-	} else {
-		send_fd(socketfd, STDIN_FILENO);
-	}
-
+	send_fd(socketfd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
 	// Send stdout
-	if (atty & ATTY_OUT) {
-		// Forward SIGWINCH
-		watch_sigwinch_async(STDOUT_FILENO, ptmx);
-
-		// Using PTY
-		send_fd(socketfd, -1);
-	} else {
-		send_fd(socketfd, STDOUT_FILENO);
-	}
-
+	send_fd(socketfd, (atty & ATTY_OUT) ? -1 : STDOUT_FILENO);
 	// Send stderr
-	if (atty & ATTY_ERR) {
-		// Using PTY
-		send_fd(socketfd, -1);
-	} else {
-		send_fd(socketfd, STDERR_FILENO);
-	}
+	send_fd(socketfd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
 
 	// Wait for acknowledgement from daemon
 	if (read_int(socketfd)) {
@@ -441,6 +423,8 @@ int su_client_main(int argc, char *argv[]) {
 		pump_stdin_async(ptmx);
 	}
 	if (atty & ATTY_OUT) {
+		// Forward SIGWINCH
+		watch_sigwinch_async(STDOUT_FILENO, ptmx);
 		pump_stdout_blocking(ptmx);
 	}
 

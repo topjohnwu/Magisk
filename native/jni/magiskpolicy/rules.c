@@ -6,7 +6,6 @@ void allowSuClient(char *target) {
 		return;
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-	sepol_allow(target, "devpts", "chr_file", "ioctl");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "process", "sigchld");
@@ -17,15 +16,16 @@ void allowSuClient(char *target) {
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "file", ALL);
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "dir", ALL);
 
-	// Fix several terminal apps running root shell
+	// Allow termios ioctl
+	sepol_allow(target, "devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_25_devpts", "chr_file", "ioctl");
+	sepol_allow(target, "untrusted_app_all_devpts", "chr_file", "ioctl");
 	if (policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
 		sepol_allowxperm(target, "devpts", "chr_file", "0x5400-0x54FF");
-		if (sepol_exists("untrusted_app_devpts"))
-			sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
-		if (sepol_exists("untrusted_app_25_devpts"))
-			sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
-		if (sepol_exists("untrusted_app_all_devpts"))
-			sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
+		sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
 	}
 }
 
