@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.container.Repo;
 
 import java.util.HashSet;
@@ -20,6 +21,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     private SQLiteDatabase mDb;
     private MagiskManager mm;
+    private ReposAdapter adapter;
 
     public RepoDatabaseHelper(Context context) {
         super(context, "repo.db", null, DATABASE_VER);
@@ -63,15 +65,18 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
     public void clearRepo() {
         mDb.delete(TABLE_NAME, null, null);
+        notifyAdapter();
     }
 
 
     public void removeRepo(String id) {
         mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+        notifyAdapter();
     }
 
     public void removeRepo(Repo repo) {
         mDb.delete(TABLE_NAME, "repo_name=?", new String[] { repo.getRepoName() });
+        notifyAdapter();
     }
 
     public void removeRepo(Iterable<String> list) {
@@ -79,10 +84,12 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             if (id == null) continue;
             mDb.delete(TABLE_NAME, "id=?", new String[] { id });
         }
+        notifyAdapter();
     }
 
     public void addRepo(Repo repo) {
         mDb.replace(TABLE_NAME, null, repo.getContentValues());
+        notifyAdapter();
     }
 
     public Repo getRepo(String id) {
@@ -120,5 +127,19 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return set;
+    }
+
+    public void registerAdapter(ReposAdapter a) {
+        adapter = a;
+    }
+
+    public void unregisterAdapter() {
+        adapter = null;
+    }
+
+    private void notifyAdapter() {
+        if (adapter != null) {
+            Data.mainHandler.post(adapter::notifyDBChanged);
+        }
     }
 }

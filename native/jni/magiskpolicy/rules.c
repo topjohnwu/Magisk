@@ -124,7 +124,7 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "security", "read_policy");
 	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "security", "load_policy");
 
-	// Allow these client to access su
+	// Allow these processes to access MagiskSU
 	allowSuClient("init");
 	allowSuClient("shell");
 	allowSuClient("system_app");
@@ -133,6 +133,7 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app");
 	allowSuClient("untrusted_app_25");
 	allowSuClient("untrusted_app_27");
+	allowSuClient("update_engine");
 
 	// Some superuser stuffs
 	otherToSU();
@@ -165,4 +166,7 @@ void sepol_magisk_rules() {
 
 	// Support deodexed ROM on Oreo
 	sepol_allow("zygote", "dalvikcache_data_file", "file", "execute");
+
+	// Allow update engine to source addon.d.sh
+	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
 }

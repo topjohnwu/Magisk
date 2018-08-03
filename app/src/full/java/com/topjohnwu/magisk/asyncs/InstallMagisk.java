@@ -101,14 +101,15 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         private ProgressStream(HttpURLConnection conn) throws IOException {
             super(conn.getInputStream());
             total = conn.getContentLength();
+            console.add("... 0%");
         }
 
         private void update(int step) {
             progress += step;
-            int curr = (int) (10 * (double) progress / total);
+            int curr = (int) (100 * (double) progress / total);
             if (prev != curr) {
                 prev = curr;
-                console.add("... " + prev * 10 + "%");
+                console.set(console.size() - 1, "... " + prev + "%");
             }
         }
 
@@ -141,7 +142,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
         BufferedInputStream buf = new BufferedInputStream(new ProgressStream(conn));
         buf.mark(Integer.MAX_VALUE);
-        try (OutputStream out = new FileOutputStream(new File(Download.EXTERNAL_PATH, filename))) {
+        File zip = new File(Download.EXTERNAL_PATH, filename);
+        zip.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(zip)) {
             ShellUtils.pump(buf, out);
             buf.reset();
         }

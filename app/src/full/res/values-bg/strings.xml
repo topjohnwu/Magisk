@@ -1,5 +1,4 @@
 <resources>
-    <!--Universal-->
 
     <!--Welcome Activity-->
     <string name="modules">Модули</string>
@@ -101,7 +100,9 @@
     <string name="patch_boot_file">Модифициране на Boot образа</string>
     <string name="direct_install">Директно инсталиране (Препоръчва се)</string>
     <string name="install_inactive_slot">Инсталиране на неактивен слот (След OTA)</string>
-    <string name="select_method">Избор на метод</string>
+    <string name="warning">Внимание</string>
+    <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране!\nИзползвайте тази опция само след приключване на OTA актуализация.\nПродължаване?</string>
+.   <string name="select_method">Избор на метод</string>
     <string name="no_boot_file_patch_support">Избраната версия на Magisk не поддържа модифициране на Boot образи</string>
     <string name="boot_file_patch_msg">Изберете стоков Boot образ с формат .img или .img.tar</string>
     <string name="complete_uninstall">Пълно деинсталиране</string>

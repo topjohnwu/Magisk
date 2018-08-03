@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Topic;
@@ -80,10 +79,6 @@ public class UpdateRepos {
                         set.remove(id);
                     repo.update(date);
                     mm.repoDB.addRepo(repo);
-                    Data.mainHandler.post(() -> {
-                        if (ReposFragment.adapter != null)
-                            ReposFragment.adapter.notifyDBChanged();
-                    });
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
                     mm.repoDB.removeRepo(id);

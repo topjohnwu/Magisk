@@ -22,7 +22,7 @@
 #include "resetprop.h"
 #include "magiskpolicy.h"
 
-static char *buf, *buf2;
+static char buf[PATH_MAX], buf2[PATH_MAX];
 static struct vector module_list;
 
 extern char **environ;
@@ -118,9 +118,20 @@ static void set_path(struct vector *v) {
 	char buffer[512];
 	for (int i = 0; environ[i]; ++i) {
 		if (strncmp(environ[i], "PATH=", 5) == 0) {
-			// Prepend BBPATH to PATH
 			sprintf(buffer, "PATH="BBPATH":%s", environ[i] + 5);
 			vec_push_back(v, strdup(buffer));
+		} else {
+			vec_push_back(v, strdup(environ[i]));
+		}
+	}
+	vec_push_back(v, NULL);
+}
+
+static void set_mirror_path(struct vector *v) {
+	for (int i = 0; environ[i]; ++i) {
+		if (strncmp(environ[i], "PATH=", 5) == 0) {
+			vec_push_back(v, strdup("PATH="BBPATH":/sbin:"MIRRDIR"/system/bin:"
+									MIRRDIR"/system/xbin:"MIRRDIR"/vendor/bin"));
 		} else {
 			vec_push_back(v, strdup(environ[i]));
 		}
@@ -146,7 +157,9 @@ static void exec_common_script(const char* stage) {
 			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(0, NULL, set_path, "sh", buf2, NULL);
+			int pid = exec_command(0, NULL,
+								   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+								   "sh", buf2, NULL);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -163,7 +176,9 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(0, NULL, set_path, "sh", buf2, NULL);
+		int pid = exec_command(0, NULL,
+							   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+							   "sh", buf2, NULL);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
@@ -516,10 +531,6 @@ void startup() {
 
 	// No uninstaller or core-only mode
 	if (access(DISABLEFILE, F_OK) != 0) {
-		// Allocate buffer
-		buf = xmalloc(PATH_MAX);
-		buf2 = xmalloc(PATH_MAX);
-
 		simple_mount("/system");
 		simple_mount("/vendor");
 	}
@@ -533,7 +544,6 @@ void startup() {
 	DIR *dir;
 	struct dirent *entry;
 	int root, sbin, fd;
-	char buf[PATH_MAX];
 	void *magisk, *init;
 	size_t magisk_size, init_size;
 
@@ -701,8 +711,6 @@ void post_fs_data(int client) {
 		"/sbin/magiskpolicy", "--save", TMPSEPOLICY, "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
 
 	// Allocate buffer
-	buf = xmalloc(PATH_MAX);
-	buf2 = xmalloc(PATH_MAX);
 	vec_init(&module_list);
 
 	// Merge, trim, mount magisk.img, which will also travel through the modules
@@ -819,10 +827,6 @@ void late_start(int client) {
 		return;
 	}
 
-	// Allocate buffer
-	if (buf == NULL) buf = xmalloc(PATH_MAX);
-	if (buf2 == NULL) buf2 = xmalloc(PATH_MAX);
-
 	auto_start_magiskhide();
 
 	if (full_patch_pid > 0) {
@@ -862,9 +866,6 @@ core_only:
 		}
 	}
 
-	// All boot stage done, cleanup everything
-	free(buf);
-	free(buf2);
-	buf = buf2 = NULL;
+	// All boot stage done, cleanup
 	vec_deep_destroy(&module_list);
 }
