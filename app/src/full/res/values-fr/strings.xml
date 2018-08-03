@@ -100,6 +100,8 @@
     <string name="patch_boot_file">Patch Fichier Image Démarrage</string>
     <string name="direct_install">Installation directe (Recommendée)</string>
     <string name="install_inactive_slot">Installer dans l\'espace inactif (Après OTA)</string>
+    <string name="warning">Avertissement</string>
+    <string name="install_inactive_slot_msg">Votre téléphone sera FORÇÉ de démarrer dans le slot actuellement inactif après un redémarrage!\nUtiliser cette option uniquement après que la mise à jour OTA ai été éffectuée.\nContinuer?</string>
     <string name="select_method">Sélectionner le méthode</string>
     <string name="no_boot_file_patch_support">La version cible de Magisk ne prend pas en charge la correction de fichier image de démarrage</string>
     <string name="boot_file_patch_msg">Sélectionnez l\'image par défaut de démarrage stockée au format .img ou .img.tar</string>
