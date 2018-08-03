@@ -92,10 +92,11 @@ chmod -R 755 $MAGISKBIN
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
-  echo "#!/sbin/sh" > /system/addon.d/99-magisk.sh
-  echo "# ADDOND_VERSION=2" >> /system/addon.d/99-magisk.sh
-  echo ". /data/adb/magisk/addon.d.sh" >> /system/addon.d/99-magisk.sh
-  chmod 755 /system/addon.d/99-magisk.sh
+  ADDOND=/system/addon.d/99-magisk.sh
+  echo '#!/sbin/sh' > $ADDOND
+  echo '# ADDOND_VERSION=2' >> $ADDOND
+  echo 'exec sh /data/adb/magisk/addon.d.sh "$@"' >> $ADDOND
+  chmod 755 $ADDOND
 fi
 
 $BOOTMODE || recovery_actions
