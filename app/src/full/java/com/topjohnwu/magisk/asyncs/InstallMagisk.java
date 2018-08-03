@@ -141,7 +141,9 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
         BufferedInputStream buf = new BufferedInputStream(new ProgressStream(conn));
         buf.mark(Integer.MAX_VALUE);
-        try (OutputStream out = new FileOutputStream(new File(Download.EXTERNAL_PATH, filename))) {
+        File zip = new File(Download.EXTERNAL_PATH, filename);
+        zip.getParentFile().mkdirs();
+        try (OutputStream out = new FileOutputStream(zip)) {
             ShellUtils.pump(buf, out);
             buf.reset();
         }
