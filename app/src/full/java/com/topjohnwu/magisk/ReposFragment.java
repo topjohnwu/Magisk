@@ -34,7 +34,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     @BindView(R.id.empty_rv) TextView emptyRv;
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public static ReposAdapter adapter;
+    private ReposAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,12 +63,6 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        adapter = null;
-    }
-
-    @Override
     public int[] getSubscribedTopics() {
         return new int[] {Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
     }
@@ -77,12 +71,12 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     public void onPublish(int topic, Object[] result) {
         if (topic == Topic.MODULE_LOAD_DONE) {
             adapter = new ReposAdapter(mm.repoDB, (Map<String, Module>) result[0]);
+            mm.repoDB.registerAdapter(adapter);
             recyclerView.setAdapter(adapter);
             recyclerView.setVisibility(View.VISIBLE);
             emptyRv.setVisibility(View.GONE);
         }
         if (Topic.isPublished(getSubscribedTopics())) {
-            adapter.notifyDBChanged();
             mSwipeRefreshLayout.setRefreshing(false);
             recyclerView.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
             emptyRv.setVisibility(adapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
@@ -125,6 +119,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mm.repoDB.unregisterAdapter();
         unbinder.unbind();
     }
 }
