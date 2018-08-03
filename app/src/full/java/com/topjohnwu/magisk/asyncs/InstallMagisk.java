@@ -101,14 +101,15 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         private ProgressStream(HttpURLConnection conn) throws IOException {
             super(conn.getInputStream());
             total = conn.getContentLength();
+            console.add("... 0%");
         }
 
         private void update(int step) {
             progress += step;
-            int curr = (int) (10 * (double) progress / total);
+            int curr = (int) (100 * (double) progress / total);
             if (prev != curr) {
                 prev = curr;
-                console.add("... " + prev * 10 + "%");
+                console.set(console.size() - 1, "... " + prev + "%");
             }
         }
 

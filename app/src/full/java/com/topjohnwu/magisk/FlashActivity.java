@@ -100,11 +100,23 @@ public class FlashActivity extends BaseActivity {
 
         logs = new ArrayList<>();
         CallbackList<String> console = new CallbackList<String>(new ArrayList<>()) {
+
+            private void updateUI() {
+                flashLogs.setText(TextUtils.join("\n", this));
+                sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
+            }
+
             @Override
             public void onAddElement(String s) {
                 logs.add(s);
-                flashLogs.setText(TextUtils.join("\n", this));
-                sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
+                updateUI();
+            }
+
+            @Override
+            public String set(int i, String s) {
+                String ret = super.set(i, s);
+                Data.mainHandler.post(this::updateUI);
+                return ret;
             }
         };
 
