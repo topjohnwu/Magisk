@@ -1,6 +1,4 @@
 <resources>
-    <!--Universal-->
-
     <!--Welcome Activity-->
     <string name="modules">Modul</string>
     <string name="downloads">Unduhan</string>
@@ -100,6 +98,9 @@
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
+    <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
+    <string name="warning">Peringatan</string>
+    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
     <string name="select_method">Pilih Metode</string>
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
