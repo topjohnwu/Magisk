@@ -128,6 +128,18 @@ static void set_path(struct vector *v) {
 	vec_push_back(v, NULL);
 }
 
+static void set_mirror_path(struct vector *v) {
+	for (int i = 0; environ[i]; ++i) {
+		if (strncmp(environ[i], "PATH=", 5) == 0) {
+			vec_push_back(v, strdup("PATH="BBPATH":/sbin:"MIRRDIR"/system/bin:"
+									MIRRDIR"/system/xbin:"MIRRDIR"/vendor/bin"));
+		} else {
+			vec_push_back(v, strdup(environ[i]));
+		}
+	}
+	vec_push_back(v, NULL);
+}
+
 /***********
  * Scripts *
  ***********/
@@ -146,7 +158,9 @@ static void exec_common_script(const char* stage) {
 			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(0, NULL, set_path, "sh", buf2, NULL);
+			int pid = exec_command(0, NULL,
+								   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+								   "sh", buf2, NULL);
 			if (pid != -1)
 				waitpid(pid, NULL, 0);
 		}
@@ -163,7 +177,9 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(0, NULL, set_path, "sh", buf2, NULL);
+		int pid = exec_command(0, NULL,
+							   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+							   "sh", buf2, NULL);
 		if (pid != -1)
 			waitpid(pid, NULL, 0);
 	}
