@@ -100,6 +100,8 @@
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
     <string name="direct_install">直接安装（推荐）</string>
     <string name="install_inactive_slot">安装到未使用的槽位（安装完OTA后）</string>
+    <string name="warning">警告</string>
+    <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个的槽位！\n请在安装完 OTA 后再使用。\n是否继续？</string>
     <string name="select_method">选择安装方法</string>
     <string name="no_boot_file_patch_support">目标安装版本不支持修补 Boot 镜像文件</string>
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
@@ -116,7 +118,7 @@
     <string name="setup_done">安装完成</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要额外安装</string>
-    <string name="env_fix_msg">您的设备需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
+    <string name="env_fix_msg">需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
     <string name="setup_title">额外安装</string>
     <string name="setup_msg">运行环境安装中…</string>
 
