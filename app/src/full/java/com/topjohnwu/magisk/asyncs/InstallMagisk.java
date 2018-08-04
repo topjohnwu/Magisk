@@ -35,6 +35,7 @@ import org.kamranzafar.jtar.TarOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilterInputStream;
@@ -136,19 +137,28 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     }
 
     private void extractFiles(String arch) throws IOException {
-        console.add("- Downloading zip");
         String filename = Utils.fmt("Magisk-v%s(%d).zip",
                 Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
-        HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
-        BufferedInputStream buf = new BufferedInputStream(new ProgressStream(conn));
-        buf.mark(Integer.MAX_VALUE);
         File zip = new File(Download.EXTERNAL_PATH, filename);
         zip.getParentFile().mkdirs();
-        try (OutputStream out = new FileOutputStream(zip)) {
-            ShellUtils.pump(buf, out);
+        BufferedInputStream buf;
+
+        if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
+            console.add("- Downloading zip");
+            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
+            buf = new BufferedInputStream(new ProgressStream(conn), conn.getContentLength());
+            buf.mark(Integer.MAX_VALUE);
+            try (OutputStream out = new FileOutputStream(zip)) {
+                ShellUtils.pump(buf, out);
+            }
             buf.reset();
+            conn.disconnect();
+        } else {
+            console.add("- Existing zip found");
+            buf = new BufferedInputStream(new FileInputStream(zip), (int) zip.length());
+            buf.mark(Integer.MAX_VALUE);
         }
-        conn.disconnect();
+
         console.add("- Extracting files");
         try (InputStream in = buf) {
             ZipUtils.unzip(in, installDir, arch + "/", true);

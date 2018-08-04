@@ -33,6 +33,7 @@ public class Data {
     public static int remoteMagiskVersionCode = -1;
     public static String magiskLink;
     public static String magiskNoteLink;
+    public static String magiskMD5;
     public static String remoteManagerVersionString;
     public static int remoteManagerVersionCode = -1;
     public static String managerLink;

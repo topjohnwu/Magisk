@@ -68,6 +68,7 @@ public class CheckUpdates {
         Data.remoteMagiskVersionCode = getInt(magisk, "versionCode", -1);
         Data.magiskLink = getString(magisk, "link", null);
         Data.magiskNoteLink = getString(magisk, "note", null);
+        Data.magiskMD5 = getString(magisk, "md5", null);
 
         JSONObject manager = getJson(json, "app");
         Data.remoteManagerVersionString = getString(manager, "version", null);
