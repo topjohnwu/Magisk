@@ -164,6 +164,27 @@ def build_binary(args):
 			error('Build binaries failed!')
 		collect_binary()
 
+def sign_zip(unsigned, output, release):
+	signer_name = 'zipsigner-3.0.jar'
+	jarsigner = os.path.join('utils', 'build', 'libs', signer_name)
+
+	if not os.path.exists(jarsigner):
+		header('* Building ' + signer_name)
+		proc = subprocess.run('{} utils:shadowJar'.format(gradlew), shell=True, stdout=STDOUT)
+		if proc.returncode != 0:
+			error('Build {} failed!'.format(signer_name))
+
+	header('* Signing Zip')
+
+	if release:
+		proc = subprocess.run(['java', '-jar', jarsigner, 'release-key.jks',
+			config['keyStorePass'], config['keyAlias'], config['keyPass'], unsigned, output])
+	else:
+		proc = subprocess.run(['java', '-jar', jarsigner, unsigned, output])
+
+	if proc.returncode != 0:
+		error('Signing zip failed!')
+
 def sign_apk(source, target):
 	# Find the latest build tools
 	build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
@@ -195,9 +216,6 @@ def build_apk(args):
 	cp(source, target)
 
 	if args.release:
-		if not os.path.exists('release-key.jks'):
-			error('Please generate a java keystore and place it in \'release-key.jks\'')
-
 		proc = subprocess.run('{} app:assembleRelease'.format(gradlew), shell=True, stdout=STDOUT)
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
@@ -337,7 +355,7 @@ def zip_main(args):
 
 	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else 
 		'magisk-release.zip' if args.release else 'magisk-debug.zip')
-	sign_adjust_zip(unsigned, output)
+	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
 
 def zip_uninstaller(args):
@@ -381,26 +399,8 @@ def zip_uninstaller(args):
 
 	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')) 
 		if config['prettyName'] else 'magisk-uninstaller.zip')
-	sign_adjust_zip(unsigned, output)
+	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
-
-def sign_adjust_zip(unsigned, output):
-	signer_name = 'zipsigner-2.2.jar'
-	jarsigner = os.path.join('utils', 'build', 'libs', signer_name)
-
-	if not os.path.exists(jarsigner):
-		header('* Building ' + signer_name)
-		proc = subprocess.run('{} utils:shadowJar'.format(gradlew), shell=True, stdout=STDOUT)
-		if proc.returncode != 0:
-			error('Build {} failed!'.format(signer_name))
-
-	header('* Signing Zip')
-
-	signed = tempfile.mkstemp()[1]
-
-	proc = subprocess.run(['java', '-jar', jarsigner, unsigned, output])
-	if proc.returncode != 0:
-		error('Signing zip failed!')
 
 def cleanup(args):
 	if len(args.target) == 0:
@@ -463,7 +463,7 @@ apk_parser.set_defaults(func=build_apk)
 snet_parser = subparsers.add_parser('snet', help='build snet extention for Magisk Manager')
 snet_parser.set_defaults(func=build_snet)
 
-zip_parser = subparsers.add_parser('zip', help='zip and sign Magisk into a flashable zip')
+zip_parser = subparsers.add_parser('zip', help='zip Magisk into a flashable zip')
 zip_parser.set_defaults(func=zip_main)
 
 uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
@@ -478,5 +478,7 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 args = parser.parse_args()
+if args.release and not os.path.exists('release-key.jks'):
+	error('Please generate a java keystore and place it in \'release-key.jks\'')
 STDOUT = None if args.verbose else subprocess.DEVNULL
 args.func(args)

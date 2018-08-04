@@ -59,11 +59,7 @@ public class ZipUtils {
     public static void signZip(File input, File output) throws Exception {
         try (JarMap map = new JarMap(input, false);
              BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(output))) {
-            signZip(map, out);
+            SignAPK.sign(map, out);
         }
-    }
-
-    public static void signZip(JarMap input, OutputStream output) throws Exception {
-        SignAPK.signZip(null, null, input, output);
     }
 }

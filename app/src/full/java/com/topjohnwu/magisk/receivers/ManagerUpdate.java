@@ -9,8 +9,8 @@ import android.os.AsyncTask;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.utils.Download;
-import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.utils.JarMap;
+import com.topjohnwu.utils.SignAPK;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -37,7 +37,7 @@ public class ManagerUpdate extends BroadcastReceiver {
                     try {
                         JarMap apk = new JarMap(orig);
                         PatchAPK.patchPackageID(apk, Const.ORIG_PKG_NAME, context.getPackageName());
-                        ZipUtils.signZip(apk, new BufferedOutputStream(new FileOutputStream(patch)));
+                        SignAPK.sign(apk, new BufferedOutputStream(new FileOutputStream(patch)));
                         super.onDownloadDone(context, Uri.fromFile(new File(patch)));
                     } catch (Exception ignored) { }
                 });

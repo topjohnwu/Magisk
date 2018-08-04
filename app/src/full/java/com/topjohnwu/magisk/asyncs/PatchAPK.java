@@ -11,11 +11,11 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.ZipUtils;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 import com.topjohnwu.superuser.io.SuFileOutputStream;
 import com.topjohnwu.utils.JarMap;
+import com.topjohnwu.utils.SignAPK;
 
 import java.security.SecureRandom;
 import java.util.jar.JarEntry;
@@ -99,7 +99,7 @@ public class PatchAPK {
             JarMap apk = new JarMap(mm.getPackageCodePath());
             if (!patchPackageID(apk, Const.ORIG_PKG_NAME, pkg))
                 return false;
-            ZipUtils.signZip(apk, new SuFileOutputStream(repack));
+            SignAPK.sign(apk, new SuFileOutputStream(repack));
         } catch (Exception e) {
             return false;
         }
