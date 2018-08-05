@@ -14,6 +14,10 @@ def error(str):
 def header(str):
 	print('\n' + '\033[44m' + str + '\033[0m' + '\n')
 
+def vprint(str):
+	if args.verbose:
+		print(str)
+
 # Environment checks
 if not sys.version_info >= (3, 5):
 	error('Requires Python 3.5+')
@@ -44,6 +48,7 @@ else:
 cpu_count = multiprocessing.cpu_count()
 gradlew = os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')
 archs = ['armeabi-v7a', 'x86']
+keystore = 'release-key.jks'
 
 def mv(source, target):
 	try:
@@ -54,7 +59,7 @@ def mv(source, target):
 def cp(source, target):
 	try:
 		shutil.copyfile(source, target)
-		print('cp: {} -> {}'.format(source, target))
+		vprint('cp: {} -> {}'.format(source, target))
 	except:
 		pass
 
@@ -77,8 +82,8 @@ def mkdir_p(path, mode=0o777):
 def zip_with_msg(zipfile, source, target):
 	if not os.path.exists(source):
 		error('{} does not exist! Try build \'binary\' and \'apk\' before zipping!'.format(source))
-	print('zip: {} -> {}'.format(source, target))
 	zipfile.write(source, target)
+	vprint('zip: {} -> {}'.format(source, target))
 
 def build_all(args):
 	build_apk(args)
@@ -93,6 +98,12 @@ def collect_binary():
 			source = os.path.join('native', 'libs', arch, bin)
 			target = os.path.join('native', 'out', arch, bin)
 			mv(source, target)
+
+def execv(cmd, redirect=None):
+	return subprocess.run(cmd, stdout=redirect if redirect != None else STDOUT)
+
+def system(cmd, redirect=None):
+	return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
 
 def build_binary(args):
 	# If nothing specified, build everything
@@ -115,7 +126,7 @@ def build_binary(args):
 
 	if 'magisk' in targets:
 		# Magisk is special case as it is a dependency of magiskinit
-		proc = subprocess.run('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count), shell=True, stdout=STDOUT)
+		proc = system('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count))
 		if proc.returncode != 0:
 			error('Build Magisk binary failed!')
 		collect_binary()
@@ -146,7 +157,7 @@ def build_binary(args):
 		old_plat = True
 
 	if old_plat:
-		proc = subprocess.run('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
+		proc = system('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count))
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()
@@ -159,28 +170,27 @@ def build_binary(args):
 		new_plat = True
 
 	if new_plat:
-		proc = subprocess.run('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count), shell=True, stdout=STDOUT)
+		proc = system('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count))
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()
 
 def sign_zip(unsigned, output, release):
 	signer_name = 'zipsigner-3.0.jar'
-	jarsigner = os.path.join('utils', 'build', 'libs', signer_name)
+	zipsigner = os.path.join('utils', 'build', 'libs', signer_name)
 
-	if not os.path.exists(jarsigner):
+	if not os.path.exists(zipsigner):
 		header('* Building ' + signer_name)
-		proc = subprocess.run('{} utils:shadowJar'.format(gradlew), shell=True, stdout=STDOUT)
+		proc = execv([gradlew, 'utils:shadowJar'])
 		if proc.returncode != 0:
 			error('Build {} failed!'.format(signer_name))
 
 	header('* Signing Zip')
 
 	if release:
-		proc = subprocess.run(['java', '-jar', jarsigner, 'release-key.jks',
-			config['keyStorePass'], config['keyAlias'], config['keyPass'], unsigned, output])
+		proc = execv(['java', '-jar', zipsigner, keystore, config['keyStorePass'], config['keyAlias'], config['keyPass'], unsigned, output])
 	else:
-		proc = subprocess.run(['java', '-jar', jarsigner, unsigned, output])
+		proc = execv(['java', '-jar', zipsigner, unsigned, output])
 
 	if proc.returncode != 0:
 		error('Signing zip failed!')
@@ -190,7 +200,7 @@ def sign_apk(source, target):
 	build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
 		sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1])
 
-	proc = subprocess.run([os.path.join(build_tool, 'zipalign'), '-vpf', '4', source, target], stdout=subprocess.DEVNULL)
+	proc = execv([os.path.join(build_tool, 'zipalign'), '-vpf', '4', source, target], subprocess.DEVNULL)
 	if proc.returncode != 0:
 		error('Zipalign Magisk Manager failed!')
 
@@ -203,8 +213,8 @@ def sign_apk(source, target):
 	if not apksigner:
 		error('Cannot find apksigner.jar in Android SDK build tools')
 
-	proc = subprocess.run('java -jar {} sign --ks release-key.jks --ks-pass pass:{} --ks-key-alias {} --key-pass pass:{} {}'.format(
-		apksigner, config['keyStorePass'], config['keyAlias'], config['keyPass'], target), shell=True)
+	proc = execv(['java', '-jar', apksigner, 'sign', '--ks', keystore, '--ks-pass', 'pass:' + config['keyStorePass'],
+		'--ks-key-alias', config['keyAlias'], '--key-pass', 'pass:' + config['keyPass'], target])
 	if proc.returncode != 0:
 		error('Release sign Magisk Manager failed!')
 
@@ -216,7 +226,7 @@ def build_apk(args):
 	cp(source, target)
 
 	if args.release:
-		proc = subprocess.run('{} app:assembleRelease'.format(gradlew), shell=True, stdout=STDOUT)
+		proc = execv([gradlew, 'app:assembleRelease'])
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -237,7 +247,7 @@ def build_apk(args):
 			with open(release, 'rb') as src:
 				xz_dump(src, out, 'manager_xz')
 	else:
-		proc = subprocess.run('{} app:assembleDebug'.format(gradlew), shell=True, stdout=STDOUT)
+		proc = execv([gradlew, 'app:assembleDebug'])
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -252,7 +262,7 @@ def build_apk(args):
 		header('Output: ' + target)
 
 def build_snet(args):
-	proc = subprocess.run('{} snet:assembleRelease'.format(gradlew), shell=True, stdout=STDOUT)
+	proc = execv([gradlew, 'snet:assembleRelease'])
 	if proc.returncode != 0:
 		error('Build snet extention failed!')
 	source = os.path.join('snet', 'build', 'outputs', 'apk', 'release', 'snet-release-unsigned.apk')
@@ -308,7 +318,7 @@ def zip_main(args):
 		# META-INF
 		# update-binary
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
-		print('zip: ' + target)
+		vprint('zip: ' + target)
 		zipf.writestr(target, gen_update_binary())
 		# updater-script
 		source = os.path.join('scripts', 'flash_script.sh')
@@ -339,7 +349,7 @@ def zip_main(args):
 			util_func = script.read().replace('#MAGISK_VERSION_STUB',
 				'MAGISK_VER="{}"\nMAGISK_VER_CODE={}'.format(config['version'], config['versionCode']))
 			target = os.path.join('common', 'util_functions.sh')
-			print('zip: ' + source + ' -> ' + target)
+			vprint('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, util_func)
 		# addon.d.sh
 		source = os.path.join('scripts', 'addon.d.sh')
@@ -367,7 +377,7 @@ def zip_uninstaller(args):
 		# META-INF
 		# update-binary
 		target = os.path.join('META-INF', 'com', 'google', 'android', 'update-binary')
-		print('zip: ' + target)
+		vprint('zip: ' + target)
 		zipf.writestr(target, gen_update_binary())
 		# updater-script
 		source = os.path.join('scripts', 'magisk_uninstaller.sh')
@@ -387,7 +397,7 @@ def zip_uninstaller(args):
 		with open(source, 'r') as script:
 			# Remove the stub
 			target = os.path.join('util_functions.sh')
-			print('zip: ' + source + ' -> ' + target)
+			vprint('zip: ' + source + ' -> ' + target)
 			zipf.writestr(target, script.read())
 
 		# Prebuilts
@@ -408,12 +418,12 @@ def cleanup(args):
 
 	if 'native' in args.target:
 		header('* Cleaning native')
-		subprocess.run(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean', shell=True, stdout=STDOUT)
+		system(ndk_build + ' -C native B_MAGISK=1 B_INIT=1 B_BOOT=1 B_BXZ=1 B_BB=1 clean')
 		shutil.rmtree(os.path.join('native', 'out'), ignore_errors=True)
 
 	if 'java' in args.target:
 		header('* Cleaning java')
-		subprocess.run('{} app:clean snet:clean utils:clean'.format(os.path.join('.', 'gradlew')), shell=True, stdout=STDOUT)
+		execv([gradlew, 'app:clean', 'snet:clean', 'utils:clean'])
 
 def parse_config():
 	c = {}
@@ -478,7 +488,7 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 args = parser.parse_args()
-if args.release and not os.path.exists('release-key.jks'):
-	error('Please generate a java keystore and place it in \'release-key.jks\'')
+if args.release and not os.path.exists(keystore):
+	error('Please generate a java keystore and place it in \'{}\''.format(keystore))
 STDOUT = None if args.verbose else subprocess.DEVNULL
 args.func(args)
