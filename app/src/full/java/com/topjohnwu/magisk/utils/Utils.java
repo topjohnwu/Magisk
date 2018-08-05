@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
 import com.topjohnwu.magisk.services.UpdateCheckService;
@@ -94,6 +95,8 @@ public class Utils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
+        } else {
+            toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT);
         }
     }
 
