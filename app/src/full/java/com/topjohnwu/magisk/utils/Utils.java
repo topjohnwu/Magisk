@@ -91,6 +91,7 @@ public class Utils {
 
     public static void openLink(Context context, Uri link) {
         Intent intent = new Intent(Intent.ACTION_VIEW, link);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
         }
