@@ -96,6 +96,7 @@
     <string name="hide_manager_toast">Hiding Magisk Manager…</string>
     <string name="hide_manager_toast2">This might take a while…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed…</string>
+    <string name="open_link_failed_toast">No application found to open the link…</string>
     <string name="download_zip_only">Download Zip Only</string>
     <string name="patch_boot_file">Patch Boot Image File</string>
     <string name="direct_install">Direct Install (Recommended)</string>
