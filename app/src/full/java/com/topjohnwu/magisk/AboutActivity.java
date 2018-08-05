@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +11,7 @@ import android.view.View;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Locale;
 
@@ -65,13 +65,13 @@ public class AboutActivity extends BaseActivity {
         }
 
         appSourceCode.removeSummary();
-        appSourceCode.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.SOURCE_CODE_URL))));
+        appSourceCode.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
 
         supportThread.removeSummary();
-        supportThread.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.XDA_THREAD))));
+        supportThread.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
 
         donation.removeSummary();
-        donation.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Const.Url.DONATION_URL))));
+        donation.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.DONATION_URL)));
 
         setFloating();
     }

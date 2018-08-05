@@ -4,6 +4,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -85,6 +86,13 @@ public class Utils {
             }
         } else {
             scheduler.cancel(Const.UPDATE_SERVICE_VER);
+        }
+    }
+
+    public static void openLink(Context context, Uri link) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, link);
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
         }
     }
 
