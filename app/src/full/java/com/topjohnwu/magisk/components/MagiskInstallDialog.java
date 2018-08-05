@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.components;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -42,9 +41,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             setNeutralButton(R.string.release_notes, (d, i) -> {
                 if (Data.magiskNoteLink.contains("forum.xda-developers")) {
                     // Open forum links in browser
-                    Intent openLink = new Intent(Intent.ACTION_VIEW, Uri.parse(Data.magiskNoteLink));
-                    openLink.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mm.startActivity(openLink);
+                    Utils.openLink(activity, Uri.parse(Data.magiskNoteLink));
                 } else {
                     new MarkDownWindow(activity, null, Data.magiskNoteLink).exec();
                 }
