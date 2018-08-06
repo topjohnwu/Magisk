@@ -529,6 +529,20 @@ void startup() {
 		unblock_boot_process();
 	}
 
+	// Increment boot count
+	int boot_count = 0;
+	FILE *cf = xfopen(BOOTCOUNT, "r");
+	if (cf) {
+		fscanf(cf, "%d", &boot_count);
+		fclose(cf);
+	}
+	boot_count++;
+	if (boot_count > 2)
+		creat(DISABLEFILE, 0644);
+	cf = xfopen(BOOTCOUNT, "w");
+	fprintf(cf, "%d", boot_count);
+	fclose(cf);
+
 	// No uninstaller or core-only mode
 	if (access(DISABLEFILE, F_OK) != 0) {
 		simple_mount("/system");
@@ -868,4 +882,15 @@ core_only:
 
 	// All boot stage done, cleanup
 	vec_deep_destroy(&module_list);
+
+	// Wait for boot complete, and clear boot count
+	while (1) {
+		char *prop = getprop("sys.boot_completed");
+		if (prop != NULL && strcmp(prop, "1") == 0) {
+			free(prop);
+			unlink(BOOTCOUNT);
+			break;
+		}
+		sleep(2);
+	}
 }
