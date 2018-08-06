@@ -117,6 +117,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (argc < 2) {
 		usage(argv[0]);
 	}
+	int code = 0;
 	int req = DO_NOTHING;
 	if (strcmp(argv[1], "--enable") == 0) {
 		req = LAUNCH_MAGISKHIDE;
@@ -136,32 +137,32 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
 	}
-	int code = read_int(fd);
+	code = read_int(fd);
 	switch (code) {
 	case DAEMON_SUCCESS:
 		break;
 	case ROOT_REQUIRED:
 		fprintf(stderr, "Root is required for this operation\n");
-		return code;
+		goto END;
 	case LOGCAT_DISABLED:
 		fprintf(stderr, "Logcat is disabled, cannot start MagiskHide\n");
-		return (code);
+		goto END;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "MagiskHide is not enabled yet\n");
-		return code;
+		goto END;
 	case HIDE_IS_ENABLED:
 		fprintf(stderr, "MagiskHide is already enabled\n");
-		return code;
+		goto END;
 	case HIDE_ITEM_EXIST:
 		fprintf(stderr, "Process [%s] already exists in hide list\n", argv[2]);
-		return code;
+		goto END;
 	case HIDE_ITEM_NOT_EXIST:
 		fprintf(stderr, "Process [%s] does not exist in hide list\n", argv[2]);
-		return code;
+		goto END;
 	case DAEMON_ERROR:
 	default:
 		fprintf(stderr, "Error occured in daemon...\n");
-		return code;
+		goto END;
 	}
 
 	if (req == LS_HIDELIST) {
@@ -172,7 +173,8 @@ int magiskhide_main(int argc, char *argv[]) {
 			free(s);
 		}
 	}
-	close(fd);
 
-	return 0;
+END:
+	close(fd);
+	return code;
 }
