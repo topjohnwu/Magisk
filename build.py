@@ -49,6 +49,7 @@ cpu_count = multiprocessing.cpu_count()
 gradlew = os.path.join('.', 'gradlew.bat' if os.name == 'nt' else 'gradlew')
 archs = ['armeabi-v7a', 'x86']
 keystore = 'release-key.jks'
+config = {}
 
 def mv(source, target):
 	try:
@@ -426,34 +427,33 @@ def cleanup(args):
 		execv([gradlew, 'app:clean', 'snet:clean', 'utils:clean'])
 
 def parse_config():
-	c = {}
+	global config
 	with open('config.prop', 'r') as f:
 		for line in [l.strip(' \t\r\n') for l in f]:
 			if line.startswith('#') or len(line) == 0:
 				continue
 			prop = line.split('=')
-			c[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+			config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
 
-	if 'version' not in c or 'versionCode' not in c:
+	if 'version' not in config or 'versionCode' not in config:
 		error('"version" and "versionCode" is required in "config.prop"')
 
 	try:
-		c['versionCode'] = int(c['versionCode'])
+		config['versionCode'] = int(config['versionCode'])
 	except ValueError:
 		error('"versionCode" is required to be an integer')
 
-	if 'prettyName' not in c:
-		c['prettyName'] = 'false'
+	if 'prettyName' not in config:
+		config['prettyName'] = 'false'
 
-	c['prettyName'] = c['prettyName'].lower() == 'true'
+	config['prettyName'] = config['prettyName'].lower() == 'true'
 
-	if 'outdir' not in c:
-		c['outdir'] = 'out'
+	if 'outdir' not in config:
+		config['outdir'] = 'out'
 
-	mkdir_p(c['outdir'])
-	return c
+	mkdir_p(config['outdir'])
 
-config = parse_config()
+parse_config()
 
 parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('-r', '--release', action='store_true', help='compile Magisk for release')
