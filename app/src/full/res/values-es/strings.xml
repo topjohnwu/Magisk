@@ -97,6 +97,7 @@
     <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
     <string name="hide_manager_toast2">Esto podría tomar un tiempo…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
+    <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>
     <string name="patch_boot_file">Parcheo de la imagen boot</string>
     <string name="direct_install">Instalación Directa (Recomendado)</string>
