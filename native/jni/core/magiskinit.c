@@ -357,6 +357,8 @@ int main(int argc, char *argv[]) {
 	 * ***********/
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
+	int mnt_system = 0;
+	int mnt_vendor = 0;
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
@@ -384,12 +386,14 @@ int main(int argc, char *argv[]) {
 		link("/.backup/init", "/init");
 	}
 
+	// Do not go further if system_root device is booting as recovery
+	if (!cmd.skip_initramfs && access("/sbin/recovery", F_OK) == 0)
+		goto exec_init;
+
 	/* ************
 	 * Early Mount
 	 * ************/
 
-	int mnt_system = 0;
-	int mnt_vendor = 0;
 	struct device dev;
 	char partname[32];
 
@@ -423,49 +427,47 @@ int main(int argc, char *argv[]) {
 	 * Ramdisk Patches
 	 * ****************/
 
-	// Only patch rootfs if not intended to run in recovery
-	if (access("/sbin/recovery", F_OK) != 0) {
-		// Handle ramdisk overlays
-		int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
-		if (fd >= 0) {
-			mv_dir(fd, root);
-			close(fd);
-			rmdir("/overlay");
-		}
-
-		// Patch init.rc to load magisk scripts
-		int injected = 0;
-		char tok[4096];
-		FILE *fp = xfopen("/init.rc", "r");
-		fd = creat("/init.rc.new", 0750);
-		while(fgets(tok, sizeof(tok), fp)) {
-			if (!injected && strncmp(tok, "import", 6) == 0) {
-				if (strstr(tok, "init.magisk.rc")) {
-					injected = 1;
-				} else {
-					xwrite(fd, "import /init.magisk.rc\n", 23);
-					injected = 1;
-				}
-			} else if (strstr(tok, "selinux.reload_policy")) {
-				// Do not allow sepolicy patch
-				continue;
-			}
-			xwrite(fd, tok, strlen(tok));
-		}
-		fclose(fp);
+	// Handle ramdisk overlays
+	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
+	if (fd >= 0) {
+		mv_dir(fd, root);
 		close(fd);
-		rename("/init.rc.new", "/init.rc");
-
-		// Patch sepolicy
-		patch_sepolicy();
-
-		// Dump binaries
-		dump_magiskrc("/init.magisk.rc", 0750);
-		dump_magisk("/sbin/magisk", 0755);
-		patch_socket_name("/sbin/magisk");
-		rename("/init.bak", "/sbin/magiskinit");
+		rmdir("/overlay");
 	}
 
+	// Patch init.rc to load magisk scripts
+	int injected = 0;
+	char tok[4096];
+	FILE *fp = xfopen("/init.rc", "r");
+	fd = creat("/init.rc.new", 0750);
+	while(fgets(tok, sizeof(tok), fp)) {
+		if (!injected && strncmp(tok, "import", 6) == 0) {
+			if (strstr(tok, "init.magisk.rc")) {
+				injected = 1;
+			} else {
+				xwrite(fd, "import /init.magisk.rc\n", 23);
+				injected = 1;
+			}
+		} else if (strstr(tok, "selinux.reload_policy")) {
+			// Do not allow sepolicy patch
+			continue;
+		}
+		xwrite(fd, tok, strlen(tok));
+	}
+	fclose(fp);
+	close(fd);
+	rename("/init.rc.new", "/init.rc");
+
+	// Patch sepolicy
+	patch_sepolicy();
+
+	// Dump binaries
+	dump_magiskrc("/init.magisk.rc", 0750);
+	dump_magisk("/sbin/magisk", 0755);
+	patch_socket_name("/sbin/magisk");
+	rename("/init.bak", "/sbin/magiskinit");
+
+exec_init:
 	// Clean up
 	close(root);
 	umount("/proc");
