@@ -50,6 +50,8 @@ public class MagiskFragment extends BaseFragment
 
     @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
 
+    @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
+
     @BindView(R.id.magisk_update) RelativeLayout magiskUpdate;
     @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
     @BindView(R.id.magisk_update_status) TextView magiskUpdateText;
@@ -217,6 +219,7 @@ public class MagiskFragment extends BaseFragment
         safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
+        coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
 
         int image, color;
 

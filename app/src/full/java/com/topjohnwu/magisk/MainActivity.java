@@ -119,13 +119,12 @@ public class MainActivity extends BaseActivity
 
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
-                        && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
-        menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
-                Shell.rootAccess() && Data.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)
-                && Download.checkNetworkStatus(this) && Shell.rootAccess() && Data.magiskVersionCode >= 0);
+        menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
+                Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED &&
+                mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
+        menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
+        menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
+                && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
         menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
                 !(Const.USER_ID > 0 && Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));

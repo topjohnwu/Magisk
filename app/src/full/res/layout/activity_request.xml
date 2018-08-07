@@ -82,7 +82,7 @@
         android:id="@+id/warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_su_warning"
+        android:drawableStart="@drawable/ic_warning"
         android:textColor="?android:textColorSecondary"
         android:text="@string/su_warning"
         android:layout_gravity="center_horizontal"
