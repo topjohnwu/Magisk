@@ -96,6 +96,7 @@
     <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_toast2">这可能需要一点时间…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
+    <string name="open_link_failed_toast">找不到应用能够打开此链接…</string>
     <string name="download_zip_only">仅下载 Zip</string>
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
     <string name="direct_install">直接安装（推荐）</string>
