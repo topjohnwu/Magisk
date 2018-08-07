@@ -240,49 +240,34 @@ void ps(void (*func)(int)) {
 	closedir(dir);
 }
 
-// Internal usage
-static void (*ps_filter_cb)(int);
-static const char *ps_filter_pattern;
-static void proc_name_filter(int pid) {
+int check_proc_name(int pid, const char *name) {
 	char buf[128];
 	FILE *f;
 	sprintf(buf, "/proc/%d/comm", pid);
 	if ((f = fopen(buf, "r"))) {
 		fgets(buf, sizeof(buf), f);
-		if (strcmp(buf, ps_filter_pattern) == 0)
-			goto run_cb;
+		if (strcmp(buf, name) == 0)
+			return 1;
 	} else {
 		// The PID is already killed
-		return;
+		return 0;
 	}
 	fclose(f);
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
 	f = fopen(buf, "r");
 	fgets(buf, sizeof(buf), f);
-	if (strcmp(basename(buf), ps_filter_pattern) == 0)
-		goto run_cb;
+	if (strcmp(basename(buf), name) == 0)
+		return 1;
 	fclose(f);
 
 	sprintf(buf, "/proc/%d/exe", pid);
 	if (access(buf, F_OK) != 0)
-		return;
+		return 0;
 	xreadlink(buf, buf, sizeof(buf));
-	if (strcmp(basename(buf), ps_filter_pattern) == 0)
-		goto run_cb;
-
-	return;
-run_cb:
-	ps_filter_cb(pid);
-	fclose(f);
-	return;
-}
-
-/* Call func with process name filtered with pattern */
-void ps_filter_proc_name(const char *pattern, void (*func)(int)) {
-	ps_filter_cb = func;
-	ps_filter_pattern = ((pattern == NULL) ? "" : pattern);
-	ps(proc_name_filter);
+	if (strcmp(basename(buf), name) == 0)
+		return 1;
+	return 0;
 }
 
 void unlock_blocks() {

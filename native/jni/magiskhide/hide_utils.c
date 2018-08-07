@@ -27,6 +27,9 @@ static char *prop_value[] =
 	  "0", "0", "0", "1",
 	  "user", "release-keys", "0", NULL };
 
+static const char *proc_name;
+static gid_t proc_gid;
+
 void manage_selinux() {
 	char val;
 	int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
@@ -60,8 +63,30 @@ static void rm_magisk_prop(const char *name, const char *value, void *v) {
 	}
 }
 
-static void kill_proc(int pid) {
-	kill(pid, SIGTERM);
+static void kill_proc_cb(int pid) {
+	if (check_proc_name(pid, proc_name))
+		kill(pid, SIGTERM);
+	else if (proc_gid > 0) {
+		char buf[128];
+		struct stat st;
+		sprintf(buf, "/proc/%d", pid);
+		stat(buf, &st);
+		if (proc_gid == st.st_gid)
+			kill(pid, SIGTERM);
+	}
+
+}
+
+static void kill_process(const char *name) {
+	proc_name = name;
+	char buf[128];
+	struct stat st;
+	sprintf(buf, "/data/data/%s", name);
+	if (stat(buf, &st) == 0)
+		proc_gid = st.st_gid;
+	else
+		proc_gid = 0;
+	ps(kill_proc_cb);
 }
 
 void clean_magisk_props() {
@@ -94,7 +119,7 @@ int add_list(char *proc) {
 
 	vec_push_back(new_list, proc);
 	LOGI("hide_list add: [%s]\n", proc);
-	ps_filter_proc_name(proc, kill_proc);
+	kill_process(proc);
 
 	// Critical region
 	pthread_mutex_lock(&hide_lock);
@@ -135,7 +160,7 @@ int rm_list(char *proc) {
 
 	if (do_rm) {
 		LOGI("hide_list rm: [%s]\n", proc);
-		ps_filter_proc_name(proc, kill_proc);
+		kill_process(proc);
 		// Critical region
 		pthread_mutex_lock(&hide_lock);
 		vec_destroy(hide_list);
@@ -170,7 +195,7 @@ int init_list() {
 	char *line;
 	vec_for_each(hide_list, line) {
 		LOGI("hide_list: [%s]\n", line);
-		ps_filter_proc_name(line, kill_proc);
+		kill_process(line);
 	}
 	return 0;
 }
@@ -178,7 +203,7 @@ int init_list() {
 int destroy_list() {
 	char *line;
 	vec_for_each(hide_list, line) {
-		ps_filter_proc_name(line, kill_proc);
+		kill_process(line);
 	}
 	vec_deep_destroy(hide_list);
 	free(hide_list);

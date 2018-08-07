@@ -95,7 +95,7 @@ ssize_t fdgets(char *buf, size_t size, int fd);
 ssize_t my_getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 void ps(void (*func)(int));
-void ps_filter_proc_name(const char *filter, void (*func)(int));
+int check_proc_name(int pid, const char *filter);
 void unlock_blocks();
 void setup_sighandlers(void (*handler)(int));
 int exec_array(int err, int *fd, void (*setenv)(struct vector *), char *const *argv);
