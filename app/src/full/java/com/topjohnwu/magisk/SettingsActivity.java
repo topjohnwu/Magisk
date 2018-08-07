@@ -123,19 +123,23 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
             SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
 
-            updateChannel.setOnPreferenceChangeListener((pref, o) -> {
-                Data.updateChannel = Integer.parseInt((String) o);
-                if (Data.updateChannel == Const.Value.CUSTOM_CHANNEL) {
+            updateChannel.setOnPreferenceChangeListener((p, o) -> {
+                String prev =String.valueOf(Data.updateChannel);
+                int channel = Integer.parseInt((String) o);
+                if (channel == Const.Value.CUSTOM_CHANNEL) {
                     View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                     EditText url = v.findViewById(R.id.custom_url);
-                    url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                    url.setText(prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                     new AlertDialog.Builder(requireActivity())
                             .setTitle(R.string.settings_update_custom)
                             .setView(v)
                             .setPositiveButton(R.string.ok, (d, i) ->
                                     prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
                                             url.getText().toString()).apply())
-                            .setNegativeButton(R.string.close, null)
+                            .setNegativeButton(R.string.close, (d, i) ->
+                                    prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                            .setOnCancelListener(d ->
+                                    prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
                             .show();
                 }
                 return true;
@@ -287,6 +291,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                     Topic.publish(false, Topic.RELOAD_ACTIVITY);
                     break;
                 case Const.Key.UPDATE_CHANNEL:
+                case Const.Key.CUSTOM_CHANNEL:
                     CheckUpdates.check();
                     break;
                 case Const.Key.CHECK_UPDATES:
@@ -321,7 +326,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
 
         @Override
         public int[] getSubscribedTopics() {
-            return new int[] {Topic.LOCAL_FETCH_DONE};
+            return new int[] {Topic.LOCALE_FETCH_DONE};
         }
     }
 

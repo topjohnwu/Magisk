@@ -70,7 +70,7 @@ public class LocaleManager {
             }
 
             Collections.sort(locales, (a, b) -> a.getDisplayName(a).compareTo(b.getDisplayName(b)));
-            Topic.publish(Topic.LOCAL_FETCH_DONE);
+            Topic.publish(Topic.LOCALE_FETCH_DONE);
         });
     }
 }

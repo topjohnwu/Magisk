@@ -17,10 +17,10 @@ public class Topic {
     public static final int REPO_LOAD_DONE = 3;
     public static final int UPDATE_CHECK_DONE = 4;
     public static final int SNET_CHECK_DONE = 5;
-    public static final int LOCAL_FETCH_DONE = 6;
+    public static final int LOCALE_FETCH_DONE = 6;
 
     @IntDef({MAGISK_HIDE_DONE, RELOAD_ACTIVITY, MODULE_LOAD_DONE, REPO_LOAD_DONE,
-            UPDATE_CHECK_DONE, SNET_CHECK_DONE, LOCAL_FETCH_DONE})
+            UPDATE_CHECK_DONE, SNET_CHECK_DONE, LOCALE_FETCH_DONE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface TopicID {}
 
