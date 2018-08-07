@@ -96,6 +96,7 @@
     <string name="hide_manager_toast">Скрытие Magisk Manager…</string>
     <string name="hide_manager_toast2">Может занять некоторое время…</string>
     <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно!</string>
+    <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки…</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>
     <string name="patch_boot_file">Пропатчить образ ядра (boot.img)</string>
     <string name="direct_install">Прямая установка (Рекомендуется)</string>
