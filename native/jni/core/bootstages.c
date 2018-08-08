@@ -706,8 +706,6 @@ void startup() {
 		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 	}
 
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-
 	// Start post-fs-data mode
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", NULL);
 }
@@ -719,6 +717,8 @@ void post_fs_data(int client) {
 
 	// If post-fs-data mode is started, it means startup succeeded
 	setup_done = 1;
+
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
 
 	LOGI("** post-fs-data mode running\n");
 
