@@ -706,6 +706,8 @@ void startup() {
 		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 	}
 
+	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+
 	// Start post-fs-data mode
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", NULL);
 }
@@ -719,10 +721,6 @@ void post_fs_data(int client) {
 	setup_done = 1;
 
 	LOGI("** post-fs-data mode running\n");
-
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
-	full_patch_pid = exec_command(0, NULL, NULL,
-		"/sbin/magiskpolicy", "--save", TMPSEPOLICY, "allow "SEPOL_PROC_DOMAIN" * * *", NULL);
 
 	// Allocate buffer
 	vec_init(&module_list);
@@ -842,14 +840,6 @@ void late_start(int client) {
 	}
 
 	auto_start_magiskhide();
-
-	if (full_patch_pid > 0) {
-		// Wait till the full patch is done
-		waitpid(full_patch_pid, NULL, 0);
-		// Load the policy
-		exec_command_sync("/sbin/magiskpolicy", "--live", "--load", TMPSEPOLICY, NULL);
-		unlink(TMPSEPOLICY);
-	}
 
 	// Run scripts after full patch, most reliable way to run scripts
 	LOGI("* Running service.d scripts\n");

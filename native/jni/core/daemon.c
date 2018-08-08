@@ -23,7 +23,6 @@
 
 int setup_done = 0;
 int seperate_vendor = 0;
-int full_patch_pid = -1;
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);

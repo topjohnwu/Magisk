@@ -220,6 +220,7 @@ static int patch_sepolicy() {
 	}
 
 	sepol_magisk_rules();
+	sepol_allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
 	dump_policydb("/sepolicy");
 
 	// Remove the stupid debug sepolicy and use our own

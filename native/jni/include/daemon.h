@@ -10,7 +10,6 @@
 
 extern int setup_done;
 extern int seperate_vendor;
-extern int full_patch_pid;
 
 // Commands require connecting to daemon
 enum {
