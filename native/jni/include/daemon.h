@@ -19,6 +19,7 @@ enum {
 	CHECK_VERSION_CODE,
 	POST_FS_DATA,
 	LATE_START,
+	BOOT_COMPLETE,
 	LAUNCH_MAGISKHIDE,
 	STOP_MAGISKHIDE,
 	ADD_HIDELIST,
@@ -73,6 +74,7 @@ void write_string(int fd, const char* val);
 void startup();
 void post_fs_data(int client);
 void late_start(int client);
+void boot_complete(int client);
 
 /**************
  * MagiskHide *

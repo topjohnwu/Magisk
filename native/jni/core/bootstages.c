@@ -872,15 +872,13 @@ core_only:
 
 	// All boot stage done, cleanup
 	vec_deep_destroy(&module_list);
+}
 
-	// Wait for boot complete, and clear boot count
-	while (1) {
-		char *prop = getprop("sys.boot_completed");
-		if (prop != NULL && strcmp(prop, "1") == 0) {
-			free(prop);
-			unlink(BOOTCOUNT);
-			break;
-		}
-		sleep(2);
-	}
+void boot_complete(int client) {
+	LOGI("** boot_complete triggered\n");
+	// ack
+	write_int(client, 0);
+	close(client);
+
+	unlink(BOOTCOUNT);
 }

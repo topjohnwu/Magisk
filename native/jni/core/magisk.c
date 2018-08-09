@@ -50,7 +50,7 @@ static void usage() {
 		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
 		"\n"
 		"Supported init triggers:\n"
-		"   startup, post-fs-data, service\n"
+		"   startup, post-fs-data, service, boot-complete\n"
 		"\n"
 		"Supported applets:\n");
 
@@ -110,6 +110,10 @@ int magisk_main(int argc, char *argv[]) {
 	} else if (strcmp(argv[1], "--service") == 0) {
 		int fd = connect_daemon();
 		write_int(fd, LATE_START);
+		return read_int(fd);
+	} else if (strcmp(argv[1], "--boot-complete") == 0) {
+		int fd = connect_daemon();
+		write_int(fd, BOOT_COMPLETE);
 		return read_int(fd);
 	}
 

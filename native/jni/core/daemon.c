@@ -40,6 +40,7 @@ static void *request_handler(void *args) {
 	case LS_HIDELIST:
 	case POST_FS_DATA:
 	case LATE_START:
+	case BOOT_COMPLETE:
 		if (credential.uid != 0) {
 			write_int(client, ROOT_REQUIRED);
 			close(client);
@@ -81,6 +82,9 @@ static void *request_handler(void *args) {
 		break;
 	case LATE_START:
 		late_start(client);
+		break;
+	case BOOT_COMPLETE:
+		boot_complete(client);
 		break;
 	case HANDSHAKE:
 		/* Do NOT close the client, make it hold */
