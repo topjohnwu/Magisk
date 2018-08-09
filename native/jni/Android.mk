@@ -67,10 +67,11 @@ ifdef B_INIT
 # magiskinit
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
-LOCAL_STATIC_LIBRARIES := libsepol
+LOCAL_STATIC_LIBRARIES := libsepol libxz
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
+	$(EXT_PATH)/include \
 	out \
 	out/$(TARGET_ARCH_ABI) \
 	$(LIBSEPOL)

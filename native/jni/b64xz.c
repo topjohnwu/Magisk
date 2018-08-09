@@ -22,7 +22,7 @@ static void decodeblock(uint8_t* in, uint8_t* out) {
 	out[2] = (uint8_t)(((in[2] << 6) & 0xc0) | in[3]);
 }
 
-static int unxz(struct xz_dec *dec, void *buf, unsigned size) {
+static int unxz(struct xz_dec *dec, const void *buf, unsigned size) {
 	uint8_t out[8192];
 	struct xz_buf b = {
 			.in = buf,

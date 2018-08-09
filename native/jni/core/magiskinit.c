@@ -36,6 +36,8 @@
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 
+#include <xz.h>
+
 #include "binaries.h"
 #include "binaries_arch.h"
 
@@ -243,16 +245,38 @@ static int patch_sepolicy() {
 	return 0;
 }
 
+static int unxz(int fd, const void *buf, size_t size) {
+	uint8_t out[8192];
+	struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
+	struct xz_buf b = {
+			.in = buf,
+			.in_pos = 0,
+			.in_size = size,
+			.out = out,
+			.out_pos = 0,
+			.out_size = sizeof(out)
+	};
+	enum xz_ret ret;
+	do {
+		ret = xz_dec_run(dec, &b);
+		if (ret != XZ_OK && ret != XZ_STREAM_END)
+			return 1;
+		write(fd, out, b.out_pos);
+		b.out_pos = 0;
+	} while (b.in_pos != size);
+	return 0;
+}
+
 static int dump_magisk(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
-	xwrite(fd, magisk_bin, sizeof(magisk_bin));
+	unxz(fd, magisk_xz, sizeof(magisk_xz));
 	close(fd);
 	return 0;
 }
 
 static int dump_manager(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
-	xwrite(fd, manager_bin, sizeof(manager_bin));
+	unxz(fd, manager_xz, sizeof(manager_xz));
 	close(fd);
 	return 0;
 }

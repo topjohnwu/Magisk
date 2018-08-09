@@ -106,6 +106,9 @@ def execv(cmd, redirect=None):
 def system(cmd, redirect=None):
 	return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
 
+def xz(data):
+	return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
+
 def sign_zip(unsigned, output, release):
 	signer_name = 'zipsigner-3.0.jar'
 	zipsigner = os.path.join('utils', 'build', 'libs', signer_name)
@@ -151,7 +154,7 @@ def sign_apk(source, target):
 
 def binary_dump(src, out, var_name):
 	out.write('const static unsigned char {}[] = {{'.format(var_name))
-	for i, c in enumerate(src.read()):
+	for i, c in enumerate(xz(src.read())):
 		if i % 16 == 0:
 			out.write('\n')
 		out.write('0x{:02X},'.format(c))
@@ -173,11 +176,11 @@ def gen_update_binary():
 	binary = os.path.join('native', 'out', 'armeabi-v7a', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\'\nBB_ARM=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
+		update_bin.append(base64.b64encode(xz(busybox.read())).decode('ascii'))
 	binary = os.path.join('native', 'out', 'x86', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\nBB_X86=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
+		update_bin.append(base64.b64encode(xz(busybox.read())).decode('ascii'))
 		update_bin.append('\n')
 	with open(os.path.join('scripts', 'update_binary.sh'), 'r') as script:
 		update_bin.append(script.read())
@@ -213,7 +216,7 @@ def build_binary(args):
 			bin_file = os.path.join('native', 'out', arch, 'magisk')
 			with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
 				with open(bin_file, 'rb') as src:
-					binary_dump(src, out, 'magisk_bin')
+					binary_dump(src, out, 'magisk_xz')
 
 	old_plat = False
 	flags = base_flags
@@ -280,7 +283,7 @@ def build_apk(args):
 		mkdir(os.path.join('native', 'out'))
 		with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
 			with open(release, 'rb') as src:
-				binary_dump(src, out, 'manager_bin');
+				binary_dump(src, out, 'manager_xz');
 	else:
 		proc = execv([gradlew, 'app:assembleDebug'])
 		if proc.returncode != 0:
