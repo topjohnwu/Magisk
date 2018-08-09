@@ -147,18 +147,4 @@ void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
 void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
 
-// img.c
-
-int create_img(const char *img, int size);
-int resize_img(const char *img, int size);
-char *mount_image(const char *img, const char *target);
-int umount_image(const char *target, const char *device);
-int merge_img(const char *source, const char *target);
-int trim_img(const char *img, const char *mount, char *loop);
-
-// pattern.c
-
-int patch_verity(void **buf, uint32_t *size, int patch);
-void patch_encryption(void **buf, uint32_t *size);
-
 #endif

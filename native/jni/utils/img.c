@@ -14,6 +14,7 @@
 
 #include "magisk.h"
 #include "utils.h"
+#include "img.h"
 
 #define round_size(a) ((((a) / 32) + 2) * 32)
 #define SOURCE_TMP "/dev/.img_src"

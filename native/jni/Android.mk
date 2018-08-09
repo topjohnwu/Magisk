@@ -10,14 +10,12 @@ LIBLZ4 := $(EXT_PATH)/lz4/lib
 LIBBZ2 := $(EXT_PATH)/bzip2
 LIBFDT := $(EXT_PATH)/dtc/libfdt
 LIBNANOPB := $(EXT_PATH)/nanopb
-UTIL_SRC := utils/cpio.c \
-            utils/file.c \
-            utils/img.c \
-            utils/list.c \
-            utils/misc.c \
-            utils/pattern.c \
-            utils/vector.c \
-            utils/xwrap.c
+COMMON_UTILS := \
+	utils/file.c \
+	utils/list.c \
+	utils/misc.c \
+	utils/vector.c \
+	utils/xwrap.c
 
 ########################
 # Binaries
@@ -55,7 +53,8 @@ LOCAL_SRC_FILES := \
 	su/pts.c \
 	su/su_daemon.c \
 	su/su_socket.c \
-	$(UTIL_SRC)
+	utils/img.c \
+	$(COMMON_UTILS)
 
 LOCAL_CFLAGS := -DIS_DAEMON -DSELINUX
 LOCAL_LDLIBS := -llog
@@ -83,7 +82,7 @@ LOCAL_SRC_FILES := \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
 	magiskpolicy/sepolicy.c \
-	$(UTIL_SRC)
+	$(COMMON_UTILS)
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
@@ -105,6 +104,7 @@ LOCAL_C_INCLUDES := \
 	$(LIBFDT)
 
 LOCAL_SRC_FILES := \
+	magiskboot/cpio.c \
 	magiskboot/main.c \
 	magiskboot/bootimg.c \
 	magiskboot/hexpatch.c \
@@ -112,7 +112,8 @@ LOCAL_SRC_FILES := \
 	magiskboot/format.c \
 	magiskboot/dtb.c \
 	magiskboot/ramdisk.c \
-	$(UTIL_SRC)
+	magiskboot/pattern.c \
+	$(COMMON_UTILS)
 
 LOCAL_CFLAGS := -DXWRAP_EXIT
 LOCAL_LDLIBS := -lz

@@ -18,6 +18,7 @@
 #include "magisk.h"
 #include "db.h"
 #include "utils.h"
+#include "img.h"
 #include "daemon.h"
 #include "resetprop.h"
 #include "magiskpolicy.h"

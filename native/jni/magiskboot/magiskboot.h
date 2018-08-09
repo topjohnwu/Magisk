@@ -32,4 +32,8 @@ size_t lz4_legacy(int mode, int fd, const void *buf, size_t size);
 long long comp(format_t type, int to, const void *from, size_t size);
 long long decomp(format_t type, int to, const void *from, size_t size);
 
+// Pattern
+int patch_verity(void **buf, uint32_t *size, int patch);
+void patch_encryption(void **buf, uint32_t *size);
+
 #endif

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "utils.h"
+#include "magiskboot.h"
 
 static int check_verity_pattern(const char *s) {
 	int skip = 0;
