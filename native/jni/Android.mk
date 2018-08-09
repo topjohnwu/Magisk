@@ -73,8 +73,7 @@ LOCAL_C_INCLUDES := \
 	jni/magiskpolicy \
 	out \
 	out/$(TARGET_ARCH_ABI) \
-	$(LIBSEPOL) \
-	$(LIBLZMA)
+	$(LIBSEPOL)
 
 LOCAL_SRC_FILES := \
 	core/magiskinit.c \
@@ -126,8 +125,8 @@ ifdef B_BXZ
 # b64xz
 include $(CLEAR_VARS)
 LOCAL_MODULE := b64xz
-LOCAL_STATIC_LIBRARIES := liblzma
-LOCAL_C_INCLUDES := $(LIBLZMA)
+LOCAL_STATIC_LIBRARIES := libxz
+LOCAL_C_INCLUDES := $(EXT_PATH)/include
 LOCAL_SRC_FILES := b64xz.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)

@@ -300,11 +300,11 @@ def gen_update_binary():
 	binary = os.path.join('native', 'out', 'armeabi-v7a', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\'\nBB_ARM=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9)).decode('ascii'))
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
 	binary = os.path.join('native', 'out', 'x86', 'busybox')
 	with open(binary, 'rb') as busybox:
 		update_bin.append('\nBB_X86=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9)).decode('ascii'))
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
 		update_bin.append('\n')
 	with open(os.path.join('scripts', 'update_binary.sh'), 'r') as script:
 		update_bin.append(script.read())
