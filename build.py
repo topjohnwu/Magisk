@@ -106,76 +106,6 @@ def execv(cmd, redirect=None):
 def system(cmd, redirect=None):
 	return subprocess.run(cmd, shell=True, stdout=redirect if redirect != None else STDOUT)
 
-def build_binary(args):
-	# If nothing specified, build everything
-	try:
-		targets = args.target
-	except:
-		targets = []
-
-	if len(targets) == 0:
-		targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
-
-	header('* Building binaries: ' + ' '.join(targets))
-
-	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
-	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
-
-	# Basic flags
-	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
-		'' if args.release else '-DMAGISK_DEBUG')
-
-	if 'magisk' in targets:
-		# Magisk is special case as it is a dependency of magiskinit
-		proc = system('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count))
-		if proc.returncode != 0:
-			error('Build Magisk binary failed!')
-		collect_binary()
-		# Dump the binary to header
-		for arch in archs:
-			bin_file = os.path.join('native', 'out', arch, 'magisk')
-			with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
-				with open(bin_file, 'rb') as src:
-					binary_dump(src, out, 'magisk_bin')
-
-	old_plat = False
-	flags = base_flags
-
-	if 'b64xz' in targets:
-		flags += ' B_BXZ=1'
-		old_plat = True
-
-	if 'magiskinit' in targets:
-		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
-			error('Build "magisk" before building "magiskinit"')
-		if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
-			error('Build release stub APK before building "magiskinit"')
-		flags += ' B_INIT=1'
-		old_plat = True
-
-	if 'magiskboot' in targets:
-		flags += ' B_BOOT=1'
-		old_plat = True
-
-	if old_plat:
-		proc = system('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count))
-		if proc.returncode != 0:
-			error('Build binaries failed!')
-		collect_binary()
-
-	new_plat = False
-	flags = base_flags
-
-	if 'busybox' in targets:
-		flags += ' B_BB=1'
-		new_plat = True
-
-	if new_plat:
-		proc = system('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count))
-		if proc.returncode != 0:
-			error('Build binaries failed!')
-		collect_binary()
-
 def sign_zip(unsigned, output, release):
 	signer_name = 'zipsigner-3.0.jar'
 	zipsigner = os.path.join('utils', 'build', 'libs', signer_name)
@@ -227,6 +157,101 @@ def binary_dump(src, out, var_name):
 		out.write('0x{:02X},'.format(c))
 	out.write('\n};\n')
 	out.flush()
+
+def gen_update_binary():
+	update_bin = []
+	binary = os.path.join('native', 'out', 'armeabi-v7a', 'b64xz')
+	if not os.path.exists(binary):
+		error('Please build \'binary\' before zipping!')
+	with open(binary, 'rb') as b64xz:
+		update_bin.append('#! /sbin/sh\nEX_ARM=\'')
+		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
+	binary = os.path.join('native', 'out', 'x86', 'b64xz')
+	with open(binary, 'rb') as b64xz:
+		update_bin.append('\'\nEX_X86=\'')
+		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
+	binary = os.path.join('native', 'out', 'armeabi-v7a', 'busybox')
+	with open(binary, 'rb') as busybox:
+		update_bin.append('\'\nBB_ARM=')
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
+	binary = os.path.join('native', 'out', 'x86', 'busybox')
+	with open(binary, 'rb') as busybox:
+		update_bin.append('\nBB_X86=')
+		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
+		update_bin.append('\n')
+	with open(os.path.join('scripts', 'update_binary.sh'), 'r') as script:
+		update_bin.append(script.read())
+	return ''.join(update_bin)
+
+def build_binary(args):
+	# If nothing specified, build everything
+	try:
+		targets = args.target
+	except:
+		targets = []
+
+	if len(targets) == 0:
+		targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
+
+	header('* Building binaries: ' + ' '.join(targets))
+
+	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
+	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
+
+	# Basic flags
+	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
+		'' if args.release else '-DMAGISK_DEBUG')
+
+	if 'magisk' in targets:
+		# Magisk is special case as it is a dependency of magiskinit
+		proc = system('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count))
+		if proc.returncode != 0:
+			error('Build Magisk binary failed!')
+		collect_binary()
+		# Dump the binary to header
+		for arch in archs:
+			bin_file = os.path.join('native', 'out', arch, 'magisk')
+			with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
+				with open(bin_file, 'rb') as src:
+					binary_dump(src, out, 'magisk_bin')
+
+	old_plat = False
+	flags = base_flags
+
+	if 'b64xz' in targets:
+		flags += ' B_BXZ=1'
+		old_plat = True
+
+	if 'magiskinit' in targets:
+		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
+			error('Build "magisk" before building "magiskinit"')
+		if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
+			error('Build stub APK before building "magiskinit"')
+		flags += ' B_INIT=1'
+		old_plat = True
+
+	if 'magiskboot' in targets:
+		flags += ' B_BOOT=1'
+		old_plat = True
+
+	if old_plat:
+		proc = system('{} -C native {} -j{}'.format(ndk_build, flags, cpu_count))
+		if proc.returncode != 0:
+			error('Build binaries failed!')
+		collect_binary()
+
+	new_plat = False
+	flags = base_flags
+
+	if 'busybox' in targets:
+		flags += ' B_BB=1'
+		new_plat = True
+
+	if new_plat:
+		proc = system('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count))
+		if proc.returncode != 0:
+			error('Build binaries failed!')
+		collect_binary()
 
 def build_apk(args):
 	header('* Building Magisk Manager')
@@ -284,31 +309,6 @@ def build_snet(args):
 				zout.writestr(item.filename, zin.read(item))
 	rm(source)
 	header('Output: ' + target)
-
-def gen_update_binary():
-	update_bin = []
-	binary = os.path.join('native', 'out', 'armeabi-v7a', 'b64xz')
-	if not os.path.exists(binary):
-		error('Please build \'binary\' before zipping!')
-	with open(binary, 'rb') as b64xz:
-		update_bin.append('#! /sbin/sh\nEX_ARM=\'')
-		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
-	binary = os.path.join('native', 'out', 'x86', 'b64xz')
-	with open(binary, 'rb') as b64xz:
-		update_bin.append('\'\nEX_X86=\'')
-		update_bin.append(''.join("\\x{:02X}".format(c) for c in b64xz.read()))
-	binary = os.path.join('native', 'out', 'armeabi-v7a', 'busybox')
-	with open(binary, 'rb') as busybox:
-		update_bin.append('\'\nBB_ARM=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
-	binary = os.path.join('native', 'out', 'x86', 'busybox')
-	with open(binary, 'rb') as busybox:
-		update_bin.append('\nBB_X86=')
-		update_bin.append(base64.b64encode(lzma.compress(busybox.read(), preset=9, check=lzma.CHECK_NONE)).decode('ascii'))
-		update_bin.append('\n')
-	with open(os.path.join('scripts', 'update_binary.sh'), 'r') as script:
-		update_bin.append(script.read())
-	return ''.join(update_bin)
 
 def zip_main(args):
 	header('* Packing Flashable Zip')
@@ -426,34 +426,30 @@ def cleanup(args):
 		header('* Cleaning java')
 		execv([gradlew, 'app:clean', 'snet:clean', 'utils:clean'])
 
-def parse_config():
-	global config
-	with open('config.prop', 'r') as f:
-		for line in [l.strip(' \t\r\n') for l in f]:
-			if line.startswith('#') or len(line) == 0:
-				continue
-			prop = line.split('=')
-			config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+with open('config.prop', 'r') as f:
+	for line in [l.strip(' \t\r\n') for l in f]:
+		if line.startswith('#') or len(line) == 0:
+			continue
+		prop = line.split('=')
+		config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
 
-	if 'version' not in config or 'versionCode' not in config:
-		error('"version" and "versionCode" is required in "config.prop"')
+if 'version' not in config or 'versionCode' not in config:
+	error('"version" and "versionCode" is required in "config.prop"')
 
-	try:
-		config['versionCode'] = int(config['versionCode'])
-	except ValueError:
-		error('"versionCode" is required to be an integer')
+try:
+	config['versionCode'] = int(config['versionCode'])
+except ValueError:
+	error('"versionCode" is required to be an integer')
 
-	if 'prettyName' not in config:
-		config['prettyName'] = 'false'
+if 'prettyName' not in config:
+	config['prettyName'] = 'false'
 
-	config['prettyName'] = config['prettyName'].lower() == 'true'
+config['prettyName'] = config['prettyName'].lower() == 'true'
 
-	if 'outdir' not in config:
-		config['outdir'] = 'out'
+if 'outdir' not in config:
+	config['outdir'] = 'out'
 
-	mkdir_p(config['outdir'])
-
-parse_config()
+mkdir_p(config['outdir'])
 
 parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('-r', '--release', action='store_true', help='compile Magisk for release')
