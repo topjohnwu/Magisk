@@ -264,28 +264,17 @@ def build_apk(args):
 	cp(source, target)
 
 	if args.release:
-		proc = execv([gradlew, 'app:assembleRelease'])
+		proc = execv([gradlew, 'app:assembleFullRelease'])
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
-		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'release', 'app-full-release-unsigned.apk')
-		release = os.path.join(config['outdir'], 'app-release.apk')
-		sign_apk(unsigned, release)
-		header('Output: ' + release)
-		rm(unsigned)
-
-		unsigned = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'release', 'app-stub-release-unsigned.apk')
-		release = os.path.join(config['outdir'], 'stub-release.apk')
-		sign_apk(unsigned, release)
-		header('Output: ' + release)
-		rm(unsigned)
-		# Dump the stub APK to header
-		mkdir(os.path.join('native', 'out'))
-		with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
-			with open(release, 'rb') as src:
-				binary_dump(src, out, 'manager_xz');
+		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'release', 'app-full-release-unsigned.apk')
+		target = os.path.join(config['outdir'], 'app-release.apk')
+		sign_apk(source, target)
+		header('Output: ' + target)
+		rm(source)
 	else:
-		proc = execv([gradlew, 'app:assembleDebug'])
+		proc = execv([gradlew, 'app:assembleFullDebug'])
 		if proc.returncode != 0:
 			error('Build Magisk Manager failed!')
 
@@ -294,10 +283,34 @@ def build_apk(args):
 		mv(source, target)
 		header('Output: ' + target)
 
+def build_stub(args):
+	header('* Building stub Magisk Manager')
+
+	if args.release:
+		proc = execv([gradlew, 'app:assembleStubRelease'])
+		if proc.returncode != 0:
+			error('Build stub Magisk Manager failed!')
+
+		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'release', 'app-stub-release-unsigned.apk')
+		target = os.path.join(config['outdir'], 'stub-release.apk')
+		sign_apk(source, target)
+		header('Output: ' + target)
+		rm(source)
+	else:
+		proc = execv([gradlew, 'app:assembleStubDebug'])
+		if proc.returncode != 0:
+			error('Build stub Magisk Manager failed!')
+
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'debug', 'app-stub-debug.apk')
 		target = os.path.join(config['outdir'], 'stub-debug.apk')
 		mv(source, target)
 		header('Output: ' + target)
+
+	# Dump the stub APK to header
+	mkdir(os.path.join('native', 'out'))
+	with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
+		with open(target, 'rb') as src:
+			binary_dump(src, out, 'manager_xz');
 
 def build_snet(args):
 	proc = execv([gradlew, 'snet:assembleRelease'])
@@ -468,6 +481,9 @@ binary_parser.set_defaults(func=build_binary)
 
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
 apk_parser.set_defaults(func=build_apk)
+
+stub_parser = subparsers.add_parser('stub', help='build stub Magisk Manager APK')
+stub_parser.set_defaults(func=build_stub)
 
 snet_parser = subparsers.add_parser('snet', help='build snet extention for Magisk Manager')
 snet_parser.set_defaults(func=build_snet)
