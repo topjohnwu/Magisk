@@ -4,10 +4,10 @@
 # Magisk Boot Image Patcher
 # by topjohnwu
 #
-# Usage: sh boot_patch.sh <bootimage>
+# Usage: boot_patch.sh <bootimage>
 #
-# The following additional flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, HIGHCOMP
+# The following flags can be set in environment variables:
+# KEEPVERITY, KEEPFORCEENCRYPT
 #
 # This script should be placed in a directory with the following files:
 #
@@ -58,7 +58,6 @@ BOOTIMAGE="$1"
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
-[ -z $HIGHCOMP ] && HIGHCOMP=false
 
 chmod -R 755 .
 
@@ -79,17 +78,14 @@ case $? in
     abort "! Unable to unpack boot image"
     ;;
   2 )
-    HIGHCOMP=true
-    ;;
-  3 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
     ;;
-  4 )
+  3 )
     ui_print "! Sony ELF32 format detected"
     abort "! Please use BootBridge from @AdrianDC to flash Magisk"
     ;;
-  5 )
+  4 )
     ui_print "! Sony ELF64 format detected"
     abort "! Stock kernel cannot be patched, please use a custom kernel"
 esac
@@ -100,7 +96,6 @@ esac
 
 # Test patch status and do restore, after this section, ramdisk.cpio.orig is guaranteed to exist
 ui_print "- Checking ramdisk status"
-MAGISK_PATCHED=false
 ./magiskboot --cpio ramdisk.cpio test
 case $? in
   0 )  # Stock boot
@@ -112,31 +107,17 @@ case $? in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
-    MAGISK_PATCHED=true
-    HIGHCOMP=false
+    ui_print "- Magisk patched boot image detected"
+    # Find SHA1 of stock boot image
+    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    ./magiskboot --cpio ramdisk.cpio restore
+    cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
-  2 ) # High compression mode
-    MAGISK_PATCHED=true
-    HIGHCOMP=true
-    ;;
-  3 ) # Other patched
-    ui_print "! Boot image patched by other programs"
+  2 ) # Other patched
+    ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore stock boot image"
     ;;
 esac
-
-if $MAGISK_PATCHED; then
-  ui_print "- Magisk patched image detected"
-  # Find SHA1 of stock boot image
-  [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
-  ./magiskboot --cpio ramdisk.cpio restore
-  cp -af ramdisk.cpio ramdisk.cpio.orig
-fi
-
-if $HIGHCOMP; then
-  ui_print "! Insufficient boot partition size detected"
-  ui_print "- Enable high compression mode"
-fi
 
 ##########################################################################################
 # Ramdisk patches
@@ -146,7 +127,7 @@ ui_print "- Patching ramdisk"
 
 ./magiskboot --cpio ramdisk.cpio \
 "add 750 init magiskinit" \
-"magisk ramdisk.cpio.orig $HIGHCOMP $KEEPVERITY $KEEPFORCEENCRYPT $SHA1"
+"magisk ramdisk.cpio.orig $KEEPVERITY $KEEPFORCEENCRYPT $SHA1"
 
 rm -f ramdisk.cpio.orig
 

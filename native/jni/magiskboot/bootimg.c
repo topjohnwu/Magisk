@@ -11,11 +11,6 @@
 #include "mincrypt/sha.h"
 #include "mincrypt/sha256.h"
 
-#define INSUF_BLOCK_RET    2
-#define CHROMEOS_RET       3
-#define ELF32_RET          4
-#define ELF64_RET          5
-
 // Macros to determine header on-the-go
 #define lheader(b, e, o) \
 	((b)->flags & PXA_FLAG) ? \
@@ -88,10 +83,13 @@ static void clean_boot(boot_img *boot) {
 	memset(boot, 0, sizeof(*boot));
 }
 
+#define CHROMEOS_RET       2
+#define ELF32_RET          3
+#define ELF64_RET          4
 #define pos_align() pos = align(pos, header(boot, page_size))
 int parse_img(const char *image, boot_img *boot) {
 	memset(boot, 0, sizeof(*boot));
-	int is_blk = mmap_ro(image, &boot->map_addr, &boot->map_size);
+	mmap_ro(image, &boot->map_addr, &boot->map_size);
 
 	// Parse image
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
@@ -246,8 +244,7 @@ int parse_img(const char *image, boot_img *boot) {
 			get_fmt_name(boot->r_fmt, fmt);
 			fprintf(stderr, "RAMDISK_FMT [%s]\n", fmt);
 
-			return boot->flags & CHROMEOS_FLAG ? CHROMEOS_RET :
-				   ((is_blk && boot->tail_size < 500 * 1024) ? INSUF_BLOCK_RET : 0);
+			return boot->flags & CHROMEOS_FLAG ? CHROMEOS_RET : 0;
 		default:
 			continue;
 		}

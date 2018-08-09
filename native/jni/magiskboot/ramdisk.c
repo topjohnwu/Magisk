@@ -32,21 +32,17 @@ static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	}
 }
 
-#define STOCK_BOOT      0x0
-#define MAGISK_PATCH    0x1
-#define HIGH_COMPRESS   0x2
-#define OTHER_PATCH     0x3
+#define STOCK_BOOT       0x0
+#define MAGISK_PATCH     0x1
+#define UNSUPPORT_PATCH  0x2
 
 static int cpio_test(struct vector *v) {
-	const char *OTHER_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
+	const char *UNSUPPORT_LIST[] = { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc", "boot/sbin/launch_daemonsu.sh", NULL };
 	const char *MAGISK_LIST[] = { ".backup/.magisk", "init.magisk.rc", "overlay/init.magisk.rc", NULL };
 
-	for (int i = 0; OTHER_LIST[i]; ++i)
-		if (cpio_find(v, OTHER_LIST[i]) >= 0)
-			return OTHER_PATCH;
-
-	if (cpio_find(v, "ramdisk.cpio.xz") >= 0)
-		return HIGH_COMPRESS;
+	for (int i = 0; UNSUPPORT_LIST[i]; ++i)
+		if (cpio_find(v, UNSUPPORT_LIST[i]) >= 0)
+			return UNSUPPORT_PATCH;
 
 	for (int i = 0; MAGISK_LIST[i]; ++i)
 		if (cpio_find(v, MAGISK_LIST[i]) >= 0)
@@ -196,55 +192,6 @@ static void cpio_restore(struct vector *v) {
 	cpio_rm(v, 0, "sbin/magic_mask.sh");
 	cpio_rm(v, 0, "init.magisk.rc");
 	cpio_rm(v, 0, "magisk");
-	cpio_rm(v, 0, "ramdisk-recovery.xz");
-}
-
-static void restore_high_compress(struct vector *v, const char *incpio) {
-	// Check if the ramdisk is in high compression mode
-	if (cpio_extract(v, "ramdisk.cpio.xz", incpio) == 0) {
-		void *xz;
-		size_t size;
-		full_read(incpio, &xz, &size);
-		int fd = creat(incpio, 0644);
-		lzma(0, fd, xz, size);
-		close(fd);
-		free(xz);
-		cpio_rm(v, 0, "ramdisk.cpio.xz");
-		cpio_rm(v, 0, "init");
-		struct vector vv;
-		vec_init(&vv);
-		parse_cpio(&vv, incpio);
-		cpio_entry *e;
-		vec_for_each(&vv, e)
-			vec_push_back(v, e);
-		vec_destroy(&vv);
-	}
-}
-
-static void enable_high_compress(struct vector *v, struct vector *b, const char *incpio) {
-	cpio_entry *init, *magiskinit;
-
-	// Swap magiskinit with original init
-	int i = cpio_find(b, ".backup/init"), j = cpio_find(v, "init");
-	init = vec_entry(b)[i];
-	magiskinit = vec_entry(v)[j];
-	free(init->filename);
-	init->filename = strdup("init");
-	vec_entry(v)[j] = init;
-	vec_entry(b)[i] = NULL;
-
-	dump_cpio(v, incpio);
-	cpio_vec_destroy(v);
-	void *cpio;
-	size_t size;
-	full_read(incpio, &cpio, &size);
-	int fd = creat(incpio, 0644);
-	lzma(1, fd, cpio, size);
-	close(fd);
-	free(cpio);
-	vec_init(v);
-	vec_push_back(v, magiskinit);
-	cpio_add(v, 0, "ramdisk.cpio.xz", incpio);
 }
 
 int cpio_commands(int argc, char *argv[]) {
@@ -267,7 +214,6 @@ int cpio_commands(int argc, char *argv[]) {
 		if (strcmp(cmdv[0], "test") == 0) {
 			exit(cpio_test(&v));
 		} else if (strcmp(cmdv[0], "restore") == 0) {
-			restore_high_compress(&v, incpio);
 			cpio_restore(&v);
 		} else if (strcmp(cmdv[0], "sha1") == 0) {
 			char *sha1 = cpio_sha1(&v);
@@ -282,12 +228,12 @@ int cpio_commands(int argc, char *argv[]) {
 			vec_for_each(&back, e)
 				if (e) vec_push_back(&v, e);
 			vec_destroy(&back);
-		} else if (cmdc >= 5 && strcmp(cmdv[0], "magisk") == 0) {
-			cpio_patch(&v, strcmp(cmdv[3], "true") == 0, strcmp(cmdv[4], "true") == 0);
+		} else if (cmdc >= 4 && strcmp(cmdv[0], "magisk") == 0) {
+			cpio_patch(&v, strcmp(cmdv[2], "true") == 0, strcmp(cmdv[3], "true") == 0);
 
 			struct vector back;
 			vec_init(&back);
-			cpio_backup(&v, &back, cmdv[1], cmdc > 5 ? cmdv[5] : NULL);
+			cpio_backup(&v, &back, cmdv[1], cmdc > 4 ? cmdv[4] : NULL);
 
 			cpio_entry *e;
 			e = xcalloc(sizeof(*e), 1);
@@ -297,10 +243,6 @@ int cpio_commands(int argc, char *argv[]) {
 			snprintf(e->data, 50, "KEEPVERITY=%s\nKEEPFORCEENCRYPT=%s\n", cmdv[3], cmdv[4]);
 			e->filesize = strlen(e->data) + 1;
 			vec_push_back(&back, e);
-
-			// Enable high compression mode
-			if (strcmp(cmdv[2], "true") == 0)
-				enable_high_compress(&v, &back, incpio);
 
 			vec_for_each(&back, e)
 				if (e) vec_push_back(&v, e);

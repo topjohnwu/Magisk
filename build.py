@@ -134,9 +134,9 @@ def build_binary(args):
 		# Dump the binary to header
 		for arch in archs:
 			bin_file = os.path.join('native', 'out', arch, 'magisk')
-			with open(os.path.join('native', 'out', arch, 'binaries_arch_xz.h'), 'w') as out:
+			with open(os.path.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
 				with open(bin_file, 'rb') as src:
-					xz_dump(src, out, 'magisk_xz')
+					binary_dump(src, out, 'magisk_bin')
 
 	old_plat = False
 	flags = base_flags
@@ -146,9 +146,9 @@ def build_binary(args):
 		old_plat = True
 
 	if 'magiskinit' in targets:
-		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch_xz.h')):
+		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
 			error('Build "magisk" before building "magiskinit"')
-		if not os.path.exists(os.path.join('native', 'out', 'binaries_xz.h')):
+		if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
 			error('Build release stub APK before building "magiskinit"')
 		flags += ' B_INIT=1'
 		old_plat = True
@@ -219,6 +219,15 @@ def sign_apk(source, target):
 	if proc.returncode != 0:
 		error('Release sign Magisk Manager failed!')
 
+def binary_dump(src, out, var_name):
+	out.write('const static unsigned char {}[] = {{'.format(var_name))
+	for i, c in enumerate(src.read()):
+		if i % 16 == 0:
+			out.write('\n')
+		out.write('0x{:02X},'.format(c))
+	out.write('\n};\n')
+	out.flush()
+
 def build_apk(args):
 	header('* Building Magisk Manager')
 
@@ -244,9 +253,9 @@ def build_apk(args):
 		rm(unsigned)
 		# Dump the stub APK to header
 		mkdir(os.path.join('native', 'out'))
-		with open(os.path.join('native', 'out', 'binaries_xz.h'), 'w') as out:
+		with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
 			with open(release, 'rb') as src:
-				xz_dump(src, out, 'manager_xz')
+				binary_dump(src, out, 'manager_bin');
 	else:
 		proc = execv([gradlew, 'app:assembleDebug'])
 		if proc.returncode != 0:
@@ -275,15 +284,6 @@ def build_snet(args):
 				zout.writestr(item.filename, zin.read(item))
 	rm(source)
 	header('Output: ' + target)
-
-def xz_dump(src, out, var_name):
-	out.write('const static unsigned char {}[] = {{'.format(var_name))
-	for i, c in enumerate(lzma.compress(src.read(), preset=9)):
-		if i % 16 == 0:
-			out.write('\n')
-		out.write('0x{:02X},'.format(c))
-	out.write('\n};\n')
-	out.flush()
 
 def gen_update_binary():
 	update_bin = []

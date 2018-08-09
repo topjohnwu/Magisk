@@ -36,16 +36,13 @@
 #include <sys/sendfile.h>
 #include <sys/sysmacros.h>
 
-#include <lzma.h>
-
-#include "binaries_xz.h"
-#include "binaries_arch_xz.h"
+#include "binaries.h"
+#include "binaries_arch.h"
 
 #include "magiskrc.h"
 #include "utils.h"
 #include "magiskpolicy.h"
 #include "daemon.h"
-#include "cpio.h"
 #include "magisk.h"
 
 #ifdef MAGISK_DEBUG
@@ -246,45 +243,18 @@ static int patch_sepolicy() {
 	return 0;
 }
 
-#define BUFSIZE (1 << 20)
-
-static int unxz(const void *buf, size_t size, int fd) {
-	lzma_stream strm = LZMA_STREAM_INIT;
-	if (lzma_auto_decoder(&strm, UINT64_MAX, 0) != LZMA_OK)
-		return 1;
-	lzma_ret ret;
-	void *out = malloc(BUFSIZE);
-	strm.next_in = buf;
-	strm.avail_in = size;
-	do {
-		strm.next_out = out;
-		strm.avail_out = BUFSIZE;
-		ret = lzma_code(&strm, LZMA_RUN);
-		xwrite(fd, out, BUFSIZE - strm.avail_out);
-	} while (strm.avail_out == 0 && ret == LZMA_OK);
-
-	free(out);
-	lzma_end(&strm);
-
-	if (ret != LZMA_OK && ret != LZMA_STREAM_END)
-		return 1;
+static int dump_magisk(const char *path, mode_t mode) {
+	int fd = creat(path, mode);
+	xwrite(fd, magisk_bin, sizeof(magisk_bin));
+	close(fd);
 	return 0;
 }
 
-static int dump_magisk(const char *path, mode_t mode) {
-	unlink(path);
-	int fd = creat(path, mode);
-	int ret = unxz(magisk_xz, sizeof(magisk_xz), fd);
-	close(fd);
-	return ret;
-}
-
 static int dump_manager(const char *path, mode_t mode) {
-	unlink(path);
 	int fd = creat(path, mode);
-	int ret = unxz(manager_xz, sizeof(manager_xz), fd);
+	xwrite(fd, manager_bin, sizeof(manager_bin));
 	close(fd);
-	return ret;
+	return 0;
 }
 
 static int dump_magiskrc(const char *path, mode_t mode) {
@@ -365,23 +335,6 @@ int main(int argc, char *argv[]) {
 		// Clear rootfs
 		excl_list = (char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
 		frm_rf(root);
-	} else if (access("/ramdisk.cpio.xz", R_OK) == 0) {
-		// High compression mode
-		void *addr;
-		size_t size;
-		mmap_ro("/ramdisk.cpio.xz", &addr, &size);
-		int fd = creat("/ramdisk.cpio", 0);
-		unxz(addr, size, fd);
-		munmap(addr, size);
-		close(fd);
-		struct vector v;
-		vec_init(&v);
-		parse_cpio(&v, "/ramdisk.cpio");
-		excl_list = (char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
-		frm_rf(root);
-		chdir("/");
-		cpio_extract_all(&v);
-		cpio_vec_destroy(&v);
 	} else {
 		// Revert original init binary
 		link("/.backup/init", "/init");

@@ -17,14 +17,10 @@ static void usage(char *arg0) {
 		"Usage: %s <action> [args...]\n"
 		"\n"
 		"Supported actions:\n"
-		"  --parse <bootimg>\n"
-		"    Parse <bootimg> only, do not unpack. Return values: \n"
-		"    0:OK   1:error   2:insufficient boot partition size\n"
-		"    3:chromeos   4:ELF32   5:ELF64\n"
-		"\n"
 		"  --unpack <bootimg>\n"
-		"     Unpack <bootimg> to kernel, ramdisk.cpio, (second), (dtb), (extra) into\n"
-		"     the current directory. Return value is the same as --parse\n"
+		"    Unpack <bootimg> to kernel, ramdisk.cpio, and if available, second, dtb,\n"
+		"    and extra into the current directory. Return values:\n"
+		"    0:valid    1:error    2:chromeos    3:ELF32    4:ELF64\n"
 		"\n"
 		"  --repack <origbootimg> [outbootimg]\n"
 		"    Repack kernel, ramdisk.cpio[.ext], second, dtb... from current directory\n"
@@ -54,7 +50,8 @@ static void usage(char *arg0) {
 		"        Extract ENTRY to OUT, or extract all entries to current directory\n"
 		"      test\n"
 		"        Test the current cpio's patch status\n"
-		"        Return value: 0/stock 1/Magisk 2/other (phh, SuperSU, Xposed)\n"
+		"        Return values:\n"
+		"        0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)\n"
 		"      patch KEEPVERITY KEEPFORCEENCRYPT\n"
 		"        Ramdisk patches. KEEP**** are boolean values\n"
 		"      backup ORIG [SHA1]\n"
@@ -62,10 +59,10 @@ static void usage(char *arg0) {
 		"        SHA1 of stock boot image is optional\n"
 		"      restore\n"
 		"        Restore ramdisk from ramdisk backup stored within incpio\n"
-		"      magisk ORIG HIGHCOMP KEEPVERITY KEEPFORCEENCRYPT [SHA1]\n"
+		"      magisk ORIG KEEPVERITY KEEPFORCEENCRYPT [SHA1]\n"
 		"        Do Magisk patches and backups all in one step\n"
 		"        Create ramdisk backups from ORIG\n"
-		"        HIGHCOMP, KEEP**** are boolean values\n"
+		"        KEEP**** are boolean values\n"
 		"        SHA1 of stock boot image is optional\n"
 		"      sha1\n"
 		"        Print stock boot SHA1 if previously stored\n"
@@ -77,7 +74,8 @@ static void usage(char *arg0) {
 		"        Dump all contents from dtb for debugging\n"
 		"      test\n"
 		"        Check if fstab has verity/avb flags\n"
-		"        Return value: 0/no flags 1/flag exists\n"
+		"        Return values:\n"
+		"        0:no flags    1:flag exists\n"
 		"      patch\n"
 		"        Search for fstab and remove verity/avb\n"
 		"\n"
@@ -135,9 +133,6 @@ int main(int argc, char *argv[]) {
 			printf("%02x", sha1[i]);
 		printf("\n");
 		munmap(buf, size);
-	} else if (argc > 2 && strcmp(argv[1], "--parse") == 0) {
-		boot_img boot;
-		return parse_img(argv[2], &boot);
 	} else if (argc > 2 && strcmp(argv[1], "--unpack") == 0) {
 		return unpack(argv[2]);
 	} else if (argc > 2 && strcmp(argv[1], "--repack") == 0) {
