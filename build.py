@@ -86,12 +86,6 @@ def zip_with_msg(zipfile, source, target):
 	zipfile.write(source, target)
 	vprint('zip: {} -> {}'.format(source, target))
 
-def build_all(args):
-	build_apk(args)
-	build_binary(args)
-	zip_main(args)
-	zip_uninstaller(args)
-
 def collect_binary():
 	for arch in archs:
 		mkdir_p(os.path.join('native', 'out', arch))
@@ -187,16 +181,17 @@ def gen_update_binary():
 	return ''.join(update_bin)
 
 def build_binary(args):
-	# If nothing specified, build everything
-	try:
-		targets = args.target
-	except:
-		targets = []
+	support_targets = {'magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz'}
+	if len(args.target) == 0:
+		# If nothing specified, build everything
+		args.target = support_targets
+	else:
+		args.target = set(args.target) & support_targets
 
-	if len(targets) == 0:
-		targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'b64xz']
+	if len(args.target) == 0:
+		return
 
-	header('* Building binaries: ' + ' '.join(targets))
+	header('* Building binaries: ' + ' '.join(args.target))
 
 	# Force update logging.h timestamp to trigger recompilation for the flags to make a difference
 	os.utime(os.path.join('native', 'jni', 'include', 'logging.h'))
@@ -205,7 +200,7 @@ def build_binary(args):
 	base_flags = 'MAGISK_VERSION=\"{}\" MAGISK_VER_CODE={} MAGISK_DEBUG={}'.format(config['version'], config['versionCode'],
 		'' if args.release else '-DMAGISK_DEBUG')
 
-	if 'magisk' in targets:
+	if 'magisk' in args.target:
 		# Magisk is special case as it is a dependency of magiskinit
 		proc = system('{} -C native {} B_MAGISK=1 -j{}'.format(ndk_build, base_flags, cpu_count))
 		if proc.returncode != 0:
@@ -221,11 +216,11 @@ def build_binary(args):
 	old_plat = False
 	flags = base_flags
 
-	if 'b64xz' in targets:
+	if 'b64xz' in args.target:
 		flags += ' B_BXZ=1'
 		old_plat = True
 
-	if 'magiskinit' in targets:
+	if 'magiskinit' in args.target:
 		if not os.path.exists(os.path.join('native', 'out', 'x86', 'binaries_arch.h')):
 			error('Build "magisk" before building "magiskinit"')
 		if not os.path.exists(os.path.join('native', 'out', 'binaries.h')):
@@ -233,7 +228,7 @@ def build_binary(args):
 		flags += ' B_INIT=1'
 		old_plat = True
 
-	if 'magiskboot' in targets:
+	if 'magiskboot' in args.target:
 		flags += ' B_BOOT=1'
 		old_plat = True
 
@@ -246,7 +241,7 @@ def build_binary(args):
 	new_plat = False
 	flags = base_flags
 
-	if 'busybox' in targets:
+	if 'busybox' in args.target:
 		flags += ' B_BB=1'
 		new_plat = True
 
@@ -271,7 +266,6 @@ def build_apk(args):
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'release', 'app-full-release-unsigned.apk')
 		target = os.path.join(config['outdir'], 'app-release.apk')
 		sign_apk(source, target)
-		header('Output: ' + target)
 		rm(source)
 	else:
 		proc = execv([gradlew, 'app:assembleFullDebug'])
@@ -281,7 +275,8 @@ def build_apk(args):
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'debug', 'app-full-debug.apk')
 		target = os.path.join(config['outdir'], 'app-debug.apk')
 		mv(source, target)
-		header('Output: ' + target)
+
+	header('Output: ' + target)
 
 def build_stub(args):
 	header('* Building stub Magisk Manager')
@@ -294,7 +289,6 @@ def build_stub(args):
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'release', 'app-stub-release-unsigned.apk')
 		target = os.path.join(config['outdir'], 'stub-release.apk')
 		sign_apk(source, target)
-		header('Output: ' + target)
 		rm(source)
 	else:
 		proc = execv([gradlew, 'app:assembleStubDebug'])
@@ -304,7 +298,8 @@ def build_stub(args):
 		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'debug', 'app-stub-debug.apk')
 		target = os.path.join(config['outdir'], 'stub-debug.apk')
 		mv(source, target)
-		header('Output: ' + target)
+
+	header('Output: ' + target)
 
 	# Dump the stub APK to header
 	mkdir(os.path.join('native', 'out'))
@@ -430,8 +425,12 @@ def zip_uninstaller(args):
 	header('Output: ' + output)
 
 def cleanup(args):
+	support_targets = {'native', 'java'}
 	if len(args.target) == 0:
-		args.target = ['native', 'java']
+		# If nothing specified, clean everything
+		args.target = support_targets
+	else:
+		args.target = set(args.target) & support_targets
 
 	if 'native' in args.target:
 		header('* Cleaning native')
@@ -441,6 +440,15 @@ def cleanup(args):
 	if 'java' in args.target:
 		header('* Cleaning java')
 		execv([gradlew, 'app:clean', 'snet:clean', 'utils:clean'])
+
+def build_all(args):
+	vars(args)['target'] = []
+	build_stub(args)
+	build_apk(args)
+	build_binary(args)
+	zip_main(args)
+	zip_uninstaller(args)
+	build_snet(args)
 
 with open('config.prop', 'r') as f:
 	for line in [l.strip(' \t\r\n') for l in f]:
@@ -475,8 +483,8 @@ subparsers = parser.add_subparsers(title='actions')
 all_parser = subparsers.add_parser('all', help='build everything (binaries/apks/zips)')
 all_parser.set_defaults(func=build_all)
 
-binary_parser = subparsers.add_parser('binary', help='build binaries. Target: magisk magiskinit magiskboot busybox b64xz')
-binary_parser.add_argument('target', nargs='*')
+binary_parser = subparsers.add_parser('binary', help='build binaries')
+binary_parser.add_argument('target', nargs='*', help='Support: magisk, magiskinit, magiskboot, busybox, b64xz. Leave empty to build all.')
 binary_parser.set_defaults(func=build_binary)
 
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
@@ -491,11 +499,11 @@ snet_parser.set_defaults(func=build_snet)
 zip_parser = subparsers.add_parser('zip', help='zip Magisk into a flashable zip')
 zip_parser.set_defaults(func=zip_main)
 
-uninstaller_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
-uninstaller_parser.set_defaults(func=zip_uninstaller)
+un_parser = subparsers.add_parser('uninstaller', help='create flashable uninstaller')
+un_parser.set_defaults(func=zip_uninstaller)
 
-clean_parser = subparsers.add_parser('clean', help='cleanup. Target: native java')
-clean_parser.add_argument('target', nargs='*')
+clean_parser = subparsers.add_parser('clean', help='cleanup.')
+clean_parser.add_argument('target', nargs='*', help='Support: native, java. Leave empty to clean all.')
 clean_parser.set_defaults(func=cleanup)
 
 if len(sys.argv) == 1:
