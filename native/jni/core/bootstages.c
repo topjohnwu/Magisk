@@ -531,7 +531,7 @@ void startup() {
 
 	// Increment boot count
 	int boot_count = 0;
-	FILE *cf = xfopen(BOOTCOUNT, "r");
+	FILE *cf = fopen(BOOTCOUNT, "r");
 	if (cf) {
 		fscanf(cf, "%d", &boot_count);
 		fclose(cf);
