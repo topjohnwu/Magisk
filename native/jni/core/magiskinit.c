@@ -247,6 +247,7 @@ static int patch_sepolicy() {
 
 static int unxz(int fd, const void *buf, size_t size) {
 	uint8_t out[8192];
+	xz_crc32_init();
 	struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
 	struct xz_buf b = {
 			.in = buf,
@@ -269,20 +270,28 @@ static int unxz(int fd, const void *buf, size_t size) {
 
 static int dump_magisk(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
-	unxz(fd, magisk_xz, sizeof(magisk_xz));
+	if (fd < 0)
+		return 1;
+	if (unxz(fd, magisk_xz, sizeof(magisk_xz)))
+		return 1;
 	close(fd);
 	return 0;
 }
 
 static int dump_manager(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
-	unxz(fd, manager_xz, sizeof(manager_xz));
+	if (fd < 0)
+		return 1;
+	if (unxz(fd, manager_xz, sizeof(manager_xz)))
+		return 1;
 	close(fd);
 	return 0;
 }
 
 static int dump_magiskrc(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
+	if (fd < 0)
+		return 1;
 	xwrite(fd, magiskrc, sizeof(magiskrc));
 	close(fd);
 	return 0;
