@@ -375,6 +375,13 @@ mktouch() {
   chmod 644 $1
 }
 
+exact_file_size() {
+  EXACT_FILESIZE=$(stat -c%s "$1")
+}
+exact_partition_size() {
+  PARTITION_SIZE=$(blockdev --getsize64 "$1")
+}
+
 request_size_check() {
   reqSizeM=`du -ms $1 | cut -f1`
 }

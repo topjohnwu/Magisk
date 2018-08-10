@@ -114,6 +114,17 @@ cd $MAGISKBIN
 # Source the boot patcher
 . ./boot_patch.sh "$BOOTIMAGE"
 
+ui_print "- Checking patched image size against partition size..."
+
+exact_file_size new-boot.img
+exact_partition_size "$BOOTIMAGE"
+ui_print "- New image size: $EXACT_FILESIZE, boot partition size: $PARTITION_SIZE"
+
+if [ "$EXACT_FILESIZE" -gt "$PARTITION_SIZE" ]; then
+  ui_print "The patched image is too big!"
+  abort "You need to patch the boot image from the MagiskManager apk, reduce it size manually and flash it manually." 
+fi  
+
 flash_boot_image new-boot.img "$BOOTIMAGE"
 rm -f new-boot.img
 
