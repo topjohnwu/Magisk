@@ -64,7 +64,8 @@ installation() {
   # Source the boot patcher
   . ./boot_patch.sh "$BOOTIMAGE"
 
-  flash_boot_image new-boot.img "$BOOTIMAGE"
+  ui_print "- Flashing new boot image"
+  flash_image new-boot.img "$BOOTIMAGE"
   rm -f new-boot.img
 
   if [ -f stock_boot* ]; then

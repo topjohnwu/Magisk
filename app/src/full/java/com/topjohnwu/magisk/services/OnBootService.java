@@ -25,9 +25,7 @@ public class OnBootService extends JobIntentService {
          * Check for dtbo status every boot time, and prompt user
          * to reboot if dtbo wasn't patched and patched by Magisk Manager.
          * */
-        Shell shell = Shell.newInstance();
-        if (shell.getStatus() >= Shell.ROOT_SHELL &&
-                Boolean.parseBoolean(ShellUtils.fastCmd(shell, "mm_patch_dtbo")))
+        if (Shell.rootAccess() && ShellUtils.fastCmdResult("mm_patch_dtbo"))
             NotificationMgr.dtboPatched();
     }
 }

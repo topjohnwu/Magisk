@@ -95,17 +95,16 @@ case $? in
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected"
-    ./magisk --unlock-blocks 2>/dev/null
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
     STOCKDTBO=/data/stock_dtbo.img.gz
     if [ -f $STOCKBOOT ]; then
       ui_print "- Restoring stock boot image"
-      gzip -d < $STOCKBOOT | cat - /dev/zero > $BOOTIMAGE 2>/dev/null
-      if [ -f $DTBOIMAGE -a -f $STOCKDTBO ]; then
+      flash_image $STOCKBOOT $BOOTIMAGE
+      if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
         ui_print "- Restoring stock dtbo image"
-        gzip -d < $STOCKDTBO > $DTBOIMAGE
+        flash_image $STOCKDTBO $DTBOIMAGE
       fi
     else
       ui_print "! Boot image backup unavailable"
@@ -114,7 +113,8 @@ case $? in
       ./magiskboot --repack $BOOTIMAGE
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
-      flash_boot_image new-boot.img $BOOTIMAGE
+      ui_print "- Flashing restored boot image"
+      flash_image new-boot.img $BOOTIMAGE
     fi
     ;;
   2 ) # Other patched

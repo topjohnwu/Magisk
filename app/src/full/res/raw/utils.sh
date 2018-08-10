@@ -54,21 +54,22 @@ fix_env() {
 }
 
 direct_install() {
-  flash_boot_image $1 $2
-  rm -f $1
   rm -rf /data/adb/magisk/* 2>/dev/null
   mkdir -p /data/adb/magisk 2>/dev/null
   chmod 700 /data/adb
   cp -rf $3/* /data/adb/magisk
+  echo "- Flashing new boot image"
+  flash_image $1 $2
+  rm -f $1
   rm -rf $3
 }
 
 mm_patch_dtbo() {
   if $KEEPVERITY; then
-    echo false
+    return 1
   else
     find_dtbo_image
-    patch_dtbo_image >/dev/null 2>&1 && echo true || echo false
+    patch_dtbo_image
   fi
 }
 
@@ -83,12 +84,11 @@ restore_imgs() {
   find_boot_image
   find_dtbo_image
 
-  magisk --unlock-blocks 2>/dev/null
-  if [ -b "$DTBOIMAGE" -a -f $STOCKDTBO ]; then
-    gzip -d < $STOCKDTBO > $DTBOIMAGE
+  if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
+    flash_image $STOCKDTBO $DTBOIMAGE
   fi
-  if [ -b "$BOOTIMAGE" -a -f $STOCKBOOT ]; then
-    gzip -d < $STOCKBOOT | cat - /dev/zero > $BOOTIMAGE 2>/dev/null
+  if [ -f $STOCKBOOT -a -b "$BOOTIMAGE" ]; then
+    flash_image $STOCKBOOT $BOOTIMAGE
     return 0
   fi
   return 1

@@ -189,29 +189,25 @@ find_boot_image() {
   fi
 }
 
-flash_boot_image() {
+flash_image() {
   # Make sure all blocks are writable
   $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
-    *.gz) COMMAND="gzip -d < '$1'";;
-    *)    COMMAND="cat '$1'";;
+    *.gz) COM1="$MAGISKBIN/magiskboot --decompress '$1' - 2>/dev/null";;
+    *)    COM1="cat '$1'";;
   esac
   if $BOOTSIGNED; then
-    SIGNCOM="$BOOTSIGNER -sign"
-    ui_print "- Sign boot image with test keys"
+    COM2="$BOOTSIGNER -sign"
+    ui_print "- Sign image with test keys"
   else
-    SIGNCOM="cat -"
+    COM2="cat -"
   fi
-  case "$2" in
-    /dev/block/*)
-      ui_print "- Flashing new boot image"
-      eval $COMMAND | eval $SIGNCOM | cat - /dev/zero 2>/dev/null | dd of="$2" bs=4096 2>/dev/null
-      ;;
-    *)
-      ui_print "- Storing new boot image"
-      eval $COMMAND | eval $SIGNCOM | dd of="$2" bs=4096 2>/dev/null
-      ;;
-  esac
+  if [ -b "$2" ]; then
+    eval $COM1 | eval $COM2 | cat - /dev/zero > "$2" 2>/dev/null
+  else
+    ui_print "- Not block device, storing image"
+    eval $COM1 | eval $COM2 > "$2" 2>/dev/null
+  fi
 }
 
 find_dtbo_image() {
