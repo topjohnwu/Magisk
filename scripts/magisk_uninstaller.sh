@@ -114,7 +114,7 @@ case $? in
       # Sign chromeos boot
       $CHROMEOS && sign_chromeos
       ui_print "- Flashing restored boot image"
-      flash_image new-boot.img $BOOTIMAGE
+      flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
     fi
     ;;
   2 ) # Other patched

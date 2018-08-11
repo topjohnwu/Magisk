@@ -203,11 +203,15 @@ flash_image() {
     COM2="cat -"
   fi
   if [ -b "$2" ]; then
+    local s_size=`stat -c '%s' "$1"`
+    local t_size=`blockdev --getsize64 "$2"`
+    [ $s_size -gt $t_size ] && return 1
     eval $COM1 | eval $COM2 | cat - /dev/zero > "$2" 2>/dev/null
   else
     ui_print "- Not block device, storing image"
     eval $COM1 | eval $COM2 > "$2" 2>/dev/null
   fi
+  return 0
 }
 
 find_dtbo_image() {

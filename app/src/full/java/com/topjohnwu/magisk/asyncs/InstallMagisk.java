@@ -248,7 +248,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         return patched;
     }
 
-    private void outputBoot(File patched) throws IOException {
+    private boolean outputBoot(File patched) throws IOException {
         switch (mode) {
             case PATCH_MODE:
                 String fmt = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
@@ -278,13 +278,14 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 break;
             case SECOND_SLOT_MODE:
             case DIRECT_MODE:
-                Shell.Job job = Shell.su(Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir))
-                        .to(console, logs);
+                if (!Shell.su(Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir))
+                        .to(console, logs).exec().isSuccess())
+                    return false;
                 if (!Data.keepVerity)
-                    job.add("find_dtbo_image", "patch_dtbo_image");
-                job.exec();
+                    Shell.su("find_dtbo_image", "patch_dtbo_image").to(console, logs).exec();
                 break;
         }
+        return true;
     }
 
     private void postOTA() {
@@ -374,7 +375,8 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 File patched = patchBoot();
                 if (patched == null)
                     return false;
-                outputBoot(patched);
+                if (!outputBoot(patched))
+                    return false;
                 if (mode == SECOND_SLOT_MODE)
                     postOTA();
                 console.add("- All done!");

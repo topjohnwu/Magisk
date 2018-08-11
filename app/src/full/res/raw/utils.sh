@@ -60,8 +60,13 @@ direct_install() {
   cp -rf $3/* /data/adb/magisk
   echo "- Flashing new boot image"
   flash_image $1 $2
+  if [ $? -ne 0 ]; then
+    echo "! Insufficient partition size"
+    return 1
+  fi
   rm -f $1
   rm -rf $3
+  return 0
 }
 
 mm_patch_dtbo() {

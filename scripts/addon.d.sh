@@ -65,7 +65,7 @@ installation() {
   . ./boot_patch.sh "$BOOTIMAGE"
 
   ui_print "- Flashing new boot image"
-  flash_image new-boot.img "$BOOTIMAGE"
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
   rm -f new-boot.img
 
   if [ -f stock_boot* ]; then
