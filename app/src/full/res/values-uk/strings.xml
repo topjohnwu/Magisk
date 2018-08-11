@@ -41,9 +41,9 @@
     <string name="disable_file_created">Модуль вимкнеться при перезавантаженні</string>
     <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні</string>
     <string name="author">Автор: %1$s</string>
-    <string name="reboot_recovery">Перезавантаження в Recovery</string>
-    <string name="reboot_bootloader">Перезавантаження в Bootloader</string>
-    <string name="reboot_download">Перезавантаження в Download</string>
+    <string name="reboot_recovery">Перезавантажити в Recovery</string>
+    <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
+    <string name="reboot_download">Перезавантажити в Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
@@ -76,7 +76,7 @@
     <string name="repo_install_title">Встановити %1$s</string>
     <string name="repo_install_msg">Бажаєте встановити %1$s ?</string>
     <string name="download">Завантажити</string>
-    <string name="reboot">Перезавантаження</string>
+    <string name="reboot">Перезавантажити</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
     <string name="release_notes">Особливості версії</string>
@@ -96,10 +96,13 @@
     <string name="hide_manager_toast">Приховування Magisk Manager…</string>
     <string name="hide_manager_toast2">Це може зайняти деякий час…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
+    <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
     <string name="download_zip_only">Тільки завантажити</string>
     <string name="patch_boot_file">Пропатчити boot образ</string>
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
-    <string name="install_inactive_slot">Встановити в Неактивний Слот (після OTA)</string>
+    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
+    <string name="warning">Попередження</string>
+    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
     <string name="select_method">Виберіть спосіб</string>
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
@@ -109,7 +112,7 @@
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
-    <string name="proprietary_notice">Magisk Manager — це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager — це безкоштовна програма з відкритим вихідним кодом, тому вона не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
     <string name="su_db_corrupt">База даних SU пошкоджена, буде створено нову БД</string>
     <string name="cannot_check_sn_title">Неможливо перевірити SafetyNet</string>
     <string name="cannot_check_sn_notice">Через деякі зміни в Сервісах Google Play, неможливо перевірити статус SafetyNet на перепакованому Magisk Manager</string>
