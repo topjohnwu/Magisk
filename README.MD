@@ -9,10 +9,10 @@
 5. (Windows Only) Python package Colorama: Install with `pip install colorama`, used for ANSI color codes
 
 ## Building Notes and Instructions
-1. Building is tested on macOS, Ubuntu, and Windows 10 using the latest stable NDK and NDK r10e. Officially released binaries were built with NDK r10e.
+1. Building is supported on macOS, Linux, and Windows using the custom NDK: [FrankeNDK](https://github.com/topjohnwu/FrankeNDK).
 2. Set configurations in `config.prop`. A sample file `config.prop.sample` is provided as an example.
 3. Run `build.py` with argument `-h` to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
-4. By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `--release` flag), you need a Java Keystore file `release-key.jks` to sign Magisk Manager's APK. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
+4. By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `-r, --release` flag), you need a Java Keystore file `release-key.jks` (only `JKS` format is supported) to sign APKs and zips. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
 
 ## Documentation
 [Link to Documentation](docs/README.MD)

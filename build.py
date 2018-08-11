@@ -238,15 +238,8 @@ def build_binary(args):
 			error('Build binaries failed!')
 		collect_binary()
 
-	new_plat = False
-	flags = base_flags
-
 	if 'busybox' in args.target:
-		flags += ' B_BB=1'
-		new_plat = True
-
-	if new_plat:
-		proc = system('{} -C native NEW_PLAT=1 {} -j{}'.format(ndk_build, flags, cpu_count))
+		proc = system('{} -C native {} B_BB=1 -j{}'.format(ndk_build, base_flags, cpu_count))
 		if proc.returncode != 0:
 			error('Build binaries failed!')
 		collect_binary()
