@@ -374,8 +374,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Do not go further if system_root device is booting as recovery
-	if (!cmd.skip_initramfs && access("/sbin/recovery", F_OK) == 0)
+	if (!cmd.skip_initramfs && access("/sbin/recovery", F_OK) == 0) {
+		// Remove Magisk traces
+		rm_rf("/.backup");
 		goto exec_init;
+	}
 
 	/* ************
 	 * Early Mount
