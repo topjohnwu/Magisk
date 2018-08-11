@@ -240,7 +240,7 @@ int cpio_commands(int argc, char *argv[]) {
 			e->filename = strdup(".backup/.magisk");
 			e->mode = S_IFREG;
 			e->data = xmalloc(50);
-			snprintf(e->data, 50, "KEEPVERITY=%s\nKEEPFORCEENCRYPT=%s\n", cmdv[3], cmdv[4]);
+			snprintf(e->data, 50, "KEEPVERITY=%s\nKEEPFORCEENCRYPT=%s\n", cmdv[2], cmdv[3]);
 			e->filesize = strlen(e->data) + 1;
 			vec_push_back(&back, e);
 
