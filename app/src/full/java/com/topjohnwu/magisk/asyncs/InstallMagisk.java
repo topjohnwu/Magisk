@@ -278,7 +278,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 break;
             case SECOND_SLOT_MODE:
             case DIRECT_MODE:
-                if (!Shell.su(Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir))
+                if (!Shell.su(Utils.fmt("direct_install %s %s", installDir, mBoot))
                         .to(console, logs).exec().isSuccess())
                     return false;
                 if (!Data.keepVerity)
