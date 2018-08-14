@@ -65,7 +65,7 @@
     <!--About Activity-->
 	<string name="about">Informazioni</string>
     <string name="app_changelog">Novità</string>
-	<string name="translators">Auanasgheps | Fabb2303 | bovirus</string>
+	<string name="translators">Auanasgheps</string>
 	<string name="app_version">Versione</string>
 	<string name="app_source_code">Codice sorgente</string>
 	<string name="donation">Dona</string>
@@ -97,10 +97,13 @@
 	<string name="hide_manager_toast">Nascondendo Magisk Manager…</string>
 	<string name="hide_manager_toast2">Potrebbe volerci un po\'…</string>
 	<string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager</string>
+	<string name="open_link_failed_toast">Nessuna app disponibile per aprire il link…</string>
 	<string name="download_zip_only">Scarica solo il file zip</string>
 	<string name="patch_boot_file">Aggiorna l\'immagine di boot</string>
 	<string name="direct_install">Installazione diretta (raccomandata)</string>
-	<string name="install_inactive_slot">Installa nello slot inattivo (Dopo un OTA)</string>
+	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
+	<string name="warning">Attenzione</string>
+	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
     	<string name="select_method">Seleziona un metodo</string>
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
