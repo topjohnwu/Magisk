@@ -95,6 +95,7 @@
     <string name="hide_manager_toast">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_toast2">Ini mungkin membutuhkan beberapa saat…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager…</string>
+    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan…</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
