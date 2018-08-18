@@ -2,6 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -208,15 +210,27 @@ public class MagiskFragment extends BaseFragment
         return expandableContainer;
     }
 
+    private boolean hasGms() {
+        PackageManager pm = mm.getPackageManager();
+        PackageInfo info;
+        try {
+            info = pm.getPackageInfo("com.google.android.gms", 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return info.applicationInfo.enabled;
+    }
+
     private void updateUI() {
         ((MainActivity) requireActivity()).checkHideSection();
 
         boolean hasNetwork = Download.checkNetworkStatus(mm);
         boolean hasRoot = Shell.rootAccess();
+        boolean hasGms = hasGms();
         boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
+        safetyNetCard.setVisibility(hasNetwork && hasGms ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
         coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
