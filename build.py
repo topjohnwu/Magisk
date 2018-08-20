@@ -233,9 +233,10 @@ def build_apk(args, flavor):
 	flavor = flavor.lower()
 	buildType = buildType.lower()
 	apk = 'app-{}-{}.apk'.format(flavor, buildType)
+	target_apk = 'app-{}.apk'.format(buildType)
 
 	source = os.path.join('app', 'build', 'outputs', 'apk', flavor, buildType, apk)
-	target = os.path.join(config['outdir'], apk)
+	target = os.path.join(config['outdir'], target_apk)
 	mv(source, target)
 	header('Output: ' + target)
 	return target
