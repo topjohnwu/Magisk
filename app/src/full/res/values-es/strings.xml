@@ -65,7 +65,7 @@
     <!--About Activity-->
     <string name="about">Acerca de</string>
     <string name="app_changelog">Registro de cambios</string>
-    <string name="translators">dark-basic, Gawenda, netizen, Deiki, Nosi</string>
+    <string name="translators">dark-basic</string>
     <string name="app_version">Versión</string>
     <string name="app_source_code">Código fuente</string>
     <string name="donation">Donar</string>
