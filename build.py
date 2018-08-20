@@ -292,7 +292,7 @@ def zip_main(args):
 				zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join(config['outdir'], 'app-release.apk' if args.release else 'app-debug.apk')
+		source = os.path.join(config['outdir'], 'app-full-release.apk' if args.release else 'app-full-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
 
@@ -391,7 +391,7 @@ def cleanup(args):
 def build_all(args):
 	vars(args)['target'] = []
 	build_stub(args)
-	build_apk(args, 'Full')
+	build_app(args)
 	build_binary(args)
 	zip_main(args)
 	zip_uninstaller(args)
