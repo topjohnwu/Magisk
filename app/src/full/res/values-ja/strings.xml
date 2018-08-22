@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">SafetyNetの状態をチェック中…</string>
     <string name="safetyNet_check_success">SafetyNetチェック成功</string>
     <string name="safetyNet_api_error">SafetyNet APIエラー</string>
-    <string name="safetyNet_network_loss">ネットワーク接続がありません</string>
-    <string name="safetyNet_service_disconnected">サービスが終了されました</string>
     <string name="safetyNet_res_invalid">応答が不正です</string>
 
     <!--Install Fragment-->

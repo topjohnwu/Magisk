@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Comprobando estado de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprobación fue exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
-    <string name="safetyNet_network_loss">Red no Disponible</string>
-    <string name="safetyNet_service_disconnected">Se ha detenido el servicio</string>
     <string name="safetyNet_res_invalid">La respuesta no es válida</string>
 
     <!--Install Fragment-->
@@ -113,8 +111,6 @@
     <string name="proprietary_title">Descargar Código Propietario</string>
     <string name="proprietary_notice">Magisk Manager es un Software Libre por lo que no contiene el código API de SafetyNet (Código Propietario de Google).\n\n ¿Puede permitir que Magisk Manager descargue una extensión (contiene el GoogleApiClient) para la comprobación de SafetyNet?</string>
     <string name="su_db_corrupt">La base de datos SU está dañada, se creará nueva base de datos</string>
-    <string name="cannot_check_sn_title">No es posible verificar SafetyNet!</string>
-    <string name="cannot_check_sn_notice">Debido a algunos cambios en los Servicios de Google Play, no es posible verificar SafetyNet en la versión reempaquetada de Magisk Manager</string>
     <string name="setup_done">Instalación Realizada</string>
     <string name="setup_fail">Instalación Fallida</string>
     <string name="env_fix_title">Se Requiere una Instalación Adicional</string>

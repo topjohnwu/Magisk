@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Ieškomas SafetyNet statusas…</string>
     <string name="safetyNet_check_success">SafetyNet Paieška sėkminga</string>
     <string name="safetyNet_api_error">SafetyNet API Klaida</string>
-    <string name="safetyNet_network_loss">Nėra prieigos prie interneto</string>
-    <string name="safetyNet_service_disconnected">Paslauga atjungta</string>
     <string name="safetyNet_res_invalid">Gautas neteisingas atsakymas</string>
 
     <!--Install Fragment-->
@@ -110,8 +108,6 @@
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
     <string name="su_db_corrupt">Supervartotojo duomenų bazė yra sugadinta, perkursime naują duomenų bazę</string>
-    <string name="cannot_check_sn_title">Negalime surasti SafetyNet</string>
-    <string name="cannot_check_sn_notice">Dėl Google Play Services pakeitimų, SafetyNet suradimas perpakuotame Magisk Manager yra neįmanomas</string>
     <string name="setup_done">Pasiruošimas baigtas</string>
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>

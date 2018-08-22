@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Проверяване статуса на SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet проверката е успешна</string>
     <string name="safetyNet_api_error">Грешка в SafetyNet ППИ</string>
-    <string name="safetyNet_network_loss">Не е налична мрежова връзка</string>
-    <string name="safetyNet_service_disconnected">Услугата е прекъсната</string>
     <string name="safetyNet_res_invalid">Невалиден отговор</string>
 
     <!--Install Fragment-->
@@ -113,8 +111,6 @@
     <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="proprietary_notice">Magisk Manager е FOSS и затова не включва частния код за SafetyNet ППИ на Google.\n\nПозволявате ли на Magisk Manager да изтегли добавката (включва GoogleApiClient) за SafetyNet проверки?</string>
     <string name="su_db_corrupt">Базата данни за SU е повредена, ще създадем нов db файл</string>
-    <string name="cannot_check_sn_title">Не можем да проверим SafetyNet статуса</string>
-    <string name="cannot_check_sn_notice">Поради промени в Услугите за Google Play, не можем да проверим SafetyNet статуса с модифициран Magisk Manager</string>
     <string name="setup_done">Първоначалната настройка е готова</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>

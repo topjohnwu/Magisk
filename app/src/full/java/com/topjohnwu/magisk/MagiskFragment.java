@@ -93,14 +93,7 @@ public class MagiskFragment extends BaseFragment
             new CheckSafetyNet(requireActivity()).exec();
             collapse();
         };
-        if (!TextUtils.equals(mm.getPackageName(), Const.ORIG_PKG_NAME)) {
-            new CustomAlertDialog(requireActivity())
-                    .setTitle(R.string.cannot_check_sn_title)
-                    .setMessage(R.string.cannot_check_sn_notice)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
-        } else if (!CheckSafetyNet.dexPath.exists()) {
+        if (!CheckSafetyNet.dexPath.exists()) {
             // Show dialog
             new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.proprietary_title)

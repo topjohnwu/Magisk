@@ -17,8 +17,6 @@
     <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
     <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
-    <string name="safetyNet_network_loss">فقدان الاتصال بالشبكة</string>
-    <string name="safetyNet_service_disconnected">تم إنهاء الخدمة</string>
     <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>
 
     <!--Install Fragment-->

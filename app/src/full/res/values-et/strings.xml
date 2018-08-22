@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Kontrollin SafetyNet\'i olekut…</string>
     <string name="safetyNet_check_success">SafetyNet\'i kontroll edukas</string>
     <string name="safetyNet_api_error">SafetyNet\'i API viga</string>
-    <string name="safetyNet_network_loss">Võrguühendus puudub</string>
-    <string name="safetyNet_service_disconnected">Teenus on sundsuletud</string>
     <string name="safetyNet_res_invalid">Vastus on sobimatu</string>
 
     <!--Install Fragment-->
@@ -111,8 +109,6 @@
     <string name="proprietary_title">Laadi alla suletud koodi</string>
     <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga, mis ei sisalda Google\'i suletud SafetyNet\'i API koodi.\n\nKas lubad Magisk Manager\'il SafetyNet\'i kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClient\'i)?</string>
     <string name="su_db_corrupt">Superkasutaja andmebaas on korrumpeerunud, loon uue andmebaasi</string>
-    <string name="cannot_check_sn_title">SafetyNet\'i ei saa kontrollida</string>
-    <string name="cannot_check_sn_notice">Teatud Google Play teenuste muudatuste tõttu ei saa kontrollida SafetyNet\'i taaspakitud Magisk Manageris</string>
     <string name="setup_done">Seadistus valmis</string>
     <string name="setup_fail">Seadistus ebaõnnnestus</string>
     <string name="env_fix_title">Vajab lisaseadistust</string>

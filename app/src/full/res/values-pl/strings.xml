@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Sprawdzanie statusu SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet Poprawny</string>
     <string name="safetyNet_api_error">SafetyNet Błędny</string>
-	<string name="safetyNet_network_loss">Brak połączenia z internetem</string>
-    <string name="safetyNet_service_disconnected">Usługa została zamknięta</string>
     <string name="safetyNet_res_invalid">Usługa nie odpowiada</string>
 
     <!--Install Fragment-->
@@ -109,9 +107,7 @@
     <string name="proprietary_title">Pobierz Kod</string>
     <string name="proprietary_notice">Magisk Manager to FOSS, więc nie zawiera zastrzeżonego kodu API SafetyNet. \n\nCzy zezwolić Magisk Managerowi na pobranie rozszerzenia (zawierającego GoogleApiClient) do sprawdzenia SafetyNet?</string>
     <string name="su_db_corrupt">Baza danych SU jest uszkodzona, odtworzy nową bazę danych</string>
-    <string name="cannot_check_sn_title">Nie mogę sprawdzić SafetyNet</string>
-    <string name="cannot_check_sn_notice">Z powodu pewnych zmian w Usługach Google Play nie jest możliwe sprawdzenie SafetyNet w przepakowanym Magisk Managerze</string>
-	<string name="setup_done">Konfiguracja gotowa</string>
+    <string name="setup_done">Konfiguracja gotowa</string>
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>

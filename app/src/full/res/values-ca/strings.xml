@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprovació ha sigut exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
-    <string name="safetyNet_network_loss">Xarxa no Disponible</string>
-    <string name="safetyNet_service_disconnected">S\'ha detingut el servei</string>
     <string name="safetyNet_res_invalid">La resposta és invàlida</string>
 
     <!--Install Fragment-->
@@ -113,8 +111,6 @@
     <string name="proprietary_title">Descarregar codi propietari</string>
     <string name="proprietary_notice">Magisk Manager es un Software Lliure. Per tant, no conté el codi API de SafetyNet (Codi Propietari de Google).\n\n Pot permetre que Magisk Manager descarregui una extensió (conté la GoogleApiClient) per la comprovació de SafetyNet?</string>
     <string name="su_db_corrupt">La base de dades SU està danyada, es crearà una nova base de dades</string>
-    <string name="cannot_check_sn_title">No es possible verificar SafetyNet!</string>
-    <string name="cannot_check_sn_notice">Degut a alguns canvis en els Serveis de Google Play, no es possible verificar SafetyNet en la versió re-empaquetada de Magisk Manager</string>
     <string name="setup_done">Instal·lació Realitzada</string>
     <string name="setup_fail">Instal·lació Fallida</string>
     <string name="env_fix_title">Es requereix una Instal·lació Addicional</string>

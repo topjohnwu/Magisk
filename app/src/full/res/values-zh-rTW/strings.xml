@@ -133,9 +133,7 @@
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
     <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide 和 systemless hosts 仍會持續運作</string>
     <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
-    <string name="safetyNet_network_loss">網路斷線</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
-    <string name="safetyNet_service_disconnected">服務已被取消</string>
     <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>
     <string name="multiuser_mode">多使用者設定</string>
     <string name="owner_manage_summary">僅裝置擁有者帳戶能管理超級用戶權限並接收權限請求通知</string>
@@ -208,8 +206,6 @@
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">在背景定期檢查更新</string>
     <string name="disable_fingerprint">沒有指紋加入或是裝置不支援</string>
-    <string name="cannot_check_sn_title">無法檢查 SafetyNet</string>
-    <string name="cannot_check_sn_notice">由於一些 Google Play Service 的改變，重新包裝過的 Magisk Manager 無法進行 SafetyNet 檢查。</string>
     <string name="setup_done">安裝完成</string>
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">需要額外的安裝</string>
