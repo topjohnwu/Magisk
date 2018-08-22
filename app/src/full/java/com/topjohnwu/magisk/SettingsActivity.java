@@ -27,6 +27,7 @@ import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -86,7 +87,6 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             implements SharedPreferences.OnSharedPreferenceChangeListener,
             Topic.Subscriber, Topic.AutoSubscriber {
 
-        private SharedPreferences prefs;
         private PreferenceScreen prefScreen;
 
         private ListPreference updateChannel, suAccess, autoRes, suNotification,
@@ -98,7 +98,6 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.app_settings, rootKey);
             mm = Data.MM();
-            prefs = mm.prefs;
             prefScreen = getPreferenceScreen();
 
             generalCatagory = (PreferenceCategory) findPreference("general");
@@ -107,7 +106,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             Preference hideManager = findPreference("hide");
             Preference restoreManager = findPreference("restore");
             findPreference("clear").setOnPreferenceClickListener((pref) -> {
-                prefs.edit().remove(Const.Key.ETAG_KEY).apply();
+                mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
                 mm.repoDB.clearRepo();
                 Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
                 return true;
@@ -129,17 +128,17 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                 if (channel == Const.Value.CUSTOM_CHANNEL) {
                     View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
                     EditText url = v.findViewById(R.id.custom_url);
-                    url.setText(prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                    url.setText(mm.prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                     new AlertDialog.Builder(requireActivity())
                             .setTitle(R.string.settings_update_custom)
                             .setView(v)
                             .setPositiveButton(R.string.ok, (d, i) ->
-                                    prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
+                                    mm.prefs.edit().putString(Const.Key.CUSTOM_CHANNEL,
                                             url.getText().toString()).apply())
                             .setNegativeButton(R.string.close, (d, i) ->
-                                    prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                    mm.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
                             .setOnCancelListener(d ->
-                                    prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
+                                    mm.prefs.edit().putString(Const.Key.UPDATE_CHANNEL, prev).apply())
                             .show();
                 }
                 return true;
@@ -155,12 +154,14 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             // Disable re-authentication option on Android O, it will not work
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 reauth.setEnabled(false);
+                reauth.setChecked(false);
                 reauth.setSummary(R.string.android_o_not_support);
             }
 
             // Disable fingerprint option if not possible
             if (!FingerprintHelper.canUseFingerprint()) {
                 fingerprint.setEnabled(false);
+                fingerprint.setChecked(false);
                 fingerprint.setSummary(R.string.disable_fingerprint);
             }
 
@@ -175,7 +176,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                     if (Download.checkNetworkStatus(mm)) {
                         restoreManager.setOnPreferenceClickListener((pref) -> {
                             Download.receive(
-                                getActivity(), new DownloadReceiver() {
+                                requireActivity(), new DownloadReceiver() {
                                     @Override
                                     public void onDownloadDone(Context context, Uri uri) {
                                         Data.exportPrefs();
@@ -233,26 +234,33 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            prefs.registerOnSharedPreferenceChangeListener(this);
+            mm.prefs.registerOnSharedPreferenceChangeListener(this);
             Topic.subscribe(this);
             return super.onCreateView(inflater, container, savedInstanceState);
         }
 
         @Override
         public void onDestroyView() {
-            prefs.unregisterOnSharedPreferenceChangeListener(this);
+            mm.prefs.unregisterOnSharedPreferenceChangeListener(this);
             Topic.unsubscribe(this);
             super.onDestroyView();
         }
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-
+            switch (key) {
+                case Const.Key.ROOT_ACCESS:
+                case Const.Key.SU_MULTIUSER_MODE:
+                case Const.Key.SU_MNT_NS:
+                    mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
+                    break;
+            }
+            Data.loadConfig();
+            setSummary();
             switch (key) {
                 case Const.Key.DARK_THEME:
-                    Data.isDarkTheme = prefs.getBoolean(key, false);
                     Topic.publish(false, Topic.RELOAD_ACTIVITY);
-                    return;
+                    break;
                 case Const.Key.COREONLY:
                     if (prefs.getBoolean(key, false)) {
                         try {
@@ -261,7 +269,7 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                     } else {
                         Const.MAGISK_DISABLE_FILE.delete();
                     }
-                    Toast.makeText(getActivity(), R.string.settings_reboot_toast, Toast.LENGTH_LONG).show();
+                    Utils.toast(R.string.settings_reboot_toast, Toast.LENGTH_LONG);
                     break;
                 case Const.Key.MAGISKHIDE:
                     if (prefs.getBoolean(key, false)) {
@@ -281,11 +289,6 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                                 .submit();
                     }
                     break;
-                case Const.Key.ROOT_ACCESS:
-                case Const.Key.SU_MULTIUSER_MODE:
-                case Const.Key.SU_MNT_NS:
-                    mm.mDB.setSettings(key, Utils.getPrefsInt(prefs, key));
-                    break;
                 case Const.Key.LOCALE:
                     LocaleManager.setLocale(mm);
                     Topic.publish(false, Topic.RELOAD_ACTIVITY);
@@ -298,8 +301,17 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
                     Utils.setupUpdateCheck();
                     break;
             }
-            Data.loadConfig();
-            setSummary();
+        }
+
+        @Override
+        public boolean onPreferenceTreeClick(Preference preference) {
+            String key = preference.getKey();
+            switch (key) {
+                case Const.Key.SU_FINGERPRINT:
+                    mm.mDB.setSettings(key, mm.prefs.getBoolean(key, false) ? 1 : 0);
+                    break;
+            }
+            return true;
         }
 
         private void setSummary() {
@@ -312,7 +324,8 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             suNotification.setSummary(getResources()
                     .getStringArray(R.array.su_notification)[Data.suNotificationType]);
             requestTimeout.setSummary(
-                    getString(R.string.request_timeout_summary, prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
+                    getString(R.string.request_timeout_summary,
+                            mm.prefs.getString(Const.Key.SU_REQUEST_TIMEOUT, "10")));
             multiuserMode.setSummary(getResources()
                     .getStringArray(R.array.multiuser_summary)[Data.multiuserMode]);
             namespaceMode.setSummary(getResources()

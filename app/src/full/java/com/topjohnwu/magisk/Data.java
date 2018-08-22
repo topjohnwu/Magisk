@@ -51,6 +51,7 @@ public class Data {
     public static int suRequestTimeout;
     public static int suLogTimeout = 14;
     public static int suAccessState;
+    public static boolean suFingerprint;
     public static int multiuserMode;
     public static int suResponseType;
     public static int suNotificationType;
@@ -151,6 +152,7 @@ public class Data {
         suAccessState = mm.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
         multiuserMode = mm.mDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         suNamespaceMode = mm.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
+        suFingerprint = mm.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
 
         // config
         isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
@@ -164,6 +166,7 @@ public class Data {
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
                 .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
+                .putBoolean(Const.Key.SU_FINGERPRINT, suFingerprint)
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
                 .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
