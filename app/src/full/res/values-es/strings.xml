@@ -163,7 +163,7 @@
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
     <string name="settings_su_fingerprint_title">Autenticación por Huella Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilizar el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
- 
+    <string name="auth_fingerprint">Autenticar Huella Dactilar</string>
     
     <string name="multiuser_mode">Modo MultiUsuario</string> 
     <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
