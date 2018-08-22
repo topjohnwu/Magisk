@@ -2,6 +2,9 @@ package com.topjohnwu.magisk;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +17,8 @@ import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +28,11 @@ import android.widget.Toast;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
@@ -308,7 +313,55 @@ public class SettingsActivity extends BaseActivity implements Topic.Subscriber {
             String key = preference.getKey();
             switch (key) {
                 case Const.Key.SU_FINGERPRINT:
-                    mm.mDB.setSettings(key, mm.prefs.getBoolean(key, false) ? 1 : 0);
+                    boolean checked = ((SwitchPreference) preference).isChecked();
+                    ((SwitchPreference) preference).setChecked(!checked);
+                    CustomAlertDialog dialog = new CustomAlertDialog(requireActivity());
+                    CustomAlertDialog.ViewHolder vh = dialog.getViewHolder();
+                    Drawable fingerprint = getResources().getDrawable(R.drawable.ic_fingerprint);
+                    fingerprint.setBounds(0, 0, Utils.dpInPx(50), Utils.dpInPx(50));
+                    TypedValue tint = new TypedValue();
+                    requireActivity().getTheme().resolveAttribute(R.attr.imageColorTint, tint, true);
+                    fingerprint.setTint(tint.data);
+                    vh.messageView.setCompoundDrawables(null, null, null, fingerprint);
+                    vh.messageView.setCompoundDrawablePadding(Utils.dpInPx(20));
+                    vh.messageView.setGravity(Gravity.CENTER);
+                    try {
+                        FingerprintHelper helper = new FingerprintHelper() {
+                            @Override
+                            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                                vh.messageView.setTextColor(Color.RED);
+                                vh.messageView.setText(errString);
+                            }
+
+                            @Override
+                            public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                                vh.messageView.setTextColor(Color.RED);
+                                vh.messageView.setText(helpString);
+                            }
+
+                            @Override
+                            public void onAuthenticationFailed() {
+                                vh.messageView.setTextColor(Color.RED);
+                                vh.messageView.setText(R.string.auth_fail);
+                            }
+
+                            @Override
+                            public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                                dialog.dismiss();
+                                ((SwitchPreference) preference).setChecked(checked);
+                                mm.mDB.setSettings(key, checked ? 1 : 0);
+
+                            }
+                        };
+                        dialog.setMessage(R.string.auth_fingerprint)
+                                .setNegativeButton(R.string.close, (d, w) -> helper.cancel())
+                                .setOnCancelListener(d -> helper.cancel())
+                                .show();
+                        helper.authenticate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Utils.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
+                    }
                     break;
             }
             return true;

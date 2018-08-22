@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Xml;
 
+import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -153,6 +154,11 @@ public class Data {
         multiuserMode = mm.mDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         suNamespaceMode = mm.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
         suFingerprint = mm.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
+        if (suFingerprint && !FingerprintHelper.canUseFingerprint()) {
+            // User revoked the fingerprint
+            mm.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
+            suFingerprint = false;
+        }
 
         // config
         isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
