@@ -39,6 +39,8 @@ public class Data {
     public static String managerLink;
     public static String managerNoteLink;
     public static String uninstallerLink;
+    public static int snetVersionCode;
+    public static String snetLink;
 
     // Install flags
     public static boolean keepVerity = false;

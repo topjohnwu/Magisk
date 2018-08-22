@@ -226,11 +226,9 @@ public class MagiskFragment extends BaseFragment
 
         boolean hasNetwork = Download.checkNetworkStatus(mm);
         boolean hasRoot = Shell.rootAccess();
-        boolean hasGms = hasGms();
         boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        safetyNetCard.setVisibility(hasNetwork && hasGms ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
         coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
@@ -253,6 +251,8 @@ public class MagiskFragment extends BaseFragment
 
     private void updateCheckUI() {
         int image, color;
+
+        safetyNetCard.setVisibility(hasGms() ? View.VISIBLE : View.GONE);
 
         if (Data.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
@@ -312,12 +312,6 @@ public class MagiskFragment extends BaseFragment
         } else {
             @StringRes int resid;
             switch (response) {
-                case ISafetyNetHelper.CAUSE_SERVICE_DISCONNECTED:
-                    resid = R.string.safetyNet_network_loss;
-                    break;
-                case ISafetyNetHelper.CAUSE_NETWORK_LOST:
-                    resid = R.string.safetyNet_service_disconnected;
-                    break;
                 case ISafetyNetHelper.RESPONSE_ERR:
                     resid = R.string.safetyNet_res_invalid;
                     break;

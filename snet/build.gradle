@@ -8,23 +8,20 @@ android {
         applicationId "com.topjohnwu.snet"
         minSdkVersion 14
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 11
+        versionName "snet"
     }
 
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    /* The oldest version */
-    implementation('com.google.android.gms:play-services-safetynet:7.0.0') {
-        exclude module: 'support-v4'
-    }
+    implementation 'com.google.android.gms:play-services-safetynet:15.0.1'
 }
