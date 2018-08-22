@@ -13,13 +13,13 @@
     <string name="magisk_version_error">Magisk no està instal·lat</string>
     <string name="checking_for_updates">Cercant actualitzacions</string>
     <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
-    <string name="invalid_update_channel">Canal d'actualització invàlid</string>
-    <string name="safetyNet_check_text">Comprova l'estat de SafetyNet</string>
-    <string name="checking_safetyNet_status">Comprovant l'estat de SafetyNet…</string>
+    <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
+    <string name="safetyNet_check_text">Comprova l\'estat de SafetyNet</string>
+    <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
     <string name="safetyNet_check_success">La comprovació ha sigut exitosa</string>
     <string name="safetyNet_api_error">Error en la API de SafetyNet</string>
     <string name="safetyNet_network_loss">Xarxa no Disponible</string>
-    <string name="safetyNet_service_disconnected">S'ha detingut el servei</string>
+    <string name="safetyNet_service_disconnected">S\'ha detingut el servei</string>
     <string name="safetyNet_res_invalid">La resposta és invàlida</string>
 
     <!--Install Fragment-->
@@ -29,7 +29,7 @@
     <string name="current_magisk_title">Versió instal·lada: %1$s</string>
     <string name="install_magisk_title">Última versió: %1$s</string>
     <string name="uninstall">Desinstal·lar</string>
-    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L'accés Root s'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
+    <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats / eliminats. L\'accés Root s\'eliminarà i, possiblement, xifrarà totes les dades si no estan ja xifrades.</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="update">Actualització %1$s</string>
     
@@ -108,7 +108,7 @@
     <string name="complete_uninstall">Desinstal·lació completa</string>
     <string name="restore_img">Restaurar imatges</string>
     <string name="restore_done">Restauració Acabada</string>
-    <string name="restore_img_msg">Restaurant ...</string>
+    <string name="restore_img_msg">Restaurant …</string>
     <string name="restore_fail">La copia de seguretat de la imatge d’arrancada Stock no existeix!</string>
     <string name="proprietary_title">Descarregar codi propietari</string>
     <string name="proprietary_notice">Magisk Manager es un Software Lliure. Per tant, no conté el codi API de SafetyNet (Codi Propietari de Google).\n\n Pot permetre que Magisk Manager descarregui una extensió (conté la GoogleApiClient) per la comprovació de SafetyNet?</string>
@@ -120,7 +120,7 @@
     <string name="env_fix_title">Es requereix una Instal·lació Addicional</string>
     <string name="env_fix_msg">El seu dispositiu requereix d’una instal·lació addicional per tal de que Magisk funcioni correctament. Es descarregarà el zip d’instalació de Magisk, desitja continuar ara?</string>
     <string name="setup_title">Configuració Addicional</string>
-    <string name="setup_msg">Executant Configuració d'Entorn</string>
+    <string name="setup_msg">Executant Configuració d\'Entorn</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
@@ -194,7 +194,7 @@
     <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permetre</string>
-    <string name="su_warning">Permet accés total al teu dispositiu.\n¡Denega si no n'està segur!</string>
+    <string name="su_warning">Permet accés total al teu dispositiu.\n¡Denega si no n\'està segur!</string>
     <string name="forever">Sempre</string>
     <string name="once">Un cop </string>
     <string name="tenmin">10 min</string>
