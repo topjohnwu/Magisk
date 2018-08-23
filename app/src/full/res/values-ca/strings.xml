@@ -12,7 +12,7 @@
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk no està instal·lat</string>
     <string name="checking_for_updates">Cercant actualitzacions</string>
-    <string name="magisk_update_available">¡Disponible Magisk v%1$s!</string>
+    <string name="magisk_update_available">Disponible Magisk v%1$s!</string>
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="safetyNet_check_text">Comprova l\'estat de SafetyNet</string>
     <string name="checking_safetyNet_status">Comprovant l\'estat de SafetyNet…</string>
@@ -163,6 +163,7 @@
     <string name="settings_su_reauth_summary">Demanar permisos de superusuari novament si una aplicació es actualitzada o reinstal·lada</string>
     <string name="settings_su_fingerprint_title">Autenticació per Empremta Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilitza el sensor d’Empremta Dactilar per permetre les sol·licituds de superusuari</string>
+    <string name="auth_fingerprint">Autenticar Emprempta Digital</string>
  
     
     <string name="multiuser_mode">Mode Multiusuari</string> 
@@ -193,15 +194,15 @@
     <string name="su_warning">Permet accés total al teu dispositiu.\n¡Denega si no n\'està segur!</string>
     <string name="forever">Sempre</string>
     <string name="once">Un cop </string>
-    <string name="tenmin">10 min</string>
-    <string name="twentymin">20 min</string>
-    <string name="thirtymin">30 min</string>
-    <string name="sixtymin">60 min</string>
-    <string name="su_allow_toast">Permesos els drets de superusuari per %1$s</string>
-    <string name="su_deny_toast">Denegats els drets de superusuari per %1$s</string>
+    <string name="tenmin">10 mins</string>
+    <string name="twentymin">20 mins</string>
+    <string name="thirtymin">30 mins</string>
+    <string name="sixtymin">60 mins</string>
+    <string name="su_allow_toast">Permesos els drets de superusuari de %1$s</string>
+    <string name="su_deny_toast">Denegats els drets de superusuari de %1$s</string>
     <string name="no_apps_found">No s’han trobat aplicacions</string>
-    <string name="su_snack_grant">Drets de superusuari per %1$s permesos</string>
-    <string name="su_snack_deny"> Drets de superusuari per %1$s denegats</string>
+    <string name="su_snack_grant">Drets de superusuari de %1$s permesos</string>
+    <string name="su_snack_deny"> Drets de superusuari de %1$s denegats</string>
     <string name="su_snack_notif_on">Notificacions de %1$s habilitades</string>
     <string name="su_snack_notif_off">Notificacions de %1$s deshabilitades</string>
     <string name="su_snack_log_on">Registres de %1$s habilitats</string>
@@ -210,7 +211,7 @@
     <string name="su_revoke_title">¿Revocar?</string>
     <string name="su_revoke_msg">Confirma per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
-    <string name="none">Res</string>
+    <string name="none">Cap</string>
     <string name="auth_fail">Autenticació fallida</string>
 
     <!--Superuser logs-->
