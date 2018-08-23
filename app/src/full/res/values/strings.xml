@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Checking SafetyNet status…</string>
     <string name="safetyNet_check_success">SafetyNet Check Success</string>
     <string name="safetyNet_api_error">SafetyNet API Error</string>
-    <string name="safetyNet_network_loss">Network connection unavailable</string>
-    <string name="safetyNet_service_disconnected">Service has been killed</string>
     <string name="safetyNet_res_invalid">The response is invalid</string>
 
     <!--Install Fragment-->
@@ -114,8 +112,6 @@
     <string name="proprietary_title">Download Proprietary Code</string>
     <string name="proprietary_notice">Magisk Manager is FOSS, which doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
     <string name="su_db_corrupt">SU database is corrupted, will recreate new db</string>
-    <string name="cannot_check_sn_title">Cannot check SafetyNet</string>
-    <string name="cannot_check_sn_notice">Due to some changes in Google Play Services, it is not possible to check SafetyNet on repackaged Magisk Manager</string>
     <string name="setup_done">Setup done</string>
     <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
@@ -168,6 +164,7 @@
     <string name="settings_su_reauth_summary">Re-authenticate superuser permissions after an application upgrades</string>
     <string name="settings_su_fingerprint_title">Enable Fingerprint Authentication</string>
     <string name="settings_su_fingerprint_summary">Use fingerprint scanner to allow superuser requests</string>
+    <string name="auth_fingerprint">Authenticate Fingerprint</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>

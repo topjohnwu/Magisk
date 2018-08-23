@@ -20,29 +20,37 @@ import butterknife.ButterKnife;
 
 public class CustomAlertDialog extends AlertDialog.Builder {
 
-    @BindView(R.id.button_panel) LinearLayout buttons;
-    @BindView(R.id.message_panel) LinearLayout messagePanel;
-
-    @BindView(R.id.negative) Button negative;
-    @BindView(R.id.positive) Button positive;
-    @BindView(R.id.neutral) Button neutral;
-    @BindView(R.id.message) TextView messageView;
-
     private DialogInterface.OnClickListener positiveListener;
     private DialogInterface.OnClickListener negativeListener;
     private DialogInterface.OnClickListener neutralListener;
-
     private AlertDialog dialog;
+
+    private ViewHolder vh;
+
+    public class ViewHolder {
+        @BindView(R.id.dialog_layout) public LinearLayout dialogLayout;
+        @BindView(R.id.button_panel) public LinearLayout buttons;
+
+        @BindView(R.id.message) public TextView messageView;
+        @BindView(R.id.negative) public Button negative;
+        @BindView(R.id.positive) public Button positive;
+        @BindView(R.id.neutral) public Button neutral;
+
+        ViewHolder(View v) {
+            ButterKnife.bind(this, v);
+            messageView.setVisibility(View.GONE);
+            negative.setVisibility(View.GONE);
+            positive.setVisibility(View.GONE);
+            neutral.setVisibility(View.GONE);
+            buttons.setVisibility(View.GONE);
+        }
+    }
 
     {
         View v = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog, null);
-        ButterKnife.bind(this, v);
+        vh = new ViewHolder(v);
         super.setView(v);
-        negative.setVisibility(View.GONE);
-        positive.setVisibility(View.GONE);
-        neutral.setVisibility(View.GONE);
-        buttons.setVisibility(View.GONE);
-        messagePanel.setVisibility(View.GONE);
+
     }
 
     public CustomAlertDialog(@NonNull Activity context) {
@@ -53,31 +61,35 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         super(context, themeResId);
     }
 
-    @Override
-    public AlertDialog.Builder setView(int layoutResId) { return this; }
+    public ViewHolder getViewHolder() {
+        return vh;
+    }
 
     @Override
-    public AlertDialog.Builder setView(View view) { return this; }
+    public CustomAlertDialog setView(int layoutResId) { return this; }
 
     @Override
-    public AlertDialog.Builder setMessage(@Nullable CharSequence message) {
-        messageView.setText(message);
-        messagePanel.setVisibility(View.VISIBLE);
+    public CustomAlertDialog setView(View view) { return this; }
+
+    @Override
+    public CustomAlertDialog setMessage(@Nullable CharSequence message) {
+        vh.messageView.setVisibility(View.VISIBLE);
+        vh.messageView.setText(message);
         return this;
     }
 
     @Override
-    public AlertDialog.Builder setMessage(@StringRes int messageId) {
+    public CustomAlertDialog setMessage(@StringRes int messageId) {
         return setMessage(getContext().getString(messageId));
     }
 
     @Override
-    public AlertDialog.Builder setPositiveButton(CharSequence text, DialogInterface.OnClickListener listener) {
-        buttons.setVisibility(View.VISIBLE);
-        positive.setVisibility(View.VISIBLE);
-        positive.setText(text);
+    public CustomAlertDialog setPositiveButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        vh.buttons.setVisibility(View.VISIBLE);
+        vh.positive.setVisibility(View.VISIBLE);
+        vh.positive.setText(text);
         positiveListener = listener;
-        positive.setOnClickListener((v) -> {
+        vh.positive.setOnClickListener((v) -> {
             if (positiveListener != null) {
                 positiveListener.onClick(dialog, DialogInterface.BUTTON_POSITIVE);
             }
@@ -87,17 +99,17 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     }
 
     @Override
-    public AlertDialog.Builder setPositiveButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
+    public CustomAlertDialog setPositiveButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
         return setPositiveButton(getContext().getString(textId), listener);
     }
 
     @Override
-    public AlertDialog.Builder setNegativeButton(CharSequence text, DialogInterface.OnClickListener listener) {
-        buttons.setVisibility(View.VISIBLE);
-        negative.setVisibility(View.VISIBLE);
-        negative.setText(text);
+    public CustomAlertDialog setNegativeButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        vh.buttons.setVisibility(View.VISIBLE);
+        vh.negative.setVisibility(View.VISIBLE);
+        vh.negative.setText(text);
         negativeListener = listener;
-        negative.setOnClickListener((v) -> {
+        vh.negative.setOnClickListener((v) -> {
             if (negativeListener != null) {
                 negativeListener.onClick(dialog, DialogInterface.BUTTON_NEGATIVE);
             }
@@ -107,17 +119,17 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     }
 
     @Override
-    public AlertDialog.Builder setNegativeButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
+    public CustomAlertDialog setNegativeButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
         return setNegativeButton(getContext().getString(textId), listener);
     }
 
     @Override
-    public AlertDialog.Builder setNeutralButton(CharSequence text, DialogInterface.OnClickListener listener) {
-        buttons.setVisibility(View.VISIBLE);
-        neutral.setVisibility(View.VISIBLE);
-        neutral.setText(text);
+    public CustomAlertDialog setNeutralButton(CharSequence text, DialogInterface.OnClickListener listener) {
+        vh.buttons.setVisibility(View.VISIBLE);
+        vh.neutral.setVisibility(View.VISIBLE);
+        vh.neutral.setText(text);
         neutralListener = listener;
-        neutral.setOnClickListener((v) -> {
+        vh.neutral.setOnClickListener((v) -> {
             if (neutralListener != null) {
                 neutralListener.onClick(dialog, DialogInterface.BUTTON_NEUTRAL);
             }
@@ -127,7 +139,7 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     }
 
     @Override
-    public AlertDialog.Builder setNeutralButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
+    public CustomAlertDialog setNeutralButton(@StringRes int textId, DialogInterface.OnClickListener listener) {
         return setNeutralButton(getContext().getString(textId), listener);
     }
 
@@ -142,5 +154,9 @@ public class CustomAlertDialog extends AlertDialog.Builder {
         create();
         dialog.show();
         return dialog;
+    }
+
+    public void dismiss() {
+        dialog.dismiss();
     }
 }

@@ -140,7 +140,7 @@ public class RequestActivity extends BaseActivity {
             }
         };
 
-        boolean useFingerprint = mm.prefs.getBoolean(Const.Key.SU_FINGERPRINT, false) && FingerprintHelper.canUseFingerprint();
+        boolean useFingerprint = Data.suFingerprint && FingerprintHelper.canUseFingerprint();
 
         if (useFingerprint) {
             try {
@@ -165,7 +165,7 @@ public class RequestActivity extends BaseActivity {
                         warning.setText(R.string.auth_fail);
                     }
                 };
-                fingerprintHelper.startAuth();
+                fingerprintHelper.authenticate();
             } catch (Exception e) {
                 e.printStackTrace();
                 useFingerprint = false;

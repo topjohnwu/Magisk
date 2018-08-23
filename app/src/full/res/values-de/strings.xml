@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
     <string name="safetyNet_api_error">SafetyNet API Fehler</string>
-    <string name="safetyNet_network_loss">Netzwerkverbindung verloren</string>
-    <string name="safetyNet_service_disconnected">Der Dienst wurde beendet</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
 
     <!--Install Fragment-->
@@ -110,8 +108,6 @@
     <string name="proprietary_title">Lade proprietären Code herunter</string>
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
     <string name="su_db_corrupt">Datenbank für SU ist fehlerhaft, es wird eine neue erstellt</string>
-    <string name="cannot_check_sn_title">Überprüfung von SafetyNet nicht möglich</string>
-    <string name="cannot_check_sn_notice">Aufgrund von Änderungen in den Google Play-Diensten, ist es nicht möglich SafetyNet auf neu verpackten Magisk Manager Versionen zu überprüfen</string>
     <string name="setup_done">Einrichtung abgeschlossen</string>
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>

@@ -1,6 +1,10 @@
-# The version string and version code of Magisk
+# The version name and version code of Magisk
 version=
 versionCode=
+
+# The version name and version code of Magisk Manager
+appVersion=
+appVersionCode=
 
 outdir=out
 

@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Проверка статуса SafetyNet…</string>
     <string name="safetyNet_check_success">Результат проверки SafetyNet</string>
     <string name="safetyNet_api_error">Ошибка SafetyNet API</string>
-    <string name="safetyNet_network_loss">Нет подключения к сети</string>
-    <string name="safetyNet_service_disconnected">Служба была остановлена</string>
     <string name="safetyNet_res_invalid">Некорректный ответ</string>
 
     <!--Install Fragment-->
@@ -114,8 +112,6 @@
     <string name="proprietary_title">Загрузка SafetyNet</string>
     <string name="proprietary_notice">Magisk Manager — свободно распространяемый продукт, он не содержит собственный код SafetyNet API от Google.\n\nРазрешить Magisk Manager загрузить расширение для проверки SafetyNet? (содержит GoogleApiClient)</string>
     <string name="su_db_corrupt">База данных SU повреждена, будет создана новая</string>
-    <string name="cannot_check_sn_title">Невозможно проверить SafetyNet</string>
-    <string name="cannot_check_sn_notice">В связи с изменениями в сервисах Google Play, невозможно выполнить проверку статуса SafetyNet с пересобранным Magisk Manager</string>
     <string name="setup_done">Установка завершена</string>
     <string name="setup_fail">Ошибка установки</string>
     <string name="env_fix_title">Требуется дополнительная установка</string>

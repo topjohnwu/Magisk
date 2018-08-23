@@ -31,7 +31,7 @@ import java.util.List;
 
 public class MagiskDatabaseHelper {
 
-    private static final int DATABASE_VER = 5;
+    private static final int DATABASE_VER = 6;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
@@ -39,6 +39,7 @@ public class MagiskDatabaseHelper {
 
     private PackageManager pm;
     private SQLiteDatabase db;
+    private MagiskManager mm;
 
     @NonNull
     public static MagiskDatabaseHelper getInstance(MagiskManager mm) {
@@ -51,7 +52,8 @@ public class MagiskDatabaseHelper {
         }
     }
 
-    private MagiskDatabaseHelper(MagiskManager mm) {
+    private MagiskDatabaseHelper(MagiskManager context) {
+        mm = context;
         pm = mm.getPackageManager();
         db = openDatabase(mm);
         db.disableWriteAheadLogging();
@@ -137,6 +139,11 @@ public class MagiskDatabaseHelper {
         }
         if (oldVersion == 4) {
             db.execSQL(Utils.fmt("UPDATE %s SET uid=uid%%100000", POLICY_TABLE));
+            ++oldVersion;
+        }
+        if (oldVersion == 5) {
+            setSettings(Const.Key.SU_FINGERPRINT,
+                    mm.prefs.getBoolean(Const.Key.SU_FINGERPRINT, false) ? 1 : 0);
             ++oldVersion;
         }
     }
