@@ -153,6 +153,7 @@ if [ -f kernel ]; then
   
   # disable defex_lsm security
   ./magiskboot --hexpatch kernel b91f040071802f005460de b91f040071812f005460de
+  ./magiskboot --hexpatch kernel b91f0400710030005460c6 b91f0400710130005460c6
 fi
 
 ##########################################################################################
