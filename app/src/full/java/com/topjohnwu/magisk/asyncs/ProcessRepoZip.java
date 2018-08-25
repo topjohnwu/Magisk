@@ -4,15 +4,16 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
+import com.topjohnwu.magisk.container.Repo;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -38,17 +39,15 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
     private ProgressDialog progressDialog;
     private boolean mInstall;
-    private String mLink;
     private File mFile;
+    private Repo mRepo;
     private int progress = 0, total = -1;
-    private Handler mHandler;
 
-    public ProcessRepoZip(BaseActivity context, String link, String filename, boolean install) {
+    public ProcessRepoZip(BaseActivity context, Repo repo, boolean install) {
         super(context);
-        mLink = link;
-        mFile = new File(Download.EXTERNAL_PATH, Download.getLegalFilename(filename));
-        mInstall = install;
-        mHandler = new Handler();
+        mRepo = repo;
+        mInstall = install && Shell.rootAccess();
+        mFile = new File(Download.EXTERNAL_PATH, repo.getDownloadFilename());
     }
 
     private void removeTopFolder(File input, File output) throws IOException {
@@ -93,7 +92,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         if (activity == null) return null;
         try {
             // Request zip from Internet
-            HttpURLConnection conn = WebService.mustRequest(mLink, null);
+            HttpURLConnection conn = WebService.mustRequest(mRepo.getZipUrl(), null);
             total = conn.getContentLength();
 
             // Temp files
@@ -111,7 +110,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             }
             conn.disconnect();
 
-            mHandler.post(() -> {
+            Data.mainHandler.post(() -> {
                 progressDialog.setTitle(R.string.zip_process_title);
                 progressDialog.setMessage(getActivity().getString(R.string.zip_process_msg));
             });
@@ -140,7 +139,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         progressDialog.dismiss();
         if (result) {
             Uri uri = Uri.fromFile(mFile);
-            if (Shell.rootAccess() && mInstall) {
+            if (mInstall) {
                 Intent intent = new Intent(activity, FlashActivity.class);
                 intent.setData(uri).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
                 activity.startActivity(intent);
@@ -175,7 +174,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         public synchronized int read() throws IOException {
             int b = super.read();
             if (b > 0) {
-                mHandler.post(() -> updateDlProgress(1));
+                Data.mainHandler.post(() -> updateDlProgress(1));
             }
             return b;
         }
@@ -189,7 +188,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         public synchronized int read(@NonNull byte[] b, int off, int len) throws IOException {
             int read = super.read(b, off, len);
             if (read > 0) {
-                mHandler.post(() -> updateDlProgress(read));
+                Data.mainHandler.post(() -> updateDlProgress(read));
             }
             return read;
         }

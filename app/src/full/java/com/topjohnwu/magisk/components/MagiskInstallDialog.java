@@ -34,7 +34,7 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             if (!s.isEmpty() && Boolean.parseBoolean(s)) {
                 options.add(mm.getString(R.string.install_inactive_slot));
             }
-            new InstallMethodDialog(activity, options, filename).show();
+            new InstallMethodDialog(activity, options).show();
         });
         setNegativeButton(R.string.no_thanks, null);
         if (!TextUtils.isEmpty(Data.magiskNoteLink)) {

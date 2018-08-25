@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.utils.Download;
 
 public abstract class BaseActivity extends FlavorActivity {
 
@@ -26,6 +27,7 @@ public abstract class BaseActivity extends FlavorActivity {
                 granted = false;
         }
         if (granted) {
+            Download.EXTERNAL_PATH.mkdirs();
             callback.run();
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!

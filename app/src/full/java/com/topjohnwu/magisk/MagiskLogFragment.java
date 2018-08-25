@@ -108,16 +108,15 @@ public class MagiskLogFragment extends BaseFragment {
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File targetFile = new File(Download.EXTERNAL_PATH + "/logs", filename);
-        targetFile.getParentFile().mkdirs();
+        File logFile = new File(Download.EXTERNAL_PATH, filename);
         try {
-            targetFile.createNewFile();
+            logFile.createNewFile();
         } catch (IOException e) {
             return;
         }
-        Shell.su("cat " + Const.MAGISK_LOG + " > " + targetFile)
+        Shell.su("cat " + Const.MAGISK_LOG + " > " + logFile)
                 .submit(result ->
-                        SnackbarMaker.make(txtLog, targetFile.getPath(), Snackbar.LENGTH_SHORT).show());
+                        SnackbarMaker.make(txtLog, logFile.getPath(), Snackbar.LENGTH_SHORT).show());
     }
 
     public void clearLogs() {
