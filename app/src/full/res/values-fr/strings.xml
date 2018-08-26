@@ -163,6 +163,7 @@
     <string name="settings_su_reauth_summary">Réauthentifier les autorisations superutilisateur après une mise à jour de l\'application</string>
     <string name="settings_su_fingerprint_title">Activer l\'authentification par empreinte digitale</string>
     <string name="settings_su_fingerprint_summary">Utiliser le scanner d\'empreintes digitales pour autoriser les demandes superutilisateur</string>
+    <string name="auth_fingerprint">Authentifier l\'empreinte digitale</string>
 
     <string name="multiuser_mode">Mode Multi-utilisateurs</string>
     <string name="settings_owner_only">Propriétaire de l\'appareil uniquement</string>
