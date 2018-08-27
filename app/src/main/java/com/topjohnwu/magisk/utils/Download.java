@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
