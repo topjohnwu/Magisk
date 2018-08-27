@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
@@ -80,6 +81,10 @@ public class Repo extends BaseModule {
 
     public Date getLastUpdate() {
         return mLastUpdate;
+    }
+
+    public String getDownloadFilename() {
+        return Download.getLegalFilename(getName() + "-" + getVersion() + ".zip");
     }
 
     public class IllegalRepoException extends Exception {

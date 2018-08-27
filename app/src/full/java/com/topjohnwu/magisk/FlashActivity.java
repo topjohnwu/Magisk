@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -57,25 +57,26 @@ public class FlashActivity extends BaseActivity {
 
     @OnClick(R.id.save_logs)
     void saveLogs() {
-        Calendar now = Calendar.getInstance();
-        String filename = String.format(Locale.US,
-                "install_log_%04d%02d%02d_%02d%02d%02d.log",
-                now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+        runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+            Calendar now = Calendar.getInstance();
+            String filename = String.format(Locale.US,
+                    "magisk_install_log_%04d%02d%02d_%02d%02d%02d.log",
+                    now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
+                    now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
+                    now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File logFile = new File(Download.EXTERNAL_PATH + "/logs", filename);
-        logFile.getParentFile().mkdirs();
-        try (FileWriter writer = new FileWriter(logFile)) {
-            for (String s : logs) {
-                writer.write(s);
-                writer.write('\n');
+            File logFile = new File(Download.EXTERNAL_PATH, filename);
+            try (FileWriter writer = new FileWriter(logFile)) {
+                for (String s : logs) {
+                    writer.write(s);
+                    writer.write('\n');
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
+            Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
+        });
     }
 
     @Override
@@ -158,7 +159,7 @@ public class FlashActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if (result == 1) {
-                new Handler().postDelayed(() ->
+                Data.mainHandler.postDelayed(() ->
                         RootUtils.uninstallPkg(getActivity().getPackageName()), 3000);
             } else {
                 super.onPostExecute(result);

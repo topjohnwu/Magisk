@@ -123,29 +123,6 @@ def sign_zip(unsigned, output, release):
 	if proc.returncode != 0:
 		error('Signing zip failed!')
 
-def sign_apk(source, target):
-	# Find the latest build tools
-	build_tool = os.path.join(os.environ['ANDROID_HOME'], 'build-tools',
-		sorted(os.listdir(os.path.join(os.environ['ANDROID_HOME'], 'build-tools')))[-1])
-
-	proc = execv([os.path.join(build_tool, 'zipalign'), '-vpf', '4', source, target], subprocess.DEVNULL)
-	if proc.returncode != 0:
-		error('Zipalign Magisk Manager failed!')
-
-	# Find apksigner.jar
-	apksigner = ''
-	for root, dirs, files in os.walk(build_tool):
-		if 'apksigner.jar' in files:
-			apksigner = os.path.join(root, 'apksigner.jar')
-			break
-	if not apksigner:
-		error('Cannot find apksigner.jar in Android SDK build tools')
-
-	proc = execv(['java', '-jar', apksigner, 'sign', '--ks', keystore, '--ks-pass', 'pass:' + config['keyStorePass'],
-		'--ks-key-alias', config['keyAlias'], '--key-pass', 'pass:' + config['keyPass'], target])
-	if proc.returncode != 0:
-		error('Release sign Magisk Manager failed!')
-
 def binary_dump(src, out, var_name):
 	out.write('const static unsigned char {}[] = {{'.format(var_name))
 	for i, c in enumerate(xz(src.read())):
@@ -244,60 +221,37 @@ def build_binary(args):
 			error('Build binaries failed!')
 		collect_binary()
 
-def build_apk(args):
-	header('* Building Magisk Manager')
+def build_apk(args, flavor):
+	header('* Building {} Magisk Manager'.format(flavor))
 
+	buildType = 'Release' if args.release else 'Debug'
+
+	proc = execv([gradlew, 'app:assemble' + flavor + buildType])
+	if proc.returncode != 0:
+		error('Build Magisk Manager failed!')
+
+	flavor = flavor.lower()
+	buildType = buildType.lower()
+	apk = 'app-{}-{}.apk'.format(flavor, buildType)
+
+	source = os.path.join('app', 'build', 'outputs', 'apk', flavor, buildType, apk)
+	target = os.path.join(config['outdir'], apk)
+	mv(source, target)
+	header('Output: ' + target)
+	return target
+
+def build_app(args):
 	source = os.path.join('scripts', 'util_functions.sh')
 	target = os.path.join('app', 'src', 'full', 'res', 'raw', 'util_functions.sh')
 	cp(source, target)
-
-	if args.release:
-		proc = execv([gradlew, 'app:assembleFullRelease'])
-		if proc.returncode != 0:
-			error('Build Magisk Manager failed!')
-
-		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'release', 'app-full-release-unsigned.apk')
-		target = os.path.join(config['outdir'], 'app-release.apk')
-		sign_apk(source, target)
-		rm(source)
-	else:
-		proc = execv([gradlew, 'app:assembleFullDebug'])
-		if proc.returncode != 0:
-			error('Build Magisk Manager failed!')
-
-		source = os.path.join('app', 'build', 'outputs', 'apk', 'full', 'debug', 'app-full-debug.apk')
-		target = os.path.join(config['outdir'], 'app-debug.apk')
-		mv(source, target)
-
-	header('Output: ' + target)
+	build_apk(args, 'Full')
 
 def build_stub(args):
-	header('* Building stub Magisk Manager')
-
-	if args.release:
-		proc = execv([gradlew, 'app:assembleStubRelease'])
-		if proc.returncode != 0:
-			error('Build stub Magisk Manager failed!')
-
-		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'release', 'app-stub-release-unsigned.apk')
-		target = os.path.join(config['outdir'], 'stub-release.apk')
-		sign_apk(source, target)
-		rm(source)
-	else:
-		proc = execv([gradlew, 'app:assembleStubDebug'])
-		if proc.returncode != 0:
-			error('Build stub Magisk Manager failed!')
-
-		source = os.path.join('app', 'build', 'outputs', 'apk', 'stub', 'debug', 'app-stub-debug.apk')
-		target = os.path.join(config['outdir'], 'stub-debug.apk')
-		mv(source, target)
-
-	header('Output: ' + target)
-
+	stub = build_apk(args, 'Stub')
 	# Dump the stub APK to header
 	mkdir(os.path.join('native', 'out'))
 	with open(os.path.join('native', 'out', 'binaries.h'), 'w') as out:
-		with open(target, 'rb') as src:
+		with open(stub, 'rb') as src:
 			binary_dump(src, out, 'manager_xz');
 
 def build_snet(args):
@@ -338,7 +292,7 @@ def zip_main(args):
 				zip_with_msg(zipf, source, target)
 
 		# APK
-		source = os.path.join(config['outdir'], 'app-release.apk' if args.release else 'app-debug.apk')
+		source = os.path.join(config['outdir'], 'app-full-release.apk' if args.release else 'app-full-debug.apk')
 		target = os.path.join('common', 'magisk.apk')
 		zip_with_msg(zipf, source, target)
 
@@ -437,7 +391,7 @@ def cleanup(args):
 def build_all(args):
 	vars(args)['target'] = []
 	build_stub(args)
-	build_apk(args)
+	build_app(args)
 	build_binary(args)
 	zip_main(args)
 	zip_uninstaller(args)
@@ -481,7 +435,7 @@ binary_parser.add_argument('target', nargs='*', help='Support: magisk, magiskini
 binary_parser.set_defaults(func=build_binary)
 
 apk_parser = subparsers.add_parser('apk', help='build Magisk Manager APK')
-apk_parser.set_defaults(func=build_apk)
+apk_parser.set_defaults(func=build_app)
 
 stub_parser = subparsers.add_parser('stub', help='build stub Magisk Manager APK')
 stub_parser.set_defaults(func=build_stub)

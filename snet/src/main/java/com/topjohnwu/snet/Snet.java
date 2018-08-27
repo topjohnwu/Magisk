@@ -5,9 +5,11 @@ import android.app.Activity;
 import java.lang.reflect.Proxy;
 
 public class Snet {
-    public static Object newHelper(Class<?> clazz, String dexPath, Activity activity, Object cb) {
-        ModdedGPSUtil.dexPath = dexPath;
+    static String dexPath;
+
+    public static Object newHelper(Class<?> interfaceClass, String dexPath, Activity activity, Object cb) {
+        Snet.dexPath = dexPath;
         return Proxy.newProxyInstance(SafetyNetHelper.class.getClassLoader(),
-                new Class[] { clazz }, new SafetyNetHelper(activity, cb));
+                new Class[] { interfaceClass }, new SafetyNetHelper(activity, cb));
     }
 }

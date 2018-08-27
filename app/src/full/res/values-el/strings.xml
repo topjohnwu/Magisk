@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
     <string name="safetyNet_api_error">Σφάλμα του SafetyNet API</string>
-    <string name="safetyNet_network_loss">Αδυναμία σύνδεσης στο δίκτυο</string>
-    <string name="safetyNet_service_disconnected">Η υπηρεσία τερματίστηκε</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
 
     <!--Install Fragment-->

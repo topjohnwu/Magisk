@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
 import com.topjohnwu.magisk.utils.Topic;
@@ -20,7 +19,7 @@ import java.net.HttpURLConnection;
 
 import dalvik.system.DexClassLoader;
 
-public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
+public class CheckSafetyNet extends ParallelTask<Void, Void, Void> {
 
     public static final File dexPath =
             new File(Data.MM().getFilesDir().getParent() + "/snet", "snet.apk");
@@ -33,7 +32,7 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     private void dlSnet() throws Exception {
         Shell.sh("rm -rf " + dexPath.getParent()).exec();
         dexPath.getParentFile().mkdir();
-        HttpURLConnection conn = WebService.mustRequest(Const.Url.SNET_URL, null);
+        HttpURLConnection conn = WebService.mustRequest(Data.snetLink, null);
         try (
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath));
                 InputStream in = new BufferedInputStream(conn.getInputStream())) {
@@ -52,13 +51,13 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
                         (ISafetyNetHelper.Callback) code ->
                                 Topic.publish(false, Topic.SNET_CHECK_DONE, code));
-        if (helper.getVersion() != Const.SNET_VER) {
+        if (helper.getVersion() < Data.snetVersionCode) {
             throw new Exception();
         }
     }
 
     @Override
-    protected Exception doInBackground(Void... voids) {
+    protected Void doInBackground(Void... voids) {
         try {
             try {
                 dyload();
@@ -67,21 +66,12 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 dlSnet();
                 dyload();
             }
-        } catch (Exception e) {
-            return e;
-        }
-
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Exception e) {
-        if (e == null) {
+            // Run attestation
             helper.attest();
-        } else {
+        } catch (Exception e) {
             e.printStackTrace();
             Topic.publish(false, Topic.SNET_CHECK_DONE, -1);
         }
-        super.onPostExecute(e);
+        return null;
     }
 }

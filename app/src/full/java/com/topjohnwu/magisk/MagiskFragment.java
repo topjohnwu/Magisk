@@ -2,13 +2,14 @@ package com.topjohnwu.magisk;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,14 +92,7 @@ public class MagiskFragment extends BaseFragment
             new CheckSafetyNet(requireActivity()).exec();
             collapse();
         };
-        if (!TextUtils.equals(mm.getPackageName(), Const.ORIG_PKG_NAME)) {
-            new CustomAlertDialog(requireActivity())
-                    .setTitle(R.string.cannot_check_sn_title)
-                    .setMessage(R.string.cannot_check_sn_notice)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.ok, null)
-                    .show();
-        } else if (!CheckSafetyNet.dexPath.exists()) {
+        if (!CheckSafetyNet.dexPath.exists()) {
             // Show dialog
             new CustomAlertDialog(requireActivity())
                     .setTitle(R.string.proprietary_title)
@@ -208,6 +202,17 @@ public class MagiskFragment extends BaseFragment
         return expandableContainer;
     }
 
+    private boolean hasGms() {
+        PackageManager pm = mm.getPackageManager();
+        PackageInfo info;
+        try {
+            info = pm.getPackageInfo("com.google.android.gms", 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+        return info.applicationInfo.enabled;
+    }
+
     private void updateUI() {
         ((MainActivity) requireActivity()).checkHideSection();
 
@@ -216,7 +221,6 @@ public class MagiskFragment extends BaseFragment
         boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        safetyNetCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
         coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
@@ -239,6 +243,8 @@ public class MagiskFragment extends BaseFragment
 
     private void updateCheckUI() {
         int image, color;
+
+        safetyNetCard.setVisibility(hasGms() ? View.VISIBLE : View.GONE);
 
         if (Data.remoteMagiskVersionCode < 0) {
             color = colorNeutral;
@@ -298,12 +304,6 @@ public class MagiskFragment extends BaseFragment
         } else {
             @StringRes int resid;
             switch (response) {
-                case ISafetyNetHelper.CAUSE_SERVICE_DISCONNECTED:
-                    resid = R.string.safetyNet_network_loss;
-                    break;
-                case ISafetyNetHelper.CAUSE_NETWORK_LOST:
-                    resid = R.string.safetyNet_service_disconnected;
-                    break;
                 case ISafetyNetHelper.RESPONSE_ERR:
                     resid = R.string.safetyNet_res_invalid;
                     break;

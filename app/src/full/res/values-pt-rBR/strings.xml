@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Verificando status de SafetyNet…</string>
     <string name="safetyNet_check_success">SafetyNet Verificado Com Sucesso</string>
     <string name="safetyNet_api_error">Erro de SafetyNet API</string>
-    <string name="safetyNet_network_loss">Conexão de rede indisponível</string>
-    <string name="safetyNet_service_disconnected">Serviço foi morto</string>
     <string name="safetyNet_res_invalid">A resposta é inválida</string>
 
     <!--Install Fragment-->

@@ -36,9 +36,8 @@ public abstract class FingerprintHelper {
     }
 
     protected FingerprintHelper() throws Exception {
-        MagiskManager mm = Data.MM();
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-        manager = mm.getSystemService(FingerprintManager.class);
+        manager = Data.MM().getSystemService(FingerprintManager.class);
         cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
                 + KeyProperties.BLOCK_MODE_CBC + "/"
                 + KeyProperties.ENCRYPTION_PADDING_PKCS7);
@@ -64,30 +63,10 @@ public abstract class FingerprintHelper {
 
     public abstract void onAuthenticationFailed();
 
-    public void startAuth() {
+    public void authenticate() {
         cancel = new CancellationSignal();
         FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(cipher);
-        manager.authenticate(cryptoObject, cancel, 0, new FingerprintManager.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationError(int errorCode, CharSequence errString) {
-                FingerprintHelper.this.onAuthenticationError(errorCode, errString);
-            }
-
-            @Override
-            public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-                FingerprintHelper.this.onAuthenticationHelp(helpCode, helpString);
-            }
-
-            @Override
-            public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-                FingerprintHelper.this.onAuthenticationSucceeded(result);
-            }
-
-            @Override
-            public void onAuthenticationFailed() {
-                FingerprintHelper.this.onAuthenticationFailed();
-            }
-        }, null);
+        manager.authenticate(cryptoObject, cancel, 0, new Callback(), null);
     }
 
     public void cancel() {
@@ -110,5 +89,27 @@ public abstract class FingerprintHelper {
         }
         keygen.init(builder.build());
         return keygen.generateKey();
+    }
+
+    private class Callback extends FingerprintManager.AuthenticationCallback {
+        @Override
+        public void onAuthenticationError(int errorCode, CharSequence errString) {
+            FingerprintHelper.this.onAuthenticationError(errorCode, errString);
+        }
+
+        @Override
+        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+            FingerprintHelper.this.onAuthenticationHelp(helpCode, helpString);
+        }
+
+        @Override
+        public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+            FingerprintHelper.this.onAuthenticationSucceeded(result);
+        }
+
+        @Override
+        public void onAuthenticationFailed() {
+            FingerprintHelper.this.onAuthenticationFailed();
+        }
     }
 }

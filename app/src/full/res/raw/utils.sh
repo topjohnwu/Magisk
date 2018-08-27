@@ -57,15 +57,15 @@ direct_install() {
   rm -rf /data/adb/magisk/* 2>/dev/null
   mkdir -p /data/adb/magisk 2>/dev/null
   chmod 700 /data/adb
-  cp -rf $3/* /data/adb/magisk
+  cp -rf $1/* /data/adb/magisk
+  rm -rf /data/adb/magisk/new-boot.img
   echo "- Flashing new boot image"
-  flash_image $1 $2
+  flash_image $1/new-boot.img $2
   if [ $? -ne 0 ]; then
     echo "! Insufficient partition size"
     return 1
   fi
-  rm -f $1
-  rm -rf $3
+  rm -rf $1
   return 0
 }
 

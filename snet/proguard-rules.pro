@@ -20,7 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--ignorewarnings
 -keep class com.topjohnwu.snet.Snet { *; }
--dontwarn java.lang.invoke**
--dontwarn com.google.android.gms.common.GooglePlayServicesUtil**

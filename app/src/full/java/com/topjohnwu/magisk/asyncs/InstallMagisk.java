@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.asyncs;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
@@ -15,7 +14,6 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.TarEntry;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
@@ -80,11 +78,6 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected BaseActivity getActivity() {
-        return (BaseActivity) super.getActivity();
-    }
-
-    @Override
     protected void onPreExecute() {
         if (mode == FIX_ENV_MODE) {
             Activity a = getActivity();
@@ -137,10 +130,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
     }
 
     private void extractFiles(String arch) throws IOException {
-        String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
-        File zip = new File(Download.EXTERNAL_PATH, filename);
-        zip.getParentFile().mkdirs();
+        File zip = new File(mm.getFilesDir(), "magisk.zip");
         BufferedInputStream buf;
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
@@ -278,7 +268,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
                 break;
             case SECOND_SLOT_MODE:
             case DIRECT_MODE:
-                if (!Shell.su(Utils.fmt("direct_install %s %s %s", patched, mBoot, installDir))
+                if (!Shell.su(Utils.fmt("direct_install %s %s", installDir, mBoot))
                         .to(console, logs).exec().isSuccess())
                     return false;
                 if (!Data.keepVerity)
@@ -403,11 +393,5 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
             }
             activity.buttonPanel.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void exec(Void... voids) {
-        getActivity().runWithPermission(
-                new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, super::exec);
     }
 }

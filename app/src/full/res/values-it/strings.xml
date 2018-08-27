@@ -18,9 +18,7 @@
 	<string name="checking_safetyNet_status">Controllo stato SafetyNet…</string>
 	<string name="safetyNet_check_success">Controllo SafetyNet OK</string>
 	<string name="safetyNet_api_error">Errore API SafetyNet</string>
-	<string name="safetyNet_network_loss">Connessione di rete persa</string>
-	<string name="safetyNet_service_disconnected">Il servizio è stato terminato</string>
-	<string name="safetyNet_res_invalid">La risposta non è valida</string>
+    <string name="safetyNet_res_invalid">La risposta non è valida</string>
 	
 	<!--Install Fragment-->
 	<string name="advanced_settings_title">Impostazioni avanzate</string>
@@ -65,7 +63,7 @@
     <!--About Activity-->
 	<string name="about">Informazioni</string>
     <string name="app_changelog">Novità</string>
-	<string name="translators">Auanasgheps | Fabb2303 | bovirus</string>
+	<string name="translators">Auanasgheps</string>
 	<string name="app_version">Versione</string>
 	<string name="app_source_code">Codice sorgente</string>
 	<string name="donation">Dona</string>
@@ -97,10 +95,13 @@
 	<string name="hide_manager_toast">Nascondendo Magisk Manager…</string>
 	<string name="hide_manager_toast2">Potrebbe volerci un po\'…</string>
 	<string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager</string>
+	<string name="open_link_failed_toast">Nessuna app disponibile per aprire il link…</string>
 	<string name="download_zip_only">Scarica solo il file zip</string>
 	<string name="patch_boot_file">Aggiorna l\'immagine di boot</string>
 	<string name="direct_install">Installazione diretta (raccomandata)</string>
-	<string name="install_inactive_slot">Installa nello slot inattivo (Dopo un OTA)</string>
+	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
+	<string name="warning">Attenzione</string>
+	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
     	<string name="select_method">Seleziona un metodo</string>
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar</string>
@@ -112,9 +113,7 @@
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS, quindi non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi permettere il download di un\'estensione (che contiene GoogleApiClient) per controllare lo stato di SafetyNet?</string>
 	<string name="su_db_corrupt">Il database SU è corrotto, un nuovo DB verrà ricreato</string>
-	<string name="cannot_check_sn_title">Impossibile controllare SafetyNet</string>
-	<string name="cannot_check_sn_notice">In seguito a dei cambiamenti in Google Play Services, non è possibile controllare SafetyNet quando Magisk Manager è nascosto</string>
-	<string name="setup_done">Configurazione completata</string>
+    <string name="setup_done">Configurazione completata</string>
 	<string name="setup_fail">Configurazione fallita</string>
 	<string name="env_fix_title">Richiedi configurazione aggiuntiva</string>
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
@@ -167,6 +166,7 @@
 	<string name="settings_su_reauth_summary">Ri-autentica i permessi Superuser dopo un aggiornamento dell\'app</string>
 	<string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>
 	<string name="settings_su_fingerprint_summary">Utilizza il sensore di impronte per accettare le richieste Superuser</string>
+	<string name="auth_fingerprint">Conferma Impronta</string>
 
 	<string name="multiuser_mode">Modalità multiutente</string>    
 	<string name="settings_owner_only">Solo proprietario del dispositivo</string>

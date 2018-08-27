@@ -16,8 +16,6 @@
     <string name="checking_safetyNet_status">Verificarea stării SafetyNet…</string>
     <string name="safetyNet_check_success">Verificare SafetyNet cu succes</string>
     <string name="safetyNet_api_error">Eroare API SafetyNet</string>
-    <string name="safetyNet_network_loss">Conexiunea la rețea nu este disponibilă</string>
-    <string name="safetyNet_service_disconnected">Serviciul a fost oprit</string>
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Setări avansate</string>

@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+def configProps = new Properties()
+configProps.load(new FileInputStream(rootProject.file('config.prop')))
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -10,11 +13,21 @@ android {
         targetSdkVersion rootProject.ext.compileSdkVersion
     }
 
+    signingConfigs {
+        config {
+            storeFile rootProject.file('release-key.jks')
+            storePassword configProps['keyStorePass']
+            keyAlias configProps['keyAlias']
+            keyPassword configProps['keyPass']
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 
@@ -22,8 +35,8 @@ android {
 
     productFlavors {
         full {
-            versionCode 134
-            versionName "5.8.3"
+            versionName configProps['appVersion']
+            versionCode configProps['appVersionCode'] as Integer
             javaCompileOptions {
                 annotationProcessorOptions {
                     argument('butterknife.debuggable', 'false')

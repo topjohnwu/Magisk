@@ -78,6 +78,10 @@ public class CheckUpdates {
 
         JSONObject uninstaller = getJson(json, "uninstaller");
         Data.uninstallerLink = getString(uninstaller, "link", null);
+
+        JSONObject snet = getJson(json, "snet");
+        Data.snetVersionCode = getInt(snet, "versionCode", -1);
+        Data.snetLink = getString(snet, "link", null);
     }
 
     public static void check(Runnable cb) {

@@ -3,7 +3,7 @@
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Superutilisateur</string>
     <string name="log">Journal</string>
     <string name="settings">Paramètres</string>
     <string name="install">Installer</string>
@@ -17,16 +17,14 @@
     <string name="checking_safetyNet_status">Vérification de l\'état SafetyNet…</string>
     <string name="safetyNet_check_success">Contrôle SafetyNet passé avec succès</string>
     <string name="safetyNet_api_error">Erreur d\'API SafetyNet</string>
-    <string name="safetyNet_network_loss">Connexion réseau indisponible</string>
-    <string name="safetyNet_service_disconnected">Le service a été tué</string>
     <string name="safetyNet_res_invalid">La réponse est invalide</string>
 
     <!--Install Fragment-->
     <string name="advanced_settings_title">Paramètres avancés</string>
-    <string name="keep_force_encryption">Garder le chiffrement forcé</string>
-    <string name="keep_dm_verity">Garder AVB 2.0/dm-verity</string>
+    <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
+    <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
     <string name="current_magisk_title">Version installée : %1$s</string>
-    <string name="install_magisk_title">Dernière Magisk : %1$s</string>
+    <string name="install_magisk_title">Dernière Version : %1$s</string>
     <string name="uninstall">Désinstaller</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés/effacés. Le root sera enlevé et vos données seront potentiellement chiffrées si elles ne le sont pas actuellement</string>
@@ -113,8 +111,6 @@
     <string name="proprietary_title">Télécharger Code Propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est Libre, il ne contient pas le code API SafetyNet propriétaire de Google. \ N \ nAutorisez vous le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet? </string>
     <string name = "su_db_corrupt"> La base de données SU est corrompue, une nouvelle base de donnée va être re-créé</string>
-    <string name="cannot_check_sn_title">Vérification SafetyNet impossible</string>
-    <string name="cannot_check_sn_notice">En raison de certains changements dans les services Google Play, il n\'est pas possible de vérifier SafetyNet via Magisk Manager reconstruit</string>
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l\'installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
@@ -126,7 +122,7 @@
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
     <string name="settings_dark_theme_summary">Activer le thème sombre</string>
-    <string name="settings_clear_cache_title">Effacer le cache du dépot</string>
+    <string name="settings_clear_cache_title">Éffacer le cache du dépot</string>
     <string name="settings_clear_cache_summary">Effacer les informations de cache pour les dépots en ligne, Forcer l\'appli à se rafraichir en ligne</string>
     <string name="settings_hide_manager_title">Masquer le Gestionnaire Magisk</string>
     <string name="settings_hide_manager_summary">Reconstruire le Gestionnaire Magisk avec un nom de paquet aléatoire</string>
@@ -137,7 +133,7 @@
     <string name="settings_update">Mis à jour des réglages</string>
     <string name="settings_check_update_title">Vérification des mises à jours</string>
     <string name="settings_check_update_summary">Vérifier l\'éxistance de mise à jour en tâche de fond de façon périodique</string>
-    <string name="settings_update_channel_title">Mis à jour du canal</string>
+    <string name="settings_update_channel_title">Canal de mise à jour</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Béta</string>
     <string name="settings_update_custom">Personalisé</string>
@@ -147,8 +143,8 @@
     <string name="settings_core_only_title">Mode Magisk Core uniquement</string>
     <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide et les hosts systemless restent activés</string>
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
-    <string name="settings_hosts_title">Hosts systemless</string>
-    <string name="settings_hosts_summary">Support hosts systemless pour les applications type Adblock</string>
+    <string name="settings_hosts_title">Hôtes systemless</string>
+    <string name="settings_hosts_summary">Support d\'hôtes systemless pour les applications type Adblock</string>
 
     <string name="settings_su_app_adb">Applis et ADB</string>
     <string name="settings_su_app">Applications uniquement</string>
@@ -161,12 +157,13 @@
     <string name="superuser_access">Accès Superuser</string>
     <string name="auto_response">Réponse automatique</string>
     <string name="request_timeout">Délai de requête</string>
-    <string name="superuser_notification">Notification Superuser</string>
+    <string name="superuser_notification">Notification Superutilisateur</string>
     <string name="request_timeout_summary">%1$s secondes</string>
-    <string name="settings_su_reauth_title">Ré-authentifier après la mise à niveau</string>
-    <string name="settings_su_reauth_summary">Réauthentifier les autorisations de superutilisateur après une mise à niveau d\'application</string>
+    <string name="settings_su_reauth_title">Réauthentifier après la mise à niveau</string>
+    <string name="settings_su_reauth_summary">Réauthentifier les autorisations superutilisateur après une mise à jour de l\'application</string>
     <string name="settings_su_fingerprint_title">Activer l\'authentification par empreinte digitale</string>
-    <string name="settings_su_fingerprint_summary">Utiliser un scanner d\'empreintes digitales pour autoriser les demandes superutilisateur</string>
+    <string name="settings_su_fingerprint_summary">Utiliser le scanner d\'empreintes digitales pour autoriser les demandes superutilisateur</string>
+    <string name="auth_fingerprint">Authentifier l\'empreinte digitale</string>
 
     <string name="multiuser_mode">Mode Multi-utilisateurs</string>
     <string name="settings_owner_only">Propriétaire de l\'appareil uniquement</string>

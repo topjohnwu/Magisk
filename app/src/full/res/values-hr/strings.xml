@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
     <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>
     <string name="safetyNet_api_error">SafetyNet API greška</string>
-    <string name="safetyNet_network_loss">Mrežna veza nije dostupna</string>
-    <string name="safetyNet_service_disconnected">Usluga je ubijena</string>
     <string name="safetyNet_res_invalid">Odgovor je nevažeći</string>
 
     <!--Install Fragment-->

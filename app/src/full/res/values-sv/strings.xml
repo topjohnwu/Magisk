@@ -17,8 +17,6 @@
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
-    <string name="safetyNet_network_loss">Tappade nätverksanslutningen</string>
-    <string name="safetyNet_service_disconnected">Tjänsten har dödats</string>
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
 
     <!--Install Fragment-->

@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Проверавам СигурнаМрежа статус…</string>
     <string name="safetyNet_check_success">СигурнаМрежа Провера Успешна</string>
     <string name="safetyNet_api_error">СигурнаМрежа АПИ Грешка</string>
-    <string name="safetyNet_network_loss">Интернет конекција недоступна</string>
-    <string name="safetyNet_service_disconnected">Сервис је елеминисан</string>
     <string name="safetyNet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->

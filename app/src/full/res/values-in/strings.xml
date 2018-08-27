@@ -16,8 +16,6 @@
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
     <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
-    <string name="safetyNet_network_loss">Koneksi jaringan tidak tersedia</string>
-    <string name="safetyNet_service_disconnected">Layanan telah dimatikan</string>
     <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
 
     <!--Install Fragment-->
@@ -95,6 +93,7 @@
     <string name="hide_manager_toast">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_toast2">Ini mungkin membutuhkan beberapa saat…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager…</string>
+    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan…</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
@@ -112,8 +111,6 @@
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS, yang tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>
-    <string name="cannot_check_sn_title">Tidak dapat memeriksa SafetyNet</string>
-    <string name="cannot_check_sn_notice">Karena beberapa perubahan dalam Layanan Google Play, adalah tidak mungkin untuk memeriksa SafetyNet di Magisk Manager yang dipak ulang</string>
     <string name="setup_done">Penyiapan selesai</string>
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
