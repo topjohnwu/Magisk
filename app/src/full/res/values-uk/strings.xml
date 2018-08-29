@@ -142,7 +142,7 @@
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
     <string name="settings_core_only_title">Режим ядра Magisk</string>
-    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, MagiskHide і позасистемні хости залишуться увімкненими</string>
+    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, Magisk Hide і позасистемні хости залишуться увімкненими</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних перевірок</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами</string>
@@ -164,6 +164,7 @@
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
     <string name="settings_su_fingerprint_title">Автентифікація за відбитком</string>
     <string name="settings_su_fingerprint_summary">Використовувати сканер відбитків пальців, щоб надавати дозвіл суперкористувача</string>
+    <string name="auth_fingerprint">Автентифікація за відбитком</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
@@ -181,8 +182,8 @@
     <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен</string>
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен</string>
-    <string name="android_o_not_support">Не підтримує Android 8.0+</string>
-    <string name="disable_fingerprint">Немає відбитків пальців або пристрій не підтримується</string>
+    <string name="android_o_not_support">Не працює на Android 8.0+</string>
+    <string name="disable_fingerprint">Немає відбитків пальця або пристрій не підтримується</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>
