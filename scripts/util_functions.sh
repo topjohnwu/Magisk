@@ -10,19 +10,19 @@
 #MAGISK_VERSION_STUB
 
 # Detect whether in boot mode
-ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
-$BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
+ps | grep zygote | grep -qv grep && BOOTMODE=true || BOOTMODE=false
+$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
-# Default location, will override if needed
-MAGISKBIN=/data/adb/magisk
+# Presets
+[ -z $NVBASE ] && NVBASE=/data/adb
+[ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
+[ -z $IMG ] && IMG=$NVBASE/magisk.img
 [ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
-[ -z $IMG ] && IMG=/data/adb/magisk.img
 
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
 BOOTSIGNED=false
 
-get_outfd() {
+setup_flashable() {
   $BOOTMODE && return
   # Preserve environment varibles
   OLD_PATH=$PATH
@@ -38,6 +38,11 @@ get_outfd() {
       fi
     done
   fi
+}
+
+# Backward compatibility
+get_outfd() {
+  setup_flashable
 }
 
 ui_print() {
@@ -250,7 +255,7 @@ is_mounted() {
 
 remove_system_su() {
   if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
-    ui_print "! System installed root detected, mount rw :("
+    ui_print "- Removing system installed root"
     mount -o rw,remount /system
     # SuperSU
     if [ -e /system/bin/.ext/.su ]; then

@@ -30,7 +30,7 @@ fi
 # Load utility functions
 . $INSTALLER/util_functions.sh
 
-get_outfd
+setup_flashable
 
 ui_print "************************"
 ui_print "   Magisk Uninstaller   "
