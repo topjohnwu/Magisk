@@ -98,7 +98,6 @@ mount_partitions() {
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   fi
-  $SYSTEM_ROOT && ui_print "- Device using system_root_image"
   if [ -L /system/vendor ]; then
     # Seperate /vendor partition
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
@@ -114,17 +113,13 @@ get_flags() {
   # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
-  HIGHCOMP=false
   if [ -z $KEEPVERITY ]; then
-    KEEPVERITY=false
-    hardware=`grep_cmdline androidboot.hardware`
-    for hw in taimen walleye; do
-      if [ "$hw" = "$hardware" ]; then
-        KEEPVERITY=true
-        ui_print "- Device on whitelist, keep avb-verity"
-        break
-      fi
-    done
+    if $SYSTEM_ROOT; then
+      KEEPVERITY=true
+      ui_print "- Using system_root_image, keep dm/avb-verity"
+    else
+      KEEPVERITY=false
+    fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
     if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
