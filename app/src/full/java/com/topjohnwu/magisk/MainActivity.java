@@ -185,8 +185,7 @@ public class MainActivity extends BaseActivity
                 displayFragment(new LogFragment(), false);
                 break;
             case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                mDrawerItem = bak;
+                displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
                 startActivity(new Intent(this, AboutActivity.class));
