@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.topjohnwu.magisk.SuLogFragment">
+    tools:context="com.topjohnwu.magisk.fragments.SuLogFragment">
 
     <TextView
         android:id="@+id/empty_rv"

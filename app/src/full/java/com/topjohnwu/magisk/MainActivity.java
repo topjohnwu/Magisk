@@ -15,6 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.fragments.LogFragment;
+import com.topjohnwu.magisk.fragments.MagiskFragment;
+import com.topjohnwu.magisk.fragments.MagiskHideFragment;
+import com.topjohnwu.magisk.fragments.ModulesFragment;
+import com.topjohnwu.magisk.fragments.ReposFragment;
+import com.topjohnwu.magisk.fragments.SettingsFragment;
+import com.topjohnwu.magisk.fragments.SuperuserFragment;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
@@ -29,8 +36,8 @@ public class MainActivity extends BaseActivity
     private int mDrawerItem;
     private boolean fromShortcut = true;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.toolbar) public Toolbar toolbar;
     @BindView(R.id.nav_view) public NavigationView navigationView;
 
     private float toolbarElevation;

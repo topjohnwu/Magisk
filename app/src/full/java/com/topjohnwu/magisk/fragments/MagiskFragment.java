@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -20,6 +20,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.BuildConfig;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.MainActivity;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.BaseActivity;

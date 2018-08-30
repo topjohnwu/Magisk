@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,6 +24,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
