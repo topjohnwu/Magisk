@@ -29,6 +29,9 @@
             android:name=".AboutActivity"
             android:theme="@style/AppTheme.StatusBar" />
         <activity
+            android:name=".DonationActivity"
+            android:theme="@style/AppTheme.StatusBar"/>
+        <activity
             android:name=".FlashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="nosensor"

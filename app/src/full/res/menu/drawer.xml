@@ -52,11 +52,23 @@
             android:icon="@drawable/ic_settings"
             android:title="@string/settings"/>
 
+    </group>
+
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/forth_group">
+
         <item
             android:checkable="false"
             android:id="@+id/app_about"
             android:icon="@drawable/ic_info_outline"
             android:title="@string/about"/>
+
+        <item
+            android:checkable="false"
+            android:id="@+id/donation"
+            android:icon="@drawable/ic_attach_money"
+            android:title="@string/donation"/>
 
     </group>
 
