@@ -68,6 +68,7 @@
     <string name="donation">Поддержать проект</string>
     <string name="app_translators">Переводчики</string>
     <string name="support_thread">Домашняя страница</string>
+    <string name="follow_twitter">Подписывайтесь в Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Закрыть</string>
