@@ -452,7 +452,7 @@ int main(int argc, char *argv[]) {
 	patch_sepolicy();
 
 	// Dump binaries
-	dump_magiskrc("/init.magisk.rc", 0750);
+	dump_magiskrc(MAGISKRC, 0750);
 	dump_magisk("/sbin/magisk", 0755);
 	patch_socket_name("/sbin/magisk");
 	rename("/init.bak", "/sbin/magiskinit");

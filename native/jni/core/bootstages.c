@@ -567,7 +567,7 @@ void startup() {
 	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
 
 	// Remove some traits of Magisk
-	unlink("/init.magisk.rc");
+	unlink(MAGISKRC);
 
 	// GSIs will have to override /sbin/adbd with /system/bin/adbd
 	if (access("/sbin/adbd", F_OK) == 0 && access("/system/bin/adbd", F_OK) == 0) {
