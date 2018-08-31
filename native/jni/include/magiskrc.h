@@ -14,9 +14,11 @@ const char magiskrc[] =
 "    rm "UNBLOCKFILE"\n"
 "\n"
 
+#if 0
 "on property:sys.boot_completed=1\n"
 "    start magisk_bc\n"
 "\n"
+#endif
 
 // Services
 

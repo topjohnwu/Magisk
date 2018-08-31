@@ -530,6 +530,7 @@ void startup() {
 		unblock_boot_process();
 	}
 
+#if 0
 	// Increment boot count
 	int boot_count = 0;
 	FILE *cf = fopen(BOOTCOUNT, "r");
@@ -543,6 +544,7 @@ void startup() {
 	cf = xfopen(BOOTCOUNT, "w");
 	fprintf(cf, "%d", boot_count);
 	fclose(cf);
+#endif
 
 	// No uninstaller or core-only mode
 	if (access(DISABLEFILE, F_OK) != 0) {
