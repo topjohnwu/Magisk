@@ -637,7 +637,10 @@ void startup() {
 						"/data/user_de/0/com.topjohnwu.magisk/install", NULL };
 	char *bin_path = NULL;
 	for (int i = 0; alt_bin[i]; ++i) {
-		if (access(alt_bin[i], F_OK) == 0) {
+		struct stat st;
+		if (lstat(alt_bin[i], &st) != -1 && !S_ISLNK(st.st_mode)) {
+			rm_rf(DATABIN);
+			cp_afc(bin_path, DATABIN);
 			bin_path = alt_bin[i];
 			break;
 		}
