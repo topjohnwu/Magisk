@@ -1,3 +1,6 @@
+### 5.9.1
+- Prevent upgrading database before upgrading to v17.0
+
 ### v5.9.0
 - No more on boot notifications
 - Support new mechanism for installing to inactive slot for OTAs on A/B devices
