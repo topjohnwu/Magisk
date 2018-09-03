@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ReposAdapter;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseFragment;

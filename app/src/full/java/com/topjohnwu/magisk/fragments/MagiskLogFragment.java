@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.Manifest;
 import android.os.Bundle;
@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Download;

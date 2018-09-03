@@ -5,7 +5,6 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 android:id="@+id/swipeRefreshLayout"
 android:layout_width="match_parent"
 android:layout_height="fill_parent"
-android:layout_marginTop="?attr/actionBarSize"
 android:orientation="vertical">
 
     <LinearLayout

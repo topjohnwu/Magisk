@@ -32,6 +32,7 @@ import java.util.List;
 public class MagiskDatabaseHelper {
 
     private static final int DATABASE_VER = 6;
+    private static final int OLD_DATABASE_VER = 5;
     private static final String POLICY_TABLE = "policies";
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
@@ -57,13 +58,15 @@ public class MagiskDatabaseHelper {
         pm = mm.getPackageManager();
         db = openDatabase(mm);
         db.disableWriteAheadLogging();
-        int version = db.getVersion();
-        if (version < DATABASE_VER) {
-            onUpgrade(db, version);
-        } else if (version > DATABASE_VER) {
+        int version = Data.magiskVersionCode >= Const.MAGISK_VER.DBVER_SIX ? DATABASE_VER : OLD_DATABASE_VER;
+        int curVersion = db.getVersion();
+        if (curVersion < version) {
+            onUpgrade(db, curVersion);
+        } else if (curVersion > DATABASE_VER) {
+            /* Higher than we can possibly support */
             onDowngrade(db);
         }
-        db.setVersion(DATABASE_VER);
+        db.setVersion(version);
         clearOutdated();
     }
 

@@ -62,13 +62,14 @@
 
     <!--About Activity-->
 	<string name="about">Informazioni</string>
-    <string name="app_changelog">Novità</string>
+    	<string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps</string>
 	<string name="app_version">Versione</string>
 	<string name="app_source_code">Codice sorgente</string>
 	<string name="donation">Dona</string>
 	<string name="app_translators">Traduttori</string>
 	<string name="support_thread">Thread di supporto</string>
+	<string name="follow_twitter">Seguimi su Twitter</string>
 
 	<!--Toasts, Dialogs-->
 	<string name="close">Chiudi</string>

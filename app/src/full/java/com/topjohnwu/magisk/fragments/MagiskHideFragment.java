@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;

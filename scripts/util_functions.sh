@@ -10,19 +10,19 @@
 #MAGISK_VERSION_STUB
 
 # Detect whether in boot mode
-ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
-$BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
+ps | grep zygote | grep -qv grep && BOOTMODE=true || BOOTMODE=false
+$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
-# Default location, will override if needed
-MAGISKBIN=/data/adb/magisk
+# Presets
+[ -z $NVBASE ] && NVBASE=/data/adb
+[ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
+[ -z $IMG ] && IMG=$NVBASE/magisk.img
 [ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
-[ -z $IMG ] && IMG=/data/adb/magisk.img
 
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
 BOOTSIGNED=false
 
-get_outfd() {
+setup_flashable() {
   $BOOTMODE && return
   # Preserve environment varibles
   OLD_PATH=$PATH
@@ -38,6 +38,11 @@ get_outfd() {
       fi
     done
   fi
+}
+
+# Backward compatibility
+get_outfd() {
+  setup_flashable
 }
 
 ui_print() {
@@ -93,7 +98,6 @@ mount_partitions() {
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   fi
-  $SYSTEM_ROOT && ui_print "- Device using system_root_image"
   if [ -L /system/vendor ]; then
     # Seperate /vendor partition
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
@@ -109,17 +113,13 @@ get_flags() {
   # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
-  HIGHCOMP=false
   if [ -z $KEEPVERITY ]; then
-    KEEPVERITY=false
-    hardware=`grep_cmdline androidboot.hardware`
-    for hw in taimen walleye; do
-      if [ "$hw" = "$hardware" ]; then
-        KEEPVERITY=true
-        ui_print "- Device on whitelist, keep avb-verity"
-        break
-      fi
-    done
+    if $SYSTEM_ROOT; then
+      KEEPVERITY=true
+      ui_print "- Using system_root_image, keep dm/avb-verity"
+    else
+      KEEPVERITY=false
+    fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
     if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
@@ -250,7 +250,7 @@ is_mounted() {
 
 remove_system_su() {
   if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
-    ui_print "! System installed root detected, mount rw :("
+    ui_print "- Removing system installed root"
     mount -o rw,remount /system
     # SuperSU
     if [ -e /system/bin/.ext/.su ]; then

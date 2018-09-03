@@ -23,6 +23,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // If keystore exists, sign the APK with custom signature
+            if (signingConfigs.config.storeFile.exists())
+                signingConfig signingConfigs.config
+        }
         release {
             minifyEnabled true
             shrinkResources true

@@ -131,7 +131,7 @@ case "$1" in
     else
       initialize
       OUTFD=
-      get_outfd
+      setup_flashable
       # Run in background, hack for addon.d-v1
       (main_v1) &
     fi

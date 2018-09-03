@@ -216,5 +216,8 @@
     <string name="install_inactive_slot">安裝到未使用的分區 (使用於OTA後)</string>
     <string name="warning">警告</string>
     <string name="install_inactive_slot_msg">你的裝置將在下一次重新啟動後強制切換到未使用的分區！\n請在安裝完OTA之後使用。\n是否繼續？</string>
+    <string name="auth_fingerprint">驗證指紋</string>
+    <string name="follow_twitter">追蹤我的 Twitter</string>
+    <string name="open_link_failed_toast">沒有應用程式能夠打開此鏈結…</string>
 
 </resources>
