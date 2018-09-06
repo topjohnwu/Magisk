@@ -105,6 +105,12 @@ uint32_t __system_property_area_serial(void);
 */
 int __system_property_add(const char* __name, unsigned int __name_length, const char* __value, unsigned int __value_length);
 
+/* Delete a system property. Added in resetprop
+**
+** Returns 0 on success, -1 if the property area is full.
+*/
+int __system_property_del(const char *__name);
+
 /* Update the value of a system property returned by
 ** __system_property_find.  Can only be done by a single process
 ** that has write access to the property area, and that process

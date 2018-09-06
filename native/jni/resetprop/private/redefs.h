@@ -17,6 +17,5 @@
 #define __system_property_serial __system_property_serial2
 #define __system_properties_init __system_properties_init2
 #define __system_property_wait_any __system_property_wait_any2
-#define __system_property_del(x)  -1  /* Temp disable */
 
 #endif //REDEFS_H

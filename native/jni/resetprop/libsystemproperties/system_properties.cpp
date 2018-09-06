@@ -63,7 +63,8 @@ bool SystemProperties::Init(const char* filename) {
   ErrnoRestorer errno_restorer;
 
   if (initialized_) {
-    contexts_->ResetAccess();
+    /* resetprop remove */
+    // contexts_->ResetAccess();
     return true;
   }
 
@@ -281,6 +282,36 @@ int SystemProperties::Add(const char* name, unsigned int namelen, const char* va
   }
 
   bool ret = pa->add(name, namelen, value, valuelen);
+  if (!ret) {
+    return -1;
+  }
+
+  // There is only a single mutator, but we want to make sure that
+  // updates are visible to a reader waiting for the update.
+  atomic_store_explicit(serial_pa->serial(),
+                        atomic_load_explicit(serial_pa->serial(), memory_order_relaxed) + 1,
+                        memory_order_release);
+  __futex_wake(serial_pa->serial(), INT32_MAX);
+  return 0;
+}
+
+int SystemProperties::Delete(const char *name) {
+  if (!initialized_) {
+    return -1;
+  }
+
+  prop_area* serial_pa = contexts_->GetSerialPropArea();
+  if (serial_pa == nullptr) {
+    return -1;
+  }
+
+  prop_area* pa = contexts_->GetPropAreaForName(name);
+  if (!pa) {
+    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied adding property \"%s\"", name);
+    return -1;
+  }
+
+  bool ret = pa->del(name);
   if (!ret) {
     return -1;
   }
