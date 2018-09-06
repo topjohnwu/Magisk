@@ -226,7 +226,7 @@ def build_apk(args, flavor):
 
 	buildType = 'Release' if args.release else 'Debug'
 
-	proc = execv([gradlew, 'app:assemble' + flavor + buildType])
+	proc = execv([gradlew, 'app:assemble' + flavor + buildType, '-PconfigPath=' + os.path.abspath(args.config)])
 	if proc.returncode != 0:
 		error('Build Magisk Manager failed!')
 
@@ -322,7 +322,7 @@ def zip_main(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else 
+	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else
 		'magisk-release.zip' if args.release else 'magisk-debug.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
@@ -366,7 +366,7 @@ def zip_uninstaller(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')) 
+	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d'))
 		if config['prettyName'] else 'magisk-uninstaller.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
