@@ -62,13 +62,14 @@
 
     <!--About Activity-->
 	<string name="about">Informazioni</string>
-    <string name="app_changelog">Novità</string>
+    	<string name="app_changelog">Novità</string>
 	<string name="translators">Auanasgheps</string>
 	<string name="app_version">Versione</string>
 	<string name="app_source_code">Codice sorgente</string>
 	<string name="donation">Dona</string>
 	<string name="app_translators">Traduttori</string>
 	<string name="support_thread">Thread di supporto</string>
+	<string name="follow_twitter">Seguimi su Twitter</string>
 
 	<!--Toasts, Dialogs-->
 	<string name="close">Chiudi</string>
@@ -166,6 +167,7 @@
 	<string name="settings_su_reauth_summary">Ri-autentica i permessi Superuser dopo un aggiornamento dell\'app</string>
 	<string name="settings_su_fingerprint_title">Abilita autenticazione impronta</string>
 	<string name="settings_su_fingerprint_summary">Utilizza il sensore di impronte per accettare le richieste Superuser</string>
+	<string name="auth_fingerprint">Conferma Impronta</string>
 
 	<string name="multiuser_mode">Modalità multiutente</string>    
 	<string name="settings_owner_only">Solo proprietario del dispositivo</string>

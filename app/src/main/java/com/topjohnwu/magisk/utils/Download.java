@@ -19,7 +19,11 @@ import java.io.File;
 public class Download {
 
     public static final File EXTERNAL_PATH =
-            new File(Environment.getExternalStorageDirectory(), "MagiskManager");
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+    static {
+        EXTERNAL_PATH.mkdirs();
+    }
 
     public static boolean isDownloading = false;
 
@@ -30,11 +34,7 @@ public class Download {
         BaseActivity.runWithPermission(context,
                 new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
             File file = new File(EXTERNAL_PATH, getLegalFilename(filename));
-
-            if ((!file.getParentFile().exists() && !file.getParentFile().mkdirs())
-                    || (file.exists() && !file.delete())) {
-                return;
-            }
+            file.delete();
 
             Toast.makeText(context, context.getString(R.string.downloading_toast, filename),
                     Toast.LENGTH_LONG).show();

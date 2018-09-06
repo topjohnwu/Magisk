@@ -40,7 +40,7 @@ public class SnackbarMaker {
 
     public static void showUri(Activity activity, Uri uri) {
         make(activity, activity.getString(R.string.internal_storage,
-                "/MagiskManager/" + Utils.getNameFromUri(activity, uri)),
+                "/Download/" + Utils.getNameFromUri(activity, uri)),
                 Snackbar.LENGTH_LONG)
                 .setAction(R.string.ok, (v)->{}).show();
     }

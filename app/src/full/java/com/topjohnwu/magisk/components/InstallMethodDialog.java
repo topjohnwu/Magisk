@@ -19,7 +19,7 @@ import java.util.List;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 
-    InstallMethodDialog(BaseActivity activity, List<String> options, String filename) {
+    InstallMethodDialog(BaseActivity activity, List<String> options) {
         super(activity);
         setTitle(R.string.select_method);
         setItems(options.toArray(new String [0]), (dialog, idx) -> {
@@ -45,6 +45,8 @@ class InstallMethodDialog extends AlertDialog.Builder {
                             });
                     break;
                 case 0:
+                    String filename = Utils.fmt("Magisk-v%s(%d).zip",
+                            Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
                     Download.receive(activity, new DownloadReceiver() {
                         @Override
                         public void onDownloadDone(Context context, Uri uri) {

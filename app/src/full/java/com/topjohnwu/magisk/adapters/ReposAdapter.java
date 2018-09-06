@@ -100,16 +100,15 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
                 new MarkDownWindow((BaseActivity) context, null, repo.getDetailUrl()).exec());
 
         holder.downloadImage.setOnClickListener(v -> {
-            String filename = repo.getName() + "-" + repo.getVersion() + ".zip";
             new CustomAlertDialog((BaseActivity) context)
                     .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(context.getString(R.string.repo_install_msg, filename))
+                    .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
                     .setCancelable(true)
                     .setPositiveButton(R.string.install, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo.getZipUrl(), filename, true).exec()
+                        new ProcessRepoZip((BaseActivity) context, repo, true).exec()
                     )
                     .setNeutralButton(R.string.download, (d, i) ->
-                        new ProcessRepoZip((BaseActivity) context, repo.getZipUrl(), filename, false).exec())
+                        new ProcessRepoZip((BaseActivity) context, repo, false).exec())
                     .setNegativeButton(R.string.no_thanks, null)
                     .show();
         });

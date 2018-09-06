@@ -15,6 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.fragments.LogFragment;
+import com.topjohnwu.magisk.fragments.MagiskFragment;
+import com.topjohnwu.magisk.fragments.MagiskHideFragment;
+import com.topjohnwu.magisk.fragments.ModulesFragment;
+import com.topjohnwu.magisk.fragments.ReposFragment;
+import com.topjohnwu.magisk.fragments.SettingsFragment;
+import com.topjohnwu.magisk.fragments.SuperuserFragment;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
@@ -27,10 +34,10 @@ public class MainActivity extends BaseActivity
 
     private final Handler mDrawerHandler = new Handler();
     private int mDrawerItem;
-    private boolean fromShortcut = true;
+    private static boolean fromShortcut = false;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.toolbar) public Toolbar toolbar;
     @BindView(R.id.nav_view) public NavigationView navigationView;
 
     private float toolbarElevation;
@@ -43,12 +50,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         if (!mm.hasInit) {
-            Intent intent = new Intent(this, SplashActivity.class);
-            String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
-            if (section != null) {
-                intent.putExtra(Const.Key.OPEN_SECTION, section);
-            }
-            startActivity(intent);
+            startActivity(new Intent(this, SplashActivity.class));
             finish();
         }
 
@@ -76,8 +78,11 @@ public class MainActivity extends BaseActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState == null)
-            navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
+        if (savedInstanceState == null) {
+            String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
+            fromShortcut = section != null;
+            navigate(section);
+        }
 
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -155,6 +160,9 @@ public class MainActivity extends BaseActivity
                 case "about":
                     itemId = R.id.app_about;
                     break;
+                case "donation":
+                    itemId = R.id.donation;
+                    break;
             }
         }
         navigate(itemId);
@@ -185,11 +193,14 @@ public class MainActivity extends BaseActivity
                 displayFragment(new LogFragment(), false);
                 break;
             case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                mDrawerItem = bak;
+                displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
                 startActivity(new Intent(this, AboutActivity.class));
+                mDrawerItem = bak;
+                break;
+            case R.id.donation:
+                startActivity(new Intent(this, DonationActivity.class));
                 mDrawerItem = bak;
                 break;
         }

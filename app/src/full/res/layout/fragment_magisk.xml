@@ -5,14 +5,12 @@
     android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:layout_marginTop="?attr/actionBarSize"
     android:orientation="vertical">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="?attr/actionBarSize"
         android:orientation="vertical">
 
         <LinearLayout

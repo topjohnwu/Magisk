@@ -68,6 +68,7 @@
     <string name="donation">Поддержать проект</string>
     <string name="app_translators">Переводчики</string>
     <string name="support_thread">Домашняя страница</string>
+    <string name="follow_twitter">Подписывайтесь в Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Закрыть</string>
@@ -122,9 +123,9 @@
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>
     <string name="settings_dark_theme_title">Тёмная тема</string>
-    <string name="settings_dark_theme_summary">Включить темное оформление</string>
+    <string name="settings_dark_theme_summary">Включить тёмное оформление</string>
     <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозитории. Будет обновлено принудительно</string>
+    <string name="settings_clear_cache_summary">Очистить сохранённую информацию о репозитории. Будет обновлен принудительно</string>
     <string name="settings_hide_manager_title">Скрытие Magisk Manager</string>
     <string name="settings_hide_manager_summary">Пересобрать Magisk Manager со случайным именем пакета</string>
     <string name="settings_restore_manager_title">Восстановление Magisk Manager</string>
@@ -141,8 +142,8 @@
     <string name="settings_update_custom_msg">Укажите ссылку</string>
     <string name="settings_boot_format_title">Тип образа ядра</string>
     <string name="settings_boot_format_summary">Выберите тип патченого образа ядра:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
-    <string name="settings_core_only_title">Magisk Core режим</string>
-    <string name="settings_core_only_summary">Включить только основные (Core) возможности. Модули не будут загружены. MagiskSU, MagiskHide и внесистемные хосты останутся активными</string>
+    <string name="settings_core_only_title">Magisk Core</string>
+    <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU, Magisk Hide и внесистемные хосты останутся активными</string>
     <string name="settings_magiskhide_summary">Скрывать Magisk от различных проверок</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений, блокирующих рекламу</string>
@@ -163,7 +164,8 @@
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав Суперпользователя после обновления приложений</string>
     <string name="settings_su_fingerprint_title">Биометрическая аутентификация</string>
-    <string name="settings_su_fingerprint_summary">Использовать дактилоскопический сканер для подтверждения запросов Суперпользователя</string>
+    <string name="settings_su_fingerprint_summary">Использовать дактилоскопический сканер для обработки запросов Суперпользователя</string>
+    <string name="auth_fingerprint">Запрос отпечатка</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только владелец</string>

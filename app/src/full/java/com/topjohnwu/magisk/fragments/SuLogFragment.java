@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 

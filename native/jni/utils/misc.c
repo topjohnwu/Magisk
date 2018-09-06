@@ -12,6 +12,7 @@
 #include <sched.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <syscall.h>
 #include <sys/types.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
@@ -83,80 +84,6 @@ int check_data() {
 		}
 	}
 	return data;
-}
-
-/* Original source: https://opensource.apple.com/source/cvs/cvs-19/cvs/lib/getline.c
- * License: GPL 2 or later
- * Adjusted to match POSIX */
-#define MIN_CHUNK 64
-ssize_t my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
-	size_t nchars_avail;
-	char *read_pos;
-
-	if (!lineptr || !n || !stream) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (!*lineptr) {
-		*n = MIN_CHUNK;
-		*lineptr = malloc(*n);
-		if (!*lineptr) {
-			errno = ENOMEM;
-			return -1;
-		}
-	}
-
-	nchars_avail = *n;
-	read_pos = *lineptr;
-
-	while (1) {
-		int save_errno;
-		register int c = getc(stream);
-
-		save_errno = errno;
-
-		if (nchars_avail < 2) {
-			if (*n > MIN_CHUNK)
-				*n *= 2;
-			else
-				*n += MIN_CHUNK;
-
-			nchars_avail = *n + *lineptr - read_pos;
-			*lineptr = realloc(*lineptr, *n);
-			if (!*lineptr) {
-				errno = ENOMEM;
-				return -1;
-			}
-			read_pos = *n - nchars_avail + *lineptr;
-		}
-
-		if (ferror(stream)) {
-			errno = save_errno;
-			return -1;
-		}
-
-		if (c == EOF) {
-			if (read_pos == *lineptr)
-				return -1;
-			else
-				break;
-		}
-
-		*read_pos++ = c;
-		nchars_avail--;
-
-		if (c == delim)
-			break;
-	}
-
-	*read_pos = '\0';
-
-	return read_pos - *lineptr;
-}
-
-ssize_t my_getline(char **lineptr, size_t *n, FILE *stream) {
-	return my_getdelim(lineptr, n, '\n', stream);
 }
 
 /* All the string should be freed manually!! */
@@ -467,4 +394,82 @@ int strend(const char *s1, const char *s2) {
 	size_t l1 = strlen(s1);
 	size_t l2 = strlen(s2);
 	return strcmp(s1 + l1 - l2, s2);
+}
+
+/* Original source: https://opensource.apple.com/source/cvs/cvs-19/cvs/lib/getline.c
+ * License: GPL 2 or later
+ * Adjusted to match POSIX */
+#define MIN_CHUNK 64
+ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
+	size_t nchars_avail;
+	char *read_pos;
+
+	if (!lineptr || !n || !stream) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (!*lineptr) {
+		*n = MIN_CHUNK;
+		*lineptr = malloc(*n);
+		if (!*lineptr) {
+			errno = ENOMEM;
+			return -1;
+		}
+	}
+
+	nchars_avail = *n;
+	read_pos = *lineptr;
+
+	while (1) {
+		int save_errno;
+		register int c = getc(stream);
+
+		save_errno = errno;
+
+		if (nchars_avail < 2) {
+			if (*n > MIN_CHUNK)
+				*n *= 2;
+			else
+				*n += MIN_CHUNK;
+
+			nchars_avail = *n + *lineptr - read_pos;
+			*lineptr = realloc(*lineptr, *n);
+			if (!*lineptr) {
+				errno = ENOMEM;
+				return -1;
+			}
+			read_pos = *n - nchars_avail + *lineptr;
+		}
+
+		if (ferror(stream)) {
+			errno = save_errno;
+			return -1;
+		}
+
+		if (c == EOF) {
+			if (read_pos == *lineptr)
+				return -1;
+			else
+				break;
+		}
+
+		*read_pos++ = c;
+		nchars_avail--;
+
+		if (c == delim)
+			break;
+	}
+
+	*read_pos = '\0';
+
+	return read_pos - *lineptr;
+}
+
+ssize_t __getline(char **lineptr, size_t *n, FILE *stream) {
+	return __getdelim(lineptr, n, '\n', stream);
+}
+
+int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags) {
+	return (int) syscall(__NR_fsetxattr, fd, name, value, size, flags);
 }

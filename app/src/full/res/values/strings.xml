@@ -68,6 +68,7 @@
     <string name="donation">Donation</string>
     <string name="app_translators">Translators</string>
     <string name="support_thread">Support thread</string>
+    <string name="follow_twitter">Follow me on Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Close</string>
