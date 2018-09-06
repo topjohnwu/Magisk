@@ -68,6 +68,7 @@
     <string name="donation">Dons</string>
     <string name="app_translators">Traducteurs de l\'application</string>
     <string name="support_thread">Fil d\'assistance</string>
+    <string name="follow_twitter">Me suivre sur Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fermer</string>
@@ -89,11 +90,12 @@
     <string name="manager_download_install">Appuyer pour télécharger et installer</string>
     <string name="dtbo_patched_title">DTBO a été patché!</string>
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer</string>
-    <string name="magisk_updates">Mises  à jours Magisk</string>
-    <string name="flashing">Flashage</string>
-    <string name="hide_manager_toast">Masquage du Gestionnaire Magisk…</string>
+    <string name="magisk_updates">Mises à jours Magisk</string>
+    <string name="flashing">Installation</string>
+    <string name="hide_manager_toast">Masquer le Gestionnaire Magisk…</string>
     <string name="hide_manager_toast2">Cela pourrait prendre un certain temps …</string>
     <string name="hide_manager_fail_toast">Masquage du Gestionnaire Magisk échoué…</string>
+    <string name="open_link_failed_toast">Aucune application trouvée pour ouvrir le lien…</string>
     <string name="download_zip_only">Uniquement télécharger le zip</string>
     <string name="patch_boot_file">Patch Fichier Image Démarrage</string>
     <string name="direct_install">Installation directe (Recommendée)</string>
@@ -110,7 +112,7 @@
     <string name="restore_fail">Le sauvegarde par défaut n\'existe pas!</string>
     <string name="proprietary_title">Télécharger Code Propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est Libre, il ne contient pas le code API SafetyNet propriétaire de Google. \ N \ nAutorisez vous le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet? </string>
-    <string name = "su_db_corrupt"> La base de données SU est corrompue, une nouvelle base de donnée va être re-créé</string>
+    <string name = "su_db_corrupt"> La base de données SU est corrompue, une nouvelle base de donnée va être re-créée</string>
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l\'installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
@@ -156,11 +158,11 @@
     <string name="settings_su_request_60">60 secondes</string>
     <string name="superuser_access">Accès Superuser</string>
     <string name="auto_response">Réponse automatique</string>
-    <string name="request_timeout">Délai de requête</string>
+    <string name="request_timeout">Délai d\'attente de la demande</string>
     <string name="superuser_notification">Notification Superutilisateur</string>
     <string name="request_timeout_summary">%1$s secondes</string>
-    <string name="settings_su_reauth_title">Réauthentifier après la mise à niveau</string>
-    <string name="settings_su_reauth_summary">Réauthentifier les autorisations superutilisateur après une mise à jour de l\'application</string>
+    <string name="settings_su_reauth_title">Authentifier à nouveau après la mise à niveau</string>
+    <string name="settings_su_reauth_summary">Authentifier à nouveau les autorisations superutilisateur après une mise à jour de l\'application</string>
     <string name="settings_su_fingerprint_title">Activer l\'authentification par empreinte digitale</string>
     <string name="settings_su_fingerprint_summary">Utiliser le scanner d\'empreintes digitales pour autoriser les demandes superutilisateur</string>
     <string name="auth_fingerprint">Authentifier l\'empreinte digitale</string>
@@ -181,7 +183,7 @@
     <string name="global_summary">Toutes les sessions racines utilisent l\'espace de noms de montage global</string>
     <string name="requester_summary">Les sessions racines hériteront de l\'espace de noms de son demandeur</string>
     <string name="isolate_summary">Chaque session racine aura son propre espace de noms isolé</string>
-    <string name="android_o_not_support">Android 8.0+ n\'est pas supporté</string>
+    <string name="android_o_not_support">Android 8.0+ non supporté</string>
     <string name="disable_fingerprint">Aucune empreinte digitale n\'a été définie ou aucun support de périphérique</string>
 
 <!--Superuser-->
