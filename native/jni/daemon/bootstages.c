@@ -161,11 +161,15 @@ static void exec_common_script(const char* stage) {
 			int pid = exec_command(0, NULL,
 								   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
 								   "sh", buf2, NULL);
-			if (pid != -1)
-				waitpid(pid, NULL, 0);
+			if (pid != -1) {
+				if (strcmp(stage, "post-fs-data") == 0) {
+					wait_for_proc(pid, 0, 0);
+				} else {
+					wait_for_proc(pid, 1, 0);
+				}
+			}
 		}
 	}
-
 	closedir(dir);
 }
 
@@ -180,10 +184,14 @@ static void exec_module_script(const char* stage) {
 		int pid = exec_command(0, NULL,
 							   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
 							   "sh", buf2, NULL);
-		if (pid != -1)
-			waitpid(pid, NULL, 0);
+		if (pid != -1) {
+			if (strcmp(stage, "post-fs-data") == 0) {
+				wait_for_proc(pid, 0, 1);
+			} else {
+				wait_for_proc(pid, 1, 0);
+			}
+		}
 	}
-
 }
 
 /***************
