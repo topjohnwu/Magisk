@@ -373,7 +373,7 @@ void wait_till_exists(const char *target) {
 }
 
 void gen_rand_str(char *buf, int len) {
-	const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.";
+	const char base[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 	int urandom;
 	if (access("/dev/urandom", R_OK) == 0) {
 		urandom = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
