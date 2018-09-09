@@ -28,9 +28,9 @@
 #ifndef _BIONIC_LOCK_H
 #define _BIONIC_LOCK_H
 
-#include "stdatomic.h"
-#include "bionic_futex.h"
-#include "bionic_macros.h"
+#include <stdatomic.h>
+#include "private/bionic_futex.h"
+#include "private/bionic_macros.h"
 
 // Lock is used in places like pthread_rwlock_t, which can be initialized without calling
 // an initialization function. So make sure Lock can be initialized by setting its memory to 0.
@@ -64,7 +64,7 @@ class Lock {
     }
     while (atomic_exchange_explicit(&state, LockedWithWaiter, memory_order_acquire) != Unlocked) {
       // TODO: As the critical section is brief, it is a better choice to spin a few times befor sleeping.
-      __futex_wait_ex(&state, process_shared, LockedWithWaiter, false, nullptr);
+      __futex_wait_ex(&state, process_shared, LockedWithWaiter);
     }
     return;
   }
@@ -74,6 +74,21 @@ class Lock {
       __futex_wake_ex(&state, process_shared, 1);
     }
   }
+};
+
+class LockGuard {
+ public:
+  LockGuard(Lock& lock) : lock_(lock) {
+    lock_.lock();
+  }
+  ~LockGuard() {
+    lock_.unlock();
+  }
+
+  DISALLOW_COPY_AND_ASSIGN(LockGuard);
+
+ private:
+  Lock& lock_;
 };
 
 #endif  // _BIONIC_LOCK_H

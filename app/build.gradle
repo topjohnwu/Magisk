@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
 def configProps = new Properties()
-configProps.load(new FileInputStream(rootProject.file('config.prop')))
+def configPath = project.hasProperty('configPath') ? project.configPath : rootProject.file('config.prop')
+configProps.load(new FileInputStream(configPath))
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
