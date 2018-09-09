@@ -1,7 +1,7 @@
 # Magisk
+[XDA Announcement Thread](https://forum.xda-developers.com/apps/magisk/official-magisk-v7-universal-systemless-t3473445)
 
 ## Building Environment Requirements
-
 1. Python 3.5+: run `build.py` script
 2. Java Development Kit (JDK) 8: Compile Magisk Manager and sign zips
 3. Latest Android SDK: set `ANDROID_HOME` environment variable to the path to Android SDK
@@ -9,10 +9,16 @@
 5. (Windows Only) Python package Colorama: Install with `pip install colorama`, used for ANSI color codes
 
 ## Building Notes and Instructions
-1. Building is supported on macOS, Linux, and Windows using the custom NDK: [FrankeNDK](https://github.com/topjohnwu/FrankeNDK).
-2. Set configurations in `config.prop`. A sample file `config.prop.sample` is provided as an example.
-3. Run `build.py` with argument `-h` to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
-4. By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `-r, --release` flag), you need a Java Keystore file `release-key.jks` (only `JKS` format is supported) to sign APKs and zips. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
+1. Clone sources with submodules: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
+2. Building is supported on macOS, Linux, and Windows. Official releases are built and tested with [FrankeNDK](https://github.com/topjohnwu/FrankeNDK); point `ANDROID_NDK_HOME` to FrankeNDK if you want to use it for compiling.
+3. Set configurations in `config.prop`. A sample file `config.prop.sample` is provided as an example.
+4. Run `build.py` with argument `-h` to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
+5. By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `-r, --release` flag), you need a Java Keystore file `release-key.jks` (only `JKS` format is supported) to sign APKs and zips. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
+
+## Bug Reports
+**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** Please **DO NOT** report bugs that is already fixed upstream.
+
+Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by opening an issue on GitHub or directly in the thread.
 
 ## Documentation
 [Link to Documentation](docs/README.MD)
