@@ -6,7 +6,7 @@
     <string name="superuser">Superuser</string>
     <string name="log">Záznamy</string>
     <string name="settings">Nastavenia</string>
-    <string name="install">Inštalácia</string>
+    <string name="install">Inštalovať</string>
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk nie je nainštalovaný</string>
@@ -74,7 +74,7 @@
     <string name="repo_install_title">Nainštalovať %1$s</string>
     <string name="repo_install_msg">Chcete teraz nainštalovať %1$s?</string>
     <string name="download">Stiahnuť</string>
-    <string name="reboot">Reštartovať</string>
+    <string name="reboot">Reštart</string>
     <string name="magisk_update_title">Nová aktualizácia Magisk!</string>
     <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>

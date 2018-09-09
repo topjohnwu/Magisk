@@ -67,6 +67,7 @@
     <string name="donation">Donasi</string>
     <string name="app_translators">Penerjemah</string>
     <string name="support_thread">Thread dukungan</string>
+    <string name="follow_twitter">Ikuti saya di Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
@@ -161,6 +162,7 @@
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
     <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>
     <string name="settings_su_fingerprint_summary">Gunakan pemindai sidik jari untuk mengizinkan permintaan superuser</string>
+    <string name="auth_fingerprint">Otentikasi Sidik Jari</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>

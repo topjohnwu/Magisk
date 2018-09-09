@@ -139,8 +139,9 @@ public class FlashActivity extends BaseActivity {
                 new InstallMagisk(this, console, logs, InstallMagisk.SECOND_SLOT_MODE).exec();
                 break;
             case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs,
-                        intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
+                runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        () -> new InstallMagisk(this, console, logs,
+                                intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec());
                 break;
         }
     }
