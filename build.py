@@ -226,7 +226,7 @@ def build_apk(args, flavor):
 
 	buildType = 'Release' if args.release else 'Debug'
 
-	proc = execv([gradlew, 'app:assemble' + flavor + buildType, '-PconfigPath=' + os.path.abspath(args.config)])
+	proc = execv([gradlew, 'app:assemble' + flavor + buildType])
 	if proc.returncode != 0:
 		error('Build Magisk Manager failed!')
 
@@ -322,7 +322,7 @@ def zip_main(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else
+	output = os.path.join(config['outdir'], 'Magisk-v{}.zip'.format(config['version']) if config['prettyName'] else 
 		'magisk-release.zip' if args.release else 'magisk-debug.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
@@ -366,7 +366,7 @@ def zip_uninstaller(args):
 
 		# End of zipping
 
-	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d'))
+	output = os.path.join(config['outdir'], 'Magisk-uninstaller-{}.zip'.format(datetime.datetime.now().strftime('%Y%m%d')) 
 		if config['prettyName'] else 'magisk-uninstaller.zip')
 	sign_zip(unsigned, output, args.release)
 	header('Output: ' + output)
@@ -397,10 +397,34 @@ def build_all(args):
 	zip_uninstaller(args)
 	build_snet(args)
 
+with open('config.prop', 'r') as f:
+	for line in [l.strip(' \t\r\n') for l in f]:
+		if line.startswith('#') or len(line) == 0:
+			continue
+		prop = line.split('=')
+		config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+
+if 'version' not in config or 'versionCode' not in config:
+	error('"version" and "versionCode" is required in "config.prop"')
+
+try:
+	config['versionCode'] = int(config['versionCode'])
+except ValueError:
+	error('"versionCode" is required to be an integer')
+
+if 'prettyName' not in config:
+	config['prettyName'] = 'false'
+
+config['prettyName'] = config['prettyName'].lower() == 'true'
+
+if 'outdir' not in config:
+	config['outdir'] = 'out'
+
+mkdir_p(config['outdir'])
+
 parser = argparse.ArgumentParser(description='Magisk build script')
 parser.add_argument('-r', '--release', action='store_true', help='compile Magisk for release')
 parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-parser.add_argument('-c', '--config', default='config.prop', help='config file location')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser('all', help='build everything (binaries/apks/zips)')
@@ -434,30 +458,6 @@ if len(sys.argv) == 1:
 	sys.exit(1)
 
 args = parser.parse_args()
-
-# Some default values
-config['outdir'] = 'out'
-config['prettyName'] = 'false'
-
-with open(args.config, 'r') as f:
-	for line in [l.strip(' \t\r\n') for l in f]:
-		if line.startswith('#') or len(line) == 0:
-			continue
-		prop = line.split('=')
-		config[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
-
-if 'version' not in config or 'versionCode' not in config:
-	error('"version" and "versionCode" is required in "config.prop"')
-
-try:
-	config['versionCode'] = int(config['versionCode'])
-except ValueError:
-	error('"versionCode" is required to be an integer')
-
-config['prettyName'] = config['prettyName'].lower() == 'true'
-
-mkdir_p(config['outdir'])
-
 if args.release and not os.path.exists(keystore):
 	error('Please generate a java keystore and place it in \'{}\''.format(keystore))
 STDOUT = None if args.verbose else subprocess.DEVNULL

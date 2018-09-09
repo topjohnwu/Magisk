@@ -10,7 +10,6 @@ LIBLZ4 := $(EXT_PATH)/lz4/lib
 LIBBZ2 := $(EXT_PATH)/bzip2
 LIBFDT := $(EXT_PATH)/dtc/libfdt
 LIBNANOPB := $(EXT_PATH)/nanopb
-LIBSYSTEMPROPERTIES := jni/resetprop/libsystemproperties/include
 COMMON_UTILS := \
 	utils/file.c \
 	utils/list.c \
@@ -28,14 +27,13 @@ ifdef B_MAGISK
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_SHARED_LIBRARIES := libsqlite libselinux
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties
+LOCAL_STATIC_LIBRARIES := libnanopb
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
 	$(EXT_PATH)/include \
 	$(LIBSELINUX) \
-	$(LIBNANOPB) \
-	$(LIBSYSTEMPROPERTIES)
+	$(LIBNANOPB)
 
 LOCAL_SRC_FILES := \
 	core/magisk.c \
@@ -47,10 +45,9 @@ LOCAL_SRC_FILES := \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
-	resetprop/persist_properties.c \
+	resetprop/persist_props.c \
 	resetprop/resetprop.c \
-	resetprop/system_property_api.cpp \
-	resetprop/system_property_set.cpp \
+	resetprop/system_properties.cpp \
 	su/su.c \
 	su/activity.c \
 	su/pts.c \
@@ -148,4 +145,3 @@ endif
 # Externals
 ########################
 include jni/external/Android.mk
-include jni/resetprop/libsystemproperties/Android.mk

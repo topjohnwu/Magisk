@@ -10,11 +10,11 @@
 
     <!--Status Fragment-->
     <string name="magisk_version_error">Magisk ist nicht installiert</string>
-    <string name="checking_for_updates">Suche nach Aktualisierungen...</string>
+    <string name="checking_for_updates">Suche nach Aktualisierungen…</string>
     <string name="magisk_update_available">Magisk %1$s ist verfügbar!</string>
-    <string name="invalid_update_channel">Ungültiger Aktualisierungskanal</string>
+    <string name="invalid_update_channel">Nicht valider Aktualisierungskanal</string>
     <string name="safetyNet_check_text">SafetyNet-Status abfragen</string>
-    <string name="checking_safetyNet_status">Prüfe SafetyNet-Status...</string>
+    <string name="checking_safetyNet_status">Prüfe SafetyNet-Status…</string>
     <string name="safetyNet_check_success">SafetyNet-Test erfolgreich</string>
     <string name="safetyNet_api_error">SafetyNet API Fehler</string>
     <string name="safetyNet_res_invalid">Die Antwort ist ungültig</string>
@@ -27,7 +27,7 @@
     <string name="install_magisk_title">Neueste Version: %1$s</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
-    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt und möglicherweise werden Ihre Daten verschlüsseln, falls Ihre Daten derzeit nicht verschlüsselt sind.</string>
+    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt. Root wird entfernt und wenn die Daten nicht verschlüsselt sind, werden sie möglicherweise verschlüsselt.</string>
     <string name="update">Aktualisierung %1$s</string>
 
     <!--Module Fragment-->
@@ -39,7 +39,7 @@
     <string name="disable_file_created">Modul wird beim nächsten Neustart deaktiviert</string>
     <string name="disable_file_removed">Modul wird beim nächsten Neustart aktiviert</string>
     <string name="author">Erstellt von %1$s</string>
-    <string name="reboot_recovery">Neustart in das Recovery</string>
+    <string name="reboot_recovery">Neustart in die Recovery</string>
     <string name="reboot_bootloader">Neustart in den Bootloader</string>
     <string name="reboot_download">Neustart in den Download-Modus</string>
 
@@ -50,22 +50,22 @@
     <string name="updated_on">Zuletzt aktualisiert: %1$s</string>
     <string name="sorting_order">Sortierung</string>
     <string name="sort_by_name">Nach Namen sortiert</string>
-    <string name="sort_by_update">Nach Aktualisierungsdatum sortiert</string>
+    <string name="sort_by_update">Nach Aktualisierung sortiert</string>
 
     <!--Log Fragment-->
-    <string name="menuSaveLog">Log speichern</string>
+    <string name="menuSaveLog">Protokoll speichern</string>
     <string name="menuReload">Log erneut laden</string>
     <string name="menuClearLog">Log löschen</string>
     <string name="logs_cleared">Log gelöscht</string>
     <string name="log_is_empty">Log ist leer</string>
 
     <!--About Activity-->
-    <string name="about">Info</string>
-    <string name="app_changelog">Änderungsprotokoll</string>
-    <string name="translators">skalnet, c727, jenslody, SuperSandro2000</string>
+    <string name="about">Über</string>
+    <string name="app_changelog">Änderungen</string>
+    <string name="translators">skalnet, c727, jenslody</string>
     <string name="app_version">Version</string>
     <string name="app_source_code">Quelltext</string>
-    <string name="donation">Spenden</string>
+    <string name="donation">Spende</string>
     <string name="app_translators">Übersetzer</string>
     <string name="support_thread">Hilfeforum</string>
     <string name="follow_twitter">Folge mir auf Twitter</string>
@@ -76,12 +76,12 @@
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
-    <string name="magisk_update_title">Neue Magisk Update verfügbar!</string>
-    <string name="settings_reboot_toast">Neustarten, um die Änderungen zu übernehmen</string>
-    <string name="release_notes">Versionshinweise</string>
-    <string name="repo_cache_cleared">Repo-Cache geleert</string>
+    <string name="magisk_update_title">Neue Magisk-Aktualisierung verfügbar!</string>
+    <string name="settings_reboot_toast">Neustarten, um die Änderungen anzuwenden</string>
+    <string name="release_notes">Änderungen</string>
+    <string name="repo_cache_cleared">Repo-Cache gelöscht</string>
     <string name="process_error">Prozessfehler</string>
-    <string name="internal_storage">Die Zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
+    <string name="internal_storage">Die zip-Datei ist gespeichert unter:\n[Interner Speicher]%1$s</string>
     <string name="zip_download_title">Herunterladen</string>
     <string name="zip_download_msg">Lade Zip-Datei herunter (%1$d%%) …</string>
     <string name="zip_process_title">Verarbeite</string>
@@ -89,13 +89,12 @@
     <string name="manager_update_title">Aktualisierung für Magisk Manager verfügbar!</string>
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
-    <string name="magisk_updates">Magisk Update</string>
+    <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte Neustart durchführen</string>
+    <string name="magisk_updates">Magisk Aktualisierungen</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Verberge Magisk Manager…</string>
-    <string name="hide_manager_toast2">Das könnte einige Zeit dauern...</string>
+    <string name="hide_manager_toast2">Dies könnte einige Zeit in Anspruch nehmen…</string>
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
-<<<<<<< HEAD
     <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um den Link zu öffnen…</string>
     <string name="download_zip_only">Zip-Datei nur herunterladen</string>
     <string name="patch_boot_file">Boot-Image-Datei patchen</string>
@@ -103,30 +102,21 @@
     <string name="install_inactive_slot">Installiere auf inaktivem Slot (Nach OTA)</string>
     <string name="warning">Warnung</string>
     <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN nach dem Neustart zum aktuellen inaktiven Slot zu booten!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
-=======
-    <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um diesen Link zu öffnen...</string>
-    <string name="download_zip_only">Nur Zip-Datei herunterladen</string>
-    <string name="patch_boot_file">Boot-Image-Datei patchen</string>
-    <string name="direct_install">Direkt installieren (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere auf inaktiven Slot (Nach OTA)</string>
-    <string name="warning">Warnung</string>
-    <string name="install_inactive_slot_msg">Dein Gerät wird GEZWUNGEN in den aktuell inaktiven Slot zu starten, nachdem nach dem ein Neustart durchgeführt wurde!\nBenutze diese Option nur, nachdem das OTA beendet wurde.\nFortsetzen?</string>
->>>>>>> upstream/master
     <string name="select_method">Methode auswählen</string>
-    <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen von Boot-Images nicht</string>
-    <string name="boot_file_patch_msg">Wähle das original Boot-Image-Dump im Format .img oder .img.tar</string>
+    <string name="no_boot_file_patch_support">Magisk Zielversion unterstützt das Patchen des Boot-Images nicht</string>
+    <string name="boot_file_patch_msg">Selektiere das originale Boot image dump im Format .img oder .img.tar</string>
     <string name="complete_uninstall">Komplette Deinstallation</string>
     <string name="restore_img">Images wiederherstellen</string>
     <string name="restore_img_msg">Wiederherstellen...</string>
-    <string name="restore_done">Wiederherstellung erfolgreich!</string>
+    <string name="restore_done">Wiederherstellung durchgeführt!</string>
     <string name="restore_fail">Kein Original Backup vorhanden!</string>
     <string name="proprietary_title">Lade proprietären Code herunter</string>
     <string name="proprietary_notice">Magisk Manager ist FOSS und enthält keinen proprietären SafetyNet API Code von Google. Magisk Manager erlauben eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Checks herunterzuladen?</string>
-    <string name="su_db_corrupt">SU-Datenbank ist fehlerhaft, es wird eine neue erstellt</string>
+    <string name="su_db_corrupt">Datenbank für SU ist fehlerhaft, es wird eine neue erstellt</string>
     <string name="setup_done">Einrichtung abgeschlossen</string>
     <string name="setup_fail">Einrichtung fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
-    <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
+    <string name="env_fix_msg">Um Magisk ordnungsgemäß zu nutzen, benötigt das Geräte eine zusätzliche Einrichtung. Magisk Einrichtungs-zip wird heruntergeladen, fortsetzen?</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
 
@@ -134,12 +124,12 @@
     <string name="settings_general_category">Allgemein</string>
     <string name="settings_dark_theme_title">Dunkles Theme</string>
     <string name="settings_dark_theme_summary">Dunkles Theme aktivieren</string>
-    <string name="settings_clear_cache_title">Repo-Cache leeren</string>
-    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen des Online-Repos. Erzwingt eine Aktualisierung</string>
+    <string name="settings_clear_cache_title">Repo-Cache löschen</string>
+    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen der Online-Repos. Erzwingt eine Online-Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
     <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
-    <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
-    <string name="settings_restore_manager_summary">Stellt Magisk Manager mit ursprünglichem Paketnamen wieder her</string>
+    <string name="settings_restore_manager_title">Stelle Magisk Manager wieder her</string>
+    <string name="settings_restore_manager_summary">Stelle Magisk Manager mit ursprünglichem Paket wieder her</string>
     <string name="language">Sprache</string>
     <string name="system_default">(Systemstandard)</string>
     <string name="settings_update">Aktualisierungs-Einstellungen</string>
@@ -149,13 +139,13 @@
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
-    <string name="settings_update_custom_msg">Gib eine benutzerdefinierte URL ein</string>
+    <string name="settings_update_custom_msg">Gebe eine benutzerdefinierte URL ein</string>
     <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
     <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
     <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
-    <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
+    <string name="settings_hosts_title">Systemlose hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
 
     <string name="settings_su_app_adb">Apps und ADB</string>
@@ -184,15 +174,15 @@
     <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
     <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffs-Anfragen</string>
     <string name="user_indepenent_summary">Jeder Nutzer hat seine eingenen Root-Regeln</string>
-    <string name="multiuser_hint_owner_request">Eine Anfrage wurde an den Gerätebesitzer gesendet. Bitte wechsel zum Bersitzerkonto und gewähre die Rechte.</string>
+    <string name="multiuser_hint_owner_request">Eine Anfrage wurde an den Gerätebesitzer gesendet. Bitte wechsle zum Bersitzerkonto und gewähre die Rechte</string>
 
-    <string name="mount_namespace_mode">Mount-Namespace-Modus</string>
-    <string name="settings_ns_global">Globaler Namespace</string>
-    <string name="settings_ns_requester">Geerbter Namespace</string>
-    <string name="settings_ns_isolate">Isolierter Namespace</string>
-    <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namespace</string>
-    <string name="requester_summary">Root-Sitzungen erben den Namespace des Abfragenden</string>
-    <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namespace</string>
+    <string name="mount_namespace_mode">Namensraum-Modus</string>
+    <string name="settings_ns_global">Globaler Namensraum</string>
+    <string name="settings_ns_requester">Geerbter Namensraum</string>
+    <string name="settings_ns_isolate">Isolierter Namensraum</string>
+    <string name="global_summary">Alle Root-Sitzungen benutzen den global angelegten Namensraum</string>
+    <string name="requester_summary">Root-Sitzungen erben den Namensraum des Abfragenden</string>
+    <string name="isolate_summary">Jede Root-Sitzung hat ihren isolierten Namensraum</string>
     <string name="android_o_not_support">Android 8.0+ wird nicht unterstützt</string>
     <string name="disable_fingerprint">Keine Fingerabdrücke gespeichert oder keine Geräteunterstützung</string>
 

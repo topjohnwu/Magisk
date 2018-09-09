@@ -82,6 +82,8 @@ pid_t xfork();
 // misc.c
 
 #define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
+#define getline my_getline
+#define getdelim my_getdelim
 
 unsigned get_shell_uid();
 unsigned get_system_uid();
@@ -90,6 +92,8 @@ int check_data();
 int file_to_vector(const char* filename, struct vector *v);
 int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
+ssize_t my_getline(char **lineptr, size_t *n, FILE *stream);
+ssize_t my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 void ps(void (*func)(int));
 int check_proc_name(int pid, const char *filter);
 void unlock_blocks();
@@ -104,14 +108,6 @@ int fork_dont_care();
 void wait_till_exists(const char *target);
 void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);
-
-#define getline __getline
-#define getdelim __getdelim
-#define fsetxattr __fsetxattr
-
-ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
-ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
-int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags);
 
 // file.c
 

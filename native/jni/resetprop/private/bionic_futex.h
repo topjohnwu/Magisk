@@ -29,17 +29,20 @@
 #define _BIONIC_FUTEX_H
 
 #include <errno.h>
-#include <linux/futex.h>
+#include "futex.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/cdefs.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
+__BEGIN_DECLS
+
 struct timespec;
 
-static inline __always_inline int __futex(volatile void* ftx, int op, int value,
-                                          const timespec* timeout, int bitset) {
+static inline int __futex(volatile void* ftx, int op, int value,
+                                          const struct timespec* timeout,
+                                          int bitset) {
   // Our generated syscall assembler sets errno, but our callers (pthread functions) don't want to.
   int saved_errno = errno;
   int result = syscall(__NR_futex, ftx, op, value, timeout, NULL, bitset);
@@ -51,30 +54,24 @@ static inline __always_inline int __futex(volatile void* ftx, int op, int value,
 }
 
 static inline int __futex_wake(volatile void* ftx, int count) {
-  return __futex(ftx, FUTEX_WAKE, count, nullptr, 0);
+  return __futex(ftx, FUTEX_WAKE, count, NULL, 0);
 }
 
 static inline int __futex_wake_ex(volatile void* ftx, bool shared, int count) {
-  return __futex(ftx, shared ? FUTEX_WAKE : FUTEX_WAKE_PRIVATE, count, nullptr, 0);
+  return __futex(ftx, shared ? FUTEX_WAKE : FUTEX_WAKE_PRIVATE, count, NULL, 0);
 }
 
-static inline int __futex_wait(volatile void* ftx, int value, const timespec* timeout) {
+static inline int __futex_wait(volatile void* ftx, int value, const struct timespec* timeout) {
   return __futex(ftx, FUTEX_WAIT, value, timeout, 0);
 }
 
-static inline int __futex_wait_ex(volatile void* ftx, bool shared, int value) {
-  return __futex(ftx, (shared ? FUTEX_WAIT_BITSET : FUTEX_WAIT_BITSET_PRIVATE), value, nullptr,
+static inline int __futex_wait_ex(volatile void* ftx, bool shared, int value,
+                                  bool use_realtime_clock, const struct timespec* abs_timeout) {
+  return __futex(ftx, (shared ? FUTEX_WAIT_BITSET : FUTEX_WAIT_BITSET_PRIVATE) |
+                 (use_realtime_clock ? FUTEX_CLOCK_REALTIME : 0), value, abs_timeout,
                  FUTEX_BITSET_MATCH_ANY);
 }
 
-__LIBC_HIDDEN__ int __futex_wait_ex(volatile void* ftx, bool shared, int value,
-                                    bool use_realtime_clock, const timespec* abs_timeout);
-
-static inline int __futex_pi_unlock(volatile void* ftx, bool shared) {
-  return __futex(ftx, shared ? FUTEX_UNLOCK_PI : FUTEX_UNLOCK_PI_PRIVATE, 0, nullptr, 0);
-}
-
-__LIBC_HIDDEN__ int __futex_pi_lock_ex(volatile void* ftx, bool shared, bool use_realtime_clock,
-                                       const timespec* abs_timeout);
+__END_DECLS
 
 #endif /* _BIONIC_FUTEX_H */
