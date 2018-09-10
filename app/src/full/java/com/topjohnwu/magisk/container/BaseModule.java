@@ -3,9 +3,10 @@ package com.topjohnwu.magisk.container;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public abstract class BaseModule implements Comparable<BaseModule> {
 

@@ -1,7 +1,8 @@
 package com.topjohnwu.magisk.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

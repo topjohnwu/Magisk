@@ -2,12 +2,11 @@ package com.topjohnwu.magisk.fragments;
 
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.tabs.TabLayout;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
@@ -15,6 +14,7 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

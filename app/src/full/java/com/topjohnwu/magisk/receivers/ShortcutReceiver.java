@@ -7,7 +7,6 @@ import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
@@ -17,6 +16,8 @@ import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
+
+import androidx.annotation.RequiresApi;
 
 public class ShortcutReceiver extends BroadcastReceiver {
     @Override

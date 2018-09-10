@@ -26,7 +26,7 @@ allprojects {
 ext {
     compileSdkVersion = 28
     buildToolsVersion = "28.0.2"
-    supportLibVersion = "27.1.1"
+    androidXVersion = "1.0.0-rc02"
 }
 
 task clean(type: Delete) {

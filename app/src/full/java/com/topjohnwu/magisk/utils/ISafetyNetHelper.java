@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 
 public interface ISafetyNetHelper {
 
