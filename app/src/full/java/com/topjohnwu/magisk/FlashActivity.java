@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +29,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -139,8 +139,9 @@ public class FlashActivity extends BaseActivity {
                 new InstallMagisk(this, console, logs, InstallMagisk.SECOND_SLOT_MODE).exec();
                 break;
             case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs,
-                        intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
+                runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        () -> new InstallMagisk(this, console, logs,
+                                intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec());
                 break;
         }
     }

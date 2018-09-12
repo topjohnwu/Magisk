@@ -292,7 +292,13 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
 	if (fd < 0)
 		return 1;
-	xwrite(fd, magiskrc, sizeof(magiskrc));
+	char startup_svc[8], late_start_svc[8], rc[sizeof(magiskrc) + 100];
+	gen_rand_str(startup_svc, sizeof(startup_svc));
+	do {
+		gen_rand_str(late_start_svc, sizeof(late_start_svc));
+	} while (strcmp(startup_svc, late_start_svc) == 0);
+	int size = sprintf(rc, magiskrc, startup_svc, startup_svc, late_start_svc);
+	xwrite(fd, rc, size);
 	close(fd);
 	return 0;
 }
@@ -452,7 +458,7 @@ int main(int argc, char *argv[]) {
 	patch_sepolicy();
 
 	// Dump binaries
-	dump_magiskrc("/init.magisk.rc", 0750);
+	dump_magiskrc(MAGISKRC, 0750);
 	dump_magisk("/sbin/magisk", 0755);
 	patch_socket_name("/sbin/magisk");
 	rename("/init.bak", "/sbin/magiskinit");

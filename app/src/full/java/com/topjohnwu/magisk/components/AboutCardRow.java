@@ -28,19 +28,18 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * @author dvdandroid
  */
 public class AboutCardRow extends LinearLayout {
 
-    private final String title;
-    private final Drawable icon;
-
-    private final TextView mTitle;
-    private final TextView mSummary;
-    private final ImageView mIcon;
-
-    private final View mView;
+    @BindView(android.R.id.title) TextView mTitle;
+    @BindView(android.R.id.summary) TextView mSummary;
+    @BindView(android.R.id.icon) ImageView mIcon;
+    @BindView(R.id.container) View mView;
 
     public AboutCardRow(Context context) {
         this(context, null);
@@ -53,21 +52,17 @@ public class AboutCardRow extends LinearLayout {
     public AboutCardRow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
+        ButterKnife.bind(this, this);
 
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
+        String title;
+        Drawable icon;
         try {
             title = a.getString(R.styleable.AboutCardRow_text);
             icon = a.getDrawable(R.styleable.AboutCardRow_icon);
         } finally {
             a.recycle();
         }
-
-        mView = findViewById(R.id.container);
-
-        mTitle = (TextView) findViewById(android.R.id.title);
-        mSummary = (TextView) findViewById(android.R.id.summary);
-        mIcon = (ImageView) findViewById(android.R.id.icon);
-
         mTitle.setText(title);
         mIcon.setImageDrawable(icon);
     }
@@ -80,10 +75,7 @@ public class AboutCardRow extends LinearLayout {
     }
 
     public void setSummary(String s) {
+        mSummary.setVisibility(VISIBLE);
         mSummary.setText(s);
-    }
-
-    public void removeSummary() {
-        mSummary.setVisibility(GONE);
     }
 }

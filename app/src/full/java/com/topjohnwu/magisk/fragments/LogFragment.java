@@ -1,16 +1,20 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.tabs.TabLayout;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.MainActivity;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -29,7 +33,7 @@ public class LogFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_log, container, false);
         unbinder = ButterKnife.bind(this, v);
 
-        ((MainActivity) getActivity()).toolbar.setElevation(0);
+        ((MainActivity) requireActivity()).toolbar.setElevation(0);
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
@@ -12,8 +11,9 @@ import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.annotation.NonNull;
 
 public class RootUtils extends Shell.Initializer {
 
@@ -27,17 +27,11 @@ public class RootUtils extends Shell.Initializer {
 
     @Override
     public boolean onInit(Context context, @NonNull Shell shell) {
+        Shell.Job job = shell.newJob();
         if (shell.isRoot()) {
-            try (InputStream magiskUtils = context.getResources().openRawResource(R.raw.util_functions);
-                 InputStream managerUtils = context.getResources().openRawResource(R.raw.utils)
-            ) {
-                shell.newJob()
-                        .add(magiskUtils).add(managerUtils)
-                        .add("mount_partitions", "get_flags", "run_migrations")
-                        .exec();
-            } catch (IOException e) {
-                return false;
-            }
+            InputStream magiskUtils = context.getResources().openRawResource(R.raw.util_functions);
+            InputStream managerUtils = context.getResources().openRawResource(R.raw.utils);
+            job.add(magiskUtils).add(managerUtils);
 
             Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
             SuFile file = new SuFile("/sbin/.core/img");
@@ -51,10 +45,15 @@ public class RootUtils extends Shell.Initializer {
             Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
 
             Data.loadMagiskInfo();
-
-            Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
-            Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
+        } else {
+            InputStream nonroot = context.getResources().openRawResource(R.raw.nonroot_utils);
+            job.add(nonroot);
         }
+
+        job.add("mount_partitions", "get_flags", "run_migrations").exec();
+
+        Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
+        Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
         return true;
     }
 }

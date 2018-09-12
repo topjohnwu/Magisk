@@ -1,8 +1,6 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,9 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.SuLogAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

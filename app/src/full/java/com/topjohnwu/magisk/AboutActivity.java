@@ -2,9 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -15,6 +12,9 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -26,7 +26,7 @@ public class AboutActivity extends BaseActivity {
     @BindView(R.id.app_translators) AboutCardRow appTranslators;
     @BindView(R.id.app_source_code) AboutCardRow appSourceCode;
     @BindView(R.id.support_thread) AboutCardRow supportThread;
-    @BindView(R.id.donation) AboutCardRow donation;
+    @BindView(R.id.follow_twitter) AboutCardRow twitter;
 
     @Override
     public int getDarkTheme() {
@@ -51,7 +51,6 @@ public class AboutActivity extends BaseActivity {
         appVersionInfo.setSummary(String.format(Locale.US, "%s (%d) (%s)",
                 BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, getPackageName()));
 
-        appChangelog.removeSummary();
         appChangelog.setOnClickListener(v -> {
             new MarkDownWindow(this, getString(R.string.app_changelog),
                     getResources().openRawResource(R.raw.changelog)).exec();
@@ -64,14 +63,9 @@ public class AboutActivity extends BaseActivity {
             appTranslators.setSummary(translators);
         }
 
-        appSourceCode.removeSummary();
-        appSourceCode.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
-
-        supportThread.removeSummary();
-        supportThread.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
-
-        donation.removeSummary();
-        donation.setOnClickListener(view -> Utils.openLink(this, Uri.parse(Const.Url.DONATION_URL)));
+        appSourceCode.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.SOURCE_CODE_URL)));
+        supportThread.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.XDA_THREAD)));
+        twitter.setOnClickListener(v -> Utils.openLink(this, Uri.parse(Const.Url.TWITTER_URL)));
 
         setFloating();
     }

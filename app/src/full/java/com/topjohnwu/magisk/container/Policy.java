@@ -4,7 +4,8 @@ import android.content.ContentValues;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 
 public class Policy implements Comparable<Policy>{

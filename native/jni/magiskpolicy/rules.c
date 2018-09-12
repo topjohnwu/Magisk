@@ -8,7 +8,6 @@ void allowSuClient(char *target) {
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
 	// Allow access to magisk files
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "sock_file", "read");
@@ -49,6 +48,8 @@ void otherToSU() {
 	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
 	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
 	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
+
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
 	// allowLog
 	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");

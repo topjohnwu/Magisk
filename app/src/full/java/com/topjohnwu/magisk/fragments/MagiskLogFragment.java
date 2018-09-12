@@ -1,9 +1,7 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,6 +14,9 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Download;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
+import androidx.annotation.Nullable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

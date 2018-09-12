@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
@@ -43,6 +42,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 

@@ -68,6 +68,7 @@
     <string name="donation">捐赠</string>
     <string name="app_translators">翻译人员</string>
     <string name="support_thread">支持主题</string>
+    <string name="follow_twitter">关注我的 Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">关闭</string>

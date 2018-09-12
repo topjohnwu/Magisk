@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.webkit.WebView;
 
 import com.topjohnwu.magisk.Data;
@@ -17,6 +16,8 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.appcompat.app.AlertDialog;
 
 public class MarkDownWindow extends ParallelTask<Void, Void, String> {
 

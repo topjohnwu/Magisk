@@ -3,10 +3,9 @@ package com.topjohnwu.magisk.components;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
@@ -16,6 +15,8 @@ import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
 
 class InstallMethodDialog extends AlertDialog.Builder {
 

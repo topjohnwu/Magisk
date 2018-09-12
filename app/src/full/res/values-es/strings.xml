@@ -69,6 +69,7 @@
     <string name="donation">Donar</string>
     <string name="app_translators">Traductores</string>
     <string name="support_thread">Hilo de soporte</string>
+    <string name="follow_twitter">Sigueme en Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Cerrar</string>

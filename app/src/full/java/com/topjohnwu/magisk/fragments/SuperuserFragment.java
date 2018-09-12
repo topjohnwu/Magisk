@@ -1,20 +1,21 @@
-package com.topjohnwu.magisk;
+package com.topjohnwu.magisk.fragments;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Policy;
 
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

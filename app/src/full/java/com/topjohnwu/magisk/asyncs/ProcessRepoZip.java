@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.topjohnwu.magisk.Const;
@@ -34,6 +33,8 @@ import java.net.HttpURLConnection;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
+
+import androidx.annotation.NonNull;
 
 public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 

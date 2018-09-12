@@ -31,7 +31,7 @@ fi
 # Load utility fuctions
 . $COMMONDIR/util_functions.sh
 
-get_outfd
+setup_flashable
 
 ##########################################################################################
 # Detection

@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.components;
 
 import android.Manifest;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.topjohnwu.magisk.Const;
@@ -12,6 +11,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.annotation.NonNull;
 
 public class ManagerInstallDialog extends CustomAlertDialog {
 

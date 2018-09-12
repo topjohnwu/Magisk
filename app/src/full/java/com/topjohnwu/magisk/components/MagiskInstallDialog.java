@@ -29,10 +29,10 @@ public class MagiskInstallDialog extends CustomAlertDialog {
             options.add(mm.getString(R.string.patch_boot_file));
             if (Shell.rootAccess()) {
                 options.add(mm.getString(R.string.direct_install));
-            }
-            String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");
-            if (!s.isEmpty() && Boolean.parseBoolean(s)) {
-                options.add(mm.getString(R.string.install_inactive_slot));
+                String s = ShellUtils.fastCmd("grep_prop ro.build.ab_update");
+                if (!s.isEmpty() && Boolean.parseBoolean(s)) {
+                    options.add(mm.getString(R.string.install_inactive_slot));
+                }
             }
             new InstallMethodDialog(activity, options).show();
         });
