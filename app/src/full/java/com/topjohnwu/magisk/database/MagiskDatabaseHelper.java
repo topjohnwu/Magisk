@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Process;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -28,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 public class MagiskDatabaseHelper {
 

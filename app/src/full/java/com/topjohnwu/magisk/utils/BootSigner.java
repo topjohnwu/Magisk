@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.utils;
 
-import android.support.annotation.Keep;
-
 import com.topjohnwu.utils.SignBoot;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import androidx.annotation.Keep;
 
 public class BootSigner {
 

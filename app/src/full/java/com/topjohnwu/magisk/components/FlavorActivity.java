@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StyleRes;
-import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
 import com.topjohnwu.magisk.Data;
@@ -14,6 +11,10 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class FlavorActivity extends AppCompatActivity implements Topic.AutoSubscriber {
 

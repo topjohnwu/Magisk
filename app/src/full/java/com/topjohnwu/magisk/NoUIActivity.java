@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk;
 
-import android.support.annotation.NonNull;
-
 import com.topjohnwu.magisk.components.BaseActivity;
+
+import androidx.annotation.NonNull;
 
 public class NoUIActivity extends BaseActivity {
     @Override

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.utils;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.support.annotation.StringRes;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
@@ -15,6 +14,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+
+import androidx.annotation.StringRes;
 
 public class LocaleManager {
     public static Locale locale = Locale.getDefault();

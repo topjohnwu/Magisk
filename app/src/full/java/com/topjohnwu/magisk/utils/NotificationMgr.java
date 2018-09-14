@@ -4,8 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
@@ -14,6 +12,9 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.receivers.RebootReceiver;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
 
 public class NotificationMgr {
 

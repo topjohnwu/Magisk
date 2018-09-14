@@ -2,13 +2,14 @@ package com.topjohnwu.magisk.components;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.annotation.StringRes;
 
 public class SnackbarMaker {
 
@@ -34,7 +35,7 @@ public class SnackbarMaker {
     }
 
     private static void setup(Snackbar snack) {
-        TextView text = snack.getView().findViewById(android.support.design.R.id.snackbar_text);
+        TextView text = snack.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         text.setMaxLines(Integer.MAX_VALUE);
     }
 

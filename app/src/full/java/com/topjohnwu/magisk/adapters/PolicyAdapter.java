@@ -2,8 +2,6 @@ package com.topjohnwu.magisk.adapters;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
@@ -22,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

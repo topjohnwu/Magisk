@@ -86,9 +86,8 @@ public class SignAPK {
                             JarMap input, OutputStream output) throws Exception {
         KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(jks, keyStorePass.toCharArray());
-        KeyStore.ProtectionParameter prot = new KeyStore.PasswordProtection(keyPass.toCharArray());
         X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
-        PrivateKey key = ((KeyStore.PrivateKeyEntry) ks.getEntry(alias, prot)).getPrivateKey();
+        PrivateKey key = (PrivateKey) ks.getKey(alias, keyPass.toCharArray());
         sign(cert, key, input, output);
     }
 
