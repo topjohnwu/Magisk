@@ -124,7 +124,7 @@ void log_daemon() {
 	setsid();
 	struct sockaddr_un sun;
 	sockfd = setup_socket(&sun, LOG_DAEMON);
-	if (xbind(sockfd, (struct sockaddr*) &sun, sizeof(sun)))
+	if (xbind(sockfd, (struct sockaddr*) &sun, sizeof(sun.sun_family) + strlen(sun.sun_path + 1) + 1))
 		exit(1);
 	xlisten(sockfd, 10);
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");

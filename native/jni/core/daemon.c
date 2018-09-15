@@ -113,7 +113,7 @@ void main_daemon() {
 	struct sockaddr_un sun;
 	fd = setup_socket(&sun, MAIN_DAEMON);
 
-	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun)))
+	if (xbind(fd, (struct sockaddr*) &sun, sizeof(sun.sun_family) + strlen(sun.sun_path + 1) + 1))
 		exit(1);
 	xlisten(fd, 10);
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") daemon started\n");
@@ -149,7 +149,8 @@ void main_daemon() {
 int connect_daemon2(daemon_t d, int *sockfd) {
 	struct sockaddr_un sun;
 	*sockfd = setup_socket(&sun, d);
-	if (connect(*sockfd, (struct sockaddr*) &sun, sizeof(sun))) {
+	socklen_t len = sizeof(sun.sun_family) + strlen(sun.sun_path + 1) + 1;
+	if (connect(*sockfd, (struct sockaddr*) &sun, len)) {
 		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
 			fprintf(stderr, "No daemon is currently running!\n");
 			exit(1);
@@ -168,7 +169,7 @@ int connect_daemon2(daemon_t d, int *sockfd) {
 			}
 		}
 
-		while (connect(*sockfd, (struct sockaddr*) &sun, sizeof(sun)))
+		while (connect(*sockfd, (struct sockaddr*) &sun, len))
 			usleep(10000);
 		return 1;
 	}
