@@ -15,7 +15,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <provider
             android:name="androidx.core.content.FileProvider"

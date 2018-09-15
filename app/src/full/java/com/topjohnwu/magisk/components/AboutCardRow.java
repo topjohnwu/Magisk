@@ -27,19 +27,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.topjohnwu.magisk.ViewBinder;
 
 /**
  * @author dvdandroid
  */
 public class AboutCardRow extends LinearLayout {
 
-    @BindView(android.R.id.title) TextView mTitle;
-    @BindView(android.R.id.summary) TextView mSummary;
-    @BindView(android.R.id.icon) ImageView mIcon;
-    @BindView(R.id.container) View mView;
+    public TextView mTitle;
+    public TextView mSummary;
+    public ImageView mIcon;
+    public View mView;
 
     public AboutCardRow(Context context) {
         this(context, null);
@@ -52,7 +50,7 @@ public class AboutCardRow extends LinearLayout {
     public AboutCardRow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
-        ButterKnife.bind(this, this);
+        ViewBinder.bind(this, this);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
         String title;
@@ -69,8 +67,6 @@ public class AboutCardRow extends LinearLayout {
 
     @Override
     public void setOnClickListener(OnClickListener l) {
-        super.setOnClickListener(l);
-
         mView.setOnClickListener(l);
     }
 

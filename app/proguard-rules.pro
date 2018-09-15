@@ -16,19 +16,20 @@
 #   public *;
 #}
 
-# Don't obfuscate, we are open source anyway :)
--dontobfuscate
-
 # BouncyCastle
 -keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
 -keep class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
 -keep class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
-# Gson
--keepattributes Signature
+# Snet extention
+-keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
 
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
   public *** debug(...);
 }
+
+# Excessive obfuscation
+-repackageclasses 'a'
+-allowaccessmodification

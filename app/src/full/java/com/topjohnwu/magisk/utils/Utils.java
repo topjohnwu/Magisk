@@ -18,11 +18,12 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
-import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.Locale;
 import java.util.Map;
+
+import a.n;
 
 public class Utils {
 
@@ -77,7 +78,7 @@ public class Utils {
         if (mm.prefs.getBoolean(Const.Key.CHECK_UPDATES, true)) {
             if (scheduler.getAllPendingJobs().isEmpty() ||
                     Const.UPDATE_SERVICE_VER > mm.prefs.getInt(Const.Key.UPDATE_SERVICE_VER, -1)) {
-                ComponentName service = new ComponentName(mm, UpdateCheckService.class);
+                ComponentName service = new ComponentName(mm, n.class);
                 JobInfo info = new JobInfo.Builder(Const.ID.UPDATE_SERVICE_ID, service)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                         .setPersisted(true)

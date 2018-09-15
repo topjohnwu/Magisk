@@ -9,9 +9,9 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
 import com.topjohnwu.magisk.utils.Utils;
 
+import a.j;
 import androidx.annotation.NonNull;
 
 public class ManagerInstallDialog extends CustomAlertDialog {
@@ -26,7 +26,7 @@ public class ManagerInstallDialog extends CustomAlertDialog {
         setCancelable(true);
         setPositiveButton(R.string.install, (d, i) -> activity.runWithPermission(
                 new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
-                    Intent intent = new Intent(mm, ManagerUpdate.class);
+                    Intent intent = new Intent(mm, j.class);
                     intent.putExtra(Const.Key.INTENT_SET_LINK, Data.managerLink);
                     intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
                     mm.sendBroadcast(intent);

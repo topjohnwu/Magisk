@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.asyncs.ParallelTask;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.container.Policy;
@@ -30,20 +31,17 @@ import com.topjohnwu.magisk.utils.FingerprintHelper;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class RequestActivity extends BaseActivity {
 
-    @BindView(R.id.su_popup) LinearLayout suPopup;
-    @BindView(R.id.timeout) Spinner timeout;
-    @BindView(R.id.app_icon) ImageView appIcon;
-    @BindView(R.id.app_name) TextView appNameView;
-    @BindView(R.id.package_name) TextView packageNameView;
-    @BindView(R.id.grant_btn) Button grant_btn;
-    @BindView(R.id.deny_btn) Button deny_btn;
-    @BindView(R.id.fingerprint) ImageView fingerprintImg;
-    @BindView(R.id.warning) TextView warning;
+    public LinearLayout suPopup;
+    public Spinner timeout;
+    public ImageView appIcon;
+    public TextView appNameView;
+    public TextView packageNameView;
+    public Button grant_btn;
+    public Button deny_btn;
+    public ImageView fingerprintImg;
+    public TextView warning;
 
     private String socketPath;
     private LocalSocket socket;
@@ -117,7 +115,7 @@ public class RequestActivity extends BaseActivity {
         }
 
         setContentView(R.layout.activity_request);
-        ButterKnife.bind(this);
+        ViewBinder.bind(this);
 
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);

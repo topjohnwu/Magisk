@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.adapters.PolicyAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.container.Policy;
@@ -16,22 +17,19 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SuperuserFragment extends BaseFragment {
 
-    private Unbinder unbinder;
+    public RecyclerView recyclerView;
+    public TextView emptyRv;
+
     private PackageManager pm;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyRv;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_superuser, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ViewBinder.bind(this, view);
 
         pm = getActivity().getPackageManager();
         return view;
@@ -52,7 +50,7 @@ public class SuperuserFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        ViewBinder.unbind(this);
     }
 
     private void displayPolicyList() {

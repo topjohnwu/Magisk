@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.utils;
 
-import androidx.annotation.Keep;
-
 public interface ISafetyNetHelper {
 
     int RESPONSE_ERR = 0x01;
@@ -10,14 +8,11 @@ public interface ISafetyNetHelper {
     int BASIC_PASS = 0x10;
     int CTS_PASS = 0x20;
 
-    @Keep
     void attest();
 
-    @Keep
     int getVersion();
 
     interface Callback {
-        @Keep
         void onResponse(int responseCode);
     }
 }

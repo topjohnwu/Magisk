@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Download;
 
@@ -35,7 +34,7 @@ public abstract class BaseActivity extends FlavorActivity {
             permissionGrantCallback = callback;
             if (!(context instanceof BaseActivity)) {
                 // Start activity to show dialog
-                Intent intent = new Intent(context, NoUIActivity.class);
+                Intent intent = new Intent(context, a.g.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(INTENT_PERM, permissions);
                 context.startActivity(intent);

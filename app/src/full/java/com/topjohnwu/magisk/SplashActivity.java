@@ -10,11 +10,12 @@ import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
-import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
+
+import a.l;
 
 public class SplashActivity extends BaseActivity {
 
@@ -44,7 +45,7 @@ public class SplashActivity extends BaseActivity {
         }
 
         // Setup shortcuts
-        sendBroadcast(new Intent(this, ShortcutReceiver.class));
+        sendBroadcast(new Intent(this, l.class));
 
         if (Download.checkNetworkStatus(this)) {
             // Fire update check
@@ -58,7 +59,7 @@ public class SplashActivity extends BaseActivity {
 
         mm.hasInit = true;
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, a.b.class);
         intent.putExtra(Const.Key.OPEN_SECTION, getIntent().getStringExtra(Const.Key.OPEN_SECTION));
         intent.putExtra(BaseActivity.INTENT_PERM, getIntent().getStringExtra(BaseActivity.INTENT_PERM));
         startActivity(intent);

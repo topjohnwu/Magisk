@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.adapters.ApplicationAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.utils.Topic;
@@ -17,15 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {
 
-    private Unbinder unbinder;
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    public SwipeRefreshLayout mSwipeRefreshLayout;
+    public RecyclerView recyclerView;
     SearchView search;
 
     private ApplicationAdapter appAdapter;
@@ -42,7 +39,7 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_magisk_hide, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ViewBinder.bind(this, view);
 
         appAdapter = new ApplicationAdapter(requireActivity());
         recyclerView.setAdapter(appAdapter);
@@ -79,7 +76,7 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        ViewBinder.unbind(this);
     }
 
     @Override

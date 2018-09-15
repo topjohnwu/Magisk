@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -22,8 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder> {
 
@@ -120,24 +119,24 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         return policyList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
-        @BindView(R.id.app_name) TextView appName;
-        @BindView(R.id.package_name) TextView packageName;
-        @BindView(R.id.app_icon) ImageView appIcon;
-        @BindView(R.id.master_switch) Switch masterSwitch;
-        @BindView(R.id.notification_switch) Switch notificationSwitch;
-        @BindView(R.id.logging_switch) Switch loggingSwitch;
-        @BindView(R.id.expand_layout) ViewGroup expandLayout;
+        public TextView appName;
+        public TextView packageName;
+        public ImageView appIcon;
+        public Switch masterSwitch;
+        public Switch notificationSwitch;
+        public Switch loggingSwitch;
+        public ViewGroup expandLayout;
 
-        @BindView(R.id.delete) ImageView delete;
-        @BindView(R.id.more_info) ImageView moreInfo;
+        public ImageView delete;
+        public ImageView moreInfo;
 
         private Container container = new Container();
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            ViewBinder.bind(this, itemView);
             container.expandLayout = expandLayout;
             setupExpandable();
         }

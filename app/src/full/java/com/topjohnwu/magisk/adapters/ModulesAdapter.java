@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.superuser.Shell;
@@ -18,8 +19,6 @@ import com.topjohnwu.superuser.Shell;
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
@@ -102,19 +101,19 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         return mList.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title) TextView title;
-        @BindView(R.id.version_name) TextView versionName;
-        @BindView(R.id.description) TextView description;
-        @BindView(R.id.notice) TextView notice;
-        @BindView(R.id.checkbox) CheckBox checkBox;
-        @BindView(R.id.author) TextView author;
-        @BindView(R.id.delete) ImageView delete;
+        public TextView title;
+        public TextView versionName;
+        public TextView description;
+        public TextView notice;
+        public CheckBox checkBox;
+        public TextView author;
+        public ImageView delete;
 
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            ViewBinder.bind(this, itemView);
 
             if (!Shell.rootAccess()) {
                 checkBox.setEnabled(false);

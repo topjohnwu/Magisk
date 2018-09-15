@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.utils.Download;
@@ -28,24 +29,19 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import androidx.annotation.Nullable;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class MagiskLogFragment extends BaseFragment {
 
-    private Unbinder unbinder;
-
-    @BindView(R.id.txtLog) TextView txtLog;
-    @BindView(R.id.svLog) ScrollView svLog;
-    @BindView(R.id.hsvLog) HorizontalScrollView hsvLog;
-    @BindView(R.id.progressBar) ProgressBar progressBar;
+    public TextView txtLog;
+    public ScrollView svLog;
+    public HorizontalScrollView hsvLog;
+    public ProgressBar progressBar;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_magisk_log, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        ViewBinder.bind(this, view);
         setHasOptionsMenu(true);
         txtLog.setTextIsSelectable(true);
         return view;
@@ -66,7 +62,7 @@ public class MagiskLogFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        ViewBinder.unbind(this);
     }
 
     @Override

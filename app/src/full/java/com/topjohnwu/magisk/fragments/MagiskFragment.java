@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.asyncs.CheckSafetyNet;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -41,55 +42,48 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import butterknife.BindColor;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class MagiskFragment extends BaseFragment
         implements SwipeRefreshLayout.OnRefreshListener, ExpandableView, Topic.Subscriber {
 
     private Container expandableContainer = new Container();
-    private Unbinder unbinder;
     private static boolean shownDialog = false;
 
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    public SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
+    public CardView coreOnlyNotice;
 
-    @BindView(R.id.magisk_update) RelativeLayout magiskUpdate;
-    @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
-    @BindView(R.id.magisk_update_status) TextView magiskUpdateText;
-    @BindView(R.id.magisk_update_progress) ProgressBar magiskUpdateProgress;
-    @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
-    @BindView(R.id.magisk_version) TextView magiskVersionText;
+    public RelativeLayout magiskUpdate;
+    public ImageView magiskUpdateIcon;
+    public TextView magiskUpdateText;
+    public ProgressBar magiskUpdateProgress;
+    public ImageView magiskStatusIcon;
+    public TextView magiskVersionText;
 
-    @BindView(R.id.safetyNet_card) CardView safetyNetCard;
-    @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
-    @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
-    @BindView(R.id.safetyNet_check_progress) ProgressBar safetyNetProgress;
-    @BindView(R.id.expand_layout) LinearLayout expandLayout;
-    @BindView(R.id.cts_status_icon) ImageView ctsStatusIcon;
-    @BindView(R.id.cts_status) TextView ctsStatusText;
-    @BindView(R.id.basic_status_icon) ImageView basicStatusIcon;
-    @BindView(R.id.basic_status) TextView basicStatusText;
+    public CardView safetyNetCard;
+    public ImageView safetyNetRefreshIcon;
+    public TextView safetyNetStatusText;
+    public ProgressBar safetyNetProgress;
+    public LinearLayout expandLayout;
+    public ImageView ctsStatusIcon;
+    public TextView ctsStatusText;
+    public ImageView basicStatusIcon;
+    public TextView basicStatusText;
 
-    @BindView(R.id.install_option_card) CardView installOptionCard;
-    @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
-    @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
-    @BindView(R.id.install_button) CardView installButton;
-    @BindView(R.id.install_text) TextView installText;
-    @BindView(R.id.uninstall_button) CardView uninstallButton;
+    public CardView installOptionCard;
+    public CheckBox keepEncChkbox;
+    public CheckBox keepVerityChkbox;
+    public CardView installButton;
+    public TextView installText;
+    public CardView uninstallButton;
 
-    @BindColor(R.color.red500) int colorBad;
-    @BindColor(R.color.green500) int colorOK;
-    @BindColor(R.color.yellow500) int colorWarn;
-    @BindColor(R.color.grey500) int colorNeutral;
-    @BindColor(R.color.blue500) int colorInfo;
+    public int colorBad;
+    public int colorOK;
+    public int colorWarn;
+    public int colorNeutral;
+    public int colorInfo;
 
-    @OnClick(R.id.safetyNet_title)
-    void safetyNet() {
+    public void safetyNet() {
         Runnable task = () -> {
             safetyNetProgress.setVisibility(View.VISIBLE);
             safetyNetRefreshIcon.setVisibility(View.GONE);
@@ -112,8 +106,7 @@ public class MagiskFragment extends BaseFragment
 
     }
 
-    @OnClick(R.id.install_button)
-    void install() {
+    public void install() {
         shownDialog = true;
 
         // Show Manager update first
@@ -126,8 +119,7 @@ public class MagiskFragment extends BaseFragment
         new MagiskInstallDialog((BaseActivity) getActivity()).show();
     }
 
-    @OnClick(R.id.uninstall_button)
-    void uninstall() {
+    public void uninstall() {
         new UninstallDialog(requireActivity()).show();
     }
 
@@ -136,7 +128,7 @@ public class MagiskFragment extends BaseFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_magisk, container, false);
-        unbinder = ButterKnife.bind(this, v);
+        ViewBinder.bind(this, v);
         requireActivity().setTitle(R.string.magisk);
 
         expandableContainer.expandLayout = expandLayout;
@@ -151,6 +143,12 @@ public class MagiskFragment extends BaseFragment
         updateUI();
 
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ViewBinder.unbind(this);
     }
 
     @Override
@@ -194,12 +192,6 @@ public class MagiskFragment extends BaseFragment
                 updateCheckUI();
                 break;
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override

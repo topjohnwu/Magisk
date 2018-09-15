@@ -11,27 +11,23 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
 import com.topjohnwu.magisk.components.BaseFragment;
 
 import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class LogFragment extends BaseFragment {
 
-    private Unbinder unbinder;
-
-    @BindView(R.id.container) ViewPager viewPager;
-    @BindView(R.id.tab) TabLayout tab;
+    public ViewPager viewPager;
+    public TabLayout tab;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_log, container, false);
-        unbinder = ButterKnife.bind(this, v);
+        ViewBinder.bind(this, v);
 
         ((MainActivity) requireActivity()).toolbar.setElevation(0);
 
@@ -52,7 +48,6 @@ public class LogFragment extends BaseFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        ViewBinder.unbind(this);
     }
-
 }

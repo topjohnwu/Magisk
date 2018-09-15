@@ -26,8 +26,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
@@ -36,9 +34,9 @@ public class MainActivity extends BaseActivity
     private int mDrawerItem;
     private static boolean fromShortcut = false;
 
-    @BindView(R.id.drawer_layout) DrawerLayout drawer;
-    @BindView(R.id.toolbar) public Toolbar toolbar;
-    @BindView(R.id.nav_view) public NavigationView navigationView;
+    public Toolbar toolbar;
+    DrawerLayout drawer;
+    NavigationView navigationView;
 
     private float toolbarElevation;
 
@@ -50,13 +48,13 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         if (!mm.hasInit) {
-            startActivity(new Intent(this, SplashActivity.class));
+            startActivity(new Intent(this, a.c.class));
             finish();
         }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        ViewBinder.bind(this);
 
         setSupportActionBar(toolbar);
 
@@ -196,11 +194,11 @@ public class MainActivity extends BaseActivity
                 displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                startActivity(new Intent(this, a.d.class));
                 mDrawerItem = bak;
                 break;
             case R.id.donation:
-                startActivity(new Intent(this, DonationActivity.class));
+                startActivity(new Intent(this, a.e.class));
                 mDrawerItem = bak;
                 break;
         }

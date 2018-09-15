@@ -9,10 +9,9 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
-import com.topjohnwu.magisk.receivers.RebootReceiver;
 
+import a.j;
+import a.k;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 
@@ -21,10 +20,10 @@ public class NotificationMgr {
     public static void magiskUpdate() {
         MagiskManager mm = Data.MM();
 
-        Intent intent = new Intent(mm, SplashActivity.class);
+        Intent intent = new Intent(mm, a.c.class);
         intent.putExtra(Const.Key.OPEN_SECTION, "magisk");
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mm);
-        stackBuilder.addParentStack(SplashActivity.class);
+        stackBuilder.addParentStack(a.c.class);
         stackBuilder.addNextIntent(intent);
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(Const.ID.MAGISK_UPDATE_NOTIFICATION_ID,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -47,7 +46,7 @@ public class NotificationMgr {
         String filename = Utils.fmt("MagiskManager-v%s(%d).apk",
                 Data.remoteManagerVersionString, Data.remoteManagerVersionCode);
 
-        Intent intent = new Intent(mm, ManagerUpdate.class);
+        Intent intent = new Intent(mm, j.class);
         intent.putExtra(Const.Key.INTENT_SET_LINK, Data.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_FILENAME, filename);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
@@ -69,7 +68,7 @@ public class NotificationMgr {
     public static void dtboPatched() {
         MagiskManager mm = Data.MM();
 
-        Intent intent = new Intent(mm, RebootReceiver.class);
+        Intent intent = new Intent(mm, k.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

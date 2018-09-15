@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.superuser.Shell;
@@ -28,8 +29,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
@@ -123,16 +122,16 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.app_icon) ImageView appIcon;
-        @BindView(R.id.app_name) TextView appName;
-        @BindView(R.id.package_name) TextView appPackage;
-        @BindView(R.id.checkbox) CheckBox checkBox;
+        public ImageView appIcon;
+        public TextView appName;
+        public TextView appPackage;
+        public CheckBox checkBox;
 
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            ViewBinder.bind(this, itemView);
         }
     }
 

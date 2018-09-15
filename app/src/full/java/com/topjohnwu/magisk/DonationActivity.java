@@ -10,14 +10,12 @@ import com.topjohnwu.magisk.utils.Utils;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class DonationActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.paypal) AboutCardRow paypal;
-    @BindView(R.id.patreon) AboutCardRow patreon;
+    Toolbar toolbar;
+    AboutCardRow paypal;
+    AboutCardRow patreon;
 
     @Override
     public int getDarkTheme() {
@@ -28,7 +26,7 @@ public class DonationActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donation);
-        ButterKnife.bind(this);
+        ViewBinder.bind(this);
 
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(view -> finish());

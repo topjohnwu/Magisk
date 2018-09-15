@@ -9,14 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.ViewBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AlertDialog;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CustomAlertDialog extends AlertDialog.Builder {
 
@@ -28,16 +27,16 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     private ViewHolder vh;
 
     public class ViewHolder {
-        @BindView(R.id.dialog_layout) public LinearLayout dialogLayout;
-        @BindView(R.id.button_panel) public LinearLayout buttons;
+        public LinearLayout dialogLayout;
+        public LinearLayout buttons;
 
-        @BindView(R.id.message) public TextView messageView;
-        @BindView(R.id.negative) public Button negative;
-        @BindView(R.id.positive) public Button positive;
-        @BindView(R.id.neutral) public Button neutral;
+        public TextView messageView;
+        public Button negative;
+        public Button positive;
+        public Button neutral;
 
         ViewHolder(View v) {
-            ButterKnife.bind(this, v);
+            ViewBinder.bind(this, v);
             messageView.setVisibility(View.GONE);
             negative.setVisibility(View.GONE);
             positive.setVisibility(View.GONE);
