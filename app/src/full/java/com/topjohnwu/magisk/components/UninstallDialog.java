@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
@@ -45,7 +44,7 @@ public class UninstallDialog extends CustomAlertDialog {
                     Download.receive(activity, new DownloadReceiver() {
                         @Override
                         public void onDownloadDone(Context context, Uri uri) {
-                            Intent intent = new Intent(context, FlashActivity.class)
+                            Intent intent = new Intent(context, a.f.class)
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     .setData(uri)
                                     .putExtra(Const.Key.FLASH_ACTION, Const.Value.UNINSTALL);

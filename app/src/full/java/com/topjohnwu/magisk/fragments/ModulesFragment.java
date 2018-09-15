@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.adapters.ModulesAdapter;
@@ -91,7 +90,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Const.ID.FETCH_ZIP && resultCode == Activity.RESULT_OK && data != null) {
             // Get the URI of the selected file
-            Intent intent = new Intent(getActivity(), FlashActivity.class);
+            Intent intent = new Intent(getActivity(), a.f.class);
             intent.setData(data.getData()).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
             startActivity(intent);
         }
