@@ -48,7 +48,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         if (!mm.hasInit) {
-            startActivity(new Intent(this, a.c.class));
+            startActivity(new Intent(this, Data.classMap.get(SplashActivity.class)));
             finish();
         }
 
@@ -194,11 +194,11 @@ public class MainActivity extends BaseActivity
                 displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
-                startActivity(new Intent(this, a.d.class));
+                startActivity(new Intent(this, Data.classMap.get(AboutActivity.class)));
                 mDrawerItem = bak;
                 break;
             case R.id.donation:
-                startActivity(new Intent(this, a.e.class));
+                startActivity(new Intent(this, Data.classMap.get(DonationActivity.class)));
                 mDrawerItem = bak;
                 break;
         }

@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.SplashActivity;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                 Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "superuser")
                     .setShortLabel(mm.getString(R.string.superuser))
-                    .setIntent(new Intent(mm, a.c.class)
+                    .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "superuser")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -48,7 +49,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                 && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "magiskhide")
                     .setShortLabel(mm.getString(R.string.magiskhide))
-                    .setIntent(new Intent(mm, a.c.class)
+                    .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "magiskhide")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -59,7 +60,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
         if (!mm.prefs.getBoolean(Const.Key.COREONLY, false) && root && Data.magiskVersionCode >= 0) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "modules")
                     .setShortLabel(mm.getString(R.string.modules))
-                    .setIntent(new Intent(mm, a.c.class)
+                    .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "modules")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
@@ -68,7 +69,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .build());
             shortCuts.add(new ShortcutInfo.Builder(mm, "downloads")
                     .setShortLabel(mm.getString(R.string.download))
-                    .setIntent(new Intent(mm, a.c.class)
+                    .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))

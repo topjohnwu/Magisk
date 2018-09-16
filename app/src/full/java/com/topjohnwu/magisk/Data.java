@@ -5,6 +5,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Xml;
 
+import com.topjohnwu.magisk.components.AboutCardRow;
+import com.topjohnwu.magisk.receivers.BootReceiver;
+import com.topjohnwu.magisk.receivers.ManagerUpdate;
+import com.topjohnwu.magisk.receivers.PackageReceiver;
+import com.topjohnwu.magisk.receivers.RebootReceiver;
+import com.topjohnwu.magisk.receivers.ShortcutReceiver;
+import com.topjohnwu.magisk.services.OnBootService;
+import com.topjohnwu.magisk.services.UpdateCheckService;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -18,11 +26,14 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Data {
     // Global app instance
     public static WeakReference<MagiskManager> weakApp;
     public static Handler mainHandler = new Handler(Looper.getMainLooper());
+    public static Map<Class, Class> classMap = new HashMap<>();
 
     // Current status
     public static String magiskVersionString;
@@ -59,6 +70,25 @@ public class Data {
     public static int suNamespaceMode;
     public static int updateChannel;
     public static int repoOrder;
+
+    static {
+        classMap.put(MagiskManager.class, a.a.class);
+        classMap.put(MainActivity.class, a.b.class);
+        classMap.put(SplashActivity.class, a.c.class);
+        classMap.put(AboutActivity.class, a.d.class);
+        classMap.put(DonationActivity.class, a.e.class);
+        classMap.put(FlashActivity.class, a.f.class);
+        classMap.put(NoUIActivity.class, a.g.class);
+        classMap.put(BootReceiver.class, a.h.class);
+        classMap.put(PackageReceiver.class, a.i.class);
+        classMap.put(ManagerUpdate.class, a.j.class);
+        classMap.put(RebootReceiver.class, a.k.class);
+        classMap.put(ShortcutReceiver.class, a.l.class);
+        classMap.put(OnBootService.class, a.m.class);
+        classMap.put(UpdateCheckService.class, a.n.class);
+        classMap.put(AboutCardRow.class, a.o.class);
+
+    }
 
     public static void loadMagiskInfo() {
         try {

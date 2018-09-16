@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -140,7 +141,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         if (result) {
             Uri uri = Uri.fromFile(mFile);
             if (mInstall) {
-                Intent intent = new Intent(activity, a.f.class);
+                Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class));
                 intent.setData(uri).putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_ZIP);
                 activity.startActivity(intent);
             } else {

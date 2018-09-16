@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.NotificationMgr;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -14,7 +15,7 @@ import androidx.core.app.JobIntentService;
 public class OnBootService extends JobIntentService {
 
     public static void enqueueWork(Context context) {
-        enqueueWork(context, OnBootService.class, Const.ID.ONBOOT_SERVICE_ID, new Intent());
+        enqueueWork(context, Data.classMap.get(OnBootService.class), Const.ID.ONBOOT_SERVICE_ID, new Intent());
     }
 
     @Override

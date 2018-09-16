@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
@@ -37,7 +38,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                             (requestCode, resultCode, data) -> {
                                 if (requestCode == Const.ID.SELECT_BOOT &&
                                         resultCode == BaseActivity.RESULT_OK && data != null) {
-                                    Intent i = new Intent(activity, a.f.class)
+                                    Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
                                             .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
                                             .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
                                     activity.startActivity(i);
@@ -55,7 +56,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     }, Data.magiskLink, filename);
                     break;
                 case 2:
-                    intent = new Intent(activity, a.f.class)
+                    intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
                             .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_MAGISK);
                     activity.startActivity(intent);
                     break;
@@ -65,7 +66,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                             .setMessage(R.string.install_inactive_slot_msg)
                             .setCancelable(true)
                             .setPositiveButton(R.string.yes, (d, i) -> {
-                                Intent it = new Intent(activity, a.f.class)
+                                Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
                                         .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
                                 activity.startActivity(it);
                             })
