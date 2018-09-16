@@ -41,7 +41,6 @@ public class Const {
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
-            "android",
             Data.MM().getPackageName(),
             "com.google.android.gms"
     );
