@@ -51,8 +51,9 @@ public class ViewBinder {
         target.flashLogs = target.findViewById(R.id.txtLog);
         target.buttonPanel = target.findViewById(R.id.button_panel);
         target.sv = target.findViewById(R.id.scrollView);
+        target.reboot = target.findViewById(R.id.reboot);
+        target.reboot.setOnClickListener(v -> target.reboot());
         target.findViewById(R.id.no_thanks).setOnClickListener(v -> target.finish());
-        target.findViewById(R.id.reboot).setOnClickListener(v -> target.reboot());
         target.findViewById(R.id.save_logs).setOnClickListener(v -> target.saveLogs());
     }
     
