@@ -52,10 +52,9 @@ LOCAL_SRC_FILES := \
 	resetprop/system_property_api.cpp \
 	resetprop/system_property_set.cpp \
 	su/su.c \
-	su/activity.c \
+	su/connect.c \
 	su/pts.c \
 	su/su_daemon.c \
-	su/su_socket.c \
 	utils/img.c \
 	$(COMMON_UTILS)
 

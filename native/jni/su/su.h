@@ -12,11 +12,6 @@
 #include "list.h"
 
 #define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
-
-// This is used if wrapping the fragment classes and activities
-// with classes in another package.
-#define REQUESTOR_PREFIX JAVA_PACKAGE_NAME ".superuser"
-
 #define DEFAULT_SHELL "/system/bin/sh"
 
 struct su_info {
@@ -49,7 +44,6 @@ struct su_context {
 	struct su_request to;
 	pid_t pid;
 	char cwd[PATH_MAX];
-	char sock_path[PATH_MAX];
 	int pipefd[2];
 };
 
@@ -61,16 +55,11 @@ int su_daemon_main(int argc, char **argv);
 __attribute__ ((noreturn)) void exit2(int status);
 void set_identity(unsigned uid);
 
-// su_client.c
+// connect.c
 
-int socket_create_temp(char *path, size_t len);
-int socket_accept(int serv_fd);
-void socket_send_request(int fd, const struct su_context *ctx);
-void socket_receive_result(int fd, char *result, ssize_t result_len);
+void app_log();
 
-// activity.c
-
-void app_send_result(struct su_context *ctx, policy_t policy);
-void app_send_request(struct su_context *ctx);
+void app_connect(const char *socket);
+void socket_send_request(int fd);
 
 #endif

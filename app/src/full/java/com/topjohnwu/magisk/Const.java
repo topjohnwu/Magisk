@@ -141,9 +141,6 @@ public class Const {
         public static final int NAMESPACE_MODE_ISOLATE = 2;
         public static final int NO_NOTIFICATION = 0;
         public static final int NOTIFICATION_TOAST = 1;
-        public static final int NOTIFY_NORMAL_LOG = 0;
-        public static final int NOTIFY_USER_TOASTS = 1;
-        public static final int NOTIFY_USER_TO_OWNER = 2;
         public static final int SU_PROMPT = 0;
         public static final int SU_AUTO_DENY = 1;
         public static final int SU_AUTO_ALLOW = 2;

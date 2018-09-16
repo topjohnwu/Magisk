@@ -123,8 +123,9 @@ int check_and_start_logger() {
 void log_daemon() {
 	setsid();
 	struct sockaddr_un sun;
-	sockfd = setup_socket(&sun, LOG_DAEMON);
-	if (xbind(sockfd, (struct sockaddr*) &sun, sizeof(sun.sun_family) + strlen(sun.sun_path + 1) + 1))
+	socklen_t len = setup_sockaddr(&sun, LOG_DAEMON);
+	sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (xbind(sockfd, (struct sockaddr*) &sun, len))
 		exit(1);
 	xlisten(sockfd, 10);
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");

@@ -25,6 +25,7 @@
 #include <selinux/selinux.h>
 
 #include "magisk.h"
+#include "daemon.h"
 #include "utils.h"
 #include "su.h"
 
@@ -44,11 +45,9 @@ static void usage(int status) {
 	"  --preserve-environment        preserve the entire environment\n"
 	"  -s, --shell SHELL             use SHELL instead of the default " DEFAULT_SHELL "\n"
 	"  -v, --version                 display version number and exit\n"
-	"  -V                            display version code and exit,\n"
-	"                                this is used almost exclusively by Superuser.apk\n"
+	"  -V                            display version code and exit\n"
 	"  -mm, -M,\n"
-	"  --mount-master                run in the global mount namespace,\n"
-	"                                use if you need to publicly apply mounts\n");
+	"  --mount-master                force run in the global mount namespace\n");
 	exit2(status);
 }
 
@@ -64,20 +63,20 @@ static char *concat_commands(int argc, char *argv[]) {
 	return strdup(command);
 }
 
-static void populate_environment(const struct su_context *ctx) {
+static void populate_environment() {
 	struct passwd *pw;
 
-	if (ctx->to.keepenv)
+	if (su_ctx->to.keepenv)
 		return;
 
-	pw = getpwuid(ctx->to.uid);
+	pw = getpwuid(su_ctx->to.uid);
 	if (pw) {
 		setenv("HOME", pw->pw_dir, 1);
-		if (ctx->to.shell)
-			setenv("SHELL", ctx->to.shell, 1);
+		if (su_ctx->to.shell)
+			setenv("SHELL", su_ctx->to.shell, 1);
 		else
 			setenv("SHELL", DEFAULT_SHELL, 1);
-		if (ctx->to.login || ctx->to.uid) {
+		if (su_ctx->to.login || su_ctx->to.uid) {
 			setenv("USER", pw->pw_name, 1);
 			setenv("LOGNAME", pw->pw_name, 1);
 		}
@@ -103,9 +102,6 @@ void set_identity(unsigned uid) {
 static __attribute__ ((noreturn)) void allow() {
 	char* argv[] = { NULL, NULL, NULL, NULL };
 
-	if (su_ctx->info->access.notify || su_ctx->info->access.log)
-		app_send_result(su_ctx, ALLOW);
-
 	if (su_ctx->to.login)
 		argv[0] = "-";
 	else
@@ -118,8 +114,11 @@ static __attribute__ ((noreturn)) void allow() {
 
 	// Setup shell
 	umask(022);
-	populate_environment(su_ctx);
+	populate_environment();
 	set_identity(su_ctx->to.uid);
+
+	if (su_ctx->info->access.notify || su_ctx->info->access.log)
+		app_log();
 
 	execvp(su_ctx->to.shell, argv);
 	fprintf(stderr, "Cannot execute %s: %s\n", su_ctx->to.shell, strerror(errno));
@@ -129,23 +128,11 @@ static __attribute__ ((noreturn)) void allow() {
 
 static __attribute__ ((noreturn)) void deny() {
 	if (su_ctx->info->access.notify || su_ctx->info->access.log)
-		app_send_result(su_ctx, DENY);
+		app_log();
 
 	LOGW("su: request rejected (%u->%u)", su_ctx->info->uid, su_ctx->to.uid);
 	fprintf(stderr, "%s\n", strerror(EACCES));
 	exit(EXIT_FAILURE);
-}
-
-static void socket_cleanup() {
-	if (su_ctx && su_ctx->sock_path[0]) {
-		unlink(su_ctx->sock_path);
-		su_ctx->sock_path[0] = '\0';
-	}
-}
-
-static void cleanup_signal(int sig) {
-	socket_cleanup();
-	exit2(EXIT_FAILURE);
 }
 
 __attribute__ ((noreturn)) void exit2(int status) {
@@ -159,8 +146,7 @@ __attribute__ ((noreturn)) void exit2(int status) {
 }
 
 int su_daemon_main(int argc, char **argv) {
-	int c, socket_serv_fd, fd;
-	char result[64];
+	int c;
 	struct option long_opts[] = {
 		{ "command",                required_argument,  NULL, 'c' },
 		{ "help",                   no_argument,        NULL, 'h' },
@@ -247,28 +233,20 @@ int su_daemon_main(int argc, char **argv) {
 	// Change directory to cwd
 	chdir(su_ctx->cwd);
 
-	// New request or no db exist, notify user for response
 	if (su_ctx->pipefd[0] >= 0) {
-		socket_serv_fd = socket_create_temp(su_ctx->sock_path, sizeof(su_ctx->sock_path));
-		setup_sighandlers(cleanup_signal);
+		// Create random socket
+		struct sockaddr_un addr;
+		int sockfd = create_rand_socket(&addr);
 
-		// Start activity
-		app_send_request(su_ctx);
+		// Connect Magisk Manager
+		app_connect(addr.sun_path + 1);
+		int fd = socket_accept(sockfd, 60);
 
-		atexit(socket_cleanup);
-
-		fd = socket_accept(socket_serv_fd);
-		socket_send_request(fd, su_ctx);
-		socket_receive_result(fd, result, sizeof(result));
+		socket_send_request(fd);
+		su_ctx->info->access.policy = read_int_be(fd);
 
 		close(fd);
-		close(socket_serv_fd);
-		socket_cleanup();
-
-		if (strcmp(result, "socket:ALLOW") == 0)
-			su_ctx->info->access.policy = ALLOW;
-		else
-			su_ctx->info->access.policy = DENY;
+		close(sockfd);
 
 		// Report the policy to main daemon
 		xwrite(su_ctx->pipefd[1], &su_ctx->info->access.policy, sizeof(policy_t));
@@ -276,9 +254,6 @@ int su_daemon_main(int argc, char **argv) {
 		close(su_ctx->pipefd[1]);
 	}
 
-	if (su_ctx->info->access.policy == ALLOW)
-		allow();
-	else
-		deny();
+	su_ctx->info->access.policy == ALLOW ? allow() : deny();
 }
 

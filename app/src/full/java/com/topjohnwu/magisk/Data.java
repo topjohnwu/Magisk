@@ -87,6 +87,7 @@ public class Data {
         classMap.put(OnBootService.class, a.m.class);
         classMap.put(UpdateCheckService.class, a.n.class);
         classMap.put(AboutCardRow.class, a.o.class);
+        classMap.put(SuRequestActivity.class, a.p.class);
 
     }
 

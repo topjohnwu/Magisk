@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.fragments.ModulesFragment;
 import com.topjohnwu.magisk.fragments.ReposFragment;
 import com.topjohnwu.magisk.fragments.SuLogFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
-import com.topjohnwu.magisk.superuser.RequestActivity;
 
 import androidx.core.content.ContextCompat;
 
@@ -56,8 +55,8 @@ public class ViewBinder {
         target.findViewById(R.id.no_thanks).setOnClickListener(v -> target.finish());
         target.findViewById(R.id.save_logs).setOnClickListener(v -> target.saveLogs());
     }
-    
-    public static void bind(RequestActivity target) {
+
+    public static void bind(SuRequestActivity target) {
         target.suPopup = target.findViewById(R.id.su_popup);
         target.timeout = target.findViewById(R.id.timeout);
         target.appIcon = target.findViewById(R.id.app_icon);
