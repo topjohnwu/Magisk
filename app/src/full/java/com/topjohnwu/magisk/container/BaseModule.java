@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 
 public abstract class BaseModule implements Comparable<BaseModule> {
 
-    private String mId = null, mName, mVersion, mAuthor, mDescription;
+    private String mId = null, mName = "", mVersion = "v0", mAuthor = "", mDescription = "";
     private int mVersionCode = -1, minMagiskVersion = -1;
 
     protected BaseModule() {}
