@@ -88,11 +88,16 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         Repo repo = repoPairs.get(section).second.get(position);
         Context context = holder.itemView.getContext();
 
-        holder.title.setText(repo.getName());
-        holder.versionName.setText(repo.getVersion());
+        String name = repo.getName();
+        String version = repo.getVersion();
         String author = repo.getAuthor();
-        holder.author.setText(TextUtils.isEmpty(author) ? null : context.getString(R.string.author, author));
-        holder.description.setText(repo.getDescription());
+        String description = repo.getDescription();
+        String noInfo = context.getString(R.string.no_info_provided);
+
+        holder.title.setText(TextUtils.isEmpty(name) ? noInfo : name);
+        holder.versionName.setText(TextUtils.isEmpty(version) ? noInfo : version);
+        holder.author.setText(TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
+        holder.description.setText(TextUtils.isEmpty(description) ? noInfo : description);
         holder.updateTime.setText(context.getString(R.string.updated_on, repo.getLastUpdateString()));
 
         holder.infoLayout.setOnClickListener(v ->

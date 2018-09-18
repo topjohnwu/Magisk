@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.container;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Download;
@@ -35,7 +36,7 @@ public class Repo extends BaseModule {
             throw new IllegalRepoException("Repo [" + repoName + "] parse error: " + e.getMessage());
         }
 
-        if (getId() == null) {
+        if (TextUtils.isEmpty(getId())) {
             throw new IllegalRepoException("Repo [" + repoName + "] does not contain id");
         }
         if (getVersionCode() < 0) {

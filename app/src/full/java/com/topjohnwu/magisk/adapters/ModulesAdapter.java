@@ -45,9 +45,9 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         String noInfo = context.getString(R.string.no_info_provided);
 
         holder.title.setText(module.getName());
-        holder.versionName.setText( TextUtils.isEmpty(version) ? noInfo : version);
-        holder.author.setText( TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
-        holder.description.setText( TextUtils.isEmpty(description) ? noInfo : description);
+        holder.versionName.setText(TextUtils.isEmpty(version) ? noInfo : version);
+        holder.author.setText(TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
+        holder.description.setText(TextUtils.isEmpty(description) ? noInfo : description);
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
