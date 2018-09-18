@@ -43,11 +43,11 @@ public abstract class FlavorActivity extends AppCompatActivity implements Topic.
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         Topic.subscribe(this);
         if (Data.isDarkTheme && getDarkTheme() != -1) {
             setTheme(getDarkTheme());
         }
+        super.onCreate(savedInstanceState);
     }
 
     @Override

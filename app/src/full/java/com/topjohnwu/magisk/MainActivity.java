@@ -111,11 +111,6 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public int[] getSubscribedTopics() {
-        return new int[] {Topic.RELOAD_ACTIVITY};
-    }
-
-    @Override
     public void onPublish(int topic, Object[] result) {
         recreate();
     }

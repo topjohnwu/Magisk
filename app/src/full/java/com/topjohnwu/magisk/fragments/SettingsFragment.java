@@ -222,7 +222,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         setSummary();
         switch (key) {
             case Const.Key.DARK_THEME:
-                Topic.publish(false, Topic.RELOAD_ACTIVITY);
+                requireActivity().recreate();
                 break;
             case Const.Key.COREONLY:
                 if (prefs.getBoolean(key, false)) {
@@ -254,7 +254,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 break;
             case Const.Key.LOCALE:
                 LocaleManager.setLocale(mm);
-                Topic.publish(false, Topic.RELOAD_ACTIVITY);
+                requireActivity().recreate();
                 break;
             case Const.Key.UPDATE_CHANNEL:
             case Const.Key.CUSTOM_CHANNEL:
