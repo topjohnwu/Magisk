@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.container;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.text.TextUtils;
 
 import java.util.List;
 
