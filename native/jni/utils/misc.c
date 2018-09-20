@@ -184,9 +184,9 @@ int check_proc_name(int pid, const char *name) {
 	sprintf(buf, "/proc/%d/cmdline", pid);
 	f = fopen(buf, "r");
 	fgets(buf, sizeof(buf), f);
+	fclose(f);
 	if (strcmp(basename(buf), name) == 0)
 		return 1;
-	fclose(f);
 
 	sprintf(buf, "/proc/%d/exe", pid);
 	if (access(buf, F_OK) != 0)
