@@ -76,7 +76,7 @@
     <string name="repo_install_msg">Möchtest du %1$s installieren?</string>
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
-    <string name="magisk_update_title">Neue Magisk Update verfügbar!</string>
+    <string name="magisk_update_title">Neue Magisk Aktualisierung verfügbar!</string>
     <string name="settings_reboot_toast">Neustarten, um die Änderungen zu übernehmen</string>
     <string name="release_notes">Versionshinweise</string>
     <string name="repo_cache_cleared">Repo-Cache geleert</string>
@@ -90,7 +90,7 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
-    <string name="magisk_updates">Magisk Update</string>
+    <string name="magisk_updates">Magisk Aktualisierungen</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Verberge Magisk Manager…</string>
     <string name="hide_manager_toast2">Das könnte einige Zeit dauern...</string>
