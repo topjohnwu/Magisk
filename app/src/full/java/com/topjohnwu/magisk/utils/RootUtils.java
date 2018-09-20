@@ -50,7 +50,7 @@ public class RootUtils extends Shell.Initializer {
             job.add(nonroot);
         }
 
-        job.add("mount_partitions", "get_flags", "run_migrations").exec();
+        job.add("mount_partitions", "get_flags", "run_migrations", "export BOOTMODE=true").exec();
 
         Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
         Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));

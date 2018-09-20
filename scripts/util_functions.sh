@@ -10,7 +10,8 @@
 #MAGISK_VERSION_STUB
 
 # Detect whether in boot mode
-ps | grep zygote | grep -qv grep && BOOTMODE=true || BOOTMODE=false
+[ -z $BOOTMODE ] && BOOTMODE=false
+$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
 $BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
 # Presets
