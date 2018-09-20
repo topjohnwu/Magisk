@@ -1,7 +1,10 @@
 package a;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.BootSigner;
 
-public class a extends MagiskManager {
+import androidx.annotation.Keep;
+
+@Keep
+public class a extends BootSigner {
     /* stub */
 }

@@ -72,7 +72,7 @@ public class Data {
     public static int repoOrder;
 
     static {
-        classMap.put(MagiskManager.class, a.a.class);
+        classMap.put(MagiskManager.class, a.q.class);
         classMap.put(MainActivity.class, a.b.class);
         classMap.put(SplashActivity.class, a.c.class);
         classMap.put(AboutActivity.class, a.d.class);
