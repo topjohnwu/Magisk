@@ -1,7 +1,7 @@
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
-void allowSuClient(char *target) {
+static void allowSuClient(char *target) {
 	if (!sepol_exists(target))
 		return;
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
@@ -10,10 +10,12 @@ void allowSuClient(char *target) {
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
 
 	// Allow access to magisk files
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "sock_file", "read");
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "sock_file", "write");
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "file", ALL);
 	sepol_allow(target, SEPOL_FILE_DOMAIN, "dir", ALL);
+
+	// Allow binder service
+	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
+	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
 
 	// Allow termios ioctl
 	sepol_allow(target, "devpts", "chr_file", "ioctl");
@@ -26,71 +28,6 @@ void allowSuClient(char *target) {
 		sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
 		sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
 	}
-}
-
-void otherToSU() {
-	// suRights
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "fd", "use");
-
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "search");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "read");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "open");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "read");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "process", "getattr");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "transfer");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
-	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
-	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
-
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
-
-	// allowLog
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
-
-	// suBackL0
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "transfer");
-
-	// suBackL6
-	sepol_allow("surfaceflinger", "app_data_file", "dir", ALL);
-	sepol_allow("surfaceflinger", "app_data_file", "file", ALL);
-	sepol_allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
-	sepol_attradd("surfaceflinger", "mlstrustedsubject");
-
-	// suMiscL6
-	if (sepol_exists("audioserver"))
-		sepol_allow("audioserver", "audioserver", "process", "execmem");
-
-	// Liveboot
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "fd", "use");
-	sepol_allow("debuggerd", SEPOL_PROC_DOMAIN, "process", "ptrace");
-
-	// dumpsys
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "write");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
-
-	// bootctl
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 }
 
 void sepol_magisk_rules() {
@@ -136,8 +73,64 @@ void sepol_magisk_rules() {
 	allowSuClient("untrusted_app_27");
 	allowSuClient("update_engine");
 
-	// Some superuser stuffs
-	otherToSU();
+	// suRights
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
+	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "search");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "read");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "open");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "read");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "process", "getattr");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "transfer");
+	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
+
+	// allowLog
+	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
+	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
+	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
+	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
+
+	// suBackL0
+	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
+	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "transfer");
+	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
+	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
+
+	// suBackL6
+	sepol_allow("surfaceflinger", "app_data_file", "dir", ALL);
+	sepol_allow("surfaceflinger", "app_data_file", "file", ALL);
+	sepol_allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
+	sepol_attradd("surfaceflinger", "mlstrustedsubject");
+
+	// suMiscL6
+	if (sepol_exists("audioserver"))
+		sepol_allow("audioserver", "audioserver", "process", "execmem");
+
+	// Liveboot
+	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
+	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "transfer");
+	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "call");
+	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "fd", "use");
+	sepol_allow("debuggerd", SEPOL_PROC_DOMAIN, "process", "ptrace");
+
+	// dumpsys
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "write");
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
+	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
+
+	// bootctl
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
+	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 
 	// For mounting loop devices, mirrors, tmpfs
 	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "process", "setsched");
