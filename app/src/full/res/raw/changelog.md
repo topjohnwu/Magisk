@@ -1,12 +1,7 @@
-### 5.9.1
-- Prevent upgrading database before upgrading to v17.0
+### 6.0.0
+- Update to latest AndroidX support library
+- Fix crashes when online repos contain incomplete metadata
+- Optimize BootSigner to use as little memory as possible, prevent OutOfMemoryError
+- Support new communication scheme between Magisk v17.2 and Magisk Manager
+- Enable excessive obfuscation to prevent APK analysis root detections (still not 100% obfuscated due to backwards compatibility with stable channel)
 
-### v5.9.0
-- No more on boot notifications
-- Support new mechanism for installing to inactive slot for OTAs on A/B devices
-- Fix restore Magisk Manager settings on Android P
-- Verify existing file checksums to prevent unnecessary re-downloads
-- Update SNET extension to use new Google API, fix "Invalid Response" errors
-- Move fingerprint settings to magisk database to prevent the settings to be easily removed
-- Fingerprint settings are now guarded with fingerprint authentications before it can get changed
-- Prevent any files to be downloaded to `/sdcard/MagiskManager`
