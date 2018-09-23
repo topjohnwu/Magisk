@@ -14,6 +14,13 @@
             android:defaultValue="@string/empty"
             android:title="@string/language"/>
 
+        <SwitchPreference
+            android:id="@+id/cn_repo"
+            android:key="cn_repo"
+            android:defaultValue="false"
+            android:title="@string/settings_cn_repo_title"
+            android:summary="@string/settings_cn_repo_summary" />
+
         <Preference
             android:key="clear"
             android:title="@string/settings_clear_cache_title"

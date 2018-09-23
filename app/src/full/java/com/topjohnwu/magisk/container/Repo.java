@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.magisk.Data;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -65,14 +66,20 @@ public class Repo extends BaseModule {
     }
 
     public String getZipUrl() {
+        if (Data.cnRepo)
+            return String.format(Const.Url.ZIP_URL_CN, repoName);
         return String.format(Const.Url.ZIP_URL, repoName);
     }
 
     public String getManifestUrl() {
+        if (Data.cnRepo)
+            return String.format(Const.Url.FILE_URL_CN, repoName, "module.prop");
         return String.format(Const.Url.FILE_URL, repoName, "module.prop");
     }
 
     public String getDetailUrl() {
+        if (Data.cnRepo)
+            return String.format(Const.Url.FILE_URL_CN, repoName, "README.md");
         return String.format(Const.Url.FILE_URL, repoName, "README.md");
     }
 

@@ -96,6 +96,8 @@ public class UpdateRepos {
         if (page == 0)
             header.put(Const.Key.IF_NONE_MATCH, mm.prefs.getString(Const.Key.ETAG_KEY, ""));
         String url = Utils.fmt(Const.Url.REPO_URL, page + 1);
+        if (Data.cnRepo)
+            url = Utils.fmt(Const.Url.REPO_URL_CN, page + 1);
 
         try {
             HttpURLConnection conn = WebService.request(url, header);

@@ -79,6 +79,9 @@ public class Const {
         public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
+        public static final String REPO_URL_CN = "https://api.github.com/users/Magisk-Modules-Repo-CN/repos?per_page=100&sort=pushed&page=%d";
+        public static final String FILE_URL_CN = "https://raw.githubusercontent.com/Magisk-Modules-Repo-CN/%s/master/%s";
+        public static final String ZIP_URL_CN = "https://github.com/Magisk-Modules-Repo-CN/%s/archive/master.zip";
         public static final String PAYPAL_URL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CC7FZ7526MNGG";
         public static final String PATREON_URL = "https://www.patreon.com/topjohnwu";
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
@@ -107,6 +110,7 @@ public class Const {
         public static final String FLASH_SET_BOOT = "boot";
 
         // others
+        public static final String CN_REPO = "cn_repo";
         public static final String CHECK_UPDATES = "check_update";
         public static final String UPDATE_CHANNEL = "update_channel";
         public static final String CUSTOM_CHANNEL = "custom_channel";

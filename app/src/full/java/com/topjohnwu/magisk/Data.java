@@ -60,6 +60,7 @@ public class Data {
 
     // Configs
     public static boolean isDarkTheme;
+    public static boolean cnRepo;
     public static int suRequestTimeout;
     public static int suLogTimeout = 14;
     public static int suAccessState;
@@ -193,6 +194,7 @@ public class Data {
 
         // config
         isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
+        cnRepo = mm.prefs.getBoolean(Const.Key.CN_REPO, false);
         updateChannel = Utils.getPrefsInt(mm.prefs, Const.Key.UPDATE_CHANNEL, Const.Value.STABLE_CHANNEL);
         repoOrder = mm.prefs.getInt(Const.Key.REPO_ORDER, Const.Value.ORDER_DATE);
     }
@@ -200,6 +202,7 @@ public class Data {
     public static void writeConfig() {
         MM().prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
+                .putBoolean(Const.Key.CN_REPO, cnRepo)
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
                 .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())

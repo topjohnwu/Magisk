@@ -87,6 +87,11 @@ public class SettingsFragment extends PreferenceFragmentCompat
         namespaceMode = (ListPreference) findPreference(Const.Key.SU_MNT_NS);
         SwitchPreference reauth = (SwitchPreference) findPreference(Const.Key.SU_REAUTH);
         SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
+        SwitchPreference cnRepo = (SwitchPreference) findPreference(Const.Key.CN_REPO);
+        if (!LocaleManager.getLang(mm).equals("zh-CN")) {
+            cnRepo.setChecked(false);
+            generalCatagory.removePreference(cnRepo);
+        }
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
             String prev =String.valueOf(Data.updateChannel);

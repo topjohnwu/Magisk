@@ -124,6 +124,8 @@
     <string name="settings_general_category">常规</string>
     <string name="settings_dark_theme_title">暗色主题</string>
     <string name="settings_dark_theme_summary">使用暗色主题</string>
+    <string name="settings_cn_repo_title">使用汉化版模块仓库</string>
+    <string name="settings_cn_repo_summary">如果找不到想要的模块请关闭此选项\n也欢迎向我们提交汉化请求</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新在线数据</string>
     <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>

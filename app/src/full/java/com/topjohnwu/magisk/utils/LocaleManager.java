@@ -36,6 +36,16 @@ public class LocaleManager {
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
+    public static String getLang(MagiskManager mm) {
+        String localeConfig = mm.prefs.getString(Const.Key.LOCALE, "");
+        if (localeConfig.isEmpty()) {
+            locale = defaultLocale;
+        } else {
+            locale = Locale.forLanguageTag(localeConfig);
+        }
+        return locale.getLanguage() + "-" + locale.getCountry();
+    }
+
     public static String getString(Locale locale, @StringRes int id) {
         Configuration config = new Configuration();
         config.setLocale(locale);
