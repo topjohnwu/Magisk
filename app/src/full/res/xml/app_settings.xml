@@ -15,7 +15,6 @@
             android:title="@string/language"/>
 
         <SwitchPreference
-            android:id="@+id/cn_repo"
             android:key="cn_repo"
             android:defaultValue="false"
             android:title="@string/settings_cn_repo_title"
