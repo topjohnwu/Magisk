@@ -1,6 +1,3 @@
-/* main.c - The multicall entry point
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -13,11 +10,6 @@
 #include "selinux.h"
 #include "flags.h"
 
-char *argv0;
-
-int (*applet_main[]) (int, char *[]) =
-		{ su_client_main, resetprop_main, magiskhide_main, imgtool_main, NULL };
-
 int create_links(const char *bin, const char *path) {
 	char self[PATH_MAX], linkpath[PATH_MAX];
 	if (bin == NULL) {
@@ -25,8 +17,8 @@ int create_links(const char *bin, const char *path) {
 		bin = self;
 	}
 	int ret = 0;
-	for (int i = 0; applet[i]; ++i) {
-		snprintf(linkpath, sizeof(linkpath), "%s/%s", path, applet[i]);
+	for (int i = 0; applet_names[i]; ++i) {
+		snprintf(linkpath, sizeof(linkpath), "%s/%s", path, applet_names[i]);
 		unlink(linkpath);
 		ret |= symlink(bin, linkpath);
 	}
@@ -57,8 +49,8 @@ static void usage() {
 		"\n"
 		"Supported applets:\n");
 
-	for (int i = 0; applet[i]; ++i)
-		fprintf(stderr, i ? ", %s" : "    %s", applet[i]);
+	for (int i = 0; applet_names[i]; ++i)
+		fprintf(stderr, i ? ", %s" : "    %s", applet_names[i]);
 	fprintf(stderr, "\n\n");
 	exit(1);
 }
@@ -86,8 +78,8 @@ int magisk_main(int argc, char *argv[]) {
 		if (argc == 3) return create_links(NULL, argv[2]);
 		else return create_links(argv[2], argv[3]);
 	} else if (strcmp(argv[1], "--list") == 0) {
-		for (int i = 0; applet[i]; ++i)
-			printf("%s\n", applet[i]);
+		for (int i = 0; applet_names[i]; ++i)
+			printf("%s\n", applet_names[i]);
 		return 0;
 	} else if (strcmp(argv[1], "--unlock-blocks") == 0) {
 		unlock_blocks();
@@ -120,41 +112,6 @@ int magisk_main(int argc, char *argv[]) {
 		return read_int(fd);
 	}
 
-	// Applets
-	argc--;
-	argv++;
-	for (int i = 0; applet[i]; ++i) {
-		if (strcmp(basename(argv[0]), applet[i]) == 0) {
-			strcpy(argv0, basename(argv[0]));
-			return (*applet_main[i])(argc, argv);
-		}
-	}
-
 	usage();
 	return 1;
-}
-
-int main(int argc, char *argv[]) {
-	umask(0);
-	argv0 = argv[0];
-	setup_selinux();
-
-	if (strcmp(basename(argv0), "magisk.bin") == 0) {
-		if (argc >= 2) {
-			// It's calling applets
-			--argc;
-			++argv;
-		}
-	}
-
-	// Applets
-	for (int i = 0; applet[i]; ++i) {
-		if (strcmp(basename(argv[0]), applet[i]) == 0) {
-			strcpy(argv0, basename(argv[0]));
-			return (*applet_main[i])(argc, argv);
-		}
-	}
-
-	// Not an applet
-	return magisk_main(argc, argv);
 }

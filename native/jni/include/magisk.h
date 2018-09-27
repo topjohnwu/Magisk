@@ -42,7 +42,7 @@
 
 extern char *argv0;     /* For changing process name */
 
-#define applet          ((char *[]) { "su", "resetprop", "magiskhide", "imgtool", NULL })
+#define applet_names    ((char *[]) { "magisk", "su", "resetprop", "magiskhide", "imgtool", NULL })
 #define init_applet     ((char *[]) { "magiskpolicy", "supolicy", NULL })
 
 extern int (*applet_main[]) (int, char *[]), (*init_applet_main[]) (int, char *[]);
@@ -50,6 +50,7 @@ extern int (*applet_main[]) (int, char *[]), (*init_applet_main[]) (int, char *[
 int create_links(const char *bin, const char *path);
 
 // Multi-call entrypoints
+int magisk_main(int argc, char *argv[]);
 int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);

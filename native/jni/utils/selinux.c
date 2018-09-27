@@ -28,14 +28,14 @@ static int i_ssp(const char *s, char ** sp) {
 
 // Function pointers
 
-void (*freecon)(char * con) = v_s;
-int (*setcon)(const char * con) = i_s;
-int (*getfilecon)(const char *path, char ** con) = i_ssp;
-int (*lgetfilecon)(const char *path, char ** con) = i_ssp;
-int (*setfilecon)(const char *path, const char * con) = i_ss;
-int (*lsetfilecon)(const char *path, const char * con) = i_ss;
+void (*freecon)(char *) = v_s;
+int (*setcon)(const char *) = i_s;
+int (*getfilecon)(const char *, char **) = i_ssp;
+int (*lgetfilecon)(const char *, char **) = i_ssp;
+int (*setfilecon)(const char *, const char *) = i_ss;
+int (*lsetfilecon)(const char *, const char *) = i_ss;
 
-void setup_selinux() {
+void dload_selinux() {
 	void *handle = dlopen("libselinux.so", RTLD_LAZY);
 	if (handle == NULL)
 		return;
@@ -112,9 +112,8 @@ static void restore_magiskcon(int dirfd) {
 void restorecon() {
 	int fd;
 	fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
-	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0) {
+	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
 		lsetfilecon(SECURE_DIR, ADB_CON);
-	}
 	close(fd);
 	fd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
 	restore_syscon(fd);

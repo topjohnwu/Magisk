@@ -593,21 +593,23 @@ void startup() {
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
 
-	// Create wrapper
-	fd = creat("/sbin/magisk", 0755);
-	xwrite(fd, wrapper, sizeof(wrapper) - 1);
-	close(fd);
-	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
-	// Setup magisk symlinks
+	// Create applet symlinks
+	for (int i = 0; applet_names[i]; ++i) {
+		snprintf(buf, PATH_MAX, "/sbin/%s", applet_names[i]);
+		xsymlink("/sbin/magisk", buf);
+	}
+
+	// Setup binary and wrapper
 	fd = creat("/sbin/magisk.bin", 0755);
 	xwrite(fd, magisk, magisk_size);
 	close(fd);
 	free(magisk);
+	unlink("/sbin/magisk");
+	fd = creat("/sbin/magisk", 0755);
+	xwrite(fd, wrapper, sizeof(wrapper) - 1);
+	close(fd);
 	setfilecon("/sbin/magisk.bin", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
-	for (int i = 0; applet[i]; ++i) {
-		snprintf(buf, PATH_MAX, "/sbin/%s", applet[i]);
-		xsymlink("/sbin/magisk", buf);
-	}
+	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 
 	// Setup magiskinit symlinks
 	fd = creat("/sbin/magiskinit", 0755);

@@ -1,4 +1,4 @@
-/* magiskinit.c - Pre-init Magisk support
+/* init.c - Pre-init Magisk support
  *
  * This code has to be compiled statically to work properly.
  *

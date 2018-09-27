@@ -32,12 +32,14 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/magisk.c \
-	core/daemon.c \
-	core/log_daemon.c \
-	core/bootstages.c \
-	core/socket.c \
-	core/db.c \
+	main.c \
+	img.c \
+	daemon/magisk.c \
+	daemon/daemon.c \
+	daemon/log_daemon.c \
+	daemon/bootstages.c \
+	daemon/socket.c \
+	daemon/db.c \
 	magiskhide/magiskhide.c \
 	magiskhide/proc_monitor.c \
 	magiskhide/hide_utils.c \
@@ -48,8 +50,7 @@ LOCAL_SRC_FILES := \
 	su/su.c \
 	su/connect.c \
 	su/pts.c \
-	su/su_daemon.c \
-	utils/img.c
+	su/su_daemon.c
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
@@ -72,7 +73,7 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	core/magiskinit.c \
+	init.c \
 	magiskpolicy/api.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
