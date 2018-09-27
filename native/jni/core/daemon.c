@@ -13,13 +13,12 @@
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/mount.h>
-#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
 #include "resetprop.h"
-#include "magiskpolicy.h"
+#include "selinux.h"
 
 int setup_done = 0;
 int seperate_vendor = 0;

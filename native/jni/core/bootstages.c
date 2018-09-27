@@ -13,7 +13,6 @@
 #include <dirent.h>
 #include <sys/mount.h>
 #include <sys/wait.h>
-#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "db.h"
@@ -21,7 +20,7 @@
 #include "img.h"
 #include "daemon.h"
 #include "resetprop.h"
-#include "magiskpolicy.h"
+#include "selinux.h"
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static struct vector module_list;

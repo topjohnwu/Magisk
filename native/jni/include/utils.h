@@ -125,6 +125,8 @@ struct file_attr {
 	char con[128];
 };
 
+int fd_getpath(int fd, char *path, size_t size);
+int fd_getpathat(int dirfd, const char *name, char *path, size_t size);
 int mkdirs(const char *pathname, mode_t mode);
 void in_order_walk(int dirfd, void (*callback)(int, struct dirent*));
 void rm_rf(const char *path);
@@ -142,7 +144,7 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
-void restorecon();
+
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void mmap_rw(const char *filename, void **buf, size_t *size);
 void fd_full_read(int fd, void **buf, size_t *size);

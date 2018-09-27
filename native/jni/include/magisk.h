@@ -10,14 +10,8 @@
 #define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"
 #define LOG_SOCKET   "5864cd77f2f8c59b3882e2d35dbf51e4"
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
-
-#ifndef ARG_MAX
-#define ARG_MAX 4096
-#endif
-
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk.unblock"
-#define TMPSEPOLICY     "/dev/.tmp_sepolicy"
 #define DISABLEFILE     "/cache/.disable_magisk"
 #define MAGISKTMP       "/sbin/.core"
 #define BLOCKDIR        MAGISKTMP "/block"
@@ -36,13 +30,14 @@
 #define MANAGERAPK      DATABIN "/magisk.apk"
 #define MAGISKRC        "/init.magisk.rc"
 
-
-// selinuxfs paths
+// selinux consts
 #define SELINUX_PATH        "/sys/fs/selinux"
 #define SELINUX_ENFORCE     SELINUX_PATH "/enforce"
 #define SELINUX_POLICY      SELINUX_PATH "/policy"
 #define SELINUX_LOAD        SELINUX_PATH "/load"
 #define SELINUX_CONTEXT     SELINUX_PATH "/context"
+#define SEPOL_PROC_DOMAIN "magisk"
+#define SEPOL_FILE_DOMAIN "magisk_file"
 
 #define MAGISKHIDE_PROP     "persist.magisk.hide"
 

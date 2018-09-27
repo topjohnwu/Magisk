@@ -13,7 +13,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "daemon.h"
@@ -21,6 +20,7 @@
 #include "su.h"
 #include "pts.h"
 #include "list.h"
+#include "selinux.h"
 
 // Constants for the atty bitfield
 #define ATTY_IN     1

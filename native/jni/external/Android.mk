@@ -8,11 +8,11 @@ LOCAL_SRC_FILES := stubs/sqlite3_stub.c
 include $(BUILD_SHARED_LIBRARY)
 
 # libselinux.so (stub)
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libselinux
-LOCAL_C_INCLUDES := $(LIBSELINUX)
-LOCAL_SRC_FILES := stubs/selinux_stub.c
-include $(BUILD_SHARED_LIBRARY)
+#include $(CLEAR_VARS)
+#LOCAL_MODULE:= libselinux
+#LOCAL_C_INCLUDES := $(LIBSELINUX)
+#LOCAL_SRC_FILES := stubs/selinux_stub.c
+#include $(BUILD_SHARED_LIBRARY)
 
 # libxz.a
 include $(CLEAR_VARS)

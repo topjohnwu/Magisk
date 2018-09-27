@@ -16,6 +16,7 @@ COMMON_UTILS := \
 	utils/list.c \
 	utils/misc.c \
 	utils/vector.c \
+	utils/selinux.c \
 	utils/xwrap.c
 
 ########################
@@ -27,13 +28,12 @@ ifdef B_MAGISK
 # magisk main binary
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_SHARED_LIBRARIES := libsqlite libselinux
+LOCAL_SHARED_LIBRARIES := libsqlite
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties
 LOCAL_C_INCLUDES := \
 	jni/include \
 	jni/magiskpolicy \
 	$(EXT_PATH)/include \
-	$(LIBSELINUX) \
 	$(LIBNANOPB) \
 	$(LIBSYSTEMPROPERTIES)
 

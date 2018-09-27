@@ -7,8 +7,6 @@
 #include <stdlib.h>
 
 #define ALL NULL
-#define SEPOL_PROC_DOMAIN "magisk"
-#define SEPOL_FILE_DOMAIN "magisk_file"
 
 // split policy paths
 #define PLAT_POLICY_DIR     "/system/etc/selinux/"

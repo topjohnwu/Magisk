@@ -11,12 +11,9 @@
 #include <sys/mman.h>
 #include <linux/fs.h>
 
-#ifdef SELINUX
-#include <selinux/selinux.h>
-#endif
-
 #include "magisk.h"
 #include "utils.h"
+#include "selinux.h"
 
 char **excl_list = NULL;
 
@@ -28,16 +25,16 @@ static int is_excl(const char *name) {
 	return 0;
 }
 
-static int fd_getpath(int fd, char *path, size_t size) {
+int fd_getpath(int fd, char *path, size_t size) {
 	snprintf(path, size, "/proc/self/fd/%d", fd);
-    return xreadlink(path, path, size) == -1;
+	return xreadlink(path, path, size) == -1;
 }
 
-static int fd_getpathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_getpath(dirfd, path, size))
-        return 1;
-    snprintf(path, size, "%s/%s", path, name);
-    return 0;
+int fd_getpathat(int dirfd, const char *name, char *path, size_t size) {
+	if (fd_getpath(dirfd, path, size))
+		return 1;
+	snprintf(path, size, "%s/%s", path, name);
+	return 0;
 }
 
 int mkdirs(const char *pathname, mode_t mode) {
@@ -262,15 +259,11 @@ void link_dir(int src, int dest) {
 int getattr(const char *path, struct file_attr *a) {
 	if (xlstat(path, &a->st) == -1)
 		return -1;
-#ifdef SELINUX
-	char *con = "";
+	char *con;
 	if (lgetfilecon(path, &con) == -1)
 		return -1;
 	strcpy(a->con, con);
 	freecon(con);
-#else
-	a->con[0] = '\0';
-#endif
 	return 0;
 }
 
@@ -281,16 +274,9 @@ int getattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fgetattr(int fd, struct file_attr *a) {
-#ifdef SELINUX
 	char path[PATH_MAX];
 	fd_getpath(fd, path, sizeof(path));
 	return getattr(path, a);
-#else
-	if (fstat(fd, &a->st) == -1)
-		return -1;
-	a->con[0] = '\0';
-	return 0;
-#endif
 }
 
 int setattr(const char *path, struct file_attr *a) {
@@ -298,10 +284,8 @@ int setattr(const char *path, struct file_attr *a) {
 		return -1;
 	if (chown(path, a->st.st_uid, a->st.st_gid) < 0)
 		return -1;
-#ifdef SELINUX
 	if (strlen(a->con) && lsetfilecon(path, a->con) < 0)
 		return -1;
-#endif
 	return 0;
 }
 
@@ -312,17 +296,9 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a) {
 }
 
 int fsetattr(int fd, struct file_attr *a) {
-#ifdef SELINUX
 	char path[PATH_MAX];
 	fd_getpath(fd, path, sizeof(path));
 	return setattr(path, a);
-#else
-	if (fchmod(fd, a->st.st_mode & 0777) < 0)
-		return -1;
-	if (fchown(fd, a->st.st_uid, a->st.st_gid) < 0)
-		return -1;
-	return 0;
-#endif
 }
 
 void clone_attr(const char *source, const char *target) {
@@ -336,94 +312,6 @@ void fclone_attr(const int sourcefd, const int targetfd) {
 	fgetattr(sourcefd, &a);
 	fsetattr(targetfd, &a);
 }
-
-#ifdef SELINUX
-
-#include "magiskpolicy.h"
-
-#define UNLABEL_CON "u:object_r:unlabeled:s0"
-#define SYSTEM_CON  "u:object_r:system_file:s0"
-#define ADB_CON     "u:object_r:adb_data_file:s0"
-#define MAGISK_CON  "u:object_r:"SEPOL_FILE_DOMAIN":s0"
-
-static void restore_syscon(int dirfd) {
-	struct dirent *entry;
-	DIR *dir;
-
-	char path[PATH_MAX], *con;
-
-	fd_getpath(dirfd, path, sizeof(path));
-	size_t len = strlen(path);
-	getfilecon(path, &con);
-	if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
-		lsetfilecon(path, SYSTEM_CON);
-	freecon(con);
-
-	dir = xfdopendir(dirfd);
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (entry->d_type == DT_DIR) {
-			int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			restore_syscon(fd);
-			close(fd);
-		} else {
-			path[len] = '/';
-			strcpy(path + len + 1, entry->d_name);
-			lgetfilecon(path, &con);
-			if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
-				lsetfilecon(path, SYSTEM_CON);
-			freecon(con);
-			path[len] = '\0';
-		}
-	}
-}
-
-static void restore_magiskcon(int dirfd) {
-	struct dirent *entry;
-	DIR *dir;
-
-	char path[PATH_MAX];
-
-	fd_getpath(dirfd, path, sizeof(path));
-	size_t len = strlen(path);
-	lsetfilecon(path, MAGISK_CON);
-	lchown(path, 0, 0);
-
-	dir = xfdopendir(dirfd);
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		if (entry->d_type == DT_DIR) {
-			int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			restore_magiskcon(fd);
-			close(fd);
-		} else {
-			path[len] = '/';
-			strcpy(path + len + 1, entry->d_name);
-			lsetfilecon(path, MAGISK_CON);
-			lchown(path, 0, 0);
-			path[len] = '\0';
-		}
-	}
-}
-
-void restorecon() {
-	int fd;
-	fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
-	if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0) {
-		lsetfilecon(SECURE_DIR, ADB_CON);
-	}
-	close(fd);
-	fd = xopen(MOUNTPOINT, O_RDONLY | O_CLOEXEC);
-	restore_syscon(fd);
-	close(fd);
-	fd = xopen(DATABIN, O_RDONLY | O_CLOEXEC);
-	restore_magiskcon(fd);
-	close(fd);
-}
-
-#endif   // SELINUX
 
 static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
 	struct stat st;

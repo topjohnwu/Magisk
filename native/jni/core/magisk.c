@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "magisk.h"
 #include "daemon.h"
+#include "selinux.h"
 
 char *argv0;
 
@@ -134,6 +135,8 @@ int magisk_main(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
 	umask(0);
 	argv0 = argv[0];
+	setup_selinux();
+
 	if (strcmp(basename(argv0), "magisk.bin") == 0) {
 		if (argc >= 2) {
 			// It's calling applets

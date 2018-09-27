@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <limits.h>
 
 #include "sepolicy.h"
 #include "vector.h"

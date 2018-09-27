@@ -22,12 +22,12 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "daemon.h"
 #include "utils.h"
 #include "su.h"
+#include "selinux.h"
 
 struct su_context *su_ctx;
 

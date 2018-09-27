@@ -9,13 +9,13 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <selinux/selinux.h>
 
 #include "magisk.h"
 #include "utils.h"
 #include "resetprop.h"
 #include "magiskhide.h"
 #include "daemon.h"
+#include "selinux.h"
 
 static char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode",
