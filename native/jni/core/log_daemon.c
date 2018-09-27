@@ -16,6 +16,7 @@
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
+#include "flags.h"
 
 static int loggable = 0;
 static struct vector log_cmd, clear_cmd;

@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "su.h"
 #include "selinux.h"
+#include "flags.h"
 
 struct su_context *su_ctx;
 
@@ -182,7 +183,7 @@ int su_daemon_main(int argc, char **argv) {
 			printf("%d\n", MAGISK_VER_CODE);
 			exit2(EXIT_SUCCESS);
 		case 'v':
-			printf("%s\n", MAGISKSU_VER_STR);
+			printf("%s\n", xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)");
 			exit2(EXIT_SUCCESS);
 		case 'z':
 			// Do nothing, placed here for legacy support :)

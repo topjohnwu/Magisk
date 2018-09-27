@@ -11,7 +11,6 @@
 #include "db.h"
 #include "list.h"
 
-#define MAGISKSU_VER_STR  xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)"
 #define DEFAULT_SHELL "/system/bin/sh"
 
 struct su_info {

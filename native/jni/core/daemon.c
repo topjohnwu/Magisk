@@ -19,6 +19,7 @@
 #include "daemon.h"
 #include "resetprop.h"
 #include "selinux.h"
+#include "flags.h"
 
 int setup_done = 0;
 int seperate_vendor = 0;
@@ -69,7 +70,7 @@ static void *request_handler(void *args) {
 		su_daemon_receiver(client, &credential);
 		break;
 	case CHECK_VERSION:
-		write_string(client, MAGISK_VER_STR);
+		write_string(client, xstr(MAGISK_VERSION) ":MAGISK");
 		close(client);
 		break;
 	case CHECK_VERSION_CODE:

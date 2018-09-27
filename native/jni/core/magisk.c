@@ -11,6 +11,7 @@
 #include "magisk.h"
 #include "daemon.h"
 #include "selinux.h"
+#include "flags.h"
 
 char *argv0;
 
@@ -66,7 +67,7 @@ int magisk_main(int argc, char *argv[]) {
 	if (argc < 2)
 		usage();
 	if (strcmp(argv[1], "-c") == 0) {
-		printf("%s (%d)\n", MAGISK_VER_STR, MAGISK_VER_CODE);
+		printf("%s (%d)\n", xstr(MAGISK_VERSION) ":MAGISK", MAGISK_VER_CODE);
 		return 0;
 	} else if (strcmp(argv[1], "-v") == 0) {
 		int fd = connect_daemon();

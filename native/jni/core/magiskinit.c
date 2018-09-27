@@ -45,6 +45,7 @@
 #include "utils.h"
 #include "daemon.h"
 #include "magisk.h"
+#include "flags.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 

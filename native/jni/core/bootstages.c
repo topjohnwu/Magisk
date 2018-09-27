@@ -21,6 +21,7 @@
 #include "daemon.h"
 #include "resetprop.h"
 #include "selinux.h"
+#include "flags.h"
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static struct vector module_list;

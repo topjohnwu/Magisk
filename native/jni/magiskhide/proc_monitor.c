@@ -20,6 +20,7 @@
 #include "daemon.h"
 #include "utils.h"
 #include "magiskhide.h"
+#include "flags.h"
 
 static int sockfd = -1;
 

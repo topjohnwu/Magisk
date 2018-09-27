@@ -23,6 +23,7 @@
 #include "logging.h"
 #include "utils.h"
 #include "resetprop.h"
+#include "flags.h"
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
