@@ -46,12 +46,6 @@
 #include "daemon.h"
 #include "magisk.h"
 
-#ifdef MAGISK_DEBUG
-#define VLOG(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
-#else
-#define VLOG(fmt, ...)
-#endif
-
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
@@ -94,7 +88,7 @@ static void parse_cmdline(struct cmdline *cmd) {
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
 
-	VLOG("cmdline: skip_initramfs[%d] slot[%s] dt_dir[%s]\n", cmd->skip_initramfs, cmd->slot, cmd->dt_dir);
+	LOGD("cmdline: skip_initramfs[%d] slot[%s] dt_dir[%s]\n", cmd->skip_initramfs, cmd->slot, cmd->dt_dir);
 }
 
 static void parse_device(struct device *dev, const char *uevent) {
@@ -113,7 +107,7 @@ static void parse_device(struct device *dev, const char *uevent) {
 		}
 	}
 	fclose(fp);
-	VLOG("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
+	LOGD("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
 }
 
 static int setup_block(struct device *dev, const char *partname) {
@@ -199,7 +193,7 @@ static int verify_precompiled() {
 		}
 	}
 	closedir(dir);
-	VLOG("sys_sha[%.*s]\nven_sha[%.*s]\n", sizeof(sys_sha), sys_sha, sizeof(ven_sha), ven_sha);
+	LOGD("sys_sha[%.*s]\nven_sha[%.*s]\n", sizeof(sys_sha), sys_sha, sizeof(ven_sha), ven_sha);
 	return memcmp(sys_sha, ven_sha, sizeof(sys_sha)) == 0;
 }
 
@@ -338,6 +332,10 @@ int main(int argc, char *argv[]) {
 		else if (strcmp(argv[2], "magiskrc") == 0)
 			return dump_magiskrc(argv[3], 0755);
 	}
+
+#ifdef MAGISK_DEBUG
+	log_cb.d = vprintf;
+#endif
 
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));

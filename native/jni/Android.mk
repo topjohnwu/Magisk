@@ -17,6 +17,7 @@ COMMON_UTILS := \
 	utils/misc.c \
 	utils/vector.c \
 	utils/selinux.c \
+	utils/logging.c \
 	utils/xwrap.c
 
 ########################
@@ -32,7 +33,6 @@ LOCAL_SHARED_LIBRARIES := libsqlite
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties
 LOCAL_C_INCLUDES := \
 	jni/include \
-	jni/magiskpolicy \
 	$(EXT_PATH)/include \
 	$(LIBNANOPB) \
 	$(LIBSYSTEMPROPERTIES)
@@ -144,7 +144,7 @@ include jni/external/busybox/Android.mk
 endif
 
 ########################
-# Externals
+# Libraries
 ########################
 include jni/external/Android.mk
 include jni/resetprop/libsystemproperties/Android.mk

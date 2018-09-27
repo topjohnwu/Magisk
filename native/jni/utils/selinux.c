@@ -1,9 +1,9 @@
 #include <dlfcn.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "magisk.h"
 #include "utils.h"
-#include "logging.h"
 #include "selinux.h"
 
 #define UNLABEL_CON "u:object_r:unlabeled:s0"

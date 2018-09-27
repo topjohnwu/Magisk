@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <string.h>
 
 #include "utils.h"
 #include "magisk.h"

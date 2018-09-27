@@ -153,7 +153,7 @@ static void pb_getprop_cb(const char *name, const char *value, void *v) {
 
 void persist_getprop_all(struct read_cb_t *read_cb) {
 	if (access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0) {
-		PRINT_D("resetprop: decode with protobuf from [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
+		LOGD("resetprop: decode with protobuf from [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
 		PersistentProperties props = PersistentProperties_init_zero;
 		props.properties.funcs.decode = prop_decode;
 		props.properties.arg = read_cb;
@@ -196,7 +196,7 @@ char *persist_getprop(const char *name) {
 		int fd = open(path, O_RDONLY | O_CLOEXEC);
 		if (fd < 0)
 			return NULL;
-		PRINT_D("resetprop: read prop from [%s]\n", path);
+		LOGD("resetprop: read prop from [%s]\n", path);
 		prop.value[read(fd, prop.value, sizeof(PROP_VALUE_MAX))] = '\0';  // Null terminate the read value
 		close(fd);
 	}
@@ -231,7 +231,7 @@ bool persist_deleteprop(const char *name) {
 			pb_ostream_t ostream = create_ostream(PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp");
 			props.properties.funcs.encode = prop_encode;
 			props.properties.arg = &v;
-			PRINT_D("resetprop: encode with protobuf to [" PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp]\n");
+			LOGD("resetprop: encode with protobuf to [" PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp]\n");
 			if (!pb_encode(&ostream, PersistentProperties_fields, &props))
 				return false;
 			clone_attr(PERSISTENT_PROPERTY_DIR "/persistent_properties", PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp");
@@ -244,7 +244,7 @@ bool persist_deleteprop(const char *name) {
 		char path[PATH_MAX];
 		snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
 		if (unlink(path) == 0) {
-			PRINT_D("resetprop: unlink [%s]\n", path);
+			LOGD("resetprop: unlink [%s]\n", path);
 			return true;
 		}
 	}

@@ -10,9 +10,6 @@
 
 extern int prop_verbose;
 
-#define PRINT_D(...)  { LOGD(__VA_ARGS__); if (prop_verbose) fprintf(stderr, __VA_ARGS__); }
-#define PRINT_E(...)  { LOGE(__VA_ARGS__); fprintf(stderr, __VA_ARGS__); }
-
 struct prop_t {
 	char *name;
 	char value[PROP_VALUE_MAX];

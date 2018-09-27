@@ -250,6 +250,7 @@ int parse_img(const char *image, boot_img *boot) {
 		}
 	}
 	LOGE("No boot image magic found!\n");
+	exit(1);
 }
 
 int unpack(const char *image) {

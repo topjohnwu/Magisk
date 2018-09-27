@@ -1,68 +1,44 @@
 /* logging.h - Error handling and logging
  */
 
-#ifndef _LOGGING_H_
-#define _LOGGING_H_
+#pragma once
 
-#include <string.h>
 #include <errno.h>
-#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
 
 #define str(a) #a
 #define xstr(a) str(a)
 
-/**************
- * No logging *
- **************/
+typedef enum {
+	L_DEBUG,
+	L_INFO,
+	L_WARN,
+	L_ERR
+} log_type;
 
-#define LOGD(...)
-#define LOGI(...)
-#define LOGW(...)
-#define LOGE(...)
-#define PLOGE(...)
+struct log_callback {
+	int (*d)(const char* fmt, va_list ap);
+	int (*i)(const char* fmt, va_list ap);
+	int (*w)(const char* fmt, va_list ap);
+	int (*e)(const char* fmt, va_list ap);
+	void (*ex)(int code);
+};
 
-/******************
- * Daemon logging *
- ******************/
+extern struct log_callback log_cb;
 
-#ifdef IS_DAEMON
-
-#undef LOGI
-#undef LOGW
-#undef LOGE
-#undef PLOGE
-
-#include <pthread.h>
-#include <android/log.h>
-
-#define LOG_TAG    "Magisk"
-
-#ifdef MAGISK_DEBUG
-#undef LOGD
-#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#endif
-#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGW(...)  __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOGD(...) log_handler(L_DEBUG, __VA_ARGS__)
+#define LOGI(...) log_handler(L_INFO, __VA_ARGS__)
+#define LOGW(...) log_handler(L_WARN, __VA_ARGS__)
+#define LOGE(...) log_handler(L_ERR, __VA_ARGS__)
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
 
-#endif
+int nop_log(const char *fmt, va_list ap);
+void nop_ex(int i);
 
-/********************
- * Tools Log & Exit *
- ********************/
+void no_logging();
+void android_logging();
+void cmdline_logging();
 
-#ifdef XWRAP_EXIT
+int log_handler(log_type t, const char *fmt, ...);
 
-#undef LOGE
-#undef PLOGE
-
-#include <stdio.h>
-
-#define LOGE(...) { fprintf(stderr, __VA_ARGS__); exit(1); }
-#define PLOGE(fmt, args...) { fprintf(stderr, fmt " failed with %d: %s\n\n", ##args, errno, strerror(errno)); exit(1); }
-
-#endif
-
-
-#endif // _LOGGING_H_

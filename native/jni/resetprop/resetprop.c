@@ -50,7 +50,7 @@ static int check_legal_property_name(const char *name) {
 	return 0;
 
 illegal:
-	PRINT_E("Illegal property name: [%s]\n", name);
+	LOGE("Illegal property name: [%s]\n", name);
 	return 1;
 }
 
@@ -124,7 +124,7 @@ static int prop_cmp(const void *p1, const void *p2) {
 
 static int init_resetprop() {
 	if (__system_properties_init()) {
-		PRINT_E("resetprop: Initialize error\n");
+		LOGE("resetprop: Initialize error\n");
 		return -1;
 	}
 	return 0;
@@ -176,7 +176,7 @@ char *getprop2(const char *name, int persist) {
 			if (value)
 				return value;
 		}
-		PRINT_D("resetprop: prop [%s] does not exist\n", name);
+		LOGD("resetprop: prop [%s] does not exist\n", name);
 		return NULL;
 	} else {
 		char value[PROP_VALUE_MAX];
@@ -185,7 +185,7 @@ char *getprop2(const char *name, int persist) {
 			.cookie = value
 		};
 		__system_property_read_callback(pi, callback_wrapper, &read_cb);
-		PRINT_D("resetprop: getprop [%s]: [%s]\n", name, value);
+		LOGD("resetprop: getprop [%s]: [%s]\n", name, value);
 		return strdup(value);
 	}
 }
@@ -218,7 +218,7 @@ int setprop2(const char *name, const char *value, const int trigger) {
 			ret = __system_property_update(pi, value, strlen(value));
 		}
 	} else {
-		PRINT_D("resetprop: New prop [%s]\n", name);
+		LOGD("resetprop: New prop [%s]\n", name);
 		if (trigger) {
 			ret = __system_property_set(name, value);
 		} else {
@@ -226,11 +226,11 @@ int setprop2(const char *name, const char *value, const int trigger) {
 		}
 	}
 
-	PRINT_D("resetprop: setprop [%s]: [%s] by %s\n", name, value,
+	LOGD("resetprop: setprop [%s]: [%s] by %s\n", name, value,
 		trigger ? "property_service" : "modifing prop data structure");
 
 	if (ret)
-		PRINT_E("resetprop: setprop error\n");
+		LOGE("resetprop: setprop error\n");
 
 	return ret;
 }
@@ -245,7 +245,7 @@ int deleteprop2(const char *name, int persist) {
 	if (init_resetprop()) return -1;
 	char path[PATH_MAX];
 	path[0] = '\0';
-	PRINT_D("resetprop: deleteprop [%s]\n", name);
+	LOGD("resetprop: deleteprop [%s]\n", name);
 	if (persist && strncmp(name, "persist.", 8) == 0)
 		persist = persist_deleteprop(name);
 	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
@@ -253,10 +253,10 @@ int deleteprop2(const char *name, int persist) {
 
 int read_prop_file(const char* filename, const int trigger) {
 	if (init_resetprop()) return -1;
-	PRINT_D("resetprop: Load prop file [%s]\n", filename);
+	LOGD("resetprop: Load prop file [%s]\n", filename);
 	FILE *fp = fopen(filename, "r");
 	if (fp == NULL) {
-		PRINT_E("Cannot open [%s]\n", filename);
+		LOGE("Cannot open [%s]\n", filename);
 		return 1;
 	}
 	char *line = NULL, *pch;
@@ -292,7 +292,14 @@ int read_prop_file(const char* filename, const int trigger) {
 	return 0;
 }
 
+static int verbose_logging(const char *fmt, va_list ap) {
+	return prop_verbose ? vfprintf(stderr, fmt, ap) : 0;
+}
+
 int resetprop_main(int argc, char *argv[]) {
+	cmdline_logging();
+	log_cb.d = verbose_logging;
+	
 	int trigger = 1, persist = 0;
 	char *argv0 = argv[0], *prop;
 

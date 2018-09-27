@@ -96,6 +96,10 @@ static void *request_handler(void *args) {
 }
 
 void main_daemon() {
+	android_logging();
+#ifndef MAGISK_DEBUG
+	log_cb.d = nop_log;
+#endif
 	setsid();
 	setcon("u:r:"SEPOL_PROC_DOMAIN":s0");
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);

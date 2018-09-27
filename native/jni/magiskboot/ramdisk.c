@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 #include <sys/stat.h>
-#include <utils.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 
 #include "magiskboot.h"
 #include "cpio.h"
+#include "utils.h"
 
 static void cpio_patch(struct vector *v, int keepverity, int keepforceencrypt) {
 	fprintf(stderr, "Patch with flag KEEPVERITY=[%s] KEEPFORCEENCRYPT=[%s]\n",

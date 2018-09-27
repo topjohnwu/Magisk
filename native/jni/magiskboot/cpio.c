@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "cpio.h"
 #include "logging.h"

@@ -114,6 +114,7 @@ void stop_magiskhide(int client) {
 }
 
 int magiskhide_main(int argc, char *argv[]) {
+	cmdline_logging();
 	if (argc < 2) {
 		usage(argv[0]);
 	}
