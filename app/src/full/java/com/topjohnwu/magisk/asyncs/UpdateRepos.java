@@ -66,17 +66,15 @@ public class UpdateRepos {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject rawRepo = jsonArray.getJSONObject(i);
-            String id = rawRepo.getString("description");
-            String name = rawRepo.getString("name");
+            String id = rawRepo.getString("name");
             Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
-            Set<String> set = Collections.synchronizedSet(cached);
             threadPool.execute(() -> {
                 Repo repo = mm.repoDB.getRepo(id);
                 try {
                     if (repo == null)
-                        repo = new Repo(name);
+                        repo = new Repo(id);
                     else
-                        set.remove(id);
+                        cached.remove(id);
                     repo.update(date);
                     mm.repoDB.addRepo(repo);
                 } catch (Repo.IllegalRepoException e) {
@@ -141,7 +139,7 @@ public class UpdateRepos {
     public void exec(boolean force) {
         Topic.reset(Topic.REPO_LOAD_DONE);
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-            cached = mm.repoDB.getRepoIDSet();
+            cached = Collections.synchronizedSet(mm.repoDB.getRepoIDSet());
             threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
 
             if (loadPage(0)) {
