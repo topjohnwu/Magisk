@@ -10,7 +10,7 @@
 #include "selinux.h"
 #include "flags.h"
 
-int create_links(const char *bin, const char *path) {
+static int create_links(const char *bin, const char *path) {
 	char self[PATH_MAX], linkpath[PATH_MAX];
 	if (bin == NULL) {
 		xreadlink("/proc/self/exe", self, sizeof(self));

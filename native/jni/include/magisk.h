@@ -47,8 +47,6 @@ extern char *argv0;     /* For changing process name */
 
 extern int (*applet_main[]) (int, char *[]), (*init_applet_main[]) (int, char *[]);
 
-int create_links(const char *bin, const char *path);
-
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
 int magiskhide_main(int argc, char *argv[]);
