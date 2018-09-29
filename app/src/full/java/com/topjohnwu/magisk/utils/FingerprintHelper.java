@@ -1,23 +1,36 @@
 package com.topjohnwu.magisk.utils;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.Dialog;
 import android.app.KeyguardManager;
+import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.CancellationSignal;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyPermanentlyInvalidatedException;
 import android.security.keystore.KeyProperties;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.magisk.components.CustomAlertDialog;
 
 import java.security.KeyStore;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+
+import androidx.preference.SwitchPreference;
 
 @TargetApi(Build.VERSION_CODES.M)
 public abstract class FingerprintHelper {
@@ -33,6 +46,56 @@ public abstract class FingerprintHelper {
         KeyguardManager km = mm.getSystemService(KeyguardManager.class);
         FingerprintManager fm = mm.getSystemService(FingerprintManager.class);
         return km.isKeyguardSecure() && fm != null && fm.isHardwareDetected() && fm.hasEnrolledFingerprints();
+    }
+
+    public static void showAuthDialog(Activity activity, Runnable onSuccess) {
+        CustomAlertDialog dialog = new CustomAlertDialog(activity);
+        CustomAlertDialog.ViewHolder vh = dialog.getViewHolder();
+        try {
+            FingerprintHelper helper = new FingerprintHelper() {
+                @Override
+                public void onAuthenticationError(int errorCode, CharSequence errString) {
+                    vh.messageView.setTextColor(Color.RED);
+                    vh.messageView.setText(errString);
+                }
+
+                @Override
+                public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
+                    vh.messageView.setTextColor(Color.RED);
+                    vh.messageView.setText(helpString);
+                }
+
+                @Override
+                public void onAuthenticationFailed() {
+                    vh.messageView.setTextColor(Color.RED);
+                    vh.messageView.setText(R.string.auth_fail);
+                }
+
+                @Override
+                public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                    dialog.dismiss();
+                    onSuccess.run();
+                }
+            };
+            Drawable fingerprint = activity.getResources().getDrawable(R.drawable.ic_fingerprint);
+            fingerprint.setBounds(0, 0, Utils.dpInPx(50), Utils.dpInPx(50));
+            Resources.Theme theme = activity.getTheme();
+            TypedArray ta = theme.obtainStyledAttributes(new int[] {R.attr.imageColorTint});
+            fingerprint.setTint(ta.getColor(0, Color.GRAY));
+            ta.recycle();
+            vh.messageView.setCompoundDrawables(null, null, null, fingerprint);
+            vh.messageView.setCompoundDrawablePadding(Utils.dpInPx(20));
+            vh.messageView.setGravity(Gravity.CENTER);
+            dialog.setMessage(R.string.auth_fingerprint)
+                    .setNegativeButton(R.string.close, (d, w) -> helper.cancel())
+                    .setOnCancelListener(d -> helper.cancel())
+                    .show();
+            helper.authenticate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
+        }
+
     }
 
     protected FingerprintHelper() throws Exception {

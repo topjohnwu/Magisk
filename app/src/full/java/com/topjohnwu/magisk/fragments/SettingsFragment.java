@@ -3,15 +3,9 @@ package com.topjohnwu.magisk.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +18,6 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
-import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
@@ -277,54 +270,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
             case Const.Key.SU_FINGERPRINT:
                 boolean checked = ((SwitchPreference) preference).isChecked();
                 ((SwitchPreference) preference).setChecked(!checked);
-                CustomAlertDialog dialog = new CustomAlertDialog(requireActivity());
-                CustomAlertDialog.ViewHolder vh = dialog.getViewHolder();
-                Drawable fingerprint = getResources().getDrawable(R.drawable.ic_fingerprint);
-                fingerprint.setBounds(0, 0, Utils.dpInPx(50), Utils.dpInPx(50));
-                Resources.Theme theme = requireActivity().getTheme();
-                TypedArray ta = theme.obtainStyledAttributes(new int[] {R.attr.imageColorTint});
-                fingerprint.setTint(ta.getColor(0, Color.GRAY));
-                ta.recycle();
-                vh.messageView.setCompoundDrawables(null, null, null, fingerprint);
-                vh.messageView.setCompoundDrawablePadding(Utils.dpInPx(20));
-                vh.messageView.setGravity(Gravity.CENTER);
-                try {
-                    FingerprintHelper helper = new FingerprintHelper() {
-                        @Override
-                        public void onAuthenticationError(int errorCode, CharSequence errString) {
-                            vh.messageView.setTextColor(Color.RED);
-                            vh.messageView.setText(errString);
-                        }
-
-                        @Override
-                        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-                            vh.messageView.setTextColor(Color.RED);
-                            vh.messageView.setText(helpString);
-                        }
-
-                        @Override
-                        public void onAuthenticationFailed() {
-                            vh.messageView.setTextColor(Color.RED);
-                            vh.messageView.setText(R.string.auth_fail);
-                        }
-
-                        @Override
-                        public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-                            dialog.dismiss();
-                            ((SwitchPreference) preference).setChecked(checked);
-                            mm.mDB.setSettings(key, checked ? 1 : 0);
-
-                        }
-                    };
-                    dialog.setMessage(R.string.auth_fingerprint)
-                            .setNegativeButton(R.string.close, (d, w) -> helper.cancel())
-                            .setOnCancelListener(d -> helper.cancel())
-                            .show();
-                    helper.authenticate();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Utils.toast(R.string.auth_fail, Toast.LENGTH_SHORT);
-                }
+                FingerprintHelper.showAuthDialog(requireActivity(), () -> {
+                    ((SwitchPreference) preference).setChecked(checked);
+                    mm.mDB.setSettings(key, checked ? 1 : 0);
+                });
                 break;
         }
         return true;
