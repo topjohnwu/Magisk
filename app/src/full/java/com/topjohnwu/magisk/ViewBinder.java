@@ -52,7 +52,7 @@ public class ViewBinder {
         target.sv = target.findViewById(R.id.scrollView);
         target.reboot = target.findViewById(R.id.reboot);
         target.reboot.setOnClickListener(v -> target.reboot());
-        target.findViewById(R.id.no_thanks).setOnClickListener(v -> target.finish());
+        target.findViewById(R.id.close).setOnClickListener(v -> target.finish());
         target.findViewById(R.id.save_logs).setOnClickListener(v -> target.saveLogs());
     }
 

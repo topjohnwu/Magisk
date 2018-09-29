@@ -42,10 +42,6 @@ public class FlashActivity extends BaseActivity {
 
     private List<String> logs;
 
-    void dismiss() {
-        finish();
-    }
-
     void reboot() {
         Shell.su("/system/bin/reboot").submit();
     }
