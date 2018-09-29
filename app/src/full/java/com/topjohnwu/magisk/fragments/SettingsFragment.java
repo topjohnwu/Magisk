@@ -272,6 +272,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 ((SwitchPreference) preference).setChecked(!checked);
                 FingerprintHelper.showAuthDialog(requireActivity(), () -> {
                     ((SwitchPreference) preference).setChecked(checked);
+                    Data.suFingerprint = checked;
                     mm.mDB.setSettings(key, checked ? 1 : 0);
                 });
                 break;
