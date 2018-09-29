@@ -2,9 +2,7 @@ package com.topjohnwu.magisk.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -29,8 +27,6 @@ import java.security.KeyStore;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
-import androidx.preference.SwitchPreference;
 
 @TargetApi(Build.VERSION_CODES.M)
 public abstract class FingerprintHelper {

@@ -10,6 +10,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
@@ -17,6 +18,7 @@ import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
+import com.topjohnwu.magisk.utils.FingerprintHelper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -62,14 +64,34 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         holder.appName.setText(policy.appName);
         holder.packageName.setText(policy.packageName);
         holder.appIcon.setImageDrawable(policy.info.loadIcon(pm));
-        holder.masterSwitch.setOnCheckedChangeListener((v, isChecked) -> {
-            if ((isChecked && policy.policy == Policy.DENY) ||
-                    (!isChecked && policy.policy == Policy.ALLOW)) {
-                policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
-                String message = v.getContext().getString(
-                        isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
-                SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
-                dbHelper.updatePolicy(policy);
+
+        holder.notificationSwitch.setOnCheckedChangeListener(null);
+        holder.loggingSwitch.setOnCheckedChangeListener(null);
+
+        holder.masterSwitch.setChecked(policy.policy == Policy.ALLOW);
+        holder.notificationSwitch.setChecked(policy.notification);
+        holder.loggingSwitch.setChecked(policy.logging);
+
+        holder.masterSwitch.setOnClickListener(v -> {
+            boolean isChecked = holder.masterSwitch.isChecked();
+            Runnable r = () -> {
+                if ((isChecked && policy.policy == Policy.DENY) ||
+                        (!isChecked && policy.policy == Policy.ALLOW)) {
+                    policy.policy = isChecked ? Policy.ALLOW : Policy.DENY;
+                    String message = v.getContext().getString(
+                            isChecked ? R.string.su_snack_grant : R.string.su_snack_deny, policy.appName);
+                    SnackbarMaker.make(holder.itemView, message, Snackbar.LENGTH_SHORT).show();
+                    dbHelper.updatePolicy(policy);
+                }
+            };
+            if (Data.suFingerprint) {
+                holder.masterSwitch.setChecked(!isChecked);
+                FingerprintHelper.showAuthDialog((Activity) v.getContext(), () -> {
+                    holder.masterSwitch.setChecked(isChecked);
+                    r.run();
+                });
+            } else {
+                r.run();
             }
         });
         holder.notificationSwitch.setOnCheckedChangeListener((v, isChecked) -> {
@@ -106,9 +128,6 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                 .setNegativeButton(R.string.no_thanks, null)
                 .setCancelable(true)
                 .show());
-        holder.masterSwitch.setChecked(policy.policy == Policy.ALLOW);
-        holder.notificationSwitch.setChecked(policy.notification);
-        holder.loggingSwitch.setChecked(policy.logging);
 
         // Hide for now
         holder.moreInfo.setVisibility(View.GONE);
