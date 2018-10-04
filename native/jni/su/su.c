@@ -189,7 +189,7 @@ int su_daemon_main(int argc, char **argv) {
 			// Do nothing, placed here for legacy support :)
 			break;
 		case 'M':
-			su_ctx->info->dbs.v[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
+			DB_SET(su_ctx->info, SU_MNT_NS) = NAMESPACE_MODE_GLOBAL;
 			break;
 		default:
 			/* Bionic getopt_long doesn't terminate its error output by newline */
@@ -214,21 +214,21 @@ int su_daemon_main(int argc, char **argv) {
 	}
 
 	// Handle namespaces
-	switch (su_ctx->info->dbs.v[SU_MNT_NS]) {
-	case NAMESPACE_MODE_GLOBAL:
-		LOGD("su: use global namespace\n");
-		break;
-	case NAMESPACE_MODE_REQUESTER:
-		LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
-		if (switch_mnt_ns(su_ctx->pid)) {
-			LOGD("su: setns failed, fallback to isolated\n");
+	switch (DB_SET(su_ctx->info, SU_MNT_NS)) {
+		case NAMESPACE_MODE_GLOBAL:
+			LOGD("su: use global namespace\n");
+			break;
+		case NAMESPACE_MODE_REQUESTER:
+			LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
+			if (switch_mnt_ns(su_ctx->pid)) {
+				LOGD("su: setns failed, fallback to isolated\n");
+				xunshare(CLONE_NEWNS);
+			}
+			break;
+		case NAMESPACE_MODE_ISOLATE:
+			LOGD("su: use new isolated namespace\n");
 			xunshare(CLONE_NEWNS);
-		}
-		break;
-	case NAMESPACE_MODE_ISOLATE:
-		LOGD("su: use new isolated namespace\n");
-		xunshare(CLONE_NEWNS);
-		break;
+			break;
 	}
 
 	// Change directory to cwd

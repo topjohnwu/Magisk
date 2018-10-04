@@ -8,11 +8,6 @@
 #include "magisk.h"
 #include "db.h"
 
-void INIT_DB_STRINGS(struct db_strings *str) {
-	for (int i = 0; i < DB_STRING_NUM; ++i)
-		str->s[i][0] = '\0';
-}
-
 static int policy_cb(void *v, int col_num, char **data, char **col_name) {
 	struct su_access *su = v;
 	for (int i = 0; i < col_num; i++) {

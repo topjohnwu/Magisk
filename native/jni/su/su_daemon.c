@@ -85,7 +85,7 @@ static void database_check(struct su_info *info) {
 		get_db_strings(db, -1, &info->str);
 
 		// Check multiuser settings
-		switch (info->dbs.v[SU_MULTIUSER_MODE]) {
+		switch (DB_SET(info, SU_MULTIUSER_MODE)) {
 			case MULTIUSER_MODE_OWNER_ONLY:
 				if (info->uid / 100000) {
 					uid = -1;
@@ -107,7 +107,7 @@ static void database_check(struct su_info *info) {
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)
-		validate_manager(info->str.s[SU_MANAGER], uid / 100000, &info->manager_stat);
+		validate_manager(DB_STR(info, SU_MANAGER), uid / 100000, &info->mgr_st);
 }
 
 static struct su_info *get_su_info(unsigned uid) {
@@ -120,13 +120,10 @@ static struct su_info *get_su_info(unsigned uid) {
 		info = cache;
 	} else {
 		cache_miss = 1;
-		info = malloc(sizeof(*info));
+		info = xcalloc(1, sizeof(*info));
 		info->uid = uid;
 		info->dbs = DEFAULT_DB_SETTINGS;
 		info->access = DEFAULT_SU_ACCESS;
-		INIT_DB_STRINGS(&info->str);
-		info->ref = 0;
-		info->count = 0;
 		pthread_mutex_init(&info->lock, NULL);
 		cache = info;
 	}
@@ -154,7 +151,7 @@ static struct su_info *get_su_info(unsigned uid) {
 		database_check(info);
 
 		// Check su access settings
-		switch (info->dbs.v[ROOT_ACCESS]) {
+		switch (DB_SET(info, ROOT_ACCESS)) {
 			case ROOT_ACCESS_DISABLED:
 				LOGE("Root access is disabled!\n");
 				info->access = NO_SU_ACCESS;
@@ -177,7 +174,7 @@ static struct su_info *get_su_info(unsigned uid) {
 		}
 
 		// If it's the manager, allow it silently
-		if ((info->uid % 100000) == (info->manager_stat.st_uid % 100000))
+		if ((info->uid % 100000) == (info->mgr_st.st_uid % 100000))
 			info->access = SILENT_SU_ACCESS;
 
 		// Allow if it's root
@@ -185,7 +182,7 @@ static struct su_info *get_su_info(unsigned uid) {
 			info->access = SILENT_SU_ACCESS;
 
 		// If still not determined, check if manager exists
-		if (info->access.policy == QUERY && info->str.s[SU_MANAGER][0] == '\0')
+		if (info->access.policy == QUERY && DB_STR(info, SU_MANAGER)[0] == '\0')
 			info->access = NO_SU_ACCESS;
 	}
 	return info;
@@ -297,16 +294,16 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 	// Default values
 	struct su_context ctx = {
-			.info = get_su_info(credential->uid),
-			.to = {
-					.uid = UID_ROOT,
-					.login = 0,
-					.keepenv = 0,
-					.shell = DEFAULT_SHELL,
-					.command = NULL,
-			},
-			.pid = credential->pid,
-			.pipefd = { -1, -1 }
+		.info = get_su_info(credential->uid),
+		.to = {
+			.uid = UID_ROOT,
+			.login = 0,
+			.keepenv = 0,
+			.shell = DEFAULT_SHELL,
+			.command = NULL,
+		},
+		.pid = credential->pid,
+		.pipefd = { -1, -1 }
 	};
 
 	// Fail fast

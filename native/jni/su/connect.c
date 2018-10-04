@@ -42,14 +42,14 @@ static void silent_run(char * const args[]) {
 }
 
 static void setup_user(char *user) {
-	switch (su_ctx->info->dbs.v[SU_MULTIUSER_MODE]) {
-	case MULTIUSER_MODE_OWNER_ONLY:
-	case MULTIUSER_MODE_OWNER_MANAGED:
-		sprintf(user, "%d", 0);
-		break;
-	case MULTIUSER_MODE_USER:
-		sprintf(user, "%d", su_ctx->info->uid / 100000);
-		break;
+	switch (DB_SET(su_ctx->info, SU_MULTIUSER_MODE)) {
+		case MULTIUSER_MODE_OWNER_ONLY:
+		case MULTIUSER_MODE_OWNER_MANAGED:
+			sprintf(user, "%d", 0);
+			break;
+		case MULTIUSER_MODE_USER:
+			sprintf(user, "%d", su_ctx->info->uid / 100000);
+			break;
 	}
 }
 
@@ -59,7 +59,7 @@ void app_log() {
 
 	char fromUid[8];
 	sprintf(fromUid, "%d",
-			su_ctx->info->dbs.v[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
+			DB_SET(su_ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
 			su_ctx->info->uid % 100000 : su_ctx->info->uid);
 
 	char toUid[8];
@@ -74,7 +74,7 @@ void app_log() {
 	char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", su_ctx->info->str.s[SU_MANAGER],
+		"-p", DB_STR(su_ctx->info, SU_MANAGER),
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
@@ -93,7 +93,7 @@ void app_connect(const char *socket) {
 	char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", su_ctx->info->str.s[SU_MANAGER],
+		"-p", DB_STR(su_ctx->info, SU_MANAGER),
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", (char *) socket,

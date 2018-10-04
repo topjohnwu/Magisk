@@ -21,12 +21,15 @@ struct su_info {
 	struct db_settings dbs;
 	struct db_strings str;
 	struct su_access access;
-	struct stat manager_stat;
+	struct stat mgr_st;
 
 	/* These should be guarded with global cache lock */
 	int ref;
 	int life;
 };
+
+#define DB_SET(i, e) (i)->dbs.v[e]
+#define DB_STR(i, e) (i)->str.s[e]
 
 struct su_request {
 	unsigned uid;

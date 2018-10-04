@@ -8,7 +8,8 @@
  * DB Settings *
  ***************/
 
-#define DB_SETTING_KEYS ((char *[]) { \
+#define DB_SETTING_KEYS \
+((char *[]) { \
 "root_access", \
 "multiuser_mode", \
 "mnt_ns" \
@@ -49,18 +50,20 @@ struct db_settings {
 	int v[DB_SETTINGS_NUM];
 };
 
-#define DEFAULT_DB_SETTINGS (struct db_settings) { .v = {\
+#define DEFAULT_DB_SETTINGS \
+(struct db_settings) { .v = { \
 ROOT_ACCESS_APPS_AND_ADB, \
 MULTIUSER_MODE_OWNER_ONLY, \
-NAMESPACE_MODE_REQUESTER \
+NAMESPACE_MODE_REQUESTER, \
 }}
 
 /**************
  * DB Strings *
  **************/
 
-#define DB_STRING_KEYS ((char *[]) { \
-"requester" \
+#define DB_STRING_KEYS \
+((char *[]) { \
+"requester", \
 })
 
 #define DB_STRING_NUM (sizeof(DB_STRING_KEYS) / sizeof(char*))
@@ -73,8 +76,6 @@ enum {
 struct db_strings {
 	char s[DB_STRING_NUM][128];
 };
-
-void INIT_DB_STRINGS(struct db_strings *str);
 
 /*************
  * SU Access *
