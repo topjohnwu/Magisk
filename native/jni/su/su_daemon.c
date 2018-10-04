@@ -126,18 +126,18 @@ static struct su_info *get_su_info(unsigned uid) {
 		// Check su access settings
 		switch (DB_SET(info, ROOT_ACCESS)) {
 			case ROOT_ACCESS_DISABLED:
-				LOGE("Root access is disabled!\n");
+				LOGW("Root access is disabled!\n");
 				info->access = NO_SU_ACCESS;
 				break;
 			case ROOT_ACCESS_ADB_ONLY:
 				if (info->uid != UID_SHELL) {
-					LOGE("Root access limited to ADB only!\n");
+					LOGW("Root access limited to ADB only!\n");
 					info->access = NO_SU_ACCESS;
 				}
 				break;
 			case ROOT_ACCESS_APPS_ONLY:
 				if (info->uid == UID_SHELL) {
-					LOGE("Root access is disabled for ADB!\n");
+					LOGW("Root access is disabled for ADB!\n");
 					info->access = NO_SU_ACCESS;
 				}
 				break;
@@ -282,7 +282,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	}
 
 	// Read su_request
-	xxread(client, &ctx.req, 3 * sizeof(unsigned));
+	xxread(client, &ctx.req, 4 * sizeof(unsigned));
 	ctx.req.shell = read_string(client);
 	ctx.req.command = read_string(client);
 
@@ -338,6 +338,8 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	close(client);
 
 	// Handle namespaces
+	if (ctx.req.mount_master)
+		DB_SET(info, SU_MNT_NS) = NAMESPACE_MODE_GLOBAL;
 	switch (DB_SET(info, SU_MNT_NS)) {
 		case NAMESPACE_MODE_GLOBAL:
 			LOGD("su: use global namespace\n");
@@ -355,13 +357,13 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			break;
 	}
 
-	if (info->access.policy) {
+	if (info->access.notify || info->access.log)
+		app_log(&ctx);
+
+	if (info->access.policy == ALLOW) {
 		char* argv[] = { NULL, NULL, NULL, NULL };
 
-		if (ctx.req.login)
-			argv[0] = "-";
-		else
-			argv[0] = ctx.req.shell;
+		argv[0] = ctx.req.login ? "-" : ctx.req.shell;
 
 		if (ctx.req.command[0]) {
 			argv[1] = "-c";
@@ -373,17 +375,11 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		populate_environment(&ctx.req);
 		set_identity(ctx.req.uid);
 
-		if (info->access.notify || info->access.log)
-			app_log(&ctx);
-
 		execvp(ctx.req.shell, argv);
 		fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
 		PLOGE("exec");
 		exit(EXIT_FAILURE);
 	} else {
-		if (info->access.notify || info->access.log)
-			app_log(&ctx);
-
 		LOGW("su: request rejected (%u->%u)", info->uid, ctx.req.uid);
 		fprintf(stderr, "%s\n", strerror(EACCES));
 		exit(EXIT_FAILURE);

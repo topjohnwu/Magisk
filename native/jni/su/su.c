@@ -105,6 +105,7 @@ int su_client_main(int argc, char *argv[]) {
 		.uid = UID_ROOT,
 		.login = 0,
 		.keepenv = 0,
+		.mount_master = 0,
 		.shell = DEFAULT_SHELL,
 		.command = "",
 	};
@@ -147,7 +148,7 @@ int su_client_main(int argc, char *argv[]) {
 				// Do nothing, placed here for legacy support :)
 				break;
 			case 'M':
-				/* TODO */
+				su_req.mount_master = 1;
 				break;
 			default:
 				/* Bionic getopt_long doesn't terminate its error output by newline */
@@ -181,7 +182,7 @@ int su_client_main(int argc, char *argv[]) {
 	write_int(fd, SUPERUSER);
 
 	// Send su_request
-	xwrite(fd, &su_req, 3 * sizeof(unsigned));
+	xwrite(fd, &su_req, 4 * sizeof(unsigned));
 	write_string(fd, su_req.shell);
 	write_string(fd, su_req.command);
 

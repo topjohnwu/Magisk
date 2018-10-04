@@ -40,6 +40,7 @@ struct su_request {
 	unsigned uid;
 	unsigned login;
 	unsigned keepenv;
+	unsigned mount_master;
 	char *shell;
 	char *command;
 };
