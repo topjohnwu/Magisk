@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 
 #include "db.h"
-#include "list.h"
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -24,10 +23,9 @@ struct su_info {
 	struct su_access access;
 	struct stat manager_stat;
 
-	/* These should be guarded with global list lock */
-	struct list_head pos;
+	/* These should be guarded with global cache lock */
 	int ref;
-	int clock;
+	int life;
 };
 
 struct su_request {
@@ -57,7 +55,6 @@ void set_identity(unsigned uid);
 // connect.c
 
 void app_log();
-
 void app_connect(const char *socket);
 void socket_send_request(int fd);
 

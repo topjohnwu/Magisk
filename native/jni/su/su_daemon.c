@@ -19,7 +19,6 @@
 #include "utils.h"
 #include "su.h"
 #include "pts.h"
-#include "list.h"
 #include "selinux.h"
 
 // Constants for the atty bitfield
@@ -29,13 +28,13 @@
 
 #define TIMEOUT     3
 
-#define LOCK_LIST()    pthread_mutex_lock(&list_lock)
-#define LOCK_UID()     pthread_mutex_lock(&info->lock)
-#define UNLOCK_LIST()  pthread_mutex_unlock(&list_lock)
-#define UNLOCK_UID()   pthread_mutex_unlock(&ctx.info->lock)
+#define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
+#define LOCK_INFO()    pthread_mutex_lock(&info->lock)
+#define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
+#define UNLOCK_INFO()  pthread_mutex_unlock(&ctx.info->lock)
 
-static struct list_head info_cache = { .prev = &info_cache, .next = &info_cache };
-static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
+static struct su_info *cache;
 
 static void sighandler(int sig) {
 	restore_stdin();
@@ -64,12 +63,13 @@ static void *info_collector(void *node) {
 	struct su_info *info = node;
 	while (1) {
 		sleep(1);
-		if (info->clock && --info->clock == 0) {
-			LOCK_LIST();
-			list_pop(&info->pos);
-			UNLOCK_LIST();
+		if (info->life) {
+			LOCK_CACHE();
+			if (--info->life == 0 && cache && info->uid == cache->uid)
+				cache = NULL;
+			UNLOCK_CACHE();
 		}
-		if (!info->clock && !info->ref) {
+		if (!info->life && !info->ref) {
 			pthread_mutex_destroy(&info->lock);
 			free(info);
 			return NULL;
@@ -111,22 +111,15 @@ static void database_check(struct su_info *info) {
 }
 
 static struct su_info *get_su_info(unsigned uid) {
-	struct su_info *info = NULL, *node;
+	struct su_info *info;
+	int cache_miss = 0;
 
-	LOCK_LIST();
+	LOCK_CACHE();
 
-	// Search for existing info in cache
-	list_for_each(node, &info_cache, struct su_info, pos) {
-		if (node->uid == uid) {
-			info = node;
-			break;
-		}
-	}
-
-	int cache_miss = info == NULL;
-
-	if (cache_miss) {
-		// If cache miss, create a new one and push to cache
+	if (cache && cache->uid == uid) {
+		info = cache;
+	} else {
+		cache_miss = 1;
 		info = malloc(sizeof(*info));
 		info->uid = uid;
 		info->dbs = DEFAULT_DB_SETTINGS;
@@ -135,26 +128,26 @@ static struct su_info *get_su_info(unsigned uid) {
 		info->ref = 0;
 		info->count = 0;
 		pthread_mutex_init(&info->lock, NULL);
-		list_insert_end(&info_cache, &info->pos);
+		cache = info;
 	}
 
 	// Update the cache status
-	info->clock = TIMEOUT;
+	info->life = TIMEOUT;
 	++info->ref;
 
-	// Start a thread to maintain the info cache
+	// Start a thread to maintain the cache
 	if (cache_miss) {
 		pthread_t thread;
 		xpthread_create(&thread, NULL, info_collector, info);
 		pthread_detach(thread);
 	}
 
-	UNLOCK_LIST();
+	UNLOCK_CACHE();
 
 	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
 
 	// Lock before the policy is determined
-	LOCK_UID();
+	LOCK_INFO();
 
 	if (info->access.policy == QUERY) {
 		//  Not cached, get data from database
@@ -318,7 +311,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 
 	// Fail fast
 	if (ctx.info->access.policy == DENY && !ctx.info->access.log && !ctx.info->access.notify) {
-		UNLOCK_UID();
+		UNLOCK_INFO();
 		write_int(client, DENY);
 		return;
 	}
@@ -346,7 +339,7 @@ void su_daemon_receiver(int client, struct ucred *credential) {
 	}
 
 	// The policy is determined, unlock
-	UNLOCK_UID();
+	UNLOCK_INFO();
 
 	// Info is now useless to us, decrement reference count
 	--ctx.info->ref;
