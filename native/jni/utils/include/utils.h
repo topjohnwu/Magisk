@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <pthread.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 
@@ -78,6 +79,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags,
 	int fd, off_t offset);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
+int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 
 // misc.c
 

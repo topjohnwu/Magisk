@@ -40,23 +40,11 @@ int create_rand_socket(struct sockaddr_un *sun) {
 }
 
 int socket_accept(int sockfd, int timeout) {
-	struct timeval tv;
-	fd_set fds;
-	int rc;
-
-	tv.tv_sec = timeout;
-	tv.tv_usec = 0;
-	FD_ZERO(&fds);
-	FD_SET(sockfd, &fds);
-	do {
-		rc = select(sockfd + 1, &fds, NULL, NULL, &tv);
-	} while (rc < 0 && errno == EINTR);
-	if (rc < 1) {
-		PLOGE("select");
-		return -1;
-	}
-
-	return xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
+	struct pollfd pfd = {
+		.fd = sockfd,
+		.events = POLL_IN
+	};
+	return xpoll(&pfd, 1, timeout * 1000) <= 0 ? -1 : xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
 }
 
 /*

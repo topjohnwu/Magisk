@@ -168,12 +168,14 @@ static struct su_info *get_su_info(unsigned uid) {
 		// Connect manager
 		app_connect(addr.sun_path + 1, info);
 		int fd = socket_accept(sockfd, 60);
-
-		socket_send_request(fd, info);
-		int ret = read_int_be(fd);
-		info->access.policy = ret < 0 ? DENY : ret;
-
-		close(fd);
+		if (fd < 0) {
+			info->access.policy = DENY;
+		} else {
+			socket_send_request(fd, info);
+			int ret = read_int_be(fd);
+			info->access.policy = ret < 0 ? DENY : ret;
+			close(fd);
+		}
 		close(sockfd);
 	}
 

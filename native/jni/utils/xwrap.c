@@ -394,3 +394,11 @@ pid_t xfork() {
 	}
 	return ret;
 }
+
+int xpoll(struct pollfd *fds, nfds_t nfds, int timeout) {
+	int ret = poll(fds, nfds, timeout);
+	if (ret == -1) {
+		PLOGE("poll");
+	}
+	return ret;
+}
