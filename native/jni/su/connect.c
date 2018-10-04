@@ -14,86 +14,86 @@
 
 #include "magisk.h"
 #include "daemon.h"
+#include "utils.h"
 #include "su.h"
 
 #define AM_PATH "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
 
 static char *get_command(const struct su_request *to) {
-	if (to->command)
+	if (to->command[0])
 		return to->command;
-	if (to->shell)
+	if (to->shell[0])
 		return to->shell;
 	return DEFAULT_SHELL;
 }
 
 static void silent_run(char * const args[]) {
-	set_identity(0);
-	if (fork())
+	if (fork_dont_care())
 		return;
 	int zero = open("/dev/zero", O_RDONLY | O_CLOEXEC);
-	dup2(zero, 0);
+	xdup2(zero, 0);
 	int null = open("/dev/null", O_WRONLY | O_CLOEXEC);
-	dup2(null, 1);
-	dup2(null, 2);
+	xdup2(null, 1);
+	xdup2(null, 2);
 	setenv("CLASSPATH", "/system/framework/am.jar", 1);
 	execv(args[0], args);
 	PLOGE("exec am");
 	_exit(EXIT_FAILURE);
 }
 
-static void setup_user(char *user) {
-	switch (DB_SET(su_ctx->info, SU_MULTIUSER_MODE)) {
+static void setup_user(char *user, struct su_info *info) {
+	switch (DB_SET(info, SU_MULTIUSER_MODE)) {
 		case MULTIUSER_MODE_OWNER_ONLY:
 		case MULTIUSER_MODE_OWNER_MANAGED:
 			sprintf(user, "%d", 0);
 			break;
 		case MULTIUSER_MODE_USER:
-			sprintf(user, "%d", su_ctx->info->uid / 100000);
+			sprintf(user, "%d", info->uid / 100000);
 			break;
 	}
 }
 
-void app_log() {
+void app_log(struct su_context *ctx) {
 	char user[8];
-	setup_user(user);
+	setup_user(user, ctx->info);
 
 	char fromUid[8];
 	sprintf(fromUid, "%d",
-			DB_SET(su_ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
-			su_ctx->info->uid % 100000 : su_ctx->info->uid);
+			DB_SET(ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
+			ctx->info->uid % 100000 : ctx->info->uid);
 
 	char toUid[8];
-	sprintf(toUid, "%d", su_ctx->to.uid);
+	sprintf(toUid, "%d", ctx->req.uid);
 
 	char pid[8];
-	sprintf(pid, "%d", su_ctx->pid);
+	sprintf(pid, "%d", ctx->pid);
 
 	char policy[2];
-	sprintf(policy, "%d", su_ctx->info->access.policy);
+	sprintf(policy, "%d", ctx->info->access.policy);
 
 	char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", DB_STR(su_ctx->info, SU_MANAGER),
+		"-p", DB_STR(ctx->info, SU_MANAGER),
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
 		"--ei", "to.uid", toUid,
 		"--ei", "pid", pid,
 		"--ei", "policy", policy,
-		"--es", "command", get_command(&su_ctx->to),
+		"--es", "command", get_command(&ctx->req),
 		NULL
 	};
 	silent_run(cmd);
 }
 
-void app_connect(const char *socket) {
+void app_connect(const char *socket, struct su_info *info) {
 	char user[8];
-	setup_user(user);
+	setup_user(user, info);
 	char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", DB_STR(su_ctx->info, SU_MANAGER),
+		"-p", DB_STR(info, SU_MANAGER),
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", (char *) socket,
@@ -102,8 +102,8 @@ void app_connect(const char *socket) {
 	silent_run(cmd);
 }
 
-void socket_send_request(int fd) {
-	write_key_token(fd, "uid", su_ctx->info->uid);
+void socket_send_request(int fd, struct su_info *info) {
+	write_key_token(fd, "uid", info->uid);
 	write_string_be(fd, "eof");
 }
 

@@ -2,13 +2,14 @@
  */
 
 #define _GNU_SOURCE
-#include <limits.h>
+
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
+#include <pwd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -21,43 +22,15 @@
 #include "pts.h"
 #include "selinux.h"
 
-// Constants for the atty bitfield
-#define ATTY_IN     1
-#define ATTY_OUT    2
-#define ATTY_ERR    4
-
 #define TIMEOUT     3
 
 #define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
 #define LOCK_INFO()    pthread_mutex_lock(&info->lock)
 #define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
-#define UNLOCK_INFO()  pthread_mutex_unlock(&ctx.info->lock)
+#define UNLOCK_INFO()  pthread_mutex_unlock(&info->lock)
 
 static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static struct su_info *cache;
-
-static void sighandler(int sig) {
-	restore_stdin();
-
-	// Assume we'll only be called before death
-	// See note before sigaction() in set_stdin_raw()
-	//
-	// Now, close all standard I/O to cause the pumps
-	// to exit so we can continue and retrieve the exit
-	// code
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
-	close(STDERR_FILENO);
-
-	// Put back all the default handlers
-	struct sigaction act;
-
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = SIG_DFL;
-	for (int i = 0; quit_signals[i]; ++i) {
-		sigaction(quit_signals[i], &act, NULL);
-	}
-}
 
 static void *info_collector(void *node) {
 	struct su_info *info = node;
@@ -185,48 +158,133 @@ static struct su_info *get_su_info(unsigned uid) {
 		if (info->access.policy == QUERY && DB_STR(info, SU_MANAGER)[0] == '\0')
 			info->access = NO_SU_ACCESS;
 	}
+
+	// If still not determined, ask manager
+	if (info->access.policy == QUERY) {
+		// Create random socket
+		struct sockaddr_un addr;
+		int sockfd = create_rand_socket(&addr);
+
+		// Connect manager
+		app_connect(addr.sun_path + 1, info);
+		int fd = socket_accept(sockfd, 60);
+
+		socket_send_request(fd, info);
+		int ret = read_int_be(fd);
+		info->access.policy = ret < 0 ? DENY : ret;
+
+		close(fd);
+		close(sockfd);
+	}
+
+	// Unlock
+	UNLOCK_INFO();
+
 	return info;
 }
 
-static void su_executor(int client) {
-	LOGD("su: executor started\n");
+static void populate_environment(struct su_request *req) {
+	struct passwd *pw;
+
+	if (req->keepenv)
+		return;
+
+	pw = getpwuid(req->uid);
+	if (pw) {
+		setenv("HOME", pw->pw_dir, 1);
+		if (req->shell)
+			setenv("SHELL", req->shell, 1);
+		else
+			setenv("SHELL", DEFAULT_SHELL, 1);
+		if (req->login || req->uid) {
+			setenv("USER", pw->pw_name, 1);
+			setenv("LOGNAME", pw->pw_name, 1);
+		}
+	}
+}
+
+static void set_identity(unsigned uid) {
+	/*
+	 * Set effective uid back to root, otherwise setres[ug]id will fail
+	 * if uid isn't root.
+	 */
+	if (seteuid(0)) {
+		PLOGE("seteuid (root)");
+	}
+	if (setresgid(uid, uid, uid)) {
+		PLOGE("setresgid (%u)", uid);
+	}
+	if (setresuid(uid, uid, uid)) {
+		PLOGE("setresuid (%u)", uid);
+	}
+}
+
+void su_daemon_handler(int client, struct ucred *credential) {
+	LOGD("su: request from client: %d\n", client);
+	
+	struct su_info *info = get_su_info(credential->uid);
+
+	// Fail fast
+	if (info->access.policy == DENY && !info->access.log && !info->access.notify) {
+		write_int(client, DENY);
+		return;
+	}
+
+	/* Fork a new process, the child process will need to setsid,
+	 * open a pseudo-terminal if needed, and will eventually run exec
+	 * The parent process will wait for the result and
+	 * send the return code back to our client
+	 */
+	int child = xfork();
+	if (child) {
+		// Decrement reference count
+		--info->ref;
+
+		// Wait result
+		LOGD("su: waiting child: [%d]\n", child);
+		int status, code;
+
+		if (waitpid(child, &status, 0) > 0)
+			code = WEXITSTATUS(status);
+		else
+			code = -1;
+
+		LOGD("su: return code: [%d]\n", code);
+		write(client, &code, sizeof(code));
+		close(client);
+		return;
+	}
+
+	LOGD("su: fork handler\n");
+
+	struct su_context ctx = {
+		.info = info,
+		.pid = credential->pid
+	};
 
 	// Become session leader
 	xsetsid();
 
 	// Migrate environment from client
 	char path[32], buf[4096];
-	snprintf(path, sizeof(path), "/proc/%d/cwd", su_ctx->pid);
-	xreadlink(path, su_ctx->cwd, sizeof(su_ctx->cwd));
-	snprintf(path, sizeof(path), "/proc/%d/environ", su_ctx->pid);
+	snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
+	xreadlink(path, buf, sizeof(buf));
+	chdir(buf);
+	snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
 	memset(buf, 0, sizeof(buf));
 	int fd = open(path, O_RDONLY);
 	read(fd, buf, sizeof(buf));
+	close(fd);
 	clearenv();
 	for (size_t pos = 0; buf[pos];) {
 		putenv(buf + pos);
 		pos += strlen(buf + pos) + 1;
 	}
 
-	// Let's read some info from the socket
-	int argc = read_int(client);
-	if (argc < 0 || argc > 512) {
-		LOGE("unable to allocate args: %d", argc);
-		exit2(1);
-	}
-	LOGD("su: argc=[%d]\n", argc);
-
-	char **argv = (char**) xmalloc(sizeof(char*) * (argc + 1));
-	argv[argc] = NULL;
-	for (int i = 0; i < argc; i++) {
-		argv[i] = read_string(client);
-		LOGD("su: argv[%d]=[%s]\n", i, argv[i]);
-		// Replace -cn with -z, -mm with -M for supporting getopt_long
-		if (strcmp(argv[i], "-cn") == 0)
-			strcpy(argv[i], "-z");
-		else if (strcmp(argv[i], "-mm") == 0)
-			strcpy(argv[i], "-M");
-	}
+	// Read su_request
+	xxread(client, &ctx.req, 3 * sizeof(unsigned));
+	ctx.req.shell = read_string(client);
+	ctx.req.command = read_string(client);
 
 	// Get pts_slave
 	char *pts_slave = read_string(client);
@@ -244,10 +302,10 @@ static void su_executor(int client) {
 		xstat(pts_slave, &st);
 
 		// If caller is not root, ensure the owner of pts_slave is the caller
-		if(st.st_uid != su_ctx->info->uid && su_ctx->info->uid != 0) {
+		if(st.st_uid != info->uid && info->uid != 0) {
 			LOGE("su: Wrong permission of pts_slave");
-			su_ctx->info->access.policy = DENY;
-			exit2(1);
+			info->access.policy = DENY;
+			exit(1);
 		}
 
 		// Set our pts_slave to devpts, same restriction as adb shell
@@ -258,18 +316,12 @@ static void su_executor(int client) {
 		// our controlling TTY and not the daemon's
 		ptsfd = xopen(pts_slave, O_RDWR);
 
-		if (infd < 0)  {
-			LOGD("su: stdin using PTY");
-			infd  = ptsfd;
-		}
-		if (outfd < 0) {
-			LOGD("su: stdout using PTY");
+		if (infd < 0)
+			infd = ptsfd;
+		if (outfd < 0)
 			outfd = ptsfd;
-		}
-		if (errfd < 0) {
-			LOGD("su: stderr using PTY");
+		if (errfd < 0)
 			errfd = ptsfd;
-		}
 	}
 
 	free(pts_slave);
@@ -285,142 +337,56 @@ static void su_executor(int client) {
 	write_int(client, 0);
 	close(client);
 
-	// Run the actual main
-	su_daemon_main(argc, argv);
-}
-
-void su_daemon_receiver(int client, struct ucred *credential) {
-	LOGD("su: request from client: %d\n", client);
-
-	// Default values
-	struct su_context ctx = {
-		.info = get_su_info(credential->uid),
-		.to = {
-			.uid = UID_ROOT,
-			.login = 0,
-			.keepenv = 0,
-			.shell = DEFAULT_SHELL,
-			.command = NULL,
-		},
-		.pid = credential->pid,
-		.pipefd = { -1, -1 }
-	};
-
-	// Fail fast
-	if (ctx.info->access.policy == DENY && !ctx.info->access.log && !ctx.info->access.notify) {
-		UNLOCK_INFO();
-		write_int(client, DENY);
-		return;
+	// Handle namespaces
+	switch (DB_SET(info, SU_MNT_NS)) {
+		case NAMESPACE_MODE_GLOBAL:
+			LOGD("su: use global namespace\n");
+			break;
+		case NAMESPACE_MODE_REQUESTER:
+			LOGD("su: use namespace of pid=[%d]\n", ctx.pid);
+			if (switch_mnt_ns(ctx.pid)) {
+				LOGD("su: setns failed, fallback to isolated\n");
+				xunshare(CLONE_NEWNS);
+			}
+			break;
+		case NAMESPACE_MODE_ISOLATE:
+			LOGD("su: use new isolated namespace\n");
+			xunshare(CLONE_NEWNS);
+			break;
 	}
 
-	// If still not determined, open a pipe and wait for results
-	if (ctx.info->access.policy == QUERY)
-		xpipe2(ctx.pipefd, O_CLOEXEC);
+	if (info->access.policy) {
+		char* argv[] = { NULL, NULL, NULL, NULL };
 
-	/* Fork a new process, the child process will need to setsid,
-	 * open a pseudo-terminal if needed, and will eventually run exec
-	 * The parent process will wait for the result and
-	 * send the return code back to our client
-	 */
-	int child = xfork();
-	if (child == 0) {
-		su_ctx = &ctx;
-		su_executor(client);
-	}
+		if (ctx.req.login)
+			argv[0] = "-";
+		else
+			argv[0] = ctx.req.shell;
 
-	// Wait for results
-	if (ctx.pipefd[0] >= 0) {
-		xxread(ctx.pipefd[0], &ctx.info->access.policy, sizeof(policy_t));
-		close(ctx.pipefd[0]);
-		close(ctx.pipefd[1]);
-	}
+		if (ctx.req.command[0]) {
+			argv[1] = "-c";
+			argv[2] = ctx.req.command;
+		}
 
-	// The policy is determined, unlock
-	UNLOCK_INFO();
+		// Setup shell
+		umask(022);
+		populate_environment(&ctx.req);
+		set_identity(ctx.req.uid);
 
-	// Info is now useless to us, decrement reference count
-	--ctx.info->ref;
+		if (info->access.notify || info->access.log)
+			app_log(&ctx);
 
-	// Wait result
-	LOGD("su: waiting child: [%d]\n", child);
-	int status, code;
-
-	if (waitpid(child, &status, 0) > 0)
-		code = WEXITSTATUS(status);
-	else
-		code = -1;
-
-	LOGD("su: return code: [%d]\n", code);
-	write(client, &code, sizeof(code));
-	close(client);
-
-	return;
-}
-
-/*
- * Connect daemon, send argc, argv, cwd, pts slave
- */
-int su_client_main(int argc, char *argv[]) {
-	char pts_slave[PATH_MAX];
-	int ptmx, socketfd;
-
-	// Connect to client
-	socketfd = connect_daemon();
-
-	// Tell the daemon we are su
-	write_int(socketfd, SUPERUSER);
-
-	// Number of command line arguments
-	write_int(socketfd, argc);
-
-	// Command line arguments
-	for (int i = 0; i < argc; i++) {
-		write_string(socketfd, argv[i]);
-	}
-
-	// Determine which one of our streams are attached to a TTY
-	int atty = 0;
-	if (isatty(STDIN_FILENO))  atty |= ATTY_IN;
-	if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
-	if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
-
-	if (atty) {
-		// We need a PTY. Get one.
-		ptmx = pts_open(pts_slave, sizeof(pts_slave));
+		execvp(ctx.req.shell, argv);
+		fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
+		PLOGE("exec");
+		exit(EXIT_FAILURE);
 	} else {
-		pts_slave[0] = '\0';
-	}
+		if (info->access.notify || info->access.log)
+			app_log(&ctx);
 
-	// Send the pts_slave path to the daemon
-	write_string(socketfd, pts_slave);
-
-	// Send stdin
-	send_fd(socketfd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
-	// Send stdout
-	send_fd(socketfd, (atty & ATTY_OUT) ? -1 : STDOUT_FILENO);
-	// Send stderr
-	send_fd(socketfd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
-
-	// Wait for acknowledgement from daemon
-	if (read_int(socketfd)) {
-		// Fast fail
+		LOGW("su: request rejected (%u->%u)", info->uid, ctx.req.uid);
 		fprintf(stderr, "%s\n", strerror(EACCES));
-		return DENY;
+		exit(EXIT_FAILURE);
 	}
-
-	if (atty & ATTY_IN) {
-		setup_sighandlers(sighandler);
-		pump_stdin_async(ptmx);
-	}
-	if (atty & ATTY_OUT) {
-		// Forward SIGWINCH
-		watch_sigwinch_async(STDOUT_FILENO, ptmx);
-		pump_stdout_blocking(ptmx);
-	}
-
-	// Get the exit code
-	int code = read_int(socketfd);
-	close(socketfd);
-
-	return code;
 }
+

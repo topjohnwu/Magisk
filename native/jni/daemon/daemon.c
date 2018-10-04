@@ -67,7 +67,7 @@ static void *request_handler(void *args) {
 		ls_hide_list(client);
 		break;
 	case SUPERUSER:
-		su_daemon_receiver(client, &credential);
+		su_daemon_handler(client, &credential);
 		break;
 	case CHECK_VERSION:
 		write_string(client, xstr(MAGISK_VERSION) ":MAGISK");

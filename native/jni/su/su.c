@@ -19,7 +19,6 @@
 #include <errno.h>
 #include <signal.h>
 #include <sched.h>
-#include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -27,10 +26,8 @@
 #include "daemon.h"
 #include "utils.h"
 #include "su.h"
-#include "selinux.h"
+#include "pts.h"
 #include "flags.h"
-
-struct su_context *su_ctx;
 
 static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
@@ -49,7 +46,7 @@ static void usage(int status) {
 	"  -V                            display version code and exit\n"
 	"  -mm, -M,\n"
 	"  --mount-master                force run in the global mount namespace\n");
-	exit2(status);
+	exit(status);
 }
 
 static char *concat_commands(int argc, char *argv[]) {
@@ -64,142 +61,103 @@ static char *concat_commands(int argc, char *argv[]) {
 	return strdup(command);
 }
 
-static void populate_environment() {
-	struct passwd *pw;
+static void sighandler(int sig) {
+	restore_stdin();
 
-	if (su_ctx->to.keepenv)
-		return;
+	// Assume we'll only be called before death
+	// See note before sigaction() in set_stdin_raw()
+	//
+	// Now, close all standard I/O to cause the pumps
+	// to exit so we can continue and retrieve the exit
+	// code
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
-	pw = getpwuid(su_ctx->to.uid);
-	if (pw) {
-		setenv("HOME", pw->pw_dir, 1);
-		if (su_ctx->to.shell)
-			setenv("SHELL", su_ctx->to.shell, 1);
-		else
-			setenv("SHELL", DEFAULT_SHELL, 1);
-		if (su_ctx->to.login || su_ctx->to.uid) {
-			setenv("USER", pw->pw_name, 1);
-			setenv("LOGNAME", pw->pw_name, 1);
-		}
+	// Put back all the default handlers
+	struct sigaction act;
+
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_DFL;
+	for (int i = 0; quit_signals[i]; ++i) {
+		sigaction(quit_signals[i], &act, NULL);
 	}
 }
 
-void set_identity(unsigned uid) {
-	/*
-	 * Set effective uid back to root, otherwise setres[ug]id will fail
-	 * if uid isn't root.
-	 */
-	if (seteuid(0)) {
-		PLOGE("seteuid (root)");
-	}
-	if (setresgid(uid, uid, uid)) {
-		PLOGE("setresgid (%u)", uid);
-	}
-	if (setresuid(uid, uid, uid)) {
-		PLOGE("setresuid (%u)", uid);
-	}
-}
-
-static __attribute__ ((noreturn)) void allow() {
-	char* argv[] = { NULL, NULL, NULL, NULL };
-
-	if (su_ctx->to.login)
-		argv[0] = "-";
-	else
-		argv[0] = basename(su_ctx->to.shell);
-
-	if (su_ctx->to.command) {
-		argv[1] = "-c";
-		argv[2] = su_ctx->to.command;
-	}
-
-	// Setup shell
-	umask(022);
-	populate_environment();
-	set_identity(su_ctx->to.uid);
-
-	if (su_ctx->info->access.notify || su_ctx->info->access.log)
-		app_log();
-
-	execvp(su_ctx->to.shell, argv);
-	fprintf(stderr, "Cannot execute %s: %s\n", su_ctx->to.shell, strerror(errno));
-	PLOGE("exec");
-	exit(EXIT_FAILURE);
-}
-
-static __attribute__ ((noreturn)) void deny() {
-	if (su_ctx->info->access.notify || su_ctx->info->access.log)
-		app_log();
-
-	LOGW("su: request rejected (%u->%u)", su_ctx->info->uid, su_ctx->to.uid);
-	fprintf(stderr, "%s\n", strerror(EACCES));
-	exit(EXIT_FAILURE);
-}
-
-__attribute__ ((noreturn)) void exit2(int status) {
-	// Handle the pipe, or the daemon will get stuck
-	if (su_ctx->pipefd[0] >= 0) {
-		xwrite(su_ctx->pipefd[1], &su_ctx->info->access.policy, sizeof(policy_t));
-		close(su_ctx->pipefd[0]);
-		close(su_ctx->pipefd[1]);
-	}
-	exit(status);
-}
-
-int su_daemon_main(int argc, char **argv) {
+/*
+ * Connect daemon, send argc, argv, cwd, pts slave
+ */
+int su_client_main(int argc, char *argv[]) {
 	int c;
 	struct option long_opts[] = {
-		{ "command",                required_argument,  NULL, 'c' },
-		{ "help",                   no_argument,        NULL, 'h' },
-		{ "login",                  no_argument,        NULL, 'l' },
-		{ "preserve-environment",   no_argument,        NULL, 'p' },
-		{ "shell",                  required_argument,  NULL, 's' },
-		{ "version",                no_argument,        NULL, 'v' },
-		{ "context",                required_argument,  NULL, 'z' },
-		{ "mount-master",           no_argument,        NULL, 'M' },
-		{ NULL, 0, NULL, 0 },
+			{ "command",                required_argument,  NULL, 'c' },
+			{ "help",                   no_argument,        NULL, 'h' },
+			{ "login",                  no_argument,        NULL, 'l' },
+			{ "preserve-environment",   no_argument,        NULL, 'p' },
+			{ "shell",                  required_argument,  NULL, 's' },
+			{ "version",                no_argument,        NULL, 'v' },
+			{ "context",                required_argument,  NULL, 'z' },
+			{ "mount-master",           no_argument,        NULL, 'M' },
+			{ NULL, 0, NULL, 0 },
 	};
+
+	struct su_request su_req = {
+		.uid = UID_ROOT,
+		.login = 0,
+		.keepenv = 0,
+		.shell = DEFAULT_SHELL,
+		.command = "",
+	};
+
+
+	for (int i = 0; i < argc; i++) {
+		// Replace -cn with -z, -mm with -M for supporting getopt_long
+		if (strcmp(argv[i], "-cn") == 0)
+			strcpy(argv[i], "-z");
+		else if (strcmp(argv[i], "-mm") == 0)
+			strcpy(argv[i], "-M");
+	}
 
 	while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:M", long_opts, NULL)) != -1) {
 		switch (c) {
-		case 'c':
-			su_ctx->to.command = concat_commands(argc, argv);
-			optind = argc;
-			break;
-		case 'h':
-			usage(EXIT_SUCCESS);
-			break;
-		case 'l':
-			su_ctx->to.login = 1;
-			break;
-		case 'm':
-		case 'p':
-			su_ctx->to.keepenv = 1;
-			break;
-		case 's':
-			su_ctx->to.shell = optarg;
-			break;
-		case 'V':
-			printf("%d\n", MAGISK_VER_CODE);
-			exit2(EXIT_SUCCESS);
-		case 'v':
-			printf("%s\n", xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)");
-			exit2(EXIT_SUCCESS);
-		case 'z':
-			// Do nothing, placed here for legacy support :)
-			break;
-		case 'M':
-			DB_SET(su_ctx->info, SU_MNT_NS) = NAMESPACE_MODE_GLOBAL;
-			break;
-		default:
-			/* Bionic getopt_long doesn't terminate its error output by newline */
-			fprintf(stderr, "\n");
-			usage(2);
+			case 'c':
+				su_req.command = concat_commands(argc, argv);
+				optind = argc;
+				break;
+			case 'h':
+				usage(EXIT_SUCCESS);
+				break;
+			case 'l':
+				su_req.login = 1;
+				break;
+			case 'm':
+			case 'p':
+				su_req.keepenv = 1;
+				break;
+			case 's':
+				su_req.shell = optarg;
+				break;
+			case 'V':
+				printf("%d\n", MAGISK_VER_CODE);
+				exit(EXIT_SUCCESS);
+			case 'v':
+				printf("%s\n", xstr(MAGISK_VERSION) ":MAGISKSU (topjohnwu)");
+				exit(EXIT_SUCCESS);
+			case 'z':
+				// Do nothing, placed here for legacy support :)
+				break;
+			case 'M':
+				/* TODO */
+				break;
+			default:
+				/* Bionic getopt_long doesn't terminate its error output by newline */
+				fprintf(stderr, "\n");
+				usage(2);
 		}
 	}
 
 	if (optind < argc && strcmp(argv[optind], "-") == 0) {
-		su_ctx->to.login = 1;
+		su_req.login = 1;
 		optind++;
 	}
 	/* username or uid */
@@ -207,54 +165,69 @@ int su_daemon_main(int argc, char **argv) {
 		struct passwd *pw;
 		pw = getpwnam(argv[optind]);
 		if (pw)
-			su_ctx->to.uid = pw->pw_uid;
+			su_req.uid = pw->pw_uid;
 		else
-			su_ctx->to.uid = atoi(argv[optind]);
+			su_req.uid = atoi(argv[optind]);
 		optind++;
 	}
 
-	// Handle namespaces
-	switch (DB_SET(su_ctx->info, SU_MNT_NS)) {
-		case NAMESPACE_MODE_GLOBAL:
-			LOGD("su: use global namespace\n");
-			break;
-		case NAMESPACE_MODE_REQUESTER:
-			LOGD("su: use namespace of pid=[%d]\n", su_ctx->pid);
-			if (switch_mnt_ns(su_ctx->pid)) {
-				LOGD("su: setns failed, fallback to isolated\n");
-				xunshare(CLONE_NEWNS);
-			}
-			break;
-		case NAMESPACE_MODE_ISOLATE:
-			LOGD("su: use new isolated namespace\n");
-			xunshare(CLONE_NEWNS);
-			break;
+	char pts_slave[PATH_MAX];
+	int ptmx, fd;
+
+	// Connect to client
+	fd = connect_daemon();
+
+	// Tell the daemon we are su
+	write_int(fd, SUPERUSER);
+
+	// Send su_request
+	xwrite(fd, &su_req, 3 * sizeof(unsigned));
+	write_string(fd, su_req.shell);
+	write_string(fd, su_req.command);
+
+	// Determine which one of our streams are attached to a TTY
+	int atty = 0;
+	if (isatty(STDIN_FILENO))  atty |= ATTY_IN;
+	if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
+	if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
+
+	if (atty) {
+		// We need a PTY. Get one.
+		ptmx = pts_open(pts_slave, sizeof(pts_slave));
+	} else {
+		pts_slave[0] = '\0';
 	}
 
-	// Change directory to cwd
-	chdir(su_ctx->cwd);
+	// Send pts_slave
+	write_string(fd, pts_slave);
 
-	if (su_ctx->pipefd[0] >= 0) {
-		// Create random socket
-		struct sockaddr_un addr;
-		int sockfd = create_rand_socket(&addr);
+	// Send stdin
+	send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
+	// Send stdout
+	send_fd(fd, (atty & ATTY_OUT) ? -1 : STDOUT_FILENO);
+	// Send stderr
+	send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
 
-		// Connect Magisk Manager
-		app_connect(addr.sun_path + 1);
-		int fd = socket_accept(sockfd, 60);
-
-		socket_send_request(fd);
-		su_ctx->info->access.policy = read_int_be(fd);
-
-		close(fd);
-		close(sockfd);
-
-		// Report the policy to main daemon
-		xwrite(su_ctx->pipefd[1], &su_ctx->info->access.policy, sizeof(policy_t));
-		close(su_ctx->pipefd[0]);
-		close(su_ctx->pipefd[1]);
+	// Wait for ack from daemon
+	if (read_int(fd)) {
+		// Fast fail
+		fprintf(stderr, "%s\n", strerror(EACCES));
+		return DENY;
 	}
 
-	su_ctx->info->access.policy == ALLOW ? allow() : deny();
+	if (atty & ATTY_IN) {
+		setup_sighandlers(sighandler);
+		pump_stdin_async(ptmx);
+	}
+	if (atty & ATTY_OUT) {
+		// Forward SIGWINCH
+		watch_sigwinch_async(STDOUT_FILENO, ptmx);
+		pump_stdout_blocking(ptmx);
+	}
+
+	// Get the exit code
+	int code = read_int(fd);
+	close(fd);
+
+	return code;
 }
-

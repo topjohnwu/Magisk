@@ -61,7 +61,7 @@ int check_and_start_logger();
 
 socklen_t setup_sockaddr(struct sockaddr_un *sun, daemon_t d);
 int create_rand_socket(struct sockaddr_un *sun);
-int socket_accept(int serv_fd, int timeout);
+int socket_accept(int sockfd, int timeout);
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);
@@ -98,6 +98,6 @@ void ls_hide_list(int client);
  * Superuser *
  *************/
 
-void su_daemon_receiver(int client, struct ucred *credential);
+void su_daemon_handler(int client, struct ucred *credential);
 
 #endif

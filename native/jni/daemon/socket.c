@@ -39,7 +39,7 @@ int create_rand_socket(struct sockaddr_un *sun) {
 	return fd;
 }
 
-int socket_accept(int serv_fd, int timeout) {
+int socket_accept(int sockfd, int timeout) {
 	struct timeval tv;
 	fd_set fds;
 	int rc;
@@ -47,16 +47,16 @@ int socket_accept(int serv_fd, int timeout) {
 	tv.tv_sec = timeout;
 	tv.tv_usec = 0;
 	FD_ZERO(&fds);
-	FD_SET(serv_fd, &fds);
+	FD_SET(sockfd, &fds);
 	do {
-		rc = select(serv_fd + 1, &fds, NULL, NULL, &tv);
+		rc = select(sockfd + 1, &fds, NULL, NULL, &tv);
 	} while (rc < 0 && errno == EINTR);
 	if (rc < 1) {
 		PLOGE("select");
-		exit(-1);
+		return -1;
 	}
 
-	return xaccept4(serv_fd, NULL, NULL, SOCK_CLOEXEC);
+	return xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
 }
 
 /*
@@ -164,13 +164,15 @@ void send_fd(int sockfd, int fd) {
 
 int read_int(int fd) {
 	int val;
-	xxread(fd, &val, sizeof(int));
+	if (xxread(fd, &val, sizeof(int)) != sizeof(int))
+		return -1;
 	return val;
 }
 
 int read_int_be(int fd) {
 	uint32_t val;
-	xxread(fd, &val, sizeof(val));
+	if (xxread(fd, &val, sizeof(val)) != sizeof(int))
+		return -1;
 	return ntohl(val);
 }
 
