@@ -1,5 +1,5 @@
 # Magisk Documentations
-(Updated on 2018.1.8) ([Changelog](changelog.md))
+(Updated on 2018.1.8)
 
 - [Introduction](#introduction)
 - [Tips and Tricks](tips.md)
