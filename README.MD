@@ -1,5 +1,13 @@
 # Magisk
-[XDA Announcement Thread](https://forum.xda-developers.com/apps/magisk/official-magisk-v7-universal-systemless-t3473445)
+[Downloads](https://github.com/topjohnwu/Magisk/releases) | [Documentation](docs/README.MD) | [XDA Thread](https://forum.xda-developers.com/apps/magisk/official-magisk-v7-universal-systemless-t3473445)
+
+## Introduction
+Magisk is a suite of open source tools for customizing Android, supporting devices with version higher than 5.0 Lollipop (API 21). It covers the fundamental parts for Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
+
+Furthermore, Magisk provides a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact. With its systemless nature along with several other hacks, Magisk can hide modifications from nearly any system integrity verifications used in banking apps, corporation monitoring apps, game cheat detections, and most importantly [Google's SafetyNet API](https://developer.android.com/training/safetynet/index.html).
+
+## Bug Reports
+**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** **DO NOT** report bugs that is already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by opening an issue on GitHub or directly in the thread.
 
 ## Building Environment Requirements
 1. Python 3.5+: run `build.py` script
@@ -15,18 +23,12 @@
 4. Run `build.py` with argument `-h` to see the built-in help message. The `-h` option also works for each supported actions, e.g. `./build.py binary -h`
 5. By default, `build.py` build binaries and Magisk Manager in debug mode. If you want to build Magisk Manager in release mode (via the `-r, --release` flag), you need a Java Keystore file `release-key.jks` (only `JKS` format is supported) to sign APKs and zips. For more information, check out [Google's Official Documentation](https://developer.android.com/studio/publish/app-signing.html#signing-manually).
 
-## Bug Reports
-**Make sure to install the latest [Canary Build](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337) before reporting any bugs!** Please **DO NOT** report bugs that is already fixed upstream. Follow the instructions in the [Canary Channel XDA Thread](https://forum.xda-developers.com/apps/magisk/dev-magisk-canary-channel-bleeding-edge-t3839337), and report a bug either by opening an issue on GitHub or directly in the thread.
-
-## Documentation
-[Link to Documentation](docs/README.MD)
-
 ## License
 
 ```
 Magisk, including all git submodules are free software:
-you can redistribute it and/or modify it under the terms of the 
-GNU General Public License as published by the Free Software Foundation, 
+you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,

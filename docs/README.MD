@@ -1,8 +1,6 @@
 # Magisk Documentations
 (Updated on 2018.1.8) ([Changelog](changelog.md))
 
-## Table of Contents
-
 - [Introduction](#introduction)
 - [Tips and Tricks](tips.md)
     - [OTA Installation Tips](tips.md#ota-installation-tips)
@@ -28,9 +26,3 @@ The following are for developers
 - [Tips and Tricks](tips.md)
     - [Remove Files](tips.md#remove-files)
     - [Remove Folders](tips.md#remove-folders)
-
-    
-## Introduction
-Magisk is a suite of open source tools for devices running Android version higher than 5.0 Lollipop (API 21). It establishes an environment which covers most stuffs you need for Android customization, such as root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt patches etc..
-
-Furthermore, Magisk provides a **Systemless Interface** to alter the system (or vendor) arbitrarily while the actual partitions stay completely intact, all of which accomplished by only patching the boot image. With its systemless nature along with several other hacks, Magisk can hide modifications from nearly any existing system integrity verifications, one of the main target is to hide from [Google's SafetyNet API](https://developer.android.com/training/safetynet/index.html).
