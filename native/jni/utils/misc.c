@@ -198,6 +198,30 @@ int check_proc_name(int pid, const char *name) {
 	return 0;
 }
 
+void wait_for_proc(pid_t pid, int block, int kill) {
+	if (block) {
+		waitpid(pid, NULL, 0);
+	} else {
+		int counter = 0;
+		char proc_dir[32];
+
+		sprintf(proc_dir, "/proc/%d", pid);
+
+		while (1) {
+			if (access(proc_dir, F_OK) == -1)
+				break;
+			if (counter == 8192) {
+				if (kill)
+					kill(pid, SIGTERM);
+				break;
+			} else {
+				usleep(120);
+				counter++;
+			}
+		}
+	}
+}
+
 void unlock_blocks() {
 	DIR *dir;
 	struct dirent *entry;

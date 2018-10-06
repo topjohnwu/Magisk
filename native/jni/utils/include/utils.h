@@ -94,6 +94,7 @@ int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
 void ps(void (*func)(int));
 int check_proc_name(int pid, const char *filter);
+void wait_for_proc(pid_t pid, int block, int kill);
 void unlock_blocks();
 void setup_sighandlers(void (*handler)(int));
 int exec_array(int err, int *fd, void (*setenv)(struct vector *), char *const *argv);
