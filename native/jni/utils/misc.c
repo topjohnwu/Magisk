@@ -56,9 +56,8 @@ int check_data() {
 	char *line;
 	int mnt = 0;
 	vec_for_each(&v, line) {
-		if (strstr(line, " /data ")) {
-			if (strstr(line, "tmpfs") == NULL)
-				mnt = 1;
+		if (strstr(line, " /data ") && strstr(line, "tmpfs") == NULL) {
+			mnt = 1;
 			break;
 		}
 	}
