@@ -57,9 +57,10 @@ int check_data() {
 	int mnt = 0;
 	vec_for_each(&v, line) {
 		if (strstr(line, " /data ")) {
-			if (strstr(line, "tmpfs") == NULL)
+			if (strstr(line, "tmpfs") == NULL) {
 				mnt = 1;
-			break;
+				break;
+			}
 		}
 	}
 	vec_deep_destroy(&v);
