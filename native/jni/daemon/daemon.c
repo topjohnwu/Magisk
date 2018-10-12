@@ -96,7 +96,7 @@ static void *request_handler(void *args) {
 	return NULL;
 }
 
-void main_daemon() {
+static void main_daemon() {
 	android_logging();
 #ifndef MAGISK_DEBUG
 	log_cb.d = nop_log;
@@ -111,11 +111,8 @@ void main_daemon() {
 	xdup2(fd, STDIN_FILENO);
 	close(fd);
 
-	// Start the log monitor
-	check_and_start_logger();
-
 	struct sockaddr_un sun;
-	socklen_t len = setup_sockaddr(&sun, MAIN_DAEMON);
+	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
 	fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (xbind(fd, (struct sockaddr*) &sun, len))
 		exit(1);
@@ -149,39 +146,24 @@ void main_daemon() {
 	}
 }
 
-/* Connect the daemon, set sockfd, and return if new daemon is spawned */
-int connect_daemon2(daemon_t d, int *sockfd) {
+int connect_daemon() {
 	struct sockaddr_un sun;
-	socklen_t len = setup_sockaddr(&sun, d);
-	*sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-	if (connect(*sockfd, (struct sockaddr*) &sun, len)) {
+	socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
+	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (connect(fd, (struct sockaddr*) &sun, len)) {
 		if (getuid() != UID_ROOT || getgid() != UID_ROOT) {
 			fprintf(stderr, "No daemon is currently running!\n");
 			exit(1);
 		}
 
+		LOGD("client: launching new main daemon process\n");
 		if (fork_dont_care() == 0) {
-			LOGD("client: connect fail, try launching new daemon process\n");
-			close(*sockfd);
-			switch (d) {
-				case MAIN_DAEMON:
-					main_daemon();
-					break;
-				case LOG_DAEMON:
-					log_daemon();
-					break;
-			}
+			close(fd);
+			main_daemon();
 		}
 
-		while (connect(*sockfd, (struct sockaddr*) &sun, len))
+		while (connect(fd, (struct sockaddr*) &sun, len))
 			usleep(10000);
-		return 1;
 	}
-	return 0;
-}
-
-int connect_daemon() {
-	int fd;
-	connect_daemon2(MAIN_DAEMON, &fd);
 	return fd;
 }

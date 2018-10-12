@@ -13,18 +13,9 @@
 
 #define ABS_SOCKET_LEN(sun) (sizeof(sun->sun_family) + strlen(sun->sun_path + 1) + 1)
 
-socklen_t setup_sockaddr(struct sockaddr_un *sun, daemon_t d) {
+socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name) {
 	memset(sun, 0, sizeof(*sun));
 	sun->sun_family = AF_LOCAL;
-	const char *name;
-	switch (d) {
-		case MAIN_DAEMON:
-			name = MAIN_SOCKET;
-			break;
-		case LOG_DAEMON:
-			name = LOG_SOCKET;
-			break;
-	}
 	strcpy(sun->sun_path + 1, name);
 	return ABS_SOCKET_LEN(sun);
 }

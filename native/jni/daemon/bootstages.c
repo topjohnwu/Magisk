@@ -492,7 +492,7 @@ static void *start_magisk_hide(void *args) {
 }
 
 static void auto_start_magiskhide() {
-	if (!check_and_start_logger())
+	if (!start_log_daemon())
 		return;
 	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
 	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
@@ -727,6 +727,9 @@ void post_fs_data(int client) {
 	setup_done = 1;
 
 	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+
+	// Start log_daemon
+	start_log_daemon();
 
 	LOGI("** post-fs-data mode running\n");
 

@@ -125,83 +125,82 @@ void proc_monitor() {
 		term_thread(TERM_THREAD);
 	}
 
-	while(1) {
-		// Connect to the log daemon
-		connect_daemon2(LOG_DAEMON, &sockfd);
-		write_int(sockfd, HIDE_CONNECT);
+	// Connect to the log daemon
+	sockfd = connect_log_daemon();
+	if (sockfd < 0)
+		return;
+	write_int(sockfd, HIDE_CONNECT);
 
-		FILE *log_in = fdopen(sockfd, "r");
-		char buf[4096];
-		while (fgets(buf, sizeof(buf), log_in)) {
-			char *ss = strchr(buf, '[');
-			int pid, ppid, num = 0;
-			char *pos = ss, proc[256];
-			struct stat ns, pns;
+	FILE *log_in = fdopen(sockfd, "r");
+	char buf[4096];
+	while (fgets(buf, sizeof(buf), log_in)) {
+		char *ss = strchr(buf, '[');
+		int pid, ppid, num = 0;
+		char *pos = ss, proc[256];
+		struct stat ns, pns;
 
-			while(1) {
-				pos = strchr(pos, ',');
-				if(pos == NULL)
-					break;
-				pos[0] = ' ';
-				++num;
+		while(1) {
+			pos = strchr(pos, ',');
+			if(pos == NULL)
+				break;
+			pos[0] = ' ';
+			++num;
+		}
+
+		if(sscanf(ss, num == 6 ? "[%*d %d %*d %*d %256s" : "[%*d %d %*d %256s", &pid, proc) != 2)
+			continue;
+
+		// Make sure our target is alive
+		if (kill(pid, 0))
+			continue;
+
+		// Allow hiding sub-services of applications
+		char *colon = strchr(proc, ':');
+		if (colon)
+			*colon = '\0';
+
+		int hide = 0;
+		pthread_mutex_lock(&hide_lock);
+		char *line;
+		vec_for_each(hide_list, line) {
+			if (strcmp(proc, line) == 0) {
+				hide = 1;
+				break;
 			}
+		}
+		pthread_mutex_unlock(&hide_lock);
+		if (!hide)
+			continue;
 
-			if(sscanf(ss, num == 6 ? "[%*d %d %*d %*d %256s" : "[%*d %d %*d %256s", &pid, proc) != 2)
-				continue;
+		ppid = parse_ppid(pid);
+		read_ns(ppid, &pns);
+		do {
+			read_ns(pid, &ns);
+			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+				usleep(50);
+			else
+				break;
+		} while (1);
 
-			// Make sure our target is alive
-			if (kill(pid, 0))
-				continue;
+		// Send pause signal ASAP
+		if (kill(pid, SIGSTOP) == -1)
+			continue;
 
-			// Allow hiding sub-services of applications
-			char *colon = strchr(proc, ':');
-			if (colon)
-				*colon = '\0';
-
-			int hide = 0;
-			pthread_mutex_lock(&hide_lock);
-			char *line;
-			vec_for_each(hide_list, line) {
-				if (strcmp(proc, line) == 0) {
-					hide = 1;
-					break;
-				}
-			}
-			pthread_mutex_unlock(&hide_lock);
-			if (!hide)
-				continue;
-
-			ppid = parse_ppid(pid);
-			read_ns(ppid, &pns);
-			do {
-				read_ns(pid, &ns);
-				if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-					usleep(50);
-				else
-					break;
-			} while (1);
-
-			// Send pause signal ASAP
-			if (kill(pid, SIGSTOP) == -1)
-				continue;
-
-			// Restore the colon so we can log the actual process name
-			if (colon)
-				*colon = ':';
+		// Restore the colon so we can log the actual process name
+		if (colon)
+			*colon = ':';
 #ifdef MAGISK_DEBUG
-			LOGI("proc_monitor: %s (PID=[%d] ns=%llu)(PPID=[%d] ns=%llu)\n",
-				 proc, pid, ns.st_ino, ppid, pns.st_ino);
+		LOGI("proc_monitor: %s (PID=[%d] ns=%llu)(PPID=[%d] ns=%llu)\n",
+			 proc, pid, ns.st_ino, ppid, pns.st_ino);
 #else
-			LOGI("proc_monitor: %s\n", proc);
+		LOGI("proc_monitor: %s\n", proc);
 #endif
 
-			/*
-			 * The setns system call do not support multithread processes
-			 * We have to fork a new process, setns, then do the unmounts
-			 */
-			if (fork_dont_care() == 0)
-				hide_daemon(pid);
-		}
-		// The other end EOF, restart the connection
+		/*
+		 * The setns system call do not support multithread processes
+		 * We have to fork a new process, setns, then do the unmounts
+		 */
+		if (fork_dont_care() == 0)
+			hide_daemon(pid);
 	}
 }

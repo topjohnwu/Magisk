@@ -48,18 +48,17 @@ typedef enum {
 
 // daemon.c
 
-void main_daemon();
 int connect_daemon();
-int connect_daemon2(daemon_t d, int *sockfd);
 
 // log_monitor.c
 
-void log_daemon();
-int check_and_start_logger();
+extern int log_daemon_started;
+int connect_log_daemon();
+int start_log_daemon();
 
 // socket.c
 
-socklen_t setup_sockaddr(struct sockaddr_un *sun, daemon_t d);
+socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
 int create_rand_socket(struct sockaddr_un *sun);
 int socket_accept(int sockfd, int timeout);
 int recv_fd(int sockfd);

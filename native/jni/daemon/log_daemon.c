@@ -18,7 +18,7 @@
 #include "daemon.h"
 #include "flags.h"
 
-static int loggable = 0;
+int log_daemon_started = 0;
 static struct vector log_cmd, clear_cmd;
 static int sockfd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -109,24 +109,10 @@ static void *logcat_thread(void *args) {
 	}
 }
 
-int check_and_start_logger() {
-	if (!loggable) {
-		int fd;
-		loggable = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0;
-		chmod("/dev/null", 0666);
-		if (loggable) {
-			connect_daemon2(LOG_DAEMON, &fd);
-			write_int(fd, HANDSHAKE);
-			close(fd);
-		}
-	}
-	return loggable;
-}
-
-void log_daemon() {
+static void log_daemon() {
 	setsid();
 	struct sockaddr_un sun;
-	socklen_t len = setup_sockaddr(&sun, LOG_DAEMON);
+	socklen_t len = setup_sockaddr(&sun, LOG_SOCKET);
 	sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (xbind(sockfd, (struct sockaddr*) &sun, len))
 		exit(1);
@@ -179,10 +165,36 @@ void log_daemon() {
 				events[HIDE_EVENT].fd = fd;
 				pthread_mutex_unlock(&lock);
 				break;
-			case HANDSHAKE:
 			default:
 				close(fd);
 				break;
 		}
 	}
+}
+
+int start_log_daemon() {
+	if (!log_daemon_started) {
+		if (exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
+			if (fork_dont_care() == 0)
+				log_daemon();
+			// Wait till we can connect to log_daemon
+			int fd = connect_log_daemon();
+			write_int(fd, HANDSHAKE);
+			close(fd);
+			log_daemon_started = 1;
+		}
+		chmod("/dev/null", 0666);
+	}
+	return log_daemon_started;
+}
+
+int connect_log_daemon() {
+	if (!log_daemon_started)
+		return -1;
+	struct sockaddr_un sun;
+	socklen_t len = setup_sockaddr(&sun, LOG_SOCKET);
+	int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	while (connect(fd, (struct sockaddr*) &sun, len))
+		usleep(10000);
+	return fd;
 }
