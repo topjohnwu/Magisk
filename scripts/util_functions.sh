@@ -20,6 +20,14 @@ $BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 [ -z $IMG ] && IMG=$NVBASE/magisk.img
 [ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
 
+[ -z $APK ] && APK=/data/adb/magisk.apk
+[ -f $APK ] || APK=/data/magisk/magisk.apk
+[ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+[ -f $APK ] || {
+  DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2)
+  [ "$DBAPK" ] && APK=/data/app/$DBAPK*/*.apk
+}
+
 # Bootsigner related stuff
 BOOTSIGNERCLASS=a.a
 BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
