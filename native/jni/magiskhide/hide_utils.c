@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
+#include <libgen.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -15,7 +16,6 @@
 #include "resetprop.h"
 #include "magiskhide.h"
 #include "daemon.h"
-#include "selinux.h"
 
 static char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode",
@@ -61,6 +61,54 @@ static void rm_magisk_prop(const char *name, const char *value, void *v) {
 	if (strstr(name, "magisk")) {
 		deleteprop2(name, 0);
 	}
+}
+
+/* Call func for each process */
+static void ps(void (*func)(int)) {
+	DIR *dir;
+	struct dirent *entry;
+
+	if (!(dir = xopendir("/proc")))
+		return;
+
+	while ((entry = xreaddir(dir))) {
+		if (entry->d_type == DT_DIR) {
+			if (is_num(entry->d_name))
+				func(atoi(entry->d_name));
+		}
+	}
+
+	closedir(dir);
+}
+
+static int check_proc_name(int pid, const char *name) {
+	char buf[128];
+	FILE *f;
+	sprintf(buf, "/proc/%d/comm", pid);
+	if ((f = fopen(buf, "r"))) {
+		fgets(buf, sizeof(buf), f);
+		if (strcmp(buf, name) == 0)
+			return 1;
+	} else {
+		// The PID is already killed
+		return 0;
+	}
+	fclose(f);
+
+	sprintf(buf, "/proc/%d/cmdline", pid);
+	f = fopen(buf, "r");
+	fgets(buf, sizeof(buf), f);
+	fclose(f);
+	if (strcmp(basename(buf), name) == 0)
+		return 1;
+
+	sprintf(buf, "/proc/%d/exe", pid);
+	if (access(buf, F_OK) != 0)
+		return 0;
+	xreadlink(buf, buf, sizeof(buf));
+	if (strcmp(basename(buf), name) == 0)
+		return 1;
+	return 0;
 }
 
 static void kill_proc_cb(int pid) {

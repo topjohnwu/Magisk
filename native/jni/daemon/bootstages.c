@@ -462,7 +462,7 @@ static int prepare_img() {
 	return 0;
 }
 
-void install_apk(const char *apk) {
+static void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:"SEPOL_FILE_DOMAIN":s0");
 	while (1) {
 		sleep(5);
@@ -486,6 +486,43 @@ void install_apk(const char *apk) {
 	unlink(apk);
 }
 
+static int check_data() {
+	struct vector v;
+	vec_init(&v);
+	file_to_vector("/proc/mounts", &v);
+	char *line;
+	int mnt = 0;
+	vec_for_each(&v, line) {
+		if (strstr(line, " /data ") && strstr(line, "tmpfs") == NULL) {
+			mnt = 1;
+			break;
+		}
+	}
+	vec_deep_destroy(&v);
+	int data = 0;
+	if (mnt) {
+		char *crypto = getprop("ro.crypto.state");
+		if (crypto != NULL) {
+			if (strcmp(crypto, "unencrypted") == 0) {
+				// Unencrypted, we can directly access data
+				data = 1;
+			} else {
+				// Encrypted, check whether vold is started
+				char *vold = getprop("init.svc.vold");
+				if (vold != NULL) {
+					free(vold);
+					data = 1;
+				}
+			}
+			free(crypto);
+		} else {
+			// ro.crypto.state is not set, assume it's unencrypted
+			data = 1;
+		}
+	}
+	return data;
+}
+
 static void *start_magisk_hide(void *args) {
 	launch_magiskhide(-1);
 	return NULL;
@@ -501,6 +538,27 @@ static void auto_start_magiskhide() {
 		pthread_detach(thread);
 	}
 	free(hide_prop);
+}
+
+void unlock_blocks() {
+	DIR *dir;
+	struct dirent *entry;
+	int fd, dev, OFF = 0;
+
+	if ((dev = xopen("/dev/block", O_RDONLY | O_CLOEXEC)) < 0)
+		return;
+	dir = xfdopendir(dev);
+
+	while((entry = readdir(dir))) {
+		if (entry->d_type == DT_BLK) {
+			if ((fd = openat(dev, entry->d_name, O_RDONLY)) < 0)
+				continue;
+			if (ioctl(fd, BLKROSET, &OFF) == -1)
+				PLOGE("unlock %s", entry->d_name);
+			close(fd);
+		}
+	}
+	close(dev);
 }
 
 /****************

@@ -29,6 +29,8 @@
 #include "pts.h"
 #include "flags.h"
 
+#define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
+
 static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
@@ -79,6 +81,15 @@ static void sighandler(int sig) {
 
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = SIG_DFL;
+	for (int i = 0; quit_signals[i]; ++i) {
+		sigaction(quit_signals[i], &act, NULL);
+	}
+}
+
+static void setup_sighandlers(void (*handler)(int)) {
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = handler;
 	for (int i = 0; quit_signals[i]; ++i) {
 		sigaction(quit_signals[i], &act, NULL);
 	}

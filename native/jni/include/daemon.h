@@ -41,11 +41,6 @@ enum {
 	HIDE_ITEM_NOT_EXIST,
 };
 
-typedef enum {
-	MAIN_DAEMON,
-	LOG_DAEMON
-} daemon_t;
-
 // daemon.c
 
 int connect_daemon();
@@ -78,6 +73,7 @@ void write_key_token(int fd, const char *key, int tok);
  * Boot Stages *
  ***************/
 
+void unlock_blocks();
 void startup();
 void post_fs_data(int client);
 void late_start(int client);

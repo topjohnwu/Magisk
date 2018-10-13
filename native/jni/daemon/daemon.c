@@ -17,12 +17,17 @@
 #include "magisk.h"
 #include "utils.h"
 #include "daemon.h"
-#include "resetprop.h"
 #include "selinux.h"
 #include "flags.h"
 
 int setup_done = 0;
 int seperate_vendor = 0;
+
+static void get_client_cred(int fd, struct ucred *cred) {
+	socklen_t ucred_length = sizeof(*cred);
+	if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length))
+		PLOGE("getsockopt");
+}
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);

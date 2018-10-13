@@ -20,13 +20,6 @@
 
 // xwrap.c
 
-#ifndef SOCK_CLOEXEC
-#define SOCK_CLOEXEC O_CLOEXEC
-#endif
-#ifndef SOCK_NONBLOCK
-#define SOCK_NONBLOCK O_NONBLOCK
-#endif
-
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
 #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
@@ -83,24 +76,17 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 
 // misc.c
 
-#define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
-
 unsigned get_shell_uid();
 unsigned get_system_uid();
 unsigned get_radio_uid();
-int check_data();
 int file_to_vector(const char* filename, struct vector *v);
 int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
-void ps(void (*func)(int));
-int check_proc_name(int pid, const char *filter);
-void unlock_blocks();
-void setup_sighandlers(void (*handler)(int));
+int is_num(const char *s);
 int exec_array(int err, int *fd, void (*setenv)(struct vector *), char *const *argv);
 int exec_command(int err, int *fd, void (*setenv)(struct vector*), const char *argv0, ...);
 int exec_command_sync(char *const argv0, ...);
 int bind_mount(const char *from, const char *to);
-void get_client_cred(int fd, struct ucred *cred);
 int switch_mnt_ns(int pid);
 int fork_dont_care();
 void wait_till_exists(const char *target);
@@ -146,7 +132,6 @@ int setattrat(int dirfd, const char *pathname, struct file_attr *a);
 int fsetattr(int fd, struct file_attr *a);
 void fclone_attr(const int sourcefd, const int targetfd);
 void clone_attr(const char *source, const char *target);
-
 void mmap_ro(const char *filename, void **buf, size_t *size);
 void mmap_rw(const char *filename, void **buf, size_t *size);
 void fd_full_read(int fd, void **buf, size_t *size);

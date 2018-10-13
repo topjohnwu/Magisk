@@ -22,7 +22,6 @@
 
 #include "logging.h"
 #include "utils.h"
-#include "resetprop.h"
 #include "flags.h"
 
 unsigned get_shell_uid() {
@@ -47,43 +46,6 @@ unsigned get_radio_uid() {
 		return 1001;
 
 	return ppwd->pw_uid;
-}
-
-int check_data() {
-	struct vector v;
-	vec_init(&v);
-	file_to_vector("/proc/mounts", &v);
-	char *line;
-	int mnt = 0;
-	vec_for_each(&v, line) {
-		if (strstr(line, " /data ") && strstr(line, "tmpfs") == NULL) {
-			mnt = 1;
-			break;
-		}
-	}
-	vec_deep_destroy(&v);
-	int data = 0;
-	if (mnt) {
-		char *crypto = getprop("ro.crypto.state");
-		if (crypto != NULL) {
-			if (strcmp(crypto, "unencrypted") == 0) {
-				// Unencrypted, we can directly access data
-				data = 1;
-			} else {
-				// Encrypted, check whether vold is started
-				char *vold = getprop("init.svc.vold");
-				if (vold != NULL) {
-					free(vold);
-					data = 1;
-				}
-			}
-			free(crypto);
-		} else {
-			// ro.crypto.state is not set, assume it's unencrypted
-			data = 1;
-		}
-	}
-	return data;
 }
 
 /* All the string should be freed manually!! */
@@ -122,7 +84,7 @@ int vector_to_file(const char *filename, struct vector *v) {
 }
 
 /* Check if the string only contains digits */
-static int is_num(const char *s) {
+int is_num(const char *s) {
 	int len = strlen(s);
 	for (int i = 0; i < len; ++i)
 		if (s[i] < '0' || s[i] > '9')
@@ -147,84 +109,6 @@ ssize_t fdgets(char *buf, const size_t size, int fd) {
 	}
 	buf[size - 1] = '\0';
 	return len;
-}
-
-/* Call func for each process */
-void ps(void (*func)(int)) {
-	DIR *dir;
-	struct dirent *entry;
-
-	if (!(dir = xopendir("/proc")))
-		return;
-
-	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR) {
-			if (is_num(entry->d_name))
-				func(atoi(entry->d_name));
-		}
-	}
-
-	closedir(dir);
-}
-
-int check_proc_name(int pid, const char *name) {
-	char buf[128];
-	FILE *f;
-	sprintf(buf, "/proc/%d/comm", pid);
-	if ((f = fopen(buf, "r"))) {
-		fgets(buf, sizeof(buf), f);
-		if (strcmp(buf, name) == 0)
-			return 1;
-	} else {
-		// The PID is already killed
-		return 0;
-	}
-	fclose(f);
-
-	sprintf(buf, "/proc/%d/cmdline", pid);
-	f = fopen(buf, "r");
-	fgets(buf, sizeof(buf), f);
-	fclose(f);
-	if (strcmp(basename(buf), name) == 0)
-		return 1;
-
-	sprintf(buf, "/proc/%d/exe", pid);
-	if (access(buf, F_OK) != 0)
-		return 0;
-	xreadlink(buf, buf, sizeof(buf));
-	if (strcmp(basename(buf), name) == 0)
-		return 1;
-	return 0;
-}
-
-void unlock_blocks() {
-	DIR *dir;
-	struct dirent *entry;
-	int fd, dev, OFF = 0;
-
-	if ((dev = xopen("/dev/block", O_RDONLY | O_CLOEXEC)) < 0)
-		return;
-	dir = xfdopendir(dev);
-
-	while((entry = readdir(dir))) {
-		if (entry->d_type == DT_BLK) {
-			if ((fd = openat(dev, entry->d_name, O_RDONLY)) < 0)
-				continue;
-			if (ioctl(fd, BLKROSET, &OFF) == -1)
-				PLOGE("unlock %s", entry->d_name);
-			close(fd);
-		}
-	}
-	close(dev);
-}
-
-void setup_sighandlers(void (*handler)(int)) {
-	struct sigaction act;
-	memset(&act, 0, sizeof(act));
-	act.sa_handler = handler;
-	for (int i = 0; quit_signals[i]; ++i) {
-		sigaction(quit_signals[i], &act, NULL);
-	}
 }
 
 /*
@@ -322,12 +206,6 @@ int bind_mount(const char *from, const char *to) {
 	LOGI("bind_mount: %s\n", to);
 #endif
 	return ret;
-}
-
-void get_client_cred(int fd, struct ucred *cred) {
-	socklen_t ucred_length = sizeof(*cred);
-	if(getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &ucred_length))
-		PLOGE("getsockopt");
 }
 
 int switch_mnt_ns(int pid) {
