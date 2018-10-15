@@ -1,4 +1,4 @@
-## Magisk Tools
+# Magisk Tools
 Magisk comes with a huge collections of tools for installation, daemons, and utilities for developers. This documentation covers the 3 binaries and all included applets. The binaries and applets are shown below:
 
 ```

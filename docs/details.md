@@ -1,3 +1,4 @@
+# Magisk Details
 ## File Structure
 ### Paths in "sbin tmpfs overlay"
 sbin tmpfs overlay is the key to hiding Magisk from detection. All Magisk binaries, applets, mirrors, mountpoints, loop devices, and other trivial stuffs are all located in the `tmpfs` mounted on `/sbin`. MagiskHide can just simply unmount `/sbin` and the bind mounts into `/system` and `/vendor` to hide all modifications easily. 

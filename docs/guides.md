@@ -1,3 +1,4 @@
+# Developer Guides
 ## Scripts
 In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
 
