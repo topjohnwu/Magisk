@@ -1,11 +1,11 @@
 # Magisk Documentations
-(Updated on 2018.10.15)
+(Updated on 2018.10.16)
 
 - [Tutorials](tutorials.md)
     - [OTA Installation](tutorials.md#ota-installation)
     - [Best Practices for MagiskHide](tutorials.md#best-practices-for-magiskhide)
 
-The following are for developers
+The followings are for developers
 
 - [Magisk Details](details.md)
     - [File Structure](details.md#file-structure)
@@ -14,6 +14,10 @@ The following are for developers
     - [Magic Mount](details.md#magic-mount)
     - [Simple Mount](details.md#simple-mount)
     - [Miscellaneous](details.md#Miscellaneous)
+- [Installation](install.md)
+    - [Systemless](install.md#systemless)
+    - [System Only](install.md#system-only)
+    - [Exploits](install.md#Exploits)
 - [Magisk Tools](tools.md)
 - [Developer Guides](guides.md)
     - [Scripts](guides.md#scripts)
