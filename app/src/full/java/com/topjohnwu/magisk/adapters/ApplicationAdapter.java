@@ -70,7 +70,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         hideList = Shell.su("magiskhide --ls").exec().getOut();
         for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
             ApplicationInfo info = i.next();
-            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
+            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled || info.uid == 1000) {
                 i.remove();
             }
         }
