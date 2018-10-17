@@ -141,6 +141,12 @@ public class FlashActivity extends BaseActivity {
         }
     }
 
+    @OnClick(R.id.close)
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
     @Override
     public void onBackPressed() {
         // Prevent user accidentally press back button
