@@ -79,4 +79,12 @@ dependencies {
     fullImplementation 'com.github.topjohnwu:libsu:2.0.2'
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
+
+    def butterKnifeVersion = '9.0.0-rc1'
+    if (properties.containsKey('android.injected.invoked.from.ide')) {
+        fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
+    } else {
+        fullImplementation "com.jakewharton:butterknife-runtime:${butterKnifeVersion}"
+        fullAnnotationProcessor "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    }
 }

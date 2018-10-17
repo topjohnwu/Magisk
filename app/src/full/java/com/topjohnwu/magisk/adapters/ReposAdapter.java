@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.asyncs.ProcessRepoZip;
 import com.topjohnwu.magisk.components.BaseActivity;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
 
 public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, ReposAdapter.RepoHolder> {
 
@@ -163,29 +163,29 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         notifyDataSetChanged();
     }
 
-    public static class SectionHolder extends RecyclerView.ViewHolder {
+    static class SectionHolder extends RecyclerView.ViewHolder {
 
-        public TextView sectionText;
+        @BindView(R.id.section_text) TextView sectionText;
 
         SectionHolder(View itemView) {
             super(itemView);
-            ViewBinder.bind(this, itemView);
+            new ReposAdapter$SectionHolder_ViewBinding(this, itemView);
         }
     }
 
-    public static class RepoHolder extends RecyclerView.ViewHolder {
+    static class RepoHolder extends RecyclerView.ViewHolder {
 
-        public TextView title;
-        public TextView versionName;
-        public TextView description;
-        public TextView author;
-        public LinearLayout infoLayout;
-        public ImageView downloadImage;
-        public TextView updateTime;
+        @BindView(R.id.title) TextView title;
+        @BindView(R.id.version_name) TextView versionName;
+        @BindView(R.id.description) TextView description;
+        @BindView(R.id.author) TextView author;
+        @BindView(R.id.info_layout) LinearLayout infoLayout;
+        @BindView(R.id.download) ImageView downloadImage;
+        @BindView(R.id.update_time) TextView updateTime;
 
         RepoHolder(View itemView) {
             super(itemView);
-            ViewBinder.bind(this, itemView);
+            new ReposAdapter$RepoHolder_ViewBinding(this, itemView);
         }
 
     }

@@ -15,16 +15,17 @@ import java.util.Locale;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import butterknife.BindView;
 
 public class AboutActivity extends BaseActivity {
 
-    Toolbar toolbar;
-    AboutCardRow appVersionInfo;
-    AboutCardRow appChangelog;
-    AboutCardRow appTranslators;
-    AboutCardRow appSourceCode;
-    AboutCardRow supportThread;
-    AboutCardRow twitter;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.app_version_info) AboutCardRow appVersionInfo;
+    @BindView(R.id.app_changelog) AboutCardRow appChangelog;
+    @BindView(R.id.app_translators) AboutCardRow appTranslators;
+    @BindView(R.id.app_source_code) AboutCardRow appSourceCode;
+    @BindView(R.id.support_thread) AboutCardRow supportThread;
+    @BindView(R.id.follow_twitter) AboutCardRow twitter;
 
     @Override
     public int getDarkTheme() {
@@ -35,7 +36,7 @@ public class AboutActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        ViewBinder.bind(this);
+        new AboutActivity_ViewBinding(this);
 
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(view -> finish());

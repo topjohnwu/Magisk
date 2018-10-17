@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.container.SuLogEntry;
 import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
 
 public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, SuLogAdapter.LogViewHolder> {
 
@@ -116,32 +116,32 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
         notifyDataSetChanged();
     }
 
-    public static class SectionHolder extends RecyclerView.ViewHolder {
+    static class SectionHolder extends RecyclerView.ViewHolder {
 
-        public TextView date;
-        public ImageView arrow;
+        @BindView(R.id.date) TextView date;
+        @BindView(R.id.arrow) ImageView arrow;
 
         SectionHolder(View itemView) {
             super(itemView);
-            ViewBinder.bind(this, itemView);
+            new SuLogAdapter$SectionHolder_ViewBinding(this, itemView);
         }
     }
 
-    public static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
-        public TextView appName;
-        public TextView action;
-        public TextView time;
-        public TextView fromPid;
-        public TextView toUid;
-        public TextView command;
-        public ViewGroup expandLayout;
+        @BindView(R.id.app_name) TextView appName;
+        @BindView(R.id.action) TextView action;
+        @BindView(R.id.time) TextView time;
+        @BindView(R.id.fromPid) TextView fromPid;
+        @BindView(R.id.toUid) TextView toUid;
+        @BindView(R.id.command) TextView command;
+        @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
         private Container container = new Container();
 
         LogViewHolder(View itemView) {
             super(itemView);
-            ViewBinder.bind(this, itemView);
+            new SuLogAdapter$LogViewHolder_ViewBinding(this, itemView);
             container.expandLayout = expandLayout;
             setupExpandable();
         }

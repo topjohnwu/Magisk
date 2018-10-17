@@ -27,17 +27,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import androidx.annotation.Nullable;
+import butterknife.BindView;
 
 public class SuRequestActivity extends BaseActivity {
-    LinearLayout suPopup;
-    Spinner timeout;
-    ImageView appIcon;
-    TextView appNameView;
-    TextView packageNameView;
-    Button grant_btn;
-    Button deny_btn;
-    ImageView fingerprintImg;
-    TextView warning;
+    @BindView(R.id.su_popup) LinearLayout suPopup;
+    @BindView(R.id.timeout) Spinner timeout;
+    @BindView(R.id.app_icon) ImageView appIcon;
+    @BindView(R.id.app_name) TextView appNameView;
+    @BindView(R.id.package_name) TextView packageNameView;
+    @BindView(R.id.grant_btn) Button grant_btn;
+    @BindView(R.id.deny_btn) Button deny_btn;
+    @BindView(R.id.fingerprint) ImageView fingerprintImg;
+    @BindView(R.id.warning) TextView warning;
 
     private SuConnector connector;
     private Policy policy;
@@ -157,7 +158,7 @@ public class SuRequestActivity extends BaseActivity {
         }
 
         setContentView(R.layout.activity_request);
-        ViewBinder.bind(this);
+        new SuRequestActivity_ViewBinding(this);
 
         appIcon.setImageDrawable(policy.info.loadIcon(pm));
         appNameView.setText(policy.appName);

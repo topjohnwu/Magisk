@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import butterknife.BindView;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
@@ -34,9 +35,9 @@ public class MainActivity extends BaseActivity
     private int mDrawerItem;
     private static boolean fromShortcut = false;
 
-    public Toolbar toolbar;
-    DrawerLayout drawer;
-    NavigationView navigationView;
+    @BindView(R.id.toolbar) public Toolbar toolbar;
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.nav_view) NavigationView navigationView;
 
     private float toolbarElevation;
 
@@ -54,7 +55,7 @@ public class MainActivity extends BaseActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ViewBinder.bind(this);
+        new MainActivity_ViewBinding(this);
 
         setSupportActionBar(toolbar);
 

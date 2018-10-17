@@ -31,21 +31,25 @@ import java.util.Locale;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import butterknife.BindView;
+import butterknife.OnClick;
 
 public class FlashActivity extends BaseActivity {
 
-    Toolbar toolbar;
-    TextView flashLogs;
-    public LinearLayout buttonPanel;
-    public Button reboot;
-    ScrollView sv;
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.txtLog) TextView flashLogs;
+    @BindView(R.id.button_panel) public LinearLayout buttonPanel;
+    @BindView(R.id.reboot) public Button reboot;
+    @BindView(R.id.scrollView) ScrollView sv;
 
     private List<String> logs;
 
+    @OnClick(R.id.reboot)
     void reboot() {
         Shell.su("/system/bin/reboot").submit();
     }
 
+    @OnClick(R.id.save_logs)
     void saveLogs() {
         runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
             Calendar now = Calendar.getInstance();
@@ -78,7 +82,8 @@ public class FlashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
-        ViewBinder.bind(this);
+        new FlashActivity_ViewBinding(this);
+
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {

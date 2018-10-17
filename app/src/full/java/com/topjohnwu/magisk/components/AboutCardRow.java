@@ -27,17 +27,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ViewBinder;
+
+import butterknife.BindView;
 
 /**
  * @author dvdandroid
  */
 public class AboutCardRow extends LinearLayout {
 
-    public TextView mTitle;
-    public TextView mSummary;
-    public ImageView mIcon;
-    public View mView;
+    @BindView(android.R.id.title) TextView mTitle;
+    @BindView(android.R.id.summary) TextView mSummary;
+    @BindView(android.R.id.icon) ImageView mIcon;
+    @BindView(R.id.container) View mView;
 
     public AboutCardRow(Context context) {
         this(context, null);
@@ -50,7 +51,7 @@ public class AboutCardRow extends LinearLayout {
     public AboutCardRow(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
-        ViewBinder.bind(this, this);
+        new AboutCardRow_ViewBinding(this, this);
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
         String title;

@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.ViewBinder;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
@@ -24,7 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
 
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder> {
 
@@ -39,6 +40,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         this.pm = pm;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_policy, parent, false);
@@ -138,24 +140,24 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
         return policyList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
+    static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
-        public TextView appName;
-        public TextView packageName;
-        public ImageView appIcon;
-        public Switch masterSwitch;
-        public Switch notificationSwitch;
-        public Switch loggingSwitch;
-        public ViewGroup expandLayout;
+        @BindView(R.id.app_name) TextView appName;
+        @BindView(R.id.package_name) TextView packageName;
+        @BindView(R.id.app_icon) ImageView appIcon;
+        @BindView(R.id.master_switch) Switch masterSwitch;
+        @BindView(R.id.notification_switch) Switch notificationSwitch;
+        @BindView(R.id.logging_switch) Switch loggingSwitch;
+        @BindView(R.id.expand_layout) ViewGroup expandLayout;
 
-        public ImageView delete;
-        public ImageView moreInfo;
+        @BindView(R.id.delete) ImageView delete;
+        @BindView(R.id.more_info) ImageView moreInfo;
 
         private Container container = new Container();
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ViewBinder.bind(this, itemView);
+            new PolicyAdapter$ViewHolder_ViewBinding(this, itemView);
             container.expandLayout = expandLayout;
             setupExpandable();
         }
