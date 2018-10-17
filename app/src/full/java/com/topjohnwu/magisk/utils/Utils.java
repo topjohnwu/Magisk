@@ -6,6 +6,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -122,5 +126,18 @@ public class Utils {
             }
             Topic.publish(Topic.MODULE_LOAD_DONE, moduleMap);
         });
+    }
+
+    public static String getAppLabel(ApplicationInfo info, PackageManager pm) {
+        try {
+            if (info.labelRes > 0) {
+                Resources res = pm.getResourcesForApplication(info);
+                Configuration config = new Configuration();
+                config.setLocale(LocaleManager.locale);
+                res.updateConfiguration(config, res.getDisplayMetrics());
+                return res.getString(info.labelRes);
+            }
+        } catch (Exception ignored) {}
+        return info.loadLabel(pm).toString();
     }
 }

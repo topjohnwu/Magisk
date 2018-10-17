@@ -31,7 +31,7 @@ public class SuperuserFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_superuser, container, false);
         unbinder = new SuperuserFragment_ViewBinding(this, view);
 
-        pm = getActivity().getPackageManager();
+        pm = requireActivity().getPackageManager();
         return view;
     }
 
