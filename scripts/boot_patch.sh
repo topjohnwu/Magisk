@@ -141,25 +141,23 @@ if ! $KEEPVERITY; then
 fi
 
 if [ -f kernel ]; then
-  # Remove Samsung RKP in stock kernel
+  # Remove Samsung RKP
   ./magiskboot --hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
   A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
-  # Remove Samsung defex (A8 variant)
+  # Remove Samsung defex
+  # Before: [mrs x0, sp_el0] [mov w2, #-221]   (-__NR_execve)
+  # After:  [mrs x0, sp_el0] [mov w2, #-32768]
   ./magiskboot --hexpatch kernel \
-  006044B91F040071802F005460DE41F9 \
-  006044B91F00006B802F005460DE41F9
+  004138D5821B8012 \
+  004138D5E2FF8F12
 
-  # Remove Samsung defex (N9 variant)
-  ./magiskboot --hexpatch kernel \
-  603A46B91F0400710030005460C642F9 \
-  603A46B91F00006B0030005460C642F9
-
+  # Force kernel to load rootfs
   # skip_initramfs -> want_initramfs
   ./magiskboot --hexpatch kernel \
-  736B69705F696E697472616D6673 \
-  77616E745F696E697472616D6673
+  736B69705F696E697472616D667300 \
+  77616E745F696E697472616D667300
 fi
 
 ##########################################################################################
