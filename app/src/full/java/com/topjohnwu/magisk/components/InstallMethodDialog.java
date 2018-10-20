@@ -1,11 +1,12 @@
 package com.topjohnwu.magisk.components;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
@@ -27,23 +28,21 @@ class InstallMethodDialog extends AlertDialog.Builder {
             Intent intent;
             switch (idx) {
                 case 1:
-                    if (Data.remoteMagiskVersionCode < 1400) {
-                        SnackbarMaker.make(activity, R.string.no_boot_file_patch_support,
-                                Snackbar.LENGTH_LONG).show();
-                        return;
-                    }
                     Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                     intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
-                    activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
-                            (requestCode, resultCode, data) -> {
-                                if (requestCode == Const.ID.SELECT_BOOT &&
-                                        resultCode == BaseActivity.RESULT_OK && data != null) {
-                                    Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                            .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
-                                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
-                                    activity.startActivity(i);
-                                }
-                            });
+                    activity.runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () ->
+                        activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
+                        (requestCode, resultCode, data) -> {
+                            if (requestCode == Const.ID.SELECT_BOOT &&
+                                    resultCode == Activity.RESULT_OK && data != null) {
+                                Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                                        .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                                activity.startActivity(i);
+                            }
+                        })
+                    );
+
                     break;
                 case 0:
                     String filename = Utils.fmt("Magisk-v%s(%d).zip",
@@ -62,16 +61,16 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     break;
                 case 3:
                     new CustomAlertDialog(activity)
-                            .setTitle(R.string.warning)
-                            .setMessage(R.string.install_inactive_slot_msg)
-                            .setCancelable(true)
-                            .setPositiveButton(R.string.yes, (d, i) -> {
-                                Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
-                                activity.startActivity(it);
-                            })
-                            .setNegativeButton(R.string.no_thanks, null)
-                            .show();
+                        .setTitle(R.string.warning)
+                        .setMessage(R.string.install_inactive_slot_msg)
+                        .setCancelable(true)
+                        .setPositiveButton(R.string.yes, (d, i) -> {
+                            Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
+                            activity.startActivity(it);
+                        })
+                        .setNegativeButton(R.string.no_thanks, null)
+                        .show();
                     break;
                 default:
             }
