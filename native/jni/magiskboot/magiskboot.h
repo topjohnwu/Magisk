@@ -4,20 +4,20 @@
 #include <sys/types.h>
 
 #include "logging.h"
-#include "bootimg.h"
+#include "format.h"
 
 #define KERNEL_FILE     "kernel"
 #define RAMDISK_FILE    "ramdisk.cpio"
 #define SECOND_FILE     "second"
 #define EXTRA_FILE      "extra"
 #define DTB_FILE        "dtb"
+#define RECV_DTBO_FILE  "recovery_dtbo"
 #define NEW_BOOT        "new-boot.img"
 
 // Main entries
 int unpack(const char *image);
 void repack(const char* orig_image, const char* out_image);
 void hexpatch(const char *image, const char *from, const char *to);
-int parse_img(const char *image, boot_img *boot);
 int cpio_commands(int argc, char *argv[]);
 void comp_file(const char *method, const char *from, const char *to);
 void decomp_file(char *from, const char *to);

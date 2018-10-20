@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "bootimg.h"
 #include "format.h"
 
 #define MATCH(s) (len >= (sizeof(s) - 1) && memcmp(buf, s, sizeof(s) - 1) == 0)

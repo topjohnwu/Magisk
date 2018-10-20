@@ -102,7 +102,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_SRC_FILES := \
 	magiskboot/cpio.c \
 	magiskboot/main.c \
-	magiskboot/bootimg.c \
+	magiskboot/bootimg.cpp \
 	magiskboot/hexpatch.c \
 	magiskboot/compress.c \
 	magiskboot/format.c \
