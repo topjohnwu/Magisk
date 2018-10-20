@@ -147,11 +147,9 @@ if [ -f kernel ]; then
   A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
 
   # Remove Samsung defex
-  # Before: [mrs x0, sp_el0] [mov w2, #-221]   (-__NR_execve)
-  # After:  [mrs x0, sp_el0] [mov w2, #-32768]
-  ./magiskboot --hexpatch kernel \
-  004138D5821B8012 \
-  004138D5E2FF8F12
+  # Before: [mov w2, #-221]   (-__NR_execve)
+  # After:  [mov w2, #-32768]
+  ./magiskboot --hexpatch kernel 821B8012 E2FF8F12
 
   # Force kernel to load rootfs
   # skip_initramfs -> want_initramfs
