@@ -227,8 +227,10 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	struct su_info *info = get_su_info(credential->uid);
 
 	// Fail fast
-	if (info->access.policy == DENY && !info->access.log && !info->access.notify) {
+	if (info->access.policy == DENY && DB_STR(info, SU_MANAGER)[0] == '\0') {
+		LOGD("su: fast deny\n");
 		write_int(client, DENY);
+		close(client);
 		return;
 	}
 
@@ -263,6 +265,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		.info = info,
 		.pid = credential->pid
 	};
+
+	// ack
+	write_int(client, 0);
 
 	// Become session leader
 	xsetsid();
@@ -334,9 +339,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	xdup2(errfd, STDERR_FILENO);
 
 	close(ptsfd);
-
-	// ack and close
-	write_int(client, 0);
 	close(client);
 
 	// Handle namespaces

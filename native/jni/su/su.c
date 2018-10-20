@@ -192,6 +192,13 @@ int su_client_main(int argc, char *argv[]) {
 	// Tell the daemon we are su
 	write_int(fd, SUPERUSER);
 
+	// Wait for ack from daemon
+	if (read_int(fd)) {
+		// Fast fail
+		fprintf(stderr, "%s\n", strerror(EACCES));
+		return DENY;
+	}
+
 	// Send su_request
 	xwrite(fd, &su_req, 4 * sizeof(unsigned));
 	write_string(fd, su_req.shell);
@@ -219,13 +226,6 @@ int su_client_main(int argc, char *argv[]) {
 	send_fd(fd, (atty & ATTY_OUT) ? -1 : STDOUT_FILENO);
 	// Send stderr
 	send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
-
-	// Wait for ack from daemon
-	if (read_int(fd)) {
-		// Fast fail
-		fprintf(stderr, "%s\n", strerror(EACCES));
-		return DENY;
-	}
 
 	if (atty & ATTY_IN) {
 		setup_sighandlers(sighandler);
