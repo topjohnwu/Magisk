@@ -94,7 +94,7 @@ mount_partitions() {
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
-  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+  grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   if [ -f /system/init ]; then
     SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
@@ -125,7 +125,10 @@ get_flags() {
     fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
-    if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
+    grep ' /data ' /proc/mounts | grep -q 'dm-' && FDE=true || FDE=false
+    [ -d /data/unencrypted ] && FBE=true || FBE=false
+    # No data access means unable to decrypt in recovery
+    if $FDE || $FBE || ! $DATA; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data detected, keep forceencrypt"
     else
