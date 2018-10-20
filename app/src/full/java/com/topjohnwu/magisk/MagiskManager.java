@@ -38,7 +38,7 @@ public class MagiskManager extends ContainerApp {
         Shell.Config.setInitializer(RootUtils.class);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mDB = MagiskDatabaseHelper.getInstance(this);
+        mDB = MagiskDatabaseHelper.getInstance();
 
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {

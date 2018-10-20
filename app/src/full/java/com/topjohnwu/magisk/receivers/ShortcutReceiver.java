@@ -45,8 +45,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(0)
                     .build());
         }
-        if (root && Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
-                && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
+        if (root && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false)) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "magiskhide")
                     .setShortLabel(mm.getString(R.string.magiskhide))
                     .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))

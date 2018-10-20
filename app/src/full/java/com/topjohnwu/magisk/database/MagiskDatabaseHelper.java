@@ -38,26 +38,26 @@ public class MagiskDatabaseHelper {
     private static final String LOG_TABLE = "logs";
     private static final String SETTINGS_TABLE = "settings";
     private static final String STRINGS_TABLE = "strings";
+    private static final File MANAGER_DB =
+            new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
 
     private PackageManager pm;
     private SQLiteDatabase db;
-    private MagiskManager mm;
 
     @NonNull
-    public static MagiskDatabaseHelper getInstance(MagiskManager mm) {
+    public static MagiskDatabaseHelper getInstance() {
         try {
-            return new MagiskDatabaseHelper(mm);
+            return new MagiskDatabaseHelper();
         } catch (Exception e) {
             // Let's cleanup everything and try again
             Shell.su("db_clean '*'").exec();
-            return new MagiskDatabaseHelper(mm);
+            return new MagiskDatabaseHelper();
         }
     }
 
-    private MagiskDatabaseHelper(MagiskManager context) {
-        mm = context;
-        pm = mm.getPackageManager();
-        db = openDatabase(mm);
+    private MagiskDatabaseHelper() {
+        pm = Data.MM().getPackageManager();
+        db = openDatabase();
         db.disableWriteAheadLogging();
         int version = Data.magiskVersionCode >= Const.MAGISK_VER.DBVER_SIX ? DATABASE_VER : OLD_DATABASE_VER;
         int curVersion = db.getVersion();
@@ -71,48 +71,37 @@ public class MagiskDatabaseHelper {
         clearOutdated();
     }
 
-    private SQLiteDatabase openDatabase(MagiskManager mm) {
-        final File DB_FILE = new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
+    private SQLiteDatabase openDatabase() {
+        MagiskManager mm = Data.MM();
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
-        if (!DB_FILE.canWrite()) {
+        if (!MANAGER_DB.canWrite()) {
             if (!Shell.rootAccess()) {
                 // We don't want the app to crash, create a db and return
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             }
             // Cleanup
             Shell.su("db_clean " + Const.USER_ID).exec();
-            if (Data.magiskVersionCode < Const.MAGISK_VER.FBE_AWARE) {
-                // Super old legacy mode
-                return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
-            } else if (Data.magiskVersionCode < Const.MAGISK_VER.HIDDEN_PATH) {
-                // Legacy mode with FBE aware
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    de.moveDatabaseFrom(mm, "su.db");
-                }
-                return de.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
-            } else {
-                // Global database
-                final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db");
-                mm.deleteDatabase("su.db");
-                de.deleteDatabase("su.db");
-                if (Data.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {
-                    // We need some additional policies on old versions
-                    Shell.su("db_sepatch").exec();
-                }
-                if (!GLOBAL_DB.exists()) {
-                    Shell.su("db_init").exec();
-                    SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
-                    Shell.su("db_restore").exec();
-                }
+            // Global database
+            final SuFile GLOBAL_DB = new SuFile("/data/adb/magisk.db");
+            mm.deleteDatabase("su.db");
+            de.deleteDatabase("su.db");
+            if (Data.magiskVersionCode < Const.MAGISK_VER.SEPOL_REFACTOR) {
+                // We need some additional policies on old versions
+                Shell.su("db_sepatch").exec();
+            }
+            if (!GLOBAL_DB.exists()) {
+                Shell.su("db_init").exec();
+                SQLiteDatabase.openOrCreateDatabase(GLOBAL_DB, null).close();
+                Shell.su("db_restore").exec();
             }
             Shell.su("db_setup " + Process.myUid()).exec();
         }
         // Not using legacy mode, open the mounted global DB
-        return SQLiteDatabase.openOrCreateDatabase(DB_FILE, null);
+        return SQLiteDatabase.openOrCreateDatabase(MANAGER_DB, null);
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion) {
+    private void onUpgrade(SQLiteDatabase db, int oldVersion) {
         if (oldVersion == 0) {
             createTables(db);
             oldVersion = 3;
@@ -147,13 +136,13 @@ public class MagiskDatabaseHelper {
         }
         if (oldVersion == 5) {
             setSettings(Const.Key.SU_FINGERPRINT,
-                    mm.prefs.getBoolean(Const.Key.SU_FINGERPRINT, false) ? 1 : 0);
+                    Data.MM().prefs.getBoolean(Const.Key.SU_FINGERPRINT, false) ? 1 : 0);
             ++oldVersion;
         }
     }
 
     // Remove everything, we do not support downgrade
-    public void onDowngrade(SQLiteDatabase db) {
+    private void onDowngrade(SQLiteDatabase db) {
         Utils.toast(R.string.su_db_corrupt, Toast.LENGTH_LONG);
         db.execSQL("DROP TABLE IF EXISTS " + POLICY_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + LOG_TABLE);

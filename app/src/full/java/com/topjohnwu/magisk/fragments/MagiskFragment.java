@@ -214,11 +214,10 @@ public class MagiskFragment extends BaseFragment
 
         boolean hasNetwork = Download.checkNetworkStatus(mm);
         boolean hasRoot = Shell.rootAccess();
-        boolean isUpToDate = Data.magiskVersionCode > Const.MAGISK_VER.UNIFIED;
 
         magiskUpdate.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
         installOptionCard.setVisibility(hasNetwork ? View.VISIBLE : View.GONE);
-        uninstallButton.setVisibility(isUpToDate && hasRoot ? View.VISIBLE : View.GONE);
+        uninstallButton.setVisibility(hasRoot ? View.VISIBLE : View.GONE);
         coreOnlyNotice.setVisibility(mm.prefs.getBoolean(Const.Key.COREONLY, false) ? View.VISIBLE : View.GONE);
 
         int image, color;

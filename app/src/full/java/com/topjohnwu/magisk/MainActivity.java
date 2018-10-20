@@ -119,7 +119,6 @@ public class MainActivity extends BaseActivity
     public void checkHideSection() {
         Menu menu = navigationView.getMenu();
         menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
-                Data.magiskVersionCode >= Const.MAGISK_VER.UNIFIED &&
                 mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
         menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)

@@ -124,7 +124,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             fingerprint.setSummary(R.string.disable_fingerprint);
         }
 
-        if (Data.magiskVersionCode >= Const.MAGISK_VER.MANAGER_HIDE) {
+        if (Shell.rootAccess()) {
             if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                 hideManager.setOnPreferenceClickListener((pref) -> {
                     PatchAPK.hideManager(requireActivity());
@@ -171,8 +171,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         if (!Shell.rootAccess()) {
             prefScreen.removePreference(magiskCategory);
             generalCatagory.removePreference(hideManager);
-        } else if (Data.magiskVersionCode < Const.MAGISK_VER.UNIFIED) {
-            prefScreen.removePreference(magiskCategory);
         }
     }
 
