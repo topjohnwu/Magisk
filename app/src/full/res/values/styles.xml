@@ -39,11 +39,11 @@
     </style>
 
     <style name="CardViewStyle.Dark" parent="CardView">
-        <item name="cardBackgroundColor">@android:color/background_dark</item>
+        <item name="cardBackgroundColor">@color/card_background_color_dark</item>
     </style>
 
     <style name="CardViewStyle.Light" parent="CardView">
-        <item name="cardBackgroundColor">@android:color/background_light</item>
+        <item name="cardBackgroundColor">@color/card_background_color_light</item>
     </style>
 
     <style name="AppTheme.StatusBar" parent="AppTheme">
