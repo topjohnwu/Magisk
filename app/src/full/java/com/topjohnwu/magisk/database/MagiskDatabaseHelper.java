@@ -57,6 +57,10 @@ public class MagiskDatabaseHelper {
 
     private MagiskDatabaseHelper() {
         pm = Data.MM().getPackageManager();
+        init();
+    }
+
+    private void init() {
         db = openDatabase();
         db.disableWriteAheadLogging();
         int version = Data.magiskVersionCode >= Const.MAGISK_VER.DBVER_SIX ? DATABASE_VER : OLD_DATABASE_VER;
@@ -169,6 +173,11 @@ public class MagiskDatabaseHelper {
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + SETTINGS_TABLE + " " +
                 "(key TEXT, value INT, PRIMARY KEY(key))");
+    }
+
+    public void flush() {
+        db.close();
+        init();
     }
 
     public void clearOutdated() {

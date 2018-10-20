@@ -111,6 +111,7 @@ public class PatchAPK {
         repack.delete();
 
         mm.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
+        mm.mDB.flush();
         Data.exportPrefs();
         RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
 
