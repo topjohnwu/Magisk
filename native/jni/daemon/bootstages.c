@@ -772,6 +772,9 @@ void startup() {
 		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 	}
 
+	// Preserve a copy of logcat
+	cp_afc("/system/bin/logcat", MIRRDIR "/bin/logcat");
+
 	// Start post-fs-data mode
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", NULL);
 }

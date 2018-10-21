@@ -132,11 +132,11 @@ static void log_daemon() {
 
 	// Construct cmdline
 	vec_init(&log_cmd);
-	vec_push_back(&log_cmd, "/system/bin/logcat");
+	vec_push_back(&log_cmd, MIRRDIR "/bin/logcat");
 	// Test whether these buffers actually works
 	const char* b[] = { "main", "events", "crash" };
 	for (int i = 0; i < 3; ++i) {
-		if (exec_command_sync("/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
+		if (exec_command_sync(MIRRDIR "/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
 			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
 	}
 	chmod("/dev/null", 0666);
@@ -174,7 +174,7 @@ static void log_daemon() {
 
 int start_log_daemon() {
 	if (!log_daemon_started) {
-		if (exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
+		if (exec_command_sync(MIRRDIR "/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
 			if (fork_dont_care() == 0)
 				log_daemon();
 			// Wait till we can connect to log_daemon
