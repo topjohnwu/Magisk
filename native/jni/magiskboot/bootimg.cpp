@@ -252,7 +252,7 @@ void boot_img::print_hdr() {
 }
 
 int unpack(const char *image) {
-	boot_img boot;
+	boot_img boot = boot_img();
 	int ret = boot.parse_image(image);
 	int fd;
 
@@ -290,7 +290,7 @@ int unpack(const char *image) {
 
 #define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, boot.page_size()))
 void repack(const char* orig_image, const char* out_image) {
-	boot_img boot;
+	boot_img boot = boot_img();
 
 	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
 
@@ -399,7 +399,7 @@ void repack(const char* orig_image, const char* out_image) {
 
 	// Map output image as rw
 	munmap(boot.map_addr, boot.map_size);
-	mmap_rw(out_image, reinterpret_cast<void **>(&boot.map_addr), &boot.map_size);
+	mmap_rw(out_image, (void **) &boot.map_addr, &boot.map_size);
 
 	// MTK headers
 	if (boot.flags & MTK_KERNEL) {
