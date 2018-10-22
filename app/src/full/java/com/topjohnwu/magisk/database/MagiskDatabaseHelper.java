@@ -80,7 +80,7 @@ public class MagiskDatabaseHelper {
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
         if (!MANAGER_DB.canWrite()) {
-            if (!Shell.rootAccess()) {
+            if (!Shell.rootAccess() || Data.magiskVersionCode < 0) {
                 // We don't want the app to crash, create a db and return
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
             }
