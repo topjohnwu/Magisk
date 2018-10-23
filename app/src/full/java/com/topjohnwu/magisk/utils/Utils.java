@@ -119,10 +119,11 @@ public class Utils {
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
             Map<String, Module> moduleMap = new ValueSortedMap<>();
             SuFile path = new SuFile(Const.MAGISK_PATH);
-            String[] modules = path.list(
+            SuFile[] modules = path.listFiles(
                     (file, name) -> !name.equals("lost+found") && !name.equals(".core"));
-            for (String name : modules) {
-                Module module = new Module(Const.MAGISK_PATH + "/" + name);
+            for (SuFile file : modules) {
+                if (file.isFile()) continue;
+                Module module = new Module(Const.MAGISK_PATH + "/" + file.getName());
                 moduleMap.put(module.getId(), module);
             }
             Topic.publish(Topic.MODULE_LOAD_DONE, moduleMap);
