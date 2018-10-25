@@ -122,6 +122,7 @@ int main(int argc, char *argv[]) {
 		unlink(SECOND_FILE);
 		unlink(DTB_FILE);
 		unlink(EXTRA_FILE);
+		unlink(RECV_DTBO_FILE);
 		for (int i = 0; SUP_EXT_LIST[i]; ++i) {
 			sprintf(name, "%s.%s", RAMDISK_FILE, SUP_EXT_LIST[i]);
 			unlink(name);
