@@ -22,7 +22,6 @@
 
 #include "logging.h"
 #include "utils.h"
-#include "flags.h"
 
 unsigned get_shell_uid() {
 	struct passwd* ppwd = getpwnam("shell");
@@ -196,16 +195,6 @@ int exec_command(int err, int *fd, void (*setenv)(struct vector*), const char *a
 	int pid = v_exec_command(err, fd, setenv, argv0, argv);
 	va_end(argv);
 	return pid;
-}
-
-int bind_mount(const char *from, const char *to) {
-	int ret = xmount(from, to, NULL, MS_BIND, NULL);
-#ifdef MAGISK_DEBUG
-	LOGI("bind_mount: %s <- %s\n", to, from);
-#else
-	LOGI("bind_mount: %s\n", to);
-#endif
-	return ret;
 }
 
 int switch_mnt_ns(int pid) {

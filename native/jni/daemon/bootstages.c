@@ -190,6 +190,16 @@ static void exec_module_script(const char* stage) {
  * Magic Mount *
  ***************/
 
+static int bind_mount(const char *from, const char *to) {
+	int ret = xmount(from, to, NULL, MS_BIND, NULL);
+#ifdef MAGISK_DEBUG
+	LOGI("bind_mount: %s <- %s\n", to, from);
+#else
+	LOGI("bind_mount: %s\n", to);
+#endif
+	return ret;
+}
+
 static void construct_tree(const char *module, struct node_entry *parent) {
 	DIR *dir;
 	struct dirent *entry;

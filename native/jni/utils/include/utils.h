@@ -90,7 +90,6 @@ int is_num(const char *s);
 int exec_array(int err, int *fd, void (*setenv)(struct vector *), char *const *argv);
 int exec_command(int err, int *fd, void (*setenv)(struct vector*), const char *argv0, ...);
 int exec_command_sync(char *const argv0, ...);
-int bind_mount(const char *from, const char *to);
 int switch_mnt_ns(int pid);
 int fork_dont_care();
 void wait_till_exists(const char *target);
