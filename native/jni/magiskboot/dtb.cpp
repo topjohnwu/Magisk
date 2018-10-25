@@ -1,6 +1,8 @@
-#include <libfdt.h>
 #include <unistd.h>
 #include <sys/mman.h>
+extern "C" {
+#include <libfdt.h>
+}
 
 #include "magiskboot.h"
 #include "utils.h"
@@ -12,7 +14,7 @@ static void print_props(const void *fdt, int node, int depth) {
 		printf("  ");
 		int size;
 		const char *name;
-		const char *value = fdt_getprop_by_offset(fdt, prop, &name, &size);
+		const char *value = (char *) fdt_getprop_by_offset(fdt, prop, &name, &size);
 		printf("[%s]: [%s]\n", name, value);
 	}
 }
@@ -41,9 +43,9 @@ static int find_fstab(const void *fdt, int parent) {
 
 static void dtb_dump(const char *file) {
 	size_t size ;
-	void *dtb, *fdt;
+	uint8_t *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
-	mmap_ro(file, &dtb, &size);
+	mmap_ro(file, (void **) &dtb, &size);
 	// Loop through all the dtbs
 	int dtb_num = 0;
 	for (int i = 0; i < size; ++i) {
@@ -60,12 +62,12 @@ static void dtb_dump(const char *file) {
 
 static void dtb_patch(const char *file, int patch) {
 	size_t size ;
-	void *dtb, *fdt;
+	uint8_t *dtb, *fdt;
 	fprintf(stderr, "Loading dtbs from [%s]\n", file);
 	if (patch)
-		mmap_rw(file, &dtb, &size);
+		mmap_rw(file, (void **) &dtb, &size);
 	else
-		mmap_ro(file, &dtb, &size);
+		mmap_ro(file, (void **) &dtb, &size);
 	// Loop through all the dtbs
 	int dtb_num = 0, found = 0;
 	for (int i = 0; i < size; ++i) {

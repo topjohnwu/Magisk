@@ -11,6 +11,10 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "vector.h"
 
 #define UID_SHELL  (get_shell_uid())
@@ -139,5 +143,9 @@ void full_read(const char *filename, void **buf, size_t *size);
 void full_read_at(int dirfd, const char *filename, void **buf, size_t *size);
 void stream_full_read(int fd, void **buf, size_t *size);
 void write_zero(int fd, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

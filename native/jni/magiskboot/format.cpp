@@ -42,7 +42,7 @@ format_t check_fmt(const void *buf, size_t len) {
 }
 
 void get_fmt_name(format_t fmt, char *name) {
-	char *s;
+	const char *s;
 	switch (fmt) {
 		case CHROMEOS:
 			s = "chromeos";

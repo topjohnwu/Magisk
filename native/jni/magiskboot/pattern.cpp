@@ -1,8 +1,8 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "utils.h"
 #include "magiskboot.h"
+#include "utils.h"
 
 static int check_verity_pattern(const char *s) {
 	int skip = 0;
@@ -32,7 +32,7 @@ static int check_encryption_pattern(const char *s) {
 
 int patch_verity(void **buf, uint32_t *size, int patch) {
 	int skip, src_size = *size, found = 0;
-	char *src = *buf, *patched = patch ? xcalloc(src_size, 1) : NULL;
+	char *src = (char *) *buf, *patched = patch ? (char *) xcalloc(src_size, 1) : nullptr;
 	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
 		if ((skip = check_verity_pattern(src + read)) > 0) {
 			if (patch) {
@@ -56,7 +56,7 @@ int patch_verity(void **buf, uint32_t *size, int patch) {
 
 void patch_encryption(void **buf, uint32_t *size) {
 	int skip, src_size = *size;
-	char *src = *buf, *patched = xcalloc(src_size, 1);
+	char *src = (char *) *buf, *patched = (char *) xcalloc(src_size, 1);
 	for (int read = 0, write = 0; read < src_size; ++read, ++write) {
 		if ((skip = check_encryption_pattern(src + read)) > 0) {
 			fprintf(stderr, "Replace pattern [%.*s] with [encryptable]\n", skip, src + read);

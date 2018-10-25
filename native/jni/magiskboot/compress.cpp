@@ -39,7 +39,7 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 	if (ret != Z_OK)
 		LOGE("Unable to init zlib stream\n");
 
-	strm.next_in = (void *) buf;
+	strm.next_in = (Bytef *) buf;
 	strm.avail_in = size;
 
 	do {
@@ -73,7 +73,7 @@ size_t gzip(int mode, int fd, const void *buf, size_t size) {
 // Mode: 0 = decode xz/lzma; 1 = encode xz; 2 = encode lzma
 size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	size_t have, total = 0;
-	lzma_ret ret = 0;
+	lzma_ret ret = LZMA_OK;
 	lzma_stream strm = LZMA_STREAM_INIT;
 	lzma_options_lzma opt;
 	unsigned char out[CHUNK];
@@ -82,7 +82,7 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	lzma_lzma_preset(&opt, 9);
 	lzma_filter filters[] = {
 		{ .id = LZMA_FILTER_LZMA2, .options = &opt },
-		{ .id = LZMA_VLI_UNKNOWN, .options = NULL },
+		{ .id = LZMA_VLI_UNKNOWN, .options = nullptr },
 	};
 
 	switch(mode) {
@@ -101,7 +101,7 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 	if (ret != LZMA_OK)
 		LOGE("Unable to init lzma stream\n");
 
-	strm.next_in = buf;
+	strm.next_in = static_cast<const uint8_t *>(buf);
 	strm.avail_in = size;
 
 	do {
@@ -119,14 +119,14 @@ size_t lzma(int mode, int fd, const void *buf, size_t size) {
 }
 
 // Mode: 0 = decode; 1 = encode
-size_t lz4(int mode, int fd, const void *buf, size_t size) {
+size_t lz4(int mode, int fd, const uint8_t *buf, size_t size) {
 	LZ4F_decompressionContext_t dctx;
 	LZ4F_compressionContext_t cctx;
 	LZ4F_frameInfo_t info;
 
 	size_t blockSize, outCapacity, avail_in, ret = 0, pos = 0, total = 0;
 	size_t have, read;
-	void *out = NULL;
+	uint8_t *out = nullptr;
 
 	// Initialize context
 	switch(mode) {
@@ -162,21 +162,21 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			pos += read;
 			break;
 		case 1:
-			outCapacity = LZ4F_compressFrameBound(blockSize, NULL);
+			outCapacity = LZ4F_compressFrameBound(blockSize, nullptr);
 			break;
 	}
 
-	out = xmalloc(outCapacity);
+	out = new uint8_t[outCapacity];
 
 	// Write header
 	if (mode == 1) {
-		LZ4F_preferences_t prefs;
-		memset(&prefs, 0, sizeof(prefs));
+		LZ4F_preferences_t prefs = LZ4F_preferences_t();
 		prefs.autoFlush = 1;
 		prefs.compressionLevel = 9;
-		prefs.frameInfo.blockMode = 1;
-		prefs.frameInfo.blockSizeID = 7;
-		prefs.frameInfo.contentChecksumFlag = 1;
+		prefs.frameInfo.blockMode = LZ4F_blockIndependent;
+		prefs.frameInfo.blockSizeID = LZ4F_max4MB;
+		prefs.frameInfo.blockChecksumFlag = LZ4F_noBlockChecksum;
+		prefs.frameInfo.contentChecksumFlag = LZ4F_contentChecksumEnabled;
 		have = ret = LZ4F_compressBegin(cctx, out, size, &prefs);
 		if (LZ4F_isError(ret))
 			LOGE("Failed to start compression: error %s\n", LZ4F_getErrorName(ret));
@@ -195,11 +195,11 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 				case 0:
 					have = outCapacity;
 					read = avail_in;
-					ret = LZ4F_decompress(dctx, out, &have, buf + pos, &read, NULL);
+					ret = LZ4F_decompress(dctx, out, &have, buf + pos, &read, nullptr);
 					break;
 				case 1:
 					read = avail_in;
-					have = ret = LZ4F_compressUpdate(cctx, out, outCapacity, buf + pos, avail_in, NULL);
+					have = ret = LZ4F_compressUpdate(cctx, out, outCapacity, buf + pos, avail_in, nullptr);
 					break;
 			}
 			if (LZ4F_isError(ret))
@@ -218,7 +218,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			LZ4F_freeDecompressionContext(dctx);
 			break;
 		case 1:
-			have = ret = LZ4F_compressEnd(cctx, out, outCapacity, NULL);
+			have = ret = LZ4F_compressEnd(cctx, out, outCapacity, nullptr);
 			if (LZ4F_isError(ret))
 				LOGE("Failed to end compression: error %s\n", LZ4F_getErrorName(ret));
 
@@ -228,7 +228,7 @@ size_t lz4(int mode, int fd, const void *buf, size_t size) {
 			break;
 	}
 
-	free(out);
+	delete[] out;
 	return total;
 }
 
@@ -238,9 +238,9 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 	bz_stream strm;
 	char out[CHUNK];
 
-	strm.bzalloc = NULL;
-	strm.bzfree = NULL;
-	strm.opaque = NULL;
+	strm.bzalloc = nullptr;
+	strm.bzfree = nullptr;
+	strm.opaque = nullptr;
 
 	switch(mode) {
 		case 0:
@@ -254,7 +254,7 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 	if (ret != BZ_OK)
 		LOGE("Unable to init bzlib stream\n");
 
-	strm.next_in = (void *) buf;
+	strm.next_in = (char *) buf;
 	strm.avail_in = size;
 
 	do {
@@ -286,7 +286,7 @@ size_t bzip2(int mode, int fd, const void* buf, size_t size) {
 #define LZ4_LEGACY_BLOCKSIZE  0x800000
 
 // Mode: 0 = decode; 1 = encode
-size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
+size_t lz4_legacy(int mode, int fd, const uint8_t *buf, size_t size) {
 	size_t pos = 0;
 	int have;
 	char *out;
@@ -294,12 +294,12 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 
 	switch(mode) {
 		case 0:
-			out = xmalloc(LZ4_LEGACY_BLOCKSIZE);
+			out = new char[LZ4_LEGACY_BLOCKSIZE];
 			// Skip magic
 			pos += 4;
 			break;
 		case 1:
-			out = xmalloc(LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE));
+			out = new char[LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE)];
 			// Write magic
 			total += xwrite(fd, "\x02\x21\x4c\x18", 4);
 			break;
@@ -313,7 +313,7 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 				pos += 4;
 				if (block_size > LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE))
 					goto done;
-				have = LZ4_decompress_safe(buf + pos, out, block_size, LZ4_LEGACY_BLOCKSIZE);
+				have = LZ4_decompress_safe((const char *) buf + pos, out, block_size, LZ4_LEGACY_BLOCKSIZE);
 				if (have < 0)
 					LOGE("Cannot decode lz4_legacy block\n");
 				pos += block_size;
@@ -323,7 +323,7 @@ size_t lz4_legacy(int mode, int fd, const void* buf, size_t size) {
 					insize = size - pos;
 				else
 					insize = LZ4_LEGACY_BLOCKSIZE;
-				have = LZ4_compress_HC(buf + pos, out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE), 9);
+				have = LZ4_compress_HC((const char *) buf + pos, out, insize, LZ4_COMPRESSBOUND(LZ4_LEGACY_BLOCKSIZE), 9);
 				if (have == 0)
 					LOGE("lz4_legacy compression error\n");
 				pos += insize;
@@ -341,44 +341,46 @@ done:
 		unsigned uncomp = size;
 		xwrite(fd, &uncomp, sizeof(uncomp));
 	}
-	free(out);
+	delete[] out;
 	return total;
 }
 
-long long decomp(format_t type, int to, const void *from, size_t size) {
+long long decompress(format_t type, int fd, const void *from, size_t size) {
+	const uint8_t *buf = (uint8_t *) from;
 	switch (type) {
 		case GZIP:
-			return gzip(0, to, from, size);
+			return gzip(0, fd, buf, size);
 		case XZ:
-			return lzma(0, to, from, size);
+			return lzma(0, fd, buf, size);
 		case LZMA:
-			return lzma(0, to, from, size);
+			return lzma(0, fd, buf, size);
 		case BZIP2:
-			return bzip2(0, to, from, size);
+			return bzip2(0, fd, buf, size);
 		case LZ4:
-			return lz4(0, to, from, size);
+			return lz4(0, fd, buf, size);
 		case LZ4_LEGACY:
-			return lz4_legacy(0, to, from, size);
+			return lz4_legacy(0, fd, buf, size);
 		default:
 			// Unsupported
 			return -1;
 	}
 }
 
-long long comp(format_t type, int to, const void *from, size_t size) {
+long long compress(format_t type, int fd, const void *from, size_t size) {
+	const uint8_t *buf = (uint8_t *) from;
 	switch (type) {
 		case GZIP:
-			return gzip(1, to, from, size);
+			return gzip(1, fd, buf, size);
 		case XZ:
-			return lzma(1, to, from, size);
+			return lzma(1, fd, buf, size);
 		case LZMA:
-			return lzma(2, to, from, size);
+			return lzma(2, fd, buf, size);
 		case BZIP2:
-			return bzip2(1, to, from, size);
+			return bzip2(1, fd, buf, size);
 		case LZ4:
-			return lz4(1, to, from, size);
+			return lz4(1, fd, buf, size);
 		case LZ4_LEGACY:
-			return lz4_legacy(1, to, from, size);
+			return lz4_legacy(1, fd, buf, size);
 		default:
 			// Unsupported
 			return -1;
@@ -389,7 +391,7 @@ long long comp(format_t type, int to, const void *from, size_t size) {
  * Below are utility functions for commandline
  */
 
-void decomp_file(char *from, const char *to) {
+void decompress(char *from, const char *to) {
 	int strip = 1;
 	void *file;
 	size_t size = 0;
@@ -400,9 +402,9 @@ void decomp_file(char *from, const char *to) {
 	format_t type = check_fmt(file, size);
 	char *ext;
 	ext = strrchr(from, '.');
-	if (to == NULL)
+	if (to == nullptr)
 		to = from;
-	if (ext != NULL) {
+	if (ext != nullptr) {
 		// Strip out a matched file extension
 		switch (type) {
 		case GZIP:
@@ -442,9 +444,9 @@ void decomp_file(char *from, const char *to) {
 		fprintf(stderr, "Decompressing to [%s]\n", to);
 	}
 
-	decomp(type, fd, file, size);
+	decompress(type, fd, file, size);
 	close(fd);
-	if (to == from && ext != NULL) {
+	if (to == from && ext != nullptr) {
 		*ext = '.';
 		unlink(from);
 	}
@@ -454,9 +456,10 @@ void decomp_file(char *from, const char *to) {
 		munmap(file, size);
 }
 
-void comp_file(const char *method, const char *from, const char *to) {
+void compress(const char *method, const char *from, const char *to) {
 	format_t type;
-	char *ext, dest[PATH_MAX];
+	const char *ext;
+	char dest[PATH_MAX];
 	if (strcmp(method, "gzip") == 0) {
 		type = GZIP;
 		ext = "gz";
@@ -488,7 +491,7 @@ void comp_file(const char *method, const char *from, const char *to) {
 		stream_full_read(STDIN_FILENO, &file, &size);
 	else
 		mmap_ro(from, &file, &size);
-	if (to == NULL) {
+	if (to == nullptr) {
 		if (strcmp(from, "-") == 0)
 			strcpy(dest, "-");
 		else
@@ -502,13 +505,13 @@ void comp_file(const char *method, const char *from, const char *to) {
 		fd = creat(dest, 0644);
 		fprintf(stderr, "Compressing to [%s]\n", dest);
 	}
-	comp(type, fd, file, size);
+	compress(type, fd, file, size);
 	close(fd);
 	if (strcmp(from, "-") == 0)
 		free(file);
 	else
 		munmap(file, size);
-	if (to == NULL)
+	if (to == nullptr)
 		unlink(from);
 }
 

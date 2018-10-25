@@ -7,6 +7,10 @@
 #include <stdarg.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define str(a) #a
 #define xstr(a) str(a)
 
@@ -42,3 +46,6 @@ void cmdline_logging();
 
 int log_handler(log_type t, const char *fmt, ...);
 
+#ifdef __cplusplus
+}
+#endif

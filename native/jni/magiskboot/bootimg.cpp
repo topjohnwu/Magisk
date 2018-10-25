@@ -7,12 +7,10 @@
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
 
-extern "C" {
 #include "bootimg.h"
 #include "magiskboot.h"
 #include "utils.h"
 #include "logging.h"
-}
 
 static void dump(void *buf, size_t size, const char *filename) {
 	if (size == 0)
@@ -259,7 +257,7 @@ int unpack(const char *image) {
 	// Dump kernel
 	if (COMPRESSED(boot.k_fmt)) {
 		fd = creat(KERNEL_FILE, 0644);
-		decomp(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size);
+		decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size);
 		close(fd);
 	} else {
 		dump(boot.kernel, boot.hdr->kernel_size, KERNEL_FILE);
@@ -271,7 +269,7 @@ int unpack(const char *image) {
 	// Dump ramdisk
 	if (COMPRESSED(boot.r_fmt)) {
 		fd = creat(RAMDISK_FILE, 0644);
-		decomp(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size);
+		decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size);
 		close(fd);
 	} else {
 		dump(boot.ramdisk, boot.hdr->ramdisk_size, RAMDISK_FILE);
@@ -335,7 +333,7 @@ void repack(const char* orig_image, const char* out_image) {
 			size_t raw_size;
 			void *kernel_raw;
 			mmap_ro(KERNEL_FILE, &kernel_raw, &raw_size);
-			boot.hdr->kernel_size = comp(boot.k_fmt, fd, kernel_raw, raw_size);
+			boot.hdr->kernel_size = compress(boot.k_fmt, fd, kernel_raw, raw_size);
 			munmap(kernel_raw, raw_size);
 		} else {
 			boot.hdr->kernel_size = restore(KERNEL_FILE, fd);
@@ -358,7 +356,7 @@ void repack(const char* orig_image, const char* out_image) {
 			size_t cpio_size;
 			void *cpio;
 			mmap_ro(RAMDISK_FILE, &cpio, &cpio_size);
-			boot.hdr->ramdisk_size = comp(boot.r_fmt, fd, cpio, cpio_size);
+			boot.hdr->ramdisk_size = compress(boot.r_fmt, fd, cpio, cpio_size);
 			munmap(cpio, cpio_size);
 		} else {
 			boot.hdr->ramdisk_size = restore(RAMDISK_FILE, fd);

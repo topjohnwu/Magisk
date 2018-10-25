@@ -100,15 +100,15 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	magiskboot/cpio.c \
-	magiskboot/main.c \
+	magiskboot/main.cpp \
+	magiskboot/cpio.cpp \
 	magiskboot/bootimg.cpp \
-	magiskboot/hexpatch.c \
-	magiskboot/compress.c \
-	magiskboot/format.c \
-	magiskboot/dtb.c \
-	magiskboot/ramdisk.c \
-	magiskboot/pattern.c
+	magiskboot/hexpatch.cpp \
+	magiskboot/compress.cpp \
+	magiskboot/format.cpp \
+	magiskboot/dtb.cpp \
+	magiskboot/ramdisk.cpp \
+	magiskboot/pattern.cpp
 
 LOCAL_LDLIBS := -lz
 include $(BUILD_EXECUTABLE)
