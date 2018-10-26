@@ -24,20 +24,20 @@ struct cpio_newc_header {
 
 struct cpio_entry {
 	// uint32_t ino;
-	uint32_t mode;
-	uint32_t uid;
-	uint32_t gid;
+	uint32_t mode = 0;
+	uint32_t uid = 0;
+	uint32_t gid = 0;
 	// uint32_t nlink;
 	// uint32_t mtime;
-	uint32_t filesize;
+	uint32_t filesize = 0;
 	// uint32_t devmajor;
 	// uint32_t devminor;
 	// uint32_t rdevmajor;
 	// uint32_t rdevminor;
 	// uint32_t namesize;
 	// uint32_t check;
-	char *filename;
-	void *data;
+	char *filename = nullptr;
+	void *data = nullptr;
 
 	cpio_entry() {}
 	cpio_entry(int fd, cpio_newc_header &header);

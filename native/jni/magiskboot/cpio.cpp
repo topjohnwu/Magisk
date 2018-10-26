@@ -211,9 +211,10 @@ bool cpio::mv(const char *from, const char *to) {
 			delete arr[t];
 			arr[t] = nullptr;
 		}
-		free(arr[f]->filename);
-		arr[f]->filename = strdup(to);
 		fprintf(stderr, "Move [%s] -> [%s]\n", from, to);
+		char * tmp = strdup(to);
+		free(arr[f]->filename);
+		arr[f]->filename = tmp;
 		return true;
 	}
 	fprintf(stderr, "Cannot find entry %s\n", from);

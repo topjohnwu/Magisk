@@ -208,9 +208,16 @@ int cpio_commands(int argc, char *argv[]) {
 	char *cmdv[6];
 
 	while (argc) {
+		// Clean up
 		cmdc = 0;
-		for (char *tok = strtok(argv[0], " "); tok; tok = strtok(NULL, " "))
+		memset(cmdv, NULL, sizeof(cmdv));
+
+		// Split the commands
+		for (char *tok = strtok(argv[0], " "); tok; tok = strtok(nullptr, " "))
 			cmdv[cmdc++] = tok;
+
+		if (cmdc == 0)
+			continue;
 
 		if (strcmp(cmdv[0], "test") == 0) {
 			exit(cpio.test());
@@ -224,13 +231,13 @@ int cpio_commands(int argc, char *argv[]) {
 			return 0;
 		} else if (cmdc >= 2 && strcmp(cmdv[0], "backup") == 0) {
 			auto bak = Array<cpio_entry*>();
-			cpio.backup(bak, cmdv[1], cmdc > 2 ? cmdv[2] : nullptr);
+			cpio.backup(bak, cmdv[1], cmdv[2]);
 			cpio.insert(bak);
 		} else if (cmdc >= 4 && strcmp(cmdv[0], "magisk") == 0) {
 			cpio.patch(strcmp(cmdv[2], "true") == 0, strcmp(cmdv[3], "true") == 0);
 
 			auto bak = Array<cpio_entry*>();
-			cpio.backup(bak, cmdv[1], cmdc > 4 ? cmdv[4] : nullptr);
+			cpio.backup(bak, cmdv[1], cmdv[4]);
 
 			auto e = new cpio_entry();
 			e->filename = strdup(".backup/.magisk");
