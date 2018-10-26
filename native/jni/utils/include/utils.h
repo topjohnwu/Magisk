@@ -109,7 +109,7 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
 #define align(p, a)     (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (align(p, a) - (p))
 
-extern char **excl_list;
+extern const char **excl_list;
 
 struct file_attr {
 	struct stat st;

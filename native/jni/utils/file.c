@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "selinux.h"
 
-char **excl_list = NULL;
+const char **excl_list = NULL;
 
 static int is_excl(const char *name) {
 	if (excl_list)

@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
-		excl_list = (char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
+		excl_list = (const char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
 		frm_rf(root);
 	} else {
 		// Revert original init binary
@@ -399,7 +399,7 @@ int main(int argc, char *argv[]) {
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
 		// Clone rootfs except /system
-		excl_list = (char *[]) { "system", NULL };
+		excl_list = (const char *[]) { "system", NULL };
 		clone_dir(system_root, root);
 		close(system_root);
 
