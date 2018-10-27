@@ -95,7 +95,7 @@ int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
 	char *err;
 	if (key > 0) {
 		char query[128];
-		sprintf(query, "SELECT key, value FROM settings WHERE key=%d", key);
+		sprintf(query, "SELECT key, value FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
 		sqlite3_exec(db, query, settings_cb, dbs, &err);
 	} else {
 		sqlite3_exec(db, "SELECT key, value FROM settings", settings_cb, dbs, &err);
@@ -134,7 +134,7 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
 	char *err;
 	if (key > 0) {
 		char query[128];
-		sprintf(query, "SELECT key, value FROM strings WHERE key=%d", key);
+		sprintf(query, "SELECT key, value FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
 		sqlite3_exec(db, query, strings_cb, str, &err);
 	} else {
 		sqlite3_exec(db, "SELECT key, value FROM strings", strings_cb, str, &err);
