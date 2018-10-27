@@ -6,7 +6,7 @@ import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
+import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
@@ -22,7 +22,7 @@ public class MagiskManager extends ContainerApp {
 
     // Global resources
     public SharedPreferences prefs;
-    public MagiskDatabaseHelper mDB;
+    public MagiskDB mDB;
     public RepoDatabaseHelper repoDB;
 
     public MagiskManager() {
@@ -38,7 +38,7 @@ public class MagiskManager extends ContainerApp {
         Shell.Config.setInitializer(RootUtils.class);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mDB = MagiskDatabaseHelper.getInstance();
+        mDB = MagiskDB.getInstance();
 
         String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
         if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {

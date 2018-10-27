@@ -48,7 +48,7 @@ public class SuperuserFragment extends BaseFragment {
     }
 
     private void displayPolicyList() {
-        List<Policy> policyList = mm.mDB.getPolicyList(pm);
+        List<Policy> policyList = mm.mDB.getPolicyList();
 
         if (policyList.size() == 0) {
             emptyRv.setVisibility(View.VISIBLE);

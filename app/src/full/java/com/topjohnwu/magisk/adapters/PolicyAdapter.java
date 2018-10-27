@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Policy;
-import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
+import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 
 import java.util.HashSet;
@@ -30,11 +30,11 @@ import butterknife.BindView;
 public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder> {
 
     private List<Policy> policyList;
-    private MagiskDatabaseHelper dbHelper;
+    private MagiskDB dbHelper;
     private PackageManager pm;
     private Set<Policy> expandList = new HashSet<>();
 
-    public PolicyAdapter(List<Policy> list, MagiskDatabaseHelper db, PackageManager pm) {
+    public PolicyAdapter(List<Policy> list, MagiskDB db, PackageManager pm) {
         policyList = list;
         dbHelper = db;
         this.pm = pm;

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Process;
@@ -21,46 +22,29 @@ import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-
-public class MagiskDatabaseHelper {
-
-    private static final int DATABASE_VER = 6;
-    private static final int OLD_DATABASE_VER = 5;
-    private static final String POLICY_TABLE = "policies";
-    private static final String LOG_TABLE = "logs";
-    private static final String SETTINGS_TABLE = "settings";
-    private static final String STRINGS_TABLE = "strings";
-    private static final File MANAGER_DB =
-            new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
+public class MagiskDBLegacy extends MagiskDB {
 
     private PackageManager pm;
     private SQLiteDatabase db;
 
-    @NonNull
-    public static MagiskDatabaseHelper getInstance() {
+    static MagiskDBLegacy newInstance() {
         try {
-            return new MagiskDatabaseHelper();
+            return new MagiskDBLegacy();
         } catch (Exception e) {
             // Let's cleanup everything and try again
             Shell.su("db_clean '*'").exec();
-            return new MagiskDatabaseHelper();
+            return new MagiskDBLegacy();
         }
     }
 
-    private MagiskDatabaseHelper() {
+    private MagiskDBLegacy() {
         pm = Data.MM().getPackageManager();
-        init();
-    }
-
-    private void init() {
         db = openDatabase();
         db.disableWriteAheadLogging();
         int version = Data.magiskVersionCode >= Const.MAGISK_VER.DBVER_SIX ? DATABASE_VER : OLD_DATABASE_VER;
@@ -79,7 +63,7 @@ public class MagiskDatabaseHelper {
         MagiskManager mm = Data.MM();
         Context de = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                 ? mm.createDeviceProtectedStorageContext() : mm;
-        if (!MANAGER_DB.canWrite()) {
+        if (!LEGACY_MANAGER_DB.canWrite()) {
             if (!Shell.rootAccess() || Data.magiskVersionCode < 0) {
                 // We don't want the app to crash, create a db and return
                 return mm.openOrCreateDatabase("su.db", Context.MODE_PRIVATE, null);
@@ -102,7 +86,7 @@ public class MagiskDatabaseHelper {
             Shell.su("db_setup " + Process.myUid()).exec();
         }
         // Not using legacy mode, open the mounted global DB
-        return SQLiteDatabase.openOrCreateDatabase(MANAGER_DB, null);
+        return SQLiteDatabase.openOrCreateDatabase(LEGACY_MANAGER_DB, null);
     }
 
     private void onUpgrade(SQLiteDatabase db, int oldVersion) {
@@ -159,27 +143,23 @@ public class MagiskDatabaseHelper {
         // Policies
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + POLICY_TABLE + " " +
-                "(uid INT, package_name TEXT, policy INT, " +
-                "until INT, logging INT, notification INT, " +
-                "PRIMARY KEY(uid))");
+                        "(uid INT, package_name TEXT, policy INT, " +
+                        "until INT, logging INT, notification INT, " +
+                        "PRIMARY KEY(uid))");
 
         // Logs
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + LOG_TABLE + " " +
-                "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
-                "to_uid INT, action INT, time INT, command TEXT)");
+                        "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
+                        "to_uid INT, action INT, time INT, command TEXT)");
 
         // Settings
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + SETTINGS_TABLE + " " +
-                "(key TEXT, value INT, PRIMARY KEY(key))");
+                        "(key TEXT, value INT, PRIMARY KEY(key))");
     }
 
-    public void flush() {
-        db.close();
-        init();
-    }
-
+    @Override
     public void clearOutdated() {
         // Clear outdated policies
         db.delete(POLICY_TABLE, Utils.fmt("until > 0 AND until < %d", System.currentTimeMillis() / 1000), null);
@@ -187,23 +167,24 @@ public class MagiskDatabaseHelper {
         db.delete(LOG_TABLE, Utils.fmt("time < %d", System.currentTimeMillis() - Data.suLogTimeout * 86400000), null);
     }
 
-    public void deletePolicy(Policy policy) {
-        deletePolicy(policy.uid);
-    }
-
+    @Override
     public void deletePolicy(String pkg) {
         db.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
     }
 
+    @Override
     public void deletePolicy(int uid) {
         db.delete(POLICY_TABLE, Utils.fmt("uid=%d", uid), null);
     }
 
+    @Override
     public Policy getPolicy(int uid) {
         Policy policy = null;
         try (Cursor c = db.query(POLICY_TABLE, null, Utils.fmt("uid=%d", uid), null, null, null, null)) {
             if (c.moveToNext()) {
-                policy = new Policy(c, pm);
+                ContentValues values = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(c, values);
+                policy = new Policy(values, pm);
             }
         } catch (PackageManager.NameNotFoundException e) {
             deletePolicy(uid);
@@ -212,21 +193,26 @@ public class MagiskDatabaseHelper {
         return policy;
     }
 
+    @Override
     public void addPolicy(Policy policy) {
         db.replace(POLICY_TABLE, null, policy.getContentValues());
     }
 
+    @Override
     public void updatePolicy(Policy policy) {
         db.update(POLICY_TABLE, policy.getContentValues(), Utils.fmt("uid=%d", policy.uid), null);
     }
 
-    public List<Policy> getPolicyList(PackageManager pm) {
+    @Override
+    public List<Policy> getPolicyList() {
         try (Cursor c = db.query(POLICY_TABLE, null, Utils.fmt("uid/100000=%d", Const.USER_ID),
                 null, null, null, null)) {
             List<Policy> ret = new ArrayList<>(c.getCount());
             while (c.moveToNext()) {
                 try {
-                    Policy policy = new Policy(c, pm);
+                    ContentValues values = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(c, values);
+                    Policy policy = new Policy(values, pm);
                     ret.add(policy);
                 } catch (PackageManager.NameNotFoundException e) {
                     // The app no longer exist, remove from DB
@@ -238,11 +224,12 @@ public class MagiskDatabaseHelper {
         }
     }
 
-    public List<List<Integer>> getLogStructure() {
-        try (Cursor c = db.query(LOG_TABLE, new String[] { "time" }, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+    @Override
+    public List<List<SuLogEntry>> getLogs() {
+        try (Cursor c = db.query(LOG_TABLE, null, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
                 null, null, null, "time DESC")) {
-            List<List<Integer>> ret = new ArrayList<>();
-            List<Integer> list = null;
+            List<List<SuLogEntry>> ret = new ArrayList<>();
+            List<SuLogEntry> list = null;
             String dateString = null, newString;
             while (c.moveToNext()) {
                 Date date = new Date(c.getLong(c.getColumnIndex("time")));
@@ -252,25 +239,25 @@ public class MagiskDatabaseHelper {
                     list = new ArrayList<>();
                     ret.add(list);
                 }
-                list.add(c.getPosition());
+                ContentValues values = new ContentValues();
+                DatabaseUtils.cursorRowToContentValues(c, values);
+                list.add(new SuLogEntry(values));
             }
             return ret;
         }
     }
 
-    public Cursor getLogCursor() {
-        return db.query(LOG_TABLE, null, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
-                null, null, null, "time DESC");
-    }
-
+    @Override
     public void addLog(SuLogEntry log) {
         db.insert(LOG_TABLE, null, log.getContentValues());
     }
 
+    @Override
     public void clearLogs() {
         db.delete(LOG_TABLE, null, null);
     }
 
+    @Override
     public void setSettings(String key, int value) {
         ContentValues data = new ContentValues();
         data.put("key", key);
@@ -278,6 +265,7 @@ public class MagiskDatabaseHelper {
         db.replace(SETTINGS_TABLE, null, data);
     }
 
+    @Override
     public int getSettings(String key, int defaultValue) {
         int value = defaultValue;
         try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
@@ -288,6 +276,7 @@ public class MagiskDatabaseHelper {
         return value;
     }
 
+    @Override
     public void setStrings(String key, String value) {
         if (value == null) {
             db.delete(STRINGS_TABLE, "key=?", new String[] { key });
@@ -299,6 +288,7 @@ public class MagiskDatabaseHelper {
         }
     }
 
+    @Override
     public String getStrings(String key, String defaultValue) {
         String value = defaultValue;
         try (Cursor c = db.query(STRINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
