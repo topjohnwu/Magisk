@@ -100,7 +100,6 @@ static void usage() {
 }
 
 int imgtool_main(int argc, char *argv[]) {
-	cmdline_logging();
 	if (argc < 2)
 		usage();
 	if (strcmp(argv[1], "create") == 0) {

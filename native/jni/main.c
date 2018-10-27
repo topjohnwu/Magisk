@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 	umask(0);
 	argv0 = argv[0];
 	dload_selinux();
+	cmdline_logging();
 
 	if (strcmp(basename(argv0), "magisk.bin") == 0 ||
 			(strcmp(basename(argv[0]), "magisk") == 0

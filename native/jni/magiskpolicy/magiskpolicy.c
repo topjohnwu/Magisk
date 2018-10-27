@@ -391,7 +391,6 @@ static void syntax_error_msg() {
 }
 
 int magiskpolicy_main(int argc, char *argv[]) {
-	cmdline_logging();
 	char *outfile = NULL, *tok, *saveptr;
 	int magisk = 0;
 	struct vector rules;
