@@ -30,6 +30,9 @@ import java.util.List;
 
 public class MagiskDBLegacy extends MagiskDB {
 
+    private static final int DATABASE_VER = 6;
+    private static final int OLD_DATABASE_VER = 5;
+
     private PackageManager pm;
     private SQLiteDatabase db;
 
@@ -194,13 +197,8 @@ public class MagiskDBLegacy extends MagiskDB {
     }
 
     @Override
-    public void addPolicy(Policy policy) {
-        db.replace(POLICY_TABLE, null, policy.getContentValues());
-    }
-
-    @Override
     public void updatePolicy(Policy policy) {
-        db.update(POLICY_TABLE, policy.getContentValues(), Utils.fmt("uid=%d", policy.uid), null);
+        db.replace(POLICY_TABLE, null, policy.getContentValues());
     }
 
     @Override

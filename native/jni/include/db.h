@@ -119,6 +119,7 @@ sqlite3 *get_magiskdb();
 int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs);
 int get_db_strings(sqlite3 *db, int key, struct db_strings *str);
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
-int validate_manager(char *pkg, int userid, struct stat *st);
+int validate_manager(char *alt_pkg, int userid, struct stat *st);
+int exec_sql(const char *sql);
 
 #endif //DB_H

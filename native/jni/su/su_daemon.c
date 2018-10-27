@@ -75,7 +75,7 @@ static void database_check(struct su_info *info) {
 
 		if (uid > 0)
 			get_uid_policy(db, uid, &info->access);
-		sqlite3_close(db);
+		sqlite3_close_v2(db);
 	}
 
 	// We need to check our manager

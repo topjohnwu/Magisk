@@ -942,13 +942,16 @@ core_only:
 	} else {
 		// Check whether we have a valid manager installed
 		sqlite3 *db = get_magiskdb();
-		struct db_strings str;
-		memset(&str, 0, sizeof(str));
-		get_db_strings(db, SU_MANAGER, &str);
-		if (validate_manager(str.s[SU_MANAGER], 0, NULL)) {
-			// There is no manager installed, install the stub
-			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", NULL);
-			install_apk("/data/magisk.apk");
+		if (db) {
+			struct db_strings str;
+			memset(&str, 0, sizeof(str));
+			get_db_strings(db, SU_MANAGER, &str);
+			if (validate_manager(str.s[SU_MANAGER], 0, NULL)) {
+				// There is no manager installed, install the stub
+				exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", NULL);
+				install_apk("/data/magisk.apk");
+			}
+			sqlite3_close_v2(db);
 		}
 	}
 

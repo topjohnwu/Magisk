@@ -8,6 +8,7 @@
 #include "magisk.h"
 #include "daemon.h"
 #include "selinux.h"
+#include "db.h"
 #include "flags.h"
 
 static int create_links(const char *bin, const char *path) {
@@ -43,6 +44,7 @@ static void usage() {
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
 		"   --restorecon              fix selinux context on Magisk files and folders\n"
 		"   --clone-attr SRC DEST     clone permission, owner, and selinux context\n"
+  		"   --sqlite SQL              exec SQL to Magisk database\n"
 		"\n"
 		"Supported init triggers:\n"
 		"   startup, post-fs-data, service, boot-complete\n"
@@ -110,6 +112,8 @@ int magisk_main(int argc, char *argv[]) {
 		int fd = connect_daemon();
 		write_int(fd, BOOT_COMPLETE);
 		return read_int(fd);
+	} else if (strcmp(argv[1], "--sqlite") == 0) {
+		return exec_sql(argv[2]);
 	}
 
 	usage();

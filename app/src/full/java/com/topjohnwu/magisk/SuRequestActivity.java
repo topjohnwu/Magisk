@@ -252,7 +252,7 @@ public class SuRequestActivity extends BaseActivity {
         policy.policy = action;
         if (time >= 0) {
             policy.until = (time == 0) ? 0 : (System.currentTimeMillis() / 1000 + time * 60);
-            mm.mDB.addPolicy(policy);
+            mm.mDB.updatePolicy(policy);
         }
         handleAction();
     }

@@ -52,6 +52,7 @@ public class Const {
         public static final int SEPOL_REFACTOR = 1640;
         public static final int FIX_ENV = 1650;
         public static final int DBVER_SIX = 17000;
+        public static final int CMDLINE_DB = 17305;
     }
 
     public static class ID {
