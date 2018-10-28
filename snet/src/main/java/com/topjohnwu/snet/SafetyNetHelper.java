@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -26,6 +25,8 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
+
+import androidx.annotation.NonNull;
 
 public class SafetyNetHelper implements InvocationHandler,
         OnSuccessListener<SafetyNetApi.AttestationResponse>, OnFailureListener {
@@ -54,7 +55,8 @@ public class SafetyNetHelper implements InvocationHandler,
         Class<?> clazz = callback.getClass();
         try {
             clazz.getMethod("onResponse", int.class).invoke(callback, code);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     /* Override ISafetyNetHelper.getVersion */
@@ -67,7 +69,7 @@ public class SafetyNetHelper implements InvocationHandler,
         int code = API_AVAIL.isGooglePlayServicesAvailable(mActivity);
         if (code != ConnectionResult.SUCCESS) {
             if (API_AVAIL.isUserResolvableError(code))
-                getErrorDialog(code, 0).show();
+                getErrorDialog(code).show();
             invokeCallback(CONNECTION_FAIL);
             return;
         }
@@ -79,7 +81,7 @@ public class SafetyNetHelper implements InvocationHandler,
         client.attest(nonce, API_KEY).addOnSuccessListener(this).addOnFailureListener(this);
     }
 
-    private Dialog getErrorDialog(int errorCode, int requestCode) {
+    private Dialog getErrorDialog(int errorCode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         Context swapCtx = new SwapResContext(mActivity, Snet.dexPath);
         Intent intent = API_AVAIL.getErrorResolutionIntent(swapCtx, errorCode, "d");
@@ -87,7 +89,7 @@ public class SafetyNetHelper implements InvocationHandler,
         builder.setMessage(ConnectionErrorMessages.getErrorMessage(swapCtx, errorCode));
         builder.setPositiveButton(
                 ConnectionErrorMessages.getErrorDialogButtonMessage(swapCtx, errorCode),
-                DialogRedirect.getInstance(mActivity, intent, requestCode));
+                DialogRedirect.getInstance(mActivity, intent, 0));
 
         String title;
         if ((title = ConnectionErrorMessages.getErrorTitle(swapCtx, errorCode)) != null) {
@@ -119,7 +121,7 @@ public class SafetyNetHelper implements InvocationHandler,
         if (e instanceof ApiException) {
             int errCode = ((ApiException) e).getStatusCode();
             if (API_AVAIL.isUserResolvableError(errCode))
-                getErrorDialog(errCode, 0).show();
+                getErrorDialog(errCode).show();
             else
                 Log.e(TAG, "Cannot resolve: " + e.getMessage());
         } else {

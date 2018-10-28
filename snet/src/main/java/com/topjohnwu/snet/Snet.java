@@ -10,6 +10,6 @@ public class Snet {
     public static Object newHelper(Class<?> interfaceClass, String dexPath, Activity activity, Object cb) {
         Snet.dexPath = dexPath;
         return Proxy.newProxyInstance(SafetyNetHelper.class.getClassLoader(),
-                new Class[] { interfaceClass }, new SafetyNetHelper(activity, cb));
+                new Class[]{interfaceClass}, new SafetyNetHelper(activity, cb));
     }
 }
