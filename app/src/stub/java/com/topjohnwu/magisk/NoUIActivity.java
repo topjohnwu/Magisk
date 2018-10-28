@@ -49,7 +49,7 @@ public class NoUIActivity extends BaseActivity {
                             .setTitle(R.string.app_name)
                             .setMessage(R.string.upgrade_msg)
                             .setPositiveButton(R.string.yes, (d, w) -> runWithPermission(new String[]
-                                    { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+                                    {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
                                 Download.receive(this, new ManagerInstall(), apkLink, filename);
                                 finish();
                             }))
