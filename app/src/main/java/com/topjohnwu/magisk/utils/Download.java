@@ -32,24 +32,24 @@ public class Download {
             return;
 
         BaseActivity.runWithPermission(context,
-                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
-            File file = new File(EXTERNAL_PATH, getLegalFilename(filename));
-            file.delete();
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+                    File file = new File(EXTERNAL_PATH, getLegalFilename(filename));
+                    file.delete();
 
-            Toast.makeText(context, context.getString(R.string.downloading_toast, filename),
-                    Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.downloading_toast, filename),
+                            Toast.LENGTH_LONG).show();
 
-            isDownloading = true;
+                    isDownloading = true;
 
-            DownloadManager.Request request = new DownloadManager
-                    .Request(Uri.parse(link))
-                    .setDestinationUri(Uri.fromFile(file));
+                    DownloadManager.Request request = new DownloadManager
+                            .Request(Uri.parse(link))
+                            .setDestinationUri(Uri.fromFile(file));
 
-            DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            receiver.setDownloadID(dm.enqueue(request)).setFile(file);
-            context.getApplicationContext().registerReceiver(receiver,
-                    new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        });
+                    DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+                    receiver.setDownloadID(dm.enqueue(request)).setFile(file);
+                    context.getApplicationContext().registerReceiver(receiver,
+                            new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                });
     }
 
     public static String getLegalFilename(CharSequence filename) {
