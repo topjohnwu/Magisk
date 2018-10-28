@@ -19,8 +19,7 @@
 #include "flags.h"
 
 int log_daemon_started = 0;
-static struct vector log_cmd, clear_cmd;
-static int sockfd;
+static struct vector log_cmd, clear_cmd;;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 enum {
@@ -111,12 +110,6 @@ static void *logcat_thread(void *args) {
 
 static void log_daemon() {
 	setsid();
-	struct sockaddr_un sun;
-	socklen_t len = setup_sockaddr(&sun, LOG_SOCKET);
-	sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-	if (xbind(sockfd, (struct sockaddr*) &sun, len))
-		exit(1);
-	xlisten(sockfd, 10);
 	LOGI("Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") logger started\n");
 	strcpy(argv0, "magisklogd");
 
@@ -132,11 +125,11 @@ static void log_daemon() {
 
 	// Construct cmdline
 	vec_init(&log_cmd);
-	vec_push_back(&log_cmd, MIRRDIR "/bin/logcat");
+	vec_push_back(&log_cmd, MIRRDIR "/system/bin/logcat");
 	// Test whether these buffers actually works
 	const char* b[] = { "main", "events", "crash" };
 	for (int i = 0; i < 3; ++i) {
-		if (exec_command_sync(MIRRDIR "/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
 			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
 	}
 	chmod("/dev/null", 0666);
@@ -156,6 +149,13 @@ static void log_daemon() {
 	xpthread_create(&thread, NULL, logcat_thread, NULL);
 	pthread_detach(thread);
 
+	// Handle socket requests
+	struct sockaddr_un sun;
+	socklen_t len = setup_sockaddr(&sun, LOG_SOCKET);
+	int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+	if (xbind(sockfd, (struct sockaddr*) &sun, len))
+		exit(1);
+	xlisten(sockfd, 10);
 	while(1) {
 		int fd = xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
 		switch(read_int(fd)) {
@@ -165,23 +165,25 @@ static void log_daemon() {
 				events[HIDE_EVENT].fd = fd;
 				pthread_mutex_unlock(&lock);
 				break;
+			case HANDSHAKE:
+				write_int(fd, HANDSHAKE);
 			default:
 				close(fd);
-				break;
 		}
 	}
 }
 
 int start_log_daemon() {
 	if (!log_daemon_started) {
-		if (exec_command_sync(MIRRDIR "/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
 			if (fork_dont_care() == 0)
 				log_daemon();
-			// Wait till we can connect to log_daemon
+			log_daemon_started = 1;
+			// Wait till we can connect to log_daemon and receive ack
 			int fd = connect_log_daemon();
 			write_int(fd, HANDSHAKE);
+			read_int(fd);
 			close(fd);
-			log_daemon_started = 1;
 		}
 		chmod("/dev/null", 0666);
 	}

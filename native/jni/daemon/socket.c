@@ -143,21 +143,21 @@ void send_fd(int sockfd, int fd) {
 
 int read_int(int fd) {
 	int val;
-	if (xxread(fd, &val, sizeof(int)) != sizeof(int))
+	if (xxread(fd, &val, sizeof(val)) != sizeof(val))
 		return -1;
 	return val;
 }
 
 int read_int_be(int fd) {
 	uint32_t val;
-	if (xxread(fd, &val, sizeof(val)) != sizeof(int))
+	if (xxread(fd, &val, sizeof(val)) != sizeof(val))
 		return -1;
 	return ntohl(val);
 }
 
 void write_int(int fd, int val) {
 	if (fd < 0) return;
-	xwrite(fd, &val, sizeof(int));
+	xwrite(fd, &val, sizeof(val));
 }
 
 void write_int_be(int fd, int val) {
