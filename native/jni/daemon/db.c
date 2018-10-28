@@ -8,12 +8,21 @@
 #include "magisk.h"
 #include "db.h"
 
+#define DB_VERSION 6
+
 static int ver_cb(void *v, int col_num, char **data, char **col_name) {
 	*((int *) v) = atoi(data[0]);
 	return 0;
 }
 
-sqlite3 *get_magiskdb() {
+#define err_abort(err) \
+if (err) { \
+	LOGE("sqlite3_exec: %s\n", err); \
+	sqlite3_free(err); \
+	return NULL; \
+}
+
+static sqlite3 *open_and_init_db() {
 	sqlite3 *db;
 	int ret = sqlite3_open(MAGISKDB, &db);
 	if (ret) {
@@ -21,25 +30,35 @@ sqlite3 *get_magiskdb() {
 		return NULL;
 	}
 	int ver, upgrade = 0;
-	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, NULL);
+	char *err;
+	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
+	err_abort(err);
+	if (ver > DB_VERSION) {
+		// Don't support downgrading database
+		sqlite3_close_v2(db);
+		return NULL;
+	}
 	if (ver < 3) {
 		// Policies
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS policies "
 					 "(uid INT, package_name TEXT, policy INT, until INT, "
 					 "logging INT, notification INT, PRIMARY KEY(uid))",
-					 NULL, NULL, NULL);
+					 NULL, NULL, &err);
+		err_abort(err);
 		// Logs
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS logs "
 					 "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
 					 "to_uid INT, action INT, time INT, command TEXT)",
-					 NULL, NULL, NULL);
+					 NULL, NULL, &err);
+		err_abort(err);
 		// Settings
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS settings "
 					 "(key TEXT, value INT, PRIMARY KEY(key))",
-					 NULL, NULL, NULL);
+					 NULL, NULL, &err);
+		err_abort(err);
 		ver = 3;
 		upgrade = 1;
 	}
@@ -48,12 +67,14 @@ sqlite3 *get_magiskdb() {
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS strings "
 					 "(key TEXT, value TEXT, PRIMARY KEY(key))",
-					 NULL, NULL, NULL);
+					 NULL, NULL, &err);
+		err_abort(err);
 		ver = 4;
 		upgrade = 1;
 	}
 	if (ver == 4) {
-		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", NULL, NULL, NULL);
+		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", NULL, NULL, &err);
+		err_abort(err);
 		/* Skip version 5 */
 		ver = 6;
 		upgrade = 1;
@@ -63,7 +84,18 @@ sqlite3 *get_magiskdb() {
 		// Set version
 		char query[32];
 		sprintf(query, "PRAGMA user_version=%d", ver);
-		sqlite3_exec(db, query, NULL, NULL, NULL);
+		sqlite3_exec(db, query, NULL, NULL, &err);
+		err_abort(err);
+	}
+	return db;
+}
+
+sqlite3 *get_magiskdb() {
+	sqlite3 *db = open_and_init_db();
+	if (db == NULL) {
+		// Open fails, remove and reconstruct
+		unlink(MAGISKDB);
+		db = open_and_init_db();
 	}
 	return db;
 }
