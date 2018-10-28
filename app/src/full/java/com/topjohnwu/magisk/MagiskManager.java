@@ -1,10 +1,8 @@
 package com.topjohnwu.magisk;
 
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 
 import com.topjohnwu.magisk.database.MagiskDB;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
@@ -39,19 +37,7 @@ public class MagiskManager extends ContainerApp {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDB.getInstance();
-
-        String pkg = mDB.getStrings(Const.Key.SU_MANAGER, null);
-        if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
-            mDB.setStrings(Const.Key.SU_MANAGER, null);
-            Shell.su("pm uninstall " + pkg).exec();
-        }
-        if (TextUtils.equals(pkg, getPackageName())) {
-            try {
-                // We are the manager, remove com.topjohnwu.magisk as it could be malware
-                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
-                RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
-            } catch (PackageManager.NameNotFoundException ignored) {}
-        }
+        repoDB = new RepoDatabaseHelper(this);
 
         LocaleManager.setLocale(this);
         Data.loadConfig();

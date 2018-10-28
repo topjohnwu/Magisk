@@ -181,9 +181,9 @@ public class SuRequestActivity extends BaseActivity {
             }
         };
 
-        boolean useFingerprint = Data.suFingerprint && FingerprintHelper.canUseFingerprint();
+        boolean useFP = FingerprintHelper.useFingerPrint();
 
-        if (useFingerprint) {
+        if (useFP) {
             try {
                 fingerprintHelper = new FingerprintHelper() {
                     @Override
@@ -209,11 +209,11 @@ public class SuRequestActivity extends BaseActivity {
                 fingerprintHelper.authenticate();
             } catch (Exception e) {
                 e.printStackTrace();
-                useFingerprint = false;
+                useFP = false;
             }
         }
 
-        if (!useFingerprint) {
+        if (!useFP) {
             grant_btn.setOnClickListener(v -> {
                 handleAction(Policy.ALLOW);
                 timer.cancel();
@@ -221,8 +221,8 @@ public class SuRequestActivity extends BaseActivity {
             grant_btn.requestFocus();
         }
 
-        grant_btn.setVisibility(useFingerprint ? View.GONE : View.VISIBLE);
-        fingerprintImg.setVisibility(useFingerprint ? View.VISIBLE : View.GONE);
+        grant_btn.setVisibility(useFP ? View.GONE : View.VISIBLE);
+        fingerprintImg.setVisibility(useFP ? View.VISIBLE : View.GONE);
 
         deny_btn.setOnClickListener(v -> {
             handleAction(Policy.DENY);

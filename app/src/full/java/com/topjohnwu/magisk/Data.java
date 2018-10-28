@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.receivers.RebootReceiver;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.services.OnBootService;
 import com.topjohnwu.magisk.services.UpdateCheckService;
-import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -62,12 +61,9 @@ public class Data {
     public static boolean isDarkTheme;
     public static int suRequestTimeout;
     public static int suLogTimeout = 14;
-    public static int suAccessState;
-    public static boolean suFingerprint;
-    public static int multiuserMode;
+    public static int multiuserState = -1;
     public static int suResponseType;
     public static int suNotificationType;
-    public static int suNamespaceMode;
     public static int updateChannel;
     public static int repoOrder;
 
@@ -180,15 +176,6 @@ public class Data {
         suRequestTimeout = Utils.getPrefsInt(mm.prefs, Const.Key.SU_REQUEST_TIMEOUT, Const.Value.timeoutList[2]);
         suResponseType = Utils.getPrefsInt(mm.prefs, Const.Key.SU_AUTO_RESPONSE, Const.Value.SU_PROMPT);
         suNotificationType = Utils.getPrefsInt(mm.prefs, Const.Key.SU_NOTIFICATION, Const.Value.NOTIFICATION_TOAST);
-        suAccessState = mm.mDB.getSettings(Const.Key.ROOT_ACCESS, Const.Value.ROOT_ACCESS_APPS_AND_ADB);
-        multiuserMode = mm.mDB.getSettings(Const.Key.SU_MULTIUSER_MODE, Const.Value.MULTIUSER_MODE_OWNER_ONLY);
-        suNamespaceMode = mm.mDB.getSettings(Const.Key.SU_MNT_NS, Const.Value.NAMESPACE_MODE_REQUESTER);
-        suFingerprint = mm.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
-        if (suFingerprint && !FingerprintHelper.canUseFingerprint()) {
-            // User revoked the fingerprint
-            mm.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
-            suFingerprint = false;
-        }
 
         // config
         isDarkTheme = mm.prefs.getBoolean(Const.Key.DARK_THEME, false);
@@ -202,13 +189,9 @@ public class Data {
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
                 .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
-                .putBoolean(Const.Key.SU_FINGERPRINT, suFingerprint)
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))
                 .putString(Const.Key.SU_NOTIFICATION, String.valueOf(suNotificationType))
-                .putString(Const.Key.ROOT_ACCESS, String.valueOf(suAccessState))
-                .putString(Const.Key.SU_MULTIUSER_MODE, String.valueOf(multiuserMode))
-                .putString(Const.Key.SU_MNT_NS, String.valueOf(suNamespaceMode))
                 .putString(Const.Key.UPDATE_CHANNEL, String.valueOf(updateChannel))
                 .putInt(Const.Key.UPDATE_SERVICE_VER, Const.UPDATE_SERVICE_VER)
                 .putInt(Const.Key.REPO_ORDER, repoOrder)

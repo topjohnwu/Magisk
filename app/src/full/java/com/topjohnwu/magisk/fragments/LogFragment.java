@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
-import com.topjohnwu.magisk.Const;
-import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MainActivity;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.adapters.TabFragmentAdapter;
@@ -33,9 +31,7 @@ public class LogFragment extends BaseFragment {
 
         TabFragmentAdapter adapter = new TabFragmentAdapter(getChildFragmentManager());
 
-        if (!(Const.USER_ID > 0 && Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
-            adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
-        }
+        adapter.addTab(new SuLogFragment(), getString(R.string.superuser));
         adapter.addTab(new MagiskLogFragment(), getString(R.string.magisk));
         tab.setupWithViewPager(viewPager);
         tab.setVisibility(View.VISIBLE);

@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -33,8 +34,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
     private ArrayList<ShortcutInfo> getShortCuts(MagiskManager mm) {
         ArrayList<ShortcutInfo> shortCuts = new ArrayList<>();
         boolean root = Shell.rootAccess();
-        if (root && !(Const.USER_ID > 0 &&
-                Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED)) {
+        if (Utils.showSuperUser()) {
             shortCuts.add(new ShortcutInfo.Builder(mm, "superuser")
                     .setShortLabel(mm.getString(R.string.superuser))
                     .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))

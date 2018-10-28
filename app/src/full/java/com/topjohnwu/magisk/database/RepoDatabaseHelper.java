@@ -29,8 +29,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
         mDb = getWritableDatabase();
 
         // Remove outdated repos
-        mDb.delete(TABLE_NAME, "minMagisk<?",
-                new String[] { String.valueOf(Const.MIN_MODULE_VER()) });
+        mDb.delete(TABLE_NAME, "minMagisk<?", new String[] { String.valueOf(Const.MIN_MODULE_VER) });
     }
 
     @Override
@@ -107,7 +106,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                 orderBy = "last_update DESC";
         }
         return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
-                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER()) },
+                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER) },
                 null, null, orderBy);
     }
 

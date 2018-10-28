@@ -3,16 +3,18 @@ package com.topjohnwu.magisk;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.UpdateRepos;
 import com.topjohnwu.magisk.components.BaseActivity;
-import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -22,6 +24,19 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String pkg = mm.mDB.getStrings(Const.Key.SU_MANAGER, null);
+        if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
+            mm.mDB.setStrings(Const.Key.SU_MANAGER, null);
+            Shell.su("pm uninstall " + pkg).exec();
+        }
+        if (TextUtils.equals(pkg, getPackageName())) {
+            try {
+                // We are the manager, remove com.topjohnwu.magisk as it could be malware
+                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
+                RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
+            } catch (PackageManager.NameNotFoundException ignored) {}
+        }
+
         // Magisk working as expected
         if (Shell.rootAccess() && Data.magiskVersionCode > 0) {
             // Update check service
@@ -30,7 +45,6 @@ public class SplashActivity extends BaseActivity {
             Utils.loadModules();
         }
 
-        mm.repoDB = new RepoDatabaseHelper(this);
         Data.importPrefs();
 
         // Dynamic detect all locales

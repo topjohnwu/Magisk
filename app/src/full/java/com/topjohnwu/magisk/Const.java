@@ -34,10 +34,7 @@ public class Const {
 
     // Versions
     public static final int UPDATE_SERVICE_VER = 1;
-
-    public static int MIN_MODULE_VER() {
-        return Data.magiskVersionCode >= MAGISK_VER.REMOVE_LEGACY_LINK ? 1500 : 1400;
-    }
+    public static final int MIN_MODULE_VER = 1500;
 
     /* A list of apps that should not be shown as hide-able */
     public static final List<String> HIDE_BLACKLIST =  Arrays.asList(

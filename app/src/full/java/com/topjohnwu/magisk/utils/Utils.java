@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Module;
 import com.topjohnwu.magisk.container.ValueSortedMap;
+import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.io.SuFile;
 
 import java.util.Locale;
@@ -139,5 +140,13 @@ public class Utils {
             }
         } catch (Exception ignored) {}
         return info.loadLabel(pm).toString();
+    }
+
+    public static boolean showSuperUser() {
+        if (Data.multiuserState < 0)
+            Data.multiuserState = Data.MM().mDB.getSettings(Const.Key.SU_MULTIUSER_MODE,
+                    Const.Value.MULTIUSER_MODE_OWNER_ONLY);
+        return Shell.rootAccess() && (Const.USER_ID == 0 ||
+                Data.multiuserState != Const.Value.MULTIUSER_MODE_OWNER_MANAGED);
     }
 }

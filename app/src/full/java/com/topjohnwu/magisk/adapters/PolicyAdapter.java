@@ -10,7 +10,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.CustomAlertDialog;
 import com.topjohnwu.magisk.components.ExpandableView;
@@ -86,7 +85,7 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
                     dbHelper.updatePolicy(policy);
                 }
             };
-            if (Data.suFingerprint) {
+            if (FingerprintHelper.useFingerPrint()) {
                 holder.masterSwitch.setChecked(!isChecked);
                 FingerprintHelper.showAuthDialog((Activity) v.getContext(), () -> {
                     holder.masterSwitch.setChecked(isChecked);

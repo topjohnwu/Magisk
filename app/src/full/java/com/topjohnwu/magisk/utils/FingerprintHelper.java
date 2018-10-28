@@ -35,6 +35,16 @@ public abstract class FingerprintHelper {
     private Cipher cipher;
     private CancellationSignal cancel;
 
+    public static boolean useFingerPrint() {
+        MagiskManager mm = Data.MM();
+        boolean fp = mm.mDB.getSettings(Const.Key.SU_FINGERPRINT, 0) != 0;
+        if (fp && !canUseFingerprint()) {
+            mm.mDB.setSettings(Const.Key.SU_FINGERPRINT, 0);
+            fp = false;
+        }
+        return fp;
+    }
+
     public static boolean canUseFingerprint() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return false;

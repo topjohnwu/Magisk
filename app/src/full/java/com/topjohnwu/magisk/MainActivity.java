@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.fragments.SettingsFragment;
 import com.topjohnwu.magisk.fragments.SuperuserFragment;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import androidx.annotation.NonNull;
@@ -124,8 +125,7 @@ public class MainActivity extends BaseActivity
         menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
                 && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
-                !(Const.USER_ID > 0 && Data.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
+        menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
     }
 
     public void navigate(String item) {
