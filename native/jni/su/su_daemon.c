@@ -361,8 +361,10 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			break;
 	}
 
-	if (info->access.notify || info->access.log)
+	if (info->access.log)
 		app_log(&ctx);
+	else if (info->access.notify)
+		app_notify(&ctx);
 
 	if (info->access.policy == ALLOW) {
 		char* argv[] = { NULL, NULL, NULL, NULL };

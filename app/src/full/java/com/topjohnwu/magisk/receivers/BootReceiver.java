@@ -14,8 +14,13 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (intent == null)
+            return;
         if (TextUtils.equals(intent.getAction(), Intent.ACTION_BOOT_COMPLETED)) {
-            switch (intent.getExtras().getString("action", "boot")) {
+            String action = intent.getStringExtra("action");
+            if (action == null)
+                action = "boot";
+            switch (action) {
                 case "request":
                     Intent i = new Intent(context, Data.classMap.get(SuRequestActivity.class))
                             .putExtra("socket", intent.getStringExtra("socket"))
@@ -25,6 +30,9 @@ public class BootReceiver extends BroadcastReceiver {
                     break;
                 case "log":
                     SuConnector.handleLogs(intent, 2);
+                    break;
+                case "notify":
+                    SuConnector.handleNotify(intent);
                     break;
                 case "boot":
                     OnBootService.enqueueWork(context);

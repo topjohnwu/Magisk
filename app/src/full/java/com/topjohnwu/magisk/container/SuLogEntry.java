@@ -19,6 +19,7 @@ public class SuLogEntry {
         fromUid = policy.uid;
         packageName = policy.packageName;
         appName = policy.appName;
+        action = policy.policy == Policy.ALLOW;
     }
 
     public SuLogEntry(ContentValues values) {

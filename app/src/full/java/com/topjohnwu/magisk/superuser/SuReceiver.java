@@ -10,6 +10,7 @@ public class SuReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SuConnector.handleLogs(intent, 1);
+        if (intent != null)
+            SuConnector.handleLogs(intent, 1);
     }
 }

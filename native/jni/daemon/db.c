@@ -15,32 +15,31 @@ static int ver_cb(void *v, int col_num, char **data, char **col_name) {
 
 sqlite3 *get_magiskdb() {
 	sqlite3 *db;
-	char *err;
 	int ret = sqlite3_open(MAGISKDB, &db);
 	if (ret) {
 		LOGE("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
 		return NULL;
 	}
 	int ver, upgrade = 0;
-	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
+	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, NULL);
 	if (ver < 3) {
 		// Policies
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS policies "
 					 "(uid INT, package_name TEXT, policy INT, until INT, "
 					 "logging INT, notification INT, PRIMARY KEY(uid))",
-					 NULL, NULL, &err);
+					 NULL, NULL, NULL);
 		// Logs
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS logs "
 					 "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
 					 "to_uid INT, action INT, time INT, command TEXT)",
-					 NULL, NULL, &err);
+					 NULL, NULL, NULL);
 		// Settings
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS settings "
 					 "(key TEXT, value INT, PRIMARY KEY(key))",
-					 NULL, NULL, &err);
+					 NULL, NULL, NULL);
 		ver = 3;
 		upgrade = 1;
 	}
@@ -49,12 +48,12 @@ sqlite3 *get_magiskdb() {
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS strings "
 					 "(key TEXT, value TEXT, PRIMARY KEY(key))",
-					 NULL, NULL, &err);
+					 NULL, NULL, NULL);
 		ver = 4;
 		upgrade = 1;
 	}
 	if (ver == 4) {
-		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", NULL, NULL, &err);
+		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", NULL, NULL, NULL);
 		/* Skip version 5 */
 		ver = 6;
 		upgrade = 1;
@@ -64,7 +63,7 @@ sqlite3 *get_magiskdb() {
 		// Set version
 		char query[32];
 		sprintf(query, "PRAGMA user_version=%d", ver);
-		sqlite3_exec(db, query, NULL, NULL, &err);
+		sqlite3_exec(db, query, NULL, NULL, NULL);
 	}
 	return db;
 }
@@ -102,6 +101,7 @@ int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
 	}
 	if (err) {
 		LOGE("sqlite3_exec: %s\n", err);
+		sqlite3_free(err);
 		return 1;
 	}
 	return 0;
@@ -141,6 +141,7 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
 	}
 	if (err) {
 		LOGE("sqlite3_exec: %s\n", err);
+		sqlite3_free(err);
 		return 1;
 	}
 	return 0;
@@ -169,6 +170,7 @@ int get_uid_policy(sqlite3 *db, int uid, struct su_access *su) {
 	sqlite3_exec(db, query, policy_cb, su, &err);
 	if (err) {
 		LOGE("sqlite3_exec: %s\n", err);
+		sqlite3_free(err);
 		return 1;
 	}
 	return 0;

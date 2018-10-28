@@ -54,6 +54,7 @@ struct su_context {
 // connect.c
 
 void app_log(struct su_context *ctx);
+void app_notify(struct su_context *ctx);
 void app_connect(const char *socket, struct su_info *info);
 void socket_send_request(int fd, struct su_info *info);
 

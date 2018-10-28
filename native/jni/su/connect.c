@@ -82,7 +82,33 @@ void app_log(struct su_context *ctx) {
 		"--ei", "pid", pid,
 		"--ei", "policy", policy,
 		"--es", "command", get_command(&ctx->req),
+		"--ez", "notify", ctx->info->access.notify ? "true" : "false",
 		NULL
+	};
+	silent_run(cmd);
+}
+
+void app_notify(struct su_context *ctx) {
+	char user[8];
+	setup_user(user, ctx->info);
+
+	char fromUid[8];
+	sprintf(fromUid, "%d",
+			DB_SET(ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
+			ctx->info->uid % 100000 : ctx->info->uid);
+
+	char policy[2];
+	sprintf(policy, "%d", ctx->info->access.policy);
+
+	char *cmd[] = {
+			AM_PATH, "broadcast",
+			"-a", "android.intent.action.BOOT_COMPLETED",
+			"-p", DB_STR(ctx->info, SU_MANAGER),
+			"--user", user,
+			"--es", "action", "notify",
+			"--ei", "from.uid", fromUid,
+			"--ei", "policy", policy,
+			NULL
 	};
 	silent_run(cmd);
 }
