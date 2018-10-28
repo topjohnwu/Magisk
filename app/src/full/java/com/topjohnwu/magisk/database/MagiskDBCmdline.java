@@ -38,6 +38,8 @@ public class MagiskDBCmdline extends MagiskDB {
             String[] cols = raw.split("\\|");
             for (String col : cols) {
                 String[] pair = col.split("=", 2);
+                if (pair.length != 2)
+                    continue;
                 values.put(pair[0], pair[1]);
             }
             list.add(values);
@@ -168,7 +170,7 @@ public class MagiskDBCmdline extends MagiskDB {
     @Override
     public void setStrings(String key, String value) {
         if (value == null) {
-            rawSQL("DELETE FROM %s WHERE key=\"%s\"", STRINGS_TABLE);
+            rawSQL("DELETE FROM %s WHERE key=\"%s\"", STRINGS_TABLE, key);
             return;
         }
         ContentValues data = new ContentValues();
