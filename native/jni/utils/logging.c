@@ -3,6 +3,7 @@
 #include <android/log.h>
 
 #include "logging.h"
+#include "flags.h"
 
 int nop_log(const char *fmt, va_list ap) {
 	return 0;
@@ -45,7 +46,11 @@ static int log_e(const char *fmt, va_list ap) {
 }
 
 void android_logging() {
+#ifdef MAGISK_DEBUG
 	log_cb.d = log_d;
+#else
+	log_cb.d = nop_log;
+#endif
 	log_cb.i = log_i;
 	log_cb.w = log_w;
 	log_cb.e = log_e;

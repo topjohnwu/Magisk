@@ -15,6 +15,7 @@
 #include "magiskhide.h"
 #include "daemon.h"
 #include "resetprop.h"
+#include "flags.h"
 
 struct vector *hide_list = NULL;
 

@@ -9,6 +9,7 @@
 #include "magiskboot.h"
 #include "logging.h"
 #include "utils.h"
+#include "flags.h"
 
 /********************
   Patch Boot Image

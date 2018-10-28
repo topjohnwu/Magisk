@@ -22,6 +22,7 @@
 #include "_resetprop.h"
 #include "vector.h"
 #include "utils.h"
+#include "flags.h"
 
 int prop_verbose = 0;
 
