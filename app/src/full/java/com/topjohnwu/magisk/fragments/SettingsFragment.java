@@ -140,7 +140,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
             fingerprint.setSummary(R.string.disable_fingerprint);
         }
 
-        if (Shell.rootAccess()) {
+        if (Shell.rootAccess() && Const.USER_ID == 0) {
             if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                 hideManager.setOnPreferenceClickListener((pref) -> {
                     PatchAPK.hideManager(requireActivity());

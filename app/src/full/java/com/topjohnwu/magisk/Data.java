@@ -106,12 +106,12 @@ public class Data {
         mm.prefs.edit().commit();
         File xml = new File(mm.getFilesDir().getParent() + "/shared_prefs",
                 mm.getPackageName() + "_preferences.xml");
-        Shell.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS)).exec();
+        Shell.su(Utils.fmt("cat %s > /data/user/0/%s", xml, Const.MANAGER_CONFIGS)).exec();
     }
 
     public static void importPrefs() {
         MagiskManager mm = MM();
-        SuFile config = new SuFile(Utils.fmt("/data/user/%d/%s", Const.USER_ID, Const.MANAGER_CONFIGS));
+        SuFile config = new SuFile("/data/user/0/" + Const.MANAGER_CONFIGS);
         if (config.exists()) {
             SharedPreferences.Editor editor = mm.prefs.edit();
             try {
