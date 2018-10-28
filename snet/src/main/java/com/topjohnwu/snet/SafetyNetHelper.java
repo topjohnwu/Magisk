@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -27,6 +26,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
 
+import androidx.annotation.NonNull;
+
 public class SafetyNetHelper implements InvocationHandler,
         OnSuccessListener<SafetyNetApi.AttestationResponse>, OnFailureListener {
 
@@ -38,9 +39,6 @@ public class SafetyNetHelper implements InvocationHandler,
     private static final GoogleApiAvailability API_AVAIL = GoogleApiAvailability.getInstance();
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String TAG = "SNET";
-
-    /* Insert the magic API key here :) */
-    private static final String API_KEY = "";
 
     private final Activity mActivity;
     private final Object callback;
@@ -55,6 +53,11 @@ public class SafetyNetHelper implements InvocationHandler,
         try {
             clazz.getMethod("onResponse", int.class).invoke(callback, code);
         } catch (Exception ignored) {}
+    }
+
+    /* Return magic API key here :) */
+    private String getApiKey() {
+        return "";
     }
 
     /* Override ISafetyNetHelper.getVersion */
@@ -76,7 +79,7 @@ public class SafetyNetHelper implements InvocationHandler,
         RANDOM.nextBytes(nonce);
 
         SafetyNetClient client = SafetyNet.getClient(mActivity.getBaseContext());
-        client.attest(nonce, API_KEY).addOnSuccessListener(this).addOnFailureListener(this);
+        client.attest(nonce, getApiKey()).addOnSuccessListener(this).addOnFailureListener(this);
     }
 
     private Dialog getErrorDialog(int errorCode, int requestCode) {
