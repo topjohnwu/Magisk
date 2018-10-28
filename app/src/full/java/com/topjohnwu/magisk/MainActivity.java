@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -85,6 +86,15 @@ public class MainActivity extends BaseActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
+
+	// Ensure navigation drawer text is legible with dark theme.
+        ColorStateList csl = ColorStateList.valueOf(
+                getResources().getColor(R.color.item_text_color_dark));
+        if (Data.isDarkTheme) {
+            csl = ColorStateList.valueOf(
+                    getResources().getColor(R.color.item_text_color_light));
+        }
+        navigationView.setItemTextColor(csl);
     }
 
     @Override
