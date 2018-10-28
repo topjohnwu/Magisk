@@ -25,6 +25,6 @@
     <color name="card_background_color_dark">#ff424242</color>
     <color name="card_background_color_light">#ffffffff</color>
 
-    <color name="item_text_color_dark">#000000</color>
-    <color name="item_text_color_light">#ffffff</color>
+    <color name="nav_item_color_dark">#000000</color>
+    <color name="nav_item_color_light">#ffffff</color>
 </resources>
