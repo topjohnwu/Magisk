@@ -13,8 +13,8 @@ native/out
 # Android Studio / Gradle
 *.iml
 .gradle
-/local.properties
-/.idea
-/build
-/captures
+local.properties
+.idea/
+build/
+captures/
 .externalNativeBuild

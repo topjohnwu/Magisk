@@ -36,7 +36,7 @@
 # Pure bash dirname implementation
 getdir() {
   case "$1" in
-    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
+    */*) dir=${1%/*}; [ -z ${dir} ] && echo "/" || echo ${dir} ;;
     *) echo "." ;;
   esac
 }
@@ -45,7 +45,7 @@ getdir() {
 # Initialization
 ##########################################################################################
 
-if [ -z $SOURCEDMODE ]; then
+if [ -z ${SOURCEDMODE} ]; then
   # Switch to the location of the script file
   cd "`getdir "${BASH_SOURCE:-$0}"`"
   # Load utility functions
@@ -56,8 +56,8 @@ BOOTIMAGE="$1"
 [ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
 
 # Flags
-[ -z $KEEPVERITY ] && KEEPVERITY=false
-[ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+[ -z ${KEEPVERITY} ] && KEEPVERITY=false
+[ -z ${KEEPFORCEENCRYPT} ] && KEEPFORCEENCRYPT=false
 
 chmod -R 755 .
 
@@ -103,13 +103,13 @@ case $? in
     ui_print "- Backing up stock boot image"
     SHA1=`./magiskboot --sha1 "$BOOTIMAGE" 2>/dev/null`
     STOCKDUMP=stock_boot_${SHA1}.img.gz
-    ./magiskboot --compress "$BOOTIMAGE" $STOCKDUMP
+    ./magiskboot --compress "$BOOTIMAGE" ${STOCKDUMP}
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z ${SHA1} ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     ./magiskboot --cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;
@@ -135,7 +135,7 @@ rm -f ramdisk.cpio.orig
 # Binary patches
 ##########################################################################################
 
-if ! $KEEPVERITY; then
+if ! ${KEEPVERITY}; then
   [ -f dtb ] && ./magiskboot --dtb-patch dtb && ui_print "- Removing dm(avb)-verity in dtb"
   [ -f extra ] && ./magiskboot --dtb-patch extra && ui_print "- Removing dm(avb)-verity in extra-dtb"
 fi
@@ -166,6 +166,6 @@ ui_print "- Repacking boot image"
 ./magiskboot --repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
 
 # Sign chromeos boot
-$CHROMEOS && sign_chromeos
+${CHROMEOS} && sign_chromeos
 
 ./magiskboot --cleanup

@@ -10,11 +10,11 @@
 V1_FUNCS=/tmp/backuptool.functions
 V2_FUNCS=/postinstall/system/bin/backuptool_ab.functions
 
-if [ -f $V1_FUNCS ]; then
-  . $V1_FUNCS
+if [ -f ${V1_FUNCS} ]; then
+  . ${V1_FUNCS}
   backuptool_ab=false
-elif [ -f $V2_FUNCS ]; then
-  . $V2_FUNCS
+elif [ -f ${V2_FUNCS} ]; then
+  . ${V2_FUNCS}
 else
   return 1
 fi
@@ -26,17 +26,17 @@ initialize() {
   mount /data 2>/dev/null
 
   MAGISKBIN=/data/adb/magisk
-  if [ ! -d $MAGISKBIN ]; then
+  if [ ! -d ${MAGISKBIN} ]; then
     echo "! Cannot find Magisk binaries!"
     exit 1
   fi
 
   # Load utility functions
-  . $MAGISKBIN/util_functions.sh
+  . ${MAGISKBIN}/util_functions.sh
 
   APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/magisk/magisk.apk
-  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  [ -f ${APK} ] || APK=/data/magisk/magisk.apk
+  [ -f ${APK} ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
 }
 
 show_logo() {
@@ -48,18 +48,18 @@ show_logo() {
 installation() {
   find_boot_image
   find_dtbo_image
-  [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
+  [ -z ${BOOTIMAGE} ] && abort "! Unable to detect target image"
   ui_print "- Target image: $BOOTIMAGE"
-  [ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
+  [ -z ${DTBOIMAGE} ] || ui_print "- DTBO image: $DTBOIMAGE"
   get_flags
 
   remove_system_su
 
-  [ -f $APK ] && eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
-  $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
+  [ -f ${APK} ] && eval ${BOOTSIGNER} -verify < ${BOOTIMAGE} && BOOTSIGNED=true
+  ${BOOTSIGNED} && ui_print "- Boot image is signed with AVB 1.0"
 
   SOURCEDMODE=true
-  cd $MAGISKBIN
+  cd ${MAGISKBIN}
 
   # Source the boot patcher
   . ./boot_patch.sh "$BOOTIMAGE"
@@ -70,14 +70,14 @@ installation() {
 
   if [ -f stock_boot* ]; then
     rm -f /data/stock_boot* 2>/dev/null
-    $DATA && mv stock_boot* /data
+    ${DATA} && mv stock_boot* /data
   fi
 
-  $KEEPVERITY || patch_dtbo_image
+  ${KEEPVERITY} || patch_dtbo_image
 
   if [ -f stock_dtbo* ]; then
     rm -f /data/stock_dtbo* 2>/dev/null
-    $DATA && mv stock_dtbo* /data
+    ${DATA} && mv stock_dtbo* /data
   fi
 
   cd /
@@ -104,7 +104,7 @@ main_v2() {
   show_logo
   mount_partitions
   # Swap the slot
-  if [ ! -z $SLOT ]; then [ $SLOT = _a ] && SLOT=_b || SLOT=_a; fi
+  if [ ! -z ${SLOT} ]; then [ ${SLOT} = _a ] && SLOT=_b || SLOT=_a; fi
   installation
   finalize
 }
@@ -126,7 +126,7 @@ case "$1" in
     # Stub
   ;;
   post-restore)
-    if $backuptool_ab; then
+    if ${backuptool_ab}; then
       exec su -c "sh $0 addond-v2"
     else
       initialize

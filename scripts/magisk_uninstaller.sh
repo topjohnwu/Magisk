@@ -14,7 +14,7 @@
 TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/install
-CHROMEDIR=$INSTALLER/chromeos
+CHROMEDIR=${INSTALLER}/chromeos
 
 # Default permissions
 umask 022
@@ -22,13 +22,13 @@ umask 022
 OUTFD=$2
 ZIP=$3
 
-if [ ! -f $INSTALLER/util_functions.sh ]; then
+if [ ! -f ${INSTALLER}/util_functions.sh ]; then
   echo "! Unable to extract zip file!"
   exit 1
 fi
 
 # Load utility functions
-. $INSTALLER/util_functions.sh
+. ${INSTALLER}/util_functions.sh
 
 setup_flashable
 
@@ -43,13 +43,13 @@ mount_partitions
 api_level_arch_detect
 
 ui_print "- Device platform: $ARCH"
-MAGISKBIN=$INSTALLER/$ARCH32
-mv $CHROMEDIR $MAGISKBIN
-chmod -R 755 $MAGISKBIN
+MAGISKBIN=${INSTALLER}/${ARCH32}
+mv ${CHROMEDIR} ${MAGISKBIN}
+chmod -R 755 ${MAGISKBIN}
 
 check_data
-$DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
-$BOOTMODE || recovery_actions
+${DATA_DE} || abort "! Cannot access /data, please uninstall with Magisk Manager"
+${BOOTMODE} || recovery_actions
 
 ##########################################################################################
 # Uninstall
@@ -58,11 +58,11 @@ $BOOTMODE || recovery_actions
 find_boot_image
 find_dtbo_image
 
-[ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
+[ -e ${BOOTIMAGE} ] || abort "! Unable to detect boot image"
 ui_print "- Found boot/ramdisk image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
+[ -z ${DTBOIMAGE} ] || ui_print "- Found dtbo image: $DTBOIMAGE"
 
-cd $MAGISKBIN
+cd ${MAGISKBIN}
 
 CHROMEOS=false
 
@@ -96,25 +96,25 @@ case $? in
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z ${SHA1} ] && SHA1=`./magiskboot --cpio ramdisk.cpio sha1 2>/dev/null`
     STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
     STOCKDTBO=/data/stock_dtbo.img.gz
-    if [ -f $STOCKBOOT ]; then
+    if [ -f ${STOCKBOOT} ]; then
       ui_print "- Restoring stock boot image"
-      flash_image $STOCKBOOT $BOOTIMAGE
-      if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
+      flash_image ${STOCKBOOT} ${BOOTIMAGE}
+      if [ -f ${STOCKDTBO} -a -b "$DTBOIMAGE" ]; then
         ui_print "- Restoring stock dtbo image"
-        flash_image $STOCKDTBO $DTBOIMAGE
+        flash_image ${STOCKDTBO} ${DTBOIMAGE}
       fi
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
       ./magiskboot --cpio ramdisk.cpio restore
-      ./magiskboot --repack $BOOTIMAGE
+      ./magiskboot --repack ${BOOTIMAGE}
       # Sign chromeos boot
-      $CHROMEOS && sign_chromeos
+      ${CHROMEOS} && sign_chromeos
       ui_print "- Flashing restored boot image"
-      flash_image new-boot.img $BOOTIMAGE || abort "! Insufficient partition size"
+      flash_image new-boot.img ${BOOTIMAGE} || abort "! Insufficient partition size"
     fi
     ;;
   2 ) # Other patched
@@ -134,12 +134,12 @@ fi
 
 # Remove persist props (for Android P+ using protobuf)
 for prop in `./magisk resetprop -p | grep -E 'persist.*magisk' | grep -oE '^\[[a-zA-Z0-9.@:_-]+\]' | tr -d '[]'`; do
-  ./magisk resetprop -p --delete $prop
+  ./magisk resetprop -p --delete ${prop}
 done
 
 cd /
 
-if $BOOTMODE; then
+if ${BOOTMODE}; then
   ui_print "**********************************************"
   ui_print "* Magisk Manager will uninstall itself, and  *"
   ui_print "* the device will reboot after a few seconds *"
