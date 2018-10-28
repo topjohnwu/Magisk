@@ -34,13 +34,13 @@ public class BootSigner {
         } else {
             System.err.println(
                     "BootSigner <actions> [args]\n" +
-                    "Input from stdin, outputs to stdout\n" +
-                    "\n" +
-                    "Actions:\n" +
-                    "   -verify [x509.pem]\n" +
-                    "      verify image, cert is optional\n" +
-                    "   -sign [x509.pem] [pk8]\n" +
-                    "      sign image, cert and key pair is optional\n"
+                            "Input from stdin, outputs to stdout\n" +
+                            "\n" +
+                            "Actions:\n" +
+                            "   -verify [x509.pem]\n" +
+                            "      verify image, cert is optional\n" +
+                            "   -sign [x509.pem] [pk8]\n" +
+                            "      sign image, cert and key pair is optional\n"
             );
         }
     }

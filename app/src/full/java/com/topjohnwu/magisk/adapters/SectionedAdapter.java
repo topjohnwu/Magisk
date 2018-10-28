@@ -30,7 +30,7 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
     final public int getItemCount() {
         int size, sec;
         size = sec = getSectionCount();
-        for (int i = 0; i < sec; ++i){
+        for (int i = 0; i < sec; ++i) {
             size += getItemCount(i);
         }
         return size;
@@ -42,7 +42,7 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
         if (info.position == -1)
             return SECTION_TYPE;
         else
-            return  getItemViewType(info.section, info.position);
+            return getItemViewType(info.section, info.position);
     }
 
     public int getItemViewType(int section, int position) {
@@ -79,6 +79,7 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
     private static class PositionInfo {
         int section;
         int position;
+
         PositionInfo(int section, int position) {
             this.section = section;
             this.position = position;
@@ -86,9 +87,14 @@ public abstract class SectionedAdapter<S extends RecyclerView.ViewHolder, C exte
     }
 
     public abstract int getSectionCount();
+
     public abstract int getItemCount(int section);
+
     public abstract S onCreateSectionViewHolder(ViewGroup parent);
+
     public abstract C onCreateItemViewHolder(ViewGroup parent, int viewType);
+
     public abstract void onBindSectionViewHolder(S holder, int section);
+
     public abstract void onBindItemViewHolder(C holder, int section, int position);
 }

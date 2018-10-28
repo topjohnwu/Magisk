@@ -27,13 +27,19 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     private ViewHolder vh;
 
     public class ViewHolder {
-        @BindView(R.id.dialog_layout) public LinearLayout dialogLayout;
-        @BindView(R.id.button_panel) public LinearLayout buttons;
+        @BindView(R.id.dialog_layout)
+        public LinearLayout dialogLayout;
+        @BindView(R.id.button_panel)
+        public LinearLayout buttons;
 
-        @BindView(R.id.message) public TextView messageView;
-        @BindView(R.id.negative) public Button negative;
-        @BindView(R.id.positive) public Button positive;
-        @BindView(R.id.neutral) public Button neutral;
+        @BindView(R.id.message)
+        public TextView messageView;
+        @BindView(R.id.negative)
+        public Button negative;
+        @BindView(R.id.positive)
+        public Button positive;
+        @BindView(R.id.neutral)
+        public Button neutral;
 
         ViewHolder(View v) {
             new CustomAlertDialog$ViewHolder_ViewBinding(this, v);
@@ -65,10 +71,14 @@ public class CustomAlertDialog extends AlertDialog.Builder {
     }
 
     @Override
-    public CustomAlertDialog setView(int layoutResId) { return this; }
+    public CustomAlertDialog setView(int layoutResId) {
+        return this;
+    }
 
     @Override
-    public CustomAlertDialog setView(View view) { return this; }
+    public CustomAlertDialog setView(View view) {
+        return this;
+    }
 
     @Override
     public CustomAlertDialog setMessage(@Nullable CharSequence message) {

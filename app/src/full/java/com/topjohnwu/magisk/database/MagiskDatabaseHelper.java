@@ -159,20 +159,20 @@ public class MagiskDatabaseHelper {
         // Policies
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + POLICY_TABLE + " " +
-                "(uid INT, package_name TEXT, policy INT, " +
-                "until INT, logging INT, notification INT, " +
-                "PRIMARY KEY(uid))");
+                        "(uid INT, package_name TEXT, policy INT, " +
+                        "until INT, logging INT, notification INT, " +
+                        "PRIMARY KEY(uid))");
 
         // Logs
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + LOG_TABLE + " " +
-                "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
-                "to_uid INT, action INT, time INT, command TEXT)");
+                        "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, " +
+                        "to_uid INT, action INT, time INT, command TEXT)");
 
         // Settings
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS " + SETTINGS_TABLE + " " +
-                "(key TEXT, value INT, PRIMARY KEY(key))");
+                        "(key TEXT, value INT, PRIMARY KEY(key))");
     }
 
     public void flush() {
@@ -192,7 +192,7 @@ public class MagiskDatabaseHelper {
     }
 
     public void deletePolicy(String pkg) {
-        db.delete(POLICY_TABLE, "package_name=?", new String[] { pkg });
+        db.delete(POLICY_TABLE, "package_name=?", new String[]{pkg});
     }
 
     public void deletePolicy(int uid) {
@@ -239,7 +239,7 @@ public class MagiskDatabaseHelper {
     }
 
     public List<List<Integer>> getLogStructure() {
-        try (Cursor c = db.query(LOG_TABLE, new String[] { "time" }, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
+        try (Cursor c = db.query(LOG_TABLE, new String[]{"time"}, Utils.fmt("from_uid/100000=%d", Const.USER_ID),
                 null, null, null, "time DESC")) {
             List<List<Integer>> ret = new ArrayList<>();
             List<Integer> list = null;
@@ -280,7 +280,7 @@ public class MagiskDatabaseHelper {
 
     public int getSettings(String key, int defaultValue) {
         int value = defaultValue;
-        try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+        try (Cursor c = db.query(SETTINGS_TABLE, null, "key=?", new String[]{key}, null, null, null)) {
             if (c.moveToNext()) {
                 value = c.getInt(c.getColumnIndex("value"));
             }
@@ -290,7 +290,7 @@ public class MagiskDatabaseHelper {
 
     public void setStrings(String key, String value) {
         if (value == null) {
-            db.delete(STRINGS_TABLE, "key=?", new String[] { key });
+            db.delete(STRINGS_TABLE, "key=?", new String[]{key});
         } else {
             ContentValues data = new ContentValues();
             data.put("key", key);
@@ -301,7 +301,7 @@ public class MagiskDatabaseHelper {
 
     public String getStrings(String key, String defaultValue) {
         String value = defaultValue;
-        try (Cursor c = db.query(STRINGS_TABLE, null, "key=?",new String[] { key }, null, null, null)) {
+        try (Cursor c = db.query(STRINGS_TABLE, null, "key=?", new String[]{key}, null, null, null)) {
             if (c.moveToNext()) {
                 value = c.getString(c.getColumnIndex("value"));
             }

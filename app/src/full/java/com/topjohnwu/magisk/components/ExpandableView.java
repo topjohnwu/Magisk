@@ -20,25 +20,25 @@ public interface ExpandableView {
     default void setupExpandable() {
         Container container = getContainer();
         container.expandLayout.getViewTreeObserver().addOnPreDrawListener(
-            new ViewTreeObserver.OnPreDrawListener() {
+                new ViewTreeObserver.OnPreDrawListener() {
 
-                @Override
-                public boolean onPreDraw() {
-                    if (container.expandHeight == 0) {
-                        final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                        final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-                        container.expandLayout.measure(widthSpec, heightSpec);
-                        container.expandHeight = container.expandLayout.getMeasuredHeight();
+                    @Override
+                    public boolean onPreDraw() {
+                        if (container.expandHeight == 0) {
+                            final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+                            final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+                            container.expandLayout.measure(widthSpec, heightSpec);
+                            container.expandHeight = container.expandLayout.getMeasuredHeight();
+                        }
+
+                        container.expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
+                        container.expandLayout.setVisibility(View.GONE);
+                        container.expandAnimator = slideAnimator(0, container.expandHeight);
+                        container.collapseAnimator = slideAnimator(container.expandHeight, 0);
+                        return true;
                     }
 
-                    container.expandLayout.getViewTreeObserver().removeOnPreDrawListener(this);
-                    container.expandLayout.setVisibility(View.GONE);
-                    container.expandAnimator = slideAnimator(0, container.expandHeight);
-                    container.collapseAnimator = slideAnimator(container.expandHeight, 0);
-                    return true;
-                }
-
-            });
+                });
     }
 
     default boolean isExpanded() {

@@ -103,19 +103,17 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
         holder.infoLayout.setOnClickListener(v ->
                 new MarkDownWindow((BaseActivity) context, null, repo.getDetailUrl()).exec());
 
-        holder.downloadImage.setOnClickListener(v -> {
-            new CustomAlertDialog((BaseActivity) context)
-                    .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
-                    .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.install, (d, i) ->
+        holder.downloadImage.setOnClickListener(v -> new CustomAlertDialog((BaseActivity) context)
+                .setTitle(context.getString(R.string.repo_install_title, repo.getName()))
+                .setMessage(context.getString(R.string.repo_install_msg, repo.getDownloadFilename()))
+                .setCancelable(true)
+                .setPositiveButton(R.string.install, (d, i) ->
                         new ProcessRepoZip((BaseActivity) context, repo, true).exec()
-                    )
-                    .setNeutralButton(R.string.download, (d, i) ->
+                )
+                .setNeutralButton(R.string.download, (d, i) ->
                         new ProcessRepoZip((BaseActivity) context, repo, false).exec())
-                    .setNegativeButton(R.string.no_thanks, null)
-                    .show();
-        });
+                .setNegativeButton(R.string.no_thanks, null)
+                .show());
     }
 
     public void notifyDBChanged() {
@@ -165,7 +163,8 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
     static class SectionHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.section_text) TextView sectionText;
+        @BindView(R.id.section_text)
+        TextView sectionText;
 
         SectionHolder(View itemView) {
             super(itemView);
@@ -175,18 +174,24 @@ public class ReposAdapter extends SectionedAdapter<ReposAdapter.SectionHolder, R
 
     static class RepoHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title) TextView title;
-        @BindView(R.id.version_name) TextView versionName;
-        @BindView(R.id.description) TextView description;
-        @BindView(R.id.author) TextView author;
-        @BindView(R.id.info_layout) LinearLayout infoLayout;
-        @BindView(R.id.download) ImageView downloadImage;
-        @BindView(R.id.update_time) TextView updateTime;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.version_name)
+        TextView versionName;
+        @BindView(R.id.description)
+        TextView description;
+        @BindView(R.id.author)
+        TextView author;
+        @BindView(R.id.info_layout)
+        LinearLayout infoLayout;
+        @BindView(R.id.download)
+        ImageView downloadImage;
+        @BindView(R.id.update_time)
+        TextView updateTime;
 
         RepoHolder(View itemView) {
             super(itemView);
             new ReposAdapter$RepoHolder_ViewBinding(this, itemView);
         }
-
     }
 }

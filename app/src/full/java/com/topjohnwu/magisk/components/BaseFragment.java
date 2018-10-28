@@ -47,7 +47,7 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
     }
 
     public void runWithPermission(String[] permissions, Runnable callback) {
-        ((BaseActivity) requireActivity()).runWithPermission(permissions,callback);
+        ((BaseActivity) requireActivity()).runWithPermission(permissions, callback);
     }
 
     @Override

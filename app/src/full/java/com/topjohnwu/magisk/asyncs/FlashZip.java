@@ -51,11 +51,11 @@ public class FlashZip extends ParallelTask<Void, Void, Integer> {
 
             mCachedFile.delete();
             try (
-                InputStream in = mm.getContentResolver().openInputStream(mUri);
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(mCachedFile))
+                    InputStream in = mm.getContentResolver().openInputStream(mUri);
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(mCachedFile))
             ) {
                 if (in == null) throw new FileNotFoundException();
-                InputStream buf= new BufferedInputStream(in);
+                InputStream buf = new BufferedInputStream(in);
                 ShellUtils.pump(buf, out);
             } catch (FileNotFoundException e) {
                 console.add("! Invalid Uri");

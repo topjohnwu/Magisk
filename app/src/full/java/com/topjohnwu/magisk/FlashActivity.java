@@ -36,11 +36,16 @@ import butterknife.OnClick;
 
 public class FlashActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.txtLog) TextView flashLogs;
-    @BindView(R.id.button_panel) public LinearLayout buttonPanel;
-    @BindView(R.id.reboot) public Button reboot;
-    @BindView(R.id.scrollView) ScrollView sv;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.txtLog)
+    TextView flashLogs;
+    @BindView(R.id.button_panel)
+    public LinearLayout buttonPanel;
+    @BindView(R.id.reboot)
+    public Button reboot;
+    @BindView(R.id.scrollView)
+    ScrollView sv;
 
     private List<String> logs;
 
@@ -51,7 +56,7 @@ public class FlashActivity extends BaseActivity {
 
     @OnClick(R.id.save_logs)
     void saveLogs() {
-        runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+        runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
             Calendar now = Calendar.getInstance();
             String filename = String.format(Locale.US,
                     "magisk_install_log_%04d%02d%02d_%02d%02d%02d.log",

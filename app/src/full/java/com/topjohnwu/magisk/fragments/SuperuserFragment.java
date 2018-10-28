@@ -20,14 +20,18 @@ import butterknife.BindView;
 
 public class SuperuserFragment extends BaseFragment {
 
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyRv;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_rv)
+    TextView emptyRv;
 
     private PackageManager pm;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_superuser, container, false);
         unbinder = new SuperuserFragment_ViewBinding(this, view);
 
@@ -59,5 +63,4 @@ public class SuperuserFragment extends BaseFragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
-
 }

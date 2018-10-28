@@ -12,9 +12,9 @@ public class TarEntry extends org.kamranzafar.jtar.TarEntry {
     }
 
     /*
-    * Workaround missing java.nio.file.attribute.PosixFilePermission
-    * Simply just assign a default permission to the file
-    * */
+     * Workaround missing java.nio.file.attribute.PosixFilePermission
+     * Simply just assign a default permission to the file
+     * */
 
     @Override
     public void extractTarHeader(String entryName) {
@@ -25,8 +25,8 @@ public class TarEntry extends org.kamranzafar.jtar.TarEntry {
     }
 
     /*
-    * Rewrite the header to GNU format
-    * */
+     * Rewrite the header to GNU format
+     * */
 
     @Override
     public void writeEntryHeader(byte[] outbuf) {
@@ -47,8 +47,8 @@ public class TarEntry extends org.kamranzafar.jtar.TarEntry {
     }
 
     /*
-    * Proper octal to ASCII conversion
-    * */
+     * Proper octal to ASCII conversion
+     * */
 
     private void getOctalBytes(long value, byte[] buf, int offset, int length) {
         int idx = length - 1;

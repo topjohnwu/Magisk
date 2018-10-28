@@ -97,7 +97,8 @@ public class Data {
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
             String s = ShellUtils.fastCmd(("resetprop -p ") + Const.MAGISKHIDE_PROP);
             magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
     }
 
     public static MagiskManager MM() {
@@ -107,7 +108,7 @@ public class Data {
     public static void exportPrefs() {
         // Flush prefs to disk
         MagiskManager mm = MM();
-        mm.prefs.edit().commit();
+        mm.prefs.edit().apply();
         File xml = new File(mm.getFilesDir().getParent() + "/shared_prefs",
                 mm.getPackageName() + "_preferences.xml");
         Shell.su(Utils.fmt("for usr in /data/user/*; do cat %s > ${usr}/%s; done", xml, Const.MANAGER_CONFIGS)).exec();

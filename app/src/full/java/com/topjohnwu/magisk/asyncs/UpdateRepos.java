@@ -54,7 +54,8 @@ public class UpdateRepos {
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
     }
 
     private boolean loadJSON(String jsonString) throws JSONException, ParseException {

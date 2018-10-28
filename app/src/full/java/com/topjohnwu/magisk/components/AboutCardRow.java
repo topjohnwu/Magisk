@@ -35,10 +35,14 @@ import butterknife.BindView;
  */
 public class AboutCardRow extends LinearLayout {
 
-    @BindView(android.R.id.title) TextView mTitle;
-    @BindView(android.R.id.summary) TextView mSummary;
-    @BindView(android.R.id.icon) ImageView mIcon;
-    @BindView(R.id.container) View mView;
+    @BindView(android.R.id.title)
+    TextView mTitle;
+    @BindView(android.R.id.summary)
+    TextView mSummary;
+    @BindView(android.R.id.icon)
+    ImageView mIcon;
+    @BindView(R.id.container)
+    View mView;
 
     public AboutCardRow(Context context) {
         this(context, null);
@@ -53,7 +57,8 @@ public class AboutCardRow extends LinearLayout {
         LayoutInflater.from(context).inflate(R.layout.info_item_row, this);
         new AboutCardRow_ViewBinding(this, this);
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
+        TypedArray a = context.getTheme()
+                .obtainStyledAttributes(attrs, R.styleable.AboutCardRow, 0, 0);
         String title;
         Drawable icon;
         try {

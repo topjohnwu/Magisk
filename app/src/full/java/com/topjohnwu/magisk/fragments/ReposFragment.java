@@ -30,9 +30,12 @@ import butterknife.BindView;
 
 public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyRv;
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_rv)
+    TextView emptyRv;
+    @BindView(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     private ReposAdapter adapter;
 
@@ -64,7 +67,7 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
+        return new int[]{Topic.MODULE_LOAD_DONE, Topic.REPO_LOAD_DONE};
     }
 
     @Override
@@ -105,13 +108,13 @@ public class ReposFragment extends BaseFragment implements Topic.Subscriber {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.repo_sort) {
             new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.sorting_order)
-                .setSingleChoiceItems(R.array.sorting_orders, Data.repoOrder, (d, which) -> {
-                    Data.repoOrder = which;
-                    mm.prefs.edit().putInt(Const.Key.REPO_ORDER, Data.repoOrder).apply();
-                    adapter.notifyDBChanged();
-                    d.dismiss();
-                }).show();
+                    .setTitle(R.string.sorting_order)
+                    .setSingleChoiceItems(R.array.sorting_orders, Data.repoOrder, (d, which) -> {
+                        Data.repoOrder = which;
+                        mm.prefs.edit().putInt(Const.Key.REPO_ORDER, Data.repoOrder).apply();
+                        adapter.notifyDBChanged();
+                        d.dismiss();
+                    }).show();
         }
         return true;
     }

@@ -30,7 +30,7 @@ public class ZipUtils {
             ZipInputStream zipfile = new ZipInputStream(zip);
             ZipEntry entry;
             while ((entry = zipfile.getNextEntry()) != null) {
-                if (!entry.getName().startsWith(path) || entry.isDirectory()){
+                if (!entry.getName().startsWith(path) || entry.isDirectory()) {
                     // Ignore directories, only create files
                     continue;
                 }
@@ -49,8 +49,7 @@ public class ZipUtils {
                     ShellUtils.pump(zipfile, out);
                 }
             }
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw e;
         }

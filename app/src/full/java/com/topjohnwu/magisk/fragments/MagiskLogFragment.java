@@ -32,10 +32,14 @@ import butterknife.BindView;
 
 public class MagiskLogFragment extends BaseFragment {
 
-    @BindView(R.id.txtLog) TextView txtLog;
-    @BindView(R.id.svLog) ScrollView svLog;
-    @BindView(R.id.hsvLog) HorizontalScrollView hsvLog;
-    @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.txtLog)
+    TextView txtLog;
+    @BindView(R.id.svLog)
+    ScrollView svLog;
+    @BindView(R.id.hsvLog)
+    HorizontalScrollView hsvLog;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     @Nullable
     @Override
@@ -71,7 +75,7 @@ public class MagiskLogFragment extends BaseFragment {
                 readLogs();
                 return true;
             case R.id.menu_save:
-                runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, this::saveLogs);
+                runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, this::saveLogs);
                 return true;
             case R.id.menu_clear:
                 clearLogs();

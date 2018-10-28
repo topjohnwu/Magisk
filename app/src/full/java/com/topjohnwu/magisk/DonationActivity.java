@@ -14,9 +14,12 @@ import butterknife.BindView;
 
 public class DonationActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.paypal) AboutCardRow paypal;
-    @BindView(R.id.patreon) AboutCardRow patreon;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.paypal)
+    AboutCardRow paypal;
+    @BindView(R.id.patreon)
+    AboutCardRow patreon;
 
     @Override
     public int getDarkTheme() {

@@ -19,8 +19,10 @@ import butterknife.BindView;
 
 public class SuLogFragment extends BaseFragment {
 
-    @BindView(R.id.empty_rv) TextView emptyRv;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.empty_rv)
+    TextView emptyRv;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
 
     private SuLogAdapter adapter;
 

@@ -24,23 +24,23 @@ class InstallMethodDialog extends AlertDialog.Builder {
     InstallMethodDialog(BaseActivity activity, List<String> options) {
         super(activity);
         setTitle(R.string.select_method);
-        setItems(options.toArray(new String [0]), (dialog, idx) -> {
+        setItems(options.toArray(new String[0]), (dialog, idx) -> {
             Intent intent;
             switch (idx) {
                 case 1:
                     Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
                     intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
                     activity.runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () ->
-                        activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
-                        (requestCode, resultCode, data) -> {
-                            if (requestCode == Const.ID.SELECT_BOOT &&
-                                    resultCode == Activity.RESULT_OK && data != null) {
-                                Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                        .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
-                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
-                                activity.startActivity(i);
-                            }
-                        })
+                            activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
+                                    (requestCode, resultCode, data) -> {
+                                        if (requestCode == Const.ID.SELECT_BOOT &&
+                                                resultCode == Activity.RESULT_OK && data != null) {
+                                            Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                                                    .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                                            activity.startActivity(i);
+                                        }
+                                    })
                     );
 
                     break;
@@ -61,16 +61,16 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     break;
                 case 3:
                     new CustomAlertDialog(activity)
-                        .setTitle(R.string.warning)
-                        .setMessage(R.string.install_inactive_slot_msg)
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.yes, (d, i) -> {
-                            Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
-                            activity.startActivity(it);
-                        })
-                        .setNegativeButton(R.string.no_thanks, null)
-                        .show();
+                            .setTitle(R.string.warning)
+                            .setMessage(R.string.install_inactive_slot_msg)
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.yes, (d, i) -> {
+                                Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
+                                activity.startActivity(it);
+                            })
+                            .setNegativeButton(R.string.no_thanks, null)
+                            .show();
                     break;
                 default:
             }

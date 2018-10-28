@@ -54,8 +54,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     private void removeTopFolder(File input, File output) throws IOException {
         JarEntry entry;
         try (
-            JarInputStream in = new JarInputStream(new BufferedInputStream(new FileInputStream(input)));
-            JarOutputStream out = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)))
+                JarInputStream in = new JarInputStream(new BufferedInputStream(new FileInputStream(input)));
+                JarOutputStream out = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(output)))
         ) {
             String path;
             while ((entry = in.getNextJarEntry()) != null) {
@@ -103,8 +103,8 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
 
             // First download the zip, Web -> temp1
             try (
-                InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
-                OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))
+                    InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))
             ) {
                 ShellUtils.pump(in, out);
                 in.close();
@@ -156,7 +156,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
     @Override
     public void exec(Void... voids) {
         getActivity().runWithPermission(
-                new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, super::exec);
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, super::exec);
     }
 
     private class ProgressInputStream extends FilterInputStream {

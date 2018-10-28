@@ -46,20 +46,17 @@ public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener,
         Topic.Subscriber, Topic.AutoSubscriber {
 
-    private PreferenceScreen prefScreen;
-
     private ListPreference updateChannel, suAccess, autoRes, suNotification,
             requestTimeout, multiuserMode, namespaceMode;
     private MagiskManager mm;
-    private PreferenceCategory generalCatagory;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.app_settings, rootKey);
         mm = Data.MM();
-        prefScreen = getPreferenceScreen();
+        PreferenceScreen prefScreen = getPreferenceScreen();
 
-        generalCatagory = (PreferenceCategory) findPreference("general");
+        PreferenceCategory generalCatagory = (PreferenceCategory) findPreference("general");
         PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
         PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
         Preference hideManager = findPreference("hide");
@@ -82,7 +79,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         SwitchPreference fingerprint = (SwitchPreference) findPreference(Const.Key.SU_FINGERPRINT);
 
         updateChannel.setOnPreferenceChangeListener((p, o) -> {
-            String prev =String.valueOf(Data.updateChannel);
+            String prev = String.valueOf(Data.updateChannel);
             int channel = Integer.parseInt((String) o);
             if (channel == Const.Value.CUSTOM_CHANNEL) {
                 View v = LayoutInflater.from(requireActivity()).inflate(R.layout.custom_channel_dialog, null);
@@ -135,21 +132,21 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 if (Download.checkNetworkStatus(mm)) {
                     restoreManager.setOnPreferenceClickListener((pref) -> {
                         Download.receive(
-                            requireActivity(), new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Context context, Uri uri) {
-                                    Data.exportPrefs();
-                                    Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
-                                    if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
+                                requireActivity(), new DownloadReceiver() {
+                                    @Override
+                                    public void onDownloadDone(Context context, Uri uri) {
+                                        Data.exportPrefs();
+                                        Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
+                                        if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
+                                            Shell.su("rm -f /data/local/tmp/manager.apk").exec();
+                                            RootUtils.uninstallPkg(context.getPackageName());
+                                            return;
+                                        }
                                         Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                                        RootUtils.uninstallPkg(context.getPackageName());
-                                        return;
                                     }
-                                    Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                                }
-                            },
-                            Data.managerLink,
-                            Utils.fmt("MagiskManager-v%s.apk", Data.remoteManagerVersionString)
+                                },
+                                Data.managerLink,
+                                Utils.fmt("MagiskManager-v%s.apk", Data.remoteManagerVersionString)
                         );
                         return true;
                     });
@@ -223,7 +220,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 if (prefs.getBoolean(key, false)) {
                     try {
                         Const.MAGISK_DISABLE_FILE.createNewFile();
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                    }
                 } else {
                     Const.MAGISK_DISABLE_FILE.delete();
                 }
@@ -303,7 +301,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.LOCALE_FETCH_DONE};
+        return new int[]{Topic.LOCALE_FETCH_DONE};
     }
 
     @Override
@@ -333,10 +331,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
         int childCount = viewGroup.getChildCount();
         for (int i = 0; i < childCount; i++) {
             setZeroPaddingToLayoutChildren(viewGroup.getChildAt(i));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-                viewGroup.setPaddingRelative(0, viewGroup.getPaddingTop(), viewGroup.getPaddingEnd(), viewGroup.getPaddingBottom());
-            else
-                viewGroup.setPadding(0, viewGroup.getPaddingTop(), viewGroup.getPaddingRight(), viewGroup.getPaddingBottom());
+            viewGroup.setPaddingRelative(0, viewGroup.getPaddingTop(),
+                    viewGroup.getPaddingEnd(), viewGroup.getPaddingBottom());
         }
     }
 }

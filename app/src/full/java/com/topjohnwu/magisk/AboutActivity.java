@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.asyncs.MarkDownWindow;
 import com.topjohnwu.magisk.components.AboutCardRow;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.BuildConfig;
 
 import java.util.Locale;
 
@@ -19,13 +20,20 @@ import butterknife.BindView;
 
 public class AboutActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.app_version_info) AboutCardRow appVersionInfo;
-    @BindView(R.id.app_changelog) AboutCardRow appChangelog;
-    @BindView(R.id.app_translators) AboutCardRow appTranslators;
-    @BindView(R.id.app_source_code) AboutCardRow appSourceCode;
-    @BindView(R.id.support_thread) AboutCardRow supportThread;
-    @BindView(R.id.follow_twitter) AboutCardRow twitter;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.app_version_info)
+    AboutCardRow appVersionInfo;
+    @BindView(R.id.app_changelog)
+    AboutCardRow appChangelog;
+    @BindView(R.id.app_translators)
+    AboutCardRow appTranslators;
+    @BindView(R.id.app_source_code)
+    AboutCardRow appSourceCode;
+    @BindView(R.id.support_thread)
+    AboutCardRow supportThread;
+    @BindView(R.id.follow_twitter)
+    AboutCardRow twitter;
 
     @Override
     public int getDarkTheme() {
@@ -50,10 +58,9 @@ public class AboutActivity extends BaseActivity {
         appVersionInfo.setSummary(String.format(Locale.US, "%s (%d) (%s)",
                 BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE, getPackageName()));
 
-        appChangelog.setOnClickListener(v -> {
-            new MarkDownWindow(this, getString(R.string.app_changelog),
-                    getResources().openRawResource(R.raw.changelog)).exec();
-        });
+        appChangelog.setOnClickListener(v ->
+                new MarkDownWindow(this, getString(R.string.app_changelog),
+                        getResources().openRawResource(R.raw.changelog)).exec());
 
         String translators = getString(R.string.translators);
         if (TextUtils.isEmpty(translators)) {

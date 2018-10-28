@@ -36,13 +36,16 @@ import butterknife.OnClick;
 
 public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.empty_rv) TextView emptyRv;
+    @BindView(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.empty_rv)
+    TextView emptyRv;
 
     @OnClick(R.id.fab)
     void selectFile() {
-        runWithPermission(new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, () -> {
+        runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("application/zip");
             startActivityForResult(intent, Const.ID.FETCH_ZIP);
@@ -82,7 +85,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.MODULE_LOAD_DONE};
+        return new int[]{Topic.MODULE_LOAD_DONE};
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.database.MagiskDatabaseHelper;
 import com.topjohnwu.magisk.database.RepoDatabaseHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.RootUtils;
+import com.topjohnwu.superuser.BuildConfig;
 import com.topjohnwu.superuser.ContainerApp;
 import com.topjohnwu.superuser.Shell;
 
@@ -50,7 +51,8 @@ public class MagiskManager extends ContainerApp {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
                 getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
                 RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
-            } catch (PackageManager.NameNotFoundException ignored) {}
+            } catch (PackageManager.NameNotFoundException ignored) {
+            }
         }
 
         LocaleManager.setLocale(this);

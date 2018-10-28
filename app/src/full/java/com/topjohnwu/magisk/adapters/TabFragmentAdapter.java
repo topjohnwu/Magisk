@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.adapters;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

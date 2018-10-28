@@ -68,7 +68,7 @@ public class Utils {
 
     public static String dos2unix(String s) {
         String newString = s.replace("\r\n", "\n");
-        if(!newString.endsWith("\n")) {
+        if (!newString.endsWith("\n")) {
             return newString + "\n";
         } else {
             return newString;
@@ -137,7 +137,8 @@ public class Utils {
                 res.updateConfiguration(config, res.getDisplayMetrics());
                 return res.getString(info.labelRes);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return info.loadLabel(pm).toString();
     }
 }

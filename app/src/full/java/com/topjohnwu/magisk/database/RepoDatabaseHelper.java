@@ -30,7 +30,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
         // Remove outdated repos
         mDb.delete(TABLE_NAME, "minMagisk<?",
-                new String[] { String.valueOf(Const.MIN_MODULE_VER()) });
+                new String[]{String.valueOf(Const.MIN_MODULE_VER())});
     }
 
     @Override
@@ -63,7 +63,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
 
 
     public void removeRepo(String id) {
-        mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+        mDb.delete(TABLE_NAME, "id=?", new String[]{id});
         notifyAdapter();
     }
 
@@ -74,7 +74,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     public void removeRepo(Iterable<String> list) {
         for (String id : list) {
             if (id == null) continue;
-            mDb.delete(TABLE_NAME, "id=?", new String[] { id });
+            mDb.delete(TABLE_NAME, "id=?", new String[]{id});
         }
         notifyAdapter();
     }
@@ -85,7 +85,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Repo getRepo(String id) {
-        try (Cursor c = mDb.query(TABLE_NAME, null, "id=?", new String[] { id }, null, null, null)) {
+        try (Cursor c = mDb.query(TABLE_NAME, null, "id=?", new String[]{id}, null, null, null)) {
             if (c.moveToNext()) {
                 return new Repo(c);
             }
@@ -107,7 +107,7 @@ public class RepoDatabaseHelper extends SQLiteOpenHelper {
                 orderBy = "last_update DESC";
         }
         return mDb.query(TABLE_NAME, null, "minMagisk<=? AND minMagisk>=?",
-                new String[] { String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER()) },
+                new String[]{String.valueOf(Data.magiskVersionCode), String.valueOf(Const.MIN_MODULE_VER())},
                 null, null, orderBy);
     }
 

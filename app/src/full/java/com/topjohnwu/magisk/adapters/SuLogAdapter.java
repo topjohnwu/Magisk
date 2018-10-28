@@ -118,8 +118,10 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
     static class SectionHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.date) TextView date;
-        @BindView(R.id.arrow) ImageView arrow;
+        @BindView(R.id.date)
+        TextView date;
+        @BindView(R.id.arrow)
+        ImageView arrow;
 
         SectionHolder(View itemView) {
             super(itemView);
@@ -129,13 +131,20 @@ public class SuLogAdapter extends SectionedAdapter<SuLogAdapter.SectionHolder, S
 
     static class LogViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
-        @BindView(R.id.app_name) TextView appName;
-        @BindView(R.id.action) TextView action;
-        @BindView(R.id.time) TextView time;
-        @BindView(R.id.fromPid) TextView fromPid;
-        @BindView(R.id.toUid) TextView toUid;
-        @BindView(R.id.command) TextView command;
-        @BindView(R.id.expand_layout) ViewGroup expandLayout;
+        @BindView(R.id.app_name)
+        TextView appName;
+        @BindView(R.id.action)
+        TextView action;
+        @BindView(R.id.time)
+        TextView time;
+        @BindView(R.id.fromPid)
+        TextView fromPid;
+        @BindView(R.id.toUid)
+        TextView toUid;
+        @BindView(R.id.command)
+        TextView command;
+        @BindView(R.id.expand_layout)
+        ViewGroup expandLayout;
 
         private Container container = new Container();
 

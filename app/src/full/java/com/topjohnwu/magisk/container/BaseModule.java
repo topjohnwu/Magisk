@@ -42,7 +42,9 @@ public abstract class BaseModule implements Comparable<BaseModule> {
         return values;
     }
 
-    protected void parseProps(List<String> props) { parseProps(props.toArray(new String[0])); }
+    protected void parseProps(List<String> props) {
+        parseProps(props.toArray(new String[0]));
+    }
 
     protected void parseProps(String[] props) throws NumberFormatException {
         for (String line : props) {

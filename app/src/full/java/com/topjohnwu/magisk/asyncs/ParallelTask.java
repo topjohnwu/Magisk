@@ -9,7 +9,8 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
 
     private WeakReference<Activity> weakActivity;
 
-    public ParallelTask() {}
+    public ParallelTask() {
+    }
 
     public ParallelTask(Activity context) {
         weakActivity = new WeakReference<>(context);

@@ -21,8 +21,10 @@ import butterknife.BindView;
 
 public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber {
 
-    @BindView(R.id.swipeRefreshLayout) SwipeRefreshLayout mSwipeRefreshLayout;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.swipeRefreshLayout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
     SearchView search;
 
     private ApplicationAdapter appAdapter;
@@ -75,7 +77,7 @@ public class MagiskHideFragment extends BaseFragment implements Topic.Subscriber
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.MAGISK_HIDE_DONE};
+        return new int[]{Topic.MAGISK_HIDE_DONE};
     }
 
     @Override

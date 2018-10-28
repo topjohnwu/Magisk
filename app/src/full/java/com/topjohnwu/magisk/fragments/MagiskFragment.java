@@ -51,39 +51,67 @@ public class MagiskFragment extends BaseFragment
     private Container expandableContainer = new Container();
     private static boolean shownDialog = false;
 
-    @BindView(R.id.swipeRefreshLayout) public SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.swipeRefreshLayout)
+    public SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.core_only_notice) CardView coreOnlyNotice;
+    @BindView(R.id.core_only_notice)
+    CardView coreOnlyNotice;
 
-    @BindView(R.id.magisk_update) RelativeLayout magiskUpdate;
-    @BindView(R.id.magisk_update_icon) ImageView magiskUpdateIcon;
-    @BindView(R.id.magisk_update_status) TextView magiskUpdateText;
-    @BindView(R.id.magisk_update_progress) ProgressBar magiskUpdateProgress;
-    @BindView(R.id.magisk_status_icon) ImageView magiskStatusIcon;
-    @BindView(R.id.magisk_version) TextView magiskVersionText;
+    @BindView(R.id.magisk_update)
+    RelativeLayout magiskUpdate;
+    @BindView(R.id.magisk_update_icon)
+    ImageView magiskUpdateIcon;
+    @BindView(R.id.magisk_update_status)
+    TextView magiskUpdateText;
+    @BindView(R.id.magisk_update_progress)
+    ProgressBar magiskUpdateProgress;
+    @BindView(R.id.magisk_status_icon)
+    ImageView magiskStatusIcon;
+    @BindView(R.id.magisk_version)
+    TextView magiskVersionText;
 
-    @BindView(R.id.safetyNet_card) CardView safetyNetCard;
-    @BindView(R.id.safetyNet_refresh) ImageView safetyNetRefreshIcon;
-    @BindView(R.id.safetyNet_status) TextView safetyNetStatusText;
-    @BindView(R.id.safetyNet_check_progress) ProgressBar safetyNetProgress;
-    @BindView(R.id.expand_layout) LinearLayout expandLayout;
-    @BindView(R.id.cts_status_icon) ImageView ctsStatusIcon;
-    @BindView(R.id.cts_status) TextView ctsStatusText;
-    @BindView(R.id.basic_status_icon) ImageView basicStatusIcon;
-    @BindView(R.id.basic_status) TextView basicStatusText;
+    @BindView(R.id.safetyNet_card)
+    CardView safetyNetCard;
+    @BindView(R.id.safetyNet_refresh)
+    ImageView safetyNetRefreshIcon;
+    @BindView(R.id.safetyNet_status)
+    TextView safetyNetStatusText;
+    @BindView(R.id.safetyNet_check_progress)
+    ProgressBar safetyNetProgress;
+    @BindView(R.id.expand_layout)
+    LinearLayout expandLayout;
+    @BindView(R.id.cts_status_icon)
+    ImageView ctsStatusIcon;
+    @BindView(R.id.cts_status)
+    TextView ctsStatusText;
+    @BindView(R.id.basic_status_icon)
+    ImageView basicStatusIcon;
+    @BindView(R.id.basic_status)
+    TextView basicStatusText;
 
-    @BindView(R.id.install_option_card) CardView installOptionCard;
-    @BindView(R.id.keep_force_enc) CheckBox keepEncChkbox;
-    @BindView(R.id.keep_verity) CheckBox keepVerityChkbox;
-    @BindView(R.id.install_button) CardView installButton;
-    @BindView(R.id.install_text) TextView installText;
-    @BindView(R.id.uninstall_button) CardView uninstallButton;
+    @BindView(R.id.install_option_card)
+    CardView installOptionCard;
+    @BindView(R.id.keep_force_enc)
+    CheckBox keepEncChkbox;
+    @BindView(R.id.keep_verity)
+    CheckBox keepVerityChkbox;
+    @BindView(R.id.install_button)
+    CardView installButton;
+    @BindView(R.id.install_text)
+    TextView installText;
+    @BindView(R.id.uninstall_button)
+    CardView uninstallButton;
 
-    @BindColor(R.color.red500) int colorBad;
-    @BindColor(R.color.green500) int colorOK;
-    @BindColor(R.color.yellow500) int colorWarn;
-    @BindColor(R.color.green500) int colorNeutral;
-    @BindColor(R.color.blue500) int colorInfo;
+    @BindColor(R.color.red500)
+    int colorBad;
+    @BindColor(R.color.green500)
+    int colorOK;
+    @BindColor(R.color.yellow500)
+    int colorWarn;
+    @BindColor(R.color.green500)
+    int colorNeutral;
+    @BindColor(R.color.blue500)
+    int colorInfo;
 
     @OnClick(R.id.safetyNet_title)
     void safetyNet() {
@@ -106,7 +134,6 @@ public class MagiskFragment extends BaseFragment
         } else {
             task.run();
         }
-
     }
 
     @OnClick(R.id.install_button)
@@ -178,7 +205,7 @@ public class MagiskFragment extends BaseFragment
 
     @Override
     public int[] getSubscribedTopics() {
-        return new int[] {Topic.SNET_CHECK_DONE, Topic.UPDATE_CHECK_DONE};
+        return new int[]{Topic.SNET_CHECK_DONE, Topic.UPDATE_CHECK_DONE};
     }
 
     @Override

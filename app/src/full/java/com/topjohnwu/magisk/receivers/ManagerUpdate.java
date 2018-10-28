@@ -39,7 +39,8 @@ public class ManagerUpdate extends BroadcastReceiver {
                         PatchAPK.patchPackageID(apk, Const.ORIG_PKG_NAME, context.getPackageName());
                         SignAPK.sign(apk, new BufferedOutputStream(new FileOutputStream(patch)));
                         super.onDownloadDone(context, Uri.fromFile(new File(patch)));
-                    } catch (Exception ignored) { }
+                    } catch (Exception ignored) {
+                    }
                 });
             } else {
                 super.onDownloadDone(context, uri);

@@ -2,6 +2,8 @@ package com.topjohnwu.magisk;
 
 import android.os.Process;
 
+import com.topjohnwu.superuser.BuildConfig;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +42,7 @@ public class Const {
     }
 
     /* A list of apps that should not be shown as hide-able */
-    public static final List<String> HIDE_BLACKLIST =  Arrays.asList(
+    public static final List<String> HIDE_BLACKLIST = Arrays.asList(
             Data.MM().getPackageName(),
             "com.google.android.gms"
     );
@@ -76,10 +78,9 @@ public class Const {
         public static final String PAYPAL_URL = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CC7FZ7526MNGG";
         public static final String PATREON_URL = "https://www.patreon.com/topjohnwu";
         public static final String TWITTER_URL = "https://twitter.com/topjohnwu";
-        public static final String XDA_THREAD = "http://forum.xda-developers.com/showthread.php?t=3432382";
+        public static final String XDA_THREAD = "https://forum.xda-developers.com/apps/magisk/mod-magisk-v1-universal-systemless-t3432382";
         public static final String SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk";
     }
-
 
     public static class Key {
         // su
@@ -117,7 +118,6 @@ public class Const {
         public static final String IF_NONE_MATCH = "If-None-Match";
         public static final String REPO_ORDER = "repo_order";
     }
-
 
     public static class Value {
         public static final int STABLE_CHANNEL = 0;

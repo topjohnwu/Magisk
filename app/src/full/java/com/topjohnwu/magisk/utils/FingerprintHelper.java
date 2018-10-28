@@ -76,7 +76,7 @@ public abstract class FingerprintHelper {
             Drawable fingerprint = activity.getResources().getDrawable(R.drawable.ic_fingerprint);
             fingerprint.setBounds(0, 0, Utils.dpInPx(50), Utils.dpInPx(50));
             Resources.Theme theme = activity.getTheme();
-            TypedArray ta = theme.obtainStyledAttributes(new int[] {R.attr.imageColorTint});
+            TypedArray ta = theme.obtainStyledAttributes(new int[]{R.attr.imageColorTint});
             fingerprint.setTint(ta.getColor(0, Color.GRAY));
             ta.recycle();
             vh.messageView.setCompoundDrawables(null, null, null, fingerprint);

@@ -110,10 +110,14 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.app_icon) ImageView appIcon;
-        @BindView(R.id.app_name) TextView appName;
-        @BindView(R.id.package_name) TextView appPackage;
-        @BindView(R.id.checkbox) CheckBox checkBox;
+        @BindView(R.id.app_icon)
+        ImageView appIcon;
+        @BindView(R.id.app_name)
+        TextView appName;
+        @BindView(R.id.package_name)
+        TextView appPackage;
+        @BindView(R.id.checkbox)
+        CheckBox checkBox;
 
         ViewHolder(View itemView) {
             super(itemView);

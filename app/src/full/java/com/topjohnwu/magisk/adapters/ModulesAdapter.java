@@ -105,13 +105,20 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.title) TextView title;
-        @BindView(R.id.version_name) TextView versionName;
-        @BindView(R.id.description) TextView description;
-        @BindView(R.id.notice) TextView notice;
-        @BindView(R.id.checkbox) CheckBox checkBox;
-        @BindView(R.id.author) TextView author;
-        @BindView(R.id.delete) ImageView delete;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.version_name)
+        TextView versionName;
+        @BindView(R.id.description)
+        TextView description;
+        @BindView(R.id.notice)
+        TextView notice;
+        @BindView(R.id.checkbox)
+        CheckBox checkBox;
+        @BindView(R.id.author)
+        TextView author;
+        @BindView(R.id.delete)
+        ImageView delete;
 
         ViewHolder(View itemView) {
             super(itemView);

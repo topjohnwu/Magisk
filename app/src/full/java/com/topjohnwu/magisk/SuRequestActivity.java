@@ -30,15 +30,24 @@ import androidx.annotation.Nullable;
 import butterknife.BindView;
 
 public class SuRequestActivity extends BaseActivity {
-    @BindView(R.id.su_popup) LinearLayout suPopup;
-    @BindView(R.id.timeout) Spinner timeout;
-    @BindView(R.id.app_icon) ImageView appIcon;
-    @BindView(R.id.app_name) TextView appNameView;
-    @BindView(R.id.package_name) TextView packageNameView;
-    @BindView(R.id.grant_btn) Button grant_btn;
-    @BindView(R.id.deny_btn) Button deny_btn;
-    @BindView(R.id.fingerprint) ImageView fingerprintImg;
-    @BindView(R.id.warning) TextView warning;
+    @BindView(R.id.su_popup)
+    LinearLayout suPopup;
+    @BindView(R.id.timeout)
+    Spinner timeout;
+    @BindView(R.id.app_icon)
+    ImageView appIcon;
+    @BindView(R.id.app_name)
+    TextView appNameView;
+    @BindView(R.id.package_name)
+    TextView packageNameView;
+    @BindView(R.id.grant_btn)
+    Button grant_btn;
+    @BindView(R.id.deny_btn)
+    Button deny_btn;
+    @BindView(R.id.fingerprint)
+    ImageView fingerprintImg;
+    @BindView(R.id.warning)
+    TextView warning;
 
     private SuConnector connector;
     private Policy policy;
@@ -119,7 +128,7 @@ public class SuRequestActivity extends BaseActivity {
         // Get policy
         Intent intent = getIntent();
         try {
-            connector =  intent.getIntExtra("version", 1) == 1 ?
+            connector = intent.getIntExtra("version", 1) == 1 ?
                     new SuConnectorV1(intent.getStringExtra("socket")) :
                     new SuConnectorV2(intent.getStringExtra("socket"));
             Bundle bundle = connector.readSocketInput();
@@ -174,6 +183,7 @@ public class SuRequestActivity extends BaseActivity {
             public void onTick(long millisUntilFinished) {
                 deny_btn.setText(getString(R.string.deny_with_str, "(" + millisUntilFinished / 1000 + ")"));
             }
+
             @Override
             public void onFinish() {
                 deny_btn.setText(getString(R.string.deny_with_str, "(0)"));

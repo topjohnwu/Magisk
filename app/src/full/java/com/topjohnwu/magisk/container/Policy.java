@@ -9,8 +9,7 @@ import com.topjohnwu.magisk.utils.Utils;
 
 import androidx.annotation.NonNull;
 
-
-public class Policy implements Comparable<Policy>{
+public class Policy implements Comparable<Policy> {
     public static final int INTERACTIVE = 0;
     public static final int DENY = 1;
     public static final int ALLOW = 2;
@@ -43,7 +42,7 @@ public class Policy implements Comparable<Policy>{
             throw new PackageManager.NameNotFoundException();
         appName = info.loadLabel(pm).toString();
     }
-    
+
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put("uid", uid);

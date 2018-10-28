@@ -5,18 +5,20 @@ import com.topjohnwu.superuser.io.SuFile;
 
 public class Module extends BaseModule {
 
-    private SuFile mRemoveFile, mDisableFile, mUpdateFile;
+    private SuFile mRemoveFile;
+    private SuFile mDisableFile;
     private boolean mEnable, mRemove, mUpdated;
 
     public Module(String path) {
 
         try {
             parseProps(Shell.Sync.su("dos2unix <  " + path + "/module.prop"));
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
 
         mRemoveFile = new SuFile(path, "remove");
         mDisableFile = new SuFile(path, "disable");
-        mUpdateFile = new SuFile(path, "update");
+        SuFile mUpdateFile = new SuFile(path, "update");
 
         if (getId() == null) {
             int sep = path.lastIndexOf('/');
@@ -63,5 +65,4 @@ public class Module extends BaseModule {
     public boolean isUpdated() {
         return mUpdated;
     }
-
 }

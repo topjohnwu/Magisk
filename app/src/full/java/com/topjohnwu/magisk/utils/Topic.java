@@ -21,7 +21,8 @@ public class Topic {
     @IntDef({MAGISK_HIDE_DONE, MODULE_LOAD_DONE, REPO_LOAD_DONE,
             UPDATE_CHECK_DONE, SNET_CHECK_DONE, LOCALE_FETCH_DONE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface TopicID {}
+    public @interface TopicID {
+    }
 
     // We will not dynamically add topics, so use arrays instead of hash tables
     private static Store[] topicList = new Store[6];

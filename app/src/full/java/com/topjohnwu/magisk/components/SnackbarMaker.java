@@ -43,6 +43,7 @@ public class SnackbarMaker {
         make(activity, activity.getString(R.string.internal_storage,
                 "/Download/" + Utils.getNameFromUri(activity, uri)),
                 Snackbar.LENGTH_LONG)
-                .setAction(R.string.ok, (v)->{}).show();
+                .setAction(R.string.ok, (v) -> {
+                }).show();
     }
 }

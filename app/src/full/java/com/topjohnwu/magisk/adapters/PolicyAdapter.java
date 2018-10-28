@@ -142,16 +142,25 @@ public class PolicyAdapter extends RecyclerView.Adapter<PolicyAdapter.ViewHolder
 
     static class ViewHolder extends RecyclerView.ViewHolder implements ExpandableView {
 
-        @BindView(R.id.app_name) TextView appName;
-        @BindView(R.id.package_name) TextView packageName;
-        @BindView(R.id.app_icon) ImageView appIcon;
-        @BindView(R.id.master_switch) Switch masterSwitch;
-        @BindView(R.id.notification_switch) Switch notificationSwitch;
-        @BindView(R.id.logging_switch) Switch loggingSwitch;
-        @BindView(R.id.expand_layout) ViewGroup expandLayout;
+        @BindView(R.id.app_name)
+        TextView appName;
+        @BindView(R.id.package_name)
+        TextView packageName;
+        @BindView(R.id.app_icon)
+        ImageView appIcon;
+        @BindView(R.id.master_switch)
+        Switch masterSwitch;
+        @BindView(R.id.notification_switch)
+        Switch notificationSwitch;
+        @BindView(R.id.logging_switch)
+        Switch loggingSwitch;
+        @BindView(R.id.expand_layout)
+        ViewGroup expandLayout;
 
-        @BindView(R.id.delete) ImageView delete;
-        @BindView(R.id.more_info) ImageView moreInfo;
+        @BindView(R.id.delete)
+        ImageView delete;
+        @BindView(R.id.more_info)
+        ImageView moreInfo;
 
         private Container container = new Container();
 
