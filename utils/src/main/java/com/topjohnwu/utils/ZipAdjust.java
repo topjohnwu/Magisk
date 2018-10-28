@@ -12,8 +12,8 @@ public class ZipAdjust {
 
     public static void adjust(File input, File output) throws IOException {
         try (
-            RandomAccessFile in = new RandomAccessFile(input, "r");
-            FileOutputStream out = new FileOutputStream(output)
+                RandomAccessFile in = new RandomAccessFile(input, "r");
+                FileOutputStream out = new FileOutputStream(output)
         ) {
             adjust(in, out);
         }
@@ -75,7 +75,7 @@ public class ZipAdjust {
     }
 
     public static short unsigned(byte n) {
-        return (short)(n & 0xff);
+        return (short) (n & 0xff);
     }
 
     public static int unsigned(short n) {
@@ -88,8 +88,8 @@ public class ZipAdjust {
 
     public static class CentralFooter {
 
-        static final int MAGIC =  0x06054b50;
-        
+        static final int MAGIC = 0x06054b50;
+
         int signature;
         short diskNumber;
         short centralDirectoryDiskNumber;
@@ -104,7 +104,7 @@ public class ZipAdjust {
             byte[] buffer = new byte[22];
             for (long i = file.length() - 4; i >= 0; --i) {
                 file.seek(i);
-                file.read(buffer, 0 ,4);
+                file.read(buffer, 0, 4);
                 ByteBuffer buf = ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN);
                 signature = buf.getInt();
                 if (signature != MAGIC) {
@@ -140,7 +140,7 @@ public class ZipAdjust {
 
     static class CentralHeader {
 
-        static final int MAGIC =  0x02014b50;
+        static final int MAGIC = 0x02014b50;
 
         int signature;
         short versionMadeBy;

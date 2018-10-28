@@ -135,6 +135,7 @@ public class SignBoot {
 
         /**
          * Initializes the object for signing an image file
+         *
          * @param target Target name, included in the signed data
          * @param length Length of the image, included in the signed data
          */
@@ -146,6 +147,7 @@ public class SignBoot {
 
         /**
          * Initializes the object for verifying a signed image file
+         *
          * @param signature Signature footer
          */
         public BootSignature(byte[] signature)
@@ -226,6 +228,5 @@ public class SignBoot {
             v.add(signature);
             return new DERSequence(v);
         }
-
     }
 }

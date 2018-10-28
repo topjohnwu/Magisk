@@ -52,8 +52,8 @@ import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 /*
-* Modified from from AOSP(Marshmallow) SignAPK.java
-* */
+ * Modified from from AOSP(Marshmallow) SignAPK.java
+ * */
 
 public class SignAPK {
 
@@ -72,7 +72,7 @@ public class SignAPK {
 
     public static void sign(JarMap input, OutputStream output) throws Exception {
         sign(SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem"),
-             SignAPK.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
+                SignAPK.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
     }
 
     public static void sign(InputStream certIs, InputStream keyIs,
@@ -156,7 +156,10 @@ public class SignAPK {
                     "\" in cert [" + cert.getSubjectDN());
         }
     }
-    /** Returns the expected signature algorithm for this key type. */
+
+    /**
+     * Returns the expected signature algorithm for this key type.
+     */
     private static String getSignatureAlgorithm(X509Certificate cert) {
         String sigAlg = cert.getSigAlgName().toUpperCase(Locale.US);
         String keyType = cert.getPublicKey().getAlgorithm().toUpperCase(Locale.US);
@@ -172,6 +175,7 @@ public class SignAPK {
             throw new IllegalArgumentException("unsupported key type: " + keyType);
         }
     }
+
     // Files matching this pattern are not copied to the output.
     private static Pattern stripPattern =
             Pattern.compile("^(META-INF/((.*)[.](SF|RSA|DSA|EC)|com/android/otacert))|(" +
@@ -205,12 +209,12 @@ public class SignAPK {
         // We sort the input entries by name, and add them to the
         // output manifest in sorted order.  We expect that the output
         // map will be deterministic.
-        TreeMap<String, JarEntry> byName = new TreeMap<String, JarEntry>();
+        TreeMap<String, JarEntry> byName = new TreeMap<>();
         for (Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements(); ) {
             JarEntry entry = e.nextElement();
             byName.put(entry.getName(), entry);
         }
-        for (JarEntry entry: byName.values()) {
+        for (JarEntry entry : byName.values()) {
             String name = entry.getName();
             if (!entry.isDirectory() &&
                     (stripPattern == null || !stripPattern.matcher(name).matches())) {
@@ -236,30 +240,38 @@ public class SignAPK {
         return output;
     }
 
-    /** Write to another stream and track how many bytes have been
-     *  written.
+    /**
+     * Write to another stream and track how many bytes have been
+     * written.
      */
     private static class CountOutputStream extends FilterOutputStream {
         private int mCount;
+
         public CountOutputStream(OutputStream out) {
             super(out);
             mCount = 0;
         }
+
         @Override
         public void write(int b) throws IOException {
             super.write(b);
             mCount++;
         }
+
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             super.write(b, off, len);
             mCount += len;
         }
+
         public int size() {
             return mCount;
         }
     }
-    /** Write a .SF file with a digest of the specified manifest. */
+
+    /**
+     * Write a .SF file with a digest of the specified manifest.
+     */
     private static void writeSignatureFile(Manifest manifest, OutputStream out,
                                            int hash)
             throws IOException, GeneralSecurityException {
@@ -302,7 +314,10 @@ public class SignAPK {
             cout.write('\n');
         }
     }
-    /** Sign data and write the digital signature to 'out'. */
+
+    /**
+     * Sign data and write the digital signature to 'out'.
+     */
     private static void writeSignatureBlock(
             CMSTypedData data, X509Certificate publicKey, PrivateKey privateKey,
             OutputStream out)
@@ -330,6 +345,7 @@ public class SignAPK {
         DEROutputStream dos = new DEROutputStream(out);
         dos.writeObject(asn1.readObject());
     }
+
     /**
      * Copy all the files in a manifest from input to output.  We set
      * the modification times in the output to a fixed time, so as to
@@ -353,14 +369,14 @@ public class SignAPK {
         // on them (since only stored entries are aligned).
         for (String name : names) {
             JarEntry inEntry = in.getJarEntry(name);
-            JarEntry outEntry = null;
+            JarEntry outEntry;
             if (inEntry.getMethod() != JarEntry.STORED) continue;
             // Preserve the STORED method of the input entry.
             outEntry = new JarEntry(inEntry);
             outEntry.setTime(timestamp);
             // 'offset' is the offset into the file at which we expect
             // the file data to begin.  This is the value we need to
-            // make a multiple of 'alignement'.
+            // make a multiple of 'alignment'.
             offset += JarFile.LOCHDR + outEntry.getName().length();
             if (firstEntry) {
                 // The first entry in a jar file has an extra field of
@@ -375,7 +391,7 @@ public class SignAPK {
                 // Set the "extra data" of the entry to between 1 and
                 // alignment-1 bytes, to make the file data begin at
                 // an aligned offset.
-                int needed = alignment - (int)(offset % alignment);
+                int needed = alignment - (int) (offset % alignment);
                 outEntry.setExtra(new byte[needed]);
                 offset += needed;
             }
@@ -392,7 +408,7 @@ public class SignAPK {
         // alignment on these entries.
         for (String name : names) {
             JarEntry inEntry = in.getJarEntry(name);
-            JarEntry outEntry = null;
+            JarEntry outEntry;
             if (inEntry.getMethod() == JarEntry.STORED) continue;
             // Create a new entry so that the compressed len is recomputed.
             outEntry = new JarEntry(name);
@@ -467,10 +483,10 @@ public class SignAPK {
         // end-of-central-directory record will be 22 bytes long, so
         // we expect to find the EOCD marker 22 bytes from the end.
         byte[] zipData = cmsFile.getTail();
-        if (zipData[zipData.length-22] != 0x50 ||
-                zipData[zipData.length-21] != 0x4b ||
-                zipData[zipData.length-20] != 0x05 ||
-                zipData[zipData.length-19] != 0x06) {
+        if (zipData[zipData.length - 22] != 0x50 ||
+                zipData[zipData.length - 21] != 0x4b ||
+                zipData[zipData.length - 20] != 0x05 ||
+                zipData[zipData.length - 19] != 0x06) {
             throw new IllegalArgumentException("zip data already has an archive comment");
         }
         int total_size = temp.size() + 6;
@@ -499,8 +515,8 @@ public class SignAPK {
         // odds of producing this sequence by chance are very low, but
         // let's catch it here if it does.
         byte[] b = temp.toByteArray();
-        for (int i = 0; i < b.length-3; ++i) {
-            if (b[i] == 0x50 && b[i+1] == 0x4b && b[i+2] == 0x05 && b[i+3] == 0x06) {
+        for (int i = 0; i < b.length - 3; ++i) {
+            if (b[i] == 0x50 && b[i + 1] == 0x4b && b[i + 2] == 0x05 && b[i + 3] == 0x06) {
                 throw new IllegalArgumentException("found spurious EOCD header at " + i);
             }
         }
@@ -510,6 +526,7 @@ public class SignAPK {
         temp.writeTo(outputStream);
         outputStream.close();
     }
+
     private static void signFile(Manifest manifest, JarMap inputJar,
                                  X509Certificate publicKey, PrivateKey privateKey,
                                  JarOutputStream outputJar)

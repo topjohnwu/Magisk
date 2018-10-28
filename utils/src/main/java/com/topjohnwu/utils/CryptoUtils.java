@@ -91,7 +91,9 @@ class CryptoUtils {
         }
     }
 
-    /** Read a PKCS#8 format private key. */
+    /**
+     * Read a PKCS#8 format private key.
+     */
     static PrivateKey readPrivateKey(InputStream input)
             throws IOException, GeneralSecurityException {
         try {

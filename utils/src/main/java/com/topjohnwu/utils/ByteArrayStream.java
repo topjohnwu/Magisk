@@ -10,9 +10,11 @@ public class ByteArrayStream extends ByteArrayOutputStream {
     public byte[] getBuf() {
         return buf;
     }
+
     public synchronized void readFrom(InputStream is) {
         readFrom(is, Integer.MAX_VALUE);
     }
+
     public synchronized void readFrom(InputStream is, int len) {
         int read;
         byte buffer[] = new byte[4096];
@@ -25,9 +27,11 @@ public class ByteArrayStream extends ByteArrayOutputStream {
             e.printStackTrace();
         }
     }
+
     public synchronized void writeTo(OutputStream out, int off, int len) throws IOException {
         out.write(buf, off, len);
     }
+
     public ByteArrayInputStream getInputStream() {
         return new ByteArrayInputStream(buf, 0, count);
     }

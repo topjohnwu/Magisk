@@ -16,12 +16,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /*
-* A universal random access interface for both JarFile and JarInputStream
-*
-* In the case when JarInputStream is provided to constructor, the whole stream
-* will be loaded into memory for random access purposes.
-* On the other hand, when a JarFile is provided, it simply works as a wrapper.
-* */
+ * A universal random access interface for both JarFile and JarInputStream
+ *
+ * In the case when JarInputStream is provided to constructor, the whole stream
+ * will be loaded into memory for random access purposes.
+ * On the other hand, when a JarFile is provided, it simply works as a wrapper.
+ * */
 
 public class JarMap implements Closeable, AutoCloseable {
 
