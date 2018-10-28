@@ -5,12 +5,13 @@
     <item
         android:id="@+id/repo_sort"
         android:icon="@drawable/ic_sort"
-        app:showAsAction="always"/>
+        android:title=""
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/repo_search"
         android:title=""
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom" />
 
 </menu>

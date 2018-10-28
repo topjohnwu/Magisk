@@ -3,10 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="5dp"
-    android:paddingEnd="15dp"
     android:paddingStart="15dp"
-    android:paddingTop="5dp">
+    android:paddingTop="5dp"
+    android:paddingEnd="15dp"
+    android:paddingBottom="5dp">
 
     <TextView
         android:layout_width="match_parent"
@@ -14,8 +14,8 @@
         android:layout_margin="5dp"
         android:labelFor="@id/custom_url"
         android:text="@string/settings_update_custom_msg"
-        android:textColor="?android:textColorPrimary"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:textColorPrimary" />
 
     <EditText
         android:id="@+id/custom_url"

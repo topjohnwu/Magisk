@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/info_layout"
+            android:orientation="horizontal"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
             android:paddingTop="5dp"
+            android:paddingEnd="10dp"
             android:paddingBottom="5dp">
 
             <ImageView
@@ -37,29 +36,29 @@
                 android:gravity="end" />
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp">
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/app_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
                     android:ellipsize="end"
+                    android:maxLines="1"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textIsSelectable="false"/>
+                    android:textIsSelectable="false" />
 
                 <TextView
                     android:id="@+id/package_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
                     android:ellipsize="end"
+                    android:maxLines="1"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@android:color/tertiary_text_dark"
                     android:textIsSelectable="false" />
@@ -67,12 +66,12 @@
             </LinearLayout>
 
             <Switch
+                android:id="@+id/master_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/master_switch"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="0"
                 android:checked="false"
-                android:layout_gravity="center_vertical"
                 android:gravity="center_vertical" />
 
         </LinearLayout>
@@ -87,56 +86,56 @@
             android:paddingEnd="10dp">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:orientation="horizontal"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:layout_gravity="center">
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_notifications"
                     android:layout_gravity="center_vertical"
-                    android:tint="@color/icon_grey"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_notifications"
+                    android:tint="@color/icon_grey" />
 
                 <Switch
+                    android:id="@+id/notification_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/notification_switch"
-                    android:checked="false"
                     android:layout_gravity="center_vertical"
+                    android:checked="false"
                     android:gravity="center_vertical" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:orientation="horizontal"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:layout_gravity="center">
+                android:paddingBottom="10dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_bug_report"
                     android:layout_gravity="center_vertical"
-                    android:tint="@color/icon_grey"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_bug_report"
+                    android:tint="@color/icon_grey" />
 
                 <Switch
+                    android:id="@+id/logging_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/logging_switch"
-                    android:checked="false"
                     android:layout_gravity="center_vertical"
+                    android:checked="false"
                     android:gravity="center_vertical" />
 
             </LinearLayout>
@@ -145,27 +144,25 @@
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_delete"
-                android:tint="@color/icon_grey"
-                android:layout_gravity="center" />
+                android:tint="@color/icon_grey" />
 
             <ImageView
                 android:id="@+id/more_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_more"
-                android:tint="@color/icon_grey"
-                android:layout_gravity="center" />
+                android:tint="@color/icon_grey" />
 
         </LinearLayout>
 
-
     </LinearLayout>
-
 
 </androidx.cardview.widget.CardView>
 

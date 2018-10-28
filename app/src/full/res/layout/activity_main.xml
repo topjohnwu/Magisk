@@ -15,10 +15,10 @@
         android:orientation="vertical">
 
         <FrameLayout
-            android:layout_marginTop="?attr/actionBarSize"
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize" />
 
         <include layout="@layout/toolbar" />
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2017 topjohnwu
   ~ Copyright 2017 dvdandroid
   ~
@@ -19,14 +18,14 @@
 <resources>
 
     <declare-styleable name="AboutCardRow">
-        <attr name="icon" format="reference"/>
-        <attr name="text" format="string"/>
-        <attr name="cardStyle" format="reference"/>
-        <attr name="navStyle" format="reference"/>
-        <attr name="ColorOK" format="reference"/>
-        <attr name="ColorWarn" format="reference"/>
-        <attr name="ColorFail" format="reference"/>
-        <attr name="ColorNeutral" format="reference"/>
+        <attr name="icon" format="reference" />
+        <attr name="text" format="string" />
+        <attr name="cardStyle" format="reference" />
+        <attr name="navStyle" format="reference" />
+        <attr name="ColorOK" format="reference" />
+        <attr name="ColorWarn" format="reference" />
+        <attr name="ColorFail" format="reference" />
+        <attr name="ColorNeutral" format="reference" />
     </declare-styleable>
 
     <attr name="colorAccentFallback" format="reference" />

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="?attr/cardStyle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation">
@@ -30,29 +29,29 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="0dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textIsSelectable="false"/>
+            android:textIsSelectable="false" />
 
         <TextView
             android:id="@+id/version_name"
             android:layout_width="@dimen/card_textview_width"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_below="@id/title"
+            android:layout_alignParentStart="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/tertiary_text_dark"
             android:textIsSelectable="false"
-            android:textStyle="bold|italic"/>
+            android:textStyle="bold|italic" />
 
         <TextView
             android:id="@+id/author"
             android:layout_width="@dimen/card_textview_width"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_below="@id/version_name"
+            android:layout_alignParentStart="true"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/tertiary_text_dark"
             android:textIsSelectable="false"
-            android:textStyle="bold|italic"/>
+            android:textStyle="bold|italic" />
 
         <TextView
             android:id="@+id/description"
@@ -61,7 +60,7 @@
             android:layout_below="@id/author"
             android:layout_gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textIsSelectable="false"/>
+            android:textIsSelectable="false" />
 
         <TextView
             android:id="@+id/notice"
@@ -72,15 +71,15 @@
             android:text="@string/remove_file_created"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/red500"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/title"
             android:layout_alignParentEnd="true"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="horizontal">
 
 
             <CheckBox
@@ -91,7 +90,7 @@
                 android:gravity="center"
                 android:padding="@dimen/checkbox_padding"
                 android:src="@drawable/ic_menu_overflow_material"
-                tools:ignore="ContentDescription"/>
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/delete"
@@ -103,7 +102,7 @@
                 android:padding="@dimen/checkbox_padding"
                 android:src="@drawable/ic_delete"
                 android:tint="@color/icon_grey"
-                tools:ignore="ContentDescription"/>
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 

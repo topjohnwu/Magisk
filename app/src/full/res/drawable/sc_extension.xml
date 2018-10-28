@@ -2,12 +2,12 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/su_request_background"/>
+            <solid android:color="@color/su_request_background" />
         </shape>
     </item>
     <item>
         <inset
             android:drawable="@drawable/ic_extension"
-            android:inset="13dp"/>
+            android:inset="13dp" />
     </item>
 </layer-list>

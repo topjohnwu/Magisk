@@ -27,17 +27,17 @@
     <string name="install_magisk_title">Latest Version: %1$s</string>
     <string name="uninstall">Uninstall</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and potentially encrypt your data if your data is not currently encrypted</string>
+    <string name="uninstall_magisk_msg">All modules will be disabled/removed. Root will be removed, and may potentially encrypt your data if your data is not currently encrypted</string>
     <string name="update">Update %1$s</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(No info provided)</string>
     <string name="no_modules_found">No modules found</string>
-    <string name="update_file_created">Module will be updated at next reboot</string>
-    <string name="remove_file_created">Module will be removed at next reboot</string>
-    <string name="remove_file_deleted">Module will not be removed at next reboot</string>
-    <string name="disable_file_created">Module will be disabled at next reboot</string>
-    <string name="disable_file_removed">Module will be enabled at next reboot</string>
+    <string name="update_file_created">Module will be updated on next reboot</string>
+    <string name="remove_file_created">Module will be removed on next reboot</string>
+    <string name="remove_file_deleted">Module will not be removed on next reboot</string>
+    <string name="disable_file_created">Module will be disabled on next reboot</string>
+    <string name="disable_file_removed">Module will be enabled on next reboot</string>
     <string name="author">Created by %1$s</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
@@ -64,10 +64,10 @@
     <string name="app_changelog">Changelog</string>
     <string name="translators" />
     <string name="app_version">Version</string>
-    <string name="app_source_code">Source code</string>
+    <string name="app_source_code">Source Code</string>
     <string name="donation">Donation</string>
     <string name="app_translators">Translators</string>
-    <string name="support_thread">Support thread</string>
+    <string name="support_thread">Support Thread</string>
     <string name="follow_twitter">Follow me on Twitter</string>
 
     <!--Toasts, Dialogs-->
@@ -76,30 +76,30 @@
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
-    <string name="magisk_update_title">New Magisk Update Available!</string>
+    <string name="magisk_update_title">New Magisk update available!</string>
     <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="process_error">Process error</string>
     <string name="internal_storage">The zip is stored in:\n[Internal Storage]%1$s</string>
-    <string name="zip_download_title">Downloading</string>
-    <string name="zip_download_msg">Downloading zip file (%1$d%%) …</string>
-    <string name="zip_process_title">Processing</string>
-    <string name="zip_process_msg">Processing zip file …</string>
-    <string name="manager_update_title">New Magisk Manager Update Available!</string>
+    <string name="zip_download_title">Downloading…</string>
+    <string name="zip_download_msg">Downloading zip file (%1$d%%)…</string>
+    <string name="zip_process_title">Processing…</string>
+    <string name="zip_process_msg">Processing zip file…</string>
+    <string name="manager_update_title">New Magisk Manager update available!</string>
     <string name="manager_download_install">Press to download and install</string>
-    <string name="dtbo_patched_title">DTBO was patched!</string>
+    <string name="dtbo_patched_title">DTBO was patched</string>
     <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img, please reboot</string>
     <string name="magisk_updates">Magisk Updates</string>
     <string name="flashing">Flashing</string>
     <string name="hide_manager_toast">Hiding Magisk Manager…</string>
     <string name="hide_manager_toast2">This might take a while…</string>
-    <string name="hide_manager_fail_toast">Hide Magisk Manager failed…</string>
+    <string name="hide_manager_fail_toast">Failed to hide Magisk Manager</string>
     <string name="open_link_failed_toast">No application found to open the link…</string>
-    <string name="download_zip_only">Download Zip Only</string>
-    <string name="patch_boot_file">Patch Boot Image File</string>
+    <string name="download_zip_only">Download zip only</string>
+    <string name="patch_boot_file">Patch boot image file</string>
     <string name="direct_install">Direct Install (Recommended)</string>
-    <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
+    <string name="install_inactive_slot">Install to inactive slot (After OTA)</string>
     <string name="warning">Warning</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="select_method">Select Method</string>
@@ -110,43 +110,43 @@
     <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
-    <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk Manager is FOSS, which doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
-    <string name="su_db_corrupt">SU database is corrupted, will recreate new db</string>
+    <string name="proprietary_title">Download proprietary code</string>
+    <string name="proprietary_notice">Magisk Manager is FOSS, which means it doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nDo you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="su_db_corrupt">SU database is corrupted; will recreate new db</string>
     <string name="setup_done">Setup done</string>
     <string name="setup_fail">Setup failed</string>
-    <string name="env_fix_title">Requires Additional Setup</string>
-    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
-    <string name="setup_title">Additional Setup</string>
+    <string name="env_fix_title">Requires additional setup</string>
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip. Do you want to proceed now?</string>
+    <string name="setup_title">Additional setup</string>
     <string name="setup_msg">Running environment setup…</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Dark Theme</string>
     <string name="settings_dark_theme_summary">Enable dark theme</string>
-    <string name="settings_clear_cache_title">Clear Repo Cache</string>
-    <string name="settings_clear_cache_summary">Clear the cached information for online repos, forces the app to refresh online</string>
+    <string name="settings_clear_cache_title">Clear repo cache</string>
+    <string name="settings_clear_cache_summary">Clear the cached information for online repos (forces the app to refresh online)</string>
     <string name="settings_hide_manager_title">Hide Magisk Manager</string>
     <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package name</string>
     <string name="settings_restore_manager_title">Restore Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package</string>
+    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package name</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_update">Update Settings</string>
-    <string name="settings_check_update_title">Check Updates</string>
-    <string name="settings_check_update_summary">Check updates in the background periodically</string>
+    <string name="settings_check_update_title">Check for updates</string>
+    <string name="settings_check_update_summary">Check for updates in the background periodically</string>
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom</string>
     <string name="settings_update_custom_msg">Insert a custom URL</string>
-    <string name="settings_boot_format_title">Patched Boot Output Format</string>
-    <string name="settings_boot_format_summary">Select the format of the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
-    <string name="settings_core_only_title">Magisk Core Only Mode</string>
-    <string name="settings_core_only_summary">Enable only core features. MagiskSU, MagiskHide and systemless hosts will still be enabled, but no modules will be loaded.</string>
+    <string name="settings_boot_format_title">Patched boot output format</string>
+    <string name="settings_boot_format_summary">Select the format of the output patched boot image.\nChoose .img to flash through fastboot/download mode, or choose .img.tar to flash with ODIN.</string>
+    <string name="settings_core_only_title">Magisk core only mode</string>
+    <string name="settings_core_only_summary">Enables only core features. MagiskSU, MagiskHide, and systemless hosts will still be enabled, but no modules will be loaded.</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various detections</string>
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
+    <string name="settings_hosts_summary">Systemless hosts support for adblock apps</string>
 
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
@@ -184,7 +184,7 @@
     <string name="requester_summary">Root sessions will inherit its requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
     <string name="android_o_not_support">Does not support Android 8.0+</string>
-    <string name="disable_fingerprint">No fingerprints were set or no device support</string>
+    <string name="disable_fingerprint">No fingerprints were set, or no device support</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
@@ -210,7 +210,7 @@
     <string name="su_snack_log_off">Logging of %1$s is disabled</string>
     <string name="su_snack_revoke">%1$s rights are revoked</string>
     <string name="su_revoke_title">Revoke?</string>
-    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+    <string name="su_revoke_msg">Revoke %1$s rights?</string>
     <string name="toast">Toast</string>
     <string name="none">None</string>
     <string name="auth_fail">Authentication Failed</string>

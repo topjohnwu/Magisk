@@ -1,58 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     style="?attr/cardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="2dp"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="2dp"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginBottom="2dp"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/info_layout"
+            android:orientation="horizontal"
             android:padding="10dp">
 
             <TextView
                 android:id="@+id/app_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:layout_weight="2"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textIsSelectable="false"
-                android:layout_weight="2" />
+                android:textIsSelectable="false" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:id="@+id/action"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?android:attr/textColorSecondary"
-                android:gravity="center_horizontal" />
-
-            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/time"
                 android:layout_weight="1"
+                android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="?android:attr/textColorSecondary"
-                android:gravity="center_horizontal" />
+                android:textColor="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?android:attr/textColorSecondary" />
 
         </LinearLayout>
 
@@ -60,76 +59,76 @@
             android:id="@+id/expand_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal">
+            android:paddingBottom="5dp">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:layout_weight="1">
+                android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/pid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:id="@+id/fromPid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:layout_weight="1">
+                android:orientation="horizontal">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/target_uid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/toUid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/toUid"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:gravity="center_horizontal"
-                android:layout_weight="2">
+                android:orientation="horizontal">
 
                 <TextView
-                    android:text="@string/command"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/command"
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/command"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/command"
-                    android:textColor="?android:attr/textColorSecondary"
                     android:gravity="start"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="12sp" />
 
             </LinearLayout>

@@ -4,10 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
 
-    <ScrollView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -21,10 +20,10 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                style="?attr/cardStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
@@ -38,21 +37,21 @@
                         android:layout_gravity="center"
                         android:padding="16dp"
                         android:text="@string/donation"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
 
                     <a.o
                         android:id="@+id/paypal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_paypal"
-                        app:text="PayPal"/>
+                        app:text="PayPal" />
 
                     <a.o
                         android:id="@+id/patreon"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_patreon"
-                        app:text="Patreon"/>
+                        app:text="Patreon" />
 
                 </LinearLayout>
 

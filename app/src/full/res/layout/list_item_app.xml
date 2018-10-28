@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    style="?attr/cardStyle"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:layout_marginBottom="@dimen/card_vertical_margin"
-    android:layout_marginEnd="@dimen/card_horizontal_margin"
     android:layout_marginStart="@dimen/card_horizontal_margin"
     android:layout_marginTop="@dimen/card_vertical_margin"
-    style="?attr/cardStyle"
+    android:layout_marginEnd="@dimen/card_horizontal_margin"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
     android:minHeight="?android:attr/listPreferredItemHeight"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/info_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/info_layout"
+        android:orientation="horizontal"
         android:paddingStart="10dp"
-        android:paddingEnd="10dp"
         android:paddingTop="5dp"
+        android:paddingEnd="10dp"
         android:paddingBottom="5dp">
 
         <ImageView
@@ -33,29 +32,29 @@
             android:gravity="end" />
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp">
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false"/>
+                android:textIsSelectable="false" />
 
             <TextView
                 android:id="@+id/package_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
                 android:ellipsize="end"
+                android:maxLines="1"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/tertiary_text_dark"
                 android:textIsSelectable="false" />
@@ -66,10 +65,10 @@
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:focusable="false"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_menu_overflow_material"
-            android:checked="false" />
+            android:checked="false"
+            android:focusable="false"
+            android:src="@drawable/ic_menu_overflow_material" />
 
     </LinearLayout>
 

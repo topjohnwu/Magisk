@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <include layout="@layout/toolbar"/>
+    <include layout="@layout/toolbar" />
 
-    <ScrollView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -21,10 +20,10 @@
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                style="?attr/cardStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                style="?attr/cardStyle"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
@@ -42,7 +41,7 @@
                             android:layout_width="72dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/ic_logo"/>
+                            android:src="@drawable/ic_logo" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -51,7 +50,7 @@
                             android:paddingLeft="16dp"
                             android:paddingRight="16dp"
                             android:text="@string/app_name"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+                            android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
                     </LinearLayout>
 
                     <a.o
@@ -59,42 +58,42 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_info_outline"
-                        app:text="@string/app_version"/>
+                        app:text="@string/app_version" />
 
                     <a.o
                         android:id="@+id/app_changelog"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_history"
-                        app:text="@string/app_changelog"/>
+                        app:text="@string/app_changelog" />
 
                     <a.o
                         android:id="@+id/app_translators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_language"
-                        app:text="@string/app_translators"/>
+                        app:text="@string/app_translators" />
 
                     <a.o
                         android:id="@+id/follow_twitter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_twitter"
-                        app:text="@string/follow_twitter"/>
+                        app:text="@string/follow_twitter" />
 
                     <a.o
                         android:id="@+id/app_source_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_github"
-                        app:text="@string/app_source_code"/>
+                        app:text="@string/app_source_code" />
 
                     <a.o
                         android:id="@+id/support_thread"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_xda"
-                        app:text="@string/support_thread"/>
+                        app:text="@string/support_thread" />
 
                 </LinearLayout>
 
