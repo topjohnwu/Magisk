@@ -14,6 +14,7 @@ import com.topjohnwu.superuser.Shell;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +117,7 @@ public class MagiskDBCmdline extends MagiskDB {
                 deletePolicy(values.getAsInteger("uid"));
             }
         }
+        Collections.sort(list);
         return list;
     }
 
