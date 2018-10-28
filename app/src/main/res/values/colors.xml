@@ -22,6 +22,6 @@
     <color name="ic_launcher_background">#00AF9C</color>
 
     <!-- Card colors -->
-    <color name="card_background_color_dark">#ff323232</color>
+    <color name="card_background_color_dark">#ff424242</color>
     <color name="card_background_color_light">#ffffffff</color>
 </resources>
