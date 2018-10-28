@@ -48,6 +48,11 @@ public class SuRequestActivity extends BaseActivity {
     class SuConnectorV1 extends SuConnector {
 
         SuConnectorV1(String name) throws IOException {
+            super(name);
+        }
+
+        @Override
+        public void connect(String name) throws IOException {
             socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.FILESYSTEM));
             new FileObserver(name) {
                 @Override
@@ -60,28 +65,25 @@ public class SuRequestActivity extends BaseActivity {
         }
 
         @Override
-        public void response() {
-            try (OutputStream out = getOutputStream()) {
-                out.write((policy.policy == Policy.ALLOW ? "socket:ALLOW" : "socket:DENY").getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        public void onResponse() throws IOException {
+            out.write((policy.policy == Policy.ALLOW ? "socket:ALLOW" : "socket:DENY").getBytes());
         }
     }
 
     class SuConnectorV2 extends SuConnector {
 
         SuConnectorV2(String name) throws IOException {
+            super(name);
+        }
+
+        @Override
+        public void connect(String name) throws IOException {
             socket.connect(new LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT));
         }
 
         @Override
-        public void response() {
-            try (DataOutputStream out = getOutputStream()) {
-                out.writeInt(policy.policy);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        public void onResponse() throws IOException {
+            out.writeInt(policy.policy);
         }
     }
 
@@ -119,9 +121,9 @@ public class SuRequestActivity extends BaseActivity {
         // Get policy
         Intent intent = getIntent();
         try {
+            String socketName = intent.getStringExtra("socket");
             connector =  intent.getIntExtra("version", 1) == 1 ?
-                    new SuConnectorV1(intent.getStringExtra("socket")) :
-                    new SuConnectorV2(intent.getStringExtra("socket"));
+                    new SuConnectorV1(socketName) : new SuConnectorV2(socketName);
             Bundle bundle = connector.readSocketInput();
             int uid = Integer.parseInt(bundle.getString("uid"));
             policy = mm.mDB.getPolicy(uid);

@@ -15,6 +15,8 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.container.SuLogEntry;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,31 +25,50 @@ import java.util.Date;
 public abstract class SuConnector {
 
     protected LocalSocket socket = new LocalSocket();
+    protected DataOutputStream out;
+    protected DataInputStream in;
 
-    private String readString(DataInputStream is) throws IOException {
-        int len = is.readInt();
+    public SuConnector(String name) throws IOException {
+        connect(name);
+        out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+        in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+    }
+
+    private String readString() throws IOException {
+        int len = in.readInt();
         byte[] buf = new byte[len];
-        is.readFully(buf);
-        return new String(buf);
+        in.readFully(buf);
+        return new String(buf, "UTF-8");
     }
 
     public Bundle readSocketInput() throws IOException {
         Bundle bundle = new Bundle();
-        DataInputStream is = new DataInputStream(socket.getInputStream());
         while (true) {
-            String name = readString(is);
+            String name = readString();
             if (TextUtils.equals(name, "eof"))
                 break;
-            bundle.putString(name, readString(is));
+            bundle.putString(name, readString());
         }
         return bundle;
     }
 
-    protected DataOutputStream getOutputStream() throws IOException {
-        return new DataOutputStream(socket.getOutputStream());
+    public void response() {
+        try {
+            onResponse();
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException ignored) { }
     }
 
-    public abstract void response();
+    public abstract void connect(String name) throws IOException;
+
+    protected abstract void onResponse() throws IOException;
 
     public static void handleLogs(Intent intent, int version) {
 
