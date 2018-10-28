@@ -18,6 +18,7 @@
 #include "utils.h"
 #include "daemon.h"
 #include "selinux.h"
+#include "flags.h"
 
 int setup_done = 0;
 int seperate_vendor = 0;
