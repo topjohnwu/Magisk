@@ -184,7 +184,7 @@ char *mount_image(const char *img, const char *target) {
 	exec_command_sync("/system/bin/e2fsck", "-yf", img, NULL);
 	char *device = loopsetup(img);
 	if (device)
-		xmount(device, target, "ext4", 0, NULL);
+		xmount(device, target, "ext4", MS_NOATIME, NULL);
 	return device;
 }
 
