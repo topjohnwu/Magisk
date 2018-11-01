@@ -75,6 +75,7 @@ void app_log(struct su_context *ctx) {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
 		"-p", DB_STR(ctx->info, SU_MANAGER),
+		"-f", "32", //FLAG_INCLUDE_STOPPED_PACKAGES
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
@@ -104,6 +105,7 @@ void app_notify(struct su_context *ctx) {
 			AM_PATH, "broadcast",
 			"-a", "android.intent.action.BOOT_COMPLETED",
 			"-p", DB_STR(ctx->info, SU_MANAGER),
+			"-f", "32",
 			"--user", user,
 			"--es", "action", "notify",
 			"--ei", "from.uid", fromUid,
@@ -120,6 +122,7 @@ void app_connect(const char *socket, struct su_info *info) {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
 		"-p", DB_STR(info, SU_MANAGER),
+		"-f", "32",
 		"--user", user,
 		"--es", "action", "request",
 		"--es", "socket", (char *) socket,
