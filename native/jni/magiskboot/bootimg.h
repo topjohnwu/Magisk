@@ -200,6 +200,7 @@ static_cast<boot_img_hdr_v1 *>(hdr)->x)
 	dyn_get(name, char *);
 	dyn_get(cmdline, char *);
 	dyn_get(id, char *);
+	dyn_get(extra_cmdline, char *);
 
 	hdr_get(os_version, uint32_t);
 	hdr_get(recovery_dtbo_size, uint32_t);
