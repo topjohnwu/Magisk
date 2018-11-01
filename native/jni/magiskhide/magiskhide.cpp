@@ -18,7 +18,7 @@ int hide_enabled = 0;
 static pthread_t proc_monitor_thread;
 pthread_mutex_t list_lock;
 
-static void usage(char *arg0) {
+[[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
 		"MagiskHide v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) - Hide Magisk!\n\n"
 		"Usage: %s [--options [arguments...] ]\n\n"
@@ -32,24 +32,15 @@ static void usage(char *arg0) {
 	exit(1);
 }
 
-void launch_magiskhide(int client) {
-	if (hide_enabled) {
-		if (client > 0) {
-			write_int(client, HIDE_IS_ENABLED);
-			close(client);
-		}
-		return;
-	}
+int launch_magiskhide() {
+	if (hide_enabled)
+		return HIDE_IS_ENABLED;
 
 	if (!log_daemon_started) {
-		if (client > 0) {
-			write_int(client, LOGCAT_DISABLED);
-			close(client);
-		}
 		setprop(MAGISKHIDE_PROP, "0");
 		// Remove without actually removing persist props
 		deleteprop2(MAGISKHIDE_PROP, 0);
-		return;
+		return LOGCAT_DISABLED;
 	}
 
 	hide_enabled = 1;
@@ -69,33 +60,18 @@ void launch_magiskhide(int client) {
 	// Add SafetyNet by default
 	add_list(strdup("com.google.android.gms.unstable"));
 
-	if (client > 0) {
-		write_int(client, DAEMON_SUCCESS);
-		close(client);
-	}
-
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
 	// Start monitoring
 	proc_monitor();
-	return;
+	return DAEMON_SUCCESS;
 
 error:
 	hide_enabled = 0;
-	if (client > 0) {
-		write_int(client, DAEMON_ERROR);
-		close(client);
-	}
-	return;
+	return DAEMON_ERROR;
 }
 
-void stop_magiskhide(int client) {
-	if (!hide_enabled) {
-		write_int(client, HIDE_NOT_ENABLED);
-		close(client);
-		return;
-	}
-
+int stop_magiskhide() {
 	LOGI("* Stopping MagiskHide\n");
 
 	hide_enabled = 0;
@@ -104,7 +80,45 @@ void stop_magiskhide(int client) {
 	deleteprop2(MAGISKHIDE_PROP, 0);
 	pthread_kill(proc_monitor_thread, TERM_THREAD);
 
-	write_int(client, DAEMON_SUCCESS);
+	return DAEMON_SUCCESS;
+}
+
+void magiskhide_handler(int client) {
+	int req = read_int(client);
+	int res = DAEMON_ERROR;
+
+	switch (req) {
+	case STOP_MAGISKHIDE:
+	case ADD_HIDELIST:
+	case RM_HIDELIST:
+	case LS_HIDELIST:
+		if (!hide_enabled) {
+			write_int(client, HIDE_NOT_ENABLED);
+			close(client);
+			return;
+		}
+	}
+
+	switch (req) {
+	case LAUNCH_MAGISKHIDE:
+		res = launch_magiskhide();
+		break;
+	case STOP_MAGISKHIDE:
+		res = stop_magiskhide();
+		break;
+	case ADD_HIDELIST:
+		res = add_list(client);
+		break;
+	case RM_HIDELIST:
+		res = rm_list(client);
+		break;
+	case LS_HIDELIST:
+		ls_list(client);
+		client = -1;
+		break;
+	}
+
+	write_int(client, res);
 	close(client);
 }
 
@@ -112,7 +126,7 @@ int magiskhide_main(int argc, char *argv[]) {
 	if (argc < 2) {
 		usage(argv[0]);
 	}
-	int req = DO_NOTHING;
+	int req;
 	if (strcmp(argv[1], "--enable") == 0) {
 		req = LAUNCH_MAGISKHIDE;
 	} else if (strcmp(argv[1], "--disable") == 0) {
@@ -126,7 +140,9 @@ int magiskhide_main(int argc, char *argv[]) {
 	} else {
 		usage(argv[0]);
 	}
+
 	int fd = connect_daemon();
+	write_int(fd, MAGISKHIDE);
 	write_int(fd, req);
 	if (req == ADD_HIDELIST || req == RM_HIDELIST) {
 		write_string(fd, argv[2]);
@@ -140,7 +156,7 @@ int magiskhide_main(int argc, char *argv[]) {
 		return code;
 	case LOGCAT_DISABLED:
 		fprintf(stderr, "Logcat is disabled, cannot start MagiskHide\n");
-		return (code);
+		return code;
 	case HIDE_NOT_ENABLED:
 		fprintf(stderr, "MagiskHide is not enabled yet\n");
 		return code;

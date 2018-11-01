@@ -166,11 +166,6 @@ static int add_list(sqlite3 *db, char *proc) {
 }
 
 int add_list(char *proc) {
-	if (!hide_enabled) {
-		free(proc);
-		return HIDE_NOT_ENABLED;
-	}
-
 	sqlite3 *db = get_magiskdb();
 	if (db) {
 		int ret = add_list(db, proc);
@@ -180,12 +175,11 @@ int add_list(char *proc) {
 	return DAEMON_ERROR;
 }
 
-int rm_list(char *proc) {
-	if (!hide_enabled) {
-		free(proc);
-		return HIDE_NOT_ENABLED;
-	}
+int add_list(int client) {
+	return add_list(read_string(client));
+}
 
+static int rm_list(char *proc) {
 	int ret = DAEMON_ERROR;
 
 	// Update list in critical region
@@ -216,9 +210,13 @@ int rm_list(char *proc) {
 		ret = HIDE_ITEM_NOT_EXIST;
 	}
 
-	error:
+error:
 	free(proc);
 	return ret;
+}
+
+int rm_list(int client) {
+	return rm_list(read_string(client));
 }
 
 #define LEGACY_LIST MOUNTPOINT "/.core/hidelist"
@@ -258,25 +256,7 @@ int destroy_list() {
 	return 0;
 }
 
-void add_hide_list(int client) {
-	char *proc = read_string(client);
-	// ack
-	write_int(client, add_list(proc));
-	close(client);
-}
-
-void rm_hide_list(int client) {
-	char *proc = read_string(client);
-	// ack
-	write_int(client, rm_list(proc));
-	close(client);
-}
-
-void ls_hide_list(int client) {
-	if (!hide_enabled) {
-		write_int(client, HIDE_NOT_ENABLED);
-		return;
-	}
+void ls_list(int client) {
 	write_int(client, DAEMON_SUCCESS);
 	write_int(client, hide_list.size());
 	for (auto &s : hide_list)

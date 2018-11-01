@@ -24,11 +24,7 @@ enum {
 	POST_FS_DATA,
 	LATE_START,
 	BOOT_COMPLETE,
-	LAUNCH_MAGISKHIDE,
-	STOP_MAGISKHIDE,
-	ADD_HIDELIST,
-	RM_HIDELIST,
-	LS_HIDELIST,
+	MAGISKHIDE,
 	HIDE_CONNECT,
 	HANDSHAKE
 };
@@ -38,11 +34,7 @@ enum {
 	DAEMON_ERROR = -1,
 	DAEMON_SUCCESS = 0,
 	ROOT_REQUIRED,
-	LOGCAT_DISABLED,
-	HIDE_IS_ENABLED,
-	HIDE_NOT_ENABLED,
-	HIDE_ITEM_EXIST,
-	HIDE_ITEM_NOT_EXIST,
+	DAEMON_LAST
 };
 
 // daemon.c
@@ -87,11 +79,7 @@ void boot_complete(int client);
  * MagiskHide *
  **************/
 
-void launch_magiskhide(int client);
-void stop_magiskhide(int client);
-void add_hide_list(int client);
-void rm_hide_list(int client);
-void ls_hide_list(int client);
+void magiskhide_handler(int client);
 
 /*************
  * Superuser *

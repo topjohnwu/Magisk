@@ -38,11 +38,7 @@ static void *request_handler(void *args) {
 	get_client_cred(client, &credential);
 
 	switch (req) {
-	case LAUNCH_MAGISKHIDE:
-	case STOP_MAGISKHIDE:
-	case ADD_HIDELIST:
-	case RM_HIDELIST:
-	case LS_HIDELIST:
+	case MAGISKHIDE:
 	case POST_FS_DATA:
 	case LATE_START:
 	case BOOT_COMPLETE:
@@ -56,20 +52,8 @@ static void *request_handler(void *args) {
 	}
 
 	switch (req) {
-	case LAUNCH_MAGISKHIDE:
-		launch_magiskhide(client);
-		break;
-	case STOP_MAGISKHIDE:
-		stop_magiskhide(client);
-		break;
-	case ADD_HIDELIST:
-		add_hide_list(client);
-		break;
-	case RM_HIDELIST:
-		rm_hide_list(client);
-		break;
-	case LS_HIDELIST:
-		ls_hide_list(client);
+	case MAGISKHIDE:
+		magiskhide_handler(client);
 		break;
 	case SUPERUSER:
 		su_daemon_handler(client, &credential);

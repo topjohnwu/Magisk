@@ -533,8 +533,10 @@ static int check_data() {
 	return data;
 }
 
+extern int launch_magiskhide();
+
 static void *start_magisk_hide(void *args) {
-	launch_magiskhide(-1);
+	launch_magiskhide();
 	return NULL;
 }
 
