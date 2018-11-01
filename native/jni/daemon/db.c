@@ -8,7 +8,7 @@
 #include "magisk.h"
 #include "db.h"
 
-#define DB_VERSION 6
+#define DB_VERSION 7
 
 static int ver_cb(void *v, int col_num, char **data, char **col_name) {
 	*((int *) v) = atoi(data[0]);
@@ -78,6 +78,16 @@ static sqlite3 *open_and_init_db() {
 		/* Skip version 5 */
 		ver = 6;
 		upgrade = 1;
+	}
+	if (ver == 5 || ver == 6) {
+		// Hide list
+		sqlite3_exec(db,
+					 "CREATE TABLE IF NOT EXISTS hidelist "
+					 "(process TEXT, PRIMARY KEY(process))",
+					 NULL, NULL, &err);
+		err_abort(err);
+		ver = 7;
+		upgrade =1 ;
 	}
 
 	if (upgrade) {

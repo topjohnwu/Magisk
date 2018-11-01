@@ -4,6 +4,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libutils
 LOCAL_C_INCLUDES := jni/include $(LIBUTILS)
 LOCAL_SRC_FILES := \
+	utils.cpp \
 	file.c \
 	list.c \
 	misc.c \

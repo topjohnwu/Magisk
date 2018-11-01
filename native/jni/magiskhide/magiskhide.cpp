@@ -1,6 +1,3 @@
-/* magiskhide.c - initialize the environment for Magiskhide
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,11 +14,9 @@
 #include "resetprop.h"
 #include "flags.h"
 
-struct vector *hide_list = NULL;
-
-int hideEnabled = 0;
+int hide_enabled = 0;
 static pthread_t proc_monitor_thread;
-pthread_mutex_t hide_lock, file_lock;
+pthread_mutex_t list_lock;
 
 static void usage(char *arg0) {
 	fprintf(stderr,
@@ -38,7 +33,7 @@ static void usage(char *arg0) {
 }
 
 void launch_magiskhide(int client) {
-	if (hideEnabled) {
+	if (hide_enabled) {
 		if (client > 0) {
 			write_int(client, HIDE_IS_ENABLED);
 			close(client);
@@ -57,7 +52,7 @@ void launch_magiskhide(int client) {
 		return;
 	}
 
-	hideEnabled = 1;
+	hide_enabled = 1;
 	LOGI("* Starting MagiskHide\n");
 
 	deleteprop2(MAGISKHIDE_PROP, 1);
@@ -65,8 +60,7 @@ void launch_magiskhide(int client) {
 	hide_sensitive_props();
 
 	// Initialize the mutex lock
-	pthread_mutex_init(&hide_lock, NULL);
-	pthread_mutex_init(&file_lock, NULL);
+	pthread_mutex_init(&list_lock, nullptr);
 
 	// Initialize the hide list
 	if (init_list())
@@ -87,7 +81,7 @@ void launch_magiskhide(int client) {
 	return;
 
 error:
-	hideEnabled = 0;
+	hide_enabled = 0;
 	if (client > 0) {
 		write_int(client, DAEMON_ERROR);
 		close(client);
@@ -96,7 +90,7 @@ error:
 }
 
 void stop_magiskhide(int client) {
-	if (!hideEnabled) {
+	if (!hide_enabled) {
 		write_int(client, HIDE_NOT_ENABLED);
 		close(client);
 		return;
@@ -104,7 +98,7 @@ void stop_magiskhide(int client) {
 
 	LOGI("* Stopping MagiskHide\n");
 
-	hideEnabled = 0;
+	hide_enabled = 0;
 	setprop(MAGISKHIDE_PROP, "0");
 	// Remove without actually removing persist props
 	deleteprop2(MAGISKHIDE_PROP, 0);

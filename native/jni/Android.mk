@@ -40,9 +40,9 @@ LOCAL_SRC_FILES := \
 	daemon/bootstages.c \
 	daemon/socket.c \
 	daemon/db.c \
-	magiskhide/magiskhide.c \
-	magiskhide/proc_monitor.c \
-	magiskhide/hide_utils.c \
+	magiskhide/magiskhide.cpp \
+	magiskhide/proc_monitor.cpp \
+	magiskhide/hide_utils.cpp \
 	resetprop/persist_properties.c \
 	resetprop/resetprop.c \
 	resetprop/system_property_api.cpp \

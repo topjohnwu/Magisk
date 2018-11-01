@@ -6,6 +6,10 @@
 
 #include "logging.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"
 #define LOG_SOCKET   "5864cd77f2f8c59b3882e2d35dbf51e4"
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
@@ -19,7 +23,6 @@
 #define MOUNTPOINT      MAGISKTMP "/img"
 #define COREDIR         MOUNTPOINT "/.core"
 #define HOSTSFILE       COREDIR "/hosts"
-#define HIDELIST        COREDIR "/hidelist"
 #define SECURE_DIR      "/data/adb"
 #define MAINIMG         SECURE_DIR "/magisk.img"
 #define DATABIN         SECURE_DIR "/magisk"
@@ -54,5 +57,9 @@ int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int resetprop_main(int argc, char *argv[]);
 int imgtool_main(int argc, char *argv[]);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

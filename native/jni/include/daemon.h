@@ -8,6 +8,10 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern int setup_done;
 extern int seperate_vendor;
 
@@ -94,5 +98,9 @@ void ls_hide_list(int client);
  *************/
 
 void su_daemon_handler(int client, struct ucred *credential);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

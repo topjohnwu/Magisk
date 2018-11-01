@@ -1,6 +1,3 @@
-/* hide_utils.c - Some utility functions for MagiskHide
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,20 +9,23 @@
 #include <sys/stat.h>
 
 #include "magisk.h"
-#include "utils.h"
+#include "utils.hpp"
 #include "resetprop.h"
 #include "magiskhide.h"
 #include "daemon.h"
+#include "db.h"
 
-static char *prop_key[] =
-	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode",
-	  "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable", "ro.secure",
-	  "ro.build.type", "ro.build.tags", "ro.build.selinux", NULL };
+auto hide_list = Array<char *>();
 
-static char *prop_value[] =
-	{ "locked", "green", "1", "enforcing",
-	  "0", "0", "0", "1",
-	  "user", "release-keys", "0", NULL };
+static const char *prop_key[] =
+	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
+	  "ro.boot.veritymode", "ro.boot.warranty_bit", "ro.warranty_bit", "ro.debuggable",
+	  "ro.secure", "ro.build.type", "ro.build.tags", "ro.build.selinux", nullptr };
+
+static const char *prop_value[] =
+	{ "locked", "green", "1",
+	  "enforcing", "0", "0", "0",
+	  "1", "user", "release-keys", "0", nullptr };
 
 static const char *proc_name;
 static gid_t proc_gid;
@@ -54,12 +54,6 @@ void hide_sensitive_props() {
 				setprop2(prop_key[i], prop_value[i], 0);
 			free(value);
 		}
-	}
-}
-
-static void rm_magisk_prop(const char *name, const char *value, void *v) {
-	if (strstr(name, "magisk")) {
-		deleteprop2(name, 0);
 	}
 }
 
@@ -139,123 +133,128 @@ static void kill_process(const char *name) {
 
 void clean_magisk_props() {
 	LOGD("hide_utils: Cleaning magisk props\n");
-	getprop_all(rm_magisk_prop, NULL);
+	getprop_all([] (const char *name, auto, auto) -> void
+				{
+					if (strstr(name, "magisk"))
+						deleteprop2(name, 0);
+				}, nullptr);
 }
 
-int add_list(char *proc) {
-	if (!hideEnabled) {
-		free(proc);
-		return HIDE_NOT_ENABLED;
-	}
-
-	char *line;
-	struct vector *new_list = xmalloc(sizeof(*new_list));
-	if (new_list == NULL)
-		return DAEMON_ERROR;
-	vec_init(new_list);
-
-	vec_for_each(hide_list, line) {
+static int add_list(sqlite3 *db, char *proc) {
+	for (auto &s : hide_list) {
 		// They should be unique
-		if (strcmp(line, proc) == 0) {
+		if (strcmp(s, proc) == 0) {
 			free(proc);
-			vec_destroy(new_list);
-			free(new_list);
 			return HIDE_ITEM_EXIST;
 		}
-		vec_push_back(new_list, line);
 	}
 
-	vec_push_back(new_list, proc);
 	LOGI("hide_list add: [%s]\n", proc);
 	kill_process(proc);
 
 	// Critical region
-	pthread_mutex_lock(&hide_lock);
-	vec_destroy(hide_list);
-	free(hide_list);
-	hide_list = new_list;
-	pthread_mutex_unlock(&hide_lock);
+	pthread_mutex_lock(&list_lock);
+	hide_list.push_back(proc);
+	pthread_mutex_unlock(&list_lock);
 
-	pthread_mutex_lock(&file_lock);
-	vector_to_file(HIDELIST, hide_list); // Do not complain if file not found
-	pthread_mutex_unlock(&file_lock);
+	// Add to database
+	char sql[128];
+	sprintf(sql, "INSERT INTO hidelist (process) VALUES('%s')", proc);
+	sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
+
 	return DAEMON_SUCCESS;
 }
 
+int add_list(char *proc) {
+	if (!hide_enabled) {
+		free(proc);
+		return HIDE_NOT_ENABLED;
+	}
+
+	sqlite3 *db = get_magiskdb();
+	if (db) {
+		int ret = add_list(db, proc);
+		sqlite3_close_v2(db);
+		return ret;
+	}
+	return DAEMON_ERROR;
+}
+
 int rm_list(char *proc) {
-	if (!hideEnabled) {
+	if (!hide_enabled) {
 		free(proc);
 		return HIDE_NOT_ENABLED;
 	}
 
 	int ret = DAEMON_ERROR;
-	char *line;
-	int do_rm = 0;
-	struct vector *new_list = xmalloc(sizeof(*new_list));
-	if (new_list == NULL)
-		goto error;
-	vec_init(new_list);
 
-	vec_for_each(hide_list, line) {
-		if (strcmp(line, proc) == 0) {
-			free(proc);
-			proc = line;
-			do_rm = 1;
-			continue;
+	// Update list in critical region
+	bool do_rm = false;
+	pthread_mutex_lock(&list_lock);
+	for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
+		if (strcmp(*it, proc) == 0) {
+			do_rm = true;
+			LOGI("hide_list rm: [%s]\n", proc);
+			free(*it);
+			hide_list.erase(it);
+			break;
 		}
-		vec_push_back(new_list, line);
 	}
+	pthread_mutex_unlock(&list_lock);
 
 	if (do_rm) {
-		LOGI("hide_list rm: [%s]\n", proc);
 		kill_process(proc);
-		// Critical region
-		pthread_mutex_lock(&hide_lock);
-		vec_destroy(hide_list);
-		free(hide_list);
-		hide_list = new_list;
-		pthread_mutex_unlock(&hide_lock);
-
+		sqlite3 *db = get_magiskdb();
+		if (db == nullptr)
+			goto error;
+		char sql[128];
+		sprintf(sql, "DELETE FROM hidelist WHERE process='%s'", proc);
+		sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
+		sqlite3_close_v2(db);
 		ret = DAEMON_SUCCESS;
-		pthread_mutex_lock(&file_lock);
-		vector_to_file(HIDELIST, hide_list); // Do not complain if file not found
-		pthread_mutex_unlock(&file_lock);
 	} else {
 		ret = HIDE_ITEM_NOT_EXIST;
-		vec_destroy(new_list);
-		free(new_list);
 	}
 
-error:
+	error:
 	free(proc);
 	return ret;
 }
 
+#define LEGACY_LIST MOUNTPOINT "/.core/hidelist"
+
 int init_list() {
-	LOGD("hide_list: initialize...\n");
-	if ((hide_list = xmalloc(sizeof(*hide_list))) == NULL)
+	LOGD("hide_list: initialize\n");
+
+	sqlite3 *db = get_magiskdb();
+	if (db == nullptr)
 		return 1;
-	vec_init(hide_list);
 
-	// Might error if file doesn't exist, no need to report
-	file_to_vector(HIDELIST, hide_list);
+	sqlite3_exec(db, "SELECT process FROM hidelist",
+				 [] (auto, auto, char **data, auto) -> int
+				 {
+				 	LOGI("hide_list: [%s]\n", data[0]);
+				 	hide_list.push_back(strdup(data[0]));
+				 	return 0;
+				 }, nullptr, nullptr);
 
-	char *line;
-	vec_for_each(hide_list, line) {
-		LOGI("hide_list: [%s]\n", line);
-		kill_process(line);
+	// Migrate old hide list into database
+	if (access(LEGACY_LIST, R_OK) == 0) {
+		auto tmp = Array<char *>();
+		file_to_array(LEGACY_LIST, tmp);
+		for (auto &s : tmp)
+			add_list(db, s);
+		unlink(LEGACY_LIST);
 	}
+
+	sqlite3_close_v2(db);
 	return 0;
 }
 
 int destroy_list() {
-	char *line;
-	vec_for_each(hide_list, line) {
-		kill_process(line);
-	}
-	vec_deep_destroy(hide_list);
-	free(hide_list);
-	hide_list = NULL;
+	for (auto &str : hide_list)
+		free(str);
+	hide_list.clear();
 	return 0;
 }
 
@@ -274,15 +273,13 @@ void rm_hide_list(int client) {
 }
 
 void ls_hide_list(int client) {
-	if (!hideEnabled) {
+	if (!hide_enabled) {
 		write_int(client, HIDE_NOT_ENABLED);
 		return;
 	}
 	write_int(client, DAEMON_SUCCESS);
-	write_int(client, vec_size(hide_list));
-	char *s;
-	vec_for_each(hide_list, s) {
+	write_int(client, hide_list.size());
+	for (auto &s : hide_list)
 		write_string(client, s);
-	}
 	close(client);
 }

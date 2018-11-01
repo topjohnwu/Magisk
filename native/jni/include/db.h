@@ -4,12 +4,16 @@
 #include <sqlite3.h>
 #include <sys/stat.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /***************
  * DB Settings *
  ***************/
 
 #define DB_SETTING_KEYS \
-((char *[]) { \
+((const char *[]) { \
 "root_access", \
 "multiuser_mode", \
 "mnt_ns" \
@@ -62,7 +66,7 @@ NAMESPACE_MODE_REQUESTER, \
  **************/
 
 #define DB_STRING_KEYS \
-((char *[]) { \
+((const char *[]) { \
 "requester", \
 })
 
@@ -121,5 +125,9 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str);
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
 int exec_sql(const char *sql);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //DB_H

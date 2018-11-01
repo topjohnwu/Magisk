@@ -1,4 +1,4 @@
-/* proc_monitor.c - Monitor am_proc_start events and unmount
+/* proc_monitor.cpp - Monitor am_proc_start events and unmount
  *
  * We monitor the logcat am_proc_start events. When a target starts up,
  * we pause it ASAP, and fork a new process to join its mount namespace
@@ -18,22 +18,21 @@
 
 #include "magisk.h"
 #include "daemon.h"
-#include "utils.h"
+#include "utils.hpp"
 #include "magiskhide.h"
 #include "flags.h"
 
 static int sockfd = -1;
 
 // Workaround for the lack of pthread_cancel
-static void term_thread(int sig) {
+static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
 	destroy_list();
-	hideEnabled = 0;
+	hide_enabled = 0;
 	close(sockfd);
 	sockfd = -1;
-	pthread_mutex_destroy(&hide_lock);
-	pthread_mutex_destroy(&file_lock);
-	LOGD("proc_monitor: terminating...\n");
+	pthread_mutex_destroy(&list_lock);
+	LOGD("proc_monitor: terminating\n");
 	pthread_exit(NULL);
 }
 
@@ -63,8 +62,8 @@ static int parse_ppid(int pid) {
 static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 
-	char *line, buffer[PATH_MAX];
-	struct vector mount_list;
+	char buffer[PATH_MAX];
+	auto mounts = Array<char *>();
 
 	manage_selinux();
 	clean_magisk_props();
@@ -73,33 +72,31 @@ static void hide_daemon(int pid) {
 		goto exit;
 
 	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	vec_init(&mount_list);
-	file_to_vector(buffer, &mount_list);
+	file_to_array(buffer, mounts);
 
 	// Unmount dummy skeletons and /sbin links
-	vec_for_each(&mount_list, line) {
-		if (strstr(line, "tmpfs /system/") || strstr(line, "tmpfs /vendor/") || strstr(line, "tmpfs /sbin")) {
-			sscanf(line, "%*s %4096s", buffer);
+	for (auto &s : mounts) {
+		if (strstr(s, "tmpfs /system/") || strstr(s, "tmpfs /vendor/") || strstr(s, "tmpfs /sbin")) {
+			sscanf(s, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-		free(line);
+		free(s);
 	}
-	vec_destroy(&mount_list);
+	mounts.clear();
 
 	// Re-read mount infos
 	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	vec_init(&mount_list);
-	file_to_vector(buffer, &mount_list);
+	file_to_array(buffer, mounts);
 
 	// Unmount everything under /system, /vendor, and loop mounts
-	vec_for_each(&mount_list, line) {
-		if (strstr(line, "/dev/block/loop") || strstr(line, " /system/") || strstr(line, " /vendor/")) {
-			sscanf(line, "%*s %4096s", buffer);
+	for (auto &s : mounts) {
+		if (strstr(s, "/dev/block/loop") || strstr(s, " /system/") || strstr(s, " /vendor/")) {
+			sscanf(s, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-		free(line);
+		free(s);
 	}
-	vec_destroy(&mount_list);
+	mounts.clear();
 
 exit:
 	// Send resume signal
@@ -159,16 +156,15 @@ void proc_monitor() {
 		if (colon)
 			*colon = '\0';
 
-		int hide = 0;
-		pthread_mutex_lock(&hide_lock);
-		char *line;
-		vec_for_each(hide_list, line) {
-			if (strcmp(proc, line) == 0) {
-				hide = 1;
+		bool hide = false;
+		pthread_mutex_lock(&list_lock);
+		for (auto &s : hide_list) {
+			if (strcmp(proc, s) == 0) {
+				hide = true;
 				break;
 			}
 		}
-		pthread_mutex_unlock(&hide_lock);
+		pthread_mutex_unlock(&list_lock);
 		if (!hide)
 			continue;
 

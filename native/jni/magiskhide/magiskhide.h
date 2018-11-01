@@ -2,6 +2,7 @@
 #define MAGISK_HIDE_H
 
 #include <pthread.h>
+#include "array.h"
 
 #define TERM_THREAD SIGUSR1
 
@@ -19,8 +20,8 @@ int rm_list(char *proc);
 int init_list();
 int destroy_list();
 
-extern int hideEnabled;
-extern struct vector *hide_list;
-extern pthread_mutex_t hide_lock, file_lock;
+extern int hide_enabled;
+extern pthread_mutex_t list_lock;
+extern Array<char *> hide_list;
 
 #endif
