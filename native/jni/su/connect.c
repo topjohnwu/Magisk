@@ -75,7 +75,7 @@ void app_log(struct su_context *ctx) {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
 		"-p", DB_STR(ctx->info, SU_MANAGER),
-		"-f", "32", //FLAG_INCLUDE_STOPPED_PACKAGES
+		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "log",
 		"--ei", "from.uid", fromUid,
