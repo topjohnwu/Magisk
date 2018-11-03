@@ -16,7 +16,7 @@ char *getprop2(const char *name, int persist);
 int deleteprop(const char *name);
 int deleteprop2(const char *name, const int persist);
 int read_prop_file(const char* filename, const int trigger);
-void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie);
+void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie, int persist);
 
 #ifdef __cplusplus
 }

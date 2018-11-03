@@ -1,9 +1,3 @@
-/* resetprop.cpp - Manipulate any system props
- *
- * Copyright 2016 nkk71     <nkk71x@gmail.com>
- * Copyright 2016 topjohnwu <topjohnwu@gmail.com>
- */
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -120,11 +114,7 @@ static int init_resetprop() {
 
 static void print_props(int persist) {
 	auto prop_list = Array<prop_t>();
-	getprop_all(collect_props, &prop_list);
-	if (persist) {
-		read_cb_t read_cb(collect_unique_props, &prop_list);
-		persist_getprop_all(&read_cb);
-	}
+	getprop_all(collect_props, &prop_list, persist);
 	prop_list.sort();
 	for (auto &prop : prop_list)
 		printf("[%s]: [%s]\n", prop.name, prop.value);
@@ -167,10 +157,14 @@ char *getprop2(const char *name, int persist) {
 	}
 }
 
-void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie) {
+void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie, int persist) {
 	if (init_resetprop()) return;
 	read_cb_t read_cb(callback, cookie);
 	__system_property_foreach(read_props, &read_cb);
+	if (persist) {
+		read_cb.cb = collect_unique_props;
+		persist_getprop_all(&read_cb);
+	}
 }
 
 int setprop(const char *name, const char *value) {

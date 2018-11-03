@@ -133,11 +133,10 @@ static void kill_process(const char *name) {
 
 void clean_magisk_props() {
 	LOGD("hide_utils: Cleaning magisk props\n");
-	getprop_all([] (const char *name, auto, auto) -> void
-				{
-					if (strstr(name, "magisk"))
-						deleteprop2(name, 0);
-				}, nullptr);
+	getprop_all([](const char *name, auto, auto) -> void {
+		if (strstr(name, "magisk"))
+			deleteprop2(name, 0);
+	}, nullptr, 0);
 }
 
 static int add_list(sqlite3 *db, char *proc) {
