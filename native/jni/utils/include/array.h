@@ -22,15 +22,18 @@ public:
 			++_node;
 			return (*this);
 		}
+
 		iterator operator ++ (int) {
 			iterator temp = *this;
 			++_node;
 			return temp;
 		}
+
 		iterator& operator -- () {
 			--_node;
 			return (*this);
 		}
+
 		iterator operator -- (int) {
 			iterator temp = *this;
 			--_node;
@@ -42,6 +45,7 @@ public:
 			temp += i;
 			return temp;
 		}
+
 		iterator& operator += (int i) {
 			_node += i;
 			return (*this);
@@ -55,6 +59,7 @@ public:
 		bool operator != (const iterator& i) const {
 			return _node != i._node;
 		}
+
 		bool operator == (const iterator& i) const { return !(*this != i); }
 
 	private:
@@ -62,11 +67,15 @@ public:
 	};
 
 	iterator begin() const { return iterator(_data); }
+
 	iterator end() const { return iterator(_data + _size); }
+
 	bool empty() const { return !_size; }
+
 	size_t size() const { return _size; }
 
 	T& operator [] (size_t i) { return _data[i]; }
+
 	const T& operator [] (size_t i) const { return _data[i]; }
 
 	const T& back() const { return _data[_size - 1]; }
@@ -75,6 +84,13 @@ public:
 		if(_size == _capacity)
 			expand();
 		_data[_size] = x;
+		++_size;
+	}
+
+	void push_back(T&& x) {
+		if(_size == _capacity)
+			expand();
+		_data[_size] = (T&&) x;
 		++_size;
 	}
 
@@ -87,7 +103,7 @@ public:
 		if (_size == 0 || d < _data || d >= _data + _size)
 			return false;
 		for (; d < _data + _size - 1; ++d)
-			*d = *(d + 1);
+			*d = (T&&) *(d + 1);
 		--_size;
 		return true;
 
@@ -129,7 +145,7 @@ private:
 			_capacity *= 2;
 		T* temp = _data;
 		_data = new T[_capacity];
-		for(int i = 0; i < _size; ++i) _data[i] = temp[i];
+		for(int i = 0; i < _size; ++i) _data[i] = (T&&) temp[i];
 		delete [] temp;
 	}
 };

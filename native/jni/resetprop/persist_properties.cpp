@@ -11,9 +11,7 @@
 
 #include "_resetprop.h"
 #include "utils.h"
-#include "vector.h"
-
-#define PERSISTENT_PROPERTY_DIR  "/data/property"
+#include "array.h"
 
 /* ***********************************************************************
  * Auto generated header and constant definitions compiled from
@@ -89,7 +87,7 @@ const pb_field_t PersistentProperties_fields[2] = {
  * ***************************/
 
 static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
-	uint8_t *name = xmalloc(stream->bytes_left + 1);
+	uint8_t *name = (uint8_t *) xmalloc(stream->bytes_left + 1);
 	name[stream->bytes_left] = '\0';
 	if (!pb_read(stream, name, stream->bytes_left))
 		return false;
@@ -98,7 +96,8 @@ static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
 }
 
 static bool name_encode(pb_ostream_t *stream, const pb_field_t *field, void * const *arg) {
-	return pb_encode_tag_for_field(stream, field) && pb_encode_string(stream, *arg, strlen(*arg));
+	return pb_encode_tag_for_field(stream, field) &&
+		   pb_encode_string(stream, (const pb_byte_t *) *arg, strlen((const char *) *arg));
 }
 
 static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
@@ -106,8 +105,7 @@ static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
 	prop.name.funcs.decode = name_decode;
 	if (!pb_decode(stream, PersistentProperties_PersistentPropertyRecord_fields, &prop))
 		return false;
-	struct read_cb_t *read_cb = *arg;
-	read_cb->func(prop.name.arg, prop.value, read_cb->cookie);
+	((read_cb_t *) *arg)->exec((const char *) prop.name.arg, prop.value);
 	return true;
 }
 
@@ -115,19 +113,14 @@ static bool prop_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
 	PersistentProperties_PersistentPropertyRecord prop = {};
 	prop.name.funcs.encode = name_encode;
 	prop.has_value = true;
-	struct vector *v = *arg;
-	struct prop_t *e;
-	vec_for_each(v, e) {
-		if (e == NULL)
-			continue;
+	Array<prop_t> &prop_list = *(Array<prop_t> *) *arg;
+	for (auto &p : prop_list) {
 		if (!pb_encode_tag_for_field(stream, field))
 			return false;
-		prop.name.arg = e->name;
-		strcpy(prop.value, e->value);
+		prop.name.arg = p.name;
+		strcpy(prop.value, p.value);
 		if (!pb_encode_submessage(stream, PersistentProperties_PersistentPropertyRecord_fields, &prop))
 			return false;
-		free(e->name);
-		free(e);
 	}
 	return true;
 }
@@ -139,107 +132,111 @@ static bool write_callback(pb_ostream_t *stream, const uint8_t *buf, size_t coun
 
 static pb_ostream_t create_ostream(const char *filename) {
 	int fd = creat(filename, 0644);
-	pb_ostream_t o = {&write_callback, (void*)(intptr_t)fd, SIZE_MAX, 0};
+	pb_ostream_t o = {
+		.callback = write_callback,
+		.state = (void*)(intptr_t)fd,
+		.max_size = SIZE_MAX,
+		.bytes_written = 0,
+	};
 	return o;
 }
 
 static void pb_getprop_cb(const char *name, const char *value, void *v) {
-	struct prop_t *prop = v;
+	struct prop_t *prop = static_cast<prop_t *>(v);
 	if (prop->name && strcmp(name, prop->name) == 0) {
 		strcpy(prop->value, value);
-		prop->name = NULL;
+		free(prop->name);
+		prop->name = nullptr;
 	}
 }
 
-void persist_getprop_all(struct read_cb_t *read_cb) {
-	if (access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0) {
-		LOGD("resetprop: decode with protobuf from [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
-		PersistentProperties props = PersistentProperties_init_zero;
-		props.properties.funcs.decode = prop_decode;
-		props.properties.arg = read_cb;
-		uint8_t *buf;
-		size_t size;
-		mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", (void **) &buf, &size);
-		pb_istream_t stream = pb_istream_from_buffer(buf, size);
-		pb_decode(&stream, PersistentProperties_fields, &props);
-		munmap(buf, size);
+static void pb_getprop_all(read_cb_t *read_cb) {
+	LOGD("resetprop: decode with protobuf [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
+	PersistentProperties props = {};
+	props.properties.funcs.decode = prop_decode;
+	props.properties.arg = read_cb;
+	uint8_t *buf;
+	size_t size;
+	mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", (void **) &buf, &size);
+	pb_istream_t stream = pb_istream_from_buffer(buf, size);
+	pb_decode(&stream, PersistentProperties_fields, &props);
+	munmap(buf, size);
+}
+
+static void file_getprop(const char *name, char *value) {
+	value[0] = '\0';
+	char path[PATH_MAX];
+	snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
+	int fd = open(path, O_RDONLY | O_CLOEXEC);
+	if (fd < 0)
+		return;
+	LOGD("resetprop: read prop from [%s]\n", path);
+	value[read(fd, value, sizeof(PROP_VALUE_MAX))] = '\0';  // Null terminate the read value
+	close(fd);
+}
+
+void persist_getprop_all(read_cb_t *read_cb) {
+	if (use_pb) {
+		pb_getprop_all(read_cb);
 	} else {
 		DIR *dir = opendir(PERSISTENT_PROPERTY_DIR);
 		struct dirent *entry;
 		while ((entry = readdir(dir))) {
 			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0 )
 				continue;
-			char *value = persist_getprop(entry->d_name);
-			if (value) {
-				read_cb->func(strdup(entry->d_name), value, read_cb->cookie);
-				free(value);
-			}
+			char value[PROP_VALUE_MAX];
+			file_getprop(entry->d_name, value);
+			if (value[0])
+				read_cb->exec(entry->d_name, value);
 		}
 	}
 }
 
 char *persist_getprop(const char *name) {
-	struct prop_t prop;
-	prop.name = (char *) name;
-	if (access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0) {
-		struct read_cb_t read_cb = {
-			.func = pb_getprop_cb,
-			.cookie = &prop
-		};
-		persist_getprop_all(&read_cb);
-		if (prop.name)
-			return NULL;
+	prop_t prop(name);
+	if (use_pb) {
+		struct read_cb_t read_cb(pb_getprop_cb, &prop);
+		pb_getprop_all(&read_cb);
+		if (prop.name == nullptr)
+			return strdup(prop.value);
 	} else {
 		// Try to read from file
-		char path[PATH_MAX];
-		snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
-		int fd = open(path, O_RDONLY | O_CLOEXEC);
-		if (fd < 0)
-			return NULL;
-		LOGD("resetprop: read prop from [%s]\n", path);
-		prop.value[read(fd, prop.value, sizeof(PROP_VALUE_MAX))] = '\0';  // Null terminate the read value
-		close(fd);
+		char value[PROP_VALUE_MAX];
+		file_getprop(name, value);
+		if (value[0])
+			return strdup(value);
 	}
-	return strdup(prop.value);
+	return nullptr;
 }
 
 bool persist_deleteprop(const char *name) {
-	if (access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0) {
-		struct vector v;
-		vec_init(&v);
-		struct read_cb_t read_cb = {
-			.func = collect_props,
-			.cookie = &v
-		};
+	if (use_pb) {
+		auto prop_list = Array<prop_t>();
+		struct read_cb_t read_cb(collect_props, &prop_list);
 		persist_getprop_all(&read_cb);
-		struct prop_t *p;
-		bool reencode = false;
-		vec_for_each(&v, p) {
-			if (strcmp(p->name, name) == 0) {
-				// Remove the prop from the list
-				free(p->name);
-				free(p);
-				vec_cur(&v) = NULL;
-				reencode = true;
-				break;
+
+		for (auto it = prop_list.begin(); it != prop_list.end(); ++it) {
+			if (strcmp((*it).name, name) == 0) {
+				prop_list.erase(it);
+				// Dump the props back
+				PersistentProperties props = PersistentProperties_init_zero;
+				pb_ostream_t ostream = create_ostream(PERSISTENT_PROPERTY_DIR
+						"/persistent_properties.tmp");
+				props.properties.funcs.encode = prop_encode;
+				props.properties.arg = &prop_list;
+				LOGD("resetprop: encode with protobuf [" PERSISTENT_PROPERTY_DIR
+							 "/persistent_properties.tmp]\n");
+				if (!pb_encode(&ostream, PersistentProperties_fields, &props))
+					return false;
+				clone_attr(PERSISTENT_PROPERTY_DIR "/persistent_properties",
+						   PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp");
+				rename(PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp",
+					   PERSISTENT_PROPERTY_DIR "/persistent_properties");
+				return true;
 			}
 		}
 
-		if (reencode) {
-			// Dump the props back
-			PersistentProperties props = PersistentProperties_init_zero;
-			pb_ostream_t ostream = create_ostream(PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp");
-			props.properties.funcs.encode = prop_encode;
-			props.properties.arg = &v;
-			LOGD("resetprop: encode with protobuf to [" PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp]\n");
-			if (!pb_encode(&ostream, PersistentProperties_fields, &props))
-				return false;
-			clone_attr(PERSISTENT_PROPERTY_DIR "/persistent_properties", PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp");
-			rename(PERSISTENT_PROPERTY_DIR "/persistent_properties.tmp", PERSISTENT_PROPERTY_DIR "/persistent_properties");
-		}
-
-		vec_destroy(&v);
-		return reencode;
+		return false;
 	} else {
 		char path[PATH_MAX];
 		snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
