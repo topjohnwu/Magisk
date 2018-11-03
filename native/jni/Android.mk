@@ -32,8 +32,8 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	main.c \
-	img.c \
+	misc/applets.c \
+	misc/img.c \
 	daemon/magisk.c \
 	daemon/daemon.c \
 	daemon/log_daemon.c \
@@ -73,7 +73,7 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	init.c \
+	misc/init.c \
 	magiskpolicy/api.c \
 	magiskpolicy/magiskpolicy.c \
 	magiskpolicy/rules.c \
@@ -122,7 +122,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := b64xz
 LOCAL_STATIC_LIBRARIES := libxz
 LOCAL_C_INCLUDES := $(EXT_PATH)/include
-LOCAL_SRC_FILES := b64xz.c
+LOCAL_SRC_FILES := misc/b64xz.c
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
