@@ -125,6 +125,10 @@ public:
 		qsort(_data, _size, sizeof(T), compare);
 	}
 
+	T* data() { return _data; }
+
+	const T* data() const { return _data; }
+
 	// void reserve(size_t n) { ... }
 	// void resize(size_t n) { ... }
 
