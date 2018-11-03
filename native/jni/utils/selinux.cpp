@@ -9,20 +9,18 @@
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
 #define ADB_CON     "u:object_r:adb_data_file:s0"
-#define MAGISK_CON  "u:object_r:"SEPOL_FILE_DOMAIN":s0"
+#define MAGISK_CON  "u:object_r:" SEPOL_FILE_DOMAIN ":s0"
 
 // Stub implementations
 
-static char *empty_str = "";
+static void v_s(char *) {}
 
-static void v_s(char *s) {}
+static int i_s(const char *) { return 0; }
 
-static int i_s(const char *s) { return 0; }
+static int i_ss(const char *, const char *) { return 0; }
 
-static int i_ss(const char *s, const char * ss) { return 0; }
-
-static int i_ssp(const char *s, char ** sp) {
-	*sp = empty_str;
+static int i_ssp(const char *, char ** sp) {
+	*sp = (char *) xcalloc(1, 1);
 	return 0;
 }
 
@@ -39,12 +37,12 @@ void dload_selinux() {
 	void *handle = dlopen("libselinux.so", RTLD_LAZY);
 	if (handle == NULL)
 		return;
-	freecon = dlsym(handle, "freecon");
-	setcon = dlsym(handle, "setcon");
-	getfilecon = dlsym(handle, "getfilecon");
-	lgetfilecon = dlsym(handle, "lgetfilecon");
-	setfilecon = dlsym(handle, "setfilecon");
-	lsetfilecon = dlsym(handle, "lsetfilecon");
+	*(void **) &freecon = dlsym(handle, "freecon");
+	*(void **) &setcon = dlsym(handle, "setcon");
+	*(void **) &getfilecon = dlsym(handle, "getfilecon");
+	*(void **) &lgetfilecon = dlsym(handle, "lgetfilecon");
+	*(void **) &setfilecon = dlsym(handle, "setfilecon");
+	*(void **) &lsetfilecon = dlsym(handle, "lsetfilecon");
 }
 
 static void restore_syscon(int dirfd) {

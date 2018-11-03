@@ -1,4 +1,4 @@
-/* file.c - Contains all files related utilities
+/* file.cpp - Contains all files related utilities
  */
 
 #include <stdlib.h>
@@ -15,7 +15,7 @@
 #include "utils.h"
 #include "selinux.h"
 
-const char **excl_list = NULL;
+const char **excl_list = nullptr;
 
 static int is_excl(const char *name) {
 	if (excl_list)
@@ -62,7 +62,7 @@ void in_order_walk(int dirfd, void (*callback)(int, struct dirent*)) {
 	struct dirent *entry;
 	int newfd;
 	DIR *dir = fdopendir(dirfd);
-	if (dir == NULL) return;
+	if (dir == nullptr) return;
 
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
@@ -176,7 +176,7 @@ void cp_afc(const char *source, const char *destination) {
 		if (S_ISREG(a.st.st_mode)) {
 			src = xopen(source, O_RDONLY);
 			dest = xopen(destination, O_WRONLY | O_CREAT | O_TRUNC);
-			xsendfile(dest, src, NULL, a.st.st_size);
+			xsendfile(dest, src, nullptr, a.st.st_size);
 			close(src);
 			close(dest);
 		} else if (S_ISLNK(a.st.st_mode)) {
@@ -321,7 +321,7 @@ static void _mmap(int rw, const char *filename, void **buf, size_t *size) {
 		ioctl(fd, BLKGETSIZE64, size);
 	else
 		*size = st.st_size;
-	*buf = *size > 0 ? xmmap(NULL, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : NULL;
+	*buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
 	close(fd);
 }
 
@@ -344,7 +344,7 @@ void fd_full_read(int fd, void **buf, size_t *size) {
 void full_read(const char *filename, void **buf, size_t *size) {
 	int fd = xopen(filename, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
-		*buf = NULL;
+		*buf = nullptr;
 		*size = 0;
 		return;
 	}
@@ -355,7 +355,7 @@ void full_read(const char *filename, void **buf, size_t *size) {
 void full_read_at(int dirfd, const char *filename, void **buf, size_t *size) {
 	int fd = xopenat(dirfd, filename, O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
-		*buf = NULL;
+		*buf = nullptr;
 		*size = 0;
 		return;
 	}
@@ -377,7 +377,7 @@ void stream_full_read(int fd, void **buf, size_t *size) {
 			cap *= 2;
 			*buf = realloc(*buf, cap);
 		}
-		memcpy(*buf + *size, tmp, read);
+		memcpy((uint8_t *) *buf + *size, tmp, read);
 		*size += read;
 	}
 }
@@ -386,4 +386,26 @@ void write_zero(int fd, size_t size) {
 	size_t pos = lseek(fd, 0, SEEK_CUR);
 	ftruncate(fd, pos + size);
 	lseek(fd, pos + size, SEEK_SET);
+}
+
+int file_to_array(const char *filename, Array<char *> &arr) {
+	if (access(filename, R_OK) != 0)
+		return 1;
+	char *line = nullptr;
+	size_t len = 0;
+	ssize_t read;
+
+	FILE *fp = xfopen(filename, "r");
+	if (fp == nullptr)
+		return 1;
+
+	while ((read = getline(&line, &len, fp)) != -1) {
+		// Remove end newline
+		if (line[read - 1] == '\n')
+			line[read - 1] = '\0';
+		arr.push_back(line);
+		line = nullptr;
+	}
+	fclose(fp);
+	return 0;
 }

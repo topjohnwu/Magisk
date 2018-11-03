@@ -18,7 +18,7 @@
 
 #include "magisk.h"
 #include "daemon.h"
-#include "utils.hpp"
+#include "utils.h"
 #include "magiskhide.h"
 #include "flags.h"
 

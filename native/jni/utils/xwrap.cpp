@@ -1,4 +1,4 @@
-/* xwrap.c - wrappers around existing library functions.
+/* xwrap.cpp - wrappers around existing library functions.
  *
  * Functions with the x prefix are wrappers that either succeed or log the
  * error message. They usually have the same arguments and return value
@@ -6,7 +6,6 @@
  *
  */
 
-#define _GNU_SOURCE
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>

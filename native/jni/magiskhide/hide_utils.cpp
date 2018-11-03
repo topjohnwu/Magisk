@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 #include "magisk.h"
-#include "utils.hpp"
+#include "utils.h"
 #include "resetprop.h"
 #include "magiskhide.h"
 #include "daemon.h"

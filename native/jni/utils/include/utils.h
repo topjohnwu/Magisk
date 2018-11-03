@@ -12,6 +12,9 @@
 #include <sys/stat.h>
 
 #ifdef __cplusplus
+// C++ only
+#include "array.h"
+int file_to_array(const char* filename, Array<char *> &arr);
 extern "C" {
 #endif
 
@@ -92,7 +95,6 @@ int exec_command(int err, int *fd, void (*setenv)(struct vector*), const char *a
 int exec_command_sync(char *const argv0, ...);
 int switch_mnt_ns(int pid);
 int fork_dont_care();
-void wait_till_exists(const char *target);
 void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);
 
