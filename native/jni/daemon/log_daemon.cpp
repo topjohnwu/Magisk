@@ -18,7 +18,7 @@
 #include "daemon.h"
 #include "flags.h"
 
-int log_daemon_started = 0;
+bool log_daemon_started = false;
 static Array<const char *> log_cmd, clear_cmd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -27,16 +27,18 @@ enum {
 	LOG_EVENT
 };
 
+#define EVENT_NUM 2
+
 struct log_listener {
 	int fd;
-	int (*filter) (const char*);
+	bool (*filter)(const char *);
 };
 
-static int am_proc_start_filter(const char *log) {
+static bool am_proc_start_filter(const char *log) {
 	return strstr(log, "am_proc_start") != nullptr;
 }
 
-static int magisk_log_filter(const char *log) {
+static bool magisk_log_filter(const char *log) {
 	return !am_proc_start_filter(log);
 }
 
@@ -50,7 +52,6 @@ static struct log_listener events[] = {
 		.filter = magisk_log_filter
 	}
 };
-#define EVENT_NUM (sizeof(events) / sizeof(struct log_listener))
 
 static void sigpipe_handler(int) {
 	close(events[HIDE_EVENT].fd);
@@ -126,7 +127,7 @@ static void log_daemon() {
 	// Construct cmdline
 	log_cmd.push_back(MIRRDIR "/system/bin/logcat");
 	// Test whether these buffers actually works
-	const char* b[] = { "main", "events", "crash" };
+	const char *b[] = { "main", "events", "crash" };
 	for (int i = 0; i < 3; ++i) {
 		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", nullptr) == 0) {
 			log_cmd.push_back("-b");
@@ -179,12 +180,12 @@ static void log_daemon() {
 	}
 }
 
-int start_log_daemon() {
+bool start_log_daemon() {
 	if (!log_daemon_started) {
 		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null", nullptr) == 0) {
 			if (fork_dont_care() == 0)
 				log_daemon();
-			log_daemon_started = 1;
+			log_daemon_started = true;
 			// Wait till we can connect to log_daemon and receive ack
 			int fd = connect_log_daemon();
 			write_int(fd, HANDSHAKE);

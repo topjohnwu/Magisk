@@ -43,9 +43,9 @@ int connect_daemon();
 
 // log_monitor.c
 
-extern int log_daemon_started;
+extern bool log_daemon_started;
 int connect_log_daemon();
-int start_log_daemon();
+bool start_log_daemon();
 
 // socket.c
 
