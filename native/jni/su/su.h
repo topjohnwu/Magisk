@@ -23,7 +23,7 @@ public:
 	int count;             /* Just a count for debugging purpose */
 
 	/* These values should be guarded with internal lock */
-	struct db_settings dbs;
+	struct db_settings cfg;
 	struct db_strings str;
 	struct su_access access;
 	struct stat mgr_st;
@@ -40,9 +40,6 @@ public:
 private:
 	pthread_mutex_t _lock;  /* Internal lock */
 };
-
-#define DB_SET(i, e) (i)->dbs.v[e]
-#define DB_STR(i, e) (i)->str.s[e]
 
 struct su_req_base {
 	unsigned uid;

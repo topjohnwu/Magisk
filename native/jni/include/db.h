@@ -17,7 +17,7 @@
 
 #define DB_SETTINGS_NUM 3
 
-// Settings indices
+// Settings keys
 enum {
 	ROOT_ACCESS = 0,
 	SU_MULTIUSER_MODE,
@@ -46,14 +46,17 @@ enum {
 	NAMESPACE_MODE_ISOLATE
 };
 
-struct db_settings {
-	int v[DB_SETTINGS_NUM];
-	db_settings()
-			: v {
-		ROOT_ACCESS_APPS_AND_ADB,
-		MULTIUSER_MODE_OWNER_ONLY,
-		NAMESPACE_MODE_REQUESTER
-	} {}
+class db_settings {
+public:
+	db_settings();
+	int& operator [](const char *);
+	const int& operator [](const char *) const;
+	int& operator [](const int);
+	const int& operator [](const int) const;
+
+private:
+	int data[DB_SETTINGS_NUM + 1];
+	int getKeyIdx(const char *) const;
 };
 
 /**************
@@ -67,17 +70,22 @@ struct db_settings {
 
 #define DB_STRING_NUM 1
 
-// Strings indices
+// Strings keys
 enum {
 	SU_MANAGER = 0
 };
 
-struct db_strings {
-	char s[DB_STRING_NUM][128];
-	db_strings() {
-		for (int i = 0; i < DB_STRING_NUM; ++i)
-			s[i][0] = '\0';
-	}
+class db_strings {
+public:
+	db_strings();
+	char * operator [](const char *);
+	const char * operator [](const char *) const;
+	char * operator [](const int);
+	const char * operator [](const int) const;
+
+private:
+	char data[DB_STRING_NUM + 1][128];
+	int getKeyIdx(const char *) const;
 };
 
 /*************
@@ -119,8 +127,8 @@ struct su_access {
  ********************/
 
 sqlite3 *get_magiskdb();
-int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs);
-int get_db_strings(sqlite3 *db, int key, struct db_strings *str);
+int get_db_settings(sqlite3 *db, struct db_settings *dbs, int key = -1);
+int get_db_strings(sqlite3 *db, struct db_strings *str, int key = -1);
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
 int exec_sql(const char *sql);

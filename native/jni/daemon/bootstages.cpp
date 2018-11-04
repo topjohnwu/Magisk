@@ -910,10 +910,9 @@ core_only:
 		// Check whether we have a valid manager installed
 		sqlite3 *db = get_magiskdb();
 		if (db) {
-			struct db_strings str;
-			memset(&str, 0, sizeof(str));
-			get_db_strings(db, SU_MANAGER, &str);
-			if (validate_manager(str.s[SU_MANAGER], 0, nullptr)) {
+			db_strings str;
+			get_db_strings(db, &str, SU_MANAGER);
+			if (validate_manager(str[SU_MANAGER], 0, nullptr)) {
 				// There is no manager installed, install the stub
 				exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", nullptr);
 				install_apk("/data/magisk.apk");

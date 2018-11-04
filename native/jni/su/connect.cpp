@@ -42,7 +42,7 @@ static void silent_run(const char *args[]) {
 }
 
 static void setup_user(char *user, struct su_info *info) {
-	switch (DB_SET(info, SU_MULTIUSER_MODE)) {
+	switch (info->cfg[SU_MULTIUSER_MODE]) {
 		case MULTIUSER_MODE_OWNER_ONLY:
 		case MULTIUSER_MODE_OWNER_MANAGED:
 			sprintf(user, "%d", 0);
@@ -59,7 +59,7 @@ void app_log(struct su_context *ctx) {
 
 	char fromUid[8];
 	sprintf(fromUid, "%d",
-			DB_SET(ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
+			ctx->info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
 			ctx->info->uid % 100000 : ctx->info->uid);
 
 	char toUid[8];
@@ -74,7 +74,7 @@ void app_log(struct su_context *ctx) {
 	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", DB_STR(ctx->info, SU_MANAGER),
+		"-p", ctx->info->str[SU_MANAGER],
 		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "log",
@@ -95,7 +95,7 @@ void app_notify(struct su_context *ctx) {
 
 	char fromUid[8];
 	sprintf(fromUid, "%d",
-			DB_SET(ctx->info, SU_MULTIUSER_MODE) == MULTIUSER_MODE_OWNER_MANAGED ?
+			ctx->info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_OWNER_MANAGED ?
 			ctx->info->uid % 100000 : ctx->info->uid);
 
 	char policy[2];
@@ -104,7 +104,7 @@ void app_notify(struct su_context *ctx) {
 	const char *cmd[] = {
 			AM_PATH, "broadcast",
 			"-a", "android.intent.action.BOOT_COMPLETED",
-			"-p", DB_STR(ctx->info, SU_MANAGER),
+			"-p", ctx->info->str[SU_MANAGER],
 			"-f", "0x00000020",
 			"--user", user,
 			"--es", "action", "notify",
@@ -121,7 +121,7 @@ void app_connect(const char *socket, struct su_info *info) {
 	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
-		"-p", DB_STR(info, SU_MANAGER),
+		"-p", info->str[SU_MANAGER],
 		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "request",

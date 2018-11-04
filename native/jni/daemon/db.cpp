@@ -10,6 +10,66 @@
 
 #define DB_VERSION 7
 
+db_strings::db_strings() {
+	memset(data, 0, sizeof(data));
+}
+
+char *db_strings::operator[](const char *key) {
+	return data[getKeyIdx(key)];
+}
+
+const char *db_strings::operator[](const char *key) const {
+	return data[getKeyIdx(key)];
+}
+
+char *db_strings::operator[](const int idx) {
+	return data[idx];
+}
+
+const char *db_strings::operator[](const int idx) const {
+	return data[idx];
+}
+
+int db_strings::getKeyIdx(const char *key) const {
+	int idx = DB_STRING_NUM;
+	for (int i = 0; i < DB_STRING_NUM; ++i) {
+		if (strcmp(key, DB_STRING_KEYS[i]) == 0)
+			idx = i;
+	}
+	return idx;
+}
+
+db_settings::db_settings() : data {
+		ROOT_ACCESS_APPS_AND_ADB,
+		MULTIUSER_MODE_OWNER_ONLY,
+		NAMESPACE_MODE_REQUESTER
+} {}
+
+int &db_settings::operator[](const int idx) {
+	return data[idx];
+}
+
+const int &db_settings::operator[](const int idx) const {
+	return data[idx];
+}
+
+int &db_settings::operator[](const char *key) {
+	return data[getKeyIdx(key)];
+}
+
+const int &db_settings::operator[](const char *key) const {
+	return data[getKeyIdx(key)];
+}
+
+int db_settings::getKeyIdx(const char *key) const {
+	int idx = DB_SETTINGS_NUM;
+	for (int i = 0; i < DB_SETTINGS_NUM; ++i) {
+		if (strcmp(key, DB_SETTING_KEYS[i]) == 0)
+			idx = i;
+	}
+	return idx;
+}
+
 static int ver_cb(void *ver, int, char **data, char **) {
 	*((int *) ver) = atoi(data[0]);
 	return 0;
@@ -111,26 +171,24 @@ sqlite3 *get_magiskdb() {
 }
 
 static int settings_cb(void *v, int col_num, char **data, char **col_name) {
-	auto dbs = (db_settings *) v;
-	int key = -1, value;
+	auto &cfg = *(db_settings *) v;
+	int value = -1;
+	const char *key = "";
 	for (int i = 0; i < col_num; ++i) {
 		if (strcmp(col_name[i], "key") == 0) {
-			for (int k = 0; k < DB_SETTINGS_NUM; ++k) {
-				if (strcmp(data[i], DB_SETTING_KEYS[k]) == 0)
-					key = k;
-			}
+			key = data[i];
 		} else if (strcmp(col_name[i], "value") == 0) {
 			value = atoi(data[i]);
 		}
 	}
-	if (key >= 0) {
-		dbs->v[key] = value;
-		LOGD("magiskdb: query %s=[%d]\n", DB_SETTING_KEYS[key], value);
+	if (key[0] && value >= 0) {
+		cfg[key] = value;
+		LOGD("magiskdb: query %s=[%d]\n", key, value);
 	}
 	return 0;
 }
 
-int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
+int get_db_settings(sqlite3 *db, struct db_settings *dbs, int key) {
 	if (db == nullptr)
 		return 1;
 	char *err;
@@ -150,27 +208,23 @@ int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
 }
 
 static int strings_cb(void *v, int col_num, char **data, char **col_name) {
-	auto dbs = (db_strings *) v;
-	int key = -1;
-	char *value;
+	auto &str = *(db_strings *) v;
+	const char *key = "", *value = "";
 	for (int i = 0; i < col_num; ++i) {
 		if (strcmp(col_name[i], "key") == 0) {
-			for (int k = 0; k < DB_STRING_NUM; ++k) {
-				if (strcmp(data[i], DB_STRING_KEYS[k]) == 0)
-					key = k;
-			}
+			key = data[i];
 		} else if (strcmp(col_name[i], "value") == 0) {
 			value = data[i];
 		}
 	}
-	if (key >= 0) {
-		strcpy(dbs->s[key], value);
-		LOGD("magiskdb: query %s=[%s]\n", DB_STRING_KEYS[key], value);
+	if (key[0] && value[0]) {
+		strcpy(str[key], value);
+		LOGD("magiskdb: query %s=[%s]\n", key, value);
 	}
 	return 0;
 }
 
-int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
+int get_db_strings(sqlite3 *db, struct db_strings *str, int key) {
 	if (db == nullptr)
 		return 1;
 	char *err;
