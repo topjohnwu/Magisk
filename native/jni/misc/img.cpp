@@ -1,4 +1,4 @@
-/* img.c - All image related functions
+/* img.cpp - All image related functions
  */
 
 #include <unistd.h>

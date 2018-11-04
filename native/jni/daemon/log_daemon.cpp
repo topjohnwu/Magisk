@@ -19,7 +19,7 @@
 #include "flags.h"
 
 int log_daemon_started = 0;
-static struct vector log_cmd, clear_cmd;
+static Array<const char *> log_cmd, clear_cmd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 enum {
@@ -33,7 +33,7 @@ struct log_listener {
 };
 
 static int am_proc_start_filter(const char *log) {
-	return strstr(log, "am_proc_start") != NULL;
+	return strstr(log, "am_proc_start") != nullptr;
 }
 
 static int magisk_log_filter(const char *log) {
@@ -52,17 +52,17 @@ static struct log_listener events[] = {
 };
 #define EVENT_NUM (sizeof(events) / sizeof(struct log_listener))
 
-static void sigpipe_handler(int sig) {
+static void sigpipe_handler(int) {
 	close(events[HIDE_EVENT].fd);
 	events[HIDE_EVENT].fd = -1;
 }
 
-static void *monitor_thread(void *args) {
+static void *monitor_thread(void *) {
 	// Block SIGPIPE to prevent interruption
 	sigset_t block_set;
 	sigemptyset(&block_set);
 	sigaddset(&block_set, SIGPIPE);
-	pthread_sigmask(SIG_SETMASK, &block_set, NULL);
+	pthread_sigmask(SIG_SETMASK, &block_set, nullptr);
 	// Give the main daemon some time before we monitor it
 	sleep(5);
 	int fd;
@@ -77,12 +77,12 @@ static void *monitor_thread(void *args) {
 	}
 }
 
-static void *logcat_thread(void *args) {
+static void *logcat_thread(void *) {
 	int log_fd = -1, log_pid;
 	char line[4096];
 	while (1) {
 		// Start logcat
-		log_pid = exec_array(0, &log_fd, NULL, (const char **) vec_entry(&log_cmd));
+		log_pid = exec_array(0, &log_fd, nullptr, log_cmd.data());
 		FILE *logs = fdopen(log_fd, "r");
 		while (fgets(line, sizeof(line), logs)) {
 			if (line[0] == '-')
@@ -99,12 +99,12 @@ static void *logcat_thread(void *args) {
 		fclose(logs);
 		log_fd = -1;
 		kill(log_pid, SIGTERM);
-		waitpid(log_pid, NULL, 0);
+		waitpid(log_pid, nullptr, 0);
 
 		LOGI("magisklogd: logcat output EOF");
 		// Clear buffer
-		log_pid = exec_array(0, NULL, NULL, (const char **) vec_entry(&clear_cmd));
-		waitpid(log_pid, NULL, 0);
+		log_pid = exec_array(0, nullptr, nullptr, clear_cmd.data());
+		waitpid(log_pid, nullptr, 0);
 	}
 }
 
@@ -117,36 +117,42 @@ static void log_daemon() {
 	struct sigaction act;
 	memset(&act, 0, sizeof(act));
 	act.sa_handler = sigpipe_handler;
-	sigaction(SIGPIPE, &act, NULL);
+	sigaction(SIGPIPE, &act, nullptr);
 
 	// Setup log dumps
 	rename(LOGFILE, LOGFILE ".bak");
 	events[LOG_EVENT].fd = xopen(LOGFILE, O_CREAT | O_WRONLY | O_TRUNC | O_CLOEXEC | O_APPEND, 0644);
 
 	// Construct cmdline
-	vec_init(&log_cmd);
-	vec_push_back(&log_cmd, MIRRDIR "/system/bin/logcat");
+	log_cmd.push_back(MIRRDIR "/system/bin/logcat");
 	// Test whether these buffers actually works
 	const char* b[] = { "main", "events", "crash" };
 	for (int i = 0; i < 3; ++i) {
-		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", NULL) == 0)
-			vec_push_back_all(&log_cmd, "-b", b[i], NULL);
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-b", b[i], "-d", "-f", "/dev/null", nullptr) == 0) {
+			log_cmd.push_back("-b");
+			log_cmd.push_back(b[i]);
+		}
 	}
 	chmod("/dev/null", 0666);
-	vec_dup(&log_cmd, &clear_cmd);
-	vec_push_back_all(&log_cmd, "-v", "threadtime", "-s", "am_proc_start", "Magisk", NULL);
+	clear_cmd = log_cmd;
+	log_cmd.push_back("-v");
+	log_cmd.push_back("threadtime");
+	log_cmd.push_back("-s");
+	log_cmd.push_back("am_proc_start");
+	log_cmd.push_back("Magisk");
 #ifdef MAGISK_DEBUG
-	vec_push_back(&log_cmd, "*:F");
+	log_cmd.push_back("*:F");
 #endif
-	vec_push_back(&log_cmd, NULL);
-	vec_push_back(&clear_cmd, "-c");
-	vec_push_back(&clear_cmd, NULL);
+	log_cmd.push_back(nullptr);
+
+	clear_cmd.push_back("-c");
+	clear_cmd.push_back(nullptr);
 
 	// Start worker threads
 	pthread_t thread;
-	pthread_create(&thread, NULL, monitor_thread, NULL);
+	pthread_create(&thread, nullptr, monitor_thread, nullptr);
 	pthread_detach(thread);
-	xpthread_create(&thread, NULL, logcat_thread, NULL);
+	xpthread_create(&thread, nullptr, logcat_thread, nullptr);
 	pthread_detach(thread);
 
 	// Handle socket requests
@@ -157,7 +163,7 @@ static void log_daemon() {
 		exit(1);
 	xlisten(sockfd, 10);
 	while(1) {
-		int fd = xaccept4(sockfd, NULL, NULL, SOCK_CLOEXEC);
+		int fd = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
 		switch(read_int(fd)) {
 			case HIDE_CONNECT:
 				pthread_mutex_lock(&lock);
@@ -175,7 +181,7 @@ static void log_daemon() {
 
 int start_log_daemon() {
 	if (!log_daemon_started) {
-		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null", NULL) == 0) {
+		if (exec_command_sync(MIRRDIR "/system/bin/logcat", "-d", "-f", "/dev/null", nullptr) == 0) {
 			if (fork_dont_care() == 0)
 				log_daemon();
 			log_daemon_started = 1;

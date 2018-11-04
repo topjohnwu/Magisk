@@ -4,7 +4,6 @@
 extern "C" {
 #endif
 
-
 extern void (*freecon)(char * con);
 extern int (*setcon)(const char * con);
 extern int (*getfilecon)(const char *path, char ** con);

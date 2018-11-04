@@ -24,13 +24,13 @@
 #include "flags.h"
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
-static struct vector module_list;
+static Array<char *> module_list;
 
-extern char **environ;
+static int bind_mount(const char *from, const char *to);
 
-/******************
- * Node structure *
- ******************/
+/***************
+ * Magic Mount *
+ ***************/
 
 // Precedence: MODULE > SKEL > INTER > DUMMY
 #define IS_DUMMY   0x01    /* mount from mirror */
@@ -42,73 +42,236 @@ extern char **environ;
 #define IS_LNK(n)  (n->type == DT_LNK)
 #define IS_REG(n)  (n->type == DT_REG)
 
-struct node_entry {
+class node_entry {
+public:
 	const char *module;    /* Only used when status & IS_MODULE */
 	char *name;
 	uint8_t type;
 	uint8_t status;
-	struct node_entry *parent;
-	struct vector *children;
+	node_entry *parent;
+	Array<node_entry *> children;
+
+	node_entry() = default;
+	node_entry(const char *, const char *, uint8_t type = 0, uint8_t status = 0);
+	node_entry(const char *, uint8_t type = 0, uint8_t status = 0);
+	~node_entry();
+	void create_module_tree(const char *module);
+	void magic_mount();
+
+private:
+	char *get_path();
+	node_entry *insert(node_entry *);
+	void clone_skeleton();
+	int get_path(char *path);
 };
 
-static void concat_path(struct node_entry *node) {
-	if (node->parent)
-		concat_path(node->parent);
-	size_t len = strlen(buf);
-	buf[len] = '/';
-	strcpy(buf + len + 1, node->name);
+node_entry::node_entry(const char *module, const char *name, uint8_t type, uint8_t status)
+		: node_entry(name, type, status) {
+	this->module = module;
 }
 
-static char *get_full_path(struct node_entry *node) {
-	buf[0] = '\0';
-	concat_path(node);
+node_entry::node_entry(const char *name, uint8_t type, uint8_t status)
+		: type(type), status(status), parent(nullptr) {
+	this->name = strdup(name);
+}
+
+node_entry::~node_entry() {
+	free(name);
+	for (auto &node : children)
+		delete node;
+}
+
+char *node_entry::get_path() {
+	get_path(buf);
 	return strdup(buf);
 }
 
-// Free the node
-static void destroy_node(struct node_entry *node) {
-	free(node->name);
-	vec_destroy(node->children);
-	free(node->children);
-	free(node);
+int node_entry::get_path(char *path) {
+	int len = 0;
+	if (parent)
+		len = parent->get_path(path);
+	len += sprintf(path + len, "/%s", name);
+	return len;
 }
 
-// Free the node and all children recursively
-static void destroy_subtree(struct node_entry *node) {
-	// Never free parent, since it shall be freed by themselves
-	struct node_entry *e;
-	vec_for_each(node->children, e) {
-		destroy_subtree(e);
-	}
-	destroy_node(node);
-}
-
-// Return the child
-static struct node_entry *insert_child(struct node_entry *p, struct node_entry *c) {
-	c->parent = p;
-	if (p->children == NULL) {
-		p->children = xmalloc(sizeof(struct vector));
-		vec_init(p->children);
-	}
-	struct node_entry *e;
-	vec_for_each(p->children, e) {
-		if (strcmp(e->name, c->name) == 0) {
-			// Exist duplicate
-			if (c->status > e->status) {
-				// Precedence is higher, replace with new node
-				destroy_subtree(e);
-				vec_cur(p->children) = c;
-				return c;
+node_entry *node_entry::insert(node_entry *node) {
+	node->parent = this;
+	for (auto &child : children) {
+		if (strcmp(child->name, node->name) == 0) {
+			if (node->status > child->status) {
+				// The new node has higher precedence
+				delete child;
+				child = node;
+				return node;
 			} else {
-				// Free the new entry, return old
-				destroy_node(c);
-				return e;
+				delete node;
+				return child;
 			}
 		}
 	}
-	// New entry, push back
-	vec_push_back(p->children, c);
-	return c;
+	children.push_back(node);
+	return node;
+}
+
+void node_entry::create_module_tree(const char *module) {
+	DIR *dir;
+	struct dirent *entry;
+
+	char *full_path = get_path();
+	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, full_path);
+
+	if (!(dir = xopendir(buf)))
+		goto cleanup;
+
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		// Create new node
+		node_entry *node = new node_entry(module, entry->d_name, entry->d_type);
+		snprintf(buf, PATH_MAX, "%s/%s", full_path, node->name);
+
+		/*
+		 * Clone the parent in the following condition:
+		 * 1. File in module is a symlink
+		 * 2. Target file do not exist
+		 * 3. Target file is a symlink (exclude /system/vendor)
+		 */
+		bool clone = false;
+		if (IS_LNK(node) || access(buf, F_OK) == -1) {
+			clone = true;
+		} else if (parent != nullptr || strcmp(node->name, "vendor") != 0) {
+			struct stat s;
+			xstat(buf, &s);
+			if (S_ISLNK(s.st_mode))
+				clone = true;
+		}
+
+		if (clone) {
+			// Mark self as a skeleton
+			status |= IS_SKEL;  /* This will not overwrite if parent is module */
+			node->status = IS_MODULE;
+		} else if (IS_DIR(node)) {
+			// Check if marked as replace
+			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MOUNTPOINT, module, buf);
+			if (access(buf2, F_OK) == 0) {
+				// Replace everything, mark as leaf
+				node->status = IS_MODULE;
+			} else {
+				// This will be an intermediate node
+				node->status = IS_INTER;
+			}
+		} else if (IS_REG(node)) {
+			// This is a file, mark as leaf
+			node->status = IS_MODULE;
+		}
+		node = insert(node);
+		if (node->status & (IS_SKEL | IS_INTER)) {
+			// Intermediate folder, travel deeper
+			node->create_module_tree(module);
+		}
+	}
+	closedir(dir);
+
+cleanup:
+	free(full_path);
+}
+
+void node_entry::clone_skeleton() {
+	DIR *dir;
+	struct dirent *entry;
+	struct node_entry *dummy;
+
+	// Clone the structure
+	char *full_path = get_path();
+	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path);
+	if (!(dir = xopendir(buf)))
+		goto cleanup;
+	while ((entry = xreaddir(dir))) {
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+		// Create dummy node
+		dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
+		insert(dummy);
+	}
+	closedir(dir);
+
+	if (status & IS_SKEL) {
+		struct stat s;
+		char *con;
+		xstat(full_path, &s);
+		getfilecon(full_path, &con);
+		LOGI("mnt_tmpfs : %s\n", full_path);
+		xmount("tmpfs", full_path, "tmpfs", 0, nullptr);
+		chmod(full_path, s.st_mode & 0777);
+		chown(full_path, s.st_uid, s.st_gid);
+		setfilecon(full_path, con);
+		free(con);
+	}
+
+	for (auto &child : children) {
+		snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
+
+		// Create the dummy file/directory
+		if (IS_DIR(child))
+			xmkdir(buf, 0755);
+		else if (IS_REG(child))
+			close(creat(buf, 0644));
+		// Links will be handled later
+
+		if (child->parent->parent == nullptr && strcmp(child->name, "vendor") == 0) {
+			if (IS_LNK(child)) {
+				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
+				LOGI("creat_link: %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
+			}
+			// Skip
+			continue;
+		} else if (child->status & IS_MODULE) {
+			// Mount from module file to dummy file
+			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
+		} else if (child->status & (IS_SKEL | IS_INTER)) {
+			// It's an intermediate folder, recursive clone
+			child->clone_skeleton();
+			continue;
+		} else if (child->status & IS_DUMMY) {
+			// Mount from mirror to dummy file
+			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, full_path, child->name);
+		}
+
+		if (IS_LNK(child)) {
+			// Copy symlinks directly
+			cp_afc(buf2, buf);
+#ifdef MAGISK_DEBUG
+			LOGI("creat_link: %s <- %s\n",buf, buf2);
+#else
+			LOGI("creat_link: %s\n", buf);
+#endif
+		} else {
+			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
+			bind_mount(buf2, buf);
+		}
+	}
+
+cleanup:
+	free(full_path);
+}
+
+void node_entry::magic_mount() {
+	if (status & IS_MODULE) {
+		// Mount module item
+		char *real_path = get_path();
+		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, real_path);
+		bind_mount(buf, real_path);
+		free(real_path);
+	} else if (status & IS_SKEL) {
+		// The node is labeled to be cloned with skeleton, lets do it
+		clone_skeleton();
+	} else if (status & IS_INTER) {
+		// It's an intermediate node, travel deeper
+		for (auto &child : children)
+			child->magic_mount();
+	}
+	// The only thing goes here should be vendor placeholder
+	// There should be no dummies, so don't need to handle it here
 }
 
 /***********
@@ -144,11 +307,12 @@ static void exec_common_script(const char* stage) {
 			if (access(buf2, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(0, NULL,
-								   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-								   "sh", buf2, NULL);
+			int pid = exec_command(
+					0, nullptr,
+					strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+					"sh", buf2, nullptr);
 			if (pid != -1)
-				waitpid(pid, NULL, 0);
+				waitpid(pid, nullptr, 0);
 		}
 	}
 
@@ -156,206 +320,19 @@ static void exec_common_script(const char* stage) {
 }
 
 static void exec_module_script(const char* stage) {
-	char *module;
-	vec_for_each(&module_list, module) {
+	for (auto &module : module_list) {
 		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
 		snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(0, NULL,
-							   strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-							   "sh", buf2, NULL);
+		int pid = exec_command(
+				0, nullptr,
+				strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
+				"sh", buf2, nullptr);
 		if (pid != -1)
-			waitpid(pid, NULL, 0);
+			waitpid(pid, nullptr, 0);
 	}
-
-}
-
-/***************
- * Magic Mount *
- ***************/
-
-static int bind_mount(const char *from, const char *to) {
-	int ret = xmount(from, to, NULL, MS_BIND, NULL);
-#ifdef MAGISK_DEBUG
-	LOGI("bind_mount: %s <- %s\n", to, from);
-#else
-	LOGI("bind_mount: %s\n", to);
-#endif
-	return ret;
-}
-
-static void construct_tree(const char *module, struct node_entry *parent) {
-	DIR *dir;
-	struct dirent *entry;
-	struct node_entry *node;
-
-	char *parent_path = get_full_path(parent);
-	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, parent_path);
-
-	if (!(dir = xopendir(buf)))
-		goto cleanup;
-
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		// Create new node
-		node = xcalloc(sizeof(*node), 1);
-		node->module = module;
-		node->name = strdup(entry->d_name);
-		node->type = entry->d_type;
-		snprintf(buf, PATH_MAX, "%s/%s", parent_path, node->name);
-
-		/*
-		 * Clone the parent in the following condition:
-		 * 1. File in module is a symlink
-		 * 2. Target file do not exist
-		 * 3. Target file is a symlink, but not /system/vendor
-		 */
-		int clone = 0;
-		if (IS_LNK(node) || access(buf, F_OK) == -1) {
-			clone = 1;
-		} else if (parent->parent != NULL || strcmp(node->name, "vendor") != 0) {
-			struct stat s;
-			xstat(buf, &s);
-			if (S_ISLNK(s.st_mode))
-				clone = 1;
-		}
-
-		if (clone) {
-			// Mark the parent folder as a skeleton
-			parent->status |= IS_SKEL;  /* This will not overwrite if parent is module */
-			node->status = IS_MODULE;
-		} else if (IS_DIR(node)) {
-			// Check if marked as replace
-			snprintf(buf2, PATH_MAX, "%s/%s%s/.replace", MOUNTPOINT, module, buf);
-			if (access(buf2, F_OK) == 0) {
-				// Replace everything, mark as leaf
-				node->status = IS_MODULE;
-			} else {
-				// This will be an intermediate node
-				node->status = IS_INTER;
-			}
-		} else if (IS_REG(node)) {
-			// This is a leaf, mark as target
-			node->status = IS_MODULE;
-		}
-		node = insert_child(parent, node);
-		if (node->status & (IS_SKEL | IS_INTER)) {
-			// Intermediate folder, travel deeper
-			construct_tree(module, node);
-		}
-	}
-
-	closedir(dir);
-
-cleanup:
-	free(parent_path);
-}
-
-static void clone_skeleton(struct node_entry *node) {
-	DIR *dir;
-	struct dirent *entry;
-	struct node_entry *dummy, *child;
-
-	// Clone the structure
-	char *full_path = get_full_path(node);
-	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path);
-	if (!(dir = xopendir(buf)))
-		goto cleanup;
-	while ((entry = xreaddir(dir))) {
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-			continue;
-		// Create dummy node
-		dummy = xcalloc(sizeof(*dummy), 1);
-		dummy->name = strdup(entry->d_name);
-		dummy->type = entry->d_type;
-		dummy->status = IS_DUMMY;
-		insert_child(node, dummy);
-	}
-	closedir(dir);
-
-	if (node->status & IS_SKEL) {
-		struct stat s;
-		char *con;
-		xstat(full_path, &s);
-		getfilecon(full_path, &con);
-		LOGI("mnt_tmpfs : %s\n", full_path);
-		xmount("tmpfs", full_path, "tmpfs", 0, NULL);
-		chmod(full_path, s.st_mode & 0777);
-		chown(full_path, s.st_uid, s.st_gid);
-		setfilecon(full_path, con);
-		free(con);
-	}
-
-	vec_for_each(node->children, child) {
-		snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
-
-		// Create the dummy file/directory
-		if (IS_DIR(child))
-			xmkdir(buf, 0755);
-		else if (IS_REG(child))
-			close(creat(buf, 0644));
-		// Links will be handled later
-
-		if (child->parent->parent == NULL && strcmp(child->name, "vendor") == 0) {
-			if (IS_LNK(child)) {
-				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
-				LOGI("creat_link: %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
-			}
-			// Skip
-			continue;
-		} else if (child->status & IS_MODULE) {
-			// Mount from module file to dummy file
-			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
-		} else if (child->status & (IS_SKEL | IS_INTER)) {
-			// It's an intermediate folder, recursive clone
-			clone_skeleton(child);
-			continue;
-		} else if (child->status & IS_DUMMY) {
-			// Mount from mirror to dummy file
-			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, full_path, child->name);
-		}
-
-		if (IS_LNK(child)) {
-			// Copy symlinks directly
-			cp_afc(buf2, buf);
-#ifdef MAGISK_DEBUG
-			LOGI("creat_link: %s <- %s\n",buf, buf2);
-#else
-			LOGI("creat_link: %s\n", buf);
-#endif
-		} else {
-			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
-			bind_mount(buf2, buf);
-		}
-	}
-
-cleanup:
-	free(full_path);
-}
-
-static void magic_mount(struct node_entry *node) {
-	char *real_path;
-	struct node_entry *child;
-
-	if (node->status & IS_MODULE) {
-		// The real deal, mount module item
-		real_path = get_full_path(node);
-		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, node->module, real_path);
-		bind_mount(buf, real_path);
-		free(real_path);
-	} else if (node->status & IS_SKEL) {
-		// The node is labeled to be cloned with skeleton, lets do it
-		clone_skeleton(node);
-	} else if (node->status & IS_INTER) {
-		// It's an intermediate node, travel deeper
-		vec_for_each(node->children, child)
-			magic_mount(child);
-	}
-	// The only thing goes here should be vendor placeholder
-	// There should be no dummies, so don't need to handle it here
 }
 
 /****************
@@ -399,8 +376,18 @@ static void simple_mount(const char *path) {
  * Miscellaneous *
  *****************/
 
-#define alt_img ((char *[]) \
-{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img", NULL })
+static int bind_mount(const char *from, const char *to) {
+	int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
+#ifdef MAGISK_DEBUG
+	LOGI("bind_mount: %s <- %s\n", to, from);
+#else
+	LOGI("bind_mount: %s\n", to);
+#endif
+	return ret;
+}
+
+#define alt_img ((const char *[]) \
+{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img", nullptr })
 
 static int prepare_img() {
 	// Merge images
@@ -419,7 +406,7 @@ static int prepare_img() {
 	LOGI("* Mounting " MAINIMG "\n");
 	// Mounting magisk image
 	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
-	if (magiskloop == NULL)
+	if (magiskloop == nullptr)
 		return 1;
 
 	xmkdir(COREDIR, 0755);
@@ -447,7 +434,7 @@ static int prepare_img() {
 			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
 			if (access(buf, F_OK) == 0)
 				continue;
-			vec_push_back(&module_list, strdup(entry->d_name));
+			module_list.push_back(strdup(entry->d_name));
 		}
 	}
 	closedir(dir);
@@ -459,19 +446,19 @@ static int prepare_img() {
 }
 
 static void install_apk(const char *apk) {
-	setfilecon(apk, "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	setfilecon(apk, "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	while (1) {
 		sleep(5);
 		LOGD("apk_install: attempting to install APK");
 		int apk_res = -1, pid;
-		pid = exec_command(1, &apk_res, NULL, "/system/bin/pm", "install", "-r", apk, NULL);
+		pid = exec_command(1, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
 		if (pid != -1) {
 			int err = 0;
 			while (fdgets(buf, PATH_MAX, apk_res) > 0) {
 				LOGD("apk_install: %s", buf);
-				err |= strstr(buf, "Error:") != NULL;
+				err |= strstr(buf, "Error:") != nullptr;
 			}
-			waitpid(pid, NULL, 0);
+			waitpid(pid, nullptr, 0);
 			close(apk_res);
 			// Keep trying until pm is started
 			if (err)
@@ -482,38 +469,35 @@ static void install_apk(const char *apk) {
 	unlink(apk);
 }
 
-static int check_data() {
-	struct vector v;
-	vec_init(&v);
-	file_to_vector("/proc/mounts", &v);
-	char *line;
-	int mnt = 0;
-	vec_for_each(&v, line) {
-		if (strstr(line, " /data ") && strstr(line, "tmpfs") == NULL) {
-			mnt = 1;
-			break;
-		}
+static bool check_data() {
+	bool mnt = false;
+	bool data = false;
+	Array<char *> mounts;
+	file_to_array("/proc/mounts", mounts);
+	for (auto &line : mounts) {
+		if (strstr(line, " /data ") && strstr(line, "tmpfs") == nullptr)
+			mnt = true;
+		free(line);
 	}
-	vec_deep_destroy(&v);
-	int data = 0;
+	mounts.clear();
 	if (mnt) {
 		char *crypto = getprop("ro.crypto.state");
-		if (crypto != NULL) {
+		if (crypto != nullptr) {
 			if (strcmp(crypto, "unencrypted") == 0) {
 				// Unencrypted, we can directly access data
-				data = 1;
+				data = true;
 			} else {
 				// Encrypted, check whether vold is started
 				char *vold = getprop("init.svc.vold");
-				if (vold != NULL) {
+				if (vold != nullptr) {
 					free(vold);
-					data = 1;
+					data = true;
 				}
 			}
 			free(crypto);
 		} else {
 			// ro.crypto.state is not set, assume it's unencrypted
-			data = 1;
+			data = true;
 		}
 	}
 	return data;
@@ -521,18 +505,18 @@ static int check_data() {
 
 extern int launch_magiskhide();
 
-static void *start_magisk_hide(void *args) {
+static void *start_magisk_hide(void *) {
 	launch_magiskhide();
-	return NULL;
+	return nullptr;
 }
 
 static void auto_start_magiskhide() {
 	if (!start_log_daemon())
 		return;
-	char *hide_prop = getprop2(MAGISKHIDE_PROP, 1);
-	if (hide_prop == NULL || strcmp(hide_prop, "0") != 0) {
+	char *hide_prop = getprop(MAGISKHIDE_PROP, 1);
+	if (hide_prop == nullptr || strcmp(hide_prop, "0") != 0) {
 		pthread_t thread;
-		xpthread_create(&thread, NULL, start_magisk_hide, NULL);
+		xpthread_create(&thread, nullptr, start_magisk_hide, nullptr);
 		pthread_detach(thread);
 	}
 	free(hide_prop);
@@ -565,7 +549,7 @@ void unlock_blocks() {
 
 static void unblock_boot_process() {
 	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
-	pthread_exit(NULL);
+	pthread_exit(nullptr);
 }
 
 static const char wrapper[] =
@@ -621,7 +605,7 @@ void startup() {
 	void *magisk, *init;
 	size_t magisk_size, init_size;
 
-	xmount(NULL, "/", NULL, MS_REMOUNT, NULL);
+	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
 	// Remove some traits of Magisk
 	unlink(MAGISKRC);
@@ -645,7 +629,7 @@ void startup() {
 	close(sbin);
 
 	// Mount the /sbin tmpfs overlay
-	xmount("tmpfs", "/sbin", "tmpfs", 0, NULL);
+	xmount("tmpfs", "/sbin", "tmpfs", 0, nullptr);
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
@@ -665,15 +649,15 @@ void startup() {
 	fd = creat("/sbin/magisk", 0755);
 	xwrite(fd, wrapper, sizeof(wrapper) - 1);
 	close(fd);
-	setfilecon("/sbin/magisk.bin", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
-	setfilecon("/sbin/magisk", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	setfilecon("/sbin/magisk.bin", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/sbin/magisk", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 
 	// Setup magiskinit symlinks
 	fd = creat("/sbin/magiskinit", 0755);
 	xwrite(fd, init, init_size);
 	close(fd);
 	free(init);
-	setfilecon("/sbin/magiskinit", "u:object_r:"SEPOL_FILE_DOMAIN":s0");
+	setfilecon("/sbin/magiskinit", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
 	for (int i = 0; init_applet[i]; ++i) {
 		snprintf(buf, PATH_MAX, "/sbin/%s", init_applet[i]);
 		xsymlink("/sbin/magiskinit", buf);
@@ -691,10 +675,10 @@ void startup() {
 	close(root);
 
 	// Alternative binaries paths
-	char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
+	const char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
 						"/data/data/com.topjohnwu.magisk/install",
-						"/data/user_de/0/com.topjohnwu.magisk/install", NULL };
-	char *bin_path = NULL;
+						"/data/user_de/0/com.topjohnwu.magisk/install", nullptr };
+	const char *bin_path = nullptr;
 	for (int i = 0; alt_bin[i]; ++i) {
 		struct stat st;
 		if (lstat(alt_bin[i], &st) != -1 && !S_ISLNK(st.st_mode)) {
@@ -723,19 +707,17 @@ void startup() {
 	xmkdir(BLOCKDIR, 0755);
 
 	LOGI("* Mounting mirrors");
-	struct vector mounts;
-	vec_init(&mounts);
-	file_to_vector("/proc/mounts", &mounts);
-	char *line;
+	Array<char *> mounts;
+	file_to_array("/proc/mounts", mounts);
 	int skip_initramfs = 0;
 	// Check whether skip_initramfs device
-	vec_for_each(&mounts, line) {
+	for (auto &line : mounts) {
 		if (strstr(line, " /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
 			skip_initramfs = 1;
 		} else if (!skip_initramfs && strstr(line, " /system ")) {
 			sscanf(line, "%s %*s %s", buf, buf2);
-			xmount(buf, MIRRDIR "/system", buf2, MS_RDONLY, NULL);
+			xmount(buf, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
 #else
@@ -745,7 +727,7 @@ void startup() {
 			seperate_vendor = 1;
 			sscanf(line, "%s %*s %s", buf, buf2);
 			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, NULL);
+			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
 #ifdef MAGISK_DEBUG
 			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
 #else
@@ -754,7 +736,7 @@ void startup() {
 		}
 		free(line);
 	}
-	vec_destroy(&mounts);
+	mounts.clear();
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 #ifdef MAGISK_DEBUG
@@ -767,12 +749,23 @@ void startup() {
 	bind_mount(DATABIN, MIRRDIR "/bin");
 	if (access(MIRRDIR "/bin/busybox", X_OK) == 0) {
 		LOGI("* Setting up internal busybox");
-		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, NULL);
+		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
 		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
 	}
 
 	// Start post-fs-data mode
-	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", NULL);
+	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
+}
+
+static void core_only() {
+	// Systemless hosts
+	if (access(HOSTSFILE, F_OK) == 0) {
+		LOGI("* Enabling systemless hosts file support");
+		bind_mount(HOSTSFILE, "/system/etc/hosts");
+	}
+
+	auto_start_magiskhide();
+	unblock_boot_process();
 }
 
 void post_fs_data(int client) {
@@ -783,20 +776,20 @@ void post_fs_data(int client) {
 	// If post-fs-data mode is started, it means startup succeeded
 	setup_done = 1;
 
-	xmount(NULL, "/", NULL, MS_REMOUNT | MS_RDONLY, NULL);
+	xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
 	// Start log_daemon
 	start_log_daemon();
 
 	LOGI("** post-fs-data mode running\n");
 
-	// Allocate buffer
-	vec_init(&module_list);
-
 	// Merge, trim, mount magisk.img, which will also travel through the modules
 	// After this, it will create the module list
-	if (prepare_img())
-		goto core_only; // Mounting fails, we can only do core only stuffs
+	if (prepare_img()) {
+		// Mounting fails, we can only do core only stuffs
+		core_only();
+		return;
+	}
 
 	restorecon();
 	chmod(SECURE_DIR, 0700);
@@ -806,30 +799,31 @@ void post_fs_data(int client) {
 	exec_common_script("post-fs-data");
 
 	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		goto core_only;
+	if (access(DISABLEFILE, F_OK) == 0) {
+		core_only();
+		return;
+	}
 
 	// Execute module scripts
 	LOGI("* Running module post-fs-data scripts\n");
 	exec_module_script("post-fs-data");
 
-	char *module;
-	struct node_entry *sys_root, *ven_root = NULL, *child;
-
 	// Create the system root entry
-	sys_root = xcalloc(sizeof(*sys_root), 1);
-	sys_root->name = strdup("system");
+	node_entry *sys_root = new node_entry("system");
 	sys_root->status = IS_INTER;
 
-	int has_modules = 0;
+	// Vendor root entry
+	node_entry *ven_root = nullptr;
+
+	bool has_modules = false;
 
 	LOGI("* Loading modules\n");
-	vec_for_each(&module_list, module) {
+	for (auto &module : module_list) {
 		// Read props
 		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
 		if (access(buf, F_OK) == 0) {
 			LOGI("%s: loading [system.prop]\n", module);
-			read_prop_file(buf, 0);
+			load_prop_file(buf, 0);
 		}
 		// Check whether enable auto_mount
 		snprintf(buf, PATH_MAX, "%s/%s/auto_mount", MOUNTPOINT, module);
@@ -841,7 +835,7 @@ void post_fs_data(int client) {
 			continue;
 
 		// Construct structure
-		has_modules = 1;
+		has_modules = true;
 		LOGI("%s: constructing magic mount structure\n", module);
 		// If /system/vendor exists in module, create a link outside
 		snprintf(buf, PATH_MAX, "%s/%s/system/vendor", MOUNTPOINT, module);
@@ -850,44 +844,31 @@ void post_fs_data(int client) {
 			unlink(buf2);
 			xsymlink(buf, buf2);
 		}
-		construct_tree(module, sys_root);
+		sys_root->create_module_tree(module);
 	}
 
 	if (has_modules) {
 		// Extract the vendor node out of system tree and swap with placeholder
-		vec_for_each(sys_root->children, child) {
+		for (auto &child : sys_root->children) {
 			if (strcmp(child->name, "vendor") == 0) {
 				ven_root = child;
-				child = xcalloc(sizeof(*child), 1);
-				child->type = seperate_vendor ? DT_LNK : DT_DIR;
+				child = new node_entry("vendor", seperate_vendor ? DT_LNK : DT_DIR);
 				child->parent = ven_root->parent;
-				child->name = strdup("vendor");
-				child->status = 0;
-				// Swap!
-				vec_cur(sys_root->children) = child;
-				ven_root->parent = NULL;
+				ven_root->parent = nullptr;
 				break;
 			}
 		}
 
 		// Magic!!
-		magic_mount(sys_root);
-		if (ven_root) magic_mount(ven_root);
+		sys_root->magic_mount();
+		if (ven_root) ven_root->magic_mount();
 	}
 
 	// Cleanup memory
-	destroy_subtree(sys_root);
-	if (ven_root) destroy_subtree(ven_root);
+	delete sys_root;
+	if (ven_root) delete ven_root;
 
-core_only:
-	// Systemless hosts
-	if (access(HOSTSFILE, F_OK) == 0) {
-		LOGI("* Enabling systemless hosts file support");
-		bind_mount(HOSTSFILE, "/system/etc/hosts");
-	}
-
-	auto_start_magiskhide();
-	unblock_boot_process();
+	core_only();
 }
 
 void late_start(int client) {
@@ -903,7 +884,7 @@ void late_start(int client) {
 
 	if (!setup_done) {
 		// The setup failed for some reason, reboot and try again
-		exec_command_sync("/system/bin/reboot", NULL);
+		exec_command_sync("/system/bin/reboot", nullptr);
 		return;
 	}
 
@@ -932,9 +913,9 @@ core_only:
 			struct db_strings str;
 			memset(&str, 0, sizeof(str));
 			get_db_strings(db, SU_MANAGER, &str);
-			if (validate_manager(str.s[SU_MANAGER], 0, NULL)) {
+			if (validate_manager(str.s[SU_MANAGER], 0, nullptr)) {
 				// There is no manager installed, install the stub
-				exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", NULL);
+				exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk", nullptr);
 				install_apk("/data/magisk.apk");
 			}
 			sqlite3_close_v2(db);
@@ -942,7 +923,9 @@ core_only:
 	}
 
 	// All boot stage done, cleanup
-	vec_deep_destroy(&module_list);
+	for (auto &module : module_list)
+		free(module);
+	module_list.clear();
 }
 
 void boot_complete(int client) {

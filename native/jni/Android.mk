@@ -32,14 +32,14 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	misc/applets.c \
-	misc/img.c \
-	daemon/magisk.c \
-	daemon/daemon.c \
-	daemon/log_daemon.c \
-	daemon/bootstages.c \
-	daemon/socket.c \
-	daemon/db.c \
+	misc/applets.cpp \
+	misc/img.cpp \
+	daemon/magisk.cpp \
+	daemon/daemon.cpp \
+	daemon/log_daemon.cpp \
+	daemon/bootstages.cpp \
+	daemon/socket.cpp \
+	daemon/db.cpp \
 	magiskhide/magiskhide.cpp \
 	magiskhide/proc_monitor.cpp \
 	magiskhide/hide_utils.cpp \
@@ -47,10 +47,10 @@ LOCAL_SRC_FILES := \
 	resetprop/resetprop.cpp \
 	resetprop/system_property_api.cpp \
 	resetprop/system_property_set.cpp \
-	su/su.c \
-	su/connect.c \
-	su/pts.c \
-	su/su_daemon.c
+	su/su.cpp \
+	su/connect.cpp \
+	su/pts.cpp \
+	su/su_daemon.cpp
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)

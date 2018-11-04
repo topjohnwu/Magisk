@@ -112,9 +112,9 @@ static int init_resetprop() {
 	return 0;
 }
 
-static void print_props(int persist) {
+static void print_props(bool persist) {
 	auto prop_list = Array<prop_t>();
-	getprop_all(collect_props, &prop_list, persist);
+	getprop(collect_props, &prop_list, persist);
 	prop_list.sort();
 	for (auto &prop : prop_list)
 		printf("[%s]: [%s]\n", prop.name, prop.value);
@@ -129,12 +129,8 @@ int prop_exist(const char *name) {
 	return __system_property_find(name) != nullptr;
 }
 
-char *getprop(const char *name) {
-	return getprop2(name, 0);
-}
-
 // Get prop by name, return string (should free manually!)
-char *getprop2(const char *name, int persist) {
+char *getprop(const char *name, bool persist) {
 	if (!check_legal_property_name(name) || init_resetprop())
 		return nullptr;
 	const prop_info *pi = __system_property_find(name);
@@ -157,7 +153,7 @@ char *getprop2(const char *name, int persist) {
 	}
 }
 
-void getprop_all(void (*callback)(const char *, const char *, void *), void *cookie, int persist) {
+void getprop(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {
 	if (init_resetprop()) return;
 	read_cb_t read_cb(callback, cookie);
 	__system_property_foreach(read_props, &read_cb);
@@ -167,11 +163,7 @@ void getprop_all(void (*callback)(const char *, const char *, void *), void *coo
 	}
 }
 
-int setprop(const char *name, const char *value) {
-	return setprop2(name, value, 1);
-}
-
-int setprop2(const char *name, const char *value, const int trigger) {
+int setprop(const char *name, const char *value, const bool trigger) {
 	if (!check_legal_property_name(name))
 		return 1;
 	if (init_resetprop())
@@ -205,11 +197,7 @@ int setprop2(const char *name, const char *value, const int trigger) {
 	return ret;
 }
 
-int deleteprop(const char *name) {
-	return deleteprop2(name, 1);
-}
-
-int deleteprop2(const char *name, int persist) {
+int deleteprop(const char *name, bool persist) {
 	if (!check_legal_property_name(name))
 		return 1;
 	if (init_resetprop()) return -1;
@@ -221,7 +209,7 @@ int deleteprop2(const char *name, int persist) {
 	return __system_property_del(name) && !(persist && strncmp(name, "persist.", 8) == 0);
 }
 
-int read_prop_file(const char* filename, const int trigger) {
+int load_prop_file(const char *filename, const bool trigger) {
 	if (init_resetprop()) return -1;
 	LOGD("resetprop: Load prop file [%s]\n", filename);
 	FILE *fp = fopen(filename, "r");
@@ -255,7 +243,7 @@ int read_prop_file(const char* filename, const int trigger) {
 		if ( ((pch == nullptr) || (i >= (pch - line))) || (pch >= line + read - 1) ) continue;
 		// Separate the string
 		*pch = '\0';
-		setprop2(line + i, pch + 1, trigger);
+		setprop(line + i, pch + 1, trigger);
 	}
 	free(line);
 	fclose(fp);
@@ -264,8 +252,8 @@ int read_prop_file(const char* filename, const int trigger) {
 
 int resetprop_main(int argc, char *argv[]) {
 	log_cb.d = [](auto fmt, auto ap) -> int { return verbose ? vfprintf(stderr, fmt, ap) : 0; };
-	
-	int trigger = 1, persist = 0;
+
+	bool trigger = true, persist = false;
 	char *argv0 = argv[0], *prop;
 
 	--argc;
@@ -277,9 +265,9 @@ int resetprop_main(int argc, char *argv[]) {
 			switch (argv[0][idx]) {
 			case '-':
 				if (strcmp(argv[0], "--file") == 0 && argc == 2) {
-					return read_prop_file(argv[1], trigger);
+					return load_prop_file(argv[1], trigger);
 				} else if (strcmp(argv[0], "--delete") == 0 && argc == 2) {
-					return deleteprop2(argv[1], persist);
+					return deleteprop(argv[1], persist);
 				} else if (strcmp(argv[0], "--help") == 0) {
 					usage(argv0);
 				}
@@ -309,13 +297,13 @@ int resetprop_main(int argc, char *argv[]) {
 		print_props(persist);
 		return 0;
 	case 1:
-		prop = getprop2(argv[0], persist);
+		prop = getprop(argv[0], persist);
 		if (prop == nullptr) return 1;
 		printf("%s\n", prop);
 		free(prop);
 		return 0;
 	case 2:
-		return setprop2(argv[0], argv[1], trigger);
+		return setprop(argv[0], argv[1], trigger);
 	default:
 		usage(argv0);
 	}

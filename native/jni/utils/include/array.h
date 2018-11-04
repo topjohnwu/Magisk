@@ -66,6 +66,15 @@ public:
 		T*    _node;
 	};
 
+	T& operator = (const T& a) {
+		_size = a._size;
+		_capacity = a._capacity;
+		_data = new T[_capacity];
+		for(int i = 0; i < _size; ++i)
+			_data[i] = (T&&) a[i];
+		return *this;
+	}
+
 	iterator begin() const { return iterator(_data); }
 
 	iterator end() const { return iterator(_data + _size); }
@@ -149,7 +158,8 @@ private:
 			_capacity *= 2;
 		T* temp = _data;
 		_data = new T[_capacity];
-		for(int i = 0; i < _size; ++i) _data[i] = (T&&) temp[i];
+		for(int i = 0; i < _size; ++i)
+			_data[i] = (T&&) temp[i];
 		delete [] temp;
 	}
 };

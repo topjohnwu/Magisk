@@ -39,14 +39,14 @@ int launch_magiskhide() {
 	if (!log_daemon_started) {
 		setprop(MAGISKHIDE_PROP, "0");
 		// Remove without actually removing persist props
-		deleteprop2(MAGISKHIDE_PROP, 0);
+		deleteprop(MAGISKHIDE_PROP);
 		return LOGCAT_DISABLED;
 	}
 
 	hide_enabled = 1;
 	LOGI("* Starting MagiskHide\n");
 
-	deleteprop2(MAGISKHIDE_PROP, 1);
+	deleteprop(MAGISKHIDE_PROP, true);
 
 	hide_sensitive_props();
 
@@ -77,7 +77,7 @@ int stop_magiskhide() {
 	hide_enabled = 0;
 	setprop(MAGISKHIDE_PROP, "0");
 	// Remove without actually removing persist props
-	deleteprop2(MAGISKHIDE_PROP, 0);
+	deleteprop(MAGISKHIDE_PROP);
 	pthread_kill(proc_monitor_thread, TERM_THREAD);
 
 	return DAEMON_SUCCESS;

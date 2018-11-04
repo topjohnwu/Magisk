@@ -1,8 +1,3 @@
-/* su_daemon.c - The entrypoint for su, connect to daemon and send correct info
- */
-
-#define _GNU_SOURCE
-
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -25,32 +20,45 @@
 #define TIMEOUT     3
 
 #define LOCK_CACHE()   pthread_mutex_lock(&cache_lock)
-#define LOCK_INFO()    pthread_mutex_lock(&info->lock)
 #define UNLOCK_CACHE() pthread_mutex_unlock(&cache_lock)
-#define UNLOCK_INFO()  pthread_mutex_unlock(&info->lock)
 
 static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
-static struct su_info *cache;
+static su_info *cache;
+
+su_info::su_info(unsigned uid) :
+		uid(uid), access(DEFAULT_SU_ACCESS), _lock(PTHREAD_MUTEX_INITIALIZER),
+		count(0), ref(0), life(0), mgr_st({}) {}
+
+su_info::~su_info() {
+	pthread_mutex_destroy(&_lock);
+}
+
+void su_info::lock() {
+	pthread_mutex_lock(&_lock);
+}
+
+void su_info::unlock() {
+	pthread_mutex_unlock(&_lock);
+}
 
 static void *info_collector(void *node) {
-	struct su_info *info = node;
+	su_info *info = (su_info *) node;
 	while (1) {
 		sleep(1);
 		if (info->life) {
 			LOCK_CACHE();
 			if (--info->life == 0 && cache && info->uid == cache->uid)
-				cache = NULL;
+				cache = nullptr;
 			UNLOCK_CACHE();
 		}
 		if (!info->life && !info->ref) {
-			pthread_mutex_destroy(&info->lock);
-			free(info);
-			return NULL;
+			delete info;
+			return nullptr;
 		}
 	}
 }
 
-static void database_check(struct su_info *info) {
+static void database_check(su_info *info) {
 	int uid = info->uid;
 	sqlite3 *db = get_magiskdb();
 	if (db) {
@@ -84,20 +92,16 @@ static void database_check(struct su_info *info) {
 }
 
 static struct su_info *get_su_info(unsigned uid) {
-	struct su_info *info;
-	int cache_miss = 0;
+	su_info *info;
+	bool cache_miss = false;
 
 	LOCK_CACHE();
 
 	if (cache && cache->uid == uid) {
 		info = cache;
 	} else {
-		cache_miss = 1;
-		info = xcalloc(1, sizeof(*info));
-		info->uid = uid;
-		info->dbs = DEFAULT_DB_SETTINGS;
-		info->access = DEFAULT_SU_ACCESS;
-		pthread_mutex_init(&info->lock, NULL);
+		cache_miss = true;
+		info = new su_info(uid);
 		cache = info;
 	}
 
@@ -108,7 +112,7 @@ static struct su_info *get_su_info(unsigned uid) {
 	// Start a thread to maintain the cache
 	if (cache_miss) {
 		pthread_t thread;
-		xpthread_create(&thread, NULL, info_collector, info);
+		xpthread_create(&thread, nullptr, info_collector, info);
 		pthread_detach(thread);
 	}
 
@@ -117,7 +121,7 @@ static struct su_info *get_su_info(unsigned uid) {
 	LOGD("su: request from uid=[%d] (#%d)\n", info->uid, ++info->count);
 
 	// Lock before the policy is determined
-	LOCK_INFO();
+	info->lock();
 
 	if (info->access.policy == QUERY) {
 		//  Not cached, get data from database
@@ -173,14 +177,14 @@ static struct su_info *get_su_info(unsigned uid) {
 		} else {
 			socket_send_request(fd, info);
 			int ret = read_int_be(fd);
-			info->access.policy = ret < 0 ? DENY : ret;
+			info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
 			close(fd);
 		}
 		close(sockfd);
 	}
 
 	// Unlock
-	UNLOCK_INFO();
+	info->unlock();
 
 	return info;
 }
@@ -224,7 +228,7 @@ static void set_identity(unsigned uid) {
 void su_daemon_handler(int client, struct ucred *credential) {
 	LOGD("su: request from client: %d\n", client);
 	
-	struct su_info *info = get_su_info(credential->uid);
+	su_info *info = get_su_info(credential->uid);
 
 	// Fail fast
 	if (info->access.policy == DENY && DB_STR(info, SU_MANAGER)[0] == '\0') {
@@ -289,7 +293,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	}
 
 	// Read su_request
-	xxread(client, &ctx.req, 4 * sizeof(unsigned));
+	xxread(client, &ctx.req, sizeof(su_req_base));
 	ctx.req.shell = read_string(client);
 	ctx.req.command = read_string(client);
 
@@ -367,7 +371,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		app_notify(&ctx);
 
 	if (info->access.policy == ALLOW) {
-		char* argv[] = { NULL, NULL, NULL, NULL };
+		const char *argv[] = { nullptr, nullptr, nullptr, nullptr };
 
 		argv[0] = ctx.req.login ? "-" : ctx.req.shell;
 
@@ -381,7 +385,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		populate_environment(&ctx.req);
 		set_identity(ctx.req.uid);
 
-		execvp(ctx.req.shell, argv);
+		execvp(ctx.req.shell, (char **) argv);
 		fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
 		PLOGE("exec");
 		exit(EXIT_FAILURE);
@@ -391,4 +395,3 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		exit(EXIT_FAILURE);
 	}
 }
-

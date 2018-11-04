@@ -50,6 +50,7 @@ int socket_accept(int sockfd, int timeout) {
 int recv_fd(int sockfd) {
 	// Need to receive data from the message, otherwise don't care about it.
 	char iovbuf;
+	struct cmsghdr *cmsg;
 
 	struct iovec iov = {
 		.iov_base = &iovbuf,
@@ -79,7 +80,7 @@ int recv_fd(int sockfd) {
 		goto error;
 	}
 
-	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+	cmsg = CMSG_FIRSTHDR(&msg);
 
 	if (cmsg             == NULL                  ||
 		cmsg->cmsg_len   != CMSG_LEN(sizeof(int)) ||
@@ -104,8 +105,9 @@ error:
  */
 void send_fd(int sockfd, int fd) {
 	// Need to send some data in the message, this will do.
+	char junk[] = { '\0' };
 	struct iovec iov = {
-		.iov_base = "",
+		.iov_base = junk,
 		.iov_len  = 1,
 	};
 
@@ -166,7 +168,7 @@ void write_int_be(int fd, int val) {
 }
 
 static char *rd_str(int fd, int len) {
-	char* val = xmalloc(sizeof(char) * (len + 1));
+	char *val = (char *) xmalloc(sizeof(char) * (len + 1));
 	xxread(fd, val, len);
 	val[len] = '\0';
 	return val;

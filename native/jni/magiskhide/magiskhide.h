@@ -9,9 +9,7 @@
 #define TERM_THREAD SIGUSR1
 
 // Daemon entries
-extern "C" {
 int launch_magiskhide();
-}
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);

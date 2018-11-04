@@ -19,7 +19,7 @@
 
 #define AM_PATH "/system/bin/app_process", "/system/bin", "com.android.commands.am.Am"
 
-static char *get_command(const struct su_request *to) {
+static const char *get_command(const struct su_request *to) {
 	if (to->command[0])
 		return to->command;
 	if (to->shell[0])
@@ -27,7 +27,7 @@ static char *get_command(const struct su_request *to) {
 	return DEFAULT_SHELL;
 }
 
-static void silent_run(char * const args[]) {
+static void silent_run(const char *args[]) {
 	if (fork_dont_care())
 		return;
 	int zero = open("/dev/zero", O_RDONLY | O_CLOEXEC);
@@ -36,7 +36,7 @@ static void silent_run(char * const args[]) {
 	xdup2(null, 1);
 	xdup2(null, 2);
 	setenv("CLASSPATH", "/system/framework/am.jar", 1);
-	execv(args[0], args);
+	execv(args[0], (char **) args);
 	PLOGE("exec am");
 	_exit(EXIT_FAILURE);
 }
@@ -71,7 +71,7 @@ void app_log(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	char *cmd[] = {
+	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
 		"-p", DB_STR(ctx->info, SU_MANAGER),
@@ -84,7 +84,7 @@ void app_log(struct su_context *ctx) {
 		"--ei", "policy", policy,
 		"--es", "command", get_command(&ctx->req),
 		"--ez", "notify", ctx->info->access.notify ? "true" : "false",
-		NULL
+		nullptr
 	};
 	silent_run(cmd);
 }
@@ -101,7 +101,7 @@ void app_notify(struct su_context *ctx) {
 	char policy[2];
 	sprintf(policy, "%d", ctx->info->access.policy);
 
-	char *cmd[] = {
+	const char *cmd[] = {
 			AM_PATH, "broadcast",
 			"-a", "android.intent.action.BOOT_COMPLETED",
 			"-p", DB_STR(ctx->info, SU_MANAGER),
@@ -110,7 +110,7 @@ void app_notify(struct su_context *ctx) {
 			"--es", "action", "notify",
 			"--ei", "from.uid", fromUid,
 			"--ei", "policy", policy,
-			NULL
+			nullptr
 	};
 	silent_run(cmd);
 }
@@ -118,15 +118,15 @@ void app_notify(struct su_context *ctx) {
 void app_connect(const char *socket, struct su_info *info) {
 	char user[8];
 	setup_user(user, info);
-	char *cmd[] = {
+	const char *cmd[] = {
 		AM_PATH, "broadcast",
 		"-a", "android.intent.action.BOOT_COMPLETED",
 		"-p", DB_STR(info, SU_MANAGER),
 		"-f", "0x00000020",
 		"--user", user,
 		"--es", "action", "request",
-		"--es", "socket", (char *) socket,
-		NULL
+		"--es", "socket", socket,
+		nullptr
 	};
 	silent_run(cmd);
 }
@@ -135,4 +135,3 @@ void socket_send_request(int fd, struct su_info *info) {
 	write_key_token(fd, "uid", info->uid);
 	write_string_be(fd, "eof");
 }
-

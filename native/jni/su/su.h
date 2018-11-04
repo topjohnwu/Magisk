@@ -17,9 +17,9 @@
 #define ATTY_OUT    2
 #define ATTY_ERR    4
 
-struct su_info {
+class su_info {
+public:
 	unsigned uid;          /* Unique key to find su_info */
-	pthread_mutex_t lock;  /* Internal lock */
 	int count;             /* Just a count for debugging purpose */
 
 	/* These values should be guarded with internal lock */
@@ -31,19 +31,33 @@ struct su_info {
 	/* These should be guarded with global cache lock */
 	int ref;
 	int life;
+
+	su_info(unsigned uid);
+	~su_info();
+	void lock();
+	void unlock();
+
+private:
+	pthread_mutex_t _lock;  /* Internal lock */
 };
 
 #define DB_SET(i, e) (i)->dbs.v[e]
 #define DB_STR(i, e) (i)->str.s[e]
 
-struct su_request {
+struct su_req_base {
 	unsigned uid;
-	unsigned login;
-	unsigned keepenv;
-	unsigned mount_master;
-	char *shell;
-	char *command;
-};
+	bool login;
+	bool keepenv;
+	bool mount_master;
+protected:
+	su_req_base();
+} __attribute__((packed));
+
+struct su_request : public su_req_base {
+	const char *shell;
+	const char *command;
+	su_request();
+} __attribute__((packed));
 
 struct su_context {
 	struct su_info *info;

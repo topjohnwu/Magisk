@@ -8,7 +8,6 @@
 /* su.c - The main function running in the daemon
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,6 +94,12 @@ static void setup_sighandlers(void (*handler)(int)) {
 	}
 }
 
+// Default values
+su_req_base::su_req_base()
+		: uid(UID_ROOT), login(false), keepenv(false), mount_master(false) {}
+su_request::su_request()
+		: shell(DEFAULT_SHELL), command("") {}
+
 /*
  * Connect daemon, send argc, argv, cwd, pts slave
  */
@@ -112,15 +117,7 @@ int su_client_main(int argc, char *argv[]) {
 			{ NULL, 0, NULL, 0 },
 	};
 
-	struct su_request su_req = {
-		.uid = UID_ROOT,
-		.login = 0,
-		.keepenv = 0,
-		.mount_master = 0,
-		.shell = DEFAULT_SHELL,
-		.command = "",
-	};
-
+	su_request su_req;
 
 	for (int i = 0; i < argc; i++) {
 		// Replace -cn with -z, -mm with -M for supporting getopt_long
@@ -140,11 +137,11 @@ int su_client_main(int argc, char *argv[]) {
 				usage(EXIT_SUCCESS);
 				break;
 			case 'l':
-				su_req.login = 1;
+				su_req.login = true;
 				break;
 			case 'm':
 			case 'p':
-				su_req.keepenv = 1;
+				su_req.keepenv = true;
 				break;
 			case 's':
 				su_req.shell = optarg;
@@ -159,7 +156,7 @@ int su_client_main(int argc, char *argv[]) {
 				// Do nothing, placed here for legacy support :)
 				break;
 			case 'M':
-				su_req.mount_master = 1;
+				su_req.mount_master = true;
 				break;
 			default:
 				/* Bionic getopt_long doesn't terminate its error output by newline */
@@ -169,7 +166,7 @@ int su_client_main(int argc, char *argv[]) {
 	}
 
 	if (optind < argc && strcmp(argv[optind], "-") == 0) {
-		su_req.login = 1;
+		su_req.login = true;
 		optind++;
 	}
 	/* username or uid */
@@ -200,7 +197,7 @@ int su_client_main(int argc, char *argv[]) {
 	}
 
 	// Send su_request
-	xwrite(fd, &su_req, 4 * sizeof(unsigned));
+	xwrite(fd, &su_req, sizeof(su_req_base));
 	write_string(fd, su_req.shell);
 	write_string(fd, su_req.command);
 

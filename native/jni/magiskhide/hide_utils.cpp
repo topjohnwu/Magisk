@@ -51,7 +51,7 @@ void hide_sensitive_props() {
 		value = getprop(prop_key[i]);
 		if (value) {
 			if (strcmp(value, prop_value[i]) != 0)
-				setprop2(prop_key[i], prop_value[i], 0);
+				setprop(prop_key[i], prop_value[i], false);
 			free(value);
 		}
 	}
@@ -133,10 +133,10 @@ static void kill_process(const char *name) {
 
 void clean_magisk_props() {
 	LOGD("hide_utils: Cleaning magisk props\n");
-	getprop_all([](const char *name, auto, auto) -> void {
+	getprop([](const char *name, auto, auto) -> void {
 		if (strstr(name, "magisk"))
-			deleteprop2(name, 0);
-	}, nullptr, 0);
+			deleteprop(name);
+	}, nullptr, false);
 }
 
 static int add_list(sqlite3 *db, char *proc) {

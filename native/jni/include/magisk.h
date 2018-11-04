@@ -45,8 +45,8 @@ extern "C" {
 
 extern char *argv0;     /* For changing process name */
 
-#define applet_names    ((char *[]) { "magisk", "su", "resetprop", "magiskhide", "imgtool", NULL })
-#define init_applet     ((char *[]) { "magiskpolicy", "supolicy", NULL })
+#define applet_names  ((const char *[]) { "magisk", "su", "resetprop", "magiskhide", "imgtool", NULL })
+#define init_applet   ((const char *[]) { "magiskpolicy", "supolicy", NULL })
 
 extern int (*applet_main[]) (int, char *[]), (*init_applet_main[]) (int, char *[]);
 

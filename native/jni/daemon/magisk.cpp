@@ -26,7 +26,7 @@ static int create_links(const char *bin, const char *path) {
 	return ret;
 }
 
-static void usage() {
+[[noreturn]] static void usage() {
 	fprintf(stderr,
 		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
 		"\n"
@@ -117,5 +117,4 @@ int magisk_main(int argc, char *argv[]) {
 	}
 
 	usage();
-	return 1;
 }

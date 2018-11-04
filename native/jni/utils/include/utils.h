@@ -18,8 +18,6 @@ int file_to_array(const char* filename, Array<char *> &arr);
 extern "C" {
 #endif
 
-#include "vector.h"
-
 #define UID_SHELL  (get_shell_uid())
 #define UID_ROOT   0
 #define UID_SYSTEM (get_system_uid())
@@ -86,8 +84,6 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 unsigned get_shell_uid();
 unsigned get_system_uid();
 unsigned get_radio_uid();
-int file_to_vector(const char* filename, struct vector *v);
-int vector_to_file(const char* filename, struct vector *v);
 ssize_t fdgets(char *buf, size_t size, int fd);
 int is_num(const char *s);
 int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]);

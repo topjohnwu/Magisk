@@ -10,8 +10,8 @@
 
 #define DB_VERSION 7
 
-static int ver_cb(void *v, int col_num, char **data, char **col_name) {
-	*((int *) v) = atoi(data[0]);
+static int ver_cb(void *ver, int, char **data, char **) {
+	*((int *) ver) = atoi(data[0]);
 	return 0;
 }
 
@@ -19,7 +19,7 @@ static int ver_cb(void *v, int col_num, char **data, char **col_name) {
 if (err) { \
 	LOGE("sqlite3_exec: %s\n", err); \
 	sqlite3_free(err); \
-	return NULL; \
+	return nullptr; \
 }
 
 static sqlite3 *open_and_init_db() {
@@ -27,7 +27,7 @@ static sqlite3 *open_and_init_db() {
 	int ret = sqlite3_open(MAGISKDB, &db);
 	if (ret) {
 		LOGE("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
-		return NULL;
+		return nullptr;
 	}
 	int ver, upgrade = 0;
 	char *err;
@@ -36,7 +36,7 @@ static sqlite3 *open_and_init_db() {
 	if (ver > DB_VERSION) {
 		// Don't support downgrading database
 		sqlite3_close_v2(db);
-		return NULL;
+		return nullptr;
 	}
 	if (ver < 3) {
 		// Policies
@@ -44,20 +44,20 @@ static sqlite3 *open_and_init_db() {
 					 "CREATE TABLE IF NOT EXISTS policies "
 					 "(uid INT, package_name TEXT, policy INT, until INT, "
 					 "logging INT, notification INT, PRIMARY KEY(uid))",
-					 NULL, NULL, &err);
+					 nullptr, nullptr, &err);
 		err_abort(err);
 		// Logs
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS logs "
 					 "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
 					 "to_uid INT, action INT, time INT, command TEXT)",
-					 NULL, NULL, &err);
+					 nullptr, nullptr, &err);
 		err_abort(err);
 		// Settings
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS settings "
 					 "(key TEXT, value INT, PRIMARY KEY(key))",
-					 NULL, NULL, &err);
+					 nullptr, nullptr, &err);
 		err_abort(err);
 		ver = 3;
 		upgrade = 1;
@@ -67,13 +67,13 @@ static sqlite3 *open_and_init_db() {
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS strings "
 					 "(key TEXT, value TEXT, PRIMARY KEY(key))",
-					 NULL, NULL, &err);
+					 nullptr, nullptr, &err);
 		err_abort(err);
 		ver = 4;
 		upgrade = 1;
 	}
 	if (ver == 4) {
-		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", NULL, NULL, &err);
+		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
 		err_abort(err);
 		/* Skip version 5 */
 		ver = 6;
@@ -84,7 +84,7 @@ static sqlite3 *open_and_init_db() {
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS hidelist "
 					 "(process TEXT, PRIMARY KEY(process))",
-					 NULL, NULL, &err);
+					 nullptr, nullptr, &err);
 		err_abort(err);
 		ver = 7;
 		upgrade =1 ;
@@ -94,7 +94,7 @@ static sqlite3 *open_and_init_db() {
 		// Set version
 		char query[32];
 		sprintf(query, "PRAGMA user_version=%d", ver);
-		sqlite3_exec(db, query, NULL, NULL, &err);
+		sqlite3_exec(db, query, nullptr, nullptr, &err);
 		err_abort(err);
 	}
 	return db;
@@ -102,7 +102,7 @@ static sqlite3 *open_and_init_db() {
 
 sqlite3 *get_magiskdb() {
 	sqlite3 *db = open_and_init_db();
-	if (db == NULL) {
+	if (db == nullptr) {
 		// Open fails, remove and reconstruct
 		unlink(MAGISKDB);
 		db = open_and_init_db();
@@ -111,7 +111,7 @@ sqlite3 *get_magiskdb() {
 }
 
 static int settings_cb(void *v, int col_num, char **data, char **col_name) {
-	struct db_settings *dbs = v;
+	auto dbs = (db_settings *) v;
 	int key = -1, value;
 	for (int i = 0; i < col_num; ++i) {
 		if (strcmp(col_name[i], "key") == 0) {
@@ -131,7 +131,7 @@ static int settings_cb(void *v, int col_num, char **data, char **col_name) {
 }
 
 int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
-	if (db == NULL)
+	if (db == nullptr)
 		return 1;
 	char *err;
 	if (key > 0) {
@@ -150,7 +150,7 @@ int get_db_settings(sqlite3 *db, int key, struct db_settings *dbs) {
 }
 
 static int strings_cb(void *v, int col_num, char **data, char **col_name) {
-	struct db_strings *dbs = v;
+	auto dbs = (db_strings *) v;
 	int key = -1;
 	char *value;
 	for (int i = 0; i < col_num; ++i) {
@@ -171,7 +171,7 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 }
 
 int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
-	if (db == NULL)
+	if (db == nullptr)
 		return 1;
 	char *err;
 	if (key > 0) {
@@ -190,7 +190,7 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str) {
 }
 
 static int policy_cb(void *v, int col_num, char **data, char **col_name) {
-	struct su_access *su = v;
+	auto su = (su_access *) v;
 	for (int i = 0; i < col_num; i++) {
 		if (strcmp(col_name[i], "policy") == 0)
 			su->policy = (policy_t) atoi(data[i]);
@@ -204,11 +204,11 @@ static int policy_cb(void *v, int col_num, char **data, char **col_name) {
 }
 
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su) {
-	if (db == NULL)
+	if (db == nullptr)
 		return 1;
 	char query[256], *err;
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
-			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(NULL));
+			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
 	sqlite3_exec(db, query, policy_cb, su, &err);
 	if (err) {
 		LOGE("sqlite3_exec: %s\n", err);
@@ -219,7 +219,7 @@ int get_uid_policy(sqlite3 *db, int uid, struct su_access *su) {
 }
 
 int validate_manager(char *alt_pkg, int userid, struct stat *st) {
-	if (st == NULL) {
+	if (st == nullptr) {
 		struct stat stat;
 		st = &stat;
 	}
@@ -229,7 +229,7 @@ int validate_manager(char *alt_pkg, int userid, struct stat *st) {
 	sprintf(app_path, "%s/%d/%s", base, userid, alt_pkg[0] ? alt_pkg : "xxx");
 	if (stat(app_path, st)) {
 		// Check the official package name
-		sprintf(app_path, "%s/%d/"JAVA_PACKAGE_NAME, base, userid);
+		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, base, userid);
 		if (stat(app_path, st)) {
 			LOGE("su: cannot find manager");
 			memset(st, 0, sizeof(*st));
@@ -256,7 +256,7 @@ int exec_sql(const char *sql) {
 	sqlite3 *db = get_magiskdb();
 	if (db) {
 		char *err;
-		sqlite3_exec(db, sql, print_cb, NULL, &err);
+		sqlite3_exec(db, sql, print_cb, nullptr, &err);
 		sqlite3_close_v2(db);
 		if (err) {
 			fprintf(stderr, "sql_err: %s\n", err);

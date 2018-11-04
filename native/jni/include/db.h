@@ -4,10 +4,6 @@
 #include <sqlite3.h>
 #include <sys/stat.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /***************
  * DB Settings *
  ***************/
@@ -19,7 +15,7 @@ extern "C" {
 "mnt_ns" \
 })
 
-#define DB_SETTINGS_NUM (sizeof(DB_SETTING_KEYS) / sizeof(char*))
+#define DB_SETTINGS_NUM 3
 
 // Settings indices
 enum {
@@ -52,14 +48,13 @@ enum {
 
 struct db_settings {
 	int v[DB_SETTINGS_NUM];
+	db_settings()
+			: v {
+		ROOT_ACCESS_APPS_AND_ADB,
+		MULTIUSER_MODE_OWNER_ONLY,
+		NAMESPACE_MODE_REQUESTER
+	} {}
 };
-
-#define DEFAULT_DB_SETTINGS \
-(struct db_settings) { .v = { \
-ROOT_ACCESS_APPS_AND_ADB, \
-MULTIUSER_MODE_OWNER_ONLY, \
-NAMESPACE_MODE_REQUESTER, \
-}}
 
 /**************
  * DB Strings *
@@ -70,7 +65,7 @@ NAMESPACE_MODE_REQUESTER, \
 "requester", \
 })
 
-#define DB_STRING_NUM (sizeof(DB_STRING_KEYS) / sizeof(char*))
+#define DB_STRING_NUM 1
 
 // Strings indices
 enum {
@@ -79,6 +74,10 @@ enum {
 
 struct db_strings {
 	char s[DB_STRING_NUM][128];
+	db_strings() {
+		for (int i = 0; i < DB_STRING_NUM; ++i)
+			s[i][0] = '\0';
+	}
 };
 
 /*************
@@ -97,19 +96,19 @@ struct su_access {
 	int notify;
 };
 
-#define DEFAULT_SU_ACCESS (struct su_access) { \
+#define DEFAULT_SU_ACCESS (su_access) { \
 .policy = QUERY, \
 .log = 1, \
 .notify = 1 \
 }
 
-#define SILENT_SU_ACCESS (struct su_access) { \
+#define SILENT_SU_ACCESS (su_access) { \
 .policy = ALLOW, \
 .log = 0, \
 .notify = 0 \
 }
 
-#define NO_SU_ACCESS (struct su_access) { \
+#define NO_SU_ACCESS (su_access) { \
 .policy = DENY, \
 .log = 0, \
 .notify = 0 \
@@ -125,9 +124,5 @@ int get_db_strings(sqlite3 *db, int key, struct db_strings *str);
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
 int exec_sql(const char *sql);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //DB_H

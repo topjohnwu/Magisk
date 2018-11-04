@@ -31,7 +31,7 @@ static void get_client_cred(int fd, struct ucred *cred) {
 
 static void *request_handler(void *args) {
 	int client = *((int *) args);
-	free(args);
+	delete (int *) args;
 	int req = read_int(client);
 
 	struct ucred credential;
@@ -88,7 +88,7 @@ static void *request_handler(void *args) {
 static void main_daemon() {
 	android_logging();
 	setsid();
-	setcon("u:r:"SEPOL_PROC_DOMAIN":s0");
+	setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
 	int fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
 	xdup2(fd, STDOUT_FILENO);
 	xdup2(fd, STDERR_FILENO);
@@ -123,7 +123,7 @@ static void main_daemon() {
 
 	// Loop forever to listen for requests
 	while(1) {
-		int *client = xmalloc(sizeof(int));
+		int *client = new int;
 		*client = xaccept4(fd, NULL, NULL, SOCK_CLOEXEC);
 		pthread_t thread;
 		xpthread_create(&thread, NULL, request_handler, client);
