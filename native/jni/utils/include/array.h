@@ -69,9 +69,11 @@ public:
 	T& operator = (const T& a) {
 		_size = a._size;
 		_capacity = a._capacity;
-		_data = new T[_capacity];
-		for(int i = 0; i < _size; ++i)
-			_data[i] = (T&&) a[i];
+		if (_capacity) {
+			_data = new T[_capacity];
+			for(int i = 0; i < _size; ++i)
+				_data[i] = (T&&) a[i];
+		}
 		return *this;
 	}
 

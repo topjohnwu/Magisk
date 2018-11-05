@@ -87,7 +87,7 @@ const pb_field_t PersistentProperties_fields[2] = {
  * ***************************/
 
 static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
-	uint8_t *name = (uint8_t *) xmalloc(stream->bytes_left + 1);
+	auto name = new pb_byte_t[stream->bytes_left + 1];
 	name[stream->bytes_left] = '\0';
 	if (!pb_read(stream, name, stream->bytes_left))
 		return false;
@@ -106,6 +106,7 @@ static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
 	if (!pb_decode(stream, PersistentProperties_PersistentPropertyRecord_fields, &prop))
 		return false;
 	((read_cb_t *) *arg)->exec((const char *) prop.name.arg, prop.value);
+	delete[] (pb_byte_t *) prop.name.arg;
 	return true;
 }
 
@@ -143,19 +144,16 @@ static pb_ostream_t create_ostream(const char *filename) {
 
 static void pb_getprop_cb(const char *name, const char *value, void *v) {
 	struct prop_t *prop = static_cast<prop_t *>(v);
-	if (prop->name && strcmp(name, prop->name) == 0) {
+	if (prop->name && strcmp(name, prop->name) == 0)
 		strcpy(prop->value, value);
-		free(prop->name);
-		prop->name = nullptr;
-	}
 }
 
-static void pb_getprop_all(read_cb_t *read_cb) {
+static void pb_getprop(read_cb_t *read_cb) {
 	LOGD("resetprop: decode with protobuf [" PERSISTENT_PROPERTY_DIR "/persistent_properties]\n");
 	PersistentProperties props = {};
 	props.properties.funcs.decode = prop_decode;
 	props.properties.arg = read_cb;
-	uint8_t *buf;
+	pb_byte_t *buf;
 	size_t size;
 	mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", (void **) &buf, &size);
 	pb_istream_t stream = pb_istream_from_buffer(buf, size);
@@ -175,9 +173,9 @@ static void file_getprop(const char *name, char *value) {
 	close(fd);
 }
 
-void persist_getprop_all(read_cb_t *read_cb) {
+void persist_getprop(read_cb_t *read_cb) {
 	if (use_pb) {
-		pb_getprop_all(read_cb);
+		pb_getprop(read_cb);
 	} else {
 		DIR *dir = opendir(PERSISTENT_PROPERTY_DIR);
 		struct dirent *entry;
@@ -195,9 +193,9 @@ void persist_getprop_all(read_cb_t *read_cb) {
 char *persist_getprop(const char *name) {
 	prop_t prop(name);
 	if (use_pb) {
-		struct read_cb_t read_cb(pb_getprop_cb, &prop);
-		pb_getprop_all(&read_cb);
-		if (prop.name == nullptr)
+		read_cb_t read_cb(pb_getprop_cb, &prop);
+		pb_getprop(&read_cb);
+		if (prop.value[0])
 			return strdup(prop.value);
 	} else {
 		// Try to read from file
@@ -211,9 +209,9 @@ char *persist_getprop(const char *name) {
 
 bool persist_deleteprop(const char *name) {
 	if (use_pb) {
-		auto prop_list = Array<prop_t>();
-		struct read_cb_t read_cb(collect_props, &prop_list);
-		persist_getprop_all(&read_cb);
+		Array<prop_t> prop_list;
+		read_cb_t read_cb(collect_props, &prop_list);
+		persist_getprop(&read_cb);
 
 		for (auto it = prop_list.begin(); it != prop_list.end(); ++it) {
 			if (strcmp((*it).name, name) == 0) {

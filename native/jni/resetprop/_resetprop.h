@@ -14,6 +14,7 @@ struct prop_t {
 	prop_t() = default;
 	prop_t(const char *name) {
 		this->name = strdup(name);
+		value[0] = '\0';
 	}
 	prop_t(const char *name, const char *value) {
 		this->name = strdup(name);
@@ -36,8 +37,7 @@ struct prop_t {
 struct read_cb_t {
 	void (*cb)(const char *, const char *, void *);
 	void *arg;
-	read_cb_t() = default;
-	read_cb_t(void (*cb)(const char *, const char *, void *), void *arg)
+	read_cb_t(void (*cb)(const char *, const char *, void *) = nullptr, void *arg = nullptr)
 			: cb(cb), arg(arg) {}
 	void exec(const char *name, const char *value) {
 		cb(name, value, arg);
@@ -49,7 +49,7 @@ struct read_cb_t {
 extern bool use_pb;
 
 char *persist_getprop(const char *name);
-void persist_getprop_all(read_cb_t *read_cb);
+void persist_getprop(read_cb_t *read_cb);
 bool persist_deleteprop(const char *name);
 void collect_props(const char *name, const char *value, void *v_plist);
 
