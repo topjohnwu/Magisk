@@ -152,8 +152,10 @@
     <string name="settings_su_adb">Sólo ADB</string>
     <string name="settings_su_disable">Deshabilitado</string>
     <string name="settings_su_request_10">10 segundos</string>
+    <string name="settings_su_request_15">15 segundos</string>
     <string name="settings_su_request_20">20 segundos</string>
     <string name="settings_su_request_30">30 segundos</string>
+    <string name="settings_su_request_45">45 segundos</string>
     <string name="settings_su_request_60">60 segundos</string>
     <string name="superuser_access">Acceso de superusuario</string>
     <string name="auto_response">Respuesta automática</string>

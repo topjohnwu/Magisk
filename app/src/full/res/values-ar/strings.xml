@@ -92,8 +92,10 @@
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">معطل</string>
     <string name="settings_su_request_10">10 ثواني</string>
+    <string name="settings_su_request_15">15 ثانية</string>
     <string name="settings_su_request_20">20 ثانية</string>
     <string name="settings_su_request_30">30 ثانية</string>
+    <string name="settings_su_request_45">45 ثانية</string>
     <string name="settings_su_request_60">60 ثانية</string>
     <string name="superuser_access">Superuser صلاحيات</string>
     <string name="auto_response">استجابة تلقائية</string>

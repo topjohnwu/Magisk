@@ -153,8 +153,10 @@
     <string name="settings_su_adb">ADB</string>
     <string name="settings_su_disable">Вимкнено</string>
     <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
     <string name="settings_su_request_20">20 секунд</string>
     <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
     <string name="superuser_access">Доступ суперкористувача</string>
     <string name="auto_response">Автоматична відповідь</string>

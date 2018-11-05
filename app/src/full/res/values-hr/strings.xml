@@ -125,8 +125,10 @@
     <string name="settings_su_adb">Samo ADB</string>
     <string name="settings_su_disable">Onemogućeno</string>
     <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
     <string name="settings_su_request_20">20 sekundi</string>
     <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
     <string name="settings_su_request_60">60 sekundi</string>
     <string name="superuser_access">Superuser pristup</string>
     <string name="auto_response">Automatski odgovor</string>

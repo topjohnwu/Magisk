@@ -137,8 +137,10 @@
     <string name="settings_su_adb">ADB μόνο</string>
     <string name="settings_su_disable">Απενεργοποιημένο</string>
     <string name="settings_su_request_10">10 δευτερόλεπτα</string>
+    <string name="settings_su_request_15">15 δευτερόλεπτα</string>
     <string name="settings_su_request_20">20 δευτερόλεπτα</string>
     <string name="settings_su_request_30">30 δευτερόλεπτα</string>
+    <string name="settings_su_request_45">45 δευτερόλεπτα</string>
     <string name="settings_su_request_60">60 δευτερόλεπτα</string>
     <string name="superuser_access">Πρόσβαση Υπερχρήστη</string>
     <string name="auto_response">Αυτόματη Απόκριση</string>

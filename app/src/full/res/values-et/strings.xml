@@ -149,8 +149,10 @@
     <string name="settings_su_adb">Ainult ADB</string>
     <string name="settings_su_disable">Keelatud</string>
     <string name="settings_su_request_10">10 sekundit</string>
+    <string name="settings_su_request_15">15 sekundit</string>
     <string name="settings_su_request_20">20 sekundit</string>
     <string name="settings_su_request_30">30 sekundit</string>
+    <string name="settings_su_request_45">45 sekundit</string>
     <string name="settings_su_request_60">60 sekundit</string>
     <string name="superuser_access">Superkasutaja ligipääs</string>
     <string name="auto_response">Automaatne vastus</string>
