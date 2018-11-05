@@ -148,8 +148,10 @@
     <string name="settings_su_adb">Tik ADB</string>
     <string name="settings_su_disable">Išjungta</string>
     <string name="settings_su_request_10">10 sekundžių</string>
+    <string name="settings_su_request_15">15 sekundžių</string>
     <string name="settings_su_request_20">20 sekundžių</string>
     <string name="settings_su_request_30">30 sekundžių</string>
+    <string name="settings_su_request_45">45 sekundžių</string>
     <string name="settings_su_request_60">60 sekundžių</string>
     <string name="superuser_access">Supervartotojo prieiga</string>
     <string name="auto_response">Automatinis atsakymas</string>

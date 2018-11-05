@@ -135,8 +135,10 @@
     <string name="settings_su_adb">Doar ADB</string>
     <string name="settings_su_disable">Dezactivat</string>
     <string name="settings_su_request_10">10 secunde</string>
+    <string name="settings_su_request_15">15 de secunde</string>
     <string name="settings_su_request_20">20 de secunde</string>
     <string name="settings_su_request_30">30 de secunde</string>
+    <string name="settings_su_request_45">45 de secunde</string>
     <string name="settings_su_request_60">60 de secunde</string>
     <string name="superuser_access">Acces Superuser</string>
     <string name="auto_response">Răspuns automat</string>

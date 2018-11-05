@@ -152,8 +152,10 @@
     <string name="settings_su_adb">Iba ADB</string>
     <string name="settings_su_disable">Zakázané</string>
     <string name="settings_su_request_10">10 sekúnd</string>
+    <string name="settings_su_request_15">15 sekúnd</string>
     <string name="settings_su_request_20">20 sekúnd</string>
     <string name="settings_su_request_30">30 sekúnd</string>
+    <string name="settings_su_request_45">45 sekúnd</string>
     <string name="settings_su_request_60">60 sekúnd</string>
     <string name="superuser_access">Prístup Superuser</string>
     <string name="auto_response">Automatická odpoveď</string>

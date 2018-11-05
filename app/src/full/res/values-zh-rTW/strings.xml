@@ -83,8 +83,10 @@
     <string name="settings_su_adb">僅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
     <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
     <string name="settings_su_request_20">20 秒</string>
     <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
     <string name="superuser_access">超級用戶訪問權限</string>
     <string name="auto_response">自動回應</string>

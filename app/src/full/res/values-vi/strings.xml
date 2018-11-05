@@ -89,8 +89,10 @@
     <string name="settings_su_adb">Chỉ ADB</string>
     <string name="settings_su_disable">Đã vô hiệu</string>
     <string name="settings_su_request_10">10 giây</string>
+    <string name="settings_su_request_15">15 giây</string>
     <string name="settings_su_request_20">20 giây</string>
     <string name="settings_su_request_30">30 giây</string>
+    <string name="settings_su_request_45">45 giây</string>
     <string name="settings_su_request_60">60 giây</string>
     <string name="superuser_access">Truy nhập Superuser</string>
     <string name="auto_response">Tự phản hồi</string>

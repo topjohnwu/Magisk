@@ -150,8 +150,10 @@
     <string name="settings_su_adb">ADB saja</string>
     <string name="settings_su_disable">Nonaktif</string>
     <string name="settings_su_request_10">10 detik</string>
+    <string name="settings_su_request_15">15 detik</string>
     <string name="settings_su_request_20">20 detik</string>
     <string name="settings_su_request_30">30 detik</string>
+    <string name="settings_su_request_45">45 detik</string>
     <string name="settings_su_request_60">60 detik</string>
     <string name="superuser_access">Akses Superuser</string>
     <string name="auto_response">Tanggapan Otomatis</string>
