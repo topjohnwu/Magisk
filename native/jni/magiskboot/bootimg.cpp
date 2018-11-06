@@ -251,7 +251,7 @@ void boot_img::print_hdr() {
 }
 
 int unpack(const char *image) {
-	boot_img boot = boot_img();
+	boot_img boot {};
 	int ret = boot.parse_image(image);
 	int fd;
 
@@ -289,7 +289,7 @@ int unpack(const char *image) {
 
 #define file_align() write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - header_off, boot.page_size()))
 void repack(const char* orig_image, const char* out_image) {
-	boot_img boot = boot_img();
+	boot_img boot {};
 
 	off_t header_off, kernel_off, ramdisk_off, second_off, extra_off;
 
