@@ -172,9 +172,12 @@ void proc_monitor() {
 		read_ns(ppid, &pns);
 		do {
 			read_ns(pid, &ns);
-			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino) {
+				// Make sure our target is alive
+				if (kill(pid, 0))
+					goto outer_loop_end;
 				usleep(50);
-			else
+			} else
 				break;
 		} while (1);
 
@@ -198,5 +201,8 @@ void proc_monitor() {
 		 */
 		if (fork_dont_care() == 0)
 			hide_daemon(pid);
+
+	outer_loop_end:
+		((void)0);
 	}
 }
