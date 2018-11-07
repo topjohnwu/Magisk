@@ -67,14 +67,27 @@ public:
 		T*    _node;
 	};
 
-	T& operator = (const T& a) {
+	Array &operator=(const Array& a) {
+		delete [] _data;
+		_data = nullptr;
 		_size = a._size;
 		_capacity = a._capacity;
 		if (_capacity) {
 			_data = new T[_capacity];
 			for(int i = 0; i < _size; ++i)
-				_data[i] = utils::move(a[i]);
+				_data[i] = a[i];
 		}
+		return *this;
+	}
+
+	Array &operator=(Array&& a) {
+		delete [] _data;
+		_size = a._size;
+		_capacity = a._capacity;
+		_data = a._data;
+		a._size = 0;
+		a._capacity = 0;
+		a._data = nullptr;
 		return *this;
 	}
 
