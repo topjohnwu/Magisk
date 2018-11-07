@@ -43,7 +43,6 @@
 
 #include "magiskrc.h"
 #include "utils.h"
-#include "daemon.h"
 #include "magisk.h"
 #include "flags.h"
 
