@@ -40,8 +40,8 @@ cpio_entry::cpio_entry(int fd, cpio_newc_header &header) {
 	// rdevminor = x8u(header.rdevminor);
 	uint32_t namesize = x8u(header.namesize);
 	// check = x8u(header.check);
-	filename = (char *) xmalloc(namesize);
-	xxread(fd, filename, namesize);
+	filename = CharArray(namesize);
+	xxread(fd, filename, filename.size());
 	parse_align();
 	if (filesize) {
 		data = xmalloc(filesize);
@@ -51,7 +51,6 @@ cpio_entry::cpio_entry(int fd, cpio_newc_header &header) {
 }
 
 cpio_entry::~cpio_entry() {
-	free(filename);
 	free(data);
 }
 
@@ -61,7 +60,7 @@ int(*Array<cpio_entry*>::_cmp)(cpio_entry*&, cpio_entry*&) = [](auto a, auto b) 
 	if (a == b) return 0;
 	if (a == nullptr) return 1;
 	if (b == nullptr) return -1;
-	return strcmp(a->filename, b->filename);
+	return a->filename.compare(b->filename);
 };
 
 
@@ -73,12 +72,11 @@ cpio::cpio(const char *filename) {
 	cpio_entry *entry;
 	while(xxread(fd, &header, sizeof(cpio_newc_header)) != -1) {
 		entry = new cpio_entry(fd, header);
-		if (strcmp(entry->filename, ".") == 0 || strcmp(entry->filename, "..") == 0 ||
-			strcmp(entry->filename, "TRAILER!!!") == 0) {
+		if (entry->filename == "." || entry->filename == ".." || entry->filename == "TRAILER!!!") {
+			bool trailer = entry->filename[0] == 'T';
 			delete entry;
-			if (entry->filename[0] == 'T')
+			if (trailer)
 				break;
-			continue;
 		}
 		arr.push_back(entry);
 	}
@@ -110,11 +108,11 @@ void cpio::dump(const char *file) {
 				0,          // e->devminor
 				0,          // e->rdevmajor
 				0,          // e->rdevminor
-				(uint32_t) strlen(e->filename) + 1,
+				(uint32_t) e->filename.size(),
 				0           // e->check
 		);
 		xwrite(fd, header, 110);
-		xwrite(fd, e->filename, strlen(e->filename) + 1);
+		xwrite(fd, e->filename, e->filename.size());
 		dump_align();
 		if (e->filesize) {
 			xwrite(fd, e->data, e->filesize);
@@ -134,7 +132,7 @@ int cpio::find(const char *name) {
 	for (int i = 0; i < arr.size(); ++i) {
 		if (!arr[i])
 			continue;
-		if (strcmp(arr[i]->filename, name) == 0)
+		if (arr[i]->filename == name)
 			return i;
 	}
 	return -1;
@@ -143,12 +141,11 @@ int cpio::find(const char *name) {
 void cpio::insert(cpio_entry *e) {
 	int i = find(e->filename);
 	if (i >= 0) {
-		// Replace, then all is done
 		delete arr[i];
 		arr[i] = e;
-		return;
+	} else {
+		arr.push_back(e);
 	}
-	arr.push_back(e);
 }
 
 void cpio::insert(Array<cpio_entry *> &arr) {
@@ -156,17 +153,17 @@ void cpio::insert(Array<cpio_entry *> &arr) {
 		insert(e);
 }
 
-void cpio::rm(int recur, const char *name) {
+void cpio::rm(const char *name, bool r) {
 	size_t len = strlen(name);
 	for (auto &e : arr) {
 		if (!e)
 			continue;
-		if (strncmp(e->filename, name, len) == 0 &&
-			((recur && e->filename[len] == '/') || e->filename[len] == '\0')) {
-			fprintf(stderr, "Remove [%s]\n", e->filename);
+		if (e->filename.compare(name, len) == 0 &&
+			((r && e->filename[len] == '/') || e->filename[len] == '\0')) {
+			fprintf(stderr, "Remove [%s]\n", e->filename.c_str());
 			delete e;
 			e = nullptr;
-			if (!recur)
+			if (!r)
 				return;
 		}
 	}
@@ -175,7 +172,7 @@ void cpio::rm(int recur, const char *name) {
 void cpio::makedir(mode_t mode, const char *name) {
 	auto e = new cpio_entry();
 	e->mode = S_IFDIR | mode;
-	e->filename = strdup(name);
+	e->filename = name;
 	insert(e);
 	fprintf(stderr, "Create directory [%s] (%04o)\n", name, mode);
 }
@@ -183,7 +180,7 @@ void cpio::makedir(mode_t mode, const char *name) {
 void cpio::ln(const char *target, const char *name) {
 	auto e = new cpio_entry();
 	e->mode = S_IFLNK;
-	e->filename = strdup(name);
+	e->filename = name;
 	e->filesize = strlen(target);
 	e->data = strdup(target);
 	insert(e);
@@ -194,7 +191,7 @@ void cpio::add(mode_t mode, const char *name, const char *file) {
 	int fd = xopen(file, O_RDONLY);
 	auto e = new cpio_entry();
 	e->mode = S_IFREG | mode;
-	e->filename = strdup(name);
+	e->filename = name;
 	e->filesize = lseek(fd, 0, SEEK_END);
 	lseek(fd, 0, SEEK_SET);
 	e->data = xmalloc(e->filesize);
@@ -212,35 +209,38 @@ bool cpio::mv(const char *from, const char *to) {
 			arr[t] = nullptr;
 		}
 		fprintf(stderr, "Move [%s] -> [%s]\n", from, to);
-		char * tmp = strdup(to);
-		free(arr[f]->filename);
-		arr[f]->filename = tmp;
+		arr[f]->filename = to;
 		return true;
 	}
 	fprintf(stderr, "Cannot find entry %s\n", from);
 	return false;
 }
 
+static void extract_entry(cpio_entry *e, const char *file) {
+	fprintf(stderr, "Extract [%s] to [%s]\n", e->filename.c_str(), file);
+	unlink(file);
+	rmdir(file);
+	if (S_ISDIR(e->mode)) {
+		mkdir(file, e->mode & 0777);
+	} else if (S_ISREG(e->mode)) {
+		int fd = creat(file, e->mode & 0777);
+		xwrite(fd, e->data, e->filesize);
+		fchown(fd, e->uid, e->gid);
+		close(fd);
+	} else if (S_ISLNK(e->mode)) {
+		auto target = new char[e->filesize + 1];
+		memcpy(target, e->data, e->filesize);
+		target[e->filesize] = '\0';
+		symlink(target, file);
+		delete[] target;
+	}
+}
+
 void cpio::extract() {
 	for (auto &e : arr) {
 		if (!e)
 			continue;
-		fprintf(stderr, "Extract [%s]\n", e->filename);
-		unlink(e->filename);
-		rmdir(e->filename);
-		if (S_ISDIR(e->mode)) {
-			mkdir(e->filename, e->mode & 0777);
-		} else if (S_ISREG(e->mode)) {
-			int fd = creat(e->filename, e->mode & 0777);
-			xwrite(fd, e->data, e->filesize);
-			fchown(fd, e->uid, e->gid);
-			close(fd);
-		} else if (S_ISLNK(e->mode)) {
-			char *target = new char[e->filesize + 1];
-			memcpy(target, e->data, e->filesize);
-			symlink(target, e->filename);
-			delete[] target;
-		}
+		extract_entry(e, e->filename);
 	}
 }
 
@@ -248,18 +248,7 @@ bool cpio::extract(const char *name, const char *file) {
 	int i = find(name);
 	if (i > 0) {
 		auto e = arr[i];
-		fprintf(stderr, "Extract [%s] to [%s]\n", name, file);
-		if (S_ISREG(e->mode)) {
-			int fd = creat(file, e->mode & 0777);
-			xwrite(fd, e->data, e->filesize);
-			fchown(fd, e->uid, e->gid);
-			close(fd);
-		} else if (S_ISLNK(e->mode)) {
-			char *target = new char[e->filesize + 1];
-			memcpy(target, e->data, e->filesize);
-			symlink(target, e->filename);
-			delete[] target;
-		}
+		extract_entry(e, file);
 		return true;
 	}
 	fprintf(stderr, "Cannot find the file entry [%s]\n", name);

@@ -268,3 +268,11 @@ int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
 	va_end(argv);
 	return pid;
 }
+
+char *strdup2(const char *s, size_t *size) {
+	size_t l = strlen(s) + 1;
+	char *buf = new char[l];
+	memcpy(buf, s, l);
+	if (size) *size = l;
+	return buf;
+}

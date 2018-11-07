@@ -82,7 +82,7 @@ static void *request_handler(void *args) {
 		close(client);
 		break;
 	}
-	return NULL;
+	return nullptr;
 }
 
 static void main_daemon() {

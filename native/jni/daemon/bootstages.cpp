@@ -24,7 +24,7 @@
 #include "flags.h"
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
-static Array<char *> module_list;
+static Array<CharArray> module_list;
 
 static int bind_mount(const char *from, const char *to);
 
@@ -44,60 +44,62 @@ static int bind_mount(const char *from, const char *to);
 
 class node_entry {
 public:
+	node_entry(const char *, uint8_t status = 0, uint8_t type = 0);
+	~node_entry();
+	void create_module_tree(const char *module);
+	void magic_mount();
+	node_entry *extract(const char *name);
+
+private:
 	const char *module;    /* Only used when status & IS_MODULE */
-	char *name;
+	const CharArray name;
 	uint8_t type;
 	uint8_t status;
 	node_entry *parent;
 	Array<node_entry *> children;
 
-	node_entry() = default;
-	node_entry(const char *, const char *, uint8_t type = 0, uint8_t status = 0);
-	node_entry(const char *, uint8_t type = 0, uint8_t status = 0);
-	~node_entry();
-	void create_module_tree(const char *module);
-	void magic_mount();
-
-private:
-	char *get_path();
+	node_entry(const char *, const char *, uint8_t type);
+	bool is_root();
+	CharArray get_path();
 	node_entry *insert(node_entry *);
 	void clone_skeleton();
 	int get_path(char *path);
 };
 
-node_entry::node_entry(const char *module, const char *name, uint8_t type, uint8_t status)
-		: node_entry(name, type, status) {
+node_entry::node_entry(const char *name, uint8_t status, uint8_t type)
+		: name(name), type(type), status(status), parent(nullptr) {}
+
+node_entry::node_entry(const char *module, const char *name, uint8_t type)
+		: node_entry(name, (uint8_t) 0, type) {
 	this->module = module;
 }
 
-node_entry::node_entry(const char *name, uint8_t type, uint8_t status)
-		: type(type), status(status), parent(nullptr) {
-	this->name = strdup(name);
-}
-
 node_entry::~node_entry() {
-	free(name);
 	for (auto &node : children)
 		delete node;
 }
 
-char *node_entry::get_path() {
+bool node_entry::is_root() {
+	return parent == nullptr;
+}
+
+CharArray node_entry::get_path() {
 	get_path(buf);
-	return strdup(buf);
+	return buf;
 }
 
 int node_entry::get_path(char *path) {
 	int len = 0;
 	if (parent)
 		len = parent->get_path(path);
-	len += sprintf(path + len, "/%s", name);
+	len += sprintf(path + len, "/%s", name.c_str());
 	return len;
 }
 
 node_entry *node_entry::insert(node_entry *node) {
 	node->parent = this;
 	for (auto &child : children) {
-		if (strcmp(child->name, node->name) == 0) {
+		if (child->name == node->name) {
 			if (node->status > child->status) {
 				// The new node has higher precedence
 				delete child;
@@ -117,18 +119,18 @@ void node_entry::create_module_tree(const char *module) {
 	DIR *dir;
 	struct dirent *entry;
 
-	char *full_path = get_path();
-	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, full_path);
+	CharArray full_path = get_path();
+	snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, full_path.c_str());
 
 	if (!(dir = xopendir(buf)))
-		goto cleanup;
+		return;
 
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		// Create new node
 		node_entry *node = new node_entry(module, entry->d_name, entry->d_type);
-		snprintf(buf, PATH_MAX, "%s/%s", full_path, node->name);
+		snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), entry->d_name);
 
 		/*
 		 * Clone the parent in the following condition:
@@ -139,7 +141,7 @@ void node_entry::create_module_tree(const char *module) {
 		bool clone = false;
 		if (IS_LNK(node) || access(buf, F_OK) == -1) {
 			clone = true;
-		} else if (parent != nullptr || strcmp(node->name, "vendor") != 0) {
+		} else if (!is_root() || node->name != "vendor") {
 			struct stat s;
 			xstat(buf, &s);
 			if (S_ISLNK(s.st_mode))
@@ -171,9 +173,6 @@ void node_entry::create_module_tree(const char *module) {
 		}
 	}
 	closedir(dir);
-
-cleanup:
-	free(full_path);
 }
 
 void node_entry::clone_skeleton() {
@@ -182,34 +181,29 @@ void node_entry::clone_skeleton() {
 	struct node_entry *dummy;
 
 	// Clone the structure
-	char *full_path = get_path();
-	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path);
+	CharArray full_path = get_path();
+	snprintf(buf, PATH_MAX, "%s%s", MIRRDIR, full_path.c_str());
 	if (!(dir = xopendir(buf)))
-		goto cleanup;
+		return;
 	while ((entry = xreaddir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
 		// Create dummy node
-		dummy = new node_entry(entry->d_name, entry->d_type, IS_DUMMY);
+		dummy = new node_entry(entry->d_name, IS_DUMMY, entry->d_type);
 		insert(dummy);
 	}
 	closedir(dir);
 
 	if (status & IS_SKEL) {
-		struct stat s;
-		char *con;
-		xstat(full_path, &s);
-		getfilecon(full_path, &con);
-		LOGI("mnt_tmpfs : %s\n", full_path);
+		file_attr attr;
+		getattr(full_path, &attr);
+		LOGI("mnt_tmpfs : %s\n", full_path.c_str());
 		xmount("tmpfs", full_path, "tmpfs", 0, nullptr);
-		chmod(full_path, s.st_mode & 0777);
-		chown(full_path, s.st_uid, s.st_gid);
-		setfilecon(full_path, con);
-		free(con);
+		setattr(full_path, &attr);
 	}
 
 	for (auto &child : children) {
-		snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
+		snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), child->name.c_str());
 
 		// Create the dummy file/directory
 		if (IS_DIR(child))
@@ -218,50 +212,47 @@ void node_entry::clone_skeleton() {
 			close(creat(buf, 0644));
 		// Links will be handled later
 
-		if (child->parent->parent == nullptr && strcmp(child->name, "vendor") == 0) {
-			if (IS_LNK(child)) {
+		if (is_root() && child->name == "vendor") {
+			if (seperate_vendor) {
 				cp_afc(MIRRDIR "/system/vendor", "/system/vendor");
-				LOGI("creat_link: %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
+				LOGI("copy_link : %s <- %s\n", "/system/vendor", MIRRDIR "/system/vendor");
 			}
 			// Skip
 			continue;
 		} else if (child->status & IS_MODULE) {
 			// Mount from module file to dummy file
-			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT, child->module, full_path, child->name);
+			snprintf(buf2, PATH_MAX, "%s/%s%s/%s", MOUNTPOINT,
+					 child->module, full_path.c_str(), child->name.c_str());
 		} else if (child->status & (IS_SKEL | IS_INTER)) {
 			// It's an intermediate folder, recursive clone
 			child->clone_skeleton();
 			continue;
 		} else if (child->status & IS_DUMMY) {
 			// Mount from mirror to dummy file
-			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, full_path, child->name);
+			snprintf(buf2, PATH_MAX, "%s%s/%s", MIRRDIR, full_path.c_str(), child->name.c_str());
 		}
 
 		if (IS_LNK(child)) {
 			// Copy symlinks directly
 			cp_afc(buf2, buf);
 #ifdef MAGISK_DEBUG
-			LOGI("creat_link: %s <- %s\n",buf, buf2);
+			LOGI("copy_link : %s <- %s\n",buf, buf2);
 #else
-			LOGI("creat_link: %s\n", buf);
+			LOGI("copy_link : %s\n", buf);
 #endif
 		} else {
-			snprintf(buf, PATH_MAX, "%s/%s", full_path, child->name);
+			snprintf(buf, PATH_MAX, "%s/%s", full_path.c_str(), child->name.c_str());
 			bind_mount(buf2, buf);
 		}
 	}
-
-cleanup:
-	free(full_path);
 }
 
 void node_entry::magic_mount() {
 	if (status & IS_MODULE) {
 		// Mount module item
-		char *real_path = get_path();
-		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, real_path);
+		CharArray real_path = get_path();
+		snprintf(buf, PATH_MAX, "%s/%s%s", MOUNTPOINT, module, real_path.c_str());
 		bind_mount(buf, real_path);
-		free(real_path);
 	} else if (status & IS_SKEL) {
 		// The node is labeled to be cloned with skeleton, lets do it
 		clone_skeleton();
@@ -272,6 +263,21 @@ void node_entry::magic_mount() {
 	}
 	// The only thing goes here should be vendor placeholder
 	// There should be no dummies, so don't need to handle it here
+}
+
+node_entry *node_entry::extract(const char *name) {
+	node_entry *node = nullptr;
+	// Extract the vendor node out of system tree and swap with placeholder
+	for (auto &child : children) {
+		if (child->name == name) {
+			node = child;
+			child = new node_entry(name);
+			child->parent = node->parent;
+			node->parent = nullptr;
+			break;
+		}
+	}
+	return node;
 }
 
 /***********
@@ -320,7 +326,7 @@ static void exec_common_script(const char* stage) {
 }
 
 static void exec_module_script(const char* stage) {
-	for (auto &module : module_list) {
+	for (const char *module : module_list) {
 		snprintf(buf2, PATH_MAX, "%s/%s/%s.sh", MOUNTPOINT, module, stage);
 		snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, module);
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
@@ -356,9 +362,9 @@ static void simple_mount(const char *path) {
 		if (access(buf2, F_OK) == -1)
 			continue;
 		if (entry->d_type == DT_DIR) {
-			char *new_path = strdup(buf2);
+			char *new_path = strdup2(buf2);
 			simple_mount(new_path);
-			free(new_path);
+			delete [] new_path;
 		} else if (entry->d_type == DT_REG) {
 			// Actual file path
 			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);
@@ -434,7 +440,7 @@ static int prepare_img() {
 			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
 			if (access(buf, F_OK) == 0)
 				continue;
-			module_list.push_back(strdup(entry->d_name));
+			module_list.push_back(entry->d_name);
 		}
 	}
 	closedir(dir);
@@ -472,29 +478,22 @@ static void install_apk(const char *apk) {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	Array<char *> mounts;
+	Array<CharArray> mounts;
 	file_to_array("/proc/mounts", mounts);
 	for (auto &line : mounts) {
-		if (strstr(line, " /data ") && strstr(line, "tmpfs") == nullptr)
+		if (line.contains(" /data ") && !line.contains("tmpfs"))
 			mnt = true;
-		free(line);
 	}
-	mounts.clear();
 	if (mnt) {
-		char *crypto = getprop("ro.crypto.state");
-		if (crypto != nullptr) {
-			if (strcmp(crypto, "unencrypted") == 0) {
+		CharArray crypto = getprop("ro.crypto.state");
+		if (!crypto.empty()) {
+			if (crypto == "unencrypted") {
 				// Unencrypted, we can directly access data
 				data = true;
 			} else {
 				// Encrypted, check whether vold is started
-				char *vold = getprop("init.svc.vold");
-				if (vold != nullptr) {
-					free(vold);
-					data = true;
-				}
+				data = !getprop("init.svc.vold").empty();
 			}
-			free(crypto);
 		} else {
 			// ro.crypto.state is not set, assume it's unencrypted
 			data = true;
@@ -513,13 +512,12 @@ static void *start_magisk_hide(void *) {
 static void auto_start_magiskhide() {
 	if (!start_log_daemon())
 		return;
-	char *hide_prop = getprop(MAGISKHIDE_PROP, 1);
-	if (hide_prop == nullptr || strcmp(hide_prop, "0") != 0) {
+	CharArray hide_prop = getprop(MAGISKHIDE_PROP, true);
+	if (hide_prop != "0") {
 		pthread_t thread;
 		xpthread_create(&thread, nullptr, start_magisk_hide, nullptr);
 		pthread_detach(thread);
 	}
-	free(hide_prop);
 }
 
 void unlock_blocks() {
@@ -707,15 +705,14 @@ void startup() {
 	xmkdir(BLOCKDIR, 0755);
 
 	LOGI("* Mounting mirrors");
-	Array<char *> mounts;
+	Array<CharArray> mounts;
 	file_to_array("/proc/mounts", mounts);
-	int skip_initramfs = 0;
-	// Check whether skip_initramfs device
+	bool system_as_root = false;
 	for (auto &line : mounts) {
-		if (strstr(line, " /system_root ")) {
+		if (line.contains(" /system_root ")) {
 			bind_mount("/system_root/system", MIRRDIR "/system");
-			skip_initramfs = 1;
-		} else if (!skip_initramfs && strstr(line, " /system ")) {
+			system_as_root = true;
+		} else if (!system_as_root && line.contains(" /system ")) {
 			sscanf(line, "%s %*s %s", buf, buf2);
 			xmount(buf, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
 #ifdef MAGISK_DEBUG
@@ -723,7 +720,7 @@ void startup() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/system");
 #endif
-		} else if (strstr(line, " /vendor ")) {
+		} else if (line.contains(" /vendor ")) {
 			seperate_vendor = 1;
 			sscanf(line, "%s %*s %s", buf, buf2);
 			xmkdir(MIRRDIR "/vendor", 0755);
@@ -734,9 +731,7 @@ void startup() {
 			LOGI("mount: %s\n", MIRRDIR "/vendor");
 #endif
 		}
-		free(line);
 	}
-	mounts.clear();
 	if (!seperate_vendor) {
 		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
 #ifdef MAGISK_DEBUG
@@ -809,8 +804,7 @@ void post_fs_data(int client) {
 	exec_module_script("post-fs-data");
 
 	// Create the system root entry
-	node_entry *sys_root = new node_entry("system");
-	sys_root->status = IS_INTER;
+	node_entry *sys_root = new node_entry("system", IS_INTER);
 
 	// Vendor root entry
 	node_entry *ven_root = nullptr;
@@ -818,7 +812,7 @@ void post_fs_data(int client) {
 	bool has_modules = false;
 
 	LOGI("* Loading modules\n");
-	for (auto &module : module_list) {
+	for (const char *module : module_list) {
 		// Read props
 		snprintf(buf, PATH_MAX, "%s/%s/system.prop", MOUNTPOINT, module);
 		if (access(buf, F_OK) == 0) {
@@ -848,16 +842,8 @@ void post_fs_data(int client) {
 	}
 
 	if (has_modules) {
-		// Extract the vendor node out of system tree and swap with placeholder
-		for (auto &child : sys_root->children) {
-			if (strcmp(child->name, "vendor") == 0) {
-				ven_root = child;
-				child = new node_entry("vendor", seperate_vendor ? DT_LNK : DT_DIR);
-				child->parent = ven_root->parent;
-				ven_root->parent = nullptr;
-				break;
-			}
-		}
+		// Pull out /system/vendor node if exist
+		ven_root = sys_root->extract("vendor");
 
 		// Magic!!
 		sys_root->magic_mount();
@@ -866,7 +852,7 @@ void post_fs_data(int client) {
 
 	// Cleanup memory
 	delete sys_root;
-	if (ven_root) delete ven_root;
+	delete ven_root;
 
 	core_only();
 }
@@ -922,9 +908,7 @@ core_only:
 	}
 
 	// All boot stage done, cleanup
-	for (auto &module : module_list)
-		free(module);
-	module_list.clear();
+	module_list.clear(true);
 }
 
 void boot_complete(int client) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include "cpputils.h"
 
 template <class T>
 class Array {
@@ -72,7 +73,7 @@ public:
 		if (_capacity) {
 			_data = new T[_capacity];
 			for(int i = 0; i < _size; ++i)
-				_data[i] = (T&&) a[i];
+				_data[i] = utils::move(a[i]);
 		}
 		return *this;
 	}
@@ -101,7 +102,7 @@ public:
 	void push_back(T&& x) {
 		if(_size == _capacity)
 			expand();
-		_data[_size] = (T&&) x;
+		_data[_size] = utils::move(x);
 		++_size;
 	}
 
@@ -114,7 +115,7 @@ public:
 		if (_size == 0 || d < _data || d >= _data + _size)
 			return false;
 		for (; d < _data + _size - 1; ++d)
-			*d = (T&&) *(d + 1);
+			*d = utils::move(*(d + 1));
 		--_size;
 		return true;
 
@@ -130,9 +131,16 @@ public:
 		return false;
 	}
 
-	void clear() { _size = 0; }
+	void clear(bool dealloc = false) {
+		_size = 0;
+		if (dealloc) {
+			_capacity = 0;
+			delete [] _data;
+			_data = nullptr;
+		}
+	}
 
-	void sort() const {
+	void sort() {
 		qsort(_data, _size, sizeof(T), compare);
 	}
 
@@ -161,7 +169,7 @@ private:
 		T* temp = _data;
 		_data = new T[_capacity];
 		for(int i = 0; i < _size; ++i)
-			_data[i] = (T&&) temp[i];
+			_data[i] = utils::move(temp[i]);
 		delete [] temp;
 	}
 };

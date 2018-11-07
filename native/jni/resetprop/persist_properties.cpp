@@ -190,21 +190,21 @@ void persist_getprop(read_cb_t *read_cb) {
 	}
 }
 
-char *persist_getprop(const char *name) {
+CharArray persist_getprop(const char *name) {
 	prop_t prop(name);
 	if (use_pb) {
 		read_cb_t read_cb(pb_getprop_cb, &prop);
 		pb_getprop(&read_cb);
 		if (prop.value[0])
-			return strdup(prop.value);
+			return prop.value;
 	} else {
 		// Try to read from file
 		char value[PROP_VALUE_MAX];
 		file_getprop(name, value);
 		if (value[0])
-			return strdup(value);
+			return value;
 	}
-	return nullptr;
+	return CharArray();
 }
 
 bool persist_deleteprop(const char *name) {

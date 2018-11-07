@@ -12,9 +12,15 @@
 #include <sys/stat.h>
 
 #ifdef __cplusplus
-// C++ only
+
 #include "array.h"
-int file_to_array(const char* filename, Array<char *> &arr);
+#include "CharArray.h"
+#include "cpputils.h"
+
+int file_to_array(const char *filename, Array<CharArray> &arr);
+char *strdup2(const char *s, size_t *size = nullptr);
+
+
 extern "C" {
 #endif
 

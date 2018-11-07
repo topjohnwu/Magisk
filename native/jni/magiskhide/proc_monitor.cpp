@@ -27,13 +27,13 @@ static int sockfd = -1;
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
-	destroy_list();
+	hide_list.clear(true);
 	hide_enabled = 0;
 	close(sockfd);
 	sockfd = -1;
 	pthread_mutex_destroy(&list_lock);
 	LOGD("proc_monitor: terminating\n");
-	pthread_exit(NULL);
+	pthread_exit(nullptr);
 }
 
 static int read_ns(const int pid, struct stat *st) {
@@ -63,7 +63,7 @@ static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 
 	char buffer[PATH_MAX];
-	auto mounts = Array<char *>();
+	Array<CharArray> mounts;
 
 	manage_selinux();
 	clean_magisk_props();
@@ -76,11 +76,10 @@ static void hide_daemon(int pid) {
 
 	// Unmount dummy skeletons and /sbin links
 	for (auto &s : mounts) {
-		if (strstr(s, "tmpfs /system/") || strstr(s, "tmpfs /vendor/") || strstr(s, "tmpfs /sbin")) {
+		if (s.contains("tmpfs /system/") || s.contains("tmpfs /vendor/") || s.contains("tmpfs /sbin")) {
 			sscanf(s, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-		free(s);
 	}
 	mounts.clear();
 
@@ -90,13 +89,11 @@ static void hide_daemon(int pid) {
 
 	// Unmount everything under /system, /vendor, and loop mounts
 	for (auto &s : mounts) {
-		if (strstr(s, "/dev/block/loop") || strstr(s, " /system/") || strstr(s, " /vendor/")) {
+		if (s.contains("/dev/block/loop") || s.contains(" /system/") || s.contains(" /vendor/")) {
 			sscanf(s, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}
-		free(s);
 	}
-	mounts.clear();
 
 exit:
 	// Send resume signal
@@ -159,7 +156,7 @@ void proc_monitor() {
 		bool hide = false;
 		pthread_mutex_lock(&list_lock);
 		for (auto &s : hide_list) {
-			if (strcmp(proc, s) == 0) {
+			if (s == proc) {
 				hide = true;
 				break;
 			}

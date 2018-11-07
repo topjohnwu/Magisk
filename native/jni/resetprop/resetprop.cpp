@@ -130,18 +130,18 @@ int prop_exist(const char *name) {
 }
 
 // Get prop by name, return string (should free manually!)
-char *getprop(const char *name, bool persist) {
+CharArray getprop(const char *name, bool persist) {
 	if (!check_legal_property_name(name) || init_resetprop())
 		return nullptr;
 	const prop_info *pi = __system_property_find(name);
 	if (pi == nullptr) {
 		if (persist && strncmp(name, "persist.", 8) == 0) {
-			char *value = persist_getprop(name);
-			if (value)
+			CharArray value = persist_getprop(name);
+			if (!value.empty())
 				return value;
 		}
 		LOGD("resetprop: prop [%s] does not exist\n", name);
-		return nullptr;
+		return CharArray();
 	} else {
 		char value[PROP_VALUE_MAX];
 		read_cb_t read_cb;
@@ -149,7 +149,7 @@ char *getprop(const char *name, bool persist) {
 		read_cb.arg = value;
 		read_props(pi, &read_cb);
 		LOGD("resetprop: getprop [%s]: [%s]\n", name, value);
-		return strdup(value);
+		return value;
 	}
 }
 
@@ -254,7 +254,8 @@ int resetprop_main(int argc, char *argv[]) {
 	log_cb.d = [](auto fmt, auto ap) -> int { return verbose ? vfprintf(stderr, fmt, ap) : 0; };
 
 	bool trigger = true, persist = false;
-	char *argv0 = argv[0], *prop;
+	char *argv0 = argv[0];
+	CharArray prop;
 
 	--argc;
 	++argv;
@@ -297,10 +298,9 @@ int resetprop_main(int argc, char *argv[]) {
 		print_props(persist);
 		return 0;
 	case 1:
-		prop = getprop(argv[0], persist);
-		if (prop == nullptr) return 1;
-		printf("%s\n", prop);
-		free(prop);
+		prop = utils::move(getprop(argv[0], persist));
+		if (!prop) return 1;
+		printf("%s\n", prop.c_str());
 		return 0;
 	case 2:
 		return setprop(argv[0], argv[1], trigger);

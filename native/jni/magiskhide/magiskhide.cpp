@@ -54,11 +54,11 @@ int launch_magiskhide() {
 	pthread_mutex_init(&list_lock, nullptr);
 
 	// Initialize the hide list
-	if (init_list())
+	if (!init_list())
 		goto error;
 
 	// Add SafetyNet by default
-	add_list(strdup("com.google.android.gms.unstable"));
+	add_list("com.google.android.gms.unstable");
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();

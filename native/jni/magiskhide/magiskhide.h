@@ -5,6 +5,7 @@
 
 #include "daemon.h"
 #include "array.h"
+#include "CharArray.h"
 
 #define TERM_THREAD SIGUSR1
 
@@ -24,13 +25,12 @@ void hide_sensitive_props();
 void clean_magisk_props();
 
 // List managements
-int add_list(char *proc);
-int init_list();
-int destroy_list();
+int add_list(const char *proc);
+bool init_list();
 
 extern int hide_enabled;
 extern pthread_mutex_t list_lock;
-extern Array<char *> hide_list;
+extern Array<CharArray> hide_list;
 
 enum {
 	LAUNCH_MAGISKHIDE,

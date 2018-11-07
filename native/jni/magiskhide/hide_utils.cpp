@@ -15,7 +15,7 @@
 #include "daemon.h"
 #include "db.h"
 
-auto hide_list = Array<char *>();
+Array<CharArray> hide_list;
 
 static const char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
@@ -46,14 +46,10 @@ void hide_sensitive_props() {
 	LOGI("hide_utils: Hiding sensitive props\n");
 
 	// Hide all sensitive props
-	char *value;
 	for (int i = 0; prop_key[i]; ++i) {
-		value = getprop(prop_key[i]);
-		if (value) {
-			if (strcmp(value, prop_value[i]) != 0)
-				setprop(prop_key[i], prop_value[i], false);
-			free(value);
-		}
+		CharArray value = getprop(prop_key[i]);
+		if (!value.empty() && value != prop_value[i])
+			setprop(prop_key[i], prop_value[i], false);
 	}
 }
 
@@ -139,13 +135,11 @@ void clean_magisk_props() {
 	}, nullptr, false);
 }
 
-static int add_list(sqlite3 *db, char *proc) {
+static int add_list(sqlite3 *db, const char *proc) {
 	for (auto &s : hide_list) {
 		// They should be unique
-		if (strcmp(s, proc) == 0) {
-			free(proc);
+		if (s == proc)
 			return HIDE_ITEM_EXIST;
-		}
 	}
 
 	LOGI("hide_list add: [%s]\n", proc);
@@ -164,7 +158,7 @@ static int add_list(sqlite3 *db, char *proc) {
 	return DAEMON_SUCCESS;
 }
 
-int add_list(char *proc) {
+int add_list(const char *proc) {
 	sqlite3 *db = get_magiskdb();
 	if (db) {
 		int ret = add_list(db, proc);
@@ -175,20 +169,20 @@ int add_list(char *proc) {
 }
 
 int add_list(int client) {
-	return add_list(read_string(client));
+	char *proc = read_string(client);
+	int ret = add_list(proc);
+	free(proc);
+	return ret;
 }
 
-static int rm_list(char *proc) {
-	int ret = DAEMON_ERROR;
-
+static int rm_list(const char *proc) {
 	// Update list in critical region
 	bool do_rm = false;
 	pthread_mutex_lock(&list_lock);
 	for (auto it = hide_list.begin(); it != hide_list.end(); ++it) {
-		if (strcmp(*it, proc) == 0) {
+		if (*it == proc) {
 			do_rm = true;
 			LOGI("hide_list rm: [%s]\n", proc);
-			free(*it);
 			hide_list.erase(it);
 			break;
 		}
@@ -199,45 +193,44 @@ static int rm_list(char *proc) {
 		kill_process(proc);
 		sqlite3 *db = get_magiskdb();
 		if (db == nullptr)
-			goto error;
+			return DAEMON_ERROR;
 		char sql[128];
 		sprintf(sql, "DELETE FROM hidelist WHERE process='%s'", proc);
 		sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
 		sqlite3_close_v2(db);
-		ret = DAEMON_SUCCESS;
+		return DAEMON_SUCCESS;
 	} else {
-		ret = HIDE_ITEM_NOT_EXIST;
+		return HIDE_ITEM_NOT_EXIST;
 	}
+}
 
-error:
+int rm_list(int client) {
+	char *proc = read_string(client);
+	int ret = rm_list(proc);
 	free(proc);
 	return ret;
 }
 
-int rm_list(int client) {
-	return rm_list(read_string(client));
-}
-
 #define LEGACY_LIST MOUNTPOINT "/.core/hidelist"
 
-int init_list() {
+bool init_list() {
 	LOGD("hide_list: initialize\n");
 
 	sqlite3 *db = get_magiskdb();
 	if (db == nullptr)
-		return 1;
+		return false;
 
 	sqlite3_exec(db, "SELECT process FROM hidelist",
 				 [] (auto, auto, char **data, auto) -> int
 				 {
 				 	LOGI("hide_list: [%s]\n", data[0]);
-				 	hide_list.push_back(strdup(data[0]));
+				 	hide_list.push_back(data[0]);
 				 	return 0;
 				 }, nullptr, nullptr);
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		auto tmp = Array<char *>();
+		Array<CharArray> tmp;
 		file_to_array(LEGACY_LIST, tmp);
 		for (auto &s : tmp)
 			add_list(db, s);
@@ -245,14 +238,7 @@ int init_list() {
 	}
 
 	sqlite3_close_v2(db);
-	return 0;
-}
-
-int destroy_list() {
-	for (auto &str : hide_list)
-		free(str);
-	hide_list.clear();
-	return 0;
+	return true;
 }
 
 void ls_list(int client) {

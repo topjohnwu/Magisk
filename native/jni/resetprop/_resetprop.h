@@ -5,6 +5,7 @@
 #ifndef MAGISK_PROPS_H
 #define MAGISK_PROPS_H
 
+#include <CharArray.h>
 #include "resetprop/private/system_properties.h"
 #include "logging.h"
 
@@ -48,7 +49,7 @@ struct read_cb_t {
 
 extern bool use_pb;
 
-char *persist_getprop(const char *name);
+CharArray persist_getprop(const char *name);
 void persist_getprop(read_cb_t *read_cb);
 bool persist_deleteprop(const char *name);
 void collect_props(const char *name, const char *value, void *v_plist);
