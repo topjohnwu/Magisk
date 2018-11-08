@@ -27,8 +27,10 @@ static const char *prop_value[] =
 	  "enforcing", "0", "0", "0",
 	  "1", "user", "release-keys", "0", nullptr };
 
-static const char *proc_name;
-static gid_t proc_gid;
+struct ps_arg {
+	const char *name;
+	uid_t uid;
+};
 
 void manage_selinux() {
 	char val;
@@ -53,8 +55,7 @@ void hide_sensitive_props() {
 	}
 }
 
-/* Call func for each process */
-static void ps(void (*func)(int)) {
+static void ps(void (*cb)(int, void*), void *arg) {
 	DIR *dir;
 	struct dirent *entry;
 
@@ -62,69 +63,70 @@ static void ps(void (*func)(int)) {
 		return;
 
 	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR) {
-			if (is_num(entry->d_name))
-				func(atoi(entry->d_name));
-		}
+		if (entry->d_type == DT_DIR && is_num(entry->d_name))
+			cb(atoi(entry->d_name), arg);
 	}
 
 	closedir(dir);
 }
 
-static int check_proc_name(int pid, const char *name) {
-	char buf[128];
+static bool check_proc_name(int pid, const char *name) {
+	char buf[4019];
 	FILE *f;
 	sprintf(buf, "/proc/%d/comm", pid);
 	if ((f = fopen(buf, "r"))) {
 		fgets(buf, sizeof(buf), f);
 		if (strcmp(buf, name) == 0)
-			return 1;
+			return true;
 	} else {
 		// The PID is already killed
-		return 0;
+		return false;
 	}
 	fclose(f);
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
-	f = fopen(buf, "r");
-	fgets(buf, sizeof(buf), f);
+	if ((f = fopen(buf, "r"))) {
+		fgets(buf, sizeof(buf), f);
+		if (strcmp(basename(buf), name) == 0)
+			return true;
+	} else {
+		// The PID is already killed
+		return false;
+	}
 	fclose(f);
-	if (strcmp(basename(buf), name) == 0)
-		return 1;
 
 	sprintf(buf, "/proc/%d/exe", pid);
 	if (access(buf, F_OK) != 0)
-		return 0;
+		return false;
 	xreadlink(buf, buf, sizeof(buf));
-	if (strcmp(basename(buf), name) == 0)
-		return 1;
-	return 0;
+	return strcmp(basename(buf), name) == 0;
 }
 
-static void kill_proc_cb(int pid) {
-	if (check_proc_name(pid, proc_name))
+static void kill_proc_cb(int pid, void *v) {
+	ps_arg *args = static_cast<ps_arg *>(v);
+	if (check_proc_name(pid, args->name))
 		kill(pid, SIGTERM);
-	else if (proc_gid > 0) {
-		char buf[128];
+	else if (args->uid > 0) {
+		char buf[64];
 		struct stat st;
 		sprintf(buf, "/proc/%d", pid);
 		stat(buf, &st);
-		if (proc_gid == st.st_gid)
+		if (args->uid == st.st_uid)
 			kill(pid, SIGTERM);
 	}
 
 }
 
 static void kill_process(const char *name) {
-	proc_name = name;
-	char buf[128];
+	ps_arg args = { .name = name };
 	struct stat st;
-	sprintf(buf, "/data/data/%s", name);
-	if (stat(buf, &st) == 0)
-		proc_gid = st.st_gid;
+	int fd = xopen("/data/data", O_RDONLY | O_CLOEXEC);
+	if (fstatat(fd, name, &st, 0) == 0)
+		args.uid = st.st_uid;
 	else
-		proc_gid = 0;
-	ps(kill_proc_cb);
+		args.uid = 0;
+	close(fd);
+	ps(kill_proc_cb, &args);
 }
 
 void clean_magisk_props() {
@@ -143,16 +145,16 @@ static int add_list(sqlite3 *db, const char *proc) {
 	}
 
 	LOGI("hide_list add: [%s]\n", proc);
-	kill_process(proc);
 
 	// Critical region
 	pthread_mutex_lock(&list_lock);
 	hide_list.push_back(proc);
+	kill_process(proc);
 	pthread_mutex_unlock(&list_lock);
 
 	// Add to database
-	char sql[128];
-	sprintf(sql, "INSERT INTO hidelist (process) VALUES('%s')", proc);
+	char sql[4096];
+	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", proc);
 	sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
 
 	return DAEMON_SUCCESS;
@@ -184,18 +186,18 @@ static int rm_list(const char *proc) {
 			do_rm = true;
 			LOGI("hide_list rm: [%s]\n", proc);
 			hide_list.erase(it);
+			kill_process(proc);
 			break;
 		}
 	}
 	pthread_mutex_unlock(&list_lock);
 
 	if (do_rm) {
-		kill_process(proc);
 		sqlite3 *db = get_magiskdb();
 		if (db == nullptr)
 			return DAEMON_ERROR;
-		char sql[128];
-		sprintf(sql, "DELETE FROM hidelist WHERE process='%s'", proc);
+		char sql[4096];
+		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", proc);
 		sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
 		sqlite3_close_v2(db);
 		return DAEMON_SUCCESS;
