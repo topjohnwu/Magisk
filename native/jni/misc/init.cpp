@@ -333,10 +333,6 @@ int main(int argc, char *argv[]) {
 			return dump_magiskrc(argv[3], 0755);
 	}
 
-#ifdef MAGISK_DEBUG
-	log_cb.d = vprintf;
-#endif
-
 	// Prevent file descriptor confusion
 	mknod("/null", S_IFCHR | 0666, makedev(1, 3));
 	int null = open("/null", O_RDWR | O_CLOEXEC);

@@ -376,6 +376,7 @@ static void parse_statement(char *statement) {
 }
 
 int magiskpolicy_main(int argc, char *argv[]) {
+	cmdline_logging();
 	const char *outfile = nullptr;
 	bool magisk = false, live = false;
 
