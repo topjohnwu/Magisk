@@ -9,7 +9,6 @@ LOCAL_SRC_FILES := \
 	selinux.cpp \
 	logging.cpp \
 	xwrap.cpp \
-	CharArray.cpp \
-	vector.c
+	CharArray.cpp
 
 include $(BUILD_STATIC_LIBRARY)

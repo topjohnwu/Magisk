@@ -1,4 +1,4 @@
-/* init.c - Pre-init Magisk support
+/* init.cpp - Pre-init Magisk support
  *
  * This code has to be compiled statically to work properly.
  *
@@ -21,7 +21,6 @@
  */
 
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -42,8 +41,9 @@
 #include "binaries_arch.h"
 
 #include "magiskrc.h"
-#include "utils.h"
 #include "magisk.h"
+#include "magiskpolicy.h"
+#include "utils.h"
 #include "flags.h"
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
@@ -223,9 +223,9 @@ static int patch_sepolicy() {
 
 	if (init_patch) {
 		// Force init to load /sepolicy
-		void *addr;
+		uint8_t *addr;
 		size_t size;
-		mmap_rw("/init", &addr, &size);
+		mmap_rw("/init", (void **) &addr, &size);
 		for (int i = 0; i < size; ++i) {
 			if (memcmp(addr + i, SPLIT_PLAT_CIL, sizeof(SPLIT_PLAT_CIL) - 1) == 0) {
 				memcpy(addr + i + sizeof(SPLIT_PLAT_CIL) - 4, "xxx", 3);
@@ -238,7 +238,7 @@ static int patch_sepolicy() {
 	return 0;
 }
 
-static int unxz(int fd, const void *buf, size_t size) {
+static int unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
 	xz_crc32_init();
 	struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
@@ -297,10 +297,10 @@ static int dump_magiskrc(const char *path, mode_t mode) {
 }
 
 static void patch_socket_name(const char *path) {
-	void *buf;
+	uint8_t *buf;
 	char name[sizeof(MAIN_SOCKET)];
 	size_t size;
-	mmap_rw(path, &buf, &size);
+	mmap_rw(path, (void **) &buf, &size);
 	for (int i = 0; i < size; ++i) {
 		if (memcmp(buf + i, MAIN_SOCKET, sizeof(MAIN_SOCKET)) == 0) {
 			gen_rand_str(name, sizeof(name));
@@ -364,8 +364,8 @@ int main(int argc, char *argv[]) {
 	 * ***********/
 
 	int root = open("/", O_RDONLY | O_CLOEXEC);
-	int mnt_system = 0;
-	int mnt_vendor = 0;
+	bool mnt_system = false;
+	bool mnt_vendor = false;
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
@@ -407,21 +407,26 @@ int main(int argc, char *argv[]) {
 	} else if (read_fstab_dt(&cmd, "system", partname) == 0) {
 		setup_block(&dev, partname);
 		xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
-		mnt_system = 1;
+		mnt_system = true;
 	}
 
 	if (read_fstab_dt(&cmd, "vendor", partname) == 0) {
 		setup_block(&dev, partname);
 		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
-		mnt_vendor = 1;
+		mnt_vendor = true;
 	}
 
 	/* ****************
 	 * Ramdisk Patches
 	 * ****************/
 
+	int fd;
+	bool injected;
+	FILE *fp;
+	char tok[4096];
+
 	// Handle ramdisk overlays
-	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
+	fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		mv_dir(fd, root);
 		close(fd);
@@ -429,17 +434,17 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Patch init.rc to load magisk scripts
-	int injected = 0;
-	char tok[4096];
-	FILE *fp = xfopen("/init.rc", "r");
+
+	injected = false;
+	fp = xfopen("/init.rc", "r");
 	fd = creat("/init.rc.new", 0750);
 	while(fgets(tok, sizeof(tok), fp)) {
 		if (!injected && strncmp(tok, "import", 6) == 0) {
 			if (strstr(tok, "init.magisk.rc")) {
-				injected = 1;
+				injected = true;
 			} else {
 				xwrite(fd, "import /init.magisk.rc\n", 23);
-				injected = 1;
+				injected = true;
 			}
 		} else if (strstr(tok, "selinux.reload_policy")) {
 			// Do not allow sepolicy patch

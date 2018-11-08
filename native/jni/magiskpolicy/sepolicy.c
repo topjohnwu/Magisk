@@ -22,7 +22,6 @@
 #include "utils.h"
 #include "magiskpolicy.h"
 #include "sepolicy.h"
-#include "vector.h"
 
 policydb_t *policydb = NULL;
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
@@ -36,7 +35,7 @@ static void *cmalloc(size_t s) {
 	return t;
 }
 
-static int get_attr(char *type, int value) {
+static int get_attr(const char *type, int value) {
 	type_datum_t *attr = hashtab_search(policydb->p_types.table, type);
 	if (!attr)
 		return 1;
@@ -47,7 +46,7 @@ static int get_attr(char *type, int value) {
 	return !! ebitmap_get_bit(&policydb->attr_type_map[attr->s.value-1], value-1);
 }
 
-static int get_attr_id(char *type) {
+static int get_attr_id(const char *type) {
 	type_datum_t *attr = hashtab_search(policydb->p_types.table, type);
 	if (!attr)
 		return 1;
@@ -58,7 +57,7 @@ static int get_attr_id(char *type) {
 	return attr->s.value;
 }
 
-static int set_attr(char *type, int value) {
+static int set_attr(const char *type, int value) {
 	type_datum_t *attr = hashtab_search(policydb->p_types.table, type);
 	if (!attr)
 		return 1;
@@ -364,7 +363,7 @@ void destroy_policydb() {
 	policydb = NULL;
 }
 
-int create_domain(char *d) {
+int create_domain(const char *d) {
 	symtab_datum_t *src = hashtab_search(policydb->p_types.table, d);
 	if(src) {
 		fprintf(stderr, "Domain %s already exists\n", d);
@@ -414,7 +413,7 @@ int create_domain(char *d) {
 	return set_attr("domain", value);
 }
 
-int set_domain_state(char* s, int state) {
+int set_domain_state(const char *s, int state) {
 	type_datum_t *type;
 	hashtab_ptr_t cur;
 	if (s == NULL) {
@@ -440,7 +439,7 @@ int set_domain_state(char* s, int state) {
 	return 0;
 }
 
-int add_transition(char *s, char *t, char *c, char *d) {
+int add_transition(const char *s, const char *t, const char *c, const char *d) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
@@ -491,7 +490,8 @@ int add_transition(char *s, char *t, char *c, char *d) {
 	return 0;
 }
 
-int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
+int add_file_transition(const char *s, const char *t, const char *c, const char *d,
+						const char *filename) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
@@ -520,7 +520,7 @@ int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
 	trans_key.stype = src->s.value;
 	trans_key.ttype = tgt->s.value;
 	trans_key.tclass = cls->s.value;
-	trans_key.name = filename;
+	trans_key.name = (char *) filename;
 
 	filename_trans_datum_t *trans_datum;
 	trans_datum = hashtab_search(policydb->p_types.table, (hashtab_key_t) &trans_key);
@@ -535,7 +535,7 @@ int add_file_transition(char *s, char *t, char *c, char *d, char* filename) {
 	return 0;
 }
 
-int add_typeattribute(char *domainS, char *attr) {
+int add_typeattribute(const char *domainS, const char *attr) {
 	type_datum_t *domain;
 
 	domain = hashtab_search(policydb->p_types.table, domainS);
@@ -564,7 +564,7 @@ int add_typeattribute(char *domainS, char *attr) {
 	return 0;
 }
 
-int add_rule(char *s, char *t, char *c, char *p, int effect, int not) {
+int add_rule(const char *s, const char *t, const char *c, const char *p, int effect, int n) {
 	type_datum_t *src = NULL, *tgt = NULL;
 	class_datum_t *cls = NULL;
 	perm_datum_t *perm = NULL;
@@ -610,10 +610,11 @@ int add_rule(char *s, char *t, char *c, char *p, int effect, int not) {
 			}
 		}
 	}
-	return add_rule_auto(src, tgt, cls, perm, effect, not);
+	return add_rule_auto(src, tgt, cls, perm, effect, n);
 }
 
-int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not) {
+int add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect,
+				   int n) {
 	type_datum_t *src = NULL, *tgt = NULL;
 	class_datum_t *cls = NULL;
 
@@ -655,5 +656,5 @@ int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not) 
 		high = 0xFFFF;
 	}
 
-	return add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
+	return add_xperm_rule_auto(src, tgt, cls, low, high, effect, n);
 }

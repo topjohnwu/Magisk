@@ -73,10 +73,10 @@ LOCAL_C_INCLUDES := \
 	$(LIBUTILS)
 
 LOCAL_SRC_FILES := \
-	misc/init.c \
-	magiskpolicy/api.c \
-	magiskpolicy/magiskpolicy.c \
-	magiskpolicy/rules.c \
+	misc/init.cpp \
+	magiskpolicy/api.cpp \
+	magiskpolicy/magiskpolicy.cpp \
+	magiskpolicy/rules.cpp \
 	magiskpolicy/sepolicy.c
 
 LOCAL_LDFLAGS := -static

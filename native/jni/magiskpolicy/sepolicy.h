@@ -6,6 +6,10 @@
 
 #include <sepol/policydb/policydb.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Global policydb
 extern policydb_t *policydb;
 
@@ -15,12 +19,17 @@ extern policydb_t *policydb;
 		for (*ptr = table->htable[_i]; *ptr != NULL; *ptr = (*ptr)->next)
 
 // sepolicy manipulation functions
-int create_domain(char *d);
-int set_domain_state(char* s, int state);
-int add_transition(char *s, char *t, char *c, char *d);
-int add_file_transition(char *s, char *t, char *c, char *d, char* filename);
-int add_typeattribute(char *domainS, char *attr);
-int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
-int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not);
+int create_domain(const char *d);
+int set_domain_state(const char *s, int state);
+int add_transition(const char *s, const char *t, const char *c, const char *d);
+int add_file_transition(const char *s, const char *t, const char *c, const char *d,
+						const char *filename);
+int add_typeattribute(const char *domainS, const char *attr);
+int add_rule(const char *s, const char *t, const char *c, const char *p, int effect, int n);
+int add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, int n);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

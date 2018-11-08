@@ -2,7 +2,7 @@
 #include "magiskpolicy.h"
 #include "sepolicy.h"
 
-static void allowSuClient(char *target) {
+static void allowSuClient(const char *target) {
 	if (!sepol_exists(target))
 		return;
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
