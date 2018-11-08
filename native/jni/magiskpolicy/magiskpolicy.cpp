@@ -7,9 +7,9 @@
 #include <limits.h>
 
 #include "sepolicy.h"
-#include "array.h"
 #include "magiskpolicy.h"
 #include "magisk.h"
+#include "utils.h"
 #include "flags.h"
 
 static const char *type_msg_1 =
@@ -92,20 +92,46 @@ static const char *type_msg_5 =
 	exit(1);
 }
 
-static char *parse_bracket(char *str, Array<const char *> *vec) {
-	str = strchr(str, '{') + 1;
-	char *end = strchr(str, '}');
-	if (end == nullptr)
-		return nullptr;
-	*end = '\0';
-	char *cur;
-	while ((cur = strtok_r(nullptr, " ", &str)) != nullptr)
-		vec->push_back(cur);
-	return end + 1;
+static int parse_bracket(char *tok, char *&stmt, Array<const char *> *vec) {
+	if (tok == nullptr || tok[0] != '{') {
+		// Not in a bracket
+		vec->push_back(tok);
+	} else {
+		if (stmt)
+			stmt[-1] = ' ';
+		tok = strchr(tok, '{') + 1;
+		char *end = strchr(tok, '}');
+		if (end == nullptr) // Bracket not closed
+			return 1;
+		*end = '\0';
+		char *cur;
+		while ((cur = strtok_r(nullptr, " ", &tok)) != nullptr)
+			vec->push_back(cur);
+		stmt = end + 1;
+	}
+	return 0;
 }
 
 // Pattern 1: action { source } { target } class { permission }
-static int parse_pattern_1(int action, char *stmt) {
+static int parse_pattern_1(int action, const char *action_str, char *stmt) {
+	int (*action_func)(const char*, const char*, const char*, const char*);
+	switch (action) {
+		case 0:
+			action_func = sepol_allow;
+			break;
+		case 1:
+			action_func = sepol_deny;
+			break;
+		case 2:
+			action_func = sepol_auditallow;
+			break;
+		case 3:
+			action_func = sepol_auditdeny;
+			break;
+		default:
+			return 1;
+	}
+
 	int state = 0;
 	char *cur, *cls;
 	Array<const char*> source, target, permission;
@@ -130,57 +156,42 @@ static int parse_pattern_1(int action, char *stmt) {
 				return 1;
 		}
 
-		if (vec) {
-			if (cur == nullptr || cur[0] != '{') {
-				vec->push_back(cur);
-			} else {
-				stmt[-1] = ' ';
-				stmt = parse_bracket(cur, vec);
-				if (stmt == nullptr)
-					return 1;
-			}
-		}
+		if (vec && parse_bracket(cur, stmt, vec))
+			return 1;
 		++state;
 	}
-	if (state != 4)
+	if (state != 4 || source.empty() || target.empty() || permission.empty())
 		return 1;
-	for(int i = 0; i < source.size(); ++i)
-		for (int j = 0; j < target.size(); ++j)
-			for (int k = 0; k < permission.size(); ++k) {
-				int (*action_func)(const char*, const char*, const char*, const char*);
-				const char *action_str;
-				switch (action) {
-					case 0:
-						action_func = sepol_allow;
-						action_str = "allow";
-						break;
-					case 1:
-						action_func = sepol_deny;
-						action_str = "deny";
-						break;
-					case 2:
-						action_func = sepol_auditallow;
-						action_str = "auditallow";
-						break;
-					case 3:
-						action_func = sepol_auditdeny;
-						action_str = "auditdeny";
-						break;
-					default:
-						return 1;
-				}
-				if (action_func(source[i], target[j], cls, permission[k]))
-					fprintf(stderr, "Error in: %s %s %s %s %s\n",
-							action_str, source[i], target[j], cls, permission[k]);
-			}
+
+	for (auto src : source)
+		for (auto tgt : target)
+			for (auto perm : permission)
+				if (action_func(src, tgt, cls, perm))
+					fprintf(stderr, "Error in: %s %s %s %s %s\n", action_str, src, tgt, cls, perm);
+
 	return 0;
 }
 
 // Pattern 2: action { source } { target } { class } ioctl range
-static int parse_pattern_2(int action, char *stmt) {
+static int parse_pattern_2(int action, const char *action_str, char *stmt) {
+	int (*action_func)(const char*, const char*, const char*, const char*);
+	switch (action) {
+		case 0:
+			action_func = sepol_allowxperm;
+			break;
+		case 1:
+			action_func = sepol_auditallowxperm;
+			break;
+		case 2:
+			action_func = sepol_dontauditxperm;
+			break;
+		default:
+			return 1;
+	}
+
 	int state = 0;
 	char *cur, *range;
-	Array<const char *> source, target, cls;
+	Array<const char *> source, target, classes;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
 		Array<const char *> *vec;
@@ -192,7 +203,7 @@ static int parse_pattern_2(int action, char *stmt) {
 				vec = &target;
 				break;
 			case 2:
-				vec = &cls;
+				vec = &classes;
 				break;
 			case 3:
 				// Currently only support ioctl
@@ -206,91 +217,76 @@ static int parse_pattern_2(int action, char *stmt) {
 				return 1;
 		}
 
-		if (vec) {
-			if (cur == nullptr || cur[0] != '{') {
-				vec->push_back(cur);
-			} else {
-				stmt[-1] = ' ';
-				stmt = parse_bracket(cur, vec);
-				if (stmt == nullptr)
-					return 1;
-			}
-		}
+		if (vec && parse_bracket(cur, stmt, vec))
+			return 1;
 		++state;
 	}
-	if (state != 5) return 1;
-	for(int i = 0; i < source.size(); ++i)
-		for (int j = 0; j < target.size(); ++j)
-			for (int k = 0; k < cls.size(); ++k) {
-				int (*action_func)(const char*, const char*, const char*, const char*);
-				const char *action_str;
-				switch (action) {
-					case 0:
-						action_func = sepol_allowxperm;
-						action_str = "allowxperm";
-						break;
-					case 1:
-						action_func = sepol_auditallowxperm;
-						action_str = "auditallowxperm";
-						break;
-					case 2:
-						action_func = sepol_dontauditxperm;
-						action_str = "dontauditxperm";
-						break;
-					default:
-						return 1;
-				}
-				if (action_func(source[i], target[j], cls[k], range))
-					fprintf(stderr, "Error in: %s %s %s %s %s\n",
-							action_str, source[i], target[j], cls[k], range);
-			}
+	if (state != 5 || source.empty() || target.empty() || classes.empty())
+		return 1;
+
+	for (auto src : source)
+		for (auto tgt : target)
+			for (auto cls : classes)
+				if (action_func(src, tgt, cls, range))
+					fprintf(stderr, "Error in: %s %s %s %s %s\n", action_str, src, tgt, cls, range);
+
 	return 0;
 }
 
 // Pattern 3: action { type }
-static int parse_pattern_3(int action, char* stmt) {
+static int parse_pattern_3(int action, const char *action_str, char* stmt) {
+	int (*action_func)(const char*);
+	switch (action) {
+		case 0:
+			action_func = sepol_create;
+			break;
+		case 1:
+			action_func = sepol_permissive;
+			break;
+		case 2:
+			action_func = sepol_enforce;
+			break;
+		default:
+			return 1;
+	}
+
 	char *cur;
 	Array<const char *> domains;
 	while ((cur = strtok_r(nullptr, " {}", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
 		domains.push_back(cur);
 	}
-	for (int i = 0; i < domains.size(); ++i) {
-		int (*action_func)(const char*);
-		const char *action_str;
-		switch (action) {
-			case 0:
-				action_func = sepol_create;
-				action_str = "create";
-				break;
-			case 1:
-				action_func = sepol_permissive;
-				action_str = "permissive";
-				break;
-			case 2:
-				action_func = sepol_enforce;
-				action_str = "enforce";
-				break;
-			default:
-				return 1;
-		}
-		if (action_func(domains[i]))
-			fprintf(stderr, "Error in: %s %s\n", action_str, domains[i]);
-	}
+
+	if (domains.empty())
+		return 1;
+
+	for (auto dom : domains)
+		if (action_func(dom))
+			fprintf(stderr, "Error in: %s %s\n", action_str, dom);
+
 	return 0;
 }
 
 // Pattern 4: action { class } { attribute }
-static int parse_pattern_4(int action, char *stmt) {
+static int parse_pattern_4(int action, const char *action_str, char *stmt) {
+	int (*action_func)(const char*, const char*);
+	switch (action) {
+		case 0:
+			action_func = sepol_attradd;
+			break;
+		default:
+			return 1;
+	}
+
 	int state = 0;
 	char *cur;
-	Array<const char *> cls, attribute;
+	Array<const char *> classes, attribute;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
 		Array<const char *> *vec;
 		switch (state) {
 			case 0:
-				vec = &cls;
+				vec = &classes;
 				break;
 			case 1:
 				vec = &attribute;
@@ -299,37 +295,23 @@ static int parse_pattern_4(int action, char *stmt) {
 				return 1;
 		}
 
-		if (cur == nullptr || cur[0] != '{') {
-			vec->push_back(cur);
-		} else {
-			stmt[-1] = ' ';
-			stmt = parse_bracket(cur, vec);
-			if (stmt == nullptr)
-				return 1;
-		}
+		if (parse_bracket(cur, stmt, vec))
+			return 1;
 		++state;
 	}
-	if (state != 2) return 1;
-	for(int i = 0; i < cls.size(); ++i)
-		for (int j = 0; j < attribute.size(); ++j) {
-			int (*action_func)(const char*, const char*);
-			const char *action_str;
-			switch (action) {
-				case 0:
-					action_func = sepol_attradd;
-					action_str = "attradd";
-					break;
-				default:
-					return 1;
-			}
-			if (action_func(cls[i], attribute[j]))
-				fprintf(stderr, "Error in: %s %s %s\n", action_str, cls[i], attribute[j]);
-		}
+	if (state != 2 || classes.empty() || attribute.empty())
+		return 1;
+
+	for (auto cls : classes)
+		for (auto attr : attribute)
+			if (action_func(cls, attr))
+				fprintf(stderr, "Error in: %s %s %s\n", action_str, cls, attr);
+
 	return 0;
 }
 
 // Pattern 5: action source target class default (filename)
-static int parse_pattern_5(int action, char *stmt) {
+static int parse_pattern_5(int action, const char *action_str, char *stmt) {
 	int state = 0;
 	char *cur;
 	char *source, *target, *cls, *def, *filename = nullptr;
@@ -357,21 +339,22 @@ static int parse_pattern_5(int action, char *stmt) {
 	}
 	if (state < 4) return 1;
 	if (sepol_typetrans(source, target, cls, def, filename))
-		fprintf(stderr, "Error in: typetrans %s %s %s %s %s\n", source, target, cls, def, filename ? filename : "");
+		fprintf(stderr, "Error in: %s %s %s %s %s %s\n",
+				action_str, source, target, cls, def, filename ? filename : "");
 	return 0;
 }
 
 #define add_action(name, type, num) \
 else if (strcmp(name, action) == 0) { \
-	if (parse_pattern_##type(num, remain)) \
-		fprintf(stderr, "Syntax error in '%s'\n\n%s\n", orig, type_msg_##type); \
+	if (parse_pattern_##type(num, name, remain)) \
+		fprintf(stderr, "Syntax error in '%s'\n\n%s\n", orig.c_str(), type_msg_##type); \
 }
 
 static void parse_statement(char *statement) {
 	char *action, *remain;
 
 	// strtok will modify the origin string, duplicate the statement for error messages
-	char *orig = strdup(statement);
+	CharArray orig(statement);
 
 	action = strtok_r(statement, " ", &remain);
 	if (remain == nullptr) remain = &action[strlen(action)];
@@ -389,9 +372,7 @@ static void parse_statement(char *statement) {
 	add_action("enforce", 3, 2)
 	add_action("attradd", 4, 0)
 	add_action("typetrans", 5, 0)
-	else { fprintf(stderr, "Unknown statement: '%s'\n\n", orig); }
-
-	free(orig);
+	else { fprintf(stderr, "Unknown statement: '%s'\n\n", orig.c_str()); }
 }
 
 int magiskpolicy_main(int argc, char *argv[]) {
