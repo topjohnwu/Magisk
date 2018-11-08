@@ -144,7 +144,7 @@
     <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
     <string name="settings_core_only_summary">Enable only core features. MagiskSU, MagiskHide and systemless hosts will still be enabled, but no modules will be loaded.</string>
-    <string name="settings_magiskhide_summary">Hide Magisk from various detections.</string>
+    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
 
@@ -173,7 +173,7 @@
     <string name="settings_user_independent">User-Independent</string>
     <string name="owner_only_summary">Only owner has root access.</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts.</string>
-    <string name="user_indepenent_summary">Each user has his own separate root rules.</string>
+    <string name="user_indepenent_summary">Each user has his/her own separate root rules.</string>
     <string name="multiuser_hint_owner_request">A request has been sent to the device owner. Please switch to the owner and grant the permissions required.</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
