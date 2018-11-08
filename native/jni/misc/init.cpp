@@ -20,7 +20,6 @@
  * preserved as it also provides CLI for sepolicy patching (magiskpolicy)
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -49,6 +48,10 @@
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
 int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
+
+static int root = -1;
+static bool mnt_system = false;
+static bool mnt_vendor = false;
 
 struct cmdline {
 	bool skip_initramfs;
@@ -110,13 +113,13 @@ static void parse_device(struct device *dev, const char *uevent) {
 	LOGD("%s [%s] (%u, %u)\n", dev->devname, dev->partname, (unsigned) dev->major, (unsigned) dev->minor);
 }
 
-static int setup_block(struct device *dev, const char *partname) {
+static bool setup_block(struct device *dev, const char *partname) {
 	char path[128];
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
 	if (dir == nullptr)
 		return 1;
-	int found = 0;
+	bool found = false;
 	while ((entry = readdir(dir))) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;
@@ -124,29 +127,29 @@ static int setup_block(struct device *dev, const char *partname) {
 		parse_device(dev, path);
 		if (strcasecmp(dev->partname, partname) == 0) {
 			sprintf(dev->path, "/dev/block/%s", dev->devname);
-			found = 1;
+			found = true;
 			break;
 		}
 	}
 	closedir(dir);
 
 	if (!found)
-		return 1;
+		return false;
 
 	mkdir("/dev", 0755);
 	mkdir("/dev/block", 0755);
 	mknod(dev->path, S_IFBLK | 0600, makedev(dev->major, dev->minor));
-	return 0;
+	return true;
 }
 
-static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
+static bool read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char *partname) {
 	char buf[128];
 	struct stat st;
 	sprintf(buf, "/%s", mnt_point);
 	lstat(buf, &st);
 	// Don't early mount if the mount point is symlink
 	if (S_ISLNK(st.st_mode))
-		return 1;
+		return false;
 	sprintf(buf, "%s/fstab/%s/dev", cmd->dt_dir, mnt_point);
 	if (access(buf, F_OK) == 0) {
 		int fd = open(buf, O_RDONLY | O_CLOEXEC);
@@ -154,12 +157,12 @@ static int read_fstab_dt(const struct cmdline *cmd, const char *mnt_point, char 
 		close(fd);
 		char *name = strrchr(buf, '/') + 1;
 		sprintf(partname, "%s%s", name, strend(name, cmd->slot) ? cmd->slot : "");
-		return 0;
+		return true;
 	}
-	return 1;
+	return false;
 }
 
-static int verify_precompiled() {
+static bool verify_precompiled() {
 	DIR *dir;
 	struct dirent *entry;
 	int fd;
@@ -197,18 +200,18 @@ static int verify_precompiled() {
 	return memcmp(sys_sha, ven_sha, sizeof(sys_sha)) == 0;
 }
 
-static int patch_sepolicy() {
-	int init_patch = 0;
+static bool patch_sepolicy() {
+	bool init_patch = false;
 	if (access(SPLIT_PRECOMPILE, R_OK) == 0 && verify_precompiled()) {
-		init_patch = 1;
+		init_patch = true;
 		load_policydb(SPLIT_PRECOMPILE);
 	} else if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
-		init_patch = 1;
+		init_patch = true;
 		compile_split_cil();
 	} else if (access("/sepolicy", R_OK) == 0) {
 		load_policydb("/sepolicy");
 	} else {
-		return 1;
+		return false;
 	}
 
 	sepol_magisk_rules();
@@ -235,10 +238,10 @@ static int patch_sepolicy() {
 		munmap(addr, size);
 	}
 
-	return 0;
+	return true;
 }
 
-static int unxz(int fd, const uint8_t *buf, size_t size) {
+static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
 	xz_crc32_init();
 	struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
@@ -254,18 +257,18 @@ static int unxz(int fd, const uint8_t *buf, size_t size) {
 	do {
 		ret = xz_dec_run(dec, &b);
 		if (ret != XZ_OK && ret != XZ_STREAM_END)
-			return 1;
+			return false;
 		write(fd, out, b.out_pos);
 		b.out_pos = 0;
 	} while (b.in_pos != size);
-	return 0;
+	return true;
 }
 
 static int dump_magisk(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
 	if (fd < 0)
 		return 1;
-	if (unxz(fd, magisk_xz, sizeof(magisk_xz)))
+	if (!unxz(fd, magisk_xz, sizeof(magisk_xz)))
 		return 1;
 	close(fd);
 	return 0;
@@ -275,7 +278,7 @@ static int dump_manager(const char *path, mode_t mode) {
 	int fd = creat(path, mode);
 	if (fd < 0)
 		return 1;
-	if (unxz(fd, manager_xz, sizeof(manager_xz)))
+	if (!unxz(fd, manager_xz, sizeof(manager_xz)))
 		return 1;
 	close(fd);
 	return 0;
@@ -314,6 +317,19 @@ static void patch_socket_name(const char *path) {
 		}
 	}
 	munmap(buf, size);
+}
+
+static void exec_init(char *argv[]) {
+	// Clean up
+	close(root);
+	umount("/proc");
+	umount("/sys");
+	if (mnt_system)
+		umount("/system");
+	if (mnt_vendor)
+		umount("/vendor");
+
+	execv("/init", argv);
 }
 
 int main(int argc, char *argv[]) {
@@ -359,9 +375,7 @@ int main(int argc, char *argv[]) {
 	 * Initialize
 	 * ***********/
 
-	int root = open("/", O_RDONLY | O_CLOEXEC);
-	bool mnt_system = false;
-	bool mnt_vendor = false;
+	root = open("/", O_RDONLY | O_CLOEXEC);
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
@@ -378,7 +392,7 @@ int main(int argc, char *argv[]) {
 	if (!cmd.skip_initramfs && access("/sbin/recovery", F_OK) == 0) {
 		// Remove Magisk traces
 		rm_rf("/.backup");
-		goto exec_init;
+		exec_init(argv);
 	}
 
 	/* ************
@@ -396,21 +410,21 @@ int main(int argc, char *argv[]) {
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
 		// Clone rootfs except /system
-		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
+		const char *excl[] = { "system", nullptr };
 		excl_list = excl;
 		clone_dir(system_root, root);
-		excl_list = nullptr;
 		close(system_root);
+		excl_list = nullptr;
 
 		xmkdir("/system", 0755);
 		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
-	} else if (read_fstab_dt(&cmd, "system", partname) == 0) {
+	} else if (read_fstab_dt(&cmd, "system", partname)) {
 		setup_block(&dev, partname);
 		xmount(dev.path, "/system", "ext4", MS_RDONLY, nullptr);
 		mnt_system = true;
 	}
 
-	if (read_fstab_dt(&cmd, "vendor", partname) == 0) {
+	if (read_fstab_dt(&cmd, "vendor", partname)) {
 		setup_block(&dev, partname);
 		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, nullptr);
 		mnt_vendor = true;
@@ -420,13 +434,8 @@ int main(int argc, char *argv[]) {
 	 * Ramdisk Patches
 	 * ****************/
 
-	int fd;
-	bool injected;
-	FILE *fp;
-	char tok[4096];
-
 	// Handle ramdisk overlays
-	fd = open("/overlay", O_RDONLY | O_CLOEXEC);
+	int fd = open("/overlay", O_RDONLY | O_CLOEXEC);
 	if (fd >= 0) {
 		mv_dir(fd, root);
 		close(fd);
@@ -434,23 +443,23 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Patch init.rc to load magisk scripts
-
-	injected = false;
-	fp = xfopen("/init.rc", "r");
+	bool injected = false;
+	char line[4096];
+	FILE *fp = xfopen("/init.rc", "r");
 	fd = creat("/init.rc.new", 0750);
-	while(fgets(tok, sizeof(tok), fp)) {
-		if (!injected && strncmp(tok, "import", 6) == 0) {
-			if (strstr(tok, "init.magisk.rc")) {
+	while(fgets(line, sizeof(line), fp)) {
+		if (!injected && strncmp(line, "import", 6) == 0) {
+			if (strstr(line, "init.magisk.rc")) {
 				injected = true;
 			} else {
 				xwrite(fd, "import /init.magisk.rc\n", 23);
 				injected = true;
 			}
-		} else if (strstr(tok, "selinux.reload_policy")) {
+		} else if (strstr(line, "selinux.reload_policy")) {
 			// Do not allow sepolicy patch
 			continue;
 		}
-		xwrite(fd, tok, strlen(tok));
+		xwrite(fd, line, strlen(line));
 	}
 	fclose(fp);
 	close(fd);
@@ -465,15 +474,5 @@ int main(int argc, char *argv[]) {
 	patch_socket_name("/sbin/magisk");
 	rename("/init.bak", "/sbin/magiskinit");
 
-exec_init:
-	// Clean up
-	close(root);
-	umount("/proc");
-	umount("/sys");
-	if (mnt_system)
-		umount("/system");
-	if (mnt_vendor)
-		umount("/vendor");
-
-	execv("/init", argv);
+	exec_init(argv);
 }
