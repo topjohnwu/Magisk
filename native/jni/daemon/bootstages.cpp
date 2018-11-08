@@ -362,9 +362,7 @@ static void simple_mount(const char *path) {
 		if (access(buf2, F_OK) == -1)
 			continue;
 		if (entry->d_type == DT_DIR) {
-			char *new_path = strdup2(buf2);
-			simple_mount(new_path);
-			delete [] new_path;
+			simple_mount(CharArray(buf2));
 		} else if (entry->d_type == DT_REG) {
 			// Actual file path
 			snprintf(buf, PATH_MAX, "%s%s", SIMPLEMOUNT, buf2);

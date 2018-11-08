@@ -7,8 +7,8 @@
 #include "magisk.h"
 #include "selinux.h"
 
-int (*applet_main[]) (int, char *[]) =
-		{ magisk_main, su_client_main, resetprop_main, magiskhide_main, imgtool_main, NULL };
+static int (*applet_main[]) (int, char *[]) =
+		{ magisk_main, su_client_main, resetprop_main, magiskhide_main, imgtool_main, nullptr };
 
 char *argv0;
 
