@@ -48,10 +48,10 @@
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
-int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, NULL };
+int (*init_applet_main[]) (int, char *[]) = { magiskpolicy_main, magiskpolicy_main, nullptr };
 
 struct cmdline {
-	char skip_initramfs;
+	bool skip_initramfs;
 	char slot[3];
 	char dt_dir[128];
 };
@@ -72,14 +72,14 @@ static void parse_cmdline(struct cmdline *cmd) {
 	int fd = open("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
 	close(fd);
-	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(NULL, " ")) {
+	for (char *tok = strtok(cmdline, " "); tok; tok = strtok(nullptr, " ")) {
 		if (strncmp(tok, "androidboot.slot_suffix", 23) == 0) {
 			sscanf(tok, "androidboot.slot_suffix=%s", cmd->slot);
 		} else if (strncmp(tok, "androidboot.slot", 16) == 0) {
 			cmd->slot[0] = '_';
 			sscanf(tok, "androidboot.slot=%c", cmd->slot + 1);
 		} else if (strcmp(tok, "skip_initramfs") == 0) {
-			cmd->skip_initramfs = 1;
+			cmd->skip_initramfs = true;
 		} else if (strncmp(tok, "androidboot.android_dt_dir", 26) == 0) {
 			sscanf(tok, "androidboot.android_dt_dir=%s", cmd->dt_dir);
 		}
@@ -114,7 +114,7 @@ static int setup_block(struct device *dev, const char *partname) {
 	char path[128];
 	struct dirent *entry;
 	DIR *dir = opendir("/sys/dev/block");
-	if (dir == NULL)
+	if (dir == nullptr)
 		return 1;
 	int found = 0;
 	while ((entry = readdir(dir))) {
@@ -352,9 +352,9 @@ int main(int argc, char *argv[]) {
 
 	// Communicate with kernel using procfs and sysfs
 	mkdir("/proc", 0755);
-	xmount("proc", "/proc", "proc", 0, NULL);
+	xmount("proc", "/proc", "proc", 0, nullptr);
 	mkdir("/sys", 0755);
-	xmount("sysfs", "/sys", "sysfs", 0, NULL);
+	xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
 	struct cmdline cmd;
 	parse_cmdline(&cmd);
@@ -369,8 +369,10 @@ int main(int argc, char *argv[]) {
 
 	if (cmd.skip_initramfs) {
 		// Clear rootfs
-		excl_list = (const char *[]) { "overlay", ".backup", "proc", "sys", "init.bak", NULL };
+		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
+		excl_list = excl;
 		frm_rf(root);
+		excl_list = nullptr;
 	} else {
 		// Revert original init binary
 		link("/.backup/init", "/init");
@@ -394,25 +396,27 @@ int main(int argc, char *argv[]) {
 		sprintf(partname, "system%s", cmd.slot);
 		setup_block(&dev, partname);
 		xmkdir("/system_root", 0755);
-		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, NULL);
+		xmount(dev.path, "/system_root", "ext4", MS_RDONLY, nullptr);
 		int system_root = open("/system_root", O_RDONLY | O_CLOEXEC);
 
 		// Clone rootfs except /system
-		excl_list = (const char *[]) { "system", NULL };
+		const char *excl[] = { "overlay", ".backup", "proc", "sys", "init.bak", nullptr };
+		excl_list = excl;
 		clone_dir(system_root, root);
+		excl_list = nullptr;
 		close(system_root);
 
 		xmkdir("/system", 0755);
-		xmount("/system_root/system", "/system", NULL, MS_BIND, NULL);
+		xmount("/system_root/system", "/system", nullptr, MS_BIND, nullptr);
 	} else if (read_fstab_dt(&cmd, "system", partname) == 0) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/system", "ext4", MS_RDONLY, NULL);
+		xmount(dev.path, "/system", "ext4", MS_RDONLY, nullptr);
 		mnt_system = true;
 	}
 
 	if (read_fstab_dt(&cmd, "vendor", partname) == 0) {
 		setup_block(&dev, partname);
-		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, NULL);
+		xmount(dev.path, "/vendor", "ext4", MS_RDONLY, nullptr);
 		mnt_vendor = true;
 	}
 
