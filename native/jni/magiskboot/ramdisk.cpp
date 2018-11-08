@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 
 #include "magiskboot.h"
-#include "array.h"
 #include "cpio.h"
 #include "utils.h"
 
@@ -14,7 +13,7 @@ public:
 	int test();
 	char * sha1();
 	void restore();
-	void backup(Array<cpio_entry*> &bak, const char *orig, const char *sha1);
+	void backup(Vector<cpio_entry*> &bak, const char *orig, const char *sha1);
 };
 
 void magisk_cpio::patch(bool keepverity, bool keepforceencrypt) {
@@ -110,7 +109,7 @@ void magisk_cpio::restore() {
 	rm("magisk", true);
 }
 
-void magisk_cpio::backup(Array<cpio_entry*> &bak, const char *orig, const char *sha1) {
+void magisk_cpio::backup(Vector<cpio_entry*> &bak, const char *orig, const char *sha1) {
 	cpio_entry *m, *n, *rem, *cksm;
 	char buf[PATH_MAX];
 
@@ -230,13 +229,13 @@ int cpio_commands(int argc, char *argv[]) {
 			free(sha1);
 			return 0;
 		} else if (cmdc >= 2 && strcmp(cmdv[0], "backup") == 0) {
-			Array<cpio_entry*> bak;
+			Vector<cpio_entry*> bak;
 			cpio.backup(bak, cmdv[1], cmdv[2]);
 			cpio.insert(bak);
 		} else if (cmdc >= 4 && strcmp(cmdv[0], "magisk") == 0) {
 			cpio.patch(strcmp(cmdv[2], "true") == 0, strcmp(cmdv[3], "true") == 0);
 
-			Array<cpio_entry*> bak;
+			Vector<cpio_entry*> bak;
 			cpio.backup(bak, cmdv[1], cmdv[4]);
 
 			auto e = new cpio_entry();

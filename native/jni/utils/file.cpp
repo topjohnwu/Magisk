@@ -388,7 +388,7 @@ void write_zero(int fd, size_t size) {
 	lseek(fd, pos + size, SEEK_SET);
 }
 
-int file_to_array(const char *filename, Array<CharArray> &arr) {
+int file_to_vector(const char *filename, Vector<CharArray> &arr) {
 	if (access(filename, R_OK) != 0)
 		return 1;
 	char *line = nullptr;

@@ -13,13 +13,12 @@
 
 #ifdef __cplusplus
 
-#include "array.h"
+#include "Vector.h"
 #include "CharArray.h"
 #include "cpputils.h"
 
-int file_to_array(const char *filename, Array<CharArray> &arr);
+int file_to_vector(const char *filename, Vector<CharArray> &arr);
 char *strdup2(const char *s, size_t *size = nullptr);
-
 
 extern "C" {
 #endif
@@ -29,7 +28,7 @@ extern "C" {
 #define UID_SYSTEM (get_system_uid())
 #define UID_RADIO  (get_radio_uid())
 
-// xwrap.c
+// xwrap.cpp
 
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
@@ -85,7 +84,7 @@ ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 
-// misc.c
+// misc.cpp
 
 unsigned get_shell_uid();
 unsigned get_system_uid();
@@ -108,7 +107,7 @@ ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 int __fsetxattr(int fd, const char *name, const void *value, size_t size, int flags);
 
-// file.c
+// file.cpp
 
 #define align(p, a)     (((p) + (a) - 1) / (a) * (a))
 #define align_off(p, a) (align(p, a) - (p))

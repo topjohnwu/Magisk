@@ -19,7 +19,7 @@
 #include "flags.h"
 
 bool log_daemon_started = false;
-static Array<const char *> log_cmd, clear_cmd;
+static Vector<const char *> log_cmd, clear_cmd;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 enum {

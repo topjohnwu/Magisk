@@ -92,7 +92,7 @@ static const char *type_msg_5 =
 	exit(1);
 }
 
-static int parse_bracket(char *tok, char *&stmt, Array<const char *> *vec) {
+static int parse_bracket(char *tok, char *&stmt, Vector<const char *> *vec) {
 	if (tok == nullptr || tok[0] != '{') {
 		// Not in a bracket
 		vec->push_back(tok);
@@ -134,10 +134,10 @@ static int parse_pattern_1(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur, *cls;
-	Array<const char*> source, target, permission;
+	Vector<const char*> source, target, permission;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Array<const char *> *vec;
+		Vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &source;
@@ -191,10 +191,10 @@ static int parse_pattern_2(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur, *range;
-	Array<const char *> source, target, classes;
+	Vector<const char *> source, target, classes;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Array<const char *> *vec;
+		Vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &source;
@@ -251,7 +251,7 @@ static int parse_pattern_3(int action, const char *action_str, char* stmt) {
 	}
 
 	char *cur;
-	Array<const char *> domains;
+	Vector<const char *> domains;
 	while ((cur = strtok_r(nullptr, " {}", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
 		domains.push_back(cur);
@@ -280,10 +280,10 @@ static int parse_pattern_4(int action, const char *action_str, char *stmt) {
 
 	int state = 0;
 	char *cur;
-	Array<const char *> classes, attribute;
+	Vector<const char *> classes, attribute;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		if (cur[0] == '*') cur = ALL;
-		Array<const char *> *vec;
+		Vector<const char *> *vec;
 		switch (state) {
 			case 0:
 				vec = &classes;

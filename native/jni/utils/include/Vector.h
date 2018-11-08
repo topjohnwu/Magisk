@@ -4,13 +4,13 @@
 #include "cpputils.h"
 
 template <class T>
-class Array {
+class Vector {
 public:
-	Array() : _data(0), _size(0), _capacity(0) {}
-	~Array() { delete []_data; }
+	Vector() : _data(0), _size(0), _capacity(0) {}
+	~Vector() { delete []_data; }
 
 	class iterator {
-		friend class Array;
+		friend class Vector;
 
 	public:
 		iterator(T* n= 0): _node(n) {}
@@ -67,7 +67,7 @@ public:
 		T*    _node;
 	};
 
-	Array &operator=(const Array& a) {
+	Vector &operator=(const Vector& a) {
 		delete [] _data;
 		_data = nullptr;
 		_size = a._size;
@@ -80,7 +80,7 @@ public:
 		return *this;
 	}
 
-	Array &operator=(Array&& a) {
+	Vector &operator=(Vector&& a) {
 		delete [] _data;
 		_size = a._size;
 		_capacity = a._capacity;
@@ -188,4 +188,4 @@ private:
 };
 
 template<class T>
-int(* Array<T>::_cmp)(T&, T&) = nullptr;
+int(* Vector<T>::_cmp)(T&, T&) = nullptr;

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "array.h"
+#include "Vector.h"
 #include "CharArray.h"
 
 struct cpio_newc_header {
@@ -57,14 +57,14 @@ public:
 	void makedir(mode_t mode, const char *name);
 	void ln(const char *target, const char *name);
 	void add(mode_t mode, const char *name, const char *file);
-	void insert(Array<cpio_entry *> &arr);
+	void insert(Vector<cpio_entry *> &arr);
 	bool mv(const char *from, const char *to);
 	void extract();
 	bool extract(const char *name, const char *file);
 	void sort();
 
 protected:
-	Array<cpio_entry *> arr;
+	Vector<cpio_entry *> arr;
 };
 
 #endif

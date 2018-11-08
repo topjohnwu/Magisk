@@ -11,7 +11,6 @@
 
 #include "_resetprop.h"
 #include "utils.h"
-#include "array.h"
 
 /* ***********************************************************************
  * Auto generated header and constant definitions compiled from
@@ -114,7 +113,7 @@ static bool prop_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
 	PersistentProperties_PersistentPropertyRecord prop = {};
 	prop.name.funcs.encode = name_encode;
 	prop.has_value = true;
-	Array<prop_t> &prop_list = *(Array<prop_t> *) *arg;
+	Vector<prop_t> &prop_list = *(Vector<prop_t> *) *arg;
 	for (auto &p : prop_list) {
 		if (!pb_encode_tag_for_field(stream, field))
 			return false;
@@ -209,7 +208,7 @@ CharArray persist_getprop(const char *name) {
 
 bool persist_deleteprop(const char *name) {
 	if (use_pb) {
-		Array<prop_t> prop_list;
+		Vector<prop_t> prop_list;
 		read_cb_t read_cb(collect_props, &prop_list);
 		persist_getprop(&read_cb);
 

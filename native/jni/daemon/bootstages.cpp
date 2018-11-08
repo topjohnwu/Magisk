@@ -24,7 +24,7 @@
 #include "flags.h"
 
 static char buf[PATH_MAX], buf2[PATH_MAX];
-static Array<CharArray> module_list;
+static Vector<CharArray> module_list;
 
 static int bind_mount(const char *from, const char *to);
 
@@ -56,7 +56,7 @@ private:
 	uint8_t type;
 	uint8_t status;
 	node_entry *parent;
-	Array<node_entry *> children;
+	Vector<node_entry *> children;
 
 	node_entry(const char *, const char *, uint8_t type);
 	bool is_root();
@@ -478,8 +478,8 @@ static void install_apk(const char *apk) {
 static bool check_data() {
 	bool mnt = false;
 	bool data = false;
-	Array<CharArray> mounts;
-	file_to_array("/proc/mounts", mounts);
+	Vector<CharArray> mounts;
+	file_to_vector("/proc/mounts", mounts);
 	for (auto &line : mounts) {
 		if (line.contains(" /data ") && !line.contains("tmpfs"))
 			mnt = true;
@@ -705,8 +705,8 @@ void startup() {
 	xmkdir(BLOCKDIR, 0755);
 
 	LOGI("* Mounting mirrors");
-	Array<CharArray> mounts;
-	file_to_array("/proc/mounts", mounts);
+	Vector<CharArray> mounts;
+	file_to_vector("/proc/mounts", mounts);
 	bool system_as_root = false;
 	for (auto &line : mounts) {
 		if (line.contains(" /system_root ")) {

@@ -56,7 +56,7 @@ cpio_entry::~cpio_entry() {
 
 // Define the way to sort cpio_entry
 template<>
-int(*Array<cpio_entry*>::_cmp)(cpio_entry*&, cpio_entry*&) = [](auto a, auto b) -> int {
+int(*Vector<cpio_entry*>::_cmp)(cpio_entry*&, cpio_entry*&) = [](auto a, auto b) -> int {
 	if (a == b) return 0;
 	if (a == nullptr) return 1;
 	if (b == nullptr) return -1;
@@ -148,7 +148,7 @@ void cpio::insert(cpio_entry *e) {
 	}
 }
 
-void cpio::insert(Array<cpio_entry *> &arr) {
+void cpio::insert(Vector<cpio_entry *> &arr) {
 	for (auto &e : arr)
 		insert(e);
 }

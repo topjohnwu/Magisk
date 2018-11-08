@@ -240,7 +240,7 @@ int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
 
 static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
 	// Collect va_list into vector
-	Array<const char *> args;
+	Vector<const char *> args;
 	args.push_back(argv0);
 	for (const char *arg = va_arg(argv, char*); arg; arg = va_arg(argv, char*))
 		args.push_back(arg);

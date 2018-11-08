@@ -63,7 +63,7 @@ static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 
 	char buffer[PATH_MAX];
-	Array<CharArray> mounts;
+	Vector<CharArray> mounts;
 
 	manage_selinux();
 	clean_magisk_props();
@@ -72,7 +72,7 @@ static void hide_daemon(int pid) {
 		goto exit;
 
 	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	file_to_array(buffer, mounts);
+	file_to_vector(buffer, mounts);
 
 	// Unmount dummy skeletons and /sbin links
 	for (auto &s : mounts) {
@@ -85,7 +85,7 @@ static void hide_daemon(int pid) {
 
 	// Re-read mount infos
 	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	file_to_array(buffer, mounts);
+	file_to_vector(buffer, mounts);
 
 	// Unmount everything under /system, /vendor, and loop mounts
 	for (auto &s : mounts) {

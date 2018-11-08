@@ -4,7 +4,7 @@
 #include <pthread.h>
 
 #include "daemon.h"
-#include "array.h"
+#include "Vector.h"
 #include "CharArray.h"
 
 #define TERM_THREAD SIGUSR1
@@ -30,7 +30,7 @@ bool init_list();
 
 extern int hide_enabled;
 extern pthread_mutex_t list_lock;
-extern Array<CharArray> hide_list;
+extern Vector<CharArray> hide_list;
 
 enum {
 	LAUNCH_MAGISKHIDE,

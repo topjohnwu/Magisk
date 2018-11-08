@@ -15,7 +15,6 @@
 #include "resetprop.h"
 #include "_resetprop.h"
 #include "utils.h"
-#include "array.h"
 #include "flags.h"
 
 bool use_pb = false;
@@ -77,7 +76,7 @@ illegal:
 
 // Define the way to sort prop_t
 template<>
-int(*Array<prop_t>::_cmp)(prop_t&, prop_t&) = [](auto a, auto b) -> int {
+int(*Vector<prop_t>::_cmp)(prop_t&, prop_t&) = [](auto a, auto b) -> int {
 	return strcmp(a.name, b.name);
 };
 
@@ -90,12 +89,12 @@ static void read_props(const prop_info *pi, void *read_cb) {
 }
 
 void collect_props(const char *name, const char *value, void *v_plist) {
-	Array<prop_t> &prop_list = *static_cast<Array<prop_t> *>(v_plist);
+	Vector<prop_t> &prop_list = *static_cast<Vector<prop_t> *>(v_plist);
 	prop_list.push_back(prop_t(name, value));
 }
 
 static void collect_unique_props(const char *name, const char *value, void *v_plist) {
-	Array<prop_t> &prop_list = *static_cast<Array<prop_t> *>(v_plist);
+	Vector<prop_t> &prop_list = *static_cast<Vector<prop_t> *>(v_plist);
 	for (auto &prop : prop_list) {
 		if (strcmp(name, prop.name) == 0)
 			return;
@@ -113,7 +112,7 @@ static int init_resetprop() {
 }
 
 static void print_props(bool persist) {
-	Array<prop_t> prop_list;
+	Vector<prop_t> prop_list;
 	getprop(collect_props, &prop_list, persist);
 	prop_list.sort();
 	for (auto &prop : prop_list)

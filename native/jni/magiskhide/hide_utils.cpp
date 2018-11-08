@@ -15,7 +15,7 @@
 #include "daemon.h"
 #include "db.h"
 
-Array<CharArray> hide_list;
+Vector<CharArray> hide_list;
 
 static const char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
@@ -232,8 +232,8 @@ bool init_list() {
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
-		Array<CharArray> tmp;
-		file_to_array(LEGACY_LIST, tmp);
+		Vector<CharArray> tmp;
+		file_to_vector(LEGACY_LIST, tmp);
 		for (auto &s : tmp)
 			add_list(db, s);
 		unlink(LEGACY_LIST);
