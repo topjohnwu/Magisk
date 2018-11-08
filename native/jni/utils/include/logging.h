@@ -35,7 +35,7 @@ extern struct log_callback log_cb;
 #define LOGI(...) log_handler(L_INFO, __VA_ARGS__)
 #define LOGW(...) log_handler(L_WARN, __VA_ARGS__)
 #define LOGE(...) log_handler(L_ERR, __VA_ARGS__)
-#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s", ##args, errno, strerror(errno))
+#define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, strerror(errno))
 
 int nop_log(const char *fmt, va_list ap);
 void nop_ex(int i);
