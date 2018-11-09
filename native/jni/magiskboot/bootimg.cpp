@@ -242,8 +242,7 @@ void boot_img::print_hdr() {
 
 	fprintf(stderr, "PAGESIZE        [%u]\n", page_size());
 	fprintf(stderr, "NAME            [%s]\n", name());
-	fprintf(stderr, "CMDLINE         [%.512s", cmdline());
-	fprintf(stderr, "%.1024s]\n", extra_cmdline());
+	fprintf(stderr, "CMDLINE         [%.512s%.1024s]\n", cmdline(), extra_cmdline());
 	fprintf(stderr, "CHECKSUM        [");
 	for (int i = 0; id()[i]; ++i)
 		fprintf(stderr, "%02x", id()[i]);
