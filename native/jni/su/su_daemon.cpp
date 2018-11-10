@@ -189,26 +189,6 @@ static struct su_info *get_su_info(unsigned uid) {
 	return info;
 }
 
-static void populate_environment(struct su_request *req) {
-	struct passwd *pw;
-
-	if (req->keepenv)
-		return;
-
-	pw = getpwuid(req->uid);
-	if (pw) {
-		setenv("HOME", pw->pw_dir, 1);
-		if (req->shell)
-			setenv("SHELL", req->shell, 1);
-		else
-			setenv("SHELL", DEFAULT_SHELL, 1);
-		if (req->login || req->uid) {
-			setenv("USER", pw->pw_name, 1);
-			setenv("LOGNAME", pw->pw_name, 1);
-		}
-	}
-}
-
 static void set_identity(unsigned uid) {
 	/*
 	 * Set effective uid back to root, otherwise setres[ug]id will fail
@@ -226,7 +206,7 @@ static void set_identity(unsigned uid) {
 }
 
 void su_daemon_handler(int client, struct ucred *credential) {
-	LOGD("su: request from client: %d\n", client);
+	LOGD("su: request from pid=[%d], client=[%d]\n", credential->pid, client);
 	
 	su_info *info = get_su_info(credential->uid);
 
@@ -249,7 +229,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		--info->ref;
 
 		// Wait result
-		LOGD("su: waiting child: [%d]\n", child);
+		LOGD("su: waiting child pid=[%d]\n", child);
 		int status, code;
 
 		if (waitpid(child, &status, 0) > 0)
@@ -257,7 +237,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		else
 			code = -1;
 
-		LOGD("su: return code: [%d]\n", code);
+		LOGD("su: return code=[%d]\n", code);
 		write(client, &code, sizeof(code));
 		close(client);
 		return;
@@ -275,22 +255,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 	// Become session leader
 	xsetsid();
-
-	// Migrate environment from client
-	char path[32], buf[4096];
-	snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
-	xreadlink(path, buf, sizeof(buf));
-	chdir(buf);
-	snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
-	memset(buf, 0, sizeof(buf));
-	int fd = open(path, O_RDONLY);
-	read(fd, buf, sizeof(buf));
-	close(fd);
-	clearenv();
-	for (size_t pos = 0; buf[pos];) {
-		putenv(buf + pos);
-		pos += strlen(buf + pos) + 1;
-	}
 
 	// Read su_request
 	xxread(client, &ctx.req, sizeof(su_req_base));
@@ -380,10 +344,35 @@ void su_daemon_handler(int client, struct ucred *credential) {
 			argv[2] = ctx.req.command;
 		}
 
-		// Setup shell
+		// Setup environment
 		umask(022);
-		populate_environment(&ctx.req);
 		set_identity(ctx.req.uid);
+		char path[32], buf[4096];
+		snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
+		xreadlink(path, buf, sizeof(buf));
+		chdir(buf);
+		snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
+		memset(buf, 0, sizeof(buf));
+		int fd = open(path, O_RDONLY);
+		read(fd, buf, sizeof(buf));
+		close(fd);
+		clearenv();
+		for (size_t pos = 0; buf[pos];) {
+			putenv(buf + pos);
+			pos += strlen(buf + pos) + 1;
+		}
+		if (!ctx.req.keepenv) {
+			struct passwd *pw;
+			pw = getpwuid(ctx.req.uid);
+			if (pw) {
+				setenv("HOME", pw->pw_dir, 1);
+				if (ctx.req.login || ctx.req.uid) {
+					setenv("USER", pw->pw_name, 1);
+					setenv("LOGNAME", pw->pw_name, 1);
+				}
+				setenv("SHELL", ctx.req.shell, 1);
+			}
+		}
 
 		execvp(ctx.req.shell, (char **) argv);
 		fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell, strerror(errno));
