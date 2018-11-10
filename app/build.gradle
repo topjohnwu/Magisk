@@ -71,7 +71,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     fullImplementation project(':utils')
-    implementation "androidx.core:core:${rootProject.ext.androidXVersion}"
+    implementation 'androidx.core:core:1.0.1'
+    fullImplementation 'androidx.appcompat:appcompat:1.0.2'
     fullImplementation "androidx.preference:preference:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
