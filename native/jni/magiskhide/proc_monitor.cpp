@@ -72,9 +72,10 @@ static void hide_daemon(int pid) {
 	if (switch_mnt_ns(pid))
 		goto exit;
 
-	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	file_to_vector(buffer, mounts);
+	snprintf(buffer, sizeof(buffer), "/proc/%d", pid);
+	chdir(buffer);
 
+	file_to_vector("mounts", mounts);
 	// Unmount dummy skeletons and /sbin links
 	for (auto &s : mounts) {
 		if (s.contains("tmpfs /system/") || s.contains("tmpfs /vendor/") || s.contains("tmpfs /sbin")) {
@@ -85,8 +86,7 @@ static void hide_daemon(int pid) {
 	mounts.clear();
 
 	// Re-read mount infos
-	snprintf(buffer, sizeof(buffer), "/proc/%d/mounts", pid);
-	file_to_vector(buffer, mounts);
+	file_to_vector("mounts", mounts);
 
 	// Unmount everything under /system, /vendor, and loop mounts
 	for (auto &s : mounts) {

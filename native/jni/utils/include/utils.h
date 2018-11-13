@@ -94,7 +94,6 @@ int is_num(const char *s);
 int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]);
 int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...);
 int exec_command_sync(const char *argv0, ...);
-int switch_mnt_ns(int pid);
 int fork_dont_care();
 void gen_rand_str(char *buf, int len);
 int strend(const char *s1, const char *s2);

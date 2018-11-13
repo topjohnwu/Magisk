@@ -37,6 +37,7 @@ enum {
 // daemon.c
 
 int connect_daemon();
+int switch_mnt_ns(int pid);
 
 // log_monitor.c
 

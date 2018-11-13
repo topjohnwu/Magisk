@@ -506,21 +506,21 @@ static bool magisk_env() {
 				strcmp(entry->d_name, ".core") == 0 ||
 				strcmp(entry->d_name, "lost+found") == 0)
 				continue;
-			snprintf(buf, PATH_MAX, "%s/%s/remove", MOUNTPOINT, entry->d_name);
-			if (access(buf, F_OK) == 0) {
-				snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
+			snprintf(buf, PATH_MAX, "%s/%s", MOUNTPOINT, entry->d_name);
+			chdir(buf);
+			if (access("remove", F_OK) == 0) {
+				chdir("..");
 				rm_rf(buf);
 				continue;
 			}
-			snprintf(buf, PATH_MAX, "%s/%s/update", MOUNTPOINT, entry->d_name);
-			unlink(buf);
-			snprintf(buf, PATH_MAX, "%s/%s/disable", MOUNTPOINT, entry->d_name);
-			if (access(buf, F_OK) == 0)
+			unlink("update");
+			if (access("disable", F_OK) == 0)
 				continue;
 			module_list.push_back(entry->d_name);
 		}
 	}
 	closedir(dir);
+	chdir("/");
 
 	return trim_img(MAINIMG, MOUNTPOINT, magiskloop) == 0;
 }
