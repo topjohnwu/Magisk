@@ -200,4 +200,5 @@ void proc_monitor() {
 		if (fork_dont_care() == 0)
 			hide_daemon(pid);
 	}
+	pthread_exit(nullptr);
 }

@@ -576,7 +576,7 @@ static bool check_data() {
 	return data;
 }
 
-extern int launch_magiskhide();
+extern int launch_magiskhide(int client = -1);
 
 static void *start_magisk_hide(void *) {
 	launch_magiskhide();

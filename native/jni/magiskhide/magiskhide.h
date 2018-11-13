@@ -10,7 +10,7 @@
 #define TERM_THREAD SIGUSR1
 
 // Daemon entries
-int launch_magiskhide();
+int launch_magiskhide(int client);
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);

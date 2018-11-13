@@ -32,7 +32,7 @@ pthread_mutex_t list_lock;
 	exit(1);
 }
 
-int launch_magiskhide() {
+int launch_magiskhide(int client) {
 	if (hide_enabled)
 		return HIDE_IS_ENABLED;
 
@@ -62,9 +62,12 @@ int launch_magiskhide() {
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();
+	if (client >= 0) {
+		write_int(client, DAEMON_SUCCESS);
+		close(client);
+	}
 	// Start monitoring
 	proc_monitor();
-	return DAEMON_SUCCESS;
 
 error:
 	hide_enabled = 0;
@@ -101,7 +104,7 @@ void magiskhide_handler(int client) {
 
 	switch (req) {
 	case LAUNCH_MAGISKHIDE:
-		res = launch_magiskhide();
+		res = launch_magiskhide(client);
 		break;
 	case STOP_MAGISKHIDE:
 		res = stop_magiskhide();
