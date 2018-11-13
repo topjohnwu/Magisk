@@ -23,6 +23,7 @@
 #include "flags.h"
 
 static int sockfd = -1;
+extern char *system_block, *vendor_block, *magiskloop;
 
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
@@ -89,7 +90,8 @@ static void hide_daemon(int pid) {
 
 	// Unmount everything under /system, /vendor, and loop mounts
 	for (auto &s : mounts) {
-		if (s.contains("/dev/block/loop") || s.contains(" /system/") || s.contains(" /vendor/")) {
+		if ((s.contains(" /system/") || s.contains(" /vendor/")) &&
+			(s.contains(system_block) || s.contains(vendor_block) || s.contains(magiskloop))) {
 			sscanf(s, "%*s %4096s", buffer);
 			lazy_unmount(buffer);
 		}

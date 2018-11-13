@@ -26,6 +26,8 @@
 static char buf[PATH_MAX], buf2[PATH_MAX];
 static Vector<CharArray> module_list;
 
+char *system_block, *vendor_block, *magiskloop;
+
 static int bind_mount(const char *from, const char *to);
 
 /***************
@@ -390,33 +392,110 @@ static int bind_mount(const char *from, const char *to) {
 	return ret;
 }
 
-#define alt_img ((const char *[]) \
-{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img", nullptr })
+static bool magisk_env() {
+	LOGI("* Initializing Magisk environment\n");
 
-static int prepare_img() {
-	// Merge images
-	for (int i = 0; alt_img[i]; ++i) {
-		if (merge_img(alt_img[i], MAINIMG)) {
-			LOGE("Image merge %s -> " MAINIMG " failed!\n", alt_img[i]);
-			return 1;
+	// Alternative binaries paths
+	const char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
+							  "/data/data/com.topjohnwu.magisk/install",
+							  "/data/user_de/0/com.topjohnwu.magisk/install" };
+	for (auto &alt : alt_bin) {
+		struct stat st;
+		if (lstat(alt, &st) != -1) {
+			if (S_ISLNK(st.st_mode)) {
+				unlink(alt);
+				continue;
+			}
+			rm_rf(DATABIN);;
+			cp_afc(alt, DATABIN);
+			rm_rf(alt);
+			break;
+		}
+	}
+
+	// Remove legacy stuffs
+	unlink("/data/magisk.img");
+	unlink("/data/magisk_debug.log");
+
+	// Create directories in tmpfs overlay
+	xmkdirs(MIRRDIR "/system", 0755);
+	xmkdir(MIRRDIR "/bin", 0755);
+	xmkdir(BBPATH, 0755);
+	xmkdir(MOUNTPOINT, 0755);
+	xmkdir(BLOCKDIR, 0755);
+
+	LOGI("* Mounting mirrors");
+	Vector<CharArray> mounts;
+	file_to_vector("/proc/mounts", mounts);
+	bool system_as_root = false;
+	for (auto &line : mounts) {
+		if (line.contains(" /system_root ")) {
+			bind_mount("/system_root/system", MIRRDIR "/system");
+			sscanf(line, "%s", buf);
+			system_block = strdup2(buf);
+			system_as_root = true;
+		} else if (!system_as_root && line.contains(" /system ")) {
+			sscanf(line, "%s %*s %s", buf, buf2);
+			system_block = strdup2(buf);
+			xmount(system_block, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
+#ifdef MAGISK_DEBUG
+			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
+#else
+			LOGI("mount: %s\n", MIRRDIR "/system");
+#endif
+		} else if (line.contains(" /vendor ")) {
+			seperate_vendor = 1;
+			sscanf(line, "%s %*s %s", buf, buf2);
+			vendor_block = strdup2(buf);
+			xmkdir(MIRRDIR "/vendor", 0755);
+			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
+#ifdef MAGISK_DEBUG
+			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
+#else
+			LOGI("mount: %s\n", MIRRDIR "/vendor");
+#endif
+		}
+	}
+	if (!seperate_vendor) {
+		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
+#ifdef MAGISK_DEBUG
+		LOGI("link: %s <- %s\n", MIRRDIR "/vendor", MIRRDIR "/system/vendor");
+#else
+		LOGI("link: %s\n", MIRRDIR "/vendor");
+#endif
+	}
+
+	xmkdirs(DATABIN, 0755);
+	bind_mount(DATABIN, MIRRDIR "/bin");
+	if (access(MIRRDIR "/bin/busybox", X_OK) == -1)
+		return false;
+	LOGI("* Setting up internal busybox");
+	exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
+	xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
+
+	const char *alt_img[] =
+			{ "/cache/magisk.img", "/data/magisk_merge.img", "/data/adb/magisk_merge.img" };
+
+	for (auto &alt : alt_img) {
+		if (merge_img(alt, MAINIMG)) {
+			LOGE("Image merge %s -> " MAINIMG " failed!\n", alt);
+			return false;
 		}
 	}
 
 	if (access(MAINIMG, F_OK) == -1) {
 		if (create_img(MAINIMG, 64))
-			return 1;
+			return false;
 	}
 
 	LOGI("* Mounting " MAINIMG "\n");
-	// Mounting magisk image
-	char *magiskloop = mount_image(MAINIMG, MOUNTPOINT);
+	magiskloop = mount_image(MAINIMG, MOUNTPOINT);
 	if (magiskloop == nullptr)
-		return 1;
+		return false;
 
 	xmkdir(COREDIR, 0755);
 	xmkdir(COREDIR "/post-fs-data.d", 0755);
 	xmkdir(COREDIR "/service.d", 0755);
-	xmkdir(COREDIR "/props", 0755);
 
 	DIR *dir = xopendir(MOUNTPOINT);
 	struct dirent *entry;
@@ -443,10 +522,7 @@ static int prepare_img() {
 	}
 	closedir(dir);
 
-	if (trim_img(MAINIMG, MOUNTPOINT, magiskloop))
-		return 1;
-	free(magiskloop);
-	return 0;
+	return trim_img(MAINIMG, MOUNTPOINT, magiskloop) == 0;
 }
 
 static void install_apk(const char *apk) {
@@ -589,8 +665,6 @@ void startup() {
 		simple_mount("/vendor");
 	}
 
-	LOGI("** Initializing Magisk\n");
-
 	// Unlock all blocks for rw
 	unlock_blocks();
 
@@ -670,82 +744,6 @@ void startup() {
 	close(sbin);
 	close(root);
 
-	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_bin", "/data/magisk",
-						"/data/data/com.topjohnwu.magisk/install",
-						"/data/user_de/0/com.topjohnwu.magisk/install", nullptr };
-	const char *bin_path = nullptr;
-	for (int i = 0; alt_bin[i]; ++i) {
-		struct stat st;
-		if (lstat(alt_bin[i], &st) != -1 && !S_ISLNK(st.st_mode)) {
-			rm_rf(DATABIN);
-			cp_afc(bin_path, DATABIN);
-			bin_path = alt_bin[i];
-			break;
-		}
-	}
-	if (bin_path) {
-		rm_rf(DATABIN);
-		cp_afc(bin_path, DATABIN);
-		rm_rf(bin_path);
-	}
-
-	// Remove legacy stuffs
-	rm_rf("/data/magisk");
-	unlink("/data/magisk.img");
-	unlink("/data/magisk_debug.log");
-
-	// Create directories in tmpfs overlay
-	xmkdirs(MIRRDIR "/system", 0755);
-	xmkdir(MIRRDIR "/bin", 0755);
-	xmkdir(BBPATH, 0755);
-	xmkdir(MOUNTPOINT, 0755);
-	xmkdir(BLOCKDIR, 0755);
-
-	LOGI("* Mounting mirrors");
-	Vector<CharArray> mounts;
-	file_to_vector("/proc/mounts", mounts);
-	bool system_as_root = false;
-	for (auto &line : mounts) {
-		if (line.contains(" /system_root ")) {
-			bind_mount("/system_root/system", MIRRDIR "/system");
-			system_as_root = true;
-		} else if (!system_as_root && line.contains(" /system ")) {
-			sscanf(line, "%s %*s %s", buf, buf2);
-			xmount(buf, MIRRDIR "/system", buf2, MS_RDONLY, nullptr);
-#ifdef MAGISK_DEBUG
-			LOGI("mount: %s <- %s\n", MIRRDIR "/system", buf);
-#else
-			LOGI("mount: %s\n", MIRRDIR "/system");
-#endif
-		} else if (line.contains(" /vendor ")) {
-			seperate_vendor = 1;
-			sscanf(line, "%s %*s %s", buf, buf2);
-			xmkdir(MIRRDIR "/vendor", 0755);
-			xmount(buf, MIRRDIR "/vendor", buf2, MS_RDONLY, nullptr);
-#ifdef MAGISK_DEBUG
-			LOGI("mount: %s <- %s\n", MIRRDIR "/vendor", buf);
-#else
-			LOGI("mount: %s\n", MIRRDIR "/vendor");
-#endif
-		}
-	}
-	if (!seperate_vendor) {
-		xsymlink(MIRRDIR "/system/vendor", MIRRDIR "/vendor");
-#ifdef MAGISK_DEBUG
-		LOGI("link: %s <- %s\n", MIRRDIR "/vendor", MIRRDIR "/system/vendor");
-#else
-		LOGI("link: %s\n", MIRRDIR "/vendor");
-#endif
-	}
-	xmkdirs(DATABIN, 0755);
-	bind_mount(DATABIN, MIRRDIR "/bin");
-	if (access(MIRRDIR "/bin/busybox", X_OK) == 0) {
-		LOGI("* Setting up internal busybox");
-		exec_command_sync(MIRRDIR "/bin/busybox", "--install", "-s", BBPATH, nullptr);
-		xsymlink(MIRRDIR "/bin/busybox", BBPATH "/busybox");
-	}
-
 	// Start post-fs-data mode
 	execl("/sbin/magisk.bin", "magisk", "--post-fs-data", nullptr);
 }
@@ -771,18 +769,17 @@ void post_fs_data(int client) {
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
-	// Start log_daemon
-	start_log_daemon();
-
 	LOGI("** post-fs-data mode running\n");
 
-	// Merge, trim, mount magisk.img, which will also travel through the modules
-	// After this, it will create the module list
-	if (prepare_img()) {
-		// Mounting fails, we can only do core only stuffs
+	// If magisk environment setup failed, only run core only operations
+	if (!magisk_env()) {
+		free(magiskloop);
+		magiskloop = nullptr;
 		core_only();
 		return;
 	}
+
+	start_log_daemon();
 
 	restorecon();
 	chmod(SECURE_DIR, 0700);

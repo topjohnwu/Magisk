@@ -86,11 +86,11 @@ int CharArray::compare(const char *s, size_t len) const {
 }
 
 bool CharArray::contains(const char *s) const {
-	return strstr(_buf, s) != nullptr;
+	return s == nullptr ? false : strstr(_buf, s) != nullptr;
 }
 
 bool CharArray::starts_with(const char *s) const {
-	return compare(s, strlen(s)) == 0;
+	return s == nullptr ? false : compare(s, strlen(s)) == 0;
 }
 
 bool CharArray::empty() const {
