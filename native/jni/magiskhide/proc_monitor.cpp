@@ -53,6 +53,8 @@ static int parse_ppid(int pid) {
 	int fd, ppid;
 	sprintf(path, "/proc/%d/stat", pid);
 	fd = xopen(path, O_RDONLY);
+	if (fd < 0)
+		return -1;
 	xread(fd, stat, sizeof(stat));
 	close(fd);
 	/* PID COMM STATE PPID ..... */
@@ -164,13 +166,13 @@ void proc_monitor() {
 			}
 		}
 		pthread_mutex_unlock(&list_lock);
-		if (!hide)
+
+		if (!hide || (ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns) == -1)
 			continue;
 
-		ppid = parse_ppid(pid);
-		read_ns(ppid, &pns);
 		do {
-			read_ns(pid, &ns);
+			if (read_ns(pid, &ns) == -1)
+				break;
 			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
 				usleep(50);
 			else
