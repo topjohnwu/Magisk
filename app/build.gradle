@@ -77,7 +77,7 @@ dependencies {
     fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
     fullImplementation "com.google.android.material:material:${rootProject.ext.androidXVersion}"
-    fullImplementation 'com.github.topjohnwu:libsu:2.0.2'
+    fullImplementation 'com.github.topjohnwu:libsu:2.0.3'
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
 
