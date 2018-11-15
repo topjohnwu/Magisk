@@ -125,11 +125,17 @@ esac
 
 ui_print "- Patching ramdisk"
 
+echo "KEEPVERITY=$KEEPVERITY" > config
+echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+[ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
+
 ./magiskboot --cpio ramdisk.cpio \
 "add 750 init magiskinit" \
-"magisk ramdisk.cpio.orig $KEEPVERITY $KEEPFORCEENCRYPT $SHA1"
+"patch $KEEPVERITY $KEEPFORCEENCRYPT" \
+"backup ramdisk.cpio.orig" \
+"add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig
+rm -f ramdisk.cpio.orig config
 
 ##########################################################################################
 # Binary patches
