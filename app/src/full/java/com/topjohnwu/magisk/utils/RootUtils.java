@@ -29,12 +29,15 @@ public class RootUtils extends Shell.Initializer {
     public boolean onInit(Context context, @NonNull Shell shell) {
         Shell.Job job = shell.newJob();
         if (shell.isRoot()) {
+            if (!new SuFile("/sbin/.magisk").exists())
+                job.add("ln -s /sbin/.core /sbin/.magisk");
+
             InputStream magiskUtils = context.getResources().openRawResource(R.raw.util_functions);
             InputStream managerUtils = context.getResources().openRawResource(R.raw.utils);
             job.add(magiskUtils).add(managerUtils);
 
             Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
-            SuFile file = new SuFile("/sbin/.core/img");
+            SuFile file = new SuFile("/sbin/.magisk/img");
             if (file.exists()) {
                 Const.MAGISK_PATH = file;
             } else if ((file = new SuFile("/dev/magisk/img")).exists()) {

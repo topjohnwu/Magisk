@@ -27,7 +27,7 @@ public class Const {
         MAGISK_PATH = MAGISK_DISABLE_FILE = MAGISK_HOST_FILE = new File("xxx");
     }
 
-    public static final String BUSYBOX_PATH = "/sbin/.core/busybox";
+    public static final String BUSYBOX_PATH = "/sbin/.magisk/busybox";
     public static final String TMP_FOLDER_PATH = "/dev/tmp";
     public static final String MAGISK_LOG = "/cache/magisk.log";
     public static final String MANAGER_CONFIGS = ".tmp.magisk.config";

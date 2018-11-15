@@ -20,7 +20,7 @@ public class MagiskDB {
     static final String SETTINGS_TABLE = "settings";
     static final String STRINGS_TABLE = "strings";
     static final File LEGACY_MANAGER_DB =
-            new File(Utils.fmt("/sbin/.core/db-%d/magisk.db", Const.USER_ID));
+            new File(Utils.fmt("/sbin/.magisk/db-%d/magisk.db", Const.USER_ID));
 
     @NonNull
     public static MagiskDB getInstance() {

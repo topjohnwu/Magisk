@@ -15,10 +15,10 @@ $BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
 $BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
 # Presets
+MAGISKTMP=/sbin/.magisk
 [ -z $NVBASE ] && NVBASE=/data/adb
 [ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
 [ -z $IMG ] && IMG=$NVBASE/magisk.img
-[ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
 
 # Bootsigner related stuff
 BOOTSIGNERCLASS=a.a
@@ -306,9 +306,9 @@ check_data() {
 }
 
 setup_bb() {
-  if [ -x /sbin/.core/busybox/busybox ]; then
+  if [ -x $MAGISKTMP/busybox/busybox ]; then
     # Make sure this path is in the front
-    echo $PATH | grep -q '^/sbin/.core/busybox' || export PATH=/sbin/.core/busybox:$PATH
+    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
   elif [ -x $TMPDIR/bin/busybox ]; then
     # Make sure this path is in the front
     echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
@@ -322,11 +322,11 @@ setup_bb() {
 }
 
 boot_actions() {
-  if [ ! -d /sbin/.core/mirror/bin ]; then
-    mkdir -p /sbin/.core/mirror/bin
-    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
+  if [ ! -d $MAGISKTMP/mirror/bin ]; then
+    mkdir -p $MAGISKTMP/mirror/bin
+    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
   fi
-  MAGISKBIN=/sbin/.core/mirror/bin
+  MAGISKBIN=$MAGISKTMP/mirror/bin
   setup_bb
 }
 

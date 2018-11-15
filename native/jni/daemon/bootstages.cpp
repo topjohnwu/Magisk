@@ -417,6 +417,9 @@ static bool magisk_env() {
 	unlink("/data/magisk.img");
 	unlink("/data/magisk_debug.log");
 
+	// Symlink for legacy path users
+	symlink(MAGISKTMP, "/sbin/.core");
+
 	// Create directories in tmpfs overlay
 	xmkdirs(MIRRDIR "/system", 0755);
 	xmkdir(MIRRDIR "/bin", 0755);
