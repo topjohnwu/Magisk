@@ -142,7 +142,7 @@
     <string name="settings_boot_format_title">Výstupný formát zaplátaného Boot</string>
     <string name="settings_boot_format_summary">Vyberte výstupný formát zaplátaného obrazu boot.\nVyberte .img pre flashovanie cez fastboot/download režim; vyberte .img.tar pre flashovanie cez ODIN.</string>
     <string name="settings_core_only_title">Režim Magisk Core</string>
-    <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU, MagiskHide a systemless hosts, ale žiadne moduly nebudú zavedené.</string>
+    <string name="settings_core_only_summary">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené.</string>
     <string name="settings_magiskhide_summary">Ukryť Magisk pre rôznymi detekciami</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre aplikácie systemless hosts Adblock</string>

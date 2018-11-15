@@ -22,9 +22,7 @@ import com.topjohnwu.magisk.container.Policy;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.SuConnector;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import androidx.annotation.Nullable;
 import butterknife.BindView;

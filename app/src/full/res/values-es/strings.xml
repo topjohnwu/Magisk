@@ -30,7 +30,7 @@
     <string name="uninstall_magisk_msg">Todos los módulos serán desactivados / eliminados. El acceso Root se eliminará y, posiblemente, cifrará los datos si los datos no están cifrados actualmente.</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Actualización %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(No hay información)</string>
     <string name="no_modules_found">No se encontraron módulos</string>
@@ -118,7 +118,7 @@
     <string name="env_fix_msg">Su dispositivo requiere una instalación adicional para que Magisk funcione correctamente. Se descargará el zip de instalación de Magisk, desea continuar ahora?</string>
     <string name="setup_title">Configuración Adicional</string>
     <string name="setup_msg">Ejecutando Configuración de Entorno</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>
     <string name="settings_dark_theme_title">Tema oscuro</string>
@@ -141,8 +141,8 @@
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
     <string name="settings_boot_format_title">Parchear imagen boot por tipo de formato</string>
     <string name="settings_boot_format_summary">Seleccionar el formato de salida para parchear la imagen boot.\nEscoja .img para flashear mediante fastboot/download mode; escoja .img.tar para flashear con ODIN.</string>
-    
-    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU, MagiskHide, y Systemless Hosts seguirán habilitados</string>
+
+    <string name="settings_core_only_summary">Habilitar sólo funciones principales, no se cargarán todos los módulos. MagiskSU y MagiskHide seguirán habilitados</string>
     <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para aplicaciones Adblock fuera de la partición system</string>
@@ -167,8 +167,8 @@
     <string name="settings_su_fingerprint_title">Autenticación por Huella Dactilar</string>
     <string name="settings_su_fingerprint_summary">Utilizar el sensor de Huella Dactilar para permitir las solicitudes de superusuario</string>
     <string name="auth_fingerprint">Autenticar Huella Dactilar</string>
-    
-    <string name="multiuser_mode">Modo MultiUsuario</string> 
+
+    <string name="multiuser_mode">Modo MultiUsuario</string>
     <string name="settings_owner_only">Sólo Administrador del Dispositivo</string>
     <string name="settings_owner_manage">Administrador del Dispositivo</string>
     <string name="settings_user_independent">Usuario Independiente</string>
@@ -176,7 +176,7 @@
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
     <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
     <string name="multiuser_hint_owner_request">Se ha enviado una solicitud al administrador del dispositivo. Por favor, cambie a la cuenta del administrador y conceda el permiso</string>
-    
+
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>
     <string name="settings_ns_requester">Heredar Namespace</string>

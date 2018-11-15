@@ -140,7 +140,7 @@
     <string name="settings_boot_format_title">Format Keluaran Boot yang Ditambal</string>
     <string name="settings_boot_format_summary">Pilih format keluaran boot image yang ditambal.\nPilih .img untuk flash melalui mode recovery/download; pilih .img.tar untuk flash melalui ODIN.</string>
     <string name="settings_core_only_title">Magisk Mode Inti Saja</string>
-    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU, MagiskHide, dan host tanpa sistem akan tetap diaktifkan</string>
+    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>

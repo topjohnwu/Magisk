@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">已修补的 Boot 镜像输出格式</string>
     <string name="settings_boot_format_summary">选择已修补的 Boot 镜像文件输出格式\n若要通过 fastboot/download 模式刷入，请选择 .img 格式；若要通过 Odin 刷入，则选择 .img.tar\n</string>
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
-    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
+    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU 和 MagiskHide 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>

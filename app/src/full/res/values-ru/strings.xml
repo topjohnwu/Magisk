@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Тип образа ядра</string>
     <string name="settings_boot_format_summary">Выберите тип патченого образа ядра:\n*.img - для прошивки через fastboot/download режимы\n*.img.tar - для прошивки через ODIN (Samsung)</string>
     <string name="settings_core_only_title">Magisk Core</string>
-    <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU, Magisk Hide и внесистемные хосты останутся активными</string>
+    <string name="settings_core_only_summary">Активировать только основные возможности. Модули не будут загружены. MagiskSU и Magisk Hide останутся активными</string>
     <string name="settings_magiskhide_summary">Скрывать Magisk от различных проверок</string>
     <string name="settings_hosts_title">Внесистемные хосты</string>
     <string name="settings_hosts_summary">Поддержка внесистемных хостов для приложений, блокирующих рекламу</string>

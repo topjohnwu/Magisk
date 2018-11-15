@@ -133,7 +133,7 @@
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
-    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide 和 systemless hosts 仍會持續運作</string>
+    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU 和 MagiskHide 仍會持續運作</string>
     <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
     <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>

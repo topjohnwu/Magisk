@@ -79,11 +79,41 @@ public class SettingsFragment extends PreferenceFragmentCompat
         PreferenceCategory magiskCategory = (PreferenceCategory) findPreference("magisk");
         PreferenceCategory suCategory = (PreferenceCategory) findPreference("superuser");
         Preference hideManager = findPreference("hide");
+        hideManager.setOnPreferenceClickListener(pref -> {
+            PatchAPK.hideManager(requireActivity());
+            return true;
+        });
         Preference restoreManager = findPreference("restore");
-        findPreference("clear").setOnPreferenceClickListener((pref) -> {
+        restoreManager.setOnPreferenceClickListener(pref -> {
+            Download.receive(
+                requireActivity(), new DownloadReceiver() {
+                    @Override
+                    public void onDownloadDone(Context context, Uri uri) {
+                        Data.exportPrefs();
+                        Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
+                        if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
+                            Shell.su("rm -f /data/local/tmp/manager.apk").exec();
+                            RootUtils.uninstallPkg(context.getPackageName());
+                            return;
+                        }
+                        Shell.su("rm -f /data/local/tmp/manager.apk").exec();
+                    }
+                },
+                Data.managerLink,
+                Utils.fmt("MagiskManager-v%s.apk", Data.remoteManagerVersionString)
+            );
+            return true;
+        });
+        findPreference("clear").setOnPreferenceClickListener(pref -> {
             mm.prefs.edit().remove(Const.Key.ETAG_KEY).apply();
             mm.repoDB.clearRepo();
             Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT);
+            return true;
+        });
+        findPreference("hosts").setOnPreferenceClickListener(pref -> {
+            Shell.su("add_hosts_module").exec();
+            Utils.loadModules();
+            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT);
             return true;
         });
 
@@ -142,36 +172,10 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
             if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-                hideManager.setOnPreferenceClickListener((pref) -> {
-                    PatchAPK.hideManager(requireActivity());
-                    return true;
-                });
                 generalCatagory.removePreference(restoreManager);
             } else {
-                if (Download.checkNetworkStatus(mm)) {
-                    restoreManager.setOnPreferenceClickListener((pref) -> {
-                        Download.receive(
-                            requireActivity(), new DownloadReceiver() {
-                                @Override
-                                public void onDownloadDone(Context context, Uri uri) {
-                                    Data.exportPrefs();
-                                    Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
-                                    if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
-                                        Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                                        RootUtils.uninstallPkg(context.getPackageName());
-                                        return;
-                                    }
-                                    Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                                }
-                            },
-                            Data.managerLink,
-                            Utils.fmt("MagiskManager-v%s.apk", Data.remoteManagerVersionString)
-                        );
-                        return true;
-                    });
-                } else {
+                if (!Download.checkNetworkStatus(mm))
                     generalCatagory.removePreference(restoreManager);
-                }
                 generalCatagory.removePreference(hideManager);
             }
         } else {
@@ -256,17 +260,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
                     Shell.su("magiskhide --enable").submit();
                 } else {
                     Shell.su("magiskhide --disable").submit();
-                }
-                break;
-            case Const.Key.HOSTS:
-                if (prefs.getBoolean(key, false)) {
-                    Shell.su("cp -af /system/etc/hosts " + Const.MAGISK_HOST_FILE,
-                            "mount -o bind " + Const.MAGISK_HOST_FILE + " /system/etc/hosts")
-                            .submit();
-                } else {
-                    Shell.su("umount -l /system/etc/hosts",
-                            "rm -f " + Const.MAGISK_HOST_FILE)
-                            .submit();
                 }
                 break;
             case Const.Key.LOCALE:

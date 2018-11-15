@@ -143,10 +143,11 @@
     <string name="settings_boot_format_title">Patched Boot Output Format</string>
     <string name="settings_boot_format_summary">Select the format for the output patched boot image.\nChoose .img to flash through fastboot/download mode; choose .img.tar to flash with ODIN.</string>
     <string name="settings_core_only_title">Magisk Core Only Mode</string>
-    <string name="settings_core_only_summary">Enable only core features. MagiskSU, MagiskHide and systemless hosts will still be enabled, but no modules will be loaded.</string>
+    <string name="settings_core_only_summary">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded.</string>
     <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps.</string>
+    <string name="settings_hosts_toast">Added systemless hosts module</string>
 
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>

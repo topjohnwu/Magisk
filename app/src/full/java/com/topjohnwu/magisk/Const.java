@@ -18,13 +18,12 @@ public class Const {
     public static final String SU_KEYSTORE_KEY = "su_key";
 
     // Paths
-    public static File MAGISK_PATH;
+    public static final String MAGISK_PATH = "/sbin/.magisk/img";
     public static File MAGISK_DISABLE_FILE;
-    public static File MAGISK_HOST_FILE;
 
     static {
         /* Prevent crashing on unrooted devices */
-        MAGISK_PATH = MAGISK_DISABLE_FILE = MAGISK_HOST_FILE = new File("xxx");
+        MAGISK_DISABLE_FILE = new File("xxx");
     }
 
     public static final String BUSYBOX_PATH = "/sbin/.magisk/busybox";

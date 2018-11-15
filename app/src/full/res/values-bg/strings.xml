@@ -119,7 +119,7 @@
     <string name="env_fix_msg">Вашето устройство се нуждае от допълнителни настройки за Magisk, за да работи перфектно. Ще бъде изтеглен архивът за настройка на Magisk. Желаете ли да продължите?</string>
     <string name="setup_title">Допълнителни настройване</string>
     <string name="setup_msg">Настройването на средата е в ход…</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">Общи</string>
     <string name="settings_dark_theme_title">Тъмна тема</string>
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Изходен формат за модифициран Boot образ</string>
     <string name="settings_boot_format_summary">Избор на изходен формат за модифициран Boot образ.\nИзберете .img, за инсталиране чрез fastboot/download режим; изберете .img.tar за инсталиране чрез ODIN.</string>
     <string name="settings_core_only_title">Режим Magisk Core Only</string>
-    <string name="settings_core_only_summary">Работят само основни функции, като MagiskSU, MagiskHide и несистемни хостове, без модули.</string>
+    <string name="settings_core_only_summary">Работят само основни функции, като MagiskSU и MagiskHide, без модули.</string>
     <string name="settings_magiskhide_summary">Скриване на Magisk от различни детектори</string>
     <string name="settings_hosts_title">Несистемни хостове</string>
     <string name="settings_hosts_summary">Поддръжка на несистемни хостове за използване на приложения, блокиращи реклами</string>

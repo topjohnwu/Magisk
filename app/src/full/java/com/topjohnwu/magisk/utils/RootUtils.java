@@ -32,21 +32,9 @@ public class RootUtils extends Shell.Initializer {
             if (!new SuFile("/sbin/.magisk").exists())
                 job.add("ln -s /sbin/.core /sbin/.magisk");
 
-            InputStream magiskUtils = context.getResources().openRawResource(R.raw.util_functions);
-            InputStream managerUtils = context.getResources().openRawResource(R.raw.utils);
-            job.add(magiskUtils).add(managerUtils);
-
+            job.add(context.getResources().openRawResource(R.raw.util_functions))
+                .add(context.getResources().openRawResource(R.raw.utils));
             Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
-            SuFile file = new SuFile("/sbin/.magisk/img");
-            if (file.exists()) {
-                Const.MAGISK_PATH = file;
-            } else if ((file = new SuFile("/dev/magisk/img")).exists()) {
-                Const.MAGISK_PATH = file;
-            } else {
-                Const.MAGISK_PATH = new SuFile("/magisk");
-            }
-            Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
-
             Data.loadMagiskInfo();
         } else {
             InputStream nonroot = context.getResources().openRawResource(R.raw.nonroot_utils);

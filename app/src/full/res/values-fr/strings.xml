@@ -1,5 +1,5 @@
 <resources>
-	
+
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
     <string name="downloads">Téléchargements</string>
@@ -119,7 +119,7 @@
     <string name="env_fix_msg">Votre appareil a besoin d\'une configuration supplémentaire pour que Magisk fonctionne correctement. Il téléchargera le zip d\'installation de Magisk, voulez-vous procéder maintenant ?</string>
     <string name="setup_title">Installation Additionnel</string>
     <string name="setup_msg">Démarrer l\'installation de l\'environnement…</string>
- 
+
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
     <string name="settings_dark_theme_title">Thème sombre</string>
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Patcher Format Fichier Démarrage</string>
     <string name="settings_boot_format_summary">Sélectioner le format de sortie de l\'image de boot.\nChoisir .img pour flasher à traver le mode démarrage rapide/téléchargement; choisir .img.tar pour flasher via ODIN.</string>
     <string name="settings_core_only_title">Mode Magisk Core uniquement</string>
-    <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU, MagiskHide et les hosts systemless restent activés</string>
+    <string name="settings_core_only_summary">Activer uniquement les fonctionnalités de base, tous les modules ne seront pas chargés. MagiskSU et MagiskHide restent activés</string>
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
     <string name="settings_hosts_title">Hôtes systemless</string>
     <string name="settings_hosts_summary">Support d\'hôtes systemless pour les applications type Adblock</string>

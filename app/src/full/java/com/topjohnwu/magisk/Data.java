@@ -187,7 +187,6 @@ public class Data {
         MM().prefs.edit()
                 .putBoolean(Const.Key.DARK_THEME, isDarkTheme)
                 .putBoolean(Const.Key.MAGISKHIDE, magiskHide)
-                .putBoolean(Const.Key.HOSTS, Const.MAGISK_HOST_FILE.exists())
                 .putBoolean(Const.Key.COREONLY, Const.MAGISK_DISABLE_FILE.exists())
                 .putString(Const.Key.SU_REQUEST_TIMEOUT, String.valueOf(suRequestTimeout))
                 .putString(Const.Key.SU_AUTO_RESPONSE, String.valueOf(suResponseType))

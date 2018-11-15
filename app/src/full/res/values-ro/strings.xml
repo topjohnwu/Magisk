@@ -27,7 +27,7 @@
     <string name="uninstall_magisk_title">Dezinstalare Magisk</string>
     <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate. Accesul la Root va fi eliminat și potențial se vor cripta datele dacă nu sunt în prezent criptate</string>
     <string name="update">Actualizare %1$s</string>
-  
+
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
@@ -125,7 +125,7 @@
     <string name="settings_boot_format_title">Formatul Boot-ului modificat</string>
     <string name="settings_boot_format_summary">Selectați formatul fișierului imaginii de Boot modificată.\nAlegeţi .img pentru flash prin modul fastboot/download; alegeţi .img.tar pentru flash prin ODIN.</string>
     <string name="settings_core_only_title">Mod de bază</string>
-    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU, MagiskHide şi systemless hosts vor fi în continuare activate</string>
+    <string name="settings_core_only_summary">Se activează numai caracteristicile principale, toate modulele nu vor fi încărcate. MagiskSU şi MagiskHide vor fi în continuare activate</string>
     <string name="settings_magiskhide_summary">Ascundeţi Magisk de la diferite detectări</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts suport pentru aplicațiile Adblock</string>
@@ -149,7 +149,7 @@
     <string name="settings_su_reauth_summary">Reautentificare permisiuni pentru superuser după o actualizare a aplicației</string>
     <string name="settings_su_fingerprint_title">Activați autentificarea cu amprenta digitală</string>
     <string name="settings_su_fingerprint_summary">Utilizați scanerul de amprentă pentru a permite solicitările superuser</string>
- 
+
     <string name="multiuser_mode">Mod Multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
     <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>

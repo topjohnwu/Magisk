@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Ausgabeformat des gepatchten Boot-Images</string>
     <string name="settings_boot_format_summary">Wähle das Ausgabeformat des gepatchten Boot-Images.\nWähle .img, um mit \"fastboot/download mode\" zu flashen; wähle .img.tar zum Flashen mit ODIN.</string>
     <string name="settings_core_only_title">Nur Kernfunktionen</string>
-    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU, Magisk Hide und Systemless hosts bleiben weiterhin aktiv</string>
+    <string name="settings_core_only_summary">Aktiviert lediglich die Kernfunktionen, Module werden nicht geladen. MagiskSU und Magisk Hide bleiben weiterhin aktiv</string>
     <string name="settings_magiskhide_summary">Versteckt Magisk vor diversen Entdeckungsmethoden</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>

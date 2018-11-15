@@ -132,7 +132,7 @@
     <string name="settings_boot_format_title">Gepatchte boot uitvoerformaat</string>
     <string name="settings_boot_format_summary">Kies het formaat van de boot image uitvoer.\nKies .img om via fastboot/downloadmodus te flashen; kies .img.tar om via ODIN te flashen.</string>
     <string name="settings_core_only_title">Magisk basismodus</string>
-    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU, MagiskHide, en systeemloze hosts blijven ingeschakeld</string>
+    <string name="settings_core_only_summary">Alleen kernfuncties inschakelen. Alle modules worden niet geladen. MagiskSU en MagiskHide blijven ingeschakeld</string>
     <string name="settings_magiskhide_summary">Magisk van verschillende detecties verbergen</string>
     <string name="settings_hosts_title">Systeemloze hosts</string>
     <string name="settings_hosts_summary">Systemloze hosts ondersteuning voor Adblock apps</string>
@@ -156,7 +156,7 @@
     <string name="settings_su_reauth_summary">Superuser rechten opnieuw opvragen na bijwerken applicatie</string>
     <string name="settings_su_fingerprint_title">Vingerafdruk authenticatie inschakelen</string>
     <string name="settings_su_fingerprint_summary">Vingerafdruk gebruiken om superuser verzoeken toe te staan</string>
-    
+
     <string name="multiuser_mode">Multi-gebruiker modus</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
     <string name="settings_owner_manage">Beheerd door apparaateigenaar</string>

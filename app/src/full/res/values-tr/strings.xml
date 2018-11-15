@@ -119,7 +119,7 @@
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_title">Ek Kurulum</string>
     <string name="setup_msg">Ortam Kurulumu Çalışıyor…</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>
     <string name="settings_dark_theme_title">Karanlık Tema</string>
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Yamalı Önyükleme Formatı</string>
     <string name="settings_boot_format_summary">Yamalı önyükleme imaj dosyasının formatını seçin\nFastboot/download modunda yüklemek için .img seçeneğini seçin; ODIN ile yüklemek için .img.tar\'ı seçin.</string>
     <string name="settings_core_only_title">Magisk Sadece Çekirdek Modu</string>
-    <string name="settings_core_only_summary">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU, MagiskHide ve host yine de etkinleştirilecektir</string>
+    <string name="settings_core_only_summary">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU ve MagiskHide yine de etkinleştirilecektir</string>
     <string name="settings_magiskhide_summary">"Magisk\'i çeşitli algılamalardan gizle"</string>
     <string name="settings_hosts_title">Sistemsiz host</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz host desteği</string>

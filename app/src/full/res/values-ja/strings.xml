@@ -128,7 +128,7 @@
     <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
     <string name="settings_boot_format_summary">パッチしたBootイメージの出力形式を選択してください。\nfastboot/download modeでインストールするには .img を、ODINでインストールするには .img.tar を選択してください</string>
     <string name="settings_core_only_title">Magisk コアモード</string>
-    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide、systemless hostsは引き続き有効になります</string>
+    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide は引き続き有効になります</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのためのSystemless hostsサポートを有効化します</string>

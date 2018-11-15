@@ -1,5 +1,5 @@
 <resources>
-    
+
     <!--Welcome Activity-->
     <string name="modules">Moduły</string>
     <string name="downloads">Pobieranie</string>
@@ -29,7 +29,7 @@
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
 	<string name="uninstall_magisk_msg">Wszystkie moduły będą wyłączone/usunięte. Root zostanie usunięty i przywrócone szyfrowanie danych, jeśli nie są te dane obecnie szyfrowane</string>
     <string name="update">Aktualizacja %1$s</string>
-    
+
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie umieszczono informacji)</string>
     <string name="no_modules_found">Nie znaleziono modułów</string>
@@ -42,7 +42,7 @@
     <string name="reboot_recovery">Restart do Recovery</string>
     <string name="reboot_bootloader">Restart do Bootloadera</string>
     <string name="reboot_download">Restart do Download</string>
-    
+
 	<!--Repo Fragment-->
     <string name="update_available">Aktualizacja jest dostępna</string>
     <string name="installed">Zainstalowany</string>
@@ -111,7 +111,7 @@
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
-	
+
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>
     <string name="settings_dark_theme_title">Ciemny Motyw</string>
@@ -135,11 +135,11 @@
     <string name="settings_boot_format_title">Poprawny format pliku rozruchowego</string>
     <string name="settings_boot_format_summary">Wybierz format pliku boot image.\nWybierz .img dla wgrywania poprzez Fastboot/Download Mode. Wybierz .img.tar dla ODINA.</string>
     <string name="settings_core_only_title">Tylko Podstawowy Tryb Magisk</string>
-    <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU, MagiskHide i systemless hosts nadal będą włączone</string>
+    <string name="settings_core_only_summary">Włącz tylko podstawowe funkcje, wszystkie moduły nie zostaną załadowane. MagiskSU i MagiskHide nadal będą włączone</string>
     <string name="settings_magiskhide_summary">Włącz Magisk Hide dla wykrytych aplikacji</string>
     <string name="settings_hosts_title">Włącz systemless hosts</string>
     <string name="settings_hosts_summary">Wsparcie systemless dla aplikacji Adblock</string>
-    
+
     <string name="settings_su_app_adb">Aplikacje i ADB</string>
     <string name="settings_su_app">Tylko Aplikacje</string>
     <string name="settings_su_adb">Tylko ADB</string>
@@ -159,7 +159,7 @@
     <string name="settings_su_reauth_summary">Ponowne uwierzytelnianie uprawnienia superużytkownika po aktualizacji aplikacji</string>
     <string name="settings_su_fingerprint_title">Włącz Uwierzytelnienie Odciskiem Palca</string>
     <string name="settings_su_fingerprint_summary">Użyj skanera linii papilarnych, aby zezwolić na żądania supersu</string>
-    
+
     <string name="multiuser_mode">Tryb Multiusera</string>
     <string name="settings_owner_only">Tylko Właściciel Urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie Właścicielami Urządzenia</string>
@@ -178,7 +178,7 @@
     <string name="isolate_summary">W każdej sesji root będzie miał własną odosobnioną nazwę</string>
     <string name="android_o_not_support">Brak wsparcia dla Androida 8.0+</string>
     <string name="disable_fingerprint">Nie ustawiono żadnych odcisków palców lub brak obsługi urządzenia</string>
-		
+
     <!--Superuser-->
     <string name="su_request_title">Prośba o dostęp Superusera</string>
     <string name="deny_with_str">Odmów%1$s</string>

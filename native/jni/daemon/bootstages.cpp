@@ -752,12 +752,6 @@ void startup() {
 }
 
 static void core_only() {
-	// Systemless hosts
-	if (access(HOSTSFILE, F_OK) == 0) {
-		LOGI("* Enabling systemless hosts file support");
-		bind_mount(HOSTSFILE, "/system/etc/hosts");
-	}
-
 	auto_start_magiskhide();
 	unblock_boot_process();
 }

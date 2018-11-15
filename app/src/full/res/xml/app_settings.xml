@@ -61,7 +61,7 @@
         android:key="magisk"
         android:title="@string/magisk">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="disable"
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
@@ -71,7 +71,7 @@
             android:title="@string/magiskhide"
             android:summary="@string/settings_magiskhide_summary" />
 
-        <SwitchPreference
+        <Preference
             android:key="hosts"
             android:title="@string/settings_hosts_title"
             android:summary="@string/settings_hosts_summary" />
