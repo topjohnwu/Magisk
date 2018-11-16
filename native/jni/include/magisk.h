@@ -17,7 +17,7 @@
 #define MIRRDIR         MAGISKTMP "/mirror"
 #define BBPATH          MAGISKTMP "/busybox"
 #define MOUNTPOINT      MAGISKTMP "/img"
-#define COREDIR         MOUNTPOINT "/.core"
+#define LEGACY_CORE     MOUNTPOINT "/.core"
 #define SECURE_DIR      "/data/adb"
 #define MAINIMG         SECURE_DIR "/magisk.img"
 #define DATABIN         SECURE_DIR "/magisk"

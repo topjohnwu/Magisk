@@ -9,9 +9,6 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 
-extern int setup_done;
-extern int seperate_vendor;
-
 // Commands require connecting to daemon
 enum {
 	DO_NOTHING = 0,
