@@ -147,6 +147,7 @@
     <string name="settings_magiskhide_summary">Masquer Magisk de diverses détections</string>
     <string name="settings_hosts_title">Hôtes systemless</string>
     <string name="settings_hosts_summary">Support d\'hôtes systemless pour les applications type Adblock</string>
+    <string name="settings_hosts_toast">Ajout d\'un module d\'hôtes sans système</string>
 
     <string name="settings_su_app_adb">Applis et ADB</string>
     <string name="settings_su_app">Applications uniquement</string>
