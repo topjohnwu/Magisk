@@ -97,6 +97,8 @@ int magiskhide_main(int argc, char *argv[]) {
 	write_int(fd, req);
 	if (req == ADD_HIDELIST || req == RM_HIDELIST)
 		write_string(fd, argv[2]);
+	if (req == LS_HIDELIST)
+		send_fd(fd, STDOUT_FILENO);
 
 	// Get response
 	int code = read_int(fd);
@@ -128,16 +130,6 @@ int magiskhide_main(int argc, char *argv[]) {
 		fprintf(stderr, "Error occured in daemon...\n");
 		return DAEMON_ERROR;
 	}
-
-	if (code == DAEMON_SUCCESS && req == LS_HIDELIST) {
-		int cnt = read_int(fd);
-		for (int i = 0; i < cnt; ++i) {
-			char *s = read_string(fd);
-			printf("%s\n", s);
-			free(s);
-		}
-	}
-	close(fd);
 
 	return req == HIDE_STATUS ? (code == HIDE_IS_ENABLED ? 0 : 1) : code != DAEMON_SUCCESS;
 }

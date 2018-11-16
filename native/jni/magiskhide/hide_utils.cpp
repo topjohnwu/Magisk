@@ -247,10 +247,11 @@ bool init_list() {
 }
 
 void ls_list(int client) {
-	write_int(client, DAEMON_SUCCESS);
-	write_int(client, hide_list.size());
+	FILE *out = fdopen(recv_fd(client), "a");
 	for (auto &s : hide_list)
-		write_string(client, s);
+		fprintf(out, "%s\n", s.c_str());
+	fclose(out);
+	write_int(client, DAEMON_SUCCESS);
 	close(client);
 }
 
