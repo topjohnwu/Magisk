@@ -507,11 +507,11 @@ static bool prepare_img() {
 
 	// Migrate legacy boot scripts
 	struct stat st;
-	if (stat(LEGACY_CORE "/post-fs-data.d", &st) == 0 && S_ISDIR(st.st_mode)) {
+	if (lstat(LEGACY_CORE "/post-fs-data.d", &st) == 0 && S_ISDIR(st.st_mode)) {
 		cp_afc(LEGACY_CORE "/post-fs-data.d", SECURE_DIR "/post-fs-data.d");
 		rm_rf(LEGACY_CORE "/post-fs-data.d");
 	}
-	if (stat(LEGACY_CORE "/service.d", &st) == 0 && S_ISDIR(st.st_mode)) {
+	if (lstat(LEGACY_CORE "/service.d", &st) == 0 && S_ISDIR(st.st_mode)) {
 		cp_afc(LEGACY_CORE "/service.d", SECURE_DIR "/service.d");
 		rm_rf(LEGACY_CORE "/service.d");
 	}
