@@ -60,31 +60,27 @@ static void *info_collector(void *node) {
 
 static void database_check(su_info *info) {
 	int uid = info->uid;
-	sqlite3 *db = get_magiskdb();
-	if (db) {
-		get_db_settings(db, &info->cfg);
-		get_db_strings(db, &info->str);
+	get_db_settings(&info->cfg, 0);
+	get_db_strings(&info->str, 0);
 
-		// Check multiuser settings
-		switch (info->cfg[SU_MULTIUSER_MODE]) {
-			case MULTIUSER_MODE_OWNER_ONLY:
-				if (info->uid / 100000) {
-					uid = -1;
-					info->access = NO_SU_ACCESS;
-				}
-				break;
-			case MULTIUSER_MODE_OWNER_MANAGED:
-				uid = info->uid % 100000;
-				break;
-			case MULTIUSER_MODE_USER:
-			default:
-				break;
-		}
-
-		if (uid > 0)
-			get_uid_policy(db, uid, &info->access);
-		sqlite3_close_v2(db);
+	// Check multiuser settings
+	switch (info->cfg[SU_MULTIUSER_MODE]) {
+		case MULTIUSER_MODE_OWNER_ONLY:
+			if (info->uid / 100000) {
+				uid = -1;
+				info->access = NO_SU_ACCESS;
+			}
+			break;
+		case MULTIUSER_MODE_OWNER_MANAGED:
+			uid = info->uid % 100000;
+			break;
+		case MULTIUSER_MODE_USER:
+		default:
+			break;
 	}
+
+	if (uid > 0)
+		get_uid_policy(uid, &info->access);
 
 	// We need to check our manager
 	if (info->access.log || info->access.notify)

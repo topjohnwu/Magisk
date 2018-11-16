@@ -7,8 +7,11 @@
 
 #include "magisk.h"
 #include "db.h"
+#include "daemon.h"
 
 #define DB_VERSION 7
+
+static sqlite3 *mDB = nullptr;
 
 db_strings::db_strings() {
 	memset(data, 0, sizeof(data));
@@ -76,24 +79,17 @@ static int ver_cb(void *ver, int, char **data, char **) {
 	return 0;
 }
 
-#define err_abort(err) \
-if (err) { \
-	LOGE("sqlite3_exec: %s\n", err); \
-	sqlite3_free(err); \
-	return nullptr; \
-}
+#define err_ret(e) if (e) return e;
 
-static sqlite3 *open_and_init_db() {
-	sqlite3 *db;
-	int ret = sqlite3_open(MAGISKDB, &db);
-	if (ret) {
-		LOGE("sqlite3 open failure: %s\n", sqlite3_errstr(ret));
-		return nullptr;
-	}
+static char *open_and_init_db(sqlite3 *&db) {
+	int ret = sqlite3_open_v2(MAGISKDB, &db,
+			SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
+	if (ret)
+		return strdup(sqlite3_errstr(ret));
 	int ver, upgrade = 0;
 	char *err;
 	sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
-	err_abort(err);
+	err_ret(err);
 	if (ver > DB_VERSION) {
 		// Don't support downgrading database
 		sqlite3_close_v2(db);
@@ -106,20 +102,20 @@ static sqlite3 *open_and_init_db() {
 					 "(uid INT, package_name TEXT, policy INT, until INT, "
 					 "logging INT, notification INT, PRIMARY KEY(uid))",
 					 nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		// Logs
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS logs "
 					 "(from_uid INT, package_name TEXT, app_name TEXT, from_pid INT, "
 					 "to_uid INT, action INT, time INT, command TEXT)",
 					 nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		// Settings
 		sqlite3_exec(db,
 					 "CREATE TABLE IF NOT EXISTS settings "
 					 "(key TEXT, value INT, PRIMARY KEY(key))",
 					 nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		ver = 3;
 		upgrade = 1;
 	}
@@ -129,13 +125,13 @@ static sqlite3 *open_and_init_db() {
 					 "CREATE TABLE IF NOT EXISTS strings "
 					 "(key TEXT, value TEXT, PRIMARY KEY(key))",
 					 nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		ver = 4;
 		upgrade = 1;
 	}
 	if (ver == 4) {
 		sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		/* Skip version 5 */
 		ver = 6;
 		upgrade = 1;
@@ -146,7 +142,7 @@ static sqlite3 *open_and_init_db() {
 					 "CREATE TABLE IF NOT EXISTS hidelist "
 					 "(process TEXT, PRIMARY KEY(process))",
 					 nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 		ver = 7;
 		upgrade =1 ;
 	}
@@ -156,19 +152,27 @@ static sqlite3 *open_and_init_db() {
 		char query[32];
 		sprintf(query, "PRAGMA user_version=%d", ver);
 		sqlite3_exec(db, query, nullptr, nullptr, &err);
-		err_abort(err);
+		err_ret(err);
 	}
-	return db;
+	return nullptr;
 }
 
-sqlite3 *get_magiskdb() {
-	sqlite3 *db = open_and_init_db();
-	if (db == nullptr) {
-		// Open fails, remove and reconstruct
-		unlink(MAGISKDB);
-		db = open_and_init_db();
+char *db_exec(const char *sql, int (*cb)(void *, int, char**, char**), void *v) {
+	char *err;
+	if (mDB == nullptr) {
+		err = open_and_init_db(mDB);
+		db_err_cmd(err,
+			// Open fails, remove and reconstruct
+			unlink(MAGISKDB);
+			err = open_and_init_db(mDB);
+			err_ret(err);
+		);
 	}
-	return db;
+	if (mDB) {
+		sqlite3_exec(mDB, sql, cb, v, &err);
+		return err;
+	}
+	return nullptr;
 }
 
 static int settings_cb(void *v, int col_num, char **data, char **col_name) {
@@ -189,22 +193,16 @@ static int settings_cb(void *v, int col_num, char **data, char **col_name) {
 	return 0;
 }
 
-int get_db_settings(sqlite3 *db, db_settings *dbs, int key) {
-	if (db == nullptr)
-		return 1;
+int get_db_settings(db_settings *dbs, int key) {
 	char *err;
 	if (key > 0) {
 		char query[128];
 		sprintf(query, "SELECT key, value FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
-		sqlite3_exec(db, query, settings_cb, dbs, &err);
+		err = db_exec(query, settings_cb, dbs);
 	} else {
-		sqlite3_exec(db, "SELECT key, value FROM settings", settings_cb, dbs, &err);
+		err = db_exec("SELECT key, value FROM settings", settings_cb, dbs);
 	}
-	if (err) {
-		LOGE("sqlite3_exec: %s\n", err);
-		sqlite3_free(err);
-		return 1;
-	}
+	db_err_cmd(err, return 1);
 	return 0;
 }
 
@@ -225,16 +223,14 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 	return 0;
 }
 
-int get_db_strings(sqlite3 *db, db_strings *str, int key) {
-	if (db == nullptr)
-		return 1;
+int get_db_strings(db_strings *str, int key) {
 	char *err;
 	if (key > 0) {
 		char query[128];
 		sprintf(query, "SELECT key, value FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
-		sqlite3_exec(db, query, strings_cb, str, &err);
+		err = db_exec(query, strings_cb, str);
 	} else {
-		sqlite3_exec(db, "SELECT key, value FROM strings", strings_cb, str, &err);
+		err = db_exec("SELECT key, value FROM strings", strings_cb, str);
 	}
 	if (err) {
 		LOGE("sqlite3_exec: %s\n", err);
@@ -258,18 +254,12 @@ static int policy_cb(void *v, int col_num, char **data, char **col_name) {
 	return 0;
 }
 
-int get_uid_policy(sqlite3 *db, int uid, struct su_access *su) {
-	if (db == nullptr)
-		return 1;
+int get_uid_policy(int uid, struct su_access *su) {
 	char query[256], *err;
 	sprintf(query, "SELECT policy, logging, notification FROM policies "
 			"WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
-	sqlite3_exec(db, query, policy_cb, su, &err);
-	if (err) {
-		LOGE("sqlite3_exec: %s\n", err);
-		sqlite3_free(err);
-		return 1;
-	}
+	err = db_exec(query, policy_cb, su);
+	db_err_cmd(err, return 1);
 	return 0;
 }
 
@@ -299,26 +289,24 @@ int validate_manager(char *alt_pkg, int userid, struct stat *st) {
 }
 
 static int print_cb(void *v, int col_num, char **data, char **col_name) {
+	FILE *out = (FILE *) v;
 	for (int i = 0; i < col_num; ++i) {
-		if (i) printf("|");
-		printf("%s=%s", col_name[i], data[i]);
+		if (i) fprintf(out, "|");
+		fprintf(out, "%s=%s", col_name[i], data[i]);
 	}
-	printf("\n");
+	fprintf(out, "\n");
 	return 0;
 }
 
-int exec_sql(const char *sql) {
-	sqlite3 *db = get_magiskdb();
-	if (db) {
-		char *err;
-		sqlite3_exec(db, sql, print_cb, nullptr, &err);
-		sqlite3_close_v2(db);
-		if (err) {
-			fprintf(stderr, "sql_err: %s\n", err);
-			sqlite3_free(err);
-			return 1;
-		}
-		return 0;
-	}
-	return 1;
+void exec_sql(int client) {
+	char *sql = read_string(client);
+	FILE *out = fdopen(recv_fd(client), "a");
+	char *err = db_exec(sql, print_cb, out);
+	free(sql);
+	fclose(out);
+	db_err_cmd(err,
+		write_int(client, 1);
+		return;
+	);
+	write_int(client, 0);
 }

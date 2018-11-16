@@ -4,6 +4,13 @@
 #include <sqlite3.h>
 #include <sys/stat.h>
 
+#define db_err(e) db_err_cmd(e, )
+#define db_err_cmd(e, cmd) if (e) { \
+	LOGE("sqlite3_exec: %s\n", e); \
+	sqlite3_free(e); \
+	cmd;\
+}
+
 /***************
  * DB Settings *
  ***************/
@@ -128,11 +135,12 @@ struct su_access {
  * Public Functions *
  ********************/
 
-sqlite3 *get_magiskdb();
-int get_db_settings(sqlite3 *db, db_settings *dbs, int key = -1);
-int get_db_strings(sqlite3 *db, db_strings *str, int key = -1);
-int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
+sqlite3 *get_magiskdb(sqlite3 *&db);
+int get_db_settings(db_settings *dbs, int key);
+int get_db_strings(db_strings *str, int key);
+int get_uid_policy(int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
-int exec_sql(const char *sql);
+void exec_sql(int client);
+char *db_exec(const char *sql, int (*cb)(void *, int, char**, char**) = nullptr, void *v = nullptr);
 
 #endif //DB_H

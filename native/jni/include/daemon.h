@@ -20,7 +20,8 @@ enum {
 	BOOT_COMPLETE,
 	MAGISKHIDE,
 	HIDE_CONNECT,
-	HANDSHAKE
+	HANDSHAKE,
+	SQLITE_CMD,
 };
 
 // Return codes for daemon

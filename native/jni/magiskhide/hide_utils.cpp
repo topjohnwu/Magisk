@@ -140,7 +140,7 @@ void clean_magisk_props() {
 	}, nullptr, false);
 }
 
-static int add_list(sqlite3 *db, const char *proc) {
+int add_list(const char *proc) {
 	for (auto &s : hide_list) {
 		// They should be unique
 		if (s == proc)
@@ -149,28 +149,19 @@ static int add_list(sqlite3 *db, const char *proc) {
 
 	LOGI("hide_list add: [%s]\n", proc);
 
+	// Add to database
+	char sql[4096];
+	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", proc);
+	char *err = db_exec(sql);
+	db_err_cmd(err, return DAEMON_ERROR);
+
 	// Critical region
 	pthread_mutex_lock(&list_lock);
 	hide_list.push_back(proc);
 	kill_process(proc);
 	pthread_mutex_unlock(&list_lock);
 
-	// Add to database
-	char sql[4096];
-	snprintf(sql, sizeof(sql), "INSERT INTO hidelist (process) VALUES('%s')", proc);
-	sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
-
 	return DAEMON_SUCCESS;
-}
-
-int add_list(const char *proc) {
-	sqlite3 *db = get_magiskdb();
-	if (db) {
-		int ret = add_list(db, proc);
-		sqlite3_close_v2(db);
-		return ret;
-	}
-	return DAEMON_ERROR;
 }
 
 int add_list(int client) {
@@ -196,13 +187,10 @@ static int rm_list(const char *proc) {
 	pthread_mutex_unlock(&list_lock);
 
 	if (do_rm) {
-		sqlite3 *db = get_magiskdb();
-		if (db == nullptr)
-			return DAEMON_ERROR;
 		char sql[4096];
 		snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE process='%s'", proc);
-		sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
-		sqlite3_close_v2(db);
+		char *err = db_exec(sql);
+		db_err(err);
 		return DAEMON_SUCCESS;
 	} else {
 		return HIDE_ITEM_NOT_EXIST;
@@ -218,31 +206,27 @@ int rm_list(int client) {
 
 #define LEGACY_LIST MOUNTPOINT "/.core/hidelist"
 
+static int collect_list(void *, int, char **data, char**) {
+	LOGI("hide_list: [%s]\n", data[0]);
+	hide_list.push_back(data[0]);
+	return 0;
+}
+
 bool init_list() {
 	LOGD("hide_list: initialize\n");
 
-	sqlite3 *db = get_magiskdb();
-	if (db == nullptr)
-		return false;
-
-	sqlite3_exec(db, "SELECT process FROM hidelist",
-				 [] (auto, auto, char **data, auto) -> int
-				 {
-				 	LOGI("hide_list: [%s]\n", data[0]);
-				 	hide_list.push_back(data[0]);
-				 	return 0;
-				 }, nullptr, nullptr);
+	char *err = db_exec("SELECT process FROM hidelist", collect_list);
+	db_err_cmd(err, return false);
 
 	// Migrate old hide list into database
 	if (access(LEGACY_LIST, R_OK) == 0) {
 		Vector<CharArray> tmp;
 		file_to_vector(LEGACY_LIST, tmp);
 		for (auto &s : tmp)
-			add_list(db, s);
+			add_list(s);
 		unlink(LEGACY_LIST);
 	}
 
-	sqlite3_close_v2(db);
 	return true;
 }
 
@@ -256,12 +240,11 @@ void ls_list(int client) {
 }
 
 static void set_hide_config() {
-	sqlite3 *db = get_magiskdb();
 	char sql[64];
 	sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
 			DB_SETTING_KEYS[HIDE_CONFIG], hide_enabled);
-	sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
-	sqlite3_close_v2(db);
+	char *err = db_exec(sql);
+	db_err(err);
 }
 
 int launch_magiskhide(int client) {
@@ -314,10 +297,8 @@ int stop_magiskhide() {
 void auto_start_magiskhide() {
 	if (!start_log_daemon())
 		return;
-	sqlite3 *db = get_magiskdb();
 	db_settings dbs;
-	get_db_settings(db, &dbs, HIDE_CONFIG);
-	sqlite3_close_v2(db);
+	get_db_settings(&dbs, HIDE_CONFIG);
 	if (dbs[HIDE_CONFIG]) {
 		pthread_t thread;
 		xpthread_create(&thread, nullptr, [](void*) -> void* {

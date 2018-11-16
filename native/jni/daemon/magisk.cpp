@@ -113,7 +113,11 @@ int magisk_main(int argc, char *argv[]) {
 		write_int(fd, BOOT_COMPLETE);
 		return read_int(fd);
 	} else if (strcmp(argv[1], "--sqlite") == 0) {
-		return exec_sql(argv[2]);
+		int fd = connect_daemon();
+		write_int(fd, SQLITE_CMD);
+		write_string(fd, argv[2]);
+		send_fd(fd, STDOUT_FILENO);
+		return read_int(fd);
 	}
 
 	usage();
