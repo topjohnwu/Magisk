@@ -28,7 +28,7 @@ void clean_magisk_props();
 int add_list(const char *proc);
 bool init_list();
 
-extern int hide_enabled;
+extern bool hide_enabled;
 extern pthread_mutex_t list_lock;
 extern Vector<CharArray> hide_list;
 
@@ -37,7 +37,8 @@ enum {
 	STOP_MAGISKHIDE,
 	ADD_HIDELIST,
 	RM_HIDELIST,
-	LS_HIDELIST
+	LS_HIDELIST,
+	HIDE_STATUS,
 };
 
 enum {

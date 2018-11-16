@@ -29,7 +29,7 @@ extern char *system_block, *vendor_block, *magiskloop;
 static void term_thread(int) {
 	LOGD("proc_monitor: running cleanup\n");
 	hide_list.clear(true);
-	hide_enabled = 0;
+	hide_enabled = false;
 	close(sockfd);
 	sockfd = -1;
 	pthread_mutex_destroy(&list_lock);

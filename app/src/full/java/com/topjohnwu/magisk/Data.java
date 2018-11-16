@@ -91,8 +91,12 @@ public class Data {
         try {
             magiskVersionString = ShellUtils.fastCmd("magisk -v").split(":")[0];
             magiskVersionCode = Integer.parseInt(ShellUtils.fastCmd("magisk -V"));
-            String s = ShellUtils.fastCmd(("resetprop -p ") + Const.MAGISKHIDE_PROP);
-            magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
+            if (magiskVersionCode >= Const.MAGISK_VER.HIDE_STATUS) {
+                magiskHide = Shell.su("magiskhide --status").exec().isSuccess();
+            } else {
+                String s = ShellUtils.fastCmd(("resetprop -p ") + Const.MAGISKHIDE_PROP);
+                magiskHide = s.isEmpty() || Integer.parseInt(s) != 0;
+            }
         } catch (NumberFormatException ignored) {}
     }
 
