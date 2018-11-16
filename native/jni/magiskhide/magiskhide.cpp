@@ -8,15 +8,11 @@
 #include <sys/types.h>
 
 #include "magisk.h"
-#include "utils.h"
 #include "magiskhide.h"
 #include "daemon.h"
-#include "resetprop.h"
 #include "flags.h"
 
 bool hide_enabled = false;
-static pthread_t proc_monitor_thread;
-pthread_mutex_t list_lock;
 
 [[noreturn]] static void usage(char *arg0) {
 	fprintf(stderr,
@@ -31,60 +27,6 @@ pthread_mutex_t list_lock;
 		"  --ls              Print out the current hide list\n"
 		, arg0);
 	exit(1);
-}
-
-int launch_magiskhide(int client) {
-	if (hide_enabled)
-		return HIDE_IS_ENABLED;
-
-	if (!log_daemon_started) {
-		setprop(MAGISKHIDE_PROP, "0");
-		// Remove without actually removing persist props
-		deleteprop(MAGISKHIDE_PROP);
-		return LOGCAT_DISABLED;
-	}
-
-	hide_enabled = true;
-	LOGI("* Starting MagiskHide\n");
-
-	deleteprop(MAGISKHIDE_PROP, true);
-
-	hide_sensitive_props();
-
-	// Initialize the mutex lock
-	pthread_mutex_init(&list_lock, nullptr);
-
-	// Initialize the hide list
-	if (!init_list())
-		goto error;
-
-	// Add SafetyNet by default
-	add_list("com.google.android.gms.unstable");
-
-	// Get thread reference
-	proc_monitor_thread = pthread_self();
-	if (client >= 0) {
-		write_int(client, DAEMON_SUCCESS);
-		close(client);
-	}
-	// Start monitoring
-	proc_monitor();
-
-error:
-	hide_enabled = false;
-	return DAEMON_ERROR;
-}
-
-int stop_magiskhide() {
-	LOGI("* Stopping MagiskHide\n");
-
-	hide_enabled = false;
-	setprop(MAGISKHIDE_PROP, "0");
-	// Remove without actually removing persist props
-	deleteprop(MAGISKHIDE_PROP);
-	pthread_kill(proc_monitor_thread, TERM_THREAD);
-
-	return DAEMON_SUCCESS;
 }
 
 void magiskhide_handler(int client) {

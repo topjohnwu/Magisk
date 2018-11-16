@@ -16,6 +16,9 @@
 #include "db.h"
 
 Vector<CharArray> hide_list;
+pthread_mutex_t list_lock;
+
+static pthread_t proc_monitor_thread;
 
 static const char *prop_key[] =
 	{ "ro.boot.vbmeta.device_state", "ro.boot.verifiedbootstate", "ro.boot.flash.locked",
@@ -249,4 +252,77 @@ void ls_list(int client) {
 	for (auto &s : hide_list)
 		write_string(client, s);
 	close(client);
+}
+
+static void set_hide_config() {
+	sqlite3 *db = get_magiskdb();
+	char sql[64];
+	sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
+			DB_SETTING_KEYS[HIDE_CONFIG], hide_enabled);
+	sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
+	sqlite3_close_v2(db);
+}
+
+int launch_magiskhide(int client) {
+	if (hide_enabled)
+		return HIDE_IS_ENABLED;
+
+	if (!log_daemon_started)
+		return LOGCAT_DISABLED;
+
+	hide_enabled = true;
+	set_hide_config();
+	LOGI("* Starting MagiskHide\n");
+
+	hide_sensitive_props();
+
+	// Initialize the mutex lock
+	pthread_mutex_init(&list_lock, nullptr);
+
+	// Initialize the hide list
+	if (!init_list())
+		goto error;
+
+	// Add SafetyNet by default
+	add_list("com.google.android.gms.unstable");
+
+	// Get thread reference
+	proc_monitor_thread = pthread_self();
+	if (client >= 0) {
+		write_int(client, DAEMON_SUCCESS);
+		close(client);
+	}
+	// Start monitoring
+	proc_monitor();
+
+	error:
+	hide_enabled = false;
+	return DAEMON_ERROR;
+}
+
+int stop_magiskhide() {
+	LOGI("* Stopping MagiskHide\n");
+
+	hide_enabled = false;
+	set_hide_config();
+	pthread_kill(proc_monitor_thread, TERM_THREAD);
+
+	return DAEMON_SUCCESS;
+}
+
+void auto_start_magiskhide() {
+	if (!start_log_daemon())
+		return;
+	sqlite3 *db = get_magiskdb();
+	db_settings dbs;
+	get_db_settings(db, &dbs, HIDE_CONFIG);
+	sqlite3_close_v2(db);
+	if (dbs[HIDE_CONFIG]) {
+		pthread_t thread;
+		xpthread_create(&thread, nullptr, [](void*) -> void* {
+			launch_magiskhide(-1);
+			return nullptr;
+		}, nullptr);
+		pthread_detach(thread);
+	}
 }

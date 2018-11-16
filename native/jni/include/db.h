@@ -12,16 +12,18 @@
 ((const char *[]) { \
 "root_access", \
 "multiuser_mode", \
-"mnt_ns" \
+"mnt_ns", \
+"magiskhide", \
 })
 
-#define DB_SETTINGS_NUM 3
+#define DB_SETTINGS_NUM 4
 
 // Settings keys
 enum {
 	ROOT_ACCESS = 0,
 	SU_MULTIUSER_MODE,
-	SU_MNT_NS
+	SU_MNT_NS,
+	HIDE_CONFIG
 };
 
 // Values for root_access
@@ -127,8 +129,8 @@ struct su_access {
  ********************/
 
 sqlite3 *get_magiskdb();
-int get_db_settings(sqlite3 *db, struct db_settings *dbs, int key = -1);
-int get_db_strings(sqlite3 *db, struct db_strings *str, int key = -1);
+int get_db_settings(sqlite3 *db, db_settings *dbs, int key = -1);
+int get_db_strings(sqlite3 *db, db_strings *str, int key = -1);
 int get_uid_policy(sqlite3 *db, int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
 int exec_sql(const char *sql);

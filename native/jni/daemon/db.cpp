@@ -42,7 +42,8 @@ int db_strings::getKeyIdx(const char *key) const {
 db_settings::db_settings() : data {
 		ROOT_ACCESS_APPS_AND_ADB,
 		MULTIUSER_MODE_OWNER_ONLY,
-		NAMESPACE_MODE_REQUESTER
+		NAMESPACE_MODE_REQUESTER,
+		1
 } {}
 
 int &db_settings::operator[](const int idx) {
@@ -188,7 +189,7 @@ static int settings_cb(void *v, int col_num, char **data, char **col_name) {
 	return 0;
 }
 
-int get_db_settings(sqlite3 *db, struct db_settings *dbs, int key) {
+int get_db_settings(sqlite3 *db, db_settings *dbs, int key) {
 	if (db == nullptr)
 		return 1;
 	char *err;
@@ -224,7 +225,7 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 	return 0;
 }
 
-int get_db_strings(sqlite3 *db, struct db_strings *str, int key) {
+int get_db_strings(sqlite3 *db, db_strings *str, int key) {
 	if (db == nullptr)
 		return 1;
 	char *err;

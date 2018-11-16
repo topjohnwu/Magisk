@@ -30,6 +30,7 @@ static bool seperate_vendor;
 char *system_block, *vendor_block, *magiskloop;
 
 static int bind_mount(const char *from, const char *to);
+extern void auto_start_magiskhide();
 
 /***************
  * Magic Mount *
@@ -597,22 +598,6 @@ static bool check_data() {
 		}
 	}
 	return data;
-}
-
-extern int launch_magiskhide(int client = -1);
-
-static void auto_start_magiskhide() {
-	if (!start_log_daemon())
-		return;
-	CharArray hide_prop = getprop(MAGISKHIDE_PROP, true);
-	if (hide_prop != "0") {
-		pthread_t thread;
-		xpthread_create(&thread, nullptr, [](void*) -> void* {
-			launch_magiskhide();
-			return nullptr;
-		}, nullptr);
-		pthread_detach(thread);
-	}
 }
 
 void unlock_blocks() {
