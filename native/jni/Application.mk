@@ -13,5 +13,4 @@ ifdef B_BB
 APP_SHORT_COMMANDS := true
 NDK_TOOLCHAIN_VERSION := 4.9
 APP_PLATFORM := android-21
-APP_CFLAGS += -Wno-implicit-function-declaration
 endif
