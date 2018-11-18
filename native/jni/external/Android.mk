@@ -189,4 +189,75 @@ LOCAL_CFLAGS += -DHAVE_CONFIG_H -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
 
 # libsepol.a
-include $(SE_PATH)/libsepol/Android.mk
+include $(CLEAR_VARS)
+LOCAL_MODULE := libsepol
+LOCAL_C_INCLUDES := $(LIBSEPOL) $(EXT_PATH)/selinux/libsepol/src
+LOCAL_SRC_FILES := \
+	selinux/libsepol/src/assertion.c \
+	selinux/libsepol/src/avrule_block.c \
+	selinux/libsepol/src/avtab.c \
+	selinux/libsepol/src/boolean_record.c \
+	selinux/libsepol/src/booleans.c \
+	selinux/libsepol/src/conditional.c \
+	selinux/libsepol/src/constraint.c \
+	selinux/libsepol/src/context.c \
+	selinux/libsepol/src/context_record.c \
+	selinux/libsepol/src/debug.c \
+	selinux/libsepol/src/ebitmap.c \
+	selinux/libsepol/src/expand.c \
+	selinux/libsepol/src/genbools.c \
+	selinux/libsepol/src/genusers.c \
+	selinux/libsepol/src/handle.c \
+	selinux/libsepol/src/hashtab.c \
+	selinux/libsepol/src/hierarchy.c \
+	selinux/libsepol/src/ibendport_record.c \
+	selinux/libsepol/src/ibendports.c \
+	selinux/libsepol/src/ibpkey_record.c \
+	selinux/libsepol/src/ibpkeys.c \
+	selinux/libsepol/src/iface_record.c \
+	selinux/libsepol/src/interfaces.c \
+	selinux/libsepol/src/kernel_to_cil.c \
+	selinux/libsepol/src/kernel_to_common.c \
+	selinux/libsepol/src/kernel_to_conf.c \
+	selinux/libsepol/src/link.c \
+	selinux/libsepol/src/mls.c \
+	selinux/libsepol/src/module.c \
+	selinux/libsepol/src/module_to_cil.c \
+	selinux/libsepol/src/node_record.c \
+	selinux/libsepol/src/nodes.c \
+	selinux/libsepol/src/polcaps.c \
+	selinux/libsepol/src/policydb.c \
+	selinux/libsepol/src/policydb_convert.c \
+	selinux/libsepol/src/policydb_public.c \
+	selinux/libsepol/src/port_record.c \
+	selinux/libsepol/src/ports.c \
+	selinux/libsepol/src/roles.c \
+	selinux/libsepol/src/services.c \
+	selinux/libsepol/src/sidtab.c \
+	selinux/libsepol/src/symtab.c \
+	selinux/libsepol/src/user_record.c \
+	selinux/libsepol/src/users.c \
+	selinux/libsepol/src/util.c \
+	selinux/libsepol/src/write.c \
+	selinux/libsepol/cil/src/cil_fqn.c \
+	selinux/libsepol/cil/src/cil_policy.c \
+	selinux/libsepol/cil/src/cil_resolve_ast.c \
+	selinux/libsepol/cil/src/cil_mem.c \
+	selinux/libsepol/cil/src/cil_strpool.c \
+	selinux/libsepol/cil/src/cil_symtab.c \
+	selinux/libsepol/cil/src/cil_log.c \
+	selinux/libsepol/cil/src/cil_lexer.c \
+	selinux/libsepol/cil/src/cil_reset_ast.c \
+	selinux/libsepol/cil/src/cil_parser.c \
+	selinux/libsepol/cil/src/cil_copy_ast.c \
+	selinux/libsepol/cil/src/cil_list.c \
+	selinux/libsepol/cil/src/cil_build_ast.c \
+	selinux/libsepol/cil/src/cil_tree.c \
+	selinux/libsepol/cil/src/cil_stack.c \
+	selinux/libsepol/cil/src/cil_find.c \
+	selinux/libsepol/cil/src/cil_binary.c \
+	selinux/libsepol/cil/src/cil_verify.c \
+	selinux/libsepol/cil/src/cil.c \
+	selinux/libsepol/cil/src/cil_post.c
+LOCAL_CFLAGS += -Dgetline=__getline -Wno-implicit-function-declaration
+include $(BUILD_STATIC_LIBRARY)
