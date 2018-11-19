@@ -17,8 +17,6 @@
     <string name="safetyNet_check_text">انقر لبدء فحص SafetyNet</string>
     <string name="checking_safetyNet_status">التحقق من حالة SafetyNet…</string>
     <string name="safetyNet_check_success">نجح فحص SafetyNet</string>
-    <string name="safetyNet_network_loss">فقدان الاتصال بالشبكة</string>
-    <string name="safetyNet_service_disconnected">تم إنهاء الخدمة</string>
     <string name="safetyNet_res_invalid">الاستجابة غير صالحه</string>
 
     <!--Install Fragment-->
@@ -84,7 +82,7 @@
     <string name="settings_clear_cache_summary">حذف المعلومات المخزنة مؤقتا للمستودع على الانترنت، يجبر التطبيق لتحديث عبر الانترنت</string>
 
     <string name="settings_core_only_title">Magisk الوضع الأساسي فقط</string>
-    <string name="settings_core_only_summary">تمكين الميزات الأساسية فقط، لن يتم تحميل جميع الإضافات. MagiskSU، MagiskHide، systemless hosts، و لا يزال ممكنا</string>
+    <string name="settings_core_only_summary">تمكين الميزات الأساسية فقط، لن يتم تحميل جميع الإضافات. MagiskSU، MagiskHide و لا يزال ممكنا</string>
     <string name="settings_magiskhide_summary">إخفاء Magisk من مختلف الاكتشافات</string>
     <string name="settings_hosts_title">تمكين المضيفين(الهوست) لـ systemless</string>
     <string name="settings_hosts_summary">Systemless يدعم تطبيقات حجب الإعلانات</string>
@@ -94,8 +92,10 @@
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">معطل</string>
     <string name="settings_su_request_10">10 ثواني</string>
+    <string name="settings_su_request_15">15 ثانية</string>
     <string name="settings_su_request_20">20 ثانية</string>
     <string name="settings_su_request_30">30 ثانية</string>
+    <string name="settings_su_request_45">45 ثانية</string>
     <string name="settings_su_request_60">60 ثانية</string>
     <string name="superuser_access">Superuser صلاحيات</string>
     <string name="auto_response">استجابة تلقائية</string>

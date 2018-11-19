@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">Перевірка статусу SafetyNet…</string>
     <string name="safetyNet_check_success">Результат перевірки SafetyNet</string>
     <string name="safetyNet_api_error">Помилка в API SafetyNet</string>
-    <string name="safetyNet_network_loss">Підключення до інтернету втрачено</string>
-    <string name="safetyNet_service_disconnected">Службу зупинено</string>
     <string name="safetyNet_res_invalid">Невірна відповідь</string>
 
     <!--Install Fragment-->
@@ -41,9 +39,9 @@
     <string name="disable_file_created">Модуль вимкнеться при перезавантаженні</string>
     <string name="disable_file_removed">Модуль увімкнеться при перезавантаженні</string>
     <string name="author">Автор: %1$s</string>
-    <string name="reboot_recovery">Перезавантаження в Recovery</string>
-    <string name="reboot_bootloader">Перезавантаження в Bootloader</string>
-    <string name="reboot_download">Перезавантаження в Download</string>
+    <string name="reboot_recovery">Перезавантажити в Recovery</string>
+    <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
+    <string name="reboot_download">Перезавантажити в Download</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Доступне оновлення</string>
@@ -70,13 +68,14 @@
     <string name="donation">Підтримати проект</string>
     <string name="app_translators">Перекладачі</string>
     <string name="support_thread">Сторінка підтримки</string>
+    <string name="follow_twitter">Читати мене в Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Закрити</string>
     <string name="repo_install_title">Встановити %1$s</string>
     <string name="repo_install_msg">Бажаєте встановити %1$s ?</string>
     <string name="download">Завантажити</string>
-    <string name="reboot">Перезавантаження</string>
+    <string name="reboot">Перезавантажити</string>
     <string name="magisk_update_title">Доступне оновлення Magisk!</string>
     <string name="settings_reboot_toast">Для застосування змін перезавантажте пристрій</string>
     <string name="release_notes">Особливості версії</string>
@@ -96,10 +95,13 @@
     <string name="hide_manager_toast">Приховування Magisk Manager…</string>
     <string name="hide_manager_toast2">Це може зайняти деякий час…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager…</string>
+    <string name="open_link_failed_toast">Не знайдено програм для відкриття посилання…</string>
     <string name="download_zip_only">Тільки завантажити</string>
     <string name="patch_boot_file">Пропатчити boot образ</string>
     <string name="direct_install">Пряме встановлення (рекомендовано)</string>
-    <string name="install_second_slot">Встановити в Другий Слот (після OTA)</string>
+    <string name="install_inactive_slot">Встановити в неактивний слот (після OTA)</string>
+    <string name="warning">Попередження</string>
+    <string name="install_inactive_slot_msg">Ваш пристрій буде примусово перезавантажено в неактивний слот!\nВикористовуйте цю опцію тільки для встановлення OTA.\nПродовжити?</string>
     <string name="select_method">Виберіть спосіб</string>
     <string name="no_boot_file_patch_support">Цільова версія Magisk не підтримує пропатчування boot образу</string>
     <string name="boot_file_patch_msg">Виберіть оригінальний дамп boot образу в форматі .img чи .img.tar</string>
@@ -109,10 +111,8 @@
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає резервної копії оригінального boot образу</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
-    <string name="proprietary_notice">Magisk Manager — це безкоштовний додаток з відкритим вихідним кодом, тому він не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager — це безкоштовна програма з відкритим вихідним кодом, тому вона не містить пропрієтарний код API SafetyNet від компанії Google.\n\nДозволити Magisk Manager завантажити розширення (яке містить GoogleApiClient) для перевірки SafetyNet?</string>
     <string name="su_db_corrupt">База даних SU пошкоджена, буде створено нову БД</string>
-    <string name="cannot_check_sn_title">Неможливо перевірити SafetyNet</string>
-    <string name="cannot_check_sn_notice">Через деякі зміни в Сервісах Google Play, неможливо перевірити статус SafetyNet на перепакованому Magisk Manager</string>
     <string name="setup_done">Налаштування завершено</string>
     <string name="setup_fail">Не вдалося налаштувати</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">Формат пропатченого образу</string>
     <string name="settings_boot_format_summary">Виберіть формат вихідного пропатченого boot образу.\n.img - для прошивання через fastboot/download режим;\n.img.tar - для прошивання через ODIN.</string>
     <string name="settings_core_only_title">Режим ядра Magisk</string>
-    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU, MagiskHide і позасистемні хости залишуться увімкненими</string>
+    <string name="settings_core_only_summary">Увімкнути тільки можливості ядра, всі модулі не будуть активними. MagiskSU i Magisk Hide залишуться увімкненими</string>
     <string name="settings_magiskhide_summary">Приховати Magisk від різних перевірок</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для програм блокування реклами</string>
@@ -153,8 +153,10 @@
     <string name="settings_su_adb">ADB</string>
     <string name="settings_su_disable">Вимкнено</string>
     <string name="settings_su_request_10">10 секунд</string>
+    <string name="settings_su_request_15">15 секунд</string>
     <string name="settings_su_request_20">20 секунд</string>
     <string name="settings_su_request_30">30 секунд</string>
+    <string name="settings_su_request_45">45 секунд</string>
     <string name="settings_su_request_60">60 секунд</string>
     <string name="superuser_access">Доступ суперкористувача</string>
     <string name="auto_response">Автоматична відповідь</string>
@@ -165,6 +167,7 @@
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програм</string>
     <string name="settings_su_fingerprint_title">Автентифікація за відбитком</string>
     <string name="settings_su_fingerprint_summary">Використовувати сканер відбитків пальців, щоб надавати дозвіл суперкористувача</string>
+    <string name="auth_fingerprint">Автентифікація за відбитком</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
@@ -182,8 +185,8 @@
     <string name="global_summary">Всі сеанси Суперкористувача використовують глобальний простір імен</string>
     <string name="requester_summary">Сеанси Суперкористувача наслідують простір імен запитувача</string>
     <string name="isolate_summary">Кожнен сеанс Суперкористувача має власний ізольований простір імен</string>
-    <string name="android_o_not_support">Не підтримує Android 8.0+</string>
-    <string name="disable_fingerprint">Немає відбитків пальців або пристрій не підтримується</string>
+    <string name="android_o_not_support">Не працює на Android 8.0+</string>
+    <string name="disable_fingerprint">Немає відбитків пальця або пристрій не підтримується</string>
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав Суперкористувача</string>

@@ -10,19 +10,26 @@
 #MAGISK_VERSION_STUB
 
 # Detect whether in boot mode
-ps | grep zygote | grep -v grep >/dev/null && BOOTMODE=true || BOOTMODE=false
-$BOOTMODE || ps -A 2>/dev/null | grep zygote | grep -v grep >/dev/null && BOOTMODE=true
-$BOOTMODE || id | grep -q 'uid=0' || BOOTMODE=true
+[ -z $BOOTMODE ] && BOOTMODE=false
+$BOOTMODE || ps | grep zygote | grep -qv grep && BOOTMODE=true
+$BOOTMODE || ps -A | grep zygote | grep -qv grep && BOOTMODE=true
 
-# Default location, will override if needed
-MAGISKBIN=/data/adb/magisk
-[ -z $MOUNTPATH ] && MOUNTPATH=/sbin/.core/img
-[ -z $IMG ] && IMG=/data/adb/magisk.img
+# Presets
+MAGISKTMP=/sbin/.magisk
+[ -z $NVBASE ] && NVBASE=/data/adb
+[ -z $MAGISKBIN ] && MAGISKBIN=$NVBASE/magisk
+[ -z $IMG ] && IMG=$NVBASE/magisk.img
 
-BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK com.topjohnwu.magisk.utils.BootSigner"
+# Bootsigner related stuff
+BOOTSIGNERCLASS=a.a
+BOOTSIGNER="/system/bin/dalvikvm -Xnodex2oat -Xnoimage-dex2oat -cp \$APK \$BOOTSIGNERCLASS"
 BOOTSIGNED=false
 
-get_outfd() {
+setup_flashable() {
+  $BOOTMODE && return
+  # Preserve environment varibles
+  OLD_PATH=$PATH
+  setup_bb
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
     for FD in `ls /proc/$$/fd`; do
@@ -34,6 +41,11 @@ get_outfd() {
       fi
     done
   fi
+}
+
+# Backward compatibility
+get_outfd() {
+  setup_flashable
 }
 
 ui_print() {
@@ -82,14 +94,13 @@ mount_partitions() {
     mount -t ext4 -o ro $SYSTEMBLOCK /system
   fi
   [ -f /system/build.prop ] || is_mounted /system || abort "! Cannot mount /system"
-  cat /proc/mounts | grep -E '/dev/root|/system_root' >/dev/null && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+  grep -qE '/dev/root|/system_root' /proc/mounts && SYSTEM_ROOT=true || SYSTEM_ROOT=false
   if [ -f /system/init ]; then
     SYSTEM_ROOT=true
     mkdir /system_root 2>/dev/null
     mount --move /system /system_root
     mount -o bind /system_root/system /system
   fi
-  $SYSTEM_ROOT && ui_print "- Device using system_root_image"
   if [ -L /system/vendor ]; then
     # Seperate /vendor partition
     is_mounted /vendor || mount -o ro /vendor 2>/dev/null
@@ -105,20 +116,19 @@ get_flags() {
   # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
-  HIGHCOMP=false
   if [ -z $KEEPVERITY ]; then
-    KEEPVERITY=false
-    hardware=`grep_cmdline androidboot.hardware`
-    for hw in taimen walleye; do
-      if [ "$hw" = "$hardware" ]; then
-        KEEPVERITY=true
-        ui_print "- Device on whitelist, keep avb-verity"
-        break
-      fi
-    done
+    if $SYSTEM_ROOT; then
+      KEEPVERITY=true
+      ui_print "- Using system_root_image, keep dm/avb-verity"
+    else
+      KEEPVERITY=false
+    fi
   fi
   if [ -z $KEEPFORCEENCRYPT ]; then
-    if [ "`getprop ro.crypto.state`" = "encrypted" ]; then
+    grep ' /data ' /proc/mounts | grep -q 'dm-' && FDE=true || FDE=false
+    [ -d /data/unencrypted ] && FBE=true || FBE=false
+    # No data access means unable to decrypt in recovery
+    if $FDE || $FBE || ! $DATA; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data detected, keep forceencrypt"
     else
@@ -185,29 +195,29 @@ find_boot_image() {
   fi
 }
 
-flash_boot_image() {
+flash_image() {
   # Make sure all blocks are writable
   $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
-    *.gz) COMMAND="gzip -d < '$1'";;
-    *)    COMMAND="cat '$1'";;
+    *.gz) COM1="$MAGISKBIN/magiskboot --decompress '$1' - 2>/dev/null";;
+    *)    COM1="cat '$1'";;
   esac
   if $BOOTSIGNED; then
-    SIGNCOM="$BOOTSIGNER -sign"
-    ui_print "- Sign boot image with test keys"
+    COM2="$BOOTSIGNER -sign"
+    ui_print "- Sign image with test keys"
   else
-    SIGNCOM="cat -"
+    COM2="cat -"
   fi
-  case "$2" in
-    /dev/block/*)
-      ui_print "- Flashing new boot image"
-      eval $COMMAND | eval $SIGNCOM | cat - /dev/zero 2>/dev/null | dd of="$2" bs=4096 2>/dev/null
-      ;;
-    *)
-      ui_print "- Storing new boot image"
-      eval $COMMAND | eval $SIGNCOM | dd of="$2" bs=4096 2>/dev/null
-      ;;
-  esac
+  if [ -b "$2" ]; then
+    local s_size=`stat -c '%s' "$1"`
+    local t_size=`blockdev --getsize64 "$2"`
+    [ $s_size -gt $t_size ] && return 1
+    eval $COM1 | eval $COM2 | cat - /dev/zero > "$2" 2>/dev/null
+  else
+    ui_print "- Not block device, storing image"
+    eval $COM1 | eval $COM2 > "$2" 2>/dev/null
+  fi
+  return 0
 }
 
 find_dtbo_image() {
@@ -246,7 +256,7 @@ is_mounted() {
 
 remove_system_su() {
   if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
-    ui_print "! System installed root detected, mount rw :("
+    ui_print "- Removing system installed root"
     mount -o rw,remount /system
     # SuperSU
     if [ -e /system/bin/.ext/.su ]; then
@@ -296,9 +306,9 @@ check_data() {
 }
 
 setup_bb() {
-  if [ -x /sbin/.core/busybox/busybox ]; then
+  if [ -x $MAGISKTMP/busybox/busybox ]; then
     # Make sure this path is in the front
-    echo $PATH | grep -q '^/sbin/.core/busybox' || export PATH=/sbin/.core/busybox:$PATH
+    echo $PATH | grep -q "^$MAGISKTMP/busybox" || export PATH=$MAGISKTMP/busybox:$PATH
   elif [ -x $TMPDIR/bin/busybox ]; then
     # Make sure this path is in the front
     echo $PATH | grep -q "^$TMPDIR/bin" || export PATH=$TMPDIR/bin:$PATH
@@ -312,20 +322,17 @@ setup_bb() {
 }
 
 boot_actions() {
-  if [ ! -d /sbin/.core/mirror/bin ]; then
-    mkdir -p /sbin/.core/mirror/bin
-    mount -o bind $MAGISKBIN /sbin/.core/mirror/bin
+  if [ ! -d $MAGISKTMP/mirror/bin ]; then
+    mkdir -p $MAGISKTMP/mirror/bin
+    mount -o bind $MAGISKBIN $MAGISKTMP/mirror/bin
   fi
-  MAGISKBIN=/sbin/.core/mirror/bin
+  MAGISKBIN=$MAGISKTMP/mirror/bin
   setup_bb
 }
 
 recovery_actions() {
   # TWRP bug fix
   mount -o bind /dev/urandom /dev/random
-  # Preserve environment varibles
-  OLD_PATH=$PATH
-  setup_bb
   # Temporarily block out all custom recovery binaries/libs
   mv /sbin /sbin_tmp
   # Unset library paths
@@ -425,5 +432,15 @@ unmount_magisk_img() {
   if [ $curSizeM -gt $newSizeM ]; then
     ui_print "- Shrinking $IMG to ${newSizeM}M"
     $MAGISKBIN/magisk imgtool resize $IMG $newSizeM >&2
+  fi
+}
+
+find_manager_apk() {
+  APK=/data/adb/magisk.apk
+  [ -f $APK ] || APK=/data/magisk/magisk.apk
+  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  if [ ! -f $APK ]; then
+    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" | cut -d= -f2`
+    [ -z "$DBAPK" ] || APK=/data/app/$DBAPK*/*.apk
   fi
 }

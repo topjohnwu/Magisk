@@ -1,8 +1,9 @@
 package com.topjohnwu.magisk.adapters;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.support.v7.widget.RecyclerView;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,10 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.asyncs.ParallelTask;
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.utils.Topic;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
 import java.util.ArrayList;
@@ -23,8 +24,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ViewHolder> {
 
@@ -33,36 +35,61 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     private PackageManager pm;
     private ApplicationFilter filter;
 
-    public ApplicationAdapter() {
+    public ApplicationAdapter(Context context) {
         fullList = showList = Collections.emptyList();
         hideList = Collections.emptyList();
         filter = new ApplicationFilter();
-        pm = MagiskManager.get().getPackageManager();
-        new LoadApps().exec();
+        pm = context.getPackageManager();
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
+        return new ViewHolder(v);
+    }
+
+    private void loadApps() {
+        fullList = pm.getInstalledApplications(0);
+        hideList = Shell.su("magiskhide --ls").exec().getOut();
+        for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
+            ApplicationInfo info = i.next();
+            if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled || info.uid == 1000) {
+                i.remove();
+            }
+        }
+        Collections.sort(fullList, (a, b) -> {
+            boolean ah = hideList.contains(a.packageName);
+            boolean bh = hideList.contains(b.packageName);
+            if (ah == bh) {
+                return Utils.getAppLabel(a, pm).toLowerCase()
+                        .compareTo(Utils.getAppLabel(b, pm).toLowerCase());
+            } else if (ah) {
+                return -1;
+            } else {
+                return 1;
+            }
+        });
+        Topic.publish(false, Topic.MAGISK_HIDE_DONE);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_app, parent, false);
-        return new ViewHolder(mView);
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ApplicationInfo info = showList.get(position);
 
         holder.appIcon.setImageDrawable(info.loadIcon(pm));
-        holder.appName.setText(info.loadLabel(pm));
+        holder.appName.setText(Utils.getAppLabel(info, pm));
         holder.appPackage.setText(info.packageName);
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(hideList.contains(info.packageName));
         holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> {
             if (isChecked) {
-                Shell.Async.su("magiskhide --add " + info.packageName);
+                Shell.su("magiskhide --add " + info.packageName).submit();
                 hideList.add(info.packageName);
             } else {
-                Shell.Async.su("magiskhide --rm " + info.packageName);
+                Shell.su("magiskhide --rm " + info.packageName).submit();
                 hideList.remove(info.packageName);
             }
         });
@@ -78,7 +105,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     }
 
     public void refresh() {
-        new LoadApps().exec();
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(this::loadApps);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -90,11 +117,11 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new ApplicationAdapter$ViewHolder_ViewBinding(this, itemView);
         }
     }
 
-    private class ApplicationFilter extends Filter {
+    class ApplicationFilter extends Filter {
 
         private boolean lowercaseContains(String s, CharSequence filter) {
             return !TextUtils.isEmpty(s) && s.toLowerCase().contains(filter);
@@ -108,7 +135,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
                 showList = new ArrayList<>();
                 String filter = constraint.toString().toLowerCase();
                 for (ApplicationInfo info : fullList) {
-                    if (lowercaseContains(info.loadLabel(pm).toString(), filter)
+                    if (lowercaseContains(Utils.getAppLabel(info, pm), filter)
                             || lowercaseContains(info.packageName, filter)) {
                         showList.add(info);
                     }
@@ -120,39 +147,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             notifyDataSetChanged();
-        }
-    }
-
-    private class LoadApps extends ParallelTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            fullList = pm.getInstalledApplications(0);
-            hideList = Shell.Sync.su("magiskhide --ls");
-            for (Iterator<ApplicationInfo> i = fullList.iterator(); i.hasNext(); ) {
-                ApplicationInfo info = i.next();
-                if (Const.HIDE_BLACKLIST.contains(info.packageName) || !info.enabled) {
-                    i.remove();
-                }
-            }
-            Collections.sort(fullList, (a, b) -> {
-                boolean ah = hideList.contains(a.packageName);
-                boolean bh = hideList.contains(b.packageName);
-                if (ah == bh) {
-                    return a.loadLabel(pm).toString().toLowerCase().compareTo(
-                            b.loadLabel(pm).toString().toLowerCase());
-                } else if (ah) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void v) {
-            MagiskManager.get().magiskHideDone.publish(false);
         }
     }
 }

@@ -6,7 +6,7 @@ db_sepatch() {
 
 db_clean() {
   local USERID=$1
-  local DIR="/sbin/.core/db-${USERID}"
+  local DIR="/sbin/.magisk/db-${USERID}"
   umount -l /data/user*/*/*/databases/su.db $DIR $DIR/*
   rm -rf $DIR
   [ "$USERID" = "*" ] && rm -fv /data/adb/magisk.db*
@@ -26,7 +26,7 @@ db_restore() {
 db_setup() {
   local USER=$1
   local USERID=$(($USER / 100000))
-  local DIR=/sbin/.core/db-${USERID}
+  local DIR=/sbin/.magisk/db-${USERID}
   mkdir -p $DIR
   touch $DIR/magisk.db
   mount -o bind /data/adb/magisk.db $DIR/magisk.db
@@ -49,47 +49,90 @@ fix_env() {
   sh update-binary extract
   rm -f update-binary magisk.apk
   cd /
-  rm -rf /sbin/.core/busybox/*
-  /sbin/.core/mirror/bin/busybox --install -s /sbin/.core/busybox
+  rm -rf /sbin/.magisk/busybox/*
+  /sbin/.magisk/mirror/bin/busybox --install -s /sbin/.magisk/busybox
 }
 
 direct_install() {
-  flash_boot_image $1 $2
-  rm -f $1
   rm -rf /data/adb/magisk/* 2>/dev/null
   mkdir -p /data/adb/magisk 2>/dev/null
   chmod 700 /data/adb
-  cp -rf $3/* /data/adb/magisk
-  rm -rf $3
+  cp -rf $1/* /data/adb/magisk
+  rm -rf /data/adb/magisk/new-boot.img
+  echo "- Flashing new boot image"
+  flash_image $1/new-boot.img $2
+  if [ $? -ne 0 ]; then
+    echo "! Insufficient partition size"
+    return 1
+  fi
+  rm -rf $1
+  return 0
 }
 
 mm_patch_dtbo() {
   if $KEEPVERITY; then
-    echo false
+    return 1
   else
     find_dtbo_image
-    patch_dtbo_image >/dev/null 2>&1 && echo true || echo false
+    patch_dtbo_image
   fi
 }
 
 restore_imgs() {
-  SHA1=`cat /.backup/.sha1`
-  [ -z $SHA1 ] && SHA1=`grep_prop #STOCKSHA1`
+  local SHA1=`grep_prop SHA1 /.backup/.magisk`
+  [ -z $SHA1 ] && local SHA1=`cat /.backup/.sha1`
+  [ -z $SHA1 ] && local SHA1=`grep_prop #STOCKSHA1 /.backup/.magisk`
   [ -z $SHA1 ] && return 1
-  STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
-  STOCKDTBO=/data/stock_dtbo.img.gz
+  local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
+  local STOCKDTBO=/data/stock_dtbo.img.gz
   [ -f $STOCKBOOT ] || return 1
 
   find_boot_image
   find_dtbo_image
 
-  magisk --unlock-blocks 2>/dev/null
-  if [ -b "$DTBOIMAGE" -a -f $STOCKDTBO ]; then
-    gzip -d < $STOCKDTBO > $DTBOIMAGE
+  if [ -f $STOCKDTBO -a -b "$DTBOIMAGE" ]; then
+    flash_image $STOCKDTBO $DTBOIMAGE
   fi
-  if [ -b "$BOOTIMAGE" -a -f $STOCKBOOT ]; then
-    gzip -d < $STOCKBOOT | cat - /dev/zero > $BOOTIMAGE 2>/dev/null
+  if [ -f $STOCKBOOT -a -b "$BOOTIMAGE" ]; then
+    flash_image $STOCKBOOT $BOOTIMAGE
     return 0
   fi
   return 1
+}
+
+post_ota() {
+  cd $1
+  chmod 755 bootctl
+  ./bootctl hal-info || return
+  [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
+  ./bootctl set-active-boot-slot $SLOT_NUM
+  echo '${0%/*}/../bootctl mark-boot-successful;rm -f ${0%/*}/../bootctl $0' > post-fs-data.d/post_ota.sh
+  chmod 755 post-fs-data.d/post_ota.sh
+  cd /
+}
+
+add_hosts_module() {
+  # Do not touch existing hosts module
+  [ -d /sbin/.magisk/img/hosts ] && return
+  cd /sbin/.magisk/img
+  mkdir -p hosts/system/etc
+  cat << EOF > hosts/module.prop
+id=hosts
+name=Systemless Hosts
+version=1.0
+versionCode=1
+author=Magisk Manager
+description=Magisk Manager built-in systemless hosts module
+minMagisk=17000
+EOF
+  if [ -f .core/hosts ]; then
+    # Migrate old hosts file to new module
+    mv -f .core/hosts hosts/system/etc/hosts
+  else
+    cp -af /system/etc/hosts hosts/system/etc/hosts
+  fi
+  chcon u:object_r:system_file:s0 hosts/system/etc/hosts
+  touch hosts/update
+  touch hosts/auto_mount
+  cd /
 }

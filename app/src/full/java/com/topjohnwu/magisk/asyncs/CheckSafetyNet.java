@@ -2,9 +2,9 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.app.Activity;
 
-import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.utils.ISafetyNetHelper;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
@@ -19,10 +19,10 @@ import java.net.HttpURLConnection;
 
 import dalvik.system.DexClassLoader;
 
-public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
+public class CheckSafetyNet extends ParallelTask<Void, Void, Void> {
 
     public static final File dexPath =
-            new File(MagiskManager.get().getFilesDir().getParent() + "/snet", "snet.apk");
+            new File(Data.MM().getFilesDir().getParent() + "/snet", "snet.apk");
     private ISafetyNetHelper helper;
 
     public CheckSafetyNet(Activity activity) {
@@ -30,9 +30,9 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     }
 
     private void dlSnet() throws Exception {
-        Shell.Sync.sh("rm -rf " + dexPath.getParent());
+        Shell.sh("rm -rf " + dexPath.getParent()).exec();
         dexPath.getParentFile().mkdir();
-        HttpURLConnection conn = WebService.request(Const.Url.SNET_URL, null);
+        HttpURLConnection conn = WebService.mustRequest(Data.snetLink, null);
         try (
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(dexPath));
                 InputStream in = new BufferedInputStream(conn.getInputStream())) {
@@ -45,17 +45,19 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
     private void dyload() throws Exception {
         DexClassLoader loader = new DexClassLoader(dexPath.getPath(), dexPath.getParent(),
                 null, ISafetyNetHelper.class.getClassLoader());
-        Class<?> clazz = loader.loadClass("com.topjohnwu.snet.SafetyNetHelper");
-        helper = (ISafetyNetHelper) clazz.getConstructors()[0]
-                .newInstance(getActivity(), (ISafetyNetHelper.Callback)
-                        code -> MagiskManager.get().safetyNetDone.publish(false, code));
-        if (helper.getVersion() != Const.SNET_VER) {
+        Class<?> clazz = loader.loadClass("com.topjohnwu.snet.Snet");
+        helper = (ISafetyNetHelper) clazz.getMethod("newHelper",
+                Class.class, String.class, Activity.class, Object.class)
+                .invoke(null, ISafetyNetHelper.class, dexPath.getPath(), getActivity(),
+                        (ISafetyNetHelper.Callback) code ->
+                                Topic.publish(false, Topic.SNET_CHECK_DONE, code));
+        if (helper.getVersion() < Data.snetVersionCode) {
             throw new Exception();
         }
     }
 
     @Override
-    protected Exception doInBackground(Void... voids) {
+    protected Void doInBackground(Void... voids) {
         try {
             try {
                 dyload();
@@ -64,21 +66,12 @@ public class CheckSafetyNet extends ParallelTask<Void, Void, Exception> {
                 dlSnet();
                 dyload();
             }
-        } catch (Exception e) {
-            return e;
-        }
-
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Exception e) {
-        if (e == null) {
+            // Run attestation
             helper.attest();
-        } else {
+        } catch (Exception e) {
             e.printStackTrace();
-            MagiskManager.get().safetyNetDone.publish(false, -1);
+            Topic.publish(false, Topic.SNET_CHECK_DONE, -1);
         }
-        super.onPostExecute(e);
+        return null;
     }
 }

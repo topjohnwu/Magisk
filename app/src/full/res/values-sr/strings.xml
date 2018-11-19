@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Проверавам СигурнаМрежа статус…</string>
     <string name="safetyNet_check_success">СигурнаМрежа Провера Успешна</string>
     <string name="safetyNet_api_error">СигурнаМрежа АПИ Грешка</string>
-    <string name="safetyNet_network_loss">Интернет конекција недоступна</string>
-    <string name="safetyNet_service_disconnected">Сервис је елеминисан</string>
     <string name="safetyNet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->
@@ -93,7 +91,6 @@
     <string name="download_zip_only">Преузми само Зип</string>
     <string name="patch_boot_file">Закрпи фајл слике покретања</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
-    <string name="install_second_slot">Инсталирај у Други Слот (После ОТА)</string>
     <string name="select_method">Изабери Методу</string>
     <string name="no_boot_file_patch_support">Циљана Магиск верзија не подржава закрпу фајла слике покретања</string>
     <string name="boot_file_patch_msg">Изабери испис фабричког фајла слике покретања у .img или img.tar формату</string>
@@ -123,7 +120,7 @@
     <string name="settings_boot_format_title">Закрпљено Покретање Излазни Формат</string>
     <string name="settings_boot_format_summary">Изабери формат излазних закрпљених слика покретања.\nИзаберите .img ако флешујете преко fastboot/download режима; Изаберите .img.tar ако флешујете уз ОДИН.</string>
     <string name="settings_core_only_title">Магиск Основни Режим</string>
-    <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК, МагискСакриј, и без-системски домаћини ће бити омогућени</string>
+    <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК и МагискСакриј ће бити омогућени</string>
     <string name="settings_magiskhide_summary">Сакриј Магиск од разних детекција</string>
     <string name="settings_hosts_title">Без-системски домаћини (hosts)</string>
     <string name="settings_hosts_summary">Подршка без-системских домаћина за апликације за блокирање реклама</string>
@@ -133,8 +130,10 @@
     <string name="settings_su_adb">Само АДБ</string>
     <string name="settings_su_disable">Онемогућено</string>
     <string name="settings_su_request_10">10 секунди</string>
+    <string name="settings_su_request_15">15 секунди</string>
     <string name="settings_su_request_20">20 секунди</string>
     <string name="settings_su_request_30">30 секунди</string>
+    <string name="settings_su_request_45">45 секунди</string>
     <string name="settings_su_request_60">60 секунди</string>
     <string name="superuser_access">Приступ Супер-кориснику</string>
     <string name="auto_response">Аутоматски одговор</string>

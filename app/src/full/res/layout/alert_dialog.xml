@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_layout"
     android:orientation="vertical"
+    android:paddingTop="5dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/message_panel"
+    <TextView
+        android:id="@+id/message"
+        style="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="12dip"
-        android:paddingEnd="20dip"
-        android:paddingStart="20dip"
-        android:paddingTop="12dip">
-
-        <TextView
-            android:id="@+id/message"
-            style="?android:attr/textAppearanceMedium"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dip" />
-
-    </LinearLayout>
+        android:paddingBottom="12dp"
+        android:paddingEnd="25dp"
+        android:paddingStart="25dp"
+        android:paddingTop="12dp" />
 
     <LinearLayout
         style="?android:attr/buttonBarStyle"

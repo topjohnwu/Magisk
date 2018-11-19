@@ -3,9 +3,7 @@ out
 *.jks
 *.apk
 config.prop
-
-# Manually dumped jars
-snet/libs
+update.sh
 
 # Built binaries
 native/out

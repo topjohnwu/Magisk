@@ -1,38 +1,50 @@
 package com.topjohnwu.magisk.utils;
 
-import com.topjohnwu.magisk.MagiskManager;
+import android.content.Context;
+
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.R;
+import com.topjohnwu.superuser.BusyBox;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 import com.topjohnwu.superuser.io.SuFile;
 
-public class RootUtils {
+import java.io.File;
+import java.io.InputStream;
 
-    public static void init() {
-        if (Shell.rootAccess()) {
-            Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
-            SuFile file = new SuFile("/sbin/.core/img");
-            if (file.exists()) {
-                Const.MAGISK_PATH = file;
-            } else if ((file = new SuFile("/dev/magisk/img")).exists()) {
-                Const.MAGISK_PATH = file;
-            } else {
-                Const.MAGISK_PATH = new SuFile("/magisk");
-            }
-            Const.MAGISK_HOST_FILE = new SuFile(Const.MAGISK_PATH + "/.core/hosts");
-        }
+import androidx.annotation.NonNull;
+
+public class RootUtils extends Shell.Initializer {
+
+    static {
+        BusyBox.BB_PATH = new File(Const.BUSYBOX_PATH);
     }
 
     public static void uninstallPkg(String pkg) {
-        Shell.Sync.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg);
+        Shell.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg).exec();
     }
 
-    public static void patchDTBO() {
-        if (Shell.rootAccess()) {
-            MagiskManager mm = MagiskManager.get();
-            if (mm.magiskVersionCode >= Const.MAGISK_VER.DTBO_SUPPORT) {
-                if (Boolean.parseBoolean(ShellUtils.fastCmd("mm_patch_dtbo")))
-                    ShowUI.dtboPatchedNotification();
-            }
+    @Override
+    public boolean onInit(Context context, @NonNull Shell shell) {
+        Shell.Job job = shell.newJob();
+        if (shell.isRoot()) {
+            if (!new SuFile("/sbin/.magisk").exists())
+                job.add("ln -s /sbin/.core /sbin/.magisk");
+
+            job.add(context.getResources().openRawResource(R.raw.util_functions))
+                .add(context.getResources().openRawResource(R.raw.utils));
+            Const.MAGISK_DISABLE_FILE = new SuFile("/cache/.disable_magisk");
+            Data.loadMagiskInfo();
+        } else {
+            InputStream nonroot = context.getResources().openRawResource(R.raw.nonroot_utils);
+            job.add(nonroot);
         }
+
+        job.add("mount_partitions", "get_flags", "run_migrations", "export BOOTMODE=true").exec();
+
+        Data.keepVerity = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPVERITY"));
+        Data.keepEnc = Boolean.parseBoolean(ShellUtils.fastCmd("echo $KEEPFORCEENCRYPT"));
+        return true;
     }
 }

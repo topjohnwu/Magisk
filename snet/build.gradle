@@ -8,8 +8,8 @@ android {
         applicationId "com.topjohnwu.snet"
         minSdkVersion 14
         targetSdkVersion rootProject.ext.compileSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "snet"
     }
 
     buildTypes {
@@ -22,6 +22,6 @@ android {
 }
 
 dependencies {
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.android.gms:play-services-safetynet:7.0.0'  /* The oldest version */
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.android.gms:play-services-safetynet:16.0.0'
 }

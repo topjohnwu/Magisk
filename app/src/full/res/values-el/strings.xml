@@ -1,7 +1,7 @@
 <resources>
     <!--Welcome Activity-->
     <string name="modules">Modules</string>
-	
+
     <string name="downloads">Λήψεις</string>
     <string name="superuser">Υπερχρήστης</string>
     <string name="log">Αρχείο Καταγραφής</string>
@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Έλεγχος κατάστασης SafetyNet…</string>
     <string name="safetyNet_check_success">Ο Έλεγχος του SafetyNet Ήταν Επιτυχής</string>
     <string name="safetyNet_api_error">Σφάλμα του SafetyNet API</string>
-    <string name="safetyNet_network_loss">Αδυναμία σύνδεσης στο δίκτυο</string>
-    <string name="safetyNet_service_disconnected">Η υπηρεσία τερματίστηκε</string>
     <string name="safetyNet_res_invalid">Η απόκριση είναι άκυρη</string>
 
     <!--Install Fragment-->
@@ -53,7 +51,7 @@
     <string name="updated_on">Αναβαθμίστηκε στις: %1$s</string>
     <string name="sorting_order">Ταξινόμηση κατά</string>
     <string name="sort_by_name">Ταξινόμηση κατά όνομα</string>
-    <string name="sort_by_update">Ταξινόμηση κατά τελευταία αναβάθμιση</string>			  
+    <string name="sort_by_update">Ταξινόμηση κατά τελευταία αναβάθμιση</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">"Αποθήκευση καταγραφής "</string>
@@ -100,7 +98,6 @@
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
-    <string name="install_second_slot">Εγκατάσταση σε Second Slot (Μετά από ΟΤΑ)</string>
     <string name="select_method">Επιλογή Μεθόδου</string>
     <string name="no_boot_file_patch_support">Αυτή η Magisk έκδοση δεν υποστηρίζει patch του boot image αρχείου</string>
     <string name="boot_file_patch_msg">Επιλογή stock boot image dump σε μορφή .img ή .img.tar</string>
@@ -110,7 +107,7 @@
     <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
     <string name="proprietary_notice">Το Magisk Manager είναι FOSS οπότε δεν περιέχει της Google τον ιδιόκτητο κώδικα του SafetyNet API.\n\nΕπιτρέπετε στο Magisk Manager να κατεβάσει μια επέκταση (περιέχει το GoogleApiClient) για ελέγχους του SafetyNet?</string>
     <string name="su_db_corrupt">Η βάση δεδομένων SU είναι κατεστραμμένη, θα αναδημιουργηθεί νέα</string>
-    
+
     <!--Settings Activity -->
     <string name="settings_general_category">Γενικά</string>
     <string name="settings_dark_theme_title">Σκούρο θέμα</string>
@@ -130,7 +127,7 @@
     <string name="settings_boot_format_title">Μορφή Τροποποιημένης Εικόνας Boot</string>
     <string name="settings_boot_format_summary">Επιλέξτε τη μορφή της εξαγόμενης εικόνας boot μετά το patch.\nΕπιλέξτε .img για flash μέσω λειτουργίας fastboot/download· επιλέξτε .img.tar για flash μέσω ODIN.</string>
     <string name="settings_core_only_title">Magisk Λειτουργία Πυρήνα Μόνο</string>
-    <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU, MagiskHide, και systemless hosts θα παραμείνουν ενεργά</string>
+    <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU και MagiskHide θα παραμείνουν ενεργά</string>
     <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Υποστήριξη Systemless hosts για εφαρμογές Adblock</string>
@@ -140,8 +137,10 @@
     <string name="settings_su_adb">ADB μόνο</string>
     <string name="settings_su_disable">Απενεργοποιημένο</string>
     <string name="settings_su_request_10">10 δευτερόλεπτα</string>
+    <string name="settings_su_request_15">15 δευτερόλεπτα</string>
     <string name="settings_su_request_20">20 δευτερόλεπτα</string>
     <string name="settings_su_request_30">30 δευτερόλεπτα</string>
+    <string name="settings_su_request_45">45 δευτερόλεπτα</string>
     <string name="settings_su_request_60">60 δευτερόλεπτα</string>
     <string name="superuser_access">Πρόσβαση Υπερχρήστη</string>
     <string name="auto_response">Αυτόματη Απόκριση</string>
@@ -168,7 +167,7 @@
     <string name="requester_summary">Οι συνεδρίες root θα κληρονομούν το χώρο ονομάτων του αιτούντα τους</string>
     <string name="isolate_summary">Κάθε συνεδρία root θα έχει το δικό της απομονωμένο χώρο ονομάτων</string>
     <string name="android_o_not_support">Δεν υποστηρίζεται Android 8.0+</string>
-	
+
     <!--Superuser-->
     <string name="su_request_title">Αίτημα υπερχρήστη</string>
     <string name="deny_with_str">Άρνηση%1$s</string>

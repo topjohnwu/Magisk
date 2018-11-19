@@ -83,8 +83,10 @@
     <string name="settings_su_adb">僅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
     <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
     <string name="settings_su_request_20">20 秒</string>
     <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
     <string name="superuser_access">超級用戶訪問權限</string>
     <string name="auto_response">自動回應</string>
@@ -131,11 +133,9 @@
     <string name="zip_process_title">處理中</string>
     <string name="uninstall_magisk_title">解除安裝 Magisk</string>
     <string name="uninstall_magisk_msg">所有模組將會被停用 / 刪除。root會被移除，並有可能在目前資料未加密的情況下被加密</string>
-    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU、MagiskHide 和 systemless hosts 仍會持續運作</string>
+    <string name="settings_core_only_summary">僅啟用核心功能，所有模組將不會被載入。MagiskSU 和 MagiskHide 仍會持續運作</string>
     <string name="safetyNet_check_success">SafetyNet 檢查成功</string>
-    <string name="safetyNet_network_loss">網路斷線</string>
     <string name="safetyNet_res_invalid">回傳值無效</string>
-    <string name="safetyNet_service_disconnected">服務已被取消</string>
     <string name="multiuser_hint_owner_request">已發送權限請求到擁有者帳戶中。請切換到擁有者帳戶進行准許</string>
     <string name="multiuser_mode">多使用者設定</string>
     <string name="owner_manage_summary">僅裝置擁有者帳戶能管理超級用戶權限並接收權限請求通知</string>
@@ -180,7 +180,6 @@
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">原廠 boot 映像備份不存在！</string>
     <string name="boot_file_patch_msg">選擇原廠 boot 映像備份；支援 .img 以及 .img.tar 格式</string>
-    <string name="install_second_slot">安裝到第二分區 (安裝完OTA後)</string>
     <string name="safetyNet_api_error">SafetyNet API 錯誤</string>
     <string name="proprietary_title">下載非開源程式</string>
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
@@ -209,8 +208,6 @@
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">在背景定期檢查更新</string>
     <string name="disable_fingerprint">沒有指紋加入或是裝置不支援</string>
-    <string name="cannot_check_sn_title">無法檢查 SafetyNet</string>
-    <string name="cannot_check_sn_notice">由於一些 Google Play Service 的改變，重新包裝過的 Magisk Manager 無法進行 SafetyNet 檢查。</string>
     <string name="setup_done">安裝完成</string>
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">需要額外的安裝</string>
@@ -218,5 +215,11 @@
     <string name="setup_title">額外安裝</string>
     <string name="setup_msg">安裝環境進行中…</string>
     <string name="restore_img_msg">還原中…</string>
+    <string name="install_inactive_slot">安裝到未使用的分區 (使用於OTA後)</string>
+    <string name="warning">警告</string>
+    <string name="install_inactive_slot_msg">你的裝置將在下一次重新啟動後強制切換到未使用的分區！\n請在安裝完OTA之後使用。\n是否繼續？</string>
+    <string name="auth_fingerprint">驗證指紋</string>
+    <string name="follow_twitter">追蹤我的 Twitter</string>
+    <string name="open_link_failed_toast">沒有應用程式能夠打開此鏈結…</string>
 
 </resources>

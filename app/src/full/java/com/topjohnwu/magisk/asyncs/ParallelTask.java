@@ -9,8 +9,6 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
 
     private WeakReference<Activity> weakActivity;
 
-    private Runnable callback = null;
-
     public ParallelTask() {}
 
     public ParallelTask(Activity context) {
@@ -22,18 +20,7 @@ public abstract class ParallelTask<Params, Progress, Result> extends AsyncTask<P
     }
 
     @SuppressWarnings("unchecked")
-    public ParallelTask<Params, Progress, Result> exec(Params... params) {
+    public void exec(Params... params) {
         executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
-        return this;
-    }
-
-    @Override
-    protected void onPostExecute(Result result) {
-        if (callback != null) callback.run();
-    }
-
-    public ParallelTask<Params, Progress, Result> setCallBack(Runnable next) {
-        callback = next;
-        return this;
     }
 }

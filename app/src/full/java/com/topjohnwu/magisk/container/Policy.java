@@ -3,8 +3,10 @@ package com.topjohnwu.magisk.container;
 import android.content.ContentValues;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.support.annotation.NonNull;
+
+import com.topjohnwu.magisk.utils.Utils;
+
+import androidx.annotation.NonNull;
 
 
 public class Policy implements Comparable<Policy>{
@@ -25,22 +27,22 @@ public class Policy implements Comparable<Policy>{
         this.uid = uid;
         packageName = pkgs[0];
         info = pm.getApplicationInfo(packageName, 0);
-        appName = info.loadLabel(pm).toString();
+        appName = Utils.getAppLabel(info, pm);
     }
 
-    public Policy(Cursor c, PackageManager pm) throws PackageManager.NameNotFoundException {
-        uid = c.getInt(c.getColumnIndex("uid"));
-        packageName = c.getString(c.getColumnIndex("package_name"));
-        policy = c.getInt(c.getColumnIndex("policy"));
-        until = c.getLong(c.getColumnIndex("until"));
-        logging = c.getInt(c.getColumnIndex("logging")) != 0;
-        notification = c.getInt(c.getColumnIndex("notification")) != 0;
+    public Policy(ContentValues values, PackageManager pm) throws PackageManager.NameNotFoundException {
+        uid = values.getAsInteger("uid");
+        packageName = values.getAsString("package_name");
+        policy = values.getAsInteger("policy");
+        until = values.getAsInteger("until");
+        logging = values.getAsInteger("logging") != 0;
+        notification = values.getAsInteger("notification") != 0;
         info = pm.getApplicationInfo(packageName, 0);
         if (info.uid != uid)
             throw new PackageManager.NameNotFoundException();
         appName = info.loadLabel(pm).toString();
     }
-    
+
     public ContentValues getContentValues() {
         ContentValues values = new ContentValues();
         values.put("uid", uid);

@@ -23,6 +23,7 @@ import java.nio.ByteOrder;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.Signature;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -37,20 +38,17 @@ public class SignBoot {
     public static boolean doSignature(String target, InputStream imgIn, OutputStream imgOut,
                                       InputStream cert, InputStream key) {
         try {
-            ByteArrayStream bas = new ByteArrayStream();
-            bas.readFrom(imgIn);
-            byte[] image = bas.toByteArray();
-            bas.close();
-            int signableSize = getSignableImageSize(image);
-            if (signableSize < image.length) {
+            ByteArrayStream image = new ByteArrayStream();
+            image.readFrom(imgIn);
+            int signableSize = getSignableImageSize(image.getBuf());
+            if (signableSize < image.size()) {
                 System.err.println("NOTE: truncating input from " +
-                        image.length + " to " + signableSize + " bytes");
-                image = Arrays.copyOf(image, signableSize);
-            } else if (signableSize > image.length) {
+                        image.size() + " to " + signableSize + " bytes");
+            } else if (signableSize > image.size()) {
                 throw new IllegalArgumentException("Invalid image: too short, expected " +
                         signableSize + " bytes");
             }
-            BootSignature bootsig = new BootSignature(target, image.length);
+            BootSignature bootsig = new BootSignature(target, image.size());
             if (cert == null) {
                 cert = SignBoot.class.getResourceAsStream("/keys/testkey.x509.pem");
             }
@@ -60,10 +58,10 @@ public class SignBoot {
                 key = SignBoot.class.getResourceAsStream("/keys/testkey.pk8");
             }
             PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
-            bootsig.setSignature(bootsig.sign(image, privateKey),
+            bootsig.setSignature(bootsig.sign(privateKey, image.getBuf(), signableSize),
                     CryptoUtils.getSignatureAlgorithmIdentifier(privateKey));
             byte[] encoded_bootsig = bootsig.getEncoded();
-            imgOut.write(image);
+            image.writeTo(imgOut);
             imgOut.write(encoded_bootsig);
             imgOut.flush();
             return true;
@@ -75,21 +73,19 @@ public class SignBoot {
 
     public static boolean verifySignature(InputStream imgIn, InputStream certIn) {
         try {
-            ByteArrayStream bas = new ByteArrayStream();
-            bas.readFrom(imgIn);
-            byte[] image = bas.toByteArray();
-            bas.close();
-            int signableSize = getSignableImageSize(image);
-            if (signableSize >= image.length) {
+            ByteArrayStream image = new ByteArrayStream();
+            image.readFrom(imgIn);
+            int signableSize = getSignableImageSize(image.getBuf());
+            if (signableSize >= image.size()) {
                 System.err.println("Invalid image: not signed");
                 return false;
             }
-            byte[] signature = Arrays.copyOfRange(image, signableSize, image.length);
+            byte[] signature = Arrays.copyOfRange(image.getBuf(), signableSize, image.size());
             BootSignature bootsig = new BootSignature(signature);
             if (certIn != null) {
                 bootsig.setCertificate(CryptoUtils.readCertificate(certIn));
             }
-            if (bootsig.verify(Arrays.copyOf(image, signableSize))) {
+            if (bootsig.verify(image.getBuf(), signableSize)) {
                 System.err.println("Signature is VALID");
                 return true;
             } else {
@@ -130,7 +126,7 @@ public class SignBoot {
     static class BootSignature extends ASN1Object {
         private ASN1Integer formatVersion;
         private ASN1Encodable certificate;
-        private AlgorithmIdentifier algorithmIdentifier;
+        private AlgorithmIdentifier algId;
         private DERPrintableString target;
         private ASN1Integer length;
         private DEROctetString signature;
@@ -167,8 +163,7 @@ public class SignBoot {
             X509Certificate c = (X509Certificate) cf.generateCertificate(bis);
             publicKey = c.getPublicKey();
             ASN1Sequence algId = (ASN1Sequence) sequence.getObjectAt(2);
-            algorithmIdentifier = new AlgorithmIdentifier(
-                    (ASN1ObjectIdentifier) algId.getObjectAt(0));
+            this.algId = new AlgorithmIdentifier((ASN1ObjectIdentifier) algId.getObjectAt(0));
             ASN1Sequence attrs = (ASN1Sequence) sequence.getObjectAt(3);
             target = (DERPrintableString) attrs.getObjectAt(0);
             length = (ASN1Integer) attrs.getObjectAt(1);
@@ -187,38 +182,38 @@ public class SignBoot {
         }
 
         public void setSignature(byte[] sig, AlgorithmIdentifier algId) {
-            algorithmIdentifier = algId;
+            this.algId = algId;
             signature = new DEROctetString(sig);
         }
 
         public void setCertificate(X509Certificate cert)
-                throws Exception, IOException, CertificateEncodingException {
+                throws CertificateEncodingException, IOException {
             ASN1InputStream s = new ASN1InputStream(cert.getEncoded());
             certificate = s.readObject();
             publicKey = cert.getPublicKey();
         }
 
-        public byte[] generateSignableImage(byte[] image) throws IOException {
-            byte[] attrs = getEncodedAuthenticatedAttributes();
-            byte[] signable = Arrays.copyOf(image, image.length + attrs.length);
-            for (int i=0; i < attrs.length; i++) {
-                signable[i+image.length] = attrs[i];
-            }
-            return signable;
+        public byte[] sign(PrivateKey key, byte[] image, int length) throws Exception {
+            Signature signer = Signature.getInstance(CryptoUtils.getSignatureAlgorithm(key));
+            signer.initSign(key);
+            signer.update(image, 0, length);
+            signer.update(getEncodedAuthenticatedAttributes());
+            return signer.sign();
         }
 
-        public byte[] sign(byte[] image, PrivateKey key) throws Exception {
-            byte[] signable = generateSignableImage(image);
-            return CryptoUtils.sign(key, signable);
-        }
-
-        public boolean verify(byte[] image) throws Exception {
-            if (length.getValue().intValue() != image.length) {
+        public boolean verify(byte[] image, int length) throws Exception {
+            if (this.length.getValue().intValue() != length) {
                 throw new IllegalArgumentException("Invalid image length");
             }
-            byte[] signable = generateSignableImage(image);
-            return CryptoUtils.verify(publicKey, signable, signature.getOctets(),
-                    algorithmIdentifier);
+            String algName = CryptoUtils.ID_TO_ALG.get(algId.getAlgorithm().getId());
+            if (algName == null) {
+                throw new IllegalArgumentException("Unsupported algorithm " + algId.getAlgorithm());
+            }
+            Signature verifier = Signature.getInstance(algName);
+            verifier.initVerify(publicKey);
+            verifier.update(image, 0, length);
+            verifier.update(getEncodedAuthenticatedAttributes());
+            return verifier.verify(signature.getOctets());
         }
 
         @Override
@@ -226,7 +221,7 @@ public class SignBoot {
             ASN1EncodableVector v = new ASN1EncodableVector();
             v.add(formatVersion);
             v.add(certificate);
-            v.add(algorithmIdentifier);
+            v.add(algId);
             v.add(getAuthenticatedAttributes());
             v.add(signature);
             return new DERSequence(v);

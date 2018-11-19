@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">SafetyNetの状態をチェック中…</string>
     <string name="safetyNet_check_success">SafetyNetチェック成功</string>
     <string name="safetyNet_api_error">SafetyNet APIエラー</string>
-    <string name="safetyNet_network_loss">ネットワーク接続がありません</string>
-    <string name="safetyNet_service_disconnected">サービスが終了されました</string>
     <string name="safetyNet_res_invalid">応答が不正です</string>
 
     <!--Install Fragment-->
@@ -100,7 +98,6 @@
     <string name="download_zip_only">ZIPのみダウンロード</string>
     <string name="patch_boot_file">Bootイメージのパッチ</string>
     <string name="direct_install">直接インストール (推奨)</string>
-    <string name="install_second_slot">第2スロットへインストール (OTA後)</string>
     <string name="select_method">方法の選択</string>
     <string name="no_boot_file_patch_support">指定されたMagiskバージョンはBootイメージのパッチに対応していません</string>
     <string name="boot_file_patch_msg">StockのBootイメージ (.img または .img.tar形式) を選択してください</string>
@@ -131,7 +128,7 @@
     <string name="settings_boot_format_title">パッチしたBootの出力形式</string>
     <string name="settings_boot_format_summary">パッチしたBootイメージの出力形式を選択してください。\nfastboot/download modeでインストールするには .img を、ODINでインストールするには .img.tar を選択してください</string>
     <string name="settings_core_only_title">Magisk コアモード</string>
-    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide、systemless hostsは引き続き有効になります</string>
+    <string name="settings_core_only_summary">コア機能のみを有効にします。すべてのモジュールが読み込まれなくなります。 MagiskSU、MagiskHide は引き続き有効になります</string>
     <string name="settings_magiskhide_summary">さまざまな検出からMagiskを隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのためのSystemless hostsサポートを有効化します</string>

@@ -1,4 +1,3 @@
-#!/sbin/sh
 ##########################################################################################
 #
 # Magisk Survival Script for ROMs with addon.d support
@@ -8,8 +7,17 @@
 #
 ##########################################################################################
 
-. /tmp/backuptool.functions
-[ -z $backuptool_ab ] && backuptool_ab=false
+V1_FUNCS=/tmp/backuptool.functions
+V2_FUNCS=/postinstall/system/bin/backuptool_ab.functions
+
+if [ -f $V1_FUNCS ]; then
+  . $V1_FUNCS
+  backuptool_ab=false
+elif [ -f $V2_FUNCS ]; then
+  . $V2_FUNCS
+else
+  return 1
+fi
 
 initialize() {
   # This path should work in any cases
@@ -26,9 +34,7 @@ initialize() {
   # Load utility functions
   . $MAGISKBIN/util_functions.sh
 
-  APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/.magisk/magisk.apk
-  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  find_manager_apk
 }
 
 show_logo() {
@@ -37,16 +43,14 @@ show_logo() {
   ui_print "************************"
 }
 
-detection() {
+installation() {
   find_boot_image
   find_dtbo_image
   [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
   ui_print "- Target image: $BOOTIMAGE"
   [ -z $DTBOIMAGE ] || ui_print "- DTBO image: $DTBOIMAGE"
   get_flags
-}
 
-installation() {
   remove_system_su
 
   [ -f $APK ] && eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
@@ -58,7 +62,8 @@ installation() {
   # Source the boot patcher
   . ./boot_patch.sh "$BOOTIMAGE"
 
-  flash_boot_image new-boot.img "$BOOTIMAGE"
+  ui_print "- Flashing new boot image"
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
   rm -f new-boot.img
 
   if [ -f stock_boot* ]; then
@@ -87,7 +92,6 @@ main_v1() {
   recovery_actions
   show_logo
   mount_partitions
-  detection
   installation
   recovery_cleanup
   finalize
@@ -99,7 +103,6 @@ main_v2() {
   mount_partitions
   # Swap the slot
   if [ ! -z $SLOT ]; then [ $SLOT = _a ] && SLOT=_b || SLOT=_a; fi
-  detection
   installation
   finalize
 }
@@ -121,15 +124,23 @@ case "$1" in
     # Stub
   ;;
   post-restore)
-    initialize
     if $backuptool_ab; then
-      # addon.d-v2
-      main_v2
+      exec su -c "sh $0 addond-v2"
     else
+      initialize
       OUTFD=
-      get_outfd
+      setup_flashable
       # Run in background, hack for addon.d-v1
       (main_v1) &
     fi
+  ;;
+  addond-v2)
+    initialize
+    # Override ui_print
+    ui_print() {
+      log -t Magisk -- "$1"
+    }
+    # addon.d-v2
+    main_v2
   ;;
 esac

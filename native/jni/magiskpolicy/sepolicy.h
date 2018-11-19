@@ -4,44 +4,32 @@
 #ifndef _SEPOLICY_H
 #define _SEPOLICY_H
 
-#include <getopt.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <limits.h>
-#include <string.h>
-#include <sepol/debug.h>
 #include <sepol/policydb/policydb.h>
-#include <sepol/policydb/expand.h>
-#include <sepol/policydb/link.h>
-#include <sepol/policydb/services.h>
-#include <sepol/policydb/avrule_block.h>
-#include <sepol/policydb/conditional.h>
-#include <sepol/policydb/constraint.h>
 
-#include "vector.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Global policydb
+extern policydb_t *policydb;
 
 // hashtab traversal macro
 #define hashtab_for_each(table, ptr) \
 	for (int _i = 0; _i < table->size; ++_i) \
 		for (*ptr = table->htable[_i]; *ptr != NULL; *ptr = (*ptr)->next)
 
-// Global policydb
-extern policydb_t *policydb;
-
 // sepolicy manipulation functions
-int create_domain(char *d);
-int set_domain_state(char* s, int state);
-int add_transition(char *s, char *t, char *c, char *d);
-int add_file_transition(char *s, char *t, char *c, char *d, char* filename);
-int add_typeattribute(char *domainS, char *attr);
-int add_rule(char *s, char *t, char *c, char *p, int effect, int not);
-int add_xperm_rule(char *s, char *t, char *c, char *range, int effect, int not);
+int create_domain(const char *d);
+int set_domain_state(const char *s, int state);
+int add_transition(const char *s, const char *t, const char *c, const char *d);
+int add_file_transition(const char *s, const char *t, const char *c, const char *d,
+						const char *filename);
+int add_typeattribute(const char *domainS, const char *attr);
+int add_rule(const char *s, const char *t, const char *c, const char *p, int effect, int n);
+int add_xperm_rule(const char *s, const char *t, const char *c, const char *range, int effect, int n);
 
-extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
+#ifdef __cplusplus
+};
+#endif
 
 #endif

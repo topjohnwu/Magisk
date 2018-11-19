@@ -17,8 +17,6 @@
     <string name="safetyNet_check_text">Tryck för att starta SafetyNet-kontroll</string>
     <string name="checking_safetyNet_status">Kontrollerar SafetyNet-status…</string>
     <string name="safetyNet_check_success">SafetyNet-kontroll lyckades</string>
-    <string name="safetyNet_network_loss">Tappade nätverksanslutningen</string>
-    <string name="safetyNet_service_disconnected">Tjänsten har dödats</string>
     <string name="safetyNet_res_invalid">Svaret är ogiltigt</string>
 
     <!--Install Fragment-->
@@ -89,7 +87,7 @@
     <string name="settings_clear_cache_summary">Rensa den lagrade information för online-repos, tvingar appen att uppdatera online</string>
 
     <string name="settings_core_only_title">Endast Magisk kärnläge</string>
-    <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU, MagiskHide och systemless hosts kommer fortfarande att vara aktiverade</string>
+    <string name="settings_core_only_summary">Aktiverar endast kärnfunktioner, alla moduler laddas inte. MagiskSU och MagiskHide kommer fortfarande att vara aktiverade</string>
     <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts-stöd för Adblock-appar</string>
@@ -99,8 +97,10 @@
     <string name="settings_su_adb">Endast ADB</string>
     <string name="settings_su_disable">Inaktiverad</string>
     <string name="settings_su_request_10">10 sekunder</string>
+    <string name="settings_su_request_15">15 sekunder</string>
     <string name="settings_su_request_20">20 sekunder</string>
     <string name="settings_su_request_30">30 sekunder</string>
+    <string name="settings_su_request_45">45 sekunder</string>
     <string name="settings_su_request_60">60 sekunder</string>
     <string name="superuser_access">Superuser-tillgång</string>
     <string name="auto_response">Automatiskt svar</string>

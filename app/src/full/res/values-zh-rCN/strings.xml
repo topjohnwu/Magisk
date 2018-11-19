@@ -17,8 +17,6 @@
     <string name="checking_safetyNet_status">正在检查 SafetyNet 状态…</string>
     <string name="safetyNet_check_success">SafetyNet 检查成功</string>
     <string name="safetyNet_api_error">SafetyNet API 错误</string>
-    <string name="safetyNet_network_loss">网络连接不可用</string>
-    <string name="safetyNet_service_disconnected">服务已被取消</string>
     <string name="safetyNet_res_invalid">回传值无效</string>
 
     <!--Install Fragment-->
@@ -70,6 +68,7 @@
     <string name="donation">捐赠</string>
     <string name="app_translators">翻译人员</string>
     <string name="support_thread">支持主题</string>
+    <string name="follow_twitter">关注我的 Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">关闭</string>
@@ -88,7 +87,7 @@
     <string name="zip_process_title">正在处理</string>
     <string name="zip_process_msg">正在处理 zip 文件…</string>
     <string name="manager_update_title">Magisk Manager 有更新！</string>
-    <string name="manager_download_install">点按以下载并安装</string>
+    <string name="manager_download_install">下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
     <string name="magisk_updates">Magisk 更新</string>
@@ -96,10 +95,13 @@
     <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_toast2">这可能需要一点时间…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败…</string>
+    <string name="open_link_failed_toast">找不到能够打开此链接的应用…</string>
     <string name="download_zip_only">仅下载 Zip</string>
     <string name="patch_boot_file">修补 Boot 镜像文件</string>
     <string name="direct_install">直接安装（推荐）</string>
-    <string name="install_second_slot">安装到第二分区（安装完OTA后）</string>
+    <string name="install_inactive_slot">安装到未使用的槽位（安装完OTA后）</string>
+    <string name="warning">警告</string>
+    <string name="install_inactive_slot_msg">重启后，设备将被强制切换到另一个槽位！\n请在安装完 OTA 后再使用。\n是否继续？</string>
     <string name="select_method">选择安装方法</string>
     <string name="no_boot_file_patch_support">目标安装版本不支持修补 Boot 镜像文件</string>
     <string name="boot_file_patch_msg">选择原厂 Boot 镜像备份；支持 .img 以及 .img.tar 格式</string>
@@ -111,12 +113,10 @@
     <string name="proprietary_title">下载专有代码</string>
     <string name="proprietary_notice">Magisk Manager 是一个 100% 开源的应用，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查吗？</string>
     <string name="su_db_corrupt">SU 数据库已损坏，将重新创建数据库</string>
-    <string name="cannot_check_sn_title">无法检查 SafetyNet</string>
-    <string name="cannot_check_sn_notice">由于一些 Google Play 服务的改变，隐藏后的 Magisk Manager 无法进行 SafetyNet 检查。</string>
     <string name="setup_done">安装完成</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要额外安装</string>
-    <string name="env_fix_msg">您的设备需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
+    <string name="env_fix_msg">需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
     <string name="setup_title">额外安装</string>
     <string name="setup_msg">运行环境安装中…</string>
 
@@ -143,7 +143,7 @@
     <string name="settings_boot_format_title">已修补的 Boot 镜像输出格式</string>
     <string name="settings_boot_format_summary">选择已修补的 Boot 镜像文件输出格式\n若要通过 fastboot/download 模式刷入，请选择 .img 格式；若要通过 Odin 刷入，则选择 .img.tar\n</string>
     <string name="settings_core_only_title">Magisk 核心功能模式</string>
-    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU、MagiskHide 和 systemless hosts 仍会持续运作</string>
+    <string name="settings_core_only_summary">仅启用核心功能，所有模块将不会被载入。MagiskSU 和 MagiskHide 仍会持续运作</string>
     <string name="settings_magiskhide_summary">隐藏 Magisk 使其不被多种方法检测到</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
@@ -153,8 +153,10 @@
     <string name="settings_su_adb">仅 ADB</string>
     <string name="settings_su_disable">已禁用</string>
     <string name="settings_su_request_10">10 秒</string>
+    <string name="settings_su_request_15">15 秒</string>
     <string name="settings_su_request_20">20 秒</string>
     <string name="settings_su_request_30">30 秒</string>
+    <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
     <string name="superuser_access">超级用户访问权限</string>
     <string name="auto_response">自动响应</string>
@@ -165,6 +167,7 @@
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
     <string name="settings_su_fingerprint_title">启用指纹验证</string>
     <string name="settings_su_fingerprint_summary">使用指纹识别来允许超级用户请求</string>
+    <string name="auth_fingerprint">验证指纹</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>

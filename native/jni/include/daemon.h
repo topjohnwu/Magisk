@@ -4,13 +4,10 @@
 #ifndef _DAEMON_H_
 #define _DAEMON_H_
 
+#include <stdbool.h>
 #include <pthread.h>
 #include <sys/un.h>
 #include <sys/socket.h>
-
-extern int setup_done;
-extern int seperate_vendor;
-extern int full_patch_pid;
 
 // Commands require connecting to daemon
 enum {
@@ -20,13 +17,11 @@ enum {
 	CHECK_VERSION_CODE,
 	POST_FS_DATA,
 	LATE_START,
-	LAUNCH_MAGISKHIDE,
-	STOP_MAGISKHIDE,
-	ADD_HIDELIST,
-	RM_HIDELIST,
-	LS_HIDELIST,
+	BOOT_COMPLETE,
+	MAGISKHIDE,
 	HIDE_CONNECT,
-	HANDSHAKE
+	HANDSHAKE,
+	SQLITE_CMD,
 };
 
 // Return codes for daemon
@@ -34,62 +29,58 @@ enum {
 	DAEMON_ERROR = -1,
 	DAEMON_SUCCESS = 0,
 	ROOT_REQUIRED,
-	LOGCAT_DISABLED,
-	HIDE_IS_ENABLED,
-	HIDE_NOT_ENABLED,
-	HIDE_ITEM_EXIST,
-	HIDE_ITEM_NOT_EXIST,
+	DAEMON_LAST
 };
-
-typedef enum {
-	MAIN_DAEMON,
-	LOG_DAEMON
-} daemon_t;
 
 // daemon.c
 
-void main_daemon();
 int connect_daemon();
-int connect_daemon2(daemon_t d, int *sockfd);
-void auto_start_magiskhide();
+int switch_mnt_ns(int pid);
 
 // log_monitor.c
 
-extern int loggable;
-void log_daemon();
+extern bool log_daemon_started;
+int connect_log_daemon();
+bool start_log_daemon();
 
 // socket.c
 
-int setup_socket(struct sockaddr_un *sun, daemon_t d);
+socklen_t setup_sockaddr(struct sockaddr_un *sun, const char *name);
+int create_rand_socket(struct sockaddr_un *sun);
+int socket_accept(int sockfd, int timeout);
 int recv_fd(int sockfd);
 void send_fd(int sockfd, int fd);
 int read_int(int fd);
+int read_int_be(int fd);
 void write_int(int fd, int val);
-char* read_string(int fd);
-void write_string(int fd, const char* val);
+void write_int_be(int fd, int val);
+char *read_string(int fd);
+char *read_string_be(int fd);
+void write_string(int fd, const char *val);
+void write_string_be(int fd, const char *val);
+void write_key_value(int fd, const char *key, const char *val);
+void write_key_token(int fd, const char *key, int tok);
 
 /***************
  * Boot Stages *
  ***************/
 
+void unlock_blocks();
 void startup();
 void post_fs_data(int client);
 void late_start(int client);
+void boot_complete(int client);
 
 /**************
  * MagiskHide *
  **************/
 
-void launch_magiskhide(int client);
-void stop_magiskhide(int client);
-void add_hide_list(int client);
-void rm_hide_list(int client);
-void ls_hide_list(int client);
+void magiskhide_handler(int client);
 
 /*************
  * Superuser *
  *************/
 
-void su_daemon_receiver(int client, struct ucred *credential);
+void su_daemon_handler(int client, struct ucred *credential);
 
 #endif

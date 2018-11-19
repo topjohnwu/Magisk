@@ -3,37 +3,42 @@ package com.topjohnwu.magisk;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Const;
+import com.google.android.material.navigation.NavigationView;
+import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.fragments.LogFragment;
+import com.topjohnwu.magisk.fragments.MagiskFragment;
+import com.topjohnwu.magisk.fragments.MagiskHideFragment;
+import com.topjohnwu.magisk.fragments.ModulesFragment;
+import com.topjohnwu.magisk.fragments.ReposFragment;
+import com.topjohnwu.magisk.fragments.SettingsFragment;
+import com.topjohnwu.magisk.fragments.SuperuserFragment;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
-public class MainActivity extends Activity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Topic.Subscriber {
 
     private final Handler mDrawerHandler = new Handler();
     private int mDrawerItem;
-    private boolean fromShortcut = true;
+    private static boolean fromShortcut = false;
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.toolbar) public Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
-    @BindView(R.id.nav_view) public NavigationView navigationView;
+    @BindView(R.id.nav_view) NavigationView navigationView;
 
     private float toolbarElevation;
 
@@ -44,27 +49,14 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-
-        MagiskManager mm = getMagiskManager();
-
         if (!mm.hasInit) {
-            Intent intent = new Intent(this, SplashActivity.class);
-            String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
-            if (section != null) {
-                intent.putExtra(Const.Key.OPEN_SECTION, section);
-            }
-            startActivity(intent);
+            startActivity(new Intent(this, Data.classMap.get(SplashActivity.class)));
             finish();
-        }
-
-        String perm = getIntent().getStringExtra(Const.Key.INTENT_PERM);
-        if (perm != null) {
-            ActivityCompat.requestPermissions(this, new String[] { perm }, 0);
         }
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        new MainActivity_ViewBinding(this);
 
         setSupportActionBar(toolbar);
 
@@ -86,8 +78,11 @@ public class MainActivity extends Activity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        if (savedInstanceState == null)
-            navigate(getIntent().getStringExtra(Const.Key.OPEN_SECTION));
+        if (savedInstanceState == null) {
+            String section = getIntent().getStringExtra(Const.Key.OPEN_SECTION);
+            fromShortcut = section != null;
+            navigate(section);
+        }
 
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -118,28 +113,19 @@ public class MainActivity extends Activity
     }
 
     @Override
-    public void onTopicPublished(Topic topic) {
+    public void onPublish(int topic, Object[] result) {
         recreate();
     }
 
-    @Override
-    public Topic[] getSubscription() {
-        return new Topic[] { getMagiskManager().reloadActivity };
-    }
-
     public void checkHideSection() {
-        MagiskManager mm = getMagiskManager();
         Menu menu = navigationView.getMenu();
-        menu.findItem(R.id.magiskhide).setVisible(
-                Shell.rootAccess() && mm.magiskVersionCode >= Const.MAGISK_VER.UNIFIED
-                        && mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
-        menu.findItem(R.id.modules).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false) &&
-                Shell.rootAccess() && mm.magiskVersionCode >= 0);
-        menu.findItem(R.id.downloads).setVisible(!mm.prefs.getBoolean(Const.Key.COREONLY, false)
-                && Utils.checkNetworkStatus() && Shell.rootAccess() && mm.magiskVersionCode >= 0);
+        menu.findItem(R.id.magiskhide).setVisible(Shell.rootAccess() &&
+                mm.prefs.getBoolean(Const.Key.MAGISKHIDE, false));
+        menu.findItem(R.id.modules).setVisible(Shell.rootAccess() && Data.magiskVersionCode >= 0);
+        menu.findItem(R.id.downloads).setVisible(Download.checkNetworkStatus(this)
+                && Shell.rootAccess() && Data.magiskVersionCode >= 0);
         menu.findItem(R.id.log).setVisible(Shell.rootAccess());
-        menu.findItem(R.id.superuser).setVisible(Shell.rootAccess() &&
-                !(Const.USER_ID > 0 && mm.multiuserMode == Const.Value.MULTIUSER_MODE_OWNER_MANAGED));
+        menu.findItem(R.id.superuser).setVisible(Utils.showSuperUser());
     }
 
     public void navigate(String item) {
@@ -166,6 +152,9 @@ public class MainActivity extends Activity
                     break;
                 case "about":
                     itemId = R.id.app_about;
+                    break;
+                case "donation":
+                    itemId = R.id.donation;
                     break;
             }
         }
@@ -197,11 +186,14 @@ public class MainActivity extends Activity
                 displayFragment(new LogFragment(), false);
                 break;
             case R.id.settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                mDrawerItem = bak;
+                displayFragment(new SettingsFragment(), true);
                 break;
             case R.id.app_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                startActivity(new Intent(this, Data.classMap.get(AboutActivity.class)));
+                mDrawerItem = bak;
+                break;
+            case R.id.donation:
+                startActivity(new Intent(this, Data.classMap.get(DonationActivity.class)));
                 mDrawerItem = bak;
                 break;
         }

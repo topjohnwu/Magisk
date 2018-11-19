@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.adapters;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Module;
@@ -18,8 +17,9 @@ import com.topjohnwu.superuser.Shell;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHolder> {
 
@@ -29,6 +29,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         mList = list;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_module, parent, false);
@@ -46,9 +47,9 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
         String noInfo = context.getString(R.string.no_info_provided);
 
         holder.title.setText(module.getName());
-        holder.versionName.setText( TextUtils.isEmpty(version) ? noInfo : version);
-        holder.author.setText( TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
-        holder.description.setText( TextUtils.isEmpty(description) ? noInfo : description);
+        holder.versionName.setText(TextUtils.isEmpty(version) ? noInfo : version);
+        holder.author.setText(TextUtils.isEmpty(author) ? noInfo : context.getString(R.string.author, author));
+        holder.description.setText(TextUtils.isEmpty(description) ? noInfo : description);
 
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(module.isEnabled());
@@ -114,7 +115,7 @@ public class ModulesAdapter extends RecyclerView.Adapter<ModulesAdapter.ViewHold
 
         ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            new ModulesAdapter$ViewHolder_ViewBinding(this, itemView);
 
             if (!Shell.rootAccess()) {
                 checkBox.setEnabled(false);

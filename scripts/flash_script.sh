@@ -31,7 +31,7 @@ fi
 # Load utility fuctions
 . $COMMONDIR/util_functions.sh
 
-get_outfd
+setup_flashable
 
 ##########################################################################################
 # Detection
@@ -47,6 +47,7 @@ mount_partitions
 find_boot_image
 find_dtbo_image
 
+check_data
 get_flags
 
 [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
@@ -72,10 +73,8 @@ remove_system_su
 
 ui_print "- Constructing environment"
 
-check_data
-
 if $DATA; then
-  MAGISKBIN=/data/.magisk
+  MAGISKBIN=/data/magisk
   $DATA_DE && MAGISKBIN=/data/adb/magisk
   run_migrations
 else
@@ -92,10 +91,11 @@ chmod -R 755 $MAGISKBIN
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
   mount -o rw,remount /system
-  echo "#!/sbin/sh" > /system/addon.d/99-magisk.sh
-  echo "# ADDOND_VERSION=2" >> /system/addon.d/99-magisk.sh
-  echo ". /data/adb/magisk/addon.d.sh" >> /system/addon.d/99-magisk.sh
-  chmod 755 /system/addon.d/99-magisk.sh
+  ADDOND=/system/addon.d/99-magisk.sh
+  echo '#!/sbin/sh' > $ADDOND
+  echo '# ADDOND_VERSION=2' >> $ADDOND
+  echo 'exec sh /data/adb/magisk/addon.d.sh "$@"' >> $ADDOND
+  chmod 755 $ADDOND
 fi
 
 $BOOTMODE || recovery_actions
@@ -113,7 +113,8 @@ cd $MAGISKBIN
 # Source the boot patcher
 . ./boot_patch.sh "$BOOTIMAGE"
 
-flash_boot_image new-boot.img "$BOOTIMAGE"
+ui_print "- Flashing new boot image"
+flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
 rm -f new-boot.img
 
 if [ -f stock_boot* ]; then

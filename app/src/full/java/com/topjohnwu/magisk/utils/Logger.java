@@ -3,8 +3,7 @@ package com.topjohnwu.magisk.utils;
 import android.util.Log;
 
 import com.topjohnwu.magisk.BuildConfig;
-
-import java.util.Locale;
+import com.topjohnwu.magisk.Const;
 
 public class Logger {
 

@@ -1,9 +1,8 @@
 package com.topjohnwu.magisk.container;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 
-import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.utils.LocaleManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,17 +19,18 @@ public class SuLogEntry {
         fromUid = policy.uid;
         packageName = policy.packageName;
         appName = policy.appName;
+        action = policy.policy == Policy.ALLOW;
     }
 
-    public SuLogEntry(Cursor c) {
-        fromUid = c.getInt(c.getColumnIndex("from_uid"));
-        fromPid = c.getInt(c.getColumnIndex("from_pid"));
-        toUid = c.getInt(c.getColumnIndex("to_uid"));
-        packageName = c.getString(c.getColumnIndex("package_name"));
-        appName = c.getString(c.getColumnIndex("app_name"));
-        command = c.getString(c.getColumnIndex("command"));
-        action = c.getInt(c.getColumnIndex("action")) != 0;
-        date = new Date(c.getLong(c.getColumnIndex("time")));
+    public SuLogEntry(ContentValues values) {
+        fromUid = values.getAsInteger("from_uid");
+        packageName = values.getAsString("package_name");
+        appName = values.getAsString("app_name");
+        fromPid = values.getAsInteger("from_pid");
+        command = values.getAsString("command");
+        toUid = values.getAsInteger("to_uid");
+        action = values.getAsInteger("action") != 0;
+        date = new Date(values.getAsLong("time"));
     }
 
     public ContentValues getContentValues() {
@@ -47,10 +47,10 @@ public class SuLogEntry {
     }
 
     public String getDateString() {
-        return DateFormat.getDateInstance(DateFormat.MEDIUM, MagiskManager.locale).format(date);
+        return DateFormat.getDateInstance(DateFormat.MEDIUM, LocaleManager.locale).format(date);
     }
 
     public String getTimeString() {
-        return new SimpleDateFormat("h:mm a", MagiskManager.locale).format(date);
+        return new SimpleDateFormat("h:mm a", LocaleManager.locale).format(date);
     }
 }

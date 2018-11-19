@@ -18,7 +18,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,6 +31,7 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.security.DigestOutputStream;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -60,7 +60,7 @@ public class SignAPK {
     private static final String CERT_SF_NAME = "META-INF/CERT.SF";
     private static final String CERT_SIG_NAME = "META-INF/CERT.%s";
 
-    public static Provider sBouncyCastleProvider;
+    private static Provider sBouncyCastleProvider;
     // bitmasks for which hash algorithms we need the manifest to include.
     private static final int USE_SHA1 = 1;
     private static final int USE_SHA256 = 2;
@@ -70,59 +70,60 @@ public class SignAPK {
         Security.insertProviderAt(sBouncyCastleProvider, 1);
     }
 
-    public static void signZip(InputStream cert, InputStream key,
-                               JarMap input, OutputStream output) throws Exception {
+    public static void sign(JarMap input, OutputStream output) throws Exception {
+        sign(SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem"),
+             SignAPK.class.getResourceAsStream("/keys/testkey.pk8"), input, output);
+    }
+
+    public static void sign(InputStream certIs, InputStream keyIs,
+                            JarMap input, OutputStream output) throws Exception {
+        X509Certificate cert = CryptoUtils.readCertificate(certIs);
+        PrivateKey key = CryptoUtils.readPrivateKey(keyIs);
+        sign(cert, key, input, output);
+    }
+
+    public static void sign(InputStream jks, String keyStorePass, String alias, String keyPass,
+                            JarMap input, OutputStream output) throws Exception {
+        KeyStore ks = KeyStore.getInstance("JKS");
+        ks.load(jks, keyStorePass.toCharArray());
+        X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+        PrivateKey key = (PrivateKey) ks.getKey(alias, keyPass.toCharArray());
+        sign(cert, key, input, output);
+    }
+
+    private static void sign(X509Certificate cert, PrivateKey key,
+                             JarMap input, OutputStream output) throws Exception {
         File temp1 = File.createTempFile("signAPK", null);
         File temp2 = File.createTempFile("signAPK", null);
-        if (cert == null) {
-            cert = SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem");
-        }
-        if (key == null) {
-            key = SignAPK.class.getResourceAsStream("/keys/testkey.pk8");
-        }
-
-        ReusableInputStream c = new ReusableInputStream(cert);
-        ReusableInputStream k = new ReusableInputStream(key);
 
         try {
             try (OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))) {
-                signZip(c, k, input, out, false);
+                sign(cert, key, input, out, false);
             }
 
             ZipAdjust.adjust(temp1, temp2);
 
             try (JarMap map = new JarMap(temp2, false)) {
-                signZip(c, k, map, output, true);
+                sign(cert, key, map, output, true);
             }
         } finally {
             temp1.delete();
             temp2.delete();
-            c.destroy();
-            k.destroy();
         }
     }
 
-    public static void signZip(InputStream cert, InputStream key,
-                               JarMap input, OutputStream output, boolean minSign) throws Exception {
-        int alignment = 4;
+    private static void sign(X509Certificate cert, PrivateKey key,
+                             JarMap input, OutputStream output, boolean minSign) throws Exception {
         int hashes = 0;
-        if (cert == null) {
-            cert = SignAPK.class.getResourceAsStream("/keys/testkey.x509.pem");
-        }
-        X509Certificate certificate = CryptoUtils.readCertificate(cert);
-        hashes |= getDigestAlgorithm(certificate);
+        hashes |= getDigestAlgorithm(cert);
 
         // Set the ZIP file timestamp to the starting valid time
         // of the 0th certificate plus one hour (to match what
         // we've historically done).
-        long timestamp = certificate.getNotBefore().getTime() + 3600L * 1000;
-        if (key == null) {
-            key = SignAPK.class.getResourceAsStream("/keys/testkey.pk8");
-        }
-        PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
+        long timestamp = cert.getNotBefore().getTime() + 3600L * 1000;
 
         if (minSign) {
-            signWholeFile(input.getFile(), certificate, privateKey, output);
+            signWholeFile(input.getFile(), cert, key, output);
         } else {
             JarOutputStream outputJar = new JarOutputStream(output);
             // For signing .apks, use the maximum compression to make
@@ -133,8 +134,8 @@ public class SignAPK {
             // (~0.1% on full OTA packages I tested).
             outputJar.setLevel(9);
             Manifest manifest = addDigestsToManifest(input, hashes);
-            copyFiles(manifest, input, outputJar, timestamp, alignment);
-            signFile(manifest, input, certificate, privateKey, outputJar);
+            copyFiles(manifest, input, outputJar, timestamp, 4);
+            signFile(manifest, input, cert, key, outputJar);
             outputJar.close();
         }
     }

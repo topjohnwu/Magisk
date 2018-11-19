@@ -1,5 +1,4 @@
 <PreferenceScreen
-    android:layout_marginTop="?attr/actionBarSize"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="general"
@@ -12,6 +11,7 @@
 
         <ListPreference
             android:key="locale"
+            android:defaultValue="@string/empty"
             android:title="@string/language"/>
 
         <Preference
@@ -52,6 +52,7 @@
             android:title="@string/settings_boot_format_title"
             android:entries="@array/boot_formats"
             android:entryValues="@array/boot_formats"
+            android:defaultValue=".img"
             android:summary="@string/settings_boot_format_summary"/>
 
     </PreferenceCategory>
@@ -60,7 +61,7 @@
         android:key="magisk"
         android:title="@string/magisk">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:key="disable"
             android:title="@string/settings_core_only_title"
             android:summary="@string/settings_core_only_summary" />
@@ -70,7 +71,7 @@
             android:title="@string/magiskhide"
             android:summary="@string/settings_magiskhide_summary" />
 
-        <SwitchPreference
+        <Preference
             android:key="hosts"
             android:title="@string/settings_hosts_title"
             android:summary="@string/settings_hosts_summary" />

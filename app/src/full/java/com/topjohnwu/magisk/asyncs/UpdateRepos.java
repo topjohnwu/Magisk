@@ -2,13 +2,13 @@ package com.topjohnwu.magisk.asyncs;
 
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 
+import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
-import com.topjohnwu.magisk.ReposFragment;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Const;
 import com.topjohnwu.magisk.utils.Logger;
+import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 
@@ -20,64 +20,41 @@ import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class UpdateRepos extends ParallelTask<Void, Void, Void> {
+public class UpdateRepos {
 
-    private static final int CHECK_ETAG = 0;
-    private static final int LOAD_NEXT = 1;
-    private static final int LOAD_PREV = 2;
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final int CORE_POOL_SIZE = Math.max(2, CPU_COUNT - 1);
+    private static final DateFormat dateFormat;
 
-    private MagiskManager mm;
-    private List<String> etags, newEtags = new LinkedList<>();
-    private Set<String> cached;
-    private boolean forceUpdate;
-    private AtomicInteger taskCount = new AtomicInteger(0);
-    final private Object allDone = new Object();
-
-    public UpdateRepos(boolean force) {
-        mm = MagiskManager.get();
-        mm.repoLoadDone.reset();
-        forceUpdate = force;
+    static {
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private void queueTask(Runnable task) {
-        // Thread pool's queue has an upper bound, batch it with 64 tasks
-        while (taskCount.get() >= 64) {
-            waitTasks();
-        }
-        taskCount.incrementAndGet();
-        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
-            task.run();
-            if (taskCount.decrementAndGet() == 0) {
-                synchronized (allDone) {
-                    allDone.notify();
-                }
-            }
-        });
+    private MagiskManager mm;
+    private Set<String> cached;
+    private ExecutorService threadPool;
+
+    public UpdateRepos() {
+        mm = Data.MM();
     }
 
     private void waitTasks() {
-        if (taskCount.get() == 0)
-            return;
-        synchronized (allDone) {
-            try {
-                allDone.wait();
-            } catch (InterruptedException e) {
-                // Wait again
-                waitTasks();
-            }
-        }
+        threadPool.shutdown();
+        try {
+            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ignored) {}
     }
 
     private boolean loadJSON(String jsonString) throws JSONException, ParseException {
@@ -89,20 +66,17 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject rawRepo = jsonArray.getJSONObject(i);
-            String id = rawRepo.getString("description");
-            String name = rawRepo.getString("name");
+            String id = rawRepo.getString("name");
             Date date = dateFormat.parse(rawRepo.getString("pushed_at"));
-            Set<String> set = Collections.synchronizedSet(cached);
-            queueTask(() -> {
+            threadPool.execute(() -> {
                 Repo repo = mm.repoDB.getRepo(id);
                 try {
                     if (repo == null)
-                        repo = new Repo(name);
+                        repo = new Repo(id);
                     else
-                        set.remove(id);
+                        cached.remove(id);
                     repo.update(date);
                     mm.repoDB.addRepo(repo);
-                    publishProgress();
                 } catch (Repo.IllegalRepoException e) {
                     Logger.debug(e.getMessage());
                     mm.repoDB.removeRepo(id);
@@ -112,99 +86,74 @@ public class UpdateRepos extends ParallelTask<Void, Void, Void> {
         return true;
     }
 
-    private boolean loadPage(int page, int mode) {
+    /* We sort repos by last push, which means that we only need to check whether the
+     * first page is updated to determine whether the online repo database is changed
+     */
+    private boolean loadPage(int page) {
         Map<String, String> header = new HashMap<>();
-        if (mode == CHECK_ETAG && page < etags.size())
-            header.put(Const.Key.IF_NONE_MATCH, etags.get(page));
+        if (page == 0)
+            header.put(Const.Key.IF_NONE_MATCH, mm.prefs.getString(Const.Key.ETAG_KEY, ""));
         String url = Utils.fmt(Const.Url.REPO_URL, page + 1);
 
         try {
             HttpURLConnection conn = WebService.request(url, header);
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                // Current page is not updated, check the next page
-                return loadPage(page + 1, CHECK_ETAG);
-            }
+            // No updates
+            if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED)
+                return false;
+            // Current page is the last page
             if (!loadJSON(WebService.getString(conn)))
-                return mode != CHECK_ETAG;
+                return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            // Should not happen, but if exception occurs, page load fails
             return false;
         }
 
-        /* If one page is updated, we force update all pages */
-
         // Update ETAG
-        String etag = header.get(Const.Key.ETAG_KEY);
-        etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
-        if (mode == LOAD_PREV) {
-            // We are loading a previous page, push the new tag to the front
-            newEtags.add(0, etag);
-        } else {
-            newEtags.add(etag);
+        if (page == 0) {
+            String etag = header.get(Const.Key.ETAG_KEY);
+            etag = etag.substring(etag.indexOf('\"'), etag.lastIndexOf('\"') + 1);
+            mm.prefs.edit().putString(Const.Key.ETAG_KEY, etag).apply();
         }
 
         String links = header.get(Const.Key.LINK_KEY);
-        if (links != null) {
-            for (String s : links.split(", ")) {
-                if (mode != LOAD_PREV && s.contains("next")) {
-                    // Force load all next pages
-                    loadPage(page + 1, LOAD_NEXT);
+        return links == null || !links.contains("next") || loadPage(page + 1);
+    }
+
+    private void fullReload() {
+        Cursor c = mm.repoDB.getRawCursor();
+        while (c.moveToNext()) {
+            Repo repo = new Repo(c);
+            threadPool.execute(() -> {
+                try {
+                    repo.update();
+                    mm.repoDB.addRepo(repo);
+                } catch (Repo.IllegalRepoException e) {
+                    Logger.debug(e.getMessage());
+                    mm.repoDB.removeRepo(repo);
                 }
-                if (mode != LOAD_NEXT && s.contains("prev")) {
-                    // Back propagation
-                    loadPage(page - 1, LOAD_PREV);
-                }
-            }
+            });
         }
-        return true;
+        waitTasks();
     }
 
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        if (ReposFragment.adapter != null)
-            ReposFragment.adapter.notifyDBChanged();
-    }
+    public void exec(boolean force) {
+        Topic.reset(Topic.REPO_LOAD_DONE);
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            cached = Collections.synchronizedSet(mm.repoDB.getRepoIDSet());
+            threadPool = Executors.newFixedThreadPool(CORE_POOL_SIZE);
 
-    @Override
-    protected void onPreExecute() {
-        mm.repoLoadDone.setPending();
-    }
-
-    @Override
-    protected Void doInBackground(Void... voids) {
-        etags = Arrays.asList(mm.prefs.getString(Const.Key.ETAG_KEY, "").split(","));
-        cached = mm.repoDB.getRepoIDSet();
-
-        if (loadPage(0, CHECK_ETAG)) {
-            waitTasks();
-
-            // The leftover cached means they are removed from online repo
-            mm.repoDB.removeRepo(cached);
-
-            // Update ETag
-            mm.prefs.edit().putString(Const.Key.ETAG_KEY, TextUtils.join(",", newEtags)).apply();
-        } else if (forceUpdate) {
-            Cursor c = mm.repoDB.getRawCursor();
-            while (c.moveToNext()) {
-                Repo repo = new Repo(c);
-                queueTask(() -> {
-                    try {
-                        repo.update();
-                        mm.repoDB.addRepo(repo);
-                    } catch (Repo.IllegalRepoException e) {
-                        Logger.debug(e.getMessage());
-                        mm.repoDB.removeRepo(repo);
-                    }
-                });
+            if (loadPage(0)) {
+                waitTasks();
+                // The leftover cached means they are removed from online repo
+                mm.repoDB.removeRepo(cached);
+            } else if (force) {
+                fullReload();
             }
-            waitTasks();
-        }
-        return null;
+            Topic.publish(Topic.REPO_LOAD_DONE);
+        });
     }
 
-    @Override
-    protected void onPostExecute(Void v) {
-        mm.repoLoadDone.publish();
-        super.onPostExecute(v);
+    public void exec() {
+        exec(false);
     }
 }

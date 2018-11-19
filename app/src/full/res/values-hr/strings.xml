@@ -18,8 +18,6 @@
     <string name="checking_safetyNet_status">Provjera SafetyNet statusa</string>
     <string name="safetyNet_check_success">SafetyNet provjera uspješna</string>
     <string name="safetyNet_api_error">SafetyNet API greška</string>
-    <string name="safetyNet_network_loss">Mrežna veza nije dostupna</string>
-    <string name="safetyNet_service_disconnected">Usluga je ubijena</string>
     <string name="safetyNet_res_invalid">Odgovor je nevažeći</string>
 
     <!--Install Fragment-->
@@ -90,7 +88,6 @@
     <string name="download_zip_only">Preuzmi samo zip</string>
     <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>
     <string name="direct_install">Izravna instalacija (preporuča se)</string>
-    <string name="install_second_slot">Instalirajte na drugo mjesto (nakon OTA-e)</string>
     <string name="select_method">Odaberite metodu</string>
     <string name="no_boot_file_patch_support">Ciljana verzija Magiska ne podržava zakrpu datoteke za podizanje sustava</string>
     <string name="boot_file_patch_msg">Odaberite standardnu datoteku za podizanje sustava u .img ili .img.tar formatu</string>
@@ -118,7 +115,7 @@
     <string name="settings_boot_format_summary">Odaberite izlazni format datoteke za podizanje sustava nakon zakrpe.\nOdaberite .img da biste aplicirali putem brzog pokretanja(fastboota)/preuzimanja(downloada); odaberite .img.tar da biste aplicirali putem ODIN-a.</string>
 
     <string name="settings_core_only_title">Samo Magisk Core način rada</string>
-    <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU, MagiskHide i systemless hostovi će i dalje biti omogućeni</string>
+    <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU i MagiskHide će i dalje biti omogućeni</string>
     <string name="settings_magiskhide_summary">Sakrij Magisk od raznih detekcija</string>
     <string name="settings_hosts_title">Systemless hostovi</string>
     <string name="settings_hosts_summary">Systemless hostovi podržavaju Adblock aplikacije</string>
@@ -128,8 +125,10 @@
     <string name="settings_su_adb">Samo ADB</string>
     <string name="settings_su_disable">Onemogućeno</string>
     <string name="settings_su_request_10">10 sekundi</string>
+    <string name="settings_su_request_15">15 sekundi</string>
     <string name="settings_su_request_20">20 sekundi</string>
     <string name="settings_su_request_30">30 sekundi</string>
+    <string name="settings_su_request_45">45 sekundi</string>
     <string name="settings_su_request_60">60 sekundi</string>
     <string name="superuser_access">Superuser pristup</string>
     <string name="auto_response">Automatski odgovor</string>

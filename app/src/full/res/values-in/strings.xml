@@ -1,6 +1,4 @@
 <resources>
-    <!--Universal-->
-
     <!--Welcome Activity-->
     <string name="modules">Modul</string>
     <string name="downloads">Unduhan</string>
@@ -18,8 +16,6 @@
     <string name="checking_safetyNet_status">Memeriksa status SafetyNet…</string>
     <string name="safetyNet_check_success">Pemeriksaan SafetyNet Berhasil</string>
     <string name="safetyNet_api_error">Kesalahan pada API SafetyNet</string>
-    <string name="safetyNet_network_loss">Koneksi jaringan tidak tersedia</string>
-    <string name="safetyNet_service_disconnected">Layanan telah dimatikan</string>
     <string name="safetyNet_res_invalid">Tanggapan tidak valid</string>
 
     <!--Install Fragment-->
@@ -71,6 +67,7 @@
     <string name="donation">Donasi</string>
     <string name="app_translators">Penerjemah</string>
     <string name="support_thread">Thread dukungan</string>
+    <string name="follow_twitter">Ikuti saya di Twitter</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Tutup</string>
@@ -97,10 +94,13 @@
     <string name="hide_manager_toast">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_toast2">Ini mungkin membutuhkan beberapa saat…</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager…</string>
+    <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan…</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
     <string name="patch_boot_file">Tambal File Boot Image</string>
     <string name="direct_install">Pasang Langsung (Direkomendasikan)</string>
-    <string name="install_second_slot">Pasang ke Slot Kedua (Setelah OTA)</string>
+    <string name="install_inactive_slot">Pasang ke Slot Nonaktif (Setelah OTA)</string>
+    <string name="warning">Peringatan</string>
+    <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA untuk boot ke slot nonaktif saat ini setelah sebuah reboot!\nHanya gunakan opsi ini setelah OTA selesai.\nLanjutkan?</string>
     <string name="select_method">Pilih Metode</string>
     <string name="no_boot_file_patch_support">Versi target Magisk tidak mendukung penambalan file boot image</string>
     <string name="boot_file_patch_msg">Pilih stock boot image dump dalam format .img atau .img.tar</string>
@@ -112,8 +112,6 @@
     <string name="proprietary_title">Unduh Kode Proprieter</string>
     <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS, yang tidak menyertakan kode API proprieter Google SafetyNet.\n\nApakah Anda mengizinkan Magisk Manager untuk mengunduh sebuah ekstensi (berisi GoogleApiClient) untuk pemeriksaan SafetyNet?</string>
     <string name="su_db_corrupt">Database SU rusak, akan membuat db baru</string>
-    <string name="cannot_check_sn_title">Tidak dapat memeriksa SafetyNet</string>
-    <string name="cannot_check_sn_notice">Karena beberapa perubahan dalam Layanan Google Play, adalah tidak mungkin untuk memeriksa SafetyNet di Magisk Manager yang dipak ulang</string>
     <string name="setup_done">Penyiapan selesai</string>
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Memerlukan Penyiapan Tambahan</string>
@@ -142,7 +140,7 @@
     <string name="settings_boot_format_title">Format Keluaran Boot yang Ditambal</string>
     <string name="settings_boot_format_summary">Pilih format keluaran boot image yang ditambal.\nPilih .img untuk flash melalui mode recovery/download; pilih .img.tar untuk flash melalui ODIN.</string>
     <string name="settings_core_only_title">Magisk Mode Inti Saja</string>
-    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU, MagiskHide, dan host tanpa sistem akan tetap diaktifkan</string>
+    <string name="settings_core_only_summary">Aktifkan fitur inti saja. MagiskSU dan MagiskHide akan tetap diaktifkan</string>
     <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai pendeteksian</string>
     <string name="settings_hosts_title">Host tanpa sistem</string>
     <string name="settings_hosts_summary">Dukungan host tanpa sistem untuk apl pemblokir iklan</string>
@@ -152,8 +150,10 @@
     <string name="settings_su_adb">ADB saja</string>
     <string name="settings_su_disable">Nonaktif</string>
     <string name="settings_su_request_10">10 detik</string>
+    <string name="settings_su_request_15">15 detik</string>
     <string name="settings_su_request_20">20 detik</string>
     <string name="settings_su_request_30">30 detik</string>
+    <string name="settings_su_request_45">45 detik</string>
     <string name="settings_su_request_60">60 detik</string>
     <string name="superuser_access">Akses Superuser</string>
     <string name="auto_response">Tanggapan Otomatis</string>
@@ -164,6 +164,7 @@
     <string name="settings_su_reauth_summary">Otentikasi ulang izin superuser setelah pembaruan sebuah aplikasi</string>
     <string name="settings_su_fingerprint_title">Aktifkan Otentikasi Sidik Jari</string>
     <string name="settings_su_fingerprint_summary">Gunakan pemindai sidik jari untuk mengizinkan permintaan superuser</string>
+    <string name="auth_fingerprint">Otentikasi Sidik Jari</string>
 
     <string name="multiuser_mode">Mode Multipengguna</string>
     <string name="settings_owner_only">Pemilik Perangkat Saja</string>

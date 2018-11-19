@@ -1,11 +1,9 @@
 package com.topjohnwu.magisk;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -16,9 +14,10 @@ import android.widget.Toast;
 
 import com.topjohnwu.magisk.asyncs.FlashZip;
 import com.topjohnwu.magisk.asyncs.InstallMagisk;
-import com.topjohnwu.magisk.components.Activity;
-import com.topjohnwu.magisk.utils.Const;
+import com.topjohnwu.magisk.components.BaseActivity;
+import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.RootUtils;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.CallbackList;
 import com.topjohnwu.superuser.Shell;
 
@@ -30,11 +29,12 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class FlashActivity extends Activity {
+public class FlashActivity extends BaseActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.txtLog) TextView flashLogs;
@@ -44,37 +44,33 @@ public class FlashActivity extends Activity {
 
     private List<String> logs;
 
-    @OnClick(R.id.no_thanks)
-    void dismiss() {
-        finish();
-    }
-
     @OnClick(R.id.reboot)
     void reboot() {
-        Shell.Async.su("/system/bin/reboot");
+        Shell.su("/system/bin/reboot").submit();
     }
 
     @OnClick(R.id.save_logs)
     void saveLogs() {
-        Calendar now = Calendar.getInstance();
-        String filename = String.format(Locale.US,
-                "install_log_%04d%02d%02d_%02d%02d%02d.log",
-                now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+        runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+            Calendar now = Calendar.getInstance();
+            String filename = String.format(Locale.US,
+                    "magisk_install_log_%04d%02d%02d_%02d%02d%02d.log",
+                    now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
+                    now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
+                    now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File logFile = new File(Const.EXTERNAL_PATH + "/logs", filename);
-        logFile.getParentFile().mkdirs();
-        try (FileWriter writer = new FileWriter(logFile)) {
-            for (String s : logs) {
-                writer.write(s);
-                writer.write('\n');
+            File logFile = new File(Download.EXTERNAL_PATH, filename);
+            try (FileWriter writer = new FileWriter(logFile)) {
+                for (String s : logs) {
+                    writer.write(s);
+                    writer.write('\n');
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        MagiskManager.toast(logFile.getPath(), Toast.LENGTH_LONG);
+            Utils.toast(logFile.getPath(), Toast.LENGTH_LONG);
+        });
     }
 
     @Override
@@ -86,7 +82,8 @@ public class FlashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash);
-        ButterKnife.bind(this);
+        new FlashActivity_ViewBinding(this);
+
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -99,11 +96,23 @@ public class FlashActivity extends Activity {
 
         logs = new ArrayList<>();
         CallbackList<String> console = new CallbackList<String>(new ArrayList<>()) {
+
+            private void updateUI() {
+                flashLogs.setText(TextUtils.join("\n", this));
+                sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
+            }
+
             @Override
             public void onAddElement(String s) {
                 logs.add(s);
-                flashLogs.setText(TextUtils.join("\n", this));
-                sv.postDelayed(() -> sv.fullScroll(ScrollView.FOCUS_DOWN), 10);
+                updateUI();
+            }
+
+            @Override
+            public String set(int i, String s) {
+                String ret = super.set(i, s);
+                Data.mainHandler.post(this::updateUI);
+                return ret;
             }
         };
 
@@ -119,16 +128,22 @@ public class FlashActivity extends Activity {
                 new UninstallMagisk(this, uri, console, logs).exec();
                 break;
             case Const.Value.FLASH_MAGISK:
-                new InstallMagisk(this, console, logs, uri, InstallMagisk.DIRECT_MODE).exec();
+                new InstallMagisk(this, console, logs, InstallMagisk.DIRECT_MODE).exec();
                 break;
-            case Const.Value.FLASH_SECOND_SLOT:
-                new InstallMagisk(this, console, logs, uri, InstallMagisk.SECOND_SLOT_MODE).exec();
+            case Const.Value.FLASH_INACTIVE_SLOT:
+                new InstallMagisk(this, console, logs, InstallMagisk.SECOND_SLOT_MODE).exec();
                 break;
             case Const.Value.PATCH_BOOT:
-                new InstallMagisk(this, console, logs, uri,
+                new InstallMagisk(this, console, logs,
                         intent.getParcelableExtra(Const.Key.FLASH_SET_BOOT)).exec();
                 break;
         }
+    }
+
+    @OnClick(R.id.close)
+    @Override
+    public void finish() {
+        super.finish();
     }
 
     @Override
@@ -138,14 +153,14 @@ public class FlashActivity extends Activity {
 
     private static class UninstallMagisk extends FlashZip {
 
-        private UninstallMagisk(Activity context, Uri uri, List<String> console, List<String> logs) {
+        private UninstallMagisk(BaseActivity context, Uri uri, List<String> console, List<String> logs) {
             super(context, uri, console, logs);
         }
 
         @Override
         protected void onPostExecute(Integer result) {
             if (result == 1) {
-                new Handler().postDelayed(() ->
+                Data.mainHandler.postDelayed(() ->
                         RootUtils.uninstallPkg(getActivity().getPackageName()), 3000);
             } else {
                 super.onPostExecute(result);

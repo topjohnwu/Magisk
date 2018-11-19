@@ -4,15 +4,14 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
-import com.topjohnwu.magisk.utils.Utils;
+import com.topjohnwu.superuser.Shell;
 
 public class UpdateCheckService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Utils.getMagiskManager(this).loadMagiskInfo();
-        new CheckUpdates(true)
-                .setCallBack(() -> jobFinished(params, false)).exec();
+        Shell.getShell();
+        CheckUpdates.check(() -> jobFinished(params, false));
         return true;
     }
 
