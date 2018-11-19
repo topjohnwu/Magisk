@@ -216,8 +216,11 @@ static void *watch_sigwinch(void *data) {
 
 		// Set the new terminal size
 		ioctl(slave, TIOCSWINSZ, &w);
+		
+		// sleep 500 milliseconds (0.5 sec)
+		usleep(500);
 
-	} while (sigwait(&winch, &sig) == 0);
+	} while (1); //while (sigwait(&winch, &sig) == 0); dont work.
 
 	free(data);
 	return NULL;
