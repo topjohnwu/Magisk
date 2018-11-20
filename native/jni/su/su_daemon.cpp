@@ -241,6 +241,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 	LOGD("su: fork handler\n");
 
+	// Abort upon any error occurred
+	log_cb.ex = exit;
+
 	struct su_context ctx = {
 		.info = info,
 		.pid = credential->pid
@@ -273,11 +276,8 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		xstat(pts_slave, &st);
 
 		// If caller is not root, ensure the owner of pts_slave is the caller
-		if(st.st_uid != info->uid && info->uid != 0) {
+		if(st.st_uid != info->uid && info->uid != 0)
 			LOGE("su: Wrong permission of pts_slave");
-			info->access.policy = DENY;
-			exit(1);
-		}
 
 		// Set our pts_slave to devpts, same restriction as adb shell
 		lsetfilecon(pts_slave, "u:object_r:devpts:s0");
