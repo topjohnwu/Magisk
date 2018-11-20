@@ -79,9 +79,8 @@ mm_patch_dtbo() {
 }
 
 restore_imgs() {
-  local SHA1=`grep_prop SHA1 /.backup/.magisk`
+  local SHA1=`grep_prop SHA1 /sbin/.magisk/config`
   [ -z $SHA1 ] && local SHA1=`cat /.backup/.sha1`
-  [ -z $SHA1 ] && local SHA1=`grep_prop #STOCKSHA1 /.backup/.magisk`
   [ -z $SHA1 ] && return 1
   local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
   local STOCKDTBO=/data/stock_dtbo.img.gz

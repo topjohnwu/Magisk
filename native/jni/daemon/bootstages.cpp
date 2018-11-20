@@ -683,9 +683,6 @@ void startup() {
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
-	// Remove some traits of Magisk
-	unlink(MAGISKRC);
-
 	// GSIs will have to override /sbin/adbd with /system/bin/adbd
 	if (access("/sbin/adbd", F_OK) == 0 && access("/system/bin/adbd", F_OK) == 0) {
 		umount2("/sbin/adbd", MNT_DETACH);
@@ -709,6 +706,12 @@ void startup() {
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+
+	// Remove some traces of Magisk
+	unlink(MAGISKRC);
+	mkdir(MAGISKTMP, 0755);
+	cp_afc("/.backup/.magisk", MAGISKTMP "/config");
+	rm_rf("/.backup");
 
 	// Create applet symlinks
 	for (int i = 0; applet_names[i]; ++i) {
