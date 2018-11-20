@@ -28,7 +28,7 @@
 #include "pts.h"
 #include "flags.h"
 
-#define quit_signals ((int []) { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 })
+int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
 static void usage(int status) {
 	FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
@@ -224,13 +224,10 @@ int su_client_main(int argc, char *argv[]) {
 	// Send stderr
 	send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
 
-	if (atty & ATTY_IN) {
+	if (atty) {
 		setup_sighandlers(sighandler);
-		pump_stdin_async(ptmx);
-	}
-	if (atty & ATTY_OUT) {
-		// Forward SIGWINCH
 		watch_sigwinch_async(STDOUT_FILENO, ptmx);
+		pump_stdin_async(ptmx);
 		pump_stdout_blocking(ptmx);
 	}
 
