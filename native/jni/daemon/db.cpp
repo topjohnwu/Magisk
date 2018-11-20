@@ -195,7 +195,7 @@ static int settings_cb(void *v, int col_num, char **data, char **col_name) {
 
 int get_db_settings(db_settings *dbs, int key) {
 	char *err;
-	if (key > 0) {
+	if (key >= 0) {
 		char query[128];
 		sprintf(query, "SELECT key, value FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
 		err = db_exec(query, settings_cb, dbs);
@@ -225,7 +225,7 @@ static int strings_cb(void *v, int col_num, char **data, char **col_name) {
 
 int get_db_strings(db_strings *str, int key) {
 	char *err;
-	if (key > 0) {
+	if (key >= 0) {
 		char query[128];
 		sprintf(query, "SELECT key, value FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
 		err = db_exec(query, strings_cb, str);

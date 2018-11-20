@@ -136,8 +136,8 @@ struct su_access {
  ********************/
 
 sqlite3 *get_magiskdb(sqlite3 *&db);
-int get_db_settings(db_settings *dbs, int key);
-int get_db_strings(db_strings *str, int key);
+int get_db_settings(db_settings *dbs, int key = -1);
+int get_db_strings(db_strings *str, int key = -1);
 int get_uid_policy(int uid, struct su_access *su);
 int validate_manager(char *alt_pkg, int userid, struct stat *st);
 void exec_sql(int client);

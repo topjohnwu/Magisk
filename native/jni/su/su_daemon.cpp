@@ -60,8 +60,8 @@ static void *info_collector(void *node) {
 
 static void database_check(su_info *info) {
 	int uid = info->uid;
-	get_db_settings(&info->cfg, 0);
-	get_db_strings(&info->str, 0);
+	get_db_settings(&info->cfg);
+	get_db_strings(&info->str);
 
 	// Check multiuser settings
 	switch (info->cfg[SU_MULTIUSER_MODE]) {
