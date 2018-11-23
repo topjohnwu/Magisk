@@ -256,9 +256,9 @@ int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
 }
 
 char *strdup2(const char *s, size_t *size) {
-	size_t l = strlen(s) + 1;
-	char *buf = new char[l];
-	memcpy(buf, s, l);
-	if (size) *size = l;
+	size_t len = strlen(s) + 1;
+	char *buf = new char[len];
+	memcpy(buf, s, len);
+	if (size) *size = len;
 	return buf;
 }

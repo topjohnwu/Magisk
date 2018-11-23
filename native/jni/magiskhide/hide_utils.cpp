@@ -268,7 +268,8 @@ int launch_magiskhide(int client) {
 		goto error;
 
 	// Add SafetyNet by default
-	add_list("com.google.android.gms.unstable");
+	rm_list("com.google.android.gms.unstable");
+	add_list("com.google.android.gms/.droidguard.DroidGuardService");
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();

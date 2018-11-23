@@ -20,7 +20,6 @@
 #include "daemon.h"
 #include "utils.h"
 #include "magiskhide.h"
-#include "flags.h"
 
 static int sockfd = -1;
 extern char *system_block, *vendor_block, *magiskloop;
@@ -61,7 +60,7 @@ static int parse_ppid(int pid) {
 }
 
 static void hide_daemon(int pid) {
-	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
+	LOGD("hide_daemon: handling pid=[%d]\n", pid);
 
 	char buffer[4096];
 	Vector<CharArray> mounts;
@@ -130,32 +129,32 @@ void proc_monitor() {
 	FILE *log_in = fdopen(sockfd, "r");
 	char buf[4096];
 	while (fgets(buf, sizeof(buf), log_in)) {
-		char *ss = strchr(buf, '[') + 1;
-		int pid, ppid, num = 0;
-		char *pos = ss, proc[256];
+		char *log;
+		int pid, ppid;
 		struct stat ns, pns;
 
-		while((pos = strchr(pos, ','))) {
-			*pos = ' ';
-			++num;
-		}
+		if ((log = strchr(buf, '[')) == nullptr)
+			continue;
 
-		if(sscanf(ss, num == 6 ? "%*d %d %*d %*d %256s" : "%*d %d %*d %256s", &pid, proc) != 2)
+		// Extract pid
+		if (sscanf(log, "[%*d,%d", &pid) != 1)
+			continue;
+
+		// Extract last token (component name)
+		const char *tok, *cpnt = "";
+		while ((tok = strtok_r(nullptr, ",[]\n", &log)))
+			cpnt = tok;
+		if (cpnt[0] == '\0')
 			continue;
 
 		// Make sure our target is alive
 		if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns))
 			continue;
 
-		// Allow hiding sub-services of applications
-		char *colon = strchr(proc, ':');
-		if (colon)
-			*colon = '\0';
-
 		bool hide = false;
 		pthread_mutex_lock(&list_lock);
 		for (auto &s : hide_list) {
-			if (s == proc) {
+			if (strncmp(cpnt, s, s.size() - 1) == 0) {
 				hide = true;
 				break;
 			}
@@ -172,20 +171,11 @@ void proc_monitor() {
 		if (kill(pid, SIGSTOP) == -1)
 			continue;
 
-		// Restore the colon so we can log the actual process name
-		if (colon)
-			*colon = ':';
-#ifdef MAGISK_DEBUG
-		LOGI("proc_monitor: %s (PID=[%d] ns=%llu)(PPID=[%d] ns=%llu)\n",
-			 proc, pid, ns.st_ino, ppid, pns.st_ino);
-#else
-		LOGI("proc_monitor: %s\n", proc);
-#endif
-
 		/*
 		 * The setns system call do not support multithread processes
 		 * We have to fork a new process, setns, then do the unmounts
 		 */
+		LOGI("proc_monitor: %s PID=[%d] ns=[%llu]\n", cpnt, pid, ns.st_ino);
 		if (fork_dont_care() == 0)
 			hide_daemon(pid);
 	}
