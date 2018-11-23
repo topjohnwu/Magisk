@@ -43,29 +43,27 @@ static int read_ns(const int pid, struct stat *st) {
 	return stat(path, st);
 }
 
-static void lazy_unmount(const char* mountpoint) {
+static inline void lazy_unmount(const char* mountpoint) {
 	if (umount2(mountpoint, MNT_DETACH) != -1)
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
 static int parse_ppid(int pid) {
-	char stat[512], path[32];
-	int fd, ppid;
+	char path[32];
+	int ppid;
 	sprintf(path, "/proc/%d/stat", pid);
-	fd = xopen(path, O_RDONLY);
-	if (fd < 0)
+	FILE *stat = fopen(path, "r");
+	if (stat == nullptr)
 		return -1;
-	xread(fd, stat, sizeof(stat));
-	close(fd);
 	/* PID COMM STATE PPID ..... */
-	sscanf(stat, "%*d %*s %*c %d", &ppid);
+	fscanf(stat, "%*d %*s %*c %d", &ppid);
 	return ppid;
 }
 
 static void hide_daemon(int pid) {
 	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
 
-	char buffer[PATH_MAX];
+	char buffer[4096];
 	Vector<CharArray> mounts;
 
 	manage_selinux();
@@ -126,30 +124,27 @@ void proc_monitor() {
 	// Connect to the log daemon
 	sockfd = connect_log_daemon();
 	if (sockfd < 0)
-		return;
+		pthread_exit(nullptr);
 	write_int(sockfd, HIDE_CONNECT);
 
 	FILE *log_in = fdopen(sockfd, "r");
 	char buf[4096];
 	while (fgets(buf, sizeof(buf), log_in)) {
-		char *ss = strchr(buf, '[');
+		char *ss = strchr(buf, '[') + 1;
 		int pid, ppid, num = 0;
 		char *pos = ss, proc[256];
 		struct stat ns, pns;
 
-		while(1) {
-			pos = strchr(pos, ',');
-			if(pos == NULL)
-				break;
-			pos[0] = ' ';
+		while((pos = strchr(pos, ','))) {
+			*pos = ' ';
 			++num;
 		}
 
-		if(sscanf(ss, num == 6 ? "[%*d %d %*d %*d %256s" : "[%*d %d %*d %256s", &pid, proc) != 2)
+		if(sscanf(ss, num == 6 ? "%*d %d %*d %*d %256s" : "%*d %d %*d %256s", &pid, proc) != 2)
 			continue;
 
 		// Make sure our target is alive
-		if (kill(pid, 0))
+		if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns))
 			continue;
 
 		// Allow hiding sub-services of applications
@@ -167,17 +162,11 @@ void proc_monitor() {
 		}
 		pthread_mutex_unlock(&list_lock);
 
-		if (!hide || (ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns) == -1)
+		if (!hide)
 			continue;
 
-		do {
-			if (read_ns(pid, &ns) == -1)
-				break;
-			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-				usleep(50);
-			else
-				break;
-		} while (1);
+		while (read_ns(pid, &ns) == 0 && ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+			usleep(500);
 
 		// Send pause signal ASAP
 		if (kill(pid, SIGSTOP) == -1)
