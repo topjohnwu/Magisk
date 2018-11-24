@@ -10,10 +10,6 @@ static void allowSuClient(const char *target) {
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
 
-	// Allow access to magisk files
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "file", ALL);
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "dir", ALL);
-
 	// Allow binder service
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
@@ -150,10 +146,15 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
 
+	// Super files
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
+	sepol_allow(SEPOL_FILE_DOMAIN, ALL, "filesystem", "associate");
+
 	// For changing attributes
 	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
-	sepol_allow(SEPOL_FILE_DOMAIN, "labeledfs", "filesystem", "associate");
-	sepol_allow(SEPOL_FILE_DOMAIN, "tmpfs", "filesystem", "associate");
 
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
