@@ -51,7 +51,7 @@ static int parse_ppid(int pid) {
 	char path[32];
 	int ppid;
 	sprintf(path, "/proc/%d/stat", pid);
-	FILE *stat = xfopen(path, "re");
+	FILE *stat = fopen(path, "re");
 	if (stat == nullptr)
 		return -1;
 	/* PID COMM STATE PPID ..... */
