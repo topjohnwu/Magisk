@@ -211,7 +211,7 @@ int deleteprop(const char *name, bool persist) {
 int load_prop_file(const char *filename, const bool trigger) {
 	if (init_resetprop()) return -1;
 	LOGD("resetprop: Load prop file [%s]\n", filename);
-	FILE *fp = fopen(filename, "r");
+	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr) {
 		LOGE("Cannot open [%s]\n", filename);
 		return 1;

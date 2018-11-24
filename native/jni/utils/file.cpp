@@ -395,7 +395,7 @@ int file_to_vector(const char *filename, Vector<CharArray> &arr) {
 	size_t len = 0;
 	ssize_t read;
 
-	FILE *fp = xfopen(filename, "r");
+	FILE *fp = xfopen(filename, "re");
 	if (fp == nullptr)
 		return 1;
 
