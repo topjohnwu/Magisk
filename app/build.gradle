@@ -77,11 +77,11 @@ dependencies {
     fullImplementation "androidx.recyclerview:recyclerview:${rootProject.ext.androidXVersion}"
     fullImplementation "androidx.cardview:cardview:${rootProject.ext.androidXVersion}"
     fullImplementation "com.google.android.material:material:${rootProject.ext.androidXVersion}"
-    fullImplementation 'com.github.topjohnwu:libsu:2.0.3'
+    fullImplementation 'com.github.topjohnwu:libsu:2.1.2'
     fullImplementation 'com.atlassian.commonmark:commonmark:0.11.0'
     fullImplementation 'org.kamranzafar:jtar:2.3'
 
-    def butterKnifeVersion = '9.0.0-rc1'
+    def butterKnifeVersion = '9.0.0-rc2'
     if (properties.containsKey('android.injected.invoked.from.ide')) {
         fullImplementation "com.jakewharton:butterknife-reflect:${butterKnifeVersion}"
     } else {
