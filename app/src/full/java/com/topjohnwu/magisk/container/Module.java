@@ -18,12 +18,12 @@ public class Module extends BaseModule {
         mDisableFile = new SuFile(path, "disable");
         mUpdateFile = new SuFile(path, "update");
 
-        if (getId() == null) {
+        if (getId().isEmpty()) {
             int sep = path.lastIndexOf('/');
             setId(path.substring(sep + 1));
         }
 
-        if (getName() == null) {
+        if (getName().isEmpty()) {
             setName(getId());
         }
 
