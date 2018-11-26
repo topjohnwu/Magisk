@@ -317,7 +317,7 @@ static void exec_common_script(const char* stage) {
 			if (access(entry->d_name, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(0, nullptr,
+			int pid = exec_command(false, nullptr,
 					strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
 					"sh", entry->d_name, nullptr);
 			if (pid != -1)
@@ -336,8 +336,7 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(
-				0, nullptr,
+		int pid = exec_command(false, nullptr,
 				strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
 				"sh", buf2, nullptr);
 		if (pid != -1)
@@ -555,7 +554,7 @@ static void install_apk(const char *apk) {
 		sleep(5);
 		LOGD("apk_install: attempting to install APK");
 		int apk_res = -1, pid;
-		pid = exec_command(1, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
+		pid = exec_command(true, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
 		if (pid != -1) {
 			int err = 0;
 			while (fdgets(buf, PATH_MAX, apk_res) > 0) {

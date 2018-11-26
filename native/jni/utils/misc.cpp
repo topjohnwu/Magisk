@@ -181,21 +181,21 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
 }
 
 /*
-   fd == NULL -> Ignore output
+   fd == nullptr -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
   *cb         -> A callback function which calls after forking
 */
-int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
-	int pipefd[2], write_end = -1;
+int exec_array(bool err, int *fd, void (*cb)(void), const char **argv) {
+	int pipefd[2], outfd = -1;
 
 	if (fd) {
 		if (*fd < 0) {
 			if (xpipe2(pipefd, O_CLOEXEC) == -1)
 				return -1;
-			write_end = pipefd[1];
+			outfd = pipefd[1];
 		} else {
-			write_end = *fd;
+			outfd = *fd;
 		}
 	}
 
@@ -210,9 +210,9 @@ int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
 	}
 
 	if (fd) {
-		xdup2(write_end, STDOUT_FILENO);
+		xdup2(outfd, STDOUT_FILENO);
 		if (err)
-			xdup2(write_end, STDERR_FILENO);
+			xdup2(outfd, STDERR_FILENO);
 	}
 
 	// Setup environment
@@ -224,7 +224,7 @@ int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
 	return -1;
 }
 
-static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
+static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
 	// Collect va_list into vector
 	Vector<const char *> args;
 	args.push_back(argv0);
@@ -239,7 +239,7 @@ int exec_command_sync(const char *argv0, ...) {
 	va_list argv;
 	va_start(argv, argv0);
 	int pid, status;
-	pid = v_exec_command(0, NULL, NULL, argv0, argv);
+	pid = v_exec_command(false, nullptr, nullptr, argv0, argv);
 	va_end(argv);
 	if (pid < 0)
 		return pid;
@@ -247,7 +247,7 @@ int exec_command_sync(const char *argv0, ...) {
 	return WEXITSTATUS(status);
 }
 
-int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
+int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...) {
 	va_list argv;
 	va_start(argv, argv0);
 	int pid = v_exec_command(err, fd, cb, argv0, argv);
