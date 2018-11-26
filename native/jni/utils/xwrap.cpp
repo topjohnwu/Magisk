@@ -172,16 +172,27 @@ int xlisten(int sockfd, int backlog) {
 	return ret;
 }
 
-int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
+static int accept4_compat(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
 	int fd = accept(sockfd, addr, addrlen);
 	if (fd == -1) {
-		PLOGE("accept4");
+		PLOGE("accept");
+	} else {
+		if (flags & SOCK_CLOEXEC)
+			fcntl(fd, F_SETFD, FD_CLOEXEC);
+		if (flags & SOCK_NONBLOCK) {
+			int i = fcntl(fd, F_GETFL);
+			fcntl(fd, F_SETFL, i | O_NONBLOCK);
+		}
 	}
-	if (flags & SOCK_CLOEXEC)
-		fcntl(fd, F_SETFD, FD_CLOEXEC);
-	if (flags & SOCK_NONBLOCK) {
-		int i = fcntl(fd, F_GETFL);
-		fcntl(fd, F_SETFL, i | O_NONBLOCK);
+	return fd;
+}
+
+int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
+	int fd = (int) syscall(__NR_accept4, sockfd, addr, addrlen, flags);
+	if (fd == -1) {
+		if (errno == ENOSYS)
+			return accept4_compat(sockfd, addr, addrlen, flags);
+		PLOGE("accept4");
 	}
 	return fd;
 }
