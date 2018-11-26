@@ -184,9 +184,9 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
    fd == nullptr -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
-  *cb         -> A callback function which calls after forking
+  *pre_exec   -> A callback function called after forking, before execvp
 */
-int exec_array(bool err, int *fd, void (*cb)(void), const char **argv) {
+int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 	int pipefd[2], outfd = -1;
 
 	if (fd) {
@@ -209,15 +209,16 @@ int exec_array(bool err, int *fd, void (*cb)(void), const char **argv) {
 		return pid;
 	}
 
-	if (fd) {
+	if (outfd >= 0) {
 		xdup2(outfd, STDOUT_FILENO);
 		if (err)
 			xdup2(outfd, STDERR_FILENO);
+		close(outfd);
 	}
 
-	// Setup environment
-	if (cb)
-		cb();
+	// Call the pre-exec callback
+	if (pre_exec)
+		pre_exec();
 
 	execvp(argv[0], (char **) argv);
 	PLOGE("execvp %s", argv[0]);

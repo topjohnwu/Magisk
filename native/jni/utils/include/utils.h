@@ -20,6 +20,9 @@
 int file_to_vector(const char *filename, Vector<CharArray> &arr);
 char *strdup2(const char *s, size_t *size = nullptr);
 
+int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv);
+int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...);
+
 extern "C" {
 #endif
 
@@ -91,8 +94,6 @@ unsigned get_system_uid();
 unsigned get_radio_uid();
 ssize_t fdgets(char *buf, size_t size, int fd);
 int is_num(const char *s);
-int exec_array(bool err, int *fd, void (*cb)(void), const char **argv);
-int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...);
 int exec_command_sync(const char *argv0, ...);
 int fork_dont_care();
 void gen_rand_str(char *buf, int len);
