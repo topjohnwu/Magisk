@@ -15,6 +15,9 @@
 #include "daemon.h"
 #include "db.h"
 
+#define SAFETYNET_COMPONENT  "com.google.android.gms/.droidguard.DroidGuardService"
+#define SAFETYNET_PROCESS    "com.google.android.gms.unstable"
+
 Vector<CharArray> hide_list;
 pthread_mutex_t list_lock;
 
@@ -58,6 +61,14 @@ void hide_sensitive_props() {
 	}
 }
 
+static bool is_digits(const char *s) {
+	for (const char *c = s; *c; ++c) {
+		if (*c < '0' || *c > '9')
+			return false;
+	}
+	return true;
+}
+
 static void ps(void (*cb)(int, void*), void *arg) {
 	DIR *dir;
 	struct dirent *entry;
@@ -66,18 +77,18 @@ static void ps(void (*cb)(int, void*), void *arg) {
 		return;
 
 	while ((entry = xreaddir(dir))) {
-		if (entry->d_type == DT_DIR && is_num(entry->d_name))
+		if (entry->d_type == DT_DIR && is_digits(entry->d_name))
 			cb(atoi(entry->d_name), arg);
 	}
 
 	closedir(dir);
 }
 
-static bool check_proc_name(int pid, const char *name) {
+static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	FILE *f;
 	sprintf(buf, "/proc/%d/comm", pid);
-	if ((f = fopen(buf, "r"))) {
+	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
 		if (strcmp(buf, name) == 0)
 			return true;
@@ -88,7 +99,7 @@ static bool check_proc_name(int pid, const char *name) {
 	fclose(f);
 
 	sprintf(buf, "/proc/%d/cmdline", pid);
-	if ((f = fopen(buf, "r"))) {
+	if ((f = fopen(buf, "re"))) {
 		fgets(buf, sizeof(buf), f);
 		if (strcmp(basename(buf), name) == 0)
 			return true;
@@ -99,15 +110,16 @@ static bool check_proc_name(int pid, const char *name) {
 	fclose(f);
 
 	sprintf(buf, "/proc/%d/exe", pid);
-	if (access(buf, F_OK) != 0)
+	ssize_t len;
+	if ((len = readlink(buf, buf, sizeof(buf))) < 0)
 		return false;
-	xreadlink(buf, buf, sizeof(buf));
+	buf[len] = '\0';
 	return strcmp(basename(buf), name) == 0;
 }
 
 static void kill_proc_cb(int pid, void *v) {
 	ps_arg *args = static_cast<ps_arg *>(v);
-	if (check_proc_name(pid, args->name))
+	if (proc_name_match(pid, args->name))
 		kill(pid, SIGTERM);
 	else if (args->uid > 0) {
 		char buf[64];
@@ -121,15 +133,29 @@ static void kill_proc_cb(int pid, void *v) {
 }
 
 static void kill_process(const char *name) {
-	ps_arg args = { .name = name };
+	ps_arg args;
+	char *slash = nullptr;
+	if (strcmp(name, SAFETYNET_COMPONENT) == 0) {
+		// We do NOT want to kill gms, it will cause massive system crashes
+		args.name = SAFETYNET_PROCESS;
+	} else {
+		// Only leave the package name part of component name temporarily
+		slash = strchr((char *)name, '/');
+		if (slash)
+			*slash = '\0';
+		args.name = name;
+	}
 	struct stat st;
 	int fd = xopen("/data/data", O_RDONLY | O_CLOEXEC);
-	if (fstatat(fd, name, &st, 0) == 0)
+	if (fstatat(fd, args.name, &st, 0) == 0)
 		args.uid = st.st_uid;
 	else
 		args.uid = 0;
 	close(fd);
 	ps(kill_proc_cb, &args);
+	// Revert back to component name
+	if (slash)
+		*slash = '/';
 }
 
 void clean_magisk_props() {
@@ -209,6 +235,7 @@ int rm_list(int client) {
 static int collect_list(void *, int, char **data, char**) {
 	LOGI("hide_list: [%s]\n", data[0]);
 	hide_list.push_back(data[0]);
+	kill_process(data[0]);
 	return 0;
 }
 
@@ -268,8 +295,8 @@ int launch_magiskhide(int client) {
 		goto error;
 
 	// Add SafetyNet by default
-	rm_list("com.google.android.gms.unstable");
-	add_list("com.google.android.gms/.droidguard.DroidGuardService");
+	rm_list(SAFETYNET_PROCESS);
+	add_list(SAFETYNET_COMPONENT);
 
 	// Get thread reference
 	proc_monitor_thread = pthread_self();

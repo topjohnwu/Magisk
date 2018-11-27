@@ -39,15 +39,6 @@ unsigned get_radio_uid() {
 	return ppwd->pw_uid;
 }
 
-/* Check if the string only contains digits */
-int is_num(const char *s) {
-	int len = strlen(s);
-	for (int i = 0; i < len; ++i)
-		if (s[i] < '0' || s[i] > '9')
-			return 0;
-	return 1;
-}
-
 /* Read a whole line from file descriptor */
 ssize_t fdgets(char *buf, const size_t size, int fd) {
 	ssize_t len = 0;
