@@ -135,3 +135,10 @@ EOF
   touch hosts/auto_mount
   cd /
 }
+
+rm_launch() {
+  db_clean $1
+  pm uninstall $2
+  monkey -p $3 1
+  exit
+}

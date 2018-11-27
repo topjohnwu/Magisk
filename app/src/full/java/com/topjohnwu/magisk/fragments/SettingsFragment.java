@@ -93,7 +93,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                         Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
                         if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
                             Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                            RootUtils.uninstallPkg(context.getPackageName());
+                            RootUtils.rmAndLaunch(context.getPackageName(), Const.ORIG_PKG_NAME);
                             return;
                         }
                         Shell.su("rm -f /data/local/tmp/manager.apk").exec();
