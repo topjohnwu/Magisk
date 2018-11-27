@@ -28,7 +28,7 @@
 	<string name="install_magisk_title">Ultima versione disponibile: %1$s</string>
 	<string name="uninstall">Disinstalla</string>
 	<string name="uninstall_magisk_title">Disinstalla Magisk</string>
-	<string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e i tuoi dati potrebbero venire crittografati nel caso non lo siano.</string>
+	<string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi. Il root verrà rimosso e i tuoi dati potrebbero venire criptati, nel caso non lo siano già.</string>
 	<string name="update">Aggiorna %1$s</string>
 
 	<!--Module Fragment-->
