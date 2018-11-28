@@ -211,8 +211,8 @@ int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
 	if (pre_exec)
 		pre_exec();
 
-	execvp(argv[0], (char **) argv);
-	PLOGE("execvp %s", argv[0]);
+	execve(argv[0], (char **) argv, environ);
+	PLOGE("execve %s", argv[0]);
 	return -1;
 }
 

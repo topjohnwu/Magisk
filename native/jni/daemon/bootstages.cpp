@@ -319,7 +319,7 @@ static void exec_common_script(const char* stage) {
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			int pid = exec_command(false, nullptr,
 					strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-					"sh", entry->d_name, nullptr);
+					MIRRDIR "/system/bin/sh", entry->d_name, nullptr);
 			if (pid != -1)
 				waitpid(pid, nullptr, 0);
 		}
@@ -338,7 +338,7 @@ static void exec_module_script(const char* stage) {
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		int pid = exec_command(false, nullptr,
 				strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-				"sh", buf2, nullptr);
+				MIRRDIR "/system/bin/sh", buf2, nullptr);
 		if (pid != -1)
 			waitpid(pid, nullptr, 0);
 	}
