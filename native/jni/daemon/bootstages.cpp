@@ -432,6 +432,9 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
+	CharArray sdk_prop = getprop("ro.build.version.sdk");
+	int sdk = sdk_prop.empty() ? -1 : atoi(sdk_prop);
+
 	LOGI("* Mounting mirrors");
 	Vector<CharArray> mounts;
 	file_to_vector("/proc/mounts", mounts);
@@ -462,6 +465,9 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/vendor");
 #endif
+		} else if (sdk >= 24 && line.contains(" /proc ") && !line.contains("hidepid=2")) {
+			// Enforce hidepid
+			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
 	}
 	if (!seperate_vendor) {
