@@ -45,8 +45,8 @@
 
     <!--Repo Fragment-->
     <string name="update_available">Налице е актуализация.</string>
-    <string name="installed">Инсталиран</string>
-    <string name="not_installed">Не е инсталиран.</string>
+    <string name="installed">Инсталирани</string>
+    <string name="not_installed">Не са инсталирани</string>
     <string name="updated_on">Актуализиран на: %1$s</string>
     <string name="sorting_order">Сортиране</string>
     <string name="sort_by_name">Сортиране по наименование</string>
