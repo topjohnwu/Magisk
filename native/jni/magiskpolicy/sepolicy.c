@@ -65,6 +65,18 @@ static int set_attr(const char *type, int value) {
 	return 0;
 }
 
+static void check_avtab_node(avtab_ptr_t node) {
+	int redundant = 0;
+	if (node->key.specified == AVTAB_AUDITDENY)
+		redundant = node->datum.data == ~0U;
+	else if (node->key.specified & AVTAB_XPERMS)
+		redundant = node->datum.xperms == NULL;
+	else
+		redundant = node->datum.data == 0U;
+	if (redundant)
+		avtab_remove_node(&policydb->te_avtab, node);
+}
+
 static avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms)  {
 	avtab_ptr_t node;
 	avtab_datum_t avdatum;
@@ -102,19 +114,19 @@ static avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xper
 }
 
 static int add_avrule(avtab_key_t *key, int p, int not) {
-	avtab_datum_t *datum = &get_avtab_node(key, NULL)->datum;
-	if(not) {
+	avtab_ptr_t node = get_avtab_node(key, NULL);
+	if (not) {
 		if (p < 0)
-			datum->data = 0U;
+			node->datum.data = 0U;
 		else
-			datum->data &= ~(1U << (p - 1));
+			node->datum.data &= ~(1U << (p - 1));
 	} else {
 		if (p < 0)
-			datum->data = ~0U;
+			node->datum.data = ~0U;
 		else
-			datum->data |= 1U << (p - 1);
+			node->datum.data |= 1U << (p - 1);
 	}
-
+	check_avtab_node(node);
 	return 0;
 }
 
@@ -322,7 +334,7 @@ int dump_policydb(const char *filename) {
 	size_t len;
 	policydb_to_image(NULL, policydb, &data, &len);
 	if (data == NULL) {
-		LOGE("Fail to dump policy image!");
+		LOGE("Fail to dump policy image!\n");
 		return 1;
 	}
 
@@ -590,9 +602,6 @@ int add_type_rule(const char *s, const char *t, const char *c, const char *d, in
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
-	avtab_key_t key;
-	avtab_datum_t *av;
-
 	src = hashtab_search(policydb->p_types.table, s);
 	if (src == NULL) {
 		LOGW("source type %s does not exist\n", s);
@@ -614,13 +623,14 @@ int add_type_rule(const char *s, const char *t, const char *c, const char *d, in
 		return 1;
 	}
 
+	avtab_key_t key;
 	key.source_type = src->s.value;
 	key.target_type = tgt->s.value;
 	key.target_class = cls->s.value;
 	key.specified = effect;
 
-	av = &get_avtab_node(&key, NULL)->datum;
-	av->data = def->s.value;
+	avtab_ptr_t node = get_avtab_node(&key, NULL);
+	node->datum.data = def->s.value;
 
 	return 0;
 }
