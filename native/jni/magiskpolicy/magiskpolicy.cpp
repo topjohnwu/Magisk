@@ -14,18 +14,20 @@
 
 static const char *type_msg_1 =
 "Type 1:\n"
-"\"<action> source-class target-class permission-class permission\"\n"
-"Action: allow, deny, auditallow, auditdeny\n";
+"\"<rule_name> source_type target_type class perm_set\"\n"
+"Rules: allow, deny, auditallow, auditdeny\n";
 
 static const char *type_msg_2 =
 "Type 2:\n"
-"\"<action> source-class target-class permission-class ioctl range\"\n"
-"Action: allowxperm, auditallowxperm, dontauditxperm\n";
+"\"<rule_name> source_type target_type class operation xperm_set\"\n"
+"Rules: allowxperm, auditallowxperm, dontauditxperm\n"
+"* The only supported operation is ioctl\n"
+"* The only supported xperm_set format is range ([low-high])\n";
 
 static const char *type_msg_3 =
 "Type 3:\n"
-"\"<action> class\"\n"
-"Action: create, permissive, enforcing\n";
+"\"<rule_name> class\"\n"
+"Rules: create, permissive, enforcing\n";
 
 static const char *type_msg_4 =
 "Type 4:\n"
@@ -33,7 +35,12 @@ static const char *type_msg_4 =
 
 static const char *type_msg_5 =
 "Type 5:\n"
-"\"typetrans source-class target-class permission-class default-class (optional: object-name)\"\n";
+"\"<rule_name> source_type target_type class default_type\"\n"
+"Rules: type_transition, type_change, type_member\n";
+
+static const char *type_msg_6 =
+"Type 6:\n"
+"\"name_transition source_type target_type class default_type object_name\"\n";
 
 
 [[noreturn]] static void statements() {
@@ -42,9 +49,10 @@ static const char *type_msg_5 =
 		"this means a full policy statement should be enclosed in quotes;\n"
 		"multiple policy statements can be provided in a single command\n"
 		"\n"
-		"The statements has a format of \"<action> [args...]\"\n"
-		"Use '*' in args to represent every possible match.\n"
-		"Collections wrapped in curly brackets can also be used as args.\n"
+		"The statements has a format of \"<rule_name> [args...]\"\n"
+		"Multiple types and permissions can be grouped into collections\n"
+		"wrapped in curly brackets.\n"
+		"'*' represents a collection containing all valid matches.\n"
 		"\n"
 		"Supported policy statements:\n"
 		"\n"
@@ -53,20 +61,21 @@ static const char *type_msg_5 =
 		"%s\n"
 		"%s\n"
 		"%s\n"
+		"%s\n"
 		"Notes:\n"
-		"- typetrans does not support the all match '*' syntax\n"
-		"- permission-class cannot be collections\n"
-		"- source-class and target-class can also be attributes\n"
+		"* Type 4 - 6 does not support collections\n"
+		"* Object classes cannot be collections\n"
+		"* source_type and target_type can also be attributes\n"
 		"\n"
-		"Example: allow { source1 source2 } { target1 target2 } permission-class *\n"
+		"Example: allow { s1 s2 } { t1 t2 } class *\n"
 		"Will be expanded to:\n"
 		"\n"
-		"allow source1 target1 permission-class { all-permissions }\n"
-		"allow source1 target2 permission-class { all-permissions }\n"
-		"allow source2 target1 permission-class { all-permissions }\n"
-		"allow source2 target2 permission-class { all-permissions }\n"
+		"allow s1 t1 class { all permissions }\n"
+		"allow s1 t2 class { all permissions }\n"
+		"allow s2 t1 class { all permissions }\n"
+		"allow s2 t2 class { all permissions }\n"
 		"\n",
-  		type_msg_1, type_msg_2, type_msg_3, type_msg_4, type_msg_5);
+		type_msg_1, type_msg_2, type_msg_3, type_msg_4, type_msg_5, type_msg_6);
 	exit(0);
 }
 
@@ -207,6 +216,8 @@ static int parse_pattern_2(int action, const char *action_str, char *stmt) {
 				break;
 			case 3:
 				// Currently only support ioctl
+				if (strcmp(cur, "ioctl"))
+					return 1;
 				vec = nullptr;
 				break;
 			case 4:
@@ -310,11 +321,25 @@ static int parse_pattern_4(int action, const char *action_str, char *stmt) {
 	return 0;
 }
 
-// Pattern 5: action source target class default (filename)
+// Pattern 5: action source target class default
 static int parse_pattern_5(int action, const char *action_str, char *stmt) {
+	int (*action_func)(const char*, const char*, const char*, const char*);
+	switch (action) {
+		case 0:
+			action_func = sepol_typetrans;
+			break;
+		case 1:
+			action_func = sepol_typechange;
+			break;
+		case 2:
+			action_func = sepol_typemember;
+			break;
+		default:
+			return 1;
+	}
 	int state = 0;
 	char *cur;
-	char *source, *target, *cls, *def, *filename = nullptr;
+	char *source, *target, *cls, *def;
 	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
 		switch(state) {
 		case 0:
@@ -329,18 +354,48 @@ static int parse_pattern_5(int action, const char *action_str, char *stmt) {
 		case 3:
 			def = cur;
 			break;
-		case 4:
-			filename = cur;
-			break;
 		default:
 			return 1;
 		}
 		++state;
 	}
 	if (state < 4) return 1;
-	if (sepol_typetrans(source, target, cls, def, filename))
+	if (action_func(source, target, cls, def))
+		fprintf(stderr, "Error in: %s %s %s %s %s\n", action_str, source, target, cls, def);
+	return 0;
+}
+
+// Pattern 6: action source target class default filename
+static int parse_pattern_6(int action, const char *action_str, char *stmt) {
+	int state = 0;
+	char *cur;
+	char *source, *target, *cls, *def, *filename;
+	while ((cur = strtok_r(nullptr, " ", &stmt)) != nullptr) {
+		switch(state) {
+			case 0:
+				source = cur;
+				break;
+			case 1:
+				target = cur;
+				break;
+			case 2:
+				cls = cur;
+				break;
+			case 3:
+				def = cur;
+				break;
+			case 4:
+				filename = cur;
+				break;
+			default:
+				return 1;
+		}
+		++state;
+	}
+	if (state < 4) return 1;
+	if (sepol_nametrans(source, target, cls, def, filename))
 		fprintf(stderr, "Error in: %s %s %s %s %s %s\n",
-				action_str, source, target, cls, def, filename ? filename : "");
+				action_str, source, target, cls, def, filename);
 	return 0;
 }
 
@@ -371,7 +426,10 @@ static void parse_statement(char *statement) {
 	add_action("permissive", 3, 1)
 	add_action("enforce", 3, 2)
 	add_action("attradd", 4, 0)
-	add_action("typetrans", 5, 0)
+	add_action("type_transition", 5, 0)
+	add_action("type_change", 5, 1)
+	add_action("type_member", 5, 2)
+	add_action("name_transition", 6, 0)
 	else { fprintf(stderr, "Unknown statement: '%s'\n\n", orig.c_str()); }
 }
 

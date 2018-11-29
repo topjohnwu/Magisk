@@ -21,16 +21,6 @@ int sepol_auditdeny(const char *s, const char *t, const char *c, const char *p) 
 	return add_rule(s, t, c, p, AVTAB_AUDITDENY, 0);
 }
 
-int sepol_typetrans(const char *s, const char *t, const char *c, const char *d, const char *o) {
-	if (o == nullptr) {
-		// printf("add_trans %s %s %s %s\n", s, t, c ,d);
-		return add_transition(s, t, c, d);
-	} else {
-		// printf("add_file_trans %s %s %s %s %s\n", s, t, c ,d, o);
-		return add_file_transition(s, t, c, d, o);
-	}
-}
-
 int sepol_allowxperm(const char *s, const char *t, const char *c, const char *range) {
 	// printf("allowxperm %s %s %s %s\n", s, t, c, range);
 	return add_xperm_rule(s, t, c, range, AVTAB_XPERMS_ALLOWED, 0);
@@ -44,6 +34,21 @@ int sepol_auditallowxperm(const char *s, const char *t, const char *c, const cha
 int sepol_dontauditxperm(const char *s, const char *t, const char *c, const char *range) {
 	// printf("dontauditxperm %s %s %s %s\n", s, t, c, range);
 	return add_xperm_rule(s, t, c, range, AVTAB_XPERMS_DONTAUDIT, 0);
+}
+
+int sepol_typetrans(const char *s, const char *t, const char *c, const char *d) {
+	// printf("type_transition %s %s %s %s\n", s, t, c, d);
+	return add_type_rule(s, t, c, d, AVTAB_TRANSITION);
+}
+
+int sepol_typechange(const char *s, const char *t, const char *c, const char *d) {
+	// printf("type_change %s %s %s %s\n", s, t, c, d);
+	return add_type_rule(s, t, c, d, AVTAB_CHANGE);
+}
+
+int sepol_typemember(const char *s, const char *t, const char *c, const char *d) {
+	// printf("type_member %s %s %s %s\n", s, t, c, d);
+	return add_type_rule(s, t, c, d, AVTAB_MEMBER);
 }
 
 int sepol_permissive(const char *s) {
