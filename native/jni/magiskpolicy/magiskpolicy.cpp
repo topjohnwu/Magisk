@@ -15,7 +15,7 @@
 static const char *type_msg_1 =
 "Type 1:\n"
 "\"<rule_name> source_type target_type class perm_set\"\n"
-"Rules: allow, deny, auditallow, auditdeny\n";
+"Rules: allow, deny, auditallow, dontaudit\n";
 
 static const char *type_msg_2 =
 "Type 2:\n"
@@ -135,7 +135,7 @@ static int parse_pattern_1(int action, const char *action_str, char *stmt) {
 			action_func = sepol_auditallow;
 			break;
 		case 3:
-			action_func = sepol_auditdeny;
+			action_func = sepol_dontaudit;
 			break;
 		default:
 			return 1;
@@ -418,7 +418,7 @@ static void parse_statement(char *statement) {
 	add_action("allow", 1, 0)
 	add_action("deny", 1, 1)
 	add_action("auditallow", 1, 2)
-	add_action("auditdeny", 1, 3)
+	add_action("dontaudit", 1, 3)
 	add_action("allowxperm", 2, 0)
 	add_action("auditallowxperm", 2, 1)
 	add_action("dontauditxperm", 2, 2)

@@ -115,7 +115,8 @@ static avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xper
 
 static int add_avrule(avtab_key_t *key, int p, int not) {
 	avtab_ptr_t node = get_avtab_node(key, NULL);
-	if (not) {
+	// Support DONTAUDIT (AUDITDENY is inverted)
+	if (AVTAB_AUDITDENY == node->key.specified == !not) {
 		if (p < 0)
 			node->datum.data = 0U;
 		else

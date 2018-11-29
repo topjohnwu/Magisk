@@ -30,7 +30,7 @@ void destroy_policydb();
 int sepol_allow(const char *s, const char *t, const char *c, const char *p);
 int sepol_deny(const char *s, const char *t, const char *c, const char *p);
 int sepol_auditallow(const char *s, const char *t, const char *c, const char *p);
-int sepol_auditdeny(const char *s, const char *t, const char *c, const char *p);
+int sepol_dontaudit(const char *s, const char *t, const char *c, const char *p);
 int sepol_typetrans(const char *s, const char *t, const char *c, const char *d);
 int sepol_typechange(const char *s, const char *t, const char *c, const char *d);
 int sepol_typemember(const char *s, const char *t, const char *c, const char *d);

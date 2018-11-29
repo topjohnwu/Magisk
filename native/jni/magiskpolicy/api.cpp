@@ -16,8 +16,8 @@ int sepol_auditallow(const char *s, const char *t, const char *c, const char *p)
 	return add_rule(s, t, c, p, AVTAB_AUDITALLOW, 0);
 }
 
-int sepol_auditdeny(const char *s, const char *t, const char *c, const char *p) {
-	// printf("auditdeny %s %s %s %s\n", s, t, c, p);
+int sepol_dontaudit(const char *s, const char *t, const char *c, const char *p) {
+	// printf("dontaudit %s %s %s %s\n", s, t, c, p);
 	return add_rule(s, t, c, p, AVTAB_AUDITDENY, 0);
 }
 
