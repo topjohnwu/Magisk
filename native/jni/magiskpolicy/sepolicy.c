@@ -406,6 +406,17 @@ int create_domain(const char *d) {
 	return set_attr("domain", value);
 }
 
+void for_each_avtab_node(void (*callback)(avtab_ptr_t)) {
+	avtab_ptr_t cur, next;
+	for (int i = 0; i < policydb->te_avtab.nslot; ++i) {
+		for (cur = policydb->te_avtab.htable[i]; cur; cur = next) {
+			// cur could be removed after callback
+			next = cur->next;
+			callback(cur);
+		}
+	}
+}
+
 int set_domain_state(const char *s, int state) {
 	type_datum_t *type;
 	hashtab_ptr_t cur;
