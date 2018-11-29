@@ -11,21 +11,6 @@
 #include "db.h"
 #include "flags.h"
 
-static int create_links(const char *bin, const char *path) {
-	char self[PATH_MAX], linkpath[PATH_MAX];
-	if (bin == NULL) {
-		xreadlink("/proc/self/exe", self, sizeof(self));
-		bin = self;
-	}
-	int ret = 0;
-	for (int i = 0; applet_names[i]; ++i) {
-		snprintf(linkpath, sizeof(linkpath), "%s/%s", path, applet_names[i]);
-		unlink(linkpath);
-		ret |= symlink(bin, linkpath);
-	}
-	return ret;
-}
-
 [[noreturn]] static void usage() {
 	fprintf(stderr,
 		"Magisk v" xstr(MAGISK_VERSION) "(" xstr(MAGISK_VER_CODE) ") (by topjohnwu) multi-call binary\n"
@@ -38,7 +23,6 @@ static int create_links(const char *bin, const char *path) {
 		"   -v                        print running daemon version\n"
 		"   -V                        print running daemon version code\n"
 		"   --list                    list all available applets\n"
-		"   --install [SOURCE] DIR    symlink all applets to DIR. SOURCE is optional\n"
 		"   --daemon                  manually start magisk daemon\n"
 		"   --[init trigger]          start service for init trigger\n"
 		"   --unlock-blocks           set BLKROSET flag to OFF for all block devices\n"
@@ -75,10 +59,6 @@ int magisk_main(int argc, char *argv[]) {
 		write_int(fd, CHECK_VERSION_CODE);
 		printf("%d\n", read_int(fd));
 		return 0;
-	} else if (strcmp(argv[1], "--install") == 0) {
-		if (argc < 3) usage();
-		if (argc == 3) return create_links(NULL, argv[2]);
-		else return create_links(argv[2], argv[3]);
 	} else if (strcmp(argv[1], "--list") == 0) {
 		for (int i = 0; applet_names[i]; ++i)
 			printf("%s\n", applet_names[i]);
