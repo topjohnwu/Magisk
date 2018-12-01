@@ -171,10 +171,11 @@ void sepol_magisk_rules() {
 	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
 
 	// Remove all dontaudit
-	for_each_avtab_node([](auto p) -> void {
-		if (p->key.specified == AVTAB_AUDITDENY || p->key.specified == AVTAB_XPERMS_DONTAUDIT)
-			avtab_remove_node(&policydb->te_avtab, p);
-	});
+	avtab_ptr_t av;
+	avtab_for_each(&policydb->te_avtab, av, {
+		if (av->key.specified == AVTAB_AUDITDENY || av->key.specified == AVTAB_XPERMS_DONTAUDIT)
+			avtab_remove_node(&policydb->te_avtab, av);
+	})
 
 	log_cb.w = bak;
 }

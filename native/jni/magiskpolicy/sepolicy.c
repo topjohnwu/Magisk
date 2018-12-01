@@ -138,20 +138,20 @@ static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 	int ret = 0;
 
 	if (src == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			src = cur->datum;
 			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
-		}
+		})
 	} else if (tgt == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			tgt = cur->datum;
 			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
-		}
+		})
 	} else if (cls == NULL) {
-		hashtab_for_each(policydb->p_classes.table, &cur) {
+		hashtab_for_each(policydb->p_classes.table, cur, {
 			cls = cur->datum;
 			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
-		}
+		})
 	} else {
 		key.source_type = src->s.value;
 		key.target_type = tgt->s.value;
@@ -210,20 +210,20 @@ static int add_xperm_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum
 	int ret = 0;
 
 	if (src == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			src = cur->datum;
 			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
-		}
+		})
 	} else if (tgt == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			tgt = cur->datum;
 			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
-		}
+		})
 	} else if (cls == NULL) {
-		hashtab_for_each(policydb->p_classes.table, &cur) {
+		hashtab_for_each(policydb->p_classes.table, cur, {
 			cls = cur->datum;
 			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
-		}
+		})
 	} else {
 		key.source_type = src->s.value;
 		key.target_type = tgt->s.value;
@@ -407,28 +407,17 @@ int create_domain(const char *d) {
 	return set_attr("domain", value);
 }
 
-void for_each_avtab_node(void (*callback)(avtab_ptr_t)) {
-	avtab_ptr_t cur, next;
-	for (int i = 0; i < policydb->te_avtab.nslot; ++i) {
-		for (cur = policydb->te_avtab.htable[i]; cur; cur = next) {
-			// cur could be removed after callback
-			next = cur->next;
-			callback(cur);
-		}
-	}
-}
-
 int set_domain_state(const char *s, int state) {
 	type_datum_t *type;
 	hashtab_ptr_t cur;
 	if (s == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			type = cur->datum;
 			if (ebitmap_set_bit(&policydb->permissive_map, type->s.value, state)) {
 				LOGW("Could not set bit in permissive map\n");
 				return 1;
 			}
-		}
+		})
 	} else {
 		type = hashtab_search(policydb->p_types.table, s);
 		if (type == NULL) {
