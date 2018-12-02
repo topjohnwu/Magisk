@@ -17,9 +17,9 @@
 #}
 
 # BouncyCastle
--keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
--keep class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
--keep class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
 # Snet extention
@@ -36,3 +36,4 @@
 # Excessive obfuscation
 -repackageclasses 'a'
 -allowaccessmodification
+-optimizationpasses 6
