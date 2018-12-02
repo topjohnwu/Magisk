@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
@@ -151,7 +152,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         }
 
         if (Shell.rootAccess() && Const.USER_ID == 0) {
-            if (mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
+            if (mm.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
                 generalCatagory.removePreference(restoreManager);
             } else {
                 if (!Download.checkNetworkStatus(mm))

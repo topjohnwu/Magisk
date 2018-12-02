@@ -3,18 +3,8 @@ package com.topjohnwu.magisk.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
-
-import java.io.File;
 
 public class Download {
-
-    public static final File EXTERNAL_PATH =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-
-    static {
-        EXTERNAL_PATH.mkdirs();
-    }
 
     public static String getLegalFilename(CharSequence filename) {
         return filename.toString().replace(" ", "_").replace("'", "").replace("\"", "")

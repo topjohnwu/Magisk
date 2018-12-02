@@ -23,15 +23,15 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         String pkg = mm.mDB.getStrings(Const.Key.SU_MANAGER, null);
-        if (pkg != null && getPackageName().equals(Const.ORIG_PKG_NAME)) {
+        if (pkg != null && getPackageName().equals(BuildConfig.APPLICATION_ID)) {
             mm.mDB.setStrings(Const.Key.SU_MANAGER, null);
             Shell.su("pm uninstall " + pkg).exec();
         }
         if (TextUtils.equals(pkg, getPackageName())) {
             try {
                 // We are the manager, remove com.topjohnwu.magisk as it could be malware
-                getPackageManager().getApplicationInfo(Const.ORIG_PKG_NAME, 0);
-                RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
+                getPackageManager().getApplicationInfo(BuildConfig.APPLICATION_ID, 0);
+                RootUtils.uninstallPkg(BuildConfig.APPLICATION_ID);
             } catch (PackageManager.NameNotFoundException ignored) {}
         }
 

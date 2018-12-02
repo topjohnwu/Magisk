@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.container.TarEntry;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -243,7 +242,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
         switch (mode) {
             case PATCH_MODE:
                 String fmt = mm.prefs.getString(Const.Key.BOOT_FORMAT, ".img");
-                File dest = new File(Download.EXTERNAL_PATH, "patched_boot" + fmt);
+                File dest = new File(Const.EXTERNAL_PATH, "patched_boot" + fmt);
                 dest.getParentFile().mkdirs();
                 OutputStream out;
                 switch (fmt) {

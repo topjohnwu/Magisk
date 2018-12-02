@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.os.Environment;
 import android.os.Process;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String ORIG_PKG_NAME = BuildConfig.APPLICATION_ID;
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
@@ -19,11 +19,13 @@ public class Const {
 
     // Paths
     public static final String MAGISK_PATH = "/sbin/.magisk/img";
+    public static final File EXTERNAL_PATH;
     public static File MAGISK_DISABLE_FILE;
 
     static {
-        /* Prevent crashing on unrooted devices */
         MAGISK_DISABLE_FILE = new File("xxx");
+        EXTERNAL_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        EXTERNAL_PATH.mkdirs();
     }
 
     public static final String BUSYBOX_PATH = "/sbin/.magisk/busybox";

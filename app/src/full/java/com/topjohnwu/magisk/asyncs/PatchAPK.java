@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
@@ -82,11 +83,11 @@ public class PatchAPK {
 
         // Generate a new app with random package name
         SuFile repack = new SuFile("/data/local/tmp/repack.apk");
-        String pkg = genPackageName("com.", Const.ORIG_PKG_NAME.length());
+        String pkg = genPackageName("com.", BuildConfig.APPLICATION_ID.length());
 
         try {
             JarMap apk = new JarMap(mm.getPackageCodePath());
-            if (!patchPackageID(apk, Const.ORIG_PKG_NAME, pkg))
+            if (!patchPackageID(apk, BuildConfig.APPLICATION_ID, pkg))
                 return false;
             SignAPK.sign(apk, new SuFileOutputStream(repack));
         } catch (Exception e) {
@@ -101,7 +102,7 @@ public class PatchAPK {
 
         mm.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
         Data.exportPrefs();
-        RootUtils.rmAndLaunch(Const.ORIG_PKG_NAME, pkg);
+        RootUtils.rmAndLaunch(BuildConfig.APPLICATION_ID, pkg);
 
         return true;
     }

@@ -135,7 +135,7 @@ public class SuRequestActivity extends BaseActivity {
         }
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (TextUtils.equals(policy.packageName, Const.ORIG_PKG_NAME)) {
+        if (TextUtils.equals(policy.packageName, BuildConfig.APPLICATION_ID)) {
             finish();
             return;
         }

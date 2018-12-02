@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.components.SnackbarMaker;
 import com.topjohnwu.magisk.container.Repo;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.magisk.utils.WebService;
 import com.topjohnwu.magisk.utils.ZipUtils;
@@ -48,7 +47,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         super(context);
         mRepo = repo;
         mInstall = install && Shell.rootAccess();
-        mFile = new File(Download.EXTERNAL_PATH, repo.getDownloadFilename());
+        mFile = new File(Const.EXTERNAL_PATH, repo.getDownloadFilename());
     }
 
     private void removeTopFolder(File input, File output) throws IOException {
