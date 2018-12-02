@@ -3,7 +3,7 @@
 
     <!--Not translatable-->
     <string name="app_name" translatable="false">Magisk Manager</string>
-    <string name="re_app_name" translatable="false">Magic</string>
+    <string name="re_app_name" translatable="false">Manager</string>
     <string name="magisk" translatable="false">Magisk</string>
     <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="empty" translatable="false"/>
