@@ -6,10 +6,7 @@ import android.os.Looper;
 import android.util.Xml;
 
 import com.topjohnwu.magisk.components.AboutCardRow;
-import com.topjohnwu.magisk.receivers.BootReceiver;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
-import com.topjohnwu.magisk.receivers.PackageReceiver;
-import com.topjohnwu.magisk.receivers.RebootReceiver;
+import com.topjohnwu.magisk.receivers.GeneralReceiver;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.services.OnBootService;
 import com.topjohnwu.magisk.services.UpdateCheckService;
@@ -75,15 +72,12 @@ public class Data {
         classMap.put(DonationActivity.class, a.e.class);
         classMap.put(FlashActivity.class, a.f.class);
         classMap.put(NoUIActivity.class, a.g.class);
-        classMap.put(BootReceiver.class, a.h.class);
-        classMap.put(PackageReceiver.class, a.i.class);
-        classMap.put(ManagerUpdate.class, a.j.class);
-        classMap.put(RebootReceiver.class, a.k.class);
-        classMap.put(ShortcutReceiver.class, a.l.class);
-        classMap.put(OnBootService.class, a.m.class);
-        classMap.put(UpdateCheckService.class, a.n.class);
-        classMap.put(AboutCardRow.class, a.o.class);
-        classMap.put(SuRequestActivity.class, a.p.class);
+        classMap.put(GeneralReceiver.class, a.h.class);
+        classMap.put(ShortcutReceiver.class, a.i.class);
+        classMap.put(OnBootService.class, a.j.class);
+        classMap.put(UpdateCheckService.class, a.k.class);
+        classMap.put(AboutCardRow.class, a.l.class);
+        classMap.put(SuRequestActivity.class, a.m.class);
 
     }
 

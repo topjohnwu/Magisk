@@ -12,8 +12,7 @@ import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.SplashActivity;
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
-import com.topjohnwu.magisk.receivers.RebootReceiver;
+import com.topjohnwu.magisk.receivers.GeneralReceiver;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -63,7 +62,8 @@ public class Notifications {
         String name = Utils.fmt("MagiskManager v%s(%d)",
                 Data.remoteManagerVersionString, Data.remoteManagerVersionCode);
 
-        Intent intent = new Intent(mm, Data.classMap.get(ManagerUpdate.class));
+        Intent intent = new Intent(mm, Data.classMap.get(GeneralReceiver.class));
+        intent.setAction(Const.Key.BROADCAST_MANAGER_UPDATE);
         intent.putExtra(Const.Key.INTENT_SET_LINK, Data.managerLink);
         intent.putExtra(Const.Key.INTENT_SET_NAME, name);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
@@ -84,7 +84,8 @@ public class Notifications {
     public static void dtboPatched() {
         MagiskManager mm = Data.MM();
 
-        Intent intent = new Intent(mm, Data.classMap.get(RebootReceiver.class));
+        Intent intent = new Intent(mm, Data.classMap.get(GeneralReceiver.class))
+                .setAction(Const.Key.BROADCAST_REBOOT);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mm,
                 Const.ID.DTBO_NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.services.OnBootService;
+import com.topjohnwu.magisk.SuRequestActivity;
 
-public class m extends OnBootService {
+public class m extends SuRequestActivity {
     /* stub */
 }

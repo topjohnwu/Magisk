@@ -100,6 +100,8 @@ public class Const {
         public static final String INTENT_SET_LINK = "link";
         public static final String FLASH_ACTION = "action";
         public static final String FLASH_SET_BOOT = "boot";
+        public static final String BROADCAST_MANAGER_UPDATE = "manager_update";
+        public static final String BROADCAST_REBOOT = "reboot";
 
         // others
         public static final String CHECK_UPDATES = "check_update";

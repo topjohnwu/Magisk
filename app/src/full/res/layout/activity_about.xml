@@ -54,42 +54,42 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
                     </LinearLayout>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/app_version_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_info_outline"
                         app:text="@string/app_version"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/app_changelog"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_history"
                         app:text="@string/app_changelog"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/app_translators"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_language"
                         app:text="@string/app_translators"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/follow_twitter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_twitter"
                         app:text="@string/follow_twitter"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/app_source_code"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_github"
                         app:text="@string/app_source_code"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/support_thread"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
