@@ -34,6 +34,7 @@ public class MagiskManager extends ContainerApp {
         Shell.Config.setFlags(Shell.FLAG_MOUNT_MASTER);
         Shell.Config.verboseLogging(BuildConfig.DEBUG);
         Shell.Config.setInitializer(RootUtils.class);
+        Shell.Config.setTimeout(2);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDB = MagiskDB.getInstance();

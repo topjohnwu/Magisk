@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Lỗi tải tập tin</string>
-    <string name="downloading_toast">Đang tải xuống %1$s</string>
-    <string name="no_rw_storage">Tính năng này không hoạt động nếu thiếu quyền ghi vào bộ nhớ ngoài.</string>
     <string name="no_thanks">Không, cảm ơn</string>
     <string name="yes">Có</string>
     <string name="ok">OK</string>

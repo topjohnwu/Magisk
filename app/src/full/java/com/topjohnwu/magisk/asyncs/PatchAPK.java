@@ -101,7 +101,7 @@ public class PatchAPK {
 
         mm.mDB.setStrings(Const.Key.SU_MANAGER, pkg);
         Data.exportPrefs();
-        RootUtils.uninstallPkg(Const.ORIG_PKG_NAME);
+        RootUtils.rmAndLaunch(Const.ORIG_PKG_NAME, pkg);
 
         return true;
     }

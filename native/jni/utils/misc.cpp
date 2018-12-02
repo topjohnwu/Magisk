@@ -39,15 +39,6 @@ unsigned get_radio_uid() {
 	return ppwd->pw_uid;
 }
 
-/* Check if the string only contains digits */
-int is_num(const char *s) {
-	int len = strlen(s);
-	for (int i = 0; i < len; ++i)
-		if (s[i] < '0' || s[i] > '9')
-			return 0;
-	return 1;
-}
-
 /* Read a whole line from file descriptor */
 ssize_t fdgets(char *buf, const size_t size, int fd) {
 	ssize_t len = 0;
@@ -181,21 +172,21 @@ int __fsetxattr(int fd, const char *name, const void *value, size_t size, int fl
 }
 
 /*
-   fd == NULL -> Ignore output
+   fd == nullptr -> Ignore output
   *fd < 0     -> Open pipe and set *fd to the read end
   *fd >= 0    -> STDOUT (or STDERR) will be redirected to *fd
-  *cb         -> A callback function which calls after forking
+  *pre_exec   -> A callback function called after forking, before execvp
 */
-int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
-	int pipefd[2], write_end = -1;
+int exec_array(bool err, int *fd, void (*pre_exec)(void), const char **argv) {
+	int pipefd[2], outfd = -1;
 
 	if (fd) {
 		if (*fd < 0) {
 			if (xpipe2(pipefd, O_CLOEXEC) == -1)
 				return -1;
-			write_end = pipefd[1];
+			outfd = pipefd[1];
 		} else {
-			write_end = *fd;
+			outfd = *fd;
 		}
 	}
 
@@ -209,22 +200,23 @@ int exec_array(int err, int *fd, void (*cb)(void), const char *argv[]) {
 		return pid;
 	}
 
-	if (fd) {
-		xdup2(write_end, STDOUT_FILENO);
+	if (outfd >= 0) {
+		xdup2(outfd, STDOUT_FILENO);
 		if (err)
-			xdup2(write_end, STDERR_FILENO);
+			xdup2(outfd, STDERR_FILENO);
+		close(outfd);
 	}
 
-	// Setup environment
-	if (cb)
-		cb();
+	// Call the pre-exec callback
+	if (pre_exec)
+		pre_exec();
 
-	execvp(argv[0], (char **) argv);
-	PLOGE("execvp %s", argv[0]);
+	execve(argv[0], (char **) argv, environ);
+	PLOGE("execve %s", argv[0]);
 	return -1;
 }
 
-static int v_exec_command(int err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
+static int v_exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, va_list argv) {
 	// Collect va_list into vector
 	Vector<const char *> args;
 	args.push_back(argv0);
@@ -239,7 +231,7 @@ int exec_command_sync(const char *argv0, ...) {
 	va_list argv;
 	va_start(argv, argv0);
 	int pid, status;
-	pid = v_exec_command(0, NULL, NULL, argv0, argv);
+	pid = v_exec_command(false, nullptr, nullptr, argv0, argv);
 	va_end(argv);
 	if (pid < 0)
 		return pid;
@@ -247,7 +239,7 @@ int exec_command_sync(const char *argv0, ...) {
 	return WEXITSTATUS(status);
 }
 
-int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
+int exec_command(bool err, int *fd, void (*cb)(void), const char *argv0, ...) {
 	va_list argv;
 	va_start(argv, argv0);
 	int pid = v_exec_command(err, fd, cb, argv0, argv);
@@ -256,9 +248,9 @@ int exec_command(int err, int *fd, void (*cb)(void), const char *argv0, ...) {
 }
 
 char *strdup2(const char *s, size_t *size) {
-	size_t l = strlen(s) + 1;
-	char *buf = new char[l];
-	memcpy(buf, s, l);
-	if (size) *size = l;
+	size_t len = strlen(s) + 1;
+	char *buf = new char[len];
+	memcpy(buf, s, len);
+	if (size) *size = len;
 	return buf;
 }

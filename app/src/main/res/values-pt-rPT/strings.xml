@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Erro ao transferir ficheiro</string>
-    <string name="downloading_toast">A transferir %1$s</string>
-    <string name="no_rw_storage">Esta funcionalidade não funcionará sem permissão de escrita do armazenamento externo.</string>
     <string name="no_thanks">Não, Obrigado</string>
     <string name="yes">Sim</string>
     <string name="ok">OK</string>

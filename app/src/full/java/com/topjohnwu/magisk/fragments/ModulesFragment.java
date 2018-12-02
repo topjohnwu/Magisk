@@ -118,7 +118,7 @@ public class ModulesFragment extends BaseFragment implements Topic.Subscriber {
                 Shell.su("/system/bin/reboot bootloader").submit();
                 return true;
             case R.id.reboot_download:
-                Shell.su("/system/bin/reboot download").submit();
+                Shell.su("/system/bin/reboot upgrade").submit();
                 return true;
             default:
                 return false;

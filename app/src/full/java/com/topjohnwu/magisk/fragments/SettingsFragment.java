@@ -1,9 +1,7 @@
 package com.topjohnwu.magisk.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -18,15 +16,13 @@ import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.CheckUpdates;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
+import com.topjohnwu.magisk.utils.DlInstallManager;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.FingerprintHelper;
 import com.topjohnwu.magisk.utils.LocaleManager;
-import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Topic;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
-import com.topjohnwu.superuser.ShellUtils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -85,23 +81,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         });
         Preference restoreManager = findPreference("restore");
         restoreManager.setOnPreferenceClickListener(pref -> {
-            Download.receive(
-                requireActivity(), new DownloadReceiver() {
-                    @Override
-                    public void onDownloadDone(Context context, Uri uri) {
-                        Data.exportPrefs();
-                        Shell.su("cp " + uri.getPath() + " /data/local/tmp/manager.apk").exec();
-                        if (ShellUtils.fastCmdResult("pm install /data/local/tmp/manager.apk")) {
-                            Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                            RootUtils.uninstallPkg(context.getPackageName());
-                            return;
-                        }
-                        Shell.su("rm -f /data/local/tmp/manager.apk").exec();
-                    }
-                },
-                Data.managerLink,
-                Utils.fmt("MagiskManager-v%s.apk", Data.remoteManagerVersionString)
-            );
+            DlInstallManager.restore();
             return true;
         });
         findPreference("clear").setOnPreferenceClickListener(pref -> {

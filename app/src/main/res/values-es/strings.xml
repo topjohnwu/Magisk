@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Error descargando archivo</string>
-    <string name="downloading_toast">Descargando %1$s</string>
-    <string name="no_rw_storage">Esta opción no funcionará sin permiso de escritura en la memoria externa.</string>
     <string name="no_thanks">No gracias</string>
     <string name="yes">Sí</string>
     <string name="ok">Aceptar</string>

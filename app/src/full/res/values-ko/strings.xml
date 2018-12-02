@@ -71,6 +71,9 @@
     <string name="process_error">처리 오류</string>
     <string name="internal_storage">zip 파일이 다음 위치에 저장됨:\n[내부 저장소]%1$s</string>
     <string name="zip_process_title">처리 중</string>
+    <string name="download_file_error">파일 다운로드 오류</string>
+    <string name="downloading_toast">%1$s 다운로드 중</string>
+    <string name="no_rw_storage">이 기능은 외부 저장소 쓰기 권한 없이는 작동하지 않습니다.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">일반</string>

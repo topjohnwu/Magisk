@@ -66,6 +66,9 @@
     <string name="settings_reboot_toast">重啟以完成設定</string>
     <string name="release_notes">發布說明</string>
     <string name="repo_cache_cleared">資源庫暫存已清除</string>
+    <string name="download_file_error">下載文件時出錯</string>
+    <string name="downloading_toast">正在下載 %1$s</string>
+    <string name="no_rw_storage">未授予寫入外部存儲權限，此功能無法正常工作。</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">常規</string>

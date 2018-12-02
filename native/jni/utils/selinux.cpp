@@ -13,14 +13,14 @@
 
 // Stub implementations
 
-static void v_s(char *) {}
+static void v_s(char *s) { delete[] s; }
 
 static int i_s(const char *) { return 0; }
 
 static int i_ss(const char *, const char *) { return 0; }
 
 static int i_ssp(const char *, char ** sp) {
-	*sp = (char *) xcalloc(1, 1);
+	*sp = new char[1]();
 	return 0;
 }
 
@@ -35,7 +35,7 @@ int (*lsetfilecon)(const char *, const char *) = i_ss;
 
 void dload_selinux() {
 	void *handle = dlopen("libselinux.so", RTLD_LAZY);
-	if (handle == NULL)
+	if (handle == nullptr)
 		return;
 	*(void **) &freecon = dlsym(handle, "freecon");
 	*(void **) &setcon = dlsym(handle, "setcon");

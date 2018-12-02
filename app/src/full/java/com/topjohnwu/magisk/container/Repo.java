@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Logger;
 import com.topjohnwu.magisk.utils.Utils;
-import com.topjohnwu.magisk.utils.WebService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -26,7 +25,7 @@ public class Repo extends BaseModule {
     }
 
     public void update() throws IllegalRepoException {
-        String props[] = Utils.dos2unix(WebService.getString(getManifestUrl())).split("\\n");
+        String props[] = Utils.dlString(getPropUrl()).split("\\n");
         try {
             parseProps(props);
         } catch (NumberFormatException e) {
@@ -57,7 +56,7 @@ public class Repo extends BaseModule {
         return String.format(Const.Url.ZIP_URL, getId());
     }
 
-    public String getManifestUrl() {
+    public String getPropUrl() {
         return String.format(Const.Url.FILE_URL, getId(), "module.prop");
     }
 

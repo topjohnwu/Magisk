@@ -119,6 +119,10 @@
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
     <string name="setup_title">Additional Setup</string>
     <string name="setup_msg">Running environment setup…</string>
+    <string name="download_file_error">Error downloading file</string>
+    <string name="downloading_toast">Downloading %1$s</string>
+    <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="download_complete">Download complete</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

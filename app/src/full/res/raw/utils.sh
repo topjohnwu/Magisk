@@ -79,9 +79,8 @@ mm_patch_dtbo() {
 }
 
 restore_imgs() {
-  local SHA1=`grep_prop SHA1 /.backup/.magisk`
+  local SHA1=`grep_prop SHA1 /sbin/.magisk/config`
   [ -z $SHA1 ] && local SHA1=`cat /.backup/.sha1`
-  [ -z $SHA1 ] && local SHA1=`grep_prop #STOCKSHA1 /.backup/.magisk`
   [ -z $SHA1 ] && return 1
   local STOCKBOOT=/data/stock_boot_${SHA1}.img.gz
   local STOCKDTBO=/data/stock_dtbo.img.gz
@@ -129,10 +128,17 @@ EOF
     # Migrate old hosts file to new module
     mv -f .core/hosts hosts/system/etc/hosts
   else
-    cp -af /system/etc/hosts hosts/system/etc/hosts
+    cp -f /system/etc/hosts hosts/system/etc/hosts
   fi
-  chcon u:object_r:system_file:s0 hosts/system/etc/hosts
+  magisk --clone-attr /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
   touch hosts/auto_mount
   cd /
+}
+
+rm_launch() {
+  db_clean $1
+  pm uninstall $2
+  monkey -p $3 1
+  exit
 }

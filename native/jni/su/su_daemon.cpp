@@ -60,8 +60,8 @@ static void *info_collector(void *node) {
 
 static void database_check(su_info *info) {
 	int uid = info->uid;
-	get_db_settings(&info->cfg, 0);
-	get_db_strings(&info->str, 0);
+	get_db_settings(&info->cfg);
+	get_db_strings(&info->str);
 
 	// Check multiuser settings
 	switch (info->cfg[SU_MULTIUSER_MODE]) {
@@ -241,6 +241,9 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 	LOGD("su: fork handler\n");
 
+	// Abort upon any error occurred
+	log_cb.ex = exit;
+
 	struct su_context ctx = {
 		.info = info,
 		.pid = credential->pid
@@ -264,7 +267,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	int infd  = recv_fd(client);
 	int outfd = recv_fd(client);
 	int errfd = recv_fd(client);
-	int ptsfd = -1;
 
 	if (pts_slave[0]) {
 		LOGD("su: pts_slave=[%s]\n", pts_slave);
@@ -273,19 +275,13 @@ void su_daemon_handler(int client, struct ucred *credential) {
 		xstat(pts_slave, &st);
 
 		// If caller is not root, ensure the owner of pts_slave is the caller
-		if(st.st_uid != info->uid && info->uid != 0) {
+		if(st.st_uid != info->uid && info->uid != 0)
 			LOGE("su: Wrong permission of pts_slave");
-			info->access.policy = DENY;
-			exit(1);
-		}
-
-		// Set our pts_slave to devpts, same restriction as adb shell
-		lsetfilecon(pts_slave, "u:object_r:devpts:s0");
 
 		// Opening the TTY has to occur after the
 		// fork() and setsid() so that it becomes
 		// our controlling TTY and not the daemon's
-		ptsfd = xopen(pts_slave, O_RDWR);
+		int ptsfd = xopen(pts_slave, O_RDWR);
 
 		if (infd < 0)
 			infd = ptsfd;
@@ -302,7 +298,14 @@ void su_daemon_handler(int client, struct ucred *credential) {
 	xdup2(outfd, STDOUT_FILENO);
 	xdup2(errfd, STDERR_FILENO);
 
-	close(ptsfd);
+	// Unleash all streams from SELinux hell
+	setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+	setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_DOMAIN ":s0");
+
+	close(infd);
+	close(outfd);
+	close(errfd);
 	close(client);
 
 	// Handle namespaces

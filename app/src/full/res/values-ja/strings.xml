@@ -108,6 +108,9 @@
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
     <string name="proprietary_notice">Magisk ManagerはFOSSのため、GoogleのプロプライエタリなSafetyNet APIコードを含んでいません。\n\nMagisk ManagerがSafetyNetチェックのための拡張機能 (GoogleApiClientを含む) をダウンロードすることを許可しますか?</string>
     <string name="su_db_corrupt">SUデータベースが壊れています。DBを再生成します</string>
+    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
+    <string name="downloading_toast">%1$s をダウンロード中</string>
+    <string name="no_rw_storage">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">一般</string>

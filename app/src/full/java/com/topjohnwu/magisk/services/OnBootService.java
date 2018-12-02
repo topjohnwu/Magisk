@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.utils.NotificationMgr;
+import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.superuser.Shell;
 import com.topjohnwu.superuser.ShellUtils;
 
@@ -28,6 +28,6 @@ public class OnBootService extends JobIntentService {
          * to reboot if dtbo wasn't patched and patched by Magisk Manager.
          * */
         if (Shell.rootAccess() && ShellUtils.fastCmdResult("mm_patch_dtbo"))
-            NotificationMgr.dtboPatched();
+            Notifications.dtboPatched();
     }
 }

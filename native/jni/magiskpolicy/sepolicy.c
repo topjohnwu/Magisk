@@ -27,15 +27,6 @@
 policydb_t *policydb = NULL;
 extern int policydb_index_decls(sepol_handle_t * handle, policydb_t * p);
 
-static void *cmalloc(size_t s) {
-	void *t = calloc(s, 1);
-	if (t == NULL) {
-		LOGE("Out of memory\n");
-		exit(1);
-	}
-	return t;
-}
-
 static int get_attr(const char *type, int value) {
 	type_datum_t *attr = hashtab_search(policydb->p_types.table, type);
 	if (!attr)
@@ -44,7 +35,7 @@ static int get_attr(const char *type, int value) {
 	if (attr->flavor != TYPE_ATTRIB)
 		return 1;
 
-	return !! ebitmap_get_bit(&policydb->attr_type_map[attr->s.value-1], value-1);
+	return ebitmap_get_bit(&policydb->attr_type_map[attr->s.value - 1], value - 1) != 0;
 }
 
 static int get_attr_id(const char *type) {
@@ -74,66 +65,99 @@ static int set_attr(const char *type, int value) {
 	return 0;
 }
 
-static int __add_rule(int s, int t, int c, int p, int effect, int not) {
-	avtab_key_t key;
-	avtab_datum_t *av;
-	int new_rule = 0;
+static void check_avtab_node(avtab_ptr_t node) {
+	int redundant = 0;
+	if (node->key.specified == AVTAB_AUDITDENY)
+		redundant = node->datum.data == ~0U;
+	else if (node->key.specified & AVTAB_XPERMS)
+		redundant = node->datum.xperms == NULL;
+	else
+		redundant = node->datum.data == 0U;
+	if (redundant)
+		avtab_remove_node(&policydb->te_avtab, node);
+}
 
-	key.source_type = s;
-	key.target_type = t;
-	key.target_class = c;
-	key.specified = effect;
+static avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms)  {
+	avtab_ptr_t node;
+	avtab_datum_t avdatum;
+	int match = 0;
 
-	av = avtab_search(&policydb->te_avtab, &key);
-	if (av == NULL) {
-		av = cmalloc(sizeof(*av));
-		new_rule = 1;
+	/* AVTAB_XPERMS entries are not necessarily unique */
+	if (key->specified & AVTAB_XPERMS) {
+		node = avtab_search_node(&policydb->te_avtab, key);
+		while (node) {
+			if ((node->datum.xperms->specified == xperms->specified) &&
+				(node->datum.xperms->driver == xperms->driver)) {
+				match = 1;
+				break;
+			}
+			node = avtab_search_node_next(node, key->specified);
+		}
+		if (!match)
+			node = NULL;
+	} else {
+		node = avtab_search_node(&policydb->te_avtab, key);
 	}
 
-	if(not) {
+	if (!node) {
+		memset(&avdatum, 0, sizeof avdatum);
+		/*
+		 * AUDITDENY, aka DONTAUDIT, are &= assigned, versus |= for
+		 * others. Initialize the data accordingly.
+		 */
+		avdatum.data = key->specified == AVTAB_AUDITDENY ? ~0U : 0U;
+		/* this is used to get the node - insertion is actually unique */
+		node = avtab_insert_nonunique(&policydb->te_avtab, key, &avdatum);
+	}
+
+	return node;
+}
+
+static int add_avrule(avtab_key_t *key, int p, int not) {
+	avtab_ptr_t node = get_avtab_node(key, NULL);
+	// Support DONTAUDIT (AUDITDENY is inverted)
+	if (AVTAB_AUDITDENY == node->key.specified == !not) {
 		if (p < 0)
-			av->data = 0U;
+			node->datum.data = 0U;
 		else
-			av->data &= ~(1U << (p - 1));
+			node->datum.data &= ~(1U << (p - 1));
 	} else {
 		if (p < 0)
-			av->data = ~0U;
+			node->datum.data = ~0U;
 		else
-			av->data |= 1U << (p - 1);
+			node->datum.data |= 1U << (p - 1);
 	}
-
-	if (new_rule) {
-		if (avtab_insert(&policydb->te_avtab, &key, av)) {
-			LOGW("Error inserting into avtab\n");
-			return 1;
-		}
-		free(av);
-	}
-
+	check_avtab_node(node);
 	return 0;
 }
 
-static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, int not) {
+static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls,
+						 perm_datum_t *perm, int effect, int not) {
+	avtab_key_t key;
 	hashtab_ptr_t cur;
 	int ret = 0;
 
 	if (src == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			src = cur->datum;
 			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
-		}
+		})
 	} else if (tgt == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			tgt = cur->datum;
 			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
-		}
+		})
 	} else if (cls == NULL) {
-		hashtab_for_each(policydb->p_classes.table, &cur) {
+		hashtab_for_each(policydb->p_classes.table, cur, {
 			cls = cur->datum;
-			ret |= __add_rule(src->s.value, tgt->s.value, cls->s.value, -1, effect, not);
-		}
+			ret |= add_rule_auto(src, tgt, cls, perm, effect, not);
+		})
 	} else {
-		return __add_rule(src->s.value, tgt->s.value, cls->s.value, perm ? perm->s.value : -1, effect, not);
+		key.source_type = src->s.value;
+		key.target_type = tgt->s.value;
+		key.target_class = cls->s.value;
+		key.specified = effect;
+		return add_avrule(&key, perm ? perm->s.value : -1, not);
 	}
 	return ret;
 }
@@ -141,79 +165,71 @@ static int add_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cl
 #define ioctl_driver(x) (x>>8 & 0xFF)
 #define ioctl_func(x) (x & 0xFF)
 
-static int __add_xperm_rule(int s, int t, int c, uint16_t low, uint16_t high, int effect, int not) {
-	avtab_key_t key;
-	avtab_datum_t *av;
-	int new_rule = 0;
+static int add_avxrule(avtab_key_t *key, uint16_t low, uint16_t high, int not) {
+	avtab_datum_t *datum;
+	avtab_extended_perms_t xperms;
 
-	key.source_type = s;
-	key.target_type = t;
-	key.target_class = c;
-	key.specified = effect;
-
-	av = avtab_search(&policydb->te_avtab, &key);
-	if (av == NULL) {
-		av = cmalloc(sizeof(*av));
-		av->xperms = cmalloc(sizeof(avtab_extended_perms_t));
-		new_rule = 1;
-		if (ioctl_driver(low) != ioctl_driver(high)) {
-			av->xperms->specified = AVTAB_XPERMS_IOCTLDRIVER;
-			av->xperms->driver = 0;
-		} else {
-			av->xperms->specified = AVTAB_XPERMS_IOCTLFUNCTION;
-			av->xperms->driver = ioctl_driver(low);
-		}
+	memset(&xperms, 0, sizeof(xperms));
+	if (ioctl_driver(low) != ioctl_driver(high)) {
+		xperms.specified = AVTAB_XPERMS_IOCTLDRIVER;
+		xperms.driver = 0;
+	} else {
+		xperms.specified = AVTAB_XPERMS_IOCTLFUNCTION;
+		xperms.driver = ioctl_driver(low);
 	}
 
-	if (av->xperms->specified == AVTAB_XPERMS_IOCTLDRIVER) {
-		for (unsigned i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
+	if (xperms.specified == AVTAB_XPERMS_IOCTLDRIVER) {
+		for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
 			if (not)
-				xperm_clear(i, av->xperms->perms);
+				xperm_clear(i, xperms.perms);
 			else
-				xperm_set(i, av->xperms->perms);
+				xperm_set(i, xperms.perms);
 		}
 	} else {
-		for (unsigned i = ioctl_func(low); i <= ioctl_func(high); ++i) {
+		for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
 			if (not)
-				xperm_clear(i, av->xperms->perms);
+				xperm_clear(i, xperms.perms);
 			else
-				xperm_set(i, av->xperms->perms);
+				xperm_set(i, xperms.perms);
 		}
 	}
 
-	if (new_rule) {
-		if (avtab_insert(&policydb->te_avtab, &key, av)) {
-			LOGW("Error inserting into avtab\n");
-			return 1;
-		}
-		free(av);
-	}
+	datum = &get_avtab_node(key, &xperms)->datum;
 
+	if (datum->xperms == NULL)
+		datum->xperms = xmalloc(sizeof(xperms));
+
+	memcpy(datum->xperms, &xperms, sizeof(xperms));
 	return 0;
 }
 
 static int add_xperm_rule_auto(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls,
 			uint16_t low, uint16_t high, int effect, int not) {
+	avtab_key_t key;
 	hashtab_ptr_t cur;
 	int ret = 0;
 
 	if (src == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			src = cur->datum;
 			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
-		}
+		})
 	} else if (tgt == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			tgt = cur->datum;
 			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
-		}
+		})
 	} else if (cls == NULL) {
-		hashtab_for_each(policydb->p_classes.table, &cur) {
+		hashtab_for_each(policydb->p_classes.table, cur, {
 			cls = cur->datum;
-			ret |= __add_xperm_rule(src->s.value, tgt->s.value, cls->s.value, low, high, effect, not);
-		}
+			ret |= add_xperm_rule_auto(src, tgt, cls, low, high, effect, not);
+		})
 	} else {
-		return __add_xperm_rule(src->s.value, tgt->s.value, cls->s.value, low, high, effect, not);
+		key.source_type = src->s.value;
+		key.target_type = tgt->s.value;
+		key.target_class = cls->s.value;
+		key.specified = effect;
+		return add_avxrule(&key, low, high, not);
 	}
 	return ret;
 }
@@ -227,7 +243,7 @@ int load_policydb(const char *filename) {
 	if (policydb)
 		destroy_policydb();
 
-	policydb = cmalloc(sizeof(*policydb));
+	policydb = xcalloc(sizeof(*policydb), 1);
 
 	mmap_ro(filename, &map, &size);
 
@@ -319,7 +335,7 @@ int dump_policydb(const char *filename) {
 	size_t len;
 	policydb_to_image(NULL, policydb, &data, &len);
 	if (data == NULL) {
-		LOGE("Fail to dump policy image!");
+		LOGE("Fail to dump policy image!\n");
 		return 1;
 	}
 
@@ -395,13 +411,13 @@ int set_domain_state(const char *s, int state) {
 	type_datum_t *type;
 	hashtab_ptr_t cur;
 	if (s == NULL) {
-		hashtab_for_each(policydb->p_types.table, &cur) {
+		hashtab_for_each(policydb->p_types.table, cur, {
 			type = cur->datum;
 			if (ebitmap_set_bit(&policydb->permissive_map, type->s.value, state)) {
 				LOGW("Could not set bit in permissive map\n");
 				return 1;
 			}
-		}
+		})
 	} else {
 		type = hashtab_search(policydb->p_types.table, s);
 		if (type == NULL) {
@@ -417,59 +433,7 @@ int set_domain_state(const char *s, int state) {
 	return 0;
 }
 
-int add_transition(const char *s, const char *t, const char *c, const char *d) {
-	type_datum_t *src, *tgt, *def;
-	class_datum_t *cls;
-
-	avtab_key_t key;
-	avtab_datum_t *av;
-	int new_rule = 0;
-
-	src = hashtab_search(policydb->p_types.table, s);
-	if (src == NULL) {
-		LOGW("source type %s does not exist\n", s);
-		return 1;
-	}
-	tgt = hashtab_search(policydb->p_types.table, t);
-	if (tgt == NULL) {
-		LOGW("target type %s does not exist\n", t);
-		return 1;
-	}
-	cls = hashtab_search(policydb->p_classes.table, c);
-	if (cls == NULL) {
-		LOGW("class %s does not exist\n", c);
-		return 1;
-	}
-	def = hashtab_search(policydb->p_types.table, d);
-	if (def == NULL) {
-		LOGW("default type %s does not exist\n", d);
-		return 1;
-	}
-
-	key.source_type = src->s.value;
-	key.target_type = tgt->s.value;
-	key.target_class = cls->s.value;
-	key.specified = AVTAB_TRANSITION;
-	av = avtab_search(&policydb->te_avtab, &key);
-	if (av == NULL) {
-		av = cmalloc(sizeof(*av));
-		new_rule = 1;
-	}
-
-	av->data = def->s.value;
-
-	if (new_rule) {
-		if (avtab_insert(&policydb->te_avtab, &key, av)) {
-			LOGW("Error inserting into avtab\n");
-			return 1;
-		}
-		free(av);
-	}
-	return 0;
-}
-
-int add_file_transition(const char *s, const char *t, const char *c, const char *d,
-						const char *filename) {
+int sepol_nametrans(const char *s, const char *t, const char *c, const char *d, const char *o) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
 
@@ -498,13 +462,13 @@ int add_file_transition(const char *s, const char *t, const char *c, const char 
 	trans_key.stype = src->s.value;
 	trans_key.ttype = tgt->s.value;
 	trans_key.tclass = cls->s.value;
-	trans_key.name = (char *) filename;
+	trans_key.name = (char *) o;
 
 	filename_trans_datum_t *trans_datum;
 	trans_datum = hashtab_search(policydb->p_types.table, (hashtab_key_t) &trans_key);
 
 	if (trans_datum == NULL) {
-		trans_datum = cmalloc(sizeof(*trans_datum));
+		trans_datum = xcalloc(sizeof(*trans_datum), 1);
 		hashtab_insert(policydb->filename_trans, (hashtab_key_t) &trans_key, trans_datum);
 	}
 
@@ -633,4 +597,41 @@ int add_xperm_rule(const char *s, const char *t, const char *c, const char *rang
 	}
 
 	return add_xperm_rule_auto(src, tgt, cls, low, high, effect, n);
+}
+
+int add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect) {
+	type_datum_t *src, *tgt, *def;
+	class_datum_t *cls;
+
+	src = hashtab_search(policydb->p_types.table, s);
+	if (src == NULL) {
+		LOGW("source type %s does not exist\n", s);
+		return 1;
+	}
+	tgt = hashtab_search(policydb->p_types.table, t);
+	if (tgt == NULL) {
+		LOGW("target type %s does not exist\n", t);
+		return 1;
+	}
+	cls = hashtab_search(policydb->p_classes.table, c);
+	if (cls == NULL) {
+		LOGW("class %s does not exist\n", c);
+		return 1;
+	}
+	def = hashtab_search(policydb->p_types.table, d);
+	if (def == NULL) {
+		LOGW("default type %s does not exist\n", d);
+		return 1;
+	}
+
+	avtab_key_t key;
+	key.source_type = src->s.value;
+	key.target_type = tgt->s.value;
+	key.target_class = cls->s.value;
+	key.specified = effect;
+
+	avtab_ptr_t node = get_avtab_node(&key, NULL);
+	node->datum.data = def->s.value;
+
+	return 0;
 }

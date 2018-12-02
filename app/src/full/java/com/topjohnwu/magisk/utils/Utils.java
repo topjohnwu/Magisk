@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.provider.OpenableColumns;
 import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
@@ -149,5 +150,10 @@ public class Utils {
                     Const.Value.MULTIUSER_MODE_OWNER_ONLY);
         return Shell.rootAccess() && (Const.USER_ID == 0 ||
                 Data.multiuserState != Const.Value.MULTIUSER_MODE_OWNER_MANAGED);
+    }
+
+    public static String dlString(String url) {
+        String s = (String) AndroidNetworking.get(url).build().executeForString().getResult();
+        return s == null ? "" : s;
     }
 }

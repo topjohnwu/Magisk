@@ -10,10 +10,6 @@ static void allowSuClient(const char *target) {
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
 	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
 
-	// Allow access to magisk files
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "file", ALL);
-	sepol_allow(target, SEPOL_FILE_DOMAIN, "dir", ALL);
-
 	// Allow binder service
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
 	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
@@ -32,6 +28,10 @@ static void allowSuClient(const char *target) {
 }
 
 void sepol_magisk_rules() {
+	// Temp suppress warnings
+	auto bak = log_cb.w;
+	log_cb.w = nop_log;
+
 	// First prevent anything to change sepolicy except ourselves
 	sepol_deny(ALL, "kernel", "security", "load_policy");
 
@@ -150,10 +150,15 @@ void sepol_magisk_rules() {
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
 	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
 
+	// Super files
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
+	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
+	sepol_allow(SEPOL_FILE_DOMAIN, ALL, "filesystem", "associate");
+
 	// For changing attributes
 	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
-	sepol_allow(SEPOL_FILE_DOMAIN, "labeledfs", "filesystem", "associate");
-	sepol_allow(SEPOL_FILE_DOMAIN, "tmpfs", "filesystem", "associate");
 
 	// Xposed
 	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
@@ -164,4 +169,13 @@ void sepol_magisk_rules() {
 
 	// Allow update engine to source addon.d.sh
 	sepol_allow("update_engine", "adb_data_file", "dir", ALL);
+
+	// Remove all dontaudit
+	avtab_ptr_t av;
+	avtab_for_each(&policydb->te_avtab, av, {
+		if (av->key.specified == AVTAB_AUDITDENY || av->key.specified == AVTAB_XPERMS_DONTAUDIT)
+			avtab_remove_node(&policydb->te_avtab, av);
+	})
+
+	log_cb.w = bak;
 }

@@ -109,6 +109,9 @@
     <string name="proprietary_title">Baixar Código Proprietário</string>
     <string name="proprietary_notice">Magisk Manager é FOSS, que não contém o código proprietário da API SafetyNet da Google.\n\nPermitir ao Magisk Manager baixar uma extensão (que contém a GoogleApiClient) para a verificação SafetyNet?</string>
     <string name="su_db_corrupt">O banco de dados do SU está corrompido, será recriado novo db</string>
+    <string name="download_file_error">Erro ao baixar arquivo</string>
+    <string name="downloading_toast">Baixando %1$s</string>
+    <string name="no_rw_storage">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>

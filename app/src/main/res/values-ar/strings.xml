@@ -1,7 +1,4 @@
 <resources>
-    <string name="downloading_toast">جاري التنزيل %1$s</string>
-    <string name="download_file_error">خطأ تنزيل الملف</string>
-    <string name="no_rw_storage">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
     <string name="no_thanks">لا شكراً</string>
     <string name="yes">نعم</string>
     <string name="ok">موافق</string>

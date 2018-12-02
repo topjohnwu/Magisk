@@ -317,9 +317,9 @@ static void exec_common_script(const char* stage) {
 			if (access(entry->d_name, X_OK) == -1)
 				continue;
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
-			int pid = exec_command(0, nullptr,
+			int pid = exec_command(false, nullptr,
 					strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-					"sh", entry->d_name, nullptr);
+					MIRRDIR "/system/bin/sh", entry->d_name, nullptr);
 			if (pid != -1)
 				waitpid(pid, nullptr, 0);
 		}
@@ -336,10 +336,9 @@ static void exec_module_script(const char* stage) {
 		if (access(buf2, F_OK) == -1 || access(buf, F_OK) == 0)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
-		int pid = exec_command(
-				0, nullptr,
+		int pid = exec_command(false, nullptr,
 				strcmp(stage, "post-fs-data") ? set_path : set_mirror_path,
-				"sh", buf2, nullptr);
+				MIRRDIR "/system/bin/sh", buf2, nullptr);
 		if (pid != -1)
 			waitpid(pid, nullptr, 0);
 	}
@@ -433,6 +432,9 @@ static bool magisk_env() {
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
+	CharArray sdk_prop = getprop("ro.build.version.sdk");
+	int sdk = sdk_prop.empty() ? -1 : atoi(sdk_prop);
+
 	LOGI("* Mounting mirrors");
 	Vector<CharArray> mounts;
 	file_to_vector("/proc/mounts", mounts);
@@ -463,6 +465,9 @@ static bool magisk_env() {
 #else
 			LOGI("mount: %s\n", MIRRDIR "/vendor");
 #endif
+		} else if (sdk >= 24 && line.contains(" /proc ") && !line.contains("hidepid=2")) {
+			// Enforce hidepid
+			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
 	}
 	if (!seperate_vendor) {
@@ -555,7 +560,7 @@ static void install_apk(const char *apk) {
 		sleep(5);
 		LOGD("apk_install: attempting to install APK");
 		int apk_res = -1, pid;
-		pid = exec_command(1, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
+		pid = exec_command(true, &apk_res, nullptr, "/system/bin/pm", "install", "-r", apk, nullptr);
 		if (pid != -1) {
 			int err = 0;
 			while (fdgets(buf, PATH_MAX, apk_res) > 0) {
@@ -683,9 +688,6 @@ void startup() {
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
-	// Remove some traits of Magisk
-	unlink(MAGISKRC);
-
 	// GSIs will have to override /sbin/adbd with /system/bin/adbd
 	if (access("/sbin/adbd", F_OK) == 0 && access("/system/bin/adbd", F_OK) == 0) {
 		umount2("/sbin/adbd", MNT_DETACH);
@@ -709,6 +711,12 @@ void startup() {
 	chmod("/sbin", 0755);
 	setfilecon("/sbin", "u:object_r:rootfs:s0");
 	sbin = xopen("/sbin", O_RDONLY | O_CLOEXEC);
+
+	// Remove some traces of Magisk
+	unlink(MAGISKRC);
+	mkdir(MAGISKTMP, 0755);
+	cp_afc("/.backup/.magisk", MAGISKTMP "/config");
+	rm_rf("/.backup");
 
 	// Create applet symlinks
 	for (int i = 0; applet_names[i]; ++i) {

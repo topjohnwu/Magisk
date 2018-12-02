@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Ihr Gerät benötigt zusätzliche Einrichtung, damit Magisk ordnungsgemäß funktioniert. Es wird eine Magisk-Installations-Zip wird heruntergeladen, fortfahren?</string>
     <string name="setup_title">Zusätzliche Einrichtung</string>
     <string name="setup_msg">Umgebungseinrichtung läuft…</string>
+    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
+    <string name="downloading_toast">Herunterladen von %1$s</string>
+    <string name="no_rw_storage">Dieses Feature funktioniert nicht, ohne die Berechtigung den externen Speicher zu beschreiben.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allgemein</string>

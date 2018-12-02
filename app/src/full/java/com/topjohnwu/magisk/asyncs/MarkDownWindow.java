@@ -6,7 +6,7 @@ import android.webkit.WebView;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.ShellUtils;
 
 import org.commonmark.node.Node;
@@ -43,7 +43,7 @@ public class MarkDownWindow extends ParallelTask<Void, Void, String> {
         MagiskManager mm = Data.MM();
         String md;
         if (mUrl != null) {
-            md = WebService.getString(mUrl);
+            md = Utils.dlString(mUrl);
         } else {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 ShellUtils.pump(is, out);

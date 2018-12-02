@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Для правильної роботи Magisk, потрібне додаткове налаштування вашого пристрою. Буде завантажено zip-архів. Розпочати негайно?</string>
     <string name="setup_title">Додаткове налаштування</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
+    <string name="download_file_error">Помилка завантаження файлу</string>
+    <string name="downloading_toast">Завантаження %1$s</string>
+    <string name="no_rw_storage">Ця функція не працюватиме без дозволу на запис у Внутрішнє сховище</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основні</string>

@@ -17,13 +17,16 @@
 #}
 
 # BouncyCastle
--keep class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
--keep class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
--keep class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.rsa.**SHA1** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.asymmetric.RSA** { *; }
+-keep,allowoptimization class org.bouncycastle.jcajce.provider.digest.SHA1** { *; }
 -dontwarn javax.naming.**
 
 # Snet extention
 -keepclassmembers class com.topjohnwu.magisk.utils.ISafetyNetHelper { *; }
+
+# Fast Android Networking Library
+-dontwarn okhttp3.**
 
 # Strip logging
 -assumenosideeffects class com.topjohnwu.magisk.utils.Logger {
@@ -33,3 +36,4 @@
 # Excessive obfuscation
 -repackageclasses 'a'
 -allowaccessmodification
+-optimizationpasses 6

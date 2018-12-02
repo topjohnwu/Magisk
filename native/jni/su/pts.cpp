@@ -41,7 +41,7 @@ static int write_blocking(int fd, char *buf, ssize_t bufsz) {
  * Pump data from input FD to output FD. If close_output is
  * true, then close the output FD when we're done.
  */
-static void pump_ex(int input, int output, int close_output) {
+static void pump(int input, int output, bool close_output = true) {
 	char buf[4096];
 	int len;
 	while ((len = read(input, buf, 4096)) > 0) {
@@ -51,32 +51,19 @@ static void pump_ex(int input, int output, int close_output) {
 	if (close_output) close(output);
 }
 
-/**
- * Pump data from input FD to output FD. Will close the
- * output FD when done.
- */
-static void pump(int input, int output) {
-	pump_ex(input, output, 1);
-}
-
 static void* pump_thread(void* data) {
-	int* files = (int*)data;
-	int input = files[0];
-	int output = files[1];
-	pump(input, output);
-	free(data);
-	return NULL;
+	int *fds = (int*) data;
+	pump(fds[0], fds[1]);
+	delete[] fds;
+	return nullptr;
 }
 
 static void pump_async(int input, int output) {
 	pthread_t writer;
-	int* files = (int*)malloc(sizeof(int) * 2);
-	if (files == NULL) {
-		exit(-1);
-	}
-	files[0] = input;
-	files[1] = output;
-	pthread_create(&writer, NULL, pump_thread, files);
+	int *fds = new int[2];
+	fds[0] = input;
+	fds[1] = output;
+	pthread_create(&writer, nullptr, pump_thread, fds);
 }
 
 
@@ -190,7 +177,7 @@ int restore_stdin(void) {
 }
 
 // Flag indicating whether the sigwinch watcher should terminate.
-static volatile int closing_time = 0;
+static volatile bool close_sigwinch_watcher = false;
 
 /**
  * Thread process. Wait for a SIGWINCH to be received, then update 
@@ -198,29 +185,29 @@ static volatile int closing_time = 0;
  */
 static void *watch_sigwinch(void *data) {
 	sigset_t winch;
+	int *fds = (int *)data;
 	int sig;
-	int master = ((int *)data)[0];
-	int slave = ((int *)data)[1];
 
 	sigemptyset(&winch);
 	sigaddset(&winch, SIGWINCH);
+	pthread_sigmask(SIG_UNBLOCK, &winch, nullptr);
 
 	do {
-		if (closing_time) break;
+		if (close_sigwinch_watcher)
+			break;
 
 		// Get the new terminal size
 		struct winsize w;
-		if (ioctl(master, TIOCGWINSZ, &w) == -1) {
+		if (ioctl(fds[0], TIOCGWINSZ, &w) == -1)
 			continue;
-		}
 
 		// Set the new terminal size
-		ioctl(slave, TIOCSWINSZ, &w);
+		ioctl(fds[1], TIOCSWINSZ, &w);
 
 	} while (sigwait(&winch, &sig) == 0);
+	delete[] fds;
 
-	free(data);
-	return NULL;
+	return nullptr;
 }
 
 /**
@@ -247,42 +234,29 @@ static void *watch_sigwinch(void *data) {
  */
 int watch_sigwinch_async(int master, int slave) {
 	pthread_t watcher;
-	int *files = (int *) malloc(sizeof(int) * 2);
-	if (files == NULL) {
-		return -1;
-	}
+	int *fds = new int[2];
 
 	// Block SIGWINCH so sigwait can later receive it
 	sigset_t winch;
 	sigemptyset(&winch);
 	sigaddset(&winch, SIGWINCH);
-	if (sigprocmask(SIG_BLOCK, &winch, NULL) == -1) {
-		free(files);
+	if (pthread_sigmask(SIG_BLOCK, &winch, nullptr) == -1) {
+		delete[] fds;
 		return -1;
 	}
 
 	// Initialize some variables, then start the thread
-	closing_time = 0;
-	files[0] = master;
-	files[1] = slave;
-	int ret = pthread_create(&watcher, NULL, &watch_sigwinch, files);
+	close_sigwinch_watcher = 0;
+	fds[0] = master;
+	fds[1] = slave;
+	int ret = pthread_create(&watcher, nullptr, &watch_sigwinch, fds);
 	if (ret != 0) {
-		free(files);
+		delete[] fds;
 		errno = ret;
 		return -1;
 	}
 
 	return 0;
-}
-
-/**
- * watch_sigwinch_cleanup
- *
- * Cause the SIGWINCH watcher thread to terminate
- */
-void watch_sigwinch_cleanup(void) {
-	closing_time = 1;
-	raise(SIGWINCH);
 }
 
 /**
@@ -309,9 +283,10 @@ void pump_stdin_async(int outfd) {
  */
 void pump_stdout_blocking(int infd) {
 	// Pump data from stdout to PTY
-	pump_ex(infd, STDOUT_FILENO, 0 /* Don't close output when done */);
+	pump(infd, STDOUT_FILENO, false /* Don't close output when done */);
 
 	// Cleanup
 	restore_stdin();
-	watch_sigwinch_cleanup();
+	close_sigwinch_watcher = true;
+	raise(SIGWINCH);
 }

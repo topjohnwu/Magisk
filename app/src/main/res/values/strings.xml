@@ -3,14 +3,12 @@
 
     <!--Not translatable-->
     <string name="app_name" translatable="false">Magisk Manager</string>
+    <string name="re_app_name" translatable="false">Manager</string>
     <string name="magisk" translatable="false">Magisk</string>
     <string name="magiskhide" translatable="false">Magisk Hide</string>
     <string name="empty" translatable="false"/>
 
     <!--Used in both stub and full app-->
-    <string name="download_file_error">Error downloading file</string>
-    <string name="downloading_toast">Downloading %1$s</string>
-    <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
     <string name="no_thanks">No thanks</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>

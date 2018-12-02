@@ -25,6 +25,10 @@ public class RootUtils extends Shell.Initializer {
         Shell.su("db_clean " + Const.USER_ID, "pm uninstall " + pkg).exec();
     }
 
+    public static void rmAndLaunch(String rm, String launch) {
+        Shell.su(Utils.fmt("(rm_launch %d %s %s)&", Const.USER_ID, rm, launch)).exec();
+    }
+
     @Override
     public boolean onInit(Context context, @NonNull Shell shell) {
         Shell.Job job = shell.newJob();

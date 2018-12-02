@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_title">Ek Kurulum</string>
     <string name="setup_msg">Ortam Kurulumu Çalışıyor…</string>
+    <string name="download_file_error">Dosya indirme hatası</string>
+    <string name="downloading_toast">%1$s indiriliyor</string>
+    <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Genel</string>

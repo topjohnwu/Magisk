@@ -153,7 +153,7 @@ grep_prop() {
 getvar() {
   local VARNAME=$1
   local VALUE=
-  VALUE=`grep_prop $VARNAME /.backup/.magisk /data/.magisk /cache/.magisk /system/.magisk`
+  VALUE=`grep_prop $VARNAME /sbin/.magisk/config /data/.magisk /cache/.magisk /system/.magisk`
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 

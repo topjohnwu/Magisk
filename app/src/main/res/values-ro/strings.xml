@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Eroare la descărcarea fișierului</string>
-    <string name="downloading_toast">Descărcare %1$s</string>
-    <string name="no_rw_storage">Această caracteristică nu va funcționa fără permisiunea de a scrie pe memoria externă.</string>
     <string name="no_thanks">Nu, mulţumesc</string>
     <string name="yes">Da</string>
     <string name="ok">OK</string>

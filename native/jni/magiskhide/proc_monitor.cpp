@@ -20,7 +20,6 @@
 #include "daemon.h"
 #include "utils.h"
 #include "magiskhide.h"
-#include "flags.h"
 
 static int sockfd = -1;
 extern char *system_block, *vendor_block, *magiskloop;
@@ -43,29 +42,28 @@ static int read_ns(const int pid, struct stat *st) {
 	return stat(path, st);
 }
 
-static void lazy_unmount(const char* mountpoint) {
+static inline void lazy_unmount(const char* mountpoint) {
 	if (umount2(mountpoint, MNT_DETACH) != -1)
 		LOGD("hide_daemon: Unmounted (%s)\n", mountpoint);
 }
 
 static int parse_ppid(int pid) {
-	char stat[512], path[32];
-	int fd, ppid;
+	char path[32];
+	int ppid;
 	sprintf(path, "/proc/%d/stat", pid);
-	fd = xopen(path, O_RDONLY);
-	if (fd < 0)
+	FILE *stat = fopen(path, "re");
+	if (stat == nullptr)
 		return -1;
-	xread(fd, stat, sizeof(stat));
-	close(fd);
 	/* PID COMM STATE PPID ..... */
-	sscanf(stat, "%*d %*s %*c %d", &ppid);
+	fscanf(stat, "%*d %*s %*c %d", &ppid);
+	fclose(stat);
 	return ppid;
 }
 
 static void hide_daemon(int pid) {
-	LOGD("hide_daemon: start unmount for pid=[%d]\n", pid);
+	LOGD("hide_daemon: handling pid=[%d]\n", pid);
 
-	char buffer[PATH_MAX];
+	char buffer[4096];
 	Vector<CharArray> mounts;
 
 	manage_selinux();
@@ -126,77 +124,59 @@ void proc_monitor() {
 	// Connect to the log daemon
 	sockfd = connect_log_daemon();
 	if (sockfd < 0)
-		return;
+		pthread_exit(nullptr);
 	write_int(sockfd, HIDE_CONNECT);
 
 	FILE *log_in = fdopen(sockfd, "r");
 	char buf[4096];
 	while (fgets(buf, sizeof(buf), log_in)) {
-		char *ss = strchr(buf, '[');
-		int pid, ppid, num = 0;
-		char *pos = ss, proc[256];
+		char *log;
+		int pid, ppid;
 		struct stat ns, pns;
 
-		while(1) {
-			pos = strchr(pos, ',');
-			if(pos == NULL)
-				break;
-			pos[0] = ' ';
-			++num;
-		}
+		if ((log = strchr(buf, '[')) == nullptr)
+			continue;
 
-		if(sscanf(ss, num == 6 ? "[%*d %d %*d %*d %256s" : "[%*d %d %*d %256s", &pid, proc) != 2)
+		// Extract pid
+		if (sscanf(log, "[%*d,%d", &pid) != 1)
+			continue;
+
+		// Extract last token (component name)
+		const char *tok, *cpnt = "";
+		while ((tok = strtok_r(nullptr, ",[]\n", &log)))
+			cpnt = tok;
+		if (cpnt[0] == '\0')
 			continue;
 
 		// Make sure our target is alive
-		if (kill(pid, 0))
+		if ((ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns))
 			continue;
-
-		// Allow hiding sub-services of applications
-		char *colon = strchr(proc, ':');
-		if (colon)
-			*colon = '\0';
 
 		bool hide = false;
 		pthread_mutex_lock(&list_lock);
 		for (auto &s : hide_list) {
-			if (s == proc) {
+			if (strncmp(cpnt, s, s.size() - 1) == 0) {
 				hide = true;
 				break;
 			}
 		}
 		pthread_mutex_unlock(&list_lock);
 
-		if (!hide || (ppid = parse_ppid(pid)) < 0 || read_ns(ppid, &pns) == -1)
+		if (!hide)
 			continue;
 
-		do {
-			if (read_ns(pid, &ns) == -1)
-				break;
-			if (ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
-				usleep(50);
-			else
-				break;
-		} while (1);
+		while (read_ns(pid, &ns) == 0 && ns.st_dev == pns.st_dev && ns.st_ino == pns.st_ino)
+			usleep(500);
 
 		// Send pause signal ASAP
 		if (kill(pid, SIGSTOP) == -1)
 			continue;
 
-		// Restore the colon so we can log the actual process name
-		if (colon)
-			*colon = ':';
-#ifdef MAGISK_DEBUG
-		LOGI("proc_monitor: %s (PID=[%d] ns=%llu)(PPID=[%d] ns=%llu)\n",
-			 proc, pid, ns.st_ino, ppid, pns.st_ino);
-#else
-		LOGI("proc_monitor: %s\n", proc);
-#endif
-
 		/*
 		 * The setns system call do not support multithread processes
 		 * We have to fork a new process, setns, then do the unmounts
 		 */
+		LOGI("proc_monitor: %s PID=[%d] ns=[%llu]\n", cpnt, pid, ns.st_ino);
 		if (fork_dont_care() == 0)
 			hide_daemon(pid);
 	}
