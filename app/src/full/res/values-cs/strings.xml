@@ -73,6 +73,9 @@
     <string name="process_error">Chyba při Zpracování</string>
     <string name="internal_storage">Zip je uchován v:\n[Interním Úložišti]%1$s</string>
     <string name="zip_process_title">Zpracování</string>
+    <string name="download_file_error">Chyba při Stahování souboru</string>
+    <string name="downloading_toast">Stahování %1$s</string>
+    <string name="no_rw_storage">Tato funkce nebude fungovat bez povolení k zápisu na externí úložiště.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Obecné</string>

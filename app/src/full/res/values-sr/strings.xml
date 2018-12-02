@@ -100,6 +100,9 @@
     <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
     <string name="su_db_corrupt">СК база података оштећена, креирам нову</string>
+    <string name="download_file_error">Грешка при преузимању фајла</string>
+    <string name="downloading_toast">Преузимање %1$s</string>
+    <string name="no_rw_storage">Ово својство неће радити без дозволе приступу екстерном складишту.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Генерално</string>

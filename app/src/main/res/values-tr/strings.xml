@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Dosya indirme hatası</string>
-    <string name="downloading_toast">%1$s indiriliyor</string>
-    <string name="no_rw_storage">Bu özellik harici depolamaya yazma izni olmadan çalışmaz.</string>
     <string name="no_thanks">Hayır teşekkürler</string>
     <string name="yes">Evet</string>
     <string name="ok">Tamam</string>

@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Вашето устройство се нуждае от допълнително надстройване на Magisk, за да работи нормално. Ще бъде изтеглен архивът за надстройка на Magisk. Желаете ли да продължите?</string>
     <string name="setup_title">Допълнително надстройване</string>
     <string name="setup_msg">Надстройването на средата е в ход…</string>
+    <string name="download_file_error">Грешка при изтеглянето на файла.</string>
+    <string name="downloading_toast">Изтегляне на %1$s</string>
+    <string name="no_rw_storage">Тази функция няма да работи без разрешение за запис във външната памет.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Общи</string>

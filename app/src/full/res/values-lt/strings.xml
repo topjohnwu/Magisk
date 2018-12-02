@@ -114,6 +114,9 @@
     <string name="env_fix_msg">Kad Magisk veiktų tinkamai, jūsų įrenginiui reikia papildomo paruošimo. Tai atsisiųs papildomą Magisk zip failą, ar norite tęsti?</string>
     <string name="setup_title">Papildomas pasiruošimas</string>
     <string name="setup_msg">Paruošiama aplinka…</string>
+    <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
+    <string name="downloading_toast">Atsisiunčiamas %1$s</string>
+    <string name="no_rw_storage">Ši funkija neveiks be prieigos prie saugyklos</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Pagrininiai</string>

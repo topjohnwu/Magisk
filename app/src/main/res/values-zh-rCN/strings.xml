@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">下载文件时出错</string>
-    <string name="downloading_toast">正在下载 %1$s</string>
-    <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
     <string name="no_thanks">不，谢谢</string>
     <string name="yes">是</string>
     <string name="ok">好</string>

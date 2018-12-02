@@ -111,6 +111,9 @@
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga Dodatkowej Konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie potrzebuje dodatkowej konfiguracji, aby Magisk działał prawidłowo. Spowoduje to pobranie pliku instalacyjnego Magisk, czy chcesz kontynuować?</string>
+    <string name="download_file_error">Błąd pobierania pliku</string>
+    <string name="downloading_toast">Pobieranie %1$s</string>
+    <string name="no_rw_storage">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
 
 	<!--Settings Activity -->
     <string name="settings_general_category">Ogólne</string>

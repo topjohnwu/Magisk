@@ -103,13 +103,13 @@
 	<string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
 	<string name="warning">Attenzione</string>
 	<string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
-    	<string name="select_method">Seleziona un metodo</string>
+    <string name="select_method">Seleziona un metodo</string>
 	<string name="no_boot_file_patch_support">La versione Magisk di destinazione non supporta l\'aggiornamento dell\'immagine di boot</string>
 	<string name="boot_file_patch_msg">Seleziona l\'immagine originale di boot in formato .img o img.tar.</string>
 	<string name="complete_uninstall">Disinstallazione completa</string>
    	<string name="restore_img">Ripristina Immagini</string>
-    	<string name="restore_img_msg">Ripristino…</string>
-    	<string name="restore_done">Ripristino completato!</string>
+    <string name="restore_img_msg">Ripristino…</string>
+    <string name="restore_done">Ripristino completato!</string>
 	<string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
    	<string name="proprietary_title">Scarica codice proprietario</string>
 	<string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
@@ -120,6 +120,9 @@
 	<string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
 	<string name="setup_title">Configurazione aggiuntiva</string>
 	<string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
+	<string name="download_file_error">Errore nel download del file</string>
+	<string name="downloading_toast">Download di %1$s</string>
+	<string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione esterna</string>
 
 
 	<!--Settings Activity -->

@@ -89,6 +89,9 @@
     <string name="select_method">Selecionar Método</string>
     <string name="complete_uninstall">Desinstalação Completa</string>
     <string name="restore_done">Restauração feita!</string>
+    <string name="download_file_error">Erro ao transferir ficheiro</string>
+    <string name="downloading_toast">A transferir %1$s</string>
+    <string name="no_rw_storage">Esta funcionalidade não funcionará sem permissão de escrita do armazenamento externo.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Geral</string>

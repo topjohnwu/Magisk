@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Errore nel download del file</string>
-    <string name="downloading_toast">Download di %1$s</string>
-    <string name="no_rw_storage">Questa funzione non sarà attiva senza l\'autorizzazione di scrittura nella memoria di archiviazione esterna</string>
     <string name="no_thanks">No, grazie</string>
     <string name="yes">Sì</string>
     <string name="ok">OK</string>

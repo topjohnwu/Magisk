@@ -118,6 +118,9 @@
     <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan untuk Magisk dapat bekerja dengan baik. Ia akan mengunduh zip penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
     <string name="setup_title">Penyiapan Tambahan</string>
     <string name="setup_msg">Menjalankan penyiapan lingkungan…</string>
+    <string name="download_file_error">Kesalahan mengunduh file</string>
+    <string name="downloading_toast">Mengunduh %1$s</string>
+    <string name="no_rw_storage">Fitur ini tidak akan bekerja tanpa izin untuk menulis ke penyimpanan eksternal.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Umum</string>

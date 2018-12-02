@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Chyba při Stahování souboru</string>
-    <string name="downloading_toast">Stahování %1$s</string>
-    <string name="no_rw_storage">Tato funkce nebude fungovat bez povolení k zápisu na externí úložiště.</string>
     <string name="no_thanks">Ne, díky</string>
     <string name="yes">Ano</string>
     <string name="ok">OK</string>

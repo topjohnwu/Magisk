@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Erro ao baixar arquivo</string>
-    <string name="downloading_toast">Baixando %1$s</string>
-    <string name="no_rw_storage">Este recurso não funcionará sem permissão para gravar no armazenamento externo.</string>
     <string name="no_thanks">Não</string>
     <string name="yes">Sim</string>
     <string name="ok">OK</string>

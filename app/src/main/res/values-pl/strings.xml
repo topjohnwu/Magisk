@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">Błąd pobierania pliku</string>
-    <string name="downloading_toast">Pobieranie %1$s</string>
-    <string name="no_rw_storage">Ta funkcja nie będzie działać bez uprawnień do zapisu na pamięci zewnętrznej.</string>
     <string name="no_thanks">Nie dziękuję</string>
     <string name="yes">Tak</string>
     <string name="ok">OK</string>

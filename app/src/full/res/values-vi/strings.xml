@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Nó sẽ tải xuống tập tin zip để thiết lập Magisk, bạn có muốn tiếp tục không?</string>
     <string name="setup_title">Thiết lập bổ sung</string>
     <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
+    <string name="download_file_error">Lỗi tải tập tin</string>
+    <string name="downloading_toast">Đang tải xuống %1$s</string>
+    <string name="no_rw_storage">Tính năng này không hoạt động nếu thiếu quyền ghi vào bộ nhớ ngoài.</string>
     
     <!--Settings Activity -->
     <string name="settings_general_category">Chung</string>

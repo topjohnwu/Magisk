@@ -115,6 +115,9 @@
     <string name="env_fix_msg">Sinu seade vajab lisaseadistust, et Magisk töötaks korralikult. Laadime alla Magisk\'i seadistus-zip\'i, kas soovid kohe jätkata?</string>
     <string name="setup_title">Lisaseadistus</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
+    <string name="download_file_error">Faili allalaadimisel esines viga</string>
+    <string name="downloading_toast">Laadin %1$s alla</string>
+    <string name="no_rw_storage">See funktsioon ei tööta ilma välismälule kirjutamise õiguseta.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Üldine</string>

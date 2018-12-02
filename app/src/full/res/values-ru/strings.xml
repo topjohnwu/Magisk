@@ -119,6 +119,9 @@
     <string name="env_fix_msg">Вашему устройству требуется дополнительная установка Magisk для корректной работы. Будет загружен установочный ZIP Magisk, продолжить?</string>
     <string name="setup_title">Дополнительная установка</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
+    <string name="download_file_error">Ошибка загрузки файла</string>
+    <string name="downloading_toast">Загрузка %1$s</string>
+    <string name="no_rw_storage">Требуется разрешение на запись во внешнее хранилище.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Основные</string>

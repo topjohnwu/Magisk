@@ -202,4 +202,7 @@
   <string name="warning">تحذير</string>
   <string name="zip_download_msg">تحميل ملف zip (%1$d%%)…</string>
   <string name="zip_download_title">يتم التحميل</string>
+  <string name="downloading_toast">جاري التنزيل %1$s</string>
+  <string name="download_file_error">خطأ تنزيل الملف</string>
+  <string name="no_rw_storage">أن هذه الميزة لا تعمل دون الحصول على إذن الكتابة على التخزين الخارجي.</string>
 </resources>

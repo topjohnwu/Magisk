@@ -96,6 +96,9 @@
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="proprietary_title">Preuzmite vlasnički kod</string>
     <string name="proprietary_notice">Magisk Manager je FOSS aplikacija te ne sadrži Googleov SafetyNet API kod.\n\nDopuštate li Magisk Manager aplikaciji da preuzme proširenje (sadrži GoogleApiClient) za SafetyNet provjere?</string>
+    <string name="download_file_error">Pogreška prilikom preuzimanja datoteke</string>
+    <string name="downloading_toast">Preuzimanje %1$s</string>
+    <string name="no_rw_storage">Ova značajka neće raditi bez dopuštenja za korištenje vanjske pohrane.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Općenito</string>

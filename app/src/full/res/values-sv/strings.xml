@@ -78,6 +78,9 @@
     <string name="manager_update_title">En uppdatering av Magisk maneger finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
     <string name="magisk_updates">Magiska uppdateringar</string>
+    <string name="download_file_error">Fel vid nerladdning av fil</string>
+    <string name="downloading_toast">Laddar ner %1$s</string>
+    <string name="no_rw_storage">Denna funktionen måste ha behörighet att skriva till externt lagringsutrymme.</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Allmän</string>

@@ -1,7 +1,4 @@
 <resources>
-    <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
-    <string name="downloading_toast">%1$s をダウンロード中</string>
-    <string name="no_rw_storage">この機能は外部ストレージへの書き込み権限がないと動作しません</string>
     <string name="no_thanks">いいえ</string>
     <string name="yes">はい</string>
     <string name="ok">OK</string>
