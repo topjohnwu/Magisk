@@ -70,13 +70,19 @@
     <string name="support_thread">Support thread</string>
     <string name="follow_twitter">Follow me on Twitter</string>
 
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Magisk Updates</string>
+    <string name="progress_channel">Progress Notifications</string>
+    <string name="download_complete">Download complete</string>
+    <string name="magisk_update_title">New Magisk Update Available!</string>
+    <string name="manager_update_title">New Magisk Manager Update Available!</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">Close</string>
     <string name="repo_install_title">Install %1$s</string>
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
-    <string name="magisk_update_title">New Magisk Update Available!</string>
     <string name="settings_reboot_toast">Reboot to apply settings.</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
@@ -86,14 +92,12 @@
     <string name="zip_download_msg">Downloading zip file (%1$d%%) …</string>
     <string name="zip_process_title">Processing</string>
     <string name="zip_process_msg">Processing zip file…</string>
-    <string name="manager_update_title">New Magisk Manager Update Available!</string>
     <string name="manager_download_install">Press to download and install.</string>
     <string name="dtbo_patched_title">DTBO was patched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
-    <string name="magisk_updates">Magisk Updates</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Hiding Magisk Manager…</string>
-    <string name="hide_manager_toast2">This might take a while.</string>
+    <string name="hide_manager_title">Hiding Magisk Manager…</string>
+    <string name="hide_manager_msg">This might take a while.</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed.</string>
     <string name="open_link_failed_toast">No application found to open the link.</string>
     <string name="download_zip_only">Download Zip Only</string>
@@ -122,7 +126,6 @@
     <string name="download_file_error">Error downloading file</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
-    <string name="download_complete">Download complete</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

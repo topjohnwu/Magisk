@@ -91,10 +91,10 @@
     <string name="manager_download_install">Pulse para descargar e instalar</string>
     <string name="dtbo_patched_title">DTBO fue parchado!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha parcheado dtbo.img, por favor reinicia</string>
-    <string name="magisk_updates">Actualización de Magisk</string>
+    <string name="update_channel">Actualización de Magisk</string>
     <string name="flashing">Flasheando</string>
-    <string name="hide_manager_toast">Ocultando Magisk Manager…</string>
-    <string name="hide_manager_toast2">Esto podría tomar un tiempo…</string>
+    <string name="hide_manager_title">Ocultando Magisk Manager…</string>
+    <string name="hide_manager_msg">Esto podría tomar un tiempo…</string>
     <string name="hide_manager_fail_toast">La Ocultación de Magisk Manager ha fallado…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="download_zip_only">Descargar sólo el archivo ZIP</string>

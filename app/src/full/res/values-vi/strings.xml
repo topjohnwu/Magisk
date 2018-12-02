@@ -90,10 +90,10 @@
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
     <string name="dtbo_patched_title">DTBO đã được vá!</string>
     <string name="dtbo_patched_reboot">Magisk Manager đã vá dtbo.img. Hãy khởi động lại.</string>
-    <string name="magisk_updates">Cập nhật Magisk</string>
+    <string name="update_channel">Cập nhật Magisk</string>
     <string name="flashing">Đang flash</string>
-    <string name="hide_manager_toast">Ẩn Magisk Manager…</string>
-    <string name="hide_manager_toast2">Điều này có thể mất chút thời gian.</string>
+    <string name="hide_manager_title">Ẩn Magisk Manager…</string>
+    <string name="hide_manager_msg">Điều này có thể mất chút thời gian.</string>
     <string name="hide_manager_fail_toast">Ẩn Magisk Manager thất bại.</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết.</string>
     <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>

@@ -134,8 +134,8 @@
   <string name="follow_twitter">تابعني على تويتر</string>
   <string name="global_summary">تستخدم كافة جلسات الجذر مساحة الأسم ذات التركيب العالمي</string>
   <string name="hide_manager_fail_toast">فشل إخفاء مدير Magisk …</string>
-  <string name="hide_manager_toast">إخفاء مدير Magisk…</string>
-  <string name="hide_manager_toast2">هذا قد يستغرق بعض الوقت…</string>
+  <string name="hide_manager_title">إخفاء مدير Magisk…</string>
+  <string name="hide_manager_msg">هذا قد يستغرق بعض الوقت…</string>
   <string name="install_inactive_slot">التثبيت على فتحة غير نشطة (بعد OTA)</string>
   <string name="install_inactive_slot_msg">"سيتم إجبار جهازك للتمهيد على الفتحة غير النشطة الحالية بعد إعادة التشغيل!
 فقط استخدام هذا الخيار بعد الانتهاء من OTA.
@@ -143,7 +143,7 @@
   <string name="invalid_update_channel">قناة تحديث غير صالحة</string>
   <string name="isolate_summary">سيكون لكل جلسة جذر مساحة الاسم الخاصة بها معزولة</string>
   <string name="language">اللغة</string>
-  <string name="magisk_updates">تحديثات Magisk</string>
+  <string name="update_channel">تحديثات Magisk</string>
   <string name="manager_download_install">اضغط للتنزيل والتثبيت</string>
   <string name="manager_update_title">تحديث مدير Magisk الجديد متوفر!</string>
   <string name="menuSaveLog">حفظ السجل</string>

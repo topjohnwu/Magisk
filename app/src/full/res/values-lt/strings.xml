@@ -89,10 +89,10 @@
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
     <string name="dtbo_patched_reboot">Magisk Manager ištaisė dtbo.img, prašome perkrauti telefoną</string>
-    <string name="magisk_updates">Magisk Atnaujinimai</string>
+    <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
-    <string name="hide_manager_toast">Magisk Manager paslėpiamas…</string>
-    <string name="hide_manager_toast2">Tai užtruks sekundėlę…</string>
+    <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
+    <string name="hide_manager_msg">Tai užtruks sekundėlę…</string>
     <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
     <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="patch_boot_file">Ištaisyti boot failą</string>

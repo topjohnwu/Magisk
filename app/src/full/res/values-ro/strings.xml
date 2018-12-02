@@ -85,10 +85,10 @@
     <string name="manager_download_install">Apăsați pentru a descărca și instala</string>
     <string name="dtbo_patched_title">DTBO a fost modificat!</string>
     <string name="dtbo_patched_reboot">Magisk Manager a modificat dtbo.img, reporniţi</string>
-    <string name="magisk_updates">Actualizări Magisk</string>
+    <string name="update_channel">Actualizări Magisk</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Ascundere Magisk Manager…</string>
-    <string name="hide_manager_toast2">Ar putea dura ceva timp…</string>
+    <string name="hide_manager_title">Ascundere Magisk Manager…</string>
+    <string name="hide_manager_msg">Ar putea dura ceva timp…</string>
     <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eşuat</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul…</string>
     <string name="download_zip_only">Doar descărcare fişier Zip</string>

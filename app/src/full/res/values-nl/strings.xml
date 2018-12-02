@@ -90,10 +90,10 @@
     <string name="manager_download_install">Tik om te downloaden en installeren</string>
     <string name="dtbo_patched_title">DTBO is gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager heeft dtbo.img gepatched, herstarten a.u.b.</string>
-    <string name="magisk_updates">Magisk updates</string>
+    <string name="update_channel">Magisk updates</string>
     <string name="flashing">Flashen</string>
-    <string name="hide_manager_toast">Magisk Manager verbergen…</string>
-    <string name="hide_manager_toast2">Dit kan even duren…</string>
+    <string name="hide_manager_title">Magisk Manager verbergen…</string>
+    <string name="hide_manager_msg">Dit kan even duren…</string>
     <string name="hide_manager_fail_toast">Magisk Manager verbergen mislukt…</string>
     <string name="download_zip_only">Alleen zip downloaden</string>
     <string name="patch_boot_file">Boot image-bestand patchen</string>

@@ -62,7 +62,8 @@ public class Const {
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
         public static final int DTBO_NOTIFICATION_ID = 7;
         public static final int DOWNLOAD_PROGRESS_ID = 8;
-        public static final String NOTIFICATION_CHANNEL = "magisk_notification";
+        public static final String UPDATE_NOTIFICATION_CHANNEL = "update";
+        public static final String PROGRESS_NOTIFICATION_CHANNEL = "progress";
     }
 
     public static class Url {

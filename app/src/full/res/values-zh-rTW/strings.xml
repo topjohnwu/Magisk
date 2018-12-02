@@ -159,11 +159,11 @@
     <string name="settings_ns_isolate">獨立 Namespace</string>
     <string name="settings_ns_requester">繼承 Namespace</string>
     <string name="update">更新 %1$s</string>
-    <string name="magisk_updates">Magisk 更新</string>
+    <string name="update_channel">Magisk 更新</string>
     <string name="system_default">(系統預設)</string>
     <string name="language">語言</string>
     <string name="flashing">正在刷入</string>
-    <string name="hide_manager_toast">正在隱藏 Magisk Manager…</string>
+    <string name="hide_manager_title">正在隱藏 Magisk Manager…</string>
     <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
     <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
     <string name="settings_update_channel_title">更新頻道</string>
@@ -188,7 +188,7 @@
     <string name="proprietary_notice">Magisk Manager 是一個 100% 開源的程式，因此不會包含 Google 私有所有權的 SafetyNet API 程式碼。\n\n你允許 Magisk Manager 下載一個擴充包 (包含 GoogleApiClient) 以執行 SafetyNet 檢查嗎？</string>
     <string name="dtbo_patched_title">DTBO 已被打上補丁！</string>
     <string name="dtbo_patched_reboot">Magisk Manager 已為 dtbo.img 打上補丁，請立即重新啟動</string>
-    <string name="hide_manager_toast2">這可能會花上一段時間…</string>
+    <string name="hide_manager_msg">這可能會花上一段時間…</string>
     <string name="settings_hide_manager_summary">將 Magisk Manager 以隨機套件名稱重新打包，以達成隱藏效果</string>
     <string name="invalid_update_channel">不合法的更新頻道</string>
     <string name="settings_update_custom">自訂</string>

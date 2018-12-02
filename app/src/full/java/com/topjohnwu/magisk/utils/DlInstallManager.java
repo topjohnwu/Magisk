@@ -71,9 +71,9 @@ public class DlInstallManager {
             File patched = apk;
             MagiskManager mm = Data.MM();
             if (!mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-                progress.getBuilder()
+                progress.getNotification()
                         .setProgress(0, 0, true)
-                        .setContentTitle(mm.getString(R.string.hide_manager_toast))
+                        .setContentTitle(mm.getString(R.string.hide_manager_title))
                         .setContentText("");
                 progress.update();
                 patched = new File(apk.getParent(), "patched.apk");

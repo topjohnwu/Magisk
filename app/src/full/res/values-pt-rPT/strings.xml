@@ -78,10 +78,10 @@
     <string name="zip_process_msg">A processar ficheiro zip …</string>
     <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
     <string name="manager_download_install">Pressione para transferir e instalar</string>
-    <string name="magisk_updates">Atualizações do Magisk</string>
+    <string name="update_channel">Atualizações do Magisk</string>
     <string name="flashing">A instalar</string>
-    <string name="hide_manager_toast">A esconder Magisk Manager…</string>
-    <string name="hide_manager_toast2">Isto pode demorar algum tempo...</string>
+    <string name="hide_manager_title">A esconder Magisk Manager…</string>
+    <string name="hide_manager_msg">Isto pode demorar algum tempo...</string>
     <string name="hide_manager_fail_toast">Falha ao esconder Magisk Manager…</string>
     <string name="download_zip_only">Transferir Apenas Ficheiro Zip</string>
     <string name="patch_boot_file">Patch a Imagem de Arranque</string>

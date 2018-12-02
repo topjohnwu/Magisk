@@ -90,10 +90,10 @@
     <string name="manager_download_install">Appuyer pour télécharger et installer.</string>
     <string name="dtbo_patched_title">DTBO a été patché!</string>
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer.</string>
-    <string name="magisk_updates">Mises à jours Magisk</string>
+    <string name="update_channel">Mises à jours Magisk</string>
     <string name="flashing">Installation</string>
-    <string name="hide_manager_toast">Masquer le Gestionnaire Magisk…</string>
-    <string name="hide_manager_toast2">Cela pourrait prendre un certain temps.</string>
+    <string name="hide_manager_title">Masquer le Gestionnaire Magisk…</string>
+    <string name="hide_manager_msg">Cela pourrait prendre un certain temps.</string>
     <string name="hide_manager_fail_toast">Masquage du Gestionnaire Magisk échoué.</string>
     <string name="open_link_failed_toast">Aucune application trouvée pour ouvrir le lien.</string>
     <string name="download_zip_only">Uniquement télécharger le zip</string>

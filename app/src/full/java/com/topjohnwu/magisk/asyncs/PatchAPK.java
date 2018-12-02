@@ -126,8 +126,8 @@ public class PatchAPK {
 
     public static void hideManager(Activity activity) {
         ProgressDialog dialog = ProgressDialog.show(activity,
-                activity.getString(R.string.hide_manager_toast),
-                activity.getString(R.string.hide_manager_toast2));
+                activity.getString(R.string.hide_manager_title),
+                activity.getString(R.string.hide_manager_msg));
         AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
             boolean b = patchAndHide();
             Data.mainHandler.post(() -> {

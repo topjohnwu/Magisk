@@ -1,10 +1,7 @@
 package com.topjohnwu.magisk;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -14,6 +11,7 @@ import com.topjohnwu.magisk.components.BaseActivity;
 import com.topjohnwu.magisk.receivers.ShortcutReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.LocaleManager;
+import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.magisk.utils.RootUtils;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
@@ -51,11 +49,7 @@ public class SplashActivity extends BaseActivity {
         LocaleManager.loadAvailableLocales();
 
         // Create notification channel on Android O
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(Const.ID.NOTIFICATION_CHANNEL,
-                    getString(R.string.magisk_updates), NotificationManager.IMPORTANCE_DEFAULT);
-            getSystemService(NotificationManager.class).createNotificationChannel(channel);
-        }
+        Notifications.setup(this);
 
         // Setup shortcuts
         sendBroadcast(new Intent(this, Data.classMap.get(ShortcutReceiver.class)));

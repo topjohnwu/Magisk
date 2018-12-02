@@ -90,10 +90,10 @@
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="dtbo_patched_title">Έγινε patch στο DTBO!</string>
     <string name="dtbo_patched_reboot">Το Magisk Manager έκανε patch το dtbo.img, παρακαλώ κάντε επανεκκίνηση</string>
-    <string name="magisk_updates">Ενημερώσεις Magisk</string>
+    <string name="update_channel">Ενημερώσεις Magisk</string>
     <string name="flashing">Γίνεται flash</string>
-    <string name="hide_manager_toast">Κρύβοντας το Magisk Manager…</string>
-    <string name="hide_manager_toast2">Αυτό μπορεί να πάρει λίγη ώρα…</string>
+    <string name="hide_manager_title">Κρύβοντας το Magisk Manager…</string>
+    <string name="hide_manager_msg">Αυτό μπορεί να πάρει λίγη ώρα…</string>
     <string name="hide_manager_fail_toast">Η απόκρυψη του Magisk Manager απέτυχε…</string>
     <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="patch_boot_file">Εφαρμογή Patch στο Αρχείο Εικόνας Boot</string>

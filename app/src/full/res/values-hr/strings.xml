@@ -81,9 +81,9 @@
     <string name="zip_process_msg">Obrada zip datoteke …</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
     <string name="manager_download_install">Pritisnite za preuzimanje i instalaciju</string>
-    <string name="magisk_updates">Magisk ažuriranja</string>
+    <string name="update_channel">Magisk ažuriranja</string>
     <string name="flashing">Apliciranje</string>
-    <string name="hide_manager_toast">Skrivanje Magisk Manager aplikacije…</string>
+    <string name="hide_manager_title">Skrivanje Magisk Manager aplikacije…</string>
     <string name="hide_manager_fail_toast">Skrivanje Magisk Manager nije uspjelo</string>
     <string name="download_zip_only">Preuzmi samo zip</string>
     <string name="patch_boot_file">Zakrpa datoteke za podizanje sustava</string>

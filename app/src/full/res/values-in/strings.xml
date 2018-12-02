@@ -89,10 +89,10 @@
     <string name="manager_download_install">Tekan untuk unduh dan pasang.</string>
     <string name="dtbo_patched_title">DTBO telah ditambal!</string>
     <string name="dtbo_patched_reboot">Magisk Manager telah menambal dtbo.img. Silahkan reboot.</string>
-    <string name="magisk_updates">Pembaruan Magisk</string>
+    <string name="update_channel">Pembaruan Magisk</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Menyembunyikan Magisk Manager…</string>
-    <string name="hide_manager_toast2">Ini mungkin membutuhkan beberapa saat.</string>
+    <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
+    <string name="hide_manager_msg">Ini mungkin membutuhkan beberapa saat.</string>
     <string name="hide_manager_fail_toast">Kesalahan menyembunyikan Magisk Manager.</string>
     <string name="open_link_failed_toast">Tidak ada aplikasi ditemukan untuk membuka tautan.</string>
     <string name="download_zip_only">Unduh Zip Saja</string>
