@@ -2,16 +2,17 @@ package com.topjohnwu.magisk.components;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.DownloadListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.receivers.DownloadReceiver;
 import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -28,31 +29,10 @@ class InstallMethodDialog extends AlertDialog.Builder {
             Intent intent;
             switch (idx) {
                 case 1:
-                    Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
-                    intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
-                    activity.runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () ->
-                        activity.startActivityForResult(intent, Const.ID.SELECT_BOOT,
-                        (requestCode, resultCode, data) -> {
-                            if (requestCode == Const.ID.SELECT_BOOT &&
-                                    resultCode == Activity.RESULT_OK && data != null) {
-                                Intent i = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                        .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
-                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
-                                activity.startActivity(i);
-                            }
-                        })
-                    );
-
+                    patchBoot(activity);
                     break;
                 case 0:
-                    String filename = Utils.fmt("Magisk-v%s(%d).zip",
-                            Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
-                    Download.receive(activity, new DownloadReceiver() {
-                        @Override
-                        public void onDownloadDone(Context context, Uri uri) {
-                            SnackbarMaker.showUri(activity, uri);
-                        }
-                    }, Data.magiskLink, filename);
+                    downloadOnly(activity);
                     break;
                 case 2:
                     intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
@@ -60,20 +40,65 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     activity.startActivity(intent);
                     break;
                 case 3:
-                    new CustomAlertDialog(activity)
-                        .setTitle(R.string.warning)
-                        .setMessage(R.string.install_inactive_slot_msg)
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.yes, (d, i) -> {
-                            Intent it = new Intent(activity, Data.classMap.get(FlashActivity.class))
-                                    .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
-                            activity.startActivity(it);
-                        })
-                        .setNegativeButton(R.string.no_thanks, null)
-                        .show();
+                    installInactiveSlot(activity);
                     break;
                 default:
             }
         });
+    }
+
+    private void patchBoot(BaseActivity a) {
+        Utils.toast(R.string.boot_file_patch_msg, Toast.LENGTH_LONG);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT).setType("*/*");
+        a.runWithPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, () ->
+                a.startActivityForResult(intent, Const.ID.SELECT_BOOT,
+                        (requestCode, resultCode, data) -> {
+                            if (requestCode == Const.ID.SELECT_BOOT &&
+                                    resultCode == Activity.RESULT_OK && data != null) {
+                                Intent i = new Intent(a, Data.classMap.get(FlashActivity.class))
+                                        .putExtra(Const.Key.FLASH_SET_BOOT, data.getData())
+                                        .putExtra(Const.Key.FLASH_ACTION, Const.Value.PATCH_BOOT);
+                                a.startActivity(i);
+                            }
+                        })
+        );
+    }
+
+    private void downloadOnly(BaseActivity a) {
+        a.runWithPermission(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, () -> {
+            String filename = Utils.fmt("Magisk-v%s(%d).zip",
+                    Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
+            NotificationProgress progress = new NotificationProgress(filename);
+            AndroidNetworking
+                    .download(Data.magiskLink, Download.EXTERNAL_PATH.getPath(), filename)
+                    .build()
+                    .setDownloadProgressListener(progress)
+                    .startDownload(new DownloadListener() {
+                        @Override
+                        public void onDownloadComplete() {
+                            progress.defaultDone();
+                            SnackbarMaker.make(a,
+                                a.getString(R.string.internal_storage, "/Download/" + filename),
+                                Snackbar.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onError(ANError anError) {}
+                    });
+        });
+    }
+
+    private void installInactiveSlot(BaseActivity activity) {
+        new CustomAlertDialog(activity)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.install_inactive_slot_msg)
+                .setCancelable(true)
+                .setPositiveButton(R.string.yes, (d, i) -> {
+                    Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
+                            .putExtra(Const.Key.FLASH_ACTION, Const.Value.FLASH_INACTIVE_SLOT);
+                    activity.startActivity(intent);
+                })
+                .setNegativeButton(R.string.no_thanks, null)
+                .show();
     }
 }

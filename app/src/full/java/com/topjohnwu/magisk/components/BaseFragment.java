@@ -52,6 +52,6 @@ public class BaseFragment extends Fragment implements Topic.AutoSubscriber {
 
     @Override
     public int[] getSubscribedTopics() {
-        return FlavorActivity.EMPTY_INT_ARRAY;
+        return BaseActivity.EMPTY_INT_ARRAY;
     }
 }

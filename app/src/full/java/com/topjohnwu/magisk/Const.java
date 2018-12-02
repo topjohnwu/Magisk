@@ -61,13 +61,14 @@ public class Const {
         public static final int MAGISK_UPDATE_NOTIFICATION_ID = 4;
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
         public static final int DTBO_NOTIFICATION_ID = 7;
+        public static final int DOWNLOAD_PROGRESS_ID = 8;
         public static final String NOTIFICATION_CHANNEL = "magisk_notification";
     }
 
     public static class Url {
         public static final String STABLE_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/stable.json";
         public static final String BETA_URL = "https://raw.githubusercontent.com/topjohnwu/magisk_files/master/beta.json";
-        public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed&page=%d";
+        public static final String REPO_URL = "https://api.github.com/users/Magisk-Modules-Repo/repos?per_page=100&sort=pushed";
         public static final String FILE_URL = "https://raw.githubusercontent.com/Magisk-Modules-Repo/%s/master/%s";
         public static final String ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip";
         public static final String PAYPAL_URL = "https://www.paypal.me/topjohnwu";
@@ -92,7 +93,7 @@ public class Const {
 
         // intents
         public static final String OPEN_SECTION = "section";
-        public static final String INTENT_SET_FILENAME = "filename";
+        public static final String INTENT_SET_NAME = "filename";
         public static final String INTENT_SET_LINK = "link";
         public static final String FLASH_ACTION = "action";
         public static final String FLASH_SET_BOOT = "boot";

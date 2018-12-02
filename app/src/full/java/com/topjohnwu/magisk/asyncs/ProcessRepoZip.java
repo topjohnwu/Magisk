@@ -93,7 +93,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
         if (activity == null) return null;
         try {
             // Request zip from Internet
-            HttpURLConnection conn = WebService.mustRequest(mRepo.getZipUrl(), null);
+            HttpURLConnection conn = WebService.mustRequest(mRepo.getZipUrl());
             total = conn.getContentLength();
 
             // Temp files
@@ -101,7 +101,7 @@ public class ProcessRepoZip extends ParallelTask<Void, Object, Boolean> {
             File temp2 = new File(temp1.getParentFile(), "2.zip");
             temp1.getParentFile().mkdir();
 
-            // First download the zip, Web -> temp1
+            // First upgrade the zip, Web -> temp1
             try (
                 InputStream in = new BufferedInputStream(new ProgressInputStream(conn.getInputStream()));
                 OutputStream out = new BufferedOutputStream(new FileOutputStream(temp1))

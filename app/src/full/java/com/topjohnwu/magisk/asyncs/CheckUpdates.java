@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
-import com.topjohnwu.magisk.utils.NotificationMgr;
+import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.magisk.utils.Topic;
-import com.topjohnwu.magisk.utils.WebService;
+import com.topjohnwu.magisk.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,13 +46,13 @@ public class CheckUpdates {
         String jsonStr = "";
         switch (Data.updateChannel) {
             case Const.Value.STABLE_CHANNEL:
-                jsonStr = WebService.getString(Const.Url.STABLE_URL);
+                jsonStr = Utils.dlString(Const.Url.STABLE_URL);
                 break;
             case Const.Value.BETA_CHANNEL:
-                jsonStr = WebService.getString(Const.Url.BETA_URL);
+                jsonStr = Utils.dlString(Const.Url.BETA_URL);
                 break;
             case Const.Value.CUSTOM_CHANNEL:
-                jsonStr = WebService.getString(Data.MM().prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
+                jsonStr = Utils.dlString(Data.MM().prefs.getString(Const.Key.CUSTOM_CHANNEL, ""));
                 break;
         }
 
@@ -89,9 +89,9 @@ public class CheckUpdates {
             fetchUpdates();
             if (cb != null) {
                 if (BuildConfig.VERSION_CODE < Data.remoteManagerVersionCode) {
-                    NotificationMgr.managerUpdate();
+                    Notifications.managerUpdate();
                 } else if (Data.magiskVersionCode < Data.remoteMagiskVersionCode) {
-                    NotificationMgr.magiskUpdate();
+                    Notifications.magiskUpdate();
                 }
                 cb.run();
             }

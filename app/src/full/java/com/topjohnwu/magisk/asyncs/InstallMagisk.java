@@ -136,7 +136,7 @@ public class InstallMagisk extends ParallelTask<Void, Void, Boolean> {
 
         if (!ShellUtils.checkSum("MD5", zip, Data.magiskMD5)) {
             console.add("- Downloading zip");
-            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink, null);
+            HttpURLConnection conn = WebService.mustRequest(Data.magiskLink);
             buf = new BufferedInputStream(new ProgressStream(conn), conn.getContentLength());
             buf.mark(conn.getContentLength() + 1);
             try (OutputStream out = new FileOutputStream(zip)) {
