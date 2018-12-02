@@ -76,7 +76,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     .startDownload(new DownloadListener() {
                         @Override
                         public void onDownloadComplete() {
-                            progress.defaultDone();
+                            progress.dlDone();
                             SnackbarMaker.make(a,
                                 a.getString(R.string.internal_storage, "/Download/" + filename),
                                 Snackbar.LENGTH_LONG).show();

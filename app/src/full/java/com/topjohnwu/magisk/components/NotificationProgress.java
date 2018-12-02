@@ -5,6 +5,8 @@ import android.widget.Toast;
 import com.androidnetworking.interfaces.DownloadProgressListener;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
+import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.utils.Notifications;
 import com.topjohnwu.magisk.utils.Utils;
 
@@ -18,11 +20,12 @@ public class NotificationProgress implements DownloadProgressListener {
     private long prevTime;
 
     public NotificationProgress(String title) {
-        mgr = NotificationManagerCompat.from(Data.MM());
+        MagiskManager mm = Data.MM();
+        mgr = NotificationManagerCompat.from(mm);
         builder = Notifications.progress(title);
         mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
         prevTime = System.currentTimeMillis();
-        Utils.toast("Downloading " + title, Toast.LENGTH_SHORT);
+        Utils.toast(mm.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
     }
 
     @Override
@@ -44,9 +47,13 @@ public class NotificationProgress implements DownloadProgressListener {
         mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
     }
 
-    public void defaultDone() {
+    public void dlDone() {
         builder.setProgress(0, 0, false);
-        builder.setContentText("Download done");
+        builder.setContentText(Data.MM().getString(R.string.download_complete));
         update();
+    }
+
+    public void dismiss() {
+        mgr.cancel(Const.ID.DOWNLOAD_PROGRESS_ID);
     }
 }

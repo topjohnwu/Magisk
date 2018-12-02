@@ -122,6 +122,7 @@
     <string name="download_file_error">Error downloading file</string>
     <string name="downloading_toast">Downloading %1$s</string>
     <string name="no_rw_storage">This feature will not work without permission to write external storage.</string>
+    <string name="download_complete">Download complete</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">General</string>

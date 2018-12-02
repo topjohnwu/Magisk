@@ -50,7 +50,7 @@ public class UninstallDialog extends CustomAlertDialog {
                     .startDownload(new DownloadListener() {
                         @Override
                         public void onDownloadComplete() {
-                            progress.defaultDone();
+                            progress.dismiss();
                             Intent intent = new Intent(activity, Data.classMap.get(FlashActivity.class))
                                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     .setData(Uri.fromFile(zip))

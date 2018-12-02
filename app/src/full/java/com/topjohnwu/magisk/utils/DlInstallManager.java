@@ -8,6 +8,7 @@ import com.androidnetworking.interfaces.DownloadListener;
 import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
+import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.asyncs.PatchAPK;
 import com.topjohnwu.magisk.components.NotificationProgress;
 import com.topjohnwu.superuser.ShellUtils;
@@ -72,7 +73,8 @@ public class DlInstallManager {
             if (!mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
                 progress.getBuilder()
                         .setProgress(0, 0, true)
-                        .setContentText("Patching APK");
+                        .setContentTitle(mm.getString(R.string.hide_manager_toast))
+                        .setContentText("");
                 progress.update();
                 patched = new File(apk.getParent(), "patched.apk");
                 try {
@@ -83,7 +85,7 @@ public class DlInstallManager {
                     return;
                 }
             }
-            progress.defaultDone();
+            progress.dismiss();
             APKInstall.install(mm, patched);
         }
     }
@@ -92,7 +94,7 @@ public class DlInstallManager {
 
         @Override
         public void onDownloadComplete(File apk, NotificationProgress progress) {
-            progress.defaultDone();
+            progress.dismiss();
             Data.exportPrefs();
             if (ShellUtils.fastCmdResult("pm install " + apk))
                 RootUtils.rmAndLaunch(Data.MM().getPackageName(), Const.ORIG_PKG_NAME);
