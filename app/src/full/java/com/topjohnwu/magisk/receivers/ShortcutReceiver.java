@@ -67,7 +67,7 @@ public class ShortcutReceiver extends BroadcastReceiver {
                     .setRank(3)
                     .build());
             shortCuts.add(new ShortcutInfo.Builder(mm, "downloads")
-                    .setShortLabel(mm.getString(R.string.download))
+                    .setShortLabel(mm.getString(R.string.downloads))
                     .setIntent(new Intent(mm, Data.classMap.get(SplashActivity.class))
                             .putExtra(Const.Key.OPEN_SECTION, "downloads")
                             .setAction(Intent.ACTION_VIEW)
