@@ -224,5 +224,8 @@
     <string name="auth_fingerprint">驗證指紋</string>
     <string name="follow_twitter">追蹤我的 Twitter</string>
     <string name="open_link_failed_toast">沒有應用程式能夠打開此鏈結…</string>
+    <string name="download_complete">下載完成</string>
+    <string name="settings_hosts_toast">已添加 systemless hosts 模組</string>
+    <string name="progress_channel">進度通知</string>
 
 </resources>
