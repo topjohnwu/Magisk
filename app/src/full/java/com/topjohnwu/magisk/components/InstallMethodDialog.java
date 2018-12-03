@@ -82,7 +82,9 @@ class InstallMethodDialog extends AlertDialog.Builder {
                         }
 
                         @Override
-                        public void onError(ANError anError) {}
+                        public void onError(ANError anError) {
+                            progress.dlFail();
+                        }
                     });
         });
     }

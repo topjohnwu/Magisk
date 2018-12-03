@@ -61,7 +61,9 @@ public class DlInstallManager {
         }
 
         @Override
-        public void onError(ANError anError) {}
+        public void onError(ANError anError) {
+            progress.dlFail();
+        }
     }
 
     private static class PatchPackageName extends ManagerDownloadListener {

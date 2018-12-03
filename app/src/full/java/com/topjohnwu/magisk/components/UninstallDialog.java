@@ -59,7 +59,9 @@ public class UninstallDialog extends CustomAlertDialog {
                         }
 
                         @Override
-                        public void onError(ANError anError) {}
+                        public void onError(ANError anError) {
+                            progress.dlFail();
+                        }
                     });
             });
         }
