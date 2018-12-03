@@ -69,6 +69,14 @@
     <string name="app_translators">Traducteurs de l\'application</string>
     <string name="support_thread">Fil d\'assistance</string>
     <string name="follow_twitter">Me suivre sur Twitter</string>
+    
+    <!-- System Components, Notifications -->
+    <string name="update_channel">Mises à jours Magisk</string>
+    <string name="progress_channel">Progression des notifications</string>
+    <string name="download_complete">Téléchargement terminé</string>
+    <string name="download_file_error">Érreure de téléchargement du fichier</string>
+    <string name="magisk_update_title">Nouvelle MàJ Magisk disponible!</string>
+    <string name="manager_update_title">Nouvelle MàJ du Gestionnaire Magisk Disponible!</string>
 
     <!--Toasts, Dialogs-->
     <string name="close">Fermer</string>
@@ -76,7 +84,6 @@
     <string name="repo_install_msg">Voulez-vous installer %1$s maintenant ?</string>
     <string name="download">Télécharger</string>
     <string name="reboot">Redémarrer</string>
-    <string name="magisk_update_title">Nouvelle mis à jour Magisk disponible!</string>
     <string name="settings_reboot_toast">Redémarrer afin d\'appliquer les réglages.</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache du dépôt éffacé</string>
@@ -86,11 +93,9 @@
     <string name="zip_download_msg">Téléchargement du fichier zip (%1$d%%) …</string>
     <string name="zip_process_title">Traitement en cours</string>
     <string name="zip_process_msg">Traitement du fichier zip…</string>
-    <string name="manager_update_title">Nouvelle mise à jour du Gestionnaire Magisk disponible!</string>
     <string name="manager_download_install">Appuyer pour télécharger et installer.</string>
     <string name="dtbo_patched_title">DTBO a été patché!</string>
     <string name="dtbo_patched_reboot">Le Gestionnaire Magisk a vient de patcher dtbo.img, merci de redémarrer.</string>
-    <string name="update_channel">Mises à jours Magisk</string>
     <string name="flashing">Installation</string>
     <string name="hide_manager_title">Masquer le Gestionnaire Magisk…</string>
     <string name="hide_manager_msg">Cela pourrait prendre un certain temps.</string>
@@ -112,17 +117,15 @@
     <string name="restore_fail">Le sauvegarde par défaut n\'existe pas!</string>
     <string name="proprietary_title">Télécharger Code Propriétaire</string>
     <string name="proprietary_notice">Magisk Manager est Libre et ne contient pas le code API SafetyNet propriétaire de Google. \n\nAutoriseriez vous le Gestionnaire Magisk à télécharger une extension (contenant GoogleApiClient) pour les contrôles SafetyNet? </string>
-    <string name = "su_db_corrupt"> La base de données SU est corrompue. Une nouvelle base de donnée va être à nouveau créée.</string>
+    <string name="su_db_corrupt"> La base de données SU est corrompue. Une nouvelle base de donnée va être à nouveau créée.</string>
     <string name="setup_done">Installation terminée</string>
     <string name="setup_fail">Échec de l\'installation</string>
     <string name="env_fix_title">Installation additionnelle requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d\'une configuration supplémentaire pour que Magisk fonctionne correctement. Il téléchargera le zip d\'installation de Magisk, voulez-vous procéder maintenant ?</string>
     <string name="setup_title">Installation Additionnel</string>
     <string name="setup_msg">Démarrer l\'installation de l\'environnement…</string>
-    <string name="download_file_error">Erreur de téléchargement du fichier</string>
     <string name="downloading_toast">Téléchargement à %1$s</string>
     <string name="no_rw_storage">Cette fonctionnalité ne marchera pas sans la permission d\'écriture sur le stockage externe.</string>
-    <string name="download_complete">Téléchargement terminé</string>
 
     <!--Settings Activity -->
     <string name="settings_general_category">Général</string>
@@ -134,7 +137,7 @@
     <string name="settings_hide_manager_summary">Reconstruire le Gestionnaire Magisk avec un nom de paquet aléatoire.</string>
     <string name="settings_restore_manager_title">Restaurer le Gestionnaire Magisk</string>
     <string name="settings_restore_manager_summary">Restaurer le Gestionnaire Magisk avec le paquet originel</string>
-    <string name="language">Language</string>
+    <string name="language">Langage</string>
     <string name="system_default">(Système par Défaut)</string>
     <string name="settings_update">Mis à jour des réglages</string>
     <string name="settings_check_update_title">Vérification des mises à jours</string>
