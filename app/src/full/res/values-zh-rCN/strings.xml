@@ -70,13 +70,20 @@
     <string name="support_thread">支持主题</string>
     <string name="follow_twitter">关注我的 Twitter</string>
 
+    <!-- System Components, Notifications -->
+    <string name="update_channel">更新提示</string>
+    <string name="progress_channel">下载进度</string>
+    <string name="download_complete">下载完成</string>
+    <string name="download_file_error">下载文件时出错</string>
+    <string name="magisk_update_title">Magisk 可更新！</string>
+    <string name="manager_update_title">Magisk Manager 可更新！</string>
+
     <!--Toasts, Dialogs-->
     <string name="close">关闭</string>
     <string name="repo_install_title">安装 %1$s</string>
     <string name="repo_install_msg">是否立即安装 %1$s ？</string>
     <string name="download">下载</string>
     <string name="reboot">重启</string>
-    <string name="magisk_update_title">Magisk 可更新！</string>
     <string name="settings_reboot_toast">重启以应用设置</string>
     <string name="release_notes">发布说明</string>
     <string name="repo_cache_cleared">仓库缓存已清除</string>
@@ -86,11 +93,9 @@
     <string name="zip_download_msg">正在下载 Zip 文件（%1$d%%）…</string>
     <string name="zip_process_title">正在处理</string>
     <string name="zip_process_msg">正在处理 zip 文件…</string>
-    <string name="manager_update_title">Magisk Manager 可更新！</string>
     <string name="manager_download_install">下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
-    <string name="update_channel">Magisk 更新</string>
     <string name="flashing">正在刷入</string>
     <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
     <string name="hide_manager_msg">这可能需要一点时间…</string>
@@ -119,7 +124,6 @@
     <string name="env_fix_msg">需要额外的安装才能使 Magisk 正常工作。 将下载 Magisk 安装包，是否继续？</string>
     <string name="setup_title">额外安装</string>
     <string name="setup_msg">运行环境安装中…</string>
-    <string name="download_file_error">下载文件时出错</string>
     <string name="downloading_toast">正在下载 %1$s</string>
     <string name="no_rw_storage">未授予写入内置存储权限，此功能无法正常工作。</string>
 
