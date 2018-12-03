@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.receivers.ManagerUpdate;
+import com.topjohnwu.magisk.services.OnBootService;
 
-public class j extends ManagerUpdate {
+public class j extends OnBootService {
     /* stub */
 }

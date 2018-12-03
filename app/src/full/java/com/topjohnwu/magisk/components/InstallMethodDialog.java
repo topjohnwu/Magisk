@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.FlashActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 
 import java.util.List;
@@ -70,7 +69,7 @@ class InstallMethodDialog extends AlertDialog.Builder {
                     Data.remoteMagiskVersionString, Data.remoteMagiskVersionCode);
             NotificationProgress progress = new NotificationProgress(filename);
             AndroidNetworking
-                    .download(Data.magiskLink, Download.EXTERNAL_PATH.getPath(), filename)
+                    .download(Data.magiskLink, Const.EXTERNAL_PATH.getPath(), filename)
                     .build()
                     .setDownloadProgressListener(progress)
                     .startDownload(new DownloadListener() {

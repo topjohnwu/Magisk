@@ -40,14 +40,14 @@
                         android:text="@string/donation"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/paypal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:icon="@drawable/ic_paypal"
                         app:text="PayPal"/>
 
-                    <a.o
+                    <a.l
                         android:id="@+id/patreon"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

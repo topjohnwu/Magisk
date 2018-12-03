@@ -90,10 +90,10 @@
     <string name="manager_download_install">İndirmek ve yüklemek için dokunun</string>
     <string name="dtbo_patched_title">DTBO yamalandı!</string>
     <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
-    <string name="magisk_updates">Magisk Güncellemeleri</string>
+    <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="flashing">Yükleniyor</string>
-    <string name="hide_manager_toast">Magisk Manager Gizleniyor…</string>
-    <string name="hide_manager_toast2">Bu biraz zaman alabilir…</string>
+    <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
+    <string name="hide_manager_msg">Bu biraz zaman alabilir…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'ı Gizleme başarısız oldu…</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek uygulama bulunamadı…</string>
     <string name="download_zip_only">Yalnızca Zip Dosyasını İndir</string>

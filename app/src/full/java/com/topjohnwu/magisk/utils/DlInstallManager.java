@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.DownloadListener;
-import com.topjohnwu.magisk.Const;
+import com.topjohnwu.magisk.BuildConfig;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.R;
@@ -70,16 +70,16 @@ public class DlInstallManager {
         public void onDownloadComplete(File apk, NotificationProgress progress) {
             File patched = apk;
             MagiskManager mm = Data.MM();
-            if (!mm.getPackageName().equals(Const.ORIG_PKG_NAME)) {
-                progress.getBuilder()
+            if (!mm.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+                progress.getNotification()
                         .setProgress(0, 0, true)
-                        .setContentTitle(mm.getString(R.string.hide_manager_toast))
+                        .setContentTitle(mm.getString(R.string.hide_manager_title))
                         .setContentText("");
                 progress.update();
                 patched = new File(apk.getParent(), "patched.apk");
                 try {
                     JarMap jarMap = new JarMap(apk);
-                    PatchAPK.patchPackageID(jarMap, Const.ORIG_PKG_NAME, mm.getPackageName());
+                    PatchAPK.patchPackageID(jarMap, BuildConfig.APPLICATION_ID, mm.getPackageName());
                     SignAPK.sign(jarMap, new BufferedOutputStream(new FileOutputStream(patched)));
                 } catch (Exception e) {
                     return;
@@ -97,7 +97,7 @@ public class DlInstallManager {
             progress.dismiss();
             Data.exportPrefs();
             if (ShellUtils.fastCmdResult("pm install " + apk))
-                RootUtils.rmAndLaunch(Data.MM().getPackageName(), Const.ORIG_PKG_NAME);
+                RootUtils.rmAndLaunch(Data.MM().getPackageName(), BuildConfig.APPLICATION_ID);
         }
     }
 }

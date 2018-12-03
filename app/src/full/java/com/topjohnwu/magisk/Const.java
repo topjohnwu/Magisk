@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk;
 
+import android.os.Environment;
 import android.os.Process;
 
 import java.io.File;
@@ -9,7 +10,6 @@ import java.util.List;
 public class Const {
 
     public static final String DEBUG_TAG = "MagiskManager";
-    public static final String ORIG_PKG_NAME = BuildConfig.APPLICATION_ID;
     public static final String MAGISKHIDE_PROP = "persist.magisk.hide";
 
     // APK content
@@ -19,11 +19,13 @@ public class Const {
 
     // Paths
     public static final String MAGISK_PATH = "/sbin/.magisk/img";
+    public static final File EXTERNAL_PATH;
     public static File MAGISK_DISABLE_FILE;
 
     static {
-        /* Prevent crashing on unrooted devices */
         MAGISK_DISABLE_FILE = new File("xxx");
+        EXTERNAL_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        EXTERNAL_PATH.mkdirs();
     }
 
     public static final String BUSYBOX_PATH = "/sbin/.magisk/busybox";
@@ -62,7 +64,8 @@ public class Const {
         public static final int APK_UPDATE_NOTIFICATION_ID = 5;
         public static final int DTBO_NOTIFICATION_ID = 7;
         public static final int DOWNLOAD_PROGRESS_ID = 8;
-        public static final String NOTIFICATION_CHANNEL = "magisk_notification";
+        public static final String UPDATE_NOTIFICATION_CHANNEL = "update";
+        public static final String PROGRESS_NOTIFICATION_CHANNEL = "progress";
     }
 
     public static class Url {
@@ -97,6 +100,8 @@ public class Const {
         public static final String INTENT_SET_LINK = "link";
         public static final String FLASH_ACTION = "action";
         public static final String FLASH_SET_BOOT = "boot";
+        public static final String BROADCAST_MANAGER_UPDATE = "manager_update";
+        public static final String BROADCAST_REBOOT = "reboot";
 
         // others
         public static final String CHECK_UPDATES = "check_update";

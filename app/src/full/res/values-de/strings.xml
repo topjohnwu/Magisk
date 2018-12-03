@@ -90,10 +90,10 @@
     <string name="manager_download_install">Herunterladen und installieren</string>
     <string name="dtbo_patched_title">DTBO wurde gepatched!</string>
     <string name="dtbo_patched_reboot">Magisk Manager hat dtbo.img gepatched, bitte neustarten</string>
-    <string name="magisk_updates">Magisk Update</string>
+    <string name="update_channel">Magisk Update</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_toast">Verberge Magisk Manager…</string>
-    <string name="hide_manager_toast2">Das könnte einige Zeit dauern...</string>
+    <string name="hide_manager_title">Verberge Magisk Manager…</string>
+    <string name="hide_manager_msg">Das könnte einige Zeit dauern...</string>
     <string name="hide_manager_fail_toast">Verbergen von Magisk Manager fehlgeschlagen…</string>
     <string name="open_link_failed_toast">Es wurde keine Anwendung gefunden, um diesen Link zu öffnen...</string>
     <string name="download_zip_only">Nur Zip-Datei herunterladen</string>

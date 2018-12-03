@@ -89,10 +89,10 @@
     <string name="manager_download_install">Naciśnij aby pobrać i zainstalować</string>
     <string name="dtbo_patched_title">DTBO został wgrany!</string>
     <string name="dtbo_patched_reboot">Magisk Manager wgrał dtbo.img, uruchom ponownie</string>
-    <string name="magisk_updates">Aktualizacja Magisk</string>
+    <string name="update_channel">Aktualizacja Magisk</string>
     <string name="flashing">Flashowanie</string>
-    <string name="hide_manager_toast">Ukryj Magisk Manager…</string>
-    <string name="hide_manager_toast2">To może chwilę potrwać…</string>
+    <string name="hide_manager_title">Ukryj Magisk Manager…</string>
+    <string name="hide_manager_msg">To może chwilę potrwać…</string>
 	<string name="hide_manager_fail_toast">Błąd Ukrycia Magisk Managera</string>
     <string name="download_zip_only">Pobierz Tylko Zip</string>
     <string name="patch_boot_file">Patchowanie Pliku Boot Image</string>

@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.R;
 import com.topjohnwu.magisk.components.BaseFragment;
 import com.topjohnwu.magisk.components.SnackbarMaker;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.Utils;
 import com.topjohnwu.superuser.Shell;
 
@@ -100,7 +99,7 @@ public class MagiskLogFragment extends BaseFragment {
                 now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
 
-        File logFile = new File(Download.EXTERNAL_PATH, filename);
+        File logFile = new File(Const.EXTERNAL_PATH, filename);
         try {
             logFile.createNewFile();
         } catch (IOException e) {

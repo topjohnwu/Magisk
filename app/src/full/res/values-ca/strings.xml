@@ -90,10 +90,10 @@
     <string name="manager_download_install">Premi per a descarregar i instal·lar</string>
     <string name="dtbo_patched_title">DTBO ha estat arranjat</string>
     <string name="dtbo_patched_reboot">Magisk Manager ha arranjat dtbo.img, per favor reinicia el dispositiu</string>
-    <string name="magisk_updates">Actualització de Magisk</string>
+    <string name="update_channel">Actualització de Magisk</string>
     <string name="flashing">Flashejat</string>
-    <string name="hide_manager_toast">Amagant Magisk Manager…</string>
-    <string name="hide_manager_toast2">Això pot tardar un temps…</string>
+    <string name="hide_manager_title">Amagant Magisk Manager…</string>
+    <string name="hide_manager_msg">Això pot tardar un temps…</string>
     <string name="hide_manager_fail_toast">L’amagament de Magisk Manager ha fallat…</string>
     <string name="open_link_failed_toast">No s’ha trobat cap aplicació per obrir l’enllaç…</string>
     <string name="download_zip_only">Descarregar només l’arxiu ZIP</string>

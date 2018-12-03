@@ -8,11 +8,11 @@ import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.topjohnwu.magisk.Const;
 import com.topjohnwu.magisk.Data;
 import com.topjohnwu.magisk.MagiskManager;
 import com.topjohnwu.magisk.NoUIActivity;
 import com.topjohnwu.magisk.R;
-import com.topjohnwu.magisk.utils.Download;
 import com.topjohnwu.magisk.utils.LocaleManager;
 import com.topjohnwu.magisk.utils.Topic;
 
@@ -91,7 +91,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Topic.Au
                 granted = false;
         }
         if (granted) {
-            Download.EXTERNAL_PATH.mkdirs();
+            Const.EXTERNAL_PATH.mkdirs();
             callback.run();
         } else {
             // Passed in context should be an activity if not granted, need to show dialog!

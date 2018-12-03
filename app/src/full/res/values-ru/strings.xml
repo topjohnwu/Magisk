@@ -90,10 +90,10 @@
     <string name="manager_download_install">Нажмите для установки</string>
     <string name="dtbo_patched_title">DTBO пропатчен!</string>
     <string name="dtbo_patched_reboot">Magisk Manager пропатчил dtbo.img. Перезагрузите устройство.</string>
-    <string name="magisk_updates">Обновления Magisk</string>
+    <string name="update_channel">Обновления Magisk</string>
     <string name="flashing">Прошивка…</string>
-    <string name="hide_manager_toast">Скрытие Magisk Manager…</string>
-    <string name="hide_manager_toast2">Может занять некоторое время…</string>
+    <string name="hide_manager_title">Скрытие Magisk Manager…</string>
+    <string name="hide_manager_msg">Может занять некоторое время…</string>
     <string name="hide_manager_fail_toast">Скрытие Magisk Manager неудачно!</string>
     <string name="open_link_failed_toast">Не найдено приложений для открытия ссылки…</string>
     <string name="download_zip_only">Загрузка установочного ZIP</string>

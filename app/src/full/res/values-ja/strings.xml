@@ -90,10 +90,10 @@
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="dtbo_patched_title">DTBOをパッチしました！</string>
     <string name="dtbo_patched_reboot">Magisk Managerはdtbo.imgをパッチしました。再起動してください</string>
-    <string name="magisk_updates">Magiskの更新</string>
+    <string name="update_channel">Magiskの更新</string>
     <string name="flashing">書き込み中</string>
-    <string name="hide_manager_toast">Magisk Managerを隠しています…</string>
-    <string name="hide_manager_toast2">しばらくお待ちください…</string>
+    <string name="hide_manager_title">Magisk Managerを隠しています…</string>
+    <string name="hide_manager_msg">しばらくお待ちください…</string>
     <string name="hide_manager_fail_toast">Magisk Managerを隠せませんでした…</string>
     <string name="download_zip_only">ZIPのみダウンロード</string>
     <string name="patch_boot_file">Bootイメージのパッチ</string>

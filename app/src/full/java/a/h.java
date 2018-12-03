@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.receivers.BootReceiver;
+import com.topjohnwu.magisk.receivers.GeneralReceiver;
 
-public class h extends BootReceiver {
+public class h extends GeneralReceiver {
     /* stub */
 }

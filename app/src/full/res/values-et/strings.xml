@@ -89,10 +89,10 @@
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks</string>
     <string name="dtbo_patched_title">DTBO sai paigatud!</string>
     <string name="dtbo_patched_reboot">Magisk Manager on paiganud dtbo.img, palun taaskäivita</string>
-    <string name="magisk_updates">Magisk\'i uuendused</string>
+    <string name="update_channel">Magisk\'i uuendused</string>
     <string name="flashing">Välgutamine</string>
-    <string name="hide_manager_toast">Peidan Magisk Manager\'i…</string>
-    <string name="hide_manager_toast2">See võib aega võtta…</string>
+    <string name="hide_manager_title">Peidan Magisk Manager\'i…</string>
+    <string name="hide_manager_msg">See võib aega võtta…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i peitmine ebaõnnestus…</string>
     <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="patch_boot_file">Paika käivituspildi fail</string>

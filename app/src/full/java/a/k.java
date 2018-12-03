@@ -1,7 +1,7 @@
 package a;
 
-import com.topjohnwu.magisk.receivers.RebootReceiver;
+import com.topjohnwu.magisk.services.UpdateCheckService;
 
-public class k extends RebootReceiver {
+public class k extends UpdateCheckService {
     /* stub */
 }

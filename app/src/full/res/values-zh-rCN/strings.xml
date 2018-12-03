@@ -90,10 +90,10 @@
     <string name="manager_download_install">下载并安装</string>
     <string name="dtbo_patched_title">已修补 DTBO!</string>
     <string name="dtbo_patched_reboot">Magisk Manager 为 dtbo 分区进行了修补，请立即重新启动</string>
-    <string name="magisk_updates">Magisk 更新</string>
+    <string name="update_channel">Magisk 更新</string>
     <string name="flashing">正在刷入</string>
-    <string name="hide_manager_toast">正在隐藏 Magisk Manager…</string>
-    <string name="hide_manager_toast2">这可能需要一点时间…</string>
+    <string name="hide_manager_title">正在隐藏 Magisk Manager…</string>
+    <string name="hide_manager_msg">这可能需要一点时间…</string>
     <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能够打开此链接的应用</string>
     <string name="download_zip_only">仅下载 Zip</string>

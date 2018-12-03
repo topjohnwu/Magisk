@@ -33,13 +33,14 @@ public class NotificationProgress implements DownloadProgressListener {
         long cur = System.currentTimeMillis();
         if (cur - prevTime >= 1000) {
             prevTime = cur;
-            builder.setProgress((int) totalBytes, (int) bytesDownloaded, false);
-            builder.setContentText(bytesDownloaded * 100 / totalBytes + "%");
+            int progress = (int) (bytesDownloaded * 100 / totalBytes);
+            builder.setProgress(100, progress, false);
+            builder.setContentText(progress + "%");
             update();
         }
     }
 
-    public NotificationCompat.Builder getBuilder() {
+    public NotificationCompat.Builder getNotification() {
         return builder;
     }
 
@@ -48,8 +49,9 @@ public class NotificationProgress implements DownloadProgressListener {
     }
 
     public void dlDone() {
-        builder.setProgress(0, 0, false);
-        builder.setContentText(Data.MM().getString(R.string.download_complete));
+        builder.setProgress(0, 0, false)
+                .setContentText(Data.MM().getString(R.string.download_complete))
+                .setSmallIcon(R.drawable.ic_check_circle);
         update();
     }
 
