@@ -20,6 +20,7 @@ import com.topjohnwu.utils.SignAPK;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.security.SecureRandom;
 import java.util.jar.JarEntry;
 
@@ -80,6 +81,18 @@ public class PatchAPK {
         return true;
     }
 
+    private static boolean findAndPatch(byte xml[], int a, int b) {
+        IntBuffer buf = ByteBuffer.wrap(xml).order(ByteOrder.LITTLE_ENDIAN).asIntBuffer();
+        int len = xml.length / 4;
+        for (int i = 0; i < len; ++i) {
+            if (buf.get(i) == a) {
+                buf.put(i, b);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean patchAndHide() {
         MagiskManager mm = Data.MM();
 
@@ -115,7 +128,8 @@ public class PatchAPK {
             byte xml[] = apk.getRawData(je);
 
             if (!findAndPatch(xml, from, to) ||
-                    !findAndPatch(xml, from + ".provider", to + ".provider"))
+                    !findAndPatch(xml, from + ".provider", to + ".provider") ||
+                    !findAndPatch(xml, R.string.app_name, R.string.re_app_name))
                 return false;
 
             // Write in changes

@@ -6,7 +6,6 @@
     <application
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:label="@string/app_name"
             android:name=".MainActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>

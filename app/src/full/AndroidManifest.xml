@@ -21,7 +21,6 @@
             android:exported="true" />
         <activity
             android:name="a.c"
-            android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/SplashTheme">
