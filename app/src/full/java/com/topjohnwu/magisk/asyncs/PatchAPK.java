@@ -133,9 +133,9 @@ public class PatchAPK {
             NotificationCompat.Builder progress =
                     Notifications.progress(mm.getString(R.string.hide_manager_title));
             NotificationManagerCompat mgr = NotificationManagerCompat.from(mm);
-            mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, progress.build());
+            mgr.notify(Const.ID.HIDE_MANAGER_NOTIFICATION_ID, progress.build());
             boolean b = patchAndHide();
-            mgr.cancel(Const.ID.DOWNLOAD_PROGRESS_ID);
+            mgr.cancel(Const.ID.HIDE_MANAGER_NOTIFICATION_ID);
             if (!b) Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG);
         });
     }

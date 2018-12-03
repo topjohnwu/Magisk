@@ -22,8 +22,8 @@ public class ProgressNotification implements DownloadProgressListener {
         MagiskManager mm = Data.MM();
         mgr = NotificationManagerCompat.from(mm);
         builder = Notifications.progress(title);
-        mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
         prevTime = System.currentTimeMillis();
+        update();
         Utils.toast(mm.getString(R.string.downloading_toast, title), Toast.LENGTH_SHORT);
     }
 
@@ -44,7 +44,7 @@ public class ProgressNotification implements DownloadProgressListener {
     }
 
     public void update() {
-        mgr.notify(Const.ID.DOWNLOAD_PROGRESS_ID, builder.build());
+        mgr.notify(hashCode(), builder.build());
     }
 
     public void dlDone() {
@@ -64,6 +64,6 @@ public class ProgressNotification implements DownloadProgressListener {
     }
 
     public void dismiss() {
-        mgr.cancel(Const.ID.DOWNLOAD_PROGRESS_ID);
+        mgr.cancel(hashCode());
     }
 }
